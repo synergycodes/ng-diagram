@@ -18,6 +18,12 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
+  packages/angular-event-handler: {}
+
+  packages/angular-renderer: {}
+
+  packages/angular-signals-model: {}
+
   packages/command-handler:
     devDependencies:
       typescript:
