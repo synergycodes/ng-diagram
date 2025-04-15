@@ -1,0 +1,72 @@
+name: PR Check
+
+on:
+ pull_request:
+  branches:
+   - main
+
+jobs:
+ check-code:
+  runs-on: ubuntu-latest
+  steps:
+   - uses: actions/checkout@v3
+
+   - name: Setup Node.js and pnpm
+     uses: actions/setup-node@v3
+     with:
+      node-version: "20"
+      cache: "pnpm"
+
+   - name: Install pnpm
+     run: npm install -g pnpm
+
+   - name: Install dependencies
+     run: pnpm install
+
+   - name: Check for lockfile changes
+     run: git diff --exit-code pnpm-lock.yaml
+
+   - name: Check code with Biome
+     run: npx biome check .
+
+ run-tests:
+  runs-on: ubuntu-latest
+  needs: check-code
+  steps:
+   - uses: actions/checkout@v3
+
+   - name: Setup Node.js and pnpm
+     uses: actions/setup-node@v3
+     with:
+      node-version: "20"
+      cache: "pnpm"
+
+   - name: Install pnpm
+     run: npm install -g pnpm
+
+   - name: Install dependencies
+     run: pnpm install
+
+   - name: Run unit tests
+     run: pnpm test
+
+ build:
+  runs-on: ubuntu-latest
+  needs: run-tests
+  steps:
+   - uses: actions/checkout@v3
+
+   - name: Setup Node.js and pnpm
+     uses: actions/setup-node@v3
+     with:
+      node-version: "20"
+      cache: "pnpm"
+
+   - name: Install pnpm
+     run: npm install -g pnpm
+
+   - name: Install dependencies
+     run: pnpm install
+
+   - name: Run build
+     run: pnpm run build
