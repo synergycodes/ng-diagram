@@ -1,0 +1,21 @@
+{
+  "name": "@angularflow/command-handler",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.18",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^1.6.1"
+  }
+}
