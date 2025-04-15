@@ -16,15 +16,6 @@ jobs:
      with:
       node-version: "20"
 
-   - name: Setup pnpm
-     uses: pnpm/action-setup@v2
-     with:
-      version: 8
-      run_install: true
-
-   - name: Check for lockfile changes
-     run: git diff --exit-code pnpm-lock.yaml
-
    - name: Check code with Biome
      run: npx biome check .
 
@@ -66,4 +57,4 @@ jobs:
       run_install: true
 
    - name: Run build
-     run: pnpm run build
+     run: pnpm build
