@@ -1,12 +1,13 @@
 {
-  "name": "angularflow/angular-demo",
+  "name": "@angularflow/angular-demo",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "dev": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint:check": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -28,8 +29,11 @@
     "@angular-devkit/build-angular": "^19.2.7",
     "@angular/cli": "^19.2.7",
     "@angular/compiler-cli": "^19.2.6",
+    "angular-eslint": "19.3.0",
+    "eslint": "^9.23.0",
     "jsdom": "^26.1.0",
     "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1",
     "vite": "^6.3.0",
     "vitest": "^3.1.1"
   }
