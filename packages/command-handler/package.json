@@ -10,7 +10,9 @@
     "build": "vite build",
     "test": "vitest",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "lint:check": "biome check .",
+    "lint:fix": "biome format --write ."
   },
   "devDependencies": {
     "typescript": "^5.8.3",

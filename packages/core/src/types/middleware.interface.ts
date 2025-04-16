@@ -1,30 +1,27 @@
-import { Node } from './node.interface';
-import { Edge } from './edge.interface';
+import type { Edge } from './edge.interface';
+import type { Node } from './node.interface';
 
 /**
  * Type for model-specific actions in the flow diagram
  */
-export type ModelAction = 
-    | 'setNodes'
-    | 'setEdges'
-    | 'setMetadata';
+export type ModelAction = 'setNodes' | 'setEdges' | 'setMetadata';
 
 /**
  * Type for the state of the flow diagram
  */
 export interface FlowState {
-    nodes: Node[];
-    edges: Edge[];
-    metadata: Record<string, unknown>;
+  nodes: Node[];
+  edges: Edge[];
+  metadata: Record<string, unknown>;
 }
 
 /**
  * Type for the context of a middleware operation
  */
 export interface MiddlewareContext {
-    action: string;
-    modelAction: ModelAction;
-    previousState: FlowState;
+  action: string;
+  modelAction: ModelAction;
+  previousState: FlowState;
 }
 
 /**
@@ -32,18 +29,18 @@ export interface MiddlewareContext {
  * @template TState - Type of the state being modified
  */
 export type Middleware<TState = FlowState> = (
-    /**
-     * Current state to be transformed
-     */
-    state: TState,
-    /**
-     * Context of the operation
-     */
-    context: MiddlewareContext
+  /**
+   * Current state to be transformed
+   */
+  state: TState,
+  /**
+   * Context of the operation
+   */
+  context: MiddlewareContext
 ) => TState;
 
 /**
  * Type for middleware chain
  * @template TState - Type of the state being modified
  */
-export type MiddlewareChain<TState = FlowState> = Middleware<TState>[]; 
+export type MiddlewareChain<TState = FlowState> = Middleware<TState>[];

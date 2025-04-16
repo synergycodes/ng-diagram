@@ -5,5 +5,5 @@
  * @returns The difference of a and b
  */
 export function subtract(a: number, b: number): number {
-	return a - b;
+  return a - b;
 }
