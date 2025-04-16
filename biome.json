@@ -10,8 +10,8 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab",
-		"indentWidth": 1,
+		"indentStyle": "space",
+		"indentWidth": 2,
 		"lineWidth": 120
 	},
 	"organizeImports": {

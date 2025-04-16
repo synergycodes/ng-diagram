@@ -5,6 +5,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "exit 0"
+    "test": "exit 0",
+    "lint:check": "biome check .",
+    "lint:fix": "biome format --write ."
   }
 }

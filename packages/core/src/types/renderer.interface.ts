@@ -1,5 +1,5 @@
-import { Node } from './node.interface';
-import { Edge } from './edge.interface';
+import type { Edge } from './edge.interface';
+import type { Node } from './node.interface';
 
 /**
  * Interface for viewport data needed for rendering
@@ -23,4 +23,4 @@ export interface Renderer {
    * @param viewportData Additional data needed for rendering
    */
   draw(nodes: Node[], edges: Edge[], viewportData: ViewportData): void;
-} 
+}

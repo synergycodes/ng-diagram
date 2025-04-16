@@ -9,4 +9,4 @@ export interface Node {
     y: number;
   };
   data?: Record<string, unknown>;
-} 
+}

@@ -7,4 +7,4 @@ export interface Edge {
   target: string; // target node id
   type?: string;
   data?: Record<string, unknown>;
-} 
+}
