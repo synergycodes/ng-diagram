@@ -1,4 +1,4 @@
-import { Injectable, effect, signal } from '@angular/core';
+import { Injectable, type Injector, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import type { Edge, ModelAdapter, Node } from '@angularflow/core';
 
 @Injectable()
@@ -7,6 +7,8 @@ export class SignalModelAdapter implements ModelAdapter {
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
   private metadata = signal<Record<string, unknown>>({});
+
+  constructor(private readonly injector: Injector) {}
 
   // Public API methods implementing ModelAdapter interface
   getNodes(): Node[] {
@@ -38,12 +40,14 @@ export class SignalModelAdapter implements ModelAdapter {
   }
 
   onChange(callback: () => void): void {
-    effect(() => {
-      this.nodes();
-      this.edges();
-      this.metadata();
+    runInInjectionContext(this.injector, () => {
+      effect(() => {
+        this.nodes();
+        this.edges();
+        this.metadata();
 
-      callback();
+        callback();
+      });
     });
   }
 

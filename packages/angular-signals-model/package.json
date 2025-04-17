@@ -15,9 +15,11 @@
     "lint:fix": "biome format --write ."
   },
   "dependencies": {
-    "@angular/core": "^19.2.6"
+    "@angular/core": "^19.2.6",
+    "@angular/platform-browser-dynamic": "^19.2.6"
   },
   "devDependencies": {
+    "@analogjs/vitest-angular": "^1.15.1",
     "@angularflow/core": "workspace:*",
     "typescript": "^5.8.3",
     "vite": "^6.3.0",
