@@ -18,9 +18,11 @@
     "@angular/core": "^19.2.6",
     "@angular/platform-browser-dynamic": "^19.2.6"
   },
+  "peerDependencies": {
+    "@angularflow/core": "workspace:*"
+  },
   "devDependencies": {
     "@analogjs/vitest-angular": "^1.15.1",
-    "@angularflow/core": "workspace:*",
     "typescript": "^5.8.3",
     "vite": "^6.3.0",
     "vite-plugin-dts": "^4.5.3",

@@ -1,4 +1,4 @@
-import { Injectable, type Injector, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { Injectable, effect, signal } from '@angular/core';
 import type { Edge, ModelAdapter, Node } from '@angularflow/core';
 
 @Injectable()
@@ -7,8 +7,19 @@ export class SignalModelAdapter implements ModelAdapter {
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
   private metadata = signal<Record<string, unknown>>({});
+  private callbacks: (() => void)[] = [];
 
-  constructor(private readonly injector: Injector) {}
+  constructor() {
+    effect(() => {
+      this.nodes();
+      this.edges();
+      this.metadata();
+
+      for (const callback of this.callbacks) {
+        callback();
+      }
+    });
+  }
 
   // Public API methods implementing ModelAdapter interface
   getNodes(): Node[] {
@@ -31,24 +42,12 @@ export class SignalModelAdapter implements ModelAdapter {
     return this.metadata();
   }
 
-  setMetadata(next: Record<string, unknown>): void {
-    this.metadata.set(next);
-  }
-
-  updateMetadata(next: Partial<Record<string, unknown>>): void {
-    this.metadata.update((prev) => ({ ...prev, ...next }));
+  setMetadata(next: Record<string, unknown> | ((prev: Record<string, unknown>) => Record<string, unknown>)): void {
+    this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : { ...prev, ...next }));
   }
 
   onChange(callback: () => void): void {
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        this.nodes();
-        this.edges();
-        this.metadata();
-
-        callback();
-      });
-    });
+    this.callbacks.push(callback);
   }
 
   undo(): void {}

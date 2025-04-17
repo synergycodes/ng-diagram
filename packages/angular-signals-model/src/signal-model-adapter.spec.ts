@@ -15,8 +15,7 @@ describe('SignalModelAdapter', () => {
   const mockEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2', type: 'default' }];
 
   beforeEach(() => {
-    const injector = TestBed.inject(Injector);
-    service = new SignalModelAdapter(injector);
+    service = new SignalModelAdapter();
   });
 
   it('should initialize with empty state', () => {
