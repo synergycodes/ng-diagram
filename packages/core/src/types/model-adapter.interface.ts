@@ -43,6 +43,12 @@ export interface ModelAdapter {
   setMetadata(metadata: Record<string, unknown>): void;
 
   /**
+   * Update part of the metadata for the model
+   * @param metadata Metadata to update
+   */
+  updateMetadata(metadata: Partial<Record<string, unknown>>): void;
+
+  /**
    * Register a callback to be called when the model changes
    * @param callback Function to be called on changes
    */

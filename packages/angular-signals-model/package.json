@@ -1,5 +1,5 @@
 {
-  "name": "@angularflow/core",
+  "name": "@angularflow/angular-signals-model",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -14,7 +14,11 @@
     "lint:check": "biome check .",
     "lint:fix": "biome format --write ."
   },
+  "dependencies": {
+    "@angular/core": "^19.2.6"
+  },
   "devDependencies": {
+    "@angularflow/core": "workspace:*",
     "typescript": "^5.8.3",
     "vite": "^6.3.0",
     "vite-plugin-dts": "^4.5.3",
