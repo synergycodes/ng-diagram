@@ -18,14 +18,18 @@ export interface ModelAdapter {
   /**
    * Set nodes in the model
    * @param nodes Array of nodes to set
+   * @param nodesFn Function that takes current nodes and returns new nodes
    */
   setNodes(nodes: Node[]): void;
+  setNodes(nodesFn: (nodes: Node[]) => Node[]): void;
 
   /**
    * Set edges in the model
    * @param edges Array of edges to set
+   * @param edgesFn Function that takes current edges and returns new edges
    */
   setEdges(edges: Edge[]): void;
+  setEdges(edgesFn: (edges: Edge[]) => Edge[]): void;
 
   /**
    * Get metadata associated with the model
