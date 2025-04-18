@@ -43,7 +43,7 @@ export class SignalModelAdapter implements ModelAdapter {
   }
 
   setMetadata(next: Record<string, unknown> | ((prev: Record<string, unknown>) => Record<string, unknown>)): void {
-    this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : { ...prev, ...next }));
+    this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
   onChange(callback: () => void): void {
