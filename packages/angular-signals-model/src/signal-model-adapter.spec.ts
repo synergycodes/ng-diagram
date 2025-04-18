@@ -1,0 +1,110 @@
+import { TestBed } from '@angular/core/testing';
+import type { Edge, Node } from '@angularflow/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { SignalModelAdapter } from './signal-model-adapter';
+
+describe('SignalModelAdapter', () => {
+  let service: SignalModelAdapter;
+
+  const mockNodes: Node[] = [
+    { id: '1', type: 'default', data: {}, position: { x: 0, y: 0 } },
+    { id: '2', type: 'default', data: {}, position: { x: 0, y: 0 } },
+  ];
+
+  const mockEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2', type: 'default' }];
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [SignalModelAdapter],
+    });
+    service = TestBed.inject(SignalModelAdapter);
+  });
+
+  it('should initialize with empty state', () => {
+    expect(service.getNodes()).toEqual([]);
+    expect(service.getEdges()).toEqual([]);
+    expect(service.getMetadata()).toEqual({});
+  });
+
+  it('should set and get nodes', () => {
+    service.setNodes(mockNodes);
+    expect(service.getNodes()).toEqual(mockNodes);
+  });
+
+  it('should set and get edges', () => {
+    service.setEdges(mockEdges);
+    expect(service.getEdges()).toEqual(mockEdges);
+  });
+
+  it('should set or update metadata', () => {
+    service.setMetadata({ theme: 'dark' });
+    expect(service.getMetadata()).toEqual({ theme: 'dark' });
+
+    service.setMetadata((prev) => ({ ...prev, mode: 'edit' }));
+    expect(service.getMetadata()).toEqual({ theme: 'dark', mode: 'edit' });
+  });
+
+  it('should call onChange callback when state changes', async () => {
+    const callback = vi.fn();
+    service.onChange(callback);
+
+    // Triggers reactivity
+    service.setNodes(mockNodes);
+
+    await new Promise((resolve) => setTimeout(resolve));
+
+    // Should have triggered the callback at least once
+    expect(callback).toHaveBeenCalled();
+  });
+
+  it('should support functional updates to nodes', () => {
+    service.setNodes(mockNodes);
+    service.setNodes((prev) => [...prev, { id: '3', type: 'default', data: {}, position: { x: 0, y: 0 } }]);
+
+    const updatedNodes = service.getNodes();
+    expect(updatedNodes.length).toBe(3);
+    expect(updatedNodes[2].id).toBe('3');
+  });
+
+  it('should support functional updates to edges', () => {
+    service.setEdges(mockEdges);
+    service.setEdges((prev) => [...prev, { id: 'e1-3', source: '1', target: '3', type: 'default' }]);
+
+    const updatedEdges = service.getEdges();
+    expect(updatedEdges.length).toBe(2);
+    expect(updatedEdges[1].id).toBe('e1-3');
+  });
+
+  it('should handle empty arrays when setting nodes and edges', () => {
+    service.setNodes(mockNodes);
+    service.setEdges(mockEdges);
+
+    service.setNodes([]);
+    service.setEdges([]);
+
+    expect(service.getNodes()).toEqual([]);
+    expect(service.getEdges()).toEqual([]);
+  });
+
+  it('should not affect other state when updating one state property', () => {
+    service.setNodes(mockNodes);
+    service.setEdges(mockEdges);
+    service.setMetadata({ theme: 'dark' });
+
+    // Update just nodes
+    const newNode = { id: '3', type: 'special', data: {}, position: { x: 10, y: 20 } };
+    service.setNodes([...mockNodes, newNode]);
+
+    // Other state should remain unchanged
+    expect(service.getEdges()).toEqual(mockEdges);
+    expect(service.getMetadata()).toEqual({ theme: 'dark' });
+  });
+
+  it('should overwrite metadata when using setMetadata', () => {
+    service.setMetadata({ theme: 'dark', mode: 'edit' });
+    service.setMetadata({ theme: 'light' });
+
+    // The entire object should be replaced
+    expect(service.getMetadata()).toEqual({ theme: 'light' });
+  });
+});
