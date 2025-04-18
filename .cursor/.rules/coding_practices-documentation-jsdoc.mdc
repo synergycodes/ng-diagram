@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## CODING_PRACTICES
+
+### Guidelines for DOCUMENTATION
+
+#### JSDOC
+
+- Document all functions, classes, and methods with consistent JSDoc comments
+- Use @param, @returns, and @throws tags to document function behavior comprehensively
+- Implement @example tags with realistic usage scenarios for {{complex_apis}}
+- Use @typedef for documenting complex object structures when not using TypeScript
+- Configure documentation generation as part of the build process to keep docs current
+- Implement custom templates to match {{project_style_guidelines}}
+

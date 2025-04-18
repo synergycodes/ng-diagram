@@ -1,0 +1,21 @@
+---
+description: Writing front-end components
+globs: 
+alwaysApply: false
+---
+## FRONTEND
+
+### Guidelines for ACCESSIBILITY
+
+#### WCAG_UNDERSTANDABLE
+
+- Specify the human language of the page and any language changes using lang attributes
+- Ensure components with the same functionality have consistent identification and behavior across {{application_sections}}
+- Provide clear labels, instructions, and error messages for user inputs and {{form_elements}}
+- Implement error prevention for submissions with legal or financial consequences (confirmation, review, undo)
+- Make navigation consistent across the site with predictable patterns for menus and interactive elements
+- Ensure that receiving focus or changing settings does not automatically trigger unexpected context changes
+- Design context-sensitive help for complex interactions including validated input formats
+- Use clear language and define unusual terms, abbreviations, and jargon for {{domain_specific_content}}
+- Provide visual and programmatic indication of current location within navigation systems
+

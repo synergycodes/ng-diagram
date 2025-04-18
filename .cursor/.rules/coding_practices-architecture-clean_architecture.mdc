@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## CODING_PRACTICES
+
+### Guidelines for ARCHITECTURE
+
+#### CLEAN_ARCHITECTURE
+
+- Strictly separate code into layers: entities, use cases, interfaces, and frameworks
+- Ensure dependencies point inward, with inner layers having no knowledge of outer layers
+- Implement domain entities that encapsulate {{business_rules}} without framework dependencies
+- Use interfaces (ports) and implementations (adapters) to isolate external dependencies
+- Create use cases that orchestrate entity interactions for specific business operations
+- Implement mappers to transform data between layers to maintain separation of concerns
+
