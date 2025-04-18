@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandInterpreter } from './command-interpreter';
+import { CoreCommandHandler } from './command-handler';
 import { FlowCore } from './flow-core';
 import { MiddlewareManager } from './middleware-manager';
-import type { CommandHandler } from './types/command-handler.abstract';
+import type { EventHandler } from './types/event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
@@ -21,8 +21,8 @@ describe('FlowCore', () => {
   let flowCore: FlowCore;
   let mockModelAdapter: ModelAdapter;
   let mockRenderer: Renderer;
-  let mockCommandHandler: CommandHandler;
-  let createCommandHandler: (interpreter: CoreCommandInterpreter) => CommandHandler;
+  let mockEventHandler: EventHandler;
+  let createEventHandler: (interpreter: CoreCommandHandler) => EventHandler;
 
   beforeEach(() => {
     // Create mock implementations
@@ -42,48 +42,48 @@ describe('FlowCore', () => {
       draw: vi.fn(),
     };
 
-    mockCommandHandler = {
+    mockEventHandler = {
       unregisterDefault: vi.fn(),
       register: vi.fn(),
       unregister: vi.fn(),
       invoke: vi.fn(),
-    } as unknown as CommandHandler;
+    } as unknown as EventHandler;
 
-    createCommandHandler = vi.fn().mockReturnValue(mockCommandHandler);
+    createEventHandler = vi.fn().mockReturnValue(mockEventHandler);
 
     // Reset all mocks
     vi.clearAllMocks();
 
     // Create FlowCore instance
-    flowCore = new FlowCore(mockModelAdapter, mockRenderer, createCommandHandler);
+    flowCore = new FlowCore(mockModelAdapter, mockRenderer, createEventHandler);
   });
 
   describe('constructor', () => {
-    it('should create a new CommandInterpreter instance', () => {
+    it('should create a new CommandHandler instance', () => {
       expect(flowCore).toBeDefined();
-      expect(createCommandHandler).toHaveBeenCalledWith(expect.any(CoreCommandInterpreter));
+      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler));
     });
 
     it('should initialize with provided dependencies', () => {
-      expect(createCommandHandler).toHaveBeenCalled();
+      expect(createEventHandler).toHaveBeenCalled();
       expect(vi.mocked(MiddlewareManager)).toHaveBeenCalled();
     });
   });
 
-  describe('setCommandHandler', () => {
-    it('should replace the current CommandHandler with a new one', () => {
-      const newCommandHandler = {
+  describe('setEventHandler', () => {
+    it('should replace the current EventHandler with a new one', () => {
+      const newEventHandler = {
         unregisterDefault: vi.fn(),
         register: vi.fn(),
         unregister: vi.fn(),
         invoke: vi.fn(),
-      } as unknown as CommandHandler;
+      } as unknown as EventHandler;
 
-      const newCreateCommandHandler = vi.fn().mockReturnValue(newCommandHandler);
+      const newCreateEventHandler = vi.fn().mockReturnValue(newEventHandler);
 
-      flowCore.setCommandHandler(newCreateCommandHandler);
+      flowCore.setEventHandler(newCreateEventHandler);
 
-      expect(newCreateCommandHandler).toHaveBeenCalledWith(expect.any(CoreCommandInterpreter));
+      expect(newCreateEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler));
     });
   });
 

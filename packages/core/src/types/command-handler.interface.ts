@@ -1,5 +1,5 @@
 /**
- * Type for system events that can be emitted by CommandHandler or Model
+ * Type for system events that can be emitted by EventHandler or Model
  */
 export type SystemEvent =
   | { type: 'command'; name: string; data?: unknown }
@@ -12,9 +12,9 @@ export type SystemEventCallback = (event: SystemEvent) => void;
 
 /**
  * Interface for interpreting and routing system events
- * This is a core component that handles events from CommandHandler and Model
+ * This is a core component that handles events from EventHandler and Model
  */
-export interface CommandInterpreter {
+export interface CommandHandler {
   /**
    * Emit a system event
    * @param event Event to emit

@@ -1,10 +1,10 @@
-import type { CommandInterpreter, SystemEvent, SystemEventCallback } from './types/command-interpreter.interface';
+import type { CommandHandler, SystemEvent, SystemEventCallback } from './types/command-handler.interface';
 
 /**
- * Core implementation of CommandInterpreter interface
+ * Core implementation of CommandHandler interface
  * Handles event emission and registration of callbacks for system events
  */
-export class CoreCommandInterpreter implements CommandInterpreter {
+export class CoreCommandHandler implements CommandHandler {
   private callbacks: Map<SystemEvent['type'], SystemEventCallback[]> = new Map();
 
   /**

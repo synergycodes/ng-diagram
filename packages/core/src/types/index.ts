@@ -1,14 +1,14 @@
 // Event types
 export * from './event.interface';
-export * from './event-handler.interface';
+export * from './event-mapper.interface';
 
 // Flow diagram types
 export * from './edge.interface';
 export * from './node.interface';
 
 // Command and system types
-export * from './command-handler.abstract';
-export * from './command-interpreter.interface';
+export * from './event-handler.abstract';
+export * from './command-handler.interface';
 
 // Model and middleware types
 export * from './model-adapter.interface';
