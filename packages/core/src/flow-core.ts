@@ -1,14 +1,14 @@
-import { CoreCommandInterpreter } from './command-interpreter';
+import { CoreCommandHandler } from './command-handler';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventHandler } from './types/event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
-type EventHandlerFactory = (interpreter: CoreCommandInterpreter) => EventHandler;
+type EventHandlerFactory = (interpreter: CoreCommandHandler) => EventHandler;
 
 export class FlowCore {
-  private readonly interpreter: CoreCommandInterpreter;
+  private readonly interpreter: CoreCommandHandler;
   private _eventHandler: EventHandler;
   private readonly middlewareManager: MiddlewareManager;
 
@@ -17,7 +17,7 @@ export class FlowCore {
     private readonly renderer: Renderer,
     createEventHandler: EventHandlerFactory
   ) {
-    this.interpreter = new CoreCommandInterpreter();
+    this.interpreter = new CoreCommandHandler();
     this._eventHandler = createEventHandler(this.interpreter);
     this.middlewareManager = new MiddlewareManager();
   }

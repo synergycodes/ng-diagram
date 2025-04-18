@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandInterpreter } from './command-interpreter';
+import { CoreCommandHandler } from './command-handler';
 import { FlowCore } from './flow-core';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventHandler } from './types/event-handler.abstract';
@@ -22,7 +22,7 @@ describe('FlowCore', () => {
   let mockModelAdapter: ModelAdapter;
   let mockRenderer: Renderer;
   let mockEventHandler: EventHandler;
-  let createEventHandler: (interpreter: CoreCommandInterpreter) => EventHandler;
+  let createEventHandler: (interpreter: CoreCommandHandler) => EventHandler;
 
   beforeEach(() => {
     // Create mock implementations
@@ -59,9 +59,9 @@ describe('FlowCore', () => {
   });
 
   describe('constructor', () => {
-    it('should create a new CommandInterpreter instance', () => {
+    it('should create a new CommandHandler instance', () => {
       expect(flowCore).toBeDefined();
-      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandInterpreter));
+      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler));
     });
 
     it('should initialize with provided dependencies', () => {
@@ -83,7 +83,7 @@ describe('FlowCore', () => {
 
       flowCore.setEventHandler(newCreateEventHandler);
 
-      expect(newCreateEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandInterpreter));
+      expect(newCreateEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler));
     });
   });
 

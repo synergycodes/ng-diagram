@@ -1,4 +1,4 @@
-import type { CommandInterpreter } from './command-interpreter.interface';
+import type { CommandHandler } from './command-handler.interface';
 import type { Event } from './event.interface';
 
 /**
@@ -19,10 +19,10 @@ export type ActionOrName = Action | ((event: Event) => void);
 
 /**
  * Abstract class for handling commands and actions
- * Enforces CommandInterpreter dependency through constructor
+ * Enforces CommandHandler dependency through constructor
  */
 export abstract class EventHandler {
-  protected constructor(protected readonly interpreter: CommandInterpreter) {}
+  protected constructor(protected readonly interpreter: CommandHandler) {}
 
   /**
    * Unregister a default action handler

@@ -8,7 +8,7 @@ export * from './node.interface';
 
 // Command and system types
 export * from './event-handler.abstract';
-export * from './command-interpreter.interface';
+export * from './command-handler.interface';
 
 // Model and middleware types
 export * from './model-adapter.interface';

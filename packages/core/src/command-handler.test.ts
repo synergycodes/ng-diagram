@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandInterpreter } from './command-interpreter';
-import type { SystemEvent } from './types/command-interpreter.interface';
+import { CoreCommandHandler } from './command-handler';
+import type { SystemEvent } from './types/command-handler.interface';
 
-describe('CoreCommandInterpreter', () => {
-  let interpreter: CoreCommandInterpreter;
+describe('CoreCommandHandler', () => {
+  let handler: CoreCommandHandler;
 
   beforeEach(() => {
-    interpreter = new CoreCommandInterpreter();
+    handler = new CoreCommandHandler();
   });
 
   describe('emit', () => {
@@ -15,12 +15,12 @@ describe('CoreCommandInterpreter', () => {
       const modelChangeCallback = vi.fn();
       const otherCommandCallback = vi.fn();
 
-      interpreter.register('command', commandCallback);
-      interpreter.register('modelChange', modelChangeCallback);
-      interpreter.register('command', otherCommandCallback);
+      handler.register('command', commandCallback);
+      handler.register('modelChange', modelChangeCallback);
+      handler.register('command', otherCommandCallback);
 
       const commandEvent: SystemEvent = { type: 'command', name: 'test' };
-      interpreter.emit(commandEvent);
+      handler.emit(commandEvent);
 
       expect(commandCallback).toHaveBeenCalledWith(commandEvent);
       expect(otherCommandCallback).toHaveBeenCalledWith(commandEvent);
@@ -29,10 +29,10 @@ describe('CoreCommandInterpreter', () => {
 
     it('should not call any callbacks if none are registered for the event type', () => {
       const callback = vi.fn();
-      interpreter.register('modelChange', callback);
+      handler.register('modelChange', callback);
 
       const commandEvent: SystemEvent = { type: 'command', name: 'test' };
-      interpreter.emit(commandEvent);
+      handler.emit(commandEvent);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -43,11 +43,11 @@ describe('CoreCommandInterpreter', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
 
-      interpreter.register('command', callback1);
-      interpreter.register('command', callback2);
+      handler.register('command', callback1);
+      handler.register('command', callback2);
 
       const event: SystemEvent = { type: 'command', name: 'test' };
-      interpreter.emit(event);
+      handler.emit(event);
 
       expect(callback1).toHaveBeenCalledWith(event);
       expect(callback2).toHaveBeenCalledWith(event);
@@ -56,11 +56,11 @@ describe('CoreCommandInterpreter', () => {
     it('should allow registering the same callback multiple times', () => {
       const callback = vi.fn();
 
-      interpreter.register('command', callback);
-      interpreter.register('command', callback);
+      handler.register('command', callback);
+      handler.register('command', callback);
 
       const event: SystemEvent = { type: 'command', name: 'test' };
-      interpreter.emit(event);
+      handler.emit(event);
 
       expect(callback).toHaveBeenCalledTimes(2);
     });
@@ -70,10 +70,10 @@ describe('CoreCommandInterpreter', () => {
       const callback1 = () => calls.push('1');
       const callback2 = () => calls.push('2');
 
-      interpreter.register('command', callback1);
-      interpreter.register('command', callback2);
+      handler.register('command', callback1);
+      handler.register('command', callback2);
 
-      interpreter.emit({ type: 'command', name: 'test' });
+      handler.emit({ type: 'command', name: 'test' });
 
       expect(calls).toEqual(['1', '2']);
     });
@@ -82,10 +82,10 @@ describe('CoreCommandInterpreter', () => {
   describe('unregister', () => {
     it('should remove the callback when unregister is called', () => {
       const callback = vi.fn();
-      const unregister = interpreter.register('command', callback);
+      const unregister = handler.register('command', callback);
 
       unregister();
-      interpreter.emit({ type: 'command', name: 'test' });
+      handler.emit({ type: 'command', name: 'test' });
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -94,11 +94,11 @@ describe('CoreCommandInterpreter', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
 
-      const unregister1 = interpreter.register('command', callback1);
-      interpreter.register('command', callback2);
+      const unregister1 = handler.register('command', callback1);
+      handler.register('command', callback2);
 
       unregister1();
-      interpreter.emit({ type: 'command', name: 'test' });
+      handler.emit({ type: 'command', name: 'test' });
 
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).toHaveBeenCalled();
@@ -106,23 +106,23 @@ describe('CoreCommandInterpreter', () => {
 
     it('should remove the event type from the map when no callbacks remain', () => {
       const callback = vi.fn();
-      const unregister = interpreter.register('command', callback);
+      const unregister = handler.register('command', callback);
 
       unregister();
-      interpreter.emit({ type: 'command', name: 'test' });
+      handler.emit({ type: 'command', name: 'test' });
 
       // @ts-expect-error - accessing private property for testing
-      expect(interpreter.callbacks.has('command')).toBe(false);
+      expect(handler.callbacks.has('command')).toBe(false);
     });
 
     it('should handle unregistering a callback that was already removed', () => {
       const callback = vi.fn();
-      const unregister = interpreter.register('command', callback);
+      const unregister = handler.register('command', callback);
 
       unregister();
       unregister(); // Call again, should not throw
 
-      interpreter.emit({ type: 'command', name: 'test' });
+      handler.emit({ type: 'command', name: 'test' });
       expect(callback).not.toHaveBeenCalled();
     });
   });
@@ -130,10 +130,10 @@ describe('CoreCommandInterpreter', () => {
   describe('event data', () => {
     it('should pass command event data to callbacks', () => {
       const callback = vi.fn();
-      interpreter.register('command', callback);
+      handler.register('command', callback);
 
       const eventData = { some: 'data' };
-      interpreter.emit({ type: 'command', name: 'test', data: eventData });
+      handler.emit({ type: 'command', name: 'test', data: eventData });
 
       expect(callback).toHaveBeenCalledWith({
         type: 'command',
@@ -144,10 +144,10 @@ describe('CoreCommandInterpreter', () => {
 
     it('should pass model change event data to callbacks', () => {
       const callback = vi.fn();
-      interpreter.register('modelChange', callback);
+      handler.register('modelChange', callback);
 
       const eventData = { some: 'data' };
-      interpreter.emit({ type: 'modelChange', action: 'update', data: eventData });
+      handler.emit({ type: 'modelChange', action: 'update', data: eventData });
 
       expect(callback).toHaveBeenCalledWith({
         type: 'modelChange',
