@@ -21,7 +21,7 @@ export type ActionOrName = Action | ((event: Event) => void);
  * Abstract class for handling commands and actions
  * Enforces CommandInterpreter dependency through constructor
  */
-export abstract class CommandHandler {
+export abstract class EventHandler {
   protected constructor(protected readonly interpreter: CommandInterpreter) {}
 
   /**

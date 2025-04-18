@@ -7,7 +7,7 @@ export * from './edge.interface';
 export * from './node.interface';
 
 // Command and system types
-export * from './command-handler.abstract';
+export * from './event-handler.abstract';
 export * from './command-interpreter.interface';
 
 // Model and middleware types

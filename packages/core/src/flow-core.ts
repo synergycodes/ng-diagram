@@ -1,40 +1,40 @@
 import { CoreCommandInterpreter } from './command-interpreter';
 import { MiddlewareManager } from './middleware-manager';
-import type { CommandHandler } from './types/command-handler.abstract';
+import type { EventHandler } from './types/event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
-type CommandHandlerFactory = (interpreter: CoreCommandInterpreter) => CommandHandler;
+type EventHandlerFactory = (interpreter: CoreCommandInterpreter) => EventHandler;
 
 export class FlowCore {
   private readonly interpreter: CoreCommandInterpreter;
-  private _commandHandler: CommandHandler;
+  private _eventHandler: EventHandler;
   private readonly middlewareManager: MiddlewareManager;
 
   constructor(
     private readonly modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
-    createCommandHandler: CommandHandlerFactory
+    createEventHandler: EventHandlerFactory
   ) {
     this.interpreter = new CoreCommandInterpreter();
-    this._commandHandler = createCommandHandler(this.interpreter);
+    this._eventHandler = createEventHandler(this.interpreter);
     this.middlewareManager = new MiddlewareManager();
   }
 
   /**
-   * Gets the current CommandHandler instance
+   * Gets the current EventHandler instance
    */
-  get commandHandler(): CommandHandler {
-    return this._commandHandler;
+  get eventHandler(): EventHandler {
+    return this._eventHandler;
   }
 
   /**
-   * Changes the current CommandHandler implementation
-   * @param createCommandHandler Factory function that creates a new CommandHandler instance
+   * Changes the current EventHandler implementation
+   * @param createEventHandler Factory function that creates a new EventHandler instance
    */
-  setCommandHandler(createCommandHandler: CommandHandlerFactory): void {
-    this._commandHandler = createCommandHandler(this.interpreter);
+  setEventHandler(createEventHandler: EventHandlerFactory): void {
+    this._eventHandler = createEventHandler(this.interpreter);
   }
 
   /**

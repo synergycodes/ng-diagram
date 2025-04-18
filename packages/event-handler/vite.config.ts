@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'CommandHandler',
+      name: 'EventHandler',
       fileName: 'index',
       formats: ['es'],
     },
