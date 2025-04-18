@@ -8,7 +8,7 @@ export type EventListener = (event: Event) => void;
 /**
  * Interface for handling UI-agnostic events
  */
-export interface EventHandler {
+export interface EventMapper {
   /**
    * Register an event listener for a specific event type
    * @param type Event type to listen for

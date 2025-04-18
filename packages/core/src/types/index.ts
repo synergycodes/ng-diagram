@@ -1,6 +1,6 @@
 // Event types
 export * from './event.interface';
-export * from './event-handler.interface';
+export * from './event-mapper.interface';
 
 // Flow diagram types
 export * from './edge.interface';
