@@ -1,0 +1,22 @@
+---
+description: 
+globs: *.ts,*.html
+alwaysApply: false
+---
+## FRONTEND
+
+### Guidelines for ANGULAR
+
+#### ANGULAR_CODING_STANDARDS
+
+- Use standalone components, directives, and pipes instead of NgModules
+- Implement signals for state management instead of traditional RxJS-based approaches
+- Use the new inject function instead of constructor injection
+- Implement control flow with @if, @for, and @switch instead of *ngIf, *ngFor, etc.
+- Leverage functional guards and resolvers instead of class-based ones
+- Use the new deferrable views for improved loading states
+- Implement OnPush change detection strategy for improved performance
+- Use TypeScript decorators with explicit visibility modifiers (public, private)
+- Leverage Angular CLI for schematics and code generation
+- Implement proper lazy loading with loadComponent and loadChildren
+

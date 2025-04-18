@@ -1,0 +1,21 @@
+---
+description: Writing front-end components
+globs: 
+alwaysApply: false
+---
+## FRONTEND
+
+### Guidelines for ACCESSIBILITY
+
+#### WCAG_PERCEIVABLE
+
+- Provide text alternatives for non-text content including images, icons, and graphics with appropriate alt attributes
+- Ensure pre-recorded audio-visual content has captions, audio descriptions, and transcripts for {{media_content}}
+- Maintain minimum contrast ratios of 4.5:1 for normal text and 3:1 for large text and UI components
+- Enable content to be presented in different ways without losing information or structure when zoomed or resized
+- Avoid using color alone to convey information; pair with text, patterns, or icons for {{status_indicators}}
+- Provide controls to pause, stop, or hide any moving, blinking, or auto-updating content
+- Ensure text can be resized up to 200% without loss of content or functionality in {{responsive_layouts}}
+- Use responsive design that adapts to different viewport sizes and zoom levels without horizontal scrolling
+- Enable users to customize text spacing (line height, paragraph spacing, letter/word spacing) without breaking layouts
+

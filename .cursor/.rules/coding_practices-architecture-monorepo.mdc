@@ -1,0 +1,18 @@
+---
+description: Creating new package, changing configuration
+globs: 
+alwaysApply: false
+---
+## CODING_PRACTICES
+
+### Guidelines for ARCHITECTURE
+
+#### MONOREPO
+
+- Configure workspace-aware tooling to optimize build and test processes
+- Implement clear package boundaries with explicit dependencies between packages
+- Use consistent versioning strategy across all packages (independent or lockstep)
+- Configure CI/CD to build and test only affected packages for efficiency
+- Implement shared configurations for linting, testing, and {{development_tooling}}
+- Use code generators to maintain consistency across similar packages or modules
+

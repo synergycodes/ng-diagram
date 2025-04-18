@@ -1,0 +1,22 @@
+---
+description: Writing front-end components
+globs: 
+alwaysApply: false
+---
+## FRONTEND
+
+### Guidelines for ACCESSIBILITY
+
+#### WCAG_OPERABLE
+
+- Make all functionality accessible via keyboard with visible focus indicators for {{interactive_elements}}
+- Avoid keyboard traps where focus cannot move away from a component via standard navigation
+- Provide mechanisms to extend, adjust, or disable time limits if present in {{timed_interactions}}
+- Avoid content that flashes more than three times per second to prevent seizure triggers
+- Implement skip navigation links to bypass blocks of repeated content across pages
+- Use descriptive page titles, headings, and link text that indicate purpose and destination
+- Ensure focus order matches the visual and logical sequence of information presentation
+- Support multiple ways to find content (search, site map, logical navigation hierarchy)
+- Allow pointer gesture actions to be accomplished with a single pointer without path-based gestures
+- Implement pointer cancellation to prevent unintended function activation, especially for {{critical_actions}}
+

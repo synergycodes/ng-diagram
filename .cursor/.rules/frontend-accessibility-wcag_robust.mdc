@@ -1,0 +1,20 @@
+---
+description: Writing front-end components
+globs: 
+alwaysApply: false
+---
+## FRONTEND
+
+### Guidelines for ACCESSIBILITY
+
+#### WCAG_ROBUST
+
+- Use valid, well-formed markup that follows HTML specifications for {{document_structure}}
+- Provide name, role, and value information for all user interface components
+- Ensure custom controls and interactive elements maintain compatibility with assistive technologies
+- Implement status messages that can be programmatically determined without receiving focus
+- Use semantic HTML elements that correctly describe the content they contain (buttons, lists, headings, etc.)
+- Validate code against technical specifications to minimize compatibility errors
+- Test with multiple browsers and assistive technologies for cross-platform compatibility
+- Avoid deprecated HTML elements and attributes that may not be supported in future technologies
+
