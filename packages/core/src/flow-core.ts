@@ -1,11 +1,12 @@
 import { CoreCommandHandler } from './command-handler';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventHandler } from './types/event-handler.abstract';
+import type { EventMapper } from './types/event-mapper.interface';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
-type EventHandlerFactory = (interpreter: CoreCommandHandler) => EventHandler;
+type EventHandlerFactory = (interpreter: CoreCommandHandler, eventMapper: EventMapper) => EventHandler;
 
 export class FlowCore {
   private readonly interpreter: CoreCommandHandler;
@@ -15,10 +16,11 @@ export class FlowCore {
   constructor(
     private readonly modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
+    private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory
   ) {
     this.interpreter = new CoreCommandHandler();
-    this._eventHandler = createEventHandler(this.interpreter);
+    this._eventHandler = createEventHandler(this.interpreter, this.eventMapper);
     this.middlewareManager = new MiddlewareManager();
   }
 
@@ -34,7 +36,7 @@ export class FlowCore {
    * @param createEventHandler Factory function that creates a new EventHandler instance
    */
   setEventHandler(createEventHandler: EventHandlerFactory): void {
-    this._eventHandler = createEventHandler(this.interpreter);
+    this._eventHandler = createEventHandler(this.interpreter, this.eventMapper);
   }
 
   /**

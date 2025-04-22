@@ -272,6 +272,9 @@ importers:
 
   packages/event-handler:
     devDependencies:
+      '@angularflow/core':
+        specifier: workspace:*
+        version: link:../core
       eslint:
         specifier: ^9.25.1
         version: 9.25.1(jiti@2.4.2)
