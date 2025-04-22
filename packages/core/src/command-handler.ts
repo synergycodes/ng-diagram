@@ -5,7 +5,7 @@ import type { CommandHandler, SystemEvent, SystemEventCallback } from './types/c
  * Handles event emission and registration of callbacks for system events
  */
 export class CoreCommandHandler implements CommandHandler {
-  private callbacks: Map<SystemEvent['type'], SystemEventCallback[]> = new Map();
+  private callbacks = new Map<SystemEvent['type'], SystemEventCallback[]>();
 
   /**
    * Emit a system event to all registered callbacks for the event type

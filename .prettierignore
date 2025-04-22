@@ -1,0 +1,12 @@
+# Build outputs
+dist
+.angular
+coverage
+
+# Package management
+node_modules
+pnpm-lock.yaml
+
+# Misc
+.git
+.DS_Store

@@ -6,14 +6,15 @@
     "dev": "turbo run dev",
     "lint:check": "turbo run lint:check",
     "lint:fix": "turbo run lint:fix",
-    "format": "biome format --write .",
+    "format:check": "prettier . --check",
+    "format:fix": "prettier . --write",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "prepare": "husky"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
     "husky": "^9.1.7",
+    "prettier": "^3.5.3",
     "turbo": "^2.5.0",
     "typescript": "5.8.3"
   },

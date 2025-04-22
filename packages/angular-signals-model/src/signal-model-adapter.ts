@@ -50,7 +50,11 @@ export class SignalModelAdapter implements ModelAdapter {
     this.callbacks.push(callback);
   }
 
-  undo(): void {}
+  undo(): void {
+    // lint:fix
+  }
 
-  redo(): void {}
+  redo(): void {
+    // lint:fix
+  }
 }

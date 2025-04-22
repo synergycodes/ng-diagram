@@ -1,6 +1,3 @@
 {
-  "recommendations": [
-    "biomejs.biome",
-    "vitest.explorer"
-  ]
-} 
+  "recommendations": ["esbenp.prettier-vscode", "vitest.explorer", "dbaeumer.vscode-eslint"]
+}
