@@ -3,6 +3,7 @@ import { CoreCommandHandler } from './command-handler';
 import { FlowCore } from './flow-core';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventHandler } from './types/event-handler.abstract';
+import { EventMapper } from './types/event-mapper.interface';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
@@ -21,6 +22,7 @@ describe('FlowCore', () => {
   let flowCore: FlowCore;
   let mockModelAdapter: ModelAdapter;
   let mockRenderer: Renderer;
+  let mockEventMapper: EventMapper;
   let mockEventHandler: EventHandler;
   let createEventHandler: (interpreter: CoreCommandHandler) => EventHandler;
 
@@ -42,6 +44,11 @@ describe('FlowCore', () => {
       draw: vi.fn(),
     };
 
+    mockEventMapper = {
+      register: vi.fn(),
+      emit: vi.fn(),
+    } as unknown as EventMapper;
+
     mockEventHandler = {
       unregisterDefault: vi.fn(),
       register: vi.fn(),
@@ -55,13 +62,13 @@ describe('FlowCore', () => {
     vi.clearAllMocks();
 
     // Create FlowCore instance
-    flowCore = new FlowCore(mockModelAdapter, mockRenderer, createEventHandler);
+    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, createEventHandler);
   });
 
   describe('constructor', () => {
     it('should create a new CommandHandler instance', () => {
       expect(flowCore).toBeDefined();
-      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler));
+      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler), mockEventMapper);
     });
 
     it('should initialize with provided dependencies', () => {
@@ -83,7 +90,7 @@ describe('FlowCore', () => {
 
       flowCore.setEventHandler(newCreateEventHandler);
 
-      expect(newCreateEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler));
+      expect(newCreateEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler), mockEventMapper);
     });
   });
 

@@ -42,25 +42,8 @@ jobs:
           version: 8
           run_install: true
 
+      - name: Build packages
+        run: pnpm run build
+
       - name: Run unit tests
         run: pnpm run test
-
-  build:
-    runs-on: ubuntu-latest
-    needs: run-tests
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: true
-
-      - name: Run build
-        run: pnpm run build

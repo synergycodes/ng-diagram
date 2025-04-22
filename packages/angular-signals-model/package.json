@@ -18,11 +18,10 @@
     "@angular/core": "^19.2.6",
     "@angular/platform-browser-dynamic": "^19.2.6"
   },
-  "peerDependencies": {
-    "@angularflow/core": "workspace:*"
-  },
   "devDependencies": {
     "@analogjs/vitest-angular": "^1.15.1",
+    "@angularflow/core": "workspace:*",
+    "@eslint/js": "^9.25.1",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
