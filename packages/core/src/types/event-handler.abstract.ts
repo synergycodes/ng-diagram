@@ -23,10 +23,10 @@ export type ActionPredicate = (event: Event) => boolean;
  */
 export type ActionOrActionName = ActionName | Action;
 
-export type ActionWithPredicate = {
+export interface ActionWithPredicate {
   action: Action;
   predicate: ActionPredicate;
-};
+}
 
 /**
  * Abstract class for handling commands and actions

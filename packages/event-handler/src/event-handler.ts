@@ -11,11 +11,11 @@ import {
 
 // TODO: Replace with proper default actions
 const DEFAULT_ACTIONS: Record<ActionName, ActionWithPredicate> = {
-  click: { action: () => {}, predicate: () => true },
+  click: { action: () => null, predicate: () => true },
 };
 
 export class EventHandler extends CoreEventHandler {
-  private defaultActions: Map<ActionName, ActionWithPredicate> = new Map();
+  private defaultActions = new Map<ActionName, ActionWithPredicate>();
   private registeredActions: ActionWithPredicate[] = [];
 
   constructor(

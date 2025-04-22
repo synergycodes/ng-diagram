@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventHandler } from './event-handler';
 
 class MockEventMapper {
-  private listener: (event: Event) => void = () => {};
+  private listener: (event: Event) => void = () => null;
 
   register(callback: (event: Event) => void): void {
     this.listener = callback;
