@@ -1,16 +1,6 @@
-# AngularDemo
+# AngularAdapter
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
-
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.0.
 
 ## Code scaffolding
 
@@ -28,13 +18,28 @@ ng generate --help
 
 ## Building
 
-To build the project run:
+To build the library, run:
 
 ```bash
-ng build
+ng build angular-adapter
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+
+### Publishing the Library
+
+Once the project is built, you can publish your library by following these steps:
+
+1. Navigate to the `dist` directory:
+
+   ```bash
+   cd dist/angular-adapter
+   ```
+
+2. Run the `npm publish` command to publish your library to the npm registry:
+   ```bash
+   npm publish
+   ```
 
 ## Running unit tests
 
