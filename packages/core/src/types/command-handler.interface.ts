@@ -1,5 +1,5 @@
 /**
- * Type for system events that can be emitted by EventHandler or Model
+ * Type for system events that can be emitted by InputEventHandler or user
  */
 export type Command = { type: 'select'; data: { id: string } } | { type: 'unselect'; data: { id: string } };
 
@@ -10,7 +10,7 @@ export type CommandCallback = (event: Command) => void;
 
 /**
  * Interface for interpreting and routing system events
- * This is a core component that handles events from EventHandler and Model
+ * This is a core component that handles events from InputEventHandler or user
  */
 export interface CommandHandler {
   /**

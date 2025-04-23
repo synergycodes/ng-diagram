@@ -10,7 +10,7 @@ AngularFlow is a library for creating interactive diagrams in Angular
 - Diagrams are DOM-based.
 - Library complies with latest Angular standards.
 - Project is organized into Monorepo managed by Turborepo.
-- Core and EventHandler are framework-agnostic, so in the future it will be possible to use them with other frameworks.
-- Core and EventHandler are environment-agnostic, so they don't rely on browser features.
+- Core and InputEventHandler are framework-agnostic, so in the future it will be possible to use them with other frameworks.
+- Core and InputEventHandler are environment-agnostic, so they don't rely on browser features.
 - Core package should contain no external dependencies
 - Write all unit tests in Vitest

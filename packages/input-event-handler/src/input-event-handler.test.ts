@@ -1,6 +1,6 @@
 import type { CommandHandler, Event, EventMapper } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventHandler } from './event-handler';
+import { EventHandler } from './input-event-handler';
 
 class MockEventMapper {
   private listener: (event: Event) => void = () => null;

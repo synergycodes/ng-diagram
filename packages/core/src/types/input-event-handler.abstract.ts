@@ -69,11 +69,4 @@ export abstract class InputEventHandler {
    * @param actionOrActionName Action to unregister
    */
   abstract unregister(predicate: ActionPredicate, actionOrActionName: ActionOrActionName): void;
-
-  /**
-   * Invoke an action by name
-   * @param actionName Name of the action to invoke
-   * @param event Event to invoke the action with
-   */
-  abstract invoke(actionName: ActionName, event: Event): void;
 }
