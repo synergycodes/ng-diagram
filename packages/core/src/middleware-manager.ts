@@ -33,7 +33,7 @@ export class MiddlewareManager {
   execute(state: FlowState, modelAction: ModelAction): FlowStateDiff {
     return this.middlewareChain.reduce(
       (currentState, middleware) => middleware(currentState, { modelAction, initialState: state }),
-      [] as FlowStateDiff
+      {} as FlowStateDiff
     );
   }
 }

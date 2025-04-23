@@ -1,6 +1,6 @@
 import type { CommandHandler, Event, EventMapper } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventHandler } from './input-event-handler';
+import { InputEventHandler } from './input-event-handler';
 
 class MockEventMapper {
   private listener: (event: Event) => void = () => null;
@@ -14,8 +14,8 @@ class MockEventMapper {
   }
 }
 
-describe('EventHandler', () => {
-  let eventHandler: EventHandler;
+describe('InputEventHandler', () => {
+  let eventHandler: InputEventHandler;
   let mockCommandHandler: CommandHandler;
   let mockEventMapper: EventMapper;
   let mockDefaultAction: (event: Event) => void;
@@ -24,16 +24,16 @@ describe('EventHandler', () => {
     mockCommandHandler = {} as CommandHandler;
     mockEventMapper = new MockEventMapper();
 
-    eventHandler = new EventHandler(mockCommandHandler, mockEventMapper);
+    eventHandler = new InputEventHandler(mockCommandHandler, mockEventMapper);
     mockDefaultAction = vi.fn();
-    eventHandler.__overwriteDefaultAction('click', { action: mockDefaultAction, predicate: () => true });
+    eventHandler.__overwriteDefaultAction('select', { action: mockDefaultAction, predicate: () => true });
   });
 
   describe('registerDefault', () => {
     it('should call default action only once if registered multiple times', () => {
-      eventHandler.registerDefault('click');
-      eventHandler.registerDefault('click');
-      eventHandler.registerDefault('click');
+      eventHandler.registerDefault('select');
+      eventHandler.registerDefault('select');
+      eventHandler.registerDefault('select');
       mockEventMapper.emit({} as Event);
 
       expect(mockDefaultAction).toHaveBeenCalledTimes(1);
@@ -42,7 +42,7 @@ describe('EventHandler', () => {
 
   describe('unregisterDefault', () => {
     it('should unregister default action for event', () => {
-      eventHandler.unregisterDefault('click');
+      eventHandler.unregisterDefault('select');
       mockEventMapper.emit({} as Event);
 
       expect(mockDefaultAction).not.toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe('EventHandler', () => {
     });
 
     it('should call default action if new action is registered for event', () => {
-      eventHandler.register(() => true, 'click');
+      eventHandler.register(() => true, 'select');
       mockEventMapper.emit({} as Event);
 
       expect(mockDefaultAction).toHaveBeenCalledTimes(2);
@@ -108,27 +108,12 @@ describe('EventHandler', () => {
 
     it('should unregister newly registered default action by name', () => {
       const predicate = () => true;
-      eventHandler.register(predicate, 'click');
-      eventHandler.unregister(predicate, 'click');
+      eventHandler.register(predicate, 'select');
+      eventHandler.unregister(predicate, 'select');
 
       mockEventMapper.emit({} as Event);
 
       expect(mockDefaultAction).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('invoke', () => {
-    it('should call default action if invoked and nothing was emitted', () => {
-      eventHandler.invoke('click', {} as Event);
-
-      expect(mockDefaultAction).toHaveBeenCalled();
-    });
-
-    it('should call default action even if it was unregistered', () => {
-      eventHandler.unregisterDefault('click');
-      eventHandler.invoke('click', {} as Event);
-
-      expect(mockDefaultAction).toHaveBeenCalled();
     });
   });
 });

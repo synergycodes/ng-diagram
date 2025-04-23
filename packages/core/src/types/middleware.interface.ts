@@ -10,14 +10,31 @@ export interface ModelAction {
 }
 
 /**
+ * Type for the Nodes and Edges diff of the flow state
+ */
+interface NodesEdgesDiff<T extends { id: string }, IdKey extends keyof T = 'id'> {
+  added?: T[];
+  removed?: IdKey[];
+  updated?: Partial<T>[];
+}
+
+/**
+ * Type for the MetaData diff of the flow state
+ */
+interface MetaDataDiff {
+  added?: Record<string, unknown>;
+  removed?: string[];
+  updated?: Record<string, unknown>;
+}
+
+/**
  * Type for the diff of the flow state
  */
-export type FlowStateDiff = {
-  id: string;
-  propertyName: string;
-  previousValue: unknown;
-  newValue: unknown;
-}[];
+export interface FlowStateDiff {
+  nodes?: NodesEdgesDiff<Node>;
+  edges?: NodesEdgesDiff<Edge>;
+  metaData?: MetaDataDiff;
+}
 
 /**
  * Type for the state of the flow diagram
