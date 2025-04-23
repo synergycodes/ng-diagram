@@ -1,20 +1,22 @@
 import {
+  type ActionContext,
   type ActionName,
   type ActionOrActionName,
   type ActionPredicate,
   type ActionWithPredicate,
   type CommandHandler,
-  EventHandler as CoreEventHandler,
+  InputEventHandler as CoreInputEventHandler,
   type Event,
   type EventMapper,
 } from '@angularflow/core';
 
 // TODO: Replace with proper default actions
 const DEFAULT_ACTIONS: Record<ActionName, ActionWithPredicate> = {
-  click: { action: () => null, predicate: () => true },
+  select: { action: () => null, predicate: () => true },
 };
 
-export class EventHandler extends CoreEventHandler {
+export class InputEventHandler extends CoreInputEventHandler {
+  private context: ActionContext;
   private defaultActions = new Map<ActionName, ActionWithPredicate>();
   private registeredActions: ActionWithPredicate[] = [];
 
@@ -23,6 +25,12 @@ export class EventHandler extends CoreEventHandler {
     protected readonly eventMapper: EventMapper
   ) {
     super(interpreter, eventMapper);
+    this.context = {
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      metaKey: false,
+    };
     this.eventMapper.register((event) => this.handleEvent(event));
     for (const [name, { action, predicate }] of Object.entries(DEFAULT_ACTIONS)) {
       this.defaultActions.set(name as ActionName, { action, predicate });
@@ -32,8 +40,8 @@ export class EventHandler extends CoreEventHandler {
 
   private handleEvent(event: Event): void {
     for (const { predicate, action } of this.registeredActions) {
-      if (predicate(event)) {
-        action(event);
+      if (predicate(event, this.context)) {
+        action(event, this.context);
       }
     }
   }
@@ -75,14 +83,6 @@ export class EventHandler extends CoreEventHandler {
             ? this.defaultActions.get(actionOrActionName)?.action
             : actionOrActionName)
     );
-  }
-
-  invoke(actionName: ActionName, event: Event): void {
-    const action = this.defaultActions.get(actionName)?.action;
-    if (!action) {
-      throw new Error(`Default action "${actionName}" does not exist.`);
-    }
-    action(event);
   }
 
   /**
