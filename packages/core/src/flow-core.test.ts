@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreCommandHandler } from './command-handler';
 import { FlowCore } from './flow-core';
 import { MiddlewareManager } from './middleware-manager';
-import type { EventHandler } from './types/event-handler.abstract';
 import { EventMapper } from './types/event-mapper.interface';
+import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
@@ -23,8 +23,8 @@ describe('FlowCore', () => {
   let mockModelAdapter: ModelAdapter;
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;
-  let mockEventHandler: EventHandler;
-  let createEventHandler: (interpreter: CoreCommandHandler) => EventHandler;
+  let mockEventHandler: InputEventHandler;
+  let createEventHandler: (interpreter: CoreCommandHandler) => InputEventHandler;
 
   beforeEach(() => {
     // Create mock implementations
@@ -54,7 +54,7 @@ describe('FlowCore', () => {
       register: vi.fn(),
       unregister: vi.fn(),
       invoke: vi.fn(),
-    } as unknown as EventHandler;
+    } as unknown as InputEventHandler;
 
     createEventHandler = vi.fn().mockReturnValue(mockEventHandler);
 
@@ -84,7 +84,7 @@ describe('FlowCore', () => {
         register: vi.fn(),
         unregister: vi.fn(),
         invoke: vi.fn(),
-      } as unknown as EventHandler;
+      } as unknown as InputEventHandler;
 
       const newCreateEventHandler = vi.fn().mockReturnValue(newEventHandler);
 

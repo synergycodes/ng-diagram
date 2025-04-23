@@ -2,21 +2,27 @@ import type { CommandHandler } from './command-handler.interface';
 import type { EventMapper } from './event-mapper.interface';
 import type { Event } from './event.interface';
 
+export interface ActionContext {
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
+}
+
 /**
- * TODO: This should be replaced with a proper action type once it's defined
- * For now, we use string as a placeholder
+ * Type for action name
  */
-export type ActionName = 'click';
+export type ActionName = 'select';
 
 /**
  * Type for action function
  */
-export type Action = (event: Event) => void;
+export type Action = (event: Event, context: ActionContext) => void;
 
 /**
  * Type for predicate function that determines if an action should be triggered
  */
-export type ActionPredicate = (event: Event) => boolean;
+export type ActionPredicate = (event: Event, context: ActionContext) => boolean;
 
 /**
  * Type for action that can be either a name or a function
@@ -32,9 +38,9 @@ export interface ActionWithPredicate {
  * Abstract class for handling commands and actions
  * Enforces CommandHandler dependency through constructor
  */
-export abstract class EventHandler {
+export abstract class InputEventHandler {
   protected constructor(
-    protected readonly interpreter: CommandHandler,
+    protected readonly commandHandler: CommandHandler,
     protected readonly eventMapper: EventMapper
   ) {}
 

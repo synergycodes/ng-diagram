@@ -1,16 +1,16 @@
 import { CoreCommandHandler } from './command-handler';
 import { MiddlewareManager } from './middleware-manager';
-import type { EventHandler } from './types/event-handler.abstract';
 import type { EventMapper } from './types/event-mapper.interface';
+import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
-type EventHandlerFactory = (interpreter: CoreCommandHandler, eventMapper: EventMapper) => EventHandler;
+type EventHandlerFactory = (commandHandler: CoreCommandHandler, eventMapper: EventMapper) => InputEventHandler;
 
 export class FlowCore {
-  private readonly interpreter: CoreCommandHandler;
-  private _eventHandler: EventHandler;
+  private commandHandler: CoreCommandHandler;
+  private _eventHandler: InputEventHandler;
   private readonly middlewareManager: MiddlewareManager;
 
   constructor(
@@ -19,15 +19,15 @@ export class FlowCore {
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory
   ) {
-    this.interpreter = new CoreCommandHandler();
-    this._eventHandler = createEventHandler(this.interpreter, this.eventMapper);
+    this.commandHandler = new CoreCommandHandler();
+    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
     this.middlewareManager = new MiddlewareManager();
   }
 
   /**
    * Gets the current EventHandler instance
    */
-  get eventHandler(): EventHandler {
+  get eventHandler(): InputEventHandler {
     return this._eventHandler;
   }
 
@@ -36,7 +36,7 @@ export class FlowCore {
    * @param createEventHandler Factory function that creates a new EventHandler instance
    */
   setEventHandler(createEventHandler: EventHandlerFactory): void {
-    this._eventHandler = createEventHandler(this.interpreter, this.eventMapper);
+    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
   }
 
   /**
