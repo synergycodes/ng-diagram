@@ -283,6 +283,42 @@ importers:
         version: 3.1.2(@types/node@22.14.1)(jiti@2.4.2)(jsdom@26.1.0)(less@4.3.0)(sass-embedded@1.87.0)(sass@1.87.0)(stylus@0.64.0)(terser@5.39.0)(yaml@2.7.1)
 
   packages/input-event-handler:
+<<<<<<< HEAD
+=======
+    devDependencies:
+      '@angularflow/core':
+        specifier: workspace:*
+        version: link:../core
+      '@eslint/js':
+        specifier: ^9.25.1
+        version: 9.25.1
+      eslint:
+        specifier: ^9.25.1
+        version: 9.25.1(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: ^10.1.2
+        version: 10.1.2(eslint@9.25.1(jiti@2.4.2))
+      eslint-plugin-prettier:
+        specifier: ^5.2.6
+        version: 5.2.6(@types/eslint@9.6.1)(eslint-config-prettier@10.1.2(eslint@9.25.1(jiti@2.4.2)))(eslint@9.25.1(jiti@2.4.2))(prettier@3.5.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+      typescript-eslint:
+        specifier: ^8.31.0
+        version: 8.31.0(eslint@9.25.1(jiti@2.4.2))(typescript@5.8.3)
+      vite:
+        specifier: ^6.3.2
+        version: 6.3.2(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.87.0)(sass@1.87.0)(stylus@0.64.0)(terser@5.39.0)(yaml@2.7.1)
+      vite-plugin-dts:
+        specifier: ^4.5.3
+        version: 4.5.3(@types/node@22.14.1)(rollup@4.40.0)(typescript@5.8.3)(vite@6.3.2(@types/node@22.14.1)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.87.0)(sass@1.87.0)(stylus@0.64.0)(terser@5.39.0)(yaml@2.7.1))
+      vitest:
+        specifier: ^3.1.2
+        version: 3.1.2(@types/node@22.14.1)(jiti@2.4.2)(jsdom@26.1.0)(less@4.3.0)(sass-embedded@1.87.0)(sass@1.87.0)(stylus@0.64.0)(terser@5.39.0)(yaml@2.7.1)
+
+  packages/logger-middleware:
+>>>>>>> 2f057b4 (Implement logger middleware)
     devDependencies:
       '@angularflow/core':
         specifier: workspace:*
