@@ -1,17 +1,17 @@
-import type { CommandHandler, SystemEvent, SystemEventCallback } from './types/command-handler.interface';
+import type { Command, CommandCallback, CommandHandler } from './types/command-handler.interface';
 
 /**
  * Core implementation of CommandHandler interface
  * Handles event emission and registration of callbacks for system events
  */
 export class CoreCommandHandler implements CommandHandler {
-  private callbacks = new Map<SystemEvent['type'], SystemEventCallback[]>();
+  private callbacks = new Map<Command['type'], CommandCallback[]>();
 
   /**
    * Emit a system event to all registered callbacks for the event type
    * @param event Event to emit
    */
-  emit(event: SystemEvent): void {
+  emit(event: Command): void {
     const callbacks = this.callbacks.get(event.type);
     if (callbacks) {
       for (const callback of callbacks) {
@@ -26,12 +26,12 @@ export class CoreCommandHandler implements CommandHandler {
    * @param callback Function to be called when event occurs
    * @returns Function to unregister the callback
    */
-  register(eventType: SystemEvent['type'], callback: SystemEventCallback): () => void {
+  register(eventType: Command['type'], callback: CommandCallback): () => void {
     if (!this.callbacks.has(eventType)) {
       this.callbacks.set(eventType, []);
     }
 
-    const callbacks = this.callbacks.get(eventType) as SystemEventCallback[];
+    const callbacks = this.callbacks.get(eventType) as CommandCallback[];
     callbacks.push(callback);
 
     // Return unregister function

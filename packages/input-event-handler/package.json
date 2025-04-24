@@ -1,5 +1,5 @@
 {
-  "name": "@angularflow/event-handler",
+  "name": "@angularflow/input-event-handler",
   "version": "0.0.1",
   "private": true,
   "type": "module",

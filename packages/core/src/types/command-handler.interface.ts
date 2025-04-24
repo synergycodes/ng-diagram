@@ -1,31 +1,28 @@
 /**
- * Type for system events that can be emitted by EventHandler or Model
+ * Type for system events that can be emitted by InputEventHandler or user
  */
-export type SystemEvent =
-  | { type: 'command'; name: string; data?: unknown }
-  | { type: 'modelChange'; action: string; data?: unknown };
+export type Command = { type: 'select'; data: { id: string } } | { type: 'unselect'; data: { id: string } };
 
 /**
  * Type for event callback function
  */
-export type SystemEventCallback = (event: SystemEvent) => void;
+export type CommandCallback = (event: Command) => void;
 
 /**
  * Interface for interpreting and routing system events
- * This is a core component that handles events from EventHandler and Model
+ * This is a core component that handles events from InputEventHandler or user
  */
 export interface CommandHandler {
   /**
    * Emit a system event
    * @param event Event to emit
    */
-  emit(event: SystemEvent): void;
+  emit(event: Command): void;
 
   /**
    * Register a callback for specific event types
    * @param eventType Type of event to listen for
    * @param callback Function to be called when event occurs
-   * @returns Function to unregister the callback
    */
-  register(eventType: SystemEvent['type'], callback: SystemEventCallback): () => void;
+  register(eventType: Command['type'], callback: CommandCallback): void;
 }

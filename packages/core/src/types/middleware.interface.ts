@@ -4,7 +4,37 @@ import type { Node } from './node.interface';
 /**
  * Type for model-specific actions in the flow diagram
  */
-export type ModelAction = 'setNodes' | 'setEdges' | 'setMetadata';
+export interface ModelAction {
+  name: 'selectionChange';
+  data: { id: string; selected: boolean };
+}
+
+/**
+ * Type for the Nodes and Edges diff of the flow state
+ */
+interface NodesEdgesDiff<T extends { id: string }, IdKey extends keyof T = 'id'> {
+  added?: T[];
+  removed?: IdKey[];
+  updated?: Partial<T>[];
+}
+
+/**
+ * Type for the MetaData diff of the flow state
+ */
+interface MetaDataDiff {
+  added?: Record<string, unknown>;
+  removed?: string[];
+  updated?: Record<string, unknown>;
+}
+
+/**
+ * Type for the diff of the flow state
+ */
+export interface FlowStateDiff {
+  nodes?: NodesEdgesDiff<Node>;
+  edges?: NodesEdgesDiff<Edge>;
+  metaData?: MetaDataDiff;
+}
 
 /**
  * Type for the state of the flow diagram
@@ -19,28 +49,27 @@ export interface FlowState {
  * Type for the context of a middleware operation
  */
 export interface MiddlewareContext {
-  action: string;
   modelAction: ModelAction;
-  previousState: FlowState;
+  initialState: FlowState;
 }
 
 /**
  * Type for middleware function that transforms state
  * @template TState - Type of the state being modified
  */
-export type Middleware<TState = FlowState> = (
+export type Middleware = (
   /**
-   * Current state to be transformed
+   * Current state diff
    */
-  state: TState,
+  stateDiff: FlowStateDiff,
   /**
    * Context of the operation
    */
   context: MiddlewareContext
-) => TState;
+) => FlowStateDiff;
 
 /**
  * Type for middleware chain
  * @template TState - Type of the state being modified
  */
-export type MiddlewareChain<TState = FlowState> = Middleware<TState>[];
+export type MiddlewareChain = Middleware[];
