@@ -1,12 +1,29 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreCommandHandler } from './command-handler';
+import { CommandMap } from './commands';
+import { FlowCore } from './flow-core';
 import type { Command } from './types/command-handler.interface';
 
 describe('CoreCommandHandler', () => {
   let handler: CoreCommandHandler;
+  let selectCommand: CommandMap['select'];
+  let deselectAllCommand: CommandMap['deselectAll'];
 
   beforeEach(() => {
-    handler = new CoreCommandHandler();
+    selectCommand = vi.fn();
+    deselectAllCommand = vi.fn();
+    handler = new CoreCommandHandler({ executeMiddlewares: vi.fn() } as unknown as FlowCore, {
+      select: selectCommand,
+      deselectAll: deselectAllCommand,
+    });
+  });
+
+  it('should register commands', () => {
+    handler.emit('select', { ids: ['1'] });
+    handler.emit('deselectAll');
+
+    expect(selectCommand).toHaveBeenCalledWith(handler, { ids: ['1'], name: 'select' });
+    expect(deselectAllCommand).toHaveBeenCalledWith(handler, { name: 'deselectAll' });
   });
 
   describe('emit', () => {

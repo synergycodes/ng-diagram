@@ -3,6 +3,10 @@ import type { FlowState, FlowStateDiff, Middleware, MiddlewareChain, ModelAction
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
 
+  constructor(middlewares: Middleware[]) {
+    middlewares.forEach(this.register);
+  }
+
   /**
    * Registers a new middleware in the chain
    * @param middleware Middleware function to register

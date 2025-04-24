@@ -1,4 +1,5 @@
 import { CoreCommandHandler } from './command-handler';
+import { commands } from './commands';
 import { MiddlewareManager } from './middleware-manager';
 import { middlewares } from './middlewares';
 import type { EventMapper } from './types/event-mapper.interface';
@@ -20,10 +21,9 @@ export class FlowCore {
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory
   ) {
-    this.commandHandler = new CoreCommandHandler(this);
+    this.commandHandler = new CoreCommandHandler(this, commands);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
-    this.middlewareManager = new MiddlewareManager();
-    middlewares.forEach(this.registerMiddleware);
+    this.middlewareManager = new MiddlewareManager(middlewares);
   }
 
   /**

@@ -1,11 +1,11 @@
-import { CommandHandler, WithoutName } from '../types/command-handler.interface';
+import { CommandHandler } from '../types/command-handler.interface';
 
 export interface SelectCommand {
   name: 'select';
   ids: string[];
 }
 
-export const select = (commandHandler: CommandHandler, { ids }: WithoutName<SelectCommand>): void => {
+export const select = (commandHandler: CommandHandler, { ids }: SelectCommand): void => {
   commandHandler.flowCore.executeMiddlewares({ type: 'selectionChange', payload: { ids } });
 };
 

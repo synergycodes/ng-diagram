@@ -28,7 +28,7 @@ export type IsEmpty<T> = keyof WithoutName<T> extends never ? true : false;
 /**
  * Type for command callback function
  */
-export type CommandCallback = (command: Command) => void;
+export type CommandCallback<K extends CommandName> = (command: CommandByName<K>) => void;
 
 /**
  * Interface for interpreting and routing system commands
@@ -43,9 +43,9 @@ export interface CommandHandler {
    */
   emit<K extends CommandName>(
     commandName: K,
-    ...rest: IsEmpty<CommandByName<K>> extends true
-      ? [] | [props?: WithoutName<CommandByName<K>>]
-      : [props: WithoutName<CommandByName<K>>]
+    ...props: IsEmpty<CommandByName<K>> extends true
+      ? [] | [WithoutName<CommandByName<K>>]
+      : [WithoutName<CommandByName<K>>]
   ): void;
 
   /**
@@ -53,5 +53,5 @@ export interface CommandHandler {
    * @param commandType Type of command to listen for
    * @param callback Function to be called when command occurs
    */
-  register(commandType: Command['name'], callback: CommandCallback): void;
+  register<K extends CommandName>(commandType: K, callback: CommandCallback<K>): void;
 }

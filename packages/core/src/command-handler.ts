@@ -1,7 +1,6 @@
-import { commands } from './commands';
+import { CommandHandlerFunction, CommandMap } from './commands';
 import { FlowCore } from './flow-core';
 import type {
-  Command,
   CommandByName,
   CommandCallback,
   CommandHandler,
@@ -14,11 +13,18 @@ import type {
  * Handles command emission and registration of callbacks for system commands
  */
 export class CoreCommandHandler implements CommandHandler {
-  private callbacks = new Map<Command['name'], CommandCallback[]>();
+  private callbacks: {
+    [K in CommandName]?: CommandCallback<K>[];
+  } = {};
   readonly flowCore: FlowCore;
 
-  constructor(flowCore: FlowCore) {
+  constructor(flowCore: FlowCore, commands: CommandMap) {
     this.flowCore = flowCore;
+    (Object.entries(commands) as [CommandName, CommandHandlerFunction<CommandName>][]).forEach(([commandName, fn]) => {
+      this.register(commandName, (command) => {
+        fn(this, command);
+      });
+    });
   }
 
   /**
@@ -28,45 +34,40 @@ export class CoreCommandHandler implements CommandHandler {
    */
   emit<K extends CommandName>(
     commandName: K,
-    ...rest: IsEmpty<CommandByName<K>> extends true
-      ? [] | [props?: WithoutName<CommandByName<K>>]
-      : [props: WithoutName<CommandByName<K>>]
+    ...props: IsEmpty<CommandByName<K>> extends true
+      ? [] | [WithoutName<CommandByName<K>>]
+      : [WithoutName<CommandByName<K>>]
   ): void {
-    const props = (rest[0] ?? {}) as WithoutName<CommandByName<K>>;
-    commands[commandName](this, props);
-
-    const callbacks = this.callbacks.get(commandName);
+    const callbacks = this.callbacks[commandName];
     if (callbacks) {
       for (const callback of callbacks) {
-        callback({ name: commandName, ...props } as CommandByName<K>);
+        callback({ name: commandName, ...props[0] } as CommandByName<K>);
       }
     }
   }
 
   /**
    * Register a callback for specific command types
-   * @param commandType Type of command to listen for
+   * @param commandName Type of command to listen for
    * @param callback Function to be called when command occurs
    * @returns Function to unregister the callback
    */
-  register(commandName: Command['name'], callback: CommandCallback): () => void {
-    if (!this.callbacks.has(commandName)) {
-      this.callbacks.set(commandName, []);
+  register<K extends CommandName>(commandName: K, callback: CommandCallback<K>): () => void {
+    if (!this.callbacks[commandName]) {
+      this.callbacks[commandName] = [];
     }
 
-    const callbacks = this.callbacks.get(commandName) as CommandCallback[];
+    const callbacks = this.callbacks[commandName]! as CommandCallback<K>[];
     callbacks.push(callback);
 
     // Return unregister function
     return () => {
-      const callbacks = this.callbacks.get(commandName);
-      if (callbacks) {
-        const index = callbacks.indexOf(callback);
-        if (index !== -1) {
-          callbacks.splice(index, 1);
-          if (callbacks.length === 0) {
-            this.callbacks.delete(commandName);
-          }
+      const callbacks = this.callbacks[commandName]! as CommandCallback<K>[];
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+        callbacks.splice(index, 1);
+        if (callbacks.length === 0) {
+          this.callbacks[commandName] = undefined;
         }
       }
     };
