@@ -12,10 +12,10 @@ export interface ModelAction {
 /**
  * Type for the Nodes and Edges diff of the flow state
  */
-interface NodesEdgesDiff<T extends { id: string }, IdKey extends keyof T = 'id'> {
+interface NodesEdgesDiff<T extends Node | Edge> {
   added?: T[];
-  removed?: IdKey[];
-  updated?: Partial<T>[];
+  removed?: string[];
+  updated?: Record<string, Partial<T>>;
 }
 
 /**

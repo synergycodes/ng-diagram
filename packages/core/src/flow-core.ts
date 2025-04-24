@@ -1,5 +1,6 @@
 import { CoreCommandHandler } from './command-handler';
 import { MiddlewareManager } from './middleware-manager';
+import { middlewares } from './middlewares';
 import type { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { Middleware, ModelAction } from './types/middleware.interface';
@@ -22,6 +23,7 @@ export class FlowCore {
     this.commandHandler = new CoreCommandHandler(this);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
     this.middlewareManager = new MiddlewareManager();
+    middlewares.forEach(this.registerMiddleware);
   }
 
   /**

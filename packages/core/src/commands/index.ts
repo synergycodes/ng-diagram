@@ -7,11 +7,9 @@ type CommandHandlerFunction<K extends CommandName> =
     ? (flowCore: FlowCore, props?: WithoutName<CommandByName<K>>) => void
     : (flowCore: FlowCore, props: WithoutName<CommandByName<K>>) => void;
 
-type CommandsMap = {
+export const commands: {
   [K in CommandName]: CommandHandlerFunction<K>;
-};
-
-export const commands: CommandsMap = {
+} = {
   select,
   deselectAll,
 };
