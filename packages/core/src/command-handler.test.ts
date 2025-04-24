@@ -21,7 +21,7 @@ describe('CoreCommandHandler', () => {
     });
   });
 
-  it('should register commands', () => {
+  it('should register default commands', () => {
     handler.emit('select', { ids: ['1'] });
     handler.emit('deselectAll');
 
