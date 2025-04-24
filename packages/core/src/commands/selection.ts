@@ -6,9 +6,13 @@ export interface SelectCommand {
 }
 
 export const select = (commandHandler: CommandHandler, { ids }: SelectCommand): void => {
-  commandHandler.flowCore.applyUpdate({
-    nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: ids.includes(node.id) })),
-  });
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: ids.includes(node.id) })),
+      edges: commandHandler.flowCore.getState().edges.map((edge) => ({ ...edge, selected: ids.includes(edge.id) })),
+    },
+    'selectionChange'
+  );
 };
 
 export interface DeselectAllCommand {
@@ -16,7 +20,11 @@ export interface DeselectAllCommand {
 }
 
 export const deselectAll = (commandHandler: CommandHandler): void => {
-  commandHandler.flowCore.applyUpdate({
-    nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: false })),
-  });
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: false })),
+      edges: commandHandler.flowCore.getState().edges.map((edge) => ({ ...edge, selected: false })),
+    },
+    'selectionChange'
+  );
 };

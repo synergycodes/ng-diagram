@@ -39,9 +39,9 @@ describe('FlowCore', () => {
 
     // Create mock implementations
     mockModelAdapter = {
-      getNodes: vi.fn().mockReturnValue([]),
-      getEdges: vi.fn().mockReturnValue([]),
-      getMetadata: vi.fn().mockReturnValue({}),
+      getNodes: mockGetNodes,
+      getEdges: mockGetEdges,
+      getMetadata: mockGetMetadata,
       setNodes: vi.fn(),
       setEdges: vi.fn(),
       setMetadata: vi.fn(),
@@ -147,8 +147,11 @@ describe('FlowCore', () => {
         edges: [mockedEdge],
         metadata: { test: 'abc' },
       });
+      flowCore.applyUpdate({ nodes: [mockedNode] }, 'selectionChange');
 
+      expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
       expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockedNode]);
+      expect(mockModelAdapter.setEdges).toHaveBeenCalledWith([mockedEdge]);
     });
 
     it('should call the middleware with the correct parameters', () => {

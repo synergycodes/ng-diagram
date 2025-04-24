@@ -10,7 +10,7 @@ export const mockedNode: Node = {
 };
 
 export const mockedEdge: Edge = {
-  id: '1',
+  id: 'edge1',
   type: 'edge',
   source: '1',
   target: '2',
