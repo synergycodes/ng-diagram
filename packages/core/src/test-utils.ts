@@ -3,7 +3,7 @@ import { PointerEvent } from './types/event.interface';
 import { Node } from './types/node.interface';
 
 export const mockedNode: Node = {
-  id: '1',
+  id: 'node1',
   type: 'node',
   selected: false,
   position: { x: 0, y: 0 },

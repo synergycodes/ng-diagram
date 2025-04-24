@@ -1,50 +1,47 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MiddlewareManager } from './middleware-manager';
-import type {
-  FlowState,
-  FlowStateDiff,
-  Middleware,
-  MiddlewareContext,
-  ModelAction,
-} from './types/middleware.interface';
+import { mockedNode } from './test-utils';
+import type { FlowState, Middleware, MiddlewareContext } from './types/middleware.interface';
 
 describe('MiddlewareManager', () => {
   let middlewareManager: MiddlewareManager;
   let mockMiddleware1: Middleware;
   let mockMiddleware2: Middleware;
-  let initialState: FlowState;
-  let modelAction: ModelAction;
+  let prevState: FlowState;
+  let nextState: FlowState;
   let context: MiddlewareContext;
 
   beforeEach(() => {
     middlewareManager = new MiddlewareManager();
 
     mockMiddleware1 = vi.fn().mockImplementation(
-      (stateDiff: FlowStateDiff): FlowStateDiff => ({
-        ...stateDiff,
-        nodes: {
-          added: [{ id: 'node1', type: 'test', position: { x: 0, y: 0 } }],
-        },
+      (state: FlowState): FlowState => ({
+        ...state,
+        nodes: [...state.nodes, { ...mockedNode, id: 'node2' }],
       })
     );
 
     mockMiddleware2 = vi.fn().mockImplementation(
-      (stateDiff: FlowStateDiff): FlowStateDiff => ({
-        ...stateDiff,
-        nodes: {
-          added: [...(stateDiff.nodes?.added ?? []), { id: 'node2', type: 'test', position: { x: 0, y: 0 } }],
-        },
+      (state: FlowState): FlowState => ({
+        ...state,
+        nodes: [...state.nodes, { ...mockedNode, id: 'node3' }],
       })
     );
 
-    initialState = {
+    prevState = {
       nodes: [],
       edges: [],
       metadata: {},
     };
-
-    modelAction = { name: 'selectionChange', data: { id: 'node1', selected: true } };
-    context = { modelAction, initialState };
+    nextState = {
+      nodes: [mockedNode],
+      edges: [],
+      metadata: {},
+    };
+    context = {
+      modelActionType: 'selectionChange',
+      historyUpdates: [{ name: 'selectionChange', prevState, nextState }],
+    };
   });
 
   describe('register', () => {
@@ -61,8 +58,8 @@ describe('MiddlewareManager', () => {
       middlewareManager.register(mockMiddleware1);
       middlewareManager.unregister(mockMiddleware1);
 
-      const result = middlewareManager.execute(initialState, modelAction);
-      expect(result).toEqual({});
+      const result = middlewareManager.execute(prevState, nextState, 'selectionChange');
+      expect(result).toEqual(nextState);
     });
 
     it('should handle unregistering a non-existent middleware gracefully', () => {
@@ -75,22 +72,33 @@ describe('MiddlewareManager', () => {
       middlewareManager.register(mockMiddleware1);
       middlewareManager.register(mockMiddleware2);
 
-      const result = middlewareManager.execute(initialState, modelAction);
+      const result = middlewareManager.execute(prevState, nextState, 'selectionChange');
 
-      expect(result.nodes?.added?.length).toBe(2);
-      expect(result.nodes?.added?.[0].id).toBe('node1');
-      expect(result.nodes?.added?.[1].id).toBe('node2');
-      expect(mockMiddleware1).toHaveBeenCalledWith({}, context);
+      expect(result.nodes.length).toBe(3);
+      expect(result.nodes[0].id).toBe('node1');
+      expect(result.nodes[1].id).toBe('node2');
+      expect(result.nodes[2].id).toBe('node3');
+      expect(mockMiddleware1).toHaveBeenCalledWith(nextState, context);
       expect(mockMiddleware2).toHaveBeenCalledWith(
-        expect.objectContaining({ nodes: { added: [{ id: 'node1', type: 'test', position: { x: 0, y: 0 } }] } }),
-        context
+        { ...nextState, nodes: [...nextState.nodes, { ...mockedNode, id: 'node2' }] },
+        {
+          ...context,
+          historyUpdates: [
+            ...context.historyUpdates,
+            {
+              name: mockMiddleware1.name,
+              prevState: nextState,
+              nextState: { ...nextState, nodes: [...nextState.nodes, { ...mockedNode, id: 'node2' }] },
+            },
+          ],
+        }
       );
     });
 
-    it('should return empty state when no middlewares are registered', () => {
-      const result = middlewareManager.execute(initialState, modelAction);
+    it('should return passed next state when no middlewares are registered', () => {
+      const result = middlewareManager.execute(prevState, nextState, 'selectionChange');
 
-      expect(result).toEqual({});
+      expect(result).toEqual(nextState);
     });
   });
 });

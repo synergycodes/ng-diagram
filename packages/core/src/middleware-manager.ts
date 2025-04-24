@@ -36,8 +36,8 @@ export class MiddlewareManager {
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(prevState: FlowState, newState: FlowState, modelActionType: ModelActionType): FlowState {
-    const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState: newState }];
+  execute(prevState: FlowState, nextState: FlowState, modelActionType: ModelActionType): FlowState {
+    const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState }];
     return this.middlewareChain.reduce(
       ({ currentState, historyUpdates }, middleware) => {
         const nextState = middleware(currentState, { modelActionType, historyUpdates });
@@ -46,7 +46,7 @@ export class MiddlewareManager {
           historyUpdates: [...historyUpdates, { name: middleware.name, prevState: currentState, nextState }],
         };
       },
-      { currentState: newState, historyUpdates }
+      { currentState: nextState, historyUpdates }
     ).currentState;
   }
 }
