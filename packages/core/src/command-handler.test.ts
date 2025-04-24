@@ -3,16 +3,19 @@ import { CoreCommandHandler } from './command-handler';
 import { CommandMap } from './commands';
 import { FlowCore } from './flow-core';
 import type { Command } from './types/command-handler.interface';
+import { FlowState } from './types/middleware.interface';
 
 describe('CoreCommandHandler', () => {
   let handler: CoreCommandHandler;
   let selectCommand: CommandMap['select'];
   let deselectAllCommand: CommandMap['deselectAll'];
+  let mockGetState: () => FlowState;
 
   beforeEach(() => {
     selectCommand = vi.fn();
     deselectAllCommand = vi.fn();
-    handler = new CoreCommandHandler({ executeMiddlewares: vi.fn() } as unknown as FlowCore, {
+    mockGetState = vi.fn();
+    handler = new CoreCommandHandler({ applyUpdate: vi.fn(), getState: mockGetState } as unknown as FlowCore, {
       select: selectCommand,
       deselectAll: deselectAllCommand,
     });
@@ -32,10 +35,10 @@ describe('CoreCommandHandler', () => {
       const otherCommandCallback = vi.fn();
 
       handler.register('select', commandCallback);
-      handler.register('unselect', otherCommandCallback);
+      handler.register('deselectAll', otherCommandCallback);
 
-      const commandEvent: Command = { type: 'select', data: { id: '1' } };
-      handler.emit(commandEvent);
+      const commandEvent: Command = { name: 'select', ids: ['1'] };
+      handler.emit('select', commandEvent);
 
       expect(commandCallback).toHaveBeenCalledWith(commandEvent);
       expect(otherCommandCallback).not.toHaveBeenCalled();
@@ -43,10 +46,10 @@ describe('CoreCommandHandler', () => {
 
     it('should not call any callbacks if none are registered for the event type', () => {
       const callback = vi.fn();
-      handler.register('unselect', callback);
+      handler.register('deselectAll', callback);
 
-      const commandEvent: Command = { type: 'select', data: { id: '1' } };
-      handler.emit(commandEvent);
+      const commandEvent: Command = { name: 'select', ids: ['1'] };
+      handler.emit('select', commandEvent);
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -60,8 +63,8 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback1);
       handler.register('select', callback2);
 
-      const event: Command = { type: 'select', data: { id: '1' } };
-      handler.emit(event);
+      const event: Command = { name: 'select', ids: ['1'] };
+      handler.emit('select', event);
 
       expect(callback1).toHaveBeenCalledWith(event);
       expect(callback2).toHaveBeenCalledWith(event);
@@ -73,8 +76,8 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback);
       handler.register('select', callback);
 
-      const event: Command = { type: 'select', data: { id: '1' } };
-      handler.emit(event);
+      const event: Command = { name: 'select', ids: ['1'] };
+      handler.emit('select', event);
 
       expect(callback).toHaveBeenCalledTimes(2);
     });
@@ -87,7 +90,7 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback1);
       handler.register('select', callback2);
 
-      handler.emit({ type: 'select', data: { id: '1' } });
+      handler.emit('select', { ids: ['1'] });
 
       expect(calls).toEqual(['1', '2']);
     });
@@ -99,7 +102,7 @@ describe('CoreCommandHandler', () => {
       const unregister = handler.register('select', callback);
 
       unregister();
-      handler.emit({ type: 'select', data: { id: '1' } });
+      handler.emit('select', { ids: ['1'] });
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -112,21 +115,10 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback2);
 
       unregister1();
-      handler.emit({ type: 'select', data: { id: '1' } });
+      handler.emit('select', { ids: ['1'] });
 
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).toHaveBeenCalled();
-    });
-
-    it('should remove the event type from the map when no callbacks remain', () => {
-      const callback = vi.fn();
-      const unregister = handler.register('select', callback);
-
-      unregister();
-      handler.emit({ type: 'select', data: { id: '1' } });
-
-      // @ts-expect-error - accessing private property for testing
-      expect(handler.callbacks.has('select')).toBe(false);
     });
 
     it('should handle unregistering a callback that was already removed', () => {
@@ -136,7 +128,7 @@ describe('CoreCommandHandler', () => {
       unregister();
       unregister(); // Call again, should not throw
 
-      handler.emit({ type: 'select', data: { id: '1' } });
+      handler.emit('select', { ids: ['1'] });
       expect(callback).not.toHaveBeenCalled();
     });
   });
@@ -146,23 +138,11 @@ describe('CoreCommandHandler', () => {
       const callback = vi.fn();
       handler.register('select', callback);
 
-      handler.emit({ type: 'select', data: { id: '1' } });
+      handler.emit('select', { ids: ['1'] });
 
       expect(callback).toHaveBeenCalledWith({
-        type: 'select',
-        data: { id: '1' },
-      });
-    });
-
-    it('should pass model change event data to callbacks', () => {
-      const callback = vi.fn();
-      handler.register('select', callback);
-
-      handler.emit({ type: 'select', data: { id: '1' } });
-
-      expect(callback).toHaveBeenCalledWith({
-        type: 'select',
-        data: { id: '1' },
+        name: 'select',
+        ids: ['1'],
       });
     });
   });
