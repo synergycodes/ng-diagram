@@ -2,39 +2,9 @@ import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
 
 /**
- * Type for model-specific actions in the flow diagram
+ * Type for model-specific actions types in the flow diagram
  */
-export interface ModelAction {
-  type: 'selectionChange';
-  payload: { ids: string[] };
-}
-
-/**
- * Type for the Nodes and Edges diff of the flow state
- */
-interface NodesEdgesDiff<T extends Node | Edge> {
-  added?: T[];
-  removed?: string[];
-  updated?: Record<string, Partial<T>>;
-}
-
-/**
- * Type for the MetaData diff of the flow state
- */
-interface MetaDataDiff {
-  added?: Record<string, unknown>;
-  removed?: string[];
-  updated?: Record<string, unknown>;
-}
-
-/**
- * Type for the diff of the flow state
- */
-export interface FlowStateDiff {
-  nodes?: NodesEdgesDiff<Node>;
-  edges?: NodesEdgesDiff<Edge>;
-  metaData?: MetaDataDiff;
-}
+export type ModelActionType = 'selectionChange';
 
 /**
  * Type for the state of the flow diagram
@@ -45,28 +15,33 @@ export interface FlowState {
   metadata: Record<string, unknown>;
 }
 
+export interface MiddlewareHistoryUpdate {
+  name: string;
+  prevState: FlowState;
+  nextState: FlowState;
+}
+
 /**
  * Type for the context of a middleware operation
  */
 export interface MiddlewareContext {
-  modelAction: ModelAction;
-  initialState: FlowState;
+  modelActionType: ModelActionType;
+  historyUpdates: MiddlewareHistoryUpdate[];
 }
 
 /**
  * Type for middleware function that transforms state
- * @template TState - Type of the state being modified
  */
 export type Middleware = (
   /**
-   * Current state diff
+   * Current state
    */
-  stateDiff: FlowStateDiff,
+  state: FlowState,
   /**
    * Context of the operation
    */
   context: MiddlewareContext
-) => FlowStateDiff;
+) => FlowState;
 
 /**
  * Type for middleware chain

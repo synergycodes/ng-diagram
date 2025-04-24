@@ -6,7 +6,9 @@ export interface SelectCommand {
 }
 
 export const select = (commandHandler: CommandHandler, { ids }: SelectCommand): void => {
-  commandHandler.flowCore.executeMiddlewares({ type: 'selectionChange', payload: { ids } });
+  commandHandler.flowCore.applyUpdate({
+    nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: ids.includes(node.id) })),
+  });
 };
 
 export interface DeselectAllCommand {
@@ -14,5 +16,7 @@ export interface DeselectAllCommand {
 }
 
 export const deselectAll = (commandHandler: CommandHandler): void => {
-  commandHandler.flowCore.executeMiddlewares({ type: 'selectionChange', payload: { ids: [] } });
+  commandHandler.flowCore.applyUpdate({
+    nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: false })),
+  });
 };

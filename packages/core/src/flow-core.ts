@@ -1,10 +1,9 @@
 import { CoreCommandHandler } from './command-handler';
 import { commands } from './commands';
 import { MiddlewareManager } from './middleware-manager';
-import { middlewares } from './middlewares';
 import type { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
-import type { Middleware, ModelAction } from './types/middleware.interface';
+import type { FlowState, Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
@@ -23,7 +22,7 @@ export class FlowCore {
   ) {
     this.commandHandler = new CoreCommandHandler(this, commands);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
-    this.middlewareManager = new MiddlewareManager(middlewares);
+    this.middlewareManager = new MiddlewareManager();
   }
 
   /**
@@ -58,16 +57,28 @@ export class FlowCore {
     this.middlewareManager.unregister(middleware);
   }
 
-  executeMiddlewares(modelAction: ModelAction): void {
-    const diff = this.middlewareManager.execute(
-      {
-        nodes: this.modelAdapter.getNodes(),
-        edges: this.modelAdapter.getEdges(),
-        metadata: this.modelAdapter.getMetadata(),
-      },
-      modelAction
-    );
-    // TODO: Handle applying diff on model
-    console.log(diff);
+  /**
+   * Gets the current state of the flow
+   */
+  getState(): FlowState {
+    return {
+      nodes: this.modelAdapter.getNodes(),
+      edges: this.modelAdapter.getEdges(),
+      metadata: this.modelAdapter.getMetadata(),
+    };
+  }
+
+  /**
+   * Applies an update to the flow state
+   * @param state Partial state to apply
+   */
+  applyUpdate(state: Partial<FlowState>): void {
+    const updatedState = { ...this.getState(), ...state };
+    const finalState = this.middlewareManager.execute(this.getState(), updatedState, 'selectionChange');
+    // TODO: Handle applying diff on model properly and not just replace the whole state
+    const { nodes, edges, metadata } = finalState;
+    this.modelAdapter.setNodes(nodes);
+    this.modelAdapter.setEdges(edges);
+    this.modelAdapter.setMetadata(metadata);
   }
 }
