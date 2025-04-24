@@ -1,48 +1,68 @@
-import type { Command, CommandCallback, CommandHandler } from './types/command-handler.interface';
-
+import { commands } from './commands';
+import { FlowCore } from './flow-core';
+import type {
+  Command,
+  CommandByName,
+  CommandCallback,
+  CommandHandler,
+  CommandName,
+  IsEmpty,
+  WithoutName,
+} from './types/command-handler.interface';
 /**
  * Core implementation of CommandHandler interface
- * Handles event emission and registration of callbacks for system events
+ * Handles command emission and registration of callbacks for system commands
  */
 export class CoreCommandHandler implements CommandHandler {
-  private callbacks = new Map<Command['type'], CommandCallback[]>();
+  private callbacks = new Map<Command['name'], CommandCallback[]>();
+
+  constructor(protected readonly flowCore: FlowCore) {}
 
   /**
-   * Emit a system event to all registered callbacks for the event type
-   * @param event Event to emit
+   * Emit a system command to all registered callbacks for the command type
+   * @param commandName Command name
+   * @param rest Command props
    */
-  emit(event: Command): void {
-    const callbacks = this.callbacks.get(event.type);
+  emit<K extends CommandName>(
+    commandName: K,
+    ...rest: IsEmpty<CommandByName<K>> extends true
+      ? [] | [props?: WithoutName<CommandByName<K>>]
+      : [props: WithoutName<CommandByName<K>>]
+  ): void {
+    const props = (rest[0] ?? {}) as WithoutName<CommandByName<K>>;
+    commands[commandName](this.flowCore, props);
+
+    const callbacks = this.callbacks.get(commandName);
     if (callbacks) {
       for (const callback of callbacks) {
-        callback(event);
+        callback({ name: commandName, ...props } as CommandByName<K>);
       }
     }
   }
 
   /**
-   * Register a callback for specific event types
-   * @param eventType Type of event to listen for
-   * @param callback Function to be called when event occurs
+   * Register a callback for specific command types
+   * @param commandType Type of command to listen for
+   * @param callback Function to be called when command occurs
    * @returns Function to unregister the callback
    */
-  register(eventType: Command['type'], callback: CommandCallback): () => void {
-    if (!this.callbacks.has(eventType)) {
-      this.callbacks.set(eventType, []);
+  register(commandName: Command['name'], callback: CommandCallback): () => void {
+    if (!this.callbacks.has(commandName)) {
+      this.callbacks.set(commandName, []);
     }
 
-    const callbacks = this.callbacks.get(eventType) as CommandCallback[];
+    const callbacks = this.callbacks.get(commandName) as CommandCallback[];
     callbacks.push(callback);
 
     // Return unregister function
     return () => {
-      const callbacks = this.callbacks.get(eventType);
+      const callbacks = this.callbacks.get(commandName);
       if (callbacks) {
         const index = callbacks.indexOf(callback);
         if (index !== -1) {
           callbacks.splice(index, 1);
           if (callbacks.length === 0) {
-            this.callbacks.delete(eventType);
+            this.callbacks.delete(commandName);
           }
         }
       }

@@ -5,8 +5,8 @@ import type { Node } from './node.interface';
  * Type for model-specific actions in the flow diagram
  */
 export interface ModelAction {
-  name: 'selectionChange';
-  data: { id: string; selected: boolean };
+  type: 'selectionChange';
+  payload: { ids: string[] };
 }
 
 /**

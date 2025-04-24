@@ -2,7 +2,7 @@ import { CoreCommandHandler } from './command-handler';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
-import type { Middleware } from './types/middleware.interface';
+import type { Middleware, ModelAction } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
@@ -19,7 +19,7 @@ export class FlowCore {
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory
   ) {
-    this.commandHandler = new CoreCommandHandler();
+    this.commandHandler = new CoreCommandHandler(this);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
     this.middlewareManager = new MiddlewareManager();
   }
@@ -54,5 +54,17 @@ export class FlowCore {
    */
   unregisterMiddleware(middleware: Middleware): void {
     this.middlewareManager.unregister(middleware);
+  }
+
+  executeMiddlewares(modelAction: ModelAction): void {
+    const diff = this.middlewareManager.execute(
+      {
+        nodes: this.modelAdapter.getNodes(),
+        edges: this.modelAdapter.getEdges(),
+        metadata: this.modelAdapter.getMetadata(),
+      },
+      modelAction
+    );
+    console.log(diff);
   }
 }
