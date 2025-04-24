@@ -11,7 +11,7 @@ export default tseslint.config(
         'error',
         {
           type: 'attribute',
-          prefix: 'angular-adapter',
+          prefix: 'angularAdapter',
           style: 'camelCase',
         },
       ],

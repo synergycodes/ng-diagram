@@ -2,5 +2,6 @@
  * Public API Surface of angular-adapter
  */
 
-export * from './lib/angular-adapter.service';
-export * from './lib/angular-adapter.component';
+export type { Node } from '@angularflow/core';
+export * from './lib/diagram/angular-adapter-diagram.component';
+export * from './lib/types';
