@@ -1,5 +1,6 @@
 import { Middleware } from '../types';
 
+// TODO: Modify logic if new approach of handling diff will be applied
 export const selectionChangeMiddleware: Middleware = (stateDiff, context) => {
   const { modelAction } = context;
 

@@ -15,8 +15,11 @@ import type {
  */
 export class CoreCommandHandler implements CommandHandler {
   private callbacks = new Map<Command['name'], CommandCallback[]>();
+  readonly flowCore: FlowCore;
 
-  constructor(protected readonly flowCore: FlowCore) {}
+  constructor(flowCore: FlowCore) {
+    this.flowCore = flowCore;
+  }
 
   /**
    * Emit a system command to all registered callbacks for the command type
@@ -30,7 +33,7 @@ export class CoreCommandHandler implements CommandHandler {
       : [props: WithoutName<CommandByName<K>>]
   ): void {
     const props = (rest[0] ?? {}) as WithoutName<CommandByName<K>>;
-    commands[commandName](this.flowCore, props);
+    commands[commandName](this, props);
 
     const callbacks = this.callbacks.get(commandName);
     if (callbacks) {

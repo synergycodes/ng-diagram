@@ -67,6 +67,7 @@ export class FlowCore {
       },
       modelAction
     );
+    // TODO: Handle applying diff on model
     console.log(diff);
   }
 }
