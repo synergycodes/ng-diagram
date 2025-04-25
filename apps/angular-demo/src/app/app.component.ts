@@ -17,7 +17,7 @@ export class AppComponent implements OnDestroy {
   private readonly diagramContainer!: ElementRef<HTMLElement>;
 
   nodes = signal<Node[]>([
-    { id: '1', type: 'input-field', position: { x: 300, y: 300 } },
+    { id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} },
     {
       id: '2',
       type: 'image',
