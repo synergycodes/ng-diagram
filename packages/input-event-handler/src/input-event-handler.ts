@@ -81,6 +81,14 @@ export class InputEventHandler extends CoreInputEventHandler {
     );
   }
 
+  invoke(actionName: ActionName, event: Event): void {
+    const action = this.defaultActions.get(actionName)?.action;
+    if (!action) {
+      throw new Error(`Default action "${actionName}" does not exist.`);
+    }
+    action(event, this);
+  }
+
   /**
    * @internal
    * Overwrites default action for given action name.
