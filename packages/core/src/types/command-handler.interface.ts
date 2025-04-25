@@ -1,9 +1,10 @@
+import { MoveNodesCommand } from '../commands/move-nodes';
 import { DeselectAllCommand, SelectCommand } from '../commands/selection';
 import { FlowCore } from '../flow-core';
 /**
  * Type for system commands that can be emitted by InputEventHandler or user
  */
-export type Command = SelectCommand | DeselectAllCommand;
+export type Command = SelectCommand | DeselectAllCommand | MoveNodesCommand;
 
 /**
  * Type for command name
