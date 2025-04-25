@@ -75,7 +75,6 @@ export class FlowCore {
   applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): void {
     const updatedState = { ...this.getState(), ...state };
     const finalState = this.middlewareManager.execute(this.getState(), updatedState, modelActionType);
-    // TODO: Handle applying diff on model properly and not just replace the whole state
     const { nodes, edges, metadata } = finalState;
     this.modelAdapter.setNodes(nodes);
     this.modelAdapter.setEdges(edges);
