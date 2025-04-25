@@ -2,6 +2,17 @@ import type { CommandHandler, Event, EventMapper } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputEventHandler } from './input-event-handler';
 
+vi.mock('./actions', async () => ({
+  actions: {
+    select: {
+      action: vi.fn(),
+      predicate: () => true,
+    },
+  },
+}));
+
+import { actions } from './actions';
+
 class MockEventMapper {
   private listener: (event: Event) => void = () => null;
 
@@ -18,15 +29,12 @@ describe('InputEventHandler', () => {
   let eventHandler: InputEventHandler;
   let mockCommandHandler: CommandHandler;
   let mockEventMapper: EventMapper;
-  let mockDefaultAction: (event: Event) => void;
 
   beforeEach(() => {
     mockCommandHandler = {} as CommandHandler;
     mockEventMapper = new MockEventMapper();
-
     eventHandler = new InputEventHandler(mockCommandHandler, mockEventMapper);
-    mockDefaultAction = vi.fn();
-    eventHandler.__overwriteDefaultAction('select', { action: mockDefaultAction, predicate: () => true });
+    vi.clearAllMocks();
   });
 
   describe('registerDefault', () => {
@@ -36,7 +44,7 @@ describe('InputEventHandler', () => {
       eventHandler.registerDefault('select');
       mockEventMapper.emit({} as Event);
 
-      expect(mockDefaultAction).toHaveBeenCalledTimes(1);
+      expect(actions.select.action).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -45,7 +53,7 @@ describe('InputEventHandler', () => {
       eventHandler.unregisterDefault('select');
       mockEventMapper.emit({} as Event);
 
-      expect(mockDefaultAction).not.toHaveBeenCalled();
+      expect(actions.select.action).not.toHaveBeenCalled();
     });
   });
 
@@ -82,14 +90,14 @@ describe('InputEventHandler', () => {
     it('should call default action if no action is registered for event', () => {
       mockEventMapper.emit({} as Event);
 
-      expect(mockDefaultAction).toHaveBeenCalled();
+      expect(actions.select.action).toHaveBeenCalled();
     });
 
     it('should call default action if new action is registered for event', () => {
       eventHandler.register(() => true, 'select');
       mockEventMapper.emit({} as Event);
 
-      expect(mockDefaultAction).toHaveBeenCalledTimes(2);
+      expect(actions.select.action).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -113,7 +121,15 @@ describe('InputEventHandler', () => {
 
       mockEventMapper.emit({} as Event);
 
-      expect(mockDefaultAction).toHaveBeenCalledTimes(1);
+      expect(actions.select.action).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('invoke', () => {
+    it('should invoke default action', () => {
+      eventHandler.invoke('select', {} as Event);
+
+      expect(actions.select.action).toHaveBeenCalled();
     });
   });
 });

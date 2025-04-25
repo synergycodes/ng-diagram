@@ -1,4 +1,4 @@
-import { CommandHandlerFunction, CommandMap } from './commands';
+import { CommandHandlerFunction, commands } from './commands';
 import { FlowCore } from './flow-core';
 import type {
   CommandByName,
@@ -18,7 +18,7 @@ export class CoreCommandHandler implements CommandHandler {
   } = {};
   readonly flowCore: FlowCore;
 
-  constructor(flowCore: FlowCore, commands: CommandMap) {
+  constructor(flowCore: FlowCore) {
     this.flowCore = flowCore;
     (Object.entries(commands) as [CommandName, CommandHandlerFunction<CommandName>][]).forEach(([commandName, fn]) => {
       this.register(commandName, (command) => {
