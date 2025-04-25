@@ -1,28 +1,57 @@
+import { DeselectAllCommand, SelectCommand } from '../commands/selection';
+import { FlowCore } from '../flow-core';
 /**
- * Type for system events that can be emitted by InputEventHandler or user
+ * Type for system commands that can be emitted by InputEventHandler or user
  */
-export type Command = { type: 'select'; data: { id: string } } | { type: 'unselect'; data: { id: string } };
+export type Command = SelectCommand | DeselectAllCommand;
 
 /**
- * Type for event callback function
+ * Type for command name
  */
-export type CommandCallback = (event: Command) => void;
+export type CommandName = Command['name'];
 
 /**
- * Interface for interpreting and routing system events
- * This is a core component that handles events from InputEventHandler or user
+ * Type for command by name
+ */
+export type CommandByName<N extends CommandName> = Extract<Command, { name: N }>;
+
+/**
+ * Type for command without name
+ */
+export type WithoutName<T> = Omit<T, 'name'>;
+
+/**
+ * Type for command without name
+ */
+export type IsEmpty<T> = keyof WithoutName<T> extends never ? true : false;
+
+/**
+ * Type for command callback function
+ */
+export type CommandCallback<K extends CommandName> = (command: CommandByName<K>) => void;
+
+/**
+ * Interface for interpreting and routing system commands
+ * This is a core component that handles commands from InputEventHandler or user
  */
 export interface CommandHandler {
-  /**
-   * Emit a system event
-   * @param event Event to emit
-   */
-  emit(event: Command): void;
+  readonly flowCore: FlowCore;
 
   /**
-   * Register a callback for specific event types
-   * @param eventType Type of event to listen for
-   * @param callback Function to be called when event occurs
+   * Emit a system command
+   * @param command Command to emit
    */
-  register(eventType: Command['type'], callback: CommandCallback): void;
+  emit<K extends CommandName>(
+    commandName: K,
+    ...props: IsEmpty<CommandByName<K>> extends true
+      ? [] | [WithoutName<CommandByName<K>>]
+      : [WithoutName<CommandByName<K>>]
+  ): void;
+
+  /**
+   * Register a callback for specific command types
+   * @param commandType Type of command to listen for
+   * @param callback Function to be called when command occurs
+   */
+  register<K extends CommandName>(commandType: K, callback: CommandCallback<K>): void;
 }

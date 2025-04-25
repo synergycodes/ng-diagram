@@ -1,8 +1,9 @@
 import { CoreCommandHandler } from './command-handler';
+import { commands } from './commands';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
-import type { Middleware } from './types/middleware.interface';
+import type { FlowState, Middleware, ModelActionType } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
@@ -19,7 +20,7 @@ export class FlowCore {
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory
   ) {
-    this.commandHandler = new CoreCommandHandler();
+    this.commandHandler = new CoreCommandHandler(this, commands);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
     this.middlewareManager = new MiddlewareManager();
   }
@@ -54,5 +55,31 @@ export class FlowCore {
    */
   unregisterMiddleware(middleware: Middleware): void {
     this.middlewareManager.unregister(middleware);
+  }
+
+  /**
+   * Gets the current state of the flow
+   */
+  getState(): FlowState {
+    return {
+      nodes: this.modelAdapter.getNodes(),
+      edges: this.modelAdapter.getEdges(),
+      metadata: this.modelAdapter.getMetadata(),
+    };
+  }
+
+  /**
+   * Applies an update to the flow state
+   * @param state Partial state to apply
+   * @param modelActionType Type of model action to apply
+   */
+  applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): void {
+    const updatedState = { ...this.getState(), ...state };
+    const finalState = this.middlewareManager.execute(this.getState(), updatedState, modelActionType);
+    // TODO: Handle applying diff on model properly and not just replace the whole state
+    const { nodes, edges, metadata } = finalState;
+    this.modelAdapter.setNodes(nodes);
+    this.modelAdapter.setEdges(edges);
+    this.modelAdapter.setMetadata(metadata);
   }
 }

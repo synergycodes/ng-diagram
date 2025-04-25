@@ -1,4 +1,10 @@
-import type { FlowState, FlowStateDiff, Middleware, MiddlewareChain, ModelAction } from './types/middleware.interface';
+import type {
+  FlowState,
+  Middleware,
+  MiddlewareChain,
+  MiddlewareHistoryUpdate,
+  ModelActionType,
+} from './types/middleware.interface';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
@@ -27,13 +33,20 @@ export class MiddlewareManager {
   /**
    * Executes all registered middlewares in sequence
    * @param state Initial state to be transformed
-   * @param modelAction Model action to be applied
-   * @returns Diff of the state after all middlewares have been applied
+   * @param modelActionType Model action type which triggers the middleware
+   * @returns State after all middlewares have been applied
    */
-  execute(state: FlowState, modelAction: ModelAction): FlowStateDiff {
+  execute(prevState: FlowState, nextState: FlowState, modelActionType: ModelActionType): FlowState {
+    const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState }];
     return this.middlewareChain.reduce(
-      (currentState, middleware) => middleware(currentState, { modelAction, initialState: state }),
-      {} as FlowStateDiff
-    );
+      ({ currentState, historyUpdates }, middleware) => {
+        const nextState = middleware(currentState, { modelActionType, historyUpdates });
+        return {
+          currentState: nextState,
+          historyUpdates: [...historyUpdates, { name: middleware.name, prevState: currentState, nextState }],
+        };
+      },
+      { currentState: nextState, historyUpdates }
+    ).currentState;
   }
 }

@@ -1,11 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { CoreCommandHandler } from './command-handler';
 import { FlowCore } from './flow-core';
 import { MiddlewareManager } from './middleware-manager';
+import { mockedEdge, mockedNode } from './test-utils';
+import { Edge } from './types/edge.interface';
 import { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
+import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
 
 const mockMiddlewareManager = {
@@ -25,15 +28,22 @@ describe('FlowCore', () => {
   let mockEventMapper: EventMapper;
   let mockEventHandler: InputEventHandler;
   let createEventHandler: (interpreter: CoreCommandHandler) => InputEventHandler;
+  let mockGetNodes: Mock<() => Node[]>;
+  let mockGetEdges: Mock<() => Edge[]>;
+  let mockGetMetadata: Mock<() => Record<string, unknown>>;
 
   beforeEach(() => {
+    mockGetNodes = vi.fn().mockReturnValue([]);
+    mockGetEdges = vi.fn().mockReturnValue([]);
+    mockGetMetadata = vi.fn().mockReturnValue({});
+
     // Create mock implementations
     mockModelAdapter = {
-      getNodes: vi.fn(),
-      getEdges: vi.fn(),
+      getNodes: mockGetNodes,
+      getEdges: mockGetEdges,
+      getMetadata: mockGetMetadata,
       setNodes: vi.fn(),
       setEdges: vi.fn(),
-      getMetadata: vi.fn(),
       setMetadata: vi.fn(),
       onChange: vi.fn(),
       undo: vi.fn(),
@@ -113,6 +123,50 @@ describe('FlowCore', () => {
       flowCore.unregisterMiddleware(middleware);
 
       expect(mockMiddlewareManager.unregister).toHaveBeenCalledWith(middleware);
+    });
+  });
+
+  describe('getState', () => {
+    it('should return the current state', () => {
+      mockGetNodes.mockReturnValue([mockedNode]);
+      mockGetEdges.mockReturnValue([mockedEdge]);
+      mockGetMetadata.mockReturnValue({ test: 'abc' });
+      const state = flowCore.getState();
+      expect(state).toEqual({
+        nodes: [mockedNode],
+        edges: [mockedEdge],
+        metadata: { test: 'abc' },
+      });
+    });
+  });
+
+  describe('applyUpdate', () => {
+    it('should apply the update to the state', () => {
+      mockMiddlewareManager.execute.mockReturnValue({
+        nodes: [mockedNode],
+        edges: [mockedEdge],
+        metadata: { test: 'abc' },
+      });
+      flowCore.applyUpdate({ nodes: [mockedNode] }, 'selectionChange');
+
+      expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
+      expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockedNode]);
+      expect(mockModelAdapter.setEdges).toHaveBeenCalledWith([mockedEdge]);
+    });
+
+    it('should call the middleware with the correct parameters', () => {
+      mockMiddlewareManager.execute.mockReturnValue({
+        nodes: [mockedNode],
+        edges: [mockedEdge],
+        metadata: { test: 'abc' },
+      });
+      flowCore.applyUpdate({ nodes: [mockedNode] }, 'selectionChange');
+
+      expect(mockMiddlewareManager.execute).toHaveBeenCalledWith(
+        { nodes: [], edges: [], metadata: {} },
+        { nodes: [mockedNode], edges: [], metadata: {} },
+        'selectionChange'
+      );
     });
   });
 });

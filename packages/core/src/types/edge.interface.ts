@@ -5,6 +5,7 @@ export interface Edge {
   id: string;
   source: string; // source node id
   target: string; // target node id
+  selected: boolean;
   type?: string;
   data?: Record<string, unknown>;
 }

@@ -4,6 +4,7 @@
 export interface Node {
   id: string;
   type: string;
+  selected: boolean;
   position: {
     x: number;
     y: number;

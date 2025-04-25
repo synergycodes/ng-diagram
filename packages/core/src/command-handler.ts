@@ -1,49 +1,73 @@
-import type { Command, CommandCallback, CommandHandler } from './types/command-handler.interface';
-
+import { CommandHandlerFunction, CommandMap } from './commands';
+import { FlowCore } from './flow-core';
+import type {
+  CommandByName,
+  CommandCallback,
+  CommandHandler,
+  CommandName,
+  IsEmpty,
+  WithoutName,
+} from './types/command-handler.interface';
 /**
  * Core implementation of CommandHandler interface
- * Handles event emission and registration of callbacks for system events
+ * Handles command emission and registration of callbacks for system commands
  */
 export class CoreCommandHandler implements CommandHandler {
-  private callbacks = new Map<Command['type'], CommandCallback[]>();
+  private callbacks: {
+    [K in CommandName]?: CommandCallback<K>[];
+  } = {};
+  readonly flowCore: FlowCore;
+
+  constructor(flowCore: FlowCore, commands: CommandMap) {
+    this.flowCore = flowCore;
+    (Object.entries(commands) as [CommandName, CommandHandlerFunction<CommandName>][]).forEach(([commandName, fn]) => {
+      this.register(commandName, (command) => {
+        fn(this, command);
+      });
+    });
+  }
 
   /**
-   * Emit a system event to all registered callbacks for the event type
-   * @param event Event to emit
+   * Emit a system command to all registered callbacks for the command type
+   * @param commandName Command name
+   * @param rest Command props
    */
-  emit(event: Command): void {
-    const callbacks = this.callbacks.get(event.type);
+  emit<K extends CommandName>(
+    commandName: K,
+    ...props: IsEmpty<CommandByName<K>> extends true
+      ? [] | [WithoutName<CommandByName<K>>]
+      : [WithoutName<CommandByName<K>>]
+  ): void {
+    const callbacks = this.callbacks[commandName];
     if (callbacks) {
       for (const callback of callbacks) {
-        callback(event);
+        callback({ name: commandName, ...props[0] } as CommandByName<K>);
       }
     }
   }
 
   /**
-   * Register a callback for specific event types
-   * @param eventType Type of event to listen for
-   * @param callback Function to be called when event occurs
+   * Register a callback for specific command types
+   * @param commandName Type of command to listen for
+   * @param callback Function to be called when command occurs
    * @returns Function to unregister the callback
    */
-  register(eventType: Command['type'], callback: CommandCallback): () => void {
-    if (!this.callbacks.has(eventType)) {
-      this.callbacks.set(eventType, []);
+  register<K extends CommandName>(commandName: K, callback: CommandCallback<K>): () => void {
+    if (!this.callbacks[commandName]) {
+      this.callbacks[commandName] = [];
     }
 
-    const callbacks = this.callbacks.get(eventType) as CommandCallback[];
+    const callbacks = this.callbacks[commandName]! as CommandCallback<K>[];
     callbacks.push(callback);
 
     // Return unregister function
     return () => {
-      const callbacks = this.callbacks.get(eventType);
-      if (callbacks) {
-        const index = callbacks.indexOf(callback);
-        if (index !== -1) {
-          callbacks.splice(index, 1);
-          if (callbacks.length === 0) {
-            this.callbacks.delete(eventType);
-          }
+      const callbacks = this.callbacks[commandName]! as CommandCallback<K>[];
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+        callbacks.splice(index, 1);
+        if (callbacks.length === 0) {
+          this.callbacks[commandName] = undefined;
         }
       }
     };

@@ -17,12 +17,12 @@ export type ActionName = 'select';
 /**
  * Type for action function
  */
-export type Action = (event: Event, context: ActionContext) => void;
+export type Action = (event: Event, inputEventHandler: InputEventHandler) => void;
 
 /**
  * Type for predicate function that determines if an action should be triggered
  */
-export type ActionPredicate = (event: Event, context: ActionContext) => boolean;
+export type ActionPredicate = (event: Event, inputEventHandler: InputEventHandler) => boolean;
 
 /**
  * Type for action that can be either a name or a function
@@ -40,7 +40,7 @@ export interface ActionWithPredicate {
  */
 export abstract class InputEventHandler {
   protected constructor(
-    protected readonly commandHandler: CommandHandler,
+    readonly commandHandler: CommandHandler,
     protected readonly eventMapper: EventMapper
   ) {}
 

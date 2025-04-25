@@ -9,22 +9,18 @@ import {
   type Event,
   type EventMapper,
 } from '@angularflow/core';
-
-// TODO: Replace with proper default actions
-const DEFAULT_ACTIONS: Record<ActionName, ActionWithPredicate> = {
-  select: { action: () => null, predicate: () => true },
-};
+import { actions } from './actions';
 
 export class InputEventHandler extends CoreInputEventHandler {
-  private context: ActionContext;
   private defaultActions = new Map<ActionName, ActionWithPredicate>();
   private registeredActions: ActionWithPredicate[] = [];
+  context: ActionContext;
 
   constructor(
-    protected readonly interpreter: CommandHandler,
+    readonly commandHandler: CommandHandler,
     protected readonly eventMapper: EventMapper
   ) {
-    super(interpreter, eventMapper);
+    super(commandHandler, eventMapper);
     this.context = {
       ctrlKey: false,
       shiftKey: false,
@@ -32,7 +28,7 @@ export class InputEventHandler extends CoreInputEventHandler {
       metaKey: false,
     };
     this.eventMapper.register((event) => this.handleEvent(event));
-    for (const [name, { action, predicate }] of Object.entries(DEFAULT_ACTIONS)) {
+    for (const [name, { action, predicate }] of Object.entries(actions)) {
       this.defaultActions.set(name as ActionName, { action, predicate });
       this.register(predicate, action);
     }
@@ -40,8 +36,8 @@ export class InputEventHandler extends CoreInputEventHandler {
 
   private handleEvent(event: Event): void {
     for (const { predicate, action } of this.registeredActions) {
-      if (predicate(event, this.context)) {
-        action(event, this.context);
+      if (predicate(event, this)) {
+        action(event, this);
       }
     }
   }
