@@ -4,7 +4,8 @@
   "type": "module",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
-    "@angular/core": "^19.2.0"
+    "@angular/core": "^19.2.0",
+    "@angularflow/core": "workspace:*"
   },
   "dependencies": {
     "tslib": "^2.3.0"

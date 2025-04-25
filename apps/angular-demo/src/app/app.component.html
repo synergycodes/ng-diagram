@@ -1,3 +1,3 @@
-<div class="diagram-container">
-  <h1>{{ title }}</h1>
+<div class="diagram-container" #diagramContainer>
+  <angular-adapter-diagram [nodes]="nodes()" [nodeTemplateMap]="nodeTemplateMap" />
 </div>
