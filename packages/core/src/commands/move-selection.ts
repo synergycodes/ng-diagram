@@ -1,12 +1,12 @@
 import { CommandHandler } from '../types/command-handler.interface';
 
-export interface MoveNodesCommand {
-  name: 'moveNodes';
+export interface MoveSelectionCommand {
+  name: 'moveSelection';
   dx: number;
   dy: number;
 }
 
-export const moveNodes = (commandHandler: CommandHandler, { dx, dy }: MoveNodesCommand): void => {
+export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSelectionCommand): void => {
   const state = commandHandler.flowCore.getState();
 
   const updatedNodes = state.nodes.map((node) => {
@@ -26,6 +26,6 @@ export const moveNodes = (commandHandler: CommandHandler, { dx, dy }: MoveNodesC
     {
       nodes: updatedNodes,
     },
-    'moveNodes'
+    'moveSelection'
   );
 };

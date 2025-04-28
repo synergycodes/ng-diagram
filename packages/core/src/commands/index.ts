@@ -1,5 +1,5 @@
 import { CommandByName, CommandHandler, CommandName } from '../types/command-handler.interface';
-import { moveNodes } from './move-nodes';
+import { moveSelection } from './move-selection';
 import { deselectAll, select } from './selection';
 
 export type CommandHandlerFunction<K extends CommandName> = (
@@ -14,5 +14,5 @@ export type CommandMap = {
 export const commands: CommandMap = {
   select,
   deselectAll,
-  moveNodes,
+  moveNodes: moveSelection,
 };

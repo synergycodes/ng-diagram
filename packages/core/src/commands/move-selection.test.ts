@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreCommandHandler } from '../command-handler';
 import { FlowCore } from '../flow-core';
 import { commands } from './index';
-import { moveNodes } from './move-nodes';
+import { moveSelection } from './move-selection';
 
 const MOVEMENT_STEP = 10;
 
-describe('Move Commands', () => {
+describe('Move Selection Commands', () => {
   let flowCore: FlowCore;
   let commandHandler: CoreCommandHandler;
 
@@ -29,7 +29,7 @@ describe('Move Commands', () => {
       nodes: [mockNode],
     });
 
-    moveNodes(commandHandler, { name: 'moveNodes', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
+    moveSelection(commandHandler, { name: 'moveSelection', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
@@ -40,7 +40,7 @@ describe('Move Commands', () => {
           },
         ],
       },
-      'moveNodes'
+      'moveSelection'
     );
   });
 
@@ -55,13 +55,13 @@ describe('Move Commands', () => {
       nodes: [mockNode],
     });
 
-    moveNodes(commandHandler, { name: 'moveNodes', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
+    moveSelection(commandHandler, { name: 'moveSelection', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
         nodes: [mockNode],
       },
-      'moveNodes'
+      'moveSelection'
     );
   });
 });
