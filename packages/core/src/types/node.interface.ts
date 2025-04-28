@@ -3,11 +3,11 @@
  */
 export interface Node {
   id: string;
-  type: string;
-  selected: boolean;
   position: {
     x: number;
     y: number;
   };
-  data?: Record<string, unknown>;
+  data: Record<string, unknown>;
+  type: string;
+  selected?: boolean;
 }

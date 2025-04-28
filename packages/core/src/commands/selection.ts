@@ -1,4 +1,26 @@
 import { CommandHandler } from '../types/command-handler.interface';
+import { Edge } from '../types/edge.interface';
+import { FlowState } from '../types/middleware.interface';
+import { Node } from '../types/node.interface';
+
+const changeSelection = (nodes: Node[], edges: Edge[], ids: string[]): Pick<FlowState, 'nodes' | 'edges'> => {
+  return {
+    nodes: nodes.map((node) => {
+      const isSelected = ids.includes(node.id);
+      if (node.selected === isSelected) {
+        return node;
+      }
+      return { ...node, selected: isSelected };
+    }),
+    edges: edges.map((edge) => {
+      const isSelected = ids.includes(edge.id);
+      if (edge.selected === isSelected) {
+        return edge;
+      }
+      return { ...edge, selected: isSelected };
+    }),
+  };
+};
 
 export interface SelectCommand {
   name: 'select';
@@ -6,13 +28,8 @@ export interface SelectCommand {
 }
 
 export const select = (commandHandler: CommandHandler, { ids }: SelectCommand): void => {
-  commandHandler.flowCore.applyUpdate(
-    {
-      nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: ids.includes(node.id) })),
-      edges: commandHandler.flowCore.getState().edges.map((edge) => ({ ...edge, selected: ids.includes(edge.id) })),
-    },
-    'selectionChange'
-  );
+  const { nodes, edges } = commandHandler.flowCore.getState();
+  commandHandler.flowCore.applyUpdate(changeSelection(nodes, edges, ids), 'selectionChange');
 };
 
 export interface DeselectAllCommand {
@@ -20,11 +37,6 @@ export interface DeselectAllCommand {
 }
 
 export const deselectAll = (commandHandler: CommandHandler): void => {
-  commandHandler.flowCore.applyUpdate(
-    {
-      nodes: commandHandler.flowCore.getState().nodes.map((node) => ({ ...node, selected: false })),
-      edges: commandHandler.flowCore.getState().edges.map((edge) => ({ ...edge, selected: false })),
-    },
-    'selectionChange'
-  );
+  const { nodes, edges } = commandHandler.flowCore.getState();
+  commandHandler.flowCore.applyUpdate(changeSelection(nodes, edges, []), 'selectionChange');
 };

@@ -1,5 +1,4 @@
 import { CoreCommandHandler } from './command-handler';
-import { commands } from './commands';
 import { MiddlewareManager } from './middleware-manager';
 import type { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
@@ -20,7 +19,7 @@ export class FlowCore {
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory
   ) {
-    this.commandHandler = new CoreCommandHandler(this, commands);
+    this.commandHandler = new CoreCommandHandler(this);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
     this.middlewareManager = new MiddlewareManager();
   }
@@ -69,17 +68,24 @@ export class FlowCore {
   }
 
   /**
+   * Sets the current state of the flow
+   * @param state State to set
+   */
+  setState(state: FlowState): void {
+    this.modelAdapter.setNodes(state.nodes);
+    this.modelAdapter.setEdges(state.edges);
+    this.modelAdapter.setMetadata(state.metadata);
+  }
+
+  /**
    * Applies an update to the flow state
    * @param state Partial state to apply
    * @param modelActionType Type of model action to apply
    */
   applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): void {
-    const updatedState = { ...this.getState(), ...state };
-    const finalState = this.middlewareManager.execute(this.getState(), updatedState, modelActionType);
-    // TODO: Handle applying diff on model properly and not just replace the whole state
-    const { nodes, edges, metadata } = finalState;
-    this.modelAdapter.setNodes(nodes);
-    this.modelAdapter.setEdges(edges);
-    this.modelAdapter.setMetadata(metadata);
+    const initialState = this.getState();
+    const updatedState = { ...initialState, ...state };
+    const finalState = this.middlewareManager.execute(initialState, updatedState, modelActionType);
+    this.setState(finalState);
   }
 }

@@ -81,15 +81,11 @@ export class InputEventHandler extends CoreInputEventHandler {
     );
   }
 
-  /**
-   * @internal
-   * Overwrites default action for given action name.
-   * @param actionName - Action name to overwrite.
-   * @param actionWithPredicate - Action with predicate to set as default.
-   */
-  __overwriteDefaultAction(actionName: ActionName, actionWithPredicate: ActionWithPredicate): void {
-    this.unregisterDefault(actionName);
-    this.defaultActions.set(actionName, actionWithPredicate);
-    this.register(actionWithPredicate.predicate, actionWithPredicate.action);
+  invoke(actionName: ActionName, event: Event): void {
+    const action = this.defaultActions.get(actionName)?.action;
+    if (!action) {
+      throw new Error(`Default action "${actionName}" does not exist.`);
+    }
+    action(event, this);
   }
 }
