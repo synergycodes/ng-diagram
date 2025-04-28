@@ -14,19 +14,25 @@ describe('MiddlewareManager', () => {
   beforeEach(() => {
     middlewareManager = new MiddlewareManager();
 
-    mockMiddleware1 = vi.fn().mockImplementation(
-      (state: FlowState): FlowState => ({
-        ...state,
-        nodes: [...state.nodes, { ...mockedNode, id: 'node2' }],
-      })
-    );
+    mockMiddleware1 = {
+      name: 'mockMiddleware1',
+      execute: vi.fn().mockImplementation(
+        (state: FlowState): FlowState => ({
+          ...state,
+          nodes: [...state.nodes, { ...mockedNode, id: 'node2' }],
+        })
+      ),
+    };
 
-    mockMiddleware2 = vi.fn().mockImplementation(
-      (state: FlowState): FlowState => ({
-        ...state,
-        nodes: [...state.nodes, { ...mockedNode, id: 'node3' }],
-      })
-    );
+    mockMiddleware2 = {
+      name: 'mockMiddleware2',
+      execute: vi.fn().mockImplementation(
+        (state: FlowState): FlowState => ({
+          ...state,
+          nodes: [...state.nodes, { ...mockedNode, id: 'node3' }],
+        })
+      ),
+    };
 
     prevState = {
       nodes: [],
@@ -39,6 +45,7 @@ describe('MiddlewareManager', () => {
       metadata: {},
     };
     context = {
+      initialState: prevState,
       modelActionType: 'selectionChange',
       historyUpdates: [{ name: 'selectionChange', prevState, nextState }],
     };
@@ -78,8 +85,8 @@ describe('MiddlewareManager', () => {
       expect(result.nodes[0].id).toBe('node1');
       expect(result.nodes[1].id).toBe('node2');
       expect(result.nodes[2].id).toBe('node3');
-      expect(mockMiddleware1).toHaveBeenCalledWith(nextState, context);
-      expect(mockMiddleware2).toHaveBeenCalledWith(
+      expect(mockMiddleware1.execute).toHaveBeenCalledWith(nextState, context);
+      expect(mockMiddleware2.execute).toHaveBeenCalledWith(
         { ...nextState, nodes: [...nextState.nodes, { ...mockedNode, id: 'node2' }] },
         {
           ...context,
