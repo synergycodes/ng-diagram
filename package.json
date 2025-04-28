@@ -9,7 +9,7 @@
     "format:check": "prettier . --check",
     "format:fix": "prettier . --write",
     "check-types": "turbo run check-types",
-    "test": "turbo run test",
+    "test": "turbo run test --parallel",
     "prepare": "husky"
   },
   "devDependencies": {

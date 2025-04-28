@@ -2,7 +2,7 @@ import { ActionWithPredicate, CommandByName, Event, InputEventHandler, KeyboardE
 
 export const keyboardMoveSelectionAction: ActionWithPredicate = {
   action: (event: Event, inputEventHandler: InputEventHandler) => {
-    inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event));
+    inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event as KeyboardEvent));
   },
   predicate: (event: Event) =>
     event.type === 'keydown' &&
