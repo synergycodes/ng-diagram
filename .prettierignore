@@ -10,3 +10,5 @@ pnpm-lock.yaml
 # Misc
 .git
 .DS_Store
+
+**/dist
