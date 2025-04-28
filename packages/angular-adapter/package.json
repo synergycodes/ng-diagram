@@ -15,7 +15,7 @@
     "lint:fix": "ng lint --fix"
   },
   "dependencies": {
-    "@angular/common": "^19.2.7",
+    "@angular/common": "^19.2.8",
     "@angular/compiler": "^19.2.7",
     "@angular/core": "^19.2.7",
     "@angular/forms": "^19.2.7",
