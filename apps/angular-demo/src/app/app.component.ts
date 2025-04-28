@@ -18,14 +18,8 @@ export class AppComponent implements OnDestroy {
 
   nodes = signal<Node[]>([
     { id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} },
-    {
-      id: '2',
-      type: 'image',
-      position: { x: 500, y: 300 },
-      data: {
-        imageUrl: 'https://tinyurl.com/bddnt44s',
-      },
-    },
+    { id: '2', type: 'image', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+    { id: '3', type: 'unknown', position: { x: 700, y: 300 }, data: {} },
   ]);
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent as unknown as Type<INodeTemplate>],

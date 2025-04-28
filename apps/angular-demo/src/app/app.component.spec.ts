@@ -29,9 +29,10 @@ describe('AppComponent', () => {
 
   it('should initialize with two nodes', () => {
     const nodes = component.nodes();
-    expect(nodes.length).toBe(2);
+    expect(nodes.length).toBe(3);
     expect(nodes[0].type).toBe('input-field');
     expect(nodes[1].type).toBe('image');
+    expect(nodes[2].type).toBe('unknown');
   });
 
   it('should have correct node template mappings', () => {

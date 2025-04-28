@@ -2,6 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Node } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import {
+  PointerDownEventListenerDirective,
+  PointerEnterEventListenerDirective,
+  PointerLeaveEventListenerDirective,
+  PointerMoveEventListenerDirective,
+  PointerUpEventListenerDirective,
+} from '../directives';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -52,5 +59,30 @@ describe('AngularAdapterDiagramComponent', () => {
     fixture.componentRef.setInput('nodeTemplateMap', templateMap);
 
     expect(component.getNodeTemplate('test-type')).toBe(mockTemplate);
+  });
+
+  it('should have PointerDownEventListenerDirective as host directive', () => {
+    const pointerDownEventListenerDirective = fixture.debugElement.injector.get(PointerDownEventListenerDirective);
+    expect(pointerDownEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have PointerEnterEventListenerDirective as host directive', () => {
+    const pointerEnterEventListenerDirective = fixture.debugElement.injector.get(PointerEnterEventListenerDirective);
+    expect(pointerEnterEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have PointerLeaveEventListenerDirective as host directive', () => {
+    const pointerLeaveEventListenerDirective = fixture.debugElement.injector.get(PointerLeaveEventListenerDirective);
+    expect(pointerLeaveEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have PointerMoveEventListenerDirective as host directive', () => {
+    const pointerMoveEventListenerDirective = fixture.debugElement.injector.get(PointerMoveEventListenerDirective);
+    expect(pointerMoveEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have PointerUpEventListenerDirective as host directive', () => {
+    const pointerUpEventListenerDirective = fixture.debugElement.injector.get(PointerUpEventListenerDirective);
+    expect(pointerUpEventListenerDirective).toBeTruthy();
   });
 });

@@ -3,6 +3,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
+import {
+  PointerDownEventListenerDirective,
+  PointerEnterEventListenerDirective,
+  PointerLeaveEventListenerDirective,
+  PointerMoveEventListenerDirective,
+  PointerUpEventListenerDirective,
+} from '../directives';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 import { NodeTemplateMap } from '../types';
 
@@ -12,6 +19,13 @@ import { NodeTemplateMap } from '../types';
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    PointerDownEventListenerDirective,
+    PointerEnterEventListenerDirective,
+    PointerLeaveEventListenerDirective,
+    PointerMoveEventListenerDirective,
+    PointerUpEventListenerDirective,
+  ],
 })
 export class AngularAdapterDiagramComponent {
   /**

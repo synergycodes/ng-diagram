@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NodePositionDirective } from '../directives';
+import {
+  NodePositionDirective,
+  PointerDownEventListenerDirective,
+  PointerEnterEventListenerDirective,
+  PointerLeaveEventListenerDirective,
+  PointerUpEventListenerDirective,
+} from '../directives';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -10,6 +16,22 @@ import { NodePositionDirective } from '../directives';
     {
       directive: NodePositionDirective,
       inputs: ['position'],
+    },
+    {
+      directive: PointerDownEventListenerDirective,
+      inputs: ['eventTarget'],
+    },
+    {
+      directive: PointerEnterEventListenerDirective,
+      inputs: ['eventTarget'],
+    },
+    {
+      directive: PointerLeaveEventListenerDirective,
+      inputs: ['eventTarget'],
+    },
+    {
+      directive: PointerUpEventListenerDirective,
+      inputs: ['eventTarget'],
     },
   ],
 })
