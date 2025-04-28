@@ -1,6 +1,6 @@
-import { ActionWithPredicate } from '@angularflow/core';
+import { ActionWithPredicate, PointerEvent } from '@angularflow/core';
 
-export const selectAction: ActionWithPredicate = {
+export const selectAction: ActionWithPredicate<PointerEvent> = {
   action: ({ target }, inputEventHandler) => {
     if (!target) {
       inputEventHandler.commandHandler.emit('deselectAll');
