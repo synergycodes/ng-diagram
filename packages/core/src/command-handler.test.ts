@@ -8,6 +8,7 @@ vi.mock('./commands', () => ({
   commands: {
     select: vi.fn(),
     deselectAll: vi.fn(),
+    moveSelection: vi.fn(),
   },
 }));
 
