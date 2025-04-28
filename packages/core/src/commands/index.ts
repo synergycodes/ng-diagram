@@ -14,5 +14,5 @@ export type CommandMap = {
 export const commands: CommandMap = {
   select,
   deselectAll,
-  moveNodes: moveSelection,
+  moveSelection,
 };

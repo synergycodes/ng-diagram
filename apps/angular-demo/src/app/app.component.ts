@@ -22,7 +22,6 @@ export class AppComponent implements OnDestroy {
       id: '2',
       type: 'image',
       position: { x: 500, y: 300 },
-      selected: false,
       data: {
         imageUrl: 'https://tinyurl.com/bddnt44s',
       },
