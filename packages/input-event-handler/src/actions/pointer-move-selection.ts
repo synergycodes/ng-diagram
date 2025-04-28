@@ -18,27 +18,29 @@ const moveState: MoveState = {
   isFirstMove: true,
 };
 
-export const pointerMoveSelectionAction: ActionWithPredicate<PointerEvent> = {
+export const pointerMoveSelectionAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
+    const pointerEvent = event as PointerEvent;
+
     switch (event.type) {
       case 'pointerdown':
-        moveState.startX = event.x;
-        moveState.startY = event.y;
-        moveState.lastX = event.x;
-        moveState.lastY = event.y;
+        moveState.startX = pointerEvent.x;
+        moveState.startY = pointerEvent.y;
+        moveState.lastX = pointerEvent.x;
+        moveState.lastY = pointerEvent.y;
         moveState.isMoving = true;
         moveState.isFirstMove = true;
         break;
 
       case 'pointermove':
         if (moveState.isMoving) {
-          const dx = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
-          const dy = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
+          const dx = moveState.isFirstMove ? pointerEvent.x - moveState.startX : pointerEvent.x - moveState.lastX;
+          const dy = moveState.isFirstMove ? pointerEvent.y - moveState.startY : pointerEvent.y - moveState.lastY;
 
           inputEventHandler.commandHandler.emit('moveSelection', { dx, dy });
 
-          moveState.lastX = event.x;
-          moveState.lastY = event.y;
+          moveState.lastX = pointerEvent.x;
+          moveState.lastY = pointerEvent.y;
           moveState.isFirstMove = false;
         }
         break;

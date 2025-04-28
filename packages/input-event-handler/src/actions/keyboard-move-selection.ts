@@ -1,8 +1,8 @@
 import { ActionWithPredicate, CommandByName, KeyboardEvent } from '@angularflow/core';
 
-export const keyboardMoveSelectionAction: ActionWithPredicate<KeyboardEvent> = {
+export const keyboardMoveSelectionAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
-    inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event));
+    inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event as KeyboardEvent));
   },
   predicate: (event) =>
     event.type === 'keydown' &&

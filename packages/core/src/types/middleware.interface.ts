@@ -4,7 +4,7 @@ import type { Node } from './node.interface';
 /**
  * Type for model-specific actions types in the flow diagram
  */
-export type ModelActionType = 'selectionChange' | 'moveSelection';
+export type ModelActionType = 'selectionChange' | 'moveSelection' | 'deleteSelection';
 
 /**
  * Type for the state of the flow diagram

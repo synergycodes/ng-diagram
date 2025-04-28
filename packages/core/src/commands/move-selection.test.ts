@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CoreCommandHandler } from '../command-handler';
 import { FlowCore } from '../flow-core';
-import { commands } from './index';
 import { moveSelection } from './move-selection';
 
 const MOVEMENT_STEP = 10;
@@ -15,7 +14,7 @@ describe('Move Selection Commands', () => {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
     } as unknown as FlowCore;
-    commandHandler = new CoreCommandHandler(flowCore, commands);
+    commandHandler = new CoreCommandHandler(flowCore);
   });
 
   it('should move selected nodes by the specified amount', () => {
@@ -44,7 +43,7 @@ describe('Move Selection Commands', () => {
     );
   });
 
-  it('should not move unselected nodes', () => {
+  it('should not apply update if no nodes are selected', () => {
     const mockNode = {
       id: '1',
       position: { x: 0, y: 0 },
@@ -57,11 +56,6 @@ describe('Move Selection Commands', () => {
 
     moveSelection(commandHandler, { name: 'moveSelection', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
-      {
-        nodes: [mockNode],
-      },
-      'moveSelection'
-    );
+    expect(flowCore.applyUpdate).not.toHaveBeenCalled();
   });
 });

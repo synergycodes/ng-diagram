@@ -12,12 +12,12 @@ export interface ActionContext {
 /**
  * Type for action name
  */
-export type ActionName = 'select' | 'keyboardMoveSelection' | 'pointerMoveSelection';
+export type ActionName = 'select' | 'keyboardMoveSelection' | 'pointerMoveSelection' | 'deleteSelection';
 
 /**
  * Type for action function
  */
-export type Action<E extends Event = Event> = (event: E, inputEventHandler: InputEventHandler) => void;
+export type Action = (event: Event, inputEventHandler: InputEventHandler) => void;
 
 /**
  * Type for predicate function that determines if an action should be triggered
@@ -29,8 +29,8 @@ export type ActionPredicate = (event: Event, inputEventHandler: InputEventHandle
  */
 export type ActionOrActionName = ActionName | Action;
 
-export interface ActionWithPredicate<E extends Event = Event> {
-  action: Action<E>;
+export interface ActionWithPredicate {
+  action: Action;
   predicate: ActionPredicate;
 }
 
