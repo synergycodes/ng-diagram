@@ -7,7 +7,7 @@ import {
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerUpEventListenerDirective,
-} from '../directives';
+} from '../../directives';
 import { AngularAdapterNodeComponent } from './angular-adapter-node.component';
 
 describe('AngularAdapterNodeComponent', () => {

@@ -5,7 +5,7 @@ import {
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerUpEventListenerDirective,
-} from '../directives';
+} from '../../directives';
 
 @Component({
   selector: 'angular-adapter-node',

@@ -8,7 +8,7 @@ import {
   PointerLeaveEventListenerDirective,
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
-} from '../directives';
+} from '../../directives';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {

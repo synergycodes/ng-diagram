@@ -2,16 +2,16 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
-import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import {
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
-} from '../directives';
+} from '../../directives';
+import { NodeTemplateMap } from '../../types';
+import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
-import { NodeTemplateMap } from '../types';
 
 @Component({
   selector: 'angular-adapter-diagram',
