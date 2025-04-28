@@ -25,6 +25,7 @@ export interface MiddlewareHistoryUpdate {
  * Type for the context of a middleware operation
  */
 export interface MiddlewareContext {
+  initialState: FlowState;
   modelActionType: ModelActionType;
   historyUpdates: MiddlewareHistoryUpdate[];
 }
@@ -32,16 +33,19 @@ export interface MiddlewareContext {
 /**
  * Type for middleware function that transforms state
  */
-export type Middleware = (
-  /**
-   * Current state
-   */
-  state: FlowState,
-  /**
-   * Context of the operation
-   */
-  context: MiddlewareContext
-) => FlowState;
+export interface Middleware {
+  name: string;
+  execute: (
+    /**
+     * Current state
+     */
+    state: FlowState,
+    /**
+     * Context of the operation
+     */
+    context: MiddlewareContext
+  ) => FlowState;
+}
 
 /**
  * Type for middleware chain

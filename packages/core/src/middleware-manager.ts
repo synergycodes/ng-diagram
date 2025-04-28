@@ -40,10 +40,20 @@ export class MiddlewareManager {
     const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState }];
     return this.middlewareChain.reduce(
       ({ currentState, historyUpdates }, middleware) => {
-        const nextState = middleware(currentState, { modelActionType, historyUpdates });
+        const updatedState = middleware.execute(currentState, {
+          initialState: prevState,
+          modelActionType,
+          historyUpdates,
+        });
+        if (Object.is(updatedState, currentState)) {
+          return { currentState, historyUpdates };
+        }
         return {
-          currentState: nextState,
-          historyUpdates: [...historyUpdates, { name: middleware.name, prevState: currentState, nextState }],
+          currentState: updatedState,
+          historyUpdates: [
+            ...historyUpdates,
+            { name: middleware.name, prevState: currentState, nextState: updatedState },
+          ],
         };
       },
       { currentState: nextState, historyUpdates }
