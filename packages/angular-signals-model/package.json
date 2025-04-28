@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@angular/core": "^19.2.6",
+    "@angular/core": "^19.2.8",
     "@angular/platform-browser-dynamic": "^19.2.6"
   },
   "devDependencies": {
