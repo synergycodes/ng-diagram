@@ -1,11 +1,18 @@
-import type { FlowState, FlowStateDiff, ModelAction } from '@angularflow/core';
+import type { FlowState } from '@angularflow/core';
 import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
-import { createLoggerMiddleware } from './logger.middleware';
+import { loggerMiddleware } from './logger.middleware';
 
 describe('LoggerMiddleware', () => {
   let consoleLogSpy: MockInstance;
+  let initialState: FlowState;
 
   beforeEach(() => {
+    initialState = {
+      nodes: [],
+      edges: [],
+      metadata: {},
+    };
+
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {
       // do nothing
     });
@@ -15,131 +22,36 @@ describe('LoggerMiddleware', () => {
     consoleLogSpy.mockRestore();
   });
 
-  it('should log action and state by default', () => {
-    const middleware = createLoggerMiddleware();
-    const initialState: FlowState = {
-      nodes: [],
-      edges: [],
+  it('should log all information and return the state', () => {
+    const state: FlowState = {
+      nodes: [
+        { id: 'node1', type: 'input', position: { x: 0, y: 0 }, data: {} },
+        { id: 'node2', type: 'output', position: { x: 0, y: 0 }, data: {} },
+      ],
+      edges: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
       metadata: {},
     };
-    const stateDiff: FlowStateDiff = {
-      nodes: {
-        added: [
-          {
-            id: '1',
-            type: 'default',
-            position: { x: 0, y: 0 },
-          },
-        ],
-      },
-    };
-    const modelAction: ModelAction = {
-      name: 'selectionChange',
-      data: { id: '1', selected: true },
-    };
 
-    middleware(stateDiff, { modelAction, initialState });
-
-    expect(consoleLogSpy).toHaveBeenCalledTimes(2);
-    expect(consoleLogSpy).toHaveBeenCalledWith('[AngularFlow] Action:', {
-      type: 'selectionChange',
-      data: { id: '1', selected: true },
+    const result = loggerMiddleware.execute(state, {
+      modelActionType: 'selectionChange',
+      historyUpdates: [
+        {
+          name: 'selectionChange',
+          prevState: initialState,
+          nextState: state,
+        },
+      ],
+      initialState,
     });
-    expect(consoleLogSpy).toHaveBeenCalledWith('[AngularFlow] State:', {
-      before: initialState,
-      after: stateDiff,
-    });
-  });
 
-  it('should only log action when logState is false', () => {
-    const middleware = createLoggerMiddleware({ logState: false });
-    const initialState: FlowState = {
-      nodes: [],
-      edges: [],
-      metadata: {},
-    };
-    const stateDiff: FlowStateDiff = {
-      nodes: {
-        added: [
-          {
-            id: '1',
-            type: 'default',
-            position: { x: 0, y: 0 },
-          },
-        ],
-      },
-    };
-    const modelAction: ModelAction = {
-      name: 'selectionChange',
-      data: { id: '1', selected: true },
-    };
-
-    middleware(stateDiff, { modelAction, initialState });
-
-    expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-    expect(consoleLogSpy).toHaveBeenCalledWith('[AngularFlow] Action:', {
-      type: 'selectionChange',
-      data: { id: '1', selected: true },
-    });
-  });
-
-  it('should only log state when logAction is false', () => {
-    const middleware = createLoggerMiddleware({ logAction: false });
-    const initialState: FlowState = {
-      nodes: [],
-      edges: [],
-      metadata: {},
-    };
-    const stateDiff: FlowStateDiff = {
-      nodes: {
-        added: [
-          {
-            id: '1',
-            type: 'default',
-            position: { x: 0, y: 0 },
-          },
-        ],
-      },
-    };
-    const modelAction: ModelAction = {
-      name: 'selectionChange',
-      data: { id: '1', selected: true },
-    };
-
-    middleware(stateDiff, { modelAction, initialState });
-
-    expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-    expect(consoleLogSpy).toHaveBeenCalledWith('[AngularFlow] State:', {
-      before: initialState,
-      after: stateDiff,
-    });
-  });
-
-  it('should return the state diff unchanged', () => {
-    const middleware = createLoggerMiddleware();
-    const initialState: FlowState = {
-      nodes: [],
-      edges: [],
-      metadata: {},
-    };
-    const stateDiff: FlowStateDiff = {
-      nodes: {
-        added: [
-          {
-            id: '1',
-            type: 'default',
-            position: { x: 0, y: 0 },
-          },
-        ],
-      },
-    };
-    const modelAction: ModelAction = {
-      name: 'selectionChange',
-      data: { id: '1', selected: true },
-    };
-
-    const result = middleware(stateDiff, { modelAction, initialState });
-
-    expect(result).toBe(stateDiff);
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[AngularFlow] selectionChange',
+      expect.objectContaining({
+        initialState,
+        finalState: state,
+        historyUpdates: [{ name: 'selectionChange', prevState: initialState, nextState: state }],
+      })
+    );
+    expect(result).toEqual(state);
   });
 });
