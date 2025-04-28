@@ -8,6 +8,7 @@ vi.mock('./commands', () => ({
   commands: {
     select: vi.fn(),
     deselectAll: vi.fn(),
+    moveSelection: vi.fn(),
   },
 }));
 
@@ -26,9 +27,11 @@ describe('CoreCommandHandler', () => {
   it('should register default commands', () => {
     handler.emit('select', { ids: ['1'] });
     handler.emit('deselectAll');
+    handler.emit('moveSelection', { dx: 0, dy: 0 });
 
     expect(commands.select).toHaveBeenCalledWith(handler, { ids: ['1'], name: 'select' });
     expect(commands.deselectAll).toHaveBeenCalledWith(handler, { name: 'deselectAll' });
+    expect(commands.moveSelection).toHaveBeenCalledWith(handler, { dx: 0, dy: 0, name: 'moveSelection' });
   });
 
   describe('emit', () => {

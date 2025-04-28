@@ -12,7 +12,7 @@ export interface ActionContext {
 /**
  * Type for action name
  */
-export type ActionName = 'select';
+export type ActionName = 'select' | 'keyboardMoveSelection';
 
 /**
  * Type for action function
