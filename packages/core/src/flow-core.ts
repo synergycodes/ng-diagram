@@ -21,6 +21,8 @@ export class FlowCore {
 
   constructor(
     private readonly modelAdapter: ModelAdapter,
+    // eslint-disable-next-line
+    // @ts-ignore
     private readonly renderer: Renderer,
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory,

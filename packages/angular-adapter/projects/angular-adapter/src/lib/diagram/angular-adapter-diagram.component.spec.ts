@@ -32,8 +32,8 @@ describe('AngularAdapterDiagramComponent', () => {
 
   it('should update nodes when input changes', () => {
     const testNodes: Node[] = [
-      { id: '1', type: 'test', position: { x: 0, y: 0 } },
-      { id: '2', type: 'test', position: { x: 100, y: 100 } },
+      { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} },
+      { id: '2', type: 'test', position: { x: 100, y: 100 }, data: {} },
     ];
 
     fixture.componentRef.setInput('nodes', testNodes);
