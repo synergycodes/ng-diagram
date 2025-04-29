@@ -29,7 +29,7 @@ export interface SelectCommand {
 
 export const select = (commandHandler: CommandHandler, { ids }: SelectCommand): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  commandHandler.flowCore.applyUpdate(changeSelection(nodes, edges, ids), 'selectionChange');
+  commandHandler.flowCore.applyUpdate(changeSelection(nodes, edges, ids), 'changeSelection');
 };
 
 export interface DeselectAllCommand {
@@ -38,5 +38,5 @@ export interface DeselectAllCommand {
 
 export const deselectAll = (commandHandler: CommandHandler): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  commandHandler.flowCore.applyUpdate(changeSelection(nodes, edges, []), 'selectionChange');
+  commandHandler.flowCore.applyUpdate(changeSelection(nodes, edges, []), 'changeSelection');
 };

@@ -125,7 +125,10 @@ describe('FlowCore', () => {
 
   describe('middleware registration', () => {
     it('should delegate middleware registration to MiddlewareManager', () => {
-      const middleware: Middleware = vi.fn();
+      const middleware: Middleware = {
+        name: 'test',
+        execute: vi.fn(),
+      };
       const unregisterFn = vi.fn();
 
       mockMiddlewareManager.register.mockReturnValue(unregisterFn);
@@ -137,7 +140,10 @@ describe('FlowCore', () => {
     });
 
     it('should delegate middleware unregistration to MiddlewareManager', () => {
-      const middleware: Middleware = vi.fn();
+      const middleware: Middleware = {
+        name: 'test',
+        execute: vi.fn(),
+      };
 
       flowCore.unregisterMiddleware(middleware);
 
@@ -149,12 +155,12 @@ describe('FlowCore', () => {
     it('should return the current state', () => {
       mockGetNodes.mockReturnValue([mockedNode]);
       mockGetEdges.mockReturnValue([mockedEdge]);
-      mockGetMetadata.mockReturnValue({ test: 'abc' });
+      mockGetMetadata.mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, test: 'abc' });
       const state = flowCore.getState();
       expect(state).toEqual({
         nodes: [mockedNode],
         edges: [mockedEdge],
-        metadata: { test: 'abc' },
+        metadata: { viewport: { x: 0, y: 0, scale: 1 }, test: 'abc' },
       });
     });
   });
@@ -166,7 +172,7 @@ describe('FlowCore', () => {
         edges: [mockedEdge],
         metadata: { test: 'abc' },
       });
-      flowCore.applyUpdate({ nodes: [mockedNode] }, 'selectionChange');
+      flowCore.applyUpdate({ nodes: [mockedNode] }, 'changeSelection');
 
       expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
       expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockedNode]);
@@ -179,12 +185,12 @@ describe('FlowCore', () => {
         edges: [mockedEdge],
         metadata: { test: 'abc' },
       });
-      flowCore.applyUpdate({ nodes: [mockedNode] }, 'selectionChange');
+      flowCore.applyUpdate({ nodes: [mockedNode] }, 'changeSelection');
 
       expect(mockMiddlewareManager.execute).toHaveBeenCalledWith(
         { nodes: [], edges: [], metadata: {} },
         { nodes: [mockedNode], edges: [], metadata: {} },
-        'selectionChange'
+        'changeSelection'
       );
     });
   });

@@ -1,5 +1,6 @@
 import { Edge } from './types/edge.interface';
 import { PointerEvent } from './types/event.interface';
+import { Metadata } from './types/metadata.interface';
 import { Node } from './types/node.interface';
 
 export const mockedNode: Node = {
@@ -25,4 +26,8 @@ export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
   y: 0,
   pressure: 0,
   timestamp: 0,
+};
+
+export const mockedMetadata: Metadata = {
+  viewport: { x: 0, y: 0, scale: 1 },
 };

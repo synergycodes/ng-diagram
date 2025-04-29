@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MiddlewareManager } from './middleware-manager';
-import { mockedNode } from './test-utils';
+import { mockedMetadata, mockedNode } from './test-utils';
 import type { FlowState, Middleware, MiddlewareContext } from './types/middleware.interface';
 
 describe('MiddlewareManager', () => {
@@ -37,17 +37,17 @@ describe('MiddlewareManager', () => {
     prevState = {
       nodes: [],
       edges: [],
-      metadata: {},
+      metadata: mockedMetadata,
     };
     nextState = {
       nodes: [mockedNode],
       edges: [],
-      metadata: {},
+      metadata: mockedMetadata,
     };
     context = {
       initialState: prevState,
-      modelActionType: 'selectionChange',
-      historyUpdates: [{ name: 'selectionChange', prevState, nextState }],
+      modelActionType: 'changeSelection',
+      historyUpdates: [{ name: 'changeSelection', prevState, nextState }],
     };
   });
 
@@ -65,7 +65,7 @@ describe('MiddlewareManager', () => {
       middlewareManager.register(mockMiddleware1);
       middlewareManager.unregister(mockMiddleware1);
 
-      const result = middlewareManager.execute(prevState, nextState, 'selectionChange');
+      const result = middlewareManager.execute(prevState, nextState, 'changeSelection');
       expect(result).toEqual(nextState);
     });
 
@@ -79,7 +79,7 @@ describe('MiddlewareManager', () => {
       middlewareManager.register(mockMiddleware1);
       middlewareManager.register(mockMiddleware2);
 
-      const result = middlewareManager.execute(prevState, nextState, 'selectionChange');
+      const result = middlewareManager.execute(prevState, nextState, 'changeSelection');
 
       expect(result.nodes.length).toBe(3);
       expect(result.nodes[0].id).toBe('node1');
@@ -103,7 +103,7 @@ describe('MiddlewareManager', () => {
     });
 
     it('should return passed next state when no middlewares are registered', () => {
-      const result = middlewareManager.execute(prevState, nextState, 'selectionChange');
+      const result = middlewareManager.execute(prevState, nextState, 'changeSelection');
 
       expect(result).toEqual(nextState);
     });

@@ -10,7 +10,7 @@ describe('LoggerMiddleware', () => {
     initialState = {
       nodes: [],
       edges: [],
-      metadata: {},
+      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
 
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {
@@ -29,14 +29,14 @@ describe('LoggerMiddleware', () => {
         { id: 'node2', type: 'output', position: { x: 0, y: 0 }, data: {} },
       ],
       edges: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
-      metadata: {},
+      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
 
     const result = loggerMiddleware.execute(state, {
-      modelActionType: 'selectionChange',
+      modelActionType: 'changeSelection',
       historyUpdates: [
         {
-          name: 'selectionChange',
+          name: 'changeSelection',
           prevState: initialState,
           nextState: state,
         },
@@ -45,11 +45,11 @@ describe('LoggerMiddleware', () => {
     });
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      '[AngularFlow] selectionChange',
+      '[AngularFlow] changeSelection',
       expect.objectContaining({
         initialState,
         finalState: state,
-        historyUpdates: [{ name: 'selectionChange', prevState: initialState, nextState: state }],
+        historyUpdates: [{ name: 'changeSelection', prevState: initialState, nextState: state }],
       })
     );
     expect(result).toEqual(state);

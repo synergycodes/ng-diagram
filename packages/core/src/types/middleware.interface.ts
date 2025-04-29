@@ -6,7 +6,7 @@ import type { Node } from './node.interface';
  * Type for model-specific actions types in the flow diagram
  */
 export type ModelActionType =
-  | 'selectionChange'
+  | 'changeSelection'
   | 'moveSelection'
   | 'deleteSelection'
   | 'addNodes'
@@ -14,7 +14,8 @@ export type ModelActionType =
   | 'deleteNodes'
   | 'addEdges'
   | 'updateEdge'
-  | 'deleteEdges';
+  | 'deleteEdges'
+  | 'changeViewport';
 
 /**
  * Type for the state of the flow diagram
