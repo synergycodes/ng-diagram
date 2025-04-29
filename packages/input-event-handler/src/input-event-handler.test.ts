@@ -1,4 +1,4 @@
-import type { CommandHandler, Event, EventMapper } from '@angularflow/core';
+import type { CommandHandler, EnvironmentInfo, Event, EventMapper } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputEventHandler } from './input-event-handler';
 
@@ -33,7 +33,7 @@ describe('InputEventHandler', () => {
   beforeEach(() => {
     mockCommandHandler = {} as CommandHandler;
     mockEventMapper = new MockEventMapper();
-    eventHandler = new InputEventHandler(mockCommandHandler, mockEventMapper);
+    eventHandler = new InputEventHandler(mockCommandHandler, mockEventMapper, {} as EnvironmentInfo);
     vi.clearAllMocks();
   });
 

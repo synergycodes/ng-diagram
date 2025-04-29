@@ -7,6 +7,7 @@ export const mockedNode: Node = {
   type: 'node',
   selected: false,
   position: { x: 0, y: 0 },
+  data: {},
 };
 
 export const mockedEdge: Edge = {
@@ -15,6 +16,7 @@ export const mockedEdge: Edge = {
   source: '1',
   target: '2',
   selected: false,
+  data: {},
 };
 
 export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
