@@ -5,6 +5,7 @@ export * from './event.interface';
 
 // Flow diagram types
 export * from './edge.interface';
+export * from './metadata.interface';
 export * from './node.interface';
 
 // Command and system types

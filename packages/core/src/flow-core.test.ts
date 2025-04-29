@@ -7,6 +7,7 @@ import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
+import type { Metadata } from './types/metadata.interface';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
@@ -35,7 +36,7 @@ describe('FlowCore', () => {
   ) => InputEventHandler;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
-  let mockGetMetadata: Mock<() => Record<string, unknown>>;
+  let mockGetMetadata: Mock<() => Metadata>;
   const mockEnvironment: EnvironmentInfo = {
     os: 'macOS',
     deviceType: 'desktop',

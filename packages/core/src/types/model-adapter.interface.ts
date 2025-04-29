@@ -1,4 +1,5 @@
 import type { Edge } from './edge.interface';
+import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
 /**
@@ -34,15 +35,15 @@ export interface ModelAdapter {
   /**
    * Get metadata associated with the model
    */
-  getMetadata(): Record<string, unknown>;
+  getMetadata(): Metadata;
 
   /**
    * Set metadata for the model
    * @param metadata Metadata to set
    * @param metadataFn Function that takes current metadata and returns new metadata
    */
-  setMetadata(metadata: Record<string, unknown>): void;
-  setMetadata(metadataFn: (metadata: Record<string, unknown>) => Record<string, unknown>): void;
+  setMetadata(metadata: Metadata): void;
+  setMetadata(metadataFn: (metadata: Metadata) => Metadata): void;
 
   /**
    * Register a callback to be called when the model changes

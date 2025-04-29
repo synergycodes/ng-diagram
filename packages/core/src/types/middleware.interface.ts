@@ -1,4 +1,5 @@
 import type { Edge } from './edge.interface';
+import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
 /**
@@ -21,7 +22,7 @@ export type ModelActionType =
 export interface FlowState {
   nodes: Node[];
   edges: Edge[];
-  metadata: Record<string, unknown>;
+  metadata: Metadata;
 }
 
 export interface MiddlewareHistoryUpdate {
