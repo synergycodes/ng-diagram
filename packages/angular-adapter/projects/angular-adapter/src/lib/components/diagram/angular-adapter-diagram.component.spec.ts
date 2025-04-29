@@ -3,6 +3,9 @@ import { Node } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  KeyDownEventListenerDirective,
+  KeyPressEventListenerDirective,
+  KeyUpEventListenerDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
@@ -84,5 +87,20 @@ describe('AngularAdapterDiagramComponent', () => {
   it('should have PointerUpEventListenerDirective as host directive', () => {
     const pointerUpEventListenerDirective = fixture.debugElement.injector.get(PointerUpEventListenerDirective);
     expect(pointerUpEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have KeyDownEventListenerDirective as host directive', () => {
+    const keyDownEventListenerDirective = fixture.debugElement.injector.get(KeyDownEventListenerDirective);
+    expect(keyDownEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have KeyPressEventListenerDirective as host directive', () => {
+    const keyPressEventListenerDirective = fixture.debugElement.injector.get(KeyPressEventListenerDirective);
+    expect(keyPressEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have KeyUpEventListenerDirective as host directive', () => {
+    const keyUpEventListenerDirective = fixture.debugElement.injector.get(KeyUpEventListenerDirective);
+    expect(keyUpEventListenerDirective).toBeTruthy();
   });
 });

@@ -29,4 +29,16 @@ export type Event =
       type: 'pointerleave';
       event: PointerEvent;
       target: Node | Edge | null;
+    }
+  | {
+      type: 'keydown';
+      event: KeyboardEvent;
+    }
+  | {
+      type: 'keyup';
+      event: KeyboardEvent;
+    }
+  | {
+      type: 'keypress';
+      event: KeyboardEvent;
     };

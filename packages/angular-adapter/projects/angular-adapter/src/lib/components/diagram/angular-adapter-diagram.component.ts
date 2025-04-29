@@ -3,6 +3,9 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
 import {
+  KeyDownEventListenerDirective,
+  KeyPressEventListenerDirective,
+  KeyUpEventListenerDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
@@ -25,6 +28,9 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     PointerLeaveEventListenerDirective,
     PointerMoveEventListenerDirective,
     PointerUpEventListenerDirective,
+    KeyDownEventListenerDirective,
+    KeyUpEventListenerDirective,
+    KeyPressEventListenerDirective,
   ],
 })
 export class AngularAdapterDiagramComponent {

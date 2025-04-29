@@ -13,7 +13,11 @@ export class EventService {
       case 'pointermove':
       case 'pointerenter':
       case 'pointerleave':
+      case 'keydown':
+      case 'keyup':
+      case 'keypress':
         console.log(event.type, event);
+        // TODO: Pass to the core later
         break;
       default:
         throw new Error(`Unknown event passed.`);

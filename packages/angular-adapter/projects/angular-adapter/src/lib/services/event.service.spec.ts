@@ -18,6 +18,7 @@ describe('EventService', () => {
 
   describe('handle', () => {
     const mockPointerEvent = {} as PointerEvent;
+    const mockKeyboardEvent = {} as KeyboardEvent;
     const mockNode: Node = { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} };
     const mockEdge: Edge = { id: '1', source: '1', target: '2', data: {} };
 
@@ -35,6 +36,9 @@ describe('EventService', () => {
       { type: 'pointermove', event: mockPointerEvent },
       { type: 'pointerenter', event: mockPointerEvent, target: mockNode },
       { type: 'pointerleave', event: mockPointerEvent, target: mockNode },
+      { type: 'keydown', event: mockKeyboardEvent },
+      { type: 'keyup', event: mockKeyboardEvent },
+      { type: 'keypress', event: mockKeyboardEvent },
     ])('should call log $type event to the console', (event) => {
       it('should call log pointerdown and received event to the console', () => {
         const spy = vi.spyOn(console, 'log');
