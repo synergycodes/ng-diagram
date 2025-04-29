@@ -21,7 +21,7 @@ export interface UpdateNodeCommand {
 export const updateNode = (commandHandler: CommandHandler, command: UpdateNodeCommand): void => {
   const { nodes } = commandHandler.flowCore.getState();
   commandHandler.flowCore.applyUpdate(
-    { nodes: nodes.map((node) => (node.id === command.id ? { ...node, ...command.node, id: command.id } : node)) },
+    { nodes: nodes.map((node) => (node.id === command.id ? { ...node, ...command.node } : node)) },
     'updateNode'
   );
 };
@@ -55,7 +55,7 @@ export interface UpdateEdgeCommand {
 export const updateEdge = (commandHandler: CommandHandler, command: UpdateEdgeCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
   commandHandler.flowCore.applyUpdate(
-    { edges: edges.map((edge) => (edge.id === command.id ? { ...edge, ...command.edge, id: command.id } : edge)) },
+    { edges: edges.map((edge) => (edge.id === command.id ? { ...edge, ...command.edge } : edge)) },
     'updateEdge'
   );
 };

@@ -1,14 +1,16 @@
-import { ActionWithPredicate, PointerEvent } from '@angularflow/core';
+import { ActionWithPredicate, isPointerDownEvent } from '@angularflow/core';
 
 export const selectAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
-    const pointerEvent = event as PointerEvent;
+    if (!isPointerDownEvent(event)) {
+      return;
+    }
 
-    if (!pointerEvent.target) {
+    if (!event.target) {
       inputEventHandler.commandHandler.emit('deselectAll');
     } else {
-      inputEventHandler.commandHandler.emit('select', { ids: [pointerEvent.target.id] });
+      inputEventHandler.commandHandler.emit('select', { ids: [event.target.id] });
     }
   },
-  predicate: (event) => event.type === 'pointerdown',
+  predicate: (event) => isPointerDownEvent(event),
 };

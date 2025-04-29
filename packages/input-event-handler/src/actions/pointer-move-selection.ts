@@ -1,4 +1,10 @@
-import { ActionWithPredicate, PointerEvent } from '@angularflow/core';
+import {
+  ActionWithPredicate,
+  isPointerDownEvent,
+  isPointerEvent,
+  isPointerMoveEvent,
+  isPointerUpEvent,
+} from '@angularflow/core';
 
 interface MoveState {
   startX: number;
@@ -20,27 +26,29 @@ const moveState: MoveState = {
 
 export const pointerMoveSelectionAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
-    const pointerEvent = event as PointerEvent;
+    if (!isPointerEvent(event)) {
+      return;
+    }
 
-    switch (pointerEvent.type) {
+    switch (event.type) {
       case 'pointerdown':
-        moveState.startX = pointerEvent.x;
-        moveState.startY = pointerEvent.y;
-        moveState.lastX = pointerEvent.x;
-        moveState.lastY = pointerEvent.y;
+        moveState.startX = event.x;
+        moveState.startY = event.y;
+        moveState.lastX = event.x;
+        moveState.lastY = event.y;
         moveState.isMoving = true;
         moveState.isFirstMove = true;
         break;
 
       case 'pointermove':
         if (moveState.isMoving) {
-          const dx = moveState.isFirstMove ? pointerEvent.x - moveState.startX : pointerEvent.x - moveState.lastX;
-          const dy = moveState.isFirstMove ? pointerEvent.y - moveState.startY : pointerEvent.y - moveState.lastY;
+          const dx = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
+          const dy = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
 
           inputEventHandler.commandHandler.emit('moveSelection', { dx, dy });
 
-          moveState.lastX = pointerEvent.x;
-          moveState.lastY = pointerEvent.y;
+          moveState.lastX = event.x;
+          moveState.lastY = event.y;
           moveState.isFirstMove = false;
         }
         break;
@@ -50,5 +58,5 @@ export const pointerMoveSelectionAction: ActionWithPredicate = {
         break;
     }
   },
-  predicate: (event) => event.type === 'pointerdown' || event.type === 'pointermove' || event.type === 'pointerup',
+  predicate: (event) => isPointerDownEvent(event) || isPointerMoveEvent(event) || isPointerUpEvent(event),
 };

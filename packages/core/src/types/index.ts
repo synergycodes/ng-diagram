@@ -1,5 +1,6 @@
 // Event types
 export * from './event-mapper.interface';
+export * from './event.guards';
 export * from './event.interface';
 
 // Flow diagram types
