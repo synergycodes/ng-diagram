@@ -1,3 +1,11 @@
+import {
+  AddEdgesCommand,
+  AddNodesCommand,
+  DeleteEdgesCommand,
+  DeleteNodesCommand,
+  UpdateEdgeCommand,
+  UpdateNodeCommand,
+} from '../commands/add-update-delete';
 import { DeleteSelectionCommand } from '../commands/delete-selection';
 import { MoveSelectionCommand } from '../commands/move-selection';
 import { DeselectAllCommand, SelectCommand } from '../commands/selection';
@@ -5,8 +13,17 @@ import { FlowCore } from '../flow-core';
 /**
  * Type for system commands that can be emitted by InputEventHandler or user
  */
-export type Command = SelectCommand | DeselectAllCommand | MoveSelectionCommand | DeleteSelectionCommand;
-
+export type Command =
+  | SelectCommand
+  | DeselectAllCommand
+  | MoveSelectionCommand
+  | DeleteSelectionCommand
+  | AddNodesCommand
+  | UpdateNodeCommand
+  | DeleteNodesCommand
+  | AddEdgesCommand
+  | UpdateEdgeCommand
+  | DeleteEdgesCommand;
 /**
  * Type for command name
  */

@@ -7,17 +7,17 @@ export interface DeleteSelectionCommand {
 export const deleteSelection = (commandHandler: CommandHandler): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
 
-  const selectedEdges = edges.filter((edge) => edge.selected);
-  const selectedNodes = nodes.filter((node) => node.selected);
+  const isAnyNodeSelected = nodes.some((node) => node.selected);
+  const isAnyEdgeSelected = edges.some((edge) => edge.selected);
 
-  if (selectedNodes.length === 0 && selectedEdges.length === 0) {
+  if (!isAnyEdgeSelected && !isAnyNodeSelected) {
     return;
   }
 
   commandHandler.flowCore.applyUpdate(
     {
-      nodes: selectedNodes.length > 0 ? nodes.filter((node) => !selectedNodes.includes(node)) : nodes,
-      edges: selectedEdges.length > 0 ? edges.filter((edge) => !selectedEdges.includes(edge)) : edges,
+      nodes: isAnyNodeSelected ? nodes.filter((node) => !node.selected) : nodes,
+      edges: isAnyEdgeSelected ? edges.filter((edge) => !edge.selected) : edges,
     },
     'deleteSelection'
   );

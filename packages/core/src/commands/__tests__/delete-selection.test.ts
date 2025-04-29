@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from '../command-handler';
-import { FlowCore } from '../flow-core';
+import { CoreCommandHandler } from '../../command-handler';
+import { FlowCore } from '../../flow-core';
 
 describe('Delete Selection Command', () => {
   let flowCore: FlowCore;

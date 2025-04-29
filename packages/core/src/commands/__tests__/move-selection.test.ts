@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from '../command-handler';
-import { FlowCore } from '../flow-core';
-import { moveSelection } from './move-selection';
+import { CoreCommandHandler } from '../../command-handler';
+import { FlowCore } from '../../flow-core';
+import { moveSelection } from '../move-selection';
 
 const MOVEMENT_STEP = 10;
 

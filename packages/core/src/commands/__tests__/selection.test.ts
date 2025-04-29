@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../flow-core';
-import { mockedEdge, mockedNode } from '../test-utils';
-import { CommandHandler } from '../types/command-handler.interface';
-import { deselectAll, select } from './selection';
+import { FlowCore } from '../../flow-core';
+import { mockedEdge, mockedNode } from '../../test-utils';
+import { CommandHandler } from '../../types/command-handler.interface';
+import { deselectAll, select } from '../selection';
 
 describe('Selection Commands', () => {
   let commandHandler: CommandHandler;
