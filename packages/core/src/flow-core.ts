@@ -1,27 +1,42 @@
 import { CoreCommandHandler } from './command-handler';
 import { MiddlewareManager } from './middleware-manager';
+import type { EnvironmentInfo } from './types/environment.interface';
 import type { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { FlowState, Middleware, ModelActionType } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
-type EventHandlerFactory = (commandHandler: CoreCommandHandler, eventMapper: EventMapper) => InputEventHandler;
+type EventHandlerFactory = (
+  commandHandler: CoreCommandHandler,
+  eventMapper: EventMapper,
+  environment: EnvironmentInfo
+) => InputEventHandler;
 
 export class FlowCore {
   private commandHandler: CoreCommandHandler;
   private _eventHandler: InputEventHandler;
   private readonly middlewareManager: MiddlewareManager;
+  private readonly environment: EnvironmentInfo;
 
   constructor(
     private readonly modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
     private readonly eventMapper: EventMapper,
-    createEventHandler: EventHandlerFactory
+    createEventHandler: EventHandlerFactory,
+    environment: EnvironmentInfo
   ) {
+    this.environment = environment;
     this.commandHandler = new CoreCommandHandler(this);
-    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
+    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper, this.environment);
     this.middlewareManager = new MiddlewareManager();
+  }
+
+  /**
+   * Gets the current environment information
+   */
+  getEnvironment(): EnvironmentInfo {
+    return this.environment;
   }
 
   /**
@@ -36,7 +51,7 @@ export class FlowCore {
    * @param createEventHandler Factory function that creates a new EventHandler instance
    */
   setEventHandler(createEventHandler: EventHandlerFactory): void {
-    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper);
+    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper, this.environment);
   }
 
   /**

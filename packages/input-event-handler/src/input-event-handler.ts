@@ -6,6 +6,7 @@ import {
   type ActionWithPredicate,
   type CommandHandler,
   InputEventHandler as CoreInputEventHandler,
+  type EnvironmentInfo,
   type Event,
   type EventMapper,
 } from '@angularflow/core';
@@ -18,9 +19,10 @@ export class InputEventHandler extends CoreInputEventHandler {
 
   constructor(
     readonly commandHandler: CommandHandler,
-    protected readonly eventMapper: EventMapper
+    protected readonly eventMapper: EventMapper,
+    protected readonly environment: EnvironmentInfo
   ) {
-    super(commandHandler, eventMapper);
+    super(commandHandler, eventMapper, environment);
     this.context = {
       ctrlKey: false,
       shiftKey: false,
@@ -37,7 +39,7 @@ export class InputEventHandler extends CoreInputEventHandler {
   private handleEvent(event: Event): void {
     for (const { predicate, action } of this.registeredActions) {
       if (predicate(event, this)) {
-        action(event, this);
+        action(event, this, this.environment);
       }
     }
   }
@@ -86,6 +88,6 @@ export class InputEventHandler extends CoreInputEventHandler {
     if (!action) {
       throw new Error(`Default action "${actionName}" does not exist.`);
     }
-    action(event, this);
+    action(event, this, this.environment);
   }
 }

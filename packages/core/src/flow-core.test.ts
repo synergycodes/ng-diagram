@@ -4,6 +4,7 @@ import { FlowCore } from './flow-core';
 import { MiddlewareManager } from './middleware-manager';
 import { mockedEdge, mockedNode } from './test-utils';
 import { Edge } from './types/edge.interface';
+import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
 import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { Middleware } from './types/middleware.interface';
@@ -27,10 +28,19 @@ describe('FlowCore', () => {
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;
   let mockEventHandler: InputEventHandler;
-  let createEventHandler: (interpreter: CoreCommandHandler) => InputEventHandler;
+  let createEventHandler: (
+    commandHandler: CoreCommandHandler,
+    eventMapper: EventMapper,
+    environment: EnvironmentInfo
+  ) => InputEventHandler;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Record<string, unknown>>;
+  const mockEnvironment: EnvironmentInfo = {
+    os: 'macOS',
+    deviceType: 'desktop',
+    browser: 'Chrome',
+  };
 
   beforeEach(() => {
     mockGetNodes = vi.fn().mockReturnValue([]);
@@ -72,18 +82,22 @@ describe('FlowCore', () => {
     vi.clearAllMocks();
 
     // Create FlowCore instance
-    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, createEventHandler);
+    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, createEventHandler, mockEnvironment);
   });
 
   describe('constructor', () => {
     it('should create a new CommandHandler instance', () => {
       expect(flowCore).toBeDefined();
-      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler), mockEventMapper);
+      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler), mockEventMapper, mockEnvironment);
     });
 
     it('should initialize with provided dependencies', () => {
       expect(createEventHandler).toHaveBeenCalled();
       expect(vi.mocked(MiddlewareManager)).toHaveBeenCalled();
+    });
+
+    it('should store the environment information', () => {
+      expect(flowCore.getEnvironment()).toEqual(mockEnvironment);
     });
   });
 
@@ -100,7 +114,11 @@ describe('FlowCore', () => {
 
       flowCore.setEventHandler(newCreateEventHandler);
 
-      expect(newCreateEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler), mockEventMapper);
+      expect(newCreateEventHandler).toHaveBeenCalledWith(
+        expect.any(CoreCommandHandler),
+        mockEventMapper,
+        mockEnvironment
+      );
     });
   });
 

@@ -1,4 +1,5 @@
 import type { CommandHandler } from './command-handler.interface';
+import type { EnvironmentInfo } from './environment.interface';
 import type { EventMapper } from './event-mapper.interface';
 import type { Event } from './event.interface';
 
@@ -17,7 +18,7 @@ export type ActionName = 'select' | 'keyboardMoveSelection' | 'pointerMoveSelect
 /**
  * Type for action function
  */
-export type Action = (event: Event, inputEventHandler: InputEventHandler) => void;
+export type Action = (event: Event, inputEventHandler: InputEventHandler, environment: EnvironmentInfo) => void;
 
 /**
  * Type for predicate function that determines if an action should be triggered
@@ -41,7 +42,8 @@ export interface ActionWithPredicate {
 export abstract class InputEventHandler {
   protected constructor(
     readonly commandHandler: CommandHandler,
-    protected readonly eventMapper: EventMapper
+    protected readonly eventMapper: EventMapper,
+    protected readonly environment: EnvironmentInfo
   ) {}
 
   /**
