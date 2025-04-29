@@ -22,7 +22,7 @@ export const pointerMoveSelectionAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
     const pointerEvent = event as PointerEvent;
 
-    switch (event.type) {
+    switch (pointerEvent.type) {
       case 'pointerdown':
         moveState.startX = pointerEvent.x;
         moveState.startY = pointerEvent.y;
