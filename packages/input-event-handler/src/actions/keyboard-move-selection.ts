@@ -1,11 +1,13 @@
-import { ActionWithPredicate, CommandByName, Event, InputEventHandler, KeyboardEvent } from '@angularflow/core';
+import { ActionWithPredicate, CommandByName, isKeyboardDownEvent, KeyboardEvent } from '@angularflow/core';
 
 export const keyboardMoveSelectionAction: ActionWithPredicate = {
-  action: (event: Event, inputEventHandler: InputEventHandler) => {
-    inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event as KeyboardEvent));
+  action: (event, inputEventHandler) => {
+    if (isKeyboardDownEvent(event)) {
+      inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event));
+    }
   },
-  predicate: (event: Event) =>
-    event.type === 'keydown' &&
+  predicate: (event) =>
+    isKeyboardDownEvent(event) &&
     (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown'),
 };
 

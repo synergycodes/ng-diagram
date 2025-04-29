@@ -7,10 +7,16 @@ export interface MoveSelectionCommand {
 }
 
 export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSelectionCommand): void => {
-  const state = commandHandler.flowCore.getState();
+  const { nodes } = commandHandler.flowCore.getState();
 
-  const updatedNodes = state.nodes.map((node) => {
-    if (node.selected) {
+  const selectedNodes = nodes.filter((node) => node.selected);
+
+  if (selectedNodes.length === 0) {
+    return;
+  }
+
+  const updatedNodes = nodes.map((node) => {
+    if (selectedNodes.includes(node)) {
       return {
         ...node,
         position: {

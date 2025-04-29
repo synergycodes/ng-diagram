@@ -13,7 +13,7 @@ export interface ActionContext {
 /**
  * Type for action name
  */
-export type ActionName = 'select' | 'keyboardMoveSelection' | 'pointerMoveSelection';
+export type ActionName = 'select' | 'keyboardMoveSelection' | 'pointerMoveSelection' | 'deleteSelection';
 
 /**
  * Type for action function
