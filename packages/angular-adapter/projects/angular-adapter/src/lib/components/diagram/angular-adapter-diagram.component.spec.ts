@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Node } from '@angularflow/core';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { ModelAdapter } from '@angularflow/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   KeyDownEventListenerDirective,
@@ -12,11 +12,23 @@ import {
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
 } from '../../directives';
+import { FlowCoreProviderService, ModelProviderService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
   let component: AngularAdapterDiagramComponent;
   let fixture: ComponentFixture<AngularAdapterDiagramComponent>;
+  const mockModel: ModelAdapter = {
+    getNodes: vi.fn(),
+    getEdges: vi.fn(),
+    getMetadata: vi.fn(),
+    setNodes: vi.fn(),
+    setEdges: vi.fn(),
+    setMetadata: vi.fn(),
+    onChange: vi.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -24,6 +36,7 @@ describe('AngularAdapterDiagramComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
+    fixture.componentRef.setInput('model', mockModel);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -32,36 +45,28 @@ describe('AngularAdapterDiagramComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with empty nodes array', () => {
-    expect(component.nodes()).toEqual([]);
-  });
-
   it('should initialize with empty node template map', () => {
     expect(component.nodeTemplateMap().size).toBe(0);
   });
 
-  it('should update nodes when input changes', () => {
-    const testNodes: Node[] = [
-      { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} },
-      { id: '2', type: 'test', position: { x: 100, y: 100 }, data: {} },
-    ];
+  it('should call modelProvider.init when model input changes', () => {
+    const spy = vi.spyOn(TestBed.inject(ModelProviderService), 'init');
+    const newModel: ModelAdapter = { ...mockModel, getNodes: vi.fn() };
 
-    fixture.componentRef.setInput('nodes', testNodes);
+    fixture.componentRef.setInput('model', newModel);
+    fixture.detectChanges();
 
-    expect(component.nodes()).toEqual(testNodes);
+    expect(spy).toHaveBeenCalledWith(newModel);
   });
 
-  it('should return null for non-existent node template', () => {
-    expect(component.getNodeTemplate('non-existent')).toBeNull();
-  });
+  it('should call flowCore.init when model input changes', () => {
+    const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
+    const newModel: ModelAdapter = { ...mockModel, getNodes: vi.fn() };
 
-  it('should return correct template for existing node type', () => {
-    const mockTemplate = { template: 'test' };
-    const templateMap = new Map([['test-type', mockTemplate]]);
+    fixture.componentRef.setInput('model', newModel);
+    fixture.detectChanges();
 
-    fixture.componentRef.setInput('nodeTemplateMap', templateMap);
-
-    expect(component.getNodeTemplate('test-type')).toBe(mockTemplate);
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should have PointerDownEventListenerDirective as host directive', () => {
@@ -102,5 +107,20 @@ describe('AngularAdapterDiagramComponent', () => {
   it('should have KeyUpEventListenerDirective as host directive', () => {
     const keyUpEventListenerDirective = fixture.debugElement.injector.get(KeyUpEventListenerDirective);
     expect(keyUpEventListenerDirective).toBeTruthy();
+  });
+
+  describe('getNodeTemplate', () => {
+    it('should return null for non-existent node template', () => {
+      expect(component.getNodeTemplate('non-existent')).toBeNull();
+    });
+
+    it('should return correct template for existing node type', () => {
+      const mockTemplate = { template: 'test' };
+      const templateMap = new Map([['test-type', mockTemplate]]);
+
+      fixture.componentRef.setInput('nodeTemplateMap', templateMap);
+
+      expect(component.getNodeTemplate('test-type')).toBe(mockTemplate);
+    });
   });
 });

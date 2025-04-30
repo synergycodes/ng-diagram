@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EventService } from '../../../services';
+import { EventMapperService } from '../../../services';
 import { KeyDownEventListenerDirective } from './key-down-event-listener.directive';
 
 @Component({
@@ -27,12 +27,18 @@ describe('KeyDownEventListenerDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should call eventService.handle', () => {
-    const event = new KeyboardEvent('keydown');
-    const spy = vi.spyOn(TestBed.inject(EventService), 'handle');
+  it('should call eventMapperService.emit', () => {
+    const event = new KeyboardEvent('keydown', { key: 'K', code: 'KeyK' });
+    const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
     document.dispatchEvent(event);
 
-    expect(spy).toHaveBeenCalledWith({ type: 'keydown', event });
+    expect(spy).toHaveBeenCalledWith({
+      type: 'keydown',
+      target: null,
+      timestamp: expect.any(Number),
+      key: 'K',
+      code: 'KeyK',
+    });
   });
 });

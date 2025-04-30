@@ -50,6 +50,9 @@ importers:
       '@angularflow/angular-adapter':
         specifier: workspace:*
         version: link:../../packages/angular-adapter
+      '@angularflow/angular-signals-model':
+        specifier: workspace:*
+        version: link:../../packages/angular-signals-model
       rxjs:
         specifier: ~7.8.2
         version: 7.8.2
@@ -138,6 +141,9 @@ importers:
       '@angularflow/core':
         specifier: workspace:*
         version: link:../core
+      '@angularflow/input-event-handler':
+        specifier: workspace:*
+        version: link:../input-event-handler
       rxjs:
         specifier: ~7.8.2
         version: 7.8.2

@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Node } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EventService } from '../../../services';
+import { EventMapperService } from '../../../services';
 import { PointerEnterEventListenerDirective } from './pointer-enter-event-listener.directive';
 
 @Component({
@@ -33,13 +33,21 @@ describe('PointerEnterEventListenerDirective', () => {
   });
 
   describe('when eventTarget is null', () => {
-    it('should call eventService.handle with null as eventTarget', () => {
+    it('should call eventMapperService.emit with null as eventTarget', () => {
       const event = new Event('pointerenter');
-      const spy = vi.spyOn(TestBed.inject(EventService), 'handle');
+      Object.assign(event, { pressure: 0, clientX: 10, clientY: 10 });
+      const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
       fixture.debugElement.nativeElement.dispatchEvent(event);
 
-      expect(spy).toHaveBeenCalledWith({ type: 'pointerenter', event, target: null });
+      expect(spy).toHaveBeenCalledWith({
+        type: 'pointerenter',
+        target: null,
+        pressure: 0,
+        timestamp: expect.any(Number),
+        x: 10,
+        y: 10,
+      });
     });
   });
 
@@ -48,13 +56,21 @@ describe('PointerEnterEventListenerDirective', () => {
       fixture.componentRef.setInput('eventTarget', { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} });
     });
 
-    it('should call eventService.handle with eventTarget', () => {
+    it('should call eventMapperService.emit with eventTarget', () => {
       const event = new Event('pointerenter');
-      const spy = vi.spyOn(TestBed.inject(EventService), 'handle');
+      Object.assign(event, { pressure: 0, clientX: 10, clientY: 10 });
+      const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
       fixture.debugElement.nativeElement.dispatchEvent(event);
 
-      expect(spy).toHaveBeenCalledWith({ type: 'pointerenter', event, target: component.eventTarget() });
+      expect(spy).toHaveBeenCalledWith({
+        type: 'pointerenter',
+        target: component.eventTarget(),
+        pressure: 0,
+        timestamp: expect.any(Number),
+        x: 10,
+        y: 10,
+      });
     });
   });
 });

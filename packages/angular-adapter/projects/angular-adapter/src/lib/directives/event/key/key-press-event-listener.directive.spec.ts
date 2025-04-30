@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EventService } from '../../../services';
+import { EventMapperService } from '../../../services';
 import { KeyPressEventListenerDirective } from './key-press-event-listener.directive';
 
 @Component({
@@ -27,12 +27,18 @@ describe('KeyPressEventListenerDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should call eventService.handle', () => {
-    const event = new KeyboardEvent('keypress');
-    const spy = vi.spyOn(TestBed.inject(EventService), 'handle');
+  it('should call eventMapperService.emit', () => {
+    const event = new KeyboardEvent('keypress', { key: 'K', code: 'KeyK' });
+    const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
     document.dispatchEvent(event);
 
-    expect(spy).toHaveBeenCalledWith({ type: 'keypress', event });
+    expect(spy).toHaveBeenCalledWith({
+      type: 'keypress',
+      target: null,
+      timestamp: expect.any(Number),
+      key: 'K',
+      code: 'KeyK',
+    });
   });
 });

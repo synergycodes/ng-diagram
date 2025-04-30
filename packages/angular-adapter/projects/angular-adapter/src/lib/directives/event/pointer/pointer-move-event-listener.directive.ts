@@ -1,16 +1,23 @@
 import { Directive, HostListener, inject } from '@angular/core';
 
-import { EventService } from '../../../services';
+import { EventMapperService } from '../../../services';
 
 @Directive({
   selector: '[angularAdapterPointerMoveEventListener]',
   standalone: true,
 })
 export class PointerMoveEventListenerDirective {
-  private readonly eventService = inject(EventService);
+  private readonly eventMapperService = inject(EventMapperService);
 
   @HostListener('pointermove', ['$event'])
   onPointerMove(event: PointerEvent) {
-    this.eventService.handle({ type: 'pointermove', event });
+    this.eventMapperService.emit({
+      type: 'pointermove',
+      target: null,
+      pressure: event.pressure,
+      timestamp: Date.now(),
+      x: event.clientX,
+      y: event.clientY,
+    });
   }
 }
