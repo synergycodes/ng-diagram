@@ -10,5 +10,9 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "devDependencies": {
+    "vite": "^6.3.2",
+    "vitest": "^3.1.2"
+  }
 }

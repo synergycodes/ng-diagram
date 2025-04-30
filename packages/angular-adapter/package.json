@@ -12,7 +12,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint:check": "ng lint",
-    "lint:fix": "ng lint --fix"
+    "lint:fix": "ng lint --fix",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@angular/common": "^19.2.7",
