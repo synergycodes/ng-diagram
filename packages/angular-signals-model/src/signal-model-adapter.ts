@@ -1,12 +1,12 @@
 import { Injectable, effect, signal } from '@angular/core';
-import type { Edge, ModelAdapter, Node } from '@angularflow/core';
+import type { Edge, Metadata, ModelAdapter, Node } from '@angularflow/core';
 
 @Injectable()
 export class SignalModelAdapter implements ModelAdapter {
   // Internal state signals
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
-  private metadata = signal<Record<string, unknown>>({});
+  private metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 } });
   private callbacks: (() => void)[] = [];
 
   constructor() {
@@ -38,11 +38,11 @@ export class SignalModelAdapter implements ModelAdapter {
     this.edges.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
-  getMetadata(): Record<string, unknown> {
+  getMetadata(): Metadata {
     return this.metadata();
   }
 
-  setMetadata(next: Record<string, unknown> | ((prev: Record<string, unknown>) => Record<string, unknown>)): void {
+  setMetadata(next: Metadata | ((prev: Metadata) => Metadata)): void {
     this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 

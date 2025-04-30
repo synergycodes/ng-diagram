@@ -1,8 +1,21 @@
-import { CommandHandler, Event, FlowCore, InputEventHandler, KeyboardEvent, PointerEvent } from '@angularflow/core';
+import {
+  CommandHandler,
+  EnvironmentInfo,
+  Event,
+  FlowCore,
+  InputEventHandler,
+  KeyboardEvent,
+  PointerEvent,
+} from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { deleteSelectionAction } from './delete-selection';
 
 describe('deleteSelectionAction', () => {
+  const environment: EnvironmentInfo = {
+    os: 'windows',
+    deviceType: 'desktop',
+    browser: 'chrome',
+  };
   let mockCommandHandler: CommandHandler;
   let mockEvent: Event;
   let mockInputEventHandler: InputEventHandler;
@@ -53,7 +66,7 @@ describe('deleteSelectionAction', () => {
 
   describe('action', () => {
     it('should emit deleteSelection command', () => {
-      deleteSelectionAction.action(mockEvent as KeyboardEvent, mockInputEventHandler);
+      deleteSelectionAction.action(mockEvent as KeyboardEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('deleteSelection');
     });

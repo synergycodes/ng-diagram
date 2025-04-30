@@ -35,7 +35,7 @@ describe('Selection Commands', () => {
             { ...mockedEdge, id: 'edge2', selected: true },
           ],
         },
-        'selectionChange'
+        'changeSelection'
       );
     });
   });
@@ -49,7 +49,7 @@ describe('Selection Commands', () => {
           nodes: [mockedNode, { ...mockedNode, id: 'node2', selected: false }],
           edges: [mockedEdge, { ...mockedEdge, id: 'edge2', selected: false }],
         },
-        'selectionChange'
+        'changeSelection'
       );
     });
   });

@@ -1,4 +1,11 @@
-import { CommandHandler, EventTarget, FlowCore, InputEventHandler, KeyboardEvent } from '@angularflow/core';
+import {
+  CommandHandler,
+  EnvironmentInfo,
+  EventTarget,
+  FlowCore,
+  InputEventHandler,
+  KeyboardEvent,
+} from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { keyboardMoveSelectionAction } from './keyboard-move-selection';
 
@@ -8,6 +15,11 @@ describe('keyboardMoveSelectionAction', () => {
   let mockTarget: EventTarget;
   let mockInputEventHandler: InputEventHandler;
   let mockFlowCore: FlowCore;
+  const environment: EnvironmentInfo = {
+    os: 'windows',
+    deviceType: 'desktop',
+    browser: 'chrome',
+  };
 
   beforeEach(() => {
     mockFlowCore = {} as FlowCore;
@@ -42,7 +54,7 @@ describe('keyboardMoveSelectionAction', () => {
     });
 
     it('should return false for non-keydown events', () => {
-      expect(keyboardMoveSelectionAction.predicate({ ...mockEvent, type: 'mousemove' }, mockInputEventHandler)).toBe(
+      expect(keyboardMoveSelectionAction.predicate({ ...mockEvent, type: 'keypress' }, mockInputEventHandler)).toBe(
         false
       );
     });
@@ -50,7 +62,7 @@ describe('keyboardMoveSelectionAction', () => {
 
   describe('action', () => {
     it('should emit moveSelection command with correct dx and dy for ArrowRight', () => {
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler);
+      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: 10,
@@ -65,7 +77,7 @@ describe('keyboardMoveSelectionAction', () => {
         code: 'ArrowLeft',
       } as KeyboardEvent;
 
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler);
+      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: -10,
@@ -80,7 +92,7 @@ describe('keyboardMoveSelectionAction', () => {
         code: 'ArrowUp',
       } as KeyboardEvent;
 
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler);
+      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: 0,
@@ -95,7 +107,7 @@ describe('keyboardMoveSelectionAction', () => {
         code: 'ArrowDown',
       } as KeyboardEvent;
 
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler);
+      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: 0,
