@@ -19,7 +19,8 @@ export type ActionName =
   | 'pointerMoveSelection'
   | 'deleteSelection'
   | 'copy'
-  | 'paste';
+  | 'paste'
+  | 'panning';
 
 /**
  * Type for action function

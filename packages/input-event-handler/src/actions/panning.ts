@@ -5,7 +5,7 @@ interface MoveState {
   startY: number;
   lastX: number;
   lastY: number;
-  isMoving: boolean;
+  isPanning: boolean;
   isFirstMove: boolean;
 }
 
@@ -14,11 +14,11 @@ const moveState: MoveState = {
   startY: 0,
   lastX: 0,
   lastY: 0,
-  isMoving: false,
+  isPanning: false,
   isFirstMove: true,
 };
 
-export const pointerMoveSelectionAction: ActionWithPredicate = {
+export const panningAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
     switch (event.type) {
       case 'pointerdown':
@@ -26,16 +26,16 @@ export const pointerMoveSelectionAction: ActionWithPredicate = {
         moveState.startY = event.y;
         moveState.lastX = event.x;
         moveState.lastY = event.y;
-        moveState.isMoving = true;
+        moveState.isPanning = true;
         moveState.isFirstMove = true;
         break;
 
       case 'pointermove':
-        if (moveState.isMoving) {
-          const dx = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
-          const dy = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
+        if (moveState.isPanning) {
+          const x = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
+          const y = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
 
-          inputEventHandler.commandHandler.emit('moveSelection', { dx, dy });
+          inputEventHandler.commandHandler.emit('moveViewportBy', { x, y });
 
           moveState.lastX = event.x;
           moveState.lastY = event.y;
@@ -44,10 +44,12 @@ export const pointerMoveSelectionAction: ActionWithPredicate = {
         break;
 
       case 'pointerup':
-        moveState.isMoving = false;
+        moveState.isPanning = false;
         break;
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.targetType === 'node') || isPointerMoveEvent(event) || isPointerUpEvent(event),
+    (isPointerDownEvent(event) && event.targetType === 'background') ||
+    isPointerMoveEvent(event) ||
+    isPointerUpEvent(event),
 };

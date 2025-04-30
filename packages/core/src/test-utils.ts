@@ -21,11 +21,11 @@ export const mockedEdge: Edge = {
 };
 
 export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
-  target: null,
   x: 0,
   y: 0,
   pressure: 0,
   timestamp: 0,
+  targetType: null,
 };
 
 export const mockedMetadata: Metadata = {

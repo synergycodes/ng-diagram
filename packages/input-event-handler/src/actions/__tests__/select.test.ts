@@ -40,7 +40,11 @@ describe('selectAction', () => {
 
   describe('action', () => {
     it('should emit deselectAll command when no target is provided', () => {
-      selectAction.action({ ...mockedPointerEvent, target: null, type: 'pointerdown' }, inputEventHandler, environment);
+      selectAction.action(
+        { ...mockedPointerEvent, target: undefined, type: 'pointerdown' },
+        inputEventHandler,
+        environment
+      );
       expect(emit).toHaveBeenCalledWith('deselectAll');
     });
 

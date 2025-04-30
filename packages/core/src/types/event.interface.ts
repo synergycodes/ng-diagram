@@ -4,7 +4,7 @@ import { Node } from './node.interface';
 /**
  * Type for event target
  */
-export type EventTarget = Node | Edge | null;
+export type EventTarget = Node | Edge;
 
 /**
  * Base interface for all events
@@ -12,7 +12,8 @@ export type EventTarget = Node | Edge | null;
 export interface BaseEvent {
   type: string;
   timestamp: number;
-  target: EventTarget;
+  target?: EventTarget;
+  targetType: 'node' | 'edge' | 'background' | null;
 }
 
 /**
