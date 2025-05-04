@@ -38,7 +38,7 @@ export class InputEventHandler extends CoreInputEventHandler {
 
   private handleEvent(event: Event): void {
     for (const { predicate, action } of this.registeredActions) {
-      if (predicate(event, this)) {
+      if (predicate(event, this, this.environment)) {
         action(event, this, this.environment);
       }
     }

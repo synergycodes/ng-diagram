@@ -7,7 +7,7 @@ import {
   KeyboardEvent,
 } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { keyboardMoveSelectionAction } from './keyboard-move-selection';
+import { keyboardMoveSelectionAction } from '../keyboard-move-selection';
 
 describe('keyboardMoveSelectionAction', () => {
   let mockCommandHandler: CommandHandler;
@@ -46,17 +46,19 @@ describe('keyboardMoveSelectionAction', () => {
 
   describe('predicate', () => {
     it('should return true for keydown events', () => {
-      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockInputEventHandler)).toBe(true);
+      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
     });
 
     it('should return false for none of the expecting key keydown event', () => {
-      expect(keyboardMoveSelectionAction.predicate({ ...mockEvent, key: 'A' }, mockInputEventHandler)).toBe(false);
+      expect(
+        keyboardMoveSelectionAction.predicate({ ...mockEvent, key: 'A' }, mockInputEventHandler, environment)
+      ).toBe(false);
     });
 
     it('should return false for non-keydown events', () => {
-      expect(keyboardMoveSelectionAction.predicate({ ...mockEvent, type: 'keypress' }, mockInputEventHandler)).toBe(
-        false
-      );
+      expect(
+        keyboardMoveSelectionAction.predicate({ ...mockEvent, type: 'keypress' }, mockInputEventHandler, environment)
+      ).toBe(false);
     });
   });
 
@@ -121,8 +123,8 @@ describe('keyboardMoveSelectionAction', () => {
         type: 'keyup',
       } as KeyboardEvent;
 
-      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockInputEventHandler)).toBe(true);
-      expect(keyboardMoveSelectionAction.predicate(keyupEvent, mockInputEventHandler)).toBe(false);
+      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
+      expect(keyboardMoveSelectionAction.predicate(keyupEvent, mockInputEventHandler, environment)).toBe(false);
     });
   });
 });
