@@ -1,11 +1,12 @@
 import type { Edge } from './edge.interface';
+import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
 /**
  * Type for model-specific actions types in the flow diagram
  */
 export type ModelActionType =
-  | 'selectionChange'
+  | 'changeSelection'
   | 'moveSelection'
   | 'deleteSelection'
   | 'addNodes'
@@ -13,7 +14,8 @@ export type ModelActionType =
   | 'deleteNodes'
   | 'addEdges'
   | 'updateEdge'
-  | 'deleteEdges';
+  | 'deleteEdges'
+  | 'changeViewport';
 
 /**
  * Type for the state of the flow diagram
@@ -21,7 +23,7 @@ export type ModelActionType =
 export interface FlowState {
   nodes: Node[];
   edges: Edge[];
-  metadata: Record<string, unknown>;
+  metadata: Metadata;
 }
 
 export interface MiddlewareHistoryUpdate {

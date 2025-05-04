@@ -12,7 +12,8 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "lint:check": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@angularflow/core": "workspace:*",

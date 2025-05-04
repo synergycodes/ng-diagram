@@ -3,7 +3,7 @@ import { Edge, Node, PointerEvent } from '@angularflow/core';
 export const mockedNode: Node = {
   id: '1',
   type: 'node',
-  selected: false,
+  data: {},
   position: { x: 0, y: 0 },
 };
 
@@ -12,7 +12,7 @@ export const mockedEdge: Edge = {
   type: 'edge',
   source: '1',
   target: '2',
-  selected: false,
+  data: {},
 };
 
 export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {

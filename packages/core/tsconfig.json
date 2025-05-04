@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
     "allowSyntheticDefaultImports": true,
@@ -16,7 +15,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
   },
   "include": ["src", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]
