@@ -21,8 +21,6 @@ export class FlowCore {
 
   constructor(
     private readonly modelAdapter: ModelAdapter,
-    // eslint-disable-next-line
-    // @ts-ignore
     private readonly renderer: Renderer,
     private readonly eventMapper: EventMapper,
     createEventHandler: EventHandlerFactory,
@@ -32,6 +30,8 @@ export class FlowCore {
     this.commandHandler = new CoreCommandHandler(this);
     this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper, this.environment);
     this.middlewareManager = new MiddlewareManager();
+    this.render();
+    this.modelAdapter.onChange(() => this.render());
   }
 
   /**
@@ -104,5 +104,13 @@ export class FlowCore {
     const updatedState = { ...initialState, ...state };
     const finalState = this.middlewareManager.execute(initialState, updatedState, modelActionType);
     this.setState(finalState);
+  }
+
+  private render(): void {
+    this.renderer.draw(
+      this.modelAdapter.getNodes(),
+      this.modelAdapter.getEdges(),
+      this.modelAdapter.getMetadata().viewport
+    );
   }
 }

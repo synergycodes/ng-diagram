@@ -100,6 +100,14 @@ describe('FlowCore', () => {
     it('should store the environment information', () => {
       expect(flowCore.getEnvironment()).toEqual(mockEnvironment);
     });
+
+    it('should render the diagram', () => {
+      expect(mockRenderer.draw).toHaveBeenCalled();
+    });
+
+    it('should register model changed listener', () => {
+      expect(mockModelAdapter.onChange).toHaveBeenCalled();
+    });
   });
 
   describe('setEventHandler', () => {

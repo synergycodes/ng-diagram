@@ -6,6 +6,7 @@ import {
   PointerLeaveEventListenerDirective,
   PointerUpEventListenerDirective,
 } from '../../directives';
+import { NodeSelectedDirective } from '../../directives/node-selected/node-selected.directive';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -16,6 +17,10 @@ import {
     {
       directive: NodePositionDirective,
       inputs: ['position'],
+    },
+    {
+      directive: NodeSelectedDirective,
+      inputs: ['selected'],
     },
     {
       directive: PointerDownEventListenerDirective,

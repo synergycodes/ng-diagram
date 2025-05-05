@@ -11,6 +11,8 @@ export class PointerMoveEventListenerDirective {
 
   @HostListener('pointermove', ['$event'])
   onPointerMove(event: PointerEvent) {
+    event.stopPropagation();
+    event.preventDefault();
     this.eventMapperService.emit({
       type: 'pointermove',
       target: null,

@@ -21,7 +21,7 @@ describe('AngularAdapterDiagramComponent', () => {
   const mockModel: ModelAdapter = {
     getNodes: vi.fn(),
     getEdges: vi.fn(),
-    getMetadata: vi.fn(),
+    getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 } })),
     setNodes: vi.fn(),
     setEdges: vi.fn(),
     setMetadata: vi.fn(),
@@ -53,20 +53,33 @@ describe('AngularAdapterDiagramComponent', () => {
     const spy = vi.spyOn(TestBed.inject(ModelProviderService), 'init');
     const newModel: ModelAdapter = { ...mockModel, getNodes: vi.fn() };
 
+    fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
     fixture.componentRef.setInput('model', newModel);
     fixture.detectChanges();
 
+    expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith(newModel);
+
+    fixture.componentRef.setInput('model', { ...mockModel, getEdges: vi.fn() });
+    fixture.detectChanges();
+
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('should call flowCore.init when model input changes', () => {
     const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
     const newModel: ModelAdapter = { ...mockModel, getNodes: vi.fn() };
 
+    fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
     fixture.componentRef.setInput('model', newModel);
     fixture.detectChanges();
 
-    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    fixture.componentRef.setInput('model', { ...mockModel, getEdges: vi.fn() });
+    fixture.detectChanges();
+
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('should have PointerDownEventListenerDirective as host directive', () => {

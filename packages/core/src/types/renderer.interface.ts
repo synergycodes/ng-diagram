@@ -1,16 +1,6 @@
 import type { Edge } from './edge.interface';
+import type { Viewport } from './metadata.interface';
 import type { Node } from './node.interface';
-
-/**
- * Interface for viewport data needed for rendering
- */
-export interface ViewportData {
-  scale: number;
-  position: {
-    x: number;
-    y: number;
-  };
-}
 
 /**
  * Interface for the Renderer that handles drawing the flow diagram
@@ -22,5 +12,5 @@ export interface Renderer {
    * @param edges List of edges to render
    * @param viewportData Additional data needed for rendering
    */
-  draw(nodes: Node[], edges: Edge[], viewportData: ViewportData): void;
+  draw(nodes: Node[], edges: Edge[], viewportData: Viewport): void;
 }
