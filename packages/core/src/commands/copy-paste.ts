@@ -27,7 +27,7 @@ export const paste = (commandHandler: CommandHandler): void => {
     return;
   }
 
-  const { nodes, edges, metadata } = commandHandler.flowCore.getState();
+  const { nodes, edges } = commandHandler.flowCore.getState();
   const nodeIdMap = new Map<string, string>();
 
   const newNodes = copiedNodes.map((node) => {
@@ -56,14 +56,13 @@ export const paste = (commandHandler: CommandHandler): void => {
     };
   });
 
-  const updatedNodes = nodes.map((node) => ({ ...node, selected: false }));
-  const updatedEdges = edges.map((edge) => ({ ...edge, selected: false }));
+  const updatedNodes = nodes.map((node) => (node.selected ? { ...node, selected: false } : node));
+  const updatedEdges = edges.map((edge) => (edge.selected ? { ...edge, selected: false } : edge));
 
   commandHandler.flowCore.applyUpdate(
     {
       nodes: [...updatedNodes, ...newNodes],
       edges: [...updatedEdges, ...newEdges],
-      metadata,
     },
     'paste'
   );

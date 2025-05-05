@@ -75,16 +75,6 @@ describe('Copy-Paste Commands', () => {
   });
 
   describe('paste', () => {
-    it('should maintain metadata when pasting', () => {
-      copy(commandHandler);
-      paste(commandHandler);
-
-      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
-      const [update] = updateCall.mock.calls[0];
-
-      expect(update.metadata).toEqual(mockedMetadata);
-    });
-
     it('should deselect original nodes and edges when pasting', () => {
       copy(commandHandler);
       paste(commandHandler);
