@@ -5,7 +5,8 @@
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0",
-    "@angularflow/core": "workspace:*"
+    "@angularflow/core": "workspace:*",
+    "@angularflow/input-event-handler": "workspace:*"
   },
   "dependencies": {
     "tslib": "^2.3.0"
