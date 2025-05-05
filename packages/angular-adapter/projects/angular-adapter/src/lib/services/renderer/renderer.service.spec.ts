@@ -15,10 +15,10 @@ describe('RendererService', () => {
   });
 
   describe('draw', () => {
-    it('should accept nodes, edges and viewport data', () => {
-      expect(() => {
-        service.draw();
-      }).not.toThrow();
+    it('should set the nodes signal to the provided nodes', () => {
+      service.draw([{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }]);
+
+      expect(service.nodes()).toEqual([{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }]);
     });
   });
 });

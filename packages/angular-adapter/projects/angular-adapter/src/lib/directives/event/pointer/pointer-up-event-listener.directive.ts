@@ -14,6 +14,8 @@ export class PointerUpEventListenerDirective implements ITargetedEventListener {
 
   @HostListener('pointerup', ['$event'])
   onPointerUp(event: PointerEvent) {
+    event.stopPropagation();
+    event.preventDefault();
     this.eventMapperService.emit({
       type: 'pointerup',
       target: this.eventTarget(),

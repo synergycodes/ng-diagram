@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
   NodePositionDirective,
+  NodeSelectedDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
@@ -31,6 +32,11 @@ describe('AngularAdapterNodeComponent', () => {
   it('should have NodePositionDirective as host directive', () => {
     const nodePositionDirective = fixture.debugElement.injector.get(NodePositionDirective);
     expect(nodePositionDirective).toBeTruthy();
+  });
+
+  it('should have NodeSelectedDirective as host directive', () => {
+    const nodeSelectedDirective = fixture.debugElement.injector.get(NodeSelectedDirective);
+    expect(nodeSelectedDirective).toBeTruthy();
   });
 
   it('should have PointerDownEventListenerDirective as host directive', () => {

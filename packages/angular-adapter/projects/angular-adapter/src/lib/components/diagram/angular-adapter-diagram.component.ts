@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { ModelAdapter, Node } from '@angularflow/core';
 
 import {
@@ -12,7 +12,7 @@ import {
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
 } from '../../directives';
-import { FlowCoreProviderService, ModelProviderService } from '../../services';
+import { FlowCoreProviderService, ModelProviderService, RendererService } from '../../services';
 import { NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
@@ -37,6 +37,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
 export class AngularAdapterDiagramComponent {
   private readonly modelProvider = inject(ModelProviderService);
   private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly renderer = inject(RendererService);
   /**
    * The nodes to display in the diagram.
    */
@@ -47,13 +48,19 @@ export class AngularAdapterDiagramComponent {
    */
   nodeTemplateMap = input<NodeTemplateMap>(new Map());
 
-  nodes = computed(() => this.model().getNodes());
+  nodes = this.renderer.nodes;
 
   constructor() {
-    effect(() => {
-      this.modelProvider.init(this.model());
-      this.flowCore.init();
-    });
+    // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
+    // To fix this behavior we need to destroy the effect after the first run
+    const effectRef = effect(
+      () => {
+        this.modelProvider.init(this.model());
+        this.flowCore.init();
+        effectRef.destroy();
+      },
+      { manualCleanup: true }
+    );
   }
 
   getNodeTemplate(nodeType: Node['type']) {

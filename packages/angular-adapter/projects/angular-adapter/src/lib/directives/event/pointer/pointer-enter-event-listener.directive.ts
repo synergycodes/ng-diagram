@@ -14,6 +14,8 @@ export class PointerEnterEventListenerDirective implements ITargetedEventListene
 
   @HostListener('pointerenter', ['$event'])
   onPointerEnter(event: PointerEvent) {
+    event.stopPropagation();
+    event.preventDefault();
     this.eventMapperService.emit({
       type: 'pointerenter',
       target: this.eventTarget(),

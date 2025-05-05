@@ -1,6 +1,10 @@
 <angular-adapter-canvas>
   @for (node of nodes(); track node.id) {
-    <angular-adapter-node [position]="node.position" [eventTarget]="{ type: 'node', element: node }">
+    <angular-adapter-node
+      [position]="node.position"
+      [eventTarget]="{ type: 'node', element: node }"
+      [selected]="node.selected"
+    >
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { data: node }" />
       } @else {

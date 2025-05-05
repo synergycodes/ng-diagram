@@ -30,6 +30,17 @@ describe('PointerMoveEventListenerDirective', () => {
     expect(directive).toBeTruthy();
   });
 
+  it('should call stopPropagation and preventDefault methods of the event', () => {
+    const event = new Event('pointermove');
+    const stopPropagationSpy = vi.spyOn(event, 'stopPropagation');
+    const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
+
+    fixture.debugElement.nativeElement.dispatchEvent(event);
+
+    expect(stopPropagationSpy).toHaveBeenCalled();
+    expect(preventDefaultSpy).toHaveBeenCalled();
+  });
+
   it('should call eventMapperService.emit', () => {
     const event = new Event('pointermove');
     Object.assign(event, { pressure: 0, clientX: 10, clientY: 10 });
