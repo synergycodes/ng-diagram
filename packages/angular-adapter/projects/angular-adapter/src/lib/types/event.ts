@@ -1,20 +1,20 @@
 import { InputSignal } from '@angular/core';
-import { Edge, Node } from '@angularflow/core';
+import type { EventTarget } from '@angularflow/core';
 
 export interface ITargetedEventListener {
-  eventTarget: InputSignal<Node | Edge | null>;
+  eventTarget: InputSignal<EventTarget | null>;
 }
 
 export type Event =
   | {
       type: 'pointerdown';
       event: PointerEvent;
-      target: Node | Edge | null;
+      target: EventTarget | null;
     }
   | {
       type: 'pointerup';
       event: PointerEvent;
-      target: Node | Edge | null;
+      target: EventTarget | null;
     }
   | {
       type: 'pointermove';
@@ -23,12 +23,12 @@ export type Event =
   | {
       type: 'pointerenter';
       event: PointerEvent;
-      target: Node | Edge | null;
+      target: EventTarget | null;
     }
   | {
       type: 'pointerleave';
       event: PointerEvent;
-      target: Node | Edge | null;
+      target: EventTarget | null;
     }
   | {
       type: 'keydown';

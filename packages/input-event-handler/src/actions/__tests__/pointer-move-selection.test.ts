@@ -8,7 +8,7 @@ import {
   PointerEventType,
 } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockedNode } from '../../test-utils';
+import { mockedEdge, mockedNode } from '../../test-utils';
 import { pointerMoveSelectionAction } from '../pointer-move-selection';
 
 describe('pointerMoveSelectionAction', () => {
@@ -31,7 +31,7 @@ describe('pointerMoveSelectionAction', () => {
       flowCore: mockFlowCore,
     } as unknown as CommandHandler;
 
-    mockTarget = mockedNode;
+    mockTarget = { type: 'node', element: mockedNode };
 
     mockEvent = {
       type: 'pointerdown' as PointerEventType,
@@ -93,8 +93,9 @@ describe('pointerMoveSelectionAction', () => {
     it('should return false for pointerdown events with a non-node target', () => {
       expect(
         pointerMoveSelectionAction.predicate(
-          { ...mockEvent, type: 'pointerdown' as PointerEventType, targetType: 'edge' },
-          mockInputEventHandler
+          { ...mockEvent, type: 'pointerdown' as PointerEventType, target: { type: 'edge', element: mockedEdge } },
+          mockInputEventHandler,
+          environment
         )
       ).toBe(false);
     });

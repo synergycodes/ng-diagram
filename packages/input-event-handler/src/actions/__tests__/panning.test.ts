@@ -31,7 +31,7 @@ describe('panningAction', () => {
       flowCore: mockFlowCore,
     } as unknown as CommandHandler;
 
-    mockTarget = mockedNode;
+    mockTarget = { type: 'background' } as EventTarget;
 
     mockEvent = {
       type: 'pointerdown' as PointerEventType,
@@ -50,35 +50,52 @@ describe('panningAction', () => {
 
   describe('predicate', () => {
     it('should return true for pointerdown events', () => {
-      expect(panningAction.predicate(mockEvent, mockInputEventHandler)).toBe(true);
+      expect(panningAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
     });
 
     it('should return true for pointermove events', () => {
       expect(
-        panningAction.predicate({ ...mockEvent, type: 'pointermove' as PointerEventType }, mockInputEventHandler)
+        panningAction.predicate(
+          { ...mockEvent, type: 'pointermove' as PointerEventType },
+          mockInputEventHandler,
+          environment
+        )
       ).toBe(true);
     });
 
     it('should return true for pointerup events', () => {
       expect(
-        panningAction.predicate({ ...mockEvent, type: 'pointerup' as PointerEventType }, mockInputEventHandler)
+        panningAction.predicate(
+          { ...mockEvent, type: 'pointerup' as PointerEventType },
+          mockInputEventHandler,
+          environment
+        )
       ).toBe(true);
     });
 
     it('should return false for other events', () => {
       expect(
-        panningAction.predicate({ ...mockEvent, type: 'pointerenter' as PointerEventType }, mockInputEventHandler)
+        panningAction.predicate(
+          { ...mockEvent, type: 'pointerenter' as PointerEventType },
+          mockInputEventHandler,
+          environment
+        )
       ).toBe(false);
       expect(
-        panningAction.predicate({ ...mockEvent, type: 'pointerleave' as PointerEventType }, mockInputEventHandler)
+        panningAction.predicate(
+          { ...mockEvent, type: 'pointerleave' as PointerEventType },
+          mockInputEventHandler,
+          environment
+        )
       ).toBe(false);
     });
 
     it('should return false for pointerdown events with a non-background target', () => {
       expect(
         panningAction.predicate(
-          { ...mockEvent, type: 'pointerdown' as PointerEventType, targetType: 'node' },
-          mockInputEventHandler
+          { ...mockEvent, type: 'pointerdown' as PointerEventType, target: { type: 'node', element: mockedNode } },
+          mockInputEventHandler,
+          environment
         )
       ).toBe(false);
     });

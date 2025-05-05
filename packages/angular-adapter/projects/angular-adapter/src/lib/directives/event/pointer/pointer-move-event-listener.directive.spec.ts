@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Node } from '@angularflow/core';
+import type { EventTarget } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EventMapperService } from '../../../services';
@@ -11,7 +11,7 @@ import { PointerMoveEventListenerDirective } from './pointer-move-event-listener
   hostDirectives: [PointerMoveEventListenerDirective],
 })
 class TestComponent {
-  eventTarget = input<Node | null>(null);
+  eventTarget = input<EventTarget | null>(null);
 }
 
 describe('PointerMoveEventListenerDirective', () => {

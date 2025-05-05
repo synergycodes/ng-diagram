@@ -20,5 +20,5 @@ export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
   y: 0,
   pressure: 0,
   timestamp: 0,
-  targetType: null,
+  target: null,
 };

@@ -32,7 +32,7 @@ describe('deleteSelectionAction', () => {
     mockEvent = {
       type: 'keydown',
       timestamp: Date.now(),
-      targetType: null,
+      target: null,
       key: 'ArrowRight',
       code: 'ArrowRight',
     } as KeyboardEvent;

@@ -41,7 +41,7 @@ describe('selectAction', () => {
   describe('action', () => {
     it('should emit deselectAll command when no target is provided', () => {
       selectAction.action(
-        { ...mockedPointerEvent, target: undefined, type: 'pointerdown' },
+        { ...mockedPointerEvent, target: { type: 'background' }, type: 'pointerdown' },
         inputEventHandler,
         environment
       );
@@ -50,7 +50,7 @@ describe('selectAction', () => {
 
     it('should emit select command when target is provided', () => {
       selectAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', target: mockedNode },
+        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockedNode } },
         inputEventHandler,
         environment
       );

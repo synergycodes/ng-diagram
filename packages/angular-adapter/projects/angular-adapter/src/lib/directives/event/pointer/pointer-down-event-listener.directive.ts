@@ -1,5 +1,5 @@
 import { Directive, HostListener, inject, input } from '@angular/core';
-import { Edge, Node } from '@angularflow/core';
+import type { EventTarget } from '@angularflow/core';
 
 import { EventMapperService } from '../../../services';
 import { ITargetedEventListener } from '../../../types';
@@ -10,7 +10,7 @@ import { ITargetedEventListener } from '../../../types';
 export class PointerDownEventListenerDirective implements ITargetedEventListener {
   private readonly eventMapperService = inject(EventMapperService);
 
-  eventTarget = input<Node | Edge | null>(null);
+  eventTarget = input<EventTarget | null>(null);
 
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerEvent) {

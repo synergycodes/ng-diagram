@@ -49,7 +49,7 @@ export const panningAction: ActionWithPredicate = {
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.targetType === 'background') ||
+    (isPointerDownEvent(event) && event.target?.type === 'background') ||
     isPointerMoveEvent(event) ||
     isPointerUpEvent(event),
 };
