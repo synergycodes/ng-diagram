@@ -3,8 +3,8 @@
  */
 export interface Edge {
   id: string;
-  source: string | { x: number; y: number };
-  target: string | { x: number; y: number };
+  source: string;
+  target: string;
   data: Record<string, unknown>;
   points?: { x: number; y: number }[];
   selected?: boolean;

@@ -50,8 +50,8 @@ export const paste = (commandHandler: CommandHandler): void => {
     return {
       ...edge,
       id: newEdgeId,
-      source: typeof edge.source === 'string' ? nodeIdMap.get(edge.source) || edge.source : edge.source,
-      target: typeof edge.target === 'string' ? nodeIdMap.get(edge.target) || edge.target : edge.target,
+      source: nodeIdMap.get(edge.source) || edge.source,
+      target: nodeIdMap.get(edge.target) || edge.target,
       selected: true,
     };
   });
