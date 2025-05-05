@@ -11,20 +11,23 @@ export class MiddlewareManager {
 
   /**
    * Registers a new middleware in the chain
-   * @param middleware Middleware function to register
+   * @param middleware Middleware to register
    * @returns Function to unregister the middleware
    */
   register(middleware: Middleware): () => void {
+    if (this.middlewareChain.find((m) => m.name === middleware.name)) {
+      throw new Error(`Middleware ${middleware.name} already registered`);
+    }
     this.middlewareChain.push(middleware);
-    return () => this.unregister(middleware);
+    return () => this.unregister(middleware.name);
   }
 
   /**
    * Unregisters a middleware from the chain
-   * @param middleware Middleware function to unregister
+   * @param name Name of the middleware to unregister
    */
-  unregister(middleware: Middleware): void {
-    const index = this.middlewareChain.indexOf(middleware);
+  unregister(name: string): void {
+    const index = this.middlewareChain.findIndex((middleware) => middleware.name === name);
     if (index !== -1) {
       this.middlewareChain.splice(index, 1);
     }

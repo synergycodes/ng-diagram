@@ -8,6 +8,7 @@ import type {
   IsEmpty,
   WithoutName,
 } from './types/command-handler.interface';
+
 /**
  * Core implementation of CommandHandler interface
  * Handles command emission and registration of callbacks for system commands

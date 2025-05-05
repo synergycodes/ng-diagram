@@ -3,9 +3,12 @@
  */
 export interface Edge {
   id: string;
-  source: string; // source node id
-  target: string; // target node id
+  source: string | { x: number; y: number };
+  target: string | { x: number; y: number };
   data: Record<string, unknown>;
+  points?: { x: number; y: number }[];
   selected?: boolean;
   type?: string;
+  fromPort?: string | null;
+  toPort?: string | null;
 }

@@ -63,14 +63,14 @@ describe('MiddlewareManager', () => {
   describe('unregister', () => {
     it('should unregister a middleware', () => {
       middlewareManager.register(mockMiddleware1);
-      middlewareManager.unregister(mockMiddleware1);
+      middlewareManager.unregister(mockMiddleware1.name);
 
       const result = middlewareManager.execute(prevState, nextState, 'changeSelection');
       expect(result).toEqual(nextState);
     });
 
     it('should handle unregistering a non-existent middleware gracefully', () => {
-      expect(() => middlewareManager.unregister(mockMiddleware1)).not.toThrow();
+      expect(() => middlewareManager.unregister(mockMiddleware1.name)).not.toThrow();
     });
   });
 

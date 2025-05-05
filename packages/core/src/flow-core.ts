@@ -58,7 +58,7 @@ export class FlowCore {
 
   /**
    * Registers a new middleware in the chain
-   * @param middleware Middleware function to register
+   * @param middleware Middleware to register
    * @returns Function to unregister the middleware
    */
   registerMiddleware(middleware: Middleware): () => void {
@@ -67,10 +67,10 @@ export class FlowCore {
 
   /**
    * Unregisters a middleware from the chain
-   * @param middleware Middleware function to unregister
+   * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(middleware: Middleware): void {
-    this.middlewareManager.unregister(middleware);
+  unregisterMiddleware(name: string): void {
+    this.middlewareManager.unregister(name);
   }
 
   /**
