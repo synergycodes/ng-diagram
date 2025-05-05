@@ -3,6 +3,7 @@ import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } 
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
 import { moveSelection } from './move-selection';
+import { moveViewport, moveViewportBy } from './move-viewport';
 import { deselectAll, select } from './selection';
 
 export type CommandHandlerFunction<K extends CommandName> = (
@@ -27,4 +28,6 @@ export const commands: CommandMap = {
   deleteEdges,
   copy,
   paste,
+  moveViewport,
+  moveViewportBy,
 };

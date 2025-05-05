@@ -7,6 +7,7 @@ import {
   KeyboardEvent,
 } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockedNode } from '../../test-utils';
 import { keyboardMoveSelectionAction } from '../keyboard-move-selection';
 
 describe('keyboardMoveSelectionAction', () => {
@@ -29,7 +30,7 @@ describe('keyboardMoveSelectionAction', () => {
       flowCore: mockFlowCore,
     } as unknown as CommandHandler;
 
-    mockTarget = { id: '1' } as EventTarget;
+    mockTarget = { type: 'node', element: mockedNode };
 
     mockEvent = {
       type: 'keydown',
