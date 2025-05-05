@@ -11,4 +11,6 @@ export interface Edge {
   type?: string;
   fromPort?: string | null;
   toPort?: string | null;
+  sourceArrowhead?: string;
+  targetArrowhead?: string;
 }
