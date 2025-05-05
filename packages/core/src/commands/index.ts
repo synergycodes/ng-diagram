@@ -1,5 +1,6 @@
 import { CommandByName, CommandHandler, CommandName } from '../types/command-handler.interface';
 import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } from './add-update-delete';
+import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
 import { moveSelection } from './move-selection';
 import { deselectAll, select } from './selection';
@@ -24,4 +25,6 @@ export const commands: CommandMap = {
   addEdges,
   updateEdge,
   deleteEdges,
+  copy,
+  paste,
 };

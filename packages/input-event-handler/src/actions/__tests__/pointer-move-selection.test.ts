@@ -8,8 +8,8 @@ import {
   PointerEventType,
 } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockedNode } from '../test-utils';
-import { pointerMoveSelectionAction } from './pointer-move-selection';
+import { mockedNode } from '../../test-utils';
+import { pointerMoveSelectionAction } from '../pointer-move-selection';
 
 describe('pointerMoveSelectionAction', () => {
   const environment: EnvironmentInfo = {
@@ -49,14 +49,15 @@ describe('pointerMoveSelectionAction', () => {
 
   describe('predicate', () => {
     it('should return true for pointerdown events', () => {
-      expect(pointerMoveSelectionAction.predicate(mockEvent, mockInputEventHandler)).toBe(true);
+      expect(pointerMoveSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
     });
 
     it('should return true for pointermove events', () => {
       expect(
         pointerMoveSelectionAction.predicate(
           { ...mockEvent, type: 'pointermove' as PointerEventType },
-          mockInputEventHandler
+          mockInputEventHandler,
+          environment
         )
       ).toBe(true);
     });
@@ -65,7 +66,8 @@ describe('pointerMoveSelectionAction', () => {
       expect(
         pointerMoveSelectionAction.predicate(
           { ...mockEvent, type: 'pointerup' as PointerEventType },
-          mockInputEventHandler
+          mockInputEventHandler,
+          environment
         )
       ).toBe(true);
     });
@@ -74,13 +76,15 @@ describe('pointerMoveSelectionAction', () => {
       expect(
         pointerMoveSelectionAction.predicate(
           { ...mockEvent, type: 'pointerenter' as PointerEventType },
-          mockInputEventHandler
+          mockInputEventHandler,
+          environment
         )
       ).toBe(false);
       expect(
         pointerMoveSelectionAction.predicate(
           { ...mockEvent, type: 'pointerleave' as PointerEventType },
-          mockInputEventHandler
+          mockInputEventHandler,
+          environment
         )
       ).toBe(false);
     });

@@ -6,6 +6,7 @@ import {
   UpdateEdgeCommand,
   UpdateNodeCommand,
 } from '../commands/add-update-delete';
+import { CopyCommand, PasteCommand } from '../commands/copy-paste';
 import { DeleteSelectionCommand } from '../commands/delete-selection';
 import { MoveSelectionCommand } from '../commands/move-selection';
 import { DeselectAllCommand, SelectCommand } from '../commands/selection';
@@ -23,7 +24,9 @@ export type Command =
   | DeleteNodesCommand
   | AddEdgesCommand
   | UpdateEdgeCommand
-  | DeleteEdgesCommand;
+  | DeleteEdgesCommand
+  | CopyCommand
+  | PasteCommand;
 /**
  * Type for command name
  */

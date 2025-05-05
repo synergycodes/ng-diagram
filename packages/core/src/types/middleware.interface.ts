@@ -15,7 +15,8 @@ export type ModelActionType =
   | 'addEdges'
   | 'updateEdge'
   | 'deleteEdges'
-  | 'changeViewport';
+  | 'changeViewport'
+  | 'paste';
 
 /**
  * Type for the state of the flow diagram

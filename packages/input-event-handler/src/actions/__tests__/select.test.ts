@@ -1,8 +1,8 @@
 import { CommandHandler, EnvironmentInfo, EventMapper } from '@angularflow/core';
 import { describe, expect, it, vi } from 'vitest';
-import { InputEventHandler } from '../input-event-handler';
-import { mockedNode, mockedPointerEvent } from '../test-utils';
-import { selectAction } from './select';
+import { InputEventHandler } from '../../input-event-handler';
+import { mockedNode, mockedPointerEvent } from '../../test-utils';
+import { selectAction } from '../select';
 
 describe('selectAction', () => {
   const environment: EnvironmentInfo = {
@@ -23,12 +23,18 @@ describe('selectAction', () => {
 
   describe('predicate', () => {
     it('should return true for pointerdown events', () => {
-      expect(selectAction.predicate({ ...mockedPointerEvent, type: 'pointerdown' }, inputEventHandler)).toBe(true);
+      expect(
+        selectAction.predicate({ ...mockedPointerEvent, type: 'pointerdown' }, inputEventHandler, environment)
+      ).toBe(true);
     });
 
     it('should return false for other events', () => {
-      expect(selectAction.predicate({ ...mockedPointerEvent, type: 'pointerenter' }, inputEventHandler)).toBe(false);
-      expect(selectAction.predicate({ ...mockedPointerEvent, type: 'pointerup' }, inputEventHandler)).toBe(false);
+      expect(
+        selectAction.predicate({ ...mockedPointerEvent, type: 'pointerenter' }, inputEventHandler, environment)
+      ).toBe(false);
+      expect(selectAction.predicate({ ...mockedPointerEvent, type: 'pointerup' }, inputEventHandler, environment)).toBe(
+        false
+      );
     });
   });
 

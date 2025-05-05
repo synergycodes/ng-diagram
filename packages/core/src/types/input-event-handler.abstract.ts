@@ -13,7 +13,13 @@ export interface ActionContext {
 /**
  * Type for action name
  */
-export type ActionName = 'select' | 'keyboardMoveSelection' | 'pointerMoveSelection' | 'deleteSelection';
+export type ActionName =
+  | 'select'
+  | 'keyboardMoveSelection'
+  | 'pointerMoveSelection'
+  | 'deleteSelection'
+  | 'copy'
+  | 'paste';
 
 /**
  * Type for action function
@@ -23,7 +29,11 @@ export type Action = (event: Event, inputEventHandler: InputEventHandler, enviro
 /**
  * Type for predicate function that determines if an action should be triggered
  */
-export type ActionPredicate = (event: Event, inputEventHandler: InputEventHandler) => boolean;
+export type ActionPredicate = (
+  event: Event,
+  inputEventHandler: InputEventHandler,
+  environment: EnvironmentInfo
+) => boolean;
 
 /**
  * Type for action that can be either a name or a function
@@ -40,6 +50,8 @@ export interface ActionWithPredicate {
  * Enforces CommandHandler dependency through constructor
  */
 export abstract class InputEventHandler {
+  abstract context: ActionContext;
+
   protected constructor(
     readonly commandHandler: CommandHandler,
     protected readonly eventMapper: EventMapper,
