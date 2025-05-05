@@ -19,7 +19,7 @@ export const straightEdgesMiddleware: Middleware = {
 
     const newEdges = state.edges.map((edge) => {
       if (typeof edge.source !== 'string' && typeof edge.target !== 'string') {
-        return edge;
+        return { ...edge, points: [edge.source, edge.target] };
       }
       // TODO: Handle calculating points between elements
       return edge;
