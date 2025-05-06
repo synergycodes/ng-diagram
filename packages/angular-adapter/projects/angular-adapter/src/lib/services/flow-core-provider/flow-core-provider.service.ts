@@ -5,6 +5,7 @@ import { InputEventHandler } from '@angularflow/input-event-handler';
 import { EventMapperService } from '../event-mapper/event-mapper.service';
 import { ModelProviderService } from '../model-provider/model-provider.service';
 import { RendererService } from '../renderer/renderer.service';
+import { detectEnvironment } from './detect-environment';
 
 @Injectable({ providedIn: 'root' })
 export class FlowCoreProviderService {
@@ -19,7 +20,7 @@ export class FlowCoreProviderService {
       this.renderer,
       this.eventMapper,
       (commandHandler, eventMapper, environment) => new InputEventHandler(commandHandler, eventMapper, environment),
-      { browser: 'chrome', os: 'macOS', deviceType: 'desktop' } // pass anything for now
+      detectEnvironment()
     );
   }
 

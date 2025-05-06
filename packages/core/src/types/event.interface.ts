@@ -31,6 +31,10 @@ export interface KeyboardEvent extends BaseEvent {
   type: KeyboardEventType;
   key: string;
   code: string;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
 }
 
 /**

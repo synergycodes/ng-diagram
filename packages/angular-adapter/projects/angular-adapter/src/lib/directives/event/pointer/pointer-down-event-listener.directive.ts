@@ -15,7 +15,6 @@ export class PointerDownEventListenerDirective implements ITargetedEventListener
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerEvent) {
     event.stopPropagation();
-    event.preventDefault();
     this.eventMapperService.emit({
       type: 'pointerdown',
       target: this.eventTarget(),

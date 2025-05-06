@@ -37,11 +37,7 @@ describe('FlowCore', () => {
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Metadata>;
-  const mockEnvironment: EnvironmentInfo = {
-    os: 'macOS',
-    deviceType: 'desktop',
-    browser: 'Chrome',
-  };
+  const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {
     mockGetNodes = vi.fn().mockReturnValue([]);

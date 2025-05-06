@@ -1,5 +1,4 @@
 import {
-  type ActionContext,
   type ActionName,
   type ActionOrActionName,
   type ActionPredicate,
@@ -15,7 +14,6 @@ import { actions } from './actions';
 export class InputEventHandler extends CoreInputEventHandler {
   private defaultActions = new Map<ActionName, ActionWithPredicate>();
   private registeredActions: ActionWithPredicate[] = [];
-  context: ActionContext;
 
   constructor(
     readonly commandHandler: CommandHandler,
@@ -23,12 +21,6 @@ export class InputEventHandler extends CoreInputEventHandler {
     protected readonly environment: EnvironmentInfo
   ) {
     super(commandHandler, eventMapper, environment);
-    this.context = {
-      ctrlKey: false,
-      shiftKey: false,
-      altKey: false,
-      metaKey: false,
-    };
     this.eventMapper.register((event) => this.handleEvent(event));
     for (const [name, { action, predicate }] of Object.entries(actions)) {
       this.defaultActions.set(name as ActionName, { action, predicate });

@@ -1,79 +1,73 @@
-import { EnvironmentInfo, InputEventHandler, KeyboardEventType } from '@angularflow/core';
+import { EnvironmentInfo, InputEventHandler, KeyboardEvent } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { pasteAction } from '../paste';
 
 describe('Paste Action', () => {
-  const mockCommandHandler = {
-    emit: vi.fn(),
-  };
-
-  const mockActionHandler = {
-    commandHandler: mockCommandHandler,
-    context: {
-      metaKey: false,
-      ctrlKey: false,
-    },
-  } as unknown as InputEventHandler;
-
-  const mockEnvironment = {
-    os: 'macos',
-  } as EnvironmentInfo;
+  const mockCommandHandler = { emit: vi.fn() };
+  const mockActionHandler = { commandHandler: mockCommandHandler } as unknown as InputEventHandler;
+  const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
+  let mockEvent: KeyboardEvent;
 
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it('should emit paste command on Mac when meta + v is pressed', () => {
-    const event = {
-      type: 'keydown' as KeyboardEventType,
+    mockEvent = {
+      type: 'keydown',
       key: 'v',
       code: 'KeyV',
       timestamp: Date.now(),
       target: null,
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      metaKey: false,
     };
-
-    mockActionHandler.context.metaKey = true;
-    mockActionHandler.context.ctrlKey = false;
-
-    pasteAction.predicate(event, mockActionHandler, mockEnvironment);
-    pasteAction.action(event, mockActionHandler, mockEnvironment);
-
-    expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste');
   });
 
-  it('should emit paste command on Windows when ctrl + v is pressed', () => {
-    const event = {
-      type: 'keydown' as KeyboardEventType,
-      key: 'v',
-      code: 'KeyV',
-      timestamp: Date.now(),
-      target: null,
-    };
+  describe('action', () => {
+    it('should emit pase command', () => {
+      pasteAction.action(mockEvent, mockActionHandler, mockEnvironment);
 
-    mockActionHandler.context.metaKey = false;
-    mockActionHandler.context.ctrlKey = true;
-    mockEnvironment.os = 'windows';
-
-    pasteAction.predicate(event, mockActionHandler, mockEnvironment);
-    pasteAction.action(event, mockActionHandler, mockEnvironment);
-
-    expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste');
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste');
+    });
   });
 
-  it('should not emit paste command when wrong key is pressed', () => {
-    const event = {
-      type: 'keydown' as KeyboardEventType,
-      key: 'c',
-      code: 'KeyC',
-      timestamp: Date.now(),
-      target: null,
-    };
+  describe('predicate', () => {
+    it('should return false if event is not a keyboard down event', () => {
+      mockEvent.type = 'keyup';
 
-    mockActionHandler.context.metaKey = true;
-    mockActionHandler.context.ctrlKey = false;
+      expect(pasteAction.predicate(mockEvent, mockActionHandler, mockEnvironment)).toBe(false);
+    });
 
-    const result = pasteAction.predicate(event, mockActionHandler, mockEnvironment);
-    expect(result).toBe(false);
-    expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+    it('should return false when key is different from v', () => {
+      mockEvent.key = 'a';
+
+      expect(pasteAction.predicate(mockEvent, mockActionHandler, mockEnvironment)).toBe(false);
+    });
+
+    it('should return false when meta key is not pressed on MacOS', () => {
+      mockEvent.metaKey = false;
+
+      expect(pasteAction.predicate(mockEvent, mockActionHandler, mockEnvironment)).toBe(false);
+    });
+
+    it('should return false when ctrl key is not pressed on Windows', () => {
+      mockEvent.ctrlKey = false;
+
+      expect(pasteAction.predicate(mockEvent, mockActionHandler, mockEnvironment)).toBe(false);
+    });
+
+    it('should return true when meta + v is pressed on MacOS', () => {
+      mockEvent.metaKey = true;
+
+      expect(pasteAction.predicate(mockEvent, mockActionHandler, mockEnvironment)).toBe(true);
+    });
+
+    it('should return true when ctrl + v is pressed on Windows', () => {
+      mockEnvironment.os = 'Windows';
+      mockEvent.ctrlKey = true;
+
+      expect(pasteAction.predicate(mockEvent, mockActionHandler, mockEnvironment)).toBe(true);
+    });
   });
 });

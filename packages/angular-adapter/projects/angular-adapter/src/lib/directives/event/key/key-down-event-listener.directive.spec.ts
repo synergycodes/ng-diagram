@@ -39,6 +39,10 @@ describe('KeyDownEventListenerDirective', () => {
       timestamp: expect.any(Number),
       key: 'K',
       code: 'KeyK',
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      metaKey: false,
     });
   });
 });
