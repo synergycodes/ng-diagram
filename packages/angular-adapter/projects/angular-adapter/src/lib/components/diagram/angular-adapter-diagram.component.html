@@ -1,5 +1,4 @@
 <angular-adapter-canvas>
-  <angular-adapter-marker-arrow />
   @for (node of nodes(); track node.id) {
     <angular-adapter-node
       [position]="node.position"
@@ -14,7 +13,7 @@
     </angular-adapter-node>
   }
   @for (edge of edges(); track edge.id) {
-    <angular-adapter-edge [eventTarget]="{ type: 'edge', element: edge }" style="z-index: 1">
+    <angular-adapter-edge [eventTarget]="{ type: 'edge', element: edge }">
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
       } @else if (edge.type === 'straight' || !edge.type) {
@@ -22,4 +21,5 @@
       }
     </angular-adapter-edge>
   }
+  <angular-adapter-marker-arrow />
 </angular-adapter-canvas>

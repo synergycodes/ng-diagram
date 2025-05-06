@@ -1,9 +1,9 @@
 <svg>
   <path
     [attr.d]="path"
-    fill="none"
-    stroke="currentColor"
-    [attr.stroke-width]="edge().selected ? 2 : 1"
+    [attr.stroke]="edge().selected ? '#888' : '#bbb'"
+    [attr.fill]="edge().selected ? '#888' : '#bbb'"
+    stroke-width="1"
     [attr.marker-start]="edge().sourceArrowhead ? 'url(#' + edge().sourceArrowhead + ')' : null"
     [attr.marker-end]="edge().targetArrowhead ? 'url(#' + edge().targetArrowhead + ')' : null"
   />
