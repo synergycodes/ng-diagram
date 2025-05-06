@@ -11,11 +11,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { deleteSelectionAction } from '../delete-selection';
 
 describe('deleteSelectionAction', () => {
-  const environment: EnvironmentInfo = {
-    os: 'windows',
-    deviceType: 'desktop',
-    browser: 'chrome',
-  };
+  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
   let mockCommandHandler: CommandHandler;
   let mockEvent: Event;
   let mockInputEventHandler: InputEventHandler;

@@ -5,11 +5,7 @@ import { mockedNode, mockedPointerEvent } from '../../test-utils';
 import { selectAction } from '../select';
 
 describe('selectAction', () => {
-  const environment: EnvironmentInfo = {
-    os: 'windows',
-    deviceType: 'desktop',
-    browser: 'chrome',
-  };
+  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
   const emit = vi.fn();
   const inputEventHandler = new InputEventHandler(
     {

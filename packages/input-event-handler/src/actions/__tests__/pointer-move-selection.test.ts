@@ -12,11 +12,7 @@ import { mockedEdge, mockedNode } from '../../test-utils';
 import { pointerMoveSelectionAction } from '../pointer-move-selection';
 
 describe('pointerMoveSelectionAction', () => {
-  const environment: EnvironmentInfo = {
-    os: 'windows',
-    deviceType: 'desktop',
-    browser: 'chrome',
-  };
+  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
   let mockCommandHandler: CommandHandler;
   let mockEvent: PointerEvent;
   let mockTarget: EventTarget;

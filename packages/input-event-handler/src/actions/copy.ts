@@ -10,7 +10,7 @@ export const copyAction: ActionWithPredicate = {
     if (!isKeyboardPressEvent(event) || !isKeyboardUpEvent(event)) {
       return false;
     }
-    const isMac = environment.os === 'macos';
+    const isMac = environment.os === 'MacOS';
     const isCopyKey = isMac ? handler.context.metaKey : handler.context.ctrlKey;
     return event.key === 'c' && isCopyKey;
   },

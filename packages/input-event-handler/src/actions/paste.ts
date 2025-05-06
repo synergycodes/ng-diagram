@@ -10,7 +10,7 @@ export const pasteAction: ActionWithPredicate = {
     if (!isKeyboardPressEvent(event) || !isKeyboardUpEvent(event)) {
       return false;
     }
-    const isMac = environment.os === 'macos';
+    const isMac = environment.os === 'MacOS';
     const isPasteKey = isMac ? handler.context.metaKey : handler.context.ctrlKey;
     return event.key === 'v' && isPasteKey;
   },

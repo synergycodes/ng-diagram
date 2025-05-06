@@ -12,11 +12,7 @@ import { mockedNode } from '../../test-utils';
 import { panningAction } from '../panning';
 
 describe('panningAction', () => {
-  const environment: EnvironmentInfo = {
-    os: 'windows',
-    deviceType: 'desktop',
-    browser: 'chrome',
-  };
+  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
   let mockCommandHandler: CommandHandler;
   let mockEvent: PointerEvent;
   let mockTarget: EventTarget;

@@ -1,4 +1,4 @@
-import { EnvironmentInfo, InputEventHandler, KeyboardEventType } from '@angularflow/core';
+import { EnvironmentInfo, InputEventHandler, KeyboardEvent } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { pasteAction } from '../paste';
 
@@ -15,17 +15,15 @@ describe('Paste Action', () => {
     },
   } as unknown as InputEventHandler;
 
-  const mockEnvironment = {
-    os: 'macos',
-  } as EnvironmentInfo;
+  const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should emit paste command on Mac when meta + v is pressed', () => {
-    const event = {
-      type: 'keydown' as KeyboardEventType,
+    const event: KeyboardEvent = {
+      type: 'keydown',
       key: 'v',
       code: 'KeyV',
       timestamp: Date.now(),
@@ -42,8 +40,8 @@ describe('Paste Action', () => {
   });
 
   it('should emit paste command on Windows when ctrl + v is pressed', () => {
-    const event = {
-      type: 'keydown' as KeyboardEventType,
+    const event: KeyboardEvent = {
+      type: 'keydown',
       key: 'v',
       code: 'KeyV',
       timestamp: Date.now(),
@@ -52,7 +50,7 @@ describe('Paste Action', () => {
 
     mockActionHandler.context.metaKey = false;
     mockActionHandler.context.ctrlKey = true;
-    mockEnvironment.os = 'windows';
+    mockEnvironment.os = 'Windows';
 
     pasteAction.predicate(event, mockActionHandler, mockEnvironment);
     pasteAction.action(event, mockActionHandler, mockEnvironment);
@@ -61,8 +59,8 @@ describe('Paste Action', () => {
   });
 
   it('should not emit paste command when wrong key is pressed', () => {
-    const event = {
-      type: 'keydown' as KeyboardEventType,
+    const event: KeyboardEvent = {
+      type: 'keydown',
       key: 'c',
       code: 'KeyC',
       timestamp: Date.now(),

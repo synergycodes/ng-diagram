@@ -1,5 +1,4 @@
 export interface EnvironmentInfo {
-  os: string;
-  deviceType: 'desktop' | 'tablet' | 'mobile';
-  browser: string;
+  os: 'MacOS' | 'Windows' | 'Linux' | 'iOS' | 'Android' | 'Other';
+  browser: 'Chrome' | 'Firefox' | 'Safari' | 'Edge' | 'Opera' | 'IE' | 'Other';
 }

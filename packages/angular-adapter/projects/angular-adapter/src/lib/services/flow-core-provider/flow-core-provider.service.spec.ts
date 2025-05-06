@@ -2,7 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { FlowCore, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModelProviderService } from '../model-provider/model-provider.service';
+import { detectEnvironment } from './detect-environment';
 import { FlowCoreProviderService } from './flow-core-provider.service';
+
+vi.mock('./detect-environment');
 
 describe('FlowCoreProviderService', () => {
   let service: FlowCoreProviderService;
@@ -40,6 +43,12 @@ describe('FlowCoreProviderService', () => {
       service.init();
 
       expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call detectEnvironment method', () => {
+      service.init();
+
+      expect(detectEnvironment).toHaveBeenCalled();
     });
   });
 

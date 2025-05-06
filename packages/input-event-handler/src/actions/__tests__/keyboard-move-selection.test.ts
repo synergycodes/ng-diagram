@@ -16,11 +16,7 @@ describe('keyboardMoveSelectionAction', () => {
   let mockTarget: EventTarget;
   let mockInputEventHandler: InputEventHandler;
   let mockFlowCore: FlowCore;
-  const environment: EnvironmentInfo = {
-    os: 'windows',
-    deviceType: 'desktop',
-    browser: 'chrome',
-  };
+  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
 
   beforeEach(() => {
     mockFlowCore = {} as FlowCore;
