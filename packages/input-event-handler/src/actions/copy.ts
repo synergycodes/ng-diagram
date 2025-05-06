@@ -1,17 +1,13 @@
-import { ActionWithPredicate, isKeyboardEvent, isKeyboardPressEvent, isKeyboardUpEvent } from '@angularflow/core';
+import { ActionWithPredicate, isKeyboardDownEvent } from '@angularflow/core';
 
 export const copyAction: ActionWithPredicate = {
-  action: (event, handler) => {
-    if (isKeyboardEvent(event)) {
-      handler.commandHandler.emit('copy');
-    }
-  },
-  predicate: (event, handler, environment) => {
-    if (!isKeyboardPressEvent(event) || !isKeyboardUpEvent(event)) {
+  action: (_event, handler) => handler.commandHandler.emit('copy'),
+  predicate: (event, _handler, environment) => {
+    if (!isKeyboardDownEvent(event)) {
       return false;
     }
-    const isMac = environment.os === 'MacOS';
-    const isCopyKey = isMac ? handler.context.metaKey : handler.context.ctrlKey;
-    return event.key === 'c' && isCopyKey;
+
+    const modifierKey = environment.os === 'MacOS' ? event.metaKey : event.ctrlKey;
+    return event.key === 'c' && modifierKey;
   },
 };

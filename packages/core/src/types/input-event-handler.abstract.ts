@@ -3,13 +3,6 @@ import type { EnvironmentInfo } from './environment.interface';
 import type { EventMapper } from './event-mapper.interface';
 import type { Event } from './event.interface';
 
-export interface ActionContext {
-  ctrlKey: boolean;
-  shiftKey: boolean;
-  altKey: boolean;
-  metaKey: boolean;
-}
-
 /**
  * Type for action name
  */
@@ -51,8 +44,6 @@ export interface ActionWithPredicate {
  * Enforces CommandHandler dependency through constructor
  */
 export abstract class InputEventHandler {
-  abstract context: ActionContext;
-
   protected constructor(
     readonly commandHandler: CommandHandler,
     protected readonly eventMapper: EventMapper,
