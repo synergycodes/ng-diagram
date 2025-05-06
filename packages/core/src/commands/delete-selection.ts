@@ -15,19 +15,19 @@ export const deleteSelection = (commandHandler: CommandHandler): void => {
     }
   }
 
-  const nodesToDeleteIds: string[] = [];
+  const nodesToDeleteIds = new Set<string>();
 
   const newNodes = isAnyNodeSelected
     ? nodes.filter((node) => {
         if (node.selected) {
-          nodesToDeleteIds.push(node.id);
+          nodesToDeleteIds.add(node.id);
         }
         return !node.selected;
       })
     : nodes;
 
   const newEdges = edges.filter(
-    (edge) => !edge.selected && !nodesToDeleteIds.includes(edge.source) && !nodesToDeleteIds.includes(edge.target)
+    (edge) => !edge.selected && !nodesToDeleteIds.has(edge.source) && !nodesToDeleteIds.has(edge.target)
   );
 
   commandHandler.flowCore.applyUpdate(

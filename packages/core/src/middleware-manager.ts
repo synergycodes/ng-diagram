@@ -1,3 +1,4 @@
+import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 import type {
   FlowState,
   Middleware,
@@ -8,6 +9,10 @@ import type {
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
+
+  constructor() {
+    this.register(edgesStraightRoutingMiddleware);
+  }
 
   /**
    * Registers a new middleware in the chain

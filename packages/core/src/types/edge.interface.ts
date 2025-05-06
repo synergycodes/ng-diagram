@@ -13,4 +13,5 @@ export interface Edge {
   toPort?: string | null;
   sourceArrowhead?: string;
   targetArrowhead?: string;
+  routing?: string;
 }

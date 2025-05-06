@@ -33,11 +33,17 @@ export interface DeleteNodesCommand {
 
 export const deleteNodes = (commandHandler: CommandHandler, command: DeleteNodesCommand): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  const edgesToDelete = edges.filter((edge) => command.ids.includes(edge.source) || command.ids.includes(edge.target));
+  const edgesToDeleteIds = new Set<string>();
+  const nodesToDeleteIds = new Set<string>(command.ids);
+  edges.forEach((edge) => {
+    if (nodesToDeleteIds.has(edge.source) || nodesToDeleteIds.has(edge.target)) {
+      edgesToDeleteIds.add(edge.id);
+    }
+  });
   commandHandler.flowCore.applyUpdate(
     {
-      nodes: nodes.filter((node) => !command.ids.includes(node.id)),
-      edges: edgesToDelete.length > 0 ? edges.filter((edge) => !edgesToDelete.includes(edge)) : edges,
+      nodes: nodes.filter((node) => !nodesToDeleteIds.has(node.id)),
+      edges: edgesToDeleteIds.size > 0 ? edges.filter((edge) => !edgesToDeleteIds.has(edge.id)) : edges,
     },
     'deleteNodes'
   );
