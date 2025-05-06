@@ -16,7 +16,8 @@ import { FlowCoreProviderService, ModelProviderService, RendererService } from '
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
-import { StraightEdgeComponent } from '../edge/straight/straight-edge.component';
+import { EdgeStraightComponent } from '../edge/edge-straight/edge-straight.component';
+import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
@@ -26,7 +27,8 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     AngularAdapterCanvasComponent,
     AngularAdapterNodeComponent,
     AngularAdapterEdgeComponent,
-    StraightEdgeComponent,
+    EdgeStraightComponent,
+    MarkerArrowComponent,
   ],
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',

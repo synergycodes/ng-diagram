@@ -25,8 +25,22 @@ export class AppComponent {
       { id: '3', type: 'unknown', position: { x: 700, y: 300 }, data: {} },
     ]);
     this.model().setEdges([
-      { id: '4', source: '1', target: '2', data: {} },
-      { id: '5', source: '2', target: '3', data: {} },
+      {
+        id: '4',
+        source: '1',
+        target: '2',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+      },
+      {
+        id: '5',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+      },
     ]);
   }
 }

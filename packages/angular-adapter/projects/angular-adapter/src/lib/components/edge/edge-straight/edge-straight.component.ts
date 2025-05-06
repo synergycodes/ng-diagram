@@ -3,12 +3,12 @@ import { Edge } from '@angularflow/core';
 import { getStraightPath } from '../../../utils/edge/get-paths';
 
 @Component({
-  selector: 'angular-adapter-straight-edge',
-  templateUrl: './straight-edge.component.html',
-  styleUrl: './straight-edge.component.scss',
+  selector: 'angular-adapter-edge-straight',
+  templateUrl: './edge-straight.component.html',
+  styleUrl: './edge-straight.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StraightEdgeComponent {
+export class EdgeStraightComponent {
   edge = input.required<Edge>();
 
   get path(): string {
