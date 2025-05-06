@@ -24,5 +24,9 @@ export class AppComponent {
       { id: '2', type: 'image', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
       { id: '3', type: 'unknown', position: { x: 700, y: 300 }, data: {} },
     ]);
+    this.model().setEdges([
+      { id: '4', source: '1', target: '2', data: {} },
+      { id: '5', source: '2', target: '3', data: {} },
+    ]);
   }
 }

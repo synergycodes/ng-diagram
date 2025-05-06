@@ -12,4 +12,13 @@
       }
     </angular-adapter-node>
   }
+  @for (edge of edges(); track edge.id) {
+    <angular-adapter-edge [eventTarget]="{ type: 'edge', element: edge }">
+      @if (getEdgeTemplate(edge.type)) {
+        <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
+      } @else {
+        <angular-adapter-straight-edge [edge]="edge" />
+      }
+    </angular-adapter-edge>
+  }
 </angular-adapter-canvas>
