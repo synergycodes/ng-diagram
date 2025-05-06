@@ -13,10 +13,10 @@
     </angular-adapter-node>
   }
   @for (edge of edges(); track edge.id) {
-    <angular-adapter-edge [eventTarget]="{ type: 'edge', element: edge }">
+    <angular-adapter-edge [eventTarget]="{ type: 'edge', element: edge }" style="z-index: 1">
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
-      } @else {
+      } @else if (edge.type === 'straight' || !edge.type) {
         <angular-adapter-straight-edge [edge]="edge" />
       }
     </angular-adapter-edge>
