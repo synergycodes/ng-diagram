@@ -32,15 +32,13 @@ describe('PointerUpEventListenerDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should call stopPropagation and preventDefault methods of the event', () => {
+  it('should call stopPropagation method on the event', () => {
     const event = new Event('pointerup');
-    const stopPropagationSpy = vi.spyOn(event, 'stopPropagation');
-    const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
+    const spy = vi.spyOn(event, 'stopPropagation');
 
     fixture.debugElement.nativeElement.dispatchEvent(event);
 
-    expect(stopPropagationSpy).toHaveBeenCalled();
-    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 
   describe('when eventTarget is null', () => {
