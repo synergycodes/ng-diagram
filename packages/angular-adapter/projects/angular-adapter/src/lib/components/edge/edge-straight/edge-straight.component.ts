@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Edge } from '@angularflow/core';
-import { getStraightPath } from '../../../utils/edge/get-paths';
+import { getStraightPath } from '../../../utils/get-paths';
 
 @Component({
   selector: 'angular-adapter-edge-straight',

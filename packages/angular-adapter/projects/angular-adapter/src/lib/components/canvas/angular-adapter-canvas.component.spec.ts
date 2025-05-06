@@ -11,6 +11,7 @@ import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.componen
   imports: [AngularAdapterCanvasComponent, AngularAdapterNodeComponent],
   template: `
     <angular-adapter-canvas>
+      <angular-adapter-edge></angular-adapter-edge>
       <angular-adapter-node>Node 1</angular-adapter-node>
       <angular-adapter-node>Node 2</angular-adapter-node>
     </angular-adapter-canvas>
@@ -36,15 +37,18 @@ describe('AngularAdapterCanvasComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render nodes container element', () => {
-    const nodesContainer = fixture.debugElement.query(By.css('.nodes-container'));
-    expect(nodesContainer).toBeTruthy();
+  it('should render nodes edges container element', () => {
+    const nodesEdgesContainer = fixture.debugElement.query(By.css('.nodes-edges-container'));
+    expect(nodesEdgesContainer).toBeTruthy();
   });
 
-  it('should correctly project nodes', () => {
-    const nodes = fixture.debugElement.query(By.css('.nodes-container')).queryAll(By.css('angular-adapter-node'));
+  it('should correctly project nodes and edges', () => {
+    const nodes = fixture.debugElement.query(By.css('.nodes-edges-container')).queryAll(By.css('angular-adapter-node'));
     expect(nodes.length).toBe(2);
     expect(nodes[0].nativeElement.textContent).toBe('Node 1');
     expect(nodes[1].nativeElement.textContent).toBe('Node 2');
+
+    const edges = fixture.debugElement.query(By.css('.nodes-edges-container')).queryAll(By.css('angular-adapter-edge'));
+    expect(edges.length).toBe(1);
   });
 });

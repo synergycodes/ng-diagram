@@ -136,4 +136,23 @@ describe('AngularAdapterDiagramComponent', () => {
       expect(component.getNodeTemplate('test-type')).toBe(mockTemplate);
     });
   });
+
+  describe('getEdgeTemplate', () => {
+    it('should return null for non-existent edge template', () => {
+      expect(component.getEdgeTemplate('non-existent')).toBeNull();
+    });
+
+    it('should return null if edge type is undefined', () => {
+      expect(component.getEdgeTemplate(undefined)).toBeNull();
+    });
+
+    it('should return correct template for existing edge type', () => {
+      const mockTemplate = { template: 'test' };
+      const templateMap = new Map([['test-type', mockTemplate]]);
+
+      fixture.componentRef.setInput('edgeTemplateMap', templateMap);
+
+      expect(component.getEdgeTemplate('test-type')).toBe(mockTemplate);
+    });
+  });
 });
