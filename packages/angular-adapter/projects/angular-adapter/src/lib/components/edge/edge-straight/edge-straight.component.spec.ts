@@ -57,8 +57,7 @@ describe('EdgeStraightComponent', () => {
     fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
-    // The path should be in the format "M{x1},{y1} L{x2},{y2}"
-    expect(component.path).toBe('M10,20 L30,40');
+    expect(component.path).toBe('M 10 20 L 30 40');
   });
 
   it('should handle edge with no points', () => {

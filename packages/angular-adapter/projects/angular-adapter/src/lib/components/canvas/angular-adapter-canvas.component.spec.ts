@@ -3,12 +3,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
 
 @Component({
   selector: 'angular-adapter-canvas-test',
-  imports: [AngularAdapterCanvasComponent, AngularAdapterNodeComponent],
+  imports: [AngularAdapterCanvasComponent, AngularAdapterNodeComponent, AngularAdapterEdgeComponent],
   template: `
     <angular-adapter-canvas>
       <angular-adapter-edge></angular-adapter-edge>
