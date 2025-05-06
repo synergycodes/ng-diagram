@@ -37,6 +37,8 @@ export const edgesStraightRoutingMiddleware: Middleware = {
       nodePositionMap.set(node.id, node.position);
     });
 
+    console.log(edgesToRouteIds);
+
     const newEdges = state.edges.map((edge) => {
       if (!edgesToRouteIds.has(edge.id)) {
         return edge;
