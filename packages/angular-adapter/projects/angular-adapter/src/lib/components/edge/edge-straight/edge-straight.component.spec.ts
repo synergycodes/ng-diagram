@@ -15,7 +15,6 @@ describe('EdgeStraightComponent', () => {
     fixture = TestBed.createComponent(EdgeStraightComponent);
     component = fixture.componentInstance;
 
-    // Set required input
     const mockEdge: Edge = {
       id: 'test-edge',
       source: 'source-node',
@@ -27,7 +26,6 @@ describe('EdgeStraightComponent', () => {
       ],
     };
 
-    // Use the input signal directly
     fixture.componentRef.setInput('edge', mockEdge);
 
     fixture.detectChanges();
@@ -71,7 +69,6 @@ describe('EdgeStraightComponent', () => {
     fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
-    // When no points are provided, the path should be empty or a default value
     expect(component.path).toBe('');
   });
 });

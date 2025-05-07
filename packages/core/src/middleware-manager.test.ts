@@ -58,6 +58,12 @@ describe('MiddlewareManager', () => {
       expect(unregister).toBeDefined();
       expect(typeof unregister).toBe('function');
     });
+
+    it('should throw an error if the middleware is already registered', () => {
+      middlewareManager.register(mockMiddleware1);
+
+      expect(() => middlewareManager.register(mockMiddleware1)).toThrow();
+    });
   });
 
   describe('unregister', () => {

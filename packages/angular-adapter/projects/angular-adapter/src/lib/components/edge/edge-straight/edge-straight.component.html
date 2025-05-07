@@ -1,11 +1,11 @@
 <svg>
   <path
-    [attr.d]="path"
-    [attr.stroke]="edge().selected ? '#888' : '#bbb'"
-    [attr.fill]="edge().selected ? '#888' : '#bbb'"
+    [attr.d]="path()"
+    [attr.stroke]="stroke()"
+    [attr.fill]="fill()"
     stroke-width="2"
-    [attr.marker-start]="edge().sourceArrowhead ? 'url(#' + edge().sourceArrowhead + ')' : null"
-    [attr.marker-end]="edge().targetArrowhead ? 'url(#' + edge().targetArrowhead + ')' : null"
+    [attr.marker-start]="markerStart()"
+    [attr.marker-end]="markerEnd()"
   />
-  <path [attr.d]="path" fill="none" stroke="currentColor" stroke-width="20" stroke-opacity="0" />
+  <path [attr.d]="path()" fill="none" stroke="currentColor" stroke-width="20" stroke-opacity="0" />
 </svg>

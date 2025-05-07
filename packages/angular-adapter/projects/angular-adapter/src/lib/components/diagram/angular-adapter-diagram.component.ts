@@ -62,7 +62,7 @@ export class AngularAdapterDiagramComponent {
    * The edge template map to use for the diagram.
    * Optional - if not provided, default edge rendering will be used.
    */
-  edgeTemplateMap = input<EdgeTemplateMap | undefined>(new Map());
+  edgeTemplateMap = input<EdgeTemplateMap>(new Map());
 
   nodes = this.renderer.nodes;
   edges = this.renderer.edges;
