@@ -26,10 +26,6 @@ describe('EdgeStraightComponent', () => {
         { x: 100, y: 100 },
       ],
     };
-
-    fixture.componentRef.setInput('data', mockEdge);
-
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -37,6 +33,9 @@ describe('EdgeStraightComponent', () => {
   });
 
   it('should have required edge input', () => {
+    fixture.componentRef.setInput('data', mockEdge);
+    fixture.detectChanges();
+
     expect(component.data).toBeDefined();
     expect(component.data().id).toBe('test-edge');
   });
