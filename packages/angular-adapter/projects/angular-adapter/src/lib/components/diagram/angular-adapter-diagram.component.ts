@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
-import { ModelAdapter, Node } from '@angularflow/core';
+import { Edge, ModelAdapter, Node } from '@angularflow/core';
 
 import {
   KeyDownEventListenerDirective,
@@ -13,13 +13,23 @@ import {
   PointerUpEventListenerDirective,
 } from '../../directives';
 import { FlowCoreProviderService, ModelProviderService, RendererService } from '../../services';
-import { NodeTemplateMap } from '../../types';
+import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
+import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
+import { EdgeStraightComponent } from '../edge/edge-straight/edge-straight.component';
+import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
   selector: 'angular-adapter-diagram',
-  imports: [CommonModule, AngularAdapterCanvasComponent, AngularAdapterNodeComponent],
+  imports: [
+    CommonModule,
+    AngularAdapterCanvasComponent,
+    AngularAdapterNodeComponent,
+    AngularAdapterEdgeComponent,
+    EdgeStraightComponent,
+    MarkerArrowComponent,
+  ],
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +58,14 @@ export class AngularAdapterDiagramComponent {
    */
   nodeTemplateMap = input<NodeTemplateMap>(new Map());
 
+  /**
+   * The edge template map to use for the diagram.
+   * Optional - if not provided, default edge rendering will be used.
+   */
+  edgeTemplateMap = input<EdgeTemplateMap>(new Map());
+
   nodes = this.renderer.nodes;
+  edges = this.renderer.edges;
 
   constructor() {
     // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
@@ -65,5 +82,12 @@ export class AngularAdapterDiagramComponent {
 
   getNodeTemplate(nodeType: Node['type']) {
     return this.nodeTemplateMap().get(nodeType) ?? null;
+  }
+
+  getEdgeTemplate(edgeType: Edge['type']) {
+    if (!edgeType) {
+      return null;
+    }
+    return this.edgeTemplateMap()?.get(edgeType) ?? null;
   }
 }

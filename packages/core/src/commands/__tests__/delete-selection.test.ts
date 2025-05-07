@@ -47,4 +47,22 @@ describe('Delete Selection Command', () => {
 
     expect(flowCore.applyUpdate).not.toHaveBeenCalled();
   });
+
+  it('should delete selected nodes and edges which were connected to the selected nodes', () => {
+    const nodes = [
+      { id: '1', selected: false },
+      { id: '2', selected: true },
+    ];
+    const edges = [
+      { id: '1', selected: false, source: '1', target: '2' },
+      { id: '2', selected: false, source: '1', target: '2' },
+      { id: '2', selected: false, source: '3', target: '4' },
+    ];
+
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+
+    commandHandler.emit('deleteSelection');
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [nodes[0]], edges: [edges[2]] }, 'deleteSelection');
+  });
 });

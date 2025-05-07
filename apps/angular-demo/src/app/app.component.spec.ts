@@ -34,4 +34,9 @@ describe('AppComponent', () => {
     expect(component.nodeTemplateMap.has('input-field')).toBeTruthy();
     expect(component.nodeTemplateMap.has('image')).toBeTruthy();
   });
+
+  it('should initialize with two edges', () => {
+    const edges = component.model().getEdges();
+    expect(edges.length).toBe(2);
+  });
 });

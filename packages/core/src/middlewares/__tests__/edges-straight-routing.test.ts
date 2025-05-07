@@ -1,0 +1,74 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+import { mockedEdge, mockedMetadata, mockedNode } from '../../test-utils';
+import { FlowState } from '../../types';
+import { edgesStraightRoutingMiddleware } from '../edges-straight-routing';
+
+describe('Edges Straight Routing Middleware', () => {
+  let initialState: FlowState;
+
+  beforeEach(() => {
+    initialState = {
+      nodes: [mockedNode],
+      edges: [mockedEdge],
+      metadata: mockedMetadata,
+    };
+  });
+
+  it('should return the initial state if model action is not relevant', () => {
+    const state = edgesStraightRoutingMiddleware.execute(initialState, {
+      modelActionType: 'moveViewport',
+      initialState,
+      historyUpdates: [],
+    });
+    expect(state).toEqual(initialState);
+  });
+
+  it('should return the initial state if there are no edges', () => {
+    initialState.edges = [];
+    const state = edgesStraightRoutingMiddleware.execute(initialState, {
+      modelActionType: 'addNodes',
+      initialState,
+      historyUpdates: [],
+    });
+    expect(state).toEqual(initialState);
+  });
+
+  it('should return the initial state if there are no edges to route', () => {
+    initialState.edges[0].routing = 'custom-routing';
+    const state = edgesStraightRoutingMiddleware.execute(initialState, {
+      modelActionType: 'addNodes',
+      initialState,
+      historyUpdates: [],
+    });
+    expect(state).toEqual(initialState);
+  });
+
+  it('should route only edges with routing set to straight or undefined and leave other edges unchanged', () => {
+    initialState.nodes = [
+      { ...mockedNode, id: 'node-1', position: { x: 100, y: 100 } },
+      { ...mockedNode, id: 'node-2', position: { x: 200, y: 200 } },
+      { ...mockedNode, id: 'node-3', position: { x: 300, y: 300 } },
+    ];
+    initialState.edges = [
+      { ...mockedEdge, points: [], id: 'edge-1', source: 'node-1', target: 'node-2', routing: 'custom-routing' },
+      { ...mockedEdge, points: [], id: 'edge-2', source: 'node-2', target: 'node-3', routing: 'straight' },
+      { ...mockedEdge, points: [], id: 'edge-3', source: 'node-3', target: 'node-1', routing: undefined },
+    ];
+
+    const state = edgesStraightRoutingMiddleware.execute(initialState, {
+      modelActionType: 'addEdges',
+      initialState,
+      historyUpdates: [],
+    });
+
+    expect(state.edges[0].points).toEqual([]);
+    expect(state.edges[1].points).toEqual([
+      { x: 200, y: 200 },
+      { x: 300, y: 300 },
+    ]);
+    expect(state.edges[2].points).toEqual([
+      { x: 300, y: 300 },
+      { x: 100, y: 100 },
+    ]);
+  });
+});

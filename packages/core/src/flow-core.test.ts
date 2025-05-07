@@ -144,14 +144,9 @@ describe('FlowCore', () => {
     });
 
     it('should delegate middleware unregistration to MiddlewareManager', () => {
-      const middleware: Middleware = {
-        name: 'test',
-        execute: vi.fn(),
-      };
+      flowCore.unregisterMiddleware('test');
 
-      flowCore.unregisterMiddleware(middleware);
-
-      expect(mockMiddlewareManager.unregister).toHaveBeenCalledWith(middleware);
+      expect(mockMiddlewareManager.unregister).toHaveBeenCalledWith('test');
     });
   });
 

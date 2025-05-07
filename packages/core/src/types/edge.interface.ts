@@ -3,9 +3,15 @@
  */
 export interface Edge {
   id: string;
-  source: string; // source node id
-  target: string; // target node id
+  source: string;
+  target: string;
   data: Record<string, unknown>;
+  points?: { x: number; y: number }[];
   selected?: boolean;
   type?: string;
+  fromPort?: string | null;
+  toPort?: string | null;
+  sourceArrowhead?: string;
+  targetArrowhead?: string;
+  routing?: string;
 }

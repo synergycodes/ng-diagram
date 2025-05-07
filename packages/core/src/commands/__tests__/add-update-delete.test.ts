@@ -35,14 +35,15 @@ describe('Add Update Delete Command', () => {
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...nodes[0], selected: true }] }, 'updateNode');
   });
 
-  it('should delete nodes from the flow', () => {
+  it('should delete nodes from the flow with edges connected to them', () => {
     const nodes = [{ id: '1', selected: true }];
+    const edges = [{ id: '1', selected: false, source: '1', target: '2' }];
 
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges: [], metadata: {} });
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
 
     commandHandler.emit('deleteNodes', { ids: ['1'] });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [] }, 'deleteNodes');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [], edges: [] }, 'deleteNodes');
   });
 
   it('should add edges to the flow', () => {
