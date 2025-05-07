@@ -26,7 +26,7 @@ describe('EdgeStraightComponent', () => {
       ],
     };
 
-    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.componentRef.setInput('data', mockEdge);
 
     fixture.detectChanges();
   });
