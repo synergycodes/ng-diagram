@@ -52,10 +52,10 @@ describe('EdgeStraightComponent', () => {
       ],
     };
 
-    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.path).toBe('M 10 20 L 30 40');
+    expect(component.path()).toBe('M 10 20 L 30 40');
   });
 
   it('should handle edge with no points', () => {
@@ -66,9 +66,9 @@ describe('EdgeStraightComponent', () => {
       data: {},
     };
 
-    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.path).toBe('');
+    expect(component.path()).toBe('');
   });
 });
