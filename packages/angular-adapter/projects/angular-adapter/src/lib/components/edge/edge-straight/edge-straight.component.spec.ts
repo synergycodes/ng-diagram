@@ -36,8 +36,8 @@ describe('EdgeStraightComponent', () => {
   });
 
   it('should have required edge input', () => {
-    expect(component.edge).toBeDefined();
-    expect(component.edge().id).toBe('test-edge');
+    expect(component.data).toBeDefined();
+    expect(component.data().id).toBe('test-edge');
   });
 
   it('should calculate path from edge points', () => {

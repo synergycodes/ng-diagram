@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Edge } from '@angularflow/core';
 import { IEdgeTemplate } from '../../../types/edge-template-map';
 import { getStraightPath } from '../../../utils/get-paths';
@@ -10,12 +10,11 @@ import { getStraightPath } from '../../../utils/get-paths';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EdgeStraightComponent implements IEdgeTemplate {
-  data: InputSignal<Edge> = input.required<Edge>();
-  edge = input.required<Edge>();
+  data = input.required<Edge>();
 
-  path = computed(() => getStraightPath(this.edge().points || []));
-  stroke = computed(() => (this.edge().selected ? '#888' : '#bbb'));
-  fill = computed(() => (this.edge().selected ? '#888' : '#bbb'));
-  markerStart = computed(() => (this.edge().sourceArrowhead ? `url(#${this.edge().sourceArrowhead})` : null));
-  markerEnd = computed(() => (this.edge().targetArrowhead ? `url(#${this.edge().targetArrowhead})` : null));
+  path = computed(() => getStraightPath(this.data().points || []));
+  stroke = computed(() => (this.data().selected ? '#888' : '#bbb'));
+  fill = computed(() => (this.data().selected ? '#888' : '#bbb'));
+  markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null));
+  markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : null));
 }
