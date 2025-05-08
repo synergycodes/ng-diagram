@@ -4,11 +4,7 @@ import { Node } from './node.interface';
 /**
  * Type for event target
  */
-export type EventTarget =
-  | { type: 'node'; element: Node }
-  | { type: 'edge'; element: Edge }
-  | { type: 'background' }
-  | null;
+export type EventTarget = { type: 'node'; element: Node } | { type: 'edge'; element: Edge } | { type: 'diagram' };
 
 /**
  * Base interface for all events

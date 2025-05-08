@@ -35,7 +35,7 @@ describe('KeyPressEventListenerDirective', () => {
 
     expect(spy).toHaveBeenCalledWith({
       type: 'keypress',
-      target: null,
+      target: { type: 'diagram' },
       timestamp: expect.any(Number),
       key: 'K',
       code: 'KeyK',

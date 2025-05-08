@@ -1,6 +1,5 @@
-import { Component, input } from '@angular/core';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import type { EventTarget } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EventMapperService } from '../../../services';
@@ -10,13 +9,12 @@ import { PointerMoveEventListenerDirective } from './pointer-move-event-listener
   template: '',
   hostDirectives: [PointerMoveEventListenerDirective],
 })
-class TestComponent {
-  eventTarget = input<EventTarget | null>(null);
-}
+class TestComponent {}
 
 describe('PointerMoveEventListenerDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
   let directive: PointerMoveEventListenerDirective;
+  let mockEvent: Event;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [TestComponent] }).compileComponents();
@@ -26,29 +24,31 @@ describe('PointerMoveEventListenerDirective', () => {
     fixture.detectChanges();
   });
 
+  beforeEach(() => {
+    mockEvent = new Event('pointermove');
+    Object.assign(mockEvent, { pressure: 0, clientX: 10, clientY: 10 });
+  });
+
   it('should create', () => {
     expect(directive).toBeTruthy();
   });
 
   it('should call stopPropagation method on the event', () => {
-    const event = new Event('pointermove');
-    const spy = vi.spyOn(event, 'stopPropagation');
+    const spy = vi.spyOn(mockEvent, 'stopPropagation');
 
-    fixture.debugElement.nativeElement.dispatchEvent(event);
+    fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
 
     expect(spy).toHaveBeenCalled();
   });
 
   it('should call eventMapperService.emit', () => {
-    const event = new Event('pointermove');
-    Object.assign(event, { pressure: 0, clientX: 10, clientY: 10 });
     const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
-    fixture.debugElement.nativeElement.dispatchEvent(event);
+    fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
 
     expect(spy).toHaveBeenCalledWith({
       type: 'pointermove',
-      target: null,
+      target: { type: 'diagram' },
       pressure: 0,
       timestamp: expect.any(Number),
       x: 10,

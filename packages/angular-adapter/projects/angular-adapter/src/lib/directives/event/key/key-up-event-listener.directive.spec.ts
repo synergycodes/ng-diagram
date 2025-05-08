@@ -35,7 +35,7 @@ describe('KeyUpEventListenerDirective', () => {
 
     expect(spy).toHaveBeenCalledWith({
       type: 'keyup',
-      target: null,
+      target: { type: 'diagram' },
       timestamp: expect.any(Number),
       key: 'K',
       code: 'KeyK',

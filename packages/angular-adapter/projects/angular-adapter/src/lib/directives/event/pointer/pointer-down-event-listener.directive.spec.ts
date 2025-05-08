@@ -11,21 +11,29 @@ import { PointerDownEventListenerDirective } from './pointer-down-event-listener
   hostDirectives: [{ directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] }],
 })
 class TestComponent {
-  eventTarget = input<EventTarget | null>(null);
+  eventTarget = input<EventTarget>();
 }
 
 describe('PointerDownEventListenerDirective', () => {
-  let component: TestComponent;
   let fixture: ComponentFixture<TestComponent>;
   let directive: PointerDownEventListenerDirective;
+  let mockCurrentTarget: HTMLDivElement;
+  let mockEvent: Event;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [TestComponent] }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
-    component = fixture.componentInstance;
     directive = fixture.debugElement.injector.get(PointerDownEventListenerDirective);
     fixture.detectChanges();
+  });
+
+  beforeEach(() => {
+    mockCurrentTarget = document.createElement('div');
+    Object.assign(mockCurrentTarget, { setPointerCapture: vi.fn() });
+    mockEvent = new Event('pointerdown');
+    Object.assign(mockEvent, { pressure: 0, clientX: 10, clientY: 10 });
+    vi.spyOn(mockEvent, 'currentTarget', 'get').mockReturnValue(mockCurrentTarget);
   });
 
   it('should create', () => {
@@ -33,25 +41,30 @@ describe('PointerDownEventListenerDirective', () => {
   });
 
   it('should call stopPropagation method on the event', () => {
-    const event = new Event('pointerdown');
-    const spy = vi.spyOn(event, 'stopPropagation');
+    const spy = vi.spyOn(mockEvent, 'stopPropagation');
 
-    fixture.debugElement.nativeElement.dispatchEvent(event);
+    fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
 
     expect(spy).toHaveBeenCalled();
   });
 
-  describe('when eventTarget is null', () => {
-    it('should call eventMapperService.emit with null as eventTarget', () => {
-      const event = new Event('pointerdown');
-      Object.assign(event, { pressure: 0, clientX: 10, clientY: 10 });
+  it('should call setPointerCapture method on the currentTarget', () => {
+    const spy = vi.spyOn(mockCurrentTarget, 'setPointerCapture');
+
+    fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  describe('when eventTarget is not provided', () => {
+    it('should call eventMapperService.emit with diagram as eventTarget', () => {
       const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
-      fixture.debugElement.nativeElement.dispatchEvent(event);
+      fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
 
       expect(spy).toHaveBeenCalledWith({
         type: 'pointerdown',
-        target: null,
+        target: { type: 'diagram' },
         pressure: 0,
         timestamp: expect.any(Number),
         x: 10,
@@ -60,21 +73,22 @@ describe('PointerDownEventListenerDirective', () => {
     });
   });
 
-  describe('when eventTarget is not null', () => {
+  describe('when eventTarget is provided', () => {
     beforeEach(() => {
-      fixture.componentRef.setInput('eventTarget', { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} });
+      fixture.componentRef.setInput('eventTarget', {
+        type: 'node',
+        element: { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} },
+      });
     });
 
-    it('should call eventMapperService.emit with eventTarget', () => {
-      const event = new Event('pointerdown');
-      Object.assign(event, { pressure: 0, clientX: 10, clientY: 10 });
+    it('should call eventMapperService.emit with provided eventTarget', () => {
       const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
-      fixture.debugElement.nativeElement.dispatchEvent(event);
+      fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
 
       expect(spy).toHaveBeenCalledWith({
         type: 'pointerdown',
-        target: component.eventTarget(),
+        target: { type: 'node', element: { id: '1', type: 'test', position: { x: 0, y: 0 }, data: {} } },
         pressure: 0,
         timestamp: expect.any(Number),
         x: 10,

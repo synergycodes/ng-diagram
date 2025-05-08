@@ -25,7 +25,7 @@ export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
   y: 0,
   pressure: 0,
   timestamp: 0,
-  target: null,
+  target: { type: 'diagram' },
 };
 
 export const mockedMetadata: Metadata = {
