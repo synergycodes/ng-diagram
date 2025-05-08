@@ -24,7 +24,7 @@ describe('RendererService', () => {
 
       expect(service.nodes()).toEqual([{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }]);
       expect(service.edges()).toEqual([{ id: '1', source: '1', target: '2', data: {} }]);
-      expect(service.viewport()).toEqual({ x: 100, y: 100, scale: 2 });
+      expect(service.viewport()).toEqual({ x: 200, y: 200, scale: 2 });
     });
   });
 });

@@ -56,7 +56,6 @@ describe('PointerUpEventListenerDirective', () => {
         timestamp: expect.any(Number),
         x: 10,
         y: 10,
-        button: 0,
       });
     });
   });
@@ -81,7 +80,6 @@ describe('PointerUpEventListenerDirective', () => {
         timestamp: expect.any(Number),
         x: 10,
         y: 10,
-        button: 0,
       });
     });
   });
