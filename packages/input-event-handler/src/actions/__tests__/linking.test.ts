@@ -94,7 +94,7 @@ describe('linkingAction', () => {
 
     it('should call startLinkingFromPosition if pointer down event and target is not a node', () => {
       linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'background' }, button: 2 },
+        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'diagram' }, button: 2 },
         mockInputEventHandler,
         environment
       );
@@ -145,7 +145,7 @@ describe('linkingAction', () => {
         environment
       );
       linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerup', target: { type: 'background' }, button: 2 },
+        { ...mockedPointerEvent, type: 'pointerup', target: { type: 'diagram' }, button: 2 },
         mockInputEventHandler,
         environment
       );

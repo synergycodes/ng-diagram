@@ -70,7 +70,7 @@ export class AngularAdapterDiagramComponent {
     const temporaryEdge = this.renderer.temporaryEdge();
     return temporaryEdge ? [...edges, temporaryEdge] : edges;
   });
-  viewport = this.renderer.viewport();
+  viewport = this.renderer.viewport;
 
   constructor() {
     // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?

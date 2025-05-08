@@ -61,15 +61,17 @@ export const startLinkingFromPosition = (
   const { metadata } = commandHandler.flowCore.getState();
   const { position } = command;
 
+  const sourcePosition = { x: position.x - metadata.viewport.x, y: position.y - metadata.viewport.y };
+
   commandHandler.flowCore.applyUpdate(
     {
       metadata: {
         ...metadata,
         temporaryEdge: getTemporaryEdge({
           source: '',
-          sourcePosition: position,
+          sourcePosition,
           target: '',
-          targetPosition: position,
+          targetPosition: sourcePosition,
         }),
       },
     },
@@ -90,11 +92,13 @@ export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveT
     return;
   }
 
+  const targetPosition = { x: position.x - metadata.viewport.x, y: position.y - metadata.viewport.y };
+
   commandHandler.flowCore.applyUpdate(
     {
       metadata: {
         ...metadata,
-        temporaryEdge: { ...metadata.temporaryEdge, targetPosition: position },
+        temporaryEdge: { ...metadata.temporaryEdge, targetPosition },
       },
     },
     'moveTemporaryEdge'
@@ -118,8 +122,6 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
 
   const newEdges: Edge[] = target ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort })] : edges;
 
-  console.log('newEdges', newEdges);
-  console.log('metadata', metadata);
   commandHandler.flowCore.applyUpdate(
     {
       metadata: { ...metadata, temporaryEdge: null },
@@ -145,9 +147,10 @@ export const finishLinkingToPosition = (
     return;
   }
 
+  const targetPosition = { x: position.x - metadata.viewport.x, y: position.y - metadata.viewport.y };
   const newEdges: Edge[] = [
     ...edges,
-    getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition: position }),
+    getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition }),
   ];
 
   commandHandler.flowCore.applyUpdate(

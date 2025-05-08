@@ -49,7 +49,7 @@ export const panningAction: ActionWithPredicate = {
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.target?.type === 'diagram') ||
+    (isPointerDownEvent(event) && event.target?.type === 'diagram' && event.button === 0) ||
     isPointerMoveEvent(event) ||
-    isPointerUpEvent(event),
+    (isPointerUpEvent(event) && event.button === 0),
 };

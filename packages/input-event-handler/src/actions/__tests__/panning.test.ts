@@ -26,7 +26,7 @@ describe('panningAction', () => {
       flowCore: mockFlowCore,
     } as unknown as CommandHandler;
 
-    mockTarget = { type: 'background' } as EventTarget;
+    mockTarget = { type: 'diagram' } as EventTarget;
 
     mockEvent = {
       type: 'pointerdown',

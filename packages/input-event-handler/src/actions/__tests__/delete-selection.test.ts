@@ -56,6 +56,7 @@ describe('deleteSelectionAction', () => {
         pressure: 0,
         target: { type: 'diagram' },
         timestamp: Date.now(),
+        button: 0,
       };
 
       expect(deleteSelectionAction.predicate(pointerEvent, mockInputEventHandler, environment)).toBe(false);

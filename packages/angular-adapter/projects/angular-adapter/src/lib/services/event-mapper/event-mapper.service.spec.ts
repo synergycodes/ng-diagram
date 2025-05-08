@@ -12,7 +12,7 @@ describe('EventMapperService', () => {
     y: 10,
     pressure: 1,
     timestamp: 1000,
-    target: { type: 'background' },
+    target: { type: 'diagram' },
     button: 0,
   };
 
