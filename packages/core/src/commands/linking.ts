@@ -1,3 +1,4 @@
+import { Edge } from '../types';
 import { CommandHandler } from '../types/command-handler.interface';
 
 export interface StartLinkingCommand {
@@ -27,6 +28,7 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
           target: '',
           targetPosition: sourceNode.position,
           data: {},
+          temporary: true,
         },
       },
     },
@@ -60,7 +62,7 @@ export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveT
 
 export interface FinishLinkingCommand {
   name: 'finishLinking';
-  target: string;
+  target?: string;
   targetPort?: string;
 }
 
@@ -72,10 +74,14 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
     return;
   }
 
+  const newEdges: Edge[] = target
+    ? [...edges, { ...metadata.temporaryEdge, target, targetPort, temporary: false, id: crypto.randomUUID() }]
+    : edges;
+
   commandHandler.flowCore.applyUpdate(
     {
       metadata: { ...metadata, temporaryEdge: null },
-      edges: [...edges, { ...metadata.temporaryEdge, target, targetPort }],
+      edges: newEdges,
     },
     'finishLinking'
   );

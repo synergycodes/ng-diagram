@@ -58,4 +58,8 @@ export interface Edge {
    * The position of the edge end.
    */
   targetPosition?: { x: number; y: number };
+  /**
+   * Whether the edge is temporary.
+   */
+  temporary?: boolean;
 }

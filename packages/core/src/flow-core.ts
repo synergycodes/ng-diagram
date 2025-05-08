@@ -32,6 +32,7 @@ export class FlowCore {
     this.middlewareManager = new MiddlewareManager();
     this.render();
     this.modelAdapter.onChange(() => this.render());
+    this.commandHandler.emit('finishLinking', {});
   }
 
   /**
@@ -107,10 +108,6 @@ export class FlowCore {
   }
 
   private render(): void {
-    this.renderer.draw(
-      this.modelAdapter.getNodes(),
-      this.modelAdapter.getEdges(),
-      this.modelAdapter.getMetadata().viewport
-    );
+    this.renderer.draw(this.modelAdapter.getNodes(), this.modelAdapter.getEdges(), this.modelAdapter.getMetadata());
   }
 }

@@ -2,6 +2,7 @@ import { CommandByName, CommandHandler, CommandName } from '../types/command-han
 import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
+import { finishLinking, moveTemporaryEdge, startLinking } from './linking';
 import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { deselectAll, select } from './selection';
@@ -30,4 +31,7 @@ export const commands: CommandMap = {
   paste,
   moveViewport,
   moveViewportBy,
+  startLinking,
+  moveTemporaryEdge,
+  finishLinking,
 };

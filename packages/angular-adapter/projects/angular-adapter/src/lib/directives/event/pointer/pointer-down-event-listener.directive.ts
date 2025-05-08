@@ -24,6 +24,7 @@ export class PointerDownEventListenerDirective implements ITargetedEventListener
       timestamp: Date.now(),
       x: event.clientX,
       y: event.clientY,
+      button: event.button,
     });
   }
 }
