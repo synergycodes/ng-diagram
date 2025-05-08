@@ -1,6 +1,13 @@
-import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
-import { AngularAdapterDiagramComponent, INodeTemplate, NodeTemplateMap } from '@angularflow/angular-adapter';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
+import {
+  AngularAdapterDiagramComponent,
+  FlowCoreProviderService,
+  INodeTemplate,
+  NodeTemplateMap,
+} from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
+import { loggerMiddleware } from '@angularflow/logger-middleware';
+
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 
@@ -11,7 +18,9 @@ import { InputFieldNodeComponent } from './node-template/input-field-node/input-
   imports: [AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+
   model = signal<SignalModelAdapter>(new SignalModelAdapter());
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
@@ -42,5 +51,9 @@ export class AppComponent {
         targetArrowhead: 'angularflow-arrow',
       },
     ]);
+  }
+
+  ngAfterViewInit() {
+    this.flowCoreProvider.provide().registerMiddleware(loggerMiddleware);
   }
 }

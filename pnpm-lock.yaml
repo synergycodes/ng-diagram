@@ -53,6 +53,9 @@ importers:
       '@angularflow/angular-signals-model':
         specifier: workspace:*
         version: link:../../packages/angular-signals-model
+      '@angularflow/logger-middleware':
+        specifier: workspace:*
+        version: link:../../packages/logger-middleware
       rxjs:
         specifier: ~7.8.2
         version: 7.8.2

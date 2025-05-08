@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AngularAdapterDiagramComponent } from '@angularflow/angular-adapter';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { AngularAdapterDiagramComponent, FlowCoreProviderService } from '@angularflow/angular-adapter';
+import { loggerMiddleware } from '@angularflow/logger-middleware';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppComponent } from './app.component';
 
@@ -38,5 +39,19 @@ describe('AppComponent', () => {
   it('should initialize with two edges', () => {
     const edges = component.model().getEdges();
     expect(edges.length).toBe(2);
+  });
+
+  describe('after view init', () => {
+    beforeEach(() => {
+      TestBed.inject(FlowCoreProviderService).provide().unregisterMiddleware(loggerMiddleware.name);
+    });
+
+    it('should register logger middleware', () => {
+      const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService).provide(), 'registerMiddleware');
+
+      component.ngAfterViewInit();
+
+      expect(spy).toHaveBeenCalledWith(loggerMiddleware);
+    });
   });
 });
