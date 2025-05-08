@@ -1,18 +1,18 @@
-import { Directive, HostListener, inject } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 
 import { EventMapperService } from '../../../services';
 
 @Directive({
   selector: '[angularAdapterKeyDownEventListener]',
+  host: { '(document:keydown)': 'onKeyDown($event)' },
 })
 export class KeyDownEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
 
-  @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
     this.eventMapperService.emit({
       type: 'keydown',
-      target: null,
+      target: { type: 'diagram' },
       timestamp: Date.now(),
       code: event.code,
       key: event.key,

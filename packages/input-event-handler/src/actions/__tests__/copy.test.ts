@@ -15,7 +15,7 @@ describe('Copy Action', () => {
       key: 'c',
       code: 'KeyC',
       timestamp: Date.now(),
-      target: null,
+      target: { type: 'diagram' },
       ctrlKey: false,
       shiftKey: false,
       altKey: false,

@@ -49,7 +49,7 @@ export class AngularAdapterDiagramComponent {
   private readonly flowCore = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   /**
-   * The nodes to display in the diagram.
+   * The model to use in the diagram.
    */
   model = input.required<ModelAdapter>();
 
@@ -66,6 +66,7 @@ export class AngularAdapterDiagramComponent {
 
   nodes = this.renderer.nodes;
   edges = this.renderer.edges;
+  viewport = this.renderer.viewport;
 
   constructor() {
     // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
@@ -88,6 +89,6 @@ export class AngularAdapterDiagramComponent {
     if (!edgeType) {
       return null;
     }
-    return this.edgeTemplateMap()?.get(edgeType) ?? null;
+    return this.edgeTemplateMap().get(edgeType) ?? null;
   }
 }

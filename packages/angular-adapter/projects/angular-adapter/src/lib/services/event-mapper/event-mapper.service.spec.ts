@@ -6,6 +6,14 @@ import { EventMapperService } from './event-mapper.service';
 
 describe('EventMapperService', () => {
   let service: EventMapperService;
+  const mockedEvent: Event = {
+    type: 'pointerdown',
+    x: 10,
+    y: 10,
+    pressure: 1,
+    timestamp: 1000,
+    target: { type: 'diagram' },
+  };
 
   beforeEach(() => {
     service = TestBed.inject(EventMapperService);
@@ -20,10 +28,9 @@ describe('EventMapperService', () => {
       const listener = vi.fn();
       service.register(listener);
 
-      const event: Event = { type: 'pointerdown', x: 10, y: 10, pressure: 1, timestamp: 1000, target: null };
-      service.emit(event);
+      service.emit(mockedEvent);
 
-      expect(listener).toHaveBeenCalledWith(event);
+      expect(listener).toHaveBeenCalledWith(mockedEvent);
     });
 
     it('should register multiple listeners', () => {
@@ -32,18 +39,17 @@ describe('EventMapperService', () => {
       service.register(listener1);
       service.register(listener2);
 
-      const event: Event = { type: 'pointerdown', x: 10, y: 10, pressure: 1, timestamp: 1000, target: null };
-      service.emit(event);
+      service.emit(mockedEvent);
 
-      expect(listener1).toHaveBeenCalledWith(event);
-      expect(listener2).toHaveBeenCalledWith(event);
+      expect(listener1).toHaveBeenCalledWith(mockedEvent);
+      expect(listener2).toHaveBeenCalledWith(mockedEvent);
     });
   });
 
   describe('emit', () => {
     it('should not throw when no listeners registered', () => {
       expect(() => {
-        service.emit({ type: 'pointerdown', x: 10, y: 10, pressure: 1, timestamp: 1000, target: null });
+        service.emit(mockedEvent);
       }).not.toThrow();
     });
 
@@ -51,11 +57,10 @@ describe('EventMapperService', () => {
       const listeners = [vi.fn(), vi.fn(), vi.fn()];
       listeners.forEach((listener) => service.register(listener));
 
-      const event: Event = { type: 'pointerdown', x: 10, y: 10, pressure: 1, timestamp: 1000, target: null };
-      service.emit(event);
+      service.emit(mockedEvent);
 
       listeners.forEach((listener) => {
-        expect(listener).toHaveBeenCalledWith(event);
+        expect(listener).toHaveBeenCalledWith(mockedEvent);
       });
     });
   });

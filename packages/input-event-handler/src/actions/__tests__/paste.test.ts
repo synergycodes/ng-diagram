@@ -16,7 +16,7 @@ describe('Paste Action', () => {
       key: 'v',
       code: 'KeyV',
       timestamp: Date.now(),
-      target: null,
+      target: { type: 'diagram' },
       ctrlKey: false,
       shiftKey: false,
       altKey: false,

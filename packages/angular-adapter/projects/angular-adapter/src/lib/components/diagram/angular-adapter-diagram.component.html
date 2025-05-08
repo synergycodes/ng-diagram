@@ -1,4 +1,4 @@
-<angular-adapter-canvas>
+<angular-adapter-canvas [viewport]="viewport()">
   @for (node of nodes(); track node.id) {
     <angular-adapter-node
       [position]="node.position"

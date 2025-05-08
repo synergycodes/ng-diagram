@@ -1,7 +1,6 @@
 import {
   CommandHandler,
   EnvironmentInfo,
-  Event,
   FlowCore,
   InputEventHandler,
   KeyboardEvent,
@@ -13,26 +12,24 @@ import { deleteSelectionAction } from '../delete-selection';
 describe('deleteSelectionAction', () => {
   const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
   let mockCommandHandler: CommandHandler;
-  let mockEvent: Event;
+  let mockEvent: KeyboardEvent;
   let mockInputEventHandler: InputEventHandler;
   let mockFlowCore: FlowCore;
 
   beforeEach(() => {
     mockFlowCore = {} as FlowCore;
-
-    mockCommandHandler = {
-      emit: vi.fn(),
-      flowCore: mockFlowCore,
-    } as unknown as CommandHandler;
-
+    mockCommandHandler = { emit: vi.fn(), flowCore: mockFlowCore } as unknown as CommandHandler;
     mockEvent = {
       type: 'keydown',
       timestamp: Date.now(),
-      target: null,
+      target: { type: 'diagram' },
       key: 'ArrowRight',
       code: 'ArrowRight',
-    } as KeyboardEvent;
-
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      metaKey: false,
+    };
     mockInputEventHandler = {
       commandHandler: mockCommandHandler,
     } as unknown as InputEventHandler;
@@ -52,11 +49,16 @@ describe('deleteSelectionAction', () => {
     });
 
     it('should return false for other event types', () => {
-      mockEvent = {
-        ...mockEvent,
+      const pointerEvent: PointerEvent = {
         type: 'pointerdown',
-      } as unknown as PointerEvent;
-      expect(deleteSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(false);
+        x: 0,
+        y: 0,
+        pressure: 0,
+        target: { type: 'diagram' },
+        timestamp: Date.now(),
+      };
+
+      expect(deleteSelectionAction.predicate(pointerEvent, mockInputEventHandler, environment)).toBe(false);
     });
   });
 

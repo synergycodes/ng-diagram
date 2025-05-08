@@ -15,14 +15,16 @@ describe('RendererService', () => {
   });
 
   describe('draw', () => {
-    it('should set the nodes signal and edges signal to the provided nodes and edges', () => {
+    it('should set the nodes, edges and viewport signals to the provided nodes, edges and viewport', () => {
       service.draw(
         [{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }],
-        [{ id: '1', source: '1', target: '2', data: {} }]
+        [{ id: '1', source: '1', target: '2', data: {} }],
+        { x: 100, y: 100, scale: 2 }
       );
 
       expect(service.nodes()).toEqual([{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }]);
       expect(service.edges()).toEqual([{ id: '1', source: '1', target: '2', data: {} }]);
+      expect(service.viewport()).toEqual({ x: 100, y: 100, scale: 2 });
     });
   });
 });

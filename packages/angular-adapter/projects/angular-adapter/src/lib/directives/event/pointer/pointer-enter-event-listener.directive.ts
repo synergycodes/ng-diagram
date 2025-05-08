@@ -1,4 +1,4 @@
-import { Directive, HostListener, inject, input } from '@angular/core';
+import { Directive, inject, input } from '@angular/core';
 import type { EventTarget } from '@angularflow/core';
 
 import { EventMapperService } from '../../../services';
@@ -6,13 +6,13 @@ import { ITargetedEventListener } from '../../../types';
 
 @Directive({
   selector: '[angularAdapterPointerEnterEventListener]',
+  host: { '(pointerenter)': 'onPointerEnter($event)' },
 })
 export class PointerEnterEventListenerDirective implements ITargetedEventListener {
   private readonly eventMapperService = inject(EventMapperService);
 
-  eventTarget = input<EventTarget | null>(null);
+  eventTarget = input<EventTarget>({ type: 'diagram' });
 
-  @HostListener('pointerenter', ['$event'])
   onPointerEnter(event: PointerEvent) {
     event.stopPropagation();
     this.eventMapperService.emit({
