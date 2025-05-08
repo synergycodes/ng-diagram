@@ -47,6 +47,8 @@ export const edgesStraightRoutingMiddleware: Middleware = {
       return {
         ...edge,
         points,
+        sourcePosition: points[0],
+        targetPosition: points[1],
       };
     });
 
