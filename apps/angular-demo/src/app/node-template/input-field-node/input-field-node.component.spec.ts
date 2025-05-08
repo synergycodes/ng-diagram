@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InputFieldNodeComponent } from './input-field-node.component';
 
@@ -40,5 +40,17 @@ describe('InputFieldNodeComponent', () => {
 
     const displayedText = fixture.nativeElement.textContent.trim();
     expect(displayedText).toBe(testValue);
+  });
+
+  describe.each(['keydown', 'keypress', 'keyup'])('event=%s', (eventType) => {
+    it(`should stop ${eventType} event propagation`, () => {
+      const input = fixture.nativeElement.querySelector('input');
+      const event = new Event(eventType);
+      const spy = vi.spyOn(event, 'stopPropagation');
+
+      input.dispatchEvent(event);
+
+      expect(spy).toHaveBeenCalled();
+    });
   });
 });
