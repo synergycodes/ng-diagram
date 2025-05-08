@@ -8,7 +8,13 @@ import {
 } from '../commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../commands/copy-paste';
 import { DeleteSelectionCommand } from '../commands/delete-selection';
-import { FinishLinkingCommand, MoveTemporaryEdgeCommand, StartLinkingCommand } from '../commands/linking';
+import {
+  FinishLinkingCommand,
+  FinishLinkingToPositionCommand,
+  MoveTemporaryEdgeCommand,
+  StartLinkingCommand,
+  StartLinkingFromPositionCommand,
+} from '../commands/linking';
 import { MoveSelectionCommand } from '../commands/move-selection';
 import { MoveViewportByCommand, MoveViewportCommand } from '../commands/move-viewport';
 import { DeselectAllCommand, SelectCommand } from '../commands/selection';
@@ -33,7 +39,9 @@ export type Command =
   | MoveViewportByCommand
   | StartLinkingCommand
   | MoveTemporaryEdgeCommand
-  | FinishLinkingCommand;
+  | FinishLinkingCommand
+  | StartLinkingFromPositionCommand
+  | FinishLinkingToPositionCommand;
 
 /**
  * Type for command name

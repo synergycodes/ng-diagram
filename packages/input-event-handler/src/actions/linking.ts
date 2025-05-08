@@ -6,22 +6,36 @@ let isLinking = false;
 
 export const linkingAction: ActionWithPredicate = {
   action: (event, inputEventHandler) => {
-    if (isPointerDownEvent(event) && event.target?.type === 'node') {
+    if (isPointerDownEvent(event)) {
       isLinking = true;
-      inputEventHandler.commandHandler.emit('startLinking', { source: event.target.element.id });
-    } else if (isPointerMoveEvent(event) && isLinking) {
+      if (event.target?.type === 'node') {
+        return inputEventHandler.commandHandler.emit('startLinking', { source: event.target.element.id });
+      }
+      inputEventHandler.commandHandler.emit('startLinkingFromPosition', {
+        position: { x: event.x, y: event.y },
+      });
+    }
+
+    if (isPointerMoveEvent(event) && isLinking) {
       inputEventHandler.commandHandler.emit('moveTemporaryEdge', {
         position: { x: event.x, y: event.y },
       });
-    } else if (isPointerUpEvent(event) && isLinking) {
+    }
+
+    if (isPointerUpEvent(event) && isLinking) {
       isLinking = false;
-      inputEventHandler.commandHandler.emit('finishLinking', {
-        target: event.target?.type === 'node' ? event.target.element.id : undefined,
+      if (event.target?.type === 'node') {
+        return inputEventHandler.commandHandler.emit('finishLinking', {
+          target: event.target.element.id,
+        });
+      }
+      inputEventHandler.commandHandler.emit('finishLinkingToPosition', {
+        position: { x: event.x, y: event.y },
       });
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.button === 2 && event.target?.type === 'node') ||
+    (isPointerDownEvent(event) && event.button === 2) ||
     isPointerMoveEvent(event) ||
     (isPointerUpEvent(event) && event.button === 2),
 };
