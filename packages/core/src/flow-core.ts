@@ -32,7 +32,6 @@ export class FlowCore {
     this.middlewareManager = new MiddlewareManager();
     this.render();
     this.modelAdapter.onChange(() => this.render());
-    this.commandHandler.emit('finishLinking', {});
   }
 
   /**

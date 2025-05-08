@@ -61,14 +61,51 @@ describe('Edges Straight Routing Middleware', () => {
       historyUpdates: [],
     });
 
-    expect(state.edges[0].points).toEqual([]);
-    expect(state.edges[1].points).toEqual([
-      { x: 200, y: 200 },
-      { x: 300, y: 300 },
-    ]);
-    expect(state.edges[2].points).toEqual([
-      { x: 300, y: 300 },
-      { x: 100, y: 100 },
-    ]);
+    expect(state.edges[0]).toEqual(initialState.edges[0]);
+    expect(state.edges[1]).toEqual({
+      ...initialState.edges[1],
+      points: [
+        { x: 200, y: 200 },
+        { x: 300, y: 300 },
+      ],
+      sourcePosition: { x: 200, y: 200 },
+      targetPosition: { x: 300, y: 300 },
+    });
+    expect(state.edges[2]).toEqual({
+      ...initialState.edges[2],
+      points: [
+        { x: 300, y: 300 },
+        { x: 100, y: 100 },
+      ],
+      sourcePosition: { x: 300, y: 300 },
+      targetPosition: { x: 100, y: 100 },
+    });
+  });
+
+  it('should route temporary edge', () => {
+    initialState.nodes = [{ ...mockedNode, id: 'node-1', position: { x: 100, y: 100 } }];
+    initialState.metadata.temporaryEdge = {
+      ...mockedEdge,
+      points: [],
+      source: 'node-1',
+      target: 'node-2',
+      targetPosition: { x: 200, y: 200 },
+    };
+
+    const state = edgesStraightRoutingMiddleware.execute(initialState, {
+      modelActionType: 'moveTemporaryEdge',
+      initialState,
+      historyUpdates: [],
+    });
+
+    expect(state.metadata.temporaryEdge).toEqual({
+      ...initialState.metadata.temporaryEdge,
+      points: [
+        { x: 100, y: 100 },
+        { x: 200, y: 200 },
+      ],
+      sourcePosition: { x: 100, y: 100 },
+      targetPosition: { x: 200, y: 200 },
+    });
   });
 });

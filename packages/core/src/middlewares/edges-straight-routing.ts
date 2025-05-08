@@ -58,7 +58,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
           }
           const points = getPoints(edge, nodePositionMap);
 
-          if (edge.points?.every((point, index) => point === points[index])) {
+          if (edge.points?.length === points.length && edge.points?.every((point, index) => point === points[index])) {
             return edge;
           }
 
@@ -76,10 +76,6 @@ export const edgesStraightRoutingMiddleware: Middleware = {
 
     if (isTemporaryEdgeAction && temporaryEdge) {
       const points = getPoints(temporaryEdge, nodePositionMap);
-
-      if (temporaryEdge.points?.every((point, index) => point === points[index])) {
-        return state;
-      }
 
       newTemporaryEdge = {
         ...temporaryEdge,

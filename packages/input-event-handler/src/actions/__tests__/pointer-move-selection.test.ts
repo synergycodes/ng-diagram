@@ -5,7 +5,6 @@ import {
   FlowCore,
   InputEventHandler,
   PointerEvent,
-  PointerEventType,
 } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockedEdge, mockedNode } from '../../test-utils';
@@ -30,7 +29,8 @@ describe('pointerMoveSelectionAction', () => {
     mockTarget = { type: 'node', element: mockedNode };
 
     mockEvent = {
-      type: 'pointerdown' as PointerEventType,
+      button: 0,
+      type: 'pointerdown',
       timestamp: Date.now(),
       target: mockTarget,
       x: 100,
@@ -51,18 +51,14 @@ describe('pointerMoveSelectionAction', () => {
 
     it('should return true for pointermove events', () => {
       expect(
-        pointerMoveSelectionAction.predicate(
-          { ...mockEvent, type: 'pointermove' as PointerEventType },
-          mockInputEventHandler,
-          environment
-        )
+        pointerMoveSelectionAction.predicate({ ...mockEvent, type: 'pointermove' }, mockInputEventHandler, environment)
       ).toBe(true);
     });
 
     it('should return true for pointerup events', () => {
       expect(
         pointerMoveSelectionAction.predicate(
-          { ...mockEvent, type: 'pointerup' as PointerEventType },
+          { ...mockEvent, type: 'pointerup', button: 0 },
           mockInputEventHandler,
           environment
         )
@@ -71,25 +67,27 @@ describe('pointerMoveSelectionAction', () => {
 
     it('should return false for other events', () => {
       expect(
-        pointerMoveSelectionAction.predicate(
-          { ...mockEvent, type: 'pointerenter' as PointerEventType },
-          mockInputEventHandler,
-          environment
-        )
+        pointerMoveSelectionAction.predicate({ ...mockEvent, type: 'pointerenter' }, mockInputEventHandler, environment)
       ).toBe(false);
       expect(
-        pointerMoveSelectionAction.predicate(
-          { ...mockEvent, type: 'pointerleave' as PointerEventType },
-          mockInputEventHandler,
-          environment
-        )
+        pointerMoveSelectionAction.predicate({ ...mockEvent, type: 'pointerleave' }, mockInputEventHandler, environment)
       ).toBe(false);
     });
 
     it('should return false for pointerdown events with a non-node target', () => {
       expect(
         pointerMoveSelectionAction.predicate(
-          { ...mockEvent, type: 'pointerdown' as PointerEventType, target: { type: 'edge', element: mockedEdge } },
+          { ...mockEvent, type: 'pointerdown', target: { type: 'edge', element: mockedEdge }, button: 0 },
+          mockInputEventHandler,
+          environment
+        )
+      ).toBe(false);
+    });
+
+    it('should return false for pointerdown events with wrong button', () => {
+      expect(
+        pointerMoveSelectionAction.predicate(
+          { ...mockEvent, type: 'pointerdown', button: 1 },
           mockInputEventHandler,
           environment
         )
@@ -101,7 +99,7 @@ describe('pointerMoveSelectionAction', () => {
     it('should initialize state on pointerdown', () => {
       pointerMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
-      const moveEvent = { ...mockEvent, type: 'pointermove' as PointerEventType, x: 110, y: 110 };
+      const moveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110, button: 0 };
       pointerMoveSelectionAction.action(moveEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
@@ -113,10 +111,10 @@ describe('pointerMoveSelectionAction', () => {
     it('should calculate movement relative to last position after first move', () => {
       pointerMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
-      const firstMoveEvent = { ...mockEvent, type: 'pointermove' as PointerEventType, x: 110, y: 110 };
+      const firstMoveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110, button: 0 };
       pointerMoveSelectionAction.action(firstMoveEvent, mockInputEventHandler, environment);
 
-      const secondMoveEvent = { ...mockEvent, type: 'pointermove' as PointerEventType, x: 120, y: 120 };
+      const secondMoveEvent = { ...mockEvent, type: 'pointermove' as const, x: 120, y: 120, button: 0 };
       pointerMoveSelectionAction.action(secondMoveEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
@@ -128,23 +126,23 @@ describe('pointerMoveSelectionAction', () => {
     it('should stop movement on pointerup', () => {
       pointerMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
 
-      const firstMoveEvent = { ...mockEvent, type: 'pointermove' as PointerEventType, x: 110, y: 110 };
+      const firstMoveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110, button: 0 };
       pointerMoveSelectionAction.action(firstMoveEvent, mockInputEventHandler, environment);
 
       pointerMoveSelectionAction.action(
-        { ...mockEvent, type: 'pointerup' as PointerEventType },
+        { ...mockEvent, type: 'pointerup', button: 0 },
         mockInputEventHandler,
         environment
       );
 
-      const moveAfterUpEvent = { ...mockEvent, type: 'pointermove' as PointerEventType, x: 120, y: 120 };
+      const moveAfterUpEvent = { ...mockEvent, type: 'pointermove' as const, x: 120, y: 120, button: 0 };
       pointerMoveSelectionAction.action(moveAfterUpEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit movement if not in moving state', () => {
-      const moveEvent = { ...mockEvent, type: 'pointermove' as PointerEventType, x: 110, y: 110 };
+      const moveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110 };
       pointerMoveSelectionAction.action(moveEvent, mockInputEventHandler, environment);
 
       expect(mockCommandHandler.emit).not.toHaveBeenCalled();

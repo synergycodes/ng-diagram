@@ -1,7 +1,7 @@
 import { Edge } from '../types';
 import { CommandHandler } from '../types/command-handler.interface';
 
-const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
+export const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
   id: 'TEMPORARY_EDGE',
   source: '',
   target: '',
@@ -10,7 +10,7 @@ const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
   ...partialEdge,
 });
 
-const getFinalEdge = (temporaryEdge: Edge, partialEdge: Partial<Edge>): Edge => ({
+export const getFinalEdge = (temporaryEdge: Edge, partialEdge: Partial<Edge>): Edge => ({
   ...temporaryEdge,
   ...partialEdge,
   temporary: false,
@@ -108,15 +108,18 @@ export interface FinishLinkingCommand {
 }
 
 export const finishLinking = (commandHandler: CommandHandler, command: FinishLinkingCommand): void => {
-  const { metadata, edges } = commandHandler.flowCore.getState();
+  const { metadata, edges, nodes } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
-  if (!metadata.temporaryEdge) {
+  const targetNode = nodes.find((node) => node.id === target);
+  if (!metadata.temporaryEdge || !targetNode) {
     return;
   }
 
   const newEdges: Edge[] = target ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort })] : edges;
 
+  console.log('newEdges', newEdges);
+  console.log('metadata', metadata);
   commandHandler.flowCore.applyUpdate(
     {
       metadata: { ...metadata, temporaryEdge: null },

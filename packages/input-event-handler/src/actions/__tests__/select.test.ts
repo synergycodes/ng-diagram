@@ -20,7 +20,11 @@ describe('selectAction', () => {
   describe('predicate', () => {
     it('should return true for pointerdown events', () => {
       expect(
-        selectAction.predicate({ ...mockedPointerEvent, type: 'pointerdown' }, inputEventHandler, environment)
+        selectAction.predicate(
+          { ...mockedPointerEvent, type: 'pointerdown', button: 0 },
+          inputEventHandler,
+          environment
+        )
       ).toBe(true);
     });
 
@@ -28,16 +32,16 @@ describe('selectAction', () => {
       expect(
         selectAction.predicate({ ...mockedPointerEvent, type: 'pointerenter' }, inputEventHandler, environment)
       ).toBe(false);
-      expect(selectAction.predicate({ ...mockedPointerEvent, type: 'pointerup' }, inputEventHandler, environment)).toBe(
-        false
-      );
+      expect(
+        selectAction.predicate({ ...mockedPointerEvent, type: 'pointerup', button: 0 }, inputEventHandler, environment)
+      ).toBe(false);
     });
   });
 
   describe('action', () => {
     it('should emit deselectAll command when no target is provided', () => {
       selectAction.action(
-        { ...mockedPointerEvent, target: { type: 'diagram' }, type: 'pointerdown' },
+        { ...mockedPointerEvent, target: { type: 'background' }, type: 'pointerdown', button: 0 },
         inputEventHandler,
         environment
       );
@@ -46,7 +50,7 @@ describe('selectAction', () => {
 
     it('should emit select command when target is provided', () => {
       selectAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockedNode } },
+        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockedNode }, button: 0 },
         inputEventHandler,
         environment
       );
