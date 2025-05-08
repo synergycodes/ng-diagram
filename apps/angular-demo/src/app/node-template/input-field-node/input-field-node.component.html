@@ -1,4 +1,13 @@
 <div class="input-field-node">
-  <input type="text" placeholder="Enter value..." [(ngModel)]="text" />
+  <!-- we need to stop the event from propagating and reaching the document,
+    otherwise event will be captured and send to Input Event Handler -->
+  <input
+    type="text"
+    placeholder="Enter value..."
+    [(ngModel)]="text"
+    (keydown)="$event.stopPropagation()"
+    (keypress)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+  />
   {{ text() }}
 </div>
