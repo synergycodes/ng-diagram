@@ -5,7 +5,7 @@ interface MoveState {
   startY: number;
   lastX: number;
   lastY: number;
-  isPanning: boolean;
+  isMoving: boolean;
   isFirstMove: boolean;
 }
 
@@ -14,28 +14,28 @@ const moveState: MoveState = {
   startY: 0,
   lastX: 0,
   lastY: 0,
-  isPanning: false,
+  isMoving: false,
   isFirstMove: true,
 };
 
-export const panningAction: ActionWithPredicate = {
-  action: (event, inputEventHandler) => {
+export const pointerMoveSelectionAction: ActionWithPredicate = {
+  action: (event, flowCore) => {
     switch (event.type) {
       case 'pointerdown':
         moveState.startX = event.x;
         moveState.startY = event.y;
         moveState.lastX = event.x;
         moveState.lastY = event.y;
-        moveState.isPanning = true;
+        moveState.isMoving = true;
         moveState.isFirstMove = true;
         break;
 
       case 'pointermove':
-        if (moveState.isPanning) {
-          const x = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
-          const y = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
+        if (moveState.isMoving) {
+          const dx = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
+          const dy = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
 
-          inputEventHandler.commandHandler.emit('moveViewportBy', { x, y });
+          flowCore.commandHandler.emit('moveSelection', { dx, dy });
 
           moveState.lastX = event.x;
           moveState.lastY = event.y;
@@ -44,12 +44,12 @@ export const panningAction: ActionWithPredicate = {
         break;
 
       case 'pointerup':
-        moveState.isPanning = false;
+        moveState.isMoving = false;
         break;
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.target?.type === 'diagram' && event.button === 0) ||
+    (isPointerDownEvent(event) && event.button === 0 && event.target?.type === 'node') ||
     isPointerMoveEvent(event) ||
     (isPointerUpEvent(event) && event.button === 0),
 };

@@ -7,28 +7,21 @@ import type { FlowState, Middleware, ModelActionType } from './types/middleware.
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
-type EventHandlerFactory = (
-  commandHandler: CoreCommandHandler,
-  eventMapper: EventMapper,
-  environment: EnvironmentInfo
-) => InputEventHandler;
-
 export class FlowCore {
-  private commandHandler: CoreCommandHandler;
-  private _eventHandler: InputEventHandler;
-  private readonly middlewareManager: MiddlewareManager;
-  private readonly environment: EnvironmentInfo;
+  readonly commandHandler: CoreCommandHandler;
+  readonly inputEventHandler: InputEventHandler;
+  readonly middlewareManager: MiddlewareManager;
+  readonly environment: EnvironmentInfo;
 
   constructor(
     private readonly modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
-    private readonly eventMapper: EventMapper,
-    createEventHandler: EventHandlerFactory,
+    readonly eventMapper: EventMapper,
     environment: EnvironmentInfo
   ) {
     this.environment = environment;
     this.commandHandler = new CoreCommandHandler(this);
-    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper, this.environment);
+    this.inputEventHandler = this.inputEventHandlerFactory(this);
     this.middlewareManager = new MiddlewareManager();
     this.render();
     this.modelAdapter.onChange(() => this.render());
@@ -39,21 +32,6 @@ export class FlowCore {
    */
   getEnvironment(): EnvironmentInfo {
     return this.environment;
-  }
-
-  /**
-   * Gets the current EventHandler instance
-   */
-  get eventHandler(): InputEventHandler {
-    return this._eventHandler;
-  }
-
-  /**
-   * Changes the current EventHandler implementation
-   * @param createEventHandler Factory function that creates a new EventHandler instance
-   */
-  setEventHandler(createEventHandler: EventHandlerFactory): void {
-    this._eventHandler = createEventHandler(this.commandHandler, this.eventMapper, this.environment);
   }
 
   /**
@@ -106,9 +84,38 @@ export class FlowCore {
     this.setState(finalState);
   }
 
+  /**
+   * Renders the flow
+   */
   private render(): void {
     const { nodes, edges, metadata } = this.getState();
     const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
     this.renderer.draw(nodes, finalEdges, metadata.viewport);
+  }
+
+  /**
+   * Converts a client position to a flow position
+   * @param clientPosition Client position
+   * @returns { x: number, y: number } Flow position
+   */
+  clientToFlowPosition(clientPosition: { x: number; y: number }): { x: number; y: number } {
+    const { x: viewportX, y: viewportY, scale } = this.modelAdapter.getMetadata().viewport;
+    return {
+      x: (clientPosition.x - viewportX) / scale,
+      y: (clientPosition.y - viewportY) / scale,
+    };
+  }
+
+  /**
+   * Converts a flow position to a client position
+   * @param flowPosition Flow position
+   * @returns { x: number, y: number } Client position
+   */
+  flowToClientPosition(flowPosition: { x: number; y: number }): { x: number; y: number } {
+    const { x: viewportX, y: viewportY, scale } = this.modelAdapter.getMetadata().viewport;
+    return {
+      x: flowPosition.x * scale + viewportX,
+      y: flowPosition.y * scale + viewportY,
+    };
   }
 }

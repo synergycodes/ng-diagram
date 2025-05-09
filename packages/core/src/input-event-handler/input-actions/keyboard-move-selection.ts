@@ -1,9 +1,9 @@
 import { ActionWithPredicate, CommandByName, isKeyboardDownEvent, KeyboardEvent } from '@angularflow/core';
 
 export const keyboardMoveSelectionAction: ActionWithPredicate = {
-  action: (event, inputEventHandler) => {
+  action: (event, flowCore) => {
     if (isKeyboardDownEvent(event)) {
-      inputEventHandler.commandHandler.emit('moveSelection', getMoveNodesCommand(event));
+      flowCore.commandHandler.emit('moveSelection', getMoveNodesCommand(event));
     }
   },
   predicate: (event) =>

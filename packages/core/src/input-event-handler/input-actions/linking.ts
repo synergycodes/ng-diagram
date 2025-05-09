@@ -5,33 +5,33 @@ import { ActionWithPredicate, isPointerDownEvent, isPointerMoveEvent, isPointerU
 let isLinking = false;
 
 export const linkingAction: ActionWithPredicate = {
-  action: (event, inputEventHandler) => {
+  action: (event, flowCore) => {
     if (isPointerDownEvent(event)) {
       isLinking = true;
       if (event.target?.type === 'node') {
-        inputEventHandler.commandHandler.emit('startLinking', { source: event.target.element.id });
+        flowCore.commandHandler.emit('startLinking', { source: event.target.element.id });
       } else {
-        inputEventHandler.commandHandler.emit('startLinkingFromPosition', {
-          position: { x: event.x, y: event.y },
+        flowCore.commandHandler.emit('startLinkingFromPosition', {
+          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
         });
       }
     }
 
     if (isPointerMoveEvent(event) && isLinking) {
-      inputEventHandler.commandHandler.emit('moveTemporaryEdge', {
-        position: { x: event.x, y: event.y },
+      flowCore.commandHandler.emit('moveTemporaryEdge', {
+        position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
       });
     }
 
     if (isPointerUpEvent(event) && isLinking) {
       isLinking = false;
       if (event.target?.type === 'node') {
-        inputEventHandler.commandHandler.emit('finishLinking', {
+        flowCore.commandHandler.emit('finishLinking', {
           target: event.target.element.id,
         });
       } else {
-        inputEventHandler.commandHandler.emit('finishLinkingToPosition', {
-          position: { x: event.x, y: event.y },
+        flowCore.commandHandler.emit('finishLinkingToPosition', {
+          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
         });
       }
     }

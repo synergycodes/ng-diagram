@@ -3,11 +3,9 @@ import {
   type ActionOrActionName,
   type ActionPredicate,
   type ActionWithPredicate,
-  type CommandHandler,
   InputEventHandler as CoreInputEventHandler,
-  type EnvironmentInfo,
   type Event,
-  type EventMapper,
+  FlowCore,
 } from '@angularflow/core';
 import { actions } from './actions';
 
@@ -15,13 +13,9 @@ export class InputEventHandler extends CoreInputEventHandler {
   private defaultActions = new Map<ActionName, ActionWithPredicate>();
   private registeredActions: ActionWithPredicate[] = [];
 
-  constructor(
-    readonly commandHandler: CommandHandler,
-    protected readonly eventMapper: EventMapper,
-    protected readonly environment: EnvironmentInfo
-  ) {
-    super(commandHandler, eventMapper, environment);
-    this.eventMapper.register((event) => this.handleEvent(event));
+  constructor(flowCore: FlowCore) {
+    super(flowCore);
+    this.flowCore.eventMapper.register((event) => this.handleEvent(event));
     for (const [name, { action, predicate }] of Object.entries(actions)) {
       this.defaultActions.set(name as ActionName, { action, predicate });
       this.register(predicate, action);
@@ -30,8 +24,8 @@ export class InputEventHandler extends CoreInputEventHandler {
 
   private handleEvent(event: Event): void {
     for (const { predicate, action } of this.registeredActions) {
-      if (predicate(event, this, this.environment)) {
-        action(event, this, this.environment);
+      if (predicate(event, this.flowCore)) {
+        action(event, this.flowCore);
       }
     }
   }
@@ -80,6 +74,6 @@ export class InputEventHandler extends CoreInputEventHandler {
     if (!action) {
       throw new Error(`Default action "${actionName}" does not exist.`);
     }
-    action(event, this, this.environment);
+    action(event, this.flowCore);
   }
 }
