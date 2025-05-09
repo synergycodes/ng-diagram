@@ -172,4 +172,32 @@ describe('FlowCore', () => {
       );
     });
   });
+
+  describe('registerEventsHandler', () => {
+    it('should register the event handler', () => {
+      flowCore.registerEventsHandler(vi.fn());
+
+      expect(mockEventMapper.register).toHaveBeenCalled();
+    });
+  });
+
+  describe('clientToFlowPosition', () => {
+    it('should convert client position to flow position', () => {
+      mockGetMetadata.mockReturnValue({ viewport: { x: 200, y: 200, scale: 2 } });
+      const clientPosition = { x: 30, y: 30 };
+      const flowPosition = flowCore.clientToFlowPosition(clientPosition);
+
+      expect(flowPosition).toEqual({ x: -85, y: -85 });
+    });
+  });
+
+  describe('flowToClientPosition', () => {
+    it('should convert flow position to client position', () => {
+      mockGetMetadata.mockReturnValue({ viewport: { x: 200, y: 200, scale: 2 } });
+      const flowPosition = { x: -85, y: -85 };
+      const clientPosition = flowCore.flowToClientPosition(flowPosition);
+
+      expect(clientPosition).toEqual({ x: 30, y: 30 });
+    });
+  });
 });
