@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../flow-core';
-import { mockedEdge, mockedMetadata, mockedNode } from '../../test-utils';
-import { CommandHandler } from '../../types/command-handler.interface';
-import { Edge } from '../../types/edge.interface';
-import { Node } from '../../types/node.interface';
+import { FlowCore } from '../../../flow-core';
+import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
+import type { Edge, Node } from '../../../types';
+import { CommandHandler } from '../../command-handler';
 import { copy, paste } from '../copy-paste';
 
 describe('Copy-Paste Commands', () => {
@@ -15,14 +14,14 @@ describe('Copy-Paste Commands', () => {
       flowCore: {
         getState: () => ({
           nodes: [
-            { ...mockedNode, id: 'node1', selected: true },
-            { ...mockedNode, id: 'node2', selected: false },
+            { ...mockNode, id: 'node1', selected: true },
+            { ...mockNode, id: 'node2', selected: false },
           ],
           edges: [
-            { ...mockedEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true },
-            { ...mockedEdge, id: 'edge2', source: 'node2', target: 'node1', selected: false },
+            { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true },
+            { ...mockEdge, id: 'edge2', source: 'node2', target: 'node1', selected: false },
           ],
-          metadata: mockedMetadata,
+          metadata: mockMetadata,
         }),
         applyUpdate: vi.fn(),
       } as unknown as FlowCore,
@@ -42,8 +41,8 @@ describe('Copy-Paste Commands', () => {
       const copiedNodes = update.nodes.filter((n: Node) => n.id !== 'node1' && n.id !== 'node2');
       expect(copiedNodes).toHaveLength(1);
       copiedNodes.forEach((node: Node) => {
-        expect(node.position.x).toBe(mockedNode.position.x + OFFSET);
-        expect(node.position.y).toBe(mockedNode.position.y + OFFSET);
+        expect(node.position.x).toBe(mockNode.position.x + OFFSET);
+        expect(node.position.y).toBe(mockNode.position.y + OFFSET);
         expect(node.selected).toBe(true);
       });
 
@@ -56,14 +55,14 @@ describe('Copy-Paste Commands', () => {
     it('should not copy anything if nothing is selected', () => {
       commandHandler.flowCore.getState = () => ({
         nodes: [
-          { ...mockedNode, id: 'node1', selected: false },
-          { ...mockedNode, id: 'node2', selected: false },
+          { ...mockNode, id: 'node1', selected: false },
+          { ...mockNode, id: 'node2', selected: false },
         ],
         edges: [
-          { ...mockedEdge, id: 'edge1', selected: false },
-          { ...mockedEdge, id: 'edge2', selected: false },
+          { ...mockEdge, id: 'edge1', selected: false },
+          { ...mockEdge, id: 'edge2', selected: false },
         ],
-        metadata: mockedMetadata,
+        metadata: mockMetadata,
       });
 
       copy(commandHandler);

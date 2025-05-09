@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { mockedEdge, mockedMetadata, mockedNode } from '../../test-utils';
-import { FlowState } from '../../types';
+import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
+import type { FlowState } from '../../../types';
 import { edgesStraightRoutingMiddleware } from '../edges-straight-routing';
 
 describe('Edges Straight Routing Middleware', () => {
@@ -8,9 +8,9 @@ describe('Edges Straight Routing Middleware', () => {
 
   beforeEach(() => {
     initialState = {
-      nodes: [mockedNode],
-      edges: [mockedEdge],
-      metadata: mockedMetadata,
+      nodes: [mockNode],
+      edges: [mockEdge],
+      metadata: mockMetadata,
     };
   });
 
@@ -45,14 +45,14 @@ describe('Edges Straight Routing Middleware', () => {
 
   it('should route only edges with routing set to straight or undefined and leave other edges unchanged', () => {
     initialState.nodes = [
-      { ...mockedNode, id: 'node-1', position: { x: 100, y: 100 } },
-      { ...mockedNode, id: 'node-2', position: { x: 200, y: 200 } },
-      { ...mockedNode, id: 'node-3', position: { x: 300, y: 300 } },
+      { ...mockNode, id: 'node-1', position: { x: 100, y: 100 } },
+      { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+      { ...mockNode, id: 'node-3', position: { x: 300, y: 300 } },
     ];
     initialState.edges = [
-      { ...mockedEdge, points: [], id: 'edge-1', source: 'node-1', target: 'node-2', routing: 'custom-routing' },
-      { ...mockedEdge, points: [], id: 'edge-2', source: 'node-2', target: 'node-3', routing: 'straight' },
-      { ...mockedEdge, points: [], id: 'edge-3', source: 'node-3', target: 'node-1', routing: undefined },
+      { ...mockEdge, points: [], id: 'edge-1', source: 'node-1', target: 'node-2', routing: 'custom-routing' },
+      { ...mockEdge, points: [], id: 'edge-2', source: 'node-2', target: 'node-3', routing: 'straight' },
+      { ...mockEdge, points: [], id: 'edge-3', source: 'node-3', target: 'node-1', routing: undefined },
     ];
 
     const state = edgesStraightRoutingMiddleware.execute(initialState, {
@@ -83,9 +83,9 @@ describe('Edges Straight Routing Middleware', () => {
   });
 
   it('should route temporary edge', () => {
-    initialState.nodes = [{ ...mockedNode, id: 'node-1', position: { x: 100, y: 100 } }];
+    initialState.nodes = [{ ...mockNode, id: 'node-1', position: { x: 100, y: 100 } }];
     initialState.metadata.temporaryEdge = {
-      ...mockedEdge,
+      ...mockEdge,
       points: [],
       source: 'node-1',
       target: 'node-2',

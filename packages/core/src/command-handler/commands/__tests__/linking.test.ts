@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from '../../command-handler';
-import { FlowCore } from '../../flow-core';
-import { mockedMetadata } from '../../test-utils';
+import { FlowCore } from '../../../flow-core';
+import { mockMetadata } from '../../../test-utils';
+import { CommandHandler } from '../../command-handler';
 import { getFinalEdge, getTemporaryEdge } from '../linking';
 
 describe('Linking Commands', () => {
   let getStateMock: ReturnType<typeof vi.fn>;
   let flowCore: FlowCore;
-  let commandHandler: CoreCommandHandler;
+  let commandHandler: CommandHandler;
 
   beforeEach(() => {
     getStateMock = vi.fn();
@@ -15,7 +15,7 @@ describe('Linking Commands', () => {
       getState: getStateMock,
       applyUpdate: vi.fn(),
     } as unknown as FlowCore;
-    commandHandler = new CoreCommandHandler(flowCore);
+    commandHandler = new CommandHandler(flowCore);
   });
 
   describe('startLinking', () => {
@@ -54,14 +54,14 @@ describe('Linking Commands', () => {
 
   describe('startLinkingFromPosition', () => {
     it('should create a temporary edge', () => {
-      getStateMock.mockReturnValue({ nodes: [], edges: [], metadata: mockedMetadata });
+      getStateMock.mockReturnValue({ nodes: [], edges: [], metadata: mockMetadata });
 
       commandHandler.emit('startLinkingFromPosition', { position: { x: 100, y: 100 } });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadata: {
-            ...mockedMetadata,
+            ...mockMetadata,
             temporaryEdge: getTemporaryEdge({
               source: '',
               sourcePosition: { x: 100, y: 100 },
@@ -94,7 +94,7 @@ describe('Linking Commands', () => {
       getStateMock.mockReturnValue({
         nodes: [{ id: 'node-1', position: { x: 100, y: 100 } }],
         edges: [],
-        metadata: { ...mockedMetadata, temporaryEdge },
+        metadata: { ...mockMetadata, temporaryEdge },
       });
 
       commandHandler.emit('moveTemporaryEdge', { position: { x: 200, y: 200 } });
@@ -102,7 +102,7 @@ describe('Linking Commands', () => {
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadata: {
-            ...mockedMetadata,
+            ...mockMetadata,
             temporaryEdge: {
               ...temporaryEdge,
               targetPosition: { x: 200, y: 200 },
@@ -169,7 +169,7 @@ describe('Linking Commands', () => {
 
   describe('finishLinkingToPosition', () => {
     it('should not call applyUpdate if temporary edge is not found', () => {
-      getStateMock.mockReturnValue({ nodes: [{ id: 'node-1' }], edges: [], metadata: mockedMetadata });
+      getStateMock.mockReturnValue({ nodes: [{ id: 'node-1' }], edges: [], metadata: mockMetadata });
 
       commandHandler.emit('finishLinkingToPosition', { position: { x: 100, y: 100 } });
 
@@ -186,14 +186,14 @@ describe('Linking Commands', () => {
       getStateMock.mockReturnValue({
         nodes: [{ id: 'node-1' }],
         edges: [],
-        metadata: { ...mockedMetadata, temporaryEdge },
+        metadata: { ...mockMetadata, temporaryEdge },
       });
 
       commandHandler.emit('finishLinkingToPosition', { position: { x: 100, y: 100 } });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: { ...mockedMetadata, temporaryEdge: null },
+          metadata: { ...mockMetadata, temporaryEdge: null },
           edges: expect.arrayContaining([
             expect.objectContaining({
               ...getFinalEdge(temporaryEdge, { target: '', targetPosition: { x: 100, y: 100 } }),

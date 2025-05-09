@@ -1,24 +1,16 @@
-import {
-  CommandHandler,
-  EnvironmentInfo,
-  FlowCore,
-  InputEventHandler,
-  KeyboardEvent,
-  PointerEvent,
-} from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { FlowCore } from '../../../flow-core';
+import { mockEnvironment } from '../../../test-utils';
+import type { KeyboardEvent, PointerEvent } from '../../../types';
 import { deleteSelectionAction } from '../delete-selection';
 
 describe('deleteSelectionAction', () => {
-  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
-  let mockCommandHandler: CommandHandler;
+  const mockCommandHandler = { emit: vi.fn() };
   let mockEvent: KeyboardEvent;
-  let mockInputEventHandler: InputEventHandler;
   let mockFlowCore: FlowCore;
 
   beforeEach(() => {
-    mockFlowCore = {} as FlowCore;
-    mockCommandHandler = { emit: vi.fn(), flowCore: mockFlowCore } as unknown as CommandHandler;
+    vi.clearAllMocks();
     mockEvent = {
       type: 'keydown',
       timestamp: Date.now(),
@@ -30,22 +22,25 @@ describe('deleteSelectionAction', () => {
       altKey: false,
       metaKey: false,
     };
-    mockInputEventHandler = {
+    mockFlowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
-    } as unknown as InputEventHandler;
+      environment: mockEnvironment,
+    } as unknown as FlowCore;
   });
 
   describe('predicate', () => {
     it('should return true for backspace or delete key', () => {
       (mockEvent as KeyboardEvent).key = 'Backspace';
-      expect(deleteSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
+      expect(deleteSelectionAction.predicate(mockEvent, mockFlowCore)).toBe(true);
       (mockEvent as KeyboardEvent).key = 'Delete';
-      expect(deleteSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
+      expect(deleteSelectionAction.predicate(mockEvent, mockFlowCore)).toBe(true);
     });
 
     it('should return false for other keys', () => {
       (mockEvent as KeyboardEvent).key = 'ArrowLeft';
-      expect(deleteSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(false);
+      expect(deleteSelectionAction.predicate(mockEvent, mockFlowCore)).toBe(false);
     });
 
     it('should return false for other event types', () => {
@@ -59,13 +54,13 @@ describe('deleteSelectionAction', () => {
         button: 0,
       };
 
-      expect(deleteSelectionAction.predicate(pointerEvent, mockInputEventHandler, environment)).toBe(false);
+      expect(deleteSelectionAction.predicate(pointerEvent, mockFlowCore)).toBe(false);
     });
   });
 
   describe('action', () => {
     it('should emit deleteSelection command', () => {
-      deleteSelectionAction.action(mockEvent, mockInputEventHandler, environment);
+      deleteSelectionAction.action(mockEvent, mockFlowCore);
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('deleteSelection');
     });
   });

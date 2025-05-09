@@ -1,27 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from '../../command-handler';
-import { FlowCore } from '../../flow-core';
-import { mockedMetadata } from '../../test-utils';
+import { FlowCore } from '../../../flow-core';
+import { mockMetadata } from '../../../test-utils';
+import { CommandHandler } from '../../command-handler';
 import { moveViewport, moveViewportBy } from '../move-viewport';
 
 const MOVEMENT_STEP = 10;
 
 describe('Move Viewport Commands', () => {
   let flowCore: FlowCore;
-  let commandHandler: CoreCommandHandler;
+  let commandHandler: CommandHandler;
 
   beforeEach(() => {
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
     } as unknown as FlowCore;
-    commandHandler = new CoreCommandHandler(flowCore);
+    commandHandler = new CommandHandler(flowCore);
   });
 
   describe('moveViewportBy', () => {
     it('should move viewport by the specified amount', () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        metadata: mockedMetadata,
+        metadata: mockMetadata,
       });
 
       moveViewportBy(commandHandler, { name: 'moveViewportBy', x: MOVEMENT_STEP, y: MOVEMENT_STEP });
@@ -29,11 +29,11 @@ describe('Move Viewport Commands', () => {
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadata: {
-            ...mockedMetadata,
+            ...mockMetadata,
             viewport: {
-              ...mockedMetadata.viewport,
-              x: mockedMetadata.viewport.x + MOVEMENT_STEP,
-              y: mockedMetadata.viewport.y + MOVEMENT_STEP,
+              ...mockMetadata.viewport,
+              x: mockMetadata.viewport.x + MOVEMENT_STEP,
+              y: mockMetadata.viewport.y + MOVEMENT_STEP,
             },
           },
         },
@@ -43,7 +43,7 @@ describe('Move Viewport Commands', () => {
 
     it('should not call applyUpdate if x and y are 0', () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        metadata: mockedMetadata,
+        metadata: mockMetadata,
       });
 
       moveViewportBy(commandHandler, { name: 'moveViewportBy', x: 0, y: 0 });
@@ -55,7 +55,7 @@ describe('Move Viewport Commands', () => {
   describe('moveViewport', () => {
     it('should move viewport to the specified coordinates', () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        metadata: mockedMetadata,
+        metadata: mockMetadata,
       });
 
       moveViewport(commandHandler, { name: 'moveViewport', x: 100, y: 100 });
@@ -63,9 +63,9 @@ describe('Move Viewport Commands', () => {
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadata: {
-            ...mockedMetadata,
+            ...mockMetadata,
             viewport: {
-              ...mockedMetadata.viewport,
+              ...mockMetadata.viewport,
               x: 100,
               y: 100,
             },
@@ -77,13 +77,13 @@ describe('Move Viewport Commands', () => {
 
     it('should not call applyUpdate if x and y are the same as the current viewport', () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        metadata: mockedMetadata,
+        metadata: mockMetadata,
       });
 
       moveViewport(commandHandler, {
         name: 'moveViewport',
-        x: mockedMetadata.viewport.x,
-        y: mockedMetadata.viewport.y,
+        x: mockMetadata.viewport.x,
+        y: mockMetadata.viewport.y,
       });
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();

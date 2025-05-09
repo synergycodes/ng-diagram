@@ -1,26 +1,26 @@
-import { CommandHandler, EnvironmentInfo, FlowCore, InputEventHandler, KeyboardEvent } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockedNode, mockedPointerEvent } from '../../test-utils';
+import { FlowCore } from '../../../flow-core';
+import { mockEnvironment, mockNode, mockPointerEvent } from '../../../test-utils';
+import type { KeyboardEvent } from '../../../types';
 import { linkingAction } from '../linking';
 
 describe('linkingAction', () => {
-  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
-  let mockCommandHandler: CommandHandler;
-  let mockInputEventHandler: InputEventHandler;
+  const mockCommandHandler = { emit: vi.fn() };
   let mockFlowCore: FlowCore;
 
   beforeEach(() => {
-    mockFlowCore = {} as FlowCore;
-    mockCommandHandler = {
-      emit: vi.fn(),
-      flowCore: mockFlowCore,
-    } as unknown as CommandHandler;
-    mockInputEventHandler = {
+    mockFlowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
-    } as unknown as InputEventHandler;
+      environment: mockEnvironment,
+      clientToFlowPosition: vi.fn().mockImplementation((args) => args),
+      flowToClientPosition: vi.fn().mockImplementation((args) => args),
+    } as unknown as FlowCore;
 
     // Clean isLinking flag before each test
-    linkingAction.action({ ...mockedPointerEvent, type: 'pointerup', button: 2 }, mockInputEventHandler, environment);
+    linkingAction.action({ ...mockPointerEvent, type: 'pointerup', button: 2 }, mockFlowCore);
+    vi.clearAllMocks();
   });
 
   describe('predicate', () => {
@@ -32,126 +32,86 @@ describe('linkingAction', () => {
         metaKey: false,
         shiftKey: false,
       } as KeyboardEvent;
-      expect(linkingAction.predicate(keyboardEvent, mockInputEventHandler, environment)).toBe(false);
+      expect(linkingAction.predicate(keyboardEvent, mockFlowCore)).toBe(false);
     });
 
     it('should return false if pointer down event and button is not 2', () => {
-      expect(
-        linkingAction.predicate(
-          { ...mockedPointerEvent, type: 'pointerdown', button: 1 },
-          mockInputEventHandler,
-          environment
-        )
-      ).toBe(false);
+      expect(linkingAction.predicate({ ...mockPointerEvent, type: 'pointerdown', button: 1 }, mockFlowCore)).toBe(
+        false
+      );
     });
 
     it('should return true if pointer down event and button is 2', () => {
-      expect(
-        linkingAction.predicate(
-          { ...mockedPointerEvent, type: 'pointerdown', button: 2 },
-          mockInputEventHandler,
-          environment
-        )
-      ).toBe(true);
+      expect(linkingAction.predicate({ ...mockPointerEvent, type: 'pointerdown', button: 2 }, mockFlowCore)).toBe(true);
     });
 
     it('should return true if pointer move event', () => {
-      expect(
-        linkingAction.predicate({ ...mockedPointerEvent, type: 'pointermove' }, mockInputEventHandler, environment)
-      ).toBe(true);
+      expect(linkingAction.predicate({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore)).toBe(true);
     });
 
     it('should return false if pointer up event and button is not 2 ', () => {
-      expect(
-        linkingAction.predicate(
-          { ...mockedPointerEvent, type: 'pointerup', button: 1 },
-          mockInputEventHandler,
-          environment
-        )
-      ).toBe(false);
+      expect(linkingAction.predicate({ ...mockPointerEvent, type: 'pointerup', button: 1 }, mockFlowCore)).toBe(false);
     });
 
     it('should return true if pointer up event and button is 2', () => {
-      expect(
-        linkingAction.predicate(
-          { ...mockedPointerEvent, type: 'pointerup', button: 2 },
-          mockInputEventHandler,
-          environment
-        )
-      ).toBe(true);
+      expect(linkingAction.predicate({ ...mockPointerEvent, type: 'pointerup', button: 2 }, mockFlowCore)).toBe(true);
     });
   });
 
   describe('action', () => {
     it('should call startLinking if pointer down event and target is a node', () => {
       linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockedNode }, button: 2 },
-        mockInputEventHandler,
-        environment
+        { ...mockPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockNode }, button: 2 },
+        mockFlowCore
       );
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('startLinking', { source: mockedNode.id });
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('startLinking', { source: mockNode.id });
     });
 
     it('should call startLinkingFromPosition if pointer down event and target is not a node', () => {
       linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'diagram' }, button: 2 },
-        mockInputEventHandler,
-        environment
+        { ...mockPointerEvent, type: 'pointerdown', target: { type: 'diagram' }, button: 2 },
+        mockFlowCore
       );
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('startLinkingFromPosition', {
-        position: { x: mockedPointerEvent.x, y: mockedPointerEvent.y },
+        position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
       });
     });
 
     it('should not call moveTemporaryEdge if pointer move event and linking not started', () => {
-      linkingAction.action({ ...mockedPointerEvent, type: 'pointermove' }, mockInputEventHandler, environment);
+      linkingAction.action({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore);
 
       expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveTemporaryEdge');
     });
 
     it('should call moveTemporaryEdge if pointer move event and linking started', () => {
-      linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', button: 2 },
-        mockInputEventHandler,
-        environment
-      );
-      linkingAction.action({ ...mockedPointerEvent, type: 'pointermove' }, mockInputEventHandler, environment);
+      linkingAction.action({ ...mockPointerEvent, type: 'pointerdown', button: 2 }, mockFlowCore);
+      linkingAction.action({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveTemporaryEdge', {
-        position: { x: mockedPointerEvent.x, y: mockedPointerEvent.y },
+        position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
       });
     });
 
     it('should call finishLinking if pointer up event and target is a node', () => {
+      linkingAction.action({ ...mockPointerEvent, type: 'pointerdown', button: 2 }, mockFlowCore);
       linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', button: 2 },
-        mockInputEventHandler,
-        environment
-      );
-      linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerup', target: { type: 'node', element: mockedNode }, button: 2 },
-        mockInputEventHandler,
-        environment
+        { ...mockPointerEvent, type: 'pointerup', target: { type: 'node', element: mockNode }, button: 2 },
+        mockFlowCore
       );
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', { target: mockedNode.id });
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', { target: mockNode.id });
     });
 
     it('should call finishLinkingToPosition if pointer up event and target is not a node', () => {
+      linkingAction.action({ ...mockPointerEvent, type: 'pointerdown', button: 2 }, mockFlowCore);
       linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', button: 2 },
-        mockInputEventHandler,
-        environment
-      );
-      linkingAction.action(
-        { ...mockedPointerEvent, type: 'pointerup', target: { type: 'diagram' }, button: 2 },
-        mockInputEventHandler,
-        environment
+        { ...mockPointerEvent, type: 'pointerup', target: { type: 'diagram' }, button: 2 },
+        mockFlowCore
       );
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinkingToPosition', {
-        position: { x: mockedPointerEvent.x, y: mockedPointerEvent.y },
+        position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
       });
     });
   });

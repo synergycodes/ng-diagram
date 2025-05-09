@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from '../../command-handler';
-import { FlowCore } from '../../flow-core';
+import { FlowCore } from '../../../flow-core';
+import { CommandHandler } from '../../command-handler';
 import { moveSelection } from '../move-selection';
 
 const MOVEMENT_STEP = 10;
 
 describe('Move Selection Commands', () => {
   let flowCore: FlowCore;
-  let commandHandler: CoreCommandHandler;
+  let commandHandler: CommandHandler;
 
   beforeEach(() => {
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
     } as unknown as FlowCore;
-    commandHandler = new CoreCommandHandler(flowCore);
+    commandHandler = new CommandHandler(flowCore);
   });
 
   it('should move selected nodes by the specified amount', () => {

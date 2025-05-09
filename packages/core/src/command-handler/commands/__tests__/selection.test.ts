@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../flow-core';
-import { mockedEdge, mockedNode } from '../../test-utils';
-import { CommandHandler } from '../../types/command-handler.interface';
+import { FlowCore } from '../../../flow-core';
+import { mockEdge, mockNode } from '../../../test-utils';
+import { CommandHandler } from '../../command-handler';
 import { deselectAll, select } from '../selection';
 
 describe('Selection Commands', () => {
@@ -11,8 +11,8 @@ describe('Selection Commands', () => {
     commandHandler = {
       flowCore: {
         getState: () => ({
-          nodes: [mockedNode, { ...mockedNode, id: 'node2', selected: true }],
-          edges: [mockedEdge, { ...mockedEdge, id: 'edge2' }],
+          nodes: [mockNode, { ...mockNode, id: 'node2', selected: true }],
+          edges: [mockEdge, { ...mockEdge, id: 'edge2' }],
           metadata: {},
         }),
         applyUpdate: vi.fn(),
@@ -27,12 +27,12 @@ describe('Selection Commands', () => {
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           nodes: [
-            { ...mockedNode, selected: true },
-            { ...mockedNode, id: 'node2', selected: false },
+            { ...mockNode, selected: true },
+            { ...mockNode, id: 'node2', selected: false },
           ],
           edges: [
-            { ...mockedEdge, selected: false },
-            { ...mockedEdge, id: 'edge2', selected: true },
+            { ...mockEdge, selected: false },
+            { ...mockEdge, id: 'edge2', selected: true },
           ],
         },
         'changeSelection'
@@ -46,8 +46,8 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [mockedNode, { ...mockedNode, id: 'node2', selected: false }],
-          edges: [mockedEdge, { ...mockedEdge, id: 'edge2', selected: false }],
+          nodes: [mockNode, { ...mockNode, id: 'node2', selected: false }],
+          edges: [mockEdge, { ...mockEdge, id: 'edge2', selected: false }],
         },
         'changeSelection'
       );

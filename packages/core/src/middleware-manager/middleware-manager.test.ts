@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockMetadata, mockNode } from '../test-utils';
+import type { FlowState, Middleware, MiddlewareContext } from '../types';
 import { MiddlewareManager } from './middleware-manager';
-import { mockedMetadata, mockedNode } from './test-utils';
-import type { FlowState, Middleware, MiddlewareContext } from './types/middleware.interface';
 
 describe('MiddlewareManager', () => {
   let middlewareManager: MiddlewareManager;
@@ -19,7 +19,7 @@ describe('MiddlewareManager', () => {
       execute: vi.fn().mockImplementation(
         (state: FlowState): FlowState => ({
           ...state,
-          nodes: [...state.nodes, { ...mockedNode, id: 'node2' }],
+          nodes: [...state.nodes, { ...mockNode, id: 'node2' }],
         })
       ),
     };
@@ -29,7 +29,7 @@ describe('MiddlewareManager', () => {
       execute: vi.fn().mockImplementation(
         (state: FlowState): FlowState => ({
           ...state,
-          nodes: [...state.nodes, { ...mockedNode, id: 'node3' }],
+          nodes: [...state.nodes, { ...mockNode, id: 'node3' }],
         })
       ),
     };
@@ -37,12 +37,12 @@ describe('MiddlewareManager', () => {
     prevState = {
       nodes: [],
       edges: [],
-      metadata: mockedMetadata,
+      metadata: mockMetadata,
     };
     nextState = {
-      nodes: [mockedNode],
+      nodes: [mockNode],
       edges: [],
-      metadata: mockedMetadata,
+      metadata: mockMetadata,
     };
     context = {
       initialState: prevState,
@@ -93,7 +93,7 @@ describe('MiddlewareManager', () => {
       expect(result.nodes[2].id).toBe('node3');
       expect(mockMiddleware1.execute).toHaveBeenCalledWith(nextState, context);
       expect(mockMiddleware2.execute).toHaveBeenCalledWith(
-        { ...nextState, nodes: [...nextState.nodes, { ...mockedNode, id: 'node2' }] },
+        { ...nextState, nodes: [...nextState.nodes, { ...mockNode, id: 'node2' }] },
         {
           ...context,
           historyUpdates: [
@@ -101,7 +101,7 @@ describe('MiddlewareManager', () => {
             {
               name: mockMiddleware1.name,
               prevState: nextState,
-              nextState: { ...nextState, nodes: [...nextState.nodes, { ...mockedNode, id: 'node2' }] },
+              nextState: { ...nextState, nodes: [...nextState.nodes, { ...mockNode, id: 'node2' }] },
             },
           ],
         }

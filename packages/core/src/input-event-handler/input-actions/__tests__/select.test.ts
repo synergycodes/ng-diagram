@@ -1,60 +1,49 @@
-import { CommandHandler, EnvironmentInfo, EventMapper } from '@angularflow/core';
-import { describe, expect, it, vi } from 'vitest';
-import { InputEventHandler } from '../../input-event-handler';
-import { mockedNode, mockedPointerEvent } from '../../test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { FlowCore } from '../../../flow-core';
+import { mockEnvironment, mockNode, mockPointerEvent } from '../../../test-utils';
 import { selectAction } from '../select';
 
 describe('selectAction', () => {
-  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
-  const emit = vi.fn();
-  const inputEventHandler = new InputEventHandler(
-    {
-      emit,
-    } as unknown as CommandHandler,
-    {
-      register: vi.fn(),
-    } as unknown as EventMapper,
-    environment
-  );
+  const mockCommandHandler = { emit: vi.fn() };
+  let mockFlowCore: FlowCore;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockFlowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
+      commandHandler: mockCommandHandler,
+      environment: mockEnvironment,
+    } as unknown as FlowCore;
+  });
 
   describe('predicate', () => {
     it('should return true for pointerdown events', () => {
-      expect(
-        selectAction.predicate(
-          { ...mockedPointerEvent, type: 'pointerdown', button: 0 },
-          inputEventHandler,
-          environment
-        )
-      ).toBe(true);
+      expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerdown', button: 0 }, mockFlowCore)).toBe(true);
     });
 
     it('should return false for other events', () => {
-      expect(
-        selectAction.predicate({ ...mockedPointerEvent, type: 'pointerenter' }, inputEventHandler, environment)
-      ).toBe(false);
-      expect(
-        selectAction.predicate({ ...mockedPointerEvent, type: 'pointerup', button: 0 }, inputEventHandler, environment)
-      ).toBe(false);
+      expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerenter' }, mockFlowCore)).toBe(false);
+      expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerup', button: 0 }, mockFlowCore)).toBe(false);
     });
   });
 
   describe('action', () => {
     it('should emit deselectAll command when no target is provided', () => {
       selectAction.action(
-        { ...mockedPointerEvent, target: { type: 'diagram' }, type: 'pointerdown', button: 0 },
-        inputEventHandler,
-        environment
+        { ...mockPointerEvent, target: { type: 'diagram' }, type: 'pointerdown', button: 0 },
+        mockFlowCore
       );
-      expect(emit).toHaveBeenCalledWith('deselectAll');
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('deselectAll');
     });
 
     it('should emit select command when target is provided', () => {
       selectAction.action(
-        { ...mockedPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockedNode }, button: 0 },
-        inputEventHandler,
-        environment
+        { ...mockPointerEvent, type: 'pointerdown', target: { type: 'node', element: mockNode }, button: 0 },
+        mockFlowCore
       );
-      expect(emit).toHaveBeenCalledWith('select', { ids: ['1'] });
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', { ids: [mockNode.id] });
     });
   });
 });

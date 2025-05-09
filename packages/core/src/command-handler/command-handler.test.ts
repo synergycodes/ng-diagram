@@ -3,6 +3,7 @@ import { FlowCore } from '../flow-core';
 import type { Command } from '../types/command-handler.interface';
 import { FlowState } from '../types/middleware.interface';
 import { CommandHandler } from './command-handler';
+
 vi.mock('./commands', () => ({
   commands: {
     select: vi.fn(),

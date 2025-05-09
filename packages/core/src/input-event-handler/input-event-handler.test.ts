@@ -1,17 +1,18 @@
-import type { CommandHandler, EnvironmentInfo, Event, EventMapper } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { FlowCore } from '../flow-core';
+import { mockEnvironment } from '../test-utils';
+import type { Event } from '../types';
+import { inputActions } from './input-actions';
 import { InputEventHandler } from './input-event-handler';
 
-vi.mock('./actions', async () => ({
-  actions: {
+vi.mock('./input-actions', async () => ({
+  inputActions: {
     select: {
       action: vi.fn(),
       predicate: () => true,
     },
   },
 }));
-
-import { actions } from './actions';
 
 class MockEventMapper {
   private listener: (event: Event) => void = () => null;
@@ -26,14 +27,22 @@ class MockEventMapper {
 }
 
 describe('InputEventHandler', () => {
+  const mockCommandHandler = { emit: vi.fn() };
+  let mockFlowCore: FlowCore;
   let eventHandler: InputEventHandler;
-  let mockCommandHandler: CommandHandler;
-  let mockEventMapper: EventMapper;
+  let mockEventMapper: MockEventMapper;
 
   beforeEach(() => {
-    mockCommandHandler = {} as CommandHandler;
     mockEventMapper = new MockEventMapper();
-    eventHandler = new InputEventHandler(mockCommandHandler, mockEventMapper, {} as EnvironmentInfo);
+    mockFlowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
+      registerEventsHandler: (handle: (event: Event) => void) => mockEventMapper.register(handle),
+      commandHandler: mockCommandHandler,
+      environment: mockEnvironment,
+      eventMapper: mockEventMapper,
+    } as unknown as FlowCore;
+    eventHandler = new InputEventHandler(mockFlowCore);
     vi.clearAllMocks();
   });
 
@@ -44,7 +53,7 @@ describe('InputEventHandler', () => {
       eventHandler.registerDefault('select');
       mockEventMapper.emit({} as Event);
 
-      expect(actions.select.action).toHaveBeenCalledTimes(1);
+      expect(inputActions.select.action).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -53,7 +62,7 @@ describe('InputEventHandler', () => {
       eventHandler.unregisterDefault('select');
       mockEventMapper.emit({} as Event);
 
-      expect(actions.select.action).not.toHaveBeenCalled();
+      expect(inputActions.select.action).not.toHaveBeenCalled();
     });
   });
 
@@ -90,14 +99,14 @@ describe('InputEventHandler', () => {
     it('should call default action if no action is registered for event', () => {
       mockEventMapper.emit({} as Event);
 
-      expect(actions.select.action).toHaveBeenCalled();
+      expect(inputActions.select.action).toHaveBeenCalled();
     });
 
     it('should call default action if new action is registered for event', () => {
       eventHandler.register(() => true, 'select');
       mockEventMapper.emit({} as Event);
 
-      expect(actions.select.action).toHaveBeenCalledTimes(2);
+      expect(inputActions.select.action).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -121,7 +130,7 @@ describe('InputEventHandler', () => {
 
       mockEventMapper.emit({} as Event);
 
-      expect(actions.select.action).toHaveBeenCalledTimes(1);
+      expect(inputActions.select.action).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -129,7 +138,7 @@ describe('InputEventHandler', () => {
     it('should invoke default action', () => {
       eventHandler.invoke('select', {} as Event);
 
-      expect(actions.select.action).toHaveBeenCalled();
+      expect(inputActions.select.action).toHaveBeenCalled();
     });
   });
 });

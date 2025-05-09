@@ -1,32 +1,17 @@
-import {
-  CommandHandler,
-  EnvironmentInfo,
-  EventTarget,
-  FlowCore,
-  InputEventHandler,
-  KeyboardEvent,
-} from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockedNode } from '../../test-utils';
+import { FlowCore } from '../../../flow-core';
+import { mockEnvironment, mockNode } from '../../../test-utils';
+import type { EventTarget, KeyboardEvent } from '../../../types';
 import { keyboardMoveSelectionAction } from '../keyboard-move-selection';
 
 describe('keyboardMoveSelectionAction', () => {
-  let mockCommandHandler: CommandHandler;
+  const mockCommandHandler = { emit: vi.fn() };
   let mockEvent: KeyboardEvent;
   let mockTarget: EventTarget;
-  let mockInputEventHandler: InputEventHandler;
   let mockFlowCore: FlowCore;
-  const environment: EnvironmentInfo = { os: 'Windows', browser: 'Chrome' };
 
   beforeEach(() => {
-    mockFlowCore = {} as FlowCore;
-
-    mockCommandHandler = {
-      emit: vi.fn(),
-      flowCore: mockFlowCore,
-    } as unknown as CommandHandler;
-
-    mockTarget = { type: 'node', element: mockedNode };
+    mockTarget = { type: 'node', element: mockNode };
 
     mockEvent = {
       type: 'keydown',
@@ -34,34 +19,37 @@ describe('keyboardMoveSelectionAction', () => {
       target: mockTarget,
       key: 'ArrowRight',
       code: 'ArrowRight',
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      metaKey: false,
     } as KeyboardEvent;
 
-    mockInputEventHandler = {
+    mockFlowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
-    } as unknown as InputEventHandler;
+      environment: mockEnvironment,
+    } as unknown as FlowCore;
   });
 
   describe('predicate', () => {
     it('should return true for keydown events', () => {
-      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
+      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockFlowCore)).toBe(true);
     });
 
     it('should return false for none of the expecting key keydown event', () => {
-      expect(
-        keyboardMoveSelectionAction.predicate({ ...mockEvent, key: 'A' }, mockInputEventHandler, environment)
-      ).toBe(false);
+      expect(keyboardMoveSelectionAction.predicate({ ...mockEvent, key: 'A' }, mockFlowCore)).toBe(false);
     });
 
     it('should return false for non-keydown events', () => {
-      expect(
-        keyboardMoveSelectionAction.predicate({ ...mockEvent, type: 'keypress' }, mockInputEventHandler, environment)
-      ).toBe(false);
+      expect(keyboardMoveSelectionAction.predicate({ ...mockEvent, type: 'keypress' }, mockFlowCore)).toBe(false);
     });
   });
 
   describe('action', () => {
     it('should emit moveSelection command with correct dx and dy for ArrowRight', () => {
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
+      keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: 10,
@@ -76,7 +64,7 @@ describe('keyboardMoveSelectionAction', () => {
         code: 'ArrowLeft',
       } as KeyboardEvent;
 
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
+      keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: -10,
@@ -91,7 +79,7 @@ describe('keyboardMoveSelectionAction', () => {
         code: 'ArrowUp',
       } as KeyboardEvent;
 
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
+      keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: 0,
@@ -106,7 +94,7 @@ describe('keyboardMoveSelectionAction', () => {
         code: 'ArrowDown',
       } as KeyboardEvent;
 
-      keyboardMoveSelectionAction.action(mockEvent, mockInputEventHandler, environment);
+      keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
         dx: 0,
@@ -120,8 +108,8 @@ describe('keyboardMoveSelectionAction', () => {
         type: 'keyup',
       } as KeyboardEvent;
 
-      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockInputEventHandler, environment)).toBe(true);
-      expect(keyboardMoveSelectionAction.predicate(keyupEvent, mockInputEventHandler, environment)).toBe(false);
+      expect(keyboardMoveSelectionAction.predicate(mockEvent, mockFlowCore)).toBe(true);
+      expect(keyboardMoveSelectionAction.predicate(keyupEvent, mockFlowCore)).toBe(false);
     });
   });
 });

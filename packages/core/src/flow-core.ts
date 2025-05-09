@@ -35,6 +35,10 @@ export class FlowCore {
     return this.environment;
   }
 
+  /**
+   * Registers a new event handler
+   * @param handler Handler to register
+   */
   registerEventsHandler(handler: (event: Event) => void): void {
     this.eventMapper.register((event) => handler(event));
   }

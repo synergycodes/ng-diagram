@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from '../../command-handler';
-import { FlowCore } from '../../flow-core';
+import { FlowCore } from '../../../flow-core';
+import { CommandHandler } from '../../command-handler';
 
 describe('Add Update Delete Command', () => {
   let flowCore: FlowCore;
-  let commandHandler: CoreCommandHandler;
+  let commandHandler: CommandHandler;
 
   beforeEach(() => {
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
     } as unknown as FlowCore;
-    commandHandler = new CoreCommandHandler(flowCore);
+    commandHandler = new CommandHandler(flowCore);
   });
 
   it('should add nodes to the flow', () => {
