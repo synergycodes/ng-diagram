@@ -49,7 +49,7 @@ export const pointerMoveSelectionAction: ActionWithPredicate = {
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.target?.type === 'node') ||
+    (isPointerDownEvent(event) && event.button === 0 && event.target?.type === 'node') ||
     isPointerMoveEvent(event) ||
-    isPointerUpEvent(event),
+    (isPointerUpEvent(event) && event.button === 0),
 };

@@ -48,13 +48,13 @@ describe('PointerDownEventListenerDirective', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('should call setPointerCapture method on the currentTarget', () => {
-    const spy = vi.spyOn(mockCurrentTarget, 'setPointerCapture');
+  // it('should call setPointerCapture method on the currentTarget', () => {
+  //   const spy = vi.spyOn(mockCurrentTarget, 'setPointerCapture');
 
-    fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
+  //   fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
 
-    expect(spy).toHaveBeenCalled();
-  });
+  //   expect(spy).toHaveBeenCalled();
+  // });
 
   describe('when eventTarget is not provided', () => {
     it('should call eventMapperService.emit with diagram as eventTarget', () => {

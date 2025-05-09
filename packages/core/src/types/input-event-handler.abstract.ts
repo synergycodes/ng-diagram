@@ -13,7 +13,8 @@ export type ActionName =
   | 'deleteSelection'
   | 'copy'
   | 'paste'
-  | 'panning';
+  | 'panning'
+  | 'linking';
 
 /**
  * Type for action function

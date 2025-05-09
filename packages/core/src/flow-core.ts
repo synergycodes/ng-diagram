@@ -107,10 +107,8 @@ export class FlowCore {
   }
 
   private render(): void {
-    this.renderer.draw(
-      this.modelAdapter.getNodes(),
-      this.modelAdapter.getEdges(),
-      this.modelAdapter.getMetadata().viewport
-    );
+    const { nodes, edges, metadata } = this.getState();
+    const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
+    this.renderer.draw(nodes, finalEdges, metadata.viewport);
   }
 }

@@ -13,6 +13,7 @@ describe('EventMapperService', () => {
     pressure: 1,
     timestamp: 1000,
     target: { type: 'diagram' },
+    button: 0,
   };
 
   beforeEach(() => {

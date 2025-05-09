@@ -34,19 +34,55 @@ export interface KeyboardEvent extends BaseEvent {
 }
 
 /**
- * Pointer event types
+ * Pointer base event interface
  */
-export type PointerEventType = 'pointerdown' | 'pointerup' | 'pointermove' | 'pointerenter' | 'pointerleave';
-
-/**
- * Pointer event interface
- */
-export interface PointerEvent extends BaseEvent {
-  type: PointerEventType;
+export interface PointerBaseEvent extends BaseEvent {
   x: number;
   y: number;
   pressure: number;
 }
+
+/**
+ * Pointer event interface
+ */
+export interface PointerDownEvent extends PointerBaseEvent {
+  type: 'pointerdown';
+  button: number;
+}
+
+/**
+ * Pointer up event interface
+ */
+export interface PointerUpEvent extends PointerBaseEvent {
+  type: 'pointerup';
+  button: number;
+}
+
+/**
+ * Pointer move event interface
+ */
+export interface PointerMoveEvent extends PointerBaseEvent {
+  type: 'pointermove';
+}
+
+/**
+ * Pointer enter event interface
+ */
+export interface PointerEnterEvent extends PointerBaseEvent {
+  type: 'pointerenter';
+}
+
+/**
+ * Pointer leave event interface
+ */
+export interface PointerLeaveEvent extends PointerBaseEvent {
+  type: 'pointerleave';
+}
+
+/**
+ * Pointer event interface
+ */
+export type PointerEvent = PointerDownEvent | PointerUpEvent | PointerMoveEvent | PointerEnterEvent | PointerLeaveEvent;
 
 /**
  * Union type of all possible events

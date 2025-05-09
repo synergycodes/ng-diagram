@@ -10,7 +10,7 @@ export interface Renderer {
    * Draws the current state of the flow diagram
    * @param nodes List of nodes to render
    * @param edges List of edges to render
-   * @param viewportData Additional data needed for rendering
+   * @param viewport Viewport to render
    */
-  draw(nodes: Node[], edges: Edge[], viewportData: Viewport): void;
+  draw(nodes: Node[], edges: Edge[], viewport: Viewport): void;
 }

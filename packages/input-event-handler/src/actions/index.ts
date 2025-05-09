@@ -2,6 +2,7 @@ import { ActionName, ActionWithPredicate } from '@angularflow/core';
 import { copyAction } from './copy';
 import { deleteSelectionAction } from './delete-selection';
 import { keyboardMoveSelectionAction } from './keyboard-move-selection';
+import { linkingAction } from './linking';
 import { panningAction } from './panning';
 import { pasteAction } from './paste';
 import { pointerMoveSelectionAction } from './pointer-move-selection';
@@ -15,4 +16,5 @@ export const actions: Record<ActionName, ActionWithPredicate> = {
   deleteSelection: deleteSelectionAction,
   copy: copyAction,
   paste: pasteAction,
+  linking: linkingAction,
 };

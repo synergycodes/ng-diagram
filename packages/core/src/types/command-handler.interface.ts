@@ -8,11 +8,17 @@ import {
 } from '../commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../commands/copy-paste';
 import { DeleteSelectionCommand } from '../commands/delete-selection';
+import {
+  FinishLinkingCommand,
+  FinishLinkingToPositionCommand,
+  MoveTemporaryEdgeCommand,
+  StartLinkingCommand,
+  StartLinkingFromPositionCommand,
+} from '../commands/linking';
 import { MoveSelectionCommand } from '../commands/move-selection';
 import { MoveViewportByCommand, MoveViewportCommand } from '../commands/move-viewport';
 import { DeselectAllCommand, SelectCommand } from '../commands/selection';
 import { FlowCore } from '../flow-core';
-
 /**
  * Type for system commands that can be emitted by InputEventHandler or user
  */
@@ -30,7 +36,12 @@ export type Command =
   | CopyCommand
   | PasteCommand
   | MoveViewportCommand
-  | MoveViewportByCommand;
+  | MoveViewportByCommand
+  | StartLinkingCommand
+  | MoveTemporaryEdgeCommand
+  | FinishLinkingCommand
+  | StartLinkingFromPositionCommand
+  | FinishLinkingToPositionCommand;
 
 /**
  * Type for command name

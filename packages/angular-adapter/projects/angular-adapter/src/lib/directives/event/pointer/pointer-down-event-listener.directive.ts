@@ -15,8 +15,8 @@ export class PointerDownEventListenerDirective implements ITargetedEventListener
 
   onPointerDown(event: PointerEvent) {
     event.stopPropagation();
-    const currentTarget = event.currentTarget as HTMLElement;
-    currentTarget.setPointerCapture(event.pointerId);
+    // const currentTarget = event.currentTarget as HTMLElement;
+    // currentTarget.setPointerCapture(event.pointerId);
     this.eventMapperService.emit({
       type: 'pointerdown',
       target: this.eventTarget(),
@@ -24,6 +24,7 @@ export class PointerDownEventListenerDirective implements ITargetedEventListener
       timestamp: Date.now(),
       x: event.clientX,
       y: event.clientY,
+      button: event.button,
     });
   }
 }

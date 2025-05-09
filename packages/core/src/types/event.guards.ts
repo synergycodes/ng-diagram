@@ -1,4 +1,13 @@
-import { Event, KeyboardEvent, PointerEvent } from './event.interface';
+import {
+  Event,
+  KeyboardEvent,
+  PointerDownEvent,
+  PointerEnterEvent,
+  PointerEvent,
+  PointerLeaveEvent,
+  PointerMoveEvent,
+  PointerUpEvent,
+} from './event.interface';
 
 /**
  * Check if an event is a keyboard down event
@@ -31,35 +40,35 @@ export const isKeyboardEvent = (event: Event): event is KeyboardEvent => {
 /**
  * Check if an event is a pointer down event
  */
-export const isPointerDownEvent = (event: Event): event is PointerEvent => {
+export const isPointerDownEvent = (event: Event): event is PointerDownEvent => {
   return event.type === 'pointerdown';
 };
 
 /**
  * Check if an event is a pointer up event
  */
-export const isPointerUpEvent = (event: Event): event is PointerEvent => {
+export const isPointerUpEvent = (event: Event): event is PointerUpEvent => {
   return event.type === 'pointerup';
 };
 
 /**
  * Check if an event is a pointer move event
  */
-export const isPointerMoveEvent = (event: Event): event is PointerEvent => {
+export const isPointerMoveEvent = (event: Event): event is PointerMoveEvent => {
   return event.type === 'pointermove';
 };
 
 /**
  * Check if an event is a pointer enter event
  */
-export const isPointerEnterEvent = (event: Event): event is PointerEvent => {
+export const isPointerEnterEvent = (event: Event): event is PointerEnterEvent => {
   return event.type === 'pointerenter';
 };
 
 /**
  * Check if an event is a pointer leave event
  */
-export const isPointerLeaveEvent = (event: Event): event is PointerEvent => {
+export const isPointerLeaveEvent = (event: Event): event is PointerLeaveEvent => {
   return event.type === 'pointerleave';
 };
 

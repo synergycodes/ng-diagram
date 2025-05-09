@@ -1,3 +1,5 @@
+import { Edge } from './edge.interface';
+
 export interface Viewport {
   x: number;
   y: number;
@@ -6,5 +8,6 @@ export interface Viewport {
 
 export interface Metadata {
   viewport: Viewport;
+  temporaryEdge?: Edge | null;
   [key: string]: unknown;
 }

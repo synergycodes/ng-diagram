@@ -98,4 +98,12 @@ describe('EdgeStraightComponent', () => {
 
     expect(component.markerEnd()).toBe('url(#arrowhead)');
   });
+
+  it('should return proper stroke opacity when edge is temporary', () => {
+    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('isTemporary', true);
+    fixture.detectChanges();
+
+    expect(component.strokeOpacity()).toBe(0.5);
+  });
 });
