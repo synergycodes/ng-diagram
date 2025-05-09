@@ -1,12 +1,10 @@
-import type { CommandHandler } from './command-handler.interface';
-import type { EnvironmentInfo } from './environment.interface';
-import type { EventMapper } from './event-mapper.interface';
+import { FlowCore } from '../flow-core';
 import type { Event } from './event.interface';
 
 /**
  * Type for action name
  */
-export type ActionName =
+export type InputActionName =
   | 'select'
   | 'keyboardMoveSelection'
   | 'pointerMoveSelection'
@@ -19,25 +17,21 @@ export type ActionName =
 /**
  * Type for action function
  */
-export type Action = (event: Event, inputEventHandler: InputEventHandler, environment: EnvironmentInfo) => void;
+export type InputAction = (event: Event, flowCore: FlowCore) => void;
 
 /**
  * Type for predicate function that determines if an action should be triggered
  */
-export type ActionPredicate = (
-  event: Event,
-  inputEventHandler: InputEventHandler,
-  environment: EnvironmentInfo
-) => boolean;
+export type InputActionPredicate = (event: Event, flowCore: FlowCore) => boolean;
 
 /**
  * Type for action that can be either a name or a function
  */
-export type ActionOrActionName = ActionName | Action;
+export type InputActionOrInputActionName = InputActionName | InputAction;
 
-export interface ActionWithPredicate {
-  action: Action;
-  predicate: ActionPredicate;
+export interface InputActionWithPredicate {
+  action: InputAction;
+  predicate: InputActionPredicate;
 }
 
 /**
@@ -45,42 +39,38 @@ export interface ActionWithPredicate {
  * Enforces CommandHandler dependency through constructor
  */
 export abstract class InputEventHandler {
-  protected constructor(
-    readonly commandHandler: CommandHandler,
-    protected readonly eventMapper: EventMapper,
-    protected readonly environment: EnvironmentInfo
-  ) {}
+  protected constructor(readonly flowCore: FlowCore) {}
 
   /**
    * Register a default action handler
    * @param actionName Name of the action to register
    */
-  abstract registerDefault(actionName: ActionName): void;
+  abstract registerDefault(actionName: InputActionName): void;
 
   /**
    * Unregister a default action handler
    * @param actionName Name of the action to unregister
    */
-  abstract unregisterDefault(actionName: ActionName): void;
+  abstract unregisterDefault(actionName: InputActionName): void;
 
   /**
    * Register a new action handler with a predicate
    * @param predicate Function that determines when the action should be triggered
    * @param actionOrActionName Action to be triggered (either name or function)
    */
-  abstract register(predicate: ActionPredicate, actionOrActionName: ActionOrActionName): void;
+  abstract register(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void;
 
   /**
    * Unregister an action handler with a predicate
    * @param predicate Predicate function to unregister
    * @param actionOrActionName Action to unregister
    */
-  abstract unregister(predicate: ActionPredicate, actionOrActionName: ActionOrActionName): void;
+  abstract unregister(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void;
 
   /**
    * Invoke an action handler
    * @param actionName Name of the action to invoke
    * @param event Event to invoke the action with
    */
-  abstract invoke(actionName: ActionName, event: Event): void;
+  abstract invoke(actionName: InputActionName, event: Event): void;
 }

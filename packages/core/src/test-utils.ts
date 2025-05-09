@@ -1,9 +1,6 @@
-import { Edge } from './types/edge.interface';
-import { PointerEvent } from './types/event.interface';
-import { Metadata } from './types/metadata.interface';
-import { Node } from './types/node.interface';
+import type { Edge, EnvironmentInfo, Metadata, Node, PointerEvent } from './types';
 
-export const mockedNode: Node = {
+export const mockNode: Node = {
   id: 'node1',
   type: 'node',
   selected: false,
@@ -11,7 +8,7 @@ export const mockedNode: Node = {
   data: {},
 };
 
-export const mockedEdge: Edge = {
+export const mockEdge: Edge = {
   id: 'edge1',
   type: 'edge',
   source: '1',
@@ -20,7 +17,7 @@ export const mockedEdge: Edge = {
   data: {},
 };
 
-export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
+export const mockPointerEvent: Omit<PointerEvent, 'type'> = {
   x: 0,
   y: 0,
   pressure: 0,
@@ -28,6 +25,11 @@ export const mockedPointerEvent: Omit<PointerEvent, 'type'> = {
   target: { type: 'diagram' },
 };
 
-export const mockedMetadata: Metadata = {
+export const mockMetadata: Metadata = {
   viewport: { x: 0, y: 0, scale: 1 },
+};
+
+export const mockEnvironment: EnvironmentInfo = {
+  os: 'MacOS',
+  browser: 'Chrome',
 };

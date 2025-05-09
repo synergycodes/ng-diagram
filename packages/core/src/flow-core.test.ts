@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { CoreCommandHandler } from './command-handler';
+import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
-import { MiddlewareManager } from './middleware-manager';
-import { mockedEdge, mockedNode } from './test-utils';
+import { InputEventHandler } from './input-event-handler/input-event-handler';
+import { MiddlewareManager } from './middleware-manager/middleware-manager';
+import { mockEdge, mockNode } from './test-utils';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
-import type { InputEventHandler } from './types/input-event-handler.abstract';
 import type { Metadata } from './types/metadata.interface';
 import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
@@ -19,8 +19,27 @@ const mockMiddlewareManager = {
   execute: vi.fn(),
 };
 
-vi.mock('./middleware-manager', () => ({
+vi.mock('./middleware-manager/middleware-manager', () => ({
   MiddlewareManager: vi.fn().mockImplementation(() => mockMiddlewareManager),
+}));
+
+const mockCommandHandler = {
+  emit: vi.fn(),
+};
+
+vi.mock('./command-handler/command-handler', () => ({
+  CommandHandler: vi.fn().mockImplementation(() => mockCommandHandler),
+}));
+
+const mockInputEventHandler = {
+  unregisterDefault: vi.fn(),
+  register: vi.fn(),
+  unregister: vi.fn(),
+  invoke: vi.fn(),
+};
+
+vi.mock('./input-event-handler/input-event-handler', () => ({
+  InputEventHandler: vi.fn().mockImplementation(() => mockInputEventHandler),
 }));
 
 describe('FlowCore', () => {
@@ -28,12 +47,6 @@ describe('FlowCore', () => {
   let mockModelAdapter: ModelAdapter;
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;
-  let mockEventHandler: InputEventHandler;
-  let createEventHandler: (
-    commandHandler: CoreCommandHandler,
-    eventMapper: EventMapper,
-    environment: EnvironmentInfo
-  ) => InputEventHandler;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Metadata>;
@@ -66,31 +79,18 @@ describe('FlowCore', () => {
       emit: vi.fn(),
     } as unknown as EventMapper;
 
-    mockEventHandler = {
-      unregisterDefault: vi.fn(),
-      register: vi.fn(),
-      unregister: vi.fn(),
-      invoke: vi.fn(),
-    } as unknown as InputEventHandler;
-
-    createEventHandler = vi.fn().mockReturnValue(mockEventHandler);
-
     // Reset all mocks
     vi.clearAllMocks();
 
     // Create FlowCore instance
-    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, createEventHandler, mockEnvironment);
+    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, mockEnvironment);
   });
 
   describe('constructor', () => {
-    it('should create a new CommandHandler instance', () => {
-      expect(flowCore).toBeDefined();
-      expect(createEventHandler).toHaveBeenCalledWith(expect.any(CoreCommandHandler), mockEventMapper, mockEnvironment);
-    });
-
     it('should initialize with provided dependencies', () => {
-      expect(createEventHandler).toHaveBeenCalled();
       expect(vi.mocked(MiddlewareManager)).toHaveBeenCalled();
+      expect(vi.mocked(CommandHandler)).toHaveBeenCalledWith(flowCore);
+      expect(vi.mocked(InputEventHandler)).toHaveBeenCalledWith(flowCore);
     });
 
     it('should store the environment information', () => {
@@ -103,27 +103,6 @@ describe('FlowCore', () => {
 
     it('should register model changed listener', () => {
       expect(mockModelAdapter.onChange).toHaveBeenCalled();
-    });
-  });
-
-  describe('setEventHandler', () => {
-    it('should replace the current EventHandler with a new one', () => {
-      const newEventHandler = {
-        unregisterDefault: vi.fn(),
-        register: vi.fn(),
-        unregister: vi.fn(),
-        invoke: vi.fn(),
-      } as unknown as InputEventHandler;
-
-      const newCreateEventHandler = vi.fn().mockReturnValue(newEventHandler);
-
-      flowCore.setEventHandler(newCreateEventHandler);
-
-      expect(newCreateEventHandler).toHaveBeenCalledWith(
-        expect.any(CoreCommandHandler),
-        mockEventMapper,
-        mockEnvironment
-      );
     });
   });
 
@@ -152,13 +131,13 @@ describe('FlowCore', () => {
 
   describe('getState', () => {
     it('should return the current state', () => {
-      mockGetNodes.mockReturnValue([mockedNode]);
-      mockGetEdges.mockReturnValue([mockedEdge]);
+      mockGetNodes.mockReturnValue([mockNode]);
+      mockGetEdges.mockReturnValue([mockEdge]);
       mockGetMetadata.mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, test: 'abc' });
       const state = flowCore.getState();
       expect(state).toEqual({
-        nodes: [mockedNode],
-        edges: [mockedEdge],
+        nodes: [mockNode],
+        edges: [mockEdge],
         metadata: { viewport: { x: 0, y: 0, scale: 1 }, test: 'abc' },
       });
     });
@@ -167,30 +146,58 @@ describe('FlowCore', () => {
   describe('applyUpdate', () => {
     it('should apply the update to the state', () => {
       mockMiddlewareManager.execute.mockReturnValue({
-        nodes: [mockedNode],
-        edges: [mockedEdge],
+        nodes: [mockNode],
+        edges: [mockEdge],
         metadata: { test: 'abc' },
       });
-      flowCore.applyUpdate({ nodes: [mockedNode] }, 'changeSelection');
+      flowCore.applyUpdate({ nodes: [mockNode] }, 'changeSelection');
 
       expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
-      expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockedNode]);
-      expect(mockModelAdapter.setEdges).toHaveBeenCalledWith([mockedEdge]);
+      expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockNode]);
+      expect(mockModelAdapter.setEdges).toHaveBeenCalledWith([mockEdge]);
     });
 
     it('should call the middleware with the correct parameters', () => {
       mockMiddlewareManager.execute.mockReturnValue({
-        nodes: [mockedNode],
-        edges: [mockedEdge],
+        nodes: [mockNode],
+        edges: [mockEdge],
         metadata: { test: 'abc' },
       });
-      flowCore.applyUpdate({ nodes: [mockedNode] }, 'changeSelection');
+      flowCore.applyUpdate({ nodes: [mockNode] }, 'changeSelection');
 
       expect(mockMiddlewareManager.execute).toHaveBeenCalledWith(
         { nodes: [], edges: [], metadata: {} },
-        { nodes: [mockedNode], edges: [], metadata: {} },
+        { nodes: [mockNode], edges: [], metadata: {} },
         'changeSelection'
       );
+    });
+  });
+
+  describe('registerEventsHandler', () => {
+    it('should register the event handler', () => {
+      flowCore.registerEventsHandler(vi.fn());
+
+      expect(mockEventMapper.register).toHaveBeenCalled();
+    });
+  });
+
+  describe('clientToFlowPosition', () => {
+    it('should convert client position to flow position', () => {
+      mockGetMetadata.mockReturnValue({ viewport: { x: 200, y: 200, scale: 2 } });
+      const clientPosition = { x: 30, y: 30 };
+      const flowPosition = flowCore.clientToFlowPosition(clientPosition);
+
+      expect(flowPosition).toEqual({ x: -85, y: -85 });
+    });
+  });
+
+  describe('flowToClientPosition', () => {
+    it('should convert flow position to client position', () => {
+      mockGetMetadata.mockReturnValue({ viewport: { x: 200, y: 200, scale: 2 } });
+      const flowPosition = { x: -85, y: -85 };
+      const clientPosition = flowCore.flowToClientPosition(flowPosition);
+
+      expect(clientPosition).toEqual({ x: 30, y: 30 });
     });
   });
 });

@@ -1,0 +1,40 @@
+import type { CommandHandler } from '../../types';
+
+export interface DeleteSelectionCommand {
+  name: 'deleteSelection';
+}
+
+export const deleteSelection = (commandHandler: CommandHandler): void => {
+  const { nodes, edges } = commandHandler.flowCore.getState();
+
+  const isAnyNodeSelected = nodes.some((node) => node.selected);
+  if (!isAnyNodeSelected) {
+    const isAnyEdgeSelected = edges.some((edge) => edge.selected);
+    if (!isAnyEdgeSelected) {
+      return;
+    }
+  }
+
+  const nodesToDeleteIds = new Set<string>();
+
+  const newNodes = isAnyNodeSelected
+    ? nodes.filter((node) => {
+        if (node.selected) {
+          nodesToDeleteIds.add(node.id);
+        }
+        return !node.selected;
+      })
+    : nodes;
+
+  const newEdges = edges.filter(
+    (edge) => !edge.selected && !nodesToDeleteIds.has(edge.source) && !nodesToDeleteIds.has(edge.target)
+  );
+
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodes: newNodes,
+      edges: newEdges.length !== edges.length ? newEdges : edges,
+    },
+    'deleteSelection'
+  );
+};

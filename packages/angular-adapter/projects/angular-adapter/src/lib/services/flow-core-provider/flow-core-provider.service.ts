@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { FlowCore } from '@angularflow/core';
-import { InputEventHandler } from '@angularflow/input-event-handler';
 
 import { EventMapperService } from '../event-mapper/event-mapper.service';
 import { ModelProviderService } from '../model-provider/model-provider.service';
@@ -15,13 +14,7 @@ export class FlowCoreProviderService {
   private flowCore: FlowCore | null = null;
 
   init(): void {
-    this.flowCore = new FlowCore(
-      this.modelProvider.provide(),
-      this.renderer,
-      this.eventMapper,
-      (commandHandler, eventMapper, environment) => new InputEventHandler(commandHandler, eventMapper, environment),
-      detectEnvironment()
-    );
+    this.flowCore = new FlowCore(this.modelProvider.provide(), this.renderer, this.eventMapper, detectEnvironment());
   }
 
   provide(): FlowCore {
