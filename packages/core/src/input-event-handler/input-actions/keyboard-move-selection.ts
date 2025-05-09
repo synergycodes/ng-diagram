@@ -1,6 +1,6 @@
-import { ActionWithPredicate, CommandByName, isKeyboardDownEvent, KeyboardEvent } from '@angularflow/core';
+import { CommandByName, isKeyboardDownEvent, type InputActionWithPredicate, type KeyboardEvent } from '../../types';
 
-export const keyboardMoveSelectionAction: ActionWithPredicate = {
+export const keyboardMoveSelectionAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
     if (isKeyboardDownEvent(event)) {
       flowCore.commandHandler.emit('moveSelection', getMoveNodesCommand(event));

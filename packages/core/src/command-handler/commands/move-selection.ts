@@ -1,4 +1,4 @@
-import { CommandHandler } from '../types/command-handler.interface';
+import type { CommandHandler } from '../../types';
 
 export interface MoveSelectionCommand {
   name: 'moveSelection';

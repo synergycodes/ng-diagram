@@ -1,14 +1,15 @@
-import { CoreCommandHandler } from './command-handler';
-import { MiddlewareManager } from './middleware-manager';
+import { CommandHandler } from './command-handler/command-handler';
+import { InputEventHandler } from './input-event-handler/input-event-handler';
+import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import type { EnvironmentInfo } from './types/environment.interface';
 import type { EventMapper } from './types/event-mapper.interface';
-import type { InputEventHandler } from './types/input-event-handler.abstract';
+import type { Event } from './types/event.interface';
 import type { FlowState, Middleware, ModelActionType } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
 export class FlowCore {
-  readonly commandHandler: CoreCommandHandler;
+  readonly commandHandler: CommandHandler;
   readonly inputEventHandler: InputEventHandler;
   readonly middlewareManager: MiddlewareManager;
   readonly environment: EnvironmentInfo;
@@ -16,12 +17,12 @@ export class FlowCore {
   constructor(
     private readonly modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
-    readonly eventMapper: EventMapper,
+    private readonly eventMapper: EventMapper,
     environment: EnvironmentInfo
   ) {
     this.environment = environment;
-    this.commandHandler = new CoreCommandHandler(this);
-    this.inputEventHandler = this.inputEventHandlerFactory(this);
+    this.commandHandler = new CommandHandler(this);
+    this.inputEventHandler = new InputEventHandler(this);
     this.middlewareManager = new MiddlewareManager();
     this.render();
     this.modelAdapter.onChange(() => this.render());
@@ -32,6 +33,10 @@ export class FlowCore {
    */
   getEnvironment(): EnvironmentInfo {
     return this.environment;
+  }
+
+  registerEventsHandler(handler: (event: Event) => void): void {
+    this.eventMapper.register((event) => handler(event));
   }
 
   /**

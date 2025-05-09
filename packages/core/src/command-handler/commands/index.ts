@@ -1,4 +1,4 @@
-import { CommandByName, CommandHandler, CommandName } from '../types/command-handler.interface';
+import type { CommandByName, CommandHandler, CommandName } from '../../types';
 import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';

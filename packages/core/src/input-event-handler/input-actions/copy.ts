@@ -1,6 +1,6 @@
-import { ActionWithPredicate, isKeyboardDownEvent } from '@angularflow/core';
+import { isKeyboardDownEvent, type InputActionWithPredicate } from '../../types';
 
-export const copyAction: ActionWithPredicate = {
+export const copyAction: InputActionWithPredicate = {
   action: (_event, flowCore) => flowCore.commandHandler.emit('copy'),
   predicate: (event, flowCore) => {
     if (!isKeyboardDownEvent(event)) {

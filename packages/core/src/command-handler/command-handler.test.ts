@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CoreCommandHandler } from './command-handler';
-import { FlowCore } from './flow-core';
-import type { Command } from './types/command-handler.interface';
-import { FlowState } from './types/middleware.interface';
-
+import { FlowCore } from '../flow-core';
+import type { Command } from '../types/command-handler.interface';
+import { FlowState } from '../types/middleware.interface';
+import { CommandHandler } from './command-handler';
 vi.mock('./commands', () => ({
   commands: {
     select: vi.fn(),
@@ -15,12 +14,12 @@ vi.mock('./commands', () => ({
 import { commands } from './commands';
 
 describe('CoreCommandHandler', () => {
-  let handler: CoreCommandHandler;
+  let handler: CommandHandler;
   let mockGetState: () => FlowState;
 
   beforeEach(() => {
     mockGetState = vi.fn();
-    handler = new CoreCommandHandler({ applyUpdate: vi.fn(), getState: mockGetState } as unknown as FlowCore);
+    handler = new CommandHandler({ applyUpdate: vi.fn(), getState: mockGetState } as unknown as FlowCore);
     vi.clearAllMocks();
   });
 

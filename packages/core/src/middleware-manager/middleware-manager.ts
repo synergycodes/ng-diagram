@@ -1,11 +1,5 @@
+import type { FlowState, Middleware, MiddlewareChain, MiddlewareHistoryUpdate, ModelActionType } from '../types';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
-import type {
-  FlowState,
-  Middleware,
-  MiddlewareChain,
-  MiddlewareHistoryUpdate,
-  ModelActionType,
-} from './types/middleware.interface';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];

@@ -1,19 +1,19 @@
-import { CommandHandlerFunction, commands } from './commands';
-import { FlowCore } from './flow-core';
+import { FlowCore } from '../flow-core';
 import type {
   CommandByName,
   CommandCallback,
-  CommandHandler,
   CommandName,
+  CommandHandler as CoreCommandHandler,
   IsEmpty,
   WithoutName,
-} from './types/command-handler.interface';
+} from '../types/command-handler.interface';
+import { CommandHandlerFunction, commands } from './commands';
 
 /**
  * Core implementation of CommandHandler interface
  * Handles command emission and registration of callbacks for system commands
  */
-export class CoreCommandHandler implements CommandHandler {
+export class CommandHandler implements CoreCommandHandler {
   private callbacks: {
     [K in CommandName]?: CommandCallback<K>[];
   } = {};

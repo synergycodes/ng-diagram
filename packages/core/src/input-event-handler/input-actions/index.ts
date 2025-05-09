@@ -1,4 +1,4 @@
-import { ActionName, ActionWithPredicate } from '@angularflow/core';
+import type { InputActionName, InputActionWithPredicate } from '../../types';
 import { copyAction } from './copy';
 import { deleteSelectionAction } from './delete-selection';
 import { keyboardMoveSelectionAction } from './keyboard-move-selection';
@@ -8,7 +8,7 @@ import { pasteAction } from './paste';
 import { pointerMoveSelectionAction } from './pointer-move-selection';
 import { selectAction } from './select';
 
-export const actions: Record<ActionName, ActionWithPredicate> = {
+export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
   select: selectAction,
   keyboardMoveSelection: keyboardMoveSelectionAction,
   pointerMoveSelection: pointerMoveSelectionAction,

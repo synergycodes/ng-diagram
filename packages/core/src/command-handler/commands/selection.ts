@@ -1,7 +1,4 @@
-import { CommandHandler } from '../types/command-handler.interface';
-import { Edge } from '../types/edge.interface';
-import { FlowState } from '../types/middleware.interface';
-import { Node } from '../types/node.interface';
+import type { CommandHandler, Edge, FlowState, Node } from '../../types';
 
 const changeSelection = (nodes: Node[], edges: Edge[], ids: string[]): Pick<FlowState, 'nodes' | 'edges'> => {
   return {

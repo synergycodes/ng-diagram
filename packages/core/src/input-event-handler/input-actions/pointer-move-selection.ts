@@ -1,4 +1,4 @@
-import { ActionWithPredicate, isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent } from '@angularflow/core';
+import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
 
 interface MoveState {
   startX: number;
@@ -18,7 +18,7 @@ const moveState: MoveState = {
   isFirstMove: true,
 };
 
-export const pointerMoveSelectionAction: ActionWithPredicate = {
+export const pointerMoveSelectionAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
     switch (event.type) {
       case 'pointerdown':

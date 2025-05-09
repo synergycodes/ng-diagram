@@ -1,23 +1,23 @@
+import { FlowCore } from '../flow-core';
 import {
-  type ActionName,
-  type ActionOrActionName,
-  type ActionPredicate,
-  type ActionWithPredicate,
   InputEventHandler as CoreInputEventHandler,
+  InputActionName,
+  InputActionOrInputActionName,
+  InputActionPredicate,
   type Event,
-  FlowCore,
-} from '@angularflow/core';
-import { actions } from './actions';
+  type InputActionWithPredicate,
+} from '../types';
+import { inputActions } from './input-actions';
 
 export class InputEventHandler extends CoreInputEventHandler {
-  private defaultActions = new Map<ActionName, ActionWithPredicate>();
-  private registeredActions: ActionWithPredicate[] = [];
+  private defaultActions = new Map<InputActionName, InputActionWithPredicate>();
+  private registeredActions: InputActionWithPredicate[] = [];
 
   constructor(flowCore: FlowCore) {
     super(flowCore);
-    this.flowCore.eventMapper.register((event) => this.handleEvent(event));
-    for (const [name, { action, predicate }] of Object.entries(actions)) {
-      this.defaultActions.set(name as ActionName, { action, predicate });
+    this.flowCore.registerEventsHandler((event) => this.handleEvent(event));
+    for (const [name, { action, predicate }] of Object.entries(inputActions)) {
+      this.defaultActions.set(name as InputActionName, { action, predicate });
       this.register(predicate, action);
     }
   }
@@ -30,7 +30,7 @@ export class InputEventHandler extends CoreInputEventHandler {
     }
   }
 
-  registerDefault(actionName: ActionName): void {
+  registerDefault(actionName: InputActionName): void {
     const actionWithPredicate = this.defaultActions.get(actionName);
     if (!actionWithPredicate) {
       throw new Error(`Default action "${actionName}" does not exist.`);
@@ -39,7 +39,7 @@ export class InputEventHandler extends CoreInputEventHandler {
     this.register(actionWithPredicate.predicate, actionWithPredicate.action);
   }
 
-  unregisterDefault(actionName: ActionName): void {
+  unregisterDefault(actionName: InputActionName): void {
     const actionWithPredicate = this.defaultActions.get(actionName);
     if (!actionWithPredicate) {
       throw new Error(`Default action "${actionName}" does not exist.`);
@@ -47,7 +47,7 @@ export class InputEventHandler extends CoreInputEventHandler {
     this.unregister(actionWithPredicate.predicate, actionWithPredicate.action);
   }
 
-  register(predicate: ActionPredicate, actionOrActionName: ActionOrActionName): void {
+  register(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void {
     const action =
       typeof actionOrActionName === 'string' ? this.defaultActions.get(actionOrActionName)?.action : actionOrActionName;
 
@@ -58,7 +58,7 @@ export class InputEventHandler extends CoreInputEventHandler {
     this.registeredActions.push({ predicate, action });
   }
 
-  unregister(predicate: ActionPredicate, actionOrActionName: ActionOrActionName): void {
+  unregister(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void {
     this.registeredActions = this.registeredActions.filter(
       (handler) =>
         handler.predicate !== predicate ||
@@ -69,7 +69,7 @@ export class InputEventHandler extends CoreInputEventHandler {
     );
   }
 
-  invoke(actionName: ActionName, event: Event): void {
+  invoke(actionName: InputActionName, event: Event): void {
     const action = this.defaultActions.get(actionName)?.action;
     if (!action) {
       throw new Error(`Default action "${actionName}" does not exist.`);

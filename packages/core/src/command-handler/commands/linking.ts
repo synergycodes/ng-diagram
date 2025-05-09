@@ -1,5 +1,4 @@
-import { Edge } from '../types';
-import { CommandHandler } from '../types/command-handler.interface';
+import type { CommandHandler, Edge } from '../../types';
 
 export const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
   id: 'TEMPORARY_EDGE',

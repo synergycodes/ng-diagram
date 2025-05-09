@@ -1,6 +1,4 @@
-import { CommandHandler } from '../types/command-handler.interface';
-import { Edge } from '../types/edge.interface';
-import { Node } from '../types/node.interface';
+import type { CommandHandler, Edge, Node } from '../../types';
 
 const OFFSET = 20;
 

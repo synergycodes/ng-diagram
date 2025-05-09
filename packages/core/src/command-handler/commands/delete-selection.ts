@@ -1,4 +1,4 @@
-import { CommandHandler } from '../types';
+import type { CommandHandler } from '../../types';
 
 export interface DeleteSelectionCommand {
   name: 'deleteSelection';

@@ -1,10 +1,10 @@
-import { ActionWithPredicate, isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent } from '@angularflow/core';
+import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
 
 // TODO: This implementation adds linking on right button click. When port is added, right click should be removed.
 
 let isLinking = false;
 
-export const linkingAction: ActionWithPredicate = {
+export const linkingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
     if (isPointerDownEvent(event)) {
       isLinking = true;

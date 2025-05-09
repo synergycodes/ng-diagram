@@ -1,4 +1,4 @@
-import { Edge, Middleware, ModelActionType } from '../types';
+import type { Edge, Middleware, ModelActionType } from '../../types';
 
 const regularEdgeActions = new Set<ModelActionType>([
   'addEdges',
