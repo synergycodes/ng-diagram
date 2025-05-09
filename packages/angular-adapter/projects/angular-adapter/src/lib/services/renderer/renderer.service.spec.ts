@@ -19,7 +19,7 @@ describe('RendererService', () => {
       service.draw(
         [{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }],
         [{ id: '1', source: '1', target: '2', data: {} }],
-        { viewport: { x: 200, y: 200, scale: 2 } }
+        { x: 200, y: 200, scale: 2 }
       );
 
       expect(service.nodes()).toEqual([{ id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} }]);

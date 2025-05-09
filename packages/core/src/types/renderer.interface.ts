@@ -1,5 +1,5 @@
 import type { Edge } from './edge.interface';
-import type { Metadata } from './metadata.interface';
+import type { Viewport } from './metadata.interface';
 import type { Node } from './node.interface';
 
 /**
@@ -10,7 +10,7 @@ export interface Renderer {
    * Draws the current state of the flow diagram
    * @param nodes List of nodes to render
    * @param edges List of edges to render
-   * @param metadata Additional data needed for rendering
+   * @param viewport Viewport to render
    */
-  draw(nodes: Node[], edges: Edge[], metadata: Metadata): void;
+  draw(nodes: Node[], edges: Edge[], viewport: Viewport): void;
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { Edge, ModelAdapter, Node } from '@angularflow/core';
 
 import {
@@ -65,11 +65,7 @@ export class AngularAdapterDiagramComponent {
   edgeTemplateMap = input<EdgeTemplateMap>(new Map());
 
   nodes = this.renderer.nodes;
-  edges = computed(() => {
-    const edges = this.renderer.edges();
-    const temporaryEdge = this.renderer.temporaryEdge();
-    return temporaryEdge ? [...edges, temporaryEdge] : edges;
-  });
+  edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
   constructor() {
