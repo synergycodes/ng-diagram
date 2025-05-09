@@ -47,7 +47,11 @@ export class MiddlewareManager {
           modelActionType,
           historyUpdates,
         });
-        if (Object.is(updatedState, currentState)) {
+        if (
+          Object.is(updatedState.metadata, currentState.metadata) &&
+          Object.is(updatedState.nodes, currentState.nodes) &&
+          Object.is(updatedState.edges, currentState.edges)
+        ) {
           return { currentState, historyUpdates };
         }
         return {
