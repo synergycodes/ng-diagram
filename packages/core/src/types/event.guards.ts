@@ -1,32 +1,36 @@
 import {
   Event,
+  KeyboardDownEvent,
   KeyboardEvent,
+  KeyboardPressEvent,
+  KeyboardUpEvent,
   PointerDownEvent,
   PointerEnterEvent,
   PointerEvent,
   PointerLeaveEvent,
   PointerMoveEvent,
   PointerUpEvent,
+  ResizeEvent,
 } from './event.interface';
 
 /**
  * Check if an event is a keyboard down event
  */
-export const isKeyboardDownEvent = (event: Event): event is KeyboardEvent => {
+export const isKeyboardDownEvent = (event: Event): event is KeyboardDownEvent => {
   return event.type === 'keydown';
 };
 
 /**
  * Check if an event is a keyboard up event
  */
-export const isKeyboardUpEvent = (event: Event): event is KeyboardEvent => {
+export const isKeyboardUpEvent = (event: Event): event is KeyboardUpEvent => {
   return event.type === 'keyup';
 };
 
 /**
  * Check if an event is a keyboard press event
  */
-export const isKeyboardPressEvent = (event: Event): event is KeyboardEvent => {
+export const isKeyboardPressEvent = (event: Event): event is KeyboardPressEvent => {
   return event.type === 'keypress';
 };
 
@@ -83,4 +87,11 @@ export const isPointerEvent = (event: Event): event is PointerEvent => {
     isPointerEnterEvent(event) ||
     isPointerLeaveEvent(event)
   );
+};
+
+/**
+ * Check if an event is a resize event
+ */
+export const isResizeEvent = (event: Event): event is ResizeEvent => {
+  return event.type === 'resize';
 };
