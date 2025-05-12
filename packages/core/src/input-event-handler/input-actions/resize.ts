@@ -13,13 +13,11 @@ export const resizeAction: InputActionWithPredicate = {
 
     const { width: newWidth, height: newHeight } = event;
 
-    flowCore.commandHandler.emit('updateNode', {
+    flowCore.commandHandler.emit('resizeNode', {
       id: node.id,
-      node: {
-        size: {
-          width: newWidth,
-          height: newHeight,
-        },
+      size: {
+        width: newWidth,
+        height: newHeight,
       },
     });
   },

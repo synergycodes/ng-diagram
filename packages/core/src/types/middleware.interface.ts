@@ -17,6 +17,7 @@ export type ModelActionType =
   | 'deleteEdges'
   | 'paste'
   | 'moveViewport'
+  | 'resizeNode'
   | 'startLinking'
   | 'moveTemporaryEdge'
   | 'finishLinking';
