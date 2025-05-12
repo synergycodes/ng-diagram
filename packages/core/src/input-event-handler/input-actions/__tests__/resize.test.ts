@@ -1,0 +1,75 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { FlowCore } from '../../../flow-core';
+import { mockEdge, mockEnvironment, mockNode, mockPointerEvent } from '../../../test-utils';
+import type { Event, EventTarget } from '../../../types';
+import { resizeAction } from '../resize';
+
+describe('resizeAction', () => {
+  const mockCommandHandler = { emit: vi.fn() };
+  let mockEvent: Event;
+  let mockTarget: EventTarget;
+  let mockFlowCore: FlowCore;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockTarget = { type: 'node', element: mockNode };
+
+    mockEvent = {
+      type: 'resize',
+      target: mockTarget,
+      width: 100,
+      height: 100,
+      timestamp: Date.now(),
+    };
+
+    mockFlowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
+      commandHandler: mockCommandHandler,
+      environment: mockEnvironment,
+    } as unknown as FlowCore;
+  });
+
+  describe('predicate', () => {
+    it('should return true for resize event and if target is node', () => {
+      expect(resizeAction.predicate(mockEvent, mockFlowCore)).toBe(true);
+    });
+
+    it('should return false for pointermove events', () => {
+      expect(resizeAction.predicate({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore)).toBe(false);
+    });
+
+    it('should return false for resize events with wrong target', () => {
+      expect(resizeAction.predicate({ ...mockEvent, target: { type: 'edge', element: mockEdge } }, mockFlowCore)).toBe(
+        false
+      );
+    });
+  });
+
+  describe('action', () => {
+    it('should not emit resizeNode if node is controlled', () => {
+      mockEvent.target = {
+        type: 'node',
+        element: { ...mockNode, size: { width: 100, height: 100, controlled: true } },
+      };
+
+      resizeAction.action(mockEvent, mockFlowCore);
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should emit resizeNode if node is not controlled', () => {
+      mockEvent.target = {
+        type: 'node',
+        element: { ...mockNode, size: { width: 100, height: 100, controlled: false } },
+      };
+
+      resizeAction.action(mockEvent, mockFlowCore);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('resizeNode', {
+        id: mockNode.id,
+        size: { width: 100, height: 100 },
+      });
+    });
+  });
+});
