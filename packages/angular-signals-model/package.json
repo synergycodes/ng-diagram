@@ -16,7 +16,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@angular/core": "^19.2.6",
+    "@angular/core": "^19.2.10",
     "@angular/platform-browser-dynamic": "^19.2.10"
   },
   "devDependencies": {
