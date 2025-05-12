@@ -6,6 +6,7 @@ import { linkingAction } from './linking';
 import { panningAction } from './panning';
 import { pasteAction } from './paste';
 import { pointerMoveSelectionAction } from './pointer-move-selection';
+import { resizeAction } from './resize';
 import { selectAction } from './select';
 
 export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
@@ -17,4 +18,5 @@ export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
   copy: copyAction,
   paste: pasteAction,
   linking: linkingAction,
+  resize: resizeAction,
 };

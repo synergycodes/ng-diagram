@@ -12,7 +12,8 @@ export type InputActionName =
   | 'copy'
   | 'paste'
   | 'panning'
-  | 'linking';
+  | 'linking'
+  | 'resize';
 
 /**
  * Type for action function

@@ -1,0 +1,27 @@
+import { isResizeEvent, type InputActionWithPredicate } from '../../types';
+
+export const resizeAction: InputActionWithPredicate = {
+  action: (event, flowCore) => {
+    if (event.target.type !== 'node' || !isResizeEvent(event)) {
+      return;
+    }
+
+    const node = event.target.element;
+    if (node.size?.controlled) {
+      return;
+    }
+
+    const { width: newWidth, height: newHeight } = event;
+
+    flowCore.commandHandler.emit('updateNode', {
+      id: node.id,
+      node: {
+        size: {
+          width: newWidth,
+          height: newHeight,
+        },
+      },
+    });
+  },
+  predicate: (event) => isResizeEvent(event) && event.target.type === 'node',
+};
