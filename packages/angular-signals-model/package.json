@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@angular/core": "^19.2.6",
-    "@angular/platform-browser-dynamic": "^19.2.6"
+    "@angular/platform-browser-dynamic": "^19.2.10"
   },
   "devDependencies": {
     "@analogjs/vitest-angular": "^1.15.1",
