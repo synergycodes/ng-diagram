@@ -103,3 +103,10 @@ export const isResizeEvent = (event: Event): event is ResizeEvent => {
 export const isWheelEvent = (event: Event): event is WheelEvent => {
   return event.type === 'wheel';
 };
+
+/**
+ * Check if an event is a resize event
+ */
+export const isResizeEvent = (event: Event): event is ResizeEvent => {
+  return event.type === 'resize';
+};

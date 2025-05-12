@@ -130,6 +130,15 @@ export interface WheelEvent extends BaseEvent {
 }
 
 /**
+ * Resize event interface
+ */
+export interface ResizeEvent extends BaseEvent {
+  type: 'resize';
+  width: number;
+  height: number;
+}
+
+/**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent | ResizeEvent | WheelEvent;
+export type Event = KeyboardEvent | PointerEvent | WheelEvent | ResizeEvent;
