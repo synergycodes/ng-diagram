@@ -10,7 +10,7 @@ import {
 @Component({
   selector: 'angular-adapter-edge',
   templateUrl: './angular-adapter-edge.component.html',
-  styleUrls: ['./angular-adapter-edge.component.scss'],
+  styleUrl: './angular-adapter-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
