@@ -18,6 +18,7 @@ import {
 import { MoveSelectionCommand } from '../command-handler/commands/move-selection';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { DeselectAllCommand, SelectCommand } from '../command-handler/commands/selection';
+import { ZoomCommand } from '../command-handler/commands/zoom';
 import { FlowCore } from '../flow-core';
 /**
  * Type for system commands that can be emitted by InputEventHandler or user
@@ -41,7 +42,8 @@ export type Command =
   | MoveTemporaryEdgeCommand
   | FinishLinkingCommand
   | StartLinkingFromPositionCommand
-  | FinishLinkingToPositionCommand;
+  | FinishLinkingToPositionCommand
+  | ZoomCommand;
 
 /**
  * Type for command name

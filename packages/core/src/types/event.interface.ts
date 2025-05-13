@@ -85,6 +85,18 @@ export interface PointerLeaveEvent extends PointerBaseEvent {
 export type PointerEvent = PointerDownEvent | PointerUpEvent | PointerMoveEvent | PointerEnterEvent | PointerLeaveEvent;
 
 /**
+ * Wheel event interface
+ */
+export interface WheelEvent extends BaseEvent {
+  type: 'wheel';
+  y: number;
+  x: number;
+  deltaX: number;
+  deltaY: number;
+  deltaZ: number;
+}
+
+/**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent;
+export type Event = KeyboardEvent | PointerEvent | WheelEvent;

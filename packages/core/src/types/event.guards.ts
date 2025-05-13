@@ -7,6 +7,7 @@ import {
   PointerLeaveEvent,
   PointerMoveEvent,
   PointerUpEvent,
+  WheelEvent,
 } from './event.interface';
 
 /**
@@ -83,4 +84,11 @@ export const isPointerEvent = (event: Event): event is PointerEvent => {
     isPointerEnterEvent(event) ||
     isPointerLeaveEvent(event)
   );
+};
+
+/**
+ * Check if an event is a wheel event
+ */
+export const isWheelEvent = (event: Event): event is WheelEvent => {
+  return event.type === 'wheel';
 };

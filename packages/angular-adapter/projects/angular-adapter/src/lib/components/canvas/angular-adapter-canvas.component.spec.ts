@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { PanningDirective } from '../../directives';
+import { ViewportDirective } from '../../directives';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
@@ -45,7 +45,7 @@ describe('AngularAdapterCanvasComponent', () => {
   });
 
   it('should have ViewportDirective as host directive', () => {
-    const viewportDirective = fixture.debugElement.injector.get(PanningDirective);
+    const viewportDirective = fixture.debugElement.injector.get(ViewportDirective);
     expect(viewportDirective).toBeTruthy();
   });
 
