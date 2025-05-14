@@ -68,4 +68,8 @@ export interface Port {
     width: number;
     height: number;
   };
+  /**
+   * The type of the port.
+   */
+  type: 'source' | 'target' | 'both';
 }
