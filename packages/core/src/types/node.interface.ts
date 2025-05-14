@@ -40,4 +40,32 @@ export interface Node {
    * The z-order of the node.
    */
   zOrder?: number;
+  /**
+   * The ports of the node.
+   */
+  ports?: Port[];
+}
+
+/**
+ * Interface representing a port in the node.
+ */
+export interface Port {
+  /**
+   * The unique identifier for the port.
+   */
+  id: string;
+  /**
+   * The position of the port in the node.
+   */
+  position: {
+    x: number;
+    y: number;
+  };
+  /**
+   * The size of the port.
+   */
+  size: {
+    width: number;
+    height: number;
+  };
 }
