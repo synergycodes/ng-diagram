@@ -8,6 +8,7 @@ describe('EventMapperService', () => {
   let service: EventMapperService;
   const mockedEvent: Event = {
     type: 'pointerdown',
+    pointerId: 1,
     x: 10,
     y: 10,
     pressure: 1,

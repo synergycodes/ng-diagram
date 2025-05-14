@@ -15,15 +15,15 @@ describe('pointerMoveSelectionAction', () => {
     mockTarget = { type: 'node', element: mockNode };
 
     mockEvent = {
-      button: 0,
       type: 'pointerdown',
+      pointerId: 1,
+      button: 0,
       timestamp: Date.now(),
       target: mockTarget,
       x: 100,
       y: 100,
       pressure: 1,
-      targetType: 'node',
-    } as PointerEvent;
+    };
 
     mockFlowCore = {
       getState: vi.fn(),

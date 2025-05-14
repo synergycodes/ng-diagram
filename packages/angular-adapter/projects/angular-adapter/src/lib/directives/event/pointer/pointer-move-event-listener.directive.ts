@@ -12,6 +12,7 @@ export class PointerMoveEventListenerDirective {
   onPointerMove(event: PointerEvent) {
     event.stopPropagation();
     this.eventMapperService.emit({
+      pointerId: event.pointerId,
       type: 'pointermove',
       target: { type: 'diagram' },
       pressure: event.pressure,

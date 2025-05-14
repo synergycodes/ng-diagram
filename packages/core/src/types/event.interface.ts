@@ -37,6 +37,7 @@ export interface KeyboardEvent extends BaseEvent {
  * Pointer base event interface
  */
 export interface PointerBaseEvent extends BaseEvent {
+  pointerId: number;
   x: number;
   y: number;
   pressure: number;

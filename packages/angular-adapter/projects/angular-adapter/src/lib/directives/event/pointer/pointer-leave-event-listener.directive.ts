@@ -16,6 +16,7 @@ export class PointerLeaveEventListenerDirective implements ITargetedEventListene
   onPointerLeave(event: PointerEvent) {
     event.stopPropagation();
     this.eventMapperService.emit({
+      pointerId: event.pointerId,
       type: 'pointerleave',
       target: this.eventTarget(),
       pressure: event.pressure,

@@ -18,6 +18,7 @@ export const mockEdge: Edge = {
 };
 
 export const mockPointerEvent: Omit<PointerEvent, 'type'> = {
+  pointerId: 0,
   x: 0,
   y: 0,
   pressure: 0,
