@@ -72,4 +72,8 @@ export interface Port {
    * The type of the port.
    */
   type: 'source' | 'target' | 'both';
+  /**
+   * The id of the node that the port belongs to.
+   */
+  nodeId: string;
 }

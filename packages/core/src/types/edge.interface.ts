@@ -33,11 +33,11 @@ export interface Edge {
   /**
    * The port of the source node.
    */
-  sourcePort?: string | null;
+  sourcePort?: string;
   /**
    * The port of the target node.
    */
-  targetPort?: string | null;
+  targetPort?: string;
   /**
    * The id of the source arrowhead of the edge.
    */

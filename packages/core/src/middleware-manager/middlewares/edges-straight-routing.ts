@@ -1,4 +1,5 @@
-import type { Edge, Middleware, ModelActionType } from '../../types';
+import { FlowCore } from '../../flow-core';
+import type { Edge, Middleware, ModelActionType, Node } from '../../types';
 
 const regularEdgeActions = new Set<ModelActionType>([
   'init',
@@ -16,16 +17,24 @@ const regularEdgeActions = new Set<ModelActionType>([
 
 const temporaryEdgeActions = new Set<ModelActionType>(['startLinking', 'moveTemporaryEdge', 'finishLinking']);
 
-const getPoints = (edge: Edge, nodePositionMap: Map<string, { x: number; y: number }>) => {
-  return [
-    nodePositionMap.get(edge.source) || edge.sourcePosition,
-    nodePositionMap.get(edge.target) || edge.targetPosition,
-  ].filter((point) => !!point);
+const getPoints = (edge: Edge, nodesMap: Map<string, Node>, flowCore: FlowCore) => {
+  const getPoint = (nodeId: string, portId?: string, position?: { x: number; y: number }) => {
+    const node = nodesMap.get(nodeId);
+    if (!node) {
+      return position;
+    }
+    return portId ? flowCore.getFlowPortPosition(node, portId) : position;
+  };
+
+  const sourcePoint = getPoint(edge.source, edge.sourcePort, edge.sourcePosition);
+  const targetPoint = getPoint(edge.target, edge.targetPort, edge.targetPosition);
+
+  return [sourcePoint, targetPoint].filter((point) => !!point);
 };
 
 export const edgesStraightRoutingMiddleware: Middleware = {
   name: 'edges-straight-routing',
-  execute: (state, context) => {
+  execute: (state, context, flowCore) => {
     const { edges, metadata } = state;
     const isRegularEdgeAction = regularEdgeActions.has(context.modelActionType);
     const isTemporaryEdgeAction = temporaryEdgeActions.has(context.modelActionType);
@@ -36,9 +45,9 @@ export const edgesStraightRoutingMiddleware: Middleware = {
 
     let newEdges = edges;
 
-    const nodePositionMap = new Map<string, { x: number; y: number }>();
+    const nodesMap = new Map<string, Node>();
     state.nodes.forEach((node) => {
-      nodePositionMap.set(node.id, node.position);
+      nodesMap.set(node.id, node);
     });
 
     // Handle regular edges
@@ -55,7 +64,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
           if (!edgesToRouteIds.has(edge.id)) {
             return edge;
           }
-          const points = getPoints(edge, nodePositionMap);
+          const points = getPoints(edge, nodesMap, flowCore);
 
           if (edge.points?.length === points.length && edge.points?.every((point, index) => point === points[index])) {
             return edge;
@@ -74,7 +83,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
     let newMetadata = metadata;
 
     if (isTemporaryEdgeAction && metadata.temporaryEdge) {
-      const points = getPoints(metadata.temporaryEdge, nodePositionMap);
+      const points = getPoints(metadata.temporaryEdge, nodesMap, flowCore);
 
       newMetadata = {
         ...metadata,

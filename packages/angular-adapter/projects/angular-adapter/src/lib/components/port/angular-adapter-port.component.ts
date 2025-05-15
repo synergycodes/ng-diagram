@@ -5,6 +5,7 @@ import { PointerDownEventListenerDirective, PointerUpEventListenerDirective } fr
 @Component({
   selector: 'angular-adapter-port',
   templateUrl: './angular-adapter-port.component.html',
+  styleUrl: './angular-adapter-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     {

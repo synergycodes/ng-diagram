@@ -1,0 +1,15 @@
+:host {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border: 2px solid rgb(63, 63, 63);
+  cursor: crosshair;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: rgb(63, 63, 63);
+  }
+}

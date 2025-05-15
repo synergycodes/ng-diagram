@@ -23,11 +23,19 @@ export interface StartLinkingCommand {
 }
 
 export const startLinking = (commandHandler: CommandHandler, command: StartLinkingCommand): void => {
-  const { metadata, nodes } = commandHandler.flowCore.getState();
+  const { metadata } = commandHandler.flowCore.getState();
   const { source, sourcePort } = command;
 
-  const sourceNode = nodes.find((node) => node.id === source);
+  const sourceNode = commandHandler.flowCore.getNodeById(source);
   if (!sourceNode) {
+    return;
+  }
+
+  const position = sourcePort
+    ? commandHandler.flowCore.getFlowPortPosition(sourceNode, sourcePort)
+    : sourceNode.position;
+
+  if (!position) {
     return;
   }
 
@@ -38,9 +46,9 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
         temporaryEdge: getTemporaryEdge({
           source,
           sourcePort,
-          sourcePosition: sourceNode.position,
+          sourcePosition: position,
           target: '',
-          targetPosition: sourceNode.position,
+          targetPosition: position,
         }),
       },
     },
@@ -107,15 +115,24 @@ export interface FinishLinkingCommand {
 }
 
 export const finishLinking = (commandHandler: CommandHandler, command: FinishLinkingCommand): void => {
-  const { metadata, edges, nodes } = commandHandler.flowCore.getState();
+  const { metadata, edges } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
-  const targetNode = nodes.find((node) => node.id === target);
+  const targetNode = target && commandHandler.flowCore.getNodeById(target);
   if (!metadata.temporaryEdge || !targetNode) {
     return;
   }
 
-  const newEdges: Edge[] = target ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort })] : edges;
+  const targetPosition =
+    target && targetPort ? commandHandler.flowCore.getFlowPortPosition(targetNode, targetPort) : targetNode.position;
+
+  if (!targetPosition) {
+    return;
+  }
+
+  const newEdges: Edge[] = target
+    ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort, targetPosition })]
+    : edges;
 
   commandHandler.flowCore.applyUpdate(
     {

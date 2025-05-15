@@ -1,10 +1,41 @@
-import { Edge } from './edge.interface';
-import { Node } from './node.interface';
+import type { Edge } from './edge.interface';
+import type { Node, Port } from './node.interface';
+
+/**
+ * Type for node target
+ */
+export interface NodeTarget {
+  type: 'node';
+  element: Node;
+}
+
+/**
+ * Type for edge target
+ */
+export interface EdgeTarget {
+  type: 'edge';
+  element: Edge;
+}
+
+/**
+ * Type for port target
+ */
+export interface PortTarget {
+  type: 'port';
+  element: Port;
+}
+
+/**
+ * Type for diagram target
+ */
+export interface DiagramTarget {
+  type: 'diagram';
+}
 
 /**
  * Type for event target
  */
-export type EventTarget = { type: 'node'; element: Node } | { type: 'edge'; element: Edge } | { type: 'diagram' };
+export type EventTarget = NodeTarget | EdgeTarget | PortTarget | DiagramTarget;
 
 /**
  * Base interface for all events
