@@ -6,6 +6,7 @@ import {
   UpdateEdgeCommand,
   UpdateNodeCommand,
 } from '../command-handler/commands/add-update-delete';
+import { ControlNodeSizeCommand } from '../command-handler/commands/control-node-size';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
 import {
@@ -44,7 +45,8 @@ export type Command =
   | FinishLinkingCommand
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
-  | ResizeNodeCommand;
+  | ResizeNodeCommand
+  | ControlNodeSizeCommand;
 
 /**
  * Type for command name

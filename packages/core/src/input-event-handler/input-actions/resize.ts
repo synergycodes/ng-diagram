@@ -7,7 +7,7 @@ export const resizeAction: InputActionWithPredicate = {
     }
 
     const node = event.target.element;
-    if (node.size?.controlled) {
+    if (node.sizeControlled) {
       return;
     }
 

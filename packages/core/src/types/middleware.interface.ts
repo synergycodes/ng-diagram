@@ -20,8 +20,8 @@ export type ModelActionType =
   | 'resizeNode'
   | 'startLinking'
   | 'moveTemporaryEdge'
-  | 'finishLinking';
-
+  | 'finishLinking'
+  | 'controlNodeSize';
 /**
  * Type for the state of the flow diagram
  */

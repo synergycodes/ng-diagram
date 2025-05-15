@@ -5,12 +5,17 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { PanningDirective } from '../../directives';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
-import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
 
 @Component({
+  selector: 'angular-adapter-node',
+  template: '<ng-content />',
+})
+class MockAngularAdapterNodeComponent {}
+
+@Component({
   selector: 'angular-adapter-canvas-test',
-  imports: [AngularAdapterCanvasComponent, AngularAdapterNodeComponent, AngularAdapterEdgeComponent],
+  imports: [AngularAdapterCanvasComponent, MockAngularAdapterNodeComponent, AngularAdapterEdgeComponent],
   template: `
     <angular-adapter-canvas>
       <angular-adapter-edge></angular-adapter-edge>

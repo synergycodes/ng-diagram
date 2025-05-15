@@ -47,21 +47,10 @@ describe('resizeAction', () => {
   });
 
   describe('action', () => {
-    it('should not emit resizeNode if node is controlled', () => {
+    it('should emit resizeNode if node', () => {
       mockEvent.target = {
         type: 'node',
-        element: { ...mockNode, size: { width: 100, height: 100, controlled: true } },
-      };
-
-      resizeAction.action(mockEvent, mockFlowCore);
-
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
-    });
-
-    it('should emit resizeNode if node is not controlled', () => {
-      mockEvent.target = {
-        type: 'node',
-        element: { ...mockNode, size: { width: 100, height: 100, controlled: false } },
+        element: { ...mockNode, size: { width: 100, height: 100 } },
       };
 
       resizeAction.action(mockEvent, mockFlowCore);

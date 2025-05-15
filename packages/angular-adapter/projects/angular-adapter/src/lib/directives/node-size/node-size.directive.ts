@@ -1,17 +1,49 @@
-import { Directive, ElementRef, inject, input, OnDestroy, OnInit } from '@angular/core';
+import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Renderer2 } from '@angular/core';
 import type { EventTarget } from '@angularflow/core';
 import { EventMapperService } from '../../services';
 
 @Directive({
   selector: '[angularAdapterNodeSize]',
 })
-export class NodeSizeDirective implements OnInit, OnDestroy {
+export class NodeSizeDirective implements OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly eventMapperService = inject(EventMapperService);
+  private readonly renderer = inject(Renderer2);
   private resizeObserver!: ResizeObserver;
-  eventTarget = input<EventTarget>({ type: 'diagram' });
 
-  ngOnInit() {
+  eventTarget = input<EventTarget>({ type: 'diagram' });
+  size = input<{ width: number; height: number }>();
+  sizeControlled = input<boolean>(false);
+
+  sizeState = computed(() => ({
+    size: this.size(),
+    controlled: this.sizeControlled(),
+  }));
+
+  constructor() {
+    effect(() => {
+      const { size, controlled } = this.sizeState();
+      if (controlled && size) {
+        const { width, height } = this.size()!;
+        this.setSize(width, height);
+        this.disconnectResizeObserver();
+      } else {
+        this.setSize();
+        this.createResizeObserver();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.disconnectResizeObserver();
+  }
+
+  private setSize(width?: number, height?: number) {
+    this.renderer.setStyle(this.hostElement.nativeElement, 'width', width ? `${width}px` : 'unset');
+    this.renderer.setStyle(this.hostElement.nativeElement, 'height', height ? `${height}px` : 'unset');
+  }
+
+  private createResizeObserver() {
     this.resizeObserver = new ResizeObserver((entries) => {
       const borderBox = entries[0].borderBoxSize?.[0];
       if (borderBox) {
@@ -26,11 +58,10 @@ export class NodeSizeDirective implements OnInit, OnDestroy {
         });
       }
     });
-
     this.resizeObserver.observe(this.hostElement.nativeElement);
   }
 
-  ngOnDestroy() {
-    this.resizeObserver.disconnect();
+  private disconnectResizeObserver() {
+    this.resizeObserver?.disconnect();
   }
 }

@@ -1,0 +1,39 @@
+<div class="resizable-node">
+  <div class="resizable-node-header">
+    width: {{ data().size?.width | number: '1.0-0' }}, height: {{ data().size?.height | number: '1.0-0' }}
+  </div>
+  <div class="size-control">
+    <input
+      class="size-input"
+      type="text"
+      placeholder="Enter size [width height]"
+      [(ngModel)]="sizeText"
+      (keydown)="$event.stopPropagation()"
+      (keypress)="$event.stopPropagation()"
+      (keyup)="$event.stopPropagation()"
+      (blur)="setSize()"
+    />
+    <label class="size-control-label">
+      <input
+        class="size-control-checkbox"
+        type="checkbox"
+        [checked]="data().sizeControlled"
+        (change)="onSizeControlChange($event)"
+        (keydown)="$event.stopPropagation()"
+        (keypress)="$event.stopPropagation()"
+        (keyup)="$event.stopPropagation()"
+      />
+      Control size
+    </label>
+  </div>
+  <input
+    class="text-input"
+    type="text"
+    placeholder="Enter value..."
+    [(ngModel)]="text"
+    (keydown)="$event.stopPropagation()"
+    (keypress)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+  />
+  {{ text() }}
+</div>

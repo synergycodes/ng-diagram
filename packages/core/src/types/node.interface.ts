@@ -31,9 +31,9 @@ export interface Node {
   size?: {
     width: number;
     height: number;
-    /**
-     * Whether the size of the node is controlled by the user.
-     */
-    controlled?: boolean;
   };
+  /**
+   * Whether the size of the node is controlled by the user.
+   */
+  sizeControlled?: boolean;
 }
