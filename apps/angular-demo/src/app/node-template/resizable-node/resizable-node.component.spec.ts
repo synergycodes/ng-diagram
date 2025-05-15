@@ -124,7 +124,7 @@ describe('ResizableNodeComponent', () => {
     input.checked = true;
     input.dispatchEvent(new Event('change'));
 
-    // one with sizeControlled true, one with new size
+    // One with sizeControlled true, one with new size
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenCalledWith('resizeNode', {
       id: '1',
@@ -141,7 +141,7 @@ describe('ResizableNodeComponent', () => {
     input.checked = false;
     input.dispatchEvent(new Event('change'));
 
-    // only with sizeControlled false, no resizeNode
+    // Only with sizeControlled false, no resizeNode
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith('controlNodeSize', {
       id: '1',
