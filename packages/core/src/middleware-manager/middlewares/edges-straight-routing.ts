@@ -26,10 +26,7 @@ const getPoints = (edge: Edge, nodePositionMap: Map<string, { x: number; y: numb
 export const edgesStraightRoutingMiddleware: Middleware = {
   name: 'edges-straight-routing',
   execute: (state, context) => {
-    const {
-      edges,
-      metadata: { temporaryEdge },
-    } = state;
+    const { edges, metadata } = state;
     const isRegularEdgeAction = regularEdgeActions.has(context.modelActionType);
     const isTemporaryEdgeAction = temporaryEdgeActions.has(context.modelActionType);
 
@@ -74,19 +71,22 @@ export const edgesStraightRoutingMiddleware: Middleware = {
       }
     }
 
-    let newTemporaryEdge = temporaryEdge;
+    let newMetadata = metadata;
 
-    if (isTemporaryEdgeAction && temporaryEdge) {
-      const points = getPoints(temporaryEdge, nodePositionMap);
+    if (isTemporaryEdgeAction && metadata.temporaryEdge) {
+      const points = getPoints(metadata.temporaryEdge, nodePositionMap);
 
-      newTemporaryEdge = {
-        ...temporaryEdge,
-        points,
-        sourcePosition: points[0],
-        targetPosition: points[1],
+      newMetadata = {
+        ...metadata,
+        temporaryEdge: {
+          ...metadata.temporaryEdge,
+          points,
+          sourcePosition: points[0],
+          targetPosition: points[1],
+        },
       };
     }
 
-    return { ...state, edges: newEdges, metadata: { ...state.metadata, temporaryEdge: newTemporaryEdge } };
+    return { ...state, edges: newEdges, metadata: newMetadata };
   },
 };
