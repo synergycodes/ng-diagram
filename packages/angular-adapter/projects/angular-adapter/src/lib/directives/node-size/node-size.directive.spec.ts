@@ -8,53 +8,45 @@ import { NodeSizeDirective } from './node-size.directive';
 type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
 
 class MockResizeObserver implements ResizeObserver {
-  private callback: ResizeObserverCallback;
+  callback: ResizeObserverCallback = vi.fn();
+  disconnect = vi.fn();
+  observe = vi.fn();
+  unobserve = vi.fn();
+}
 
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback;
-  }
-
-  observe(): void {
-    // do nothing
-  }
-
-  unobserve(): void {
-    // do nothing
-  }
-
-  disconnect(): void {
-    // do nothing
-  }
+@Component({
+  template: `<div
+    angularAdapterNodeSize
+    [sizeControlled]="sizeControlled"
+    [size]="size"
+    [eventTarget]="eventTarget"
+  ></div>`,
+  imports: [NodeSizeDirective],
+})
+class TestComponent {
+  sizeControlled = false;
+  size?: { width: number; height: number };
+  eventTarget = { type: 'diagram' };
 }
 
 describe('NodeSizeDirective', () => {
   let directive: NodeSizeDirective;
   let fixture: ComponentFixture<TestComponent>;
   let eventMapperService: EventMapperService;
-
-  @Component({
-    template: `<div
-      angularAdapterNodeSize
-      [sizeControlled]="sizeControlled"
-      [size]="size"
-      [eventTarget]="eventTarget"
-    ></div>`,
-    standalone: true,
-    imports: [NodeSizeDirective],
-  })
-  class TestComponent {
-    sizeControlled = false;
-    size?: { width: number; height: number };
-    eventTarget = { type: 'diagram' };
-  }
+  let mockResizeObserver: MockResizeObserver;
 
   beforeEach(async () => {
+    mockResizeObserver = new MockResizeObserver();
+    global.ResizeObserver = function (callback: ResizeObserverCallback) {
+      mockResizeObserver.callback = callback;
+      return mockResizeObserver;
+    } as unknown as typeof ResizeObserver;
+
     await TestBed.configureTestingModule({
       imports: [TestComponent],
       providers: [EventMapperService],
     }).compileComponents();
 
-    global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
     fixture = TestBed.createComponent(TestComponent);
     directive = fixture.debugElement.query(By.directive(NodeSizeDirective)).injector.get(NodeSizeDirective);
     eventMapperService = TestBed.inject(EventMapperService);
@@ -65,53 +57,33 @@ describe('NodeSizeDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should set size when sizeControlled is true and size is provided', () => {
-    const spy = vi.spyOn(directive as unknown as { setSize: (width: number, height: number) => void }, 'setSize');
+  it('should update element size when sizeControlled is true and size is provided', () => {
+    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
     fixture.componentInstance.sizeControlled = true;
     fixture.componentInstance.size = { width: 100, height: 200 };
     fixture.detectChanges();
 
-    expect(spy).toHaveBeenCalledWith(100, 200);
+    expect(element.style.width).toBe('100px');
+    expect(element.style.height).toBe('200px');
   });
 
-  it('should create resize observer when sizeControlled is false', () => {
-    const spy = vi.spyOn(directive as unknown as { createResizeObserver: () => void }, 'createResizeObserver');
-    fixture.componentInstance.sizeControlled = true;
-    fixture.detectChanges();
+  it('should observe size changes when sizeControlled is false', () => {
+    const emitSpy = vi.spyOn(eventMapperService, 'emit');
+    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
+
     fixture.componentInstance.sizeControlled = false;
     fixture.detectChanges();
 
-    expect(spy).toHaveBeenCalled();
-  });
+    Object.defineProperty(element, 'offsetWidth', { value: 150 });
+    Object.defineProperty(element, 'offsetHeight', { value: 250 });
 
-  it('should disconnect resize observer when sizeControlled is true and size is provided', () => {
-    const spy = vi.spyOn(directive as unknown as { disconnectResizeObserver: () => void }, 'disconnectResizeObserver');
-    fixture.componentInstance.sizeControlled = true;
-    fixture.componentInstance.size = { width: 100, height: 200 };
-    fixture.detectChanges();
-
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('should emit resize event when element is resized', () => {
-    const emitSpy = vi.spyOn(eventMapperService, 'emit');
-    fixture.componentInstance.eventTarget = { type: 'diagram' };
-    fixture.detectChanges();
-
-    const resizeCallback = (directive as unknown as { resizeObserver: { callback: ResizeObserverCallback } })
-      .resizeObserver.callback;
-    resizeCallback([
+    mockResizeObserver.callback([
       {
-        borderBoxSize: [
-          {
-            inlineSize: 150,
-            blockSize: 250,
-          },
-        ],
+        borderBoxSize: [{ inlineSize: 150, blockSize: 250 }],
         contentBoxSize: [],
         contentRect: new DOMRect(),
         devicePixelContentBoxSize: [],
-        target: document.createElement('div'),
+        target: element,
       } as ResizeObserverEntry,
     ]);
 
@@ -125,16 +97,12 @@ describe('NodeSizeDirective', () => {
   });
 
   it('should disconnect resize observer on destroy', () => {
-    const spy = vi.spyOn(directive as unknown as { disconnectResizeObserver: () => void }, 'disconnectResizeObserver');
     fixture.destroy();
-    expect(spy).toHaveBeenCalled();
+    expect(mockResizeObserver.disconnect).toHaveBeenCalled();
   });
 
-  it('should update size when size input changes', () => {
-    const setSizeSpy = vi.spyOn(
-      directive as unknown as { setSize: (width: number, height: number) => void },
-      'setSize'
-    );
+  it('should update element size when size input changes', () => {
+    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
     fixture.componentInstance.sizeControlled = true;
     fixture.componentInstance.size = { width: 100, height: 200 };
     fixture.detectChanges();
@@ -142,6 +110,7 @@ describe('NodeSizeDirective', () => {
     fixture.componentInstance.size = { width: 300, height: 400 };
     fixture.detectChanges();
 
-    expect(setSizeSpy).toHaveBeenCalledWith(300, 400);
+    expect(element.style.width).toBe('300px');
+    expect(element.style.height).toBe('400px');
   });
 });

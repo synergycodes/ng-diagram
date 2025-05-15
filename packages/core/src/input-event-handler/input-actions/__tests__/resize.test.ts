@@ -47,7 +47,7 @@ describe('resizeAction', () => {
   });
 
   describe('action', () => {
-    it('should emit resizeNode if node', () => {
+    it('should emit resizeNode if target is node', () => {
       mockEvent.target = {
         type: 'node',
         element: { ...mockNode, size: { width: 100, height: 100 } },
