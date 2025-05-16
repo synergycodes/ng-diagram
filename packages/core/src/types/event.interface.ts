@@ -130,4 +130,3 @@ export interface WheelEvent extends BaseEvent {
  * Union type of all possible events
  */
 export type Event = KeyboardEvent | PointerEvent | ResizeEvent | WheelEvent;
-
