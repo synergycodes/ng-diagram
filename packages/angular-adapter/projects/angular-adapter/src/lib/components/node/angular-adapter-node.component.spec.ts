@@ -32,6 +32,11 @@ describe('AngularAdapterNodeComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should have NodeSizeDirective as host directive', () => {
+    const nodeSizeDirective = fixture.debugElement.injector.get(NodeSizeDirective);
+    expect(nodeSizeDirective).toBeTruthy();
+  });
+
   it('should have NodePositionDirective as host directive', () => {
     const nodePositionDirective = fixture.debugElement.injector.get(NodePositionDirective);
     expect(nodePositionDirective).toBeTruthy();

@@ -1,8 +1,17 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { AngularAdapterPortComponent } from '@angularflow/angular-adapter';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InputFieldNodeComponent } from './input-field-node.component';
+
+@Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
+  selector: 'angular-adapter-port',
+  template: '<span></span>',
+})
+class MockAngularAdapterPortComponent {}
 
 describe('InputFieldNodeComponent', () => {
   let component: InputFieldNodeComponent;
@@ -11,7 +20,12 @@ describe('InputFieldNodeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FormsModule, InputFieldNodeComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(InputFieldNodeComponent, {
+        remove: { imports: [AngularAdapterPortComponent] },
+        add: { imports: [MockAngularAdapterPortComponent] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(InputFieldNodeComponent);
     component = fixture.componentInstance;
