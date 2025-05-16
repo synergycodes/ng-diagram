@@ -31,10 +31,10 @@ export class AppComponent implements AfterViewInit {
 
   constructor() {
     this.model().setNodes([
-      { id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {} },
+      { id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {}, autoSize: true },
       { id: '2', type: 'image', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
       { id: '3', type: 'unknown', position: { x: 700, y: 300 }, data: {} },
-      { id: '4', type: 'resizable', position: { x: 750, y: 300 }, data: {} },
+      { id: '4', type: 'resizable', position: { x: 750, y: 300 }, data: {}, autoSize: true },
     ]);
     this.model().setEdges([
       {

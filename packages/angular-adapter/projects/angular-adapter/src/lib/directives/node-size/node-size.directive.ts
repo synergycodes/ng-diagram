@@ -13,17 +13,17 @@ export class NodeSizeDirective implements OnDestroy {
 
   eventTarget = input<EventTarget>({ type: 'diagram' });
   size = input<{ width: number; height: number }>();
-  sizeControlled = input<boolean>(false);
+  autoSize = input<boolean>(true);
 
   sizeState = computed(() => ({
     size: this.size(),
-    controlled: this.sizeControlled(),
+    autoSize: this.autoSize(),
   }));
 
   constructor() {
     effect(() => {
-      const { size, controlled } = this.sizeState();
-      if (controlled && size) {
+      const { size, autoSize } = this.sizeState();
+      if (!autoSize && size) {
         const { width, height } = this.size()!;
         this.setSize(width, height);
         this.disconnectResizeObserver();

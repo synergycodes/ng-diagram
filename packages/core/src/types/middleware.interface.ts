@@ -21,7 +21,6 @@ export type ModelActionType =
   | 'startLinking'
   | 'moveTemporaryEdge'
   | 'finishLinking'
-  | 'controlNodeSize'
   | 'zoom';
 
 /**

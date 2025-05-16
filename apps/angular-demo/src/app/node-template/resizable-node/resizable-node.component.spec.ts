@@ -83,6 +83,7 @@ describe('ResizableNodeComponent', () => {
     input.dispatchEvent(new Event('blur'));
 
     expect(spy).toHaveBeenCalledWith('resizeNode', {
+      disableAutoSize: true,
       id: '1',
       size: { width: 100, height: 200 },
     });
@@ -101,51 +102,58 @@ describe('ResizableNodeComponent', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it('should update controlNodeSize when size controlled is checked', () => {
-    const input = fixture.nativeElement.querySelector('.size-control-checkbox');
-    const flowCoreProvider = TestBed.inject(FlowCoreProviderService);
-    const spy = vi.spyOn(flowCoreProvider.provide().commandHandler, 'emit');
-
-    input.checked = true;
-    input.dispatchEvent(new Event('change'));
-
-    expect(spy).toHaveBeenCalledWith('controlNodeSize', {
-      id: '1',
-      sizeControlled: true,
-    });
-  });
-
-  it('should update size when size controlled is checked', () => {
-    component.sizeText.set('100 200');
-    const input = fixture.nativeElement.querySelector('.size-control-checkbox');
-    const flowCoreProvider = TestBed.inject(FlowCoreProviderService);
-    const spy = vi.spyOn(flowCoreProvider.provide().commandHandler, 'emit');
-
-    input.checked = true;
-    input.dispatchEvent(new Event('change'));
-
-    // One with sizeControlled true, one with new size
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith('resizeNode', {
-      id: '1',
-      size: { width: 100, height: 200 },
-    });
-  });
-
-  it('should not update size when size controlled is unchecked', () => {
-    component.sizeText.set('100 200');
-    const input = fixture.nativeElement.querySelector('.size-control-checkbox');
+  it('should update autoSize when size controlled is checked', () => {
+    const input = fixture.nativeElement.querySelector('.auto-size-checkbox');
     const flowCoreProvider = TestBed.inject(FlowCoreProviderService);
     const spy = vi.spyOn(flowCoreProvider.provide().commandHandler, 'emit');
 
     input.checked = false;
     input.dispatchEvent(new Event('change'));
 
-    // Only with sizeControlled false, no resizeNode
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('controlNodeSize', {
+    expect(spy).toHaveBeenCalledWith('updateNode', {
       id: '1',
-      sizeControlled: false,
+      node: {
+        ...component.data(),
+        autoSize: false,
+      },
+    });
+  });
+
+  it('should update size when autoSize is not checked', () => {
+    component.sizeText.set('100 200');
+    const input = fixture.nativeElement.querySelector('.auto-size-checkbox');
+    const flowCoreProvider = TestBed.inject(FlowCoreProviderService);
+    const spy = vi.spyOn(flowCoreProvider.provide().commandHandler, 'emit');
+
+    input.checked = false;
+    input.dispatchEvent(new Event('change'));
+
+    // One with autoSize false, one with new size
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenCalledWith('resizeNode', {
+      id: '1',
+      size: { width: 100, height: 200 },
+      disableAutoSize: true,
+    });
+  });
+
+  it('should not update size when autoSize is checked', () => {
+    component.sizeText.set('100 200');
+    const input = fixture.nativeElement.querySelector('.auto-size-checkbox');
+    const flowCoreProvider = TestBed.inject(FlowCoreProviderService);
+    const spy = vi.spyOn(flowCoreProvider.provide().commandHandler, 'emit');
+
+    input.checked = true;
+    input.dispatchEvent(new Event('change'));
+
+    // Only with autoSize false, no resizeNode
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith('updateNode', {
+      id: '1',
+      node: {
+        ...component.data(),
+        autoSize: true,
+      },
     });
   });
 

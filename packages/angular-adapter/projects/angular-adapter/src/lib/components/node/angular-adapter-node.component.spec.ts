@@ -20,7 +20,7 @@ import { AngularAdapterNodeComponent } from './angular-adapter-node.component';
 class MockNodeSizeDirective {
   @Input() eventTarget?: { type: string };
   @Input() size?: { width: number; height: number };
-  @Input() sizeControlled = false;
+  @Input() autoSize = true;
 }
 
 describe('AngularAdapterNodeComponent', () => {
@@ -36,7 +36,7 @@ describe('AngularAdapterNodeComponent', () => {
           hostDirectives: [
             {
               directive: NodeSizeDirective,
-              inputs: ['eventTarget', 'size', 'sizeControlled'],
+              inputs: ['eventTarget', 'size', 'autoSize'],
             },
           ],
         },
@@ -44,7 +44,7 @@ describe('AngularAdapterNodeComponent', () => {
           hostDirectives: [
             {
               directive: MockNodeSizeDirective,
-              inputs: ['eventTarget', 'size', 'sizeControlled'],
+              inputs: ['eventTarget', 'size', 'autoSize'],
             },
           ],
         },

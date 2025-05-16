@@ -1,6 +1,5 @@
 import type { CommandByName, CommandHandler, CommandName } from '../../types';
 import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } from './add-update-delete';
-import { controlNodeSize } from './control-node-size';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
 import {
@@ -46,6 +45,5 @@ export const commands: CommandMap = {
   finishLinkingToPosition,
   startLinkingFromPosition,
   resizeNode,
-  controlNodeSize,
   zoom,
 };

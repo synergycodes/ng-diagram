@@ -17,7 +17,7 @@ import { NodeSizeDirective } from '../../directives/node-size/node-size.directiv
   hostDirectives: [
     {
       directive: NodeSizeDirective,
-      inputs: ['eventTarget', 'size', 'sizeControlled'],
+      inputs: ['eventTarget', 'size', 'autoSize'],
     },
     {
       directive: NodePositionDirective,

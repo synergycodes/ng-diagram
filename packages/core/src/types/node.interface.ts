@@ -33,7 +33,7 @@ export interface Node {
     height: number;
   };
   /**
-   * Whether the size of the node is controlled by the user.
+   * Whether the size of the node is automatically resized based on the content.
    */
-  sizeControlled?: boolean;
+  autoSize?: boolean;
 }

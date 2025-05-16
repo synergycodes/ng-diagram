@@ -13,17 +13,17 @@
       (keyup)="$event.stopPropagation()"
       (blur)="setSize()"
     />
-    <label class="size-control-label">
+    <label class="auto-size-label">
       <input
-        class="size-control-checkbox"
+        class="auto-size-checkbox"
         type="checkbox"
-        [checked]="data().sizeControlled"
+        [checked]="data().autoSize"
         (change)="onSizeControlChange($event)"
         (keydown)="$event.stopPropagation()"
         (keypress)="$event.stopPropagation()"
         (keyup)="$event.stopPropagation()"
       />
-      Control size
+      Auto size
     </label>
   </div>
   <input

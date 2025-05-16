@@ -16,7 +16,6 @@ export class ResizableNodeComponent implements INodeTemplate {
   text = model<string>('');
   sizeText = model<string>('');
   data = input.required<Node>();
-  sizeControlled = input.required<Node['sizeControlled']>();
 
   setSize() {
     const [textWidth, textHeight] = this.sizeText().split(' ');
@@ -30,17 +29,21 @@ export class ResizableNodeComponent implements INodeTemplate {
     this.flowCoreProvider.provide().commandHandler.emit('resizeNode', {
       id: this.data().id,
       size: { width, height },
+      disableAutoSize: true,
     });
   }
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.flowCoreProvider.provide().commandHandler.emit('controlNodeSize', {
+    this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
       id: this.data().id,
-      sizeControlled: checked,
+      node: {
+        ...this.data(),
+        autoSize: checked,
+      },
     });
 
-    if (checked) {
+    if (!checked) {
       this.setSize();
     }
   }

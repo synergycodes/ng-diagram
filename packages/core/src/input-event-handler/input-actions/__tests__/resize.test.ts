@@ -12,7 +12,7 @@ describe('resizeAction', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTarget = { type: 'node', element: mockNode };
+    mockTarget = { type: 'node', element: { ...mockNode, autoSize: true } };
 
     mockEvent = {
       type: 'resize',
@@ -50,7 +50,7 @@ describe('resizeAction', () => {
     it('should emit resizeNode if target is node', () => {
       mockEvent.target = {
         type: 'node',
-        element: { ...mockNode, size: { width: 100, height: 100 } },
+        element: { ...mockNode, size: { width: 100, height: 100 }, autoSize: true },
       };
 
       resizeAction.action(mockEvent, mockFlowCore);

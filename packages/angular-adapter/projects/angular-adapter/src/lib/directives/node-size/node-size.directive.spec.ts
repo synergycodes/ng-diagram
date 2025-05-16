@@ -15,16 +15,11 @@ class MockResizeObserver implements ResizeObserver {
 }
 
 @Component({
-  template: `<div
-    angularAdapterNodeSize
-    [sizeControlled]="sizeControlled"
-    [size]="size"
-    [eventTarget]="eventTarget"
-  ></div>`,
+  template: `<div angularAdapterNodeSize [autoSize]="autoSize" [size]="size" [eventTarget]="eventTarget"></div>`,
   imports: [NodeSizeDirective],
 })
 class TestComponent {
-  sizeControlled = false;
+  autoSize = true;
   size?: { width: number; height: number };
   eventTarget = { type: 'diagram' };
 }
@@ -57,9 +52,9 @@ describe('NodeSizeDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should update element size when sizeControlled is true and size is provided', () => {
+  it('should update element size when autoSize is false and size is provided', () => {
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-    fixture.componentInstance.sizeControlled = true;
+    fixture.componentInstance.autoSize = false;
     fixture.componentInstance.size = { width: 100, height: 200 };
     fixture.detectChanges();
 
@@ -67,11 +62,11 @@ describe('NodeSizeDirective', () => {
     expect(element.style.height).toBe('200px');
   });
 
-  it('should observe size changes when sizeControlled is false', () => {
+  it('should observe size changes when autoSize is true', () => {
     const emitSpy = vi.spyOn(eventMapperService, 'emit');
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
 
-    fixture.componentInstance.sizeControlled = false;
+    fixture.componentInstance.autoSize = true;
     fixture.detectChanges();
 
     Object.defineProperty(element, 'offsetWidth', { value: 150 });
@@ -103,7 +98,7 @@ describe('NodeSizeDirective', () => {
 
   it('should update element size when size input changes', () => {
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-    fixture.componentInstance.sizeControlled = true;
+    fixture.componentInstance.autoSize = false;
     fixture.componentInstance.size = { width: 100, height: 200 };
     fixture.detectChanges();
 

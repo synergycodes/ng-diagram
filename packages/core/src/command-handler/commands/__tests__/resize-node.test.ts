@@ -55,5 +55,64 @@ describe('Resize Node Command', () => {
         'resizeNode'
       );
     });
+
+    it('should disable autoSize if disableAutoSize is true', () => {
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: [{ id: '1', size: { width: 0, height: 0 }, autoSize: true }],
+      });
+
+      resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 100, height: 100 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodes: [{ id: '1', size: { width: 100, height: 100 }, autoSize: false }],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('should not disable autoSize if disableAutoSize is false', () => {
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: [{ id: '1', size: { width: 0, height: 0 }, autoSize: true }],
+      });
+
+      resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 100, height: 100 },
+        disableAutoSize: false,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodes: [{ id: '1', size: { width: 100, height: 100 }, autoSize: true }],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('should not disable autoSize if disableAutoSize is not provided', () => {
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: [{ id: '1', size: { width: 0, height: 0 }, autoSize: true }],
+      });
+
+      resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 100, height: 100 },
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodes: [{ id: '1', size: { width: 100, height: 100 }, autoSize: true }],
+        },
+        'resizeNode'
+      );
+    });
   });
 });
