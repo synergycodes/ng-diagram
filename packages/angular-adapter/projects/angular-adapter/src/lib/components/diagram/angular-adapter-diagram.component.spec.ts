@@ -11,6 +11,7 @@ import {
   PointerLeaveEventListenerDirective,
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
+  WheelEventListenerDirective,
 } from '../../directives';
 import { FlowCoreProviderService, ModelProviderService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
@@ -120,6 +121,11 @@ describe('AngularAdapterDiagramComponent', () => {
   it('should have KeyUpEventListenerDirective as host directive', () => {
     const keyUpEventListenerDirective = fixture.debugElement.injector.get(KeyUpEventListenerDirective);
     expect(keyUpEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have KeyUpEventListenerDirective as host directive', () => {
+    const wheelEventListenerDirective = fixture.debugElement.injector.get(WheelEventListenerDirective);
+    expect(wheelEventListenerDirective).toBeTruthy();
   });
 
   describe('getNodeTemplate', () => {

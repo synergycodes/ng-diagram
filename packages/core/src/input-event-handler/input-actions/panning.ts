@@ -1,49 +1,41 @@
 import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
 
 interface MoveState {
-  startX: number;
-  startY: number;
   lastX: number;
   lastY: number;
   isPanning: boolean;
-  isFirstMove: boolean;
 }
 
 const moveState: MoveState = {
-  startX: 0,
-  startY: 0,
   lastX: 0,
   lastY: 0,
   isPanning: false,
-  isFirstMove: true,
 };
+
+const pointerIds = new Set<number>();
 
 export const panningAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
     switch (event.type) {
       case 'pointerdown':
-        moveState.startX = event.x;
-        moveState.startY = event.y;
+        pointerIds.add(event.pointerId);
         moveState.lastX = event.x;
         moveState.lastY = event.y;
         moveState.isPanning = true;
-        moveState.isFirstMove = true;
         break;
-
       case 'pointermove':
-        if (moveState.isPanning) {
-          const x = moveState.isFirstMove ? event.x - moveState.startX : event.x - moveState.lastX;
-          const y = moveState.isFirstMove ? event.y - moveState.startY : event.y - moveState.lastY;
+        if (moveState.isPanning && pointerIds.size === 1) {
+          const x = event.x - moveState.lastX;
+          const y = event.y - moveState.lastY;
 
           flowCore.commandHandler.emit('moveViewportBy', { x, y });
 
           moveState.lastX = event.x;
           moveState.lastY = event.y;
-          moveState.isFirstMove = false;
         }
         break;
-
       case 'pointerup':
+        pointerIds.delete(event.pointerId);
         moveState.isPanning = false;
         break;
     }

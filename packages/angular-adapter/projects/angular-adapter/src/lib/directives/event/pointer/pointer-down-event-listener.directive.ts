@@ -18,6 +18,7 @@ export class PointerDownEventListenerDirective implements ITargetedEventListener
     // const currentTarget = event.currentTarget as HTMLElement;
     // currentTarget.setPointerCapture(event.pointerId);
     this.eventMapperService.emit({
+      pointerId: event.pointerId,
       type: 'pointerdown',
       target: this.eventTarget(),
       pressure: event.pressure,

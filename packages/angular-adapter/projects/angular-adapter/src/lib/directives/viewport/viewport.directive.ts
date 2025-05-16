@@ -2,9 +2,9 @@ import { Directive, effect, ElementRef, inject, input, Renderer2 } from '@angula
 import { Viewport } from '@angularflow/core';
 
 @Directive({
-  selector: '[angularAdapterPanning]',
+  selector: '[angularAdapterViewport]',
 })
-export class PanningDirective {
+export class ViewportDirective {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly renderer = inject(Renderer2);
 
@@ -12,7 +12,10 @@ export class PanningDirective {
 
   constructor() {
     effect(() => {
-      this.setStyle('transform', `translate(${this.viewport().x}px, ${this.viewport().y}px)`);
+      this.setStyle(
+        'transform',
+        `translate(${this.viewport().x}px, ${this.viewport().y}px) scale(${this.viewport().scale})`
+      );
     });
   }
 

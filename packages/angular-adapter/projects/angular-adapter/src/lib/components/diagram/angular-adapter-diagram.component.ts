@@ -11,6 +11,7 @@ import {
   PointerLeaveEventListenerDirective,
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
+  WheelEventListenerDirective,
 } from '../../directives';
 import { FlowCoreProviderService, ModelProviderService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
@@ -42,6 +43,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     KeyDownEventListenerDirective,
     KeyUpEventListenerDirective,
     KeyPressEventListenerDirective,
+    WheelEventListenerDirective,
   ],
 })
 export class AngularAdapterDiagramComponent {

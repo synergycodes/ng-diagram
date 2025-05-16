@@ -46,6 +46,7 @@ describe('deleteSelectionAction', () => {
     it('should return false for other event types', () => {
       const pointerEvent: PointerEvent = {
         type: 'pointerdown',
+        pointerId: 1,
         x: 0,
         y: 0,
         pressure: 0,

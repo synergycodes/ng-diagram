@@ -19,7 +19,8 @@ export type ModelActionType =
   | 'moveViewport'
   | 'startLinking'
   | 'moveTemporaryEdge'
-  | 'finishLinking';
+  | 'finishLinking'
+  | 'zoom';
 
 /**
  * Type for the state of the flow diagram
