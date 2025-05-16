@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { mockEnvironment, mockNode } from '../../../test-utils';
+import { getSamplePointerEvent, mockEnvironment, mockNode } from '../../../test-utils';
 import type { EventTarget, PointerEvent } from '../../../types';
 import { panningAction } from '../panning';
 
@@ -12,18 +12,15 @@ describe('panningAction', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTarget = { type: 'diagram' } as EventTarget;
-
-    mockEvent = {
+    mockTarget = { type: 'diagram' };
+    mockEvent = getSamplePointerEvent({
       type: 'pointerdown',
-      timestamp: Date.now(),
-      target: mockTarget,
+      pointerId: 1,
       x: 100,
       y: 100,
-      pressure: 1,
       button: 0,
-    } as PointerEvent;
-
+      target: mockTarget,
+    });
     mockFlowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
@@ -31,7 +28,7 @@ describe('panningAction', () => {
       environment: mockEnvironment,
     } as unknown as FlowCore;
 
-    panningAction.action({ ...mockEvent, type: 'pointerup' as const, button: 0 }, mockFlowCore);
+    panningAction.action(getSamplePointerEvent({ type: 'pointerup', button: 0 }), mockFlowCore);
   });
 
   describe('predicate', () => {
@@ -40,22 +37,22 @@ describe('panningAction', () => {
     });
 
     it('should return true for pointermove events', () => {
-      expect(panningAction.predicate({ ...mockEvent, type: 'pointermove' }, mockFlowCore)).toBe(true);
+      expect(panningAction.predicate(getSamplePointerEvent({ type: 'pointermove' }), mockFlowCore)).toBe(true);
     });
 
     it('should return true for pointerup events', () => {
-      expect(panningAction.predicate({ ...mockEvent, type: 'pointerup', button: 0 }, mockFlowCore)).toBe(true);
+      expect(panningAction.predicate(getSamplePointerEvent({ type: 'pointerup', button: 0 }), mockFlowCore)).toBe(true);
     });
 
     it('should return false for other events', () => {
-      expect(panningAction.predicate({ ...mockEvent, type: 'pointerenter' }, mockFlowCore)).toBe(false);
-      expect(panningAction.predicate({ ...mockEvent, type: 'pointerleave' }, mockFlowCore)).toBe(false);
+      expect(panningAction.predicate(getSamplePointerEvent({ type: 'pointerenter' }), mockFlowCore)).toBe(false);
+      expect(panningAction.predicate(getSamplePointerEvent({ type: 'pointerleave' }), mockFlowCore)).toBe(false);
     });
 
     it('should return false for pointerdown events with a non-background target', () => {
       expect(
         panningAction.predicate(
-          { ...mockEvent, type: 'pointerdown', target: { type: 'node', element: mockNode }, button: 0 },
+          getSamplePointerEvent({ type: 'pointerdown', target: { type: 'node', element: mockNode }, button: 0 }),
           mockFlowCore
         )
       ).toBe(false);
@@ -66,46 +63,58 @@ describe('panningAction', () => {
     it('should initialize state on pointerdown', () => {
       panningAction.action(mockEvent, mockFlowCore);
 
-      const moveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110 };
+      const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110 });
       panningAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', {
-        x: 10,
-        y: 10,
-      });
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 10 });
     });
 
     it('should calculate movement relative to last position after first move', () => {
       panningAction.action(mockEvent, mockFlowCore);
 
-      const firstMoveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110 };
+      const firstMoveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110 });
       panningAction.action(firstMoveEvent, mockFlowCore);
 
-      const secondMoveEvent = { ...mockEvent, type: 'pointermove' as const, x: 120, y: 120 };
+      const secondMoveEvent = getSamplePointerEvent({ type: 'pointermove', x: 120, y: 120 });
       panningAction.action(secondMoveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', {
-        x: 10,
-        y: 10,
-      });
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 10 });
     });
 
     it('should stop movement on pointerup', () => {
       panningAction.action(mockEvent, mockFlowCore);
 
-      const firstMoveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110 };
+      const firstMoveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110 });
       panningAction.action(firstMoveEvent, mockFlowCore);
 
-      panningAction.action({ ...mockEvent, type: 'pointerup' as const, button: 0 }, mockFlowCore);
+      panningAction.action(getSamplePointerEvent({ type: 'pointerup', button: 0 }), mockFlowCore);
 
-      const moveAfterUpEvent = { ...mockEvent, type: 'pointermove' as const, x: 120, y: 120 };
+      const moveAfterUpEvent = getSamplePointerEvent({ type: 'pointermove', x: 120, y: 120 });
       panningAction.action(moveAfterUpEvent, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit movement if not in moving state', () => {
-      const moveEvent = { ...mockEvent, type: 'pointermove' as const, x: 110, y: 110 };
+      const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110 });
+      panningAction.action(moveEvent, mockFlowCore);
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should not emit movement if multiple pointers are down', () => {
+      const anotherPointerDownEvent = getSamplePointerEvent({
+        type: 'pointerdown',
+        pointerId: 2,
+        x: 200,
+        y: 200,
+        button: 0,
+        target: mockTarget,
+      });
+      panningAction.action(mockEvent, mockFlowCore);
+      panningAction.action(anotherPointerDownEvent, mockFlowCore);
+
+      const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110 });
       panningAction.action(moveEvent, mockFlowCore);
 
       expect(mockCommandHandler.emit).not.toHaveBeenCalled();

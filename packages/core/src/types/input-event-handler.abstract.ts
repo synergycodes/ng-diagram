@@ -13,7 +13,8 @@ export type InputActionName =
   | 'paste'
   | 'panning'
   | 'linking'
-  | 'resize';
+  | 'resize'
+  | 'zooming';
 
 /**
  * Type for action function

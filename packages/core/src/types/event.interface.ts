@@ -57,6 +57,7 @@ export type KeyboardEvent = KeyboardDownEvent | KeyboardUpEvent | KeyboardPressE
  * Pointer base event interface
  */
 export interface PointerBaseEvent extends BaseEvent {
+  pointerId: number;
   x: number;
   y: number;
   pressure: number;
@@ -114,6 +115,19 @@ export interface ResizeEvent extends BaseEvent {
 }
 
 /**
+ * Wheel event interface
+ */
+export interface WheelEvent extends BaseEvent {
+  type: 'wheel';
+  y: number;
+  x: number;
+  deltaX: number;
+  deltaY: number;
+  deltaZ: number;
+}
+
+/**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent | ResizeEvent;
+export type Event = KeyboardEvent | PointerEvent | ResizeEvent | WheelEvent;
+

@@ -3,22 +3,24 @@ import { Directive, inject } from '@angular/core';
 import { EventMapperService } from '../../../services';
 
 @Directive({
-  selector: '[angularAdapterPointerMoveEventListener]',
-  host: { '(pointermove)': 'onPointerMove($event)' },
+  selector: '[angularAdapterWheelEventListener]',
+  host: { '(wheel)': 'onWheel($event)' },
 })
-export class PointerMoveEventListenerDirective {
+export class WheelEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
 
-  onPointerMove(event: PointerEvent) {
+  onWheel(event: WheelEvent) {
     event.stopPropagation();
+    event.preventDefault();
     this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointermove',
+      type: 'wheel',
       target: { type: 'diagram' },
-      pressure: event.pressure,
       timestamp: Date.now(),
       x: event.clientX,
       y: event.clientY,
+      deltaX: event.deltaX,
+      deltaY: event.deltaY,
+      deltaZ: event.deltaZ,
     });
   }
 }

@@ -11,6 +11,7 @@ import {
   PointerMoveEvent,
   PointerUpEvent,
   ResizeEvent,
+  WheelEvent,
 } from './event.interface';
 
 /**
@@ -94,4 +95,11 @@ export const isPointerEvent = (event: Event): event is PointerEvent => {
  */
 export const isResizeEvent = (event: Event): event is ResizeEvent => {
   return event.type === 'resize';
+};
+
+/**
+ * Check if an event is a wheel event
+ */
+export const isWheelEvent = (event: Event): event is WheelEvent => {
+  return event.type === 'wheel';
 };

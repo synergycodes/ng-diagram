@@ -16,6 +16,7 @@ export class PointerUpEventListenerDirective implements ITargetedEventListener {
   onPointerUp(event: PointerEvent) {
     event.stopPropagation();
     this.eventMapperService.emit({
+      pointerId: event.pointerId,
       type: 'pointerup',
       target: this.eventTarget(),
       pressure: event.pressure,

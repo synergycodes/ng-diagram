@@ -8,6 +8,7 @@ import { pasteAction } from './paste';
 import { pointerMoveSelectionAction } from './pointer-move-selection';
 import { resizeAction } from './resize';
 import { selectAction } from './select';
+import { zoomingAction } from './zooming/zooming';
 
 export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
   select: selectAction,
@@ -19,4 +20,5 @@ export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
   paste: pasteAction,
   linking: linkingAction,
   resize: resizeAction,
+  zooming: zoomingAction,
 };

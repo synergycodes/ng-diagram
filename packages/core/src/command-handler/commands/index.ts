@@ -14,6 +14,7 @@ import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
 import { deselectAll, select } from './selection';
+import { zoom } from './zoom';
 
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
@@ -46,4 +47,5 @@ export const commands: CommandMap = {
   startLinkingFromPosition,
   resizeNode,
   controlNodeSize,
+  zoom,
 };

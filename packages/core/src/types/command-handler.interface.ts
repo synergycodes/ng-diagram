@@ -20,6 +20,7 @@ import { MoveSelectionCommand } from '../command-handler/commands/move-selection
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { DeselectAllCommand, SelectCommand } from '../command-handler/commands/selection';
+import { ZoomCommand } from '../command-handler/commands/zoom';
 import { FlowCore } from '../flow-core';
 
 /**
@@ -46,7 +47,8 @@ export type Command =
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
   | ResizeNodeCommand
-  | ControlNodeSizeCommand;
+  | ControlNodeSizeCommand
+  | ZoomCommand;
 
 /**
  * Type for command name
