@@ -61,6 +61,8 @@ export interface PointerBaseEvent extends BaseEvent {
   x: number;
   y: number;
   pressure: number;
+  ctrlKey: boolean;
+  metaKey: boolean;
 }
 
 /**

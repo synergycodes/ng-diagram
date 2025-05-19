@@ -12,7 +12,7 @@ import {
 import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
-import { deselectAll, select } from './selection';
+import { deselect, deselectAll, select } from './selection';
 import { zoom } from './zoom';
 
 export type CommandHandlerFunction<K extends CommandName> = (
@@ -26,6 +26,7 @@ export type CommandMap = {
 
 export const commands: CommandMap = {
   select,
+  deselect,
   deselectAll,
   moveSelection,
   deleteSelection,

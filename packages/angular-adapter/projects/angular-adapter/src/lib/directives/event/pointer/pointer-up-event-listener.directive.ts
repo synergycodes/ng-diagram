@@ -24,6 +24,8 @@ export class PointerUpEventListenerDirective implements ITargetedEventListener {
       x: event.clientX,
       y: event.clientY,
       button: event.button,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
     });
   }
 }

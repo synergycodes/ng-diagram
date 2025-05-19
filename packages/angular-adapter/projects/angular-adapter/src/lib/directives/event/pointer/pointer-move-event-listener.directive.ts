@@ -19,6 +19,8 @@ export class PointerMoveEventListenerDirective {
       timestamp: Date.now(),
       x: event.clientX,
       y: event.clientY,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
     });
   }
 }

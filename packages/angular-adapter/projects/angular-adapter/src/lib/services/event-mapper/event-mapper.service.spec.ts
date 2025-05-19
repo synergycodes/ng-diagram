@@ -15,6 +15,8 @@ describe('EventMapperService', () => {
     timestamp: 1000,
     target: { type: 'diagram' },
     button: 0,
+    ctrlKey: false,
+    metaKey: false,
   };
 
   beforeEach(() => {
