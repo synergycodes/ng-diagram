@@ -23,6 +23,8 @@ export class PointerEnterEventListenerDirective implements ITargetedEventListene
       timestamp: Date.now(),
       x: event.clientX,
       y: event.clientY,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
     });
   }
 }

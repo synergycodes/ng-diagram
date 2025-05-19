@@ -24,6 +24,8 @@ export const mockPointerEvent: Omit<PointerEvent, 'type'> = {
   pressure: 0,
   timestamp: 0,
   target: { type: 'diagram' },
+  ctrlKey: false,
+  metaKey: false,
 };
 
 export function getSampleWheelEvent(overrides: Partial<WheelEvent> = {}): WheelEvent {
@@ -50,6 +52,8 @@ export function getSamplePointerEvent(overrides: Partial<PointerEvent> = {}): Po
     y: 0,
     pressure: 0,
     button: 0,
+    ctrlKey: false,
+    metaKey: false,
     ...overrides,
   };
 }

@@ -53,6 +53,8 @@ describe('deleteSelectionAction', () => {
         target: { type: 'diagram' },
         timestamp: Date.now(),
         button: 0,
+        ctrlKey: false,
+        metaKey: false,
       };
 
       expect(deleteSelectionAction.predicate(pointerEvent, mockFlowCore)).toBe(false);

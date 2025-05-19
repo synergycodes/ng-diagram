@@ -7,6 +7,7 @@ import { CommandHandler } from './command-handler';
 vi.mock('./commands', () => ({
   commands: {
     select: vi.fn(),
+    deselect: vi.fn(),
     deselectAll: vi.fn(),
     moveSelection: vi.fn(),
   },
@@ -25,11 +26,13 @@ describe('CoreCommandHandler', () => {
   });
 
   it('should register default commands', () => {
-    handler.emit('select', { ids: ['1'] });
+    handler.emit('select', { nodeIds: ['1'] });
+    handler.emit('deselect', { nodeIds: ['1'] });
     handler.emit('deselectAll');
     handler.emit('moveSelection', { dx: 0, dy: 0 });
 
-    expect(commands.select).toHaveBeenCalledWith(handler, { ids: ['1'], name: 'select' });
+    expect(commands.select).toHaveBeenCalledWith(handler, { nodeIds: ['1'], name: 'select' });
+    expect(commands.deselect).toHaveBeenCalledWith(handler, { nodeIds: ['1'], name: 'deselect' });
     expect(commands.deselectAll).toHaveBeenCalledWith(handler, { name: 'deselectAll' });
     expect(commands.moveSelection).toHaveBeenCalledWith(handler, { dx: 0, dy: 0, name: 'moveSelection' });
   });
@@ -42,7 +45,7 @@ describe('CoreCommandHandler', () => {
       handler.register('select', commandCallback);
       handler.register('deselectAll', otherCommandCallback);
 
-      const commandEvent: Command = { name: 'select', ids: ['1'] };
+      const commandEvent: Command = { name: 'select', nodeIds: ['1'] };
       handler.emit('select', commandEvent);
 
       expect(commandCallback).toHaveBeenCalledWith(commandEvent);
@@ -53,7 +56,7 @@ describe('CoreCommandHandler', () => {
       const callback = vi.fn();
       handler.register('deselectAll', callback);
 
-      const commandEvent: Command = { name: 'select', ids: ['1'] };
+      const commandEvent: Command = { name: 'select', nodeIds: ['1'] };
       handler.emit('select', commandEvent);
 
       expect(callback).not.toHaveBeenCalled();
@@ -68,7 +71,7 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback1);
       handler.register('select', callback2);
 
-      const event: Command = { name: 'select', ids: ['1'] };
+      const event: Command = { name: 'select', nodeIds: ['1'] };
       handler.emit('select', event);
 
       expect(callback1).toHaveBeenCalledWith(event);
@@ -81,7 +84,7 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback);
       handler.register('select', callback);
 
-      const event: Command = { name: 'select', ids: ['1'] };
+      const event: Command = { name: 'select', nodeIds: ['1'] };
       handler.emit('select', event);
 
       expect(callback).toHaveBeenCalledTimes(2);
@@ -95,7 +98,7 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback1);
       handler.register('select', callback2);
 
-      handler.emit('select', { ids: ['1'] });
+      handler.emit('select', { nodeIds: ['1'] });
 
       expect(calls).toEqual(['1', '2']);
     });
@@ -107,7 +110,7 @@ describe('CoreCommandHandler', () => {
       const unregister = handler.register('select', callback);
 
       unregister();
-      handler.emit('select', { ids: ['1'] });
+      handler.emit('select', { nodeIds: ['1'] });
 
       expect(callback).not.toHaveBeenCalled();
     });
@@ -120,7 +123,7 @@ describe('CoreCommandHandler', () => {
       handler.register('select', callback2);
 
       unregister1();
-      handler.emit('select', { ids: ['1'] });
+      handler.emit('select', { nodeIds: ['1'] });
 
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).toHaveBeenCalled();
@@ -133,7 +136,7 @@ describe('CoreCommandHandler', () => {
       unregister();
       unregister(); // Call again, should not throw
 
-      handler.emit('select', { ids: ['1'] });
+      handler.emit('select', { nodeIds: ['1'] });
       expect(callback).not.toHaveBeenCalled();
     });
   });
@@ -143,11 +146,11 @@ describe('CoreCommandHandler', () => {
       const callback = vi.fn();
       handler.register('select', callback);
 
-      handler.emit('select', { ids: ['1'] });
+      handler.emit('select', { nodeIds: ['1'] });
 
       expect(callback).toHaveBeenCalledWith({
         name: 'select',
-        ids: ['1'],
+        nodeIds: ['1'],
       });
     });
   });
