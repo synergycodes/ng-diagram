@@ -16,15 +16,9 @@ export interface BaseEvent {
 }
 
 /**
- * Keyboard event types
+ * Keyboard base event interface
  */
-export type KeyboardEventType = 'keydown' | 'keyup' | 'keypress';
-
-/**
- * Keyboard event interface
- */
-export interface KeyboardEvent extends BaseEvent {
-  type: KeyboardEventType;
+export interface KeyboardBaseEvent extends BaseEvent {
   key: string;
   code: string;
   ctrlKey: boolean;
@@ -32,6 +26,32 @@ export interface KeyboardEvent extends BaseEvent {
   altKey: boolean;
   metaKey: boolean;
 }
+
+/**
+ * Keyboard down event interface
+ */
+export interface KeyboardDownEvent extends KeyboardBaseEvent {
+  type: 'keydown';
+}
+
+/**
+ * Keyboard up event interface
+ */
+export interface KeyboardUpEvent extends KeyboardBaseEvent {
+  type: 'keyup';
+}
+
+/**
+ * Keyboard press event interface
+ */
+export interface KeyboardPressEvent extends KeyboardBaseEvent {
+  type: 'keypress';
+}
+
+/**
+ * Keyboard event interface
+ */
+export type KeyboardEvent = KeyboardDownEvent | KeyboardUpEvent | KeyboardPressEvent;
 
 /**
  * Pointer base event interface
@@ -86,6 +106,16 @@ export interface PointerLeaveEvent extends PointerBaseEvent {
 export type PointerEvent = PointerDownEvent | PointerUpEvent | PointerMoveEvent | PointerEnterEvent | PointerLeaveEvent;
 
 /**
+ * Resize event interface
+ */
+export interface ResizeEvent extends BaseEvent {
+  type: 'resize';
+  width: number;
+  height: number;
+  disableAutoSize?: boolean;
+}
+
+/**
  * Wheel event interface
  */
 export interface WheelEvent extends BaseEvent {
@@ -100,4 +130,4 @@ export interface WheelEvent extends BaseEvent {
 /**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent | WheelEvent;
+export type Event = KeyboardEvent | PointerEvent | ResizeEvent | WheelEvent;

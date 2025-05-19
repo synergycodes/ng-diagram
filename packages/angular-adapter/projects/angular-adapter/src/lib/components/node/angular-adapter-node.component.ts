@@ -7,6 +7,7 @@ import {
   PointerUpEventListenerDirective,
 } from '../../directives';
 import { NodeSelectedDirective } from '../../directives/node-selected/node-selected.directive';
+import { NodeSizeDirective } from '../../directives/node-size/node-size.directive';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -14,6 +15,10 @@ import { NodeSelectedDirective } from '../../directives/node-selected/node-selec
   styleUrl: './angular-adapter-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
+    {
+      directive: NodeSizeDirective,
+      inputs: ['eventTarget', 'size', 'autoSize'],
+    },
     {
       directive: NodePositionDirective,
       inputs: ['position'],

@@ -1,21 +1,58 @@
+import { Component, Input, Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AngularAdapterDiagramComponent, FlowCoreProviderService } from '@angularflow/angular-adapter';
+import { AngularAdapterDiagramComponent, FlowCoreProviderService, INodeTemplate } from '@angularflow/angular-adapter';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { AppComponent } from './app.component';
+
+@Component({
+  // eslint-disable-next-line @angular-eslint/component-selector -- Mocking library component that uses its own prefix
+  selector: 'angular-adapter-diagram',
+  template: '',
+  standalone: true,
+})
+class MockAngularAdapterDiagramComponent {
+  @Input() model = new SignalModelAdapter();
+  @Input() nodeTemplateMap = new Map<string, Type<INodeTemplate>>();
+}
+
+const mockFlowCore = {
+  registerMiddleware: vi.fn(),
+  unregisterMiddleware: vi.fn(),
+};
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
+  let flowCoreProvider: FlowCoreProviderService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent, AngularAdapterDiagramComponent],
-    }).compileComponents();
+      imports: [AppComponent],
+      providers: [
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            provide: vi.fn().mockReturnValue(mockFlowCore),
+          },
+        },
+      ],
+    })
+      .overrideComponent(AppComponent, {
+        remove: {
+          imports: [AngularAdapterDiagramComponent],
+        },
+        add: {
+          imports: [MockAngularAdapterDiagramComponent],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
+    flowCoreProvider = TestBed.inject(FlowCoreProviderService);
     fixture.detectChanges();
   });
 
@@ -25,10 +62,11 @@ describe('AppComponent', () => {
 
   it('should initialize with three nodes', () => {
     const nodes = component.model().getNodes();
-    expect(nodes.length).toBe(3);
+    expect(nodes.length).toBe(4);
     expect(nodes[0].type).toBe('input-field');
     expect(nodes[1].type).toBe('image');
     expect(nodes[2].type).toBe('unknown');
+    expect(nodes[3].type).toBe('resizable');
   });
 
   it('should have correct node template mappings', () => {
@@ -43,11 +81,13 @@ describe('AppComponent', () => {
 
   describe('after view init', () => {
     beforeEach(() => {
-      TestBed.inject(FlowCoreProviderService).provide().unregisterMiddleware(loggerMiddleware.name);
+      const mockFlowCore = flowCoreProvider.provide();
+      mockFlowCore.unregisterMiddleware(loggerMiddleware.name);
     });
 
     it('should register logger middleware', () => {
-      const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService).provide(), 'registerMiddleware');
+      const mockFlowCore = flowCoreProvider.provide();
+      const spy = vi.spyOn(mockFlowCore, 'registerMiddleware');
 
       component.ngAfterViewInit();
 

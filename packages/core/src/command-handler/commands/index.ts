@@ -11,6 +11,7 @@ import {
 } from './linking';
 import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
+import { resizeNode } from './resize-node';
 import { deselectAll, select } from './selection';
 import { zoom } from './zoom';
 
@@ -43,5 +44,6 @@ export const commands: CommandMap = {
   finishLinking,
   finishLinkingToPosition,
   startLinkingFromPosition,
+  resizeNode,
   zoom,
 };

@@ -1,15 +1,27 @@
+import { Directive, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
-  NodePositionDirective,
-  NodeSelectedDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerUpEventListenerDirective,
 } from '../../directives';
+import { NodePositionDirective } from '../../directives/node-position/node-position.directive';
+import { NodeSelectedDirective } from '../../directives/node-selected/node-selected.directive';
+import { NodeSizeDirective } from '../../directives/node-size/node-size.directive';
 import { AngularAdapterNodeComponent } from './angular-adapter-node.component';
+
+@Directive({
+  selector: '[angularAdapterNodeSize]',
+  standalone: true,
+})
+class MockNodeSizeDirective {
+  @Input() eventTarget?: { type: string };
+  @Input() size?: { width: number; height: number };
+  @Input() autoSize = true;
+}
 
 describe('AngularAdapterNodeComponent', () => {
   let component: AngularAdapterNodeComponent;
@@ -18,7 +30,26 @@ describe('AngularAdapterNodeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterNodeComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(AngularAdapterNodeComponent, {
+        remove: {
+          hostDirectives: [
+            {
+              directive: NodeSizeDirective,
+              inputs: ['eventTarget', 'size', 'autoSize'],
+            },
+          ],
+        },
+        add: {
+          hostDirectives: [
+            {
+              directive: MockNodeSizeDirective,
+              inputs: ['eventTarget', 'size', 'autoSize'],
+            },
+          ],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterNodeComponent);
     component = fixture.componentInstance;
@@ -57,5 +88,10 @@ describe('AngularAdapterNodeComponent', () => {
   it('should have PointerUpEventListenerDirective as host directive', () => {
     const pointerUpEventListenerDirective = fixture.debugElement.injector.get(PointerUpEventListenerDirective);
     expect(pointerUpEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have NodeSizeDirective as host directive', () => {
+    const nodeSizeDirective = fixture.debugElement.injector.get(MockNodeSizeDirective);
+    expect(nodeSizeDirective).toBeTruthy();
   });
 });

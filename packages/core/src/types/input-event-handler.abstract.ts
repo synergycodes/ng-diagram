@@ -13,6 +13,7 @@ export type InputActionName =
   | 'paste'
   | 'panning'
   | 'linking'
+  | 'resize'
   | 'zooming';
 
 /**

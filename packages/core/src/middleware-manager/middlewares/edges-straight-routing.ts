@@ -10,6 +10,7 @@ const regularEdgeActions = new Set<ModelActionType>([
   'moveSelection',
   'paste',
   'finishLinking',
+  'resizeNode',
 ]);
 
 const temporaryEdgeActions = new Set<ModelActionType>(['startLinking', 'moveTemporaryEdge', 'finishLinking']);

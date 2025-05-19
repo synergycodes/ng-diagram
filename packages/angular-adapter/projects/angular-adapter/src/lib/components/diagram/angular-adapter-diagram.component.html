@@ -4,6 +4,8 @@
       [position]="node.position"
       [eventTarget]="{ type: 'node', element: node }"
       [selected]="node.selected"
+      [size]="node.size"
+      [autoSize]="node.autoSize ?? false"
     >
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { data: node }" />

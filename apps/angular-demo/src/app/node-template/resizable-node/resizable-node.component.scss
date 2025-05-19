@@ -1,0 +1,43 @@
+:host {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.resizable-node {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+.size-input {
+  width: 100%;
+}
+
+.size-control {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+
+  > .size-input {
+    flex: 0.6;
+  }
+
+  > .auto-size-label {
+    flex: 0.4;
+    margin: 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+input {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  border-radius: 2px;
+}

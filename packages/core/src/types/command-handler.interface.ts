@@ -17,9 +17,11 @@ import {
 } from '../command-handler/commands/linking';
 import { MoveSelectionCommand } from '../command-handler/commands/move-selection';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
+import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { DeselectAllCommand, SelectCommand } from '../command-handler/commands/selection';
 import { ZoomCommand } from '../command-handler/commands/zoom';
 import { FlowCore } from '../flow-core';
+
 /**
  * Type for system commands that can be emitted by InputEventHandler or user
  */
@@ -43,6 +45,7 @@ export type Command =
   | FinishLinkingCommand
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
+  | ResizeNodeCommand
   | ZoomCommand;
 
 /**

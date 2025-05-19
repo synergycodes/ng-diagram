@@ -34,7 +34,8 @@ export class MiddlewareManager {
 
   /**
    * Executes all registered middlewares in sequence
-   * @param state Initial state to be transformed
+   * @param prevState Initial state to be transformed
+   * @param nextState Next state to be transformed
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
