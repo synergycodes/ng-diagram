@@ -77,6 +77,8 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       x: event.clientX,
       y: event.clientY,
       button: event.button,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
     });
   }
 
@@ -91,6 +93,8 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       x: event.clientX,
       y: event.clientY,
       button: event.button,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
     });
   }
 

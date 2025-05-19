@@ -30,14 +30,13 @@ export class AppComponent {
 
   constructor() {
     this.model().setNodes([
-      { id: '1', type: 'input-field', position: { x: 300, y: 300 }, data: {}, autoSize: true },
-      { id: '2', type: 'image', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-      { id: '3', type: 'unknown', position: { x: 700, y: 300 }, data: {} },
-      { id: '4', type: 'resizable', position: { x: 750, y: 300 }, data: {}, autoSize: true },
+      { id: '1', type: 'image', position: { x: 0, y: 200 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+      { id: '2', type: 'input-field', position: { x: 200, y: 250 }, data: {}, autoSize: true },
+      { id: '3', type: 'resizable', position: { x: 400, y: 200 }, data: {}, autoSize: true },
     ]);
     this.model().setEdges([
       {
-        id: '4',
+        id: '1',
         source: '1',
         target: '2',
         data: {},
@@ -45,6 +44,36 @@ export class AppComponent {
         targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-left',
         targetPort: 'port-right',
+      },
+      {
+        id: '2',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left-1',
+      },
+      {
+        id: '3',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left-2',
+      },
+      {
+        id: '4',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left-3',
       },
     ]);
   }
