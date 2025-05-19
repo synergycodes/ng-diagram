@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { getSamplePointerEvent, mockEdge, mockEnvironment, mockNode } from '../../../test-utils';
+import { getSamplePointerEvent, mockEdge, mockEnvironment, mockNode, mockPointerEvent } from '../../../test-utils';
 import { selectAction } from '../select';
 
 describe('selectAction', () => {
@@ -20,12 +20,12 @@ describe('selectAction', () => {
 
   describe('predicate', () => {
     it('should return true for pointerdown events', () => {
-      expect(selectAction.predicate(getSamplePointerEvent({ type: 'pointerdown' }), mockFlowCore)).toBe(true);
+      expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerdown', button: 0 }, mockFlowCore)).toBe(true);
     });
 
     it('should return false for other events', () => {
-      expect(selectAction.predicate(getSamplePointerEvent({ type: 'pointerenter' }), mockFlowCore)).toBe(false);
-      expect(selectAction.predicate(getSamplePointerEvent({ type: 'pointerup' }), mockFlowCore)).toBe(false);
+      expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerenter' }, mockFlowCore)).toBe(false);
+      expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerup', button: 0 }, mockFlowCore)).toBe(false);
     });
   });
 
