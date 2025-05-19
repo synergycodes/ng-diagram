@@ -1,5 +1,15 @@
 import type { CommandByName, CommandHandler, CommandName } from '../../types';
-import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } from './add-update-delete';
+import {
+  addEdges,
+  addNodes,
+  addPorts,
+  deleteEdges,
+  deleteNodes,
+  deletePorts,
+  updateEdge,
+  updateNode,
+  updatePort,
+} from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
 import { init } from './init';
@@ -49,4 +59,7 @@ export const commands: CommandMap = {
   startLinkingFromPosition,
   resizeNode,
   zoom,
+  addPorts,
+  updatePort,
+  deletePorts,
 };

@@ -10,7 +10,6 @@ let isLinking = false;
 
 export const linkingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    console.log(event);
     if (isPointerDownEvent(event) && isPortTarget(event.target)) {
       isLinking = true;
       flowCore.commandHandler.emit('startLinking', {

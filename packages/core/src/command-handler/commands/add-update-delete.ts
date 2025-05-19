@@ -1,4 +1,4 @@
-import type { CommandHandler, Edge, Node } from '../../types';
+import type { CommandHandler, Edge, Node, Port } from '../../types';
 
 export interface AddNodesCommand {
   name: 'addNodes';
@@ -79,4 +79,73 @@ export interface DeleteEdgesCommand {
 export const deleteEdges = (commandHandler: CommandHandler, command: DeleteEdgesCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
   commandHandler.flowCore.applyUpdate({ edges: edges.filter((edge) => !command.ids.includes(edge.id)) }, 'deleteEdges');
+};
+
+export interface AddPortsCommand {
+  name: 'addPorts';
+  nodeId: string;
+  ports: Port[];
+}
+
+export const addPorts = (commandHandler: CommandHandler, command: AddPortsCommand): void => {
+  const { nodes } = commandHandler.flowCore.getState();
+  const { nodeId, ports } = command;
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodes: nodes.map((node) => (node.id === nodeId ? { ...node, ports: [...(node.ports ?? []), ...ports] } : node)),
+    },
+    'updateNode'
+  );
+};
+
+export interface UpdatePortCommand {
+  name: 'updatePort';
+  nodeId: string;
+  portId: string;
+  portChanges: Partial<Port>;
+}
+
+export const updatePort = (commandHandler: CommandHandler, command: UpdatePortCommand): void => {
+  const { nodes } = commandHandler.flowCore.getState();
+  const { nodeId, portId, portChanges } = command;
+  const portExists = nodes.find((node) => node.id === nodeId)?.ports?.find((port) => port.id === portId);
+  if (!portExists) {
+    return;
+  }
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodes: nodes.map((node) =>
+        node.id === nodeId
+          ? {
+              ...node,
+              ports: node.ports?.map((port) => (port.id === portId ? { ...port, ...portChanges } : port)),
+            }
+          : node
+      ),
+    },
+    'updateNode'
+  );
+};
+
+export interface DeletePortsCommand {
+  name: 'deletePorts';
+  nodeId: string;
+  portIds: string[];
+}
+
+export const deletePorts = (commandHandler: CommandHandler, command: DeletePortsCommand): void => {
+  const { nodes } = commandHandler.flowCore.getState();
+  const { nodeId, portIds } = command;
+  const portsExists = nodes.find((node) => node.id === nodeId)?.ports?.filter((port) => portIds.includes(port.id));
+  if (!portsExists) {
+    return;
+  }
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodes: nodes.map((node) =>
+        node.id === nodeId ? { ...node, ports: node.ports?.filter((port) => !portIds.includes(port.id)) } : node
+      ),
+    },
+    'updateNode'
+  );
 };

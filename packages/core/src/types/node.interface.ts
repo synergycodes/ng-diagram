@@ -76,4 +76,8 @@ export interface Port {
    * The id of the node that the port belongs to.
    */
   nodeId: string;
+  /**
+   * The side of the node that the port is on.
+   */
+  side: 'top' | 'right' | 'bottom' | 'left';
 }

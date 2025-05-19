@@ -2,7 +2,7 @@ import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Rend
 import type { Node } from '@angularflow/core';
 
 import { EventMapperService } from '../../services';
-
+import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
 @Directive({
   selector: '[angularAdapterNodeSize]',
 })
@@ -10,11 +10,14 @@ export class NodeSizeDirective implements OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly eventMapperService = inject(EventMapperService);
   private readonly renderer = inject(Renderer2);
+  private readonly updatePortsService = inject(UpdatePortsService);
   private resizeObserver!: ResizeObserver;
 
+  isDestroyed = false;
   data = input.required<Node>();
   size = computed(() => this.data().size);
   autoSize = computed(() => this.data().autoSize ?? true);
+  id = computed(() => this.data().id);
 
   sizeState = computed(() => ({
     size: this.size(),
@@ -36,6 +39,7 @@ export class NodeSizeDirective implements OnDestroy {
   }
 
   ngOnDestroy() {
+    this.isDestroyed = true;
     this.disconnectResizeObserver();
   }
 
@@ -47,7 +51,7 @@ export class NodeSizeDirective implements OnDestroy {
   private createResizeObserver() {
     this.resizeObserver = new ResizeObserver((entries) => {
       const borderBox = entries[0].borderBoxSize?.[0];
-      if (borderBox) {
+      if (borderBox && !this.isDestroyed) {
         const width = borderBox.inlineSize;
         const height = borderBox.blockSize;
         this.eventMapperService.emit({
@@ -57,6 +61,7 @@ export class NodeSizeDirective implements OnDestroy {
           height,
           timestamp: Date.now(),
         });
+        this.updatePortsService.updateNodePorts(this.id());
       }
     });
     this.resizeObserver.observe(this.hostElement.nativeElement);
