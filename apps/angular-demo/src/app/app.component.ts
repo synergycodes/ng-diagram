@@ -30,9 +30,9 @@ export class AppComponent {
 
   constructor() {
     this.model().setNodes([
-      { id: '1', type: 'image', position: { x: 0, y: 200 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-      { id: '2', type: 'input-field', position: { x: 200, y: 250 }, data: {}, autoSize: true },
-      { id: '3', type: 'resizable', position: { x: 400, y: 200 }, data: {}, autoSize: true },
+      { id: '1', type: 'image', position: { x: 100, y: 200 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, autoSize: true },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, autoSize: true },
     ]);
     this.model().setEdges([
       {
@@ -42,8 +42,8 @@ export class AppComponent {
         data: {},
         sourceArrowhead: 'angularflow-arrow',
         targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-left',
-        targetPort: 'port-right',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
       },
       {
         id: '2',
