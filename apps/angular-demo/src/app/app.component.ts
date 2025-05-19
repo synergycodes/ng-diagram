@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
-  FlowCoreProviderService,
   INodeTemplate,
+  Middleware,
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
@@ -19,15 +19,14 @@ import { ResizableNodeComponent } from './node-template/resizable-node/resizable
   imports: [AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements AfterViewInit {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService);
-
+export class AppComponent {
   model = signal<SignalModelAdapter>(new SignalModelAdapter());
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],
     ['resizable', ResizableNodeComponent],
   ]);
+  middlewares = signal<Middleware[]>([loggerMiddleware]);
 
   constructor() {
     this.model().setNodes([
@@ -54,9 +53,5 @@ export class AppComponent implements AfterViewInit {
         targetArrowhead: 'angularflow-arrow',
       },
     ]);
-  }
-
-  ngAfterViewInit() {
-    this.flowCoreProvider.provide().registerMiddleware(loggerMiddleware);
   }
 }

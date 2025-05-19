@@ -2,6 +2,7 @@ import type { CommandByName, CommandHandler, CommandName } from '../../types';
 import { addEdges, addNodes, deleteEdges, deleteNodes, updateEdge, updateNode } from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
+import { init } from './init';
 import {
   finishLinking,
   finishLinkingToPosition,
@@ -25,6 +26,7 @@ export type CommandMap = {
 };
 
 export const commands: CommandMap = {
+  init,
   select,
   deselect,
   deselectAll,

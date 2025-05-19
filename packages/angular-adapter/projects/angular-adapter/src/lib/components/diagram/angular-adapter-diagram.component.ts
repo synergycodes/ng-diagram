@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
-import { Edge, ModelAdapter, Node } from '@angularflow/core';
+import { Edge, Middleware, ModelAdapter, Node } from '@angularflow/core';
 
 import {
   KeyDownEventListenerDirective,
@@ -13,7 +13,7 @@ import {
   PointerUpEventListenerDirective,
   WheelEventListenerDirective,
 } from '../../directives';
-import { FlowCoreProviderService, ModelProviderService, RendererService } from '../../services';
+import { FlowCoreProviderService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
@@ -47,13 +47,17 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   ],
 })
 export class AngularAdapterDiagramComponent {
-  private readonly modelProvider = inject(ModelProviderService);
-  private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   /**
    * The model to use in the diagram.
    */
   model = input.required<ModelAdapter>();
+
+  /**
+   * The starting middlewares to use in the Flow Core.
+   */
+  middlewares = input<Middleware[]>([]);
 
   /**
    * The node template map to use for the diagram.
@@ -75,8 +79,7 @@ export class AngularAdapterDiagramComponent {
     // To fix this behavior we need to destroy the effect after the first run
     const effectRef = effect(
       () => {
-        this.modelProvider.init(this.model());
-        this.flowCore.init();
+        this.flowCoreProvider.init(this.model(), this.middlewares());
         effectRef.destroy();
       },
       { manualCleanup: true }

@@ -8,6 +8,7 @@ import {
 } from '../command-handler/commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
+import { InitCommand } from '../command-handler/commands/init';
 import {
   FinishLinkingCommand,
   FinishLinkingToPositionCommand,
@@ -26,6 +27,7 @@ import { FlowCore } from '../flow-core';
  * Type for system commands that can be emitted by InputEventHandler or user
  */
 export type Command =
+  | InitCommand
   | SelectCommand
   | DeselectCommand
   | DeselectAllCommand

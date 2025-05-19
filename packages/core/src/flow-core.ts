@@ -9,23 +9,41 @@ import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Renderer } from './types/renderer.interface';
 
 export class FlowCore {
+  private _model: ModelAdapter;
   readonly commandHandler: CommandHandler;
   readonly inputEventHandler: InputEventHandler;
   readonly middlewareManager: MiddlewareManager;
   readonly environment: EnvironmentInfo;
 
   constructor(
-    private readonly modelAdapter: ModelAdapter,
+    modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
     private readonly eventMapper: EventMapper,
-    environment: EnvironmentInfo
+    environment: EnvironmentInfo,
+    middlewares?: Middleware[]
   ) {
+    this._model = modelAdapter;
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.inputEventHandler = new InputEventHandler(this);
-    this.middlewareManager = new MiddlewareManager();
-    this.render();
-    this.modelAdapter.onChange(() => this.render());
+    this.middlewareManager = new MiddlewareManager(middlewares);
+    this.init();
+  }
+
+  /**
+   * Sets the new model and runs the init process
+   * @param model Model
+   */
+  set model(model: ModelAdapter) {
+    this._model = model;
+    this.init();
+  }
+
+  /**
+   * Gets the current model that flow core is using
+   */
+  get model(): ModelAdapter {
+    return this._model;
   }
 
   /**
@@ -65,9 +83,9 @@ export class FlowCore {
    */
   getState(): FlowState {
     return {
-      nodes: this.modelAdapter.getNodes(),
-      edges: this.modelAdapter.getEdges(),
-      metadata: this.modelAdapter.getMetadata(),
+      nodes: this.model.getNodes(),
+      edges: this.model.getEdges(),
+      metadata: this.model.getMetadata(),
     };
   }
 
@@ -76,9 +94,9 @@ export class FlowCore {
    * @param state State to set
    */
   setState(state: FlowState): void {
-    this.modelAdapter.setNodes(state.nodes);
-    this.modelAdapter.setEdges(state.edges);
-    this.modelAdapter.setMetadata(state.metadata);
+    this.model.setNodes(state.nodes);
+    this.model.setEdges(state.edges);
+    this.model.setMetadata(state.metadata);
   }
 
   /**
@@ -94,21 +112,12 @@ export class FlowCore {
   }
 
   /**
-   * Renders the flow
-   */
-  private render(): void {
-    const { nodes, edges, metadata } = this.getState();
-    const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
-    this.renderer.draw(nodes, finalEdges, metadata.viewport);
-  }
-
-  /**
    * Converts a client position to a flow position
    * @param clientPosition Client position
    * @returns { x: number, y: number } Flow position
    */
   clientToFlowPosition(clientPosition: { x: number; y: number }): { x: number; y: number } {
-    const { x: viewportX, y: viewportY, scale } = this.modelAdapter.getMetadata().viewport;
+    const { x: viewportX, y: viewportY, scale } = this.model.getMetadata().viewport;
     return {
       x: (clientPosition.x - viewportX) / scale,
       y: (clientPosition.y - viewportY) / scale,
@@ -121,10 +130,27 @@ export class FlowCore {
    * @returns { x: number, y: number } Client position
    */
   flowToClientPosition(flowPosition: { x: number; y: number }): { x: number; y: number } {
-    const { x: viewportX, y: viewportY, scale } = this.modelAdapter.getMetadata().viewport;
+    const { x: viewportX, y: viewportY, scale } = this.model.getMetadata().viewport;
     return {
       x: flowPosition.x * scale + viewportX,
       y: flowPosition.y * scale + viewportY,
     };
+  }
+
+  /**
+   * Starts listening to model changes and emits init command
+   */
+  private init() {
+    this.model.onChange(() => this.render());
+    this.commandHandler.emit('init');
+  }
+
+  /**
+   * Renders the flow
+   */
+  private render(): void {
+    const { nodes, edges, metadata } = this.getState();
+    const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
+    this.renderer.draw(nodes, finalEdges, metadata.viewport);
   }
 }

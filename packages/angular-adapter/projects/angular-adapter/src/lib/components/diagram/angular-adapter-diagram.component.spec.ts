@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ModelAdapter } from '@angularflow/core';
+import { Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -13,7 +13,7 @@ import {
   PointerUpEventListenerDirective,
   WheelEventListenerDirective,
 } from '../../directives';
-import { FlowCoreProviderService, ModelProviderService } from '../../services';
+import { FlowCoreProviderService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -34,6 +34,7 @@ describe('AngularAdapterDiagramComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterDiagramComponent],
+      providers: [{ provide: FlowCoreProviderService, useValue: { init: vi.fn() } }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
@@ -50,34 +51,34 @@ describe('AngularAdapterDiagramComponent', () => {
     expect(component.nodeTemplateMap().size).toBe(0);
   });
 
-  it('should call modelProvider.init when model input changes', () => {
-    const spy = vi.spyOn(TestBed.inject(ModelProviderService), 'init');
-    const newModel: ModelAdapter = { ...mockModel, getNodes: vi.fn() };
+  it('should call flowCoreProvider.init only once with provided model', () => {
+    const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
-    fixture.componentRef.setInput('model', newModel);
+    fixture.componentRef.setInput('model', mockModel);
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith(newModel);
 
-    fixture.componentRef.setInput('model', { ...mockModel, getEdges: vi.fn() });
+    fixture.componentRef.setInput('model', { ...mockModel });
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it('should call flowCore.init when model input changes', () => {
+  it('should call flowCoreProvider.init only once with provided middlewares', () => {
     const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
-    const newModel: ModelAdapter = { ...mockModel, getNodes: vi.fn() };
+    const middlewares: Middleware[] = [{ name: 'test', execute: vi.fn().mockImplementation((state) => state) }];
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
-    fixture.componentRef.setInput('model', newModel);
+    fixture.componentRef.setInput('model', mockModel);
+    fixture.componentRef.setInput('middlewares', middlewares);
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(mockModel, middlewares);
 
-    fixture.componentRef.setInput('model', { ...mockModel, getEdges: vi.fn() });
+    fixture.componentRef.setInput('middlewares', [...middlewares]);
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledTimes(1);

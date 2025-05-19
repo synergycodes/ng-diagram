@@ -2,6 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockMetadata, mockNode } from '../test-utils';
 import type { FlowState, Middleware, MiddlewareContext } from '../types';
 import { MiddlewareManager } from './middleware-manager';
+import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
+
+vi.mock('./middlewares/edges-straight-routing', () => ({
+  edgesStraightRoutingMiddleware: {
+    name: 'edges-straight-routing',
+    execute: vi.fn().mockImplementation((state) => state),
+  },
+}));
 
 describe('MiddlewareManager', () => {
   let middlewareManager: MiddlewareManager;
@@ -49,6 +57,24 @@ describe('MiddlewareManager', () => {
       modelActionType: 'changeSelection',
       historyUpdates: [{ name: 'changeSelection', prevState, nextState }],
     };
+  });
+
+  describe('constructor', () => {
+    it('should register edges straight routing middleware', () => {
+      const middlewareManager = new MiddlewareManager();
+      middlewareManager.execute(prevState, nextState, 'init');
+
+      expect(edgesStraightRoutingMiddleware.execute).toHaveBeenCalled();
+    });
+
+    it('should register starting middlewares if they are provided', () => {
+      const spy = vi.spyOn(mockMiddleware1, 'execute');
+
+      const middlewareManager = new MiddlewareManager([mockMiddleware1]);
+      middlewareManager.execute(prevState, nextState, 'init');
+
+      expect(spy).toHaveBeenCalled();
+    });
   });
 
   describe('register', () => {

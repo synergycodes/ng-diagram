@@ -1,20 +1,18 @@
 import { inject, Injectable } from '@angular/core';
-import { FlowCore } from '@angularflow/core';
+import { FlowCore, Middleware, ModelAdapter } from '@angularflow/core';
 
 import { EventMapperService } from '../event-mapper/event-mapper.service';
-import { ModelProviderService } from '../model-provider/model-provider.service';
 import { RendererService } from '../renderer/renderer.service';
 import { detectEnvironment } from './detect-environment';
 
 @Injectable({ providedIn: 'root' })
 export class FlowCoreProviderService {
-  private readonly modelProvider = inject(ModelProviderService);
   private readonly renderer = inject(RendererService);
   private readonly eventMapper = inject(EventMapperService);
   private flowCore: FlowCore | null = null;
 
-  init(): void {
-    this.flowCore = new FlowCore(this.modelProvider.provide(), this.renderer, this.eventMapper, detectEnvironment());
+  init(model: ModelAdapter, middlewares: Middleware[] = []): void {
+    this.flowCore = new FlowCore(model, this.renderer, this.eventMapper, detectEnvironment(), middlewares);
   }
 
   provide(): FlowCore {

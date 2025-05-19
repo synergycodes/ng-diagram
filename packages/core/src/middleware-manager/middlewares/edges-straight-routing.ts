@@ -1,6 +1,7 @@
 import type { Edge, Middleware, ModelActionType } from '../../types';
 
 const regularEdgeActions = new Set<ModelActionType>([
+  'init',
   'addEdges',
   'updateEdge',
   'updateNode',
