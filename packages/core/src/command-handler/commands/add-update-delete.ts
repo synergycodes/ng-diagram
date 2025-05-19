@@ -13,13 +13,13 @@ export const addNodes = (commandHandler: CommandHandler, command: AddNodesComman
 export interface UpdateNodeCommand {
   name: 'updateNode';
   id: string;
-  node: Partial<Node>;
+  nodeChanges: Partial<Node>;
 }
 
 export const updateNode = (commandHandler: CommandHandler, command: UpdateNodeCommand): void => {
   const { nodes } = commandHandler.flowCore.getState();
   commandHandler.flowCore.applyUpdate(
-    { nodes: nodes.map((node) => (node.id === command.id ? { ...node, ...command.node } : node)) },
+    { nodes: nodes.map((node) => (node.id === command.id ? { ...node, ...command.nodeChanges } : node)) },
     'updateNode'
   );
 };
@@ -60,13 +60,13 @@ export const addEdges = (commandHandler: CommandHandler, command: AddEdgesComman
 export interface UpdateEdgeCommand {
   name: 'updateEdge';
   id: string;
-  edge: Partial<Edge>;
+  edgeChanges: Partial<Edge>;
 }
 
 export const updateEdge = (commandHandler: CommandHandler, command: UpdateEdgeCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
   commandHandler.flowCore.applyUpdate(
-    { edges: edges.map((edge) => (edge.id === command.id ? { ...edge, ...command.edge } : edge)) },
+    { edges: edges.map((edge) => (edge.id === command.id ? { ...edge, ...command.edgeChanges } : edge)) },
     'updateEdge'
   );
 };

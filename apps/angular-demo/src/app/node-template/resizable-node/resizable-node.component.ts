@@ -37,8 +37,7 @@ export class ResizableNodeComponent implements INodeTemplate {
     const checked = (event.target as HTMLInputElement).checked;
     this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
       id: this.data().id,
-      node: {
-        ...this.data(),
+      nodeChanges: {
         autoSize: checked,
       },
     });

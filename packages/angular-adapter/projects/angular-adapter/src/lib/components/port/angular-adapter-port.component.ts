@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit } from '@angular/core';
 import { Port, PortTarget } from '@angularflow/core';
-import { EventMapperService } from '../../services';
+import { EventMapperService, FlowCoreProviderService } from '../../services';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
@@ -13,12 +13,42 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     '(pointerup)': 'onPointerUp($event)',
   },
 })
-export class AngularAdapterPortComponent {
+export class AngularAdapterPortComponent implements OnInit, OnDestroy {
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly eventMapperService = inject(EventMapperService);
   private readonly nodeComponent = inject(AngularAdapterNodeComponent);
 
   id = input.required<string>();
   type = input.required<Port['type']>();
+
+  ngOnInit(): void {
+    const node = this.nodeComponent.data();
+    this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
+      id: node.id,
+      nodeChanges: {
+        ports: [
+          ...(node.ports ?? []),
+          {
+            id: this.id(),
+            position: { x: 0, y: 0 },
+            type: this.type(),
+            size: { width: 8, height: 8 },
+            nodeId: node.id,
+          },
+        ],
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    const node = this.nodeComponent.data();
+    this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
+      id: node.id,
+      nodeChanges: {
+        ports: node.ports?.filter((port) => port.id !== this.id()),
+      },
+    });
+  }
 
   onPointerDown(event: PointerEvent) {
     event.stopPropagation();
@@ -49,6 +79,7 @@ export class AngularAdapterPortComponent {
   }
 
   private getEventTarget(): PortTarget {
+    console.log(this.nodeComponent.data());
     return {
       type: 'port',
       element: {

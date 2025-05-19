@@ -10,6 +10,7 @@ let isLinking = false;
 
 export const linkingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
+    console.log(event);
     if (isPointerDownEvent(event) && isPortTarget(event.target)) {
       isLinking = true;
       flowCore.commandHandler.emit('startLinking', {
@@ -26,16 +27,14 @@ export const linkingAction: InputActionWithPredicate = {
 
     if (isPointerUpEvent(event) && isLinking) {
       isLinking = false;
-      if (isPortTarget(event.target)) {
-        flowCore.commandHandler.emit('finishLinking', {
-          target: event.target.element.nodeId,
-          targetPort: event.target.element.id,
-        });
-      }
+      flowCore.commandHandler.emit('finishLinking', {
+        target: isPortTarget(event.target) ? event.target.element.nodeId : undefined,
+        targetPort: isPortTarget(event.target) ? event.target.element.id : undefined,
+      });
     }
   },
   predicate: (event) =>
     (isPointerDownEvent(event) && event.button === 0 && isPortTarget(event.target)) ||
     (isPointerMoveEvent(event) && isLinking) ||
-    (isPointerUpEvent(event) && event.button === 0 && isPortTarget(event.target)),
+    (isPointerUpEvent(event) && event.button === 0),
 };

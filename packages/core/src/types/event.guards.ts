@@ -110,13 +110,6 @@ export const isWheelEvent = (event: Event): event is WheelEvent => {
 };
 
 /**
- * Check if an event is a resize event
- */
-export const isResizeEvent = (event: Event): event is ResizeEvent => {
-  return event.type === 'resize';
-};
-
-/**
  * Check if an event target is a node
  */
 export const isNodeTarget = (target: EventTarget): target is NodeTarget => {

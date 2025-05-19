@@ -118,16 +118,23 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
   const { metadata, edges } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
-  const targetNode = target && commandHandler.flowCore.getNodeById(target);
-  if (!metadata.temporaryEdge || !targetNode) {
+  if (!metadata.temporaryEdge) {
     return;
   }
 
+  const targetNode = target && commandHandler.flowCore.getNodeById(target);
+
+  if (!targetNode) {
+    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+  }
+
   const targetPosition =
-    target && targetPort ? commandHandler.flowCore.getFlowPortPosition(targetNode, targetPort) : targetNode.position;
+    !!target && !!targetPort
+      ? commandHandler.flowCore.getFlowPortPosition(targetNode, targetPort)
+      : targetNode.position;
 
   if (!targetPosition) {
-    return;
+    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
   }
 
   const newEdges: Edge[] = target
