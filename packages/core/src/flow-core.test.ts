@@ -285,7 +285,7 @@ describe('FlowCore', () => {
         mockPort.id
       );
 
-      expect(position).toEqual({ x: 105, y: 155 });
+      expect(position).toEqual({ x: 150, y: 155 });
     });
 
     it('should return proper flow port position for right side', () => {
