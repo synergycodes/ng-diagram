@@ -21,7 +21,10 @@ describe('AngularAdapterPortComponent', () => {
       imports: [AngularAdapterPortComponent],
       providers: [
         { provide: EventMapperService, useValue: { emit: vi.fn() } },
-        { provide: AngularAdapterNodeComponent, useValue: { data: vi.fn().mockReturnValue({ id: 'test-node-id' }) } },
+        {
+          provide: AngularAdapterNodeComponent,
+          useValue: { data: vi.fn().mockReturnValue({ id: 'test-node-id', ports: [{ id: 'test-port-id' }] }) },
+        },
         { provide: UpdatePortsService, useValue: { updateNodePorts: vi.fn(), getPortData: vi.fn() } },
         { provide: FlowCoreProviderService, useValue: { provide: () => flowCore } },
       ],
@@ -69,10 +72,6 @@ describe('AngularAdapterPortComponent', () => {
           type: 'port',
           element: {
             id: 'test-port-id',
-            type: 'both',
-            nodeId: 'test-node-id',
-            position: { x: 0, y: 0 },
-            size: { width: 8, height: 8 },
           },
         },
         pressure: 0.5,
@@ -112,10 +111,6 @@ describe('AngularAdapterPortComponent', () => {
           type: 'port',
           element: {
             id: 'test-port-id',
-            type: 'both',
-            nodeId: 'test-node-id',
-            position: { x: 0, y: 0 },
-            size: { width: 8, height: 8 },
           },
         },
         pressure: 0,
