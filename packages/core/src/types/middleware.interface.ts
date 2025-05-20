@@ -1,3 +1,4 @@
+import type { FlowCore } from '../flow-core';
 import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
@@ -61,7 +62,11 @@ export interface Middleware {
     /**
      * Context of the operation
      */
-    context: MiddlewareContext
+    context: MiddlewareContext,
+    /**
+     * Flow core
+     */
+    flowCore: FlowCore
   ) => FlowState;
 }
 

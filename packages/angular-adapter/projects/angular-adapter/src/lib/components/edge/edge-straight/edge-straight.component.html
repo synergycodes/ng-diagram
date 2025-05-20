@@ -1,4 +1,5 @@
-<svg>
+<!-- TODO: For now I set temporary class here to make linking works but when we add snapping to port it probably can be removed -->
+<svg [class.temporary]="isTemporary()">
   <path
     [attr.d]="path()"
     [attr.stroke]="stroke()"
@@ -8,5 +9,5 @@
     [attr.marker-end]="markerEnd()"
     [attr.stroke-opacity]="strokeOpacity()"
   />
-  <path [attr.d]="path()" fill="none" stroke="currentColor" stroke-width="20" stroke-opacity="0" />
+  <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
 </svg>

@@ -45,21 +45,21 @@ describe('AppComponent', () => {
 
   it('should initialize with three nodes', () => {
     const nodes = component.model().getNodes();
-    expect(nodes.length).toBe(4);
-    expect(nodes[0].type).toBe('input-field');
-    expect(nodes[1].type).toBe('image');
-    expect(nodes[2].type).toBe('unknown');
-    expect(nodes[3].type).toBe('resizable');
+    expect(nodes.length).toBe(3);
+    expect(nodes[0].type).toBe('image');
+    expect(nodes[1].type).toBe('input-field');
+    expect(nodes[2].type).toBe('resizable');
   });
 
   it('should have correct node template mappings', () => {
     expect(component.nodeTemplateMap.has('input-field')).toBeTruthy();
     expect(component.nodeTemplateMap.has('image')).toBeTruthy();
+    expect(component.nodeTemplateMap.has('resizable')).toBeTruthy();
   });
 
-  it('should initialize with two edges', () => {
+  it('should initialize with four edges', () => {
     const edges = component.model().getEdges();
-    expect(edges.length).toBe(2);
+    expect(edges.length).toBe(4);
   });
 
   it('should initialize with logger middleware', () => {

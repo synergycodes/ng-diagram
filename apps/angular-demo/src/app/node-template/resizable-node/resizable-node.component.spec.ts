@@ -1,8 +1,16 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { FlowCoreProviderService } from '@angularflow/angular-adapter';
+import { AngularAdapterPortComponent, FlowCoreProviderService } from '@angularflow/angular-adapter';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ResizableNodeComponent } from './resizable-node.component';
+
+@Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
+  selector: 'angular-adapter-port',
+  template: '<span></span>',
+})
+class MockAngularAdapterPortComponent {}
 
 describe('ResizableNodeComponent', () => {
   let component: ResizableNodeComponent;
@@ -23,7 +31,12 @@ describe('ResizableNodeComponent', () => {
           },
         },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(ResizableNodeComponent, {
+        remove: { imports: [AngularAdapterPortComponent] },
+        add: { imports: [MockAngularAdapterPortComponent] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ResizableNodeComponent);
     component = fixture.componentInstance;
@@ -112,8 +125,7 @@ describe('ResizableNodeComponent', () => {
 
     expect(spy).toHaveBeenCalledWith('updateNode', {
       id: '1',
-      node: {
-        ...component.data(),
+      nodeChanges: {
         autoSize: false,
       },
     });
@@ -150,8 +162,7 @@ describe('ResizableNodeComponent', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith('updateNode', {
       id: '1',
-      node: {
-        ...component.data(),
+      nodeChanges: {
         autoSize: true,
       },
     });

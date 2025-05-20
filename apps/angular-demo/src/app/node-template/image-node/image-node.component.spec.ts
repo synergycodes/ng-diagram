@@ -1,7 +1,16 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AngularAdapterPortComponent } from '@angularflow/angular-adapter';
 import { ImageNodeComponent } from './image-node.component';
+
+@Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
+  selector: 'angular-adapter-port',
+  template: '<span></span>',
+})
+class MockAngularAdapterPortComponent {}
 
 describe('ImageNodeComponent', () => {
   let component: ImageNodeComponent;
@@ -10,7 +19,12 @@ describe('ImageNodeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ImageNodeComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(ImageNodeComponent, {
+        remove: { imports: [AngularAdapterPortComponent] },
+        add: { imports: [MockAngularAdapterPortComponent] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ImageNodeComponent);
     component = fixture.componentInstance;

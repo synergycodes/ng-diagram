@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { INodeTemplate, Node } from '@angularflow/angular-adapter';
+import { AngularAdapterPortComponent, INodeTemplate, Node } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-input-field-node',
-  imports: [FormsModule],
+  imports: [FormsModule, AngularAdapterPortComponent],
   templateUrl: './input-field-node.component.html',
   styleUrls: ['./input-field-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

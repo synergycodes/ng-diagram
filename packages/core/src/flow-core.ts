@@ -1,12 +1,17 @@
 import { CommandHandler } from './command-handler/command-handler';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
-import type { EnvironmentInfo } from './types/environment.interface';
-import type { EventMapper } from './types/event-mapper.interface';
-import type { Event } from './types/event.interface';
-import type { FlowState, Middleware, ModelActionType } from './types/middleware.interface';
-import type { ModelAdapter } from './types/model-adapter.interface';
-import type { Renderer } from './types/renderer.interface';
+import type {
+  EnvironmentInfo,
+  Event,
+  EventMapper,
+  FlowState,
+  Middleware,
+  ModelActionType,
+  ModelAdapter,
+  Node,
+  Renderer,
+} from './types';
 
 export class FlowCore {
   private _model: ModelAdapter;
@@ -26,7 +31,7 @@ export class FlowCore {
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.inputEventHandler = new InputEventHandler(this);
-    this.middlewareManager = new MiddlewareManager(middlewares);
+    this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.init();
   }
 
@@ -152,5 +157,41 @@ export class FlowCore {
     const { nodes, edges, metadata } = this.getState();
     const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
     this.renderer.draw(nodes, finalEdges, metadata.viewport);
+  }
+
+  /**
+   * Gets the flow position of a port
+   * @param nodeId Node id
+   * @param portId Port id
+   * @returns { x: number, y: number } Flow position
+   */
+  getFlowPortPosition(node: Node, portId: string): { x: number; y: number } | null {
+    const port = node.ports?.find((port) => port.id === portId);
+    if (!port) {
+      return null;
+    }
+    let x = port.position.x + node.position.x;
+    let y = port.position.y + node.position.y;
+    if (port.side === 'left') {
+      y = y + port.size.width / 2;
+    } else if (port.side === 'right') {
+      x = x + port.size.width;
+      y = y + port.size.height / 2;
+    } else if (port.side === 'top') {
+      x = x + port.size.width / 2;
+    } else if (port.side === 'bottom') {
+      x = x + port.size.width / 2;
+      y = y + port.size.height;
+    }
+    return { x, y };
+  }
+
+  /**
+   * Gets a node by id
+   * @param nodeId Node id
+   * @returns Node
+   */
+  getNodeById(nodeId: string): Node | null {
+    return this.model.getNodes().find((node) => node.id === nodeId) ?? null;
   }
 }

@@ -23,11 +23,23 @@ export interface StartLinkingCommand {
 }
 
 export const startLinking = (commandHandler: CommandHandler, command: StartLinkingCommand): void => {
-  const { metadata, nodes } = commandHandler.flowCore.getState();
+  const { metadata } = commandHandler.flowCore.getState();
   const { source, sourcePort } = command;
 
-  const sourceNode = nodes.find((node) => node.id === source);
+  const sourceNode = commandHandler.flowCore.getNodeById(source);
   if (!sourceNode) {
+    return;
+  }
+
+  if (sourcePort && sourceNode.ports?.find((port) => port.id === sourcePort)?.type === 'target') {
+    return;
+  }
+
+  const position = sourcePort
+    ? commandHandler.flowCore.getFlowPortPosition(sourceNode, sourcePort)
+    : sourceNode.position;
+
+  if (!position) {
     return;
   }
 
@@ -38,9 +50,9 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
         temporaryEdge: getTemporaryEdge({
           source,
           sourcePort,
-          sourcePosition: sourceNode.position,
+          sourcePosition: position,
           target: '',
-          targetPosition: sourceNode.position,
+          targetPosition: position,
         }),
       },
     },
@@ -107,15 +119,35 @@ export interface FinishLinkingCommand {
 }
 
 export const finishLinking = (commandHandler: CommandHandler, command: FinishLinkingCommand): void => {
-  const { metadata, edges, nodes } = commandHandler.flowCore.getState();
+  const { metadata, edges } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
-  const targetNode = nodes.find((node) => node.id === target);
-  if (!metadata.temporaryEdge || !targetNode) {
+  if (!metadata.temporaryEdge) {
     return;
   }
 
-  const newEdges: Edge[] = target ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort })] : edges;
+  const targetNode = target && commandHandler.flowCore.getNodeById(target);
+
+  if (!targetNode) {
+    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+  }
+
+  if (targetPort && targetNode.ports?.find((port) => port.id === targetPort)?.type === 'source') {
+    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+  }
+
+  const targetPosition =
+    !!target && !!targetPort
+      ? commandHandler.flowCore.getFlowPortPosition(targetNode, targetPort)
+      : targetNode.position;
+
+  if (!targetPosition) {
+    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+  }
+
+  const newEdges: Edge[] = target
+    ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort, targetPosition })]
+    : edges;
 
   commandHandler.flowCore.applyUpdate(
     {

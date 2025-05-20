@@ -35,7 +35,17 @@ describe('pointerMoveSelectionAction', () => {
       ).toBe(true);
     });
 
-    it('should return true for pointermove events', () => {
+    it('should return false for pointer move event if moving is not started', () => {
+      expect(
+        pointerMoveSelectionAction.predicate(
+          getSamplePointerEvent({ type: 'pointermove', target: mockTarget }),
+          mockFlowCore
+        )
+      ).toBe(false);
+    });
+
+    it('should return true for pointermove events if move started', () => {
+      pointerMoveSelectionAction.action(mockEvent, mockFlowCore);
       expect(
         pointerMoveSelectionAction.predicate(
           getSamplePointerEvent({ type: 'pointermove', target: mockTarget }),

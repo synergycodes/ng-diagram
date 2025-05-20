@@ -1,10 +1,13 @@
 import {
   AddEdgesCommand,
   AddNodesCommand,
+  AddPortsCommand,
   DeleteEdgesCommand,
   DeleteNodesCommand,
+  DeletePortsCommand,
   UpdateEdgeCommand,
   UpdateNodeCommand,
+  UpdatePortCommand,
 } from '../command-handler/commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
@@ -49,7 +52,10 @@ export type Command =
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
   | ResizeNodeCommand
-  | ZoomCommand;
+  | ZoomCommand
+  | AddPortsCommand
+  | UpdatePortCommand
+  | DeletePortsCommand;
 
 /**
  * Type for command name

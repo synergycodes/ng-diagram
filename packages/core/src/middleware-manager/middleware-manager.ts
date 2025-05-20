@@ -1,10 +1,13 @@
+import { FlowCore } from '../flow-core';
 import type { FlowState, Middleware, MiddlewareChain, MiddlewareHistoryUpdate, ModelActionType } from '../types';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
+  readonly flowCore: FlowCore;
 
-  constructor(middlewares: Middleware[] = []) {
+  constructor(flowCore: FlowCore, middlewares: Middleware[] = []) {
+    this.flowCore = flowCore;
     this.register(edgesStraightRoutingMiddleware);
     middlewares.forEach((middleware) => this.register(middleware));
   }
@@ -44,11 +47,15 @@ export class MiddlewareManager {
     const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState }];
     return this.middlewareChain.reduce(
       ({ currentState, historyUpdates }, middleware) => {
-        const updatedState = middleware.execute(currentState, {
-          initialState: prevState,
-          modelActionType,
-          historyUpdates,
-        });
+        const updatedState = middleware.execute(
+          currentState,
+          {
+            initialState: prevState,
+            modelActionType,
+            historyUpdates,
+          },
+          this.flowCore
+        );
         if (
           Object.is(updatedState.metadata, currentState.metadata) &&
           Object.is(updatedState.nodes, currentState.nodes) &&

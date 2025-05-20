@@ -1,20 +1,21 @@
-import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
-
-// TODO: This implementation adds linking on right button click. When port is added, right click should be removed.
+import {
+  isPointerDownEvent,
+  isPointerMoveEvent,
+  isPointerUpEvent,
+  isPortTarget,
+  type InputActionWithPredicate,
+} from '../../types';
 
 let isLinking = false;
 
 export const linkingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    if (isPointerDownEvent(event)) {
+    if (isPointerDownEvent(event) && isPortTarget(event.target) && event.target.element.type !== 'target') {
       isLinking = true;
-      if (event.target?.type === 'node') {
-        flowCore.commandHandler.emit('startLinking', { source: event.target.element.id });
-      } else {
-        flowCore.commandHandler.emit('startLinkingFromPosition', {
-          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
-        });
-      }
+      flowCore.commandHandler.emit('startLinking', {
+        source: event.target.element.nodeId,
+        sourcePort: event.target.element.id,
+      });
     }
 
     if (isPointerMoveEvent(event) && isLinking) {
@@ -25,19 +26,21 @@ export const linkingAction: InputActionWithPredicate = {
 
     if (isPointerUpEvent(event) && isLinking) {
       isLinking = false;
-      if (event.target?.type === 'node') {
+      if (isPortTarget(event.target) && event.target.element.type !== 'source') {
         flowCore.commandHandler.emit('finishLinking', {
-          target: event.target.element.id,
+          target: event.target.element.nodeId,
+          targetPort: event.target.element.id,
         });
       } else {
-        flowCore.commandHandler.emit('finishLinkingToPosition', {
-          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
-        });
+        flowCore.commandHandler.emit('finishLinking', {});
       }
     }
   },
   predicate: (event) =>
-    (isPointerDownEvent(event) && event.button === 2) ||
-    isPointerMoveEvent(event) ||
-    (isPointerUpEvent(event) && event.button === 2),
+    (isPointerDownEvent(event) &&
+      event.button === 0 &&
+      isPortTarget(event.target) &&
+      event.target.element.type !== 'target') ||
+    (isPointerMoveEvent(event) && isLinking) ||
+    (isPointerUpEvent(event) && event.button === 0),
 };

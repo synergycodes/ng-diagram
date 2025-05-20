@@ -1,4 +1,4 @@
-import type { Edge, EnvironmentInfo, KeyboardEvent, Metadata, Node, PointerEvent, WheelEvent } from './types';
+import type { Edge, EnvironmentInfo, KeyboardEvent, Metadata, Node, PointerEvent, Port, WheelEvent } from './types';
 
 export const mockNode: Node = {
   id: 'node1',
@@ -80,4 +80,13 @@ export const mockMetadata: Metadata = {
 export const mockEnvironment: EnvironmentInfo = {
   os: 'MacOS',
   browser: 'Chrome',
+};
+
+export const mockPort: Port = {
+  id: 'port1',
+  type: 'both',
+  side: 'left',
+  position: { x: 0, y: 0 },
+  size: { width: 10, height: 10 },
+  nodeId: 'node1',
 };

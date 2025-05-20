@@ -1,15 +1,20 @@
-import {
+import type {
+  DiagramTarget,
+  EdgeTarget,
   Event,
+  EventTarget,
   KeyboardDownEvent,
   KeyboardEvent,
   KeyboardPressEvent,
   KeyboardUpEvent,
+  NodeTarget,
   PointerDownEvent,
   PointerEnterEvent,
   PointerEvent,
   PointerLeaveEvent,
   PointerMoveEvent,
   PointerUpEvent,
+  PortTarget,
   ResizeEvent,
   WheelEvent,
 } from './event.interface';
@@ -102,4 +107,32 @@ export const isResizeEvent = (event: Event): event is ResizeEvent => {
  */
 export const isWheelEvent = (event: Event): event is WheelEvent => {
   return event.type === 'wheel';
+};
+
+/**
+ * Check if an event target is a node
+ */
+export const isNodeTarget = (target: EventTarget): target is NodeTarget => {
+  return target.type === 'node';
+};
+
+/**
+ * Check if an event target is an edge
+ */
+export const isEdgeTarget = (target: EventTarget): target is EdgeTarget => {
+  return target.type === 'edge';
+};
+
+/**
+ * Check if an event target is a port
+ */
+export const isPortTarget = (target: EventTarget): target is PortTarget => {
+  return target.type === 'port';
+};
+
+/**
+ * Check if an event target is a diagram
+ */
+export const isDiagramTarget = (target: EventTarget): target is DiagramTarget => {
+  return target.type === 'diagram';
 };

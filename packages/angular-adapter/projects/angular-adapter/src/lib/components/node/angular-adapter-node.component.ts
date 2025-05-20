@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Node } from '@angularflow/core';
+
 import {
   NodePositionDirective,
   NodeSelectedDirective,
@@ -26,4 +28,6 @@ import {
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
 })
-export class AngularAdapterNodeComponent {}
+export class AngularAdapterNodeComponent {
+  data = input.required<Node>();
+}

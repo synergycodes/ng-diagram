@@ -41,6 +41,6 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
   },
   predicate: (event) =>
     (isPointerDownEvent(event) && event.button === 0 && event.target?.type === 'node') ||
-    isPointerMoveEvent(event) ||
+    (isPointerMoveEvent(event) && moveState.isMoving) ||
     (isPointerUpEvent(event) && event.button === 0),
 };

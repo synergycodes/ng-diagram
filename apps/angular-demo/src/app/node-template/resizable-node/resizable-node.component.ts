@@ -1,11 +1,16 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FlowCoreProviderService, INodeTemplate, Node } from '@angularflow/angular-adapter';
+import {
+  AngularAdapterPortComponent,
+  FlowCoreProviderService,
+  INodeTemplate,
+  Node,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-resizable-node',
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe, AngularAdapterPortComponent],
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,8 +42,7 @@ export class ResizableNodeComponent implements INodeTemplate {
     const checked = (event.target as HTMLInputElement).checked;
     this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
       id: this.data().id,
-      node: {
-        ...this.data(),
+      nodeChanges: {
         autoSize: checked,
       },
     });
