@@ -4,8 +4,9 @@ import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-rou
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
 
-  constructor() {
+  constructor(middlewares: Middleware[] = []) {
     this.register(edgesStraightRoutingMiddleware);
+    middlewares.forEach((middleware) => this.register(middleware));
   }
 
   /**

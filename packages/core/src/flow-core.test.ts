@@ -97,12 +97,40 @@ describe('FlowCore', () => {
       expect(flowCore.getEnvironment()).toEqual(mockEnvironment);
     });
 
-    it('should render the diagram', () => {
-      expect(mockRenderer.draw).toHaveBeenCalled();
+    it('should pass starting middlewares to MiddlewareManager', () => {
+      const middleware: Middleware = { name: 'test', execute: vi.fn() };
+
+      flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, mockEnvironment, [middleware]);
+
+      expect(MiddlewareManager).toHaveBeenCalledWith([middleware]);
     });
 
     it('should register model changed listener', () => {
       expect(mockModelAdapter.onChange).toHaveBeenCalled();
+    });
+
+    it('should emit init command', () => {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init');
+    });
+  });
+
+  describe('set model', () => {
+    it('should set new model', () => {
+      flowCore.model = { ...mockModelAdapter };
+
+      expect(flowCore.model).not.toBe(mockModelAdapter);
+    });
+
+    it('should reinitialize flow core', () => {
+      flowCore.model = { ...mockModelAdapter };
+
+      expect(flowCore.commandHandler.emit).toHaveBeenCalledWith('init');
+    });
+  });
+
+  describe('get model', () => {
+    it('should return the current model', () => {
+      expect(flowCore.model).toBe(mockModelAdapter);
     });
   });
 
