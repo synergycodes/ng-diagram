@@ -2,9 +2,16 @@ svg {
   overflow: visible;
   position: absolute;
   cursor: pointer;
-}
 
-path {
-  pointer-events: visibleStroke;
-  cursor: pointer;
+  path {
+    pointer-events: visibleStroke;
+    cursor: pointer;
+  }
+
+  &.temporary {
+    path {
+      pointer-events: none;
+      cursor: grab;
+    }
+  }
 }

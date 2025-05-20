@@ -86,9 +86,7 @@ describe('AngularAdapterPortComponent', () => {
       fixture.componentRef.setInput('id', 'test-port-id-not-found');
       fixture.detectChanges();
 
-      component.onPointerDown(mockEvent);
-
-      expect(() => component.onPointerDown(mockEvent)).toThrowError();
+      expect(() => component.onPointerDown(mockEvent)).toThrow();
     });
   });
 
