@@ -1,4 +1,4 @@
-import type { FlowState } from '@angularflow/core';
+import type { FlowCore, FlowState } from '@angularflow/core';
 import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
 import { loggerMiddleware } from './logger.middleware';
 
@@ -32,17 +32,21 @@ describe('LoggerMiddleware', () => {
       metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
 
-    const result = loggerMiddleware.execute(state, {
-      modelActionType: 'changeSelection',
-      historyUpdates: [
-        {
-          name: 'changeSelection',
-          prevState: initialState,
-          nextState: state,
-        },
-      ],
-      initialState,
-    });
+    const result = loggerMiddleware.execute(
+      state,
+      {
+        modelActionType: 'changeSelection',
+        historyUpdates: [
+          {
+            name: 'changeSelection',
+            prevState: initialState,
+            nextState: state,
+          },
+        ],
+        initialState,
+      },
+      {} as unknown as FlowCore
+    );
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       '[AngularFlow] changeSelection',
