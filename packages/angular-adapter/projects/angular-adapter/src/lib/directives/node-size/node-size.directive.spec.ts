@@ -37,9 +37,14 @@ describe('NodeSizeDirective', () => {
       return mockResizeObserver;
     } as unknown as typeof ResizeObserver;
 
+    // Mock service
+    const mockUpdatePortsService = {
+      updateNodePorts: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
       imports: [TestComponent],
-      providers: [EventMapperService, UpdatePortsService],
+      providers: [EventMapperService, { provide: UpdatePortsService, useValue: mockUpdatePortsService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);

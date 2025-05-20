@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EventMapperService } from '../../services';
+import { EventMapperService, UpdatePortsService } from '../../services';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 import { AngularAdapterPortComponent } from './angular-adapter-port.component';
 
@@ -15,6 +15,7 @@ describe('AngularAdapterPortComponent', () => {
       providers: [
         { provide: EventMapperService, useValue: { emit: vi.fn() } },
         { provide: AngularAdapterNodeComponent, useValue: { data: vi.fn().mockReturnValue({ id: 'test-node-id' }) } },
+        { provide: UpdatePortsService, useValue: { updateNodePorts: vi.fn() } },
       ],
     }).compileComponents();
   });
