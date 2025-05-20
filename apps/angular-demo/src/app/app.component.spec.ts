@@ -57,7 +57,7 @@ describe('AppComponent', () => {
     expect(component.nodeTemplateMap.has('resizable')).toBeTruthy();
   });
 
-  it('should initialize with two edges', () => {
+  it('should initialize with four edges', () => {
     const edges = component.model().getEdges();
     expect(edges.length).toBe(4);
   });
