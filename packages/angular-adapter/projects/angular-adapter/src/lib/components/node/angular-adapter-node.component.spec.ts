@@ -7,6 +7,7 @@ import {
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerUpEventListenerDirective,
+  ZIndexDirective,
 } from '../../directives';
 import { NodePositionDirective } from '../../directives/node-position/node-position.directive';
 import { NodeSelectedDirective } from '../../directives/node-selected/node-selected.directive';
@@ -52,6 +53,7 @@ describe('AngularAdapterNodeComponent', () => {
       .compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterNodeComponent);
+    fixture.componentRef.setInput('data', { id: '1', type: 'unknown', position: { x: 700, y: 300 }, data: {} });
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -93,5 +95,10 @@ describe('AngularAdapterNodeComponent', () => {
   it('should have NodeSizeDirective as host directive', () => {
     const nodeSizeDirective = fixture.debugElement.injector.get(MockNodeSizeDirective);
     expect(nodeSizeDirective).toBeTruthy();
+  });
+
+  it('should have ZIndexDirective as host directive', () => {
+    const zIndexDirective = fixture.debugElement.injector.get(ZIndexDirective);
+    expect(zIndexDirective).toBeTruthy();
   });
 });

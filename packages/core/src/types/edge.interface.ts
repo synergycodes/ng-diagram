@@ -62,4 +62,8 @@ export interface Edge {
    * Whether the edge is temporary.
    */
   temporary?: boolean;
+  /**
+   * The z-index of the edge.
+   */
+  zIndex?: number;
 }

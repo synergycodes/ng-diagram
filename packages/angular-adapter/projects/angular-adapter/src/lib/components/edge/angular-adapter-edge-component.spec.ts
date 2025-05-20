@@ -6,6 +6,7 @@ import {
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerUpEventListenerDirective,
+  ZIndexDirective,
 } from '../../directives';
 import { AngularAdapterEdgeComponent } from './angular-adapter-edge.component';
 
@@ -19,6 +20,7 @@ describe('AngularAdapterEdgeComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterEdgeComponent);
+    fixture.componentRef.setInput('data', { id: '1', type: 'unknown', position: { x: 700, y: 300 }, data: {} });
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -45,5 +47,10 @@ describe('AngularAdapterEdgeComponent', () => {
   it('should have PointerUpEventListenerDirective as host directive', () => {
     const pointerUpEventListenerDirective = fixture.debugElement.injector.get(PointerUpEventListenerDirective);
     expect(pointerUpEventListenerDirective).toBeTruthy();
+  });
+
+  it('should have ZIndexDirective as host directive', () => {
+    const zIndexDirective = fixture.debugElement.injector.get(ZIndexDirective);
+    expect(zIndexDirective).toBeTruthy();
   });
 });
