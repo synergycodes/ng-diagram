@@ -24,11 +24,13 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
 
   id = input.required<string>();
   type = input.required<Port['type']>();
+  side = input.required<Port['side']>();
 
   ngOnInit(): void {
     const node = this.nodeComponent.data();
     this.hostElement.nativeElement.setAttribute('data-port-id', this.id());
 
+    const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
     this.flowCoreProvider.provide().commandHandler.emit('addPorts', {
       nodeId: node.id,
       ports: [
@@ -36,7 +38,8 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
           id: this.id(),
           type: this.type(),
           nodeId: node.id,
-          ...this.updatePortsService.getPortData(this.hostElement.nativeElement),
+          side: this.side(),
+          ...portData,
         },
       ],
     });
@@ -46,11 +49,11 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       if (borderBox) {
         const width = borderBox.inlineSize;
         const height = borderBox.blockSize;
-        const { position, side } = this.updatePortsService.getPortData(this.hostElement.nativeElement);
+        const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
         this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
           nodeId: node.id,
           portId: this.id(),
-          portChanges: { size: { width, height }, position, side },
+          portChanges: { ...portData },
         });
       }
     });
@@ -107,5 +110,9 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       type: 'port',
       element: port,
     };
+  }
+
+  private isLinking(): boolean {
+    return !!this.flowCoreProvider.provide().getState().metadata['temporary-edge'];
   }
 }

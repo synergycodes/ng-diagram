@@ -95,7 +95,6 @@ export const edgesStraightRoutingMiddleware: Middleware = {
         },
       };
     }
-
     return { ...state, edges: newEdges, metadata: newMetadata };
   },
 };

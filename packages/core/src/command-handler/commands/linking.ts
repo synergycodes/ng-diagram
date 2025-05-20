@@ -31,6 +31,10 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
     return;
   }
 
+  if (sourcePort && sourceNode.ports?.find((port) => port.id === sourcePort)?.type === 'target') {
+    return;
+  }
+
   const position = sourcePort
     ? commandHandler.flowCore.getFlowPortPosition(sourceNode, sourcePort)
     : sourceNode.position;
@@ -125,6 +129,10 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
   const targetNode = target && commandHandler.flowCore.getNodeById(target);
 
   if (!targetNode) {
+    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+  }
+
+  if (targetPort && targetNode.ports?.find((port) => port.id === targetPort)?.type === 'source') {
     return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
   }
 

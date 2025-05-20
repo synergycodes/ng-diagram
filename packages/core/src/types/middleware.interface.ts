@@ -2,6 +2,7 @@ import type { FlowCore } from '../flow-core';
 import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
+
 /**
  * Type for model-specific actions types in the flow diagram
  */
