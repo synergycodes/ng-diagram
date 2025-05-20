@@ -39,7 +39,7 @@ describe('ZIndexDirective', () => {
   });
 
   it('should update z-index style when data changes', () => {
-    component.data = { zIndex: 1 };
+    component.data = { zOrder: 1 };
     fixture.detectChanges();
 
     expect(divElement.style.zIndex).toBe('1');

@@ -63,7 +63,7 @@ export interface Edge {
    */
   temporary?: boolean;
   /**
-   * The z-index of the edge.
+   * The z-order of the edge.
    */
-  zIndex?: number;
+  zOrder?: number;
 }

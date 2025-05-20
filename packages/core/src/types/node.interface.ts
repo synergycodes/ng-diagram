@@ -37,7 +37,7 @@ export interface Node {
    */
   autoSize?: boolean;
   /**
-   * The z-index of the node.
+   * The z-order of the node.
    */
-  zIndex?: number;
+  zOrder?: number;
 }
