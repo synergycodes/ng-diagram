@@ -36,4 +36,8 @@ export interface Node {
    * Whether the size of the node is automatically resized based on the content.
    */
   autoSize?: boolean;
+  /**
+   * The z-order of the node.
+   */
+  zOrder?: number;
 }

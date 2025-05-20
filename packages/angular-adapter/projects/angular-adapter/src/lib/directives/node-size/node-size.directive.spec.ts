@@ -15,18 +15,17 @@ class MockResizeObserver implements ResizeObserver {
 }
 
 @Component({
-  template: `<div angularAdapterNodeSize [autoSize]="autoSize" [size]="size" [eventTarget]="eventTarget"></div>`,
+  template: `<div angularAdapterNodeSize [data]="data"></div>`,
   imports: [NodeSizeDirective],
 })
 class TestComponent {
-  autoSize = true;
-  size?: { width: number; height: number };
-  eventTarget = { type: 'diagram' };
+  data = {};
 }
 
 describe('NodeSizeDirective', () => {
   let directive: NodeSizeDirective;
   let fixture: ComponentFixture<TestComponent>;
+  let component: TestComponent;
   let eventMapperService: EventMapperService;
   let mockResizeObserver: MockResizeObserver;
 
@@ -43,6 +42,7 @@ describe('NodeSizeDirective', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
+    component = fixture.componentInstance;
     directive = fixture.debugElement.query(By.directive(NodeSizeDirective)).injector.get(NodeSizeDirective);
     eventMapperService = TestBed.inject(EventMapperService);
     fixture.detectChanges();
@@ -54,8 +54,7 @@ describe('NodeSizeDirective', () => {
 
   it('should update element size when autoSize is false and size is provided', () => {
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-    fixture.componentInstance.autoSize = false;
-    fixture.componentInstance.size = { width: 100, height: 200 };
+    component.data = { autoSize: false, size: { width: 100, height: 200 } };
     fixture.detectChanges();
 
     expect(element.style.width).toBe('100px');
@@ -66,7 +65,7 @@ describe('NodeSizeDirective', () => {
     const emitSpy = vi.spyOn(eventMapperService, 'emit');
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
 
-    fixture.componentInstance.autoSize = true;
+    component.data = { autoSize: true };
     fixture.detectChanges();
 
     Object.defineProperty(element, 'offsetWidth', { value: 150 });
@@ -84,7 +83,7 @@ describe('NodeSizeDirective', () => {
 
     expect(emitSpy).toHaveBeenCalledWith({
       type: 'resize',
-      target: { type: 'diagram' },
+      target: { type: 'node', element: component.data },
       width: 150,
       height: 250,
       timestamp: expect.any(Number),
@@ -98,11 +97,10 @@ describe('NodeSizeDirective', () => {
 
   it('should update element size when size input changes', () => {
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-    fixture.componentInstance.autoSize = false;
-    fixture.componentInstance.size = { width: 100, height: 200 };
+    component.data = { autoSize: false, size: { width: 100, height: 200 } };
     fixture.detectChanges();
 
-    fixture.componentInstance.size = { width: 300, height: 400 };
+    component.data = { autoSize: false, size: { width: 300, height: 400 } };
     fixture.detectChanges();
 
     expect(element.style.width).toBe('300px');

@@ -1,22 +1,14 @@
-import { Directive, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import { computed, Directive, input } from '@angular/core';
+import { Node } from '@angularflow/core';
 
 @Directive({
   selector: '[angularAdapterNodeSelected]',
+  host: {
+    '[style.transition]': '"box-shadow 0.1s ease-in-out"',
+    '[style.box-shadow]': 'selected() ? "0 0 2px 4px rgba(30, 144, 255, 0.5)" : "none"',
+  },
 })
 export class NodeSelectedDirective {
-  private readonly hostElement = inject(ElementRef<HTMLElement>);
-  private readonly renderer = inject(Renderer2);
-
-  selected = input<boolean | undefined>(false);
-
-  constructor() {
-    this.setStyle('transition', 'box-shadow 0.1s ease-in-out');
-    effect(() => {
-      this.setStyle('box-shadow', this.selected() ? '0 0 2px 4px rgba(30, 144, 255, 0.5)' : 'none');
-    });
-  }
-
-  private setStyle(styleName: string, value: string) {
-    this.renderer.setStyle(this.hostElement.nativeElement, styleName, value);
-  }
+  data = input.required<Node>();
+  selected = computed(() => this.data().selected ?? false);
 }

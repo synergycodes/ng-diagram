@@ -4,7 +4,6 @@ import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ViewportDirective } from '../../directives';
-import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
 
 @Component({
@@ -14,8 +13,14 @@ import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.componen
 class MockAngularAdapterNodeComponent {}
 
 @Component({
+  selector: 'angular-adapter-edge',
+  template: '<ng-content />',
+})
+class MockAngularAdapterEdgeComponent {}
+
+@Component({
   selector: 'angular-adapter-canvas-test',
-  imports: [AngularAdapterCanvasComponent, MockAngularAdapterNodeComponent, AngularAdapterEdgeComponent],
+  imports: [AngularAdapterCanvasComponent, MockAngularAdapterNodeComponent, MockAngularAdapterEdgeComponent],
   template: `
     <angular-adapter-canvas>
       <angular-adapter-edge></angular-adapter-edge>
@@ -44,9 +49,12 @@ describe('AngularAdapterCanvasComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render nodes edges container element', () => {
-    const nodesEdgesContainer = fixture.debugElement.query(By.css('.nodes-edges-container'));
-    expect(nodesEdgesContainer).toBeTruthy();
+  it('should render nodes and edges containers', () => {
+    const nodesContainer = fixture.debugElement.query(By.css('.nodes-container'));
+    const edgesContainer = fixture.debugElement.query(By.css('.edges-container'));
+
+    expect(nodesContainer).toBeTruthy();
+    expect(edgesContainer).toBeTruthy();
   });
 
   it('should have ViewportDirective as host directive', () => {
@@ -62,17 +70,17 @@ describe('AngularAdapterCanvasComponent', () => {
       testFixture.detectChanges();
     });
 
-    it('should correctly project nodes and edges', () => {
-      const nodes = testFixture.debugElement
-        .query(By.css('.nodes-edges-container'))
-        .queryAll(By.css('angular-adapter-node'));
+    it('should project nodes into nodes container', () => {
+      const nodes = testFixture.debugElement.query(By.css('.nodes-container')).queryAll(By.css('angular-adapter-node'));
+
       expect(nodes.length).toBe(2);
       expect(nodes[0].nativeElement.textContent).toBe('Node 1');
       expect(nodes[1].nativeElement.textContent).toBe('Node 2');
+    });
 
-      const edges = testFixture.debugElement
-        .query(By.css('.nodes-edges-container'))
-        .queryAll(By.css('angular-adapter-edge'));
+    it('should project edges into edges container', () => {
+      const edges = testFixture.debugElement.query(By.css('.edges-container')).queryAll(By.css('angular-adapter-edge'));
+
       expect(edges.length).toBe(1);
     });
   });
