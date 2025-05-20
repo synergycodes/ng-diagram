@@ -6,11 +6,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { NodePositionDirective } from './node-position.directive';
 
 @Component({
-  template: `<div [angularAdapterNodePosition] [position]="position"></div>`,
+  template: `<div [angularAdapterNodePosition] [data]="data"></div>`,
   imports: [NodePositionDirective],
 })
 class TestComponent {
-  position = { x: 0, y: 0 };
+  data = { position: { x: 0, y: 0 } };
 }
 
 describe('NodePositionDirective', () => {
@@ -38,8 +38,8 @@ describe('NodePositionDirective', () => {
     expect(divElement.style.transform).toBe('translate(0px, 0px)');
   });
 
-  it('should update transform style when position changes', () => {
-    component.position = { x: 100, y: 200 };
+  it('should update transform style when data changes', () => {
+    component.data = { position: { x: 100, y: 200 } };
     fixture.detectChanges();
 
     expect(divElement.style.transform).toBe('translate(100px, 200px)');

@@ -1,5 +1,6 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Renderer2 } from '@angular/core';
-import type { EventTarget } from '@angularflow/core';
+import type { Node } from '@angularflow/core';
+
 import { EventMapperService } from '../../services';
 
 @Directive({
@@ -11,9 +12,9 @@ export class NodeSizeDirective implements OnDestroy {
   private readonly renderer = inject(Renderer2);
   private resizeObserver!: ResizeObserver;
 
-  eventTarget = input<EventTarget>({ type: 'diagram' });
-  size = input<{ width: number; height: number }>();
-  autoSize = input<boolean>(true);
+  data = input.required<Node>();
+  size = computed(() => this.data().size);
+  autoSize = computed(() => this.data().autoSize ?? true);
 
   sizeState = computed(() => ({
     size: this.size(),
@@ -51,7 +52,7 @@ export class NodeSizeDirective implements OnDestroy {
         const height = borderBox.blockSize;
         this.eventMapperService.emit({
           type: 'resize',
-          target: this.eventTarget(),
+          target: { type: 'node', element: this.data() },
           width,
           height,
           timestamp: Date.now(),

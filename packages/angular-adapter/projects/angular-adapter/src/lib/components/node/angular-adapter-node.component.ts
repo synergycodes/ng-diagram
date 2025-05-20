@@ -16,9 +16,9 @@ import {
   styleUrl: './angular-adapter-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    { directive: NodeSizeDirective, inputs: ['eventTarget', 'size', 'autoSize'] },
-    { directive: NodePositionDirective, inputs: ['position'] },
-    { directive: NodeSelectedDirective, inputs: ['selected'] },
+    { directive: NodeSizeDirective, inputs: ['data'] },
+    { directive: NodePositionDirective, inputs: ['data'] },
+    { directive: NodeSelectedDirective, inputs: ['data'] },
     { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },

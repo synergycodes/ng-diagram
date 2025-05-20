@@ -1,4 +1,5 @@
-import { Directive, input } from '@angular/core';
+import { computed, Directive, input } from '@angular/core';
+import { Node } from '@angularflow/core';
 
 @Directive({
   selector: '[angularAdapterNodePosition]',
@@ -7,5 +8,6 @@ import { Directive, input } from '@angular/core';
   },
 })
 export class NodePositionDirective {
-  position = input<{ x: number; y: number }>({ x: 0, y: 0 });
+  data = input.required<Node>();
+  position = computed(() => this.data().position);
 }

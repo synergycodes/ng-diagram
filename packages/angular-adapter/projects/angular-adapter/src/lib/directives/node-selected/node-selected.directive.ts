@@ -1,4 +1,5 @@
-import { Directive, input } from '@angular/core';
+import { computed, Directive, input } from '@angular/core';
+import { Node } from '@angularflow/core';
 
 @Directive({
   selector: '[angularAdapterNodeSelected]',
@@ -8,5 +9,6 @@ import { Directive, input } from '@angular/core';
   },
 })
 export class NodeSelectedDirective {
-  selected = input<boolean | undefined>(false);
+  data = input.required<Node>();
+  selected = computed(() => this.data().selected ?? false);
 }
