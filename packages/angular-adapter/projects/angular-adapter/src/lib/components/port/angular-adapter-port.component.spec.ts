@@ -15,7 +15,7 @@ describe('AngularAdapterPortComponent', () => {
       providers: [
         { provide: EventMapperService, useValue: { emit: vi.fn() } },
         { provide: AngularAdapterNodeComponent, useValue: { data: vi.fn().mockReturnValue({ id: 'test-node-id' }) } },
-        { provide: UpdatePortsService, useValue: { updateNodePorts: vi.fn() } },
+        { provide: UpdatePortsService, useValue: { updateNodePorts: vi.fn(), getPortData: vi.fn() } },
       ],
     }).compileComponents();
   });
