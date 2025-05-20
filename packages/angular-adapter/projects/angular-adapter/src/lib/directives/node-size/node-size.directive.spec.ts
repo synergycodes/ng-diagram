@@ -73,7 +73,7 @@ describe('NodeSizeDirective', () => {
     const updatePortsSpy = vi.spyOn(updatePortsService, 'updateNodePorts');
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
 
-    component.data = { autoSize: true };
+    component.data = { autoSize: true, id: 'test-node-id' };
     fixture.detectChanges();
 
     Object.defineProperty(element, 'offsetWidth', { value: 150 });

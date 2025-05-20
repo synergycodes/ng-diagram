@@ -85,11 +85,10 @@ describe('AngularAdapterPortComponent', () => {
     it('should throw an error if the port is not found', () => {
       fixture.componentRef.setInput('id', 'test-port-id-not-found');
       fixture.detectChanges();
-      const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 
       component.onPointerDown(mockEvent);
 
-      expect(spy).not.toHaveBeenCalled();
+      expect(() => component.onPointerDown(mockEvent)).toThrowError();
     });
   });
 
