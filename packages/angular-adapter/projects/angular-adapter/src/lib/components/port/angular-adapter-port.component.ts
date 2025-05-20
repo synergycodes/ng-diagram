@@ -53,7 +53,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
         this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
           nodeId: node.id,
           portId: this.id(),
-          portChanges: { ...portData },
+          portChanges: { ...portData, size: { width, height }, side: this.side() },
         });
       }
     });
@@ -110,9 +110,5 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       type: 'port',
       element: port,
     };
-  }
-
-  private isLinking(): boolean {
-    return !!this.flowCoreProvider.provide().getState().metadata['temporary-edge'];
   }
 }

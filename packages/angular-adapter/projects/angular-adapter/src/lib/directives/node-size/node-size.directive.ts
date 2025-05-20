@@ -3,6 +3,7 @@ import type { Node } from '@angularflow/core';
 
 import { EventMapperService } from '../../services';
 import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
+
 @Directive({
   selector: '[angularAdapterNodeSize]',
 })

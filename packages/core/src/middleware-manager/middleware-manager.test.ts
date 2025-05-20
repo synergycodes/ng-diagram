@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { FlowCore } from '../flow-core';
 import { mockMetadata, mockNode } from '../test-utils';
 import type { FlowState, Middleware, MiddlewareContext } from '../types';
 import { MiddlewareManager } from './middleware-manager';
@@ -12,6 +13,7 @@ vi.mock('./middlewares/edges-straight-routing', () => ({
 }));
 
 describe('MiddlewareManager', () => {
+  let flowCore: FlowCore;
   let middlewareManager: MiddlewareManager;
   let mockMiddleware1: Middleware;
   let mockMiddleware2: Middleware;
@@ -20,7 +22,11 @@ describe('MiddlewareManager', () => {
   let context: MiddlewareContext;
 
   beforeEach(() => {
-    middlewareManager = new MiddlewareManager();
+    flowCore = {
+      getState: vi.fn(),
+      applyUpdate: vi.fn(),
+    } as unknown as FlowCore;
+    middlewareManager = new MiddlewareManager(flowCore);
 
     mockMiddleware1 = {
       name: 'mockMiddleware1',
@@ -61,7 +67,7 @@ describe('MiddlewareManager', () => {
 
   describe('constructor', () => {
     it('should register edges straight routing middleware', () => {
-      const middlewareManager = new MiddlewareManager();
+      const middlewareManager = new MiddlewareManager(flowCore);
       middlewareManager.execute(prevState, nextState, 'init');
 
       expect(edgesStraightRoutingMiddleware.execute).toHaveBeenCalled();
@@ -70,7 +76,7 @@ describe('MiddlewareManager', () => {
     it('should register starting middlewares if they are provided', () => {
       const spy = vi.spyOn(mockMiddleware1, 'execute');
 
-      const middlewareManager = new MiddlewareManager([mockMiddleware1]);
+      const middlewareManager = new MiddlewareManager(flowCore, [mockMiddleware1]);
       middlewareManager.execute(prevState, nextState, 'init');
 
       expect(spy).toHaveBeenCalled();
@@ -117,7 +123,7 @@ describe('MiddlewareManager', () => {
       expect(result.nodes[0].id).toBe('node1');
       expect(result.nodes[1].id).toBe('node2');
       expect(result.nodes[2].id).toBe('node3');
-      expect(mockMiddleware1.execute).toHaveBeenCalledWith(nextState, context);
+      expect(mockMiddleware1.execute).toHaveBeenCalledWith(nextState, context, flowCore);
       expect(mockMiddleware2.execute).toHaveBeenCalledWith(
         { ...nextState, nodes: [...nextState.nodes, { ...mockNode, id: 'node2' }] },
         {
@@ -130,7 +136,8 @@ describe('MiddlewareManager', () => {
               nextState: { ...nextState, nodes: [...nextState.nodes, { ...mockNode, id: 'node2' }] },
             },
           ],
-        }
+        },
+        flowCore
       );
     });
 

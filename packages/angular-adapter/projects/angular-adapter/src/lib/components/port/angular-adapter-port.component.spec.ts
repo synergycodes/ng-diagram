@@ -24,6 +24,7 @@ describe('AngularAdapterPortComponent', () => {
     component = fixture.componentInstance;
     fixture.componentRef.setInput('id', 'test-port-id');
     fixture.componentRef.setInput('type', 'both');
+    fixture.componentRef.setInput('side', 'left');
     fixture.detectChanges();
   });
 

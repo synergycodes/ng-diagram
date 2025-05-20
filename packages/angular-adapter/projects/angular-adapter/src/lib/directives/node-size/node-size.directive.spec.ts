@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventMapperService } from '../../services';
+import { EventMapperService, UpdatePortsService } from '../../services';
 import { NodeSizeDirective } from './node-size.directive';
 
 type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
@@ -27,6 +27,7 @@ describe('NodeSizeDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
   let component: TestComponent;
   let eventMapperService: EventMapperService;
+  let updatePortsService: UpdatePortsService;
   let mockResizeObserver: MockResizeObserver;
 
   beforeEach(async () => {
@@ -38,13 +39,14 @@ describe('NodeSizeDirective', () => {
 
     await TestBed.configureTestingModule({
       imports: [TestComponent],
-      providers: [EventMapperService],
+      providers: [EventMapperService, UpdatePortsService],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
     directive = fixture.debugElement.query(By.directive(NodeSizeDirective)).injector.get(NodeSizeDirective);
     eventMapperService = TestBed.inject(EventMapperService);
+    updatePortsService = TestBed.inject(UpdatePortsService);
     fixture.detectChanges();
   });
 
@@ -63,6 +65,7 @@ describe('NodeSizeDirective', () => {
 
   it('should observe size changes when autoSize is true', () => {
     const emitSpy = vi.spyOn(eventMapperService, 'emit');
+    const updatePortsSpy = vi.spyOn(updatePortsService, 'updateNodePorts');
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
 
     component.data = { autoSize: true };
@@ -88,6 +91,8 @@ describe('NodeSizeDirective', () => {
       height: 250,
       timestamp: expect.any(Number),
     });
+
+    expect(updatePortsSpy).toHaveBeenCalledWith('test-node-id');
   });
 
   it('should disconnect resize observer on destroy', () => {

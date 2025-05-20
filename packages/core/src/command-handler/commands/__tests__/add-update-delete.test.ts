@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
+import { mockNode, mockPort } from '../../../test-utils';
 import { CommandHandler } from '../../command-handler';
 
 describe('Add Update Delete Command', () => {
@@ -30,7 +31,7 @@ describe('Add Update Delete Command', () => {
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges: [], metadata: {} });
 
-    commandHandler.emit('updateNode', { id: '1', node: { selected: true } });
+    commandHandler.emit('updateNode', { id: '1', nodeChanges: { selected: true } });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...nodes[0], selected: true }] }, 'updateNode');
   });
@@ -62,7 +63,7 @@ describe('Add Update Delete Command', () => {
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [], edges, metadata: {} });
 
-    commandHandler.emit('updateEdge', { id: '1', edge: { selected: true } });
+    commandHandler.emit('updateEdge', { id: '1', edgeChanges: { selected: true } });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edges: [{ ...edges[0], selected: true }] }, 'updateEdge');
   });
@@ -75,5 +76,44 @@ describe('Add Update Delete Command', () => {
     commandHandler.emit('deleteEdges', { ids: ['1'] });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edges: [] }, 'deleteEdges');
+  });
+
+  it('should add ports to a node', () => {
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [mockNode], edges: [], metadata: {} });
+
+    commandHandler.emit('addPorts', { nodeId: mockNode.id, ports: [mockPort] });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...mockNode, ports: [mockPort] }] }, 'updateNode');
+  });
+
+  it('should update a port', () => {
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [{ ...mockNode, ports: [mockPort] }],
+      edges: [],
+      metadata: {},
+    });
+
+    commandHandler.emit('updatePort', {
+      nodeId: mockNode.id,
+      portId: mockPort.id,
+      portChanges: { size: { width: 100, height: 100 } },
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodes: [{ ...mockNode, ports: [{ ...mockPort, size: { width: 100, height: 100 } }] }] },
+      'updateNode'
+    );
+  });
+
+  it('should delete ports from a node', () => {
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [{ ...mockNode, ports: [mockPort] }],
+      edges: [],
+      metadata: {},
+    });
+
+    commandHandler.emit('deletePorts', { nodeId: mockNode.id, portIds: [mockPort.id] });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...mockNode, ports: [] }] }, 'updateNode');
   });
 });
