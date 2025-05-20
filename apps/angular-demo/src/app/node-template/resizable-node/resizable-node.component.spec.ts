@@ -125,8 +125,7 @@ describe('ResizableNodeComponent', () => {
 
     expect(spy).toHaveBeenCalledWith('updateNode', {
       id: '1',
-      node: {
-        ...component.data(),
+      nodeChanges: {
         autoSize: false,
       },
     });
@@ -163,8 +162,7 @@ describe('ResizableNodeComponent', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith('updateNode', {
       id: '1',
-      node: {
-        ...component.data(),
+      nodeChanges: {
         autoSize: true,
       },
     });
