@@ -1,8 +1,7 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Renderer2 } from '@angular/core';
 import type { Node } from '@angularflow/core';
 
-import { EventMapperService } from '../../services';
-import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
+import { EventMapperService, UpdatePortsService } from '../../services';
 
 @Directive({
   selector: '[angularAdapterNodeSize]',

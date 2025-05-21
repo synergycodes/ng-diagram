@@ -2,6 +2,7 @@
   @for (node of nodes(); track node.id) {
     <angular-adapter-node
       class="flow__angular-adapter-node"
+      [attr.data-node-id]="node.id"
       [data]="node"
       [eventTarget]="{ type: 'node', element: node }"
     >
