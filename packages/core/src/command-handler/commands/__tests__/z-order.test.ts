@@ -90,6 +90,44 @@ describe('Z-order commands', () => {
         'changeZOrder'
       );
     });
+
+    it('should not map over nodes collection if there are no target nodes', () => {
+      const command: BringToFrontCommand = { name: 'bringToFront', edgeIds: ['1'] };
+      const spy = vi.spyOn(flowCore, 'applyUpdate');
+      const nodes = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      const edges = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      mockGetState.mockReturnValue({ nodes, edges });
+
+      bringToFront(commandHandler, command);
+
+      expect(spy.mock.calls[0][0].nodes).toBe(nodes);
+      expect(spy.mock.calls[0][0].edges).not.toBe(edges);
+    });
+
+    it('should not map over edges collection if there are no target edges', () => {
+      const command: BringToFrontCommand = { name: 'bringToFront', nodeIds: ['1'] };
+      const spy = vi.spyOn(flowCore, 'applyUpdate');
+      const nodes = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      const edges = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      mockGetState.mockReturnValue({ nodes, edges });
+
+      bringToFront(commandHandler, command);
+
+      expect(spy.mock.calls[0][0].nodes).not.toBe(nodes);
+      expect(spy.mock.calls[0][0].edges).toBe(edges);
+    });
   });
 
   describe('sendToBack', () => {
@@ -166,6 +204,44 @@ describe('Z-order commands', () => {
         },
         'changeZOrder'
       );
+    });
+
+    it('should not map over nodes collection if there are no target nodes', () => {
+      const command: SendToBackCommand = { name: 'sendToBack', edgeIds: ['1'] };
+      const spy = vi.spyOn(flowCore, 'applyUpdate');
+      const nodes = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      const edges = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      mockGetState.mockReturnValue({ nodes, edges });
+
+      sendToBack(commandHandler, command);
+
+      expect(spy.mock.calls[0][0].nodes).toBe(nodes);
+      expect(spy.mock.calls[0][0].edges).not.toBe(edges);
+    });
+
+    it('should not map over edges collection if there are no target edges', () => {
+      const command: SendToBackCommand = { name: 'sendToBack', nodeIds: ['1'] };
+      const spy = vi.spyOn(flowCore, 'applyUpdate');
+      const nodes = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      const edges = [
+        { id: '1', selected: false },
+        { id: '2', selected: false },
+      ];
+      mockGetState.mockReturnValue({ nodes, edges });
+
+      sendToBack(commandHandler, command);
+
+      expect(spy.mock.calls[0][0].nodes).not.toBe(nodes);
+      expect(spy.mock.calls[0][0].edges).toBe(edges);
     });
   });
 });
