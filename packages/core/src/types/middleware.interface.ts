@@ -23,7 +23,8 @@ export type ModelActionType =
   | 'startLinking'
   | 'moveTemporaryEdge'
   | 'finishLinking'
-  | 'zoom';
+  | 'zoom'
+  | 'changeZOrder';
 
 /**
  * Type for the state of the flow diagram

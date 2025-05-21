@@ -24,8 +24,8 @@ import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
 import { deselect, deselectAll, select } from './selection';
+import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
-
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
   command: CommandByName<K>
@@ -62,4 +62,6 @@ export const commands: CommandMap = {
   addPorts,
   updatePort,
   deletePorts,
+  bringToFront,
+  sendToBack,
 };
