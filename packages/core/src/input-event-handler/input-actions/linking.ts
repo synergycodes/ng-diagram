@@ -3,10 +3,27 @@ import {
   isPointerMoveEvent,
   isPointerUpEvent,
   isPortTarget,
+  Port,
   type InputActionWithPredicate,
 } from '../../types';
 
 let isLinking = false;
+
+const isProperTargetPort = (targetPort: Port, source?: string, sourcePortId?: string) => {
+  if (!source || !sourcePortId) {
+    return false;
+  }
+  if (targetPort.type === 'source') {
+    return false;
+  }
+  if (targetPort.nodeId !== source) {
+    return true;
+  }
+  if (targetPort.id !== sourcePortId) {
+    return true;
+  }
+  return false;
+};
 
 export const linkingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
@@ -19,21 +36,30 @@ export const linkingAction: InputActionWithPredicate = {
     }
 
     if (isPointerMoveEvent(event) && isLinking) {
-      flowCore.commandHandler.emit('moveTemporaryEdge', {
-        position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
-      });
+      const nearestPort = flowCore.getNearestPortInRange({ x: event.x, y: event.y }, 5);
+      const { temporaryEdge } = flowCore.getState().metadata;
+      if (nearestPort && isProperTargetPort(nearestPort, temporaryEdge?.source, temporaryEdge?.sourcePort)) {
+        flowCore.commandHandler.emit('moveTemporaryEdge', {
+          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
+          target: nearestPort.nodeId,
+          targetPort: nearestPort.id,
+        });
+      } else {
+        flowCore.commandHandler.emit('moveTemporaryEdge', {
+          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
+          target: '',
+          targetPort: '',
+        });
+      }
     }
 
     if (isPointerUpEvent(event) && isLinking) {
       isLinking = false;
-      if (isPortTarget(event.target) && event.target.element.type !== 'source') {
-        flowCore.commandHandler.emit('finishLinking', {
-          target: event.target.element.nodeId,
-          targetPort: event.target.element.id,
-        });
-      } else {
-        flowCore.commandHandler.emit('finishLinking', {});
-      }
+      const temporaryEdge = flowCore.getState().metadata.temporaryEdge;
+      flowCore.commandHandler.emit('finishLinking', {
+        target: temporaryEdge?.target,
+        targetPort: temporaryEdge?.targetPort,
+      });
     }
   },
   predicate: (event) =>

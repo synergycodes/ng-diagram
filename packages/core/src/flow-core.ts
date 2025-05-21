@@ -2,6 +2,7 @@ import { CommandHandler } from './command-handler/command-handler';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
+import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
   EnvironmentInfo,
   Event,
@@ -11,6 +12,7 @@ import type {
   ModelActionType,
   ModelAdapter,
   Node,
+  Port,
   Renderer,
 } from './types';
 
@@ -152,7 +154,6 @@ export class FlowCore {
     this.model.onChange(({ nodes }) => {
       this.render();
       this.spatialHash.process(nodes);
-      console.log(this.spatialHash);
     });
     this.commandHandler.emit('init');
   }
@@ -200,5 +201,35 @@ export class FlowCore {
    */
   getNodeById(nodeId: string): Node | null {
     return this.model.getNodes().find((node) => node.id === nodeId) ?? null;
+  }
+
+  /**
+   * Gets all nodes in a range
+   * @param point Point
+   * @param range Range
+   * @returns Nodes
+   */
+  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
+    return getNodesInRange(this, point, range);
+  }
+
+  /**
+   * Gets the nearest node in a range
+   * @param point Point
+   * @param range Range
+   * @returns Node
+   */
+  getNearestNodeInRange(point: { x: number; y: number }, range: number): Node | null {
+    return getNearestNodeInRange(this, point, range);
+  }
+
+  /**
+   * Gets the nearest port in a range
+   * @param point Point
+   * @param range Range
+   * @returns Port
+   */
+  getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
+    return getNearestPortInRange(this, point, range);
   }
 }
