@@ -7,16 +7,16 @@ export class SignalModelAdapter implements ModelAdapter {
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
   private metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 } });
-  private callbacks: (() => void)[] = [];
+  private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void)[] = [];
 
   constructor() {
     effect(() => {
-      this.nodes();
-      this.edges();
-      this.metadata();
+      const nodes = this.nodes();
+      const edges = this.edges();
+      const metadata = this.metadata();
 
       for (const callback of this.callbacks) {
-        callback();
+        callback({ nodes, edges, metadata });
       }
     });
   }
@@ -46,7 +46,7 @@ export class SignalModelAdapter implements ModelAdapter {
     this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
-  onChange(callback: () => void): void {
+  onChange(callback: (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void): void {
     this.callbacks.push(callback);
   }
 

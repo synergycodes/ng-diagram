@@ -1,0 +1,115 @@
+import { Node } from '../types';
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  id: string;
+}
+
+export class SpatialHash {
+  private readonly cellSize = 100;
+  private readonly grid = new Map<string, Rect[]>();
+  private readonly idToCells = new Map<string, string[]>();
+  private readonly idToRects = new Map<string, Rect>();
+
+  process(nodes: Node[]) {
+    const existingIds = new Set(this.idToRects.keys());
+    const newIds = new Set<string>();
+
+    for (const node of nodes) {
+      const rect = this.idToRects.get(node.id);
+      if (!rect) {
+        this.addToGrid(this.nodeToRect(node));
+      } else if (!this.isSameRect(rect, this.nodeToRect(node))) {
+        this.updateInGrid(this.nodeToRect(node));
+      }
+    }
+
+    for (const id of existingIds.difference(newIds)) {
+      this.removeFromGrid(id);
+    }
+  }
+
+  private isSameRect(rect1: Rect, rect2: Rect) {
+    return rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
+  }
+
+  private nodeToRect(node: Node): Rect {
+    return {
+      x: node.position.x,
+      y: node.position.y,
+      width: node.size?.width ?? 0,
+      height: node.size?.height ?? 0,
+      id: node.id,
+    };
+  }
+
+  private addToCell(cell: string, rect: Rect) {
+    if (!this.grid.has(cell)) {
+      this.grid.set(cell, []);
+    }
+    this.grid.get(cell)!.push(rect);
+  }
+
+  private removeFromCell(cell: string, id: string) {
+    const newCells = this.grid.get(cell)!.filter((rect) => rect.id !== id);
+    this.grid.set(cell, newCells);
+  }
+
+  private addToGrid(rect: Rect) {
+    const cells = this.getCells(rect);
+    for (const cell of cells) {
+      this.addToCell(cell, rect);
+    }
+    this.idToCells.set(rect.id, cells);
+    this.idToRects.set(rect.id, rect);
+  }
+
+  private updateInGrid(rect: Rect) {
+    const newCells = this.getCells(rect);
+    const newCellsSet = new Set(newCells);
+    const oldCellsSet = new Set(this.idToCells.get(rect.id) || []);
+    const cellsToRemove = oldCellsSet.difference(newCellsSet);
+    const cellsToAdd = newCellsSet.difference(oldCellsSet);
+    for (const cell of cellsToRemove) {
+      this.removeFromCell(cell, rect.id);
+    }
+    for (const cell of cellsToAdd) {
+      this.addToCell(cell, rect);
+    }
+    this.idToRects.set(rect.id, rect);
+    this.idToCells.set(rect.id, newCells);
+  }
+
+  private removeFromGrid(id: string) {
+    const cells = this.idToCells.get(id);
+    if (!cells) {
+      return;
+    }
+    for (const cell of cells) {
+      this.removeFromCell(cell, id);
+    }
+    this.idToCells.delete(id);
+    this.idToRects.delete(id);
+  }
+
+  private getCellsRange(startPos: number, size: number): [number, number] {
+    const start = Math.floor(startPos / this.cellSize);
+    const end = Math.floor((startPos + size) / this.cellSize);
+    return [start, end];
+  }
+
+  private getCells(rect: Rect) {
+    const [minX, maxX] = this.getCellsRange(rect.x, rect.width);
+    const [minY, maxY] = this.getCellsRange(rect.y, rect.height);
+    const cells: string[] = [];
+    for (let x = minX; x <= maxX; x++) {
+      for (let y = minY; y <= maxY; y++) {
+        cells.push(`${x}-${y}`);
+      }
+    }
+    return cells;
+  }
+}

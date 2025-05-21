@@ -49,7 +49,7 @@ export interface ModelAdapter {
    * Register a callback to be called when the model changes
    * @param callback Function to be called on changes
    */
-  onChange(callback: () => void): void;
+  onChange(callback: ({ nodes, edges, metadata }: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void): void;
 
   /**
    * Undo the last change
