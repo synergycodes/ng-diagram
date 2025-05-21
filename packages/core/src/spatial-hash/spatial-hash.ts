@@ -15,11 +15,12 @@ export class SpatialHash {
   private readonly idToRects = new Map<string, Rect>();
 
   process(nodes: Node[]) {
-    const existingIds = new Set(this.idToRects.keys());
-    const newIds = new Set<string>();
+    const previousIds = new Set(this.idToRects.keys());
+    const currentIds = new Set<string>();
 
     for (const node of nodes) {
       const rect = this.idToRects.get(node.id);
+      currentIds.add(node.id);
       if (!rect) {
         this.addToGrid(this.nodeToRect(node));
       } else if (!this.isSameRect(rect, this.nodeToRect(node))) {
@@ -27,7 +28,7 @@ export class SpatialHash {
       }
     }
 
-    for (const id of existingIds.difference(newIds)) {
+    for (const id of previousIds.difference(currentIds)) {
       this.removeFromGrid(id);
     }
   }
