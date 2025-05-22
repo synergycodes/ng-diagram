@@ -78,6 +78,16 @@ export class SpatialHash {
     const expandedWidth = width + rightOffset - leftOffset;
     const expandedHeight = height + bottomOffset - topOffset;
 
+    if (!node.angle || node.angle % 1 === 0) {
+      return {
+        id: node.id,
+        x: expandedX,
+        y: expandedY,
+        width: expandedWidth,
+        height: expandedHeight,
+      };
+    }
+
     const cx = expandedX + expandedWidth / 2;
     const cy = expandedY + expandedHeight / 2;
 
