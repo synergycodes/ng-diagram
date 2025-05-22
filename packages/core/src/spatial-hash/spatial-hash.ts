@@ -1,20 +1,21 @@
 import { Node } from '../types';
 import { Rect, RectWithId } from '../types/utils';
-import { getRect } from './utils';
+import { doesRectsIntersect, getRect } from './utils';
 
 export class SpatialHash {
   private readonly cellSize = 100;
   private readonly grid = new Map<string, RectWithId[]>();
   private readonly idToCells = new Map<string, string[]>();
-  private readonly idToRects = new Map<string, RectWithId>();
+  private readonly idToRect = new Map<string, Rect>();
 
   process(nodes: Node[]) {
-    const previousIds = new Set(this.idToRects.keys());
+    const previousIds = new Set(this.idToRect.keys());
     const currentIds = new Set<string>();
 
     for (const node of nodes) {
-      const rect = this.idToRects.get(node.id);
       currentIds.add(node.id);
+
+      const rect = this.idToRect.get(node.id);
       if (!rect) {
         this.addToGrid(this.nodeToRect(node));
       } else if (!this.isSameRect(rect, this.nodeToRect(node))) {
@@ -34,7 +35,7 @@ export class SpatialHash {
       const objects = this.grid.get(cell);
       if (objects) {
         for (const rect of objects) {
-          if (this.intersects(rect, range)) {
+          if (doesRectsIntersect(rect, range)) {
             result.add(rect);
           }
         }
@@ -43,17 +44,27 @@ export class SpatialHash {
     return [...result];
   }
 
-  private intersects(a: Rect, b: Rect): boolean {
-    return b.x <= a.x + a.width && b.x + b.width >= a.x && b.y <= a.y + a.height && b.y + b.height >= a.y;
-  }
-
   private isSameRect(rect1: Rect, rect2: Rect) {
     return rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
   }
 
   private nodeToRect(node: Node): RectWithId {
+    const portsOffset = { left: 0, right: 0, top: 0, bottom: 0 };
+    const ports = node.ports || [];
+    const { x, y, width, height } = getRect(node);
+    for (const port of ports) {
+      portsOffset.left = Math.min(0, Math.min(portsOffset.left, port.position.x));
+      portsOffset.right = Math.max(0, Math.max(portsOffset.right, port.position.x + port.size.width - width));
+      portsOffset.top = Math.min(0, Math.min(portsOffset.top, port.position.y));
+      portsOffset.bottom = Math.max(0, Math.max(portsOffset.bottom, port.position.y + port.size.height - height));
+    }
+    const finalX = x + portsOffset.left;
+    const finalY = y + portsOffset.top;
     return {
-      ...getRect(node),
+      width: width + portsOffset.right - portsOffset.left,
+      height: height + portsOffset.bottom - portsOffset.top,
+      x: finalX,
+      y: finalY,
       id: node.id,
     };
   }
@@ -81,7 +92,7 @@ export class SpatialHash {
       this.addToCell(cell, rect);
     }
     this.idToCells.set(rect.id, cells);
-    this.idToRects.set(rect.id, rect);
+    this.idToRect.set(rect.id, rect);
   }
 
   private updateInGrid(rect: RectWithId) {
@@ -100,7 +111,7 @@ export class SpatialHash {
     for (const cell of cellsToUpdate) {
       this.updateInCell(cell, rect);
     }
-    this.idToRects.set(rect.id, rect);
+    this.idToRect.set(rect.id, rect);
     this.idToCells.set(rect.id, newCells);
   }
 
@@ -113,7 +124,7 @@ export class SpatialHash {
       this.removeFromCell(cell, id);
     }
     this.idToCells.delete(id);
-    this.idToRects.delete(id);
+    this.idToRect.delete(id);
   }
 
   private getCellsRange(startPos: number, size: number): [number, number] {

@@ -25,7 +25,7 @@ export const getRect = ({
   };
 };
 
-const doesRectsIntersect = (rect1: Rect, rect2: Rect): boolean => {
+export const doesRectsIntersect = (rect1: Rect, rect2: Rect): boolean => {
   return (
     rect1.x < rect2.x + rect2.width &&
     rect1.x + rect1.width > rect2.x &&
@@ -111,24 +111,24 @@ export const getNearestPortInRange = (
   range: number
 ): Port | null => {
   const nodeToPortsMap = new Map<Node, Port[]>();
-  getNodesInRange(flowCore, point, range * 2).forEach((node) => {
+  getNodesInRange(flowCore, point, range + 100).forEach((node) => {
     nodeToPortsMap.set(node, node.ports || []);
   });
   let minDistance = Infinity;
   let nearestPort: Port | null = null;
   for (const [node, ports] of nodeToPortsMap.entries()) {
     for (const port of ports) {
-      const portPosition = flowCore.getFlowPortPosition(node, port.id);
-      if (portPosition) {
-        const distance = getDistanceBetweenRects(
-          getRect({ size: port.size, position: portPosition }),
-          getPointRangeRect(point, range)
-        );
-        if (distance <= range) {
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestPort = port;
-          }
+      const distance = getDistanceBetweenRects(
+        getRect({
+          size: port.size,
+          position: { x: port.position.x + node.position.x, y: port.position.y + node.position.y },
+        }),
+        getPointRangeRect(point, range)
+      );
+      if (distance <= range) {
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPort = port;
         }
       }
     }
