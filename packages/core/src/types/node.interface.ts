@@ -44,6 +44,19 @@ export interface Node {
    * The ports of the node.
    */
   ports?: Port[];
+  /**
+   * Whether the node is resizable.
+   */
+  resizable?: boolean;
+  /**
+   * Configurable properties of the resize adornment.
+   */
+  resizeAdornment?: {
+    handleSize?: number;
+    strokeWidth?: number;
+    color?: string;
+    backgroundColor?: string;
+  };
 }
 
 /**

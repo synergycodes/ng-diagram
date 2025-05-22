@@ -30,7 +30,13 @@ export class AppComponent {
 
   constructor() {
     this.model().setNodes([
-      { id: '1', type: 'image', position: { x: 100, y: 200 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+      {
+        id: '1',
+        type: 'image',
+        position: { x: 100, y: 200 },
+        data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
+        resizable: true,
+      },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, autoSize: true },
       { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, autoSize: true },
     ]);

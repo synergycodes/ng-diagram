@@ -11,6 +11,7 @@ import {
   PointerUpEventListenerDirective,
   ZIndexDirective,
 } from '../../directives';
+import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -27,6 +28,7 @@ import {
     { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
+  imports: [NodeResizeAdornmentComponent],
 })
 export class AngularAdapterNodeComponent {
   data = input.required<Node>();
