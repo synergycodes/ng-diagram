@@ -36,17 +36,18 @@ export const linkingAction: InputActionWithPredicate = {
     }
 
     if (isPointerMoveEvent(event) && isLinking) {
-      const nearestPort = flowCore.getNearestPortInRange({ x: event.x, y: event.y }, 5);
+      const flowPosition = flowCore.clientToFlowPosition({ x: event.x, y: event.y });
+      const nearestPort = flowCore.getNearestPortInRange(flowPosition, 5);
       const { temporaryEdge } = flowCore.getState().metadata;
       if (nearestPort && isProperTargetPort(nearestPort, temporaryEdge?.source, temporaryEdge?.sourcePort)) {
         flowCore.commandHandler.emit('moveTemporaryEdge', {
-          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
+          position: flowPosition,
           target: nearestPort.nodeId,
           targetPort: nearestPort.id,
         });
       } else {
         flowCore.commandHandler.emit('moveTemporaryEdge', {
-          position: flowCore.clientToFlowPosition({ x: event.x, y: event.y }),
+          position: flowPosition,
           target: '',
           targetPort: '',
         });

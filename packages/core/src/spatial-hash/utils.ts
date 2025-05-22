@@ -111,7 +111,7 @@ export const getNearestPortInRange = (
   range: number
 ): Port | null => {
   const nodeToPortsMap = new Map<Node, Port[]>();
-  getNodesInRange(flowCore, point, range + 100).forEach((node) => {
+  getNodesInRange(flowCore, point, range).forEach((node) => {
     nodeToPortsMap.set(node, node.ports || []);
   });
   let minDistance = Infinity;
