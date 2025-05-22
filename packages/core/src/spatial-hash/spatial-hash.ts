@@ -6,7 +6,7 @@ export class SpatialHash {
   private readonly cellSize = 100;
   private readonly grid = new Map<string, RectWithId[]>();
   private readonly idToCells = new Map<string, string[]>();
-  private readonly idToRect = new Map<string, Rect>();
+  private readonly idToRect = new Map<string, RectWithId>();
 
   process(nodes: Node[]) {
     const previousIds = new Set(this.idToRect.keys());
@@ -32,19 +32,24 @@ export class SpatialHash {
   }
 
   query(range: Rect): RectWithId[] {
-    const result = new Set<RectWithId>();
+    const result: RectWithId[] = [];
     const cells = this.getCells(range);
+    const checkedRects = new Set<string>();
     for (const cell of cells) {
       const objects = this.grid.get(cell);
       if (objects) {
         for (const rect of objects) {
+          if (checkedRects.has(rect.id)) {
+            continue;
+          }
+          checkedRects.add(rect.id);
           if (doesRectsIntersect(rect, range)) {
-            result.add(rect);
+            result.push(rect);
           }
         }
       }
     }
-    return [...result];
+    return result;
   }
 
   private isSameRect(rect1: Rect, rect2: Rect) {

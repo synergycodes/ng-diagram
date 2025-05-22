@@ -15,18 +15,24 @@ const keyboardEvent = {
 describe('linkingAction', () => {
   const mockCommandHandler = { emit: vi.fn() };
   let mockFlowCore: FlowCore;
+  const mockGetState = vi.fn();
+  const mockGetNearestPortInRange = vi.fn();
 
   beforeEach(() => {
     mockFlowCore = {
-      getState: vi.fn(),
+      getState: mockGetState,
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn().mockImplementation((args) => args),
       flowToClientPosition: vi.fn().mockImplementation((args) => args),
+      getNearestPortInRange: mockGetNearestPortInRange,
     } as unknown as FlowCore;
 
     // Clean isLinking flag before each test
+    mockGetState.mockReturnValue({
+      metadata: {},
+    });
     linkingAction.action({ ...mockPointerEvent, type: 'pointerup', button: 2 }, mockFlowCore);
     vi.clearAllMocks();
   });
@@ -142,7 +148,8 @@ describe('linkingAction', () => {
       expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveTemporaryEdge');
     });
 
-    it('should call moveTemporaryEdge if pointer move event and linking started', () => {
+    it('should call moveTemporaryEdge if pointer move event and linking started but did not found nearest port and set target and target port to empty string', () => {
+      mockGetNearestPortInRange.mockReturnValue(null);
       linkingAction.action(
         { ...mockPointerEvent, type: 'pointerdown', button: 0, target: { type: 'port', element: mockPort } },
         mockFlowCore
@@ -151,36 +158,90 @@ describe('linkingAction', () => {
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveTemporaryEdge', {
         position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
+        target: '',
+        targetPort: '',
       });
     });
 
-    it('should call finishLinking with target port if pointer up event and target is a port', () => {
+    it('should call moveTemporaryEdge with nearest port if found is not source port and the found port is target type port', () => {
+      const port = { ...mockPort, type: 'target', nodeId: 'node-2', id: 'port-2' };
+      mockGetNearestPortInRange.mockReturnValue(port);
+      mockGetState.mockReturnValue({
+        metadata: {
+          temporaryEdge: {
+            source: 'node-1',
+            sourcePort: 'port-1',
+          },
+        },
+      });
       linkingAction.action(
         { ...mockPointerEvent, type: 'pointerdown', button: 0, target: { type: 'port', element: mockPort } },
         mockFlowCore
       );
+      linkingAction.action({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveTemporaryEdge', {
+        position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
+        target: port.nodeId,
+        targetPort: port.id,
+      });
+    });
+
+    it('should call moveTemporaryEdge with empty target if found nearest port type is source', () => {
+      const port = { ...mockPort, type: 'source', nodeId: 'node-2', id: 'port-2' };
+      mockGetNearestPortInRange.mockReturnValue(port);
       linkingAction.action(
-        { ...mockPointerEvent, type: 'pointerup', target: { type: 'port', element: mockPort }, button: 0 },
+        { ...mockPointerEvent, type: 'pointerdown', button: 0, target: { type: 'port', element: mockPort } },
         mockFlowCore
       );
+      linkingAction.action({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveTemporaryEdge', {
+        position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
+        target: '',
+        targetPort: '',
+      });
+    });
+
+    it('should call moveTemporaryEdge with empty target if found nearest port is same port as source', () => {
+      mockGetNearestPortInRange.mockReturnValue(mockPort);
+      mockGetState.mockReturnValue({
+        metadata: {},
+      });
+      linkingAction.action(
+        { ...mockPointerEvent, type: 'pointerdown', button: 0, target: { type: 'port', element: mockPort } },
+        mockFlowCore
+      );
+      linkingAction.action({ ...mockPointerEvent, type: 'pointermove' }, mockFlowCore);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveTemporaryEdge', {
+        position: { x: mockPointerEvent.x, y: mockPointerEvent.y },
+        target: '',
+        targetPort: '',
+      });
+    });
+
+    it('should call finishLinking with same target and target port as temporary edge', () => {
+      mockGetState.mockReturnValue({
+        metadata: {
+          temporaryEdge: {
+            source: mockPort.nodeId,
+            sourcePort: mockPort.id,
+            target: mockPort.nodeId,
+            targetPort: mockPort.id,
+          },
+        },
+      });
+      linkingAction.action(
+        { ...mockPointerEvent, type: 'pointerdown', button: 0, target: { type: 'port', element: mockPort } },
+        mockFlowCore
+      );
+      linkingAction.action({ ...mockPointerEvent, type: 'pointerup', button: 0 }, mockFlowCore);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', {
         target: mockPort.nodeId,
         targetPort: mockPort.id,
       });
-    });
-
-    it('should call finishLinking without target port if pointer up event and target is not a port', () => {
-      linkingAction.action(
-        { ...mockPointerEvent, type: 'pointerdown', button: 0, target: { type: 'port', element: mockPort } },
-        mockFlowCore
-      );
-      linkingAction.action(
-        { ...mockPointerEvent, type: 'pointerup', target: { type: 'diagram' }, button: 0 },
-        mockFlowCore
-      );
-
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', {});
     });
   });
 });

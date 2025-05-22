@@ -10,16 +10,13 @@ import {
 let isLinking = false;
 
 const isProperTargetPort = (targetPort: Port, source?: string, sourcePortId?: string) => {
-  if (!source || !sourcePortId) {
-    return false;
-  }
   if (targetPort.type === 'source') {
     return false;
   }
-  if (targetPort.nodeId !== source) {
+  if (source && targetPort.nodeId !== source) {
     return true;
   }
-  if (targetPort.id !== sourcePortId) {
+  if (sourcePortId && targetPort.id !== sourcePortId) {
     return true;
   }
   return false;

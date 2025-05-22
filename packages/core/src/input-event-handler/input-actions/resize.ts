@@ -8,10 +8,6 @@ export const resizeAction: InputActionWithPredicate = {
 
     const node = event.target.element;
 
-    if (node.autoSize === false && !node.size) {
-      throw new Error('Node is set to not autoSize, but has no size passed');
-    }
-
     if (node.autoSize === false) {
       return;
     }
