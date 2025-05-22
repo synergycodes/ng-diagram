@@ -48,6 +48,10 @@ export interface Node {
    * Whether the node is resizable.
    */
   resizable?: boolean;
+  /**
+   * The angle of the node from 0 to 1.
+   */
+  angle?: number;
 }
 
 /**

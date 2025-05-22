@@ -15,11 +15,14 @@ export class SpatialHash {
     for (const node of nodes) {
       currentIds.add(node.id);
 
-      const rect = this.idToRect.get(node.id);
-      if (!rect) {
+      const prevRect = this.idToRect.get(node.id);
+      if (!prevRect) {
         this.addToGrid(this.nodeToRect(node));
-      } else if (!this.isSameRect(rect, this.nodeToRect(node))) {
-        this.updateInGrid(this.nodeToRect(node));
+      } else {
+        const currentRect = this.nodeToRect(node);
+        if (!this.isSameRect(prevRect, currentRect)) {
+          this.updateInGrid(currentRect);
+        }
       }
     }
 
@@ -49,23 +52,64 @@ export class SpatialHash {
   }
 
   private nodeToRect(node: Node): RectWithId {
-    const portsOffset = { left: 0, right: 0, top: 0, bottom: 0 };
     const ports = node.ports || [];
     const { x, y, width, height } = getRect(node);
+    const angle = (node.angle || 0) * 2 * Math.PI;
+
+    let leftOffset = 0;
+    let rightOffset = 0;
+    let topOffset = 0;
+    let bottomOffset = 0;
+
     for (const port of ports) {
-      portsOffset.left = Math.min(0, Math.min(portsOffset.left, port.position.x));
-      portsOffset.right = Math.max(0, Math.max(portsOffset.right, port.position.x + port.size.width - width));
-      portsOffset.top = Math.min(0, Math.min(portsOffset.top, port.position.y));
-      portsOffset.bottom = Math.max(0, Math.max(portsOffset.bottom, port.position.y + port.size.height - height));
+      const px = port.position.x;
+      const py = port.position.y;
+      const pw = port.size.width;
+      const ph = port.size.height;
+
+      leftOffset = Math.min(leftOffset, px);
+      rightOffset = Math.max(rightOffset, px + pw - width);
+      topOffset = Math.min(topOffset, py);
+      bottomOffset = Math.max(bottomOffset, py + ph - height);
     }
-    const finalX = x + portsOffset.left;
-    const finalY = y + portsOffset.top;
+
+    const expandedX = x + leftOffset;
+    const expandedY = y + topOffset;
+    const expandedWidth = width + rightOffset - leftOffset;
+    const expandedHeight = height + bottomOffset - topOffset;
+
+    const cx = expandedX + expandedWidth / 2;
+    const cy = expandedY + expandedHeight / 2;
+
+    const corners = [
+      { x: expandedX, y: expandedY },
+      { x: expandedX + expandedWidth, y: expandedY },
+      { x: expandedX + expandedWidth, y: expandedY + expandedHeight },
+      { x: expandedX, y: expandedY + expandedHeight },
+    ];
+
+    const rotated = corners.map(({ x, y }) => {
+      const dx = x - cx;
+      const dy = y - cy;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return {
+        x: cx + dx * cos - dy * sin,
+        y: cy + dx * sin + dy * cos,
+      };
+    });
+
+    const minX = Math.min(...rotated.map((p) => p.x));
+    const maxX = Math.max(...rotated.map((p) => p.x));
+    const minY = Math.min(...rotated.map((p) => p.y));
+    const maxY = Math.max(...rotated.map((p) => p.y));
+
     return {
-      width: width + portsOffset.right - portsOffset.left,
-      height: height + portsOffset.bottom - portsOffset.top,
-      x: finalX,
-      y: finalY,
       id: node.id,
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
     };
   }
 
@@ -82,7 +126,7 @@ export class SpatialHash {
   }
 
   private updateInCell(cell: string, rect: RectWithId) {
-    const newCells = this.grid.get(cell)!.filter((rect) => rect.id !== rect.id);
+    const newCells = this.grid.get(cell)!.filter(({ id }) => id !== rect.id);
     this.grid.set(cell, [...newCells, rect]);
   }
 
@@ -122,6 +166,9 @@ export class SpatialHash {
     }
     for (const cell of cells) {
       this.removeFromCell(cell, id);
+      if (this.grid.get(cell)!.length === 0) {
+        this.grid.delete(cell);
+      }
     }
     this.idToCells.delete(id);
     this.idToRect.delete(id);
