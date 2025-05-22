@@ -154,11 +154,6 @@ export class FlowCore {
     this.model.onChange(({ nodes }) => {
       this.render();
       this.spatialHash.process(nodes);
-      const t1 = performance.now();
-      const result = this.spatialHash.query({ x: 0, y: 0, width: 1000, height: 1000 });
-      const t2 = performance.now();
-      console.log(`Time taken: ${t2 - t1} milliseconds`);
-      console.log(result);
     });
     this.commandHandler.emit('init');
   }
