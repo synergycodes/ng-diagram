@@ -9,6 +9,7 @@ import {
   getNodesInRange,
   getPointRangeRect,
   getRect,
+  isSameRect,
 } from './utils';
 
 describe('SpatialHash utils', () => {
@@ -34,6 +35,22 @@ describe('SpatialHash utils', () => {
       const result = getPointRangeRect(point, range);
 
       expect(result).toEqual({ x: 5, y: 5, width: 10, height: 10 });
+    });
+  });
+
+  describe('isSameRect', () => {
+    it('should return true if the rects are the same', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 10, height: 10 } });
+      const rect2 = getRect({ position: { x: 0, y: 0 }, size: { width: 10, height: 10 } });
+
+      expect(isSameRect(rect1, rect2)).toBe(true);
+    });
+
+    it('should return false if the rects are not the same', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 15, height: 10 } });
+      const rect2 = getRect({ position: { x: 0, y: 0 }, size: { width: 10, height: 10 } });
+
+      expect(isSameRect(rect1, rect2)).toBe(false);
     });
   });
 

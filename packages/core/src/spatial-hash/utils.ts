@@ -10,6 +10,10 @@ export const getPointRangeRect = (point: { x: number; y: number }, range: number
   };
 };
 
+export const isSameRect = (rect1: Rect, rect2: Rect): boolean => {
+  return rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
+};
+
 export const getRect = ({
   position = { x: 0, y: 0 },
   size = { width: 1, height: 1 },

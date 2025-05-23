@@ -1,27 +1,6 @@
 import { Node } from '../types';
 import { Rect, RectWithId } from '../types/utils';
-import { doesRectsIntersect, getRect } from './utils';
-
-// TODO: When set methods will be supported widely use them instead of these functions
-const setDifference = <T>(set1: Set<T>, set2: Set<T>): Set<T> => {
-  const result = new Set<T>();
-  for (const elem of set1) {
-    if (!set2.has(elem)) {
-      result.add(elem);
-    }
-  }
-  return result;
-};
-
-const setIntersection = <T>(set1: Set<T>, set2: Set<T>): Set<T> => {
-  const result = new Set<T>();
-  for (const elem of set1) {
-    if (set2.has(elem)) {
-      result.add(elem);
-    }
-  }
-  return result;
-};
+import { doesRectsIntersect, getRect, isSameRect } from './utils';
 
 export class SpatialHash {
   private readonly cellSize = 100;
@@ -41,13 +20,13 @@ export class SpatialHash {
         this.addToGrid(this.nodeToRect(node));
       } else {
         const currentRect = this.nodeToRect(node);
-        if (!this.isSameRect(prevRect, currentRect)) {
+        if (!isSameRect(prevRect, currentRect)) {
           this.updateInGrid(currentRect);
         }
       }
     }
 
-    for (const id of setDifference(previousIds, currentIds)) {
+    for (const id of previousIds.difference(currentIds)) {
       this.removeFromGrid(id);
     }
   }
@@ -81,10 +60,6 @@ export class SpatialHash {
         }
       }
     }
-  }
-
-  private isSameRect(rect1: Rect, rect2: Rect) {
-    return rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
   }
 
   private nodeToRect(node: Node): RectWithId {
@@ -189,9 +164,9 @@ export class SpatialHash {
     const newCells = this.getCells(rect);
     const newCellsSet = new Set(newCells);
     const oldCellsSet = new Set(this.idToCells.get(rect.id) || []);
-    const cellsToRemove = setDifference(oldCellsSet, newCellsSet);
-    const cellsToAdd = setDifference(newCellsSet, oldCellsSet);
-    const cellsToUpdate = setIntersection(newCellsSet, oldCellsSet);
+    const cellsToRemove = oldCellsSet.difference(newCellsSet);
+    const cellsToAdd = newCellsSet.difference(oldCellsSet);
+    const cellsToUpdate = newCellsSet.intersection(oldCellsSet);
     for (const cell of cellsToRemove) {
       this.removeFromCell(cell, rect.id);
     }
