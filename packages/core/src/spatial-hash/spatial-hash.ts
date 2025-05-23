@@ -2,6 +2,27 @@ import { Node } from '../types';
 import { Rect, RectWithId } from '../types/utils';
 import { doesRectsIntersect, getRect } from './utils';
 
+// TODO: When set methods will be supported widely use them instead of these functions
+const setDifference = <T>(set1: Set<T>, set2: Set<T>): Set<T> => {
+  const result = new Set<T>();
+  for (const elem of set1) {
+    if (!set2.has(elem)) {
+      result.add(elem);
+    }
+  }
+  return result;
+};
+
+const setIntersection = <T>(set1: Set<T>, set2: Set<T>): Set<T> => {
+  const result = new Set<T>();
+  for (const elem of set1) {
+    if (set2.has(elem)) {
+      result.add(elem);
+    }
+  }
+  return result;
+};
+
 export class SpatialHash {
   private readonly cellSize = 100;
   private readonly grid = new Map<string, RectWithId[]>();
@@ -26,7 +47,7 @@ export class SpatialHash {
       }
     }
 
-    for (const id of previousIds.difference(currentIds)) {
+    for (const id of setDifference(previousIds, currentIds)) {
       this.removeFromGrid(id);
     }
   }
@@ -168,9 +189,9 @@ export class SpatialHash {
     const newCells = this.getCells(rect);
     const newCellsSet = new Set(newCells);
     const oldCellsSet = new Set(this.idToCells.get(rect.id) || []);
-    const cellsToRemove = oldCellsSet.difference(newCellsSet);
-    const cellsToAdd = newCellsSet.difference(oldCellsSet);
-    const cellsToUpdate = newCellsSet.intersection(oldCellsSet);
+    const cellsToRemove = setDifference(oldCellsSet, newCellsSet);
+    const cellsToAdd = setDifference(newCellsSet, oldCellsSet);
+    const cellsToUpdate = setIntersection(newCellsSet, oldCellsSet);
     for (const cell of cellsToRemove) {
       this.removeFromCell(cell, rect.id);
     }
