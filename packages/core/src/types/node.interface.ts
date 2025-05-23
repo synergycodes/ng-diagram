@@ -49,7 +49,7 @@ export interface Node {
    */
   resizable?: boolean;
   /**
-   * The angle of the node from 0 to 1.
+   * The angle of the node from 0 to 360.
    */
   angle?: number;
 }
