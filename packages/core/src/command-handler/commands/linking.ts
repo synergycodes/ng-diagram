@@ -108,23 +108,22 @@ export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveT
 
   const targetNode = target ? commandHandler.flowCore.getNodeById(target) : null;
 
+  if (target && target === temporaryEdge.target && targetPortId === temporaryEdge.targetPort) {
+    return;
+  }
+
   if (target && targetNode) {
     if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)) {
-      if (target === temporaryEdge.target && targetPortId === temporaryEdge.targetPort) {
-        return;
-      }
       newTemporaryEdge = {
         ...temporaryEdge,
         target,
         targetPort: targetPortId,
       };
     } else {
-      if (target === temporaryEdge.target) {
-        return;
-      }
       newTemporaryEdge = {
         ...temporaryEdge,
         target,
+        targetPort: '',
       };
     }
   } else {
@@ -134,9 +133,6 @@ export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveT
       targetPort: '',
       targetPosition: position,
     };
-  }
-  if (Object.is(newTemporaryEdge, temporaryEdge)) {
-    return;
   }
 
   commandHandler.flowCore.applyUpdate(
