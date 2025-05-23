@@ -26,11 +26,11 @@ export const getRect = ({
 };
 
 export const doesRectsIntersect = (rect1: Rect, rect2: Rect): boolean => {
-  return (
-    rect1.x < rect2.x + rect2.width &&
-    rect1.x + rect1.width > rect2.x &&
-    rect1.y < rect2.y + rect2.height &&
-    rect1.y + rect1.height > rect2.y
+  return !(
+    rect1.x + rect1.width <= rect2.x ||
+    rect2.x + rect2.width <= rect1.x ||
+    rect1.y + rect1.height <= rect2.y ||
+    rect2.y + rect2.height <= rect1.y
   );
 };
 
@@ -81,7 +81,7 @@ export const getDistanceBetweenRects = (rect1: Rect, rect2: Rect): number => {
 };
 
 export const getNodesInRange = (flowCore: FlowCore, point: { x: number; y: number }, range: number): Node[] => {
-  const foundNodesIds = new Set(flowCore.spatialHash.query(getPointRangeRect(point, range)).map(({ id }) => id));
+  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(getPointRangeRect(point, range)));
   const foundNodes: Node[] = [];
   flowCore.getState().nodes.forEach((node) => {
     if (foundNodesIds.has(node.id)) {

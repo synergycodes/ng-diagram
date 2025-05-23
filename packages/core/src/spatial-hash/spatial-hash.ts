@@ -33,6 +33,17 @@ export class SpatialHash {
 
   query(range: Rect): RectWithId[] {
     const result: RectWithId[] = [];
+    this._query(range, (rect) => result.push(rect));
+    return result;
+  }
+
+  queryIds(range: Rect): string[] {
+    const results: string[] = [];
+    this._query(range, (rect) => results.push(rect.id));
+    return results;
+  }
+
+  private _query(range: Rect, addToCollection: (rect: RectWithId) => void): void {
     const cells = this.getCells(range);
     const checkedRects = new Set<string>();
     for (const cell of cells) {
@@ -44,12 +55,11 @@ export class SpatialHash {
           }
           checkedRects.add(rect.id);
           if (doesRectsIntersect(rect, range)) {
-            result.push(rect);
+            addToCollection(rect);
           }
         }
       }
     }
-    return result;
   }
 
   private isSameRect(rect1: Rect, rect2: Rect) {
