@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EventMapperService } from '../../../services';
+import { EventMapperService, FlowCoreProviderService } from '../../../services';
 import { ResizeHandleComponent } from './handle/resize-handle.component';
 import { ResizeLineComponent } from './line/resize-line.component';
 import { NodeResizeAdornmentComponent } from './node-resize-adornment.component';
@@ -9,11 +9,18 @@ import { NodeResizeAdornmentComponent } from './node-resize-adornment.component'
 describe('NodeResizeAdornmentComponent', () => {
   let component: NodeResizeAdornmentComponent;
   let fixture: ComponentFixture<NodeResizeAdornmentComponent>;
+  const mockGetMetadata = vi.fn(() => ({}));
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NodeResizeAdornmentComponent, ResizeHandleComponent, ResizeLineComponent],
-      providers: [{ provide: EventMapperService, useValue: { emit: vi.fn() } }],
+      providers: [
+        { provide: EventMapperService, useValue: { emit: vi.fn() } },
+        {
+          provide: FlowCoreProviderService,
+          useValue: { provide: vi.fn(() => ({ model: { getMetadata: mockGetMetadata } })) },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NodeResizeAdornmentComponent);
@@ -48,16 +55,27 @@ describe('NodeResizeAdornmentComponent', () => {
   });
 
   it('should use provided values for appearance when they are provided', () => {
-    fixture.componentRef.setInput('data', {
-      ...component.data(),
-      resizeAdornment: { handleSize: 10, strokeWidth: 2, color: '#ff0000', backgroundColor: '#00ff00' },
+    mockGetMetadata.mockReturnValue({
+      nodeResizeAdornmentConfig: { handleSize: 10, strokeWidth: 2, color: '#ff0000', handleBackgroundColor: '#00ff00' },
     });
+    fixture = TestBed.createComponent(NodeResizeAdornmentComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('data', { id: '1', type: 'default', position: { x: 0, y: 0 }, selected: false });
     fixture.detectChanges();
 
     expect(component.size()).toBe(10);
     expect(component.strokeWidth()).toBe(2);
     expect(component.color()).toBe('#ff0000');
     expect(component.backgroundColor()).toBe('#00ff00');
+  });
+
+  it('should stop event propagation', () => {
+    const pointerEvent = new Event('pointerdown') as PointerEvent;
+    const spy = vi.spyOn(pointerEvent, 'stopPropagation');
+
+    component.onPointerEvent({ event: pointerEvent, position: 'top-left' });
+
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should emit pointer events with correct data', () => {
