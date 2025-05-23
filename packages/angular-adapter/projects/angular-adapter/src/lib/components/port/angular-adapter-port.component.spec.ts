@@ -58,8 +58,8 @@ describe('AngularAdapterPortComponent', () => {
         pointerId: 1,
         pressure: 0.5,
         button: 0,
-        currentTarget: mockCurrentTarget,
       });
+      vi.spyOn(mockEvent, 'currentTarget', 'get').mockReturnValue(mockCurrentTarget);
     });
 
     it('should stop event propagation', () => {
