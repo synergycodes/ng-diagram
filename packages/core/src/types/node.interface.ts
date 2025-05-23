@@ -44,6 +44,10 @@ export interface Node {
    * The ports of the node.
    */
   ports?: Port[];
+  /**
+   * Whether the node is resizable.
+   */
+  resizable?: boolean;
 }
 
 /**

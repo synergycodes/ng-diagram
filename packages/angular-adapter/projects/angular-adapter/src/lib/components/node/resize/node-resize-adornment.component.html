@@ -1,0 +1,22 @@
+<ng-content></ng-content>
+
+@if (showAdornment()) {
+  @for (position of linePositions; track position) {
+    <angular-adapter-resize-line
+      [position]="position"
+      [strokeWidth]="strokeWidth()"
+      [color]="color()"
+      (pointerEvent)="onPointerEvent($event)"
+    ></angular-adapter-resize-line>
+  }
+  @for (position of handlePositions; track position) {
+    <angular-adapter-resize-handle
+      [position]="position"
+      [size]="size()"
+      [strokeWidth]="strokeWidth()"
+      [color]="color()"
+      [backgroundColor]="backgroundColor()"
+      (pointerEvent)="onPointerEvent($event)"
+    ></angular-adapter-resize-handle>
+  }
+}

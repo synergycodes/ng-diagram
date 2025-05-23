@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { Component, input } from '@angular/core';
 import {
   NodePositionDirective,
   NodeSelectedDirective,
@@ -12,6 +13,15 @@ import {
   ZIndexDirective,
 } from '../../directives';
 import { AngularAdapterNodeComponent } from './angular-adapter-node.component';
+import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
+
+@Component({
+  selector: 'angular-adapter-node-resize-adornment',
+  template: '<div><ng-content /></div>',
+})
+class MockNodeResizeAdornmentComponent {
+  data = input.required<Node>();
+}
 
 describe('AngularAdapterNodeComponent', () => {
   let component: AngularAdapterNodeComponent;
@@ -20,7 +30,16 @@ describe('AngularAdapterNodeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterNodeComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(AngularAdapterNodeComponent, {
+        remove: {
+          imports: [NodeResizeAdornmentComponent],
+        },
+        add: {
+          imports: [MockNodeResizeAdornmentComponent],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterNodeComponent);
     fixture.componentRef.setInput('data', { id: '1', type: 'unknown', position: { x: 700, y: 300 }, data: {} });
