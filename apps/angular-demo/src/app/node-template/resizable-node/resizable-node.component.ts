@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   AngularAdapterPortComponent,
@@ -21,6 +21,7 @@ export class ResizableNodeComponent implements INodeTemplate {
   text = model<string>('');
   sizeText = model<string>('');
   data = input.required<Node>();
+  autoSize = computed(() => this.data().autoSize ?? true);
 
   setSize() {
     const [textWidth, textHeight] = this.sizeText().split(' ');

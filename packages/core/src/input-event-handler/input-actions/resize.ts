@@ -1,4 +1,4 @@
-import { isResizeEvent, type InputActionWithPredicate } from '../../types';
+import { isNodeTarget, isResizeEvent, type InputActionWithPredicate } from '../../types';
 
 export const resizeAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
@@ -7,7 +7,8 @@ export const resizeAction: InputActionWithPredicate = {
     }
 
     const node = event.target.element;
-    if (!node.autoSize) {
+
+    if (node.autoSize === false) {
       return;
     }
 
@@ -22,5 +23,5 @@ export const resizeAction: InputActionWithPredicate = {
       disableAutoSize,
     });
   },
-  predicate: (event) => isResizeEvent(event) && event.target.type === 'node',
+  predicate: (event) => isResizeEvent(event) && isNodeTarget(event.target),
 };

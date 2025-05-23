@@ -120,28 +120,91 @@ describe('Linking Commands', () => {
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
     });
 
-    it('should move the temporary edge', () => {
-      const temporaryEdge = getTemporaryEdge({
-        source: 'node-1',
-        sourcePosition: { x: 100, y: 100 },
-        target: '',
-        targetPosition: { x: 100, y: 100 },
-      });
+    it('should not call applyUpdate if target is the same as the temporary edge target and target port is the same as the temporary edge target port', () => {
       getStateMock.mockReturnValue({
-        nodes: [{ id: 'node-1', position: { x: 100, y: 100 } }],
-        edges: [],
-        metadata: { ...mockMetadata, temporaryEdge },
+        metadata: { temporaryEdge: getTemporaryEdge({ target: 'node-1', targetPort: 'port-1' }) },
       });
 
-      commandHandler.emit('moveTemporaryEdge', { position: { x: 200, y: 200 } });
+      commandHandler.emit('moveTemporaryEdge', {
+        position: { x: 100, y: 100 },
+        target: 'node-1',
+        targetPort: 'port-1',
+      });
+
+      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should call applyUpdate with passed target and target port if different from temporary edge target and target port', () => {
+      const temporaryEdge = getTemporaryEdge({ target: 'node-1', targetPort: 'port-1' });
+      getStateMock.mockReturnValue({
+        metadata: { temporaryEdge },
+      });
+      getNodeByIdMock.mockReturnValue({ id: 'node-2', ports: [{ id: 'port-2', type: 'target' }] });
+
+      commandHandler.emit('moveTemporaryEdge', {
+        position: { x: 100, y: 100 },
+        target: 'node-2',
+        targetPort: 'port-2',
+      });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadata: {
-            ...mockMetadata,
             temporaryEdge: {
               ...temporaryEdge,
-              targetPosition: { x: 200, y: 200 },
+              target: 'node-2',
+              targetPort: 'port-2',
+            },
+          },
+        },
+        'moveTemporaryEdge'
+      );
+    });
+
+    it('should call applyUpdate with passed target if different from temporary edge target', () => {
+      const temporaryEdge = getTemporaryEdge({ target: 'node-1', targetPort: 'port-1' });
+      getStateMock.mockReturnValue({
+        metadata: { temporaryEdge },
+      });
+      getNodeByIdMock.mockReturnValue({ id: 'node-2' });
+
+      commandHandler.emit('moveTemporaryEdge', {
+        position: { x: 100, y: 100 },
+        target: 'node-2',
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          metadata: {
+            temporaryEdge: {
+              ...temporaryEdge,
+              target: 'node-2',
+              targetPort: '',
+            },
+          },
+        },
+        'moveTemporaryEdge'
+      );
+    });
+
+    it('should call applyUpdate with target and target port as empty strings if target is not passed', () => {
+      const temporaryEdge = getTemporaryEdge({ target: 'node-1', targetPort: 'port-1' });
+      getStateMock.mockReturnValue({
+        metadata: { temporaryEdge },
+      });
+
+      commandHandler.emit('moveTemporaryEdge', {
+        position: { x: 100, y: 100 },
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          metadata: {
+            temporaryEdge: {
+              ...temporaryEdge,
+              target: '',
+              targetPort: '',
+              targetPosition: { x: 100, y: 100 },
             },
           },
         },

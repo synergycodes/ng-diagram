@@ -47,7 +47,7 @@ describe('resizeAction', () => {
   });
 
   describe('action', () => {
-    it('should emit resizeNode if target is node', () => {
+    it('should emit resizeNode if target is node and autoSize is true', () => {
       mockEvent.target = {
         type: 'node',
         element: { ...mockNode, size: { width: 100, height: 100 }, autoSize: true },
@@ -59,6 +59,31 @@ describe('resizeAction', () => {
         id: mockNode.id,
         size: { width: 100, height: 100 },
       });
+    });
+
+    it('should emit resizeNode if target is node and autoSize is not defined', () => {
+      mockEvent.target = {
+        type: 'node',
+        element: { ...mockNode, size: { width: 100, height: 100 } },
+      };
+
+      resizeAction.action(mockEvent, mockFlowCore);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('resizeNode', {
+        id: mockNode.id,
+        size: { width: 100, height: 100 },
+      });
+    });
+
+    it('should not emit resizeNode if target is node and autoSize is false', () => {
+      mockEvent.target = {
+        type: 'node',
+        element: { ...mockNode, size: { width: 100, height: 100 }, autoSize: false },
+      };
+
+      resizeAction.action(mockEvent, mockFlowCore);
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
     });
   });
 });

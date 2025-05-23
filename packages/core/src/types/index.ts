@@ -21,3 +21,6 @@ export * from './renderer.interface';
 
 // Environment types
 export * from './environment.interface';
+
+// Utils types
+export * from './utils';

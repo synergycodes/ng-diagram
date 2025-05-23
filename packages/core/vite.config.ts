@@ -18,4 +18,7 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
   ],
+  test: {
+    setupFiles: ['./src/set.polyfill.ts'],
+  },
 });

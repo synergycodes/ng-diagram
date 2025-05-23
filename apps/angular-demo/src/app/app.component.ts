@@ -7,7 +7,6 @@ import {
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
-
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
@@ -37,8 +36,8 @@ export class AppComponent {
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
         resizable: true,
       },
-      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, autoSize: true },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, autoSize: true },
+      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {} },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {} },
     ]);
     this.model().setEdges([
       {

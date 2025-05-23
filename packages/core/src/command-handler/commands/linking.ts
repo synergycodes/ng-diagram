@@ -91,21 +91,55 @@ export const startLinkingFromPosition = (
 export interface MoveTemporaryEdgeCommand {
   name: 'moveTemporaryEdge';
   position: { x: number; y: number };
+  target?: string;
+  targetPort?: string;
 }
 
 export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveTemporaryEdgeCommand): void => {
   const { metadata } = commandHandler.flowCore.getState();
-  const { position } = command;
+  const { position, target, targetPort: targetPortId } = command;
+  const temporaryEdge = metadata.temporaryEdge;
 
-  if (!metadata.temporaryEdge) {
+  if (!temporaryEdge) {
     return;
+  }
+
+  let newTemporaryEdge: Edge = temporaryEdge;
+
+  const targetNode = target ? commandHandler.flowCore.getNodeById(target) : null;
+
+  if (target && target === temporaryEdge.target && targetPortId === temporaryEdge.targetPort) {
+    return;
+  }
+
+  if (target && targetNode) {
+    if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)) {
+      newTemporaryEdge = {
+        ...temporaryEdge,
+        target,
+        targetPort: targetPortId,
+      };
+    } else {
+      newTemporaryEdge = {
+        ...temporaryEdge,
+        target,
+        targetPort: '',
+      };
+    }
+  } else {
+    newTemporaryEdge = {
+      ...temporaryEdge,
+      target: '',
+      targetPort: '',
+      targetPosition: position,
+    };
   }
 
   commandHandler.flowCore.applyUpdate(
     {
       metadata: {
         ...metadata,
-        temporaryEdge: { ...metadata.temporaryEdge, targetPosition: position },
+        temporaryEdge: newTemporaryEdge,
       },
     },
     'moveTemporaryEdge'

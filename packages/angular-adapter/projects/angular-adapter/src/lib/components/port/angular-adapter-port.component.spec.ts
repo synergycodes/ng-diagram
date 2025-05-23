@@ -46,10 +46,20 @@ describe('AngularAdapterPortComponent', () => {
 
   describe('onPointerDown', () => {
     let mockEvent: PointerEvent;
+    let mockCurrentTarget: HTMLElement;
 
     beforeEach(() => {
+      mockCurrentTarget = document.createElement('div');
+      Object.assign(mockCurrentTarget, { setPointerCapture: vi.fn() });
       mockEvent = new Event('pointerdown') as PointerEvent;
-      Object.assign(mockEvent, { clientX: 100, clientY: 200, pointerId: 1, pressure: 0.5, button: 0 });
+      Object.assign(mockEvent, {
+        clientX: 100,
+        clientY: 200,
+        pointerId: 1,
+        pressure: 0.5,
+        button: 0,
+      });
+      vi.spyOn(mockEvent, 'currentTarget', 'get').mockReturnValue(mockCurrentTarget);
     });
 
     it('should stop event propagation', () => {

@@ -1,6 +1,8 @@
 import { CommandHandler } from './command-handler/command-handler';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
+import { SpatialHash } from './spatial-hash/spatial-hash';
+import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
   EnvironmentInfo,
   Event,
@@ -10,6 +12,7 @@ import type {
   ModelActionType,
   ModelAdapter,
   Node,
+  Port,
   Renderer,
 } from './types';
 
@@ -19,6 +22,7 @@ export class FlowCore {
   readonly inputEventHandler: InputEventHandler;
   readonly middlewareManager: MiddlewareManager;
   readonly environment: EnvironmentInfo;
+  readonly spatialHash: SpatialHash;
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -32,6 +36,7 @@ export class FlowCore {
     this.commandHandler = new CommandHandler(this);
     this.inputEventHandler = new InputEventHandler(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
+    this.spatialHash = new SpatialHash();
     this.init();
   }
 
@@ -146,7 +151,10 @@ export class FlowCore {
    * Starts listening to model changes and emits init command
    */
   private init() {
-    this.model.onChange(() => this.render());
+    this.model.onChange(({ nodes }) => {
+      this.render();
+      this.spatialHash.process(nodes);
+    });
     this.commandHandler.emit('init');
   }
 
@@ -193,5 +201,35 @@ export class FlowCore {
    */
   getNodeById(nodeId: string): Node | null {
     return this.model.getNodes().find((node) => node.id === nodeId) ?? null;
+  }
+
+  /**
+   * Gets all nodes in a range
+   * @param point Point
+   * @param range Range
+   * @returns Nodes
+   */
+  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
+    return getNodesInRange(this, point, range);
+  }
+
+  /**
+   * Gets the nearest node in a range
+   * @param point Point
+   * @param range Range
+   * @returns Node
+   */
+  getNearestNodeInRange(point: { x: number; y: number }, range: number): Node | null {
+    return getNearestNodeInRange(this, point, range);
+  }
+
+  /**
+   * Gets the nearest port in a range
+   * @param point Point
+   * @param range Range
+   * @returns Port
+   */
+  getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
+    return getNearestPortInRange(this, point, range);
   }
 }

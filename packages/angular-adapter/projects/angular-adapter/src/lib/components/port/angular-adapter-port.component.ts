@@ -71,6 +71,8 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
 
   onPointerDown(event: PointerEvent) {
     event.stopPropagation();
+    const currentTarget = event.currentTarget as HTMLElement;
+    currentTarget.setPointerCapture(event.pointerId);
     this.eventMapperService.emit({
       pointerId: event.pointerId,
       type: 'pointerdown',
