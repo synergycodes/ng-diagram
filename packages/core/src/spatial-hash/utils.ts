@@ -1,7 +1,7 @@
 import { FlowCore } from '../flow-core';
 import { Node, Port, Rect } from '../types';
 
-const getPointRangeRect = (point: { x: number; y: number }, range: number): Rect => {
+export const getPointRangeRect = (point: { x: number; y: number }, range: number): Rect => {
   return {
     x: point.x - range,
     y: point.y - range,
@@ -69,15 +69,7 @@ export const getDistanceBetweenRects = (rect1: Rect, rect2: Rect): number => {
   if (rect1.y >= rect2Bottom) {
     return rect1.y - rect2Bottom;
   }
-  const center1 = {
-    x: rect1.x + rect1.width / 2,
-    y: rect1.y + rect1.height / 2,
-  };
-  const center2 = {
-    x: rect2.x + rect2.width / 2,
-    y: rect2.y + rect2.height / 2,
-  };
-  return Math.sqrt((center1.x - center2.x) ** 2 + (center1.y - center2.y) ** 2);
+  return Infinity;
 };
 
 export const getNodesInRange = (flowCore: FlowCore, point: { x: number; y: number }, range: number): Node[] => {
@@ -98,8 +90,8 @@ export const getNearestNodeInRange = (
 ): Node | null => {
   return (
     getNodesInRange(flowCore, point, range).sort((a, b) => {
-      const aDistance = getDistanceBetweenRects(getRect(a), getPointRangeRect(point, range));
-      const bDistance = getDistanceBetweenRects(getRect(b), getPointRangeRect(point, range));
+      const aDistance = getDistanceBetweenRects(getRect(a), getPointRangeRect(point, 1));
+      const bDistance = getDistanceBetweenRects(getRect(b), getPointRangeRect(point, 1));
       return aDistance - bDistance;
     })[0] || null
   );
@@ -123,7 +115,7 @@ export const getNearestPortInRange = (
           size: port.size,
           position: { x: port.position.x + node.position.x, y: port.position.y + node.position.y },
         }),
-        getPointRangeRect(point, range)
+        getPointRangeRect(point, 1)
       );
       if (distance <= range) {
         if (distance < minDistance) {
