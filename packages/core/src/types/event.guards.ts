@@ -1,5 +1,6 @@
 import type {
   DiagramTarget,
+  EdgeLabelTarget,
   EdgeTarget,
   Event,
   EventTarget,
@@ -135,4 +136,11 @@ export const isPortTarget = (target: EventTarget): target is PortTarget => {
  */
 export const isDiagramTarget = (target: EventTarget): target is DiagramTarget => {
   return target.type === 'diagram';
+};
+
+/**
+ * Check if an event target is an edge label
+ */
+export const isEdgeLabelTarget = (target: EventTarget): target is EdgeLabelTarget => {
+  return target.type === 'edge-label';
 };

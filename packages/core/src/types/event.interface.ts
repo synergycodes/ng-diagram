@@ -1,4 +1,4 @@
-import type { Edge } from './edge.interface';
+import type { Edge, EdgeLabel } from './edge.interface';
 import type { Node, Port } from './node.interface';
 
 /**
@@ -33,6 +33,14 @@ export interface DiagramTarget {
 }
 
 /**
+ * Type for edge label target
+ */
+export interface EdgeLabelTarget {
+  type: 'edge-label';
+  element: EdgeLabel;
+}
+
+/**
  * Type for resize handle position
  */
 export type ResizeHandlePosition =
@@ -57,7 +65,7 @@ export interface ResizeHandleTarget {
 /**
  * Type for event target
  */
-export type EventTarget = NodeTarget | EdgeTarget | PortTarget | ResizeHandleTarget | DiagramTarget;
+export type EventTarget = NodeTarget | EdgeTarget | PortTarget | ResizeHandleTarget | DiagramTarget | EdgeLabelTarget;
 
 /**
  * Base interface for all events
