@@ -1,4 +1,14 @@
-import type { Edge, EnvironmentInfo, KeyboardEvent, Metadata, Node, PointerEvent, Port, WheelEvent } from './types';
+import type {
+  Edge,
+  EdgeLabel,
+  EnvironmentInfo,
+  KeyboardEvent,
+  Metadata,
+  Node,
+  PointerEvent,
+  Port,
+  WheelEvent,
+} from './types';
 
 export const mockNode: Node = {
   id: 'node1',
@@ -89,4 +99,11 @@ export const mockPort: Port = {
   position: { x: 0, y: 0 },
   size: { width: 10, height: 10 },
   nodeId: 'node1',
+};
+
+export const mockEdgeLabel: EdgeLabel = {
+  id: 'label1',
+  size: { width: 10, height: 10 },
+  position: { x: 0, y: 0 },
+  positionOnEdge: 0.5,
 };

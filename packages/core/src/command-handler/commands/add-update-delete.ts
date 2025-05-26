@@ -7,7 +7,8 @@ export interface AddNodesCommand {
 
 export const addNodes = (commandHandler: CommandHandler, command: AddNodesCommand): void => {
   const { nodes } = commandHandler.flowCore.getState();
-  commandHandler.flowCore.applyUpdate({ nodes: [...nodes, ...command.nodes] }, 'addNodes');
+  const { nodes: nodesToAdd } = command;
+  commandHandler.flowCore.applyUpdate({ nodes: [...nodes, ...nodesToAdd] }, 'addNodes');
 };
 
 export interface UpdateNodeCommand {
@@ -18,8 +19,9 @@ export interface UpdateNodeCommand {
 
 export const updateNode = (commandHandler: CommandHandler, command: UpdateNodeCommand): void => {
   const { nodes } = commandHandler.flowCore.getState();
+  const { id, nodeChanges } = command;
   commandHandler.flowCore.applyUpdate(
-    { nodes: nodes.map((node) => (node.id === command.id ? { ...node, ...command.nodeChanges } : node)) },
+    { nodes: nodes.map((node) => (node.id === id ? { ...node, ...nodeChanges } : node)) },
     'updateNode'
   );
 };
@@ -31,8 +33,9 @@ export interface DeleteNodesCommand {
 
 export const deleteNodes = (commandHandler: CommandHandler, command: DeleteNodesCommand): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
+  const { ids } = command;
   const edgesToDeleteIds = new Set<string>();
-  const nodesToDeleteIds = new Set<string>(command.ids);
+  const nodesToDeleteIds = new Set<string>(ids);
   edges.forEach((edge) => {
     if (nodesToDeleteIds.has(edge.source) || nodesToDeleteIds.has(edge.target)) {
       edgesToDeleteIds.add(edge.id);
@@ -54,7 +57,8 @@ export interface AddEdgesCommand {
 
 export const addEdges = (commandHandler: CommandHandler, command: AddEdgesCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
-  commandHandler.flowCore.applyUpdate({ edges: [...edges, ...command.edges] }, 'addEdges');
+  const { edges: edgesToAdd } = command;
+  commandHandler.flowCore.applyUpdate({ edges: [...edges, ...edgesToAdd] }, 'addEdges');
 };
 
 export interface UpdateEdgeCommand {
@@ -65,8 +69,9 @@ export interface UpdateEdgeCommand {
 
 export const updateEdge = (commandHandler: CommandHandler, command: UpdateEdgeCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
+  const { id, edgeChanges } = command;
   commandHandler.flowCore.applyUpdate(
-    { edges: edges.map((edge) => (edge.id === command.id ? { ...edge, ...command.edgeChanges } : edge)) },
+    { edges: edges.map((edge) => (edge.id === id ? { ...edge, ...edgeChanges } : edge)) },
     'updateEdge'
   );
 };
@@ -78,7 +83,8 @@ export interface DeleteEdgesCommand {
 
 export const deleteEdges = (commandHandler: CommandHandler, command: DeleteEdgesCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
-  commandHandler.flowCore.applyUpdate({ edges: edges.filter((edge) => !command.ids.includes(edge.id)) }, 'deleteEdges');
+  const { ids } = command;
+  commandHandler.flowCore.applyUpdate({ edges: edges.filter((edge) => !ids.includes(edge.id)) }, 'deleteEdges');
 };
 
 export interface AddPortsCommand {
@@ -158,10 +164,11 @@ export interface AddEdgeLabelsCommand {
 
 export const addEdgeLabels = (commandHandler: CommandHandler, command: AddEdgeLabelsCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
+  const { edgeId, labels } = command;
   commandHandler.flowCore.applyUpdate(
     {
       edges: edges.map((edge) =>
-        edge.id === command.edgeId ? { ...edge, labels: [...(edge.labels ?? []), ...command.labels] } : edge
+        edge.id === edgeId ? { ...edge, labels: [...(edge.labels ?? []), ...labels] } : edge
       ),
     },
     'updateEdge'
@@ -177,15 +184,14 @@ export interface UpdateEdgeLabelCommand {
 
 export const updateEdgeLabel = (commandHandler: CommandHandler, command: UpdateEdgeLabelCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
+  const { edgeId, labelId, labelChanges } = command;
   commandHandler.flowCore.applyUpdate(
     {
       edges: edges.map((edge) =>
-        edge.id === command.edgeId
+        edge.id === edgeId
           ? {
               ...edge,
-              labels: edge.labels?.map((label) =>
-                label.id === command.labelId ? { ...label, ...command.labelChanges } : label
-              ),
+              labels: edge.labels?.map((label) => (label.id === labelId ? { ...label, ...labelChanges } : label)),
             }
           : edge
       ),
@@ -202,12 +208,11 @@ export interface DeleteEdgeLabelsCommand {
 
 export const deleteEdgeLabels = (commandHandler: CommandHandler, command: DeleteEdgeLabelsCommand): void => {
   const { edges } = commandHandler.flowCore.getState();
+  const { edgeId, labelIds } = command;
   commandHandler.flowCore.applyUpdate(
     {
       edges: edges.map((edge) =>
-        edge.id === command.edgeId
-          ? { ...edge, labels: edge.labels?.filter((label) => !command.labelIds.includes(label.id)) }
-          : edge
+        edge.id === edgeId ? { ...edge, labels: edge.labels?.filter((label) => !labelIds.includes(label.id)) } : edge
       ),
     },
     'updateEdge'
