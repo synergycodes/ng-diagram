@@ -1,9 +1,15 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
-import { AngularAdapterEdgeComponent } from '../angular-adapter-edge.component';
 import { EdgeStraightComponent } from './edge-straight.component';
+
+@Component({
+  selector: 'angular-adapter-edge-label',
+  template: '', // Empty mock template
+  standalone: true,
+})
+class MockAngularAdapterEdgeLabelComponent {}
 
 describe('EdgeStraightComponent', () => {
   let component: EdgeStraightComponent;
@@ -12,22 +18,7 @@ describe('EdgeStraightComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EdgeStraightComponent],
-      providers: [
-        {
-          provide: AngularAdapterEdgeComponent,
-          useValue: {
-            data: () => mockEdge,
-          },
-        },
-        {
-          provide: AngularAdapterEdgeLabelComponent,
-          useValue: {
-            id: 'test-label',
-            positionOnEdge: 0.5,
-          },
-        },
-      ],
+      imports: [EdgeStraightComponent, MockAngularAdapterEdgeLabelComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EdgeStraightComponent);
