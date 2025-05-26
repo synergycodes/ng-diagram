@@ -4,7 +4,6 @@ import {
   computed,
   effect,
   ElementRef,
-  HostBinding,
   inject,
   input,
   OnDestroy,
@@ -24,13 +23,10 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   host: {
     '(pointerdown)': 'onPointerDown($event)',
     '(pointerup)': 'onPointerUp($event)',
+    '[attr.data-port-id]': 'id()',
   },
 })
 export class AngularAdapterPortComponent implements OnInit, OnDestroy {
-  @HostBinding('attr.data-port-id') get dataPortIdAttr() {
-    return this.id();
-  }
-
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly eventMapperService = inject(EventMapperService);
