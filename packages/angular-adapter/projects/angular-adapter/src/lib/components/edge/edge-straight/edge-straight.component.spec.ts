@@ -118,8 +118,8 @@ describe('EdgeStraightComponent', () => {
   });
 
   it('should return proper stroke opacity when edge is temporary', () => {
-    fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('isTemporary', true);
+    fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
+
     fixture.detectChanges();
 
     expect(component.strokeOpacity()).toBe(0.5);
