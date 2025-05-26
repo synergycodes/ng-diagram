@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { mockNode, mockPort } from '../../../test-utils';
+import { mockEdge, mockEdgeLabel, mockNode, mockPort } from '../../../test-utils';
 import { CommandHandler } from '../../command-handler';
 
 describe('Add Update Delete Command', () => {
@@ -115,5 +115,68 @@ describe('Add Update Delete Command', () => {
     commandHandler.emit('deletePorts', { nodeId: mockNode.id, portIds: [mockPort.id] });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...mockNode, ports: [] }] }, 'updateNode');
+  });
+
+  it('should add edge labels to an edge', () => {
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [],
+      edges: [{ ...mockEdge, labels: [] }],
+      metadata: {},
+    });
+
+    commandHandler.emit('addEdgeLabels', {
+      edgeId: mockEdge.id,
+      labels: [mockEdgeLabel],
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edges: [{ ...mockEdge, labels: [mockEdgeLabel] }],
+      },
+      'updateEdge'
+    );
+  });
+
+  it('should update an edge label', () => {
+    const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1' };
+    const mockEdgeLabel2 = { ...mockEdgeLabel, id: 'label2' };
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [],
+      edges: [{ ...mockEdge, labels: [mockEdgeLabel1, mockEdgeLabel2] }],
+      metadata: {},
+    });
+
+    commandHandler.emit('updateEdgeLabel', {
+      edgeId: mockEdge.id,
+      labelId: mockEdgeLabel1.id,
+      labelChanges: { position: { x: 100, y: 100 } },
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edges: [{ ...mockEdge, labels: [{ ...mockEdgeLabel1, position: { x: 100, y: 100 } }, mockEdgeLabel2] }],
+      },
+      'updateEdge'
+    );
+  });
+
+  it('should delete an edge label', () => {
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [],
+      edges: [{ ...mockEdge, labels: [mockEdgeLabel, { ...mockEdgeLabel, id: 'label2' }] }],
+      metadata: {},
+    });
+
+    commandHandler.emit('deleteEdgeLabels', {
+      edgeId: mockEdge.id,
+      labelIds: [mockEdgeLabel.id],
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edges: [{ ...mockEdge, labels: [{ ...mockEdgeLabel, id: 'label2' }] }],
+      },
+      'updateEdge'
+    );
   });
 });

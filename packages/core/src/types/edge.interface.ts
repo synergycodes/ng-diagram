@@ -66,4 +66,33 @@ export interface Edge {
    * The z-order of the edge.
    */
   zOrder?: number;
+  /**
+   * The labels of the edge.
+   */
+  labels?: EdgeLabel[];
+}
+
+/**
+ * Interface representing a label of an edge.
+ */
+export interface EdgeLabel {
+  /**
+   * The id of the label.
+   */
+  id: string;
+  /**
+   * The position of the label from 0 to 1 where 0 is the source position of edge and 1 is the target position of edge.
+   */
+  positionOnEdge: number;
+  /**
+   * The position of the label on flow.
+   */
+  position: { x: number; y: number };
+  /**
+   * The size of the label.
+   */
+  size: {
+    width: number;
+    height: number;
+  };
 }

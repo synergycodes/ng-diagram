@@ -1,7 +1,16 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 import { EdgeStraightComponent } from './edge-straight.component';
+
+@Component({
+  selector: 'angular-adapter-edge-label',
+  template: '', // Empty mock template
+  standalone: true,
+})
+class MockAngularAdapterEdgeLabelComponent {}
 
 describe('EdgeStraightComponent', () => {
   let component: EdgeStraightComponent;
@@ -11,7 +20,16 @@ describe('EdgeStraightComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EdgeStraightComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(EdgeStraightComponent, {
+        remove: {
+          imports: [AngularAdapterEdgeLabelComponent],
+        },
+        add: {
+          imports: [MockAngularAdapterEdgeLabelComponent],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(EdgeStraightComponent);
     component = fixture.componentInstance;
@@ -100,8 +118,8 @@ describe('EdgeStraightComponent', () => {
   });
 
   it('should return proper stroke opacity when edge is temporary', () => {
-    fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('isTemporary', true);
+    fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
+
     fixture.detectChanges();
 
     expect(component.strokeOpacity()).toBe(0.5);

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Edge } from '@angularflow/core';
 import {
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
@@ -20,4 +21,6 @@ import {
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
 })
-export class AngularAdapterEdgeComponent {}
+export class AngularAdapterEdgeComponent {
+  data = input.required<Edge>();
+}

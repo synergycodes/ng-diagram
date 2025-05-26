@@ -7,11 +7,4 @@ svg {
     pointer-events: visibleStroke;
     cursor: pointer;
   }
-
-  &.temporary {
-    path {
-      pointer-events: none;
-      cursor: grab;
-    }
-  }
 }

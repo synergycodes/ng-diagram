@@ -1,6 +1,6 @@
-<!-- TODO: For now I set temporary class here to make linking works but when we add snapping to port it probably can be removed -->
-<svg [class.temporary]="isTemporary()">
+<svg>
   <path
+    class="flow__angular-adapter-edge__path"
     [attr.d]="path()"
     [attr.stroke]="stroke()"
     [attr.fill]="fill()"
@@ -11,3 +11,9 @@
   />
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
 </svg>
+<!-- TODO: Temporary solution. If edge templates will be implemented this code should be removed -->
+@if (!data().temporary) {
+  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
+    <div style="padding: 4px; background-color: white; border-radius: 5px; font-size: 10px">Label</div>
+  </angular-adapter-edge-label>
+}

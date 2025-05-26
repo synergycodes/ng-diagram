@@ -57,9 +57,9 @@ describe('AppComponent', () => {
     expect(component.nodeTemplateMap.has('resizable')).toBeTruthy();
   });
 
-  it('should initialize with four edges', () => {
+  it('should initialize with three edges', () => {
     const edges = component.model().getEdges();
-    expect(edges.length).toBe(4);
+    expect(edges.length).toBe(3);
   });
 
   it('should initialize with logger middleware', () => {
