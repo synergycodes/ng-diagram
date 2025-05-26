@@ -1,5 +1,6 @@
 import { FlowCore } from '../../flow-core';
 import type { Edge, Middleware, ModelActionType, Node } from '../../types';
+import { getPointOnPath } from '../../utils/get-point-on-path';
 
 const regularEdgeActions = new Set<ModelActionType>([
   'init',
@@ -70,11 +71,20 @@ export const edgesStraightRoutingMiddleware: Middleware = {
             return edge;
           }
 
+          const updatedLabels = edge.labels?.map((label) => {
+            const pointOnPath = getPointOnPath(points, label.positionOnEdge);
+            return {
+              ...label,
+              position: pointOnPath,
+            };
+          });
+
           return {
             ...edge,
             points,
             sourcePosition: points[0],
             targetPosition: points[1],
+            labels: updatedLabels,
           };
         });
       }

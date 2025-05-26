@@ -12,8 +12,6 @@ import {
 } from '@angular/core';
 import { EdgeLabel, EdgeLabelTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
-import { findParentWithClass } from '../../utils/find-parent-with-class';
-import { getPointOnPath } from '../../utils/get-point-on-path';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 
 @Component({
@@ -41,40 +39,13 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
 
   points = computed(() => this.edgeData()?.points);
   edgeId = computed(() => this.edgeData()?.id);
-  position = computed(() => {
-    if (this.positionOnEdge() < 0 || this.positionOnEdge() > 1) {
-      throw new Error(`Position on edge must be between 0 and 1, got ${this.positionOnEdge()}`);
-    }
-    if (!this.points()?.length) {
-      return { x: 0, y: 0 };
-    }
-    const path = findParentWithClass(this.hostElement.nativeElement, 'flow__angular-adapter-edge')?.querySelector(
-      '.flow__angular-adapter-edge__path'
-    );
-    if (!path) {
-      return { x: 0, y: 0 };
-    }
-    return getPointOnPath(path as SVGPathElement, this.positionOnEdge());
-  });
+  position = computed(
+    () => this.edgeData()?.labels?.find((label) => label.id === this.id())?.position || { x: 0, y: 0 }
+  );
 
-  private lastEmittedPosition = signal<EdgeLabel['position'] | undefined>(undefined);
   private lastPositionOnEdge = signal<EdgeLabel['positionOnEdge'] | undefined>(undefined);
 
   constructor() {
-    effect(() => {
-      const newPosition = this.position();
-      const lastPosition = this.lastEmittedPosition();
-
-      if (newPosition.x !== lastPosition?.x || newPosition.y !== lastPosition?.y) {
-        this.lastEmittedPosition.set(newPosition);
-
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabel', {
-          edgeId: this.edgeId(),
-          labelId: this.id(),
-          labelChanges: { position: newPosition },
-        });
-      }
-    });
     effect(() => {
       const newPositionOnEdge = this.positionOnEdge();
       const lastPositionOnEdge = this.lastPositionOnEdge();
