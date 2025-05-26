@@ -61,16 +61,6 @@ export class AppComponent {
         targetPort: 'port-left-1',
       },
       {
-        id: '3',
-        source: '2',
-        target: '3',
-        data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-right',
-        targetPort: 'port-left-2',
-      },
-      {
         id: '4',
         source: '2',
         target: '3',

@@ -1,11 +1,14 @@
 import {
+  AddEdgeLabelsCommand,
   AddEdgesCommand,
   AddNodesCommand,
   AddPortsCommand,
+  DeleteEdgeLabelsCommand,
   DeleteEdgesCommand,
   DeleteNodesCommand,
   DeletePortsCommand,
   UpdateEdgeCommand,
+  UpdateEdgeLabelCommand,
   UpdateNodeCommand,
   UpdatePortCommand,
 } from '../command-handler/commands/add-update-delete';
@@ -58,7 +61,10 @@ export type Command =
   | UpdatePortCommand
   | DeletePortsCommand
   | BringToFrontCommand
-  | SendToBackCommand;
+  | SendToBackCommand
+  | AddEdgeLabelsCommand
+  | UpdateEdgeLabelCommand
+  | DeleteEdgeLabelsCommand;
 
 /**
  * Type for command name

@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostBinding,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Port, PortTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
 import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
@@ -15,6 +24,10 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   },
 })
 export class AngularAdapterPortComponent implements OnInit, OnDestroy {
+  @HostBinding('attr.data-port-id') get dataPortIdAttr() {
+    return this.id();
+  }
+
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly eventMapperService = inject(EventMapperService);
@@ -28,7 +41,6 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const node = this.nodeComponent.data();
-    this.hostElement.nativeElement.setAttribute('data-port-id', this.id());
 
     const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
     this.flowCoreProvider.provide().commandHandler.emit('addPorts', {

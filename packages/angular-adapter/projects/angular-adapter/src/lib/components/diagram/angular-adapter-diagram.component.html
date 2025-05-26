@@ -22,7 +22,7 @@
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
       } @else if (edge.type === 'straight' || !edge.type) {
-        <angular-adapter-edge-straight [data]="edge" [isTemporary]="edge.temporary" />
+        <angular-adapter-edge-straight [data]="edge" />
       }
     </angular-adapter-edge>
   }

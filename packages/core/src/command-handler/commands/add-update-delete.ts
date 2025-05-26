@@ -1,4 +1,4 @@
-import type { CommandHandler, Edge, Node, Port } from '../../types';
+import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
 
 export interface AddNodesCommand {
   name: 'addNodes';
@@ -147,5 +147,69 @@ export const deletePorts = (commandHandler: CommandHandler, command: DeletePorts
       ),
     },
     'updateNode'
+  );
+};
+
+export interface AddEdgeLabelsCommand {
+  name: 'addEdgeLabels';
+  edgeId: string;
+  labels: EdgeLabel[];
+}
+
+export const addEdgeLabels = (commandHandler: CommandHandler, command: AddEdgeLabelsCommand): void => {
+  const { edges } = commandHandler.flowCore.getState();
+  commandHandler.flowCore.applyUpdate(
+    {
+      edges: edges.map((edge) =>
+        edge.id === command.edgeId ? { ...edge, labels: [...(edge.labels ?? []), ...command.labels] } : edge
+      ),
+    },
+    'updateEdge'
+  );
+};
+
+export interface UpdateEdgeLabelCommand {
+  name: 'updateEdgeLabel';
+  edgeId: string;
+  labelId: string;
+  labelChanges: Partial<EdgeLabel>;
+}
+
+export const updateEdgeLabel = (commandHandler: CommandHandler, command: UpdateEdgeLabelCommand): void => {
+  const { edges } = commandHandler.flowCore.getState();
+  commandHandler.flowCore.applyUpdate(
+    {
+      edges: edges.map((edge) =>
+        edge.id === command.edgeId
+          ? {
+              ...edge,
+              labels: edge.labels?.map((label) =>
+                label.id === command.labelId ? { ...label, ...command.labelChanges } : label
+              ),
+            }
+          : edge
+      ),
+    },
+    'updateEdge'
+  );
+};
+
+export interface DeleteEdgeLabelsCommand {
+  name: 'deleteEdgeLabels';
+  edgeId: string;
+  labelIds: string[];
+}
+
+export const deleteEdgeLabels = (commandHandler: CommandHandler, command: DeleteEdgeLabelsCommand): void => {
+  const { edges } = commandHandler.flowCore.getState();
+  commandHandler.flowCore.applyUpdate(
+    {
+      edges: edges.map((edge) =>
+        edge.id === command.edgeId
+          ? { ...edge, labels: edge.labels?.filter((label) => !command.labelIds.includes(label.id)) }
+          : edge
+      ),
+    },
+    'updateEdge'
   );
 };

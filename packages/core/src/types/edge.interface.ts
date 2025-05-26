@@ -83,7 +83,11 @@ export interface EdgeLabel {
   /**
    * The position of the label from 0 to 1 where 0 is the source position of edge and 1 is the target position of edge.
    */
-  position: number;
+  positionOnEdge: number;
+  /**
+   * The position of the label on flow.
+   */
+  position: { x: number; y: number };
   /**
    * The size of the label.
    */

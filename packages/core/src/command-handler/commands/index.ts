@@ -1,12 +1,15 @@
 import type { CommandByName, CommandHandler, CommandName } from '../../types';
 import {
+  addEdgeLabels,
   addEdges,
   addNodes,
   addPorts,
+  deleteEdgeLabels,
   deleteEdges,
   deleteNodes,
   deletePorts,
   updateEdge,
+  updateEdgeLabel,
   updateNode,
   updatePort,
 } from './add-update-delete';
@@ -26,6 +29,7 @@ import { resizeNode } from './resize-node';
 import { deselect, deselectAll, select } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
+
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
   command: CommandByName<K>
@@ -64,4 +68,7 @@ export const commands: CommandMap = {
   deletePorts,
   bringToFront,
   sendToBack,
+  addEdgeLabels,
+  updateEdgeLabel,
+  deleteEdgeLabels,
 };
