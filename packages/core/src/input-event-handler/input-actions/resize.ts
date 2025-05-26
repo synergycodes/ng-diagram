@@ -12,16 +12,19 @@ export const resizeAction: InputActionWithPredicate = {
       return;
     }
 
-    const { width, height, disableAutoSize } = event;
+    const { width, height } = event;
 
-    flowCore.commandHandler.emit('resizeNode', {
-      id: node.id,
-      size: {
-        width,
-        height,
-      },
-      disableAutoSize,
-    });
+    if (!node.size) {
+      flowCore.initializationGuard.initNodeSize(node.id, { width, height });
+    } else {
+      flowCore.commandHandler.emit('resizeNode', {
+        id: node.id,
+        size: {
+          width,
+          height,
+        },
+      });
+    }
   },
   predicate: (event) => isResizeEvent(event) && isNodeTarget(event.target),
 };

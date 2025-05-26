@@ -175,7 +175,6 @@ export interface ResizeEvent extends BaseEvent {
   type: 'resize';
   width: number;
   height: number;
-  disableAutoSize?: boolean;
 }
 
 /**

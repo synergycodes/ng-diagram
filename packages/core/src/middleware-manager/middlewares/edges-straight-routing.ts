@@ -1,6 +1,6 @@
-import { FlowCore } from '../../flow-core';
 import type { Edge, Middleware, ModelActionType, Node } from '../../types';
 import { getPointOnPath } from '../../utils/get-point-on-path';
+import { getFlowPortPosition } from '../../utils/get-port-flow-position';
 
 const regularEdgeActions = new Set<ModelActionType>([
   'init',
@@ -18,13 +18,13 @@ const regularEdgeActions = new Set<ModelActionType>([
 
 const temporaryEdgeActions = new Set<ModelActionType>(['startLinking', 'moveTemporaryEdge', 'finishLinking']);
 
-const getPoints = (edge: Edge, nodesMap: Map<string, Node>, flowCore: FlowCore) => {
+const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
   const getPoint = (nodeId: string, portId?: string, position?: { x: number; y: number }) => {
     const node = nodesMap.get(nodeId);
     if (!node) {
       return position;
     }
-    return portId ? flowCore.getFlowPortPosition(node, portId) : position;
+    return portId ? getFlowPortPosition(node, portId) : position;
   };
 
   const sourcePoint = getPoint(edge.source, edge.sourcePort, edge.sourcePosition);
@@ -35,7 +35,7 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, flowCore: FlowCore) 
 
 export const edgesStraightRoutingMiddleware: Middleware = {
   name: 'edges-straight-routing',
-  execute: (state, context, flowCore) => {
+  execute: (state, context) => {
     const { edges, metadata } = state;
     const isRegularEdgeAction = regularEdgeActions.has(context.modelActionType);
     const isTemporaryEdgeAction = temporaryEdgeActions.has(context.modelActionType);
@@ -65,7 +65,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
           if (!edgesToRouteIds.has(edge.id)) {
             return edge;
           }
-          const points = getPoints(edge, nodesMap, flowCore);
+          const points = getPoints(edge, nodesMap);
 
           if (edge.points?.length === points.length && edge.points?.every((point, index) => point === points[index])) {
             return edge;
@@ -93,7 +93,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
     let newMetadata = metadata;
 
     if (isTemporaryEdgeAction && metadata.temporaryEdge) {
-      const points = getPoints(metadata.temporaryEdge, nodesMap, flowCore);
+      const points = getPoints(metadata.temporaryEdge, nodesMap);
 
       newMetadata = {
         ...metadata,

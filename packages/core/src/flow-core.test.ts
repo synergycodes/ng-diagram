@@ -245,12 +245,12 @@ describe('FlowCore', () => {
 
   describe('getFlowPortPosition', () => {
     it('should return null if the port is not found', () => {
-      const position = flowCore.getFlowPortPosition(mockNode, 'port-1');
+      const position = flowCore.getPortFlowPosition(mockNode, 'port-1');
       expect(position).toBeNull();
     });
 
     it('should return proper flow port position for top side', () => {
-      const position = flowCore.getFlowPortPosition(
+      const position = flowCore.getPortFlowPosition(
         {
           ...mockNode,
           position: { x: 100, y: 100 },
@@ -263,7 +263,7 @@ describe('FlowCore', () => {
     });
 
     it('should return proper flow port position for bottom side', () => {
-      const position = flowCore.getFlowPortPosition(
+      const position = flowCore.getPortFlowPosition(
         {
           ...mockNode,
           position: { x: 100, y: 100 },
@@ -276,7 +276,7 @@ describe('FlowCore', () => {
     });
 
     it('should return proper flow port position for left side', () => {
-      const position = flowCore.getFlowPortPosition(
+      const position = flowCore.getPortFlowPosition(
         {
           ...mockNode,
           position: { x: 100, y: 100 },
@@ -289,7 +289,7 @@ describe('FlowCore', () => {
     });
 
     it('should return proper flow port position for right side', () => {
-      const position = flowCore.getFlowPortPosition(
+      const position = flowCore.getPortFlowPosition(
         {
           ...mockNode,
           position: { x: 100, y: 100 },

@@ -1,4 +1,5 @@
 import { CommandHandler } from './command-handler/command-handler';
+import { InitializationGuard } from './initialization-guard';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
@@ -23,6 +24,7 @@ export class FlowCore {
   readonly middlewareManager: MiddlewareManager;
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
+  readonly initializationGuard: InitializationGuard;
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -37,7 +39,23 @@ export class FlowCore {
     this.inputEventHandler = new InputEventHandler(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.spatialHash = new SpatialHash();
+    this.initializationGuard = new InitializationGuard(this);
+
     this.init();
+  }
+
+  /**
+   * Starts listening to model changes and emits init command
+   */
+  private init() {
+    this.render();
+    this.initializationGuard.start(() => {
+      this.model.onChange(({ nodes }) => {
+        this.render();
+        this.spatialHash.process(nodes);
+      });
+      this.commandHandler.emit('init');
+    });
   }
 
   /**
@@ -148,50 +166,12 @@ export class FlowCore {
   }
 
   /**
-   * Starts listening to model changes and emits init command
-   */
-  private init() {
-    this.model.onChange(({ nodes }) => {
-      this.render();
-      this.spatialHash.process(nodes);
-    });
-    this.commandHandler.emit('init');
-  }
-
-  /**
    * Renders the flow
    */
   private render(): void {
     const { nodes, edges, metadata } = this.getState();
     const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
     this.renderer.draw(nodes, finalEdges, metadata.viewport);
-  }
-
-  /**
-   * Gets the flow position of a port
-   * @param nodeId Node id
-   * @param portId Port id
-   * @returns { x: number, y: number } Flow position
-   */
-  getFlowPortPosition(node: Node, portId: string): { x: number; y: number } | null {
-    const port = node.ports?.find((port) => port.id === portId);
-    if (!port) {
-      return null;
-    }
-    let x = port.position.x + node.position.x;
-    let y = port.position.y + node.position.y;
-    if (port.side === 'left') {
-      y = y + port.size.width / 2;
-    } else if (port.side === 'right') {
-      x = x + port.size.width;
-      y = y + port.size.height / 2;
-    } else if (port.side === 'top') {
-      x = x + port.size.width / 2;
-    } else if (port.side === 'bottom') {
-      x = x + port.size.width / 2;
-      y = y + port.size.height;
-    }
-    return { x, y };
   }
 
   /**
@@ -231,5 +211,14 @@ export class FlowCore {
    */
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return getNearestPortInRange(this, point, range);
+  }
+
+  /**
+   * Initializes a node size
+   * @param nodeId Node id
+   * @param size Size
+   */
+  initNodeSize(nodeId: string, size: { width: number; height: number }) {
+    this.initializationGuard.initNodeSize(nodeId, size);
   }
 }
