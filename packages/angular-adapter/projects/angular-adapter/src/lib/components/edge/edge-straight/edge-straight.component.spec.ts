@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 import { EdgeStraightComponent } from './edge-straight.component';
 
 @Component({
@@ -18,8 +19,17 @@ describe('EdgeStraightComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EdgeStraightComponent, MockAngularAdapterEdgeLabelComponent],
-    }).compileComponents();
+      imports: [EdgeStraightComponent],
+    })
+      .overrideComponent(EdgeStraightComponent, {
+        remove: {
+          imports: [AngularAdapterEdgeLabelComponent],
+        },
+        add: {
+          imports: [MockAngularAdapterEdgeLabelComponent],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(EdgeStraightComponent);
     component = fixture.componentInstance;
