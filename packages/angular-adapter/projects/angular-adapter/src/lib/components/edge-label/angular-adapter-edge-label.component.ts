@@ -8,10 +8,12 @@ import {
   input,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core';
 import { EdgeLabel, EdgeLabelTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
+import { getPointOnPath } from '../../utils/get-point-on-path';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 
 @Component({
@@ -35,35 +37,60 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
   id = input.required<EdgeLabel['id']>();
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
 
-  points = computed(() => this.edgeComponent.data()?.points);
-  edgeId = computed(() => this.edgeComponent.data()?.id);
+  edgeData = computed(() => this.edgeComponent.data());
+
+  points = computed(() => this.edgeData()?.points);
+  edgeId = computed(() => this.edgeData()?.id);
   position = computed(() => {
+    if (this.positionOnEdge() < 0 || this.positionOnEdge() > 1) {
+      throw new Error(`Position on edge must be between 0 and 1, got ${this.positionOnEdge()}`);
+    }
     if (!this.points()?.length) {
       return { x: 0, y: 0 };
     }
-    const edgeElement = findParentWithClass(this.hostElement.nativeElement, 'flow__angular-adapter-edge');
-    const path = edgeElement?.querySelector('.flow__angular-adapter-edge__path');
+    const path = findParentWithClass(this.hostElement.nativeElement, 'flow__angular-adapter-edge')?.querySelector(
+      '.flow__angular-adapter-edge__path'
+    );
     if (!path) {
       return { x: 0, y: 0 };
     }
-    return this.getPointOnPath(path as SVGPathElement, this.positionOnEdge());
+    return getPointOnPath(path as SVGPathElement, this.positionOnEdge());
   });
 
+  private lastEmittedPosition = signal<EdgeLabel['position'] | undefined>(undefined);
+  private lastPositionOnEdge = signal<EdgeLabel['positionOnEdge'] | undefined>(undefined);
+
   constructor() {
-    let lastPosition = this.position();
     effect(() => {
-      if (lastPosition.x !== this.position().x || lastPosition.y !== this.position().y) {
-        lastPosition = this.position();
+      const newPosition = this.position();
+      const lastPosition = this.lastEmittedPosition();
+
+      if (newPosition.x !== lastPosition?.x || newPosition.y !== lastPosition?.y) {
+        this.lastEmittedPosition.set(newPosition);
+
         this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabel', {
           edgeId: this.edgeId(),
           labelId: this.id(),
-          labelChanges: { position: this.position() },
+          labelChanges: { position: newPosition },
+        });
+      }
+    });
+    effect(() => {
+      const newPositionOnEdge = this.positionOnEdge();
+      const lastPositionOnEdge = this.lastPositionOnEdge();
+      if (newPositionOnEdge !== lastPositionOnEdge) {
+        this.lastPositionOnEdge.set(newPositionOnEdge);
+        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabel', {
+          edgeId: this.edgeId(),
+          labelId: this.id(),
+          labelChanges: { positionOnEdge: newPositionOnEdge },
         });
       }
     });
   }
 
   ngOnInit() {
+    this.lastPositionOnEdge.set(this.positionOnEdge());
     this.flowCoreProvider.provide().commandHandler.emit('addEdgeLabels', {
       edgeId: this.edgeId(),
       labels: [
@@ -134,20 +161,13 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
   }
 
   private getEventTarget(): EdgeLabelTarget {
-    const edgeLabel = this.edgeComponent.data()?.labels?.find((label) => label.id === this.id());
+    const edgeLabel = this.edgeData()?.labels?.find((label) => label.id === this.id());
     if (!edgeLabel) {
-      throw new Error(`Edge label with id ${this.id()} on edge ${this.edgeComponent.data()?.id} not found`);
+      throw new Error(`Edge label with id ${this.id()} on edge ${this.edgeData()?.id} not found`);
     }
     return {
       type: 'edge-label',
       element: edgeLabel,
     };
-  }
-
-  private getPointOnPath(pathElement: SVGPathElement, percentage: number) {
-    const totalLength = pathElement.getTotalLength();
-    const lengthAtPercent = totalLength * percentage;
-    const point = pathElement.getPointAtLength(lengthAtPercent);
-    return { x: point.x, y: point.y };
   }
 }

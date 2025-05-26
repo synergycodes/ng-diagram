@@ -1,12 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  effect,
   ElementRef,
   HostBinding,
   inject,
   input,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core';
 import { Port, PortTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
@@ -35,21 +38,49 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   private readonly updatePortsService = inject(UpdatePortsService);
   private resizeObserver!: ResizeObserver;
 
-  id = input.required<string>();
+  id = input.required<Port['id']>();
   type = input.required<Port['type']>();
   side = input.required<Port['side']>();
+  nodeData = computed(() => this.nodeComponent.data());
+
+  lastSide = signal<Port['side'] | undefined>(undefined);
+  lastType = signal<Port['type'] | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      if (this.lastSide() !== this.side()) {
+        this.lastSide.set(this.side());
+        this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
+          nodeId: this.nodeData().id,
+          portId: this.id(),
+          portChanges: { side: this.side() },
+        });
+      }
+    });
+
+    effect(() => {
+      if (this.lastType() !== this.type()) {
+        this.lastType.set(this.type());
+        this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
+          nodeId: this.nodeData().id,
+          portId: this.id(),
+          portChanges: { type: this.type() },
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
-    const node = this.nodeComponent.data();
-
     const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
+    this.lastSide.set(this.side());
+    this.lastType.set(this.type());
     this.flowCoreProvider.provide().commandHandler.emit('addPorts', {
-      nodeId: node.id,
+      nodeId: this.nodeData().id,
       ports: [
         {
           id: this.id(),
           type: this.type(),
-          nodeId: node.id,
+          nodeId: this.nodeData().id,
           side: this.side(),
           ...portData,
         },
@@ -63,9 +94,9 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
         const height = borderBox.blockSize;
         const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
         this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
-          nodeId: node.id,
+          nodeId: this.nodeData().id,
           portId: this.id(),
-          portChanges: { ...portData, size: { width, height }, side: this.side() },
+          portChanges: { ...portData, size: { width, height } },
         });
       }
     });
@@ -73,9 +104,8 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    const node = this.nodeComponent.data();
     this.flowCoreProvider.provide().commandHandler.emit('deletePorts', {
-      nodeId: node.id,
+      nodeId: this.nodeData().id,
       portIds: [this.id()],
     });
     this.resizeObserver.disconnect();
@@ -116,9 +146,9 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   }
 
   private getEventTarget(): PortTarget {
-    const port = this.nodeComponent.data()?.ports?.find((port) => port.id === this.id());
+    const port = this.nodeData()?.ports?.find((port) => port.id === this.id());
     if (!port) {
-      throw new Error(`Port with id ${this.id()} on node ${this.nodeComponent.data()?.id} not found`);
+      throw new Error(`Port with id ${this.id()} on node ${this.nodeData()?.id} not found`);
     }
     return {
       type: 'port',
