@@ -16,6 +16,10 @@ describe('AngularAdapterPortComponent', () => {
       commandHandler: {
         emit: vi.fn(),
       },
+      internalUpdater: {
+        addPort: vi.fn(),
+        applyPortsSizesAndPositions: vi.fn(),
+      },
     } as unknown as FlowCore;
     await TestBed.configureTestingModule({
       imports: [AngularAdapterPortComponent],
