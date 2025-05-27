@@ -50,7 +50,7 @@ describe('Edges Straight Routing Middleware', () => {
   });
 
   it('should return the initial state if there are no edges to route', () => {
-    initialState.edges[0].routing = 'custom-routing';
+    initialState = { ...initialState, edges: [{ ...mockEdge, routing: 'custom-routing' }] };
     const state = edgesStraightRoutingMiddleware.execute(
       initialState,
       {
