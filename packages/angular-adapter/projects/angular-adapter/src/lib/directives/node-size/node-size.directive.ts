@@ -1,14 +1,13 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Renderer2 } from '@angular/core';
-import type { Node } from '@angularflow/core';
-
-import { EventMapperService, UpdatePortsService } from '../../services';
+import { type Node } from '@angularflow/core';
+import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 
 @Directive({
   selector: '[angularAdapterNodeSize]',
 })
 export class NodeSizeDirective implements OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
-  private readonly eventMapperService = inject(EventMapperService);
+  private readonly flowCore = inject(FlowCoreProviderService);
   private readonly renderer = inject(Renderer2);
   private readonly updatePortsService = inject(UpdatePortsService);
   private resizeObserver!: ResizeObserver;
@@ -54,13 +53,7 @@ export class NodeSizeDirective implements OnDestroy {
       if (borderBox && !this.isDestroyed) {
         const width = borderBox.inlineSize;
         const height = borderBox.blockSize;
-        this.eventMapperService.emit({
-          type: 'resize',
-          target: { type: 'node', element: this.data() },
-          width,
-          height,
-          timestamp: Date.now(),
-        });
+        this.flowCore.provide().internalUpdater.applyNodeSize(this.id(), { width, height });
         this.updatePortsService.updateNodePorts(this.id());
       }
     });

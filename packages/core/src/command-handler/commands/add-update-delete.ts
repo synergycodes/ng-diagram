@@ -104,27 +104,28 @@ export const addPorts = (commandHandler: CommandHandler, command: AddPortsComman
   );
 };
 
-export interface UpdatePortCommand {
-  name: 'updatePort';
+export interface UpdatePortsCommand {
+  name: 'updatePorts';
   nodeId: string;
-  portId: string;
-  portChanges: Partial<Port>;
+  ports: { portId: string; portChanges: Partial<Port> }[];
 }
 
-export const updatePort = (commandHandler: CommandHandler, command: UpdatePortCommand): void => {
+export const updatePorts = (commandHandler: CommandHandler, command: UpdatePortsCommand): void => {
   const { nodes } = commandHandler.flowCore.getState();
-  const { nodeId, portId, portChanges } = command;
-  const portExists = nodes.find((node) => node.id === nodeId)?.ports?.find((port) => port.id === portId);
-  if (!portExists) {
-    return;
-  }
+  const { nodeId, ports } = command;
+  const portsUpdateMap = new Map<string, Partial<Port>>();
+  ports.forEach(({ portId, portChanges }) => {
+    portsUpdateMap.set(portId, portChanges);
+  });
   commandHandler.flowCore.applyUpdate(
     {
       nodes: nodes.map((node) =>
         node.id === nodeId
           ? {
               ...node,
-              ports: node.ports?.map((port) => (port.id === portId ? { ...port, ...portChanges } : port)),
+              ports: node.ports?.map((port) =>
+                portsUpdateMap.get(port.id) ? { ...port, ...portsUpdateMap.get(port.id) } : port
+              ),
             }
           : node
       ),

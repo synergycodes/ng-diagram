@@ -1,6 +1,5 @@
 import type { Edge, Middleware, ModelActionType, Node } from '../../types';
-import { getPointOnPath } from '../../utils/get-point-on-path';
-import { getFlowPortPosition } from '../../utils/get-port-flow-position';
+import { getPointOnPath, getPortFlowPosition } from '../../utils';
 
 const regularEdgeActions = new Set<ModelActionType>([
   'init',
@@ -24,7 +23,7 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
     if (!node) {
       return position;
     }
-    return portId ? getFlowPortPosition(node, portId) : position;
+    return portId ? getPortFlowPosition(node, portId) : position;
   };
 
   const sourcePoint = getPoint(edge.source, edge.sourcePort, edge.sourcePosition);

@@ -1,6 +1,6 @@
 import { Node } from '../types';
 import { Rect, RectWithId } from '../types/utils';
-import { doesRectsIntersect, getRect, isSameRect } from './utils';
+import { doesRectsIntersect, getRect, isSameRect } from '../utils';
 
 export class SpatialHash {
   private readonly cellSize = 100;
@@ -73,10 +73,7 @@ export class SpatialHash {
     let bottomOffset = 0;
 
     for (const port of ports) {
-      const px = port.position.x;
-      const py = port.position.y;
-      const pw = port.size.width;
-      const ph = port.size.height;
+      const { x: px, y: py, width: pw, height: ph } = getRect(port);
 
       leftOffset = Math.min(leftOffset, px);
       rightOffset = Math.max(rightOffset, px + pw - width);

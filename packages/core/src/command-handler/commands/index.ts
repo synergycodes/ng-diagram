@@ -11,7 +11,7 @@ import {
   updateEdge,
   updateEdgeLabel,
   updateNode,
-  updatePort,
+  updatePorts,
 } from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
@@ -64,7 +64,7 @@ export const commands: CommandMap = {
   resizeNode,
   zoom,
   addPorts,
-  updatePort,
+  updatePorts,
   deletePorts,
   bringToFront,
   sendToBack,

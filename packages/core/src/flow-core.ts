@@ -1,10 +1,12 @@
 import { CommandHandler } from './command-handler/command-handler';
 import { InitializationGuard } from './initialization-guard';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
+import { InternalUpdater } from './internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
+  Edge,
   EnvironmentInfo,
   Event,
   EventMapper,
@@ -25,6 +27,7 @@ export class FlowCore {
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
   readonly initializationGuard: InitializationGuard;
+  readonly internalUpdater: InternalUpdater;
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -40,6 +43,7 @@ export class FlowCore {
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
+    this.internalUpdater = new InternalUpdater(this);
 
     this.init();
   }
@@ -180,7 +184,16 @@ export class FlowCore {
    * @returns Node
    */
   getNodeById(nodeId: string): Node | null {
-    return this.model.getNodes().find((node) => node.id === nodeId) ?? null;
+    return this.getState().nodes.find((node) => node.id === nodeId) ?? null;
+  }
+
+  /**
+   * Gets an edge by id
+   * @param edgeId Edge id
+   * @returns Edge
+   */
+  getEdgeById(edgeId: string): Edge | null {
+    return this.getState().edges.find((edge) => edge.id === edgeId) ?? null;
   }
 
   /**
@@ -211,14 +224,5 @@ export class FlowCore {
    */
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return getNearestPortInRange(this, point, range);
-  }
-
-  /**
-   * Initializes a node size
-   * @param nodeId Node id
-   * @param size Size
-   */
-  initNodeSize(nodeId: string, size: { width: number; height: number }) {
-    this.initializationGuard.initNodeSize(nodeId, size);
   }
 }

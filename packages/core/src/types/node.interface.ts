@@ -65,14 +65,14 @@ export interface Port {
   /**
    * The position of the port in the node.
    */
-  position: {
+  position?: {
     x: number;
     y: number;
   };
   /**
    * The size of the port.
    */
-  size: {
+  size?: {
     width: number;
     height: number;
   };

@@ -87,11 +87,11 @@ export interface EdgeLabel {
   /**
    * The position of the label on flow.
    */
-  position: { x: number; y: number };
+  position?: { x: number; y: number };
   /**
    * The size of the label.
    */
-  size: {
+  size?: {
     width: number;
     height: number;
   };
