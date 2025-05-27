@@ -14,7 +14,7 @@ export class InternalUpdater {
    */
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>) {
     const node = this.flowCore.getNodeById(nodeId);
-    if (node && isSameRect(getRect(node), getRect({ size }))) {
+    if (!node || isSameRect(getRect(node), getRect({ size }))) {
       return;
     }
     if (this.flowCore.initializationGuard.isInitialized) {
@@ -95,7 +95,7 @@ export class InternalUpdater {
   applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>) {
     const edge = this.flowCore.getEdgeById(edgeId);
     const label = edge?.labels?.find((label) => label.id === labelId);
-    if (label && isSameRect(getRect(label), getRect({ size }))) {
+    if (!label || isSameRect(getRect({ size: label.size }), getRect({ size }))) {
       return;
     }
     if (this.flowCore.initializationGuard.isInitialized) {
