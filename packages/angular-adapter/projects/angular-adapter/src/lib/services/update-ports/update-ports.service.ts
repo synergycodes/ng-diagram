@@ -9,7 +9,7 @@ import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provide
 export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  getPortData(port: HTMLElement): { position: Port['position']; size: Port['size'] } {
+  getPortData(port: HTMLElement): { position: NonNullable<Port['position']>; size: NonNullable<Port['size']> } {
     const nodeElement = findParentWithClass(port, 'flow__angular-adapter-node');
     if (!nodeElement) {
       throw new Error(`Parent node of port with id ${port.id} not found`);
@@ -36,18 +36,21 @@ export class UpdatePortsService {
     }
 
     const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
+    const portsToUpdate: {
+      portId: string;
+      size: NonNullable<Port['size']>;
+      position: NonNullable<Port['position']>;
+    }[] = [];
     ports.forEach((port) => {
       const portId = port.getAttribute('data-port-id');
       if (!portId) {
         throw new Error(`Port with id ${port.id} in node ${nodeId} not found`);
       }
 
-      this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
-        nodeId,
-        portId,
-        portChanges: { ...this.getPortData(port) },
-      });
+      const { size, position } = this.getPortData(port);
+      portsToUpdate.push({ portId, size, position });
     });
+    this.flowCoreProvider.provide().internalUpdater.applyPortsSizesAndPositions(nodeId, portsToUpdate);
   }
 
   private getScale() {

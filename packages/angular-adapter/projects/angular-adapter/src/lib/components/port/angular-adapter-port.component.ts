@@ -46,10 +46,9 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
     effect(() => {
       if (this.lastSide() !== this.side()) {
         this.lastSide.set(this.side());
-        this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
+        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: this.nodeData().id,
-          portId: this.id(),
-          portChanges: { side: this.side() },
+          ports: [{ portId: this.id(), portChanges: { side: this.side() } }],
         });
       }
     });
@@ -57,30 +56,22 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
     effect(() => {
       if (this.lastType() !== this.type()) {
         this.lastType.set(this.type());
-        this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
+        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: this.nodeData().id,
-          portId: this.id(),
-          portChanges: { type: this.type() },
+          ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
         });
       }
     });
   }
 
   ngOnInit(): void {
-    const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
     this.lastSide.set(this.side());
     this.lastType.set(this.type());
-    this.flowCoreProvider.provide().commandHandler.emit('addPorts', {
+    this.flowCoreProvider.provide().internalUpdater.addPort(this.nodeData().id, {
+      id: this.id(),
+      type: this.type(),
       nodeId: this.nodeData().id,
-      ports: [
-        {
-          id: this.id(),
-          type: this.type(),
-          nodeId: this.nodeData().id,
-          side: this.side(),
-          ...portData,
-        },
-      ],
+      side: this.side(),
     });
 
     this.resizeObserver = new ResizeObserver((entries) => {
@@ -88,12 +79,12 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       if (borderBox) {
         const width = borderBox.inlineSize;
         const height = borderBox.blockSize;
-        const portData = this.updatePortsService.getPortData(this.hostElement.nativeElement);
-        this.flowCoreProvider.provide().commandHandler.emit('updatePort', {
-          nodeId: this.nodeData().id,
-          portId: this.id(),
-          portChanges: { ...portData, size: { width, height } },
-        });
+        const { position } = this.updatePortsService.getPortData(this.hostElement.nativeElement);
+        this.flowCoreProvider
+          .provide()
+          .internalUpdater.applyPortsSizesAndPositions(this.nodeData().id, [
+            { portId: this.id(), size: { width, height }, position },
+          ]);
       }
     });
     this.resizeObserver.observe(this.hostElement.nativeElement);

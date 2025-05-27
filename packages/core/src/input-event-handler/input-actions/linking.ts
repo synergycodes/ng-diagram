@@ -34,7 +34,7 @@ export const linkingAction: InputActionWithPredicate = {
 
     if (isPointerMoveEvent(event) && isLinking) {
       const flowPosition = flowCore.clientToFlowPosition({ x: event.x, y: event.y });
-      const nearestPort = flowCore.getNearestPortInRange(flowPosition, 5);
+      const nearestPort = flowCore.getNearestPortInRange(flowPosition, 10);
       const { temporaryEdge } = flowCore.getState().metadata;
       if (nearestPort && isProperTargetPort(nearestPort, temporaryEdge?.source, temporaryEdge?.sourcePort)) {
         flowCore.commandHandler.emit('moveTemporaryEdge', {

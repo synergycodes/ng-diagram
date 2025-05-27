@@ -12,7 +12,7 @@ export const resizeAction: InputActionWithPredicate = {
       return;
     }
 
-    const { width, height, disableAutoSize } = event;
+    const { width, height } = event;
 
     flowCore.commandHandler.emit('resizeNode', {
       id: node.id,
@@ -20,7 +20,6 @@ export const resizeAction: InputActionWithPredicate = {
         width,
         height,
       },
-      disableAutoSize,
     });
   },
   predicate: (event) => isResizeEvent(event) && isNodeTarget(event.target),

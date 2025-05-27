@@ -1,4 +1,5 @@
 import type { CommandHandler, Edge } from '../../types';
+import { getPortFlowPosition } from '../../utils';
 
 export const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
   id: 'TEMPORARY_EDGE',
@@ -35,9 +36,7 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
     return;
   }
 
-  const position = sourcePort
-    ? commandHandler.flowCore.getFlowPortPosition(sourceNode, sourcePort)
-    : sourceNode.position;
+  const position = sourcePort ? getPortFlowPosition(sourceNode, sourcePort) : sourceNode.position;
 
   if (!position) {
     return;
@@ -170,10 +169,7 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
     return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
   }
 
-  const targetPosition =
-    !!target && !!targetPort
-      ? commandHandler.flowCore.getFlowPortPosition(targetNode, targetPort)
-      : targetNode.position;
+  const targetPosition = !!target && !!targetPort ? getPortFlowPosition(targetNode, targetPort) : targetNode.position;
 
   if (!targetPosition) {
     return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');

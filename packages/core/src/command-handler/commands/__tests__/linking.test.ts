@@ -7,19 +7,16 @@ import { getFinalEdge, getTemporaryEdge } from '../linking';
 describe('Linking Commands', () => {
   let getStateMock: ReturnType<typeof vi.fn>;
   let getNodeByIdMock: ReturnType<typeof vi.fn>;
-  let getFlowPortPositionMock: ReturnType<typeof vi.fn>;
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
 
   beforeEach(() => {
     getStateMock = vi.fn();
     getNodeByIdMock = vi.fn();
-    getFlowPortPositionMock = vi.fn();
     flowCore = {
       getState: getStateMock,
       applyUpdate: vi.fn(),
       getNodeById: getNodeByIdMock,
-      getFlowPortPosition: getFlowPortPositionMock,
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });
@@ -67,7 +64,6 @@ describe('Linking Commands', () => {
     it('should create a temporary edge from port position if port is provided', () => {
       getStateMock.mockReturnValue({ metadata: {} });
       getNodeByIdMock.mockReturnValue({ ...mockNode, ports: [{ ...mockPort, type: 'source' }] });
-      getFlowPortPositionMock.mockReturnValue({ x: 100, y: 100 });
 
       commandHandler.emit('startLinking', { source: mockNode.id, sourcePort: mockPort.id });
 
@@ -77,9 +73,9 @@ describe('Linking Commands', () => {
             temporaryEdge: getTemporaryEdge({
               source: mockNode.id,
               sourcePort: mockPort.id,
-              sourcePosition: { x: 100, y: 100 },
+              sourcePosition: { x: 0, y: 5 },
               target: '',
-              targetPosition: { x: 100, y: 100 },
+              targetPosition: { x: 0, y: 5 },
             }),
           },
         },
@@ -309,8 +305,8 @@ describe('Linking Commands', () => {
       getNodeByIdMock.mockReturnValue({
         id: 'node-2',
         ports: [{ id: 'port-2', type: 'target', position: { x: 250, y: 250 } }],
+        position: { x: 0, y: 0 },
       });
-      getFlowPortPositionMock.mockReturnValue({ x: 250, y: 250 });
 
       commandHandler.emit('finishLinking', { target: 'node-2', targetPort: 'port-2' });
 

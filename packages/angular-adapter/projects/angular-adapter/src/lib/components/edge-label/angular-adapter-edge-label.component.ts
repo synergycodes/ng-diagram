@@ -62,16 +62,9 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lastPositionOnEdge.set(this.positionOnEdge());
-    this.flowCoreProvider.provide().commandHandler.emit('addEdgeLabels', {
-      edgeId: this.edgeId(),
-      labels: [
-        {
-          id: this.id(),
-          positionOnEdge: this.positionOnEdge(),
-          position: { x: 0, y: 0 },
-          size: { width: 0, height: 0 },
-        },
-      ],
+    this.flowCoreProvider.provide().internalUpdater.addEdgeLabel(this.edgeId(), {
+      id: this.id(),
+      positionOnEdge: this.positionOnEdge(),
     });
 
     this.resizeObserver = new ResizeObserver((entries) => {
@@ -79,11 +72,7 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
       if (borderBox) {
         const width = borderBox.inlineSize;
         const height = borderBox.blockSize;
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabel', {
-          edgeId: this.edgeId(),
-          labelId: this.id(),
-          labelChanges: { size: { width, height } },
-        });
+        this.flowCoreProvider.provide().internalUpdater.applyEdgeLabelSize(this.edgeId(), this.id(), { width, height });
       }
     });
     this.resizeObserver.observe(this.hostElement.nativeElement);

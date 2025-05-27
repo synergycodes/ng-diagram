@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventMapperService, UpdatePortsService } from '../../services';
+import { EventMapperService, FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeSizeDirective } from './node-size.directive';
 
 type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
@@ -26,11 +26,12 @@ describe('NodeSizeDirective', () => {
   let directive: NodeSizeDirective;
   let fixture: ComponentFixture<TestComponent>;
   let component: TestComponent;
-  let eventMapperService: EventMapperService;
+  let applyNodeSizeMock: ReturnType<typeof vi.fn>;
   let updatePortsService: UpdatePortsService;
   let mockResizeObserver: MockResizeObserver;
 
   beforeEach(async () => {
+    applyNodeSizeMock = vi.fn();
     mockResizeObserver = new MockResizeObserver();
     global.ResizeObserver = function (callback: ResizeObserverCallback) {
       mockResizeObserver.callback = callback;
@@ -44,13 +45,25 @@ describe('NodeSizeDirective', () => {
 
     await TestBed.configureTestingModule({
       imports: [TestComponent],
-      providers: [EventMapperService, { provide: UpdatePortsService, useValue: mockUpdatePortsService }],
+      providers: [
+        EventMapperService,
+        { provide: UpdatePortsService, useValue: mockUpdatePortsService },
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            provide: vi.fn().mockReturnValue({
+              internalUpdater: {
+                applyNodeSize: applyNodeSizeMock,
+              },
+            }),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
     directive = fixture.debugElement.query(By.directive(NodeSizeDirective)).injector.get(NodeSizeDirective);
-    eventMapperService = TestBed.inject(EventMapperService);
     updatePortsService = TestBed.inject(UpdatePortsService);
     fixture.detectChanges();
   });
@@ -69,7 +82,6 @@ describe('NodeSizeDirective', () => {
   });
 
   it('should observe size changes when autoSize is true', () => {
-    const emitSpy = vi.spyOn(eventMapperService, 'emit');
     const updatePortsSpy = vi.spyOn(updatePortsService, 'updateNodePorts');
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
 
@@ -89,14 +101,7 @@ describe('NodeSizeDirective', () => {
       } as ResizeObserverEntry,
     ]);
 
-    expect(emitSpy).toHaveBeenCalledWith({
-      type: 'resize',
-      target: { type: 'node', element: component.data },
-      width: 150,
-      height: 250,
-      timestamp: expect.any(Number),
-    });
-
+    expect(applyNodeSizeMock).toHaveBeenCalledWith('test-node-id', { width: 150, height: 250 });
     expect(updatePortsSpy).toHaveBeenCalledWith('test-node-id');
   });
 
