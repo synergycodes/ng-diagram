@@ -14,17 +14,13 @@ export const resizeAction: InputActionWithPredicate = {
 
     const { width, height } = event;
 
-    if (!node.size) {
-      flowCore.initializationGuard.initNodeSize(node.id, { width, height });
-    } else {
-      flowCore.commandHandler.emit('resizeNode', {
-        id: node.id,
-        size: {
-          width,
-          height,
-        },
-      });
-    }
+    flowCore.commandHandler.emit('resizeNode', {
+      id: node.id,
+      size: {
+        width,
+        height,
+      },
+    });
   },
   predicate: (event) => isResizeEvent(event) && isNodeTarget(event.target),
 };

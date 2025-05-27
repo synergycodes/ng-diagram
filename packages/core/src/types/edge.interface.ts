@@ -91,8 +91,5 @@ export interface EdgeLabel {
   /**
    * The size of the label.
    */
-  size?: {
-    width: number;
-    height: number;
-  };
+  size?: { width: number; height: number };
 }

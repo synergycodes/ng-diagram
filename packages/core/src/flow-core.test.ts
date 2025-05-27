@@ -3,7 +3,7 @@ import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
-import { mockEdge, mockNode, mockPort } from './test-utils';
+import { mockEdge, mockNode } from './test-utils';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
@@ -240,65 +240,6 @@ describe('FlowCore', () => {
       mockGetNodes.mockReturnValue([mockNode]);
       const node = flowCore.getNodeById('node-2');
       expect(node).toBeNull();
-    });
-  });
-
-  describe('getFlowPortPosition', () => {
-    it('should return null if the port is not found', () => {
-      const position = flowCore.getPortFlowPosition(mockNode, 'port-1');
-      expect(position).toBeNull();
-    });
-
-    it('should return proper flow port position for top side', () => {
-      const position = flowCore.getPortFlowPosition(
-        {
-          ...mockNode,
-          position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
-        },
-        mockPort.id
-      );
-
-      expect(position).toEqual({ x: 155, y: 150 });
-    });
-
-    it('should return proper flow port position for bottom side', () => {
-      const position = flowCore.getPortFlowPosition(
-        {
-          ...mockNode,
-          position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
-        },
-        mockPort.id
-      );
-
-      expect(position).toEqual({ x: 155, y: 160 });
-    });
-
-    it('should return proper flow port position for left side', () => {
-      const position = flowCore.getPortFlowPosition(
-        {
-          ...mockNode,
-          position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
-        },
-        mockPort.id
-      );
-
-      expect(position).toEqual({ x: 150, y: 155 });
-    });
-
-    it('should return proper flow port position for right side', () => {
-      const position = flowCore.getPortFlowPosition(
-        {
-          ...mockNode,
-          position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
-        },
-        mockPort.id
-      );
-
-      expect(position).toEqual({ x: 160, y: 155 });
     });
   });
 });

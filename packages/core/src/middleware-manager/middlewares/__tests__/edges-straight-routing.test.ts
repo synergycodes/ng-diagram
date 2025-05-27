@@ -4,16 +4,17 @@ import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import type { FlowState, Node } from '../../../types';
 import { edgesStraightRoutingMiddleware } from '../edges-straight-routing';
 
+vi.mock('../../../utils', () => ({
+  getPortFlowPosition: (node: Node) => node.position,
+  getPointOnPath: () => ({ x: 50, y: 50 }),
+}));
+
 describe('Edges Straight Routing Middleware', () => {
   let flowCore: FlowCore;
   let initialState: FlowState;
 
   beforeEach(() => {
-    flowCore = {
-      getState: vi.fn(),
-      applyUpdate: vi.fn(),
-      getFlowPortPosition: (node: Node) => node.position,
-    } as unknown as FlowCore;
+    flowCore = {} as unknown as FlowCore;
     initialState = {
       nodes: [mockNode],
       edges: [mockEdge],
@@ -163,5 +164,35 @@ describe('Edges Straight Routing Middleware', () => {
       sourcePosition: { x: 100, y: 100 },
       targetPosition: { x: 200, y: 200 },
     });
+  });
+
+  it('should update edge labels', () => {
+    initialState.nodes = [
+      { ...mockNode, id: 'node-1', position: { x: 100, y: 100 } },
+      { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+    ];
+    initialState.edges = [
+      {
+        ...mockEdge,
+        id: 'edge-1',
+        source: 'node-1',
+        sourcePort: 'port-1',
+        target: 'node-2',
+        targetPort: 'port-2',
+        labels: [{ id: 'label-1', positionOnEdge: 5 }],
+      },
+    ];
+
+    const state = edgesStraightRoutingMiddleware.execute(
+      initialState,
+      {
+        modelActionType: 'updateEdge',
+        initialState,
+        historyUpdates: [],
+      },
+      flowCore
+    );
+
+    expect(state.edges[0].labels).toEqual([{ id: 'label-1', positionOnEdge: 5, position: { x: 50, y: 50 } }]);
   });
 });

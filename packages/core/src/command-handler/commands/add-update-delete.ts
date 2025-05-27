@@ -114,9 +114,7 @@ export const updatePorts = (commandHandler: CommandHandler, command: UpdatePorts
   const { nodes } = commandHandler.flowCore.getState();
   const { nodeId, ports } = command;
   const portsUpdateMap = new Map<string, Partial<Port>>();
-  ports.forEach(({ portId, portChanges }) => {
-    portsUpdateMap.set(portId, portChanges);
-  });
+  ports.forEach(({ portId, portChanges }) => portsUpdateMap.set(portId, portChanges));
   commandHandler.flowCore.applyUpdate(
     {
       nodes: nodes.map((node) =>
