@@ -54,12 +54,12 @@ export class InitializationGuard {
     if (alreadyExist) {
       return;
     }
+    const state = this.flowCore.getState();
     this.flowCore.setState({
-      ...this.flowCore.getState(),
-      nodes: this.flowCore
-        .getState()
-        .nodes.map((node) => (node.id === nodeId ? { ...node, ports: [...(node.ports || []), port] } : node)),
+      ...state,
+      nodes: state.nodes.map((node) => (node.id === nodeId ? { ...node, ports: [...(node.ports || []), port] } : node)),
     });
+    this.checkIfInitialized();
   }
 
   initPortSizeAndPosition(
@@ -72,16 +72,15 @@ export class InitializationGuard {
     if (!this.measuredPorts.has(portKey) || this.measuredPorts.get(portKey)) {
       return;
     }
+    const state = this.flowCore.getState();
     this.measuredPorts.set(portKey, true);
     this.flowCore.setState({
-      ...this.flowCore.getState(),
-      nodes: this.flowCore
-        .getState()
-        .nodes.map((node) =>
-          node.id === nodeId
-            ? { ...node, ports: node.ports?.map((port) => (port.id === portId ? { ...port, size, position } : port)) }
-            : node
-        ),
+      ...state,
+      nodes: state.nodes.map((node) =>
+        node.id === nodeId
+          ? { ...node, ports: node.ports?.map((port) => (port.id === portId ? { ...port, size, position } : port)) }
+          : node
+      ),
     });
     this.checkIfInitialized();
   }
@@ -96,12 +95,14 @@ export class InitializationGuard {
     if (alreadyExist) {
       return;
     }
+    const state = this.flowCore.getState();
     this.flowCore.setState({
-      ...this.flowCore.getState(),
-      edges: this.flowCore
-        .getState()
-        .edges.map((edge) => (edge.id === edgeId ? { ...edge, labels: [...(edge.labels || []), label] } : edge)),
+      ...state,
+      edges: state.edges.map((edge) =>
+        edge.id === edgeId ? { ...edge, labels: [...(edge.labels || []), label] } : edge
+      ),
     });
+    this.checkIfInitialized();
   }
 
   initEdgeLabelSize(edgeId: string, labelId: string, size: { width: number; height: number }) {
@@ -110,9 +111,10 @@ export class InitializationGuard {
       return;
     }
     this.measuredEdgeLabels.set(labelKey, true);
+    const state = this.flowCore.getState();
     this.flowCore.setState({
-      ...this.flowCore.getState(),
-      edges: this.flowCore.getState().edges.map((edge) =>
+      ...state,
+      edges: state.edges.map((edge) =>
         edge.id === edgeId
           ? {
               ...edge,
