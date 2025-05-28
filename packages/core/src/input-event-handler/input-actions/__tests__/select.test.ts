@@ -19,8 +19,22 @@ describe('selectAction', () => {
   });
 
   describe('predicate', () => {
-    it('should return true for pointerdown events', () => {
+    it('should return true for pointerdown events with target other than resize handle', () => {
       expect(selectAction.predicate({ ...mockPointerEvent, type: 'pointerdown', button: 0 }, mockFlowCore)).toBe(true);
+    });
+
+    it('should return false for pointerdown events wit resize handle as target', () => {
+      expect(
+        selectAction.predicate(
+          {
+            ...mockPointerEvent,
+            type: 'pointerdown',
+            button: 0,
+            target: { type: 'resize-handle', element: mockNode, position: 'top-left' },
+          },
+          mockFlowCore
+        )
+      ).toBe(false);
     });
 
     it('should return false for other events', () => {

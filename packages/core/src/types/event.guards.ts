@@ -17,6 +17,7 @@ import type {
   PointerUpEvent,
   PortTarget,
   ResizeEvent,
+  ResizeHandleTarget,
   WheelEvent,
 } from './event.interface';
 
@@ -143,4 +144,11 @@ export const isDiagramTarget = (target: EventTarget): target is DiagramTarget =>
  */
 export const isEdgeLabelTarget = (target: EventTarget): target is EdgeLabelTarget => {
   return target.type === 'edge-label';
+};
+
+/**
+ * Check if an event target is a resize handle
+ */
+export const isResizeHandleTarget = (target: EventTarget): target is ResizeHandleTarget => {
+  return target.type === 'resize-handle';
 };

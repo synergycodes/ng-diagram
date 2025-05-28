@@ -36,8 +36,8 @@ export class AppComponent {
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
         resizable: true,
       },
-      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {} },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {} },
+      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
     ]);
     this.model().setEdges([
       {

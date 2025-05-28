@@ -1,4 +1,11 @@
-import { isPointerDownEvent, type Edge, type EventTarget, type InputActionWithPredicate, type Node } from '../../types';
+import {
+  isPointerDownEvent,
+  isResizeHandleTarget,
+  type Edge,
+  type EventTarget,
+  type InputActionWithPredicate,
+  type Node,
+} from '../../types';
 
 interface TargetElements {
   nodeIds: string[] | undefined;
@@ -51,5 +58,5 @@ export const selectAction: InputActionWithPredicate = {
       preserveSelection: isAlreadySelected || isModifierPressed,
     });
   },
-  predicate: (event) => isPointerDownEvent(event),
+  predicate: (event) => isPointerDownEvent(event) && !isResizeHandleTarget(event.target),
 };
