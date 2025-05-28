@@ -3,7 +3,6 @@ import {
   AngularAdapterDiagramComponent,
   INodeTemplate,
   Middleware,
-  Node,
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
@@ -28,33 +27,6 @@ export class AppComponent {
   middlewares = signal<Middleware[]>([]);
 
   constructor() {
-    const nodes = Array.from(
-      { length: 1000 },
-      (_, i) =>
-        ({
-          id: `${i + 1}`,
-          type: 'resizable',
-          position: {
-            x: Math.random() * 2000,
-            y: Math.random() * 2000,
-          },
-          data: {},
-          resizable: true,
-          angle: 0,
-          autoSize: true,
-          ports: [],
-          selected: false,
-          size: { width: 100, height: 100 },
-          zOrder: 0,
-        }) satisfies Node
-    );
-    const t1 = performance.now();
-    const nodesMap = new Map<string, Node>(nodes.map((node) => [node.id, node]));
-    const t2 = performance.now();
-    console.log(t2 - t1);
-    console.log(nodesMap);
-
-    this.model().setNodes(nodes);
     this.model().setNodes([
       {
         id: '1',
