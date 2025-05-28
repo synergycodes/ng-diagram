@@ -1,7 +1,7 @@
 import { CommandHandler } from './command-handler/command-handler';
-import { InitializationGuard } from './initialization-guard';
+import { InitializationGuard } from './initialization-guard/initialization-guard';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
-import { InternalUpdater } from './internal-updater';
+import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
