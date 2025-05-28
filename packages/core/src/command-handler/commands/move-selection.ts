@@ -20,8 +20,8 @@ export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSe
       return {
         ...node,
         position: {
-          x: node.position.x + dx,
-          y: node.position.y + dy,
+          x: Math.round(node.position.x + dx),
+          y: Math.round(node.position.y + dy),
         },
       };
     }

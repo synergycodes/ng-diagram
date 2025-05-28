@@ -56,6 +56,24 @@ describe('Resize Node Command', () => {
       );
     });
 
+    it('should update position if position is provided', () => {
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: [{ id: '1', size: { width: 0, height: 0 }, position: { x: 0, y: 0 } }],
+      });
+
+      resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 100, height: 100 },
+        position: { x: 100, y: 100 },
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodes: [{ id: '1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } }] },
+        'resizeNode'
+      );
+    });
+
     it('should disable autoSize if disableAutoSize is true', () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
         nodes: [{ id: '1', size: { width: 0, height: 0 }, autoSize: true }],
