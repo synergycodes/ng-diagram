@@ -42,33 +42,20 @@ export interface MiddlewareHistoryUpdate {
 }
 
 /**
- * Type for the context of a middleware operation
- */
-export interface MiddlewareContext {
-  initialState: FlowState;
-  modelActionType: ModelActionType;
-  historyUpdates: MiddlewareHistoryUpdate[];
-}
-
-/**
  * Type for middleware function that transforms state
  */
 export interface Middleware {
   name: string;
   execute: (
-    /**
-     * Current state
-     */
-    state: FlowState,
-    /**
-     * Context of the operation
-     */
-    context: MiddlewareContext,
-    /**
-     * Flow core
-     */
-    flowCore: FlowCore
-  ) => FlowState;
+    context: {
+      state: FlowState;
+      initialState: FlowState;
+      modelActionType: ModelActionType;
+      flowCore: FlowCore;
+    },
+    next: (partialState?: Partial<FlowState>) => Promise<void> | void,
+    cancel: () => void
+  ) => Promise<void> | void;
 }
 
 /**

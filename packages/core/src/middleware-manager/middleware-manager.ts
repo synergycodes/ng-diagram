@@ -1,5 +1,5 @@
 import { FlowCore } from '../flow-core';
-import type { FlowState, Middleware, MiddlewareChain, MiddlewareHistoryUpdate, ModelActionType } from '../types';
+import type { FlowState, Middleware, MiddlewareChain, ModelActionType } from '../types';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 
 export class MiddlewareManager {
@@ -43,35 +43,57 @@ export class MiddlewareManager {
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(prevState: FlowState, nextState: FlowState, modelActionType: ModelActionType): FlowState {
-    const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState }];
-    return this.middlewareChain.reduce(
-      ({ currentState, historyUpdates }, middleware) => {
-        const updatedState = middleware.execute(
-          currentState,
-          {
-            initialState: prevState,
-            modelActionType,
-            historyUpdates,
-          },
-          this.flowCore
-        );
-        if (
-          Object.is(updatedState.metadata, currentState.metadata) &&
-          Object.is(updatedState.nodes, currentState.nodes) &&
-          Object.is(updatedState.edges, currentState.edges)
-        ) {
-          return { currentState, historyUpdates };
-        }
-        return {
-          currentState: updatedState,
-          historyUpdates: [
-            ...historyUpdates,
-            { name: middleware.name, prevState: currentState, nextState: updatedState },
-          ],
-        };
-      },
-      { currentState: nextState, historyUpdates }
-    ).currentState;
+  execute(prevState: FlowState, nextState: FlowState, modelActionType: ModelActionType) {
+    return new Promise<FlowState | undefined>((finalResolve) => {
+      const resolvers: (() => void)[] = [];
+      const middlewaresExecutedIndexes = new Set<number>();
+      let currentState = { ...nextState };
+
+      const context = {
+        state: currentState,
+        initialState: prevState,
+        modelActionType,
+        flowCore: this.flowCore,
+      };
+
+      const dispatch = (i: number) =>
+        new Promise<void>((resolve) => {
+          const middleware = this.middlewareChain[i];
+
+          if (!middleware) {
+            while (resolvers.length > 0) {
+              resolvers.pop()?.();
+            }
+            return finalResolve(currentState);
+          }
+
+          if (middlewaresExecutedIndexes.has(i)) {
+            throw new Error(`Middleware ${middleware.name} executed next() multiple times`);
+          }
+          middlewaresExecutedIndexes.add(i);
+
+          resolvers.push(resolve);
+
+          const next = async (partialUpdate?: Partial<FlowState>) => {
+            if (partialUpdate) {
+              currentState = {
+                ...currentState,
+                ...partialUpdate,
+              };
+            }
+            await dispatch(i + 1);
+          };
+          const cancel = () => {
+            while (resolvers.length > 0) {
+              resolvers.pop()?.();
+            }
+            finalResolve(undefined);
+          };
+
+          middleware.execute(context, next, cancel);
+        });
+
+      dispatch(0);
+    });
   }
 }

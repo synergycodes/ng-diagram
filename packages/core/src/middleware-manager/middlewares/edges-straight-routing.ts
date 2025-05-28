@@ -34,13 +34,13 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
 
 export const edgesStraightRoutingMiddleware: Middleware = {
   name: 'edges-straight-routing',
-  execute: (state, context) => {
+  execute: async ({ state, modelActionType }, next) => {
     const { edges, metadata } = state;
-    const isRegularEdgeAction = regularEdgeActions.has(context.modelActionType);
-    const isTemporaryEdgeAction = temporaryEdgeActions.has(context.modelActionType);
+    const isRegularEdgeAction = regularEdgeActions.has(modelActionType);
+    const isTemporaryEdgeAction = temporaryEdgeActions.has(modelActionType);
 
     if (!isRegularEdgeAction && !isTemporaryEdgeAction) {
-      return state;
+      return next();
     }
 
     let newEdges = edges;
@@ -104,6 +104,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
         },
       };
     }
-    return { ...state, edges: newEdges, metadata: newMetadata };
+
+    next({ edges: newEdges, metadata: newMetadata });
   },
 };

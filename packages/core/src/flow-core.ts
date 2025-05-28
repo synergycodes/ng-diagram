@@ -136,11 +136,13 @@ export class FlowCore {
    * @param state Partial state to apply
    * @param modelActionType Type of model action to apply
    */
-  applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): void {
+  async applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): Promise<void> {
     const initialState = this.getState();
     const updatedState = { ...initialState, ...state };
-    const finalState = this.middlewareManager.execute(initialState, updatedState, modelActionType);
-    this.setState(finalState);
+    const finalState = await this.middlewareManager.execute(initialState, updatedState, modelActionType);
+    if (finalState) {
+      this.setState(finalState);
+    }
   }
 
   /**

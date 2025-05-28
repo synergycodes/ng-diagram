@@ -4,8 +4,7 @@ export interface InitCommand {
   name: 'init';
 }
 
-export const init = (commandHandler: CommandHandler): void => {
+export const init = async (commandHandler: CommandHandler): Promise<void> => {
   const state = commandHandler.flowCore.getState();
-  const newState = commandHandler.flowCore.middlewareManager.execute(state, state, 'init');
-  commandHandler.flowCore.setState(newState);
+  commandHandler.flowCore.applyUpdate(state, 'init');
 };
