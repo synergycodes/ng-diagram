@@ -28,10 +28,5 @@ export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSe
     return node;
   });
 
-  commandHandler.flowCore.applyUpdate(
-    {
-      nodes: updatedNodes,
-    },
-    'moveSelection'
-  );
+  commandHandler.flowCore.applyUpdate({ nodes: updatedNodes }, 'moveSelection');
 };
