@@ -61,10 +61,11 @@ export class MiddlewareManager {
           const middleware = this.middlewareChain[i];
 
           if (!middleware) {
+            finalResolve(currentState);
             while (resolvers.length > 0) {
               resolvers.pop()?.();
             }
-            return finalResolve(currentState);
+            return;
           }
 
           if (middlewaresExecutedIndexes.has(i)) {
