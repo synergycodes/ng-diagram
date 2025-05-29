@@ -134,7 +134,7 @@ export class FlowCore {
 
   /**
    * Applies an update to the flow state
-   * @param state Partial state to apply
+   * @param stateUpdate Partial state to apply
    * @param modelActionType Type of model action to apply
    */
   async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: ModelActionType): Promise<void> {

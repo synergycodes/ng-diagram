@@ -85,12 +85,12 @@ export const edgesStraightRoutingMiddleware: Middleware = {
       });
     }
 
-    const metadataUpdate: FlowStateUpdate['metadataUpdate'] = {};
+    let newTemporaryEdge: Edge | undefined = undefined;
 
     if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {
       const points = getPoints(metadata.temporaryEdge, nodesMap);
 
-      metadataUpdate.temporaryEdge = {
+      newTemporaryEdge = {
         ...metadata.temporaryEdge,
         points,
         sourcePosition: points[0],
@@ -98,6 +98,9 @@ export const edgesStraightRoutingMiddleware: Middleware = {
       };
     }
 
-    next({ edgesToUpdate, metadataUpdate });
+    next({
+      ...(edgesToUpdate.length > 0 ? { edgesToUpdate } : {}),
+      ...(newTemporaryEdge ? { metadataUpdate: { temporaryEdge: newTemporaryEdge } } : {}),
+    });
   },
 };

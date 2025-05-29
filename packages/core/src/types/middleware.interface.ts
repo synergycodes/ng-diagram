@@ -36,12 +36,17 @@ export interface FlowState {
   metadata: Metadata;
 }
 
+/**
+ * Type for the history update to be applied to the flow diagram
+ */
 export interface MiddlewareHistoryUpdate {
   name: string;
-  prevState: FlowState;
-  nextState: FlowState;
+  stateUpdate: FlowStateUpdate;
 }
 
+/**
+ * Type for the state update to be applied to the flow diagram
+ */
 export interface FlowStateUpdate {
   nodesToAdd?: Node[];
   nodesToUpdate?: (Partial<Node> & { id: Node['id'] })[];
@@ -52,6 +57,9 @@ export interface FlowStateUpdate {
   metadataUpdate?: Partial<Metadata>;
 }
 
+/**
+ * Type for the context of the middleware
+ */
 export interface MiddlewareContext {
   initialState: FlowState;
   state: FlowState;
@@ -60,6 +68,8 @@ export interface MiddlewareContext {
   modelActionType: ModelActionType;
   flowCore: FlowCore;
   helpers: ReturnType<MiddlewareExecutor['helpers']>;
+  history: MiddlewareHistoryUpdate[];
+  initialUpdate: FlowStateUpdate;
 }
 
 /**

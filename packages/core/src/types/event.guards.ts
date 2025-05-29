@@ -16,7 +16,6 @@ import type {
   PointerMoveEvent,
   PointerUpEvent,
   PortTarget,
-  ResizeEvent,
   ResizeHandleTarget,
   WheelEvent,
 } from './event.interface';
@@ -95,13 +94,6 @@ export const isPointerEvent = (event: Event): event is PointerEvent => {
     isPointerEnterEvent(event) ||
     isPointerLeaveEvent(event)
   );
-};
-
-/**
- * Check if an event is a resize event
- */
-export const isResizeEvent = (event: Event): event is ResizeEvent => {
-  return event.type === 'resize';
 };
 
 /**

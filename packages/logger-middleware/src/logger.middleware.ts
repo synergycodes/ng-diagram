@@ -6,6 +6,8 @@ export const loggerMiddleware: Middleware = {
     console.log(`[AngularFlow] ${context.modelActionType}`, {
       initialState: context.initialState,
       finalState: context.state,
+      history: context.history,
+      initialUpdate: context.initialUpdate,
     });
 
     next();

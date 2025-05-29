@@ -6,6 +6,7 @@ import type {
   Metadata,
   MiddlewareChain,
   MiddlewareContext,
+  MiddlewareHistoryUpdate,
   ModelActionType,
   Node,
 } from '../types';
@@ -15,7 +16,9 @@ export class MiddlewareExecutor {
   readonly flowCore: FlowCore;
   readonly middlewareChain: MiddlewareChain;
 
+  private history: MiddlewareHistoryUpdate[] = [];
   private initialState!: FlowState;
+  private initialStateUpdate!: FlowStateUpdate;
   private modelActionType!: ModelActionType;
   private metadata: Metadata = { viewport: { x: 0, y: 0, scale: 1 } };
   private edgesMap = new Map<string, Edge>();
@@ -45,6 +48,7 @@ export class MiddlewareExecutor {
     this.metadata = initialState.metadata;
     this.nodesMap = new Map(initialState.nodes.map((node) => [node.id, node]));
     this.edgesMap = new Map(initialState.edges.map((edge) => [edge.id, edge]));
+    this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
     return this.resolveMiddlewares();
   }
@@ -79,6 +83,8 @@ export class MiddlewareExecutor {
     modelActionType: this.modelActionType,
     flowCore: this.flowCore,
     helpers: this.helpers(),
+    history: this.history,
+    initialUpdate: this.initialStateUpdate,
   });
 
   private resolveMiddlewares = (): Promise<FlowState | undefined> => {
@@ -107,8 +113,8 @@ export class MiddlewareExecutor {
           resolvers.push(resolve);
 
           const next = async (stateUpdate?: FlowStateUpdate) => {
-            if (stateUpdate) {
-              this.applyStateUpdate(stateUpdate);
+            if (stateUpdate && Object.keys(stateUpdate).length > 0) {
+              this.applyStateUpdate(stateUpdate, middleware.name);
             }
             const state = await dispatch(i + 1);
             return state;
@@ -127,7 +133,10 @@ export class MiddlewareExecutor {
     });
   };
 
-  private applyStateUpdate = (stateUpdate: FlowStateUpdate) => {
+  private applyStateUpdate = (stateUpdate: FlowStateUpdate, middlewareName?: string) => {
+    if (middlewareName) {
+      this.history.push({ name: middlewareName, stateUpdate });
+    }
     stateUpdate.nodesToAdd?.forEach((node) => this.addNode(node));
     stateUpdate.edgesToAdd?.forEach((edge) => this.addEdge(edge));
     stateUpdate.edgesToRemove?.forEach((id) => this.removeEdge(id));
