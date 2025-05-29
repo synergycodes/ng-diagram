@@ -49,14 +49,8 @@ describe('Z-order commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { id: '1', selected: true, zOrder: 4 },
-            { id: '2', selected: false, zOrder: 2 },
-          ],
-          edges: [
-            { id: '1', selected: true, zOrder: 4 },
-            { id: '2', selected: false, zOrder: 3 },
-          ],
+          nodesToUpdate: [{ id: '1', zOrder: 4 }],
+          edgesToUpdate: [{ id: '1', zOrder: 4 }],
         },
         'changeZOrder'
       );
@@ -78,14 +72,8 @@ describe('Z-order commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { id: '1', selected: false, zOrder: 1 },
-            { id: '2', selected: false },
-          ],
-          edges: [
-            { id: '1', selected: false, zOrder: 1 },
-            { id: '2', selected: false },
-          ],
+          nodesToUpdate: [{ id: '1', zOrder: 1 }],
+          edgesToUpdate: [{ id: '1', zOrder: 1 }],
         },
         'changeZOrder'
       );
@@ -93,7 +81,6 @@ describe('Z-order commands', () => {
 
     it('should not map over nodes collection if there are no target nodes', () => {
       const command: BringToFrontCommand = { name: 'bringToFront', edgeIds: ['1'] };
-      const spy = vi.spyOn(flowCore, 'applyUpdate');
       const nodes = [
         { id: '1', selected: false },
         { id: '2', selected: false },
@@ -106,13 +93,14 @@ describe('Z-order commands', () => {
 
       bringToFront(commandHandler, command);
 
-      expect(spy.mock.calls[0][0].nodes).toBe(nodes);
-      expect(spy.mock.calls[0][0].edges).not.toBe(edges);
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToUpdate: [], edgesToUpdate: [{ id: '1', zOrder: 1 }] },
+        'changeZOrder'
+      );
     });
 
     it('should not map over edges collection if there are no target edges', () => {
       const command: BringToFrontCommand = { name: 'bringToFront', nodeIds: ['1'] };
-      const spy = vi.spyOn(flowCore, 'applyUpdate');
       const nodes = [
         { id: '1', selected: false },
         { id: '2', selected: false },
@@ -125,8 +113,10 @@ describe('Z-order commands', () => {
 
       bringToFront(commandHandler, command);
 
-      expect(spy.mock.calls[0][0].nodes).not.toBe(nodes);
-      expect(spy.mock.calls[0][0].edges).toBe(edges);
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToUpdate: [{ id: '1', zOrder: 1 }], edgesToUpdate: [] },
+        'changeZOrder'
+      );
     });
   });
 
@@ -164,14 +154,8 @@ describe('Z-order commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { id: '1', selected: true, zOrder: 0 },
-            { id: '2', selected: false, zOrder: 2 },
-          ],
-          edges: [
-            { id: '1', selected: true, zOrder: 0 },
-            { id: '2', selected: false, zOrder: 3 },
-          ],
+          nodesToUpdate: [{ id: '1', zOrder: 0 }],
+          edgesToUpdate: [{ id: '1', zOrder: 0 }],
         },
         'changeZOrder'
       );
@@ -193,14 +177,8 @@ describe('Z-order commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { id: '1', selected: false, zOrder: -1 },
-            { id: '2', selected: false },
-          ],
-          edges: [
-            { id: '1', selected: false, zOrder: -1 },
-            { id: '2', selected: false },
-          ],
+          nodesToUpdate: [{ id: '1', zOrder: -1 }],
+          edgesToUpdate: [{ id: '1', zOrder: -1 }],
         },
         'changeZOrder'
       );
@@ -208,7 +186,6 @@ describe('Z-order commands', () => {
 
     it('should not map over nodes collection if there are no target nodes', () => {
       const command: SendToBackCommand = { name: 'sendToBack', edgeIds: ['1'] };
-      const spy = vi.spyOn(flowCore, 'applyUpdate');
       const nodes = [
         { id: '1', selected: false },
         { id: '2', selected: false },
@@ -221,13 +198,14 @@ describe('Z-order commands', () => {
 
       sendToBack(commandHandler, command);
 
-      expect(spy.mock.calls[0][0].nodes).toBe(nodes);
-      expect(spy.mock.calls[0][0].edges).not.toBe(edges);
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToUpdate: [], edgesToUpdate: [{ id: '1', zOrder: -1 }] },
+        'changeZOrder'
+      );
     });
 
     it('should not map over edges collection if there are no target edges', () => {
       const command: SendToBackCommand = { name: 'sendToBack', nodeIds: ['1'] };
-      const spy = vi.spyOn(flowCore, 'applyUpdate');
       const nodes = [
         { id: '1', selected: false },
         { id: '2', selected: false },
@@ -240,8 +218,10 @@ describe('Z-order commands', () => {
 
       sendToBack(commandHandler, command);
 
-      expect(spy.mock.calls[0][0].nodes).not.toBe(nodes);
-      expect(spy.mock.calls[0][0].edges).toBe(edges);
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToUpdate: [{ id: '1', zOrder: -1 }], edgesToUpdate: [] },
+        'changeZOrder'
+      );
     });
   });
 });

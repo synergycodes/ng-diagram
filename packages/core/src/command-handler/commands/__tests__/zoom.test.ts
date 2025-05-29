@@ -25,6 +25,9 @@ describe('zoom command', () => {
   it('should apply update with new viewport values', () => {
     zoom(commandHandler, { name: 'zoom', x: 100, y: 200, scale: 2 });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadata: { viewport: { x: 100, y: 200, scale: 2 } } }, 'zoom');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { metadataUpdate: { viewport: { x: 100, y: 200, scale: 2 } } },
+      'zoom'
+    );
   });
 });

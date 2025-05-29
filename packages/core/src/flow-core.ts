@@ -138,18 +138,7 @@ export class FlowCore {
    * @param modelActionType Type of model action to apply
    */
   async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: ModelActionType): Promise<void> {
-    const t1 = performance.now();
     const finalState = await this.middlewareManager.execute(this.getState(), stateUpdate, modelActionType);
-    const t2 = performance.now();
-    let color: string;
-    if (t2 - t1 > 3) {
-      color = 'red';
-    } else if (t2 - t1 > 1) {
-      color = 'yellow';
-    } else {
-      color = 'green';
-    }
-    console.log(`%c applyUpdate took ${t2 - t1}ms - ${modelActionType}`, `color: ${color}`);
     if (finalState) {
       this.setState(finalState);
     }

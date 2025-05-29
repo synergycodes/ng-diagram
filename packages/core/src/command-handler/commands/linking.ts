@@ -145,7 +145,7 @@ export interface FinishLinkingCommand {
 }
 
 export const finishLinking = (commandHandler: CommandHandler, command: FinishLinkingCommand): void => {
-  const { metadata, edges } = commandHandler.flowCore.getState();
+  const { metadata } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
   if (!metadata.temporaryEdge) {
@@ -189,22 +189,17 @@ export const finishLinkingToPosition = (
   commandHandler: CommandHandler,
   command: FinishLinkingToPositionCommand
 ): void => {
-  const { metadata, edges } = commandHandler.flowCore.getState();
+  const { metadata } = commandHandler.flowCore.getState();
   const { position } = command;
 
   if (!metadata.temporaryEdge) {
     return;
   }
 
-  const newEdges: Edge[] = [
-    ...edges,
-    getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition: position }),
-  ];
-
   commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { temporaryEdge: null },
-      edgesToAdd: newEdges,
+      edgesToAdd: [getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition: position })],
     },
     'finishLinking'
   );

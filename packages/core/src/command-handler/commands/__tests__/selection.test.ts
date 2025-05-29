@@ -31,11 +31,8 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { ...mockNode, selected: true },
-            { ...mockNode, id: 'node2', selected: false },
-          ],
-          edges: [mockEdge],
+          nodesToUpdate: [{ id: mockNode.id, selected: true }],
+          edgesToUpdate: [],
         },
         'changeSelection'
       );
@@ -55,11 +52,8 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [mockNode],
-          edges: [
-            { ...mockEdge, selected: true },
-            { ...mockEdge, id: 'edge2', selected: false },
-          ],
+          nodesToUpdate: [],
+          edgesToUpdate: [{ id: mockEdge.id, selected: true }],
         },
         'changeSelection'
       );
@@ -90,15 +84,8 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { ...mockNode, selected: true },
-            { ...mockNode, id: 'node2', selected: true },
-            { ...mockNode, id: 'node3', selected: true },
-          ],
-          edges: [
-            { ...mockEdge, selected: true },
-            { ...mockEdge, id: 'edge2', selected: false },
-          ],
+          nodesToUpdate: [{ id: 'node3', selected: true }],
+          edgesToUpdate: [],
         },
         'changeSelection'
       );
@@ -142,11 +129,8 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { ...mockNode, selected: false },
-            { ...mockNode, id: 'node2', selected: true },
-          ],
-          edges: [mockEdge],
+          nodesToUpdate: [{ id: mockNode.id, selected: false }],
+          edgesToUpdate: [],
         },
         'changeSelection'
       );
@@ -169,11 +153,8 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [mockNode],
-          edges: [
-            { ...mockEdge, selected: false },
-            { ...mockEdge, id: 'edge2', selected: true },
-          ],
+          nodesToUpdate: [],
+          edgesToUpdate: [{ id: 'edge1', selected: false }],
         },
         'changeSelection'
       );
@@ -216,13 +197,13 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            { ...mockNode, selected: false },
-            { ...mockNode, id: 'node2', selected: false },
+          nodesToUpdate: [
+            { id: mockNode.id, selected: false },
+            { id: 'node2', selected: false },
           ],
-          edges: [
-            { ...mockEdge, selected: false },
-            { ...mockEdge, id: 'edge2', selected: false },
+          edgesToUpdate: [
+            { id: mockEdge.id, selected: false },
+            { id: 'edge2', selected: false },
           ],
         },
         'changeSelection'

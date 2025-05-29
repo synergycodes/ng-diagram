@@ -2,9 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FlowCore } from '../../../flow-core';
 import { getSampleKeyboardEvent, getSamplePointerEvent } from '../../../test-utils';
-import { Node, ResizeEvent } from '../../../types';
+import { Node } from '../../../types';
 import { handlePointerEvent } from './handle-pointer-event';
-import { handleResizeEvent } from './handle-resize-event';
 import { resizeAction } from './resize';
 
 vi.mock('./handle-pointer-event', () => ({
@@ -31,18 +30,6 @@ describe('Resize actions', () => {
   });
 
   describe('predicate', () => {
-    it('should return true for resize event with node target', () => {
-      const event: ResizeEvent = {
-        type: 'resize',
-        timestamp: 0,
-        target: { type: 'node', element: mockNode },
-        width: 300,
-        height: 300,
-      };
-
-      expect(resizeAction.predicate(event, flowCore)).toBe(true);
-    });
-
     it('should return true for pointer down event with resize handle target and button 0 (left mouse button)', () => {
       const event = getSamplePointerEvent({
         type: 'pointerdown',
@@ -81,27 +68,12 @@ describe('Resize actions', () => {
       expect(handlePointerEvent).toHaveBeenCalledWith(flowCore, event);
     });
 
-    it('should call handleResizeEvent for resize event', () => {
-      const resizeEvent: ResizeEvent = {
-        type: 'resize',
-        target: { element: mockNode, type: 'node' },
-        width: 300,
-        height: 300,
-        timestamp: 0,
-      };
-
-      resizeAction.action(resizeEvent, flowCore);
-
-      expect(handleResizeEvent).toHaveBeenCalledWith(flowCore, resizeEvent);
-    });
-
-    it('should not call handlePointerEvent or handleResizeEvent for keyboard event', () => {
+    it('should not call handlePointerEvent for keyboard event', () => {
       const event = getSampleKeyboardEvent({ type: 'keydown' });
 
       resizeAction.action(event, flowCore);
 
       expect(handlePointerEvent).not.toHaveBeenCalled();
-      expect(handleResizeEvent).not.toHaveBeenCalled();
     });
   });
 });

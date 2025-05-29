@@ -45,12 +45,7 @@ describe('Resize Node Command', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [
-            {
-              id: '1',
-              size: { width: 100, height: 100 },
-            },
-          ],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 } }],
         },
         'resizeNode'
       );
@@ -69,7 +64,7 @@ describe('Resize Node Command', () => {
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
-        { nodes: [{ id: '1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } }] },
+        { nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } }] },
         'resizeNode'
       );
     });
@@ -88,7 +83,7 @@ describe('Resize Node Command', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [{ id: '1', size: { width: 100, height: 100 }, autoSize: false }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, autoSize: false }],
         },
         'resizeNode'
       );
@@ -108,7 +103,7 @@ describe('Resize Node Command', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [{ id: '1', size: { width: 100, height: 100 }, autoSize: true }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, autoSize: true }],
         },
         'resizeNode'
       );
@@ -127,7 +122,7 @@ describe('Resize Node Command', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodes: [{ id: '1', size: { width: 100, height: 100 }, autoSize: true }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 } }],
         },
         'resizeNode'
       );

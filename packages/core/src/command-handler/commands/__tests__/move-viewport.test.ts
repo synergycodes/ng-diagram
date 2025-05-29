@@ -28,8 +28,7 @@ describe('Move Viewport Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
-            ...mockMetadata,
+          metadataUpdate: {
             viewport: {
               ...mockMetadata.viewport,
               x: mockMetadata.viewport.x + MOVEMENT_STEP,
@@ -62,8 +61,7 @@ describe('Move Viewport Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
-            ...mockMetadata,
+          metadataUpdate: {
             viewport: {
               ...mockMetadata.viewport,
               x: 100,

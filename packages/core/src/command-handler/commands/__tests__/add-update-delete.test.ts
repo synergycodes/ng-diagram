@@ -6,91 +6,84 @@ import { CommandHandler } from '../../command-handler';
 describe('Add Update Delete Command', () => {
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
+  const getNodeByIdMock = vi.fn();
+  const getEdgeByIdMock = vi.fn();
 
   beforeEach(() => {
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
+      getNodeById: getNodeByIdMock,
+      getEdgeById: getEdgeByIdMock,
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });
 
   it('should add nodes to the flow', () => {
-    const node1 = { id: '1', selected: true };
-    const node2 = { id: '2', position: { x: 0, y: 0 }, data: {}, type: 'default' };
+    const node1 = { ...mockNode, id: '1' };
+    const node2 = { ...mockNode, id: '2' };
 
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [node1], edges: [], metadata: {} });
+    commandHandler.emit('addNodes', { nodes: [node1, node2] });
 
-    commandHandler.emit('addNodes', { nodes: [node2] });
-
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [node1, node2] }, 'addNodes');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToAdd: [node1, node2] }, 'addNodes');
   });
 
   it('should update a node', () => {
-    const nodes = [{ id: '1', selected: false }];
-
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges: [], metadata: {} });
-
     commandHandler.emit('updateNode', { id: '1', nodeChanges: { selected: true } });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...nodes[0], selected: true }] }, 'updateNode');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToUpdate: [{ id: '1', selected: true }] }, 'updateNode');
   });
 
   it('should delete nodes from the flow with edges connected to them', () => {
-    const nodes = [{ id: '1', selected: true }];
-    const edges = [{ id: '1', selected: false, source: '1', target: '2' }];
-
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+    const node1 = { ...mockNode, id: '1', selected: true };
+    const node2 = { ...mockNode, id: '2', selected: false };
+    const edge = { ...mockEdge, id: '1', selected: false, source: '1', target: '2' };
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [node1, node2],
+      edges: [edge],
+      metadata: {},
+    });
 
     commandHandler.emit('deleteNodes', { ids: ['1'] });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [], edges: [] }, 'deleteNodes');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToRemove: ['1'], edgesToRemove: ['1'] }, 'deleteNodes');
   });
 
   it('should add edges to the flow', () => {
-    const edge1 = { id: '1', selected: true };
-    const edge2 = { id: '2', source: '1', target: '2', data: {} };
+    const edge1 = { ...mockEdge, id: '1', selected: true };
+    const edge2 = { ...mockEdge, id: '2', source: '1', target: '2', data: {} };
 
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [], edges: [edge1], metadata: {} });
+    commandHandler.emit('addEdges', { edges: [edge1, edge2] });
 
-    commandHandler.emit('addEdges', { edges: [edge2] });
-
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edges: [edge1, edge2] }, 'addEdges');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edgesToAdd: [edge1, edge2] }, 'addEdges');
   });
 
   it('should update an edge', () => {
-    const edges = [{ id: '1', selected: false }];
-
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [], edges, metadata: {} });
-
     commandHandler.emit('updateEdge', { id: '1', edgeChanges: { selected: true } });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edges: [{ ...edges[0], selected: true }] }, 'updateEdge');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edgesToUpdate: [{ id: '1', selected: true }] }, 'updateEdge');
   });
 
   it('should delete edges from the flow', () => {
-    const edges = [{ id: '1', selected: true }];
-
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [], edges, metadata: {} });
-
     commandHandler.emit('deleteEdges', { ids: ['1'] });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edges: [] }, 'deleteEdges');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edgesToRemove: ['1'] }, 'deleteEdges');
   });
 
   it('should add ports to a node', () => {
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [mockNode], edges: [], metadata: {} });
+    const node = { ...mockNode, id: '1' };
+    const port = { ...mockPort, id: '1' };
+    getNodeByIdMock.mockReturnValue(node);
 
-    commandHandler.emit('addPorts', { nodeId: mockNode.id, ports: [mockPort] });
+    commandHandler.emit('addPorts', { nodeId: node.id, ports: [port] });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...mockNode, ports: [mockPort] }] }, 'updateNode');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToUpdate: [{ id: '1', ports: [port] }] }, 'updateNode');
   });
 
   it('should update ports', () => {
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-      nodes: [{ ...mockNode, ports: [mockPort, { ...mockPort, id: 'port2' }, { ...mockPort, id: 'port3' }] }],
-      edges: [],
-      metadata: {},
+    getNodeByIdMock.mockReturnValue({
+      ...mockNode,
+      ports: [mockPort, { ...mockPort, id: 'port2' }, { ...mockPort, id: 'port3' }],
     });
 
     commandHandler.emit('updatePorts', {
@@ -103,9 +96,9 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        nodes: [
+        nodesToUpdate: [
           {
-            ...mockNode,
+            id: mockNode.id,
             ports: [
               { ...mockPort, size: { width: 100, height: 100 } },
               { ...mockPort, id: 'port2', size: { width: 100, height: 100 } },
@@ -119,23 +112,18 @@ describe('Add Update Delete Command', () => {
   });
 
   it('should delete ports from a node', () => {
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-      nodes: [{ ...mockNode, ports: [mockPort] }],
-      edges: [],
-      metadata: {},
-    });
+    getNodeByIdMock.mockReturnValue({ ...mockNode, ports: [mockPort] });
 
     commandHandler.emit('deletePorts', { nodeId: mockNode.id, portIds: [mockPort.id] });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [{ ...mockNode, ports: [] }] }, 'updateNode');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToUpdate: [{ id: mockNode.id, ports: [] }] },
+      'updateNode'
+    );
   });
 
-  it('should add edge labels to an edge', () => {
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-      nodes: [],
-      edges: [{ ...mockEdge, labels: [] }],
-      metadata: {},
-    });
+  it('should add edge labels to an edge and apply position on edge', () => {
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, labels: [] });
 
     commandHandler.emit('addEdgeLabels', {
       edgeId: mockEdge.id,
@@ -144,41 +132,34 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edges: [{ ...mockEdge, labels: [mockEdgeLabel] }],
+        edgesToUpdate: [{ id: mockEdge.id, labels: [{ ...mockEdgeLabel, position: { x: 50, y: 50 } }] }],
       },
       'updateEdge'
     );
   });
 
   it('should update an edge label', () => {
-    const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1' };
-    const mockEdgeLabel2 = { ...mockEdgeLabel, id: 'label2' };
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-      nodes: [],
-      edges: [{ ...mockEdge, labels: [mockEdgeLabel1, mockEdgeLabel2] }],
-      metadata: {},
-    });
+    const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, labels: [mockEdgeLabel1] });
 
     commandHandler.emit('updateEdgeLabel', {
       edgeId: mockEdge.id,
       labelId: mockEdgeLabel1.id,
-      labelChanges: { position: { x: 100, y: 100 } },
+      labelChanges: { positionOnEdge: 0 },
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edges: [{ ...mockEdge, labels: [{ ...mockEdgeLabel1, position: { x: 100, y: 100 } }, mockEdgeLabel2] }],
+        edgesToUpdate: [
+          { id: mockEdge.id, labels: [{ ...mockEdgeLabel1, positionOnEdge: 0, position: { x: 0, y: 0 } }] },
+        ],
       },
       'updateEdge'
     );
   });
 
   it('should delete an edge label', () => {
-    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-      nodes: [],
-      edges: [{ ...mockEdge, labels: [mockEdgeLabel, { ...mockEdgeLabel, id: 'label2' }] }],
-      metadata: {},
-    });
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, labels: [mockEdgeLabel, { ...mockEdgeLabel, id: 'label2' }] });
 
     commandHandler.emit('deleteEdgeLabels', {
       edgeId: mockEdge.id,
@@ -187,7 +168,7 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edges: [{ ...mockEdge, labels: [{ ...mockEdgeLabel, id: 'label2' }] }],
+        edgesToUpdate: [{ id: mockEdge.id, labels: [{ ...mockEdgeLabel, id: 'label2' }] }],
       },
       'updateEdge'
     );

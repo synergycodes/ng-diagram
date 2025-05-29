@@ -14,14 +14,14 @@ const changeSelection = (
     if (!!node.selected === isSelected) {
       return;
     }
-    nodesToUpdate.push({ ...node, selected: isSelected });
+    nodesToUpdate.push({ id: node.id, selected: isSelected });
   });
   edges.map((edge) => {
     const isSelected = selectedEdgeIds.includes(edge.id);
     if (!!edge.selected === isSelected) {
       return;
     }
-    edgesToUpdate.push({ ...edge, selected: isSelected });
+    edgesToUpdate.push({ id: edge.id, selected: isSelected });
   });
   return { nodesToUpdate, edgesToUpdate };
 };
@@ -50,6 +50,9 @@ export const select = (
     edgeIds = [...(edgeIds ?? []), ...selectedEdgeIds];
   }
   const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, nodeIds ?? [], edgeIds ?? []);
+  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
+    return;
+  }
   commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
@@ -65,6 +68,9 @@ export const deselect = (commandHandler: CommandHandler, { nodeIds, edgeIds }: D
   const newNodeIds = selectedNodeIds.filter((id) => !nodeIds?.includes(id));
   const newEdgeIds = selectedEdgeIds.filter((id) => !edgeIds?.includes(id));
   const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, newNodeIds ?? [], newEdgeIds ?? []);
+  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
+    return;
+  }
   commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
@@ -75,5 +81,8 @@ export interface DeselectAllCommand {
 export const deselectAll = (commandHandler: CommandHandler): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
   const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, [], []);
+  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
+    return;
+  }
   commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };

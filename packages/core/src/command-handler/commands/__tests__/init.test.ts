@@ -20,11 +20,9 @@ describe('init command', () => {
     commandHandler = new CommandHandler(flowCore);
   });
 
-  it('should execute init command on middlewares with current state', () => {
+  it('should execute init command on middlewares', () => {
     init(commandHandler);
 
-    expect(commandHandler.flowCore.getState).toHaveBeenCalled();
-    expect(flowCore.middlewareManager.execute).toHaveBeenCalledWith(mockState, mockState, 'init');
-    expect(commandHandler.flowCore.setState).toHaveBeenCalledWith(mockState);
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({}, 'init');
   });
 });
