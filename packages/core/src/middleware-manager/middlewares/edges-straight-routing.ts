@@ -4,8 +4,8 @@ import { getPointOnPath, getPortFlowPosition, isSamePoint } from '../../utils';
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
   helpers.anyEdgesAdded() ||
-  helpers.checkNodePropsChange(['position', 'size', 'angle', 'ports']) ||
-  helpers.checkEdgePropsChange([
+  helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'ports']) ||
+  helpers.checkIfAnyEdgePropsChanged([
     'targetPosition',
     'sourcePosition',
     'points',
@@ -24,7 +24,6 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
     }
     return portId ? getPortFlowPosition(node, portId) : position;
   };
-
   const sourcePoint = getPoint(edge.source, edge.sourcePort, edge.sourcePosition);
   const targetPoint = getPoint(edge.target, edge.targetPort, edge.targetPosition);
 
@@ -41,7 +40,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
       modelActionType,
     } = context;
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
-    const shouldUpdateTemporaryEdge = helpers.checkMetadataPropsChange(['temporaryEdge']) && metadata.temporaryEdge;
+    const shouldUpdateTemporaryEdge = helpers.checkIfMetadataPropsChanged(['temporaryEdge']) && metadata.temporaryEdge;
 
     if (!shouldRouteEdges && !shouldUpdateTemporaryEdge) {
       next();
