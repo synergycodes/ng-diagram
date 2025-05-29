@@ -8,3 +8,13 @@ export interface Rect {
 export interface RectWithId extends Rect {
   id: string;
 }
+
+export interface Size {
+  width: number;
+  height: number;
+}
+
+export interface Point {
+  x: number;
+  y: number;
+}

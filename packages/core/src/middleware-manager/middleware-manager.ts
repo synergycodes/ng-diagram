@@ -1,5 +1,6 @@
 import { FlowCore } from '../flow-core';
-import type { FlowState, Middleware, MiddlewareChain, ModelActionType } from '../types';
+import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
+import { MiddlewareExecutor } from './middleware-executor';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 
 export class MiddlewareManager {
@@ -43,58 +44,8 @@ export class MiddlewareManager {
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(prevState: FlowState, nextState: FlowState, modelActionType: ModelActionType) {
-    return new Promise<FlowState | undefined>((finalResolve) => {
-      const resolvers: (() => void)[] = [];
-      const middlewaresExecutedIndexes = new Set<number>();
-      let currentState = { ...nextState };
-
-      const context = {
-        state: currentState,
-        initialState: prevState,
-        modelActionType,
-        flowCore: this.flowCore,
-      };
-
-      const dispatch = (i: number) =>
-        new Promise<void>((resolve) => {
-          const middleware = this.middlewareChain[i];
-
-          if (!middleware) {
-            finalResolve(currentState);
-            while (resolvers.length > 0) {
-              resolvers.pop()?.();
-            }
-            return;
-          }
-
-          if (middlewaresExecutedIndexes.has(i)) {
-            throw new Error(`Middleware ${middleware.name} executed next() multiple times`);
-          }
-          middlewaresExecutedIndexes.add(i);
-
-          resolvers.push(resolve);
-
-          const next = async (partialUpdate?: Partial<FlowState>) => {
-            if (partialUpdate) {
-              currentState = {
-                ...currentState,
-                ...partialUpdate,
-              };
-            }
-            await dispatch(i + 1);
-          };
-          const cancel = () => {
-            while (resolvers.length > 0) {
-              resolvers.pop()?.();
-            }
-            finalResolve(undefined);
-          };
-
-          middleware.execute(context, next, cancel);
-        });
-
-      dispatch(0);
-    });
+  execute(initialState: FlowState, stateUpdate: FlowStateUpdate, modelActionType: ModelActionType) {
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
+    return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
   }
 }

@@ -15,26 +15,25 @@ export const deleteSelection = (commandHandler: CommandHandler): void => {
     }
   }
 
-  const nodesToDeleteIds = new Set<string>();
+  const nodesToDeleteIds: string[] = [];
 
-  const newNodes = isAnyNodeSelected
-    ? nodes.filter((node) => {
-        if (node.selected) {
-          nodesToDeleteIds.add(node.id);
-        }
-        return !node.selected;
-      })
-    : nodes;
+  if (isAnyNodeSelected) {
+    nodes.forEach((node) => {
+      if (node.selected) {
+        nodesToDeleteIds.push(node.id);
+      }
+    });
+  }
 
-  const newEdges = edges.filter(
-    (edge) => !edge.selected && !nodesToDeleteIds.has(edge.source) && !nodesToDeleteIds.has(edge.target)
-  );
+  const edgesToDeleteIds: string[] = [];
+  edges.forEach((edge) => {
+    if (edge.selected || nodesToDeleteIds.includes(edge.source) || nodesToDeleteIds.includes(edge.target)) {
+      edgesToDeleteIds.push(edge.id);
+    }
+  });
 
   commandHandler.flowCore.applyUpdate(
-    {
-      nodes: newNodes,
-      edges: newEdges.length !== edges.length ? newEdges : edges,
-    },
+    { nodesToRemove: nodesToDeleteIds, edgesToRemove: edgesToDeleteIds },
     'deleteSelection'
   );
 };

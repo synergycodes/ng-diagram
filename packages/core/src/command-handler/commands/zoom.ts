@@ -14,8 +14,5 @@ export const zoom = (commandHandler: CommandHandler, { x, y, scale }: ZoomComman
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
-    { metadata: { ...metadata, viewport: { ...metadata.viewport, x, y, scale } } },
-    'zoom'
-  );
+  commandHandler.flowCore.applyUpdate({ metadataUpdate: { viewport: { ...metadata.viewport, x, y, scale } } }, 'zoom');
 };

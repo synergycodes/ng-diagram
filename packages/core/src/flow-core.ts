@@ -11,6 +11,7 @@ import type {
   Event,
   EventMapper,
   FlowState,
+  FlowStateUpdate,
   Middleware,
   ModelActionType,
   ModelAdapter,
@@ -136,10 +137,19 @@ export class FlowCore {
    * @param state Partial state to apply
    * @param modelActionType Type of model action to apply
    */
-  async applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): Promise<void> {
-    const initialState = this.getState();
-    const updatedState = { ...initialState, ...state };
-    const finalState = await this.middlewareManager.execute(initialState, updatedState, modelActionType);
+  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: ModelActionType): Promise<void> {
+    const t1 = performance.now();
+    const finalState = await this.middlewareManager.execute(this.getState(), stateUpdate, modelActionType);
+    const t2 = performance.now();
+    let color: string;
+    if (t2 - t1 > 3) {
+      color = 'red';
+    } else if (t2 - t1 > 1) {
+      color = 'yellow';
+    } else {
+      color = 'green';
+    }
+    console.log(`%c applyUpdate took ${t2 - t1}ms - ${modelActionType}`, `color: ${color}`);
     if (finalState) {
       this.setState(finalState);
     }

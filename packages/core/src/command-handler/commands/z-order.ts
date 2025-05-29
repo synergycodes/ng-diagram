@@ -46,11 +46,13 @@ const changeZOrder = (commandHandler: CommandHandler, command: BringToFrontComma
   }
 
   const zOrder = getZOrder(nodes, edges, command);
-  const newNodes =
-    nodeIds.length > 0 ? nodes.map((node) => (nodeIds.includes(node.id) ? { ...node, zOrder } : node)) : nodes;
-  const newEdges =
-    edgeIds.length > 0 ? edges.map((edge) => (edgeIds.includes(edge.id) ? { ...edge, zOrder } : edge)) : edges;
-  commandHandler.flowCore.applyUpdate({ nodes: newNodes, edges: newEdges }, 'changeZOrder');
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodesToUpdate: nodeIds.map((id) => ({ id, zOrder })),
+      edgesToUpdate: edgeIds.map((id) => ({ id, zOrder })),
+    },
+    'changeZOrder'
+  );
 };
 
 export const bringToFront = (commandHandler: CommandHandler, command: BringToFrontCommand): void => {

@@ -1,4 +1,4 @@
-import { Rect } from '../types';
+import { Point, Rect, Size } from '../types';
 
 export const getPointRangeRect = (point: { x: number; y: number }, range: number): Rect => {
   return {
@@ -9,8 +9,10 @@ export const getPointRangeRect = (point: { x: number; y: number }, range: number
   };
 };
 
-export const isSameRect = (rect1: Rect, rect2: Rect): boolean => {
-  return rect1.x === rect2.x && rect1.y === rect2.y && rect1.width === rect2.width && rect1.height === rect2.height;
+export const isSameRect = (rect1?: Rect, rect2?: Rect): boolean => {
+  return (
+    rect1?.x === rect2?.x && rect1?.y === rect2?.y && rect1?.width === rect2?.width && rect1?.height === rect2?.height
+  );
 };
 
 export const getRect = ({
@@ -73,4 +75,12 @@ export const getDistanceBetweenRects = (rect1: Rect, rect2: Rect): number => {
     return rect1.y - rect2Bottom;
   }
   return Infinity;
+};
+
+export const isSamePoint = (point1?: Point, point2?: Point): boolean => {
+  return point1?.x === point2?.x && point1?.y === point2?.y;
+};
+
+export const isSameSize = (size1?: Size, size2?: Size): boolean => {
+  return size1?.width === size2?.width && size1?.height === size2?.height;
 };

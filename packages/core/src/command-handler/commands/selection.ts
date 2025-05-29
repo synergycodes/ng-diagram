@@ -1,33 +1,29 @@
-import type { CommandHandler, Edge, FlowState, Node } from '../../types';
+import type { CommandHandler, Edge, FlowStateUpdate, Node } from '../../types';
 
 const changeSelection = (
   nodes: Node[],
   edges: Edge[],
   selectedNodeIds: string[],
   selectedEdgeIds: string[]
-): Pick<FlowState, 'nodes' | 'edges'> => {
-  let nodesSelectionChanged = false;
-  const newNodes = nodes.map((node) => {
+): Pick<FlowStateUpdate, 'nodesToUpdate' | 'edgesToUpdate'> => {
+  const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
+  const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
+
+  nodes.forEach((node) => {
     const isSelected = selectedNodeIds.includes(node.id);
     if (!!node.selected === isSelected) {
-      return node;
+      return;
     }
-    nodesSelectionChanged = true;
-    return { ...node, selected: isSelected };
+    nodesToUpdate.push({ ...node, selected: isSelected });
   });
-  let edgesSelectionChanged = false;
-  const newEdges = edges.map((edge) => {
+  edges.map((edge) => {
     const isSelected = selectedEdgeIds.includes(edge.id);
     if (!!edge.selected === isSelected) {
-      return edge;
+      return;
     }
-    edgesSelectionChanged = true;
-    return { ...edge, selected: isSelected };
+    edgesToUpdate.push({ ...edge, selected: isSelected });
   });
-  return {
-    nodes: nodesSelectionChanged ? newNodes : nodes,
-    edges: edgesSelectionChanged ? newEdges : edges,
-  };
+  return { nodesToUpdate, edgesToUpdate };
 };
 
 const getSelectedIds = (nodes: Node[], edges: Edge[]): { selectedNodeIds: string[]; selectedEdgeIds: string[] } => {
@@ -53,11 +49,8 @@ export const select = (
     nodeIds = [...(nodeIds ?? []), ...selectedNodeIds];
     edgeIds = [...(edgeIds ?? []), ...selectedEdgeIds];
   }
-  const { nodes: newNodes, edges: newEdges } = changeSelection(nodes, edges, nodeIds ?? [], edgeIds ?? []);
-  if (Object.is(nodes, newNodes) && Object.is(edges, newEdges)) {
-    return;
-  }
-  commandHandler.flowCore.applyUpdate({ nodes: newNodes, edges: newEdges }, 'changeSelection');
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, nodeIds ?? [], edgeIds ?? []);
+  commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
 export interface DeselectCommand {
@@ -71,11 +64,8 @@ export const deselect = (commandHandler: CommandHandler, { nodeIds, edgeIds }: D
   const { selectedNodeIds, selectedEdgeIds } = getSelectedIds(nodes, edges);
   const newNodeIds = selectedNodeIds.filter((id) => !nodeIds?.includes(id));
   const newEdgeIds = selectedEdgeIds.filter((id) => !edgeIds?.includes(id));
-  const { nodes: newNodes, edges: newEdges } = changeSelection(nodes, edges, newNodeIds ?? [], newEdgeIds ?? []);
-  if (Object.is(nodes, newNodes) && Object.is(edges, newEdges)) {
-    return;
-  }
-  commandHandler.flowCore.applyUpdate({ nodes: newNodes, edges: newEdges }, 'changeSelection');
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, newNodeIds ?? [], newEdgeIds ?? []);
+  commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
 export interface DeselectAllCommand {
@@ -84,9 +74,6 @@ export interface DeselectAllCommand {
 
 export const deselectAll = (commandHandler: CommandHandler): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  const { nodes: newNodes, edges: newEdges } = changeSelection(nodes, edges, [], []);
-  if (Object.is(nodes, newNodes) && Object.is(edges, newEdges)) {
-    return;
-  }
-  commandHandler.flowCore.applyUpdate({ nodes: newNodes, edges: newEdges }, 'changeSelection');
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, [], []);
+  commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };

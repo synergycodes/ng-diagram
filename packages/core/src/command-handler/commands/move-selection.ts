@@ -9,24 +9,22 @@ export interface MoveSelectionCommand {
 export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSelectionCommand): void => {
   const { nodes } = commandHandler.flowCore.getState();
 
-  const selectedNodesIds = nodes.filter((node) => node.selected).map((node) => node.id);
+  const nodesToMove = nodes.filter((node) => node.selected);
 
-  if (selectedNodesIds.length === 0) {
+  if (nodesToMove.length === 0) {
     return;
   }
 
-  const updatedNodes = nodes.map((node) => {
-    if (selectedNodesIds.includes(node.id)) {
-      return {
-        ...node,
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodesToUpdate: nodesToMove.map((node) => ({
+        id: node.id,
         position: {
           x: Math.round(node.position.x + dx),
           y: Math.round(node.position.y + dy),
         },
-      };
-    }
-    return node;
-  });
-
-  commandHandler.flowCore.applyUpdate({ nodes: updatedNodes }, 'moveSelection');
+      })),
+    },
+    'moveSelection'
+  );
 };

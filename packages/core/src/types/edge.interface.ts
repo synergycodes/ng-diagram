@@ -1,3 +1,5 @@
+import type { Point, Size } from './utils';
+
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
  */
@@ -21,7 +23,7 @@ export interface Edge {
   /**
    * The points of the edge defining the path.
    */
-  points?: { x: number; y: number }[];
+  points?: Point[];
   /**
    * Whether the edge is selected
    */
@@ -53,11 +55,11 @@ export interface Edge {
   /**
    * The position of the edge start.
    */
-  sourcePosition?: { x: number; y: number };
+  sourcePosition?: Point;
   /**
    * The position of the edge end.
    */
-  targetPosition?: { x: number; y: number };
+  targetPosition?: Point;
   /**
    * Whether the edge is temporary.
    */
@@ -87,9 +89,9 @@ export interface EdgeLabel {
   /**
    * The position of the label on flow.
    */
-  position?: { x: number; y: number };
+  position?: Point;
   /**
    * The size of the label.
    */
-  size?: { width: number; height: number };
+  size?: Size;
 }

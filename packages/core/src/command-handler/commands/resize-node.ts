@@ -19,16 +19,14 @@ export const resizeNode = (
   }
   commandHandler.flowCore.applyUpdate(
     {
-      nodes: nodes.map((node) =>
-        node.id === id
-          ? {
-              ...node,
-              size,
-              position: position ?? node.position,
-              ...(disableAutoSize !== undefined && { autoSize: !disableAutoSize }),
-            }
-          : node
-      ),
+      nodesToUpdate: [
+        {
+          id,
+          size,
+          ...(position && { position }),
+          ...(disableAutoSize !== undefined && { autoSize: !disableAutoSize }),
+        },
+      ],
     },
     'resizeNode'
   );
