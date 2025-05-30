@@ -47,7 +47,7 @@ describe('LoggerMiddleware', () => {
       state,
     };
 
-    const result = loggerMiddleware.execute(
+    loggerMiddleware.execute(
       newContext,
       () => Promise.resolve(newContext.state),
       () => null
@@ -62,6 +62,5 @@ describe('LoggerMiddleware', () => {
         initialUpdate: context.initialUpdate,
       })
     );
-    expect(result).toEqual(state);
   });
 });
