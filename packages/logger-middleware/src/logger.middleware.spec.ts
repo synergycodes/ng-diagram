@@ -58,7 +58,7 @@ describe('LoggerMiddleware', () => {
       expect.objectContaining({
         initialState,
         finalState: state,
-        historyUpdates: context.history,
+        history: context.history,
         initialUpdate: context.initialUpdate,
       })
     );
