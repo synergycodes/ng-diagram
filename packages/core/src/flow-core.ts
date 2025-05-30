@@ -1,7 +1,7 @@
 import { CommandHandler } from './command-handler/command-handler';
-import { InitializationGuard } from './initialization-guard';
+import { InitializationGuard } from './initialization-guard/initialization-guard';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
-import { InternalUpdater } from './internal-updater';
+import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
@@ -11,6 +11,7 @@ import type {
   Event,
   EventMapper,
   FlowState,
+  FlowStateUpdate,
   Middleware,
   ModelActionType,
   ModelAdapter,
@@ -133,14 +134,14 @@ export class FlowCore {
 
   /**
    * Applies an update to the flow state
-   * @param state Partial state to apply
+   * @param stateUpdate Partial state to apply
    * @param modelActionType Type of model action to apply
    */
-  applyUpdate(state: Partial<FlowState>, modelActionType: ModelActionType): void {
-    const initialState = this.getState();
-    const updatedState = { ...initialState, ...state };
-    const finalState = this.middlewareManager.execute(initialState, updatedState, modelActionType);
-    this.setState(finalState);
+  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: ModelActionType): Promise<void> {
+    const finalState = await this.middlewareManager.execute(this.getState(), stateUpdate, modelActionType);
+    if (finalState) {
+      this.setState(finalState);
+    }
   }
 
   /**

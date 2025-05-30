@@ -1,5 +1,6 @@
 import { FlowCore } from '../flow-core';
-import type { FlowState, Middleware, MiddlewareChain, MiddlewareHistoryUpdate, ModelActionType } from '../types';
+import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
+import { MiddlewareExecutor } from './middleware-executor';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 
 export class MiddlewareManager {
@@ -38,40 +39,13 @@ export class MiddlewareManager {
 
   /**
    * Executes all registered middlewares in sequence
-   * @param prevState Initial state to be transformed
-   * @param nextState Next state to be transformed
+   * @param initialState Initial state to be transformed
+   * @param stateUpdate State update to be applied
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(prevState: FlowState, nextState: FlowState, modelActionType: ModelActionType): FlowState {
-    const historyUpdates: MiddlewareHistoryUpdate[] = [{ name: modelActionType, prevState, nextState }];
-    return this.middlewareChain.reduce(
-      ({ currentState, historyUpdates }, middleware) => {
-        const updatedState = middleware.execute(
-          currentState,
-          {
-            initialState: prevState,
-            modelActionType,
-            historyUpdates,
-          },
-          this.flowCore
-        );
-        if (
-          Object.is(updatedState.metadata, currentState.metadata) &&
-          Object.is(updatedState.nodes, currentState.nodes) &&
-          Object.is(updatedState.edges, currentState.edges)
-        ) {
-          return { currentState, historyUpdates };
-        }
-        return {
-          currentState: updatedState,
-          historyUpdates: [
-            ...historyUpdates,
-            { name: middleware.name, prevState: currentState, nextState: updatedState },
-          ],
-        };
-      },
-      { currentState: nextState, historyUpdates }
-    ).currentState;
+  execute(initialState: FlowState, stateUpdate: FlowStateUpdate, modelActionType: ModelActionType) {
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
+    return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
   }
 }

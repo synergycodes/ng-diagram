@@ -1,10 +1,12 @@
-import type { FlowCore, FlowState } from '@angularflow/core';
+import type { FlowState, MiddlewareContext } from '@angularflow/core';
 import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
 import { loggerMiddleware } from './logger.middleware';
 
 describe('LoggerMiddleware', () => {
   let consoleLogSpy: MockInstance;
   let initialState: FlowState;
+  let context: MiddlewareContext;
+  const nextMock = vi.fn();
 
   beforeEach(() => {
     initialState = {
@@ -12,6 +14,15 @@ describe('LoggerMiddleware', () => {
       edges: [],
       metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
+    context = {
+      initialState,
+      state: initialState,
+      nodesMap: new Map(),
+      edgesMap: new Map(),
+      metadata: initialState.metadata,
+      history: [{ name: 'init', stateUpdate: { nodesToAdd: [] } }],
+      initialUpdate: { nodesToAdd: [] },
+    } as unknown as MiddlewareContext;
 
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {
       // do nothing
@@ -31,31 +42,23 @@ describe('LoggerMiddleware', () => {
       edges: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
       metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
-
-    const result = loggerMiddleware.execute(
+    const newContext: MiddlewareContext = {
+      ...context,
+      modelActionType: 'changeSelection',
       state,
-      {
-        modelActionType: 'changeSelection',
-        historyUpdates: [
-          {
-            name: 'changeSelection',
-            prevState: initialState,
-            nextState: state,
-          },
-        ],
-        initialState,
-      },
-      {} as unknown as FlowCore
-    );
+    };
+
+    loggerMiddleware.execute(newContext, nextMock, () => null);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       '[AngularFlow] changeSelection',
       expect.objectContaining({
         initialState,
         finalState: state,
-        historyUpdates: [{ name: 'changeSelection', prevState: initialState, nextState: state }],
+        history: context.history,
+        initialUpdate: context.initialUpdate,
       })
     );
-    expect(result).toEqual(state);
+    expect(nextMock).toHaveBeenCalled();
   });
 });

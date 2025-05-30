@@ -1,7 +1,7 @@
-import { FlowCore } from './flow-core';
-import type { Node, Port } from './types';
-import { EdgeLabel } from './types';
-import { getRect, isSameRect } from './utils';
+import { FlowCore } from '../flow-core';
+import type { Node, Port } from '../types';
+import { EdgeLabel } from '../types';
+import { getRect, isSameRect } from '../utils';
 
 export class InternalUpdater {
   constructor(private readonly flowCore: FlowCore) {}

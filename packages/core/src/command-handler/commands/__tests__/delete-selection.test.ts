@@ -28,7 +28,10 @@ describe('Delete Selection Command', () => {
 
     commandHandler.emit('deleteSelection');
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [nodes[1]], edges: [edges[0]] }, 'deleteSelection');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToRemove: ['1'], edgesToRemove: ['2'] },
+      'deleteSelection'
+    );
   });
 
   it('should not delete anything if no nodes or edges are selected', () => {
@@ -63,6 +66,9 @@ describe('Delete Selection Command', () => {
 
     commandHandler.emit('deleteSelection');
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodes: [nodes[0]], edges: [edges[2]] }, 'deleteSelection');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToRemove: ['2'], edgesToRemove: ['1', '2'] },
+      'deleteSelection'
+    );
   });
 });

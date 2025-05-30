@@ -1,5 +1,5 @@
 import { Node } from '../types';
-import { getRect } from './rects';
+import { getRect } from './rects-points-sizes';
 
 export const getPortFlowPosition = (node: Node, portId: string) => {
   const port = node.ports?.find((port) => port.id === portId);

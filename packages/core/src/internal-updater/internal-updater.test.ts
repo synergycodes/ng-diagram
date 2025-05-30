@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CommandHandler } from './command-handler/command-handler';
-import { FlowCore } from './flow-core';
-import { InitializationGuard } from './initialization-guard';
+import { CommandHandler } from '../command-handler/command-handler';
+import { FlowCore } from '../flow-core';
+import { InitializationGuard } from '../initialization-guard/initialization-guard';
+import { mockEdge, mockEdgeLabel, mockNode, mockPort } from '../test-utils';
 import { InternalUpdater } from './internal-updater';
-import { mockEdge, mockEdgeLabel, mockNode, mockPort } from './test-utils';
 
 describe('InternalUpdater', () => {
   const getNodeByIdMock = vi.fn();

@@ -169,15 +169,6 @@ export interface PointerLeaveEvent extends PointerBaseEvent {
 export type PointerEvent = PointerDownEvent | PointerUpEvent | PointerMoveEvent | PointerEnterEvent | PointerLeaveEvent;
 
 /**
- * Resize event interface
- */
-export interface ResizeEvent extends BaseEvent {
-  type: 'resize';
-  width: number;
-  height: number;
-}
-
-/**
  * Wheel event interface
  */
 export interface WheelEvent extends BaseEvent {
@@ -190,15 +181,6 @@ export interface WheelEvent extends BaseEvent {
 }
 
 /**
- * Resize event interface
- */
-export interface ResizeEvent extends BaseEvent {
-  type: 'resize';
-  width: number;
-  height: number;
-}
-
-/**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent | WheelEvent | ResizeEvent;
+export type Event = KeyboardEvent | PointerEvent | WheelEvent;

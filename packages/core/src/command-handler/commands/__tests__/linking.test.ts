@@ -48,7 +48,7 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
+          metadataUpdate: {
             temporaryEdge: getTemporaryEdge({
               source: 'node-1',
               sourcePosition: { x: 100, y: 100 },
@@ -69,7 +69,7 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
+          metadataUpdate: {
             temporaryEdge: getTemporaryEdge({
               source: mockNode.id,
               sourcePort: mockPort.id,
@@ -92,8 +92,7 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
-            ...mockMetadata,
+          metadataUpdate: {
             temporaryEdge: getTemporaryEdge({
               source: '',
               sourcePosition: { x: 100, y: 100 },
@@ -145,7 +144,7 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
+          metadataUpdate: {
             temporaryEdge: {
               ...temporaryEdge,
               target: 'node-2',
@@ -171,7 +170,7 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
+          metadataUpdate: {
             temporaryEdge: {
               ...temporaryEdge,
               target: 'node-2',
@@ -195,7 +194,7 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: {
+          metadataUpdate: {
             temporaryEdge: {
               ...temporaryEdge,
               target: '',
@@ -229,7 +228,7 @@ describe('Linking Commands', () => {
 
       commandHandler.emit('finishLinking', {});
 
-      expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadata: { temporaryEdge: null } }, 'finishLinking');
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     });
 
     it('should call applyUpdate if there is no target node provided to remove temporary edge', () => {
@@ -244,7 +243,7 @@ describe('Linking Commands', () => {
 
       commandHandler.emit('finishLinking', { target: 'node-2' });
 
-      expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadata: { temporaryEdge: null } }, 'finishLinking');
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     });
 
     it('should call applyUpdate if target port is a type of source to remove temporary edge', () => {
@@ -259,7 +258,7 @@ describe('Linking Commands', () => {
 
       commandHandler.emit('finishLinking', { target: mockNode.id, targetPort: mockPort.id });
 
-      expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadata: { temporaryEdge: null } }, 'finishLinking');
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     });
 
     it('should create a new edge and remove the temporary edge if only target node is provided', () => {
@@ -279,8 +278,8 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: { temporaryEdge: null },
-          edges: expect.arrayContaining([
+          metadataUpdate: { temporaryEdge: null },
+          edgesToAdd: expect.arrayContaining([
             expect.objectContaining({
               ...getFinalEdge(temporaryEdge, { target: 'node-2', targetPosition: { x: 200, y: 200 } }),
               id: expect.any(String),
@@ -312,8 +311,8 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: { temporaryEdge: null },
-          edges: expect.arrayContaining([
+          metadataUpdate: { temporaryEdge: null },
+          edgesToAdd: expect.arrayContaining([
             expect.objectContaining({
               ...getFinalEdge(temporaryEdge, { target: 'node-2', targetPosition: { x: 250, y: 250 } }),
               id: expect.any(String),
@@ -351,8 +350,8 @@ describe('Linking Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadata: { ...mockMetadata, temporaryEdge: null },
-          edges: expect.arrayContaining([
+          metadataUpdate: { temporaryEdge: null },
+          edgesToAdd: expect.arrayContaining([
             expect.objectContaining({
               ...getFinalEdge(temporaryEdge, { target: '', targetPosition: { x: 100, y: 100 } }),
               id: expect.any(String),

@@ -24,7 +24,6 @@ export interface StartLinkingCommand {
 }
 
 export const startLinking = (commandHandler: CommandHandler, command: StartLinkingCommand): void => {
-  const { metadata } = commandHandler.flowCore.getState();
   const { source, sourcePort } = command;
 
   const sourceNode = commandHandler.flowCore.getNodeById(source);
@@ -44,8 +43,7 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
 
   commandHandler.flowCore.applyUpdate(
     {
-      metadata: {
-        ...metadata,
+      metadataUpdate: {
         temporaryEdge: getTemporaryEdge({
           source,
           sourcePort,
@@ -68,13 +66,11 @@ export const startLinkingFromPosition = (
   commandHandler: CommandHandler,
   command: StartLinkingFromPositionCommand
 ): void => {
-  const { metadata } = commandHandler.flowCore.getState();
   const { position } = command;
 
   commandHandler.flowCore.applyUpdate(
     {
-      metadata: {
-        ...metadata,
+      metadataUpdate: {
         temporaryEdge: getTemporaryEdge({
           source: '',
           sourcePosition: position,
@@ -136,10 +132,7 @@ export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveT
 
   commandHandler.flowCore.applyUpdate(
     {
-      metadata: {
-        ...metadata,
-        temporaryEdge: newTemporaryEdge,
-      },
+      metadataUpdate: { temporaryEdge: newTemporaryEdge },
     },
     'moveTemporaryEdge'
   );
@@ -152,7 +145,7 @@ export interface FinishLinkingCommand {
 }
 
 export const finishLinking = (commandHandler: CommandHandler, command: FinishLinkingCommand): void => {
-  const { metadata, edges } = commandHandler.flowCore.getState();
+  const { metadata } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
   if (!metadata.temporaryEdge) {
@@ -162,27 +155,26 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
   const targetNode = target && commandHandler.flowCore.getNodeById(target);
 
   if (!targetNode) {
-    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+    commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    return;
   }
 
   if (targetPort && targetNode.ports?.find((port) => port.id === targetPort)?.type === 'source') {
-    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+    commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    return;
   }
 
   const targetPosition = !!target && !!targetPort ? getPortFlowPosition(targetNode, targetPort) : targetNode.position;
 
   if (!targetPosition) {
-    return commandHandler.flowCore.applyUpdate({ metadata: { ...metadata, temporaryEdge: null } }, 'finishLinking');
+    commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    return;
   }
-
-  const newEdges: Edge[] = target
-    ? [...edges, getFinalEdge(metadata.temporaryEdge, { target, targetPort, targetPosition })]
-    : edges;
 
   commandHandler.flowCore.applyUpdate(
     {
-      metadata: { ...metadata, temporaryEdge: null },
-      edges: newEdges,
+      metadataUpdate: { temporaryEdge: null },
+      edgesToAdd: [getFinalEdge(metadata.temporaryEdge, { target, targetPort, targetPosition })],
     },
     'finishLinking'
   );
@@ -197,20 +189,18 @@ export const finishLinkingToPosition = (
   commandHandler: CommandHandler,
   command: FinishLinkingToPositionCommand
 ): void => {
-  const { metadata, edges } = commandHandler.flowCore.getState();
+  const { metadata } = commandHandler.flowCore.getState();
   const { position } = command;
 
   if (!metadata.temporaryEdge) {
     return;
   }
 
-  const newEdges: Edge[] = [
-    ...edges,
-    getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition: position }),
-  ];
-
   commandHandler.flowCore.applyUpdate(
-    { metadata: { ...metadata, temporaryEdge: null }, edges: newEdges },
+    {
+      metadataUpdate: { temporaryEdge: null },
+      edgesToAdd: [getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition: position })],
+    },
     'finishLinking'
   );
 };

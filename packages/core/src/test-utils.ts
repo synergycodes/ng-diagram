@@ -25,6 +25,10 @@ export const mockEdge: Edge = {
   target: '2',
   selected: false,
   data: {},
+  points: [
+    { x: 0, y: 0 },
+    { x: 100, y: 100 },
+  ],
 };
 
 export const mockPointerEvent: Omit<PointerEvent, 'type'> = {

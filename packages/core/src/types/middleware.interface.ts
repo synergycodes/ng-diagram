@@ -1,4 +1,5 @@
 import type { FlowCore } from '../flow-core';
+import { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
 import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
@@ -35,19 +36,40 @@ export interface FlowState {
   metadata: Metadata;
 }
 
+/**
+ * Type for the history update to be applied to the flow diagram
+ */
 export interface MiddlewareHistoryUpdate {
   name: string;
-  prevState: FlowState;
-  nextState: FlowState;
+  stateUpdate: FlowStateUpdate;
 }
 
 /**
- * Type for the context of a middleware operation
+ * Type for the state update to be applied to the flow diagram
+ */
+export interface FlowStateUpdate {
+  nodesToAdd?: Node[];
+  nodesToUpdate?: (Partial<Node> & { id: Node['id'] })[];
+  nodesToRemove?: string[];
+  edgesToAdd?: Edge[];
+  edgesToUpdate?: (Partial<Edge> & { id: Edge['id'] })[];
+  edgesToRemove?: string[];
+  metadataUpdate?: Partial<Metadata>;
+}
+
+/**
+ * Type for the context of the middleware
  */
 export interface MiddlewareContext {
   initialState: FlowState;
+  state: FlowState;
+  nodesMap: Map<string, Node>;
+  edgesMap: Map<string, Edge>;
   modelActionType: ModelActionType;
-  historyUpdates: MiddlewareHistoryUpdate[];
+  flowCore: FlowCore;
+  helpers: ReturnType<MiddlewareExecutor['helpers']>;
+  history: MiddlewareHistoryUpdate[];
+  initialUpdate: FlowStateUpdate;
 }
 
 /**
@@ -56,19 +78,10 @@ export interface MiddlewareContext {
 export interface Middleware {
   name: string;
   execute: (
-    /**
-     * Current state
-     */
-    state: FlowState,
-    /**
-     * Context of the operation
-     */
     context: MiddlewareContext,
-    /**
-     * Flow core
-     */
-    flowCore: FlowCore
-  ) => FlowState;
+    next: (stateUpdate?: FlowStateUpdate) => Promise<FlowState>,
+    cancel: () => void
+  ) => Promise<void> | void;
 }
 
 /**

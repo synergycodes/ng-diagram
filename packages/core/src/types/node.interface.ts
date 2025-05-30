@@ -1,3 +1,5 @@
+import type { Point, Size } from './utils';
+
 /**
  * Interface representing a node in the flow diagram
  */
@@ -9,7 +11,7 @@ export interface Node {
   /**
    * The position of the node in the diagram.
    */
-  position: { x: number; y: number };
+  position: Point;
   /**
    * The data associated with the node.
    */
@@ -25,7 +27,7 @@ export interface Node {
   /**
    * The size of the node.
    */
-  size?: { width: number; height: number };
+  size?: Size;
   /**
    * Whether the size of the node is automatically resized based on the content.
    */
@@ -59,11 +61,11 @@ export interface Port {
   /**
    * The position of the port in the node.
    */
-  position?: { x: number; y: number };
+  position?: Point;
   /**
    * The size of the port.
    */
-  size?: { width: number; height: number };
+  size?: Size;
   /**
    * The type of the port.
    */

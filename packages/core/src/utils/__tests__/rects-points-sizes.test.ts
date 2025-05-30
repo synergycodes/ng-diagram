@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { doesRectsIntersect, getDistanceBetweenRects, getPointRangeRect, getRect, isSameRect } from '../rects';
+import {
+  doesRectsIntersect,
+  getDistanceBetweenRects,
+  getPointRangeRect,
+  getRect,
+  isSamePoint,
+  isSameRect,
+  isSameSize,
+} from '../rects-points-sizes';
 
 describe('rects', () => {
   describe('getPointRangeRect', () => {
@@ -128,6 +136,38 @@ describe('rects', () => {
       const rect2 = getRect({ position: { x: 0, y: 0 }, size: { width: 5, height: 5 } });
 
       expect(getDistanceBetweenRects(rect1, rect2)).toBe(5);
+    });
+  });
+
+  describe('isSamePoint', () => {
+    it('should return true if the points are the same', () => {
+      const point1 = { x: 0, y: 0 };
+      const point2 = { x: 0, y: 0 };
+
+      expect(isSamePoint(point1, point2)).toBe(true);
+    });
+
+    it('should return false if the points are not the same', () => {
+      const point1 = { x: 0, y: 0 };
+      const point2 = { x: 1, y: 1 };
+
+      expect(isSamePoint(point1, point2)).toBe(false);
+    });
+  });
+
+  describe('isSameSize', () => {
+    it('should return true if the sizes are the same', () => {
+      const size1 = { width: 10, height: 10 };
+      const size2 = { width: 10, height: 10 };
+
+      expect(isSameSize(size1, size2)).toBe(true);
+    });
+
+    it('should return false if the sizes are not the same', () => {
+      const size1 = { width: 10, height: 10 };
+      const size2 = { width: 15, height: 10 };
+
+      expect(isSameSize(size1, size2)).toBe(false);
     });
   });
 });

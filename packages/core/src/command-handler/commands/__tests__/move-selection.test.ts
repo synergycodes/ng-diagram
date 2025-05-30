@@ -32,9 +32,9 @@ describe('Move Selection Commands', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        nodes: [
+        nodesToUpdate: [
           {
-            ...mockNode,
+            id: mockNode.id,
             position: { x: MOVEMENT_STEP, y: MOVEMENT_STEP },
           },
         ],

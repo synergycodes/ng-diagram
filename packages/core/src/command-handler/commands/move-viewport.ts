@@ -15,8 +15,7 @@ export const moveViewportBy = (commandHandler: CommandHandler, { x, y }: MoveVie
 
   commandHandler.flowCore.applyUpdate(
     {
-      metadata: {
-        ...metadata,
+      metadataUpdate: {
         viewport: {
           ...metadata.viewport,
           x: metadata.viewport.x + x,
@@ -43,8 +42,7 @@ export const moveViewport = (commandHandler: CommandHandler, { x, y }: MoveViewp
 
   commandHandler.flowCore.applyUpdate(
     {
-      metadata: {
-        ...metadata,
+      metadataUpdate: {
         viewport: {
           ...metadata.viewport,
           x,

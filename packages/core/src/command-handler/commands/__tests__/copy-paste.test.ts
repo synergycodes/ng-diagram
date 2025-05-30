@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
-import type { Edge, Node } from '../../../types';
+import type { Node } from '../../../types';
 import { CommandHandler } from '../../command-handler';
 import { copy, paste } from '../copy-paste';
 
@@ -36,20 +36,13 @@ describe('Copy-Paste Commands', () => {
       const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
       const [update] = updateCall.mock.calls[0];
 
-      // Verify new nodes were created with offset
-      expect(update.nodes).toHaveLength(3); // 2 original + 1 copied
-      const copiedNodes = update.nodes.filter((n: Node) => n.id !== 'node1' && n.id !== 'node2');
-      expect(copiedNodes).toHaveLength(1);
-      copiedNodes.forEach((node: Node) => {
+      expect(update.nodesToAdd).toHaveLength(1);
+      update.nodesToAdd.forEach((node: Node) => {
         expect(node.position.x).toBe(mockNode.position.x + OFFSET);
         expect(node.position.y).toBe(mockNode.position.y + OFFSET);
         expect(node.selected).toBe(true);
       });
-
-      // Verify new edges were created with correct source/target mapping
-      expect(update.edges).toHaveLength(3); // 2 original + 1 copied
-      const copiedEdges = update.edges.filter((e: Edge) => e.id !== 'edge1' && e.id !== 'edge2');
-      expect(copiedEdges).toHaveLength(1);
+      expect(update.edgesToAdd).toHaveLength(1);
     });
 
     it('should not copy anything if nothing is selected', () => {
@@ -81,11 +74,8 @@ describe('Copy-Paste Commands', () => {
       const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
       const [update] = updateCall.mock.calls[0];
 
-      const originalNodes = update.nodes.filter((n: Node) => n.id === 'node1' || n.id === 'node2');
-      const originalEdges = update.edges.filter((e: Edge) => e.id === 'edge1' || e.id === 'edge2');
-
-      originalNodes.forEach((node: Node) => expect(node.selected).toBe(false));
-      originalEdges.forEach((edge: Edge) => expect(edge.selected).toBe(false));
+      expect(update.nodesToUpdate).toEqual([{ id: 'node1', selected: false }]);
+      expect(update.edgesToUpdate).toEqual([{ id: 'edge1', selected: false }]);
     });
   });
 });

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from './flow-core';
+import { FlowCore } from '../flow-core';
+import { mockEdgeLabel, mockPort } from '../test-utils';
 import { InitializationGuard } from './initialization-guard';
-import { mockEdgeLabel, mockPort } from './test-utils';
 
 describe('InitializationGuard', () => {
   const stateMock = { nodes: [], edges: [], metadata: {} };

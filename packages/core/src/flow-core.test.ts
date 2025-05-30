@@ -3,7 +3,7 @@ import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
-import { mockEdge, mockNode } from './test-utils';
+import { mockEdge, mockMetadata, mockNode } from './test-utils';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
@@ -172,32 +172,44 @@ describe('FlowCore', () => {
   });
 
   describe('applyUpdate', () => {
-    it('should apply the update to the state', () => {
-      mockMiddlewareManager.execute.mockReturnValue({
+    it('should apply the update to the state', async () => {
+      const finalState = {
         nodes: [mockNode],
         edges: [mockEdge],
         metadata: { test: 'abc' },
-      });
-      flowCore.applyUpdate({ nodes: [mockNode] }, 'changeSelection');
+      };
+
+      mockMiddlewareManager.execute.mockResolvedValue(finalState);
+
+      await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
       expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
       expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockNode]);
       expect(mockModelAdapter.setEdges).toHaveBeenCalledWith([mockEdge]);
     });
 
-    it('should call the middleware with the correct parameters', () => {
-      mockMiddlewareManager.execute.mockReturnValue({
-        nodes: [mockNode],
-        edges: [mockEdge],
-        metadata: { test: 'abc' },
-      });
-      flowCore.applyUpdate({ nodes: [mockNode] }, 'changeSelection');
+    it('should call the middleware with the correct parameters', async () => {
+      mockGetMetadata.mockReturnValue(mockMetadata);
+      mockGetNodes.mockReturnValue([mockNode]);
+      mockGetEdges.mockReturnValue([mockEdge]);
+
+      await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
       expect(mockMiddlewareManager.execute).toHaveBeenCalledWith(
-        { nodes: [], edges: [], metadata: {} },
-        { nodes: [mockNode], edges: [], metadata: {} },
+        { nodes: [mockNode], edges: [mockEdge], metadata: mockMetadata },
+        { nodesToUpdate: [mockNode] },
         'changeSelection'
       );
+    });
+
+    it('should not set any state if the middleware does not return a new state', async () => {
+      mockMiddlewareManager.execute.mockResolvedValue(undefined);
+
+      await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
+
+      expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
+      expect(mockModelAdapter.setNodes).not.toHaveBeenCalled();
+      expect(mockModelAdapter.setEdges).not.toHaveBeenCalled();
     });
   });
 

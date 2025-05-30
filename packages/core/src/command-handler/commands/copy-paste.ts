@@ -1,4 +1,4 @@
-import type { CommandHandler, Edge, Node } from '../../types';
+import type { CommandHandler, Edge, FlowStateUpdate, Node } from '../../types';
 
 const OFFSET = 20;
 
@@ -54,14 +54,22 @@ export const paste = (commandHandler: CommandHandler): void => {
     };
   });
 
-  const updatedNodes = nodes.map((node) => (node.selected ? { ...node, selected: false } : node));
-  const updatedEdges = edges.map((edge) => (edge.selected ? { ...edge, selected: false } : edge));
+  const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
+  const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
+
+  nodes.forEach((node) => {
+    if (node.selected) {
+      nodesToUpdate.push({ id: node.id, selected: false });
+    }
+  });
+  edges.forEach((edge) => {
+    if (edge.selected) {
+      edgesToUpdate.push({ id: edge.id, selected: false });
+    }
+  });
 
   commandHandler.flowCore.applyUpdate(
-    {
-      nodes: [...updatedNodes, ...newNodes],
-      edges: [...updatedEdges, ...newEdges],
-    },
+    { nodesToAdd: newNodes, edgesToAdd: newEdges, nodesToUpdate, edgesToUpdate },
     'paste'
   );
 };

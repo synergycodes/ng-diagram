@@ -1,5 +1,5 @@
-import { FlowCore } from './flow-core';
-import { EdgeLabel, Port } from './types';
+import { FlowCore } from '../flow-core';
+import { EdgeLabel, Port } from '../types';
 
 export class InitializationGuard {
   private onInitialized: () => void = () => null;
