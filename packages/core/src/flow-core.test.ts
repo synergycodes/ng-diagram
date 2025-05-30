@@ -201,6 +201,16 @@ describe('FlowCore', () => {
         'changeSelection'
       );
     });
+
+    it('should not set any state if the middleware does not return a new state', async () => {
+      mockMiddlewareManager.execute.mockResolvedValue(undefined);
+
+      await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
+
+      expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
+      expect(mockModelAdapter.setNodes).not.toHaveBeenCalled();
+      expect(mockModelAdapter.setEdges).not.toHaveBeenCalled();
+    });
   });
 
   describe('registerEventsHandler', () => {

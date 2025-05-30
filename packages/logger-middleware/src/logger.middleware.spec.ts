@@ -6,6 +6,7 @@ describe('LoggerMiddleware', () => {
   let consoleLogSpy: MockInstance;
   let initialState: FlowState;
   let context: MiddlewareContext;
+  const nextMock = vi.fn();
 
   beforeEach(() => {
     initialState = {
@@ -47,11 +48,7 @@ describe('LoggerMiddleware', () => {
       state,
     };
 
-    loggerMiddleware.execute(
-      newContext,
-      () => Promise.resolve(newContext.state),
-      () => null
-    );
+    loggerMiddleware.execute(newContext, nextMock, () => null);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       '[AngularFlow] changeSelection',
@@ -62,5 +59,6 @@ describe('LoggerMiddleware', () => {
         initialUpdate: context.initialUpdate,
       })
     );
+    expect(nextMock).toHaveBeenCalled();
   });
 });
