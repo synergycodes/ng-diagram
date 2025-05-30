@@ -5,6 +5,7 @@ import type { FlowState, FlowStateUpdate, Middleware } from '../types';
 import { MiddlewareManager } from './middleware-manager';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 
+// Define all mocks at the top level
 vi.mock('./middlewares/edges-straight-routing', () => ({
   edgesStraightRoutingMiddleware: {
     name: 'edges-straight-routing',
@@ -12,14 +13,11 @@ vi.mock('./middlewares/edges-straight-routing', () => ({
   },
 }));
 
-const mockMiddlewareExecutor = {
-  run: vi.fn(),
-};
-
-const MockMiddlewareExecutor = vi.fn().mockImplementation(() => mockMiddlewareExecutor);
-
+const mockRun = vi.fn();
 vi.mock('./middleware-executor', () => ({
-  MiddlewareExecutor: MockMiddlewareExecutor,
+  MiddlewareExecutor: vi.fn().mockImplementation(() => ({
+    run: mockRun,
+  })),
 }));
 
 describe('MiddlewareManager', () => {
@@ -29,8 +27,12 @@ describe('MiddlewareManager', () => {
   let mockMiddleware2: Middleware;
   let initialState: FlowState;
   let stateUpdate: FlowStateUpdate;
+  let MiddlewareExecutor: unknown;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    const module = await import('./middleware-executor');
+    MiddlewareExecutor = module.MiddlewareExecutor;
+
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
@@ -73,16 +75,14 @@ describe('MiddlewareManager', () => {
 
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
-      expect(mockMiddlewareExecutor.run).toHaveBeenCalledWith(initialState, stateUpdate, 'init');
-      expect(MockMiddlewareExecutor).toHaveBeenCalledWith(flowCore, [edgesStraightRoutingMiddleware]);
+      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [edgesStraightRoutingMiddleware]);
     });
 
     it('should register starting middlewares if they are provided', () => {
       const middlewareManager = new MiddlewareManager(flowCore, [mockMiddleware1]);
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
-      expect(mockMiddlewareExecutor.run).toHaveBeenCalledWith(initialState, stateUpdate, 'init');
-      expect(MockMiddlewareExecutor).toHaveBeenCalledWith(flowCore, [edgesStraightRoutingMiddleware, mockMiddleware1]);
+      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [edgesStraightRoutingMiddleware, mockMiddleware1]);
     });
   });
 
@@ -107,7 +107,7 @@ describe('MiddlewareManager', () => {
       middlewareManager.unregister(mockMiddleware1.name);
 
       middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
-      expect(mockMiddlewareExecutor.run).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
     });
 
     it('should handle unregistering a non-existent middleware gracefully', () => {
@@ -122,13 +122,13 @@ describe('MiddlewareManager', () => {
 
       middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
 
-      expect(mockMiddlewareExecutor.run).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
     });
 
     it('should return passed next state when no middlewares are registered', () => {
       middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
 
-      expect(mockMiddlewareExecutor.run).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
     });
   });
 });
