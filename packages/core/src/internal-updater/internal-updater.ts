@@ -10,15 +10,27 @@ export class InternalUpdater {
    * @internal
    * Internal method to initialize a node size
    * @param nodeId Node id
-   * @param size Size
+  //  * @param size Size
    */
-  applyNodeSize(nodeId: string, size: NonNullable<Node['size']>) {
+  applyNodeSize(
+    nodeId: string,
+    { size, ports }: { size: NonNullable<Node['size']>; ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[] }
+  ) {
     const node = this.flowCore.getNodeById(nodeId);
+
+    // If the node size is the same the ports should be the same too
     if (!node || isSameRect(getRect(node), getRect({ size }))) {
       return;
     }
+
+    const portsToUpdate = this.getPortsToUpdate(node, ports);
+
     if (this.flowCore.initializationGuard.isInitialized) {
-      this.flowCore.commandHandler.emit('resizeNode', { id: nodeId, size });
+      this.flowCore.commandHandler.emit('resizeNode', {
+        id: nodeId,
+        size,
+        ports: portsToUpdate.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } })),
+      });
     } else {
       this.flowCore.initializationGuard.initNodeSize(nodeId, size);
     }
@@ -44,28 +56,26 @@ export class InternalUpdater {
    * @param nodeId Node id
    * @param ports Ports with size and position
    */
-  applyPortsSizesAndPositions(
-    nodeId: string,
-    ports: { portId: string; size: NonNullable<Port['size']>; position: NonNullable<Port['position']> }[]
-  ) {
+  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
     const node = this.flowCore.getNodeById(nodeId);
-    const allPortsMap = new Map<string, { size: Port['size']; position: Port['position'] }>();
-    node?.ports?.forEach(({ id, size, position }) => allPortsMap.set(id, { size, position }));
-    const portsToUpdate = ports.filter(({ portId, size, position }) => {
-      const port = allPortsMap.get(portId);
-      return port && !isSameRect(getRect(port), getRect({ size, position }));
-    });
+
+    if (!node) {
+      return;
+    }
+
+    const portsToUpdate = this.getPortsToUpdate(node, ports);
+
     if (!portsToUpdate?.length) {
       return;
     }
     if (this.flowCore.initializationGuard.isInitialized) {
       this.flowCore.commandHandler.emit('updatePorts', {
         nodeId,
-        ports: portsToUpdate.map(({ portId, size, position }) => ({ portId, portChanges: { size, position } })),
+        ports: portsToUpdate.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } })),
       });
     } else {
-      portsToUpdate.forEach(({ portId, size, position }) => {
-        this.flowCore.initializationGuard.initPortSizeAndPosition(nodeId, portId, size, position);
+      portsToUpdate.forEach(({ id, size, position }) => {
+        this.flowCore.initializationGuard.initPortSizeAndPosition(nodeId, id, size!, position!);
       });
     }
   }
@@ -103,5 +113,16 @@ export class InternalUpdater {
     } else {
       this.flowCore.initializationGuard.initEdgeLabelSize(edgeId, labelId, size);
     }
+  }
+
+  private getPortsToUpdate(node: Node, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
+    const allPortsMap = new Map<string, { size: Port['size']; position: Port['position'] }>();
+    node?.ports?.forEach(({ id, size, position }) => allPortsMap.set(id, { size, position }));
+
+    return ports.filter(({ id, size, position }) => {
+      const port = allPortsMap.get(id);
+
+      return port && !isSameRect(getRect(port), getRect({ size, position }));
+    });
   }
 }

@@ -41,7 +41,7 @@ describe('InternalUpdater', () => {
         size: { width: 100, height: 100 },
       });
 
-      internalUpdater.applyNodeSize('node-1', { width: 100, height: 100 });
+      internalUpdater.applyNodeSize('node-1', { size: { width: 100, height: 100 }, ports: [] });
 
       expect(initializationGuard.initNodeSize).not.toHaveBeenCalled();
       expect(commandHandler.emit).not.toHaveBeenCalled();
@@ -53,7 +53,7 @@ describe('InternalUpdater', () => {
         size: { width: 100, height: 100 },
       });
 
-      internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
+      internalUpdater.applyNodeSize('node-1', { size: { width: 5, height: 5 }, ports: [] });
 
       expect(initializationGuard.initNodeSize).toHaveBeenCalledWith('node-1', { width: 5, height: 5 });
       expect(commandHandler.emit).not.toHaveBeenCalled();
@@ -62,9 +62,13 @@ describe('InternalUpdater', () => {
     it('should emit resizeNode if flow is initialized', () => {
       initializationGuard.isInitialized = true;
 
-      internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
+      internalUpdater.applyNodeSize('node-1', { size: { width: 5, height: 5 }, ports: [] });
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('resizeNode', { id: 'node-1', size: { width: 5, height: 5 } });
+      expect(commandHandler.emit).toHaveBeenCalledWith('resizeNode', {
+        id: 'node-1',
+        size: { width: 5, height: 5 },
+        ports: [],
+      });
     });
   });
 
@@ -98,8 +102,8 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { portId: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
-        { portId: 'port-2', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
+        { id: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
+        { id: 'port-2', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
       ]);
 
       expect(initializationGuard.initPortSizeAndPosition).not.toHaveBeenCalled();
@@ -119,9 +123,9 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { portId: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
-        { portId: 'port-2', size: { width: 100, height: 100 }, position: { x: 50, y: 100 } },
-        { portId: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
+        { id: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
+        { id: 'port-2', size: { width: 100, height: 100 }, position: { x: 50, y: 100 } },
+        { id: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
       ]);
 
       expect(initializationGuard.initPortSizeAndPosition).toHaveBeenCalledWith(
@@ -155,9 +159,9 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { portId: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
-        { portId: 'port-2', size: { width: 100, height: 100 }, position: { x: 50, y: 100 } },
-        { portId: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
+        { id: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
+        { id: 'port-2', size: { width: 100, height: 100 }, position: { x: 50, y: 100 } },
+        { id: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
       ]);
 
       expect(commandHandler.emit).toHaveBeenCalledWith('updatePorts', {

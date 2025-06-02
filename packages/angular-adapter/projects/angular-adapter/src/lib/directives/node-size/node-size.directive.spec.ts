@@ -40,7 +40,7 @@ describe('NodeSizeDirective', () => {
 
     // Mock service
     const mockUpdatePortsService = {
-      updateNodePorts: vi.fn(),
+      getNodePortsData: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -82,7 +82,7 @@ describe('NodeSizeDirective', () => {
   });
 
   it('should observe size changes when autoSize is true', () => {
-    const updatePortsSpy = vi.spyOn(updatePortsService, 'updateNodePorts');
+    const getNodePortsDataSpy = vi.spyOn(updatePortsService, 'getNodePortsData').mockReturnValue([]);
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
 
     component.data = { autoSize: true, id: 'test-node-id' };
@@ -101,8 +101,8 @@ describe('NodeSizeDirective', () => {
       } as ResizeObserverEntry,
     ]);
 
-    expect(applyNodeSizeMock).toHaveBeenCalledWith('test-node-id', { width: 150, height: 250 });
-    expect(updatePortsSpy).toHaveBeenCalledWith('test-node-id');
+    expect(applyNodeSizeMock).toHaveBeenCalledWith('test-node-id', { size: { width: 150, height: 250 }, ports: [] });
+    expect(getNodePortsDataSpy).toHaveBeenCalledWith('test-node-id');
   });
 
   it('should disconnect resize observer on destroy', () => {

@@ -20,6 +20,7 @@ describe('handlePointerEvent', () => {
     mockFlowCore = {
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       commandHandler: { emit: vi.fn() },
+      getNodeById: () => mockNode,
     } as unknown as FlowCore;
     handlePointerEvent(mockFlowCore, getSamplePointerEvent({ type: 'pointerup' }));
   });

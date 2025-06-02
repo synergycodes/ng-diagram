@@ -25,7 +25,7 @@ describe('Resize actions', () => {
   };
 
   beforeEach(() => {
-    flowCore = {} as unknown as FlowCore;
+    flowCore = { getNodeById: () => mockNode } as unknown as FlowCore;
     vi.clearAllMocks();
   });
 

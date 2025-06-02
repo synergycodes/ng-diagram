@@ -9,7 +9,7 @@ import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provide
 export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  getPortData(port: HTMLElement): { position: NonNullable<Port['position']>; size: NonNullable<Port['size']> } {
+  getPortData(port: HTMLElement): Required<Pick<Port, 'size' | 'position'>> {
     const nodeElement = findParentWithClass(port, 'flow__angular-adapter-node');
     if (!nodeElement) {
       throw new Error(`Parent node of port with id ${port.id} not found`);
@@ -17,11 +17,13 @@ export class UpdatePortsService {
     const portRect = port.getBoundingClientRect();
     const nodeRect = nodeElement.getBoundingClientRect();
 
-    const width = portRect.width / this.getScale();
-    const height = portRect.height / this.getScale();
+    const scale = this.getScale();
 
-    const relativeX = (portRect.left - nodeRect.left) / this.getScale();
-    const relativeY = (portRect.top - nodeRect.top) / this.getScale();
+    const width = portRect.width / scale;
+    const height = portRect.height / scale;
+
+    const relativeX = (portRect.left - nodeRect.left) / scale;
+    const relativeY = (portRect.top - nodeRect.top) / scale;
 
     return {
       position: { x: relativeX, y: relativeY },
@@ -29,18 +31,15 @@ export class UpdatePortsService {
     };
   }
 
-  updateNodePorts(nodeId: string) {
+  getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | 'size' | 'position'>>[] {
     const node = document.querySelector(`.flow__angular-adapter-node[data-node-id="${nodeId}"]`) as HTMLElement;
     if (!node) {
       throw new Error(`Node with id ${nodeId} not found`);
     }
 
     const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
-    const portsToUpdate: {
-      portId: string;
-      size: NonNullable<Port['size']>;
-      position: NonNullable<Port['position']>;
-    }[] = [];
+    const portsData: Required<Pick<Port, 'id' | 'size' | 'position'>>[] = [];
+
     ports.forEach((port) => {
       const portId = port.getAttribute('data-port-id');
       if (!portId) {
@@ -48,9 +47,10 @@ export class UpdatePortsService {
       }
 
       const { size, position } = this.getPortData(port);
-      portsToUpdate.push({ portId, size, position });
+      portsData.push({ id: portId, size, position });
     });
-    this.flowCoreProvider.provide().internalUpdater.applyPortsSizesAndPositions(nodeId, portsToUpdate);
+
+    return portsData;
   }
 
   private getScale() {
