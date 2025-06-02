@@ -23,7 +23,7 @@
     "@analogjs/vitest-angular": "^1.16.0",
     "@angularflow/core": "workspace:*",
     "@eslint/js": "^9.25.1",
-    "eslint": "^9.25.1",
+    "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
     "typescript": "^5.8.3",
