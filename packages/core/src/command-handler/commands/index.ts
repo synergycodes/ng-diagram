@@ -26,9 +26,11 @@ import {
 import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
+import { rotateNodeBy } from './rotate-node';
 import { deselect, deselectAll, select } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
+export { rotateNodeBy } from './rotate-node';
 
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
@@ -71,4 +73,5 @@ export const commands: CommandMap = {
   addEdgeLabels,
   updateEdgeLabel,
   deleteEdgeLabels,
+  rotateNodeBy,
 };

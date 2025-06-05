@@ -25,7 +25,8 @@ export type ModelActionType =
   | 'moveTemporaryEdge'
   | 'finishLinking'
   | 'zoom'
-  | 'changeZOrder';
+  | 'changeZOrder'
+  | 'rotateNodeBy';
 
 /**
  * Type for the state of the flow diagram

@@ -17,6 +17,8 @@ import type {
   PointerUpEvent,
   PortTarget,
   ResizeHandleTarget,
+  RotateEvent,
+  RotateHandleTarget,
   WheelEvent,
 } from './event.interface';
 
@@ -104,6 +106,13 @@ export const isWheelEvent = (event: Event): event is WheelEvent => {
 };
 
 /**
+ * Check if an event is a rotate event
+ */
+export const isRotateEvent = (event: Event): event is RotateEvent => {
+  return event.type === 'rotate';
+};
+
+/**
  * Check if an event target is a node
  */
 export const isNodeTarget = (target: EventTarget): target is NodeTarget => {
@@ -143,4 +152,11 @@ export const isEdgeLabelTarget = (target: EventTarget): target is EdgeLabelTarge
  */
 export const isResizeHandleTarget = (target: EventTarget): target is ResizeHandleTarget => {
   return target.type === 'resize-handle';
+};
+
+/**
+ * Check if an event target is a rotate handle
+ */
+export const isRotateHandleTarget = (target: EventTarget): target is RotateHandleTarget => {
+  return target.type === 'rotate-handle';
 };

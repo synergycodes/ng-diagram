@@ -7,6 +7,7 @@ import { panningAction } from './panning';
 import { pasteAction } from './paste';
 import { pointerMoveSelectionAction } from './pointer-move-selection';
 import { resizeAction } from './resize/resize';
+import { rotateAction } from './rotate/rotate';
 import { selectAction } from './select';
 import { zoomingAction } from './zooming/zooming';
 
@@ -21,4 +22,5 @@ export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
   linking: linkingAction,
   resize: resizeAction,
   zooming: zoomingAction,
+  rotate: rotateAction,
 };
