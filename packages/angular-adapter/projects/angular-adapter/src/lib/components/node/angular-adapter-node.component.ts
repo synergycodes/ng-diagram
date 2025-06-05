@@ -12,6 +12,7 @@ import {
   ZIndexDirective,
 } from '../../directives';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
+import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -28,7 +29,7 @@ import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.com
     { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
-  imports: [NodeResizeAdornmentComponent],
+  imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
 })
 export class AngularAdapterNodeComponent {
   data = input.required<Node>();

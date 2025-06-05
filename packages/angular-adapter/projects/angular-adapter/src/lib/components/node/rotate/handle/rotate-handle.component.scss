@@ -1,0 +1,51 @@
+:host {
+  position: absolute;
+  left: 50%;
+  top: -40px;
+  transform: translate(-50%, -50%);
+  width: var(--handle-size, 24px);
+  height: var(--handle-size, 24px);
+  background: var(--handle-bg, #fff);
+  border: 2px solid var(--handle-color, #1e90ff);
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
+  display: block;
+  z-index: 10;
+  box-sizing: border-box;
+  outline: none;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.1s;
+}
+
+:host(:hover),
+:host(:focus-visible) {
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.25);
+  border-color: #005fcc;
+  outline: 2px solid #005fcc;
+  outline-offset: 2px;
+}
+
+:host([data-rotating]),
+:host(.active),
+:host-context(.active) {
+  cursor: grabbing;
+  background: #e6f0ff;
+  border-color: #005fcc;
+  box-shadow: 0 2px 12px rgba(30, 144, 255, 0.3);
+  outline: 2px solid #005fcc;
+  outline-offset: 2px;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+:host(:active) {
+  cursor: grabbing;
+}
+
+:host {
+  /* For accessibility: make it focusable */
+  tab-index: 0;
+}
