@@ -17,10 +17,7 @@ export const rotateNodeBy = (
   if (!node) {
     return;
   }
-  console.log({
-    nodePorts: node.ports,
-    portsToUpdate,
-  });
+
   const ports =
     node.ports && portsToUpdate && portsToUpdate.length > 0
       ? node.ports.map((port) => {
