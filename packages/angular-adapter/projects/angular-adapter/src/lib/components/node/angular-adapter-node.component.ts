@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
 import {
   NodePositionDirective,
-  NodeSelectedDirective,
   NodeSizeDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
@@ -22,7 +21,6 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: NodeSelectedDirective, inputs: ['data'] },
     { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
@@ -33,4 +31,6 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
 })
 export class AngularAdapterNodeComponent {
   data = input.required<Node>();
+
+  readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
 }
