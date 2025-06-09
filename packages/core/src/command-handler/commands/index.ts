@@ -30,7 +30,6 @@ import { rotateNodeBy } from './rotate-node';
 import { deselect, deselectAll, select } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
-export { rotateNodeBy } from './rotate-node';
 
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,

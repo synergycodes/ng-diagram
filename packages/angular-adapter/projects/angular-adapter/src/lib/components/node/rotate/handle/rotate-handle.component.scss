@@ -1,5 +1,6 @@
 :host {
   position: absolute;
+  // TODO: Add a way to position the handle
   left: 50%;
   top: -40px;
   transform: translate(-50%, -50%);
@@ -43,9 +44,4 @@
 
 :host(:active) {
   cursor: grabbing;
-}
-
-:host {
-  /* For accessibility: make it focusable */
-  tab-index: 0;
 }
