@@ -16,7 +16,7 @@ describe('ResizeLineComponent', () => {
     component = fixture.componentInstance;
     fixture.componentRef.setInput('position', 'bottom');
     fixture.componentRef.setInput('strokeWidth', 1);
-    fixture.componentRef.setInput('color', '#1e90ff');
+    fixture.componentRef.setInput('color', 'rgb(30, 144, 255)');
     fixture.detectChanges();
   });
 
@@ -30,7 +30,7 @@ describe('ResizeLineComponent', () => {
 
   it('should have proper styles', () => {
     const elementStyles = fixture.debugElement.nativeElement.style;
-    expect(elementStyles.borderBottom).toBe('1px solid #1e90ff');
+    expect(elementStyles.borderBottom).toBe('1px solid rgb(30, 144, 255)');
   });
 
   it('should emit pointer down and up events', () => {
