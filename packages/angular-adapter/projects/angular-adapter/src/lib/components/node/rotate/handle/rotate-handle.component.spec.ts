@@ -16,6 +16,7 @@ describe('RotateHandleComponent', () => {
     fixture.componentRef.setInput('size', 24);
     fixture.componentRef.setInput('color', '#1e90ff');
     fixture.componentRef.setInput('backgroundColor', '#fff');
+    fixture.componentRef.setInput('isRotating', false);
     fixture.detectChanges();
   });
 
@@ -23,10 +24,24 @@ describe('RotateHandleComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should emit pointer events', () => {
-    const spy = vi.spyOn(component.pointerEvent, 'emit');
+  it('should compute styles correctly', () => {
+    expect(component.styles()).toEqual({
+      '--handle-size': '24px',
+      '--handle-bg': '#fff',
+      '--handle-color': '#1e90ff',
+    });
+  });
+
+  it('should emit pointerDownEvent on pointer down', () => {
+    const spy = vi.spyOn(component.pointerDownEvent, 'emit');
     const event = new Event('pointerdown') as PointerEvent;
     component.onPointerDown(event);
-    expect(spy).toHaveBeenCalledWith({ event, type: 'pointerdown' });
+    expect(spy).toHaveBeenCalledWith({ event });
+  });
+
+  it('should set data-rotating attribute when rotating', () => {
+    fixture.componentRef.setInput('isRotating', true);
+    fixture.detectChanges();
+    expect(component.pointerDownAttr).toBe('true');
   });
 });

@@ -57,7 +57,7 @@ export class NodeSizeDirective implements OnDestroy {
         const size = { width, height };
 
         this.flowCore.provide().internalUpdater.applyNodeSize(this.id(), { size });
-        
+
         const portsData = this.updatePortsService.getNodePortsData(this.id());
         this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(this.id(), portsData);
       }

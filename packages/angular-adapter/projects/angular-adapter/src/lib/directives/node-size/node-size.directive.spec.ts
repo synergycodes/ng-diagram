@@ -27,11 +27,13 @@ describe('NodeSizeDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
   let component: TestComponent;
   let applyNodeSizeMock: ReturnType<typeof vi.fn>;
+  let applyPortSizesAndPositionsMock: ReturnType<typeof vi.fn>;
   let updatePortsService: UpdatePortsService;
   let mockResizeObserver: MockResizeObserver;
 
   beforeEach(async () => {
     applyNodeSizeMock = vi.fn();
+    applyPortSizesAndPositionsMock = vi.fn();
     mockResizeObserver = new MockResizeObserver();
     global.ResizeObserver = function (callback: ResizeObserverCallback) {
       mockResizeObserver.callback = callback;
@@ -54,6 +56,7 @@ describe('NodeSizeDirective', () => {
             provide: vi.fn().mockReturnValue({
               internalUpdater: {
                 applyNodeSize: applyNodeSizeMock,
+                applyPortsSizesAndPositions: applyPortSizesAndPositionsMock,
               },
             }),
           },
@@ -101,7 +104,10 @@ describe('NodeSizeDirective', () => {
       } as ResizeObserverEntry,
     ]);
 
-    expect(applyNodeSizeMock).toHaveBeenCalledWith('test-node-id', { size: { width: 150, height: 250 }, ports: [] });
+    expect(applyNodeSizeMock).toHaveBeenCalledWith('test-node-id', {
+      size: { width: 150, height: 250 },
+    });
+    expect(applyPortSizesAndPositionsMock).toHaveBeenCalledWith('test-node-id', []);
     expect(getNodePortsDataSpy).toHaveBeenCalledWith('test-node-id');
   });
 
