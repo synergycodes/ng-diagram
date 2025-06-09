@@ -53,8 +53,11 @@ export class NodeSizeDirective implements OnDestroy {
       if (borderBox && !this.isDestroyed) {
         const width = borderBox.inlineSize;
         const height = borderBox.blockSize;
-        this.flowCore.provide().internalUpdater.applyNodeSize(this.id(), { width, height });
-        this.updatePortsService.updateNodePorts(this.id());
+
+        const size = { width, height };
+
+        const portsData = this.updatePortsService.getNodePortsData(this.id());
+        this.flowCore.provide().internalUpdater.applyNodeSize(this.id(), { size, ports: portsData });
       }
     });
     this.resizeObserver.observe(this.hostElement.nativeElement);

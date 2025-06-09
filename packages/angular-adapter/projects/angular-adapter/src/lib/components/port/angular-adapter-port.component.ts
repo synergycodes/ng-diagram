@@ -83,7 +83,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
         this.flowCoreProvider
           .provide()
           .internalUpdater.applyPortsSizesAndPositions(this.nodeData().id, [
-            { portId: this.id(), size: { width, height }, position },
+            { id: this.id(), size: { width, height }, position },
           ]);
       }
     });
