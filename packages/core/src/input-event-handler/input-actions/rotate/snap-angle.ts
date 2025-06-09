@@ -7,7 +7,7 @@ import { normalizeAngle } from './normalize-angle';
  * @param step The snapping step (e.g., 5 for 5-degree increments)
  * @returns The snapped angle (in degrees)
  */
-export function snapRotate(angle: number, step: number): number {
+export function snapAngle(angle: number, step: number): number {
   // Quantize the angle to the nearest step
   const numberOfStepsToAdd = Math.round(angle / step);
 
