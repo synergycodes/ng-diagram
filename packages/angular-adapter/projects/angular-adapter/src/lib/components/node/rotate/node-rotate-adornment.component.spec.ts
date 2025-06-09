@@ -1,99 +1,240 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Node } from '@angularflow/core';
+import { MockedFunction, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventMapperService, UpdatePortsService } from '../../../services';
 import { NodeRotateAdornmentComponent } from './node-rotate-adornment.component';
+
+interface MockEventMapperService {
+  emit: MockedFunction<(event: unknown) => void>;
+}
+
+interface MockUpdatePortsService {
+  getNodePortsData: MockedFunction<(nodeId: string) => unknown[]>;
+}
+
+interface MockPointerEvent extends Partial<PointerEvent> {
+  pointerId: number;
+  clientX: number;
+  clientY: number;
+  target: HTMLElement;
+  stopPropagation: MockedFunction<() => void>;
+  preventDefault: MockedFunction<() => void>;
+}
+
+interface MockHTMLElement extends Partial<HTMLElement> {
+  setPointerCapture: MockedFunction<(pointerId: number) => void>;
+  hasPointerCapture: MockedFunction<(pointerId: number) => boolean>;
+  releasePointerCapture: MockedFunction<(pointerId: number) => void>;
+  getBoundingClientRect: MockedFunction<() => DOMRect>;
+}
 
 describe('NodeRotateAdornmentComponent', () => {
   let component: NodeRotateAdornmentComponent;
   let fixture: ComponentFixture<NodeRotateAdornmentComponent>;
-  let eventMapper: EventMapperService;
-  let portsService: UpdatePortsService;
+  let mockNode: Node;
+  let mockEventMapper: MockEventMapperService;
+  let mockPortsService: MockUpdatePortsService;
 
-  const mockNode = { id: 'node-1', selected: true } as any;
+  // Common mock objects
+  let mockTarget: MockHTMLElement;
+  let mockPointerDownEvent: MockPointerEvent;
+  let mockPointerMoveEvent: MockPointerEvent;
+  let mockPointerUpEvent: MockPointerEvent;
+  let eventListeners: Map<string, (ev: Event) => void>;
 
   beforeEach(async () => {
+    // Setup services
+    mockEventMapper = { emit: vi.fn() };
+    mockPortsService = { getNodePortsData: vi.fn().mockReturnValue([]) };
+    eventListeners = new Map();
+
+    // Setup common mock objects
+    mockTarget = {
+      setPointerCapture: vi.fn(),
+      hasPointerCapture: vi.fn().mockReturnValue(true),
+      releasePointerCapture: vi.fn(),
+      getBoundingClientRect: vi.fn().mockReturnValue({ left: 60, top: 60, width: 24, height: 24 } as DOMRect),
+    };
+
+    mockPointerDownEvent = {
+      target: mockTarget as HTMLElement,
+      pointerId: 1,
+      clientX: 100,
+      clientY: 100,
+      stopPropagation: vi.fn(),
+      preventDefault: vi.fn(),
+    };
+
+    mockPointerMoveEvent = {
+      pointerId: 1,
+      clientX: 150,
+      clientY: 150,
+      stopPropagation: vi.fn(),
+      preventDefault: vi.fn(),
+      target: mockTarget as HTMLElement,
+    };
+
+    mockPointerUpEvent = {
+      pointerId: 1,
+      clientX: 150,
+      clientY: 150,
+      stopPropagation: vi.fn(),
+      preventDefault: vi.fn(),
+      target: mockTarget as HTMLElement,
+    };
+
+    // Mock window event listeners to capture registered listeners
+    vi.spyOn(window, 'addEventListener').mockImplementation((type, listener) => {
+      eventListeners.set(type, listener as (ev: Event) => void);
+    });
+
+    vi.spyOn(window, 'removeEventListener').mockImplementation((type) => {
+      eventListeners.delete(type);
+    });
+
+    // Setup component
     await TestBed.configureTestingModule({
       imports: [NodeRotateAdornmentComponent],
       providers: [
-        { provide: EventMapperService, useValue: { emit: vi.fn() } },
-        { provide: UpdatePortsService, useValue: { getNodePortsData: vi.fn(() => []) } },
-        {
-          provide: ElementRef,
-          useValue: { nativeElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) } },
-        },
+        { provide: EventMapperService, useValue: mockEventMapper },
+        { provide: UpdatePortsService, useValue: mockPortsService },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NodeRotateAdornmentComponent);
-    component = fixture.componentInstance;
-    eventMapper = TestBed.inject(EventMapperService);
-    portsService = TestBed.inject(UpdatePortsService);
+    mockNode = { id: '1', type: 'default', position: { x: 0, y: 0 }, selected: false, data: {} };
     fixture.componentRef.setInput('data', mockNode);
+    component = fixture.componentInstance;
+
+    // Mock host element getBoundingClientRect
+    vi.spyOn(fixture.debugElement.nativeElement, 'getBoundingClientRect').mockReturnValue({
+      left: 50,
+      top: 50,
+      width: 200,
+      height: 200,
+    } as DOMRect);
+
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  it('should show adornment if node is selected', () => {
-    expect(component.showAdornment()).toBe(true);
-  });
-
-  it('should set isRotating to true on pointer down', () => {
-    const event = {
-      stopPropagation: vi.fn(),
-      preventDefault: vi.fn(),
-      pointerId: 1,
-      target: { setPointerCapture: vi.fn() },
-    } as any;
-    component.onPointerDownEvent({ event });
-    expect(component.isRotating()).toBe(true);
-  });
-
-  it('should emit rotate event on pointer move', () => {
-    const moveEvent = {
-      stopPropagation: vi.fn(),
-      preventDefault: vi.fn(),
-      pointerId: 1,
-      clientX: 10,
-      clientY: 20,
-    } as any;
-    // Mock the read-only hostElement and handleNode using Object.defineProperty
-    Object.defineProperty(component, 'hostElement', {
-      value: { nativeElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) } },
+  describe('Component initialization', () => {
+    it('should have correct default values', () => {
+      expect(component.handleSize()).toBe(24);
+      expect(component.color()).toBe('#1e90ff');
+      expect(component.backgroundColor()).toBe('#fff');
+      expect(component.isRotating()).toBe(false);
     });
-    Object.defineProperty(component, 'handleNode', {
-      value: () => ({ nativeElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 24, height: 24 }) } }),
+
+    it('should show adornment when node is selected or rotating', () => {
+      // Not selected, not rotating
+      expect(component.showAdornment()).toBe(false);
+
+      // Selected
+      fixture.componentRef.setInput('data', { ...mockNode, selected: true });
+      fixture.detectChanges();
+      expect(component.showAdornment()).toBe(true);
+
+      // Not selected but rotating
+      fixture.componentRef.setInput('data', mockNode);
+      component.isRotating.set(true);
+      expect(component.showAdornment()).toBe(true);
     });
-    const emitSpy = vi.spyOn(eventMapper, 'emit');
-    component['onPointerMove'](moveEvent, 1);
-    expect(emitSpy).toHaveBeenCalled();
   });
 
-  it('should set isRotating to false on pointer up', () => {
-    const upEvent = {
-      stopPropagation: vi.fn(),
-      preventDefault: vi.fn(),
-      pointerId: 1,
-      target: { hasPointerCapture: () => true, releasePointerCapture: vi.fn() },
-    } as any;
-    const moveListener = vi.fn();
-    const upListener = vi.fn();
-    const lostCaptureListener = vi.fn();
-    component['isRotating'].set(true);
-    component['onPointerUp'](upEvent, 1, upEvent.target, moveListener, upListener, lostCaptureListener);
-    expect(component.isRotating()).toBe(false);
+  describe('Rotation interaction', () => {
+    it('should start rotation on pointer down', () => {
+      component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
+
+      expect(component.isRotating()).toBe(true);
+      expect(mockPointerDownEvent.stopPropagation).toHaveBeenCalled();
+      expect(mockPointerDownEvent.preventDefault).toHaveBeenCalled();
+      expect(mockTarget.setPointerCapture).toHaveBeenCalledWith(1);
+      expect(eventListeners.size).toBe(3); // move, up, lostcapture
+    });
+
+    it('should emit rotate events during pointer move', () => {
+      // Start rotation
+      component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
+
+      // Simulate move
+      const moveListener = eventListeners.get('pointermove')!;
+      moveListener(mockPointerMoveEvent as PointerEvent);
+
+      expect(mockEventMapper.emit).toHaveBeenCalledWith({
+        type: 'rotate',
+        timestamp: expect.any(Number),
+        target: { type: 'rotate-handle', element: mockNode },
+        mouse: { x: 150, y: 150 },
+        center: { x: 150, y: 150 }, // 50 + 200/2
+        handle: { x: 0, y: 0 }, // no handle element
+        ports: [],
+      });
+    });
+
+    it('should end rotation on pointer up with proper cleanup', () => {
+      // Start rotation
+      component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
+      expect(component.isRotating()).toBe(true);
+
+      // End rotation
+      const upListener = eventListeners.get('pointerup')!;
+      upListener(mockPointerUpEvent as PointerEvent);
+
+      expect(component.isRotating()).toBe(false);
+      expect(mockTarget.releasePointerCapture).toHaveBeenCalledWith(1);
+      expect(window.removeEventListener).toHaveBeenCalledTimes(3); // move, up, lostcapture
+    });
+
+    it('should end rotation on lost pointer capture', () => {
+      // Start rotation
+      component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
+      expect(component.isRotating()).toBe(true);
+
+      // Lost capture
+      const lostCaptureListener = eventListeners.get('lostpointercapture')!;
+      lostCaptureListener(mockPointerUpEvent as PointerEvent);
+
+      expect(component.isRotating()).toBe(false);
+      expect(window.removeEventListener).toHaveBeenCalledTimes(3);
+    });
   });
 
-  it('should set isRotating to false on lost pointer capture', () => {
-    const lostEvent = { pointerId: 1 } as any;
-    const moveListener = vi.fn();
-    const upListener = vi.fn();
-    const lostCaptureListener = vi.fn();
-    component['isRotating'].set(true);
-    component['onLostPointerCapture'](lostEvent, 1, moveListener, upListener, lostCaptureListener);
-    expect(component.isRotating()).toBe(false);
+  describe('Edge cases', () => {
+    it('should ignore events from different pointer IDs', () => {
+      // Start rotation with pointer ID 1
+      component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
+
+      // Try to move with pointer ID 2
+      const differentPointerEvent = { ...mockPointerMoveEvent, pointerId: 2 };
+      const moveListener = eventListeners.get('pointermove')!;
+      moveListener(differentPointerEvent as PointerEvent);
+
+      expect(mockEventMapper.emit).not.toHaveBeenCalled();
+    });
+
+    it('should include handle position when handle element exists', () => {
+      // Mock handle element
+      const mockElementRef = { nativeElement: mockTarget } as ElementRef<HTMLElement>;
+      Object.defineProperty(component, 'handleNode', {
+        get: () => () => mockElementRef,
+        configurable: true,
+      });
+
+      // Start rotation and move
+      component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
+      const moveListener = eventListeners.get('pointermove')!;
+      moveListener(mockPointerMoveEvent as PointerEvent);
+
+      expect(mockEventMapper.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          handle: { x: 72, y: 72 }, // 60 + 24/2
+        })
+      );
+    });
   });
 });
