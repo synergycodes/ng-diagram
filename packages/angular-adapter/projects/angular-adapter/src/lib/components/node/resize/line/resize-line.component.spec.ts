@@ -29,7 +29,8 @@ describe('ResizeLineComponent', () => {
   });
 
   it('should have proper styles', () => {
-    expect(fixture.debugElement.styles).toHaveProperty('border-bottom', '1px solid #1e90ff');
+    const elementStyles = fixture.debugElement.nativeElement.style;
+    expect(elementStyles.borderBottom).toBe('1px solid #1e90ff');
   });
 
   it('should emit pointer down and up events', () => {
