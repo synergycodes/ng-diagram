@@ -13,23 +13,12 @@ describe('RotateHandleComponent', () => {
 
     fixture = TestBed.createComponent(RotateHandleComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('size', 24);
-    fixture.componentRef.setInput('color', '#1e90ff');
-    fixture.componentRef.setInput('backgroundColor', '#fff');
     fixture.componentRef.setInput('isRotating', false);
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should compute styles correctly', () => {
-    expect(component.styles()).toEqual({
-      '--handle-size': '24px',
-      '--handle-bg': '#fff',
-      '--handle-color': '#1e90ff',
-    });
   });
 
   it('should emit pointerDownEvent on pointer down', () => {

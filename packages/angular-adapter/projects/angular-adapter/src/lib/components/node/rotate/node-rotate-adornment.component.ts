@@ -20,6 +20,9 @@ import { RotateHandleComponent } from './handle/rotate-handle.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RotateHandleComponent],
   hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
+  host: {
+    class: 'node-rotate-adornment',
+  },
 })
 export class NodeRotateAdornmentComponent {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
@@ -36,9 +39,6 @@ export class NodeRotateAdornmentComponent {
 
   readonly isRotating = signal(false);
   readonly data = input.required<Node>();
-  readonly handleSize = signal(24);
-  readonly color = signal('#1e90ff');
-  readonly backgroundColor = signal('#fff');
   readonly showAdornment = computed(() => !!this.data().selected || this.isRotating());
 
   /**
@@ -98,8 +98,8 @@ export class NodeRotateAdornmentComponent {
       },
       handle: handleRect
         ? {
-            x: handleRect.left + this.handleSize() / 2,
-            y: handleRect.top + this.handleSize() / 2,
+            x: handleRect.left + handleRect.width / 2,
+            y: handleRect.top + handleRect.height / 2,
           }
         : { x: 0, y: 0 },
       ports: this.portsService.getNodePortsData(this.data().id),

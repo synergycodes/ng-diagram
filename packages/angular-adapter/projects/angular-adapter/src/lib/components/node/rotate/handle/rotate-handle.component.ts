@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, HostBinding, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, input, output } from '@angular/core';
 
 @Component({
   selector: 'angular-adapter-rotate-handle',
@@ -6,21 +6,12 @@ import { ChangeDetectionStrategy, Component, computed, HostBinding, input, outpu
   styleUrl: './rotate-handle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'rotate-handle',
-    '[style]': 'styles()',
+    class: 'node-rotate-handle',
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
 export class RotateHandleComponent {
-  size = input.required<number>();
-  color = input.required<string>();
-  backgroundColor = input.required<string>();
   isRotating = input.required<boolean>();
-  styles = computed(() => ({
-    '--handle-size': `${this.size()}px`,
-    '--handle-bg': this.backgroundColor(),
-    '--handle-color': this.color(),
-  }));
 
   pointerDownEvent = output<{ event: PointerEvent }>();
 

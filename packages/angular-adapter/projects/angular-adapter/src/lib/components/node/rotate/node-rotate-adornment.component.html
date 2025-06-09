@@ -1,10 +1,7 @@
 @if (showAdornment()) {
   <angular-adapter-rotate-handle
     #handleNode
-    [size]="handleSize()"
-    [color]="color()"
-    [backgroundColor]="backgroundColor()"
     [isRotating]="isRotating()"
     (pointerDownEvent)="onPointerDownEvent($event)"
-  ></angular-adapter-rotate-handle>
+  />
 }

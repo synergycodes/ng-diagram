@@ -122,14 +122,7 @@ describe('NodeRotateAdornmentComponent', () => {
     vi.restoreAllMocks();
   });
 
-  describe('Component initialization', () => {
-    it('should have correct default values', () => {
-      expect(component.handleSize()).toBe(24);
-      expect(component.color()).toBe('#1e90ff');
-      expect(component.backgroundColor()).toBe('#fff');
-      expect(component.isRotating()).toBe(false);
-    });
-
+  describe('Rotation interaction', () => {
     it('should show adornment when node is selected or rotating', () => {
       // Not selected, not rotating
       expect(component.showAdornment()).toBe(false);
@@ -144,9 +137,7 @@ describe('NodeRotateAdornmentComponent', () => {
       component.isRotating.set(true);
       expect(component.showAdornment()).toBe(true);
     });
-  });
 
-  describe('Rotation interaction', () => {
     it('should start rotation on pointer down', () => {
       component.onPointerDownEvent({ event: mockPointerDownEvent as PointerEvent });
 

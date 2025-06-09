@@ -1,17 +1,15 @@
 :host {
-  position: absolute;
   // TODO: Add a way to position the handle
   left: 50%;
-  top: -40px;
+  top: -32px;
   transform: translate(-50%, -50%);
-  width: var(--handle-size, 24px);
-  height: var(--handle-size, 24px);
-  background: var(--handle-bg, #fff);
-  border: 2px solid var(--handle-color, #1e90ff);
+  width: var(--node-rotate-handle-size, 20px);
+  height: var(--node-rotate-handle-size, 20px);
+  background-color: var(--node-rotate-handle-bg, #ffffff);
+  border: 1px solid var(--node-rotate-handle-color, #1e90ff);
+  position: absolute;
   border-radius: 50%;
-  cursor: grab;
   box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
-  display: block;
   z-index: 10;
   box-sizing: border-box;
   outline: none;
@@ -20,13 +18,15 @@
     border-color 0.2s,
     background 0.2s,
     transform 0.1s;
+  pointer-events: auto;
+  cursor: grab;
 }
 
 :host(:hover),
 :host(:focus-visible) {
-  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.25);
-  border-color: #005fcc;
-  outline: 2px solid #005fcc;
+  box-shadow: var(--node-rotate-handle-hover-shadow, 0 4px 16px rgba(30, 144, 255, 0.25));
+  border-color: var(--node-rotate-handle-hover-color, #005fcc);
+  outline: 2px solid var(--node-rotate-handle-hover-color, #005fcc);
   outline-offset: 2px;
 }
 
@@ -34,14 +34,10 @@
 :host(.active),
 :host-context(.active) {
   cursor: grabbing;
-  background: #e6f0ff;
-  border-color: #005fcc;
-  box-shadow: 0 2px 12px rgba(30, 144, 255, 0.3);
-  outline: 2px solid #005fcc;
+  background: var(--node-rotate-handle-active-bg, #ffffff);
+  border-color: var(--node-rotate-handle-active-color, #005fcc);
+  box-shadow: var(--node-rotate-handle-active-shadow, 0 2px 12px rgba(30, 144, 255, 0.3));
+  outline: 2px solid var(--node-rotate-handle-active-color, #005fcc);
   outline-offset: 2px;
-  transform: translate(-50%, -50%) scale(0.96);
-}
-
-:host(:active) {
-  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(0.94);
 }
