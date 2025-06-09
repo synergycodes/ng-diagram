@@ -1,6 +1,19 @@
 import { clamp } from '../../../utils/clamp';
 import { normalizeAngle } from './normalize-angle';
 
+/** Epsilon for floating-point comparisons */
+const EPSILON = 0.0001;
+/** Threshold for snapping to right angles (in degrees) */
+const RIGHT_ANGLE_SNAP_THRESHOLD = 0.9;
+
+/**
+ * Returns the positive fractional part of a number.
+ * @param n The number.
+ */
+function fractionalPart(n: number): number {
+  return Math.abs(n - Math.trunc(n));
+}
+
 /**
  * Applies snapping and step logic to a rotation angle.
  * @param angle The raw angle after initial transformation (can be positive or negative, in degrees)
@@ -37,12 +50,18 @@ export function snapAngle(angle: number, step: number): number {
     const isJustBeforeRightAngle = (snappedAngle + 1) % 90 === 0;
     const isJustAfterRightAngle = (snappedAngle - 1) % 90 === 0;
 
-    if (isJustBeforeRightAngle || isJustAfterRightAngle) {
-      const offset = isJustBeforeRightAngle ? 1 : -1;
-      const rawDifference = Math.abs(Math.abs(offset) - Math.abs(angle % 1));
+    // Snap to right angle if within threshold before or after
+    if (isJustBeforeRightAngle) {
+      const diff = 1 - fractionalPart(angle);
 
-      if (rawDifference < 0.9) {
-        snappedAngle = snappedAngle + offset;
+      if (diff < RIGHT_ANGLE_SNAP_THRESHOLD + EPSILON) {
+        snappedAngle = snappedAngle + 1;
+      }
+    } else if (isJustAfterRightAngle) {
+      const diff = fractionalPart(angle);
+
+      if (diff < RIGHT_ANGLE_SNAP_THRESHOLD + EPSILON) {
+        snappedAngle = snappedAngle - 1;
       }
     }
   }
