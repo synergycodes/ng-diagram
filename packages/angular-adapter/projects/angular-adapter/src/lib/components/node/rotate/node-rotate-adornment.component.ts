@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -22,7 +21,7 @@ import { RotateHandleComponent } from './handle/rotate-handle.component';
   imports: [RotateHandleComponent],
   hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
 })
-export class NodeRotateAdornmentComponent implements AfterViewInit {
+export class NodeRotateAdornmentComponent {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly handleNode = viewChild('handleNode', { read: ElementRef<HTMLElement> });
   private readonly eventMapper = inject(EventMapperService);
@@ -41,8 +40,6 @@ export class NodeRotateAdornmentComponent implements AfterViewInit {
   readonly color = signal('#1e90ff');
   readonly backgroundColor = signal('#fff');
   readonly showAdornment = computed(() => !!this.data().selected || this.isRotating());
-
-  ngAfterViewInit() {}
 
   /**
    * Handles pointer down event on the rotate handle.
