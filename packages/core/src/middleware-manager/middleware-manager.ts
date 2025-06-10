@@ -2,6 +2,7 @@ import { FlowCore } from '../flow-core';
 import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
+import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
@@ -10,6 +11,7 @@ export class MiddlewareManager {
   constructor(flowCore: FlowCore, middlewares: Middleware[] = []) {
     this.flowCore = flowCore;
     this.register(edgesStraightRoutingMiddleware);
+    this.register(nodeRotationSnapMiddleware);
     middlewares.forEach((middleware) => this.register(middleware));
   }
 

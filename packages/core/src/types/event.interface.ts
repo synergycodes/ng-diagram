@@ -1,5 +1,6 @@
 import type { Edge, EdgeLabel } from './edge.interface';
 import type { Node, Port } from './node.interface';
+import { Point } from './utils';
 
 /**
  * Type for node target
@@ -63,9 +64,24 @@ export interface ResizeHandleTarget {
 }
 
 /**
+ * Type for rotate handle target
+ */
+export interface RotateHandleTarget {
+  type: 'rotate-handle';
+  element: Node;
+}
+
+/**
  * Type for event target
  */
-export type EventTarget = NodeTarget | EdgeTarget | PortTarget | ResizeHandleTarget | DiagramTarget | EdgeLabelTarget;
+export type EventTarget =
+  | NodeTarget
+  | EdgeTarget
+  | PortTarget
+  | ResizeHandleTarget
+  | RotateHandleTarget
+  | DiagramTarget
+  | EdgeLabelTarget;
 
 /**
  * Base interface for all events
@@ -181,6 +197,17 @@ export interface WheelEvent extends BaseEvent {
 }
 
 /**
+ * Rotate event interface
+ */
+export interface RotateEvent extends BaseEvent {
+  type: 'rotate';
+  mouse: Point;
+  handle: Point;
+  center: Point;
+  ports: Pick<Port, 'id' | 'size' | 'position'>[];
+}
+
+/**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent | WheelEvent;
+export type Event = KeyboardEvent | PointerEvent | WheelEvent | RotateEvent;

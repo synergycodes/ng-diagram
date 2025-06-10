@@ -10,11 +10,15 @@ export class InternalUpdater {
    * @internal
    * Internal method to initialize a node size
    * @param nodeId Node id
-  //  * @param size Size
+   * @param size Size
    */
   applyNodeSize(
     nodeId: string,
-    { size, ports }: { size: NonNullable<Node['size']>; ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[] }
+    {
+      size,
+    }: {
+      size: NonNullable<Node['size']>;
+    }
   ) {
     const node = this.flowCore.getNodeById(nodeId);
 
@@ -23,13 +27,10 @@ export class InternalUpdater {
       return;
     }
 
-    const portsToUpdate = this.getPortsToUpdate(node, ports);
-
     if (this.flowCore.initializationGuard.isInitialized) {
       this.flowCore.commandHandler.emit('resizeNode', {
         id: nodeId,
         size,
-        ports: portsToUpdate.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } })),
       });
     } else {
       this.flowCore.initializationGuard.initNodeSize(nodeId, size);

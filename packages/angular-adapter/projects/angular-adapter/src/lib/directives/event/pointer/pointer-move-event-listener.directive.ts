@@ -10,7 +10,6 @@ export class PointerMoveEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
 
   onPointerMove(event: PointerEvent) {
-    event.stopPropagation();
     this.eventMapperService.emit({
       pointerId: event.pointerId,
       type: 'pointermove',

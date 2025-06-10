@@ -26,6 +26,7 @@ import {
 import { moveSelection } from './move-selection';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
+import { rotateNodeBy } from './rotate-node';
 import { deselect, deselectAll, select } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
@@ -71,4 +72,5 @@ export const commands: CommandMap = {
   addEdgeLabels,
   updateEdgeLabel,
   deleteEdgeLabels,
+  rotateNodeBy,
 };

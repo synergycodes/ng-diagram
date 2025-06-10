@@ -92,47 +92,11 @@ export function handlePointerEvent(flowCore: FlowCore, event: PointerEvent) {
             break;
         }
 
-        const portsToUpdate = resizeState.draggingNode.ports?.map((port) => {
-          if (!port.position || !port.size) {
-            // TODO: think if we should throw an error for this case
-            return { portId: port.id, portChanges: {} };
-          }
-          const startPortPosition = port.position;
-          const startPortSize = port.size;
-
-          const positionFactor = {
-            x: startPortPosition.x / resizeState.startWidth,
-            y: startPortPosition.y / resizeState.startHeight,
-          };
-          const sizeFactor = {
-            width: startPortSize.width / resizeState.startWidth,
-            height: startPortSize.height / resizeState.startHeight,
-          };
-
-          const newPortPos = {
-            x: Math.round(positionFactor.x * newWidth),
-            y: Math.round(positionFactor.y * newHeight),
-          };
-          const newPortSize = {
-            width: Math.round(sizeFactor.width * newWidth),
-            height: Math.round(sizeFactor.height * newHeight),
-          };
-
-          return {
-            portId: port.id,
-            portChanges: {
-              position: newPortPos,
-              size: newPortSize,
-            },
-          };
-        });
-
         flowCore.commandHandler.emit('resizeNode', {
           id: resizeState.nodeId,
           disableAutoSize: true,
           position: { x: Math.round(newX), y: Math.round(newY) },
           size: { width: Math.round(newWidth), height: Math.round(newHeight) },
-          ...(portsToUpdate ? { ports: portsToUpdate } : {}),
         });
       }
       break;

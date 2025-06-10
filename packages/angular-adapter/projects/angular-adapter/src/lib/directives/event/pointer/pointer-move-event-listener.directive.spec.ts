@@ -33,14 +33,6 @@ describe('PointerMoveEventListenerDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should call stopPropagation method on the event', () => {
-    const spy = vi.spyOn(mockEvent, 'stopPropagation');
-
-    fixture.debugElement.nativeElement.dispatchEvent(mockEvent);
-
-    expect(spy).toHaveBeenCalled();
-  });
-
   it('should call eventMapperService.emit', () => {
     const spy = vi.spyOn(TestBed.inject(EventMapperService), 'emit');
 

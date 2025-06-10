@@ -41,33 +41,31 @@ describe('InternalUpdater', () => {
         size: { width: 100, height: 100 },
       });
 
-      internalUpdater.applyNodeSize('node-1', { size: { width: 100, height: 100 }, ports: [] });
+      internalUpdater.applyNodeSize('node-1', { size: { width: 100, height: 100 } });
 
       expect(initializationGuard.initNodeSize).not.toHaveBeenCalled();
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
 
     it('should call initNodeSize if flow is not initialized', () => {
-      getNodeByIdMock.mockReturnValue({
-        ...mockNode,
-        size: { width: 100, height: 100 },
-      });
-
-      internalUpdater.applyNodeSize('node-1', { size: { width: 5, height: 5 }, ports: [] });
+      internalUpdater.applyNodeSize('node-1', { size: { width: 5, height: 5 } });
 
       expect(initializationGuard.initNodeSize).toHaveBeenCalledWith('node-1', { width: 5, height: 5 });
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
 
     it('should emit resizeNode if flow is initialized', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: { width: 100, height: 100 },
+      });
       initializationGuard.isInitialized = true;
 
-      internalUpdater.applyNodeSize('node-1', { size: { width: 5, height: 5 }, ports: [] });
+      internalUpdater.applyNodeSize('node-1', { size: { width: 5, height: 5 } });
 
       expect(commandHandler.emit).toHaveBeenCalledWith('resizeNode', {
         id: 'node-1',
         size: { width: 5, height: 5 },
-        ports: [],
       });
     });
   });

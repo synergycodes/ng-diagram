@@ -7,6 +7,7 @@ import type {
   Node,
   PointerEvent,
   Port,
+  RotateEvent,
   WheelEvent,
 } from './types';
 
@@ -86,6 +87,19 @@ export function getSampleKeyboardEvent(overrides: Partial<KeyboardEvent> = {}): 
     ...overrides,
   };
 }
+
+export const getSampleRotateEvent = (overrides: Partial<RotateEvent> = {}): RotateEvent => {
+  return {
+    type: 'rotate',
+    timestamp: 1,
+    target: { type: 'rotate-handle', element: mockNode },
+    mouse: { x: 0, y: 0 },
+    handle: { x: 0, y: 0 },
+    center: { x: 0, y: 0 },
+    ports: [],
+    ...overrides,
+  };
+};
 
 export const mockMetadata: Metadata = {
   viewport: { x: 0, y: 0, scale: 1 },

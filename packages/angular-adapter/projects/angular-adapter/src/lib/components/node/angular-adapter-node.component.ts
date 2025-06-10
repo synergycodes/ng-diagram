@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
 import {
   NodePositionDirective,
-  NodeSelectedDirective,
   NodeSizeDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
@@ -12,6 +11,7 @@ import {
   ZIndexDirective,
 } from '../../directives';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
+import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -21,15 +21,16 @@ import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: NodeSelectedDirective, inputs: ['data'] },
     { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
-  imports: [NodeResizeAdornmentComponent],
+  imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
 })
 export class AngularAdapterNodeComponent {
   data = input.required<Node>();
+
+  readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
 }

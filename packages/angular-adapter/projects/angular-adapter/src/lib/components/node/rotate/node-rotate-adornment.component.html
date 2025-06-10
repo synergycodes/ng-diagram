@@ -1,0 +1,7 @@
+@if (showAdornment()) {
+  <angular-adapter-rotate-handle
+    #handleNode
+    [isRotating]="isRotating()"
+    (pointerDownEvent)="onPointerDownEvent($event)"
+  />
+}

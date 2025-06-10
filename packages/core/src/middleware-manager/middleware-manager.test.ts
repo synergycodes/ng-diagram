@@ -4,6 +4,7 @@ import { mockMetadata, mockNode } from '../test-utils';
 import type { FlowState, FlowStateUpdate, Middleware } from '../types';
 import { MiddlewareManager } from './middleware-manager';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
+import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 
 // Define all mocks at the top level
 vi.mock('./middlewares/edges-straight-routing', () => ({
@@ -75,14 +76,21 @@ describe('MiddlewareManager', () => {
 
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
-      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [edgesStraightRoutingMiddleware]);
+      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
+        edgesStraightRoutingMiddleware,
+        nodeRotationSnapMiddleware,
+      ]);
     });
 
     it('should register starting middlewares if they are provided', () => {
       const middlewareManager = new MiddlewareManager(flowCore, [mockMiddleware1]);
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
-      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [edgesStraightRoutingMiddleware, mockMiddleware1]);
+      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
+        edgesStraightRoutingMiddleware,
+        nodeRotationSnapMiddleware,
+        mockMiddleware1,
+      ]);
     });
   });
 

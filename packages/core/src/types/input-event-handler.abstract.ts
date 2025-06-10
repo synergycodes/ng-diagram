@@ -14,7 +14,8 @@ export type InputActionName =
   | 'panning'
   | 'linking'
   | 'resize'
-  | 'zooming';
+  | 'zooming'
+  | 'rotate';
 
 /**
  * Type for action function
