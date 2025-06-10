@@ -21,22 +21,29 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         moveState.isMoving = true;
         break;
 
-      case 'pointermove':
-        if (moveState.isMoving) {
-          const { x, y } = flowCore.clientToFlowPosition(event);
-          const dx = x - moveState.lastX;
-          const dy = y - moveState.lastY;
+      case 'pointermove': {
+        if (!moveState.isMoving) return;
 
-          flowCore.commandHandler.emit('moveSelection', { dx, dy });
+        const { x, y } = flowCore.clientToFlowPosition(event);
+        const dx = x - moveState.lastX;
+        const dy = y - moveState.lastY;
 
-          moveState.lastX = x;
-          moveState.lastY = y;
-        }
+        const nodesToMove = flowCore.modelLookup.getSelectedNodesWithChildren();
+
+        if (nodesToMove.length === 0) return;
+
+        flowCore.commandHandler.emit('moveNodes', { dx, dy, nodes: nodesToMove });
+
+        moveState.lastX = x;
+        moveState.lastY = y;
+
         break;
+      }
 
-      case 'pointerup':
+      case 'pointerup': {
         moveState.isMoving = false;
         break;
+      }
     }
   },
   predicate: (event) =>
