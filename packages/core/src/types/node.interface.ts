@@ -48,6 +48,18 @@ export interface Node {
    * The angle of the node from 0 to 360.
    */
   angle?: number;
+  /**
+   * The id of the parent node.
+   */
+  parentId?: Node['id'];
+  /**
+   * Indicates if the node can be used as a parent node.
+   */
+  canBeParent?: boolean;
+  /**
+   * Indicates if the node can be used as a child node.
+   */
+  canBeChild?: boolean;
 }
 
 /**
