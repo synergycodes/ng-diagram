@@ -11,6 +11,7 @@ export type ModelActionType =
   | 'init'
   | 'changeSelection'
   | 'moveSelection'
+  | 'moveNodes'
   | 'deleteSelection'
   | 'addNodes'
   | 'updateNode'

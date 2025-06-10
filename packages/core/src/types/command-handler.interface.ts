@@ -22,7 +22,7 @@ import {
   StartLinkingCommand,
   StartLinkingFromPositionCommand,
 } from '../command-handler/commands/linking';
-import { MoveSelectionCommand } from '../command-handler/commands/move-selection';
+import { MoveNodesCommand, MoveSelectionCommand } from '../command-handler/commands/move';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { RotateNodeByCommand } from '../command-handler/commands/rotate-node';
@@ -40,6 +40,7 @@ export type Command =
   | DeselectCommand
   | DeselectAllCommand
   | MoveSelectionCommand
+  | MoveNodesCommand
   | DeleteSelectionCommand
   | AddNodesCommand
   | UpdateNodeCommand
