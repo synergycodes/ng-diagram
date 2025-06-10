@@ -3,6 +3,7 @@ import { InitializationGuard } from './initialization-guard/initialization-guard
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
+import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
@@ -29,8 +30,7 @@ export class FlowCore {
   readonly spatialHash: SpatialHash;
   readonly initializationGuard: InitializationGuard;
   readonly internalUpdater: InternalUpdater;
-  nodesMap: Map<string, Node>;
-  edgesMap: Map<string, Edge>;
+  readonly modelLookup: ModelLookup;
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -47,8 +47,7 @@ export class FlowCore {
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
     this.internalUpdater = new InternalUpdater(this);
-    this.nodesMap = new Map(modelAdapter.getNodes().map((node) => [node.id, node]));
-    this.edgesMap = new Map(modelAdapter.getEdges().map((edge) => [edge.id, edge]));
+    this.modelLookup = new ModelLookup(this);
 
     this.init();
   }
@@ -61,10 +60,8 @@ export class FlowCore {
     this.initializationGuard.start(() => {
       this.model.onChange(({ nodes, edges }) => {
         this.render();
-        this.nodesMap = this.mapModelNodesToMap(nodes);
-        this.edgesMap = this.mapModelEdgesToMap(edges);
+        this.modelLookup.update({ nodes, edges });
         this.spatialHash.process(nodes);
-        console.log('model changed', { nodes, edges });
       });
       this.commandHandler.emit('init');
     });
@@ -138,8 +135,7 @@ export class FlowCore {
     this.model.setEdges(state.edges);
     this.model.setMetadata(state.metadata);
 
-    this.nodesMap = this.mapModelNodesToMap(state.nodes);
-    this.edgesMap = this.mapModelEdgesToMap(state.edges);
+    this.modelLookup.update(state);
   }
 
   /**
@@ -189,21 +185,13 @@ export class FlowCore {
     this.renderer.draw(nodes, finalEdges, metadata.viewport);
   }
 
-  private mapModelNodesToMap(nodes: Node[]): Map<string, Node> {
-    return new Map(nodes.map((node) => [node.id, node]));
-  }
-
-  private mapModelEdgesToMap(edges: Edge[]): Map<string, Edge> {
-    return new Map(edges.map((edge) => [edge.id, edge]));
-  }
-
   /**
    * Gets a node by id
    * @param nodeId Node id
    * @returns Node
    */
   getNodeById(nodeId: string): Node | null {
-    return this.nodesMap.get(nodeId) ?? null;
+    return this.modelLookup.getNodeById(nodeId);
   }
 
   /**
@@ -212,7 +200,7 @@ export class FlowCore {
    * @returns Edge
    */
   getEdgeById(edgeId: string): Edge | null {
-    return this.edgesMap.get(edgeId) ?? null;
+    return this.modelLookup.getEdgeById(edgeId);
   }
 
   /**
