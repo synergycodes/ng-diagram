@@ -28,11 +28,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         const dx = x - moveState.lastX;
         const dy = y - moveState.lastY;
 
-        const nodesToMove = flowCore.modelLookup.getSelectedNodesWithChildren();
-
-        if (nodesToMove.length === 0) return;
-
-        flowCore.commandHandler.emit('moveNodes', { dx, dy, nodes: nodesToMove });
+        flowCore.commandHandler.emit('moveSelection', { dx, dy });
 
         moveState.lastX = x;
         moveState.lastY = y;

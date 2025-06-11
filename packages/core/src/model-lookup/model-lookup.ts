@@ -86,8 +86,8 @@ export class ModelLookup {
    * @param parentId Parent node id
    * @returns Array of child node ids
    */
-  public getChildrenIds(parentId: string): Node['id'][] {
-    return this.childrenMap.get(parentId) || [];
+  public getChildrenIds(parentId: string): Node['id'][] | null {
+    return this.childrenMap.get(parentId) ?? null;
   }
 
   /**
@@ -95,8 +95,11 @@ export class ModelLookup {
    * @param parentId Parent node id
    * @returns Array of child nodes
    */
-  public getChildren(parentId: string): Node[] {
+  public getChildren(parentId: string): Node[] | null {
     const childrenIds = this.getChildrenIds(parentId);
+
+    if (!childrenIds) return null;
+
     return childrenIds.map((id) => this.getNodeById(id)).filter((node): node is Node => node !== null);
   }
 
@@ -132,6 +135,14 @@ export class ModelLookup {
   public getSelectedNodesWithChildren(): Node[] {
     const selectedNodes = this.getSelectedNodes();
 
-    return selectedNodes.flatMap((node) => [node, ...this.getChildren(node.id)]);
+    return selectedNodes.flatMap((node) => [node, ...(this.getChildren(node.id) ?? [])]);
+  }
+
+  /**
+   * Gets all selected edges
+   * @returns Array of selected edges
+   */
+  public getSelectedEdges(): Edge[] {
+    return this.flowCore.getState().edges.filter((edge) => edge.selected);
   }
 }
