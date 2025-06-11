@@ -10,6 +10,7 @@ import {
   UpdateEdgeCommand,
   UpdateEdgeLabelCommand,
   UpdateNodeCommand,
+  UpdateNodesCommand,
   UpdatePortsCommand,
 } from '../command-handler/commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
@@ -44,6 +45,7 @@ export type Command =
   | DeleteSelectionCommand
   | AddNodesCommand
   | UpdateNodeCommand
+  | UpdateNodesCommand
   | DeleteNodesCommand
   | AddEdgesCommand
   | UpdateEdgeCommand

@@ -15,6 +15,7 @@ export type ModelActionType =
   | 'deleteSelection'
   | 'addNodes'
   | 'updateNode'
+  | 'updateNodes'
   | 'deleteNodes'
   | 'addEdges'
   | 'updateEdge'
