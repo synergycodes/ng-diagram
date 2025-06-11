@@ -19,6 +19,7 @@ export type ModelActionType =
   | 'addEdges'
   | 'updateEdge'
   | 'deleteEdges'
+  | 'deleteElements'
   | 'paste'
   | 'moveViewport'
   | 'resizeNode'

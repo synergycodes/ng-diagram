@@ -1,36 +1,40 @@
 import type { CommandHandler } from '../../types';
+import type { Edge } from '../../types/edge.interface';
 
 export interface DeleteSelectionCommand {
   name: 'deleteSelection';
 }
 
+interface GetEdgesToRemoveParams {
+  edges: Edge[];
+  nodesToDeleteIds: string[];
+}
+
+const getEdgesToRemove = ({ edges, nodesToDeleteIds }: GetEdgesToRemoveParams): string[] => {
+  return edges
+    .filter((edge) => edge.selected || nodesToDeleteIds.includes(edge.source) || nodesToDeleteIds.includes(edge.target))
+    .map((edge) => edge.id);
+};
+
 export const deleteSelection = (commandHandler: CommandHandler): void => {
   const { nodes, edges } = commandHandler.flowCore.getState();
 
   const isAnyNodeSelected = nodes.some((node) => node.selected);
-  if (!isAnyNodeSelected) {
-    const isAnyEdgeSelected = edges.some((edge) => edge.selected);
-    if (!isAnyEdgeSelected) {
-      return;
-    }
+  const isAnyEdgeSelected = edges.some((edge) => edge.selected);
+
+  if (!isAnyNodeSelected && !isAnyEdgeSelected) {
+    return;
   }
 
-  const nodesToDeleteIds: string[] = [];
+  const nodesToDeleteIds = isAnyNodeSelected
+    ? commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren().map((node) => node.id)
+    : [];
 
-  if (isAnyNodeSelected) {
-    nodes.forEach((node) => {
-      if (node.selected) {
-        nodesToDeleteIds.push(node.id);
-      }
-    });
+  const edgesToDeleteIds = getEdgesToRemove({ edges, nodesToDeleteIds });
+
+  if (nodesToDeleteIds.length === 0 && edgesToDeleteIds.length === 0) {
+    return;
   }
-
-  const edgesToDeleteIds: string[] = [];
-  edges.forEach((edge) => {
-    if (edge.selected || nodesToDeleteIds.includes(edge.source) || nodesToDeleteIds.includes(edge.target)) {
-      edgesToDeleteIds.push(edge.id);
-    }
-  });
 
   commandHandler.flowCore.applyUpdate(
     { nodesToRemove: nodesToDeleteIds, edgesToRemove: edgesToDeleteIds },
