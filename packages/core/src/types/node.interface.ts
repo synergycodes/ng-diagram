@@ -51,15 +51,11 @@ export interface Node {
   /**
    * The id of the parent node.
    */
-  parentId?: Node['id'];
+  groupId?: Node['id'];
   /**
-   * Indicates if the node can be used as a parent node.
+   * Whether the node is treated as a group node.
    */
-  canBeParent?: boolean;
-  /**
-   * Indicates if the node can be used as a child node.
-   */
-  canBeChild?: boolean;
+  isGroup?: boolean;
 }
 
 /**

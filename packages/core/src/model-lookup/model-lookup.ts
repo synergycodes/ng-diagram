@@ -4,15 +4,17 @@ import type { Edge, FlowState, Node } from '../types';
 export class ModelLookup {
   nodesMap: Map<string, Node>;
   edgesMap: Map<string, Edge>;
-  childrenMap: Map<Node['id'], Node['id'][]>;
+  directChildrenMap: Map<Node['id'], Node['id'][]>;
+  private descendantsCache: Map<Node['id'], Node['id'][]>; // Cache for all descendants
 
   constructor(private readonly flowCore: FlowCore) {
     const nodes = this.flowCore.model.getNodes();
     const edges = this.flowCore.model.getEdges();
 
-    this.nodesMap = new Map(nodes.map((node) => [node.id, node]));
+    this.nodesMap = this.mapModelNodesToMap(nodes);
     this.edgesMap = new Map(edges.map((edge) => [edge.id, edge]));
-    this.childrenMap = this.buildChildrenMap(nodes);
+    this.directChildrenMap = this.buildDirectChildrenMap(nodes);
+    this.descendantsCache = new Map(); // Initialize descendants cache
   }
 
   /**
@@ -34,20 +36,20 @@ export class ModelLookup {
   }
 
   /**
-   * Builds a map of parent nodes to their children
+   * Builds a map of group nodes to their children
    * @param nodes Nodes array
-   * @returns Map where key is parent id and value is array of child ids
+   * @returns Map where key is group id and value is array of child ids
    */
-  private buildChildrenMap(nodes: Node[]): Map<Node['id'], Node['id'][]> {
+  private buildDirectChildrenMap(nodes: Node[]): Map<Node['id'], Node['id'][]> {
     const childrenMap = new Map<Node['id'], Node['id'][]>();
 
     for (const node of nodes) {
-      if (node.parentId) {
+      if (node.groupId) {
         // Get existing children array or create new one
-        const children = childrenMap.get(node.parentId) || [];
+        const children = childrenMap.get(node.groupId) || [];
 
         children.push(node.id);
-        childrenMap.set(node.parentId, children);
+        childrenMap.set(node.groupId, children);
       }
     }
 
@@ -60,7 +62,8 @@ export class ModelLookup {
   public update(state: Pick<FlowState, 'nodes' | 'edges'>) {
     this.nodesMap = this.mapModelNodesToMap(state.nodes);
     this.edgesMap = this.mapModelEdgesToMap(state.edges);
-    this.childrenMap = this.buildChildrenMap(state.nodes);
+    this.directChildrenMap = this.buildDirectChildrenMap(state.nodes);
+    this.descendantsCache.clear(); // Clear descendants cache on update
   }
 
   /**
@@ -82,25 +85,79 @@ export class ModelLookup {
   }
 
   /**
-   * Gets all children ids for a given parent node id
-   * @param parentId Parent node id
+   * Gets all children ids for a given group node id
+   * @param groupId group node id
    * @returns Array of child node ids
    */
-  public getChildrenIds(parentId: string): Node['id'][] | null {
-    return this.childrenMap.get(parentId) ?? null;
+  public getChildrenIds(groupId: string): Node['id'][] {
+    return this.directChildrenMap.get(groupId) ?? [];
   }
 
   /**
-   * Gets all children nodes for a given parent node id
-   * @param parentId Parent node id
+   * Gets all children nodes for a given group node id
+   * @param groupId group node id
    * @returns Array of child nodes
    */
-  public getChildren(parentId: string): Node[] | null {
-    const childrenIds = this.getChildrenIds(parentId);
+  private getChildren(groupId: string): Node[] {
+    const childrenIds = this.getChildrenIds(groupId);
 
-    if (!childrenIds) return null;
+    if (!childrenIds) return [];
 
     return childrenIds.map((id) => this.getNodeById(id)).filter((node): node is Node => node !== null);
+  }
+
+  /**
+   * Gets all descendant IDs for a given group node id (with caching)
+   * @param groupId group node id
+   * @returns Array of all descendant node ids (children, grandchildren, etc.)
+   */
+  private getAllDescendantIds(groupId: string): Node['id'][] {
+    // Check cache first
+    if (this.descendantsCache.has(groupId)) {
+      return this.descendantsCache.get(groupId)!;
+    }
+
+    // Compute descendants if not cached
+    const descendants = this.computeAllDescendants(groupId);
+
+    // Cache the result
+    this.descendantsCache.set(groupId, descendants);
+
+    return descendants;
+  }
+
+  /**
+   * Recursively computes all descendants for a given group node id
+   * @param groupId group node id
+   * @returns Array of all descendant node ids
+   */
+  private computeAllDescendants(groupId: string): Node['id'][] {
+    const directChildren = this.getChildrenIds(groupId);
+
+    if (!directChildren || directChildren.length === 0) {
+      return [];
+    }
+
+    const allDescendants: Node['id'][] = [...directChildren];
+
+    // Recursively get descendants of each child
+    for (const childId of directChildren) {
+      const childDescendants = this.computeAllDescendants(childId);
+      allDescendants.push(...childDescendants);
+    }
+
+    return allDescendants;
+  }
+
+  /**
+   * Gets all descendant nodes for a given group node id
+   * @param groupId group node id
+   * @returns Array of all descendant nodes (children, grandchildren, etc.)
+   */
+  private getAllDescendants(groupId: string): Node[] {
+    const descendantIds = this.getAllDescendantIds(groupId);
+
+    return descendantIds.map((id) => this.getNodeById(id)).filter((node): node is Node => node !== null);
   }
 
   /**
@@ -109,7 +166,16 @@ export class ModelLookup {
    * @returns True if the node has children
    */
   public hasChildren(nodeId: string): boolean {
-    return this.childrenMap.has(nodeId) && this.childrenMap.get(nodeId)!.length > 0;
+    return this.directChildrenMap.has(nodeId) && this.directChildrenMap.get(nodeId)!.length > 0;
+  }
+
+  /**
+   * Checks if a node has any descendants (children, grandchildren, etc.)
+   * @param nodeId Node id
+   * @returns True if the node has any descendants
+   */
+  public hasDescendants(nodeId: string): boolean {
+    return this.getAllDescendantIds(nodeId).length > 0;
   }
 
   /**
@@ -117,7 +183,7 @@ export class ModelLookup {
    * @returns Children map
    */
   public getChildrenMap(): ReadonlyMap<Node['id'], readonly Node['id'][]> {
-    return this.childrenMap;
+    return this.directChildrenMap;
   }
 
   /**
@@ -129,13 +195,23 @@ export class ModelLookup {
   }
 
   /**
+   * Gets the children of a node
+   * @param nodeId Node id
+   * @param directOnly Whether to get only direct children
+   * @returns Array of children nodes
+   */
+  public getNodeChildren(nodeId: string, { directOnly = true }: { directOnly?: boolean } = {}): Node[] {
+    return directOnly ? this.getChildren(nodeId) : this.getAllDescendants(nodeId);
+  }
+
+  /**
    * Gets all selected nodes with their children
    * @returns Array of selected nodes with their children
    */
-  public getSelectedNodesWithChildren(): Node[] {
+  public getSelectedNodesWithChildren({ directOnly = true }: { directOnly?: boolean } = {}): Node[] {
     const selectedNodes = this.getSelectedNodes();
 
-    return selectedNodes.flatMap((node) => [node, ...(this.getChildren(node.id) ?? [])]);
+    return selectedNodes.flatMap((node) => [node, ...this.getNodeChildren(node.id, { directOnly })]);
   }
 
   /**

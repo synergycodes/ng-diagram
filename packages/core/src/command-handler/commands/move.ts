@@ -45,7 +45,7 @@ const moveNodesInFlow = ({ commandHandler, nodes, delta, actionName }: MoveNodes
 };
 
 export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSelectionCommand): void => {
-  const nodesToMove = commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren();
+  const nodesToMove = commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
 
   moveNodesInFlow({
     commandHandler,
