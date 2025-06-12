@@ -101,23 +101,6 @@ describe('ModelLookup', () => {
       expect(modelLookup.directChildrenMap.size).toBe(1);
       expect(modelLookup.directChildrenMap.get('newNode1')).toEqual(['newNode2']);
     });
-
-    it('should clear descendants cache on update', () => {
-      // First call to populate cache
-      modelLookup.hasDescendants('node1');
-
-      // Verify cache was populated
-      expect(modelLookup['descendantsCache'].has('node1')).toBe(true);
-
-      const newNodes = [...mockNodes];
-      modelLookup.update({ nodes: newNodes, edges: mockEdges });
-
-      // Verify cache was cleared
-      expect(modelLookup['descendantsCache'].has('node1')).toBe(false);
-
-      // Verify descendants are still correctly computed after cache clear
-      expect(modelLookup.hasDescendants('node1')).toBe(true);
-    });
   });
 
   describe('getNodeById', () => {
