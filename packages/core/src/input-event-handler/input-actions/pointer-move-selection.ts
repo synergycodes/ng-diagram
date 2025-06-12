@@ -1,10 +1,5 @@
-import {
-  isPointerDownEvent,
-  isPointerMoveEvent,
-  isPointerUpEvent,
-  Node,
-  type InputActionWithPredicate,
-} from '../../types';
+import { FlowCore } from '../../flow-core';
+import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
 
 interface MoveState {
   lastX: number;
@@ -46,28 +41,28 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
       }
 
       case 'pointerup': {
+        if (!moveState.isMoving) return;
+
         const selectedNodes = flowCore.modelLookup.getSelectedNodes();
-        const nodes = flowCore.model.getNodes();
+
+        // Get all nodes at this position
+        const groupsAtPointer = flowCore
+          .getNodesInRange(
+            {
+              x: moveState.lastX,
+              y: moveState.lastY,
+            },
+            1
+          )
+          .filter((node) => node.isGroup || !node.selected);
+
+        const topLevelGroupNode = groupsAtPointer.sort((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];
 
         const updateData: { id: string; groupId?: string; zOrder?: number }[] = [];
 
         for (const selectedNode of selectedNodes) {
-          // Find if there's a group node under the center of this node
-          const nodeCenter = {
-            x: selectedNode.position.x + (selectedNode.size?.width || 0) / 2,
-            y: selectedNode.position.y + (selectedNode.size?.height || 0) / 2,
-          };
-
-          // Get all nodes at this position
-          const groupsAtPosition = flowCore
-            .getNodesInRange(nodeCenter, 1)
-            .filter((node) => node.isGroup || !node.selected);
-
-          const topLevelGroupNode = groupsAtPosition.sort((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];
-
           if (topLevelGroupNode) {
-            // Check for circular dependency
-            if (!wouldCreateCircularDependency(nodes, selectedNode.id, topLevelGroupNode.id)) {
+            if (!wouldCreateCircularDependency(flowCore, selectedNode.id, topLevelGroupNode.id)) {
               updateData.push({
                 id: selectedNode.id,
                 groupId: topLevelGroupNode.id,
@@ -91,6 +86,8 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         }
 
         moveState.isMoving = false;
+        moveState.lastX = 0;
+        moveState.lastY = 0;
         break;
       }
     }
@@ -101,26 +98,12 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
     (isPointerUpEvent(event) && event.button === 0),
 };
 
-// Helper function to check for circular dependencies
-function wouldCreateCircularDependency(nodes: Node[], nodeId: string, targetParentId: string): boolean {
+const wouldCreateCircularDependency = (flowCore: FlowCore, nodeId: string, targetParentId: string): boolean => {
   // If trying to make a node its own parent
   if (nodeId === targetParentId) {
     return true;
   }
 
   // Check if targetParentId is a descendant of nodeId
-  const checkDescendants = (currentId: string): boolean => {
-    const children = nodes.filter((n) => n.groupId === currentId);
-    for (const child of children) {
-      if (child.id === targetParentId) {
-        return true;
-      }
-      if (checkDescendants(child.id)) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  return checkDescendants(nodeId);
-}
+  return flowCore.modelLookup.isNodeDescendantOfGroup(targetParentId, nodeId);
+};
