@@ -12,7 +12,7 @@ export class ModelLookup {
     const edges = this.flowCore.model.getEdges();
 
     this.nodesMap = this.mapModelNodesToMap(nodes);
-    this.edgesMap = new Map(edges.map((edge) => [edge.id, edge]));
+    this.edgesMap = this.mapModelEdgesToMap(edges);
     this.directChildrenMap = this.buildDirectChildrenMap(nodes);
     this.descendantsCache = new Map(); // Initialize descendants cache
   }
