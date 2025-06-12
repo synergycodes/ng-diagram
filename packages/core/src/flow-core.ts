@@ -50,6 +50,7 @@ export class FlowCore {
     this.modelLookup = new ModelLookup(this);
 
     this.init();
+    this.modelLookup.update(this.getState());
   }
 
   /**
@@ -58,9 +59,8 @@ export class FlowCore {
   private init() {
     this.render();
     this.initializationGuard.start(() => {
-      this.model.onChange(({ nodes, edges }) => {
+      this.model.onChange(({ nodes }) => {
         this.render();
-        this.modelLookup.update({ nodes, edges });
         this.spatialHash.process(nodes);
       });
       this.commandHandler.emit('init');
@@ -134,7 +134,6 @@ export class FlowCore {
     this.model.setNodes(state.nodes);
     this.model.setEdges(state.edges);
     this.model.setMetadata(state.metadata);
-
     this.modelLookup.update(state);
   }
 

@@ -221,4 +221,14 @@ export class ModelLookup {
   public getSelectedEdges(): Edge[] {
     return this.flowCore.getState().edges.filter((edge) => edge.selected);
   }
+
+  /**
+   * Checks if a node is descendant of a group node
+   * @param nodeId Node id
+   * @param groupId Group node id
+   * @returns True if the node is descendant of the group node
+   */
+  public isNodeDescendantOfGroup(nodeId: string, groupId: string): boolean {
+    return this.getAllDescendantIds(groupId).includes(nodeId);
+  }
 }
