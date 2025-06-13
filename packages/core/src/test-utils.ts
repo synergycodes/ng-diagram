@@ -8,6 +8,7 @@ import type {
   PointerEvent,
   Port,
   RotateEvent,
+  TreeNode,
   WheelEvent,
 } from './types';
 
@@ -124,4 +125,13 @@ export const mockEdgeLabel: EdgeLabel = {
   size: { width: 10, height: 10 },
   position: { x: 0, y: 0 },
   positionOnEdge: 0.5,
+};
+
+export const getMockTreeNode = (id: string, width: number, height: number): TreeNode => {
+  return {
+    id,
+    size: { width, height },
+    position: { x: 0, y: 0 },
+    children: [],
+  };
 };
