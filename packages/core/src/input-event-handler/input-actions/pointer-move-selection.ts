@@ -54,7 +54,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
             },
             1
           )
-          .filter((node) => node.isGroup || !node.selected);
+          .filter((node) => node.isGroup);
 
         const topLevelGroupNode = groupsAtPointer.sort((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];
 
