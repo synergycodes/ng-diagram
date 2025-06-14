@@ -1,4 +1,3 @@
-import { FlowCore } from '../../flow-core';
 import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
 
 interface MoveState {
@@ -62,7 +61,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
 
         for (const selectedNode of selectedNodes) {
           if (topLevelGroupNode) {
-            if (!wouldCreateCircularDependency(flowCore, selectedNode.id, topLevelGroupNode.id)) {
+            if (!flowCore.modelLookup.wouldCreateCircularDependency(selectedNode.id, topLevelGroupNode.id)) {
               updateData.push({
                 id: selectedNode.id,
                 groupId: topLevelGroupNode.id,
@@ -96,14 +95,4 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
     (isPointerDownEvent(event) && event.button === 0 && event.target?.type === 'node') ||
     (isPointerMoveEvent(event) && moveState.isMoving) ||
     (isPointerUpEvent(event) && event.button === 0),
-};
-
-const wouldCreateCircularDependency = (flowCore: FlowCore, nodeId: string, targetParentId: string): boolean => {
-  // If trying to make a node its own parent
-  if (nodeId === targetParentId) {
-    return true;
-  }
-
-  // Check if targetParentId is a descendant of nodeId
-  return flowCore.modelLookup.isNodeDescendantOfGroup(targetParentId, nodeId);
 };

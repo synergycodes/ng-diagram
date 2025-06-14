@@ -13,8 +13,7 @@ export const resizeNode = (
   commandHandler: CommandHandler,
   { id, size, position, disableAutoSize, ports: portsToUpdate }: ResizeNodeCommand
 ): void => {
-  const { nodes } = commandHandler.flowCore.getState();
-  const node = nodes.find((node) => node.id === id);
+  const node = commandHandler.flowCore.getNodeById(id);
 
   if (!node || (node.size?.width === size.width && node.size?.height === size.height)) {
     return;

@@ -231,4 +231,20 @@ export class ModelLookup {
   public isNodeDescendantOfGroup(nodeId: string, groupId: string): boolean {
     return this.getAllDescendantIds(groupId).includes(nodeId);
   }
+
+  /**
+   * Check for potential circular dependency between a node and a group
+   * @param nodeId Node id
+   * @param groupId Group node id
+   * @returns True if the group is a descendant of the node or the node is the group
+   */
+  public wouldCreateCircularDependency(nodeId: string, groupId: string): boolean {
+    // If trying to make a node its own parent
+    if (nodeId === groupId) {
+      return true;
+    }
+
+    // Check if groupId is already a descendant of nodeId
+    return this.isNodeDescendantOfGroup(groupId, nodeId);
+  }
 }
