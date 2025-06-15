@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
 import {
@@ -10,6 +10,7 @@ import {
   PointerUpEventListenerDirective,
   ZIndexDirective,
 } from '../../directives';
+import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
 
@@ -30,7 +31,22 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
 })
 export class AngularAdapterNodeComponent {
+  private readonly portsService = inject(UpdatePortsService);
+  private readonly flowCore = inject(FlowCoreProviderService);
+
   data = input.required<Node>();
 
   readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
+  readonly id = computed(() => this.data().id);
+
+  constructor() {
+    effect(() => {
+      const _ = this.rotate();
+      // TODO: fix problem with DOM position resync after repaint
+      setTimeout(() => {
+        const portsData = this.portsService.getNodePortsData(this.id());
+        this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(this.id(), portsData);
+      }, 0);
+    });
+  }
 }

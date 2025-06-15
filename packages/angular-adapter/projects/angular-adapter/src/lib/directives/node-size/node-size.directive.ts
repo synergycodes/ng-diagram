@@ -58,6 +58,7 @@ export class NodeSizeDirective implements OnDestroy {
 
         this.flowCore.provide().internalUpdater.applyNodeSize(this.id(), { size });
 
+        // TODO: fix problem with DOM position resync after repaint
         const portsData = this.updatePortsService.getNodePortsData(this.id());
         this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(this.id(), portsData);
       }

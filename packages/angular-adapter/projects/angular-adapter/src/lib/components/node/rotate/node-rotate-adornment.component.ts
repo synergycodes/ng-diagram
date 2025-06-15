@@ -102,7 +102,6 @@ export class NodeRotateAdornmentComponent {
             y: handleRect.top + handleRect.height / 2,
           }
         : { x: 0, y: 0 },
-      ports: this.portsService.getNodePortsData(this.data().id),
     });
   }
 

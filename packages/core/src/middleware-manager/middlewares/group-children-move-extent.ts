@@ -40,6 +40,7 @@ export const groupChildrenMoveExtent: Middleware = {
        * NOTE: We don't return children nodes directly
        * The model lookup is not updated yet -> get nodes data from nodesMap
        * which are updated but not yet pushed to the state
+       * TODO: support nested groups
        */
       const groupChildren = flowCore.modelLookup.getNodeChildrenIds(group.id, { directOnly: true });
 
