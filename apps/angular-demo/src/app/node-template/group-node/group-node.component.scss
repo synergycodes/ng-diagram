@@ -16,7 +16,7 @@
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-  &[data-highlight] {
+  &[data-highlight='true'] {
     background: rgba(221, 221, 221, 0.85);
     border: 1px solid #000;
   }
