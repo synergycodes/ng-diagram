@@ -12,10 +12,10 @@ export class MiddlewareManager {
 
   constructor(flowCore: FlowCore, middlewares: Middleware[] = []) {
     this.flowCore = flowCore;
-    this.register(edgesStraightRoutingMiddleware);
-    this.register(nodeRotationSnapMiddleware);
     this.register(groupChildrenChangeExtent);
     this.register(groupChildrenMoveExtent);
+    this.register(edgesStraightRoutingMiddleware);
+    this.register(nodeRotationSnapMiddleware);
     middlewares.forEach((middleware) => this.register(middleware));
   }
 

@@ -1,5 +1,6 @@
 import type { CommandHandler, ModelActionType } from '../../types';
 import type { Node } from '../../types/node.interface';
+import { snapNumber } from '../../utils/snap-number';
 
 interface BaseMoveCommand {
   dx: number;
@@ -25,6 +26,8 @@ interface MoveNodesInFlowParams {
   actionName: ModelActionType;
 }
 
+const SNAP_GRID = 10;
+
 const moveNodesInFlow = ({ commandHandler, nodes, delta, actionName }: MoveNodesInFlowParams): void => {
   if (nodes.length === 0) {
     return;
@@ -35,8 +38,8 @@ const moveNodesInFlow = ({ commandHandler, nodes, delta, actionName }: MoveNodes
       nodesToUpdate: nodes.map((node) => ({
         id: node.id,
         position: {
-          x: Math.round(node.position.x + delta.x),
-          y: Math.round(node.position.y + delta.y),
+          x: snapNumber(node.position.x + delta.x, SNAP_GRID),
+          y: snapNumber(node.position.y + delta.y, SNAP_GRID),
         },
       })),
     },
