@@ -15,6 +15,7 @@ import {
 } from '../command-handler/commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
+import { GroupHighlightClearCommand, GroupHighlightCommand } from '../command-handler/commands/group-highlight';
 import { InitCommand } from '../command-handler/commands/init';
 import {
   FinishLinkingCommand,
@@ -69,7 +70,9 @@ export type Command =
   | AddEdgeLabelsCommand
   | UpdateEdgeLabelCommand
   | DeleteEdgeLabelsCommand
-  | RotateNodeByCommand;
+  | RotateNodeByCommand
+  | GroupHighlightCommand
+  | GroupHighlightClearCommand;
 
 /**
  * Type for command name

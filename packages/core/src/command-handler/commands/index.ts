@@ -16,6 +16,7 @@ import {
 } from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
+import { groupHighlight, groupHighlightClear } from './group-highlight';
 import { init } from './init';
 import {
   finishLinking,
@@ -76,4 +77,6 @@ export const commands: CommandMap = {
   updateEdgeLabel,
   deleteEdgeLabels,
   rotateNodeBy,
+  groupHighlight,
+  groupHighlightClear,
 };
