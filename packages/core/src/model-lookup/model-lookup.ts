@@ -89,7 +89,7 @@ export class ModelLookup {
    * @param groupId group node id
    * @returns Array of child node ids
    */
-  public getChildrenIds(groupId: string): Node['id'][] {
+  private getChildrenIds(groupId: string): Node['id'][] {
     return this.directChildrenMap.get(groupId) ?? [];
   }
 
@@ -202,6 +202,16 @@ export class ModelLookup {
    */
   public getNodeChildren(nodeId: string, { directOnly = true }: { directOnly?: boolean } = {}): Node[] {
     return directOnly ? this.getChildren(nodeId) : this.getAllDescendants(nodeId);
+  }
+
+  /**
+   * Gets the children ids of a node
+   * @param nodeId Node id
+   * @param directOnly Whether to get only direct children
+   * @returns Array of children node ids
+   */
+  public getNodeChildrenIds(nodeId: string, { directOnly = true }: { directOnly?: boolean } = {}): Node['id'][] {
+    return directOnly ? this.getChildrenIds(nodeId) : this.getAllDescendantIds(nodeId);
   }
 
   /**
