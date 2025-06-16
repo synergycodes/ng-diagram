@@ -28,16 +28,16 @@ export const treeLayoutMiddleware: Middleware = {
     let offsetX = 100;
 
     roots.forEach((root) => {
-      if (config.orientation === 'Horizontal') {
+      const isHorizontal = config.orientation === 'Horizontal';
+      const hasChildren = root.children.length > 0;
+      const nodeSize = isHorizontal ? root.size?.height || 0 : root.size?.width || 0;
+
+      if (isHorizontal) {
         const currentRootOffset = horizontalTreeLayout(root, config, offsetX, offsetY);
-        const rootHeight = root.size?.height || 0;
-        const hasChildren = root.children.length > 0 ? 0 : rootHeight;
-        offsetY = currentRootOffset + config.siblingGap + hasChildren;
+        offsetY = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
       } else {
         const currentRootOffset = verticalTreeLayout(root, config, offsetX, offsetY);
-        const rootWidth = root.size?.width || 0;
-        const hasChildren = root.children.length > 0 ? 0 : rootWidth;
-        offsetX = currentRootOffset + config.siblingGap + hasChildren;
+        offsetX = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
       }
     });
 
@@ -48,7 +48,7 @@ export const treeLayoutMiddleware: Middleware = {
       }
 
       const currentNode = nodeList.find((layoutNode) => layoutNode.id === node.id);
-      if (!currentNode) {
+      if (!currentNode || (node.position.x === currentNode.position.x && node.position.y === currentNode.position.y)) {
         continue;
       }
       nodesToUpdate.push(currentNode);
