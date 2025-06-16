@@ -1,16 +1,27 @@
 import { horizontalTreeLayout, verticalTreeLayout } from '../../utils/orientation-tree-layout.ts';
 import { buildTreeStructure } from '../../utils/build-tree-structure.ts';
-import { FlowStateUpdate, Middleware, TreeLayoutConfig } from '../../types';
+import { FlowStateUpdate, Middleware, ModelActionType, TreeLayoutConfig } from '../../types';
 
 // Todo: Move this to metadata
 const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, orientation: 'Horizontal' };
+
+const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 
 export const treeLayoutMiddleware: Middleware = {
   name: 'tree-layout',
   execute: (context, next) => {
     const {
       state: { edges, nodes },
+      modelActionType,
     } = context;
+    const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
+
+    if (!shouldTreeLayout) {
+      next();
+      return;
+    }
+    const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
+
     const { nodeMap, roots } = buildTreeStructure(nodes, edges);
     const config = CONFIG;
     let offsetY = 100;
@@ -31,7 +42,6 @@ export const treeLayoutMiddleware: Middleware = {
     });
 
     const nodeList = Array.from(nodeMap.values());
-    const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
     for (const node of nodes) {
       if (!node.position) {
         continue;

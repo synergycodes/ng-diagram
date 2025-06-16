@@ -26,7 +26,8 @@ export type ModelActionType =
   | 'finishLinking'
   | 'zoom'
   | 'changeZOrder'
-  | 'rotateNodeBy';
+  | 'rotateNodeBy'
+  | 'treeLayout';
 
 /**
  * Type for the state of the flow diagram

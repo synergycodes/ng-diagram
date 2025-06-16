@@ -226,4 +226,14 @@ export class FlowCore {
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return getNearestPortInRange(this, point, range);
   }
+
+  /**
+   * Sets the tree layout
+   */
+  async treeLayout() {
+    const finalState = await this.middlewareManager.execute(this.getState(), {}, 'treeLayout');
+    if (finalState) {
+      this.setState(finalState);
+    }
+  }
 }
