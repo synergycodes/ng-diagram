@@ -20,7 +20,7 @@ import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.compon
 import { EdgeStraightComponent } from '../edge/edge-straight/edge-straight.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
-import { ToolbarComponent } from '../toolbar/toolbar';
+import { ToolbarComponent } from '../toolbar/angular-adapter-toolbar';
 
 @Component({
   selector: 'angular-adapter-diagram',
