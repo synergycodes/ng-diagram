@@ -1,9 +1,10 @@
 import { horizontalTreeLayout, verticalTreeLayout } from '../../utils/orientation-tree-layout.ts';
 import { buildTreeStructure } from '../../utils/build-tree-structure.ts';
 import { FlowStateUpdate, Middleware, ModelActionType, TreeLayoutConfig } from '../../types';
+import { isAngleHorizontal } from '../../utils/get-direction.ts';
 
 // Todo: Move this to metadata
-const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, orientation: 'Horizontal' };
+const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, layoutAngle: 270 };
 
 const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 
@@ -20,6 +21,7 @@ export const treeLayoutMiddleware: Middleware = {
       next();
       return;
     }
+
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
 
     const { nodeMap, roots } = buildTreeStructure(nodes, edges);
@@ -28,7 +30,7 @@ export const treeLayoutMiddleware: Middleware = {
     let offsetX = 100;
 
     roots.forEach((root) => {
-      const isHorizontal = config.orientation === 'Horizontal';
+      const isHorizontal = isAngleHorizontal(config.layoutAngle);
       const hasChildren = root.children.length > 0;
       const nodeSize = isHorizontal ? root.size?.height || 0 : root.size?.width || 0;
 

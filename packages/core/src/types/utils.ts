@@ -24,7 +24,7 @@ export interface TreeLayoutConfig {
   siblingGap: number;
   // Configurable gap between parent and child nodes
   levelGap: number;
-  orientation: 'Vertical' | 'Horizontal';
+  layoutAngle: 0 | 90 | 180 | 270;
 }
 
 export interface TreeNode {
@@ -32,4 +32,5 @@ export interface TreeNode {
   children: TreeNode[];
   size?: { width: number; height: number };
   position: { x: number; y: number };
+  layoutAngle?: 0 | 90 | 180 | 270;
 }

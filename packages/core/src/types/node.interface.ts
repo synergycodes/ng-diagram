@@ -48,6 +48,10 @@ export interface Node {
    * The angle of the node from 0 to 360.
    */
   angle?: number;
+  /**
+   * Node layout direction: 0, 90, 180, 270.
+   */
+  layoutAngle?: 0 | 90 | 180 | 270;
 }
 
 /**

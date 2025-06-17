@@ -10,7 +10,7 @@ import { Edge, Node, TreeNode } from '../types';
  *          Object with an array of root nodes and a map of all nodes by ID.
  **/
 export const buildTreeStructure = (
-  nodes: Pick<Node, 'id' | 'position' | 'size'>[],
+  nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutAngle'>[],
   edges: Pick<Edge, 'source' | 'target'>[]
 ): {
   roots: TreeNode[];
@@ -24,6 +24,7 @@ export const buildTreeStructure = (
       position: { ...node.position },
       size: node.size ? { ...node.size } : undefined,
       children: [],
+      layoutAngle: node.layoutAngle,
     });
   });
 
