@@ -37,11 +37,12 @@ export const horizontalTreeLayout = (
     const childHeight = child.size?.height || 0;
     const childWidth = child.size?.width || 0;
 
-    const childX = sign === 1
-      // Angle 0°: children positioned to the right of the parent
-      ? offsetX + parentWidth + config.levelGap
-      // Angle 180°: children positioned to the left of the parent
-      : offsetX - (childWidth + config.levelGap);
+    const childX =
+      sign === 1
+        ? // Angle 0°: children positioned to the right of the parent
+          offsetX + parentWidth + config.levelGap
+        : // Angle 180°: children positioned to the left of the parent
+          offsetX - (childWidth + config.levelGap);
 
     const childY = isAngleHorizontal(parentAngle)
       ? horizontalTreeLayout(child, config, childX, childOffsetY)
@@ -50,7 +51,9 @@ export const horizontalTreeLayout = (
     childOffsetY = currentOffsetY + (i < children.length - 1 ? config.siblingGap : 0);
   });
 
-  const topOffsetY = Math.min(children[0].position.y, offsetY);
+  const topOffsetY =
+    config.layoutAlignment === 'Subtree' ? Math.min(children[0].position.y, offsetY) : Math.min(children[0].position.y);
+
   parentNode.position.y = (topOffsetY + currentOffsetY - parentHeight) / 2;
 
   return currentOffsetY;
@@ -91,15 +94,15 @@ export const verticalTreeLayout = (
   let childOffsetX = offsetX;
 
   children.forEach((child, i) => {
-
     const childHeight = child.size?.height || 0;
     const childWidth = child.size?.width || 0;
 
-    const childY = sign === 1
-      // Angle 90°: children positioned to the bottom of the parent
-      ? offsetY + parentHeight + config.levelGap
-      // Angle 270°: children positioned to the top of the parent
-      : offsetY - (childHeight + config.levelGap);
+    const childY =
+      sign === 1
+        ? // Angle 90°: children positioned to the bottom of the parent
+          offsetY + parentHeight + config.levelGap
+        : // Angle 270°: children positioned to the top of the parent
+          offsetY - (childHeight + config.levelGap);
 
     const childX = isAngleVertical(parentAngle)
       ? verticalTreeLayout(child, config, childOffsetX, childY)
@@ -109,7 +112,9 @@ export const verticalTreeLayout = (
     childOffsetX = currentOffsetX + (i < children.length - 1 ? config.siblingGap : 0);
   });
 
-  const topOffsetX = Math.min(children[0].position.x, offsetX);
+  const topOffsetX =
+    config.layoutAlignment === 'Subtree' ? Math.min(children[0].position.x, offsetX) : Math.min(children[0].position.x);
+
   parentNode.position.x = (topOffsetX + currentOffsetX - parentWidth) / 2;
 
   return currentOffsetX;

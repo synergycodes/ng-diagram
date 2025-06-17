@@ -4,7 +4,7 @@ import { FlowStateUpdate, Middleware, ModelActionType, TreeLayoutConfig } from '
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
 
 // Todo: Move this to metadata
-const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, layoutAngle: 270 };
+const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, layoutAngle: 0, layoutAlignment: 'Parent' };
 
 const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 
