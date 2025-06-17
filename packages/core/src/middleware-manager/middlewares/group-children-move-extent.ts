@@ -72,9 +72,6 @@ function calculateGroupUpdates(
   for (const group of sortedGroups) {
     const groupUpdates = updateGroupHierarchy(group, workingNodesMap, flowCore, processedNodeIds);
     updates.push(...groupUpdates);
-
-    // Apply updates to working map for next iteration
-    applyUpdatesToWorkingMap(groupUpdates, workingNodesMap);
   }
 
   return updates;
@@ -82,6 +79,7 @@ function calculateGroupUpdates(
 
 /**
  * Update a group and all its ancestors with new bounds
+ * It's like bubbling the update up the hierarchy
  */
 function updateGroupHierarchy(
   group: Node,
@@ -95,16 +93,11 @@ function updateGroupHierarchy(
   const hierarchy = [group, ...flowCore.modelLookup.getParentChain(group.id)];
 
   for (const currentGroup of hierarchy) {
-    // Skip if this node has already been processed (on-the-fly deduplication)
-    if (processedNodeIds.has(currentGroup.id)) {
-      continue;
-    }
-
     const children = flowCore.modelLookup.getNodeChildrenIds(currentGroup.id, { directOnly: true });
 
     if (children.length === 0) continue;
 
-    const childNodes = children.map((id: string) => workingNodesMap.get(id)!).filter(Boolean);
+    const childNodes = children.map((id: string) => workingNodesMap.get(id)!);
 
     const groupRect = calculateGroupRect(childNodes, currentGroup);
 
@@ -115,26 +108,23 @@ function updateGroupHierarchy(
       autoSize: false,
     };
 
-    updates.push(update);
-    processedNodeIds.add(currentGroup.id); // Mark as processed
-  }
-
-  return updates;
-}
-
-/**
- * Apply updates to the working nodes map for subsequent calculations
- */
-function applyUpdatesToWorkingMap(updates: NodeUpdate[], workingNodesMap: Map<string, Node>): void {
-  for (const update of updates) {
-    const existingNode = workingNodesMap.get(update.id);
+    // Always update the working map for subsequent calculations
+    const existingNode = workingNodesMap.get(currentGroup.id);
     if (existingNode) {
-      workingNodesMap.set(update.id, {
+      workingNodesMap.set(currentGroup.id, {
         ...existingNode,
         position: update.position,
         size: update.size,
         autoSize: update.autoSize,
       });
     }
+
+    // Only add to results if not already processed (keep first occurrence)
+    if (!processedNodeIds.has(currentGroup.id)) {
+      updates.push(update);
+      processedNodeIds.add(currentGroup.id);
+    }
   }
+
+  return updates;
 }
