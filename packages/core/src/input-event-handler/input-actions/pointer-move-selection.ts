@@ -53,34 +53,6 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
       case 'pointermove': {
         if (!moveState.isMoving) return;
 
-        const { x, y } = flowCore.clientToFlowPosition(event);
-
-        const dx = x - moveState.lastX;
-        const dy = y - moveState.lastY;
-
-        flowCore.commandHandler.emit('moveSelection', { dx, dy });
-
-        const topLevelGroupNode = getTopGroupAtPoint(flowCore, {
-          x: moveState.lastX,
-          y: moveState.lastY,
-        });
-
-        if (topLevelGroupNode) {
-          flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
-        } else {
-          flowCore.commandHandler.emit('highlightGroupClear');
-        }
-
-        moveState.lastX = x;
-        moveState.lastY = y;
-
-        break;
-      }
-
-      case 'pointerup': {
-        if (!moveState.isMoving) return;
-
-        const updateData: { id: string; groupId?: string; zOrder?: number }[] = [];
         const selectedNodes = flowCore.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
 
         if (selectedNodes.length === 0) return;
@@ -119,6 +91,28 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           y,
         });
 
+        if (topLevelGroupNode) {
+          flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+        } else {
+          flowCore.commandHandler.emit('highlightGroupClear');
+        }
+
+        moveState.lastX = x;
+        moveState.lastY = y;
+
+        break;
+      }
+
+      case 'pointerup': {
+        if (!moveState.isMoving) return;
+
+        const topLevelGroupNode = getTopGroupAtPoint(flowCore, {
+          x: moveState.lastX,
+          y: moveState.lastY,
+        });
+
+        const updateData: { id: string; groupId?: string; zOrder?: number }[] = [];
+
         for (const selectedNode of flowCore.modelLookup.getSelectedNodes()) {
           if (topLevelGroupNode) {
             if (!flowCore.modelLookup.wouldCreateCircularDependency(selectedNode.id, topLevelGroupNode.id)) {
@@ -138,27 +132,6 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
               groupId: undefined,
             });
           }
-
-          if (updateData.length > 0) {
-            flowCore.commandHandler.emit('updateNodes', { nodes: updateData });
-          }
-
-          // That means a group has been highlighted, so we need to clear it
-          if (updateData.some((node) => Boolean(node.groupId))) {
-            // TODO: Add batching updates - due to race condition this is not applied correctly
-            // the initial state for the update is not updated
-            setTimeout(() => {
-              flowCore.commandHandler.emit('groupHighlightClear');
-            }, 0);
-          }
-
-          moveState.isMoving = false;
-          moveState.lastX = 0;
-          moveState.lastY = 0;
-          moveState.startX = 0;
-          moveState.startY = 0;
-          moveState.initialNodePosition = undefined;
-          break;
         }
 
         if (updateData.length > 0) {
@@ -168,7 +141,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         // That means a group has been highlighted, so we need to clear it
         if (updateData.some((node) => Boolean(node.groupId))) {
           // TODO: Add batching updates - due to race condition this is not applied correctly
-          // the initial state for the update is not yetupdated
+          // the initial state for the update is not yet updated
           setTimeout(() => {
             flowCore.commandHandler.emit('highlightGroupClear');
           }, 0);
@@ -177,6 +150,9 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         moveState.isMoving = false;
         moveState.lastX = 0;
         moveState.lastY = 0;
+        moveState.startX = 0;
+        moveState.startY = 0;
+        moveState.initialNodePosition = undefined;
         break;
       }
     }
