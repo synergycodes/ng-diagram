@@ -257,4 +257,24 @@ export class ModelLookup {
     // Check if groupId is already a descendant of nodeId
     return this.isNodeDescendantOfGroup(groupId, nodeId);
   }
+
+  /**
+   * Gets the full chain of parent group Nodes for a given nodeId.
+   * @param nodeId Node id
+   * @returns Array of parent group Node objects, from closest parent to farthest ancestor
+   */
+  public getParentChain(nodeId: string): Node[] {
+    const chain: Node[] = [];
+    let current = this.getNodeById(nodeId);
+
+    while (current && current.groupId) {
+      const parent = this.getNodeById(current.groupId);
+
+      if (parent) {
+        chain.push(parent);
+        current = parent;
+      }
+    }
+    return chain;
+  }
 }
