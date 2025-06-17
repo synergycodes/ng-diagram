@@ -96,7 +96,6 @@ export const getSampleRotateEvent = (overrides: Partial<RotateEvent> = {}): Rota
     mouse: { x: 0, y: 0 },
     handle: { x: 0, y: 0 },
     center: { x: 0, y: 0 },
-    ports: [],
     ...overrides,
   };
 };

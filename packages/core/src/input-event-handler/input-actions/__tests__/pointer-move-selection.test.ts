@@ -149,7 +149,8 @@ describe('pointerMoveSelectionAction', () => {
       const moveAfterUpEvent = getSamplePointerEvent({ type: 'pointermove', x: 120, y: 120 });
       pointerMoveSelectionAction.action(moveAfterUpEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledTimes(1);
+      expect(mockCommandHandler.emit).toHaveBeenNthCalledWith(1, 'moveSelection', { dx: 10, dy: 10 });
+      expect(mockCommandHandler.emit).not.toHaveBeenNthCalledWith(2, 'moveSelection', { dx: 10, dy: 10 });
     });
 
     it('should not emit movement if not in moving state', () => {

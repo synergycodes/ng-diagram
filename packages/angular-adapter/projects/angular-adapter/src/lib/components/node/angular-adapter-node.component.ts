@@ -41,7 +41,7 @@ export class AngularAdapterNodeComponent {
 
   constructor() {
     effect(() => {
-      const _ = this.rotate();
+      this.rotate();
       // TODO: fix problem with DOM position resync after repaint
       setTimeout(() => {
         const portsData = this.portsService.getNodePortsData(this.id());

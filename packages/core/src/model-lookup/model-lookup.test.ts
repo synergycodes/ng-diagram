@@ -129,12 +129,13 @@ describe('ModelLookup', () => {
 
   describe('getChildrenIds', () => {
     it('should return direct children ids for a group', () => {
-      const children = modelLookup.getChildrenIds('node1');
+      const children = modelLookup.getNodeChildrenIds('node1');
       expect(children).toEqual(['node2']);
     });
 
     it('should return empty array for non-group node', () => {
-      const children = modelLookup.getChildrenIds('node4');
+      const children = modelLookup.getNodeChildrenIds('node4');
+
       expect(children).toEqual([]);
     });
   });
