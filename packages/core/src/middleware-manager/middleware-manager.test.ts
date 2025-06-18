@@ -6,8 +6,8 @@ import { MiddlewareManager } from './middleware-manager';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
-import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
+import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 
 // Define all mocks at the top level
 vi.mock('./middlewares/edges-straight-routing', () => ({
