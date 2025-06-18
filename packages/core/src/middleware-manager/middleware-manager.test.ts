@@ -79,10 +79,10 @@ describe('MiddlewareManager', () => {
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
-        edgesStraightRoutingMiddleware,
-        nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
+        edgesStraightRoutingMiddleware,
+        nodeRotationSnapMiddleware,
       ]);
     });
 
@@ -91,10 +91,10 @@ describe('MiddlewareManager', () => {
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
-        edgesStraightRoutingMiddleware,
-        nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
+        edgesStraightRoutingMiddleware,
+        nodeRotationSnapMiddleware,
         mockMiddleware1,
       ]);
     });
