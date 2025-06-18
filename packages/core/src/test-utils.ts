@@ -19,6 +19,16 @@ export const mockNode: Node = {
   data: {},
 };
 
+export const mockGroupNode: Node = {
+  id: 'group1',
+  type: 'group',
+  selected: false,
+  isGroup: true,
+  position: { x: 0, y: 0 },
+  data: {},
+  zOrder: 1,
+};
+
 export const mockEdge: Edge = {
   id: 'edge1',
   type: 'edge',
