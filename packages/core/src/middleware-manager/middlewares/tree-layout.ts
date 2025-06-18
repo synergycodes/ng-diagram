@@ -4,7 +4,7 @@ import { FlowStateUpdate, Middleware, ModelActionType, TreeLayoutConfig } from '
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
 
 // Todo: Move this to metadata
-const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, layoutAngle: 90, layoutAlignment: 'Parent' };
+const CONFIG: TreeLayoutConfig = { siblingGap: 50, levelGap: 100, layoutAngle: 0, layoutAlignment: 'Parent' };
 
 const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 
@@ -32,18 +32,22 @@ export const treeLayoutMiddleware: Middleware = {
     roots.forEach((root) => {
       const isHorizontal = isAngleHorizontal(config.layoutAngle);
       console.log("isHorizontal", isHorizontal)
+      console.log("root", root);
+      console.log("offsetX", offsetX);
       const hasChildren = root.children.length > 0;
       const nodeSize = isHorizontal ? root.size?.height || 0 : root.size?.width || 0;
 
       if (isHorizontal) {
         const currentRootOffset = horizontalTreeLayout(root, config, offsetX, offsetY);
+        console.log("currentRootOffset", currentRootOffset);
         offsetY = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
       } else {
         const currentRootOffset = verticalTreeLayout(root, config, offsetX, offsetY);
+        console.log("currentRootOffset", currentRootOffset);
         offsetX = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
       }
     });
-
+console.log("NEw node", roots);
     const nodeList = Array.from(nodeMap.values());
     for (const node of nodes) {
       if (!node.position) {

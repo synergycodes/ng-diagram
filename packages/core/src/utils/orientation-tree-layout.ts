@@ -17,55 +17,62 @@ export const horizontalTreeLayout = (
   offsetY: number
 ): number => {
   const { children } = parentNode;
-  let currentOffsetY = offsetY;
   parentNode.position.x = offsetX;
 
-  // Handle leaf node (no children)
+  // 1. Leaf node: set X and return
   if (!children.length) {
-    parentNode.position.y = (offsetY + currentOffsetY) / 2;
-    return currentOffsetY;
+    parentNode.position.y = offsetY;
+    return offsetY;
   }
-  // 2. Initialize dimensions and direction
+
+  // Dimensions and direction
   const { width: parentWidth = 0, height: parentHeight = 0 } = parentNode.size || {};
+  const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
+  const isHorizontal = isAngleHorizontal(parentAngle);
+  const sign = getSign(parentAngle);
 
-  const parentAngle = parentNode?.layoutAngle || config.layoutAngle;
-  const directionSign = getSign(parentNode?.layoutAngle || config.layoutAngle);
+  // Offsets for children
+  let childOffsetY = offsetY + (!isHorizontal ? parentHeight + config.levelGap : 0);
+  let childOffsetX = offsetX;
+  let currentOffsetY = offsetY;
 
-  let childOffsetY = offsetY;
-
-  children.forEach((child, index) => {
+  // Layout children
+  children.forEach((child, i) => {
     const { width: childWidth = 0, height: childHeight = 0 } = child.size || {};
+    const childX = sign === 1
+      ? offsetX+ parentWidth + config.levelGap
+      : offsetX - (childWidth + config.levelGap);
 
-    const childX =
-      directionSign === 1
-        ? // Angle 0°: children positioned to the right of the parent
-          offsetX + parentWidth + config.levelGap
-        : // Angle 180°: children positioned to the left of the parent
-          offsetX - (childWidth + config.levelGap);
+    const childY = isHorizontal
+      ? horizontalTreeLayout(child, config, childOffsetX,childX)
+      : verticalTreeLayout(child, config, childOffsetX, childOffsetY);
 
-    const childY = isAngleHorizontal(parentAngle)
-      ? horizontalTreeLayout(child, config, childX, childOffsetY)
-      : verticalTreeLayout(child, config, childX, childOffsetY);
+    childOffsetX += childWidth + config.siblingGap;
+    currentOffsetY= childY + (child.children.length ? 0 : childHeight);
 
-    // Update currentOffsetY for the next child
-    currentOffsetY = childY + (child.children.length > 0 ? 0 : childHeight);
-    childOffsetY = currentOffsetY + (index < children.length - 1 ? config.siblingGap : 0);
+    if (!isHorizontal) {
+      childOffsetY = currentOffsetY + (i < children.length - 1 ? config.siblingGap : 0);
+    }
   });
 
-  // Calculate parent's Y position based on alignment mode
-  const firstChild = children[0];
-  const lastChild = children[children.length - 1];
+  // Parent X position based on alignment
+  const [firstChild, lastChild] = [children[0], children[children.length - 1]];
+  const topOffsetY = config.layoutAlignment === 'Subtree'
+    ? Math.min(firstChild.position.y, offsetY)
+    : firstChild.position.y;
+  const bottomOffsetY = config.layoutAlignment === 'Subtree'
+    ? Math.max(lastChild.position.y + (lastChild.size?.height || 0), currentOffsetY)
+    : lastChild.position.y + (lastChild.size?.height || 0);
 
-  const topOffsetY =
-    config.layoutAlignment === 'Subtree' ? Math.min(firstChild.position.y, offsetY) : firstChild.position.y;
+  parentNode.position.y = !isHorizontal
+    ? offsetY
+    : (topOffsetY + bottomOffsetY - parentHeight) / 2;
 
-  const bottomOffsetY =
-    config.layoutAlignment === 'Subtree'
-      ? Math.max(lastChild.position.y + (lastChild.size?.height || 0), currentOffsetY)
-      : lastChild.position.y + (lastChild.size?.height || 0);
-
-  parentNode.position.y = (topOffsetY + bottomOffsetY - parentHeight) / 2;
-  return currentOffsetY;
+  // Return updated offset
+  const maxChildrenHeight = Math.max(...children.map(child => child.size?.height || 0));
+  return !isHorizontal
+    ? offsetY + maxChildrenHeight + parentHeight + config.levelGap
+    : currentOffsetY;
 };
 
 /**
@@ -84,53 +91,60 @@ export const verticalTreeLayout = (
   offsetY: number
 ): number => {
   const { children } = parentNode;
-  let currentOffsetX = offsetX;
   parentNode.position.y = offsetY;
 
-  // Handle leaf node (no children)
+  // 1. Leaf node: set X and return
   if (!children.length) {
-    parentNode.position.x = (offsetX + currentOffsetX) / 2;
-    return currentOffsetX;
+    parentNode.position.x = offsetX;
+    return offsetX;
   }
-  // 2. Initialize dimensions and direction
+
+  // Dimensions and direction
   const { width: parentWidth = 0, height: parentHeight = 0 } = parentNode.size || {};
+  const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
+  const isHorizontal = isAngleHorizontal(parentAngle);
+  const sign = getSign(parentAngle);
 
-  const parentAngle = parentNode?.layoutAngle || config.layoutAngle;
-  const directionSign = getSign(parentNode?.layoutAngle || config.layoutAngle);
+  // Offsets for children
+  let childOffsetX = offsetX + (isHorizontal ? parentWidth + config.levelGap : 0);
+  let childOffsetY = offsetY;
+  let currentOffsetX = offsetX;
 
-  let childOffsetX = offsetX;
-
-  children.forEach((child, index) => {
+  // Layout children
+  children.forEach((child, i) => {
     const { width: childWidth = 0, height: childHeight = 0 } = child.size || {};
+    const childY = sign === 1
+      ? offsetY + parentHeight + config.levelGap
+      : offsetY - (childHeight + config.levelGap);
 
-    const childY =
-      directionSign === 1
-        ? // Angle 0°: children positioned to the right of the parent
-        offsetY + parentHeight + config.levelGap
-        : // Angle 180°: children positioned to the left of the parent
-        offsetY - (childHeight + config.levelGap);
-
-    const childX = isAngleHorizontal(parentAngle)
-      ? horizontalTreeLayout(child, config, childOffsetX, childY)
+    const childX = isHorizontal
+      ? horizontalTreeLayout(child, config, childOffsetX, childOffsetY)
       : verticalTreeLayout(child, config, childOffsetX, childY);
 
-    // Update currentOffsetX for the next child
-    currentOffsetX = childX + (child.children.length > 0 ? 0 : childWidth);
-    childOffsetX = currentOffsetX + (index < children.length - 1 ? config.siblingGap : 0);
+    childOffsetY += childHeight + config.siblingGap;
+    currentOffsetX = childX + (child.children.length ? 0 : childWidth);
+
+    if (!isHorizontal) {
+      childOffsetX = currentOffsetX + (i < children.length - 1 ? config.siblingGap : 0);
+    }
   });
 
-  // Calculate parent's X position based on alignment mode
-  const firstChild = children[0];
-  const lastChild = children[children.length - 1];
+  // Parent X position based on alignment
+  const [firstChild, lastChild] = [children[0], children[children.length - 1]];
+  const topOffsetX = config.layoutAlignment === 'Subtree'
+    ? Math.min(firstChild.position.x, offsetX)
+    : firstChild.position.x;
+  const bottomOffsetX = config.layoutAlignment === 'Subtree'
+    ? Math.max(lastChild.position.x + (lastChild.size?.width || 0), currentOffsetX)
+    : lastChild.position.x + (lastChild.size?.width || 0);
 
-  const topOffsetX =
-    config.layoutAlignment === 'Subtree' ? Math.min(firstChild.position.x, offsetX) : firstChild.position.x;
+  parentNode.position.x = isHorizontal
+    ? offsetX
+    : (topOffsetX + bottomOffsetX - parentWidth) / 2;
 
-  const bottomOffsetX =
-    config.layoutAlignment === 'Subtree'
-      ? Math.max(lastChild.position.x + (lastChild.size?.width || 0), currentOffsetX)
-      : lastChild.position.x + (lastChild.size?.width || 0);
-
-  parentNode.position.x = (topOffsetX + bottomOffsetX - parentWidth) / 2;
-  return currentOffsetX;
+  // Return updated offset
+  const maxChildrenWidth = Math.max(...children.map(child => child.size?.width || 0));
+  return isHorizontal
+    ? offsetX + maxChildrenWidth + parentWidth + config.levelGap
+    : currentOffsetX;
 };
