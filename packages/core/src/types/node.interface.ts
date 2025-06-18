@@ -1,4 +1,4 @@
-import type { Point, Size } from './utils';
+import type { LayoutAlignmentType, LayoutAngleType, Point, Size } from './utils';
 
 /**
  * Interface representing a node in the flow diagram
@@ -51,7 +51,11 @@ export interface Node {
   /**
    * Node layout direction: 0, 90, 180, 270.
    */
-  layoutAngle?: 0 | 90 | 180 | 270;
+  layoutAngle?: LayoutAngleType;
+  /**
+   * Node layout alignment: 'Parent' | 'Subtree'.
+   */
+  layoutAlignment?: LayoutAlignmentType;
 }
 
 /**
