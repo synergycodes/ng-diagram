@@ -1,5 +1,5 @@
 import type { Middleware, Node } from '../../types';
-import { calculateGroupRect } from '../../utils/get-group-bounds';
+import { calculateGroupRect } from '../../utils/group-size';
 
 export const groupChildrenChangeExtent: Middleware = {
   name: 'group-children-change-extent',
