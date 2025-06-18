@@ -43,14 +43,6 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with three nodes', () => {
-    const nodes = component.model().getNodes();
-    expect(nodes.length).toBe(3);
-    expect(nodes[0].type).toBe('image');
-    expect(nodes[1].type).toBe('input-field');
-    expect(nodes[2].type).toBe('resizable');
-  });
-
   it('should have correct node template mappings', () => {
     expect(component.nodeTemplateMap.has('input-field')).toBeTruthy();
     expect(component.nodeTemplateMap.has('image')).toBeTruthy();

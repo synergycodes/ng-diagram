@@ -30,6 +30,9 @@ describe('keyboardMoveSelectionAction', () => {
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
       environment: mockEnvironment,
+      modelLookup: {
+        getSelectedNodesWithChildren: vi.fn().mockReturnValue([mockNode]),
+      },
     } as unknown as FlowCore;
   });
 
@@ -48,16 +51,17 @@ describe('keyboardMoveSelectionAction', () => {
   });
 
   describe('action', () => {
-    it('should emit moveSelection command with correct dx and dy for ArrowRight', () => {
+    it('should emit moveNodes command with correct dx and dy for ArrowRight', () => {
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+        nodes: [mockNode],
         dx: 10,
         dy: 0,
       });
     });
 
-    it('should emit moveSelection command with correct dx and dy for ArrowLeft', () => {
+    it('should emit moveNodes command with correct dx and dy for ArrowLeft', () => {
       mockEvent = {
         ...mockEvent,
         key: 'ArrowLeft',
@@ -66,13 +70,14 @@ describe('keyboardMoveSelectionAction', () => {
 
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+        nodes: [mockNode],
         dx: -10,
         dy: 0,
       });
     });
 
-    it('should emit moveSelection command with correct dx and dy for ArrowUp', () => {
+    it('should emit moveNodes command with correct dx and dy for ArrowUp', () => {
       mockEvent = {
         ...mockEvent,
         key: 'ArrowUp',
@@ -81,13 +86,14 @@ describe('keyboardMoveSelectionAction', () => {
 
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+        nodes: [mockNode],
         dx: 0,
         dy: -10,
       });
     });
 
-    it('should emit moveSelection command with correct dx and dy for ArrowDown', () => {
+    it('should emit moveNodes command with correct dx and dy for ArrowDown', () => {
       mockEvent = {
         ...mockEvent,
         key: 'ArrowDown',
@@ -96,10 +102,23 @@ describe('keyboardMoveSelectionAction', () => {
 
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveSelection', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+        nodes: [mockNode],
         dx: 0,
         dy: 10,
       });
+    });
+
+    it('should not emit command if no nodes are selected', () => {
+      // Reset all mocks to ensure clean state
+      vi.clearAllMocks();
+
+      // Set up the mock to return empty array
+      (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
+
+      keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
     });
 
     it('should only trigger for keydown events', () => {

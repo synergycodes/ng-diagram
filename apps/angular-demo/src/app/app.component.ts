@@ -7,6 +7,7 @@ import {
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
+import { GroupNodeComponent } from './node-template/group-node/group-node.component';
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
@@ -24,6 +25,7 @@ export class AppComponent {
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],
     ['resizable', ResizableNodeComponent],
+    ['group', GroupNodeComponent],
   ]);
   middlewares = signal<Middleware[]>([loggerMiddleware]);
 
@@ -38,7 +40,9 @@ export class AppComponent {
         angle: 0,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true, angle: 0 },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, angle: 0 },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, angle: 0, groupId: '2' },
+      { id: '4', type: 'group', position: { x: 100, y: 400 }, data: { title: 'Group 1' }, resizable: true, angle: 0 },
+      { id: '5', type: 'group', position: { x: 300, y: 400 }, data: { title: 'Group 2' }, resizable: true, angle: 0 },
     ]);
     this.model().setEdges([
       {
