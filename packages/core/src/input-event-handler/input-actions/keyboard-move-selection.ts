@@ -2,9 +2,13 @@ import { CommandByName, isKeyboardDownEvent, type InputActionWithPredicate, type
 
 export const keyboardMoveSelectionAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    if (isKeyboardDownEvent(event)) {
-      flowCore.commandHandler.emit('moveSelection', getMoveNodesCommand(event));
-    }
+    if (!isKeyboardDownEvent(event)) return;
+
+    const nodesToMove = flowCore.modelLookup.getSelectedNodesWithChildren();
+
+    if (nodesToMove.length === 0) return;
+
+    flowCore.commandHandler.emit('moveNodes', { nodes: nodesToMove, ...getMoveNodesCommand(event) });
   },
   predicate: (event) =>
     isKeyboardDownEvent(event) &&

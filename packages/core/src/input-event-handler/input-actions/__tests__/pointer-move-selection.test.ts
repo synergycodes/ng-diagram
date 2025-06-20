@@ -5,16 +5,34 @@ import { getSamplePointerEvent, mockEdge, mockEnvironment, mockNode } from '../.
 import type { EventTarget, PointerEvent } from '../../../types';
 import { pointerMoveSelectionAction } from '../pointer-move-selection';
 
+// Import the moveState directly from the module
+import * as pointerMoveSelectionModule from '../pointer-move-selection';
+
+interface MoveState {
+  lastX: number;
+  lastY: number;
+  isMoving: boolean;
+}
+
 describe('pointerMoveSelectionAction', () => {
   const mockCommandHandler = { emit: vi.fn() };
   let mockEvent: PointerEvent;
   let mockTarget: EventTarget;
   let mockFlowCore: FlowCore;
+  let mockModelLookup: {
+    getSelectedNodes: ReturnType<typeof vi.fn>;
+    isNodeDescendantOfGroup: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockTarget = { type: 'node', element: mockNode };
     mockEvent = getSamplePointerEvent({ type: 'pointerdown', x: 100, y: 100, target: mockTarget });
+
+    mockModelLookup = {
+      getSelectedNodes: vi.fn().mockReturnValue([mockNode]),
+      isNodeDescendantOfGroup: vi.fn().mockReturnValue(false),
+    };
 
     mockFlowCore = {
       getState: vi.fn(),
@@ -22,7 +40,17 @@ describe('pointerMoveSelectionAction', () => {
       commandHandler: mockCommandHandler,
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
+      modelLookup: mockModelLookup,
+      getNodesInRange: vi.fn().mockReturnValue([]),
     } as unknown as FlowCore;
+
+    // Reset the moveState
+    const moveState = (pointerMoveSelectionModule as unknown as { moveState: MoveState }).moveState;
+    if (moveState) {
+      moveState.lastX = 0;
+      moveState.lastY = 0;
+      moveState.isMoving = false;
+    }
   });
 
   describe('predicate', () => {

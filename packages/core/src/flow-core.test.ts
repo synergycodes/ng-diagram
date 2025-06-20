@@ -42,6 +42,26 @@ vi.mock('./input-event-handler/input-event-handler', () => ({
   InputEventHandler: vi.fn().mockImplementation(() => mockInputEventHandler),
 }));
 
+// Mock ModelLookup
+const mockModelLookup = {
+  getNodeById: vi.fn(),
+  getEdgeById: vi.fn(),
+  getChildrenIds: vi.fn(),
+  hasChildren: vi.fn(),
+  hasDescendants: vi.fn(),
+  getNodeChildren: vi.fn(),
+  getSelectedNodes: vi.fn(),
+  getSelectedEdges: vi.fn(),
+  getSelectedNodesWithChildren: vi.fn(),
+  isNodeDescendantOfGroup: vi.fn(),
+  getChildrenMap: vi.fn(),
+  update: vi.fn(),
+};
+
+vi.mock('./model-lookup/model-lookup', () => ({
+  ModelLookup: vi.fn().mockImplementation(() => mockModelLookup),
+}));
+
 describe('FlowCore', () => {
   let flowCore: FlowCore;
   let mockModelAdapter: ModelAdapter;
@@ -243,15 +263,17 @@ describe('FlowCore', () => {
 
   describe('getNodeById', () => {
     it('should return the node by id', () => {
-      mockGetNodes.mockReturnValue([mockNode]);
+      mockModelLookup.getNodeById.mockReturnValue(mockNode);
       const node = flowCore.getNodeById(mockNode.id);
-      expect(node).toEqual(mockNode);
+      expect(node).toBe(mockNode);
+      expect(mockModelLookup.getNodeById).toHaveBeenCalledWith(mockNode.id);
     });
 
     it('should return null if the node is not found', () => {
-      mockGetNodes.mockReturnValue([mockNode]);
-      const node = flowCore.getNodeById('node-2');
+      mockModelLookup.getNodeById.mockReturnValue(null);
+      const node = flowCore.getNodeById('non-existent');
       expect(node).toBeNull();
+      expect(mockModelLookup.getNodeById).toHaveBeenCalledWith('non-existent');
     });
   });
 });

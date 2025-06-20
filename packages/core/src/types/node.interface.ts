@@ -48,6 +48,14 @@ export interface Node {
    * The angle of the node from 0 to 360.
    */
   angle?: number;
+  /**
+   * The id of the parent node.
+   */
+  groupId?: Node['id'];
+  /**
+   * Whether the node is treated as a group node.
+   */
+  isGroup?: boolean;
 }
 
 /**

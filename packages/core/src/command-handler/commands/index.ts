@@ -11,6 +11,7 @@ import {
   updateEdge,
   updateEdgeLabel,
   updateNode,
+  updateNodes,
   updatePorts,
 } from './add-update-delete';
 import { copy, paste } from './copy-paste';
@@ -23,7 +24,7 @@ import {
   startLinking,
   startLinkingFromPosition,
 } from './linking';
-import { moveSelection } from './move-selection';
+import { moveNodes, moveSelection } from './move';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
 import { rotateNodeBy } from './rotate-node';
@@ -46,9 +47,11 @@ export const commands: CommandMap = {
   deselect,
   deselectAll,
   moveSelection,
+  moveNodes,
   deleteSelection,
   addNodes,
   updateNode,
+  updateNodes,
   deleteNodes,
   addEdges,
   updateEdge,

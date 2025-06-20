@@ -22,6 +22,17 @@ export const updateNode = (commandHandler: CommandHandler, command: UpdateNodeCo
   commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id, ...nodeChanges }] }, 'updateNode');
 };
 
+export interface UpdateNodesCommand {
+  name: 'updateNodes';
+  nodes: (Pick<Node, 'id'> & Partial<Node>)[];
+}
+
+export const updateNodes = (commandHandler: CommandHandler, command: UpdateNodesCommand): void => {
+  const { nodes } = command;
+
+  commandHandler.flowCore.applyUpdate({ nodesToUpdate: nodes }, 'updateNodes');
+};
+
 export interface DeleteNodesCommand {
   name: 'deleteNodes';
   ids: string[];

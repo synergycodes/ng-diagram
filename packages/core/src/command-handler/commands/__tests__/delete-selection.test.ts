@@ -7,9 +7,14 @@ describe('Delete Selection Command', () => {
   let commandHandler: CommandHandler;
 
   beforeEach(() => {
+    const mockModelLookup = {
+      getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+    };
+
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
+      modelLookup: mockModelLookup,
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });
@@ -25,6 +30,7 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([nodes[0]]);
 
     commandHandler.emit('deleteSelection');
 
@@ -45,6 +51,7 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
     commandHandler.emit('deleteSelection');
 
@@ -63,6 +70,7 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([nodes[1]]);
 
     commandHandler.emit('deleteSelection');
 
