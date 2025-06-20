@@ -1,4 +1,5 @@
-import { Edge, Node, TreeNode } from '../types';
+import { Edge, Node } from '../types';
+import { TreeNode } from '../types/tree-layout.interface.ts';
 
 /**
  * Builds a tree structure from list of nodes and edges.

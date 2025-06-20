@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { horizontalTreeLayout, verticalTreeLayout } from '../orientation-tree-layout.ts';
 import { getMockTreeNode } from '../../test-utils.ts';
-import { TreeLayoutConfig } from '../../types';
+import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
 
 describe('verticalTreeLayout', () => {
   const config: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, orientation: 'Vertical' };

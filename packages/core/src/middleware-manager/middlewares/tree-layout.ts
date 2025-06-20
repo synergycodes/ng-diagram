@@ -1,6 +1,7 @@
 import { horizontalTreeLayout, verticalTreeLayout } from '../../utils/orientation-tree-layout.ts';
 import { buildTreeStructure } from '../../utils/build-tree-structure.ts';
-import { FlowStateUpdate, Middleware, ModelActionType, TreeLayoutConfig } from '../../types';
+import { FlowStateUpdate, Middleware, ModelActionType } from '../../types';
+import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
 
 // Todo: Move this to metadata
 const CONFIG: TreeLayoutConfig = { siblingGap: 100, levelGap: 100, orientation: 'Horizontal' };

@@ -1,4 +1,4 @@
-import { TreeLayoutConfig, TreeNode } from '../types';
+import { TreeLayoutConfig, TreeNode } from '../types/tree-layout.interface.ts';
 
 /**
  * Calculates horizontal positions for a tree layout starting from the given parent node.

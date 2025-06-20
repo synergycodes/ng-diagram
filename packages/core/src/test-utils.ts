@@ -8,9 +8,9 @@ import type {
   PointerEvent,
   Port,
   RotateEvent,
-  TreeNode,
   WheelEvent,
 } from './types';
+import { TreeNode } from './types/tree-layout.interface.ts';
 
 export const mockNode: Node = {
   id: 'node1',
