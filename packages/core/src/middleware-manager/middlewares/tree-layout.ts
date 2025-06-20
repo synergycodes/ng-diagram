@@ -31,23 +31,17 @@ export const treeLayoutMiddleware: Middleware = {
 
     roots.forEach((root) => {
       const isHorizontal = isAngleHorizontal(config.layoutAngle);
-      console.log("isHorizontal", isHorizontal)
-      console.log("root", root);
-      console.log("offsetX", offsetX);
       const hasChildren = root.children.length > 0;
       const nodeSize = isHorizontal ? root.size?.height || 0 : root.size?.width || 0;
 
       if (isHorizontal) {
         const currentRootOffset = horizontalTreeLayout(root, config, offsetX, offsetY);
-        console.log("currentRootOffset", currentRootOffset);
         offsetY = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
       } else {
         const currentRootOffset = verticalTreeLayout(root, config, offsetX, offsetY);
-        console.log("currentRootOffset", currentRootOffset);
         offsetX = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
       }
     });
-console.log("NEw node", roots);
     const nodeList = Array.from(nodeMap.values());
     for (const node of nodes) {
       if (!node.position) {

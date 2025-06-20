@@ -19,7 +19,7 @@ export const horizontalTreeLayout = (
   const { children } = parentNode;
   parentNode.position.x = offsetX;
 
-  // 1. Leaf node: set X and return
+  // Leaf node: set X and return
   if (!children.length) {
     parentNode.position.y = offsetY;
     return offsetY;
@@ -40,17 +40,17 @@ export const horizontalTreeLayout = (
   children.forEach((child, i) => {
     const { width: childWidth = 0, height: childHeight = 0 } = child.size || {};
     const childX = sign === 1
-      ? offsetX+ parentWidth + config.levelGap
+      ? offsetX + parentWidth + config.levelGap
       : offsetX - (childWidth + config.levelGap);
 
     const childY = isHorizontal
-      ? horizontalTreeLayout(child, config, childOffsetX,childX)
+      ? horizontalTreeLayout(child, config, childX, childOffsetY)
       : verticalTreeLayout(child, config, childOffsetX, childOffsetY);
 
     childOffsetX += childWidth + config.siblingGap;
-    currentOffsetY= childY + (child.children.length ? 0 : childHeight);
+    currentOffsetY = childY+ (child.children.length ? 0 : childHeight);
 
-    if (!isHorizontal) {
+    if (isHorizontal) {
       childOffsetY = currentOffsetY + (i < children.length - 1 ? config.siblingGap : 0);
     }
   });
@@ -61,7 +61,7 @@ export const horizontalTreeLayout = (
     ? Math.min(firstChild.position.y, offsetY)
     : firstChild.position.y;
   const bottomOffsetY = config.layoutAlignment === 'Subtree'
-    ? Math.max(lastChild.position.y + (lastChild.size?.height || 0), currentOffsetY)
+    ? Math.max(lastChild.position.y + (lastChild.size?.height|| 0), currentOffsetY)
     : lastChild.position.y + (lastChild.size?.height || 0);
 
   parentNode.position.y = !isHorizontal
@@ -93,7 +93,7 @@ export const verticalTreeLayout = (
   const { children } = parentNode;
   parentNode.position.y = offsetY;
 
-  // 1. Leaf node: set X and return
+  // Leaf node: set X and return
   if (!children.length) {
     parentNode.position.x = offsetX;
     return offsetX;
