@@ -1,10 +1,11 @@
 import { horizontalTreeLayout, verticalTreeLayout } from '../../utils/orientation-tree-layout.ts';
 import { buildTreeStructure } from '../../utils/build-tree-structure.ts';
-import { FlowStateUpdate, Middleware, ModelActionType, TreeLayoutConfig } from '../../types';
+import { FlowStateUpdate, Middleware, ModelActionType } from '../../types';
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
+import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
 
 // Todo: Move this to metadata
-const CONFIG: TreeLayoutConfig = { siblingGap: 50, levelGap: 100, layoutAngle: 0, layoutAlignment: 'Parent' };
+const CONFIG: TreeLayoutConfig = { siblingGap: 50, levelGap: 100, layoutAngle: 90, layoutAlignment: 'Parent' };
 
 const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 

@@ -49,6 +49,14 @@ export interface Node {
    */
   angle?: number;
   /**
+   * The id of the parent node.
+   */
+  groupId?: Node['id'];
+  /**
+   * Whether the node is treated as a group node.
+   */
+  isGroup?: boolean;
+  /**
    * Node layout direction: 0, 90, 180, 270.
    */
   layoutAngle?: LayoutAngleType;

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { CommandHandler } from '../../command-handler';
-import { moveSelection } from '../move-selection';
+import { moveSelection } from '../move';
 
 const MOVEMENT_STEP = 10;
 
@@ -13,6 +13,9 @@ describe('Move Selection Commands', () => {
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
+      modelLookup: {
+        getSelectedNodesWithChildren: vi.fn().mockReturnValue([{ id: '1', position: { x: 0, y: 0 }, selected: true }]),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });
@@ -53,6 +56,8 @@ describe('Move Selection Commands', () => {
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
       nodes: [mockNode],
     });
+
+    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
     moveSelection(commandHandler, { name: 'moveSelection', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
 

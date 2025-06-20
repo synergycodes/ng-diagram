@@ -3,6 +3,7 @@ import { InitializationGuard } from './initialization-guard/initialization-guard
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
+import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
@@ -29,6 +30,7 @@ export class FlowCore {
   readonly spatialHash: SpatialHash;
   readonly initializationGuard: InitializationGuard;
   readonly internalUpdater: InternalUpdater;
+  readonly modelLookup: ModelLookup;
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -45,8 +47,10 @@ export class FlowCore {
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
     this.internalUpdater = new InternalUpdater(this);
+    this.modelLookup = new ModelLookup(this);
 
     this.init();
+    this.modelLookup.update(this.getState());
   }
 
   /**
@@ -104,7 +108,7 @@ export class FlowCore {
   }
 
   /**
-   * Unregisters a middleware from the chain
+   * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
   unregisterMiddleware(name: string): void {
@@ -130,6 +134,7 @@ export class FlowCore {
     this.model.setNodes(state.nodes);
     this.model.setEdges(state.edges);
     this.model.setMetadata(state.metadata);
+    this.modelLookup.update(state);
   }
 
   /**
@@ -185,7 +190,7 @@ export class FlowCore {
    * @returns Node
    */
   getNodeById(nodeId: string): Node | null {
-    return this.getState().nodes.find((node) => node.id === nodeId) ?? null;
+    return this.modelLookup.getNodeById(nodeId);
   }
 
   /**
@@ -194,7 +199,7 @@ export class FlowCore {
    * @returns Edge
    */
   getEdgeById(edgeId: string): Edge | null {
-    return this.getState().edges.find((edge) => edge.id === edgeId) ?? null;
+    return this.modelLookup.getEdgeById(edgeId);
   }
 
   /**

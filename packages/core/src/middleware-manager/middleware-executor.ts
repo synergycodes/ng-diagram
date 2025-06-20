@@ -46,8 +46,8 @@ export class MiddlewareExecutor {
     this.initialState = initialState;
     this.modelActionType = modelActionType;
     this.metadata = initialState.metadata;
-    this.nodesMap = new Map(initialState.nodes.map((node) => [node.id, node]));
-    this.edgesMap = new Map(initialState.edges.map((edge) => [edge.id, edge]));
+    this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
+    this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
     return this.resolveMiddlewares();
