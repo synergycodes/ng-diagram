@@ -59,9 +59,9 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         });
 
         if (topLevelGroupNode) {
-          flowCore.commandHandler.emit('groupHighlight', { groupId: topLevelGroupNode.id });
+          flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
         } else {
-          flowCore.commandHandler.emit('groupHighlightClear');
+          flowCore.commandHandler.emit('highlightGroupClear');
         }
 
         moveState.lastX = x;
@@ -110,7 +110,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           // TODO: Add batching updates - due to race condition this is not applied correctly
           // the initial state for the update is not updated
           setTimeout(() => {
-            flowCore.commandHandler.emit('groupHighlightClear');
+            flowCore.commandHandler.emit('highlightGroupClear');
           }, 0);
         }
 

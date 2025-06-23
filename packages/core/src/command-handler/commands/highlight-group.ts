@@ -1,13 +1,13 @@
 import type { CommandHandler, Node } from '../../types';
 
-export interface GroupHighlightCommand {
-  name: 'groupHighlight';
+export interface HighlightGroupCommand {
+  name: 'highlightGroup';
   groupId: Node['id'];
 }
 
-export const groupHighlight = async (
+export const highlightGroup = async (
   commandHandler: CommandHandler,
-  { groupId }: GroupHighlightCommand
+  { groupId }: HighlightGroupCommand
 ): Promise<void> => {
   const { highlightedGroup } = commandHandler.flowCore.getState().metadata;
 
@@ -24,15 +24,15 @@ export const groupHighlight = async (
       metadataUpdate: { highlightedGroup: groupId },
       nodesToUpdate,
     },
-    'groupHighlight'
+    'highlightGroup'
   );
 };
 
-export interface GroupHighlightClearCommand {
-  name: 'groupHighlightClear';
+export interface HighlightGroupClearCommand {
+  name: 'highlightGroupClear';
 }
 
-export const groupHighlightClear = async (commandHandler: CommandHandler): Promise<void> => {
+export const highlightGroupClear = async (commandHandler: CommandHandler): Promise<void> => {
   const { highlightedGroup } = commandHandler.flowCore.getState().metadata;
 
   if (!highlightedGroup) return;
@@ -42,6 +42,6 @@ export const groupHighlightClear = async (commandHandler: CommandHandler): Promi
       metadataUpdate: { highlightedGroup: null },
       nodesToUpdate: [{ id: highlightedGroup, highlighted: false }],
     },
-    'groupHighlightClear'
+    'highlightGroupClear'
   );
 };

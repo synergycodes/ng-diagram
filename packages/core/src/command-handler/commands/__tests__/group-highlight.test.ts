@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { CommandHandler } from '../../command-handler';
-import { groupHighlight, groupHighlightClear } from '../group-highlight';
+import { highlightGroup, highlightGroupClear } from '../highlight-group';
 
-describe('Group Highlight Commands', () => {
+describe('Highlight Group Commands', () => {
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
 
@@ -15,11 +15,11 @@ describe('Group Highlight Commands', () => {
     commandHandler = new CommandHandler(flowCore);
   });
 
-  describe('groupHighlight', () => {
+  describe('highlightGroup', () => {
     it('should highlight a new group and unhighlight previous', async () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: 'oldGroup' } });
 
-      await groupHighlight(commandHandler, { name: 'groupHighlight', groupId: 'newGroup' });
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'newGroup' });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
@@ -29,52 +29,52 @@ describe('Group Highlight Commands', () => {
             { id: 'oldGroup', highlighted: false },
           ],
         },
-        'groupHighlight'
+        'highlightGroup'
       );
     });
 
     it('should highlight a group when no previous group is highlighted', async () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: null } });
 
-      await groupHighlight(commandHandler, { name: 'groupHighlight', groupId: 'group1' });
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'group1' });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadataUpdate: { highlightedGroup: 'group1' },
           nodesToUpdate: [{ id: 'group1', highlighted: true }],
         },
-        'groupHighlight'
+        'highlightGroup'
       );
     });
 
     it('should do nothing if the group is already highlighted', async () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: 'group1' } });
 
-      await groupHighlight(commandHandler, { name: 'groupHighlight', groupId: 'group1' });
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'group1' });
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
     });
   });
 
-  describe('groupHighlightClear', () => {
+  describe('highlightGroupClear', () => {
     it('should clear highlight if a group is highlighted', async () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: 'group1' } });
 
-      await groupHighlightClear(commandHandler);
+      await highlightGroupClear(commandHandler);
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           metadataUpdate: { highlightedGroup: null },
           nodesToUpdate: [{ id: 'group1', highlighted: false }],
         },
-        'groupHighlightClear'
+        'highlightGroupClear'
       );
     });
 
     it('should do nothing if no group is highlighted', async () => {
       (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: null } });
 
-      await groupHighlightClear(commandHandler);
+      await highlightGroupClear(commandHandler);
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
     });
