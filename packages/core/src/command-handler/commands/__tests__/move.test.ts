@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { CommandHandler } from '../../command-handler';
-import { moveSelection } from '../move';
+import { moveNodesBy } from '../move';
 
 const MOVEMENT_STEP = 10;
 
@@ -25,13 +25,19 @@ describe('Move Selection Commands', () => {
       id: '1',
       position: { x: 0, y: 0 },
       selected: true,
+      data: {},
+      type: 'node',
     };
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
       nodes: [mockNode],
     });
 
-    moveSelection(commandHandler, { name: 'moveSelection', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
+    moveNodesBy(commandHandler, {
+      name: 'moveNodesBy',
+      delta: { x: MOVEMENT_STEP, y: MOVEMENT_STEP },
+      nodes: [mockNode],
+    });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
@@ -42,7 +48,7 @@ describe('Move Selection Commands', () => {
           },
         ],
       },
-      'moveSelection'
+      'moveNodesBy'
     );
   });
 
@@ -51,6 +57,8 @@ describe('Move Selection Commands', () => {
       id: '1',
       position: { x: 0, y: 0 },
       selected: false,
+      data: {},
+      type: 'node',
     };
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -59,7 +67,11 @@ describe('Move Selection Commands', () => {
 
     (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
-    moveSelection(commandHandler, { name: 'moveSelection', dx: MOVEMENT_STEP, dy: MOVEMENT_STEP });
+    moveNodesBy(commandHandler, {
+      name: 'moveNodesBy',
+      delta: { x: MOVEMENT_STEP, y: MOVEMENT_STEP },
+      nodes: [],
+    });
 
     expect(flowCore.applyUpdate).not.toHaveBeenCalled();
   });

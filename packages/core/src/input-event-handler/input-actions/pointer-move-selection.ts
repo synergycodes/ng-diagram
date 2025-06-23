@@ -84,7 +84,10 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         const dx = deltaX - (firstNode.position.x - moveState.initialNodePosition.x);
         const dy = deltaY - (firstNode.position.y - moveState.initialNodePosition.y);
 
-        flowCore.commandHandler.emit('moveNodes', { dx, dy, nodes: selectedNodes });
+        flowCore.commandHandler.emit('moveNodesBy', {
+          delta: { x: dx, y: dy },
+          nodes: selectedNodes,
+        });
 
         const topLevelGroupNode = getTopGroupAtPoint(flowCore, {
           x,

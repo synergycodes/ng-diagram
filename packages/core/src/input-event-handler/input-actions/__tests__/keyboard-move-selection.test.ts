@@ -54,10 +54,9 @@ describe('keyboardMoveSelectionAction', () => {
     it('should emit moveNodes command with correct dx and dy for ArrowRight', () => {
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
         nodes: [mockNode],
-        dx: 10,
-        dy: 0,
+        delta: { x: 10, y: 0 },
       });
     });
 
@@ -70,10 +69,9 @@ describe('keyboardMoveSelectionAction', () => {
 
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
         nodes: [mockNode],
-        dx: -10,
-        dy: 0,
+        delta: { x: -10, y: 0 },
       });
     });
 
@@ -86,10 +84,9 @@ describe('keyboardMoveSelectionAction', () => {
 
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
         nodes: [mockNode],
-        dx: 0,
-        dy: -10,
+        delta: { x: 0, y: -10 },
       });
     });
 
@@ -102,10 +99,9 @@ describe('keyboardMoveSelectionAction', () => {
 
       keyboardMoveSelectionAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodes', {
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
         nodes: [mockNode],
-        dx: 0,
-        dy: 10,
+        delta: { x: 0, y: 10 },
       });
     });
 
