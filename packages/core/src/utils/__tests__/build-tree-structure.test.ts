@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTreeStructure } from '../build-tree-structure.ts';
+import { buildTreeStructure } from '../tree-layout/build-tree-structure.ts';
 import { Edge, Node } from '../../types';
 
 type PartialNode = Pick<Node, 'id' | 'position' | 'size'>;
@@ -17,13 +17,12 @@ describe('buildTreeStructure', () => {
       { source: 'root', target: 'child2' },
     ];
 
-    const { roots, nodeMap } = buildTreeStructure(nodes, edges);
+    const { roots } = buildTreeStructure(nodes, edges);
 
     expect(roots.length).toBe(1);
     expect(roots[0].id).toBe('root');
     expect(roots[0].children.length).toBe(2);
     expect(roots[0].children.map((c) => c.id).sort()).toEqual(['child1', 'child2']);
-    expect(nodeMap.size).toBe(3);
   });
 
   it('should not mutate the original nodes', () => {

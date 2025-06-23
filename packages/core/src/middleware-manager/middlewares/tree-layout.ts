@@ -1,11 +1,23 @@
-import { horizontalTreeLayout, verticalTreeLayout } from '../../utils/orientation-tree-layout.ts';
-import { buildTreeStructure } from '../../utils/build-tree-structure.ts';
+import { makeTreeLayout } from '../../utils/tree-layout/orientation-tree-layout.ts';
+import {
+  buildGroupsHierarchy,
+  buildTopGroupMap,
+  buildTreeStructure,
+  getNodeMap,
+  remapEdges,
+} from '../../utils/tree-layout/build-tree-structure.ts';
 import { FlowStateUpdate, Middleware, ModelActionType } from '../../types';
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
 import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
 
 // Todo: Move this to metadata
-const CONFIG: TreeLayoutConfig = { siblingGap: 50, levelGap: 100, layoutAngle: 90, layoutAlignment: 'Parent' };
+const CONFIG: TreeLayoutConfig = {
+  siblingGap: 0,
+  levelGap: 0,
+  layoutAngle: 90,
+  layoutAlignment: 'Parent',
+  autoLayout: false,
+};
 
 const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 
@@ -18,31 +30,37 @@ export const treeLayoutMiddleware: Middleware = {
     } = context;
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
 
-    if (!shouldTreeLayout) {
+    if (!shouldTreeLayout && !CONFIG.autoLayout) {
       next();
       return;
     }
 
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
+    const nodeMap = getNodeMap(nodes);
+    const topGroupMap = buildTopGroupMap(nodeMap);
+    const remappedEdges = remapEdges(edges, topGroupMap);
 
-    const { nodeMap, roots } = buildTreeStructure(nodes, edges);
+    buildGroupsHierarchy(nodeMap);
+    const { roots } = buildTreeStructure(nodeMap, remappedEdges);
+
     const config = CONFIG;
-    let offsetY = 100;
-    let offsetX = 100;
 
+    let offset = { x: 100, y: 100 };
+
+    const isHorizontal = isAngleHorizontal(config.layoutAngle);
     roots.forEach((root) => {
-      const isHorizontal = isAngleHorizontal(config.layoutAngle);
-      const hasChildren = root.children.length > 0;
-      const nodeSize = isHorizontal ? root.size?.height || 0 : root.size?.width || 0;
+      const subtreeBounds = makeTreeLayout(root, config, offset.x, offset.y, true);
+      const subtreeSizeAlongCross = isAngleHorizontal(config.layoutAngle)
+        ? Math.abs(subtreeBounds.maxY - subtreeBounds.minY)
+        : Math.abs(subtreeBounds.maxX - subtreeBounds.minX);
 
       if (isHorizontal) {
-        const currentRootOffset = horizontalTreeLayout(root, config, offsetX, offsetY);
-        offsetY = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
+        offset.y += config.siblingGap + subtreeSizeAlongCross;
       } else {
-        const currentRootOffset = verticalTreeLayout(root, config, offsetX, offsetY);
-        offsetX = currentRootOffset + config.siblingGap + (hasChildren ? 0 : nodeSize);
+        offset.x += config.siblingGap + subtreeSizeAlongCross;
       }
     });
+
     const nodeList = Array.from(nodeMap.values());
     for (const node of nodes) {
       if (!node.position) {

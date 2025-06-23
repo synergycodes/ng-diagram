@@ -1,4 +1,5 @@
-import type { LayoutAlignmentType, LayoutAngleType, Point, Size } from './utils';
+import type { Point, Size } from './utils';
+import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface.ts';
 
 /**
  * Interface representing a node in the flow diagram
@@ -64,6 +65,7 @@ export interface Node {
    * Node layout alignment: 'Parent' | 'Subtree'.
    */
   layoutAlignment?: LayoutAlignmentType;
+  text?: string;
 }
 
 /**

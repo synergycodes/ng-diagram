@@ -1,3 +1,5 @@
+import { Node } from './node.interface.ts';
+
 /**
  * Type for layout angle
  */
@@ -6,7 +8,7 @@ export type LayoutAngleType = 0 | 90 | 180 | 270;
 /**
  * Type for layout alignment
  */
-export type LayoutAlignmentType = 'Parent' | 'Subtree';
+export type LayoutAlignmentType = 'Parent' | 'Subtree' | 'Start';
 
 export interface TreeLayoutConfig {
   // Configurable gap between sibling nodes in the same row/column
@@ -16,14 +18,10 @@ export interface TreeLayoutConfig {
   layoutAngle: LayoutAngleType;
   // Default 'Parent'
   layoutAlignment?: LayoutAlignmentType;
+  autoLayout?: boolean;
 }
 
-export interface TreeNode {
-  id: string;
+export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'layoutAngle' | 'type' | 'groupId'> {
   children: TreeNode[];
-  size?: { width: number; height: number };
-  position: { x: number; y: number };
-  layoutAngle?: LayoutAngleType;
-  // Default 'Parent'
-  layoutAlignment?: LayoutAlignmentType;
+  groupChildren?: TreeNode[];
 }
