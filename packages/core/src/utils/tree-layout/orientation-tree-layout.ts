@@ -1,13 +1,9 @@
 import { TreeLayoutConfig, TreeNode } from '../../types/tree-layout.interface.ts';
 import { getDirectionVectors, isAngleHorizontal } from '../get-direction.ts';
-import { getNodeSize, groupLayout, isLeafNode } from './tree-layout-utils.ts';
+import { getNodeSize, getSizeAlongAxis, groupLayout, isLeafNode } from './tree-layout-utils.ts';
 
 type Rect = { minX: number; maxX: number; minY: number; maxY: number };
 
-export function getSizeAlongAxis(width: number, height: number, axis: { x: number; y: number }): number {
-  if (axis.x !== 0) return width;
-  else return height;
-}
 
 /**
  * Calculates horizontal positions for a tree layout starting from the given parent node.
@@ -30,7 +26,7 @@ export const makeTreeLayout = (
   const { width, height } = getNodeSize(parentNode);
 
   // Leaf node and groups: set X, Y and return
-  if (isLeafNode(parentNode) || parentNode.type === 'group') {
+  if (isLeafNode(parentNode)) {
     if (parentNode.type === 'group') {
       const delta = { x: offsetX - parentNode.position.x, y: offsetY - parentNode.position.y };
       if (parentNode.groupChildren) groupLayout(parentNode.groupChildren, delta);
@@ -56,9 +52,10 @@ export const makeTreeLayout = (
   let minY = offsetY;
   let maxY = offsetY + height;
 
+  console.log('PARENt', parentNode);
+  console.log('CHILDREN', children);
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
-
     const { width: childWidth, height: childHeight } = getNodeSize(child);
 
     const parentSizeAlongMain = getSizeAlongAxis(width, height, main);
@@ -67,21 +64,33 @@ export const makeTreeLayout = (
     // Determine whether you are drawing "forward" (0 or 90) or "backward" (180 or 270)
     const drawForward = main.x > 0 || main.y > 0;
 
+    // Calculate the offset relative to the main axis
     const offsetMain = config.levelGap + (drawForward ? parentSizeAlongMain : childSizeAlongMain);
-    // const offsetMain = config.levelGap + getSizeAlongAxis(childWidth, childHeight, main);
-    // Child position = parent position + main offset + cross-offset
+
+    // Child’s position relative to the parent
     const childPos = {
       x: offsetX + main.x * offsetMain + cross.x * crossPos,
       y: offsetY + main.y * offsetMain + cross.y * crossPos,
     };
 
-    const childBounds = makeTreeLayout(children[i], config, childPos.x, childPos.y);
+    // Recursively arrange the subtree
+    const childBounds = makeTreeLayout(child, config, childPos.x, childPos.y);
+
+    // Update the boundaries of the entire subtree
     minX = Math.min(minX, childBounds.minX);
     maxX = Math.max(maxX, childBounds.maxX);
     minY = Math.min(minY, childBounds.minY);
     maxY = Math.max(maxY, childBounds.maxY);
-    // Move crossPos by child size and gap to position next sibling
-    crossPos += getSizeAlongAxis(childWidth, childHeight, cross) + (i < children.length - 1 ? config.siblingGap : 0);
+
+    // Calculate the size of the entire child subtree along the cross axis
+    const childSubtreeCrossSize = getSizeAlongAxis(
+      Math.abs(childBounds.maxX - childBounds.minX),
+      Math.abs(childBounds.maxY - childBounds.minY),
+      cross
+    );
+
+    // Move along the cross-axis, taking into account the size of the child subtree and the spacing
+    crossPos += childSubtreeCrossSize + (i < children.length - 1 ? config.siblingGap : 0);
   }
   const [firstChild, lastChild] = [children[0], children[children.length - 1]];
   const isHorizontal = isAngleHorizontal(parentAngle);
@@ -103,6 +112,10 @@ export const makeTreeLayout = (
       : offsetY;
   }
 
+  if (parentNode.type === 'group') {
+    const delta = { x: x - parentNode.position.x, y: y - parentNode.position.y };
+    if (parentNode.groupChildren) groupLayout(parentNode.groupChildren, delta);
+  }
   parentNode.position.x = x;
   parentNode.position.y = y;
 

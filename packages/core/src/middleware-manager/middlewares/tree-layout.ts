@@ -9,11 +9,12 @@ import {
 import { FlowStateUpdate, Middleware, ModelActionType } from '../../types';
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
 import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
+import { getNodeSize } from '../../utils/tree-layout/tree-layout-utils.ts';
 
 // Todo: Move this to metadata
 const CONFIG: TreeLayoutConfig = {
-  siblingGap: 0,
-  levelGap: 0,
+  siblingGap: 50,
+  levelGap: 100,
   layoutAngle: 90,
   layoutAlignment: 'Parent',
   autoLayout: false,
@@ -49,18 +50,21 @@ export const treeLayoutMiddleware: Middleware = {
 
     const isHorizontal = isAngleHorizontal(config.layoutAngle);
     roots.forEach((root) => {
-      const subtreeBounds = makeTreeLayout(root, config, offset.x, offset.y, true);
-      const subtreeSizeAlongCross = isAngleHorizontal(config.layoutAngle)
-        ? Math.abs(subtreeBounds.maxY - subtreeBounds.minY)
-        : Math.abs(subtreeBounds.maxX - subtreeBounds.minX);
+      // Układamy poddrzewo zaczynając od bieżącego offsetu
+      makeTreeLayout(root, config, offset.x, offset.y, true);
 
+      // Bierzemy tylko rozmiar roota, a nie całego poddrzewa
+      const { width = 0, height = 0 } = getNodeSize(root);
+      const rootSizeAlongCross = isAngleHorizontal(config.layoutAngle) ? height : width;
+
+      // Przesuwamy offset tylko o rozmiar roota + odstęp
       if (isHorizontal) {
-        offset.y += config.siblingGap + subtreeSizeAlongCross;
+        offset.y += config.siblingGap + rootSizeAlongCross;
       } else {
-        offset.x += config.siblingGap + subtreeSizeAlongCross;
+        offset.x += config.siblingGap + rootSizeAlongCross;
       }
     });
-
+    console.log('roots', roots);
     const nodeList = Array.from(nodeMap.values());
     for (const node of nodes) {
       if (!node.position) {
@@ -71,7 +75,7 @@ export const treeLayoutMiddleware: Middleware = {
       if (!currentNode || (node.position.x === currentNode.position.x && node.position.y === currentNode.position.y)) {
         continue;
       }
-      nodesToUpdate.push(currentNode);
+      nodesToUpdate.push({ id: currentNode.id, position: currentNode.position });
     }
 
     next({ ...(nodesToUpdate.length > 0 ? { nodesToUpdate } : {}) });
