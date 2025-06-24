@@ -32,8 +32,8 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
   return [sourcePoint, targetPoint].filter((point) => !!point);
 };
 
-export const edgesOrthogonalRoutingMiddleware: Middleware = {
-  name: 'edges-orthogonal-routing',
+export const edgesRoutingMiddleware: Middleware = {
+  name: 'edges-routing',
   execute: (context, next) => {
     const {
       state: { edges, metadata },

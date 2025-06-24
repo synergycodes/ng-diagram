@@ -6,6 +6,7 @@ export function getStraightPath(points: { x: number; y: number }[]): string {
   const [start, end] = points;
   return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
 }
+
 /** Radius for orthogonal edges. */
 export const MAX_ORTHOGONAL_RADIUS = 16;
 
@@ -19,10 +20,12 @@ export enum Orientation {
   Horizontal = 'horizontal',
   Vertical = 'vertical',
 }
+
 export interface Point {
   x: number;
   y: number;
 }
+
 /**
  * Determines the orientation of a segment based on its start and end X coordinates.
  *
@@ -42,14 +45,8 @@ export const getSegmentOrientation = (startX: number, endX: number) => {
  * @param targetPoint - The ending point of the segment with x and y coordinates.
  * @returns `true` if the segment is growing (i.e., the target point is further along the orientation axis than the source point), otherwise `false`.
  */
-export const getIsGrowing = (
-  segmentOrientation: Orientation,
-  sourcePoint: Point,
-  targetPoint: Point,
-) =>
-  segmentOrientation === Orientation.Vertical
-    ? sourcePoint.y < targetPoint.y
-    : sourcePoint.x < targetPoint.x;
+export const getIsGrowing = (segmentOrientation: Orientation, sourcePoint: Point, targetPoint: Point) =>
+  segmentOrientation === Orientation.Vertical ? sourcePoint.y < targetPoint.y : sourcePoint.x < targetPoint.x;
 
 /**
  * Generates an orthogonal SVG path string
@@ -61,27 +58,25 @@ export const getIsGrowing = (
  * @param points - An optional array of intermediate points (XYPosition) through which the path should pass.
  * @returns A string representing the SVG path data for the orthogonal path.
  */
-export const getOrthogonalPath = (
-  allPoints: Point[] = [],
-): string => {
-  const source = allPoints[0];
-  const middle = allPoints.slice(1, -1);
-  const target = allPoints[allPoints.length - 1];
+export const getOrthogonalPath = (points: Point[] = []): string => {
+  if (points.length <= 2) {
+    return getStraightPath(points);
+  }
+  console.log('points', points);
+  const source = points[0];
+  const middle = points.slice(1, -1);
+  const target = points[points.length - 1];
 
   // @ts-ignore
   const pathArray = middle.map((point, index) => {
-    const prevPoint = allPoints[index];
-    const nextPoint = allPoints[index + 2];
+    const prevPoint = points[index];
+    const nextPoint = points[index + 2];
     const orientation = getSegmentOrientation(prevPoint.x, point.x);
 
     // Compare the previous and next points to calculate a dynamic radius
     const dx = nextPoint.x - prevPoint.x;
     const dy = nextPoint.y - prevPoint.y;
-    const radius = Math.min(
-      Math.abs(dx) / 2,
-      Math.abs(dy) / 2,
-      MAX_ORTHOGONAL_RADIUS,
-    );
+    const radius = Math.min(Math.abs(dx) / 2, Math.abs(dy) / 2, MAX_ORTHOGONAL_RADIUS);
 
     //
     // // top left corner of canvas is 0,0
@@ -105,8 +100,7 @@ export const getOrthogonalPath = (
     // This makes it easier to draw handlers and lines.
     if (
       middle.length <= 2 &&
-      ((isXCloseToPrevPoint && isYCloseToPrevPoint) ||
-        (isXCloseToNextPoint && isYCloseToNextPoint))
+      ((isXCloseToPrevPoint && isYCloseToPrevPoint) || (isXCloseToNextPoint && isYCloseToNextPoint))
     ) {
       return '';
     }

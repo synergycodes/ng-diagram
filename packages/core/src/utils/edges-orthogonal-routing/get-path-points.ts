@@ -2,7 +2,7 @@ import { getInitialPathPoints, Position } from './initial-positions/get-initial-
 import { Point } from '../../types';
 
 /**
- * Custom hook that calculates the path points for orthogonal routing between two positions.
+ * Calculates the path points for orthogonal routing between two positions.
  *
  * @param {Position} sourcePosition - The position of the source handle.
  * @param {Position} targetPosition - The position of the target handle.
@@ -11,17 +11,19 @@ import { Point } from '../../types';
  *
  * @returns {Array} pathPoints - An array of path points for the orthogonal routing.
  */
-export const getPathPoints = (sourcePosition: Position, targetPosition: Position, xySource: Point, xyTarget: Point) => {
+export const getPathPoints = (
+  sourcePosition: Position,
+  targetPosition: Position,
+  xySource: Point,
+  xyTarget: Point
+): Array<any> => {
   const centerX = (xySource.x + xyTarget.x) / 2;
 
   const centerY = (xySource.y + xyTarget.y) / 2;
-  const pathPoints =
+  return (
     getInitialPathPoints(sourcePosition, targetPosition, xySource, xyTarget, {
       x: centerX,
       y: centerY,
-    }) || [];
-
-  return {
-    pathPoints,
-  };
+    }) || []
+  );
 };

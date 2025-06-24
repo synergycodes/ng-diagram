@@ -67,7 +67,7 @@ describe('EdgeOrthogonalComponent', () => {
     fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.path()).toBe('M 10 20  L 30 40');
+    expect(component.path()).toBe('M 10 20 L 30 40');
   });
 
   it('should calculate path from edge points', () => {
