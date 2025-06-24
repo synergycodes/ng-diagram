@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { Port, PortTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
-import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
+import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
@@ -31,8 +31,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly eventMapperService = inject(EventMapperService);
   private readonly nodeComponent = inject(AngularAdapterNodeComponent);
-  private readonly updatePortsService = inject(UpdatePortsService);
-  private resizeObserver!: ResizeObserver;
+  private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<Port['id']>();
   type = input.required<Port['type']>();
@@ -41,10 +40,11 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
 
   lastSide = signal<Port['side'] | undefined>(undefined);
   lastType = signal<Port['type'] | undefined>(undefined);
+  private isInitialized = signal(false);
 
   constructor() {
     effect(() => {
-      if (this.lastSide() !== this.side()) {
+      if (this.isInitialized() && this.lastSide() !== this.side()) {
         this.lastSide.set(this.side());
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: this.nodeData().id,
@@ -54,7 +54,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
     });
 
     effect(() => {
-      if (this.lastType() !== this.type()) {
+      if (this.isInitialized() && this.lastType() !== this.type()) {
         this.lastType.set(this.type());
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: this.nodeData().id,
@@ -67,6 +67,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.lastSide.set(this.side());
     this.lastType.set(this.type());
+
     this.flowCoreProvider.provide().internalUpdater.addPort(this.nodeData().id, {
       id: this.id(),
       type: this.type(),
@@ -74,20 +75,12 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       side: this.side(),
     });
 
-    this.resizeObserver = new ResizeObserver((entries) => {
-      const borderBox = entries[0].borderBoxSize?.[0];
-      if (borderBox) {
-        const width = borderBox.inlineSize;
-        const height = borderBox.blockSize;
-        const { position } = this.updatePortsService.getPortData(this.hostElement.nativeElement);
-        this.flowCoreProvider
-          .provide()
-          .internalUpdater.applyPortsSizesAndPositions(this.nodeData().id, [
-            { id: this.id(), size: { width, height }, position },
-          ]);
-      }
+    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
+      type: 'port',
+      nodeId: this.nodeData().id,
+      portId: this.id(),
     });
-    this.resizeObserver.observe(this.hostElement.nativeElement);
+    this.isInitialized.set(true);
   }
 
   ngOnDestroy(): void {
@@ -95,7 +88,8 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
       nodeId: this.nodeData().id,
       portIds: [this.id()],
     });
-    this.resizeObserver.disconnect();
+
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 
   onPointerDown(event: PointerEvent) {

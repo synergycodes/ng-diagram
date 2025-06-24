@@ -13,7 +13,7 @@ import {
   PointerUpEventListenerDirective,
   WheelEventListenerDirective,
 } from '../../directives';
-import { FlowCoreProviderService, RendererService } from '../../services';
+import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
@@ -49,6 +49,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
 export class AngularAdapterDiagramComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
+  private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
   /**
    * The model to use in the diagram.
    */
@@ -80,6 +81,8 @@ export class AngularAdapterDiagramComponent {
     const effectRef = effect(
       () => {
         this.flowCoreProvider.init(this.model(), this.middlewares());
+        // Initialize the resize batch processor after FlowCore is ready
+        this.flowResizeBatchProcessor.initialize();
         effectRef.destroy();
       },
       { manualCleanup: true }

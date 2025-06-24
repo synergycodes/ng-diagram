@@ -2,7 +2,7 @@
  * Public API Surface of angular-adapter
  */
 
-export type { Middleware, Node } from '@angularflow/core';
+export type { Edge, Middleware, Node } from '@angularflow/core';
 export * from './lib/components/diagram/angular-adapter-diagram.component';
 export * from './lib/components/port/angular-adapter-port.component';
 export * from './lib/directives';
