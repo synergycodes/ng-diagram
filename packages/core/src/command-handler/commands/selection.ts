@@ -39,10 +39,10 @@ export interface SelectCommand {
   preserveSelection?: boolean;
 }
 
-export const select = (
+export const select = async (
   commandHandler: CommandHandler,
   { nodeIds, edgeIds, preserveSelection = false }: SelectCommand
-): void => {
+) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
   if (preserveSelection) {
     const { selectedNodeIds, selectedEdgeIds } = getSelectedIds(nodes, edges);
@@ -53,7 +53,7 @@ export const select = (
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
 export interface DeselectCommand {
@@ -62,7 +62,7 @@ export interface DeselectCommand {
   edgeIds?: string[];
 }
 
-export const deselect = (commandHandler: CommandHandler, { nodeIds, edgeIds }: DeselectCommand): void => {
+export const deselect = async (commandHandler: CommandHandler, { nodeIds, edgeIds }: DeselectCommand) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
   const { selectedNodeIds, selectedEdgeIds } = getSelectedIds(nodes, edges);
   const newNodeIds = selectedNodeIds.filter((id) => !nodeIds?.includes(id));
@@ -71,18 +71,18 @@ export const deselect = (commandHandler: CommandHandler, { nodeIds, edgeIds }: D
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
 export interface DeselectAllCommand {
   name: 'deselectAll';
 }
 
-export const deselectAll = (commandHandler: CommandHandler): void => {
+export const deselectAll = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
   const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, [], []);
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };

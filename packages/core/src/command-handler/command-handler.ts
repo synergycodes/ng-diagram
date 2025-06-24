@@ -33,17 +33,16 @@ export class CommandHandler implements CoreCommandHandler {
    * @param commandName Command name
    * @param rest Command props
    */
-  emit<K extends CommandName>(
+  async emit<K extends CommandName>(
     commandName: K,
     ...props: IsEmpty<CommandByName<K>> extends true
       ? [] | [WithoutName<CommandByName<K>>]
       : [WithoutName<CommandByName<K>>]
-  ): void {
+  ): Promise<void> {
     const callbacks = this.callbacks[commandName];
     if (callbacks) {
-      for (const callback of callbacks) {
-        callback({ name: commandName, ...props[0] } as CommandByName<K>);
-      }
+      const command = { name: commandName, ...props[0] } as CommandByName<K>;
+      await Promise.all(callbacks.map((callback) => callback(command)));
     }
   }
 

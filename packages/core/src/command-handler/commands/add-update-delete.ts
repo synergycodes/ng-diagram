@@ -6,9 +6,9 @@ export interface AddNodesCommand {
   nodes: Node[];
 }
 
-export const addNodes = (commandHandler: CommandHandler, command: AddNodesCommand): void => {
+export const addNodes = async (commandHandler: CommandHandler, command: AddNodesCommand) => {
   const { nodes } = command;
-  commandHandler.flowCore.applyUpdate({ nodesToAdd: nodes }, 'addNodes');
+  await commandHandler.flowCore.applyUpdate({ nodesToAdd: nodes }, 'addNodes');
 };
 
 export interface UpdateNodeCommand {
@@ -17,9 +17,9 @@ export interface UpdateNodeCommand {
   nodeChanges: Partial<Node>;
 }
 
-export const updateNode = (commandHandler: CommandHandler, command: UpdateNodeCommand): void => {
+export const updateNode = async (commandHandler: CommandHandler, command: UpdateNodeCommand) => {
   const { id, nodeChanges } = command;
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id, ...nodeChanges }] }, 'updateNode');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id, ...nodeChanges }] }, 'updateNode');
 };
 
 export interface UpdateNodesCommand {
@@ -27,10 +27,10 @@ export interface UpdateNodesCommand {
   nodes: (Pick<Node, 'id'> & Partial<Node>)[];
 }
 
-export const updateNodes = (commandHandler: CommandHandler, command: UpdateNodesCommand): void => {
+export const updateNodes = async (commandHandler: CommandHandler, command: UpdateNodesCommand) => {
   const { nodes } = command;
 
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate: nodes }, 'updateNodes');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: nodes }, 'updateNodes');
 };
 
 export interface DeleteNodesCommand {
@@ -38,7 +38,7 @@ export interface DeleteNodesCommand {
   ids: string[];
 }
 
-export const deleteNodes = (commandHandler: CommandHandler, command: DeleteNodesCommand): void => {
+export const deleteNodes = async (commandHandler: CommandHandler, command: DeleteNodesCommand) => {
   const { edges } = commandHandler.flowCore.getState();
   const { ids } = command;
   const edgesToDeleteIds = new Set<string>();
@@ -48,7 +48,7 @@ export const deleteNodes = (commandHandler: CommandHandler, command: DeleteNodes
       edgesToDeleteIds.add(edge.id);
     }
   });
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       nodesToRemove: Array.from(nodesToDeleteIds),
       edgesToRemove: edgesToDeleteIds.size > 0 ? Array.from(edgesToDeleteIds) : [],
@@ -62,9 +62,9 @@ export interface AddEdgesCommand {
   edges: Edge[];
 }
 
-export const addEdges = (commandHandler: CommandHandler, command: AddEdgesCommand): void => {
+export const addEdges = async (commandHandler: CommandHandler, command: AddEdgesCommand) => {
   const { edges } = command;
-  commandHandler.flowCore.applyUpdate({ edgesToAdd: edges }, 'addEdges');
+  await commandHandler.flowCore.applyUpdate({ edgesToAdd: edges }, 'addEdges');
 };
 
 export interface UpdateEdgeCommand {
@@ -73,9 +73,9 @@ export interface UpdateEdgeCommand {
   edgeChanges: Partial<Edge>;
 }
 
-export const updateEdge = (commandHandler: CommandHandler, command: UpdateEdgeCommand): void => {
+export const updateEdge = async (commandHandler: CommandHandler, command: UpdateEdgeCommand) => {
   const { id, edgeChanges } = command;
-  commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id, ...edgeChanges }] }, 'updateEdge');
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id, ...edgeChanges }] }, 'updateEdge');
 };
 
 export interface DeleteEdgesCommand {
@@ -83,9 +83,9 @@ export interface DeleteEdgesCommand {
   ids: string[];
 }
 
-export const deleteEdges = (commandHandler: CommandHandler, command: DeleteEdgesCommand): void => {
+export const deleteEdges = async (commandHandler: CommandHandler, command: DeleteEdgesCommand) => {
   const { ids } = command;
-  commandHandler.flowCore.applyUpdate({ edgesToRemove: ids }, 'deleteEdges');
+  await commandHandler.flowCore.applyUpdate({ edgesToRemove: ids }, 'deleteEdges');
 };
 
 export interface AddPortsCommand {
@@ -94,14 +94,14 @@ export interface AddPortsCommand {
   ports: Port[];
 }
 
-export const addPorts = (commandHandler: CommandHandler, command: AddPortsCommand): void => {
+export const addPorts = async (commandHandler: CommandHandler, command: AddPortsCommand) => {
   const { nodeId, ports } = command;
   const node = commandHandler.flowCore.getNodeById(nodeId);
   if (!node) {
     return;
   }
   const newPorts = [...(node.ports ?? []), ...ports];
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: newPorts }] }, 'updateNode');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: newPorts }] }, 'updateNode');
 };
 
 export interface UpdatePortsCommand {
@@ -110,7 +110,7 @@ export interface UpdatePortsCommand {
   ports: { portId: string; portChanges: Partial<Port> }[];
 }
 
-export const updatePorts = (commandHandler: CommandHandler, command: UpdatePortsCommand): void => {
+export const updatePorts = async (commandHandler: CommandHandler, command: UpdatePortsCommand) => {
   const { nodeId, ports } = command;
   const node = commandHandler.flowCore.getNodeById(nodeId);
   if (!node) {
@@ -129,7 +129,7 @@ export const updatePorts = (commandHandler: CommandHandler, command: UpdatePorts
   if (!portsToUpdate) {
     return;
   }
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: portsToUpdate }] }, 'updateNode');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: portsToUpdate }] }, 'updateNode');
 };
 
 export interface DeletePortsCommand {
@@ -138,14 +138,14 @@ export interface DeletePortsCommand {
   portIds: string[];
 }
 
-export const deletePorts = (commandHandler: CommandHandler, command: DeletePortsCommand): void => {
+export const deletePorts = async (commandHandler: CommandHandler, command: DeletePortsCommand) => {
   const { nodeId, portIds } = command;
   const node = commandHandler.flowCore.getNodeById(nodeId);
   if (!node) {
     return;
   }
   const leftPorts = node.ports?.filter((port) => !portIds.includes(port.id));
-  commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: leftPorts }] }, 'updateNode');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: leftPorts }] }, 'updateNode');
 };
 
 export interface AddEdgeLabelsCommand {
@@ -154,7 +154,7 @@ export interface AddEdgeLabelsCommand {
   labels: EdgeLabel[];
 }
 
-export const addEdgeLabels = (commandHandler: CommandHandler, command: AddEdgeLabelsCommand): void => {
+export const addEdgeLabels = async (commandHandler: CommandHandler, command: AddEdgeLabelsCommand) => {
   const { edgeId, labels } = command;
   const edge = commandHandler.flowCore.getEdgeById(edgeId);
   if (!edge) {
@@ -165,7 +165,7 @@ export const addEdgeLabels = (commandHandler: CommandHandler, command: AddEdgeLa
     ...(edge.labels ?? []),
     ...labels.map((label) => ({ ...label, position: getPointOnPath(points, label.positionOnEdge) })),
   ];
-  commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
 };
 
 export interface UpdateEdgeLabelCommand {
@@ -175,22 +175,24 @@ export interface UpdateEdgeLabelCommand {
   labelChanges: Partial<EdgeLabel>;
 }
 
-export const updateEdgeLabel = (commandHandler: CommandHandler, command: UpdateEdgeLabelCommand): void => {
+export const updateEdgeLabel = async (commandHandler: CommandHandler, command: UpdateEdgeLabelCommand) => {
   const { edgeId, labelId, labelChanges } = command;
   const edge = commandHandler.flowCore.getEdgeById(edgeId);
   if (!edge) {
     return;
   }
   const points = edge.points || [];
-  const newLabels = edge.labels
-    ?.map((label) => {
-      if (label.id !== labelId) {
-        return label;
-      }
-      return { ...label, ...(labelChanges || {}) };
-    })
-    .map((label) => ({ ...label, position: getPointOnPath(points, label.positionOnEdge) }));
-  commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
+  const newLabels = edge.labels?.map((label) => {
+    const position = getPointOnPath(points, label.positionOnEdge);
+    if (label.id !== labelId) {
+      return { ...label, position };
+    }
+    return { ...label, ...(labelChanges || {}), position };
+  });
+  if (!newLabels) {
+    return;
+  }
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
 };
 
 export interface DeleteEdgeLabelsCommand {
@@ -199,12 +201,12 @@ export interface DeleteEdgeLabelsCommand {
   labelIds: string[];
 }
 
-export const deleteEdgeLabels = (commandHandler: CommandHandler, command: DeleteEdgeLabelsCommand): void => {
+export const deleteEdgeLabels = async (commandHandler: CommandHandler, command: DeleteEdgeLabelsCommand) => {
   const { edgeId, labelIds } = command;
   const edge = commandHandler.flowCore.getEdgeById(edgeId);
   if (!edge) {
     return;
   }
   const leftLabels = edge.labels?.filter((label) => !labelIds.includes(label.id));
-  commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: leftLabels }] }, 'updateEdge');
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: leftLabels }] }, 'updateEdge');
 };

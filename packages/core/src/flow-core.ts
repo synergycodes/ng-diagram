@@ -50,7 +50,6 @@ export class FlowCore {
     this.modelLookup = new ModelLookup(this);
 
     this.init();
-    this.updateModelLookup();
   }
 
   /**
@@ -60,7 +59,6 @@ export class FlowCore {
     this.render();
     this.initializationGuard.start(() => {
       this.model.onChange((state) => {
-        this.updateModelLookup(state);
         this.spatialHash.process(state.nodes);
         this.render();
       });
@@ -135,14 +133,8 @@ export class FlowCore {
     this.model.setNodes(state.nodes);
     this.model.setEdges(state.edges);
     this.model.setMetadata(state.metadata);
-  }
-
-  updateModelLookup(state?: FlowState): void {
-    if (state) {
-      this.modelLookup.update(state);
-    } else {
-      this.modelLookup.update(this.getState());
-    }
+    // We desynchronize the model lookup to force a re-sync of the model lookup maps on the fly
+    this.modelLookup.desynchronize();
   }
 
   /**

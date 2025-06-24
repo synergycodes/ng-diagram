@@ -131,7 +131,6 @@ export class InitializationGuard {
       ...currentState,
       ...state,
     });
-    this.flowCore.updateModelLookup();
     this.checkIfInitialized();
   }
 

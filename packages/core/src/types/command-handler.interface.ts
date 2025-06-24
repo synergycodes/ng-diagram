@@ -114,7 +114,7 @@ export interface CommandHandler {
     ...props: IsEmpty<CommandByName<K>> extends true
       ? [] | [WithoutName<CommandByName<K>>]
       : [WithoutName<CommandByName<K>>]
-  ): void;
+  ): Promise<void>;
 
   /**
    * Register a callback for specific command types

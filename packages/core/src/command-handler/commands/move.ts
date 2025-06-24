@@ -10,7 +10,10 @@ export interface MoveNodesByCommand {
   };
 }
 
-export const moveNodesBy = (commandHandler: CommandHandler, { delta, nodes }: MoveNodesByCommand): void => {
+export const moveNodesBy = async (
+  commandHandler: CommandHandler,
+  { delta, nodes }: MoveNodesByCommand
+): Promise<void> => {
   if (nodes.length === 0) {
     return;
   }
@@ -31,7 +34,7 @@ export const moveNodesBy = (commandHandler: CommandHandler, { delta, nodes }: Mo
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: nodes.map((node) => ({
         id: node.id,
