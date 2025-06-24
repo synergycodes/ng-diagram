@@ -6,7 +6,7 @@ import {
   getNodeMap,
   remapEdges,
 } from '../../utils/tree-layout/build-tree-structure.ts';
-import { FlowStateUpdate, Middleware, ModelActionType } from '../../types';
+import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../types';
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
 import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
 
@@ -19,6 +19,12 @@ const CONFIG: TreeLayoutConfig = {
   autoLayout: false,
 };
 
+const checkIfShouldAutoTreeLayout = ({ helpers, modelActionType }: MiddlewareContext) =>
+  modelActionType === 'init' ||
+  helpers.anyEdgesAdded() ||
+  helpers.anyEdgesRemoved() ||
+  helpers.checkIfAnyNodePropsChanged(['position', 'size']);
+
 const checkIfShouldTreeLayout = (modelActionType: ModelActionType) => modelActionType === 'treeLayout';
 
 export const treeLayoutMiddleware: Middleware = {
@@ -29,8 +35,12 @@ export const treeLayoutMiddleware: Middleware = {
       modelActionType,
     } = context;
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
+    const shouldAutoLayout = checkIfShouldAutoTreeLayout(context);
 
-    if (!shouldTreeLayout && !CONFIG.autoLayout) {
+    if (
+      !shouldTreeLayout &&
+      (!CONFIG.autoLayout || !shouldAutoLayout)
+    ) {
       next();
       return;
     }

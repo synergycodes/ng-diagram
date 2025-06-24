@@ -1,23 +1,27 @@
 import { describe, expect, it } from 'vitest';
 import { buildTreeStructure } from '../tree-layout/build-tree-structure.ts';
 import { Edge, Node } from '../../types';
+import { TreeNode } from '../../types/tree-layout.interface.ts';
 
-type PartialNode = Pick<Node, 'id' | 'position' | 'size'>;
+type PartialNode = Pick<Node, 'id' | 'position' | 'size' | 'layoutAngle' | 'type' | 'groupId'>;
 type PartialEdge = Pick<Edge, 'source' | 'target'>;
 
 describe('buildTreeStructure', () => {
   it('should build a single root tree', () => {
     const nodes: PartialNode[] = [
-      { id: 'root', position: { x: 0, y: 0 }, size: { width: 100, height: 50 } },
-      { id: 'child1', position: { x: 0, y: 0 }, size: { width: 50, height: 25 } },
-      { id: 'child2', position: { x: 0, y: 0 }, size: { width: 50, height: 25 } },
+      { id: 'root', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, type: 'Test' },
+      { id: 'child1', position: { x: 0, y: 0 }, size: { width: 50, height: 25 }, type: 'Test' },
+      { id: 'child2', position: { x: 0, y: 0 }, size: { width: 50, height: 25 }, type: 'Test' },
     ];
+    const nodeMap: Map<string, TreeNode> = new Map(
+      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
+    );
     const edges: PartialEdge[] = [
       { source: 'root', target: 'child1' },
       { source: 'root', target: 'child2' },
     ];
 
-    const { roots } = buildTreeStructure(nodes, edges);
+    const { roots } = buildTreeStructure(nodeMap, edges);
 
     expect(roots.length).toBe(1);
     expect(roots[0].id).toBe('root');
@@ -27,26 +31,32 @@ describe('buildTreeStructure', () => {
 
   it('should not mutate the original nodes', () => {
     const nodes: PartialNode[] = [
-      { id: 'root', position: { x: 0, y: 0 } },
-      { id: 'leaf', position: { x: 0, y: 0 } },
+      { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
+      { id: 'leaf', position: { x: 0, y: 0 }, type: 'Test' },
     ];
+    const nodeMap: Map<string, TreeNode> = new Map(
+      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
+    );
     const edges: PartialEdge[] = [{ source: 'root', target: 'leaf' }];
 
     const nodesCopy = JSON.parse(JSON.stringify(nodes));
-    buildTreeStructure(nodes, edges);
+    buildTreeStructure(nodeMap, edges);
 
     expect(nodes).toEqual(nodesCopy);
   });
 
   it('should handle multiple roots', () => {
     const nodes: PartialNode[] = [
-      { id: 'a', position: { x: 0, y: 0 } },
-      { id: 'b', position: { x: 0, y: 0 } },
-      { id: 'c', position: { x: 0, y: 0 } },
+      { id: 'a', position: { x: 0, y: 0 }, type: 'Test' },
+      { id: 'b', position: { x: 0, y: 0 }, type: 'Test' },
+      { id: 'c', position: { x: 0, y: 0 }, type: 'Test' },
     ];
+    const nodeMap: Map<string, TreeNode> = new Map(
+      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
+    );
     const edges: PartialEdge[] = [{ source: 'a', target: 'b' }];
 
-    const { roots } = buildTreeStructure(nodes, edges);
+    const { roots } = buildTreeStructure(nodeMap, edges);
     const rootIds = roots.map((r) => r.id).sort();
 
     expect(rootIds).toEqual(['a', 'c']);
@@ -56,15 +66,18 @@ describe('buildTreeStructure', () => {
 
   it('should not add the same child twice', () => {
     const nodes: PartialNode[] = [
-      { id: 'root', position: { x: 0, y: 0 } },
-      { id: 'child', position: { x: 0, y: 0 } },
+      { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
+      { id: 'child', position: { x: 0, y: 0 }, type: 'Test' },
     ];
+    const nodeMap: Map<string, TreeNode> = new Map(
+      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
+    );
     const edges: PartialEdge[] = [
       { source: 'root', target: 'child' },
       { source: 'root', target: 'child' },
     ];
 
-    const { roots } = buildTreeStructure(nodes, edges);
+    const { roots } = buildTreeStructure(nodeMap, edges);
 
     expect(roots[0].children.length).toBe(1);
     expect(roots[0].children[0].id).toBe('child');
@@ -72,12 +85,15 @@ describe('buildTreeStructure', () => {
 
   it('should handle nodes with no edges (all roots)', () => {
     const nodes: PartialNode[] = [
-      { id: 'x', position: { x: 0, y: 0 } },
-      { id: 'y', position: { x: 0, y: 0 } },
+      { id: 'x', position: { x: 0, y: 0 }, type: 'Test' },
+      { id: 'y', position: { x: 0, y: 0 }, type: 'Test' },
     ];
+    const nodeMap: Map<string, TreeNode> = new Map(
+      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
+    );
     const edges: Edge[] = [];
 
-    const { roots } = buildTreeStructure(nodes, edges);
+    const { roots } = buildTreeStructure(nodeMap, edges);
 
     expect(roots.length).toBe(2);
     expect(roots.map((r) => r.id).sort()).toEqual(['x', 'y']);
