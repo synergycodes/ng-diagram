@@ -65,7 +65,6 @@ export interface Node {
    * Node layout alignment: 'Parent' | 'Subtree'.
    */
   layoutAlignment?: LayoutAlignmentType;
-  text?: string;
 }
 
 /**
