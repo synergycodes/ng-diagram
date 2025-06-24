@@ -1,9 +1,18 @@
-import { TreeLayoutConfig, TreeNode } from '../../types/tree-layout.interface.ts';
-import { getDirectionVectors, isAngleHorizontal } from '../get-direction.ts';
-import { getNodeSize, getSizeAlongAxis, groupLayout, isLeafNode } from './tree-layout-utils.ts';
+import { LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../types/tree-layout.interface.ts';
+import { getSign, isAngleHorizontal, isAngleVertical } from '../get-direction.ts';
+import { getNodeSize, groupLayout, isLeafNode } from './tree-layout-utils.ts';
 
 type Rect = { minX: number; maxX: number; minY: number; maxY: number };
 
+const shiftSubtree = (node: TreeNode, dx: number, dy: number) => {
+  node.position.x += dx;
+  node.position.y += dy;
+  if (node.children) {
+    for (const child of node.children) {
+      shiftSubtree(child, dx, dy);
+    }
+  }
+};
 
 /**
  * Calculates horizontal positions for a tree layout starting from the given parent node.
@@ -12,97 +21,168 @@ type Rect = { minX: number; maxX: number; minY: number; maxY: number };
  * @param config
  * @param offsetX
  * @param offsetY
+ * @param grandparentAngle
  * @returns {number}
  */
-export const makeTreeLayout = (
+const layoutChildren = (
   parentNode: TreeNode,
   config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
-  isRoot?: boolean
+  grandparentAngle: LayoutAngleType // ⬅️ nowy parametr
 ): Rect => {
-  const { children } = parentNode;
-  // Dimensions and direction
-  const { width, height } = getNodeSize(parentNode);
+  const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
+  const isVertical = isAngleVertical(parentAngle);
+  const sign = getSign(parentAngle);
+  const children = parentNode.children || [];
+  const parentWidth = parentNode.size?.width ?? 0;
+  const parentHeight = parentNode.size?.height ?? 0;
 
-  // Leaf node and groups: set X, Y and return
-  if (isLeafNode(parentNode)) {
-    if (parentNode.type === 'group') {
-      const delta = { x: offsetX - parentNode.position.x, y: offsetY - parentNode.position.y };
-      if (parentNode.groupChildren) groupLayout(parentNode.groupChildren, delta);
+  // offset dla dzieci
+  let childOffsetX =
+    offsetX + (!isVertical ? (sign === -1 ? -config.levelGap : sign * (parentWidth + config.levelGap)) : 0);
+  let childOffsetY =
+    offsetY + (isVertical ? (sign === -1 ? -config.levelGap : sign * (parentHeight + config.levelGap)) : 0);
+
+  if (sign === -1 && grandparentAngle !== parentAngle) {
+    if (!isVertical) {
+      childOffsetY = offsetY;
+    } else {
+      childOffsetX = offsetX;
     }
-    parentNode.position.x = offsetX;
-    parentNode.position.y = offsetY;
-    return {
-      minX: offsetX,
-      maxX: offsetX + width,
-      minY: offsetY,
-      maxY: offsetY + height,
-    };
   }
 
-  const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
+  let bounds: Rect = {
+    minX: Infinity,
+    maxX: -Infinity,
+    minY: Infinity,
+    maxY: -Infinity,
+  };
 
-  const { main, cross } = getDirectionVectors(parentAngle);
-  // crossPos starts at 0, children will be laid out starting exactly at parent's cross position
-  let crossPos = 0;
-
-  let minX = offsetX;
-  let maxX = offsetX + width;
-  let minY = offsetY;
-  let maxY = offsetY + height;
-
-  console.log('PARENt', parentNode);
-  console.log('CHILDREN', children);
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
-    const { width: childWidth, height: childHeight } = getNodeSize(child);
+    const { width, height } = getNodeSize(child);
 
-    const parentSizeAlongMain = getSizeAlongAxis(width, height, main);
-    const childSizeAlongMain = getSizeAlongAxis(childWidth, childHeight, main);
+    if (sign === -1 && isAngleVertical(grandparentAngle) === isVertical) {
+      if (!isVertical) {
+        childOffsetX -= width;
+      } else {
+        childOffsetY -= height;
+      }
+    }
+    const childBounds = makeTreeLayout(child, config, childOffsetX, childOffsetY, parentAngle); // ⬅️ przekazujemy parentAngle jako grandparentAngle
 
-    // Determine whether you are drawing "forward" (0 or 90) or "backward" (180 or 270)
-    const drawForward = main.x > 0 || main.y > 0;
+    if (i === children.length - 1 && grandparentAngle !== parentAngle && sign === -1) {
+      if (!isVertical) {
+        childBounds.maxX += parentWidth + config.levelGap;
+      } else {
+        childBounds.maxY += parentHeight + config.levelGap;
+      }
+    }
 
-    // Calculate the offset relative to the main axis
-    const offsetMain = config.levelGap + (drawForward ? parentSizeAlongMain : childSizeAlongMain);
-
-    // Child’s position relative to the parent
-    const childPos = {
-      x: offsetX + main.x * offsetMain + cross.x * crossPos,
-      y: offsetY + main.y * offsetMain + cross.y * crossPos,
+    bounds = {
+      minX: Math.min(bounds.minX, childBounds.minX),
+      maxX: Math.max(bounds.maxX, childBounds.maxX),
+      minY: Math.min(bounds.minY, childBounds.minY),
+      maxY: Math.max(bounds.maxY, childBounds.maxY),
     };
 
-    // Recursively arrange the subtree
-    const childBounds = makeTreeLayout(child, config, childPos.x, childPos.y);
+    const subtreeCrossSize = isVertical ? childBounds.maxX - childBounds.minX : childBounds.maxY - childBounds.minY;
 
-    // Update the boundaries of the entire subtree
-    minX = Math.min(minX, childBounds.minX);
-    maxX = Math.max(maxX, childBounds.maxX);
-    minY = Math.min(minY, childBounds.minY);
-    maxY = Math.max(maxY, childBounds.maxY);
-
-    // Calculate the size of the entire child subtree along the cross axis
-    const childSubtreeCrossSize = getSizeAlongAxis(
-      Math.abs(childBounds.maxX - childBounds.minX),
-      Math.abs(childBounds.maxY - childBounds.minY),
-      cross
-    );
-
-    // Move along the cross-axis, taking into account the size of the child subtree and the spacing
-    crossPos += childSubtreeCrossSize + (i < children.length - 1 ? config.siblingGap : 0);
+    if (isVertical) {
+      childOffsetX += sign * (subtreeCrossSize + config.siblingGap);
+    } else {
+      childOffsetY += sign * (subtreeCrossSize + config.siblingGap);
+    }
   }
-  const [firstChild, lastChild] = [children[0], children[children.length - 1]];
-  const isHorizontal = isAngleHorizontal(parentAngle);
 
-  let x, y;
+  return bounds;
+};
+
+const maybeShiftChildren = (
+  parent: TreeNode,
+  angle: number,
+  parentOffset: { x: number; y: number },
+  childrenBounds: Rect,
+  parentAngle: LayoutAngleType,
+  grandparentAngle: LayoutAngleType
+): void => {
+  const isVertical = isAngleVertical(parentAngle);
+  const sign = getSign(parentAngle);
+  if (sign === -1 && isAngleVertical(grandparentAngle) === isVertical) return;
+  // 1. CENTROWANIE DZIECI WZGLĘDEM RODZICA (jak poprzednio)
+  const { width, height } = getNodeSize(parent);
+  const childrenWidth = childrenBounds.maxX - childrenBounds.minX;
+  const childrenHeight = childrenBounds.maxY - childrenBounds.minY;
+
+  let shiftX = 0,
+    shiftY = 0;
+  if ((angle === 90 || angle === 270) && width > childrenWidth) {
+    shiftX = (width - childrenWidth) / 2 + parentOffset.x - childrenBounds.minX;
+  }
+  if ((angle === 0 || angle === 180) && height > childrenHeight) {
+    shiftY = (height - childrenHeight) / 2 + parentOffset.y - childrenBounds.minY;
+  }
+
+  if (shiftX !== 0 || shiftY !== 0) {
+    for (const child of parent.children) {
+      child.position.x += shiftX;
+      child.position.y += shiftY;
+    }
+    // Aktualizuj granice dzieci po przesunięciu
+    childrenBounds.minX += shiftX;
+    childrenBounds.maxX += shiftX;
+    childrenBounds.minY += shiftY;
+    childrenBounds.maxY += shiftY;
+  }
+
+  // 2. GRANICA: NIE PRZEKRACZAJ offsetX/offsetY
+  const deltaX = parentOffset.x - childrenBounds.minX;
+  const deltaY = parentOffset.y - childrenBounds.minY;
+
+  // Przesuwaj tylko jeśli wychodzimy poza offset
+  if (deltaX > 0 || deltaY > 0) {
+    const shiftSubtree = (node: TreeNode) => {
+      node.position.x += deltaX > 0 ? deltaX : 0;
+      node.position.y += deltaY > 0 ? deltaY : 0;
+      node.children?.forEach(shiftSubtree);
+    };
+    shiftSubtree(parent);
+    // Aktualizuj granice dzieci po przesunięciu
+    if (deltaX > 0) {
+      childrenBounds.minX += deltaX;
+      childrenBounds.maxX += deltaX;
+    }
+    if (deltaY > 0) {
+      childrenBounds.minY += deltaY;
+      childrenBounds.maxY += deltaY;
+    }
+  }
+};
+
+const alignParent = (
+  parent: TreeNode,
+  config: TreeLayoutConfig,
+  childrenBounds: Rect,
+  offsetX: number,
+  offsetY: number,
+  grandparentAngle: LayoutAngleType
+): void => {
+  const angle = parent.layoutAngle ?? config.layoutAngle;
+  const isHorizontal = isAngleHorizontal(angle);
+  const { width, height } = getNodeSize(parent);
+  const [firstChild, lastChild] = [parent.children[0], parent.children.at(-1)!];
+  const sign = getSign(angle);
+
+  let x: number;
+  let y: number;
 
   if (config.layoutAlignment === 'Start') {
     x = offsetX;
     y = offsetY;
   } else if (config.layoutAlignment === 'Subtree') {
-    x = !isHorizontal ? (minX + maxX - width) / 2 : offsetX;
-    y = isHorizontal ? (minY + maxY - height) / 2 : offsetY;
+    x = !isHorizontal ? (childrenBounds.minX + childrenBounds.maxX - width) / 2 : offsetX;
+    y = isHorizontal ? (childrenBounds.minY + childrenBounds.maxY - height) / 2 : offsetY;
   } else {
     x = !isHorizontal
       ? (firstChild.position.x + lastChild.position.x + (lastChild.size?.width || 0) - width) / 2
@@ -112,12 +192,67 @@ export const makeTreeLayout = (
       : offsetY;
   }
 
-  if (parentNode.type === 'group') {
-    const delta = { x: x - parentNode.position.x, y: y - parentNode.position.y };
-    if (parentNode.groupChildren) groupLayout(parentNode.groupChildren, delta);
-  }
-  parentNode.position.x = x;
-  parentNode.position.y = y;
+  if (!isHorizontal) x = Math.max(x, offsetX);
+  else y = Math.max(y, offsetY);
 
-  return { minX, maxX, minY, maxY };
+  if (sign === -1 && grandparentAngle !== angle) {
+    if (isHorizontal) {
+      x = childrenBounds.maxX - width;
+    } else {
+      y = childrenBounds.maxY - height;
+    }
+  }
+
+  if (parent.type === 'group' && parent.groupChildren) {
+    const dx = x - parent.position.x;
+    const dy = y - parent.position.y;
+    groupLayout(parent.groupChildren, { x: dx, y: dy });
+  }
+  parent.position.x = x;
+  parent.position.y = y;
+};
+
+export const makeTreeLayout = (
+  parent: TreeNode,
+  config: TreeLayoutConfig,
+  offsetX: number,
+  offsetY: number,
+  grandparentAngle: LayoutAngleType
+): Rect => {
+  const { width, height } = getNodeSize(parent);
+  const parentAngle = parent.layoutAngle ?? config.layoutAngle;
+
+  if (isLeafNode(parent)) {
+    if (parent.type === 'group' && parent.groupChildren) {
+      const delta = { x: offsetX - parent.position.x, y: offsetY - parent.position.y };
+      groupLayout(parent.groupChildren, delta);
+    }
+    parent.position.x = offsetX;
+    parent.position.y = offsetY;
+    return {
+      minX: offsetX,
+      maxX: offsetX + width,
+      minY: offsetY,
+      maxY: offsetY + height,
+    };
+  }
+
+  const angle = parent.layoutAngle ?? config.layoutAngle;
+
+  // 1. Layout children get their bounding box
+  const childrenBounds = layoutChildren(parent, config, offsetX, offsetY, grandparentAngle);
+
+  // 2. Shift children if parent is wider/taller
+  maybeShiftChildren(parent, angle, { x: offsetX, y: offsetY }, childrenBounds, parentAngle, grandparentAngle);
+
+  // 3. Align parent (Start, Subtree, Parent)
+  alignParent(parent, config, childrenBounds, offsetX, offsetY, grandparentAngle);
+
+  // 4. Return bounding box for this subtree
+  return {
+    minX: Math.min(offsetX, childrenBounds.minX),
+    maxX: Math.max(offsetX + width, childrenBounds.maxX),
+    minY: Math.min(offsetY, childrenBounds.minY),
+    maxY: Math.max(offsetY + height, childrenBounds.maxY),
+  };
 };

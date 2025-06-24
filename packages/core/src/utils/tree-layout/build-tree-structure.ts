@@ -1,21 +1,28 @@
 import { Edge, Node } from '../../types';
 import { TreeNode } from '../../types/tree-layout.interface.ts';
 
-export const buildTopGroupMap = (nodeMap: Map<string, TreeNode>): Map<string, string> => {
+/**
+ * Makes a map that shows, for each node, the top group it belongs to.
+ *
+ * @param nodeMap - Map of all tree nodes, with node ID as the key.
+ * @returns Map where each key is a node ID, and the value is its top group ID
+ */
+export const buildTopGroupMap = (
+  nodeMap: Map<string, TreeNode>
+): Map<string, string> => {
   const topGroupMap = new Map<string, string>();
 
-  for (const [id, node] of nodeMap.entries()) {
-    let current = node;
-    let topGroupId = id;
+  for (const [id, node] of nodeMap) {
+    let topId = id;
+    let parent = nodeMap.get(node.groupId ?? '');
 
-    while (current.groupId) {
-      const parent = nodeMap.get(current.groupId);
-      if (!parent || parent.type !== 'group') break;
-      topGroupId = parent.id;
-      current = parent;
+    // Go up the tree to find the top group
+    while (parent?.type === 'group') {
+      topId = parent.id;
+      parent = nodeMap.get(parent.groupId ?? '');
     }
 
-    topGroupMap.set(id, topGroupId);
+    topGroupMap.set(id, topId);
   }
 
   return topGroupMap;
@@ -24,7 +31,7 @@ export const buildTopGroupMap = (nodeMap: Map<string, TreeNode>): Map<string, st
 /**
  * Zwraca top-level grupę dla danego nodeId.
  *
- * @param nodeId - id node'a
+ * @param nodeId
  * @param topGroupMap - mapa childId -> topLevelGroupId
  * @returns id top-level grupy lub nodeId jeśli nie jest w grupie
  */
@@ -32,13 +39,22 @@ const getTopGroupId = (nodeId: string, topGroupMap: Map<string, string>): string
   return topGroupMap.get(nodeId) ?? nodeId;
 };
 
-export const remapEdges = (edges: Edge[], topGroupMap: Map<string, string>): { source: string; target: string }[] => {
-  return edges.map(({ source, target, ...rest }) => ({
-    ...rest,
-    source: getTopGroupId(source, topGroupMap),
-    target: getTopGroupId(target, topGroupMap),
+/**
+ * Updates edges so source and target are top group IDs.
+ *
+ * @param edges - List of edges with source and target IDs.
+ * @param topGroupMap - Map from node ID to top group ID.
+ * @returns New list of edges with an updated source and target.
+ */
+export const remapEdges = (
+  edges: Edge[],
+  topGroupMap: Map<string, string>
+): { source: string; target: string }[] =>
+  edges.map(edge => ({
+    ...edge,
+    source: getTopGroupId(edge.source, topGroupMap),
+    target: getTopGroupId(edge.target, topGroupMap),
   }));
-};
 
 export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[] => {
   const result: TreeNode[] = [];
@@ -84,6 +100,7 @@ export const getNodeMap = (nodes: Pick<Node, 'id' | 'position' | 'size' | 'layou
   });
   return nodeMap;
 };
+
 /**
  * Builds a tree structure from list of nodes and edges.
  * Returns an object containing the root nodes and a map of all nodes.

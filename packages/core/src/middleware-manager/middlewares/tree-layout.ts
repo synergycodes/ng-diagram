@@ -9,7 +9,6 @@ import {
 import { FlowStateUpdate, Middleware, ModelActionType } from '../../types';
 import { isAngleHorizontal } from '../../utils/get-direction.ts';
 import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
-import { getNodeSize } from '../../utils/tree-layout/tree-layout-utils.ts';
 
 // Todo: Move this to metadata
 const CONFIG: TreeLayoutConfig = {
@@ -50,21 +49,19 @@ export const treeLayoutMiddleware: Middleware = {
 
     const isHorizontal = isAngleHorizontal(config.layoutAngle);
     roots.forEach((root) => {
-      // Układamy poddrzewo zaczynając od bieżącego offsetu
-      makeTreeLayout(root, config, offset.x, offset.y, true);
+      const subtreeBounds = makeTreeLayout(root, config, offset.x, offset.y, config.layoutAngle);
 
-      // Bierzemy tylko rozmiar roota, a nie całego poddrzewa
-      const { width = 0, height = 0 } = getNodeSize(root);
-      const rootSizeAlongCross = isAngleHorizontal(config.layoutAngle) ? height : width;
+      const subtreeSizeAlongCross = isHorizontal
+        ? subtreeBounds.maxY - subtreeBounds.minY
+        : subtreeBounds.maxX - subtreeBounds.minX;
 
-      // Przesuwamy offset tylko o rozmiar roota + odstęp
       if (isHorizontal) {
-        offset.y += config.siblingGap + rootSizeAlongCross;
+        offset.y += subtreeSizeAlongCross + config.siblingGap;
       } else {
-        offset.x += config.siblingGap + rootSizeAlongCross;
+        offset.x += subtreeSizeAlongCross + config.siblingGap;
       }
     });
-    console.log('roots', roots);
+
     const nodeList = Array.from(nodeMap.values());
     for (const node of nodes) {
       if (!node.position) {

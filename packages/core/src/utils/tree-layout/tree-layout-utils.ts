@@ -23,12 +23,3 @@ export const groupLayout = (groupChildren: TreeNode[], delta: { x: number; y: nu
     }
   }
 };
-
-export const getSizeAlongAxis = (
-  width: number,
-  height: number,
-  axis: {
-    x: number;
-    y: number;
-  }
-): number => (axis.x !== 0 ? width : height);
