@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Edge } from '@angularflow/core';
-import { IEdgeTemplate } from '../../../types/edge-template-map';
+import { IEdgeTemplate } from '../../../types';
 import { getStraightPath } from '../../../utils/get-paths';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 @Component({

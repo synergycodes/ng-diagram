@@ -17,10 +17,10 @@ import { FlowCoreProviderService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
-import { EdgeOrthogonalComponent} from '../edge/edge-orthogonal/edge-straight.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 import { EdgeStraightComponent } from '../edge/edge-straight/edge-straight.component';
+import { EdgeOrthogonalComponent } from '../edge/edge-orthogonal/edge-orthogonal.component';
 
 @Component({
   selector: 'angular-adapter-diagram',

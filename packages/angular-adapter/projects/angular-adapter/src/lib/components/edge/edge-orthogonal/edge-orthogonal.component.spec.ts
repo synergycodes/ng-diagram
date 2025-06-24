@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
-import { EdgeStraightComponent } from './edge-straight.component';
+import { EdgeOrthogonalComponent } from './edge-orthogonal.component';
 
 @Component({
   selector: 'angular-adapter-edge-label',
@@ -12,16 +12,16 @@ import { EdgeStraightComponent } from './edge-straight.component';
 })
 class MockAngularAdapterEdgeLabelComponent {}
 
-describe('EdgeStraightComponent', () => {
-  let component: EdgeStraightComponent;
-  let fixture: ComponentFixture<EdgeStraightComponent>;
+describe('EdgeOrthogonalComponent', () => {
+  let component: EdgeOrthogonalComponent;
+  let fixture: ComponentFixture<EdgeOrthogonalComponent>;
   let mockEdge: Edge;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EdgeStraightComponent],
+      imports: [EdgeOrthogonalComponent],
     })
-      .overrideComponent(EdgeStraightComponent, {
+      .overrideComponent(EdgeOrthogonalComponent, {
         remove: {
           imports: [AngularAdapterEdgeLabelComponent],
         },
@@ -31,7 +31,7 @@ describe('EdgeStraightComponent', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(EdgeStraightComponent);
+    fixture = TestBed.createComponent(EdgeOrthogonalComponent);
     component = fixture.componentInstance;
 
     mockEdge = {
@@ -58,7 +58,7 @@ describe('EdgeStraightComponent', () => {
     expect(component.data().id).toBe('test-edge');
   });
 
-  it('should calculate path from edge points', () => {
+  it('should calculate straight path from edge points', () => {
     mockEdge.points = [
       { x: 10, y: 20 },
       { x: 30, y: 40 },
@@ -67,7 +67,21 @@ describe('EdgeStraightComponent', () => {
     fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.path()).toBe('M 10 20 L 30 40');
+    expect(component.path()).toBe('M 10 20  L 30 40');
+  });
+
+  it('should calculate path from edge points', () => {
+    mockEdge.points = [
+      { x: 10, y: 20 },
+      { x: 20, y: 20 },
+      { x: 20, y: 40 },
+      { x: 30, y: 40 },
+    ];
+
+    fixture.componentRef.setInput('data', mockEdge);
+    fixture.detectChanges();
+
+    expect(component.path()).toBe('M 10,20 L15,20 A5,5,0,0,1,20,25 L20,35 A5,5,0,0,0,25,40 L 30,40');
   });
 
   it('should handle edge with no points', () => {
@@ -86,7 +100,6 @@ describe('EdgeStraightComponent', () => {
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('#888');
-    expect(component.fill()).toBe('#888');
   });
 
   it('should return proper color when edge is not selected', () => {
@@ -96,7 +109,6 @@ describe('EdgeStraightComponent', () => {
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('#bbb');
-    expect(component.fill()).toBe('#bbb');
   });
 
   it('should return proper marker when edge has source arrowhead', () => {
