@@ -3,6 +3,8 @@ import { Edge } from '@angularflow/core';
 import { IEdgeTemplate } from '../../../types';
 import { getStraightPath } from '../../../utils/get-paths';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
+import { getOrthogonalPath } from '../../../utils/get-orthogonal-paths';
+
 @Component({
   selector: 'angular-adapter-edge-straight',
   templateUrl: './edge-straight.component.html',
@@ -13,7 +15,11 @@ import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapt
 export class EdgeStraightComponent implements IEdgeTemplate {
   data = input.required<Edge>();
 
-  path = computed(() => getStraightPath(this.data().points || []));
+  path = computed(() =>
+    this.data().routing === 'orthogonal'
+      ? getOrthogonalPath(this.data().points || [])
+      : getStraightPath(this.data().points || [])
+  );
   stroke = computed(() => (this.data().selected ? '#888' : '#bbb'));
   markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null));
   markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : null));

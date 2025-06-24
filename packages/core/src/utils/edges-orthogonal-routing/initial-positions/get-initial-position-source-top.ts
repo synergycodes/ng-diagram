@@ -1,17 +1,16 @@
 import { getOffsetPoint } from '../get-offset-point.ts';
-import { Position } from './get-initial-path-points.ts';
-import { Point } from '../../../types';
+import { Point, PortSide } from '../../../types';
 
 export const getInitialPositionSourceTop = (
-  targetPosition: Position,
+  targetPortSide: PortSide,
   xySource: Point,
   xyTarget: Point,
   xyCenter: Point
 ) => {
-  const sourcePort = getOffsetPoint(xySource, Position.Top);
-  const targetPort = getOffsetPoint(xyTarget, targetPosition);
+  const sourcePort = getOffsetPoint(xySource, 'top');
+  const targetPort = getOffsetPoint(xyTarget, targetPortSide);
 
-  if (targetPosition === Position.Left) {
+  if (targetPortSide === 'left') {
     if (sourcePort.y > targetPort.y) {
       if (sourcePort.x > targetPort.x) {
         return [
@@ -67,7 +66,7 @@ export const getInitialPositionSourceTop = (
       },
     ];
   }
-  if (targetPosition === Position.Right) {
+  if (targetPortSide === 'right') {
     if (sourcePort.y > targetPort.y) {
       if (sourcePort.x > targetPort.x) {
         return [
@@ -117,7 +116,7 @@ export const getInitialPositionSourceTop = (
       { x: targetPort.x, y: targetPort.y },
     ];
   }
-  if (targetPosition === Position.Bottom) {
+  if (targetPortSide === 'bottom') {
     if (sourcePort.y > targetPort.y) {
       return [
         {
@@ -153,7 +152,7 @@ export const getInitialPositionSourceTop = (
       },
     ];
   }
-  if (targetPosition === Position.Top) {
+  if (targetPortSide === 'top') {
     if (sourcePort.y > targetPort.y) {
       return [
         {

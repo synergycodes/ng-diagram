@@ -1,7 +1,6 @@
-import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node } from '../../types';
+import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortSide } from '../../types';
 import { getPointOnPath, getPortFlowPosition, isSamePoint } from '../../utils';
 import { getPathPoints } from '../../utils/edges-orthogonal-routing/get-path-points.ts';
-import { Position } from '../../utils/edges-orthogonal-routing/initial-positions/get-initial-path-points.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -19,7 +18,7 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
   ]);
 
 const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
-  const getPoint = (nodeId: string, portId?: string, position?: { x: number; y: number }) => {
+  const getPoint = (nodeId: string, portId?: string, position?: { x: number; y: number; side?: PortSide }) => {
     const node = nodesMap.get(nodeId);
     if (!node) {
       return position;
@@ -58,15 +57,20 @@ export const edgesRoutingMiddleware: Middleware = {
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
           helpers.checkIfNodeChanged(edge.target);
-        const shouldRoute = (isEdgeOrNodesChanged || modelActionType === 'init');
+        const shouldRoute = isEdgeOrNodesChanged || modelActionType === 'init';
         if (!shouldRoute) {
           return;
         }
 
         const points = getPoints(edge, nodesMap);
-        if (edge.routing === 'orthogonal' || true) {
-          const middlePoints = getPathPoints(Position.Right, Position.Left,points[0], points[1]);
-          points.splice(1, 0, ...middlePoints)
+        if (edge.routing === 'orthogonal') {
+          const middlePoints = getPathPoints(
+            (points[0]?.side as PortSide) || 'left',
+            (points[2]?.side as PortSide) || 'right',
+            points[0],
+            points[1]
+          );
+          points.splice(1, 0, ...middlePoints);
         }
 
         if (

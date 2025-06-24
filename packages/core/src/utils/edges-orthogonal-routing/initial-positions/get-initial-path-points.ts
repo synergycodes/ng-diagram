@@ -2,19 +2,33 @@ import { getInitialPositionSourceBottom } from './get-initial-position-source-bo
 import { getInitialPositionSourceLeft } from './get-initial-position-source-left.ts';
 import { getInitialPositionSourceRight } from './get-initial-position-source-right.ts';
 import { getInitialPositionSourceTop } from './get-initial-position-source-top.ts';
-import { Point } from '../../../types';
+import { Point, PortSide } from '../../../types';
 
 export enum Position {
-  Left = "left",
-  Top = "top",
-  Right = "right",
-  Bottom = "bottom"
+  Left = 'left',
+  Top = 'top',
+  Right = 'right',
+  Bottom = 'bottom',
 }
-const positionFunctionMap = {
-	[Position.Top]: getInitialPositionSourceTop,
-	[Position.Right]: getInitialPositionSourceRight,
-	[Position.Bottom]: getInitialPositionSourceBottom,
-	[Position.Left]: getInitialPositionSourceLeft,
+
+const positionFunctionMap: Record<
+  PortSide,
+  (
+    targetPosition: PortSide,
+    xySource: Point,
+    xyTarget: Point,
+    xyCenter: Point
+  ) =>
+    | {
+        x: number;
+        y: number;
+      }[]
+    | undefined
+> = {
+  top: getInitialPositionSourceTop,
+  right: getInitialPositionSourceRight,
+  bottom: getInitialPositionSourceBottom,
+  left: getInitialPositionSourceLeft,
 };
 
 /**
@@ -30,13 +44,12 @@ const positionFunctionMap = {
  * @returns An array of points representing the orthogonal path.
  */
 export const getInitialPathPoints = (
-	sourcePosition: Position,
-	targetPosition: Position,
-	xySource: Point,
-	xyTarget: Point,
-	xyCenter: Point,
+  sourcePosition: PortSide,
+  targetPosition: PortSide,
+  xySource: Point,
+  xyTarget: Point,
+  xyCenter: Point
 ) => {
-	const getPositionFunction =
-		positionFunctionMap[sourcePosition] || getInitialPositionSourceLeft;
-	return getPositionFunction(targetPosition, xySource, xyTarget, xyCenter);
+  const getPositionFunction = positionFunctionMap[sourcePosition] || getInitialPositionSourceLeft;
+  return getPositionFunction(targetPosition, xySource, xyTarget, xyCenter);
 };

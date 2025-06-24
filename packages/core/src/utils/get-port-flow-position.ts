@@ -12,20 +12,20 @@ export const getPortFlowPosition = (node: Node, portId: string) => {
   const y = py + node.position.y;
 
   if (port.side === 'left') {
-    return { x, y: y + ph / 2 };
+    return { x, y: y + ph / 2, side: 'left' };
   }
 
   if (port.side === 'top') {
-    return { x: x + pw / 2, y };
+    return { x: x + pw / 2, y, side: 'top' };
   }
 
   if (port.side === 'bottom') {
-    return { x: x + pw / 2, y: y + ph };
+    return { x: x + pw / 2, y: y + ph, side: 'bottom' };
   }
 
   if (port.side === 'right') {
-    return { x: x + pw, y: y + ph / 2 };
+    return { x: x + pw, y: y + ph / 2, side: 'right' };
   }
 
-  return { x, y };
+  return { x, y, side: 'right' };
 };
