@@ -1,5 +1,6 @@
 import type { CommandHandler } from '../../types';
 import type { Node } from '../../types/node.interface';
+import { isSamePoint } from '../../utils/rects-points-sizes';
 
 export interface MoveNodesByCommand {
   name: 'moveNodesBy';
@@ -18,16 +19,16 @@ export const moveNodesBy = async (
     return;
   }
 
-  const nodesToUpdate: Node[] = [];
+  const nodesToUpdate: { id: Node['id']; position: Node['position'] }[] = [];
   nodes.forEach((node) => {
     const newPosition = {
-      x: snapNumber(node.position.x + delta.x, SNAP_GRID),
-      y: snapNumber(node.position.y + delta.y, SNAP_GRID),
+      x: Math.round(node.position.x + delta.x),
+      y: Math.round(node.position.y + delta.y),
     };
     if (isSamePoint(node.position, newPosition)) {
       return;
     }
-    nodesToUpdate.push({ ...node, position: newPosition });
+    nodesToUpdate.push({ id: node.id, position: newPosition });
   });
 
   if (nodesToUpdate.length === 0) {
