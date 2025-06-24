@@ -1,10 +1,10 @@
 import { FlowCore } from '../flow-core';
 import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
+import { edgesOrthogonalRoutingMiddleware } from './middlewares/edges-orthogonal-routing.ts';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
@@ -12,7 +12,7 @@ export class MiddlewareManager {
 
   constructor(flowCore: FlowCore, middlewares: Middleware[] = []) {
     this.flowCore = flowCore;
-    this.register(edgesStraightRoutingMiddleware);
+    this.register(edgesOrthogonalRoutingMiddleware);
     this.register(nodeRotationSnapMiddleware);
     this.register(groupChildrenChangeExtent);
     this.register(groupChildrenMoveExtent);

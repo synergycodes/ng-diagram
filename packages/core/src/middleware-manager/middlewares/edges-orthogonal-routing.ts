@@ -1,5 +1,7 @@
 import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node } from '../../types';
 import { getPointOnPath, getPortFlowPosition, isSamePoint } from '../../utils';
+import { getPathPoints } from '../../utils/edges-orthogonal-routing/get-path-points.ts';
+import { Position } from '../../utils/edges-orthogonal-routing/initial-positions/get-initial-path-points.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -30,8 +32,8 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
   return [sourcePoint, targetPoint].filter((point) => !!point);
 };
 
-export const edgesStraightRoutingMiddleware: Middleware = {
-  name: 'edges-straight-routing',
+export const edgesOrthogonalRoutingMiddleware: Middleware = {
+  name: 'edges-orthogonal-routing',
   execute: (context, next) => {
     const {
       state: { edges, metadata },
@@ -51,7 +53,7 @@ export const edgesStraightRoutingMiddleware: Middleware = {
 
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
-        const isProperEdgeRouting = edge.routing === 'straight';
+        const isProperEdgeRouting = edge.routing === 'orthogonal' || edge.routing === undefined;
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
@@ -61,10 +63,11 @@ export const edgesStraightRoutingMiddleware: Middleware = {
           return;
         }
         const points = getPoints(edge, nodesMap);
-
+        const middlePoints = getPathPoints(Position.Right, Position.Left,points[0], points[1]);
+        const allPoints = [points[0], ...middlePoints.pathPoints, points[1]];
         if (
-          edge.points?.length === points.length &&
-          edge.points?.every((point, index) => isSamePoint(point, points[index]))
+          edge.points?.length === allPoints.length &&
+          edge.points?.every((point, index) => isSamePoint(point, allPoints[index]))
         ) {
           return;
         }
@@ -73,17 +76,17 @@ export const edgesStraightRoutingMiddleware: Middleware = {
           ...label,
           position: getPointOnPath(points, label.positionOnEdge),
         }));
+        console.log("ALL points", allPoints)
 
         edgesToUpdate.push({
           id: edge.id,
-          points,
+          points: allPoints,
           sourcePosition: points[0],
           targetPosition: points[1],
           labels: updatedLabels,
         });
       });
     }
-
     let newTemporaryEdge: Edge | undefined = undefined;
 
     if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {
