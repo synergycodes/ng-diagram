@@ -7,6 +7,7 @@ import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-rou
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
+import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 
 // Define all mocks at the top level
 vi.mock('./middlewares/edges-straight-routing', () => ({
@@ -79,10 +80,11 @@ describe('MiddlewareManager', () => {
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
+        nodePositionSnapMiddleware,
+        nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
         edgesStraightRoutingMiddleware,
-        nodeRotationSnapMiddleware,
       ]);
     });
 
@@ -91,10 +93,11 @@ describe('MiddlewareManager', () => {
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
+        nodePositionSnapMiddleware,
+        nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
         edgesStraightRoutingMiddleware,
-        nodeRotationSnapMiddleware,
         mockMiddleware1,
       ]);
     });
