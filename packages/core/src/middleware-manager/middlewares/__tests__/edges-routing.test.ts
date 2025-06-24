@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import type { FlowState, MiddlewareContext, Node, Point } from '../../../types';
-import { edgesStraightRoutingMiddleware } from '../edges-straight-routing';
+import { edgesRoutingMiddleware } from '../edges-routing.ts';
 
 vi.mock('../../../utils', () => ({
   getPortFlowPosition: (node: Node) => node.position,
@@ -10,7 +10,7 @@ vi.mock('../../../utils', () => ({
   isSamePoint: (point1: Point, point2: Point) => point1.x === point2.x && point1.y === point2.y,
 }));
 
-describe('Edges Straight Routing Middleware', () => {
+describe('Edges Routing Middleware', () => {
   let flowCore: FlowCore;
   let initialState: FlowState;
   let context: MiddlewareContext;
@@ -55,7 +55,7 @@ describe('Edges Straight Routing Middleware', () => {
     checkIfAnyEdgePropsChangedMock.mockReturnValue(false);
     checkIfMetadataPropsChangedMock.mockReturnValue(false);
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith();
   });
@@ -64,7 +64,7 @@ describe('Edges Straight Routing Middleware', () => {
     context = { ...context, modelActionType: 'init', state: { ...initialState, edges: [] } };
     anyEdgesAddedMock.mockReturnValue(false);
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({});
   });
@@ -76,7 +76,7 @@ describe('Edges Straight Routing Middleware', () => {
       state: { ...initialState, edges: [{ ...mockEdge, routing: 'custom-routing' }] },
     };
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({});
   });
@@ -129,7 +129,7 @@ describe('Edges Straight Routing Middleware', () => {
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
     };
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({
       edgesToUpdate: [
@@ -171,7 +171,7 @@ describe('Edges Straight Routing Middleware', () => {
     context = { ...context, state: newState, modelActionType: 'moveTemporaryEdge' };
     checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({
       metadataUpdate: {
@@ -212,7 +212,7 @@ describe('Edges Straight Routing Middleware', () => {
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
     };
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({
       edgesToUpdate: [
@@ -258,7 +258,7 @@ describe('Edges Straight Routing Middleware', () => {
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
     };
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({});
   });
@@ -294,7 +294,7 @@ describe('Edges Straight Routing Middleware', () => {
     checkIfEdgeChangedMock.mockReturnValue(false);
     checkIfNodeChangedMock.mockReturnValue(false);
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({});
   });
@@ -330,7 +330,7 @@ describe('Edges Straight Routing Middleware', () => {
     checkIfEdgeChangedMock.mockReturnValue(true);
     checkIfNodeChangedMock.mockReturnValue(false);
 
-    edgesStraightRoutingMiddleware.execute(context, nextMock, () => null);
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledWith({
       edgesToUpdate: [

@@ -15,7 +15,6 @@ export class EdgeStraightComponent implements IEdgeTemplate {
 
   path = computed(() => getStraightPath(this.data().points || []));
   stroke = computed(() => (this.data().selected ? '#888' : '#bbb'));
-  fill = computed(() => (this.data().selected ? '#888' : '#bbb'));
   markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null));
   markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : null));
   strokeOpacity = computed(() => (this.data().temporary ? 0.5 : 1));

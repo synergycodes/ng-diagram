@@ -64,7 +64,7 @@ export const edgesRoutingMiddleware: Middleware = {
         }
 
         const points = getPoints(edge, nodesMap);
-        if (edge.routing === 'orthogonal') {
+        if (edge.routing === 'orthogonal' || true) {
           const middlePoints = getPathPoints(Position.Right, Position.Left,points[0], points[1]);
           points.splice(1, 0, ...middlePoints)
         }

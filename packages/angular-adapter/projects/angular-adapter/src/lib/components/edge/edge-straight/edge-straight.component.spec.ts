@@ -86,7 +86,6 @@ describe('EdgeStraightComponent', () => {
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('#888');
-    expect(component.fill()).toBe('#888');
   });
 
   it('should return proper color when edge is not selected', () => {
@@ -96,7 +95,6 @@ describe('EdgeStraightComponent', () => {
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('#bbb');
-    expect(component.fill()).toBe('#bbb');
   });
 
   it('should return proper marker when edge has source arrowhead', () => {

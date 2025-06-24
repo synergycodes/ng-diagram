@@ -21,15 +21,12 @@
     >
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
-      }
-      @else if (edge.type === 'orthogonal' || !edge.type) {
-        <angular-adapter-edge-orthogonal [data]="edge" />
+      } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
+        <angular-adapter-edge-straight [data]="edge" />
       }
     </angular-adapter-edge>
   }
   <angular-adapter-marker-arrow />
 </angular-adapter-canvas>
 
-<!--      @else if (edge.type === 'straight' || !edge.type) {-->
-<!--        <angular-adapter-edge-straight [data]="edge" />-->
-<!--      }-->
+
