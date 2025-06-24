@@ -89,7 +89,7 @@ export class ModelLookup {
    * @param groupId group node id
    * @returns Array of child node ids
    */
-  public getChildrenIds(groupId: string): Node['id'][] {
+  private getChildrenIds(groupId: string): Node['id'][] {
     return this.directChildrenMap.get(groupId) ?? [];
   }
 
@@ -205,6 +205,16 @@ export class ModelLookup {
   }
 
   /**
+   * Gets the children ids of a node
+   * @param nodeId Node id
+   * @param directOnly Whether to get only direct children
+   * @returns Array of children node ids
+   */
+  public getNodeChildrenIds(nodeId: string, { directOnly = true }: { directOnly?: boolean } = {}): Node['id'][] {
+    return directOnly ? this.getChildrenIds(nodeId) : this.getAllDescendantIds(nodeId);
+  }
+
+  /**
    * Gets all selected nodes with their children
    * @returns Array of selected nodes with their children
    */
@@ -230,5 +240,41 @@ export class ModelLookup {
    */
   public isNodeDescendantOfGroup(nodeId: string, groupId: string): boolean {
     return this.getAllDescendantIds(groupId).includes(nodeId);
+  }
+
+  /**
+   * Check for potential circular dependency between a node and a group
+   * @param nodeId Node id
+   * @param groupId Group node id
+   * @returns True if the group is a descendant of the node or the node is the group
+   */
+  public wouldCreateCircularDependency(nodeId: string, groupId: string): boolean {
+    // If trying to make a node its own parent
+    if (nodeId === groupId) {
+      return true;
+    }
+
+    // Check if groupId is already a descendant of nodeId
+    return this.isNodeDescendantOfGroup(groupId, nodeId);
+  }
+
+  /**
+   * Gets the full chain of parent group Nodes for a given nodeId.
+   * @param nodeId Node id
+   * @returns Array of parent group Node objects, from closest parent to farthest ancestor
+   */
+  public getParentChain(nodeId: string): Node[] {
+    const chain: Node[] = [];
+    let current = this.getNodeById(nodeId);
+
+    while (current && current.groupId) {
+      const parent = this.getNodeById(current.groupId);
+
+      if (parent) {
+        chain.push(parent);
+        current = parent;
+      }
+    }
+    return chain;
   }
 }

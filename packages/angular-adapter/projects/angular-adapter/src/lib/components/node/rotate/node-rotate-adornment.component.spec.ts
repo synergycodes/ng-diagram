@@ -163,7 +163,6 @@ describe('NodeRotateAdornmentComponent', () => {
         mouse: { x: 150, y: 150 },
         center: { x: 150, y: 150 }, // 50 + 200/2
         handle: { x: 0, y: 0 }, // no handle element
-        ports: [],
       });
     });
 

@@ -4,6 +4,8 @@ import { mockMetadata, mockNode } from '../test-utils';
 import type { FlowState, FlowStateUpdate, Middleware } from '../types';
 import { MiddlewareManager } from './middleware-manager';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
+import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
+import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 
 // Define all mocks at the top level
@@ -79,6 +81,8 @@ describe('MiddlewareManager', () => {
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
         edgesStraightRoutingMiddleware,
         nodeRotationSnapMiddleware,
+        groupChildrenChangeExtent,
+        groupChildrenMoveExtent,
       ]);
     });
 
@@ -89,6 +93,8 @@ describe('MiddlewareManager', () => {
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
         edgesStraightRoutingMiddleware,
         nodeRotationSnapMiddleware,
+        groupChildrenChangeExtent,
+        groupChildrenMoveExtent,
         mockMiddleware1,
       ]);
     });

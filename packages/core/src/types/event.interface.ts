@@ -204,7 +204,6 @@ export interface RotateEvent extends BaseEvent {
   mouse: Point;
   handle: Point;
   center: Point;
-  ports: Pick<Port, 'id' | 'size' | 'position'>[];
 }
 
 /**

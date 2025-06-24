@@ -12,7 +12,7 @@ const MIN_DISTANCE_TO_CENTER = 30;
 
 export const rotateAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    const { mouse, handle, center, target, ports } = event as RotateEvent;
+    const { mouse, handle, center, target } = event as RotateEvent;
     const nodeId = (target as ResizeHandleTarget).element.id;
 
     const mouseToCenterDistance = getDistanceBetweenPoints(mouse, center);
@@ -34,7 +34,6 @@ export const rotateAction: InputActionWithPredicate = {
     flowCore.commandHandler.emit('rotateNodeBy', {
       nodeId,
       angle,
-      ports: ports.map((port) => ({ portId: port.id, portChanges: { position: port.position } })),
     });
   },
   predicate: (event) => isRotateHandleTarget(event.target) && isRotateEvent(event),

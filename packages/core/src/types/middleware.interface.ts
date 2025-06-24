@@ -29,7 +29,9 @@ export type ModelActionType =
   | 'finishLinking'
   | 'zoom'
   | 'changeZOrder'
-  | 'rotateNodeBy';
+  | 'rotateNodeBy'
+  | 'highlightGroup'
+  | 'highlightGroupClear';
 
 /**
  * Type for the state of the flow diagram

@@ -11,4 +11,5 @@ import { INodeTemplate, Node } from '@angularflow/angular-adapter';
 export class GroupNodeComponent implements INodeTemplate {
   data = input.required<Node>();
   groupTitle = computed(() => this.data().data?.['title'] ?? 'Group');
+  highlighted = computed(() => this.data().highlighted ?? false);
 }
