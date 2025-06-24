@@ -20,7 +20,6 @@ import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.compon
 import { EdgeStraightComponent } from '../edge/edge-straight/edge-straight.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
-import { ToolbarComponent } from '../toolbar/angular-adapter-toolbar';
 
 @Component({
   selector: 'angular-adapter-diagram',
@@ -31,7 +30,6 @@ import { ToolbarComponent } from '../toolbar/angular-adapter-toolbar';
     AngularAdapterEdgeComponent,
     EdgeStraightComponent,
     MarkerArrowComponent,
-    ToolbarComponent,
   ],
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',

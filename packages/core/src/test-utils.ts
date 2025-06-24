@@ -10,7 +10,6 @@ import type {
   RotateEvent,
   WheelEvent,
 } from './types';
-import { TreeNode } from './types/tree-layout.interface.ts';
 
 export const mockNode: Node = {
   id: 'node1',
@@ -127,11 +126,3 @@ export const mockEdgeLabel: EdgeLabel = {
   positionOnEdge: 0.5,
 };
 
-export const getMockTreeNode = (id: string, width: number, height: number): TreeNode => {
-  return {
-    id,
-    size: { width, height },
-    position: { x: 0, y: 0 },
-    children: [],
-  };
-};
