@@ -34,6 +34,7 @@ const layoutChildren = (
 
   // Special case: adjust offset if parent is sing = -1 and a direction changed
   if (sign === -1 && grandparentAngle !== parentAngle) {
+
     if (!isVertical) childOffsetY = offsetY;
     else childOffsetX = offsetX;
   }
@@ -59,7 +60,7 @@ const layoutChildren = (
     }
 
     // Recursively layout the child subtree
-    const childBounds = makeTreeLayout(child, config, childOffsetX, childOffsetY, parentAngle); // ⬅️ przekazujemy parentAngle jako grandparentAngle
+    const childBounds = makeTreeLayout(child, config, childOffsetX, childOffsetY, parentAngle);
 
     // For the last child, extend the bounding box if needed
     if (i === children.length - 1 && grandparentAngle !== parentAngle && sign === -1) {
