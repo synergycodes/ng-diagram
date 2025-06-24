@@ -1,22 +1,10 @@
-import { LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../types/tree-layout.interface.ts';
+import { LayoutAngleType, TreeLayoutConfig, TreeNode, Rect } from '../../types/tree-layout.interface.ts';
 import { getSign, isAngleHorizontal, isAngleVertical } from '../get-direction.ts';
-import { getNodeSize, groupLayout, isLeafNode } from './tree-layout-utils.ts';
-
-type Rect = { minX: number; maxX: number; minY: number; maxY: number };
-
-const shiftSubtree = (node: TreeNode, dx: number, dy: number) => {
-  node.position.x += dx;
-  node.position.y += dy;
-  if (node.children) {
-    for (const child of node.children) {
-      shiftSubtree(child, dx, dy);
-    }
-  }
-};
+import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
 
 /**
- * Calculates horizontal positions for a tree layout starting from the given parent node.
- *
+ * Calculates the bounding box for all children nodes in a tree layout,
+ * starting from the given parent node and position.
  * @param parentNode
  * @param config
  * @param offsetX
@@ -29,7 +17,7 @@ const layoutChildren = (
   config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
-  grandparentAngle: LayoutAngleType // ⬅️ nowy parametr
+  grandparentAngle: LayoutAngleType
 ): Rect => {
   const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
   const isVertical = isAngleVertical(parentAngle);
@@ -38,20 +26,19 @@ const layoutChildren = (
   const parentWidth = parentNode.size?.width ?? 0;
   const parentHeight = parentNode.size?.height ?? 0;
 
-  // offset dla dzieci
+  // Set initial offset for children based on layout direction and sign
   let childOffsetX =
     offsetX + (!isVertical ? (sign === -1 ? -config.levelGap : sign * (parentWidth + config.levelGap)) : 0);
   let childOffsetY =
     offsetY + (isVertical ? (sign === -1 ? -config.levelGap : sign * (parentHeight + config.levelGap)) : 0);
 
+  // Special case: adjust offset if parent is sing = -1 and a direction changed
   if (sign === -1 && grandparentAngle !== parentAngle) {
-    if (!isVertical) {
-      childOffsetY = offsetY;
-    } else {
-      childOffsetX = offsetX;
-    }
+    if (!isVertical) childOffsetY = offsetY;
+    else childOffsetX = offsetX;
   }
 
+  // Initialize bounding box for all children
   let bounds: Rect = {
     minX: Infinity,
     maxX: -Infinity,
@@ -70,8 +57,11 @@ const layoutChildren = (
         childOffsetY -= height;
       }
     }
+
+    // Recursively layout the child subtree
     const childBounds = makeTreeLayout(child, config, childOffsetX, childOffsetY, parentAngle); // ⬅️ przekazujemy parentAngle jako grandparentAngle
 
+    // For the last child, extend the bounding box if needed
     if (i === children.length - 1 && grandparentAngle !== parentAngle && sign === -1) {
       if (!isVertical) {
         childBounds.maxX += parentWidth + config.levelGap;
@@ -87,6 +77,7 @@ const layoutChildren = (
       maxY: Math.max(bounds.maxY, childBounds.maxY),
     };
 
+    // Move offset for next sibling
     const subtreeCrossSize = isVertical ? childBounds.maxX - childBounds.minX : childBounds.maxY - childBounds.minY;
 
     if (isVertical) {
@@ -97,67 +88,6 @@ const layoutChildren = (
   }
 
   return bounds;
-};
-
-const maybeShiftChildren = (
-  parent: TreeNode,
-  angle: number,
-  parentOffset: { x: number; y: number },
-  childrenBounds: Rect,
-  parentAngle: LayoutAngleType,
-  grandparentAngle: LayoutAngleType
-): void => {
-  const isVertical = isAngleVertical(parentAngle);
-  const sign = getSign(parentAngle);
-  if (sign === -1 && isAngleVertical(grandparentAngle) === isVertical) return;
-  // 1. CENTROWANIE DZIECI WZGLĘDEM RODZICA (jak poprzednio)
-  const { width, height } = getNodeSize(parent);
-  const childrenWidth = childrenBounds.maxX - childrenBounds.minX;
-  const childrenHeight = childrenBounds.maxY - childrenBounds.minY;
-
-  let shiftX = 0,
-    shiftY = 0;
-  if ((angle === 90 || angle === 270) && width > childrenWidth) {
-    shiftX = (width - childrenWidth) / 2 + parentOffset.x - childrenBounds.minX;
-  }
-  if ((angle === 0 || angle === 180) && height > childrenHeight) {
-    shiftY = (height - childrenHeight) / 2 + parentOffset.y - childrenBounds.minY;
-  }
-
-  if (shiftX !== 0 || shiftY !== 0) {
-    for (const child of parent.children) {
-      child.position.x += shiftX;
-      child.position.y += shiftY;
-    }
-    // Aktualizuj granice dzieci po przesunięciu
-    childrenBounds.minX += shiftX;
-    childrenBounds.maxX += shiftX;
-    childrenBounds.minY += shiftY;
-    childrenBounds.maxY += shiftY;
-  }
-
-  // 2. GRANICA: NIE PRZEKRACZAJ offsetX/offsetY
-  const deltaX = parentOffset.x - childrenBounds.minX;
-  const deltaY = parentOffset.y - childrenBounds.minY;
-
-  // Przesuwaj tylko jeśli wychodzimy poza offset
-  if (deltaX > 0 || deltaY > 0) {
-    const shiftSubtree = (node: TreeNode) => {
-      node.position.x += deltaX > 0 ? deltaX : 0;
-      node.position.y += deltaY > 0 ? deltaY : 0;
-      node.children?.forEach(shiftSubtree);
-    };
-    shiftSubtree(parent);
-    // Aktualizuj granice dzieci po przesunięciu
-    if (deltaX > 0) {
-      childrenBounds.minX += deltaX;
-      childrenBounds.maxX += deltaX;
-    }
-    if (deltaY > 0) {
-      childrenBounds.minY += deltaY;
-      childrenBounds.maxY += deltaY;
-    }
-  }
 };
 
 const alignParent = (
@@ -172,6 +102,7 @@ const alignParent = (
   const isHorizontal = isAngleHorizontal(angle);
   const { width, height } = getNodeSize(parent);
   const [firstChild, lastChild] = [parent.children[0], parent.children.at(-1)!];
+  const { width: lastChildWidth, height: lastChildHeight } = getNodeSize(lastChild);
   const sign = getSign(angle);
 
   let x: number;
@@ -184,12 +115,8 @@ const alignParent = (
     x = !isHorizontal ? (childrenBounds.minX + childrenBounds.maxX - width) / 2 : offsetX;
     y = isHorizontal ? (childrenBounds.minY + childrenBounds.maxY - height) / 2 : offsetY;
   } else {
-    x = !isHorizontal
-      ? (firstChild.position.x + lastChild.position.x + (lastChild.size?.width || 0) - width) / 2
-      : offsetX;
-    y = isHorizontal
-      ? (firstChild.position.y + lastChild.position.y + (lastChild.size?.height || 0) - height) / 2
-      : offsetY;
+    x = !isHorizontal ? (firstChild.position.x + lastChild.position.x + (lastChildWidth || 0) - width) / 2 : offsetX;
+    y = isHorizontal ? (firstChild.position.y + lastChild.position.y + (lastChildHeight || 0) - height) / 2 : offsetY;
   }
 
   if (!isHorizontal) x = Math.max(x, offsetX);
@@ -212,23 +139,33 @@ const alignParent = (
   parent.position.y = y;
 };
 
+/**
+ * Calculates the layout for a tree starting from the given parent node.
+ * Positions the parent and its children, and returns the bounding box (Rect) for the whole subtree.
+ *
+ * @param parentNode
+ * @param config - Layout configuration options.
+ * @param offsetX - X coordinate to start layout.
+ * @param offsetY - Y coordinate to start layout.
+ * @param grandparentAngle - The layout angle of the parent’s parent node.
+ */
 export const makeTreeLayout = (
-  parent: TreeNode,
+  parentNode: TreeNode,
   config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
 ): Rect => {
-  const { width, height } = getNodeSize(parent);
-  const parentAngle = parent.layoutAngle ?? config.layoutAngle;
+  const { width, height } = getNodeSize(parentNode);
+  const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
 
-  if (isLeafNode(parent)) {
-    if (parent.type === 'group' && parent.groupChildren) {
-      const delta = { x: offsetX - parent.position.x, y: offsetY - parent.position.y };
-      groupLayout(parent.groupChildren, delta);
+  if (isLeafNode(parentNode)) {
+    if (parentNode.type === 'group' && parentNode.groupChildren) {
+      const delta = { x: offsetX - parentNode.position.x, y: offsetY - parentNode.position.y };
+      groupLayout(parentNode.groupChildren, delta);
     }
-    parent.position.x = offsetX;
-    parent.position.y = offsetY;
+    parentNode.position.x = offsetX;
+    parentNode.position.y = offsetY;
     return {
       minX: offsetX,
       maxX: offsetX + width,
@@ -237,18 +174,16 @@ export const makeTreeLayout = (
     };
   }
 
-  const angle = parent.layoutAngle ?? config.layoutAngle;
+  // Layout children get their bounding box
+  const childrenBounds = layoutChildren(parentNode, config, offsetX, offsetY, grandparentAngle);
 
-  // 1. Layout children get their bounding box
-  const childrenBounds = layoutChildren(parent, config, offsetX, offsetY, grandparentAngle);
+  // Shift children if parent is bigger
+  maybeShiftChildren(parentNode, parentAngle, { x: offsetX, y: offsetY }, childrenBounds, grandparentAngle);
 
-  // 2. Shift children if parent is wider/taller
-  maybeShiftChildren(parent, angle, { x: offsetX, y: offsetY }, childrenBounds, parentAngle, grandparentAngle);
+  // Align parent (Start, Subtree, Parent)
+  alignParent(parentNode, config, childrenBounds, offsetX, offsetY, grandparentAngle);
 
-  // 3. Align parent (Start, Subtree, Parent)
-  alignParent(parent, config, childrenBounds, offsetX, offsetY, grandparentAngle);
-
-  // 4. Return bounding box for this subtree
+  // Return bounding box for this subtree
   return {
     minX: Math.min(offsetX, childrenBounds.minX),
     maxX: Math.max(offsetX + width, childrenBounds.maxX),

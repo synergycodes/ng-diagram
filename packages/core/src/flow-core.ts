@@ -235,16 +235,12 @@ export class FlowCore {
   /**
    * Sets the layout
    */
-  async layout(layout: 'Tree') {
-    let finalState;
+  layout(layout: 'Tree' | 'None') {
     switch (layout) {
       case 'Tree':
       default:
-        finalState = await this.middlewareManager.execute(this.getState(), {}, 'treeLayout');
+        this.applyUpdate({}, 'treeLayout');
         break;
-    }
-    if (finalState) {
-      this.setState(finalState);
     }
   }
 }
