@@ -13,7 +13,6 @@ describe('BatchResizeObserverService', () => {
   let mockCancelAnimationFrame: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    // Mock ResizeObserver globally for realistic testing
     mockResizeObserver = {
       observe: vi.fn(),
       unobserve: vi.fn(),
@@ -22,7 +21,6 @@ describe('BatchResizeObserverService', () => {
 
     global.ResizeObserver = vi.fn().mockImplementation(() => mockResizeObserver);
 
-    // Mock RAF functions
     mockRequestAnimationFrame = vi.fn().mockReturnValue(123);
     mockCancelAnimationFrame = vi.fn();
     global.requestAnimationFrame = mockRequestAnimationFrame;
@@ -72,11 +70,9 @@ describe('BatchResizeObserverService', () => {
       const processor = vi.fn();
       service.setBatchProcessor(processor);
 
-      // Set up pending entries using type-safe interface
       service['pendingEntries'] = [...mockEntries];
       service['rafId'] = 123;
 
-      // Call private method using type-safe interface
       service['processBatch']();
 
       expect(service['pendingEntries']).toEqual([]);
@@ -109,10 +105,8 @@ describe('BatchResizeObserverService', () => {
     it('should queue entries and schedule batch processing', () => {
       const mockEntries = [{ target: document.createElement('div') }] as unknown as ResizeObserverEntry[];
 
-      // Get the callback passed to ResizeObserver constructor
       const resizeObserverCallback = (global.ResizeObserver as Mock).mock.calls[0][0];
 
-      // Simulate ResizeObserver firing
       resizeObserverCallback(mockEntries);
 
       expect(service['pendingEntries']).toEqual(mockEntries);
@@ -123,12 +117,10 @@ describe('BatchResizeObserverService', () => {
       const mockEntries = [{ target: document.createElement('div') }] as unknown as ResizeObserverEntry[];
       const resizeObserverCallback = (global.ResizeObserver as Mock).mock.calls[0][0];
 
-      // Set existing rafId using type-safe interface
       service['rafId'] = 456;
 
       resizeObserverCallback(mockEntries);
 
-      // Should not call requestAnimationFrame again
       expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
     });
   });

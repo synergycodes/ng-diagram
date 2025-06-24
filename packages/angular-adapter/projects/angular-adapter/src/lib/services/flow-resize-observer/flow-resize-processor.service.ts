@@ -42,9 +42,6 @@ export class FlowResizeBatchProcessorService {
       return;
     }
 
-    const startTime = performance.now();
-
-    // Separate ports and edge labels
     const portEntries: ProcessedEntry[] = [];
     const edgeLabelEntries: ProcessedEntry[] = [];
     const nodeEntries: ProcessedEntry[] = [];
@@ -83,10 +80,6 @@ export class FlowResizeBatchProcessorService {
     if (nodeEntries.length > 0) {
       this.processNodeBatch(nodeEntries);
     }
-
-    const elapsed = performance.now() - startTime;
-
-    console.log(`[ResizeBatch] Processed ${entries.length} elements in ${elapsed.toFixed(2)}ms`);
   }
 
   /**
