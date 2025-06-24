@@ -25,7 +25,7 @@ import {
   startLinking,
   startLinkingFromPosition,
 } from './linking';
-import { moveNodes, moveSelection } from './move';
+import { moveNodesBy } from './move';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
 import { rotateNodeBy } from './rotate-node';
@@ -47,8 +47,7 @@ export const commands: CommandMap = {
   select,
   deselect,
   deselectAll,
-  moveSelection,
-  moveNodes,
+  moveNodesBy,
   deleteSelection,
   addNodes,
   updateNode,

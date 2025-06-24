@@ -9,7 +9,7 @@ vi.mock('./commands', () => ({
     select: vi.fn(),
     deselect: vi.fn(),
     deselectAll: vi.fn(),
-    moveSelection: vi.fn(),
+    moveNodesBy: vi.fn(),
   },
 }));
 
@@ -29,12 +29,16 @@ describe('CoreCommandHandler', () => {
     handler.emit('select', { nodeIds: ['1'] });
     handler.emit('deselect', { nodeIds: ['1'] });
     handler.emit('deselectAll');
-    handler.emit('moveSelection', { dx: 0, dy: 0 });
+    handler.emit('moveNodesBy', { delta: { x: 0, y: 0 }, nodes: [] });
 
     expect(commands.select).toHaveBeenCalledWith(handler, { nodeIds: ['1'], name: 'select' });
     expect(commands.deselect).toHaveBeenCalledWith(handler, { nodeIds: ['1'], name: 'deselect' });
     expect(commands.deselectAll).toHaveBeenCalledWith(handler, { name: 'deselectAll' });
-    expect(commands.moveSelection).toHaveBeenCalledWith(handler, { dx: 0, dy: 0, name: 'moveSelection' });
+    expect(commands.moveNodesBy).toHaveBeenCalledWith(handler, {
+      delta: { x: 0, y: 0 },
+      nodes: [],
+      name: 'moveNodesBy',
+    });
   });
 
   describe('emit', () => {

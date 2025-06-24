@@ -8,26 +8,26 @@ export const keyboardMoveSelectionAction: InputActionWithPredicate = {
 
     if (nodesToMove.length === 0) return;
 
-    flowCore.commandHandler.emit('moveNodes', { nodes: nodesToMove, ...getMoveNodesCommand(event) });
+    flowCore.commandHandler.emit('moveNodesBy', { nodes: nodesToMove, delta: getMoveNodesCommandDelta(event) });
   },
   predicate: (event) =>
     isKeyboardDownEvent(event) &&
     (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown'),
 };
 
-function getMoveNodesCommand(event: KeyboardEvent): Omit<CommandByName<'moveSelection'>, 'name'> {
+function getMoveNodesCommandDelta(event: KeyboardEvent): CommandByName<'moveNodesBy'>['delta'] {
   const MOVEMENT_STEP = 10;
 
   switch (event.key) {
     case 'ArrowLeft':
-      return { dx: -MOVEMENT_STEP, dy: 0 };
+      return { x: -MOVEMENT_STEP, y: 0 };
     case 'ArrowRight':
-      return { dx: MOVEMENT_STEP, dy: 0 };
+      return { x: MOVEMENT_STEP, y: 0 };
     case 'ArrowUp':
-      return { dx: 0, dy: -MOVEMENT_STEP };
+      return { x: 0, y: -MOVEMENT_STEP };
     case 'ArrowDown':
-      return { dx: 0, dy: MOVEMENT_STEP };
+      return { x: 0, y: MOVEMENT_STEP };
     default:
-      return { dx: 0, dy: 0 };
+      return { x: 0, y: 0 };
   }
 }

@@ -1,0 +1,120 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { FlowCore } from '../../../flow-core';
+import { snapAngle } from '../../../input-event-handler/input-actions/rotate/snap-angle';
+import { mockNode } from '../../../test-utils';
+import type { MiddlewareContext, Node } from '../../../types';
+import { nodeRotationSnapMiddleware } from '../node-rotation-snap';
+
+import type { MiddlewareExecutor } from '../../middleware-executor';
+type Helpers = ReturnType<MiddlewareExecutor['helpers']>;
+
+const SNAP_ANGLE = 15;
+
+describe('nodeRotationSnapMiddleware', () => {
+  let helpers: Partial<Helpers>;
+  let nodesMap: Map<string, Node>;
+  let flowCore: Pick<FlowCore, 'getNodeById'>;
+  let context: Partial<MiddlewareContext>;
+  let nextMock: ReturnType<typeof vi.fn>;
+  let cancelMock: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    helpers = {
+      checkIfAnyNodePropsChanged: vi.fn(),
+      getAffectedNodeIds: vi.fn(),
+    };
+    nodesMap = new Map();
+    flowCore = {
+      getNodeById: vi.fn(),
+    };
+    nextMock = vi.fn();
+    cancelMock = vi.fn();
+    context = {
+      helpers: helpers as Helpers,
+      nodesMap,
+      flowCore: flowCore as FlowCore,
+    };
+  });
+
+  it('should call next if no angle property changed', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith();
+  });
+
+  it('should call cancel if no nodes need snapping', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 30 });
+    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+      id: 'node1',
+      angle: snapAngle(30, SNAP_ANGLE),
+    });
+
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(cancelMock).toHaveBeenCalled();
+    expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
+  });
+
+  it('should skip nodes without angle', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1', 'node2']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1' });
+    nodesMap.set('node2', { ...mockNode, id: 'node2', angle: undefined });
+
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
+  });
+
+  it('should snap angle if not snapped and update state', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 17 });
+    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({ id: 'node1', angle: 17 });
+
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith({ nodesToUpdate: [{ id: 'node1', angle: snapAngle(17, SNAP_ANGLE) }] });
+  });
+
+  it('should not update if angle is already snapped', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 30 });
+    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({ id: 'node1', angle: 30 });
+
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(cancelMock).toHaveBeenCalled();
+    expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
+  });
+
+  it('should handle multiple nodes, only updating those needing snap', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1', 'node2']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 17 });
+    nodesMap.set('node2', { ...mockNode, id: 'node2', angle: 30 });
+    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockImplementation((id: string) => ({
+      id,
+      angle: nodesMap.get(id)?.angle,
+    }));
+
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith({ nodesToUpdate: [{ id: 'node1', angle: snapAngle(17, SNAP_ANGLE) }] });
+  });
+
+  it('should call cancel if nodesToUpdate is empty', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 30 });
+    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({ id: 'node1', angle: 30 });
+
+    nodeRotationSnapMiddleware.execute(context as MiddlewareContext, nextMock, cancelMock);
+
+    expect(cancelMock).toHaveBeenCalled();
+  });
+});
