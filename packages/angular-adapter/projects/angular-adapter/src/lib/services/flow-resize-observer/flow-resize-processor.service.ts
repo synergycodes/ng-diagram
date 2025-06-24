@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
-import { BatchResizeObserverService, ObservedElementMetadata } from './batched-resize-observer.service';
+import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
 
 interface ProcessedEntry {
   entry: ResizeObserverEntry;
@@ -15,14 +15,6 @@ export class FlowResizeBatchProcessorService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly updatePortsService = inject(UpdatePortsService);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
-
-  // Track performance metrics
-  private metrics = {
-    totalBatches: 0,
-    totalElements: 0,
-    averageBatchSize: 0,
-    lastBatchTime: 0,
-  };
 
   private isInitialized = false;
 
