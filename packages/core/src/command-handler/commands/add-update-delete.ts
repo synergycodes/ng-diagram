@@ -183,7 +183,8 @@ export const updateEdgeLabel = async (commandHandler: CommandHandler, command: U
   }
   const points = edge.points || [];
   const newLabels = edge.labels?.map((label) => {
-    const position = getPointOnPath(points, label.positionOnEdge);
+    const positionOnEdge = labelChanges?.positionOnEdge ?? label.positionOnEdge;
+    const position = getPointOnPath(points, positionOnEdge);
     if (label.id !== labelId) {
       return { ...label, position };
     }
