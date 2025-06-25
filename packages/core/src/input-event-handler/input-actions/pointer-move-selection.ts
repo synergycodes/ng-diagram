@@ -143,11 +143,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
 
         // That means a group has been highlighted, so we need to clear it
         if (updateData.some((node) => Boolean(node.groupId))) {
-          // TODO: Add batching updates - due to race condition this is not applied correctly
-          // the initial state for the update is not yet updated
-          setTimeout(() => {
-            flowCore.commandHandler.emit('highlightGroupClear');
-          }, 0);
+          flowCore.commandHandler.emit('highlightGroupClear');
         }
 
         moveState.isMoving = false;

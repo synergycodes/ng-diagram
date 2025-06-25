@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FlowCore } from '../../../flow-core';
 import { mockNode } from '../../../test-utils';
 import type { MiddlewareContext, Node } from '../../../types';
-import { snapNumber } from '../../../utils/snap-number';
+import { snapNumber } from '../../../utils';
 import type { MiddlewareExecutor } from '../../middleware-executor';
 import { nodePositionSnapMiddleware } from '../node-position-snap';
 

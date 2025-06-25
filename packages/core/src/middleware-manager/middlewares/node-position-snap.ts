@@ -1,5 +1,5 @@
 import type { FlowStateUpdate, Middleware } from '../../types';
-import { snapNumber } from '../../utils/snap-number';
+import { snapNumber } from '../../utils';
 
 const SNAP_GRID = 10;
 
