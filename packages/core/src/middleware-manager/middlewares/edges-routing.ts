@@ -68,8 +68,8 @@ export const edgesRoutingMiddleware: Middleware = {
         const target = points[1];
         if (edge.routing === 'orthogonal') {
           const middlePoints = getPathPoints(
-            (source?.side as PortSide) || 'left',
-            (target?.side as PortSide) || 'right',
+            (source?.side as PortSide) || 'right',
+            (target?.side as PortSide) || 'left',
             source,
             target
           );
