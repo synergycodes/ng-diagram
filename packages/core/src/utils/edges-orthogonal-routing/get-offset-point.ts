@@ -9,15 +9,15 @@ import { POINT_DISTANCE } from './constants.ts';
  * @returns An object containing the new x and y coordinates after applying the offset.
  */
 export const getOffsetPoint = (point: Point, position: PortSide) => {
-	const offset = {
-		left: { x: -POINT_DISTANCE, y: 0 },
-		right: { x: POINT_DISTANCE, y: 0 },
-		top: { x: 0, y: -POINT_DISTANCE },
-		bottom: { x: 0, y: POINT_DISTANCE },
-	}[position] || { x: 0, y: 0 };
+  const offset = {
+    left: { x: -POINT_DISTANCE, y: 0 },
+    right: { x: POINT_DISTANCE, y: 0 },
+    top: { x: 0, y: -POINT_DISTANCE },
+    bottom: { x: 0, y: POINT_DISTANCE },
+  }[position] || { x: 0, y: 0 };
 
-	return {
-		x: point.x + offset.x,
-		y: point.y + offset.y,
-	};
+  return {
+    x: point.x + offset.x,
+    y: point.y + offset.y,
+  };
 };
