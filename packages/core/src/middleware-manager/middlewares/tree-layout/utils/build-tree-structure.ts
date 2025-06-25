@@ -1,5 +1,5 @@
-import { Edge, Node } from '../../types';
-import { TreeNode } from '../../types/tree-layout.interface.ts';
+import { Edge, Node } from '../../../../types';
+import { TreeNode } from '../../../../types/tree-layout.interface.ts';
 
 /**
  * Makes a map that shows, for each node, the top group it belongs to.
@@ -29,11 +29,11 @@ export const buildTopGroupMap = (
 };
 
 /**
- * Zwraca top-level grupę dla danego nodeId.
+ * Returns the top-level group for a given nodeId.
  *
  * @param nodeId
- * @param topGroupMap - mapa childId -> topLevelGroupId
- * @returns id top-level grupy lub nodeId jeśli nie jest w grupie
+ * @param topGroupMap - a map of childId -> topLevelGroupId
+ * @returns the id of the top-level group or nodeId if it is not in a group
  */
 const getTopGroupId = (nodeId: string, topGroupMap: Map<string, string>): string => {
   return topGroupMap.get(nodeId) ?? nodeId;
@@ -44,7 +44,7 @@ const getTopGroupId = (nodeId: string, topGroupMap: Map<string, string>): string
  *
  * @param edges - List of edges with source and target IDs.
  * @param topGroupMap - Map from node ID to top group ID.
- * @returns New list of edges with an updated source and target.
+ * @returns new list of edges with an updated source and target.
  */
 export const remapEdges = (
   edges: Edge[],
@@ -107,8 +107,7 @@ export const getNodeMap = (nodes: Pick<Node, 'id' | 'position' | 'size' | 'layou
  *
  * @param nodeMap
  * @param edges
- * @returns {roots}
- *          Object with an array of root nodes and a map of all nodes by ID.
+ * @returns {roots} Object with an array of root nodes and a map of all nodes by ID.
  **/
 export const buildTreeStructure = (
   nodeMap: Map<string, TreeNode>,

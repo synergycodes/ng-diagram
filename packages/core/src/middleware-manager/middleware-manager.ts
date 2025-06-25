@@ -3,7 +3,7 @@ import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActi
 import { MiddlewareExecutor } from './middleware-executor';
 import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { treeLayoutMiddleware } from './middlewares/tree-layout.ts';
+import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];

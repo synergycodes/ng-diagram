@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { buildTreeStructure } from '../tree-layout/build-tree-structure.ts';
-import { Edge, Node } from '../../types';
-import { TreeNode } from '../../types/tree-layout.interface.ts';
+import { buildTreeStructure } from './build-tree-structure.ts';
+import { Edge, Node } from '../../../../types';
+import { TreeNode } from '../../../../types/tree-layout.interface.ts';
 
 type PartialNode = Pick<Node, 'id' | 'position' | 'size' | 'layoutAngle' | 'type' | 'groupId'>;
 type PartialEdge = Pick<Edge, 'source' | 'target'>;

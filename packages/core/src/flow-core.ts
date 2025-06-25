@@ -238,9 +238,10 @@ export class FlowCore {
   layout(layout: 'Tree' | 'None') {
     switch (layout) {
       case 'Tree':
-      default:
         this.applyUpdate({}, 'treeLayout');
         break;
+      default:
+        throw new Error(`The "${layout}" layout does not exist.`);
     }
   }
 }

@@ -1,5 +1,5 @@
-import { LayoutAngleType, TreeLayoutConfig, TreeNode, Rect } from '../../types/tree-layout.interface.ts';
-import { getSign, isAngleHorizontal, isAngleVertical } from '../get-direction.ts';
+import { LayoutAngleType, TreeLayoutConfig, TreeNode, Rect } from '../../../../types/tree-layout.interface.ts';
+import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils/get-direction.ts';
 import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
 
 /**
@@ -32,7 +32,7 @@ const layoutChildren = (
   let childOffsetY =
     offsetY + (isVertical ? (sign === -1 ? -config.levelGap : sign * (parentHeight + config.levelGap)) : 0);
 
-  // Special case: adjust offset if parent is sing = -1 and a direction changed
+  // Special case: adjust offset if the parent is sing = -1 and a direction changed
   if (sign === -1 && grandparentAngle !== parentAngle) {
 
     if (!isVertical) childOffsetY = offsetY;

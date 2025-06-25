@@ -1,14 +1,14 @@
-import { makeTreeLayout } from '../../utils/tree-layout/orientation-tree-layout.ts';
+import { makeTreeLayout } from './utils/orientation-tree-layout.ts';
 import {
   buildGroupsHierarchy,
   buildTopGroupMap,
   buildTreeStructure,
   getNodeMap,
   remapEdges,
-} from '../../utils/tree-layout/build-tree-structure.ts';
-import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../types';
-import { isAngleHorizontal } from '../../utils/get-direction.ts';
-import { TreeLayoutConfig } from '../../types/tree-layout.interface.ts';
+} from './utils/build-tree-structure.ts';
+import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
+import { isAngleHorizontal } from '../../../utils/get-direction.ts';
+import { TreeLayoutConfig } from '../../../types/tree-layout.interface.ts';
 
 // Todo: Move this to metadata
 const CONFIG: TreeLayoutConfig = {
