@@ -1,31 +1,16 @@
-import type { CommandHandler, ModelActionType } from '../../types';
+import type { CommandHandler } from '../../types';
 import type { Node } from '../../types/node.interface';
 
-interface BaseMoveCommand {
-  dx: number;
-  dy: number;
-}
-
-export interface MoveSelectionCommand extends BaseMoveCommand {
-  name: 'moveSelection';
-}
-
-export interface MoveNodesCommand extends BaseMoveCommand {
-  name: 'moveNodes';
-  nodes: Node[];
-}
-
-interface MoveNodesInFlowParams {
-  commandHandler: CommandHandler;
+export interface MoveNodesByCommand {
+  name: 'moveNodesBy';
   nodes: Node[];
   delta: {
     x: number;
     y: number;
   };
-  actionName: ModelActionType;
 }
 
-const moveNodesInFlow = ({ commandHandler, nodes, delta, actionName }: MoveNodesInFlowParams): void => {
+export const moveNodesBy = (commandHandler: CommandHandler, { delta, nodes }: MoveNodesByCommand): void => {
   if (nodes.length === 0) {
     return;
   }
@@ -35,31 +20,11 @@ const moveNodesInFlow = ({ commandHandler, nodes, delta, actionName }: MoveNodes
       nodesToUpdate: nodes.map((node) => ({
         id: node.id,
         position: {
-          x: Math.round(node.position.x + delta.x),
-          y: Math.round(node.position.y + delta.y),
+          x: node.position.x + delta.x,
+          y: node.position.y + delta.y,
         },
       })),
     },
-    actionName
+    'moveNodesBy'
   );
-};
-
-export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSelectionCommand): void => {
-  const nodesToMove = commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
-
-  moveNodesInFlow({
-    commandHandler,
-    nodes: nodesToMove,
-    delta: { x: dx, y: dy },
-    actionName: 'moveSelection',
-  });
-};
-
-export const moveNodes = (commandHandler: CommandHandler, { dx, dy, nodes }: MoveNodesCommand): void => {
-  moveNodesInFlow({
-    commandHandler,
-    nodes,
-    delta: { x: dx, y: dy },
-    actionName: 'moveNodes',
-  });
 };

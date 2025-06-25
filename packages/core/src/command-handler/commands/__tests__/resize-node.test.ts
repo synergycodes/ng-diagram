@@ -19,7 +19,9 @@ describe('Resize Node Command', () => {
     it('should not call applyUpdate if node is not found', () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(null);
 
-      resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } });
+      expect(() =>
+        resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } })
+      ).toThrowError('Node with id 1 not found.');
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
     });

@@ -1,4 +1,4 @@
-import type { Bounds, CommandHandler, Node, Port, Rect } from '../../types';
+import type { Bounds, CommandHandler, Node, Rect } from '../../types';
 import { getRectFromBounds } from '../../utils';
 import { calculateGroupBounds } from '../../utils/group-size';
 
@@ -8,71 +8,92 @@ export interface ResizeNodeCommand {
   size: Required<Node>['size'];
   position?: Node['position'];
   disableAutoSize?: boolean;
-  ports?: { portId: string; portChanges: Partial<Port> }[];
 }
 
-export const resizeNode = (
-  commandHandler: CommandHandler,
-  { id, size, position, disableAutoSize }: ResizeNodeCommand
-): void => {
-  const node = commandHandler.flowCore.getNodeById(id);
+export function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCommand): void {
+  const node = commandHandler.flowCore.getNodeById(command.id);
 
-  if (!node || (node.size?.width === size.width && node.size?.height === size.height)) {
-    return;
+  if (!node) {
+    throw new Error(`Node with id ${command.id} not found.`);
+  }
+
+  if (node.size?.width === command.size.width && node.size?.height === command.size.height) {
+    return; // No-op if size is unchanged
   }
 
   if (node.isGroup) {
-    const children = commandHandler.flowCore.modelLookup.getNodeChildren(id, { directOnly: false });
-    const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
-
-    // Calculate the new bounds based on the resize request
-    const requestedBounds: Bounds = {
-      minX: position?.x ?? node.position.x,
-      minY: position?.y ?? node.position.y,
-      maxX: (position?.x ?? node.position.x) + size.width,
-      maxY: (position?.y ?? node.position.y) + size.height,
-    };
-
-    // Ensure the new bounds fully contain the children bounds
-    const newGroupRect: Rect = getRectFromBounds({
-      minX: Math.min(requestedBounds.minX, childrenBounds.minX),
-      minY: Math.min(requestedBounds.minY, childrenBounds.minY),
-      maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
-      maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
-    });
-
-    commandHandler.flowCore.applyUpdate(
-      {
-        nodesToUpdate: [
-          {
-            id,
-            size: {
-              width: newGroupRect.width,
-              height: newGroupRect.height,
-            },
-            position: {
-              x: newGroupRect.x,
-              y: newGroupRect.y,
-            },
-            autoSize: false,
-          },
-        ],
-      },
-      'resizeNode'
-    );
+    handleGroupNodeResize(commandHandler, command, node);
   } else {
-    commandHandler.flowCore.applyUpdate(
-      {
-        nodesToUpdate: [
-          {
-            id,
-            size,
-            ...(position && { position }),
-            ...(disableAutoSize !== undefined && { autoSize: !disableAutoSize }),
-          },
-        ],
-      },
-      'resizeNode'
-    );
+    handleSingleNodeResize(commandHandler, command);
   }
-};
+}
+
+/**
+ * Handles resizing of a group node, ensuring children are contained.
+ */
+function handleGroupNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand, node: Node): void {
+  const children = commandHandler.flowCore.modelLookup.getNodeChildren(command.id, { directOnly: false });
+
+  if (children.length === 0) {
+    // if the group has no children, we fallback to single node mode
+    handleSingleNodeResize(commandHandler, command);
+    return;
+  }
+
+  const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
+
+  // Calculate the new bounds based on the resize request
+  const requestedBounds: Bounds = {
+    minX: command.position?.x ?? node.position.x,
+    minY: command.position?.y ?? node.position.y,
+    maxX: (command.position?.x ?? node.position.x) + command.size.width,
+    maxY: (command.position?.y ?? node.position.y) + command.size.height,
+  };
+
+  // Ensure the new bounds fully contain the children bounds
+  const newGroupRect: Rect = getRectFromBounds({
+    minX: Math.min(requestedBounds.minX, childrenBounds.minX),
+    minY: Math.min(requestedBounds.minY, childrenBounds.minY),
+    maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
+    maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
+  });
+
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodesToUpdate: [
+        {
+          id: command.id,
+          size: {
+            width: newGroupRect.width,
+            height: newGroupRect.height,
+          },
+          position: {
+            x: newGroupRect.x,
+            y: newGroupRect.y,
+          },
+          autoSize: false,
+        },
+      ],
+    },
+    'resizeNode'
+  );
+}
+
+/**
+ * Handles resizing of a single (non-group) node.
+ */
+function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): void {
+  commandHandler.flowCore.applyUpdate(
+    {
+      nodesToUpdate: [
+        {
+          id: command.id,
+          size: command.size,
+          ...(command.position && { position: command.position }),
+          ...(command.disableAutoSize !== undefined && { autoSize: !command.disableAutoSize }),
+        },
+      ],
+    },
+    'resizeNode'
+  );
+}
