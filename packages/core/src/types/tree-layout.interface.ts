@@ -25,5 +25,3 @@ export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'layou
   children: TreeNode[];
   groupChildren?: TreeNode[];
 }
-
-export type Rect = { minX: number; maxX: number; minY: number; maxY: number };

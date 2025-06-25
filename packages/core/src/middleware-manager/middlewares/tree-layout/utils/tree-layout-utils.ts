@@ -1,5 +1,6 @@
-import { LayoutAngleType, TreeNode, Rect } from '../../../../types/tree-layout.interface.ts';
+import { LayoutAngleType, TreeNode } from '../../../../types/tree-layout.interface.ts';
 import { getSign, isAngleVertical } from '../../../../utils/get-direction.ts';
+import { Bounds } from '../../../../types';
 
 /**
  * Determines whether the given node is a leaf
@@ -53,12 +54,12 @@ export const maybeShiftChildren = (
   parenNode: TreeNode,
   parentAngle: LayoutAngleType,
   parentOffset: { x: number; y: number },
-  childrenBounds: Rect,
+  childrenBounds: Bounds,
   grandparentAngle: LayoutAngleType
 ): void => {
   const isVertical = isAngleVertical(parentAngle);
 
-  // Skip if the parent is flipped and a layout direction matches grandparent
+  // Skip if the parent is sign = -1 and a layout direction matches grandparent
   if (getSign(parentAngle) === -1 && isAngleVertical(grandparentAngle) === isVertical) return;
 
   const { width, height } = getNodeSize(parenNode);

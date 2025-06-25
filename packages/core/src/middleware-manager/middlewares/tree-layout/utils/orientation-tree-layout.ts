@@ -1,6 +1,7 @@
-import { LayoutAngleType, TreeLayoutConfig, TreeNode, Rect } from '../../../../types/tree-layout.interface.ts';
+import { LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../../../types/tree-layout.interface.ts';
 import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils/get-direction.ts';
 import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
+import { Bounds } from '../../../../types';
 
 /**
  * Calculates the bounding box for all children nodes in a tree layout,
@@ -18,7 +19,7 @@ const layoutChildren = (
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
-): Rect => {
+): Bounds => {
   const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
   const isVertical = isAngleVertical(parentAngle);
   const sign = getSign(parentAngle);
@@ -34,13 +35,12 @@ const layoutChildren = (
 
   // Special case: adjust offset if the parent is sing = -1 and a direction changed
   if (sign === -1 && grandparentAngle !== parentAngle) {
-
     if (!isVertical) childOffsetY = offsetY;
     else childOffsetX = offsetX;
   }
 
   // Initialize bounding box for all children
-  let bounds: Rect = {
+  let bounds: Bounds = {
     minX: Infinity,
     maxX: -Infinity,
     minY: Infinity,
@@ -94,7 +94,7 @@ const layoutChildren = (
 const alignParent = (
   parent: TreeNode,
   config: TreeLayoutConfig,
-  childrenBounds: Rect,
+  childrenBounds: Bounds,
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
@@ -156,7 +156,7 @@ export const makeTreeLayout = (
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
-): Rect => {
+): Bounds => {
   const { width, height } = getNodeSize(parentNode);
   const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
 
