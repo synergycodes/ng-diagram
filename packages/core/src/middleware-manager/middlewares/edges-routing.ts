@@ -88,8 +88,8 @@ export const edgesRoutingMiddleware: Middleware = {
         edgesToUpdate.push({
           id: edge.id,
           points,
-          sourcePosition: points[0],
-          targetPosition: points[1],
+          sourcePosition: { x: points[0]?.x, y: points[0]?.y },
+          targetPosition: { x: points[1]?.x, y: points[1]?.y },
           labels: updatedLabels,
         });
       });
@@ -102,8 +102,8 @@ export const edgesRoutingMiddleware: Middleware = {
       newTemporaryEdge = {
         ...metadata.temporaryEdge,
         points,
-        sourcePosition: points[0],
-        targetPosition: points[1],
+        sourcePosition: { x: points[0]?.x, y: points[0]?.y },
+        targetPosition: { x: points[1]?.x, y: points[1]?.y },
       };
     }
 
