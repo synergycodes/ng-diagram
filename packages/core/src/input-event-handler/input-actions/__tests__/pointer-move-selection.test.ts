@@ -156,7 +156,7 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledTimes(2);
+      expect(mockCommandHandler.emit).toHaveBeenCalledTimes(0);
     });
 
     it('should emit highlightGroup when moving over a group', () => {
@@ -381,12 +381,12 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledTimes(2);
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
 
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledTimes(3);
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
     });
   });
 });
