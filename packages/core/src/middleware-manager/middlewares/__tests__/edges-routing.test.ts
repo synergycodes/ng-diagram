@@ -81,7 +81,7 @@ describe('Edges Routing Middleware', () => {
     expect(nextMock).toHaveBeenCalledWith({});
   });
 
-  it('should route only edges with routing set to straight or undefined and leave other edges unchanged', () => {
+  it('should route only edges with routing set to straight or orthogonal or undefined and leave other edges unchanged', () => {
     const newState = {
       nodes: [
         { ...mockNode, id: 'node-1', position: { x: 100, y: 100 } },

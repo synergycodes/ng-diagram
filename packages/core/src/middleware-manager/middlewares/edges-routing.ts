@@ -52,23 +52,27 @@ export const edgesRoutingMiddleware: Middleware = {
 
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
-        // const isProperEdgeRouting = edge.routing === 'orthogonal' || edge.routing === undefined;
+        const isProperEdgeRouting =
+          edge.routing === 'straight' || edge.routing === 'orthogonal' || edge.routing === undefined;
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
           helpers.checkIfNodeChanged(edge.target);
-        const shouldRoute = isEdgeOrNodesChanged || modelActionType === 'init';
+        const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
         if (!shouldRoute) {
           return;
         }
 
         const points = getPoints(edge, nodesMap);
+        const source = points[0];
+        const target = points[1];
+
         if (edge.routing === 'orthogonal') {
           const middlePoints = getPathPoints(
-            (points[0]?.side as PortSide) || 'left',
-            (points[2]?.side as PortSide) || 'right',
-            points[0],
-            points[1]
+            (source?.side as PortSide) || 'left',
+            (source?.side as PortSide) || 'right',
+            source,
+            source
           );
           points.splice(1, 0, ...middlePoints);
         }
@@ -88,8 +92,8 @@ export const edgesRoutingMiddleware: Middleware = {
         edgesToUpdate.push({
           id: edge.id,
           points,
-          sourcePosition: { x: points[0]?.x, y: points[0]?.y },
-          targetPosition: { x: points[1]?.x, y: points[1]?.y },
+          sourcePosition: source ? { x: source.x, y: source.y } : undefined,
+          targetPosition: target ? { x: target.x, y: target.y } : undefined,
           labels: updatedLabels,
         });
       });
@@ -98,12 +102,14 @@ export const edgesRoutingMiddleware: Middleware = {
 
     if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {
       const points = getPoints(metadata.temporaryEdge, nodesMap);
+      const source = points[0];
+      const target = points[1];
 
       newTemporaryEdge = {
         ...metadata.temporaryEdge,
         points,
-        sourcePosition: { x: points[0]?.x, y: points[0]?.y },
-        targetPosition: { x: points[1]?.x, y: points[1]?.y },
+        sourcePosition: source ? { x: source.x, y: source.y } : undefined,
+        targetPosition: target ? { x: target.x, y: target.y } : undefined,
       };
     }
 
