@@ -1,38 +1,75 @@
 import { FlowCore } from '../flow-core';
-import type { Edge, FlowState, Node } from '../types';
+import type { Edge, Node } from '../types';
 
 export class ModelLookup {
-  nodesMap: Map<string, Node>;
-  edgesMap: Map<string, Edge>;
-  directChildrenMap: Map<Node['id'], Node['id'][]>;
-  private descendantsCache: Map<Node['id'], Node['id'][]>; // Cache for all descendants
+  private _nodesMap = { map: new Map<string, Node>(), synchronized: false };
+  private _edgesMap = { map: new Map<string, Edge>(), synchronized: false };
+  private _directChildrenMap = { map: new Map<Node['id'], Node['id'][]>(), synchronized: false };
+  private _descendantsCache = { map: new Map<Node['id'], Node['id'][]>(), synchronized: false }; // Cache for all descendants
 
-  constructor(private readonly flowCore: FlowCore) {
-    const nodes = this.flowCore.model.getNodes();
-    const edges = this.flowCore.model.getEdges();
+  constructor(private readonly flowCore: FlowCore) {}
 
-    this.nodesMap = this.mapModelNodesToMap(nodes);
-    this.edgesMap = this.mapModelEdgesToMap(edges);
-    this.directChildrenMap = this.buildDirectChildrenMap(nodes);
-    this.descendantsCache = new Map(); // Initialize descendants cache
+  /**
+   * Desynchronizes the model lookup
+   */
+  public desynchronize() {
+    this._nodesMap.synchronized = false;
+    this._edgesMap.synchronized = false;
+    this._directChildrenMap.synchronized = false;
+    this._descendantsCache.synchronized = false;
   }
 
   /**
-   * Maps model nodes to a map
-   * @param nodes Nodes
-   * @returns Map of nodes
+   * Gets the nodes map if it is not synchronized synchronize it
+   * @returns Nodes map
    */
-  private mapModelNodesToMap(nodes: Node[]): Map<string, Node> {
-    return new Map(nodes.map((node) => [node.id, node]));
+  get nodesMap() {
+    if (!this._nodesMap.synchronized) {
+      this._nodesMap = {
+        map: new Map(this.flowCore.getState().nodes.map((node) => [node.id, node])),
+        synchronized: true,
+      };
+    }
+    return this._nodesMap.map;
   }
 
   /**
-   * Maps model edges to a map
-   * @param edges Edges
-   * @returns Map of edges
+   * Gets the edges map if it is not synchronized synchronize it
+   * @returns Edges map
    */
-  private mapModelEdgesToMap(edges: Edge[]): Map<string, Edge> {
-    return new Map(edges.map((edge) => [edge.id, edge]));
+  get edgesMap() {
+    if (!this._edgesMap.synchronized) {
+      this._edgesMap = {
+        map: new Map(this.flowCore.getState().edges.map((edge) => [edge.id, edge])),
+        synchronized: true,
+      };
+    }
+    return this._edgesMap.map;
+  }
+
+  /**
+   * Gets the direct children map if it is not synchronized synchronize it
+   * @returns Direct children map
+   */
+  get directChildrenMap() {
+    if (!this._directChildrenMap.synchronized) {
+      this._directChildrenMap = {
+        map: this.buildDirectChildrenMap(this.flowCore.getState().nodes),
+        synchronized: true,
+      };
+    }
+    return this._directChildrenMap.map;
+  }
+
+  /**
+   * Gets the descendants cache if it is not synchronized synchronize it
+   * @returns Descendants cache
+   */
+  private get descendantsCache() {
+    if (!this._descendantsCache.synchronized) {
+      this._descendantsCache = { map: new Map(), synchronized: true };
+    }
+    return this._descendantsCache.map;
   }
 
   /**
@@ -54,16 +91,6 @@ export class ModelLookup {
     }
 
     return childrenMap;
-  }
-
-  /**
-   * Updates the model lookup
-   */
-  public update(state: Pick<FlowState, 'nodes' | 'edges'>) {
-    this.nodesMap = this.mapModelNodesToMap(state.nodes);
-    this.edgesMap = this.mapModelEdgesToMap(state.edges);
-    this.directChildrenMap = this.buildDirectChildrenMap(state.nodes);
-    this.descendantsCache.clear(); // Clear descendants cache on update
   }
 
   /**
@@ -220,8 +247,22 @@ export class ModelLookup {
    */
   public getSelectedNodesWithChildren({ directOnly = true }: { directOnly?: boolean } = {}): Node[] {
     const selectedNodes = this.getSelectedNodes();
+    const allSelectedNodesIds = new Set<string>();
+    const allSelectedNodes = [];
 
-    return selectedNodes.flatMap((node) => [node, ...this.getNodeChildren(node.id, { directOnly })]);
+    for (const node of selectedNodes) {
+      if (allSelectedNodesIds.has(node.id)) continue;
+      allSelectedNodesIds.add(node.id);
+      allSelectedNodes.push(node);
+      const children = this.getNodeChildren(node.id, { directOnly });
+      for (const child of children) {
+        if (allSelectedNodesIds.has(child.id)) continue;
+        allSelectedNodesIds.add(child.id);
+        allSelectedNodes.push(child);
+      }
+    }
+
+    return allSelectedNodes;
   }
 
   /**

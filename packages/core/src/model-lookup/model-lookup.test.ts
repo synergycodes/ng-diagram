@@ -86,20 +86,36 @@ describe('ModelLookup', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update all maps with new state', () => {
-      const newNodes = [
-        { ...mockNodes[0], id: 'newNode1' },
-        { ...mockNodes[1], id: 'newNode2', groupId: 'newNode1' },
-      ];
-      const newEdges = [{ ...mockEdges[0], id: 'newEdge1' }];
+  describe('synchronization', () => {
+    it('should synchronize the model lookup', () => {
+      const nodes1 = [mockNodes[0], mockNodes[1]];
+      const edges1 = [mockEdges[0]];
+      (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: nodes1,
+        edges: edges1,
+        metadata: {},
+      });
 
-      modelLookup.update({ nodes: newNodes, edges: newEdges });
+      const nodesSize1 = modelLookup.nodesMap.size;
+      const edgesSize1 = modelLookup.edgesMap.size;
 
-      expect(modelLookup.nodesMap.size).toBe(2);
-      expect(modelLookup.edgesMap.size).toBe(1);
-      expect(modelLookup.directChildrenMap.size).toBe(1);
-      expect(modelLookup.directChildrenMap.get('newNode1')).toEqual(['newNode2']);
+      modelLookup.desynchronize();
+
+      const nodes2 = [mockNodes[0], mockNodes[1], mockNodes[2]];
+      const edges2 = [mockEdges[0], mockEdges[1]];
+      (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: nodes2,
+        edges: edges2,
+        metadata: {},
+      });
+
+      const nodesSize2 = modelLookup.nodesMap.size;
+      const edgesSize2 = modelLookup.edgesMap.size;
+
+      expect(nodesSize1).toBe(2);
+      expect(edgesSize1).toBe(1);
+      expect(nodesSize2).toBe(3);
+      expect(edgesSize2).toBe(2);
     });
   });
 
@@ -217,6 +233,23 @@ describe('ModelLookup', () => {
       const selectedNodes = [
         { ...mockNodes[0], selected: true },
         { ...mockNodes[1], selected: false },
+        { ...mockNodes[2], selected: false },
+      ];
+      (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: selectedNodes,
+        edges: mockEdges,
+        metadata: {},
+      });
+
+      const result = modelLookup.getSelectedNodesWithChildren({ directOnly: false });
+      expect(result).toHaveLength(3); // Selected node + all descendants
+    });
+
+    it('should return selected nodes with all descendants without duplicates', () => {
+      const selectedNodes = [
+        { ...mockNodes[0], selected: true },
+        { ...mockNodes[1], selected: true },
+        { ...mockNodes[2], selected: false },
       ];
       (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
         nodes: selectedNodes,

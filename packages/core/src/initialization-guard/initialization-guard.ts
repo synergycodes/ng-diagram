@@ -1,5 +1,5 @@
 import { FlowCore } from '../flow-core';
-import { EdgeLabel, Port } from '../types';
+import { EdgeLabel, FlowState, Port } from '../types';
 
 export class InitializationGuard {
   private onInitialized: () => void = () => null;
@@ -34,14 +34,13 @@ export class InitializationGuard {
       return;
     }
     this.measuredNodes.set(nodeId, true);
-    const state = this.flowCore.getState();
-    this.flowCore.setState({
-      ...state,
-      nodes: state.nodes.map((node) =>
-        node.id === nodeId ? { ...node, size: { width: size.width, height: size.height } } : node
-      ),
+    this.updateState({
+      nodes: this.flowCore
+        .getState()
+        .nodes.map((node) =>
+          node.id === nodeId ? { ...node, size: { width: size.width, height: size.height } } : node
+        ),
     });
-    this.checkIfInitialized();
   }
 
   addPort(nodeId: string, port: Port, alreadyExist = false) {
@@ -54,12 +53,11 @@ export class InitializationGuard {
     if (alreadyExist) {
       return;
     }
-    const state = this.flowCore.getState();
-    this.flowCore.setState({
-      ...state,
-      nodes: state.nodes.map((node) => (node.id === nodeId ? { ...node, ports: [...(node.ports || []), port] } : node)),
+    this.updateState({
+      nodes: this.flowCore
+        .getState()
+        .nodes.map((node) => (node.id === nodeId ? { ...node, ports: [...(node.ports || []), port] } : node)),
     });
-    this.checkIfInitialized();
   }
 
   initPortSizeAndPosition(
@@ -72,17 +70,16 @@ export class InitializationGuard {
     if (!this.measuredPorts.has(portKey) || this.measuredPorts.get(portKey)) {
       return;
     }
-    const state = this.flowCore.getState();
     this.measuredPorts.set(portKey, true);
-    this.flowCore.setState({
-      ...state,
-      nodes: state.nodes.map((node) =>
-        node.id === nodeId
-          ? { ...node, ports: node.ports?.map((port) => (port.id === portId ? { ...port, size, position } : port)) }
-          : node
-      ),
+    this.updateState({
+      nodes: this.flowCore
+        .getState()
+        .nodes.map((node) =>
+          node.id === nodeId
+            ? { ...node, ports: node.ports?.map((port) => (port.id === portId ? { ...port, size, position } : port)) }
+            : node
+        ),
     });
-    this.checkIfInitialized();
   }
 
   addEdgeLabel(edgeId: string, label: EdgeLabel, alreadyExist = false) {
@@ -95,14 +92,11 @@ export class InitializationGuard {
     if (alreadyExist) {
       return;
     }
-    const state = this.flowCore.getState();
-    this.flowCore.setState({
-      ...state,
-      edges: state.edges.map((edge) =>
-        edge.id === edgeId ? { ...edge, labels: [...(edge.labels || []), label] } : edge
-      ),
+    this.updateState({
+      edges: this.flowCore
+        .getState()
+        .edges.map((edge) => (edge.id === edgeId ? { ...edge, labels: [...(edge.labels || []), label] } : edge)),
     });
-    this.checkIfInitialized();
   }
 
   initEdgeLabelSize(edgeId: string, labelId: string, size: { width: number; height: number }) {
@@ -111,10 +105,8 @@ export class InitializationGuard {
       return;
     }
     this.measuredEdgeLabels.set(labelKey, true);
-    const state = this.flowCore.getState();
-    this.flowCore.setState({
-      ...state,
-      edges: state.edges.map((edge) =>
+    this.updateState({
+      edges: this.flowCore.getState().edges.map((edge) =>
         edge.id === edgeId
           ? {
               ...edge,
@@ -123,7 +115,6 @@ export class InitializationGuard {
           : edge
       ),
     });
-    this.checkIfInitialized();
   }
 
   private getPortKey(nodeId: string, portId: string) {
@@ -132,6 +123,15 @@ export class InitializationGuard {
 
   private getEdgeLabelKey(edgeId: string, labelId: string) {
     return `${edgeId}->${labelId}`;
+  }
+
+  private updateState(state: Partial<FlowState>) {
+    const currentState = this.flowCore.getState();
+    this.flowCore.setState({
+      ...currentState,
+      ...state,
+    });
+    this.checkIfInitialized();
   }
 
   private checkIfInitialized() {

@@ -5,10 +5,7 @@ export interface HighlightGroupCommand {
   groupId: Node['id'];
 }
 
-export const highlightGroup = async (
-  commandHandler: CommandHandler,
-  { groupId }: HighlightGroupCommand
-): Promise<void> => {
+export const highlightGroup = async (commandHandler: CommandHandler, { groupId }: HighlightGroupCommand) => {
   const { highlightedGroup } = commandHandler.flowCore.getState().metadata;
 
   if (highlightedGroup === groupId) return;
@@ -19,7 +16,7 @@ export const highlightGroup = async (
     nodesToUpdate.push({ id: highlightedGroup, highlighted: false });
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { highlightedGroup: groupId },
       nodesToUpdate,
@@ -32,12 +29,12 @@ export interface HighlightGroupClearCommand {
   name: 'highlightGroupClear';
 }
 
-export const highlightGroupClear = async (commandHandler: CommandHandler): Promise<void> => {
+export const highlightGroupClear = async (commandHandler: CommandHandler) => {
   const { highlightedGroup } = commandHandler.flowCore.getState().metadata;
 
   if (!highlightedGroup) return;
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { highlightedGroup: null },
       nodesToUpdate: [{ id: highlightedGroup, highlighted: false }],

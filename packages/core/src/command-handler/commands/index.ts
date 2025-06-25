@@ -36,7 +36,7 @@ import { zoom } from './zoom';
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
   command: CommandByName<K>
-) => void;
+) => Promise<void>;
 
 export type CommandMap = {
   [K in CommandName]: CommandHandlerFunction<K>;
