@@ -1,5 +1,5 @@
 import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortSide } from '../../types';
-import { getPointOnPath, getPortFlowPosition, isSamePoint } from '../../utils';
+import { getPointOnPath, getPortFlowPositionSide, isSamePoint } from '../../utils';
 import { getPathPoints } from '../../utils/edges-orthogonal-routing/get-path-points.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
@@ -23,7 +23,7 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
     if (!node) {
       return position;
     }
-    return portId ? getPortFlowPosition(node, portId) : position;
+    return portId ? getPortFlowPositionSide(node, portId) : position;
   };
   const sourcePoint = getPoint(edge.source, edge.sourcePort, edge.sourcePosition);
   const targetPoint = getPoint(edge.target, edge.targetPort, edge.targetPosition);
