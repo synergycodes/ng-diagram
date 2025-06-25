@@ -15,13 +15,21 @@ export interface TreeLayoutConfig {
   siblingGap: number;
   // Configurable gap between parent and child nodes
   levelGap: number;
+  autoLayout?: boolean;
   layoutAngle: LayoutAngleType;
   // Default 'Parent'
   layoutAlignment?: LayoutAlignmentType;
-  autoLayout?: boolean;
 }
 
-export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'layoutAngle' | 'type' | 'groupId'> {
+export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'type' | 'groupId'> {
   children: TreeNode[];
   groupChildren?: TreeNode[];
+  /**
+   * Node layout direction: 0, 90, 180, 270.
+   */
+  layoutAngle?: LayoutAngleType;
+  /**
+   * Node layout alignment: 'Parent' | 'Subtree' | 'Start'.
+   */
+  layoutAlignment?: LayoutAlignmentType;
 }

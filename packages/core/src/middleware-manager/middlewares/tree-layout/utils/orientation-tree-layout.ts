@@ -97,6 +97,7 @@ const alignParent = (
   grandparentAngle: LayoutAngleType
 ): void => {
   const angle = parent.layoutAngle ?? config.layoutAngle;
+  const layoutAlignment = parent.layoutAlignment ?? config.layoutAlignment;
   const isHorizontal = isAngleHorizontal(angle);
   const { width, height } = getNodeSize(parent);
   const [firstChild, lastChild] = [parent.children[0], parent.children.at(-1)!];
@@ -106,10 +107,10 @@ const alignParent = (
   let x: number;
   let y: number;
 
-  if (config.layoutAlignment === 'Start') {
+  if (layoutAlignment === 'Start') {
     x = offsetX;
     y = offsetY;
-  } else if (config.layoutAlignment === 'Subtree') {
+  } else if (layoutAlignment === 'Subtree') {
     x = !isHorizontal ? (childrenBounds.minX + childrenBounds.maxX - width) / 2 : offsetX;
     y = isHorizontal ? (childrenBounds.minY + childrenBounds.maxY - height) / 2 : offsetY;
   } else {
@@ -175,7 +176,7 @@ export const makeTreeLayout = (
   // Layout children get their bounding box
   const childrenBounds = layoutChildren(parentNode, config, offsetX, offsetY, grandparentAngle);
 
-  // Shift children if parent is bigger
+  // Shift children if the parent is bigger
   maybeShiftChildren(parentNode, parentAngle, { x: offsetX, y: offsetY }, childrenBounds, grandparentAngle);
 
   // Align parent (Start, Subtree, Parent)

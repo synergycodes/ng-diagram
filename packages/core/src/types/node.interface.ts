@@ -1,5 +1,5 @@
 import type { Point, Size } from './utils';
-import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface.ts';
+import { NodeData } from './node-data.interface.ts';
 
 /**
  * Interface representing a node in the flow diagram
@@ -16,7 +16,7 @@ export interface Node {
   /**
    * The data associated with the node.
    */
-  data: Record<string, unknown>;
+  data: NodeData;
   /**
    * The type of the node declared in nodeTemplateMap.
    */
@@ -62,14 +62,6 @@ export interface Node {
    * NOTE: group only property
    */
   highlighted?: boolean;
-  /**
-   * Node layout direction: 0, 90, 180, 270.
-   */
-  layoutAngle?: LayoutAngleType;
-  /**
-   * Node layout alignment: 'Parent' | 'Subtree'.
-   */
-  layoutAlignment?: LayoutAlignmentType;
 }
 
 /**

@@ -8,16 +8,6 @@ import {
 } from './utils/build-tree-structure.ts';
 import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
 import { isAngleHorizontal } from '../../../utils/get-direction.ts';
-import { TreeLayoutConfig } from '../../../types/tree-layout.interface.ts';
-
-// Todo: Move this to metadata
-const CONFIG: TreeLayoutConfig = {
-  siblingGap: 50,
-  levelGap: 100,
-  layoutAngle: 90,
-  layoutAlignment: 'Parent',
-  autoLayout: false,
-};
 
 const checkIfShouldAutoTreeLayout = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -31,16 +21,14 @@ export const treeLayoutMiddleware: Middleware = {
   name: 'tree-layout',
   execute: (context, next) => {
     const {
-      state: { edges, nodes },
+      state: { edges, nodes, metadata },
       modelActionType,
     } = context;
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
     const shouldAutoLayout = checkIfShouldAutoTreeLayout(context);
-
-    if (
-      !shouldTreeLayout &&
-      (!CONFIG.autoLayout || !shouldAutoLayout)
-    ) {
+    const config = metadata.layoutConfiguration?.tree;
+console.log(metadata)
+    if (!config || (!shouldTreeLayout && (!config?.autoLayout || !shouldAutoLayout))) {
       next();
       return;
     }
@@ -52,8 +40,6 @@ export const treeLayoutMiddleware: Middleware = {
 
     buildGroupsHierarchy(nodeMap);
     const { roots } = buildTreeStructure(nodeMap, remappedEdges);
-
-    const config = CONFIG;
 
     let offset = { x: 100, y: 100 };
 

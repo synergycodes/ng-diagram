@@ -73,7 +73,7 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   return result;
 };
 
-export const getNodeMap = (nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutAngle' | 'type' | 'groupId'>[]) => {
+export const getNodeMap = (nodes: Pick<Node, 'id' | 'position' | 'size' | 'data' | 'type' | 'groupId'>[]) => {
   const nodeMap = new Map<string, TreeNode>();
   //  Each node is deeply copied and extended with a `children` array.
   nodes.forEach((node) => {
@@ -82,7 +82,8 @@ export const getNodeMap = (nodes: Pick<Node, 'id' | 'position' | 'size' | 'layou
       position: { ...node.position },
       size: node.size ? { ...node.size } : undefined,
       children: [],
-      layoutAngle: node.layoutAngle,
+      layoutAngle: node.data.layoutConfiguration?.tree?.layoutAngle,
+      layoutAlignment: node.data.layoutConfiguration?.tree?.layoutAlignment,
       type: node.type,
       groupId: node.groupId,
     });
