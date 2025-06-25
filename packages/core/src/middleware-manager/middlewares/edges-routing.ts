@@ -66,13 +66,12 @@ export const edgesRoutingMiddleware: Middleware = {
         const points = getPoints(edge, nodesMap);
         const source = points[0];
         const target = points[1];
-
         if (edge.routing === 'orthogonal') {
           const middlePoints = getPathPoints(
             (source?.side as PortSide) || 'left',
-            (source?.side as PortSide) || 'right',
+            (target?.side as PortSide) || 'right',
             source,
-            source
+            target
           );
           points.splice(1, 0, ...middlePoints);
         }
@@ -104,7 +103,6 @@ export const edgesRoutingMiddleware: Middleware = {
       const points = getPoints(metadata.temporaryEdge, nodesMap);
       const source = points[0];
       const target = points[1];
-
       newTemporaryEdge = {
         ...metadata.temporaryEdge,
         points,
