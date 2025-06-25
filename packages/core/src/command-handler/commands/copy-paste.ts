@@ -13,14 +13,14 @@ export interface PasteCommand {
   name: 'paste';
 }
 
-export const copy = (commandHandler: CommandHandler): void => {
+export const copy = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
 
   copiedNodes = nodes.filter((node) => node.selected);
   copiedEdges = edges.filter((edge) => edge.selected);
 };
 
-export const paste = (commandHandler: CommandHandler): void => {
+export const paste = async (commandHandler: CommandHandler) => {
   if (copiedNodes.length === 0 && copiedEdges.length === 0) {
     return;
   }
@@ -68,7 +68,7 @@ export const paste = (commandHandler: CommandHandler): void => {
     }
   });
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     { nodesToAdd: newNodes, edgesToAdd: newEdges, nodesToUpdate, edgesToUpdate },
     'paste'
   );

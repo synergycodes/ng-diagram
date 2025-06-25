@@ -55,7 +55,7 @@ const mockModelLookup = {
   getSelectedNodesWithChildren: vi.fn(),
   isNodeDescendantOfGroup: vi.fn(),
   getChildrenMap: vi.fn(),
-  update: vi.fn(),
+  desynchronize: vi.fn(),
 };
 
 vi.mock('./model-lookup/model-lookup', () => ({

@@ -15,6 +15,7 @@ import {
 } from '../command-handler/commands/add-update-delete';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
+import { HighlightGroupClearCommand, HighlightGroupCommand } from '../command-handler/commands/highlight-group';
 import { InitCommand } from '../command-handler/commands/init';
 import {
   FinishLinkingCommand,
@@ -23,7 +24,7 @@ import {
   StartLinkingCommand,
   StartLinkingFromPositionCommand,
 } from '../command-handler/commands/linking';
-import { MoveNodesCommand, MoveSelectionCommand } from '../command-handler/commands/move';
+import { MoveNodesByCommand } from '../command-handler/commands/move';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { RotateNodeByCommand } from '../command-handler/commands/rotate-node';
@@ -40,8 +41,7 @@ export type Command =
   | SelectCommand
   | DeselectCommand
   | DeselectAllCommand
-  | MoveSelectionCommand
-  | MoveNodesCommand
+  | MoveNodesByCommand
   | DeleteSelectionCommand
   | AddNodesCommand
   | UpdateNodeCommand
@@ -69,7 +69,9 @@ export type Command =
   | AddEdgeLabelsCommand
   | UpdateEdgeLabelCommand
   | DeleteEdgeLabelsCommand
-  | RotateNodeByCommand;
+  | RotateNodeByCommand
+  | HighlightGroupCommand
+  | HighlightGroupClearCommand;
 
 /**
  * Type for command name
@@ -112,7 +114,7 @@ export interface CommandHandler {
     ...props: IsEmpty<CommandByName<K>> extends true
       ? [] | [WithoutName<CommandByName<K>>]
       : [WithoutName<CommandByName<K>>]
-  ): void;
+  ): Promise<void>;
 
   /**
    * Register a callback for specific command types

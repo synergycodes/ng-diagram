@@ -58,6 +58,11 @@ export interface Node {
    */
   isGroup?: boolean;
   /**
+   * Whether the group is highlighted.
+   * NOTE: group only property
+   */
+  highlighted?: boolean;
+  /**
    * Node layout direction: 0, 90, 180, 270.
    */
   layoutAngle?: LayoutAngleType;

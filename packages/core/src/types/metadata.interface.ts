@@ -1,4 +1,5 @@
 import { Edge } from './edge.interface';
+import { Node } from './node.interface';
 
 /**
  * Interface representing the viewport of the diagram.
@@ -26,5 +27,6 @@ export interface Metadata {
   viewport: Viewport;
   temporaryEdge?: Edge | null;
   nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
+  highlightedGroup?: Node['id'] | null;
   [key: string]: unknown;
 }

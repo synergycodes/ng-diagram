@@ -10,8 +10,7 @@ import type { Node } from './node.interface';
 export type ModelActionType =
   | 'init'
   | 'changeSelection'
-  | 'moveSelection'
-  | 'moveNodes'
+  | 'moveNodesBy'
   | 'deleteSelection'
   | 'addNodes'
   | 'updateNode'
@@ -30,6 +29,8 @@ export type ModelActionType =
   | 'zoom'
   | 'changeZOrder'
   | 'rotateNodeBy'
+  | 'highlightGroup'
+  | 'highlightGroupClear'
   | 'treeLayout';
 
 /**

@@ -38,7 +38,10 @@ export interface SendToBackCommand {
   edgeIds?: string[];
 }
 
-const changeZOrder = (commandHandler: CommandHandler, command: BringToFrontCommand | SendToBackCommand): void => {
+const changeZOrder = async (
+  commandHandler: CommandHandler,
+  command: BringToFrontCommand | SendToBackCommand
+): Promise<void> => {
   const { nodes, edges } = commandHandler.flowCore.getState();
   const { nodeIds, edgeIds } = getCommandTarget(commandHandler, command);
   if (nodeIds.length === 0 && edgeIds.length === 0) {
@@ -46,7 +49,7 @@ const changeZOrder = (commandHandler: CommandHandler, command: BringToFrontComma
   }
 
   const zOrder = getZOrder(nodes, edges, command);
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: nodeIds.map((id) => ({ id, zOrder })),
       edgesToUpdate: edgeIds.map((id) => ({ id, zOrder })),
@@ -55,10 +58,10 @@ const changeZOrder = (commandHandler: CommandHandler, command: BringToFrontComma
   );
 };
 
-export const bringToFront = (commandHandler: CommandHandler, command: BringToFrontCommand): void => {
-  changeZOrder(commandHandler, command);
+export const bringToFront = async (commandHandler: CommandHandler, command: BringToFrontCommand) => {
+  await changeZOrder(commandHandler, command);
 };
 
-export const sendToBack = (commandHandler: CommandHandler, command: SendToBackCommand): void => {
-  changeZOrder(commandHandler, command);
+export const sendToBack = async (commandHandler: CommandHandler, command: SendToBackCommand) => {
+  await changeZOrder(commandHandler, command);
 };

@@ -67,6 +67,8 @@ export class MiddlewareExecutor {
     anyEdgesAdded: () => this.addedEdgesIds.size > 0,
     anyNodesRemoved: () => this.removedNodesIds.size > 0,
     anyEdgesRemoved: () => this.removedEdgesIds.size > 0,
+    getAffectedNodeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToNodeIds.get(prop) ?? [])]),
+    getAffectedEdgeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToEdgeIds.get(prop) ?? [])]),
   });
 
   private getState = (): FlowState => ({

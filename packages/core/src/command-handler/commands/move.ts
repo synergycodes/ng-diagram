@@ -1,65 +1,39 @@
-import type { CommandHandler, ModelActionType } from '../../types';
+import type { CommandHandler } from '../../types';
 import type { Node } from '../../types/node.interface';
+import { isSamePoint } from '../../utils/rects-points-sizes';
 
-interface BaseMoveCommand {
-  dx: number;
-  dy: number;
-}
-
-export interface MoveSelectionCommand extends BaseMoveCommand {
-  name: 'moveSelection';
-}
-
-export interface MoveNodesCommand extends BaseMoveCommand {
-  name: 'moveNodes';
-  nodes: Node[];
-}
-
-interface MoveNodesInFlowParams {
-  commandHandler: CommandHandler;
+export interface MoveNodesByCommand {
+  name: 'moveNodesBy';
   nodes: Node[];
   delta: {
     x: number;
     y: number;
   };
-  actionName: ModelActionType;
 }
 
-const moveNodesInFlow = ({ commandHandler, nodes, delta, actionName }: MoveNodesInFlowParams): void => {
+export const moveNodesBy = async (
+  commandHandler: CommandHandler,
+  { delta, nodes }: MoveNodesByCommand
+): Promise<void> => {
   if (nodes.length === 0) {
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
-    {
-      nodesToUpdate: nodes.map((node) => ({
-        id: node.id,
-        position: {
-          x: Math.round(node.position.x + delta.x),
-          y: Math.round(node.position.y + delta.y),
-        },
-      })),
-    },
-    actionName
-  );
-};
-
-export const moveSelection = (commandHandler: CommandHandler, { dx, dy }: MoveSelectionCommand): void => {
-  const nodesToMove = commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
-
-  moveNodesInFlow({
-    commandHandler,
-    nodes: nodesToMove,
-    delta: { x: dx, y: dy },
-    actionName: 'moveSelection',
+  const nodesToUpdate: { id: Node['id']; position: Node['position'] }[] = [];
+  nodes.forEach((node) => {
+    const newPosition = {
+      x: node.position.x + delta.x,
+      y: node.position.y + delta.y,
+    };
+    if (isSamePoint(node.position, newPosition)) {
+      return;
+    }
+    nodesToUpdate.push({ id: node.id, position: newPosition });
   });
-};
 
-export const moveNodes = (commandHandler: CommandHandler, { dx, dy, nodes }: MoveNodesCommand): void => {
-  moveNodesInFlow({
-    commandHandler,
-    nodes,
-    delta: { x: dx, y: dy },
-    actionName: 'moveNodes',
-  });
+  if (nodesToUpdate.length === 0) {
+    return;
+  }
+
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'moveNodesBy');
 };

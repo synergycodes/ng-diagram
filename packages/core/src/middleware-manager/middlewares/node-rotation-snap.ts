@@ -5,11 +5,8 @@ const SNAP_ANGLE = 15;
 
 export const nodeRotationSnapMiddleware: Middleware = {
   name: 'node-rotation-snap',
-  execute: (context, next) => {
-    const {
-      state: { nodes },
-      helpers,
-    } = context;
+  execute: (context, next, cancel) => {
+    const { helpers, nodesMap, flowCore } = context;
 
     const shouldSnap = helpers.checkIfAnyNodePropsChanged(['angle']);
 
@@ -20,8 +17,10 @@ export const nodeRotationSnapMiddleware: Middleware = {
 
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
 
-    for (const node of nodes) {
-      if (!node.angle) {
+    for (const nodeId of helpers.getAffectedNodeIds(['angle'])) {
+      const node = nodesMap.get(nodeId);
+
+      if (!node || !node.angle) {
         continue;
       }
 
@@ -33,7 +32,17 @@ export const nodeRotationSnapMiddleware: Middleware = {
 
       const snappedAngle = snapAngle(node.angle, SNAP_ANGLE);
 
-      nodesToUpdate.push({ id: node.id, angle: snappedAngle });
+      const originalNode = flowCore.getNodeById(node.id);
+
+      // This prevents unnecessary state updates when the angle is already snapped
+      if (originalNode && originalNode.angle !== snappedAngle) {
+        nodesToUpdate.push({ id: node.id, angle: snappedAngle });
+      }
+    }
+
+    if (nodesToUpdate.length === 0) {
+      cancel();
+      return;
     }
 
     next({ ...(nodesToUpdate.length > 0 ? { nodesToUpdate } : {}) });

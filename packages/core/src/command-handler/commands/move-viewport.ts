@@ -6,14 +6,14 @@ export interface MoveViewportByCommand {
   y: number;
 }
 
-export const moveViewportBy = (commandHandler: CommandHandler, { x, y }: MoveViewportByCommand): void => {
+export const moveViewportBy = async (commandHandler: CommandHandler, { x, y }: MoveViewportByCommand) => {
   const { metadata } = commandHandler.flowCore.getState();
 
   if (!x && !y) {
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
         viewport: {
@@ -33,14 +33,14 @@ export interface MoveViewportCommand {
   y: number;
 }
 
-export const moveViewport = (commandHandler: CommandHandler, { x, y }: MoveViewportCommand): void => {
+export const moveViewport = async (commandHandler: CommandHandler, { x, y }: MoveViewportCommand) => {
   const { metadata } = commandHandler.flowCore.getState();
 
   if (x === metadata.viewport.x && y === metadata.viewport.y) {
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
         viewport: {

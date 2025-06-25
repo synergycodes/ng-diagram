@@ -16,6 +16,7 @@ import {
 } from './add-update-delete';
 import { copy, paste } from './copy-paste';
 import { deleteSelection } from './delete-selection';
+import { highlightGroup, highlightGroupClear } from './highlight-group';
 import { init } from './init';
 import {
   finishLinking,
@@ -24,7 +25,7 @@ import {
   startLinking,
   startLinkingFromPosition,
 } from './linking';
-import { moveNodes, moveSelection } from './move';
+import { moveNodesBy } from './move';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
 import { rotateNodeBy } from './rotate-node';
@@ -35,7 +36,7 @@ import { zoom } from './zoom';
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
   command: CommandByName<K>
-) => void;
+) => Promise<void>;
 
 export type CommandMap = {
   [K in CommandName]: CommandHandlerFunction<K>;
@@ -46,8 +47,7 @@ export const commands: CommandMap = {
   select,
   deselect,
   deselectAll,
-  moveSelection,
-  moveNodes,
+  moveNodesBy,
   deleteSelection,
   addNodes,
   updateNode,
@@ -76,4 +76,6 @@ export const commands: CommandMap = {
   updateEdgeLabel,
   deleteEdgeLabels,
   rotateNodeBy,
+  highlightGroup,
+  highlightGroupClear,
 };
