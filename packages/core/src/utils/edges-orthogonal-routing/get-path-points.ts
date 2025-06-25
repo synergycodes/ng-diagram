@@ -16,7 +16,7 @@ export const getPathPoints = (
   targetPosition: PortSide,
   xySource: Point,
   xyTarget: Point
-): Array<any> => {
+): { x: number; y: number }[] => {
   const centerX = (xySource.x + xyTarget.x) / 2;
 
   const centerY = (xySource.y + xyTarget.y) / 2;

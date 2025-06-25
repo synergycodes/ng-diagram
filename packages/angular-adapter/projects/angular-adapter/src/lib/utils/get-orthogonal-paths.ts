@@ -31,7 +31,6 @@ export const getOrthogonalPath = (points: Point[] = []): string => {
   const middle = points.slice(1, -1);
   const target = points[points.length - 1];
 
-  // @ts-ignore
   const pathArray = middle.map((point, index) => {
     const prevPoint = points[index];
     const nextPoint = points[index + 2];
@@ -98,6 +97,7 @@ export const getOrthogonalPath = (points: Point[] = []): string => {
       const arcSegment = `A${radius},${radius},0,0,${rotateClockwise ? 1 : 0},${point.x},${point.y + (isNextPointAbove ? -radius : radius)}`;
       return `${lineSegment} ${arcSegment}`;
     }
+    return '';
   });
 
   return `M ${source.x},${source.y} ${pathArray.join(' ')} L ${target.x},${target.y}`;
