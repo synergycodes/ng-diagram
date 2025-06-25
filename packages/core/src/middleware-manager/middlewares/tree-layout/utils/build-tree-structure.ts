@@ -7,9 +7,7 @@ import { TreeNode } from '../../../../types/tree-layout.interface.ts';
  * @param nodeMap - Map of all tree nodes, with node ID as the key.
  * @returns Map where each key is a node ID, and the value is its top group ID
  */
-export const buildTopGroupMap = (
-  nodeMap: Map<string, TreeNode>
-): Map<string, string> => {
+export const buildTopGroupMap = (nodeMap: Map<string, TreeNode>): Map<string, string> => {
   const topGroupMap = new Map<string, string>();
 
   for (const [id, node] of nodeMap) {
@@ -46,11 +44,8 @@ const getTopGroupId = (nodeId: string, topGroupMap: Map<string, string>): string
  * @param topGroupMap - Map from node ID to top group ID.
  * @returns new list of edges with an updated source and target.
  */
-export const remapEdges = (
-  edges: Edge[],
-  topGroupMap: Map<string, string>
-): { source: string; target: string }[] =>
-  edges.map(edge => ({
+export const remapEdges = (edges: Edge[], topGroupMap: Map<string, string>): { source: string; target: string }[] =>
+  edges.map((edge) => ({
     ...edge,
     source: getTopGroupId(edge.source, topGroupMap),
     target: getTopGroupId(edge.target, topGroupMap),
@@ -62,22 +57,16 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   for (const node of nodeMap.values()) {
     if (node.type === 'group') {
       (node as TreeNode).groupChildren = [];
+      if (!node.groupId) {
+        result.push(node as TreeNode);
+      }
     }
-  }
-
-  for (const node of nodeMap.values()) {
     if (node.groupId) {
       const parent = nodeMap.get(node.groupId);
       if (parent?.type === 'group') {
         const groupNode = parent as TreeNode;
         groupNode.groupChildren!.push(node);
       }
-    }
-  }
-
-  for (const node of nodeMap.values()) {
-    if (node.type === 'group' && !node.groupId) {
-      result.push(node as TreeNode);
     }
   }
 
