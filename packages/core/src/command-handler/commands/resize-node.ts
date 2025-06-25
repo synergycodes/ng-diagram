@@ -13,7 +13,6 @@ export interface ResizeNodeCommand {
 export async function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCommand) {
   const node = commandHandler.flowCore.getNodeById(command.id);
 
-  console.log(node);
   if (!node) {
     throw new Error(`Node with id ${command.id} not found.`);
   }

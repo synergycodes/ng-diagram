@@ -22,8 +22,8 @@ export const moveNodesBy = async (
   const nodesToUpdate: { id: Node['id']; position: Node['position'] }[] = [];
   nodes.forEach((node) => {
     const newPosition = {
-      x: Math.round(node.position.x + delta.x),
-      y: Math.round(node.position.y + delta.y),
+      x: node.position.x + delta.x,
+      y: node.position.y + delta.y,
     };
     if (isSamePoint(node.position, newPosition)) {
       return;
@@ -35,16 +35,5 @@ export const moveNodesBy = async (
     return;
   }
 
-  await commandHandler.flowCore.applyUpdate(
-    {
-      nodesToUpdate: nodes.map((node) => ({
-        id: node.id,
-        position: {
-          x: node.position.x + delta.x,
-          y: node.position.y + delta.y,
-        },
-      })),
-    },
-    'moveNodesBy'
-  );
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'moveNodesBy');
 };

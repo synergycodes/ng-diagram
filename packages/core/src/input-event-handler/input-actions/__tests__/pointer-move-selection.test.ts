@@ -156,7 +156,7 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledTimes(0);
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
     });
 
     it('should emit highlightGroup when moving over a group', () => {
