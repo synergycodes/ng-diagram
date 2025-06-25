@@ -18,7 +18,7 @@ describe('getFlowPortPosition', () => {
       mockPort.id
     );
 
-    expect(position).toEqual({ x: 155, y: 150, side: 'top' });
+    expect(position).toEqual({ x: 155, y: 150 });
   });
 
   it('should return proper flow port position for bottom side', () => {
@@ -31,7 +31,7 @@ describe('getFlowPortPosition', () => {
       mockPort.id
     );
 
-    expect(position).toEqual({ x: 155, y: 160, side: 'bottom' });
+    expect(position).toEqual({ x: 155, y: 160 });
   });
 
   it('should return proper flow port position for left side', () => {
@@ -44,7 +44,7 @@ describe('getFlowPortPosition', () => {
       mockPort.id
     );
 
-    expect(position).toEqual({ x: 150, y: 155, side: 'left' });
+    expect(position).toEqual({ x: 150, y: 155 });
   });
 
   it('should return proper flow port position for right side', () => {
@@ -57,6 +57,6 @@ describe('getFlowPortPosition', () => {
       mockPort.id
     );
 
-    expect(position).toEqual({ x: 160, y: 155, side: 'right' });
+    expect(position).toEqual({ x: 160, y: 155 });
   });
 });

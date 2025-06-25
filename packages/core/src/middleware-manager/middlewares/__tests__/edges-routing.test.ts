@@ -5,7 +5,7 @@ import type { FlowState, MiddlewareContext, Node, Point } from '../../../types';
 import { edgesRoutingMiddleware } from '../edges-routing.ts';
 
 vi.mock('../../../utils', () => ({
-  getPortFlowPosition: (node: Node) => node.position,
+  getPortFlowPositionSide: (node: Node) => node.position,
   getPointOnPath: () => ({ x: 50, y: 50 }),
   isSamePoint: (point1: Point, point2: Point) => point1.x === point2.x && point1.y === point2.y,
 }));
