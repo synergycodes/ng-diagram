@@ -27,17 +27,16 @@ const layoutChildren = (
   const parentWidth = parentNode.size?.width ?? 0;
   const parentHeight = parentNode.size?.height ?? 0;
 
-  // Set initial offset for children based on layout direction and sign
-  let childOffsetX =
-    offsetX + (!isVertical ? (sign === -1 ? -config.levelGap : sign * (parentWidth + config.levelGap)) : 0);
-  let childOffsetY =
-    offsetY + (isVertical ? (sign === -1 ? -config.levelGap : sign * (parentHeight + config.levelGap)) : 0);
+  let siblingOffset = isVertical ? offsetX : offsetY;
+  let parentChildOffset = isVertical ? offsetY : offsetX;
 
-  // Special case: adjust offset if the parent is sing = -1 and a direction changed
-  if (sign === -1 && grandparentAngle !== parentAngle) {
-    if (!isVertical) childOffsetY = offsetY;
-    else childOffsetX = offsetX;
-  }
+  parentChildOffset +=
+    // Set initial offset for children based on layout direction and sign
+    sign === -1
+      ? grandparentAngle !== parentAngle
+        ? 0
+        : -config.levelGap
+      : sign * ((isVertical ? parentHeight : parentWidth) + config.levelGap);
 
   // Initialize bounding box for all children
   let bounds: Bounds = {
@@ -52,15 +51,17 @@ const layoutChildren = (
     const { width, height } = getNodeSize(child);
 
     if (sign === -1 && isAngleVertical(grandparentAngle) === isVertical) {
-      if (!isVertical) {
-        childOffsetX -= width;
-      } else {
-        childOffsetY -= height;
-      }
+      parentChildOffset -= isVertical ? height : width;
     }
 
     // Recursively layout the child subtree
-    const childBounds = makeTreeLayout(child, config, childOffsetX, childOffsetY, parentAngle);
+    const childBounds = makeTreeLayout(
+      child,
+      config,
+      isVertical ? siblingOffset : parentChildOffset,
+      isVertical ? parentChildOffset : siblingOffset,
+      parentAngle
+    );
 
     // For the last child, extend the bounding box if needed
     if (i === children.length - 1 && grandparentAngle !== parentAngle && sign === -1) {
@@ -81,11 +82,7 @@ const layoutChildren = (
     // Move offset for next sibling
     const subtreeCrossSize = isVertical ? childBounds.maxX - childBounds.minX : childBounds.maxY - childBounds.minY;
 
-    if (isVertical) {
-      childOffsetX += sign * (subtreeCrossSize + config.siblingGap);
-    } else {
-      childOffsetY += sign * (subtreeCrossSize + config.siblingGap);
-    }
+    siblingOffset += sign * (subtreeCrossSize + config.siblingGap);
   }
 
   return bounds;
