@@ -1,4 +1,5 @@
 import type { CommandHandler } from '../../types';
+import { isSamePoint } from '../../utils';
 
 export interface MoveViewportByCommand {
   name: 'moveViewportBy';
@@ -33,10 +34,11 @@ export interface MoveViewportCommand {
   y: number;
 }
 
-export const moveViewport = async (commandHandler: CommandHandler, { x, y }: MoveViewportCommand) => {
+export const moveViewport = async (commandHandler: CommandHandler, command: MoveViewportCommand) => {
+  const { x, y } = command;
   const { metadata } = commandHandler.flowCore.getState();
 
-  if (x === metadata.viewport.x && y === metadata.viewport.y) {
+  if (isSamePoint(metadata.viewport, { x, y })) {
     return;
   }
 

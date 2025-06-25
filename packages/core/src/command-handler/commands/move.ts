@@ -15,10 +15,6 @@ export const moveNodesBy = async (
   commandHandler: CommandHandler,
   { delta, nodes }: MoveNodesByCommand
 ): Promise<void> => {
-  if (nodes.length === 0) {
-    return;
-  }
-
   const nodesToUpdate: { id: Node['id']; position: Node['position'] }[] = [];
   nodes.forEach((node) => {
     const newPosition = {
