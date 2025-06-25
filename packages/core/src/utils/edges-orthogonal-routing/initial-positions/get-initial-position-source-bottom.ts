@@ -9,7 +9,7 @@ export const getInitialPositionSourceBottom = (
 ) => {
   const sourcePort = getOffsetPoint({ x: xySource.x, y: xySource.y }, 'bottom');
   const targetPort = getOffsetPoint({ x: xyTarget.x, y: xyTarget.y }, targetPortSide);
-console.log(sourcePort, targetPort);
+
   if (targetPortSide === 'bottom') {
     if (sourcePort.y > targetPort.y) {
       return [
