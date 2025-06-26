@@ -134,4 +134,3 @@ export const mockEdgeLabel: EdgeLabel = {
   position: { x: 0, y: 0 },
   positionOnEdge: 0.5,
 };
-

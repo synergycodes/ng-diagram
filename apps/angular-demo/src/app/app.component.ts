@@ -74,7 +74,7 @@ export class AppComponent {
         id: '2',
         source: '2',
         target: '3',
-        data: {},
+        data: { label: 'Label 1' },
         sourceArrowhead: 'angularflow-arrow',
         targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-right',

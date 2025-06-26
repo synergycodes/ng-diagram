@@ -42,7 +42,7 @@ export const treeLayoutMiddleware: Middleware = {
     buildGroupsHierarchy(nodeMap);
     const { roots } = buildTreeStructure(nodeMap, remappedEdges);
 
-    let offset = { x: 100, y: 100 };
+    const offset = { x: 100, y: 100 };
 
     const isHorizontal = isAngleHorizontal(config.layoutAngle);
     roots.forEach((root) => {

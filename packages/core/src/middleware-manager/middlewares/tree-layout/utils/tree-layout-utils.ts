@@ -37,9 +37,8 @@ export const shiftSubtree = (node: TreeNode, dx: number, dy: number): void => {
   node.position.x += dx;
   node.position.y += dy;
   // Move all children, if any
-  node.children?.forEach(child => shiftSubtree(child, dx, dy));
+  node.children?.forEach((child) => shiftSubtree(child, dx, dy));
 };
-
 
 /**
  * Shifts children nodes to center and keep within offset bounds.
