@@ -13,9 +13,7 @@ describe('buildTreeStructure', () => {
       { id: 'child1', position: { x: 0, y: 0 }, size: { width: 50, height: 25 }, type: 'Test' },
       { id: 'child2', position: { x: 0, y: 0 }, size: { width: 50, height: 25 }, type: 'Test' },
     ];
-    const nodeMap: Map<string, TreeNode> = new Map(
-      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
-    );
+    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
     const edges: PartialEdge[] = [
       { source: 'root', target: 'child1' },
       { source: 'root', target: 'child2' },
@@ -34,9 +32,7 @@ describe('buildTreeStructure', () => {
       { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'leaf', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap: Map<string, TreeNode> = new Map(
-      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
-    );
+    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
     const edges: PartialEdge[] = [{ source: 'root', target: 'leaf' }];
 
     const nodesCopy = JSON.parse(JSON.stringify(nodes));
@@ -51,9 +47,7 @@ describe('buildTreeStructure', () => {
       { id: 'b', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'c', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap: Map<string, TreeNode> = new Map(
-      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
-    );
+    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
     const edges: PartialEdge[] = [{ source: 'a', target: 'b' }];
 
     const { roots } = buildTreeStructure(nodeMap, edges);
@@ -69,9 +63,7 @@ describe('buildTreeStructure', () => {
       { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'child', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap: Map<string, TreeNode> = new Map(
-      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
-    );
+    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
     const edges: PartialEdge[] = [
       { source: 'root', target: 'child' },
       { source: 'root', target: 'child' },
@@ -88,9 +80,7 @@ describe('buildTreeStructure', () => {
       { id: 'x', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'y', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap: Map<string, TreeNode> = new Map(
-      nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode])
-    );
+    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
     const edges: Edge[] = [];
 
     const { roots } = buildTreeStructure(nodeMap, edges);
