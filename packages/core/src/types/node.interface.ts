@@ -1,5 +1,5 @@
-import type { Point, Size } from './utils';
 import { LayoutConfiguration } from './node-data.interface.ts';
+import type { Point, PortSide, Size } from './utils';
 
 /**
  * Interface representing a node in the flow diagram
@@ -95,5 +95,5 @@ export interface Port {
   /**
    * The side of the node that the port is on.
    */
-  side: 'top' | 'right' | 'bottom' | 'left';
+  side: PortSide;
 }

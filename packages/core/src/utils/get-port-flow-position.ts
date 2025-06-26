@@ -1,11 +1,7 @@
-import { Node } from '../types';
+import { Node, Port } from '../types';
 import { getRect } from './rects-points-sizes';
 
-export const getPortFlowPosition = (node: Node, portId: string) => {
-  const port = node.ports?.find((port) => port.id === portId);
-  if (!port) {
-    return null;
-  }
+export const getPortPosition = (port: Port, node: Node) => {
   const { x: px, y: py, width: pw, height: ph } = getRect(port);
 
   const x = px + node.position.x;
@@ -28,4 +24,24 @@ export const getPortFlowPosition = (node: Node, portId: string) => {
   }
 
   return { x, y };
+};
+
+export const getPortFlowPosition = (node: Node, portId: string) => {
+  const port = node.ports?.find((port) => port.id === portId);
+  if (!port) {
+    return null;
+  }
+
+  return getPortPosition(port, node);
+};
+
+export const getPortFlowPositionSide = (node: Node, portId: string) => {
+  const port = node.ports?.find((port) => port.id === portId);
+  if (!port) {
+    return null;
+  }
+
+  const position = getPortPosition(port, node);
+
+  return { ...position, side: port.side };
 };

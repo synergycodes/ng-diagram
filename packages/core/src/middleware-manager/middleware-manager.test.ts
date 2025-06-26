@@ -3,17 +3,17 @@ import { FlowCore } from '../flow-core';
 import { mockMetadata, mockNode } from '../test-utils';
 import type { FlowState, FlowStateUpdate, Middleware } from '../types';
 import { MiddlewareManager } from './middleware-manager';
-import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
+import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
 import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 // Define all mocks at the top level
-vi.mock('./middlewares/edges-straight-routing', () => ({
-  edgesStraightRoutingMiddleware: {
-    name: 'edges-straight-routing',
+vi.mock('./middlewares/edges-routing', () => ({
+  edgesRoutingMiddleware: {
+    name: 'edges-routing',
     execute: vi.fn().mockImplementation((state) => state),
   },
 }));
@@ -75,7 +75,7 @@ describe('MiddlewareManager', () => {
   });
 
   describe('constructor', () => {
-    it('should register edges straight routing middleware', () => {
+    it('should register edges routing middleware', () => {
       const middlewareManager = new MiddlewareManager(flowCore);
 
       middlewareManager.execute(initialState, stateUpdate, 'init');
@@ -86,7 +86,7 @@ describe('MiddlewareManager', () => {
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
         treeLayoutMiddleware,
-        edgesStraightRoutingMiddleware,
+        edgesRoutingMiddleware,
       ]);
     });
 
@@ -100,7 +100,7 @@ describe('MiddlewareManager', () => {
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
         treeLayoutMiddleware,
-        edgesStraightRoutingMiddleware,
+        edgesRoutingMiddleware,
         mockMiddleware1,
       ]);
     });

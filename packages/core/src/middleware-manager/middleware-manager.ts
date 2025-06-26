@@ -1,11 +1,11 @@
 import { FlowCore } from '../flow-core';
 import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { edgesStraightRoutingMiddleware } from './middlewares/edges-straight-routing';
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
+import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
 import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 export class MiddlewareManager {
@@ -19,7 +19,7 @@ export class MiddlewareManager {
     this.register(groupChildrenChangeExtent);
     this.register(groupChildrenMoveExtent);
     this.register(treeLayoutMiddleware);
-    this.register(edgesStraightRoutingMiddleware);
+    this.register(edgesRoutingMiddleware);
     middlewares.forEach((middleware) => this.register(middleware));
   }
 
