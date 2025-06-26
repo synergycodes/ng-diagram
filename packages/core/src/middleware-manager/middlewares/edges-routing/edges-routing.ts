@@ -31,7 +31,7 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
     y: target.y,
   };
 
-  let points = edge.routing === 'orthogonal' ? getOrthogonalPathPoints(source, target) : [sourcePoint, targetPoint];
+  const points = edge.routing === 'orthogonal' ? getOrthogonalPathPoints(source, target) : [sourcePoint, targetPoint];
 
   return { targetPoint, sourcePoint, points };
 };
