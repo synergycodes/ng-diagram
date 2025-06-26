@@ -28,14 +28,15 @@ describe('AngularAdapterEdgeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterEdgeComponent],
-    }).overrideComponent(AngularAdapterEdgeComponent, {
-      remove: {
-        imports: [AngularAdapterEdgeLabelComponent],
-      },
-      add: {
-        imports: [MockAngularAdapterEdgeLabelComponent],
-      },
     })
+      .overrideComponent(AngularAdapterEdgeComponent, {
+        remove: {
+          imports: [AngularAdapterEdgeLabelComponent],
+        },
+        add: {
+          imports: [MockAngularAdapterEdgeLabelComponent],
+        },
+      })
       .compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterEdgeComponent);
@@ -83,7 +84,6 @@ describe('AngularAdapterEdgeComponent', () => {
     const zIndexDirective = fixture.debugElement.injector.get(ZIndexDirective);
     expect(zIndexDirective).toBeTruthy();
   });
-
 
   it('should create', () => {
     expect(component).toBeTruthy();
