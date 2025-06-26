@@ -22,8 +22,14 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
   const sourceTarget = getSourceTarget(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
-  const { side: sourceSide, ...sourcePoint } = source;
-  const { side: targetSide, ...targetPoint } = target;
+  const sourcePoint = {
+    x: source.x,
+    y: source.y,
+  };
+  const targetPoint = {
+    x: target.x,
+    y: target.y,
+  };
 
   let points = edge.routing === 'orthogonal' ? getOrthogonalPathPoints(source, target) : [sourcePoint, targetPoint];
 

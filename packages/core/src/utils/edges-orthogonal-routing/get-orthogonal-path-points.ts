@@ -19,8 +19,14 @@ export const getOrthogonalPathPoints = (source: PortLocation, target: PortLocati
       y: centerY,
     }) || [];
 
-  const { side: sourceSide, ...sourcePoint } = source;
-  const { side: targetSide, ...targetPoint } = target;
+  const sourcePoint = {
+    x: source.x,
+    y: source.y,
+  };
+  const targetPoint = {
+    x: target.x,
+    y: target.y,
+  };
 
   return [sourcePoint, ...midpoints, targetPoint];
 };
