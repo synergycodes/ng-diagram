@@ -25,3 +25,9 @@ export interface Bounds {
   maxX: number;
   maxY: number;
 }
+
+export type PortSide = 'top' | 'right' | 'bottom' | 'left';
+
+export type PortLocation = {
+  side: PortSide;
+} & Point;
