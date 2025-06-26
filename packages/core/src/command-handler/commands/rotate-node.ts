@@ -7,14 +7,14 @@ export interface RotateNodeByCommand {
   angle: number;
 }
 
-export const rotateNodeBy = (commandHandler: CommandHandler, { nodeId, angle }: RotateNodeByCommand): void => {
+export const rotateNodeBy = async (commandHandler: CommandHandler, { nodeId, angle }: RotateNodeByCommand) => {
   const node = commandHandler.flowCore.getNodeById(nodeId);
 
   if (!node) {
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {

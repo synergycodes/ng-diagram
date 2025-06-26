@@ -381,6 +381,8 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 

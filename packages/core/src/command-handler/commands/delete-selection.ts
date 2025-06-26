@@ -16,7 +16,7 @@ const getEdgesToRemove = ({ edges, nodesToDeleteIds }: GetEdgesToRemoveParams): 
     .map((edge) => edge.id);
 };
 
-export const deleteSelection = (commandHandler: CommandHandler): void => {
+export const deleteSelection = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
 
   const isAnyNodeSelected = nodes.some((node) => node.selected);
@@ -36,7 +36,7 @@ export const deleteSelection = (commandHandler: CommandHandler): void => {
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     { nodesToRemove: nodesToDeleteIds, edgesToRemove: edgesToDeleteIds },
     'deleteSelection'
   );

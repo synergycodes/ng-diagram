@@ -37,7 +37,7 @@ const getTopGroupAtPoint = (flowCore: FlowCore, point: Point): Node | null => {
 };
 
 export const pointerMoveSelectionAction: InputActionWithPredicate = {
-  action: (event, flowCore) => {
+  action: async (event, flowCore) => {
     switch (event.type) {
       case 'pointerdown': {
         const { x, y } = flowCore.clientToFlowPosition(event);
@@ -138,16 +138,12 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         }
 
         if (updateData.length > 0) {
-          flowCore.commandHandler.emit('updateNodes', { nodes: updateData });
+          await flowCore.commandHandler.emit('updateNodes', { nodes: updateData });
         }
 
         // That means a group has been highlighted, so we need to clear it
         if (updateData.some((node) => Boolean(node.groupId))) {
-          // TODO: Add batching updates - due to race condition this is not applied correctly
-          // the initial state for the update is not yet updated
-          setTimeout(() => {
-            flowCore.commandHandler.emit('highlightGroupClear');
-          }, 0);
+          flowCore.commandHandler.emit('highlightGroupClear');
         }
 
         moveState.isMoving = false;

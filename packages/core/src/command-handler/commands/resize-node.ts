@@ -10,7 +10,7 @@ export interface ResizeNodeCommand {
   disableAutoSize?: boolean;
 }
 
-export function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCommand): void {
+export async function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCommand) {
   const node = commandHandler.flowCore.getNodeById(command.id);
 
   if (!node) {
@@ -22,21 +22,25 @@ export function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCo
   }
 
   if (node.isGroup) {
-    handleGroupNodeResize(commandHandler, command, node);
+    await handleGroupNodeResize(commandHandler, command, node);
   } else {
-    handleSingleNodeResize(commandHandler, command);
+    await handleSingleNodeResize(commandHandler, command);
   }
 }
 
 /**
  * Handles resizing of a group node, ensuring children are contained.
  */
-function handleGroupNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand, node: Node): void {
+async function handleGroupNodeResize(
+  commandHandler: CommandHandler,
+  command: ResizeNodeCommand,
+  node: Node
+): Promise<void> {
   const children = commandHandler.flowCore.modelLookup.getNodeChildren(command.id, { directOnly: false });
 
   if (children.length === 0) {
     // if the group has no children, we fallback to single node mode
-    handleSingleNodeResize(commandHandler, command);
+    await handleSingleNodeResize(commandHandler, command);
     return;
   }
 
@@ -58,7 +62,7 @@ function handleGroupNodeResize(commandHandler: CommandHandler, command: ResizeNo
     maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
   });
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {
@@ -82,8 +86,8 @@ function handleGroupNodeResize(commandHandler: CommandHandler, command: ResizeNo
 /**
  * Handles resizing of a single (non-group) node.
  */
-function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): void {
-  commandHandler.flowCore.applyUpdate(
+async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
+  await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {

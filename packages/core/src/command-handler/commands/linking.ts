@@ -23,7 +23,7 @@ export interface StartLinkingCommand {
   sourcePort?: string;
 }
 
-export const startLinking = (commandHandler: CommandHandler, command: StartLinkingCommand): void => {
+export const startLinking = async (commandHandler: CommandHandler, command: StartLinkingCommand) => {
   const { source, sourcePort } = command;
 
   const sourceNode = commandHandler.flowCore.getNodeById(source);
@@ -41,7 +41,7 @@ export const startLinking = (commandHandler: CommandHandler, command: StartLinki
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
         temporaryEdge: getTemporaryEdge({
@@ -62,13 +62,13 @@ export interface StartLinkingFromPositionCommand {
   position: { x: number; y: number };
 }
 
-export const startLinkingFromPosition = (
+export const startLinkingFromPosition = async (
   commandHandler: CommandHandler,
   command: StartLinkingFromPositionCommand
-): void => {
+) => {
   const { position } = command;
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
         temporaryEdge: getTemporaryEdge({
@@ -90,7 +90,7 @@ export interface MoveTemporaryEdgeCommand {
   targetPort?: string;
 }
 
-export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveTemporaryEdgeCommand): void => {
+export const moveTemporaryEdge = async (commandHandler: CommandHandler, command: MoveTemporaryEdgeCommand) => {
   const { metadata } = commandHandler.flowCore.getState();
   const { position, target, targetPort: targetPortId } = command;
   const temporaryEdge = metadata.temporaryEdge;
@@ -130,7 +130,7 @@ export const moveTemporaryEdge = (commandHandler: CommandHandler, command: MoveT
     };
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { temporaryEdge: newTemporaryEdge },
     },
@@ -144,7 +144,7 @@ export interface FinishLinkingCommand {
   targetPort?: string;
 }
 
-export const finishLinking = (commandHandler: CommandHandler, command: FinishLinkingCommand): void => {
+export const finishLinking = async (commandHandler: CommandHandler, command: FinishLinkingCommand) => {
   const { metadata } = commandHandler.flowCore.getState();
   const { target, targetPort } = command;
 
@@ -155,23 +155,23 @@ export const finishLinking = (commandHandler: CommandHandler, command: FinishLin
   const targetNode = target && commandHandler.flowCore.getNodeById(target);
 
   if (!targetNode) {
-    commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     return;
   }
 
   if (targetPort && targetNode.ports?.find((port) => port.id === targetPort)?.type === 'source') {
-    commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     return;
   }
 
   const targetPosition = !!target && !!targetPort ? getPortFlowPosition(targetNode, targetPort) : targetNode.position;
 
   if (!targetPosition) {
-    commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { temporaryEdge: null },
       edgesToAdd: [getFinalEdge(metadata.temporaryEdge, { target, targetPort, targetPosition })],
@@ -185,10 +185,10 @@ export interface FinishLinkingToPositionCommand {
   position: { x: number; y: number };
 }
 
-export const finishLinkingToPosition = (
+export const finishLinkingToPosition = async (
   commandHandler: CommandHandler,
   command: FinishLinkingToPositionCommand
-): void => {
+) => {
   const { metadata } = commandHandler.flowCore.getState();
   const { position } = command;
 
@@ -196,7 +196,7 @@ export const finishLinkingToPosition = (
     return;
   }
 
-  commandHandler.flowCore.applyUpdate(
+  await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { temporaryEdge: null },
       edgesToAdd: [getFinalEdge(metadata.temporaryEdge, { target: '', targetPort: '', targetPosition: position })],
