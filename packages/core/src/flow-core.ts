@@ -235,7 +235,7 @@ export class FlowCore {
   /**
    * Sets the layout
    */
-  layout(layout: 'Tree' | 'None') {
+  layout(layout: 'Tree') {
     switch (layout) {
       case 'Tree':
         this.applyUpdate({}, 'treeLayout');
