@@ -233,12 +233,15 @@ export class FlowCore {
   }
 
   /**
-   * Sets the tree layout
+   * Sets the layout
    */
-  async treeLayout() {
-    const finalState = await this.middlewareManager.execute(this.getState(), {}, 'treeLayout');
-    if (finalState) {
-      this.setState(finalState);
+  layout(layout: 'Tree') {
+    switch (layout) {
+      case 'Tree':
+        this.applyUpdate({}, 'treeLayout');
+        break;
+      default:
+        throw new Error(`The "${layout}" layout does not exist.`);
     }
   }
 }

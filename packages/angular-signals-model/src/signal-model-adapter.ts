@@ -6,7 +6,9 @@ export class SignalModelAdapter implements ModelAdapter {
   // Internal state signals
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
-  private metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 } });
+  private metadata = signal<Metadata>({
+    viewport: { x: 0, y: 0, scale: 1 },
+  });
   private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void)[] = [];
 
   constructor() {

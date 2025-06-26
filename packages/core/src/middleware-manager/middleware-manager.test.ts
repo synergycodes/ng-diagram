@@ -8,7 +8,7 @@ import { groupChildrenMoveExtent } from './middlewares/group-children-move-exten
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
-import { treeLayoutMiddleware } from './middlewares/tree-layout.ts';
+import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 // Define all mocks at the top level
 vi.mock('./middlewares/edges-routing', () => ({

@@ -6,6 +6,6 @@ export class LayoutService {
   private readonly flowCore = inject(FlowCoreProviderService);
 
   configureTreeLayout() {
-    this.flowCore.provide().treeLayout();
+    this.flowCore.provide().layout('Tree');
   }
 }
