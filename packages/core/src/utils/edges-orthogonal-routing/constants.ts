@@ -1,3 +1,2 @@
-// Todo: move to mock data?
-/** Distance from the source/target where the edge breaks for the first and last handler. */
+/** Default distance from the source/target where the edge breaks. */
 export const POINT_DISTANCE = 20;

@@ -5,7 +5,7 @@ import { groupChildrenChangeExtent } from './middlewares/group-children-change-e
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { edgesRoutingMiddleware } from './middlewares/edges-routing.ts';
+import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];

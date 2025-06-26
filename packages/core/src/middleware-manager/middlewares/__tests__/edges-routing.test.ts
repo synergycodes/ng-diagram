@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import type { FlowState, MiddlewareContext, Node, Point } from '../../../types';
-import { edgesRoutingMiddleware } from '../edges-routing.ts';
+import { edgesRoutingMiddleware } from '../edges-routing/edges-routing.ts';
 
 vi.mock('../../../utils', () => ({
   getPortFlowPositionSide: (node: Node) => node.position,

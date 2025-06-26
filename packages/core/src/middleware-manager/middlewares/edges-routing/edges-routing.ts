@@ -1,6 +1,7 @@
-import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortSide } from '../../types';
-import { getPointOnPath, getPortFlowPositionSide, isSamePoint } from '../../utils';
-import { getPathPoints } from '../../utils/edges-orthogonal-routing/get-path-points.ts';
+import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point, PortLocation } from '../../../types';
+import { getPointOnPath, isSamePoint } from '../../../utils';
+import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
+import { getSourceTarget } from './get-source-target.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -18,17 +19,15 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
   ]);
 
 const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
-  const getPoint = (nodeId: string, portId?: string, position?: { x: number; y: number; side?: PortSide }) => {
-    const node = nodesMap.get(nodeId);
-    if (!node) {
-      return position;
-    }
-    return portId ? getPortFlowPositionSide(node, portId) : position;
-  };
-  const sourcePoint = getPoint(edge.source, edge.sourcePort, edge.sourcePosition);
-  const targetPoint = getPoint(edge.target, edge.targetPort, edge.targetPosition);
+  const sourceTarget = getSourceTarget(edge, nodesMap);
+  const source = sourceTarget[0] as PortLocation;
+  const target = sourceTarget[1] as PortLocation;
+  const { side: _, ...sourcePoint } = source;
+  const { side: __, ...targetPoint } = target;
 
-  return [sourcePoint, targetPoint].filter((point) => !!point);
+  let points = edge.routing === 'orthogonal' ? getOrthogonalPathPoints(source, target) : [sourcePoint, targetPoint];
+
+  return { targetPoint, sourcePoint, points };
 };
 
 export const edgesRoutingMiddleware: Middleware = {
@@ -63,22 +62,11 @@ export const edgesRoutingMiddleware: Middleware = {
           return;
         }
 
-        const points = getPoints(edge, nodesMap);
-        const source = points[0];
-        const target = points[1];
-        if (edge.routing === 'orthogonal') {
-          const middlePoints = getPathPoints(
-            (source?.side as PortSide) || 'right',
-            (target?.side as PortSide) || 'left',
-            source,
-            target
-          );
-          points.splice(1, 0, ...middlePoints);
-        }
+        const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
 
         if (
           edge.points?.length === points.length &&
-          edge.points?.every((point, index) => isSamePoint(point, points[index]))
+          edge.points?.every((point, index) => isSamePoint(point, points[index] as Point))
         ) {
           return;
         }
@@ -91,8 +79,8 @@ export const edgesRoutingMiddleware: Middleware = {
         edgesToUpdate.push({
           id: edge.id,
           points,
-          sourcePosition: source ? { x: source.x, y: source.y } : undefined,
-          targetPosition: target ? { x: target.x, y: target.y } : undefined,
+          sourcePosition: sourcePoint || undefined,
+          targetPosition: targetPoint || undefined,
           labels: updatedLabels,
         });
       });
@@ -100,14 +88,14 @@ export const edgesRoutingMiddleware: Middleware = {
     let newTemporaryEdge: Edge | undefined = undefined;
 
     if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {
-      const points = getPoints(metadata.temporaryEdge, nodesMap);
-      const source = points[0];
-      const target = points[1];
+      const edge = metadata.temporaryEdge;
+      const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
+
       newTemporaryEdge = {
         ...metadata.temporaryEdge,
         points,
-        sourcePosition: source ? { x: source.x, y: source.y } : undefined,
-        targetPosition: target ? { x: target.x, y: target.y } : undefined,
+        sourcePosition: sourcePoint || undefined,
+        targetPosition: targetPoint || undefined,
       };
     }
 

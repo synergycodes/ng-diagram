@@ -19,11 +19,6 @@
       [data]="edge"
       [eventTarget]="{ type: 'edge', element: edge }"
     >
-      @if (getEdgeTemplate(edge.type)) {
-        <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
-      } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
-        <angular-adapter-edge-straight [data]="edge" />
-      }
     </angular-adapter-edge>
   }
   <angular-adapter-marker-arrow />

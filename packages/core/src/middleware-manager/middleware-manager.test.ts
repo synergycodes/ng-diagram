@@ -6,7 +6,7 @@ import { MiddlewareManager } from './middleware-manager';
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { edgesRoutingMiddleware } from './middlewares/edges-routing.ts';
+import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 
 // Define all mocks at the top level

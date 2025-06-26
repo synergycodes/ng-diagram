@@ -2,7 +2,7 @@ import { getInitialPositionSourceBottom } from './get-initial-position-source-bo
 import { getInitialPositionSourceLeft } from './get-initial-position-source-left.ts';
 import { getInitialPositionSourceRight } from './get-initial-position-source-right.ts';
 import { getInitialPositionSourceTop } from './get-initial-position-source-top.ts';
-import { Point, PortSide } from '../../../types';
+import { Point, PortLocation, PortSide } from '../../../types';
 
 export enum Position {
   Left = 'left',
@@ -36,20 +36,12 @@ const positionFunctionMap: Record<
  * for an orthogonal path.
  *
  * @returns An array of points representing the orthogonal path.
- * @param sourcePosition source Handle position
- * @param targetPosition target Handle position
- * @param xySource The starting XYPosition of the edge
- * @param xyTarget The ending XYPosition of the edge
+ * @param source
+ * @param target
  * @param xyCenter The center point of the path
  * @returns An array of points representing the orthogonal path.
  */
-export const getInitialPathPoints = (
-  sourcePosition: PortSide,
-  targetPosition: PortSide,
-  xySource: Point,
-  xyTarget: Point,
-  xyCenter: Point
-) => {
-  const getPositionFunction = positionFunctionMap[sourcePosition] || getInitialPositionSourceLeft;
-  return getPositionFunction(targetPosition, xySource, xyTarget, xyCenter);
+export const getInitialPathPoints = (source: PortLocation, target: PortLocation, xyCenter: Point) => {
+  const getPositionFunction = positionFunctionMap[source.side] || getInitialPositionSourceLeft;
+  return getPositionFunction(target.side, { x: source.x, y: source.y }, { x: target.x, y: target.y }, xyCenter);
 };
