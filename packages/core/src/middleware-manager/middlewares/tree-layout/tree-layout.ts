@@ -8,6 +8,7 @@ import {
 } from './utils/build-tree-structure.ts';
 import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
 import { isAngleHorizontal } from '../../../utils/get-direction.ts';
+import { TREE_LAYOUT_DEFAULT_CONFIG } from './constants.ts';
 
 const checkIfShouldAutoTreeLayout = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -26,7 +27,7 @@ export const treeLayoutMiddleware: Middleware = {
     } = context;
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
     const shouldAutoLayout = checkIfShouldAutoTreeLayout(context);
-    const config = metadata.layoutConfiguration?.tree;
+    const config = metadata.layoutConfiguration?.tree || TREE_LAYOUT_DEFAULT_CONFIG;
     if (!config || (!shouldTreeLayout && (!config?.autoLayout || !shouldAutoLayout))) {
       next();
       return;

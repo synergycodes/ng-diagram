@@ -1,6 +1,5 @@
 import { Injectable, effect, signal } from '@angular/core';
 import type { Edge, Metadata, ModelAdapter, Node } from '@angularflow/core';
-import { TREE_LAYOUT_DEFAULT_CONFIG } from '@angularflow/core/src/middleware-manager/middlewares/tree-layout/constants';
 
 @Injectable()
 export class SignalModelAdapter implements ModelAdapter {
@@ -9,7 +8,6 @@ export class SignalModelAdapter implements ModelAdapter {
   private edges = signal<Edge[]>([]);
   private metadata = signal<Metadata>({
     viewport: { x: 0, y: 0, scale: 1 },
-    layoutConfiguration: { tree: TREE_LAYOUT_DEFAULT_CONFIG },
   });
   private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void)[] = [];
 
