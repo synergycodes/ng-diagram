@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { getSamplePointerEvent, getSampleRotateEvent, mockNode, mockPort } from '../../../test-utils';
+import { getSamplePointerEvent, getSampleRotateEvent, mockNode } from '../../../test-utils';
 import type { RotateEvent, RotateHandleTarget } from '../../../types';
 import { getDistanceBetweenPoints } from '../../../utils/get-distance-between-points';
 import { getRotationAngle } from './get-rotation-angle';
@@ -25,7 +25,6 @@ describe('rotateAction', () => {
     mouse: { x: 100, y: 100 },
     handle: { x: 120, y: 120 },
     center: { x: 110, y: 110 },
-    ports: [{ id: mockPort.id, position: { x: 1, y: 2 }, size: { width: 10, height: 10 } }],
   };
 
   beforeEach(() => {
@@ -70,7 +69,6 @@ describe('rotateAction', () => {
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeBy', {
         nodeId: 'test-node',
         angle: 42,
-        ports: [{ portId: mockPort.id, portChanges: { position: { x: 1, y: 2 } } }],
       });
     });
   });

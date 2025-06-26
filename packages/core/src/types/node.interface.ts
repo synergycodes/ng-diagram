@@ -56,6 +56,11 @@ export interface Node {
    * Whether the node is treated as a group node.
    */
   isGroup?: boolean;
+  /**
+   * Whether the group is highlighted.
+   * NOTE: group only property
+   */
+  highlighted?: boolean;
 }
 
 /**

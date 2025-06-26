@@ -1,4 +1,4 @@
-import { Point, Rect, Size } from '../types';
+import { Bounds, Point, Rect, Size } from '../types';
 
 export const getPointRangeRect = (point: { x: number; y: number }, range: number): Rect => {
   return {
@@ -83,4 +83,22 @@ export const isSamePoint = (point1?: Point, point2?: Point): boolean => {
 
 export const isSameSize = (size1?: Size, size2?: Size): boolean => {
   return size1?.width === size2?.width && size1?.height === size2?.height;
+};
+
+export const getRectFromBounds = (bounds: Bounds): Rect => {
+  return {
+    x: bounds.minX,
+    y: bounds.minY,
+    width: bounds.maxX - bounds.minX,
+    height: bounds.maxY - bounds.minY,
+  };
+};
+
+export const getBoundsFromRect = (rect: Rect): Bounds => {
+  return {
+    minX: rect.x,
+    minY: rect.y,
+    maxX: rect.x + rect.width,
+    maxY: rect.y + rect.height,
+  };
 };
