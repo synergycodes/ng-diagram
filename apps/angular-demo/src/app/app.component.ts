@@ -38,10 +38,9 @@ export class AppComponent {
         position: { x: 100, y: 200 },
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
         resizable: true,
-        angle: 0,
       },
-      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true, angle: 0 },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, angle: 0, groupId: '2' },
+      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, groupId: '2' },
       {
         id: '4',
         type: 'group',
@@ -49,8 +48,6 @@ export class AppComponent {
         position: { x: 100, y: 400 },
         data: { title: 'Group 1' },
         resizable: true,
-        angle: 0,
-        zOrder: 1,
       },
       {
         id: '5',
@@ -59,8 +56,6 @@ export class AppComponent {
         position: { x: 300, y: 400 },
         data: { title: 'Group 2' },
         resizable: true,
-        angle: 0,
-        zOrder: 2,
       },
     ]);
     this.model().setEdges([

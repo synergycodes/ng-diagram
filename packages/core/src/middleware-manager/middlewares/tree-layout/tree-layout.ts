@@ -28,6 +28,7 @@ export const treeLayoutMiddleware: Middleware = {
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
     const shouldAutoLayout = checkIfShouldAutoTreeLayout(context);
     const config = metadata.layoutConfiguration?.tree || TREE_LAYOUT_DEFAULT_CONFIG;
+
     if (!config || (!shouldTreeLayout && (!config?.autoLayout || !shouldAutoLayout))) {
       next();
       return;

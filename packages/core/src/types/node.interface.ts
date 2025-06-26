@@ -1,5 +1,5 @@
 import type { Point, Size } from './utils';
-import { NodeData } from './node-data.interface.ts';
+import { LayoutConfiguration } from './node-data.interface.ts';
 
 /**
  * Interface representing a node in the flow diagram
@@ -16,7 +16,7 @@ export interface Node {
   /**
    * The data associated with the node.
    */
-  data: NodeData;
+  data: Record<string, unknown>;
   /**
    * The type of the node declared in nodeTemplateMap.
    */
@@ -62,6 +62,10 @@ export interface Node {
    * NOTE: group only property
    */
   highlighted?: boolean;
+  /**
+   * The layout for the node
+   */
+  layoutConfiguration?: LayoutConfiguration;
 }
 
 /**
