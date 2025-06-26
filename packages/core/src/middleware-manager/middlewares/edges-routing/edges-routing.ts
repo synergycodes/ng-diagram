@@ -40,7 +40,7 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
       ? getOrthogonalPathPoints(source, target)
       : [sourcePoint, targetPoint].filter((point) => !!point);
 
-  return { targetPoint, sourcePoint, points };
+  return { sourcePoint, targetPoint, points };
 };
 
 export const edgesRoutingMiddleware: Middleware = {
