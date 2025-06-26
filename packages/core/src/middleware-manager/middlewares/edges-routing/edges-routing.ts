@@ -22,16 +22,23 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
   const sourceTarget = getSourceTarget(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
-  const sourcePoint = {
-    x: source.x,
-    y: source.y,
-  };
-  const targetPoint = {
-    x: target.x,
-    y: target.y,
-  };
+  const sourcePoint = source?.x
+    ? {
+        x: source.x,
+        y: source.y,
+      }
+    : undefined;
+  const targetPoint = target?.x
+    ? {
+        x: target.x,
+        y: target.y,
+      }
+    : undefined;
 
-  const points = edge.routing === 'orthogonal' ? getOrthogonalPathPoints(source, target) : [sourcePoint, targetPoint];
+  const points =
+    edge.routing === 'orthogonal'
+      ? getOrthogonalPathPoints(source, target)
+      : [sourcePoint, targetPoint].filter((point) => !!point);
 
   return { targetPoint, sourcePoint, points };
 };
@@ -81,7 +88,6 @@ export const edgesRoutingMiddleware: Middleware = {
           ...label,
           position: getPointOnPath(points, label.positionOnEdge),
         }));
-
         edgesToUpdate.push({
           id: edge.id,
           points,

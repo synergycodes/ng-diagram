@@ -143,8 +143,8 @@ describe('Edges Routing Middleware', () => {
         {
           id: 'edge-3',
           points: [{ x: 100, y: 100 }],
-          sourcePosition: { x: 100, y: 100 },
-          targetPosition: undefined,
+          sourcePosition: undefined,
+          targetPosition: { x: 100, y: 100 },
           labels: undefined,
         },
       ],
@@ -168,7 +168,13 @@ describe('Edges Routing Middleware', () => {
         },
       },
     };
-    context = { ...context, state: newState, modelActionType: 'moveTemporaryEdge' };
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'moveTemporaryEdge',
+      nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+    };
+
     checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
@@ -177,8 +183,8 @@ describe('Edges Routing Middleware', () => {
       metadataUpdate: {
         temporaryEdge: {
           ...newState.metadata.temporaryEdge,
-          points: [{ x: 200, y: 200 }],
-          sourcePosition: { x: 200, y: 200 },
+          points: [{ x: 100, y: 100 }],
+          sourcePosition: { x: 100, y: 100 },
           targetPosition: undefined,
         },
       },
