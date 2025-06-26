@@ -1,4 +1,4 @@
-import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point, PortLocation } from '../../../types';
+import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortLocation } from '../../../types';
 import { getPointOnPath, isSamePoint } from '../../../utils';
 import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
 import { getSourceTarget } from './get-source-target.ts';
@@ -79,7 +79,7 @@ export const edgesRoutingMiddleware: Middleware = {
 
         if (
           edge.points?.length === points.length &&
-          edge.points?.every((point, index) => isSamePoint(point, points[index] as Point))
+          edge.points?.every((point, index) => isSamePoint(point, points[index]))
         ) {
           return;
         }
