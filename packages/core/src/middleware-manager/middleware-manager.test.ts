@@ -8,11 +8,12 @@ import { groupChildrenMoveExtent } from './middlewares/group-children-move-exten
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
 import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
+import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 // Define all mocks at the top level
 vi.mock('./middlewares/edges-routing', () => ({
   edgesRoutingMiddleware: {
-    name: 'edges-straight-routing',
+    name: 'edges-routing',
     execute: vi.fn().mockImplementation((state) => state),
   },
 }));
@@ -74,7 +75,7 @@ describe('MiddlewareManager', () => {
   });
 
   describe('constructor', () => {
-    it('should register edges straight routing middleware', () => {
+    it('should register edges routing middleware', () => {
       const middlewareManager = new MiddlewareManager(flowCore);
 
       middlewareManager.execute(initialState, stateUpdate, 'init');
@@ -84,6 +85,7 @@ describe('MiddlewareManager', () => {
         nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
+        treeLayoutMiddleware,
         edgesRoutingMiddleware,
       ]);
     });
@@ -97,6 +99,7 @@ describe('MiddlewareManager', () => {
         nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
+        treeLayoutMiddleware,
         edgesRoutingMiddleware,
         mockMiddleware1,
       ]);

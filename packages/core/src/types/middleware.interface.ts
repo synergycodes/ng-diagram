@@ -30,7 +30,8 @@ export type ModelActionType =
   | 'changeZOrder'
   | 'rotateNodeBy'
   | 'highlightGroup'
-  | 'highlightGroupClear';
+  | 'highlightGroupClear'
+  | 'treeLayout';
 
 /**
  * Type for the state of the flow diagram

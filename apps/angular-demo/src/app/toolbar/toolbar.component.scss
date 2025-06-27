@@ -1,0 +1,14 @@
+:host {
+  position: absolute;
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  bottom: 8px;
+  margin: 0 -2px;
+
+  & > div {
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 4px;
+  }
+}

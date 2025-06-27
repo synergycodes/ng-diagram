@@ -231,4 +231,17 @@ export class FlowCore {
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return getNearestPortInRange(this, point, range);
   }
+
+  /**
+   * Sets the layout
+   */
+  layout(layout: 'Tree') {
+    switch (layout) {
+      case 'Tree':
+        this.applyUpdate({}, 'treeLayout');
+        break;
+      default:
+        throw new Error(`The "${layout}" layout does not exist.`);
+    }
+  }
 }
