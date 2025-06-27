@@ -1,5 +1,6 @@
 import { Edge } from './edge.interface';
 import { Node } from './node.interface';
+import { TreeLayoutConfig } from './tree-layout.interface.ts';
 
 /**
  * Interface representing the viewport of the diagram.
@@ -21,6 +22,13 @@ export interface NodeResizeAdornmentConfig {
 }
 
 /**
+ * Interface representing configurable properties of the layouts.
+ */
+export interface LayoutConfiguration {
+  tree?: TreeLayoutConfig;
+}
+
+/**
  * Interface representing the metadata of the diagram.
  */
 export interface Metadata {
@@ -28,5 +36,7 @@ export interface Metadata {
   temporaryEdge?: Edge | null;
   nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
   highlightedGroup?: Node['id'] | null;
+  layoutConfiguration?: LayoutConfiguration;
+
   [key: string]: unknown;
 }
