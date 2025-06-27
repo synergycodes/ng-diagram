@@ -1,16 +1,15 @@
-import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Renderer2 } from '@angular/core';
+import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { type Node } from '@angularflow/core';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 
 @Directive({
   selector: '[angularAdapterNodeSize]',
 })
-export class NodeSizeDirective implements OnDestroy {
+export class NodeSizeDirective implements OnDestroy, OnInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly renderer = inject(Renderer2);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
-  isDestroyed = false;
   data = input.required<Node>();
   size = computed(() => this.data().size);
   autoSize = computed(() => this.data().autoSize ?? true);
@@ -28,16 +27,17 @@ export class NodeSizeDirective implements OnDestroy {
       if (!autoSize && size) {
         const { width, height } = this.size()!;
         this.setSize(width, height);
-        this.disconnectResizeObserver();
       } else {
         this.setSize();
-        this.connectResizeObserver();
       }
     });
   }
 
+  ngOnInit() {
+    this.connectResizeObserver();
+  }
+
   ngOnDestroy() {
-    this.isDestroyed = true;
     this.disconnectResizeObserver();
   }
 

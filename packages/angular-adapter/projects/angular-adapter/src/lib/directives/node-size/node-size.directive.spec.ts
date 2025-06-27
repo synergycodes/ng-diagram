@@ -54,19 +54,6 @@ describe('NodeSizeDirective', () => {
     expect(element.style.height).toBe('200px');
   });
 
-  it('should observe size changes when autoSize is true', () => {
-    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-
-    component.data = { autoSize: true, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    // Verify that the directive observes the element with correct metadata
-    expect(mockBatchResizeObserver.observe).toHaveBeenCalledWith(element, {
-      type: 'node',
-      nodeId: 'test-node-id',
-    });
-  });
-
   it('should disconnect resize observer on destroy', () => {
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
     fixture.destroy();
@@ -83,42 +70,5 @@ describe('NodeSizeDirective', () => {
 
     expect(element.style.width).toBe('300px');
     expect(element.style.height).toBe('400px');
-  });
-
-  it('should connect resize observer when autoSize changes from false to true', () => {
-    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-
-    // Start with autoSize false
-    component.data = { autoSize: false, size: { width: 100, height: 200 }, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    // Clear previous calls
-    mockBatchResizeObserver.observe.mockClear();
-
-    // Change to autoSize true
-    component.data = { autoSize: true, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    expect(mockBatchResizeObserver.observe).toHaveBeenCalledWith(element, {
-      type: 'node',
-      nodeId: 'test-node-id',
-    });
-  });
-
-  it('should disconnect resize observer when autoSize changes from true to false', () => {
-    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-
-    // Start with autoSize true
-    component.data = { autoSize: true, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    // Clear previous calls
-    mockBatchResizeObserver.unobserve.mockClear();
-
-    // Change to autoSize false with size
-    component.data = { autoSize: false, size: { width: 100, height: 200 }, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    expect(mockBatchResizeObserver.unobserve).toHaveBeenCalledWith(element);
   });
 });
