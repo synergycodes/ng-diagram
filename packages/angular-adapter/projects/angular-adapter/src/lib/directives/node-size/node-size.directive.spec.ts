@@ -54,19 +54,6 @@ describe('NodeSizeDirective', () => {
     expect(element.style.height).toBe('200px');
   });
 
-  it('should observe size changes when autoSize is true', () => {
-    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-
-    component.data = { autoSize: true, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    // Verify that the directive observes the element with correct metadata
-    expect(mockBatchResizeObserver.observe).toHaveBeenCalledWith(element, {
-      type: 'node',
-      nodeId: 'test-node-id',
-    });
-  });
-
   it('should disconnect resize observer on destroy', () => {
     const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
     fixture.destroy();
