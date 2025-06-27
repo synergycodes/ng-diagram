@@ -29,7 +29,9 @@ export class AngularAdapterEdgeComponent {
   data = input.required<Edge>();
 
   path = computed(() =>
-    this.data().routing === 'orthogonal'
+    // this.data().routing === 'orthogonal'
+    // Todo
+    true
       ? getOrthogonalPath(this.data().points || [])
       : getStraightPath(this.data().points || [])
   );

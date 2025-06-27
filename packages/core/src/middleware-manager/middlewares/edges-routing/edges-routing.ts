@@ -36,7 +36,9 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
     : undefined;
 
   const points =
-    edge.routing === 'orthogonal'
+    // edge.routing === 'orthogonal'
+    // Todo
+    true
       ? getOrthogonalPathPoints(source, target)
       : [sourcePoint, targetPoint].filter((point) => !!point);
 
