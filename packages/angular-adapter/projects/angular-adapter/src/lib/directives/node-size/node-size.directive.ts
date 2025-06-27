@@ -1,18 +1,15 @@
-import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, Renderer2 } from '@angular/core';
+import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { type Node } from '@angularflow/core';
-import { FlowCoreProviderService, UpdatePortsService } from '../../services';
+import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 
 @Directive({
   selector: '[angularAdapterNodeSize]',
 })
-export class NodeSizeDirective implements OnDestroy {
+export class NodeSizeDirective implements OnDestroy, OnInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
-  private readonly flowCore = inject(FlowCoreProviderService);
   private readonly renderer = inject(Renderer2);
-  private readonly updatePortsService = inject(UpdatePortsService);
-  private resizeObserver!: ResizeObserver;
+  private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
-  isDestroyed = false;
   data = input.required<Node>();
   size = computed(() => this.data().size);
   autoSize = computed(() => this.data().autoSize ?? true);
@@ -26,19 +23,21 @@ export class NodeSizeDirective implements OnDestroy {
   constructor() {
     effect(() => {
       const { size, autoSize } = this.sizeState();
+
       if (!autoSize && size) {
         const { width, height } = this.size()!;
         this.setSize(width, height);
-        this.disconnectResizeObserver();
       } else {
         this.setSize();
-        this.createResizeObserver();
       }
     });
   }
 
+  ngOnInit() {
+    this.connectResizeObserver();
+  }
+
   ngOnDestroy() {
-    this.isDestroyed = true;
     this.disconnectResizeObserver();
   }
 
@@ -47,26 +46,14 @@ export class NodeSizeDirective implements OnDestroy {
     this.renderer.setStyle(this.hostElement.nativeElement, 'height', height ? `${height}px` : 'unset');
   }
 
-  private createResizeObserver() {
-    this.resizeObserver = new ResizeObserver((entries) => {
-      const borderBox = entries[0].borderBoxSize?.[0];
-      if (borderBox && !this.isDestroyed) {
-        const width = borderBox.inlineSize;
-        const height = borderBox.blockSize;
-
-        const size = { width, height };
-
-        this.flowCore.provide().internalUpdater.applyNodeSize(this.id(), { size });
-
-        // TODO: fix problem with DOM position resync after repaint
-        const portsData = this.updatePortsService.getNodePortsData(this.id());
-        this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(this.id(), portsData);
-      }
+  private connectResizeObserver() {
+    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
+      type: 'node',
+      nodeId: this.id(),
     });
-    this.resizeObserver.observe(this.hostElement.nativeElement);
   }
 
   private disconnectResizeObserver() {
-    this.resizeObserver?.disconnect();
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }

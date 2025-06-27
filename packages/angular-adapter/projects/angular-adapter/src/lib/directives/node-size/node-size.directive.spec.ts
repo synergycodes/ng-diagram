@@ -1,18 +1,10 @@
 import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventMapperService, FlowCoreProviderService, UpdatePortsService } from '../../services';
+import { EventMapperService } from '../../services';
+import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { NodeSizeDirective } from './node-size.directive';
-
-type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
-
-class MockResizeObserver implements ResizeObserver {
-  callback: ResizeObserverCallback = vi.fn();
-  disconnect = vi.fn();
-  observe = vi.fn();
-  unobserve = vi.fn();
-}
 
 @Component({
   template: `<div angularAdapterNodeSize [data]="data"></div>`,
@@ -26,48 +18,26 @@ describe('NodeSizeDirective', () => {
   let directive: NodeSizeDirective;
   let fixture: ComponentFixture<TestComponent>;
   let component: TestComponent;
-  let applyNodeSizeMock: ReturnType<typeof vi.fn>;
-  let applyPortSizesAndPositionsMock: ReturnType<typeof vi.fn>;
-  let updatePortsService: UpdatePortsService;
-  let mockResizeObserver: MockResizeObserver;
+
+  let mockBatchResizeObserver: {
+    observe: ReturnType<typeof vi.fn>;
+    unobserve: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    applyNodeSizeMock = vi.fn();
-    applyPortSizesAndPositionsMock = vi.fn();
-    mockResizeObserver = new MockResizeObserver();
-    global.ResizeObserver = function (callback: ResizeObserverCallback) {
-      mockResizeObserver.callback = callback;
-      return mockResizeObserver;
-    } as unknown as typeof ResizeObserver;
-
-    // Mock service
-    const mockUpdatePortsService = {
-      getNodePortsData: vi.fn(),
+    mockBatchResizeObserver = {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
       imports: [TestComponent],
-      providers: [
-        EventMapperService,
-        { provide: UpdatePortsService, useValue: mockUpdatePortsService },
-        {
-          provide: FlowCoreProviderService,
-          useValue: {
-            provide: vi.fn().mockReturnValue({
-              internalUpdater: {
-                applyNodeSize: applyNodeSizeMock,
-                applyPortsSizesAndPositions: applyPortSizesAndPositionsMock,
-              },
-            }),
-          },
-        },
-      ],
+      providers: [EventMapperService, { provide: BatchResizeObserverService, useValue: mockBatchResizeObserver }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
     component = fixture.componentInstance;
     directive = fixture.debugElement.query(By.directive(NodeSizeDirective)).injector.get(NodeSizeDirective);
-    updatePortsService = TestBed.inject(UpdatePortsService);
     fixture.detectChanges();
   });
 
@@ -84,36 +54,10 @@ describe('NodeSizeDirective', () => {
     expect(element.style.height).toBe('200px');
   });
 
-  it('should observe size changes when autoSize is true', () => {
-    const getNodePortsDataSpy = vi.spyOn(updatePortsService, 'getNodePortsData').mockReturnValue([]);
-    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
-
-    component.data = { autoSize: true, id: 'test-node-id' };
-    fixture.detectChanges();
-
-    Object.defineProperty(element, 'offsetWidth', { value: 150 });
-    Object.defineProperty(element, 'offsetHeight', { value: 250 });
-
-    mockResizeObserver.callback([
-      {
-        borderBoxSize: [{ inlineSize: 150, blockSize: 250 }],
-        contentBoxSize: [],
-        contentRect: new DOMRect(),
-        devicePixelContentBoxSize: [],
-        target: element,
-      } as ResizeObserverEntry,
-    ]);
-
-    expect(applyNodeSizeMock).toHaveBeenCalledWith('test-node-id', {
-      size: { width: 150, height: 250 },
-    });
-    expect(applyPortSizesAndPositionsMock).toHaveBeenCalledWith('test-node-id', []);
-    expect(getNodePortsDataSpy).toHaveBeenCalledWith('test-node-id');
-  });
-
   it('should disconnect resize observer on destroy', () => {
+    const element = fixture.debugElement.query(By.directive(NodeSizeDirective)).nativeElement;
     fixture.destroy();
-    expect(mockResizeObserver.disconnect).toHaveBeenCalled();
+    expect(mockBatchResizeObserver.unobserve).toHaveBeenCalledWith(element);
   });
 
   it('should update element size when size input changes', () => {
