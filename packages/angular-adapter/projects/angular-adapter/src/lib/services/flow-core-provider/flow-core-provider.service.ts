@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { FlowCore, Middleware, ModelAdapter } from '@angularflow/core';
+import { Injectable, inject } from '@angular/core';
+import { FlowCore, type Middleware, type ModelAdapter } from '@angularflow/core';
 
 import { EventMapperService } from '../event-mapper/event-mapper.service';
 import { RendererService } from '../renderer/renderer.service';

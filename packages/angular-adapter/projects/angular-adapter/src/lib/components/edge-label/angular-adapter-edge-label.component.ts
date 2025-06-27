@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { EdgeLabel, EdgeLabelTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
+import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 
 @Component({
@@ -30,7 +31,7 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly edgeComponent = inject(AngularAdapterEdgeComponent);
   private readonly eventMapperService = inject(EventMapperService);
-  private resizeObserver!: ResizeObserver;
+  private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<EdgeLabel['id']>();
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
@@ -67,15 +68,11 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
       positionOnEdge: this.positionOnEdge(),
     });
 
-    this.resizeObserver = new ResizeObserver((entries) => {
-      const borderBox = entries[0].borderBoxSize?.[0];
-      if (borderBox) {
-        const width = borderBox.inlineSize;
-        const height = borderBox.blockSize;
-        this.flowCoreProvider.provide().internalUpdater.applyEdgeLabelSize(this.edgeId(), this.id(), { width, height });
-      }
+    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
+      type: 'edge-label',
+      edgeId: this.edgeId(),
+      labelId: this.id(),
     });
-    this.resizeObserver.observe(this.hostElement.nativeElement);
   }
 
   ngOnDestroy(): void {
@@ -83,7 +80,7 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
       edgeId: this.edgeId(),
       labelIds: [this.id()],
     });
-    this.resizeObserver.disconnect();
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 
   onPointerDown(event: PointerEvent) {
