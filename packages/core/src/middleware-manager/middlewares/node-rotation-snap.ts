@@ -1,12 +1,26 @@
 import { snapAngle } from '../../input-event-handler/input-actions/rotate/snap-angle';
 import type { FlowStateUpdate, Middleware } from '../../types';
 
-const SNAP_ANGLE = 15;
+export interface NodeRotationSnapMiddlewareMetadata {
+  snap: number;
+  enabled: boolean;
+}
 
-export const nodeRotationSnapMiddleware: Middleware = {
+export const nodeRotationSnapMiddleware: Middleware<'node-rotation-snap', NodeRotationSnapMiddlewareMetadata> = {
   name: 'node-rotation-snap',
+  defaultMetadata: {
+    snap: 15,
+    enabled: true,
+  },
   execute: (context, next, cancel) => {
     const { helpers, nodesMap, flowCore } = context;
+
+    const { enabled, snap } = context.middlewareMetadata;
+
+    if (!enabled) {
+      next();
+      return;
+    }
 
     const shouldSnap = helpers.checkIfAnyNodePropsChanged(['angle']);
 
@@ -24,13 +38,13 @@ export const nodeRotationSnapMiddleware: Middleware = {
         continue;
       }
 
-      const shouldSnap = node.angle % SNAP_ANGLE !== 0;
+      const shouldSnap = node.angle % snap !== 0;
 
       if (!shouldSnap) {
         continue;
       }
 
-      const snappedAngle = snapAngle(node.angle, SNAP_ANGLE);
+      const snappedAngle = snapAngle(node.angle, snap);
 
       const originalNode = flowCore.getNodeById(node.id);
 

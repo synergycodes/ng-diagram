@@ -17,18 +17,19 @@ import { FlowCoreProviderService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
-  let component: AngularAdapterDiagramComponent;
-  let fixture: ComponentFixture<AngularAdapterDiagramComponent>;
+  let component: AngularAdapterDiagramComponent<ModelAdapter>;
+  let fixture: ComponentFixture<AngularAdapterDiagramComponent<ModelAdapter>>;
   const mockModel: ModelAdapter = {
     getNodes: vi.fn(),
     getEdges: vi.fn(),
-    getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 } })),
+    getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresMetadata: {} })),
     setNodes: vi.fn(),
     setEdges: vi.fn(),
     setMetadata: vi.fn(),
     onChange: vi.fn(),
     undo: vi.fn(),
     redo: vi.fn(),
+    updateMiddlewareMetadata: vi.fn(),
   };
 
   beforeEach(async () => {

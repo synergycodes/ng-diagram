@@ -3,6 +3,10 @@ import { getPointOnPath, isSamePoint } from '../../../utils';
 import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
 import { getSourceTarget } from './get-source-target.ts';
 
+export interface EdgesRoutingMiddlewareMetadata {
+  enabled: boolean;
+}
+
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
   helpers.anyEdgesAdded() ||
@@ -43,8 +47,11 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
   return { targetPoint, sourcePoint, points };
 };
 
-export const edgesRoutingMiddleware: Middleware = {
+export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMiddlewareMetadata> = {
   name: 'edges-routing',
+  defaultMetadata: {
+    enabled: true,
+  },
   execute: (context, next) => {
     const {
       state: { edges, metadata },
@@ -52,6 +59,14 @@ export const edgesRoutingMiddleware: Middleware = {
       helpers,
       modelActionType,
     } = context;
+    // Access the typed middleware metadata
+    const isEnabled = context.middlewareMetadata.enabled;
+
+    if (!isEnabled) {
+      next();
+      return;
+    }
+
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
     const shouldUpdateTemporaryEdge = helpers.checkIfMetadataPropsChanged(['temporaryEdge']) && metadata.temporaryEdge;
 

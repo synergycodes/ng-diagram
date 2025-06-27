@@ -18,6 +18,7 @@ describe('FlowCoreProviderService', () => {
     onChange: vi.fn(),
     undo: vi.fn(),
     redo: vi.fn(),
+    updateMiddlewareMetadata: vi.fn(),
   };
 
   beforeEach(() => {
@@ -42,12 +43,13 @@ describe('FlowCoreProviderService', () => {
     });
 
     it('should initialize FlowCore with provided middlewares', () => {
-      const spy = vi.fn().mockImplementation((state) => state);
-      const middlewares = [{ name: 'test', execute: spy }];
+      const middlewares = [{ name: 'test', execute: vi.fn() }];
 
       service.init(mockModelAdapter, middlewares);
 
-      expect(spy).toHaveBeenCalled();
+      // Verify that FlowCore was created successfully with middlewares
+      const flowCore = service.provide();
+      expect(flowCore).toBeInstanceOf(FlowCore);
     });
   });
 

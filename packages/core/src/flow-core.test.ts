@@ -4,6 +4,7 @@ import { FlowCore } from './flow-core';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockMetadata, mockNode } from './test-utils';
+import { CombinedMiddlewaresMetadata } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
@@ -64,12 +65,12 @@ vi.mock('./model-lookup/model-lookup', () => ({
 
 describe('FlowCore', () => {
   let flowCore: FlowCore;
-  let mockModelAdapter: ModelAdapter;
+  let mockModelAdapter: ModelAdapter<Metadata<CombinedMiddlewaresMetadata<[]>>>;
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
-  let mockGetMetadata: Mock<() => Metadata>;
+  let mockGetMetadata: Mock<() => Metadata<CombinedMiddlewaresMetadata<[]>>>;
   const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {
@@ -88,6 +89,7 @@ describe('FlowCore', () => {
       onChange: vi.fn(),
       undo: vi.fn(),
       redo: vi.fn(),
+      updateMiddlewareMetadata: vi.fn(),
     };
 
     mockRenderer = {
@@ -181,12 +183,12 @@ describe('FlowCore', () => {
     it('should return the current state', () => {
       mockGetNodes.mockReturnValue([mockNode]);
       mockGetEdges.mockReturnValue([mockEdge]);
-      mockGetMetadata.mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, test: 'abc' });
+      mockGetMetadata.mockReturnValue(mockMetadata);
       const state = flowCore.getState();
       expect(state).toEqual({
         nodes: [mockNode],
         edges: [mockEdge],
-        metadata: { viewport: { x: 0, y: 0, scale: 1 }, test: 'abc' },
+        metadata: mockMetadata,
       });
     });
   });
@@ -243,7 +245,7 @@ describe('FlowCore', () => {
 
   describe('clientToFlowPosition', () => {
     it('should convert client position to flow position', () => {
-      mockGetMetadata.mockReturnValue({ viewport: { x: 200, y: 200, scale: 2 } });
+      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
       const clientPosition = { x: 30, y: 30 };
       const flowPosition = flowCore.clientToFlowPosition(clientPosition);
 
@@ -253,7 +255,7 @@ describe('FlowCore', () => {
 
   describe('flowToClientPosition', () => {
     it('should convert flow position to client position', () => {
-      mockGetMetadata.mockReturnValue({ viewport: { x: 200, y: 200, scale: 2 } });
+      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
       const flowPosition = { x: -85, y: -85 };
       const clientPosition = flowCore.flowToClientPosition(flowPosition);
 

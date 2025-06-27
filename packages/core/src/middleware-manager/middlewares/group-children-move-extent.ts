@@ -2,6 +2,10 @@ import { FlowCore } from '../../flow-core';
 import type { Middleware, MiddlewareContext, Node } from '../../types';
 import { calculateGroupRect } from '../../utils/group-size';
 
+export interface GroupChildrenMoveExtentMiddlewareMetadata {
+  enabled: boolean;
+}
+
 interface NodeUpdate {
   id: string;
   position: Node['position'];
@@ -9,9 +13,22 @@ interface NodeUpdate {
   autoSize: boolean;
 }
 
-export const groupChildrenMoveExtent: Middleware = {
+export const groupChildrenMoveExtent: Middleware<
+  'group-children-move-extent',
+  GroupChildrenMoveExtentMiddlewareMetadata
+> = {
   name: 'group-children-move-extent',
-  execute: ({ helpers, nodesMap, flowCore }, next) => {
+  defaultMetadata: {
+    enabled: true,
+  },
+  execute: ({ helpers, nodesMap, flowCore, middlewareMetadata }, next) => {
+    const isEnabled = middlewareMetadata.enabled;
+
+    if (!isEnabled) {
+      next();
+      return;
+    }
+
     // Early exit if no relevant changes
     if (!helpers.checkIfAnyNodePropsChanged(['position', 'size'])) {
       next();

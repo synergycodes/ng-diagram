@@ -13,6 +13,8 @@ import { InputFieldNodeComponent } from './node-template/input-field-node/input-
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
+const appliedMiddlewares = [loggerMiddleware] as const satisfies Middleware[];
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -21,14 +23,14 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  model = signal<SignalModelAdapter>(new SignalModelAdapter());
+  model = signal(new SignalModelAdapter<typeof appliedMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],
     ['resizable', ResizableNodeComponent],
     ['group', GroupNodeComponent],
   ]);
-  middlewares = signal<Middleware[]>([loggerMiddleware]);
+  middlewares = signal<Middleware[]>(appliedMiddlewares);
 
   constructor() {
     this.model().setNodes([

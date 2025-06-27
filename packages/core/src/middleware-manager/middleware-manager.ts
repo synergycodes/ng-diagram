@@ -1,26 +1,33 @@
 import { FlowCore } from '../flow-core';
-import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
+import type {
+  CombinedMiddlewaresMetadata,
+  FlowState,
+  FlowStateUpdate,
+  Metadata,
+  Middleware,
+  MiddlewareChain,
+  ModelActionType,
+} from '../types';
+import { defaultMiddlewares } from './default-middlewares';
 import { MiddlewareExecutor } from './middleware-executor';
-import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
-import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
-import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
-import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
-import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
-export class MiddlewareManager {
+export class MiddlewareManager<
+  TCustomMiddlewares extends MiddlewareChain = [],
+  TMetadata extends Metadata<CombinedMiddlewaresMetadata<TCustomMiddlewares>> = Metadata<
+    CombinedMiddlewaresMetadata<TCustomMiddlewares>
+  >,
+> {
   private middlewareChain: MiddlewareChain = [];
-  readonly flowCore: FlowCore;
+  readonly flowCore: FlowCore<TCustomMiddlewares, TMetadata>;
 
-  constructor(flowCore: FlowCore, middlewares: Middleware[] = []) {
+  constructor(flowCore: FlowCore<TCustomMiddlewares, TMetadata>, middlewares?: TCustomMiddlewares) {
     this.flowCore = flowCore;
-    this.register(nodePositionSnapMiddleware);
-    this.register(nodeRotationSnapMiddleware);
-    this.register(groupChildrenChangeExtent);
-    this.register(groupChildrenMoveExtent);
-    this.register(treeLayoutMiddleware);
-    this.register(edgesRoutingMiddleware);
-    middlewares.forEach((middleware) => this.register(middleware));
+
+    defaultMiddlewares.forEach((middleware) => this.register(middleware));
+
+    if (middlewares) {
+      middlewares.forEach((middleware) => this.register(middleware));
+    }
   }
 
   /**
@@ -28,7 +35,8 @@ export class MiddlewareManager {
    * @param middleware Middleware to register
    * @returns Function to unregister the middleware
    */
-  register(middleware: Middleware): () => void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  register<T extends Middleware<any>>(middleware: T): () => void {
     if (this.middlewareChain.find((m) => m.name === middleware.name)) {
       throw new Error(`Middleware ${middleware.name} already registered`);
     }
@@ -37,7 +45,7 @@ export class MiddlewareManager {
   }
 
   /**
-   * Unregisters a middleware from the chain
+   * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
   unregister(name: string): void {
@@ -54,8 +62,11 @@ export class MiddlewareManager {
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(initialState: FlowState, stateUpdate: FlowStateUpdate, modelActionType: ModelActionType) {
-    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
+  execute(initialState: FlowState<TMetadata>, stateUpdate: FlowStateUpdate, modelActionType: ModelActionType) {
+    const middlewareExecutor = new MiddlewareExecutor<TCustomMiddlewares, TMetadata>(
+      this.flowCore,
+      this.middlewareChain
+    );
     return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
   }
 }

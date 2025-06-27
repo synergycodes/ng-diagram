@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../flow-core';
 import { mockMetadata, mockNode } from '../test-utils';
-import type { FlowState, FlowStateUpdate, Middleware } from '../types';
+import type { CombinedMiddlewaresMetadata, FlowState, FlowStateUpdate, Metadata, Middleware } from '../types';
 import { MiddlewareManager } from './middleware-manager';
+import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
 import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
 import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
 import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
 import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
 import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 // Define all mocks at the top level
@@ -30,7 +30,7 @@ describe('MiddlewareManager', () => {
   let middlewareManager: MiddlewareManager;
   let mockMiddleware1: Middleware;
   let mockMiddleware2: Middleware;
-  let initialState: FlowState;
+  let initialState: FlowState<Metadata<CombinedMiddlewaresMetadata<[]>>>;
   let stateUpdate: FlowStateUpdate;
   let MiddlewareExecutor: unknown;
 
@@ -68,7 +68,7 @@ describe('MiddlewareManager', () => {
       nodes: [],
       edges: [],
       metadata: mockMetadata,
-    };
+    } as unknown as FlowState<Metadata<CombinedMiddlewaresMetadata<[]>>>;
     stateUpdate = {
       nodesToAdd: [mockNode],
     };
@@ -81,12 +81,12 @@ describe('MiddlewareManager', () => {
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
-        nodePositionSnapMiddleware,
         nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
         treeLayoutMiddleware,
         edgesRoutingMiddleware,
+        nodePositionSnapMiddleware,
       ]);
     });
 
@@ -95,12 +95,12 @@ describe('MiddlewareManager', () => {
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
-        nodePositionSnapMiddleware,
         nodeRotationSnapMiddleware,
         groupChildrenChangeExtent,
         groupChildrenMoveExtent,
         treeLayoutMiddleware,
         edgesRoutingMiddleware,
+        nodePositionSnapMiddleware,
         mockMiddleware1,
       ]);
     });

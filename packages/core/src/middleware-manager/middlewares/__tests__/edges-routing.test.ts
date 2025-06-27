@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import type { FlowState, MiddlewareContext, Node, Point } from '../../../types';
-import { edgesRoutingMiddleware } from '../edges-routing/edges-routing.ts';
+import { edgesRoutingMiddleware, EdgesRoutingMiddlewareMetadata } from '../edges-routing/edges-routing.ts';
 
 vi.mock('../../../utils', () => ({
   getPortFlowPositionSide: (node: Node) => node.position,
@@ -13,7 +13,7 @@ vi.mock('../../../utils', () => ({
 describe('Edges Routing Middleware', () => {
   let flowCore: FlowCore;
   let initialState: FlowState;
-  let context: MiddlewareContext;
+  let context: MiddlewareContext<EdgesRoutingMiddlewareMetadata>;
   const nextMock = vi.fn();
   const anyEdgesAddedMock = vi.fn();
   const checkIfAnyNodePropsChangedMock = vi.fn();
@@ -46,7 +46,10 @@ describe('Edges Routing Middleware', () => {
       },
       history: [],
       initialUpdate: {},
-    } as unknown as MiddlewareContext;
+      middlewareMetadata: {
+        enabled: true,
+      },
+    } as unknown as MiddlewareContext<EdgesRoutingMiddlewareMetadata>;
   });
 
   it('should call next without update if model action and properties changes are not relevant for routing edges and temporary edge', () => {

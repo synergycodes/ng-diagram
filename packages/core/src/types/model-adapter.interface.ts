@@ -5,7 +5,7 @@ import type { Node } from './node.interface';
 /**
  * Interface for model adapters that handle the data management of a flow diagram
  */
-export interface ModelAdapter {
+export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
   /**
    * Get all nodes in the model
    */
@@ -35,21 +35,32 @@ export interface ModelAdapter {
   /**
    * Get metadata associated with the model
    */
-  getMetadata(): Metadata;
+  getMetadata(): TMetadata;
 
   /**
    * Set metadata for the model
    * @param metadata Metadata to set
    * @param metadataFn Function that takes current metadata and returns new metadata
    */
-  setMetadata(metadata: Metadata): void;
-  setMetadata(metadataFn: (metadata: Metadata) => Metadata): void;
+  setMetadata(metadata: TMetadata): void;
+  setMetadata(metadataFn: (metadata: TMetadata) => TMetadata): void;
+
+  /**
+   * Update middleware metadata with full type safety
+   * This method allows partial updates while maintaining type safety
+   * @param middlewareName - The name of the middleware to update
+   * @param state - The new state of the middleware
+   */
+  updateMiddlewareMetadata<TName extends keyof TMetadata['middlewaresMetadata']>(
+    middlewareName: TName,
+    state: TMetadata['middlewaresMetadata'][TName]
+  ): void;
 
   /**
    * Register a callback to be called when the model changes
    * @param callback Function to be called on changes
    */
-  onChange(callback: ({ nodes, edges, metadata }: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void): void;
+  onChange(callback: ({ nodes, edges, metadata }: { nodes: Node[]; edges: Edge[]; metadata: TMetadata }) => void): void;
 
   /**
    * Undo the last change

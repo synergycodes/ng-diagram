@@ -36,10 +36,10 @@ export type ModelActionType =
 /**
  * Type for the state of the flow diagram
  */
-export interface FlowState {
+export interface FlowState<TMetadata = Metadata> {
   nodes: Node[];
   edges: Edge[];
-  metadata: Metadata;
+  metadata: TMetadata;
 }
 
 /**
@@ -66,7 +66,7 @@ export interface FlowStateUpdate {
 /**
  * Type for the context of the middleware
  */
-export interface MiddlewareContext {
+export interface MiddlewareContext<TMiddlewareMetadata = unknown> {
   initialState: FlowState;
   state: FlowState;
   nodesMap: Map<string, Node>;
@@ -76,18 +76,23 @@ export interface MiddlewareContext {
   helpers: ReturnType<MiddlewareExecutor['helpers']>;
   history: MiddlewareHistoryUpdate[];
   initialUpdate: FlowStateUpdate;
+  middlewareMetadata: TMiddlewareMetadata;
 }
 
 /**
  * Type for middleware function that transforms state
+ * @template TMetadata - Type of the metadata of the middleware
+ * @template TName - Type of the name of the middleware (should be a string literal)
  */
-export interface Middleware {
-  name: string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Middleware<TName extends string = string, TMetadata = any> {
+  name: TName;
   execute: (
-    context: MiddlewareContext,
+    context: MiddlewareContext<TMetadata>,
     next: (stateUpdate?: FlowStateUpdate) => Promise<FlowState>,
     cancel: () => void
   ) => Promise<void> | void;
+  defaultMetadata?: TMetadata;
 }
 
 /**

@@ -44,14 +44,14 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     WheelEventListenerDirective,
   ],
 })
-export class AngularAdapterDiagramComponent {
+export class AngularAdapterDiagramComponent<TAdapter extends ModelAdapter> {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
   /**
    * The model to use in the diagram.
    */
-  model = input.required<ModelAdapter>();
+  model = input.required<TAdapter>();
 
   /**
    * The starting middlewares to use in the Flow Core.
