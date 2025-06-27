@@ -29,7 +29,6 @@ export interface UpdateNodesCommand {
 
 export const updateNodes = async (commandHandler: CommandHandler, command: UpdateNodesCommand) => {
   const { nodes } = command;
-
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: nodes }, 'updateNodes');
 };
 

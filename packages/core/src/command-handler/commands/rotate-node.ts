@@ -10,7 +10,7 @@ export interface RotateNodeByCommand {
 export const rotateNodeBy = async (commandHandler: CommandHandler, { nodeId, angle }: RotateNodeByCommand) => {
   const node = commandHandler.flowCore.getNodeById(nodeId);
 
-  if (!node) {
+  if (!node || angle === 0) {
     return;
   }
 

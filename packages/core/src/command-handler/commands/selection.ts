@@ -4,32 +4,27 @@ const changeSelection = (
   nodes: Node[],
   edges: Edge[],
   selectedNodeIds: string[],
-  selectedEdgeIds: string[]
+  selectedEdgeIds: string[],
+  preserveSelection = false
 ): Pick<FlowStateUpdate, 'nodesToUpdate' | 'edgesToUpdate'> => {
   const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
   const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
 
   nodes.forEach((node) => {
     const isSelected = selectedNodeIds.includes(node.id);
-    if (!!node.selected === isSelected) {
+    if (!!node.selected === isSelected || (preserveSelection && !!node.selected)) {
       return;
     }
     nodesToUpdate.push({ id: node.id, selected: isSelected });
   });
-  edges.map((edge) => {
+  edges.forEach((edge) => {
     const isSelected = selectedEdgeIds.includes(edge.id);
-    if (!!edge.selected === isSelected) {
+    if (!!edge.selected === isSelected || (preserveSelection && !!edge.selected)) {
       return;
     }
     edgesToUpdate.push({ id: edge.id, selected: isSelected });
   });
   return { nodesToUpdate, edgesToUpdate };
-};
-
-const getSelectedIds = (nodes: Node[], edges: Edge[]): { selectedNodeIds: string[]; selectedEdgeIds: string[] } => {
-  const selectedNodeIds = nodes.filter((node) => node.selected).map((node) => node.id);
-  const selectedEdgeIds = edges.filter((edge) => edge.selected).map((edge) => edge.id);
-  return { selectedNodeIds, selectedEdgeIds };
 };
 
 export interface SelectCommand {
@@ -44,12 +39,13 @@ export const select = async (
   { nodeIds, edgeIds, preserveSelection = false }: SelectCommand
 ) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  if (preserveSelection) {
-    const { selectedNodeIds, selectedEdgeIds } = getSelectedIds(nodes, edges);
-    nodeIds = [...(nodeIds ?? []), ...selectedNodeIds];
-    edgeIds = [...(edgeIds ?? []), ...selectedEdgeIds];
-  }
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, nodeIds ?? [], edgeIds ?? []);
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(
+    nodes,
+    edges,
+    nodeIds ?? [],
+    edgeIds ?? [],
+    preserveSelection
+  );
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
@@ -64,10 +60,18 @@ export interface DeselectCommand {
 
 export const deselect = async (commandHandler: CommandHandler, { nodeIds, edgeIds }: DeselectCommand) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  const { selectedNodeIds, selectedEdgeIds } = getSelectedIds(nodes, edges);
-  const newNodeIds = selectedNodeIds.filter((id) => !nodeIds?.includes(id));
-  const newEdgeIds = selectedEdgeIds.filter((id) => !edgeIds?.includes(id));
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, newNodeIds ?? [], newEdgeIds ?? []);
+  const nodesToLeftSelected = nodes
+    .filter(({ id, selected }) => !nodeIds?.includes(id) && !!selected)
+    .map(({ id }) => id);
+  const edgesToLeftSelected = edges
+    .filter(({ id, selected }) => !edgeIds?.includes(id) && !!selected)
+    .map(({ id }) => id);
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(
+    nodes,
+    edges,
+    nodesToLeftSelected ?? [],
+    edgesToLeftSelected ?? []
+  );
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }

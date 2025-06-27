@@ -95,7 +95,9 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         });
 
         if (topLevelGroupNode) {
-          flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+          if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
+            flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+          }
         } else {
           flowCore.commandHandler.emit('highlightGroupClear');
         }
@@ -117,24 +119,22 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         const updateData: { id: string; groupId?: string; zOrder?: number }[] = [];
 
         for (const selectedNode of flowCore.modelLookup.getSelectedNodes()) {
-          if (topLevelGroupNode) {
-            if (!flowCore.modelLookup.wouldCreateCircularDependency(selectedNode.id, topLevelGroupNode.id)) {
-              updateData.push({
-                id: selectedNode.id,
-                groupId: topLevelGroupNode.id,
-                zOrder: ((topLevelGroupNode.zOrder || selectedNode.zOrder) ?? 0) + 1,
-              });
-            }
-            /**
-             * If there is no group but node has a parent
-             * thats means the node has been unassigned from the group
-             */
-          } else if (selectedNode.groupId) {
-            updateData.push({
-              id: selectedNode.id,
-              groupId: undefined,
-            });
+          if (
+            topLevelGroupNode &&
+            flowCore.modelLookup.wouldCreateCircularDependency(selectedNode.id, topLevelGroupNode.id)
+          ) {
+            continue;
           }
+          const newGroupId = topLevelGroupNode?.id;
+          if (selectedNode.groupId === newGroupId) {
+            continue;
+          }
+
+          updateData.push({
+            id: selectedNode.id,
+            groupId: newGroupId,
+            ...(topLevelGroupNode ? { zOrder: ((topLevelGroupNode.zOrder || selectedNode.zOrder) ?? 0) + 1 } : {}),
+          });
         }
 
         if (updateData.length > 0) {
