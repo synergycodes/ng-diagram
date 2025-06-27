@@ -183,9 +183,12 @@ describe('Edges Routing Middleware', () => {
       metadataUpdate: {
         temporaryEdge: {
           ...newState.metadata.temporaryEdge,
-          points: [{ x: 100, y: 100 }],
+          points: [
+            { x: 100, y: 100 },
+            { x: 200, y: 200 },
+          ],
           sourcePosition: { x: 100, y: 100 },
-          targetPosition: undefined,
+          targetPosition: { x: 200, y: 200 },
         },
       },
     });
