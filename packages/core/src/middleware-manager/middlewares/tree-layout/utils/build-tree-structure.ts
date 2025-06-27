@@ -57,16 +57,19 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   for (const node of nodeMap.values()) {
     if (node.type === 'group') {
       (node as TreeNode).groupChildren = [];
-      if (!node.groupId) {
-        result.push(node as TreeNode);
-      }
     }
+  }
+
+  for (const node of nodeMap.values()) {
     if (node.groupId) {
       const parent = nodeMap.get(node.groupId);
       if (parent?.type === 'group') {
         const groupNode = parent as TreeNode;
         groupNode.groupChildren!.push(node);
       }
+    }
+    if (node.type === 'group' && !node.groupId) {
+      result.push(node as TreeNode);
     }
   }
 
