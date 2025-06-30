@@ -86,6 +86,7 @@ export class FlowResizeBatchProcessorService {
    * Process all port resize events
    */
   private processPortBatch(entries: ProcessedEntry[]): void {
+    const flowCore = this.flowCoreProvider.provide();
     const updatesByNode = new Map<
       string,
       {
@@ -103,6 +104,22 @@ export class FlowResizeBatchProcessorService {
 
       const { position } = this.updatePortsService.getPortData(entry.target as HTMLElement);
 
+      const node = flowCore.getNodeById(metadata.nodeId);
+      if (!node) continue;
+
+      const port = node.ports?.find((port) => port.id === metadata.portId);
+      const currentSize = port?.size;
+      const currentPosition = port?.position;
+
+      if (
+        currentSize &&
+        !this.isSizeChanged(currentSize, size) &&
+        currentPosition &&
+        !this.isPositionChanged(currentPosition, position)
+      ) {
+        continue;
+      }
+
       if (!updatesByNode.has(metadata.nodeId)) {
         updatesByNode.set(metadata.nodeId, []);
       }
@@ -113,8 +130,6 @@ export class FlowResizeBatchProcessorService {
         position,
       });
     }
-
-    const flowCore = this.flowCoreProvider.provide();
 
     updatesByNode.forEach((ports, nodeId) => {
       flowCore.internalUpdater.applyPortsSizesAndPositions(nodeId, ports);
@@ -133,12 +148,18 @@ export class FlowResizeBatchProcessorService {
       const size = this.getBorderBoxSize(entry);
       if (!size) continue;
 
+      const currentSize = flowCore.getNodeById(metadata.nodeId)?.size;
+      if (currentSize && !this.isSizeChanged(currentSize, size)) {
+        continue;
+      }
+
       flowCore.internalUpdater.applyNodeSize(metadata.nodeId, { size });
 
       const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
       flowCore.internalUpdater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
     }
   }
+
   /**
    * Process all edge label resize events
    */
@@ -158,6 +179,14 @@ export class FlowResizeBatchProcessorService {
 
       const size = this.getBorderBoxSize(entry);
       if (!size) continue;
+
+      const edge = flowCore.getEdgeById(metadata.edgeId);
+      if (!edge) continue;
+
+      const currentSize = edge.labels?.find((label) => label.id === metadata.labelId)?.size;
+      if (currentSize && !this.isSizeChanged(currentSize, size)) {
+        continue;
+      }
 
       if (!updatesByEdge.has(metadata.edgeId)) {
         updatesByEdge.set(metadata.edgeId, []);
@@ -187,5 +216,26 @@ export class FlowResizeBatchProcessorService {
     if (!borderBox) return null;
 
     return { width: borderBox.inlineSize, height: borderBox.blockSize };
+  }
+
+  /**
+   * Check if the size has changed by more than 1px
+   * Because of different render engines we skip updates if the size has less than 1px difference
+   * @param currentSize Current size
+   * @param newSize New size
+   * @returns True if the size has changed by more than 1px, false otherwise
+   */
+  private isSizeChanged(currentSize: { width: number; height: number }, newSize: { width: number; height: number }) {
+    return Math.abs(currentSize.width - newSize.width) > 1 || Math.abs(currentSize.height - newSize.height) > 1;
+  }
+
+  /**
+   * Check if the position has changed by more than 1px
+   * @param currentPosition Current position
+   * @param newPosition New position
+   * @returns True if the position has changed by more than 1px, false otherwise
+   */
+  private isPositionChanged(currentPosition: { x: number; y: number }, newPosition: { x: number; y: number }) {
+    return Math.abs(currentPosition.x - newPosition.x) > 1 || Math.abs(currentPosition.y - newPosition.y) > 1;
   }
 }
