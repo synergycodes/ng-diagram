@@ -22,6 +22,7 @@ describe('LoggerMiddleware', () => {
       metadata: initialState.metadata,
       history: [{ name: 'init', stateUpdate: { nodesToAdd: [] } }],
       initialUpdate: { nodesToAdd: [] },
+      middlewareMetadata: { enabled: true },
     } as unknown as MiddlewareContext<LoggerMiddlewareMetadata>;
 
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {
