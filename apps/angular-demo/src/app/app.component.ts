@@ -4,6 +4,8 @@ import {
   INodeTemplate,
   Middleware,
   NodeTemplateMap,
+  EdgeTemplateMap,
+  IEdgeTemplate,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
@@ -12,6 +14,7 @@ import { ImageNodeComponent } from './node-template/image-node/image-node.compon
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
+import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +31,7 @@ export class AppComponent {
     ['resizable', ResizableNodeComponent],
     ['group', GroupNodeComponent],
   ]);
+  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<IEdgeTemplate>>([['button-edge', ButtonEdgeComponent]]);
   middlewares = signal<Middleware[]>([loggerMiddleware]);
 
   constructor() {
@@ -40,7 +44,6 @@ export class AppComponent {
         resizable: true,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, groupId: '2' },
       {
         id: '4',
         type: 'group',
@@ -72,24 +75,14 @@ export class AppComponent {
       },
       {
         id: '2',
-        source: '2',
-        target: '3',
+        source: '1',
+        target: '2',
         data: {},
         sourceArrowhead: 'angularflow-arrow',
         targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-right',
-        targetPort: 'port-left-1',
-        routing: 'orthogonal',
-      },
-      {
-        id: '4',
-        source: '2',
-        target: '3',
-        data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-right',
-        targetPort: 'port-left-3',
+        sourcePort: 'port-top',
+        targetPort: 'port-left',
+        routing: 'button-edge',
       },
     ]);
   }

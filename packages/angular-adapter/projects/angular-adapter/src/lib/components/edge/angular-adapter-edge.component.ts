@@ -9,7 +9,7 @@ import {
 } from '../../directives';
 import { AngularAdapterEdgeLabelComponent } from '../edge-label/angular-adapter-edge-label.component';
 import { getOrthogonalPath } from '../../utils/get-orthogonal-paths';
-import { getStraightPath } from '../../utils/get-paths';
+import { getStraightPath } from '../../utils/get-straight-paths';
 
 @Component({
   selector: 'angular-adapter-edge',
@@ -29,9 +29,7 @@ export class AngularAdapterEdgeComponent {
   data = input.required<Edge>();
 
   path = computed(() =>
-    // this.data().routing === 'orthogonal'
-    // Todo
-    true
+    this.data().routing === 'orthogonal'
       ? getOrthogonalPath(this.data().points || [])
       : getStraightPath(this.data().points || [])
   );

@@ -1,6 +1,6 @@
 import { Point } from '@angularflow/core';
 import { Orientation } from '../types';
-import { getStraightPath } from './get-paths';
+import { getStraightPath } from './get-straight-paths';
 
 // Todo: move to mock data?
 /** Radius for orthogonal edges. */
