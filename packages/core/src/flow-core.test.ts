@@ -4,7 +4,7 @@ import { FlowCore } from './flow-core';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockMetadata, mockNode } from './test-utils';
-import { CombinedMiddlewaresMetadata } from './types';
+import { CombinedMiddlewaresConfig } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
@@ -65,12 +65,12 @@ vi.mock('./model-lookup/model-lookup', () => ({
 
 describe('FlowCore', () => {
   let flowCore: FlowCore;
-  let mockModelAdapter: ModelAdapter<Metadata<CombinedMiddlewaresMetadata<[]>>>;
+  let mockModelAdapter: ModelAdapter<Metadata<CombinedMiddlewaresConfig<[]>>>;
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
-  let mockGetMetadata: Mock<() => Metadata<CombinedMiddlewaresMetadata<[]>>>;
+  let mockGetMetadata: Mock<() => Metadata<CombinedMiddlewaresConfig<[]>>>;
   const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {
@@ -89,7 +89,6 @@ describe('FlowCore', () => {
       onChange: vi.fn(),
       undo: vi.fn(),
       redo: vi.fn(),
-      updateMiddlewareMetadata: vi.fn(),
     };
 
     mockRenderer = {
@@ -173,9 +172,9 @@ describe('FlowCore', () => {
     });
 
     it('should delegate middleware unregistration to MiddlewareManager', () => {
-      flowCore.unregisterMiddleware('test');
+      flowCore.unregisterMiddleware('node-position-snap');
 
-      expect(mockMiddlewareManager.unregister).toHaveBeenCalledWith('test');
+      expect(mockMiddlewareManager.unregister).toHaveBeenCalledWith('node-position-snap');
     });
   });
 

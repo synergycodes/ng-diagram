@@ -46,17 +46,6 @@ export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
   setMetadata(metadataFn: (metadata: TMetadata) => TMetadata): void;
 
   /**
-   * Update middleware metadata with full type safety
-   * This method allows partial updates while maintaining type safety
-   * @param middlewareName - The name of the middleware to update
-   * @param state - The new state of the middleware
-   */
-  updateMiddlewareMetadata<TName extends keyof TMetadata['middlewaresMetadata']>(
-    middlewareName: TName,
-    state: TMetadata['middlewaresMetadata'][TName]
-  ): void;
-
-  /**
    * Register a callback to be called when the model changes
    * @param callback Function to be called on changes
    */

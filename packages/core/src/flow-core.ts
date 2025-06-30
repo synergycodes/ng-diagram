@@ -7,7 +7,7 @@ import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
-  CombinedMiddlewaresMetadata,
+  CombinedMiddlewaresConfig,
   Edge,
   EnvironmentInfo,
   Event,
@@ -26,8 +26,8 @@ import type {
 
 export class FlowCore<
   TMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<CombinedMiddlewaresMetadata<TMiddlewares>> = Metadata<
-    CombinedMiddlewaresMetadata<TMiddlewares>
+  TMetadata extends Metadata<CombinedMiddlewaresConfig<TMiddlewares>> = Metadata<
+    CombinedMiddlewaresConfig<TMiddlewares>
   >,
 > {
   private _model: ModelAdapter<TMetadata>;
@@ -51,11 +51,11 @@ export class FlowCore<
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.inputEventHandler = new InputEventHandler(this);
-    this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
+    this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
 
     this.init();
   }
@@ -118,8 +118,20 @@ export class FlowCore<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(name: string): void {
+  unregisterMiddleware(name: keyof TMetadata['middlewaresConfig']): void {
     this.middlewareManager.unregister(name);
+  }
+
+  /**
+   * Updates the configuration of a middleware
+   * @param name Name of the middleware to update
+   * @param metadata Metadata to update
+   */
+  updateMiddlewareConfig<TName extends keyof TMetadata['middlewaresConfig']>(
+    name: TName,
+    config: TMetadata['middlewaresConfig'][TName]
+  ): void {
+    this.middlewareManager.applyMiddlewareConfig(name, config);
   }
 
   /**

@@ -22,14 +22,13 @@ describe('AngularAdapterDiagramComponent', () => {
   const mockModel: ModelAdapter = {
     getNodes: vi.fn(),
     getEdges: vi.fn(),
-    getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresMetadata: {} })),
+    getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} })),
     setNodes: vi.fn(),
     setEdges: vi.fn(),
     setMetadata: vi.fn(),
     onChange: vi.fn(),
     undo: vi.fn(),
     redo: vi.fn(),
-    updateMiddlewareMetadata: vi.fn(),
   };
 
   beforeEach(async () => {

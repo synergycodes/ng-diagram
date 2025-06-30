@@ -54,12 +54,12 @@ model.setMiddlewareMetadata('node-rotation-snap', {
 
 ### Type Definitions
 
-#### `CombinedMiddlewaresMetadata<TCustomMiddlewares>`
+#### `CombinedMiddlewaresConfig<TCustomMiddlewares>`
 
 The type for middleware metadata that includes both default and custom middlewares.
 
 ```typescript
-type AppMiddlewareMetadata = CombinedMiddlewaresMetadata<typeof customMiddlewares>;
+type AppMiddlewareMetadata = CombinedMiddlewaresConfig<typeof customMiddlewares>;
 ```
 
 ## Best Practices

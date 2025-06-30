@@ -1,5 +1,5 @@
 import type {
-  CombinedMiddlewaresMetadata,
+  CombinedMiddlewaresConfig,
   Edge,
   EdgeLabel,
   EnvironmentInfo,
@@ -111,14 +111,14 @@ export const getSampleRotateEvent = (overrides: Partial<RotateEvent> = {}): Rota
   };
 };
 
-export const mockMetadata: Metadata<CombinedMiddlewaresMetadata<[]>> = {
+export const mockMetadata: Metadata<CombinedMiddlewaresConfig<[]>> = {
   viewport: { x: 0, y: 0, scale: 1 },
-  middlewaresMetadata: {
+  middlewaresConfig: {
     'node-position-snap': { snap: { x: 10, y: 10 } },
     'node-rotation-snap': { enabled: true, snap: 10 },
     'group-children-change-extent': { enabled: true },
     'group-children-move-extent': { enabled: true },
-    'edges-straight-routing': { enabled: true },
+    'edges-routing': { enabled: true },
   },
 };
 

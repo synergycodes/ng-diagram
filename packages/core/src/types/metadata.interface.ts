@@ -37,5 +37,5 @@ export interface Metadata<TMiddlewaresMetadata = unknown> {
   nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
-  middlewaresMetadata: TMiddlewaresMetadata;
+  middlewaresConfig: TMiddlewaresMetadata;
 }

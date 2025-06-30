@@ -23,7 +23,7 @@ const appliedMiddlewares = [loggerMiddleware] as const satisfies Middleware[];
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  model = signal(new SignalModelAdapter<typeof appliedMiddlewares>());
+  model = signal(new SignalModelAdapter());
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],

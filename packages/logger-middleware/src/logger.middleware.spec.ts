@@ -12,7 +12,7 @@ describe('LoggerMiddleware', () => {
     initialState = {
       nodes: [],
       edges: [],
-      metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresMetadata: {} },
+      metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} },
     };
     context = {
       initialState,
@@ -40,7 +40,7 @@ describe('LoggerMiddleware', () => {
         { id: 'node2', type: 'output', position: { x: 0, y: 0 }, data: {} },
       ],
       edges: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
-      metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresMetadata: {} },
+      metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} },
     };
     const newContext: MiddlewareContext<LoggerMiddlewareMetadata> = {
       ...context,

@@ -1,6 +1,6 @@
 import { FlowCore } from '../flow-core';
 import type {
-  CombinedMiddlewaresMetadata,
+  CombinedMiddlewaresConfig,
   FlowState,
   FlowStateUpdate,
   Metadata,
@@ -13,8 +13,8 @@ import { MiddlewareExecutor } from './middleware-executor';
 
 export class MiddlewareManager<
   TCustomMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<CombinedMiddlewaresMetadata<TCustomMiddlewares>> = Metadata<
-    CombinedMiddlewaresMetadata<TCustomMiddlewares>
+  TMetadata extends Metadata<CombinedMiddlewaresConfig<TCustomMiddlewares>> = Metadata<
+    CombinedMiddlewaresConfig<TCustomMiddlewares>
   >,
 > {
   private middlewareChain: MiddlewareChain = [];
@@ -40,6 +40,15 @@ export class MiddlewareManager<
     if (this.middlewareChain.find((m) => m.name === middleware.name)) {
       throw new Error(`Middleware ${middleware.name} already registered`);
     }
+
+    // Apply default metadata if it exists
+    if (middleware.defaultMetadata) {
+      this.applyMiddlewareConfig(
+        middleware.name as keyof TMetadata['middlewaresConfig'],
+        middleware.defaultMetadata as TMetadata['middlewaresConfig'][keyof TMetadata['middlewaresConfig']]
+      );
+    }
+
     this.middlewareChain.push(middleware);
     return () => this.unregister(middleware.name);
   }
@@ -48,9 +57,10 @@ export class MiddlewareManager<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregister(name: string): void {
+  unregister(name: keyof TMetadata['middlewaresConfig']): void {
     const index = this.middlewareChain.findIndex((middleware) => middleware.name === name);
     if (index !== -1) {
+      this.removeMiddlewareConfig(name);
       this.middlewareChain.splice(index, 1);
     }
   }
@@ -68,5 +78,33 @@ export class MiddlewareManager<
       this.middlewareChain
     );
     return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
+  }
+
+  /**
+   * Assigns middleware configuration with full type safety
+   * @param middlewareName - The name of the middleware to update
+   * @param config - The configuration of the middleware
+   */
+  applyMiddlewareConfig<TName extends keyof TMetadata['middlewaresConfig']>(
+    middlewareName: TName,
+    config?: TMetadata['middlewaresConfig'][TName]
+  ): void {
+    const state = this.flowCore.getState();
+
+    (state.metadata.middlewaresConfig as Record<string, unknown>)[middlewareName as string] = config || null;
+
+    this.flowCore.setState(state);
+  }
+
+  /**
+   * Removes a middleware configuration
+   * @param middlewareName Name of the middleware to remove
+   */
+  removeMiddlewareConfig<TName extends keyof TMetadata['middlewaresConfig']>(middlewareName: TName): void {
+    const state = this.flowCore.getState();
+
+    delete (state.metadata.middlewaresConfig as Record<string, unknown>)[middlewareName as string];
+
+    this.flowCore.setState(state);
   }
 }

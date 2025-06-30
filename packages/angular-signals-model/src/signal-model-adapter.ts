@@ -1,30 +1,16 @@
 import { Injectable, effect, signal } from '@angular/core';
-import type {
-  CombinedMiddlewaresMetadata,
-  Edge,
-  Metadata,
-  MiddlewareArray,
-  MiddlewaresMetadataFromMiddlewares,
-  ModelAdapter,
-  Node,
-} from '@angularflow/core';
+import type { Edge, Metadata, ModelAdapter, Node } from '@angularflow/core';
 
 @Injectable()
-export class SignalModelAdapter<
-  TCustomMiddlewares extends MiddlewareArray = [],
-  TMetadata extends Metadata<CombinedMiddlewaresMetadata<TCustomMiddlewares>> = Metadata<
-    CombinedMiddlewaresMetadata<TCustomMiddlewares>
-  >,
-> implements ModelAdapter<TMetadata>
-{
+export class SignalModelAdapter implements ModelAdapter {
   // Internal state signals
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
-  private metadata = signal<TMetadata>({
+  private metadata = signal<Metadata>({
     viewport: { x: 0, y: 0, scale: 1 },
-    middlewaresMetadata: {} as MiddlewaresMetadataFromMiddlewares<TCustomMiddlewares>,
-  } as TMetadata);
-  private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: TMetadata }) => void)[] = [];
+    middlewaresConfig: {},
+  });
+  private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void)[] = [];
 
   constructor() {
     effect(() => {
@@ -55,28 +41,15 @@ export class SignalModelAdapter<
     this.edges.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
-  getMetadata(): TMetadata {
+  getMetadata(): Metadata {
     return this.metadata();
   }
 
-  setMetadata(next: TMetadata | ((prev: TMetadata) => TMetadata)): void {
+  setMetadata(next: Metadata | ((prev: Metadata) => Metadata)): void {
     this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
-  updateMiddlewareMetadata<TName extends keyof TMetadata['middlewaresMetadata']>(
-    middlewareName: TName,
-    state: TMetadata['middlewaresMetadata'][TName]
-  ): void {
-    this.metadata.update((prev) => ({
-      ...prev,
-      middlewaresMetadata: {
-        ...prev.middlewaresMetadata,
-        [middlewareName]: state,
-      },
-    }));
-  }
-
-  onChange(callback: (data: { nodes: Node[]; edges: Edge[]; metadata: TMetadata }) => void): void {
+  onChange(callback: (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void): void {
     this.callbacks.push(callback);
   }
 

@@ -11,14 +11,13 @@ describe('FlowCoreProviderService', () => {
   const mockModelAdapter: ModelAdapter = {
     getNodes: vi.fn().mockReturnValue([]),
     getEdges: vi.fn().mockReturnValue([]),
-    getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 } }),
+    getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} }),
     setNodes: vi.fn(),
     setEdges: vi.fn(),
     setMetadata: vi.fn(),
     onChange: vi.fn(),
     undo: vi.fn(),
     redo: vi.fn(),
-    updateMiddlewareMetadata: vi.fn(),
   };
 
   beforeEach(() => {

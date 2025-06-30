@@ -14,4 +14,18 @@ export class ToolbarComponent {
   onTreeLayoutClick(): void {
     this.flowCoreProvider.provide().layout('Tree');
   }
+
+  onToggleGroupChildrenClick(): void {
+    const flowCore = this.flowCoreProvider.provide();
+    const model = flowCore.model;
+    const metadata = model.getMetadata();
+
+    // Get current state of the move extent middleware (both middlewares should be in sync)
+    const moveExtentEnabled = metadata.middlewaresConfig['group-children-move-extent'].enabled;
+    const changeExtentEnabled = metadata.middlewaresConfig['group-children-change-extent'].enabled;
+
+    // Toggle both middlewares
+    flowCore.updateMiddlewareConfig('group-children-move-extent', { enabled: !moveExtentEnabled });
+    flowCore.updateMiddlewareConfig('group-children-change-extent', { enabled: !changeExtentEnabled });
+  }
 }

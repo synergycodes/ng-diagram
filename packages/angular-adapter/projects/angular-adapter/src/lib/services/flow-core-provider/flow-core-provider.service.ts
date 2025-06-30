@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { CombinedMiddlewaresMetadata, FlowCore, Metadata, Middleware, ModelAdapter } from '@angularflow/core';
+import { CombinedMiddlewaresConfig, FlowCore, Metadata, Middleware, ModelAdapter } from '@angularflow/core';
 
 import { EventMapperService } from '../event-mapper/event-mapper.service';
 import { RendererService } from '../renderer/renderer.service';
@@ -13,7 +13,7 @@ export class FlowCoreProviderService {
 
   init(model: ModelAdapter<Metadata>, middlewares: Middleware[] = []): void {
     this.flowCore = new FlowCore(
-      model as ModelAdapter<Metadata<CombinedMiddlewaresMetadata<[]>>>,
+      model as ModelAdapter<Metadata<CombinedMiddlewaresConfig<[]>>>,
       this.renderer,
       this.eventMapper,
       detectEnvironment(),

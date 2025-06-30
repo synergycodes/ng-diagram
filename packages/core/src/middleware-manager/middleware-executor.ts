@@ -1,6 +1,6 @@
 import { FlowCore } from '../flow-core';
 import type {
-  CombinedMiddlewaresMetadata,
+  CombinedMiddlewaresConfig,
   Edge,
   FlowState,
   FlowStateUpdate,
@@ -15,8 +15,8 @@ import { isSamePoint, isSameSize } from '../utils';
 
 export class MiddlewareExecutor<
   TCustomMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<CombinedMiddlewaresMetadata<TCustomMiddlewares>> = Metadata<
-    CombinedMiddlewaresMetadata<TCustomMiddlewares>
+  TMetadata extends Metadata<CombinedMiddlewaresConfig<TCustomMiddlewares>> = Metadata<
+    CombinedMiddlewaresConfig<TCustomMiddlewares>
   >,
 > {
   readonly flowCore: FlowCore<TCustomMiddlewares, TMetadata>;
@@ -38,6 +38,7 @@ export class MiddlewareExecutor<
   private updatedNodeIdsToProps = new Map<string, Set<string>>();
   private updatedEdgeIdsToProps = new Map<string, Set<string>>();
   private updatedMetadataProps = new Set<keyof TMetadata>();
+  private updatedMiddlewaresMetadataProps = new Set<keyof TMetadata['middlewaresConfig']>();
 
   constructor(flowCore: FlowCore<TCustomMiddlewares, TMetadata>, middlewareChain: MiddlewareChain) {
     this.flowCore = flowCore;
@@ -76,6 +77,8 @@ export class MiddlewareExecutor<
     anyEdgesRemoved: () => this.removedEdgesIds.size > 0,
     getAffectedNodeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToNodeIds.get(prop) ?? [])]),
     getAffectedEdgeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToEdgeIds.get(prop) ?? [])]),
+    hasMiddlewareMetadataChanged: (middlewareName: string) =>
+      this.updatedMiddlewaresMetadataProps.has(middlewareName as keyof TMetadata['middlewaresConfig']),
   });
 
   private getState = (): FlowState<TMetadata> => ({
@@ -84,7 +87,7 @@ export class MiddlewareExecutor<
     metadata: this.metadata,
   });
 
-  private getContext = (): MiddlewareContext<unknown> => ({
+  private getContext = (middlewareName: string): MiddlewareContext<unknown> => ({
     state: this.getState(),
     nodesMap: this.nodesMap,
     edgesMap: this.edgesMap,
@@ -94,7 +97,8 @@ export class MiddlewareExecutor<
     helpers: this.helpers(),
     history: this.history,
     initialUpdate: this.initialStateUpdate,
-    middlewareMetadata: undefined,
+    middlewareMetadata:
+      this.metadata.middlewaresConfig?.[middlewareName as keyof typeof this.metadata.middlewaresConfig],
   });
 
   private resolveMiddlewares = (): Promise<FlowState<TMetadata> | undefined> => {
@@ -136,9 +140,7 @@ export class MiddlewareExecutor<
             finalResolve(undefined);
           };
 
-          const context = this.getContext();
-          context.middlewareMetadata =
-            this.metadata.middlewaresMetadata?.[middleware.name as keyof typeof this.metadata.middlewaresMetadata];
+          const context = this.getContext(middleware.name);
 
           middleware.execute(context, next, cancel);
         });
@@ -162,6 +164,11 @@ export class MiddlewareExecutor<
       Object.keys(stateUpdate.metadataUpdate ?? {}).forEach((key) => {
         this.updatedMetadataProps.add(key as keyof TMetadata);
       });
+      if (stateUpdate.metadataUpdate.middlewaresConfig) {
+        Object.keys(stateUpdate.metadataUpdate.middlewaresConfig).forEach((key) => {
+          this.updatedMiddlewaresMetadataProps.add(key as keyof TMetadata['middlewaresConfig']);
+        });
+      }
       this.metadata = { ...this.metadata, ...stateUpdate.metadataUpdate };
     }
   };

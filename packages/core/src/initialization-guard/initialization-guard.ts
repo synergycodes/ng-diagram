@@ -1,5 +1,5 @@
 import { FlowCore } from '../flow-core';
-import { CombinedMiddlewaresMetadata, EdgeLabel, FlowState, Metadata, Port } from '../types';
+import { CombinedMiddlewaresConfig, EdgeLabel, FlowState, Metadata, Port } from '../types';
 
 export class InitializationGuard {
   private onInitialized: () => void = () => null;
@@ -130,7 +130,7 @@ export class InitializationGuard {
     this.flowCore.setState({
       ...currentState,
       ...state,
-    } as FlowState<Metadata<CombinedMiddlewaresMetadata<[]>>>);
+    } as FlowState<Metadata<CombinedMiddlewaresConfig<[]>>>);
     this.checkIfInitialized();
   }
 
