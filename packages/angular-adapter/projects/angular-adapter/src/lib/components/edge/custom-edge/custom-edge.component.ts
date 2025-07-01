@@ -39,8 +39,12 @@ export class AngularAdapterCustomEdgeComponent {
     return this.data().selected ? '#888' : '#bbb';
   });
 
-  markerStart = computed(
-    () => this.customMarkerStart() ?? (this.data()?.sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null)
+  markerStart = computed(() =>
+    this.customMarkerStart()
+      ? `url(#${this.customMarkerStart()})`
+      : this.data()?.targetArrowhead
+        ? `url(#${this.data().targetArrowhead})`
+        : null
   );
 
   markerEnd = computed(() =>
