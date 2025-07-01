@@ -73,8 +73,9 @@ export const edgesRoutingMiddleware: Middleware = {
           helpers.checkIfNodeChanged(edge.target);
 
         const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
-        const shouldRouteCustomEdge = isCustomEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
-
+        const shouldRouteCustomEdge =
+          isCustomEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init') && !!edge.type;
+        console.log(edge);
         if (shouldRouteCustomEdge) {
           const { sourcePoint, targetPoint } = getPoints(edge, nodesMap);
 

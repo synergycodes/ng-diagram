@@ -31,7 +31,6 @@ export const mockGroupNode: Node = {
 
 export const mockEdge: Edge = {
   id: 'edge1',
-  type: 'edge',
   source: '1',
   target: '2',
   selected: false,
