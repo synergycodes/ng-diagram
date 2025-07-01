@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
+  EdgeTemplateMap,
+  IEdgeTemplate,
   INodeTemplate,
   Middleware,
   NodeTemplateMap,
-  EdgeTemplateMap,
-  IEdgeTemplate,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
@@ -13,8 +13,8 @@ import { GroupNodeComponent } from './node-template/group-node/group-node.compon
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
-import { ToolbarComponent } from './toolbar/toolbar.component';
 import { BezierEdgeComponent } from './edge-template/bezier-edge/bezier-edge.component';
+import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @Component({
   selector: 'app-root',
@@ -42,9 +42,10 @@ export class AppComponent {
         position: { x: 100, y: 200 },
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
         resizable: true,
+        angle: 0,
       },
-      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
-      { id: '3', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
+      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true, angle: 0 },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, angle: 0, groupId: '2' },
       {
         id: '4',
         type: 'group',
@@ -62,7 +63,6 @@ export class AppComponent {
         resizable: true,
       },
     ]);
-
     this.model().setEdges([
       {
         id: '1',
@@ -73,17 +73,28 @@ export class AppComponent {
         targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-right',
         targetPort: 'port-left',
-        routing: 'orthogonal',
+        type: 'bezier-edge',
       },
       {
         id: '2',
         source: '2',
         target: '3',
         data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-right',
-        targetPort: 'port-left',
-        routing: 'bezier-edge',
-        type: 'bezier-edge',
+        targetPort: 'port-left-1',
+        routing: 'orthogonal',
+      },
+      {
+        id: '4',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left-3',
       },
     ]);
   }

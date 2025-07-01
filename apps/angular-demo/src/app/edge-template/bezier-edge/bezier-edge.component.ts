@@ -18,7 +18,7 @@ export class BezierEdgeComponent implements IEdgeTemplate {
   data = input.required<Edge>();
 
   points: Point[] = [];
-  path: string = '';
+  path = '';
   private prevSourcePosition?: Point;
   private prevTargetPosition?: Point;
 
@@ -33,13 +33,12 @@ export class BezierEdgeComponent implements IEdgeTemplate {
         if (currentSource && currentTarget) {
           const points = this.bezierControlPoints(currentSource, currentTarget);
 
-          this.path = points
-            ? points.length === 4
+          this.path =
+            points?.length === 4
               ? `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`
-              : points.length === 2
+              : points?.length === 2
                 ? `M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y}`
-                : ''
-            : '';
+                : '';
 
           this.points = points;
         }
