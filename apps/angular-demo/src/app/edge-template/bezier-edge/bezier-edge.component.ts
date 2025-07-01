@@ -36,18 +36,12 @@ export class BezierEdgeComponent implements IEdgeTemplate {
   private prevTargetPosition?: Point;
 
   constructor() {
-    console.log('BezierEdgeComponent');
     effect(() => {
       const currentSource = this.data().sourcePosition;
       const currentTarget = this.data().targetPosition;
-      console.log('e');
-      // Sprawdź, czy zmienił się sourcePosition lub targetPosition
       const sourceChanged = this.prevSourcePosition !== undefined && this.prevSourcePosition !== currentSource;
       const targetChanged = this.prevTargetPosition !== undefined && this.prevTargetPosition !== currentTarget;
-      console.log('currentSource', currentSource);
-      console.log('currentSource', currentTarget);
       if (sourceChanged || targetChanged || !this.path) {
-        console.log('sourceChanged', sourceChanged);
         if (currentSource && currentTarget) {
           const points = this.bezierControlPoints(currentSource, currentTarget);
           const path = points
@@ -65,9 +59,6 @@ export class BezierEdgeComponent implements IEdgeTemplate {
   }
 
   bezierControlPoints = (source: Point, target: Point) => {
-    // const [source, target] = this.getSourceAndTarget();
-    // const source = this.data().sourcePosition;
-    // const target  = this.data().targetPosition;
     if (!source || !target) return [];
 
     const c1 = { x: source.x + 100, y: source.y };
@@ -75,14 +66,4 @@ export class BezierEdgeComponent implements IEdgeTemplate {
 
     return [source, c1, c2, target];
   };
-
-  // path = computed(() => {
-  //   console.log("thisdata", this.data())
-  //   const source = this.data().sourcePosition
-  //   const points = this.bezierControlPoints();
-  //   console.log("points", points)
-  //   return ''
-  //   // if (!points) return '';
-  //   // return `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`;
-  // });
 }

@@ -81,11 +81,12 @@ export const edgesRoutingMiddleware: Middleware = {
             ...label,
             position: getPointOnPath(edge.points|| [], label.positionOnEdge),
           }));
+          console.log('edeg',edge)
           edgesToUpdate.push({
             id: edge.id,
             sourcePosition: sourcePoint || undefined,
             targetPosition: targetPoint || undefined,
-            // labels: updatedLabels,
+            labels: updatedLabels,
 
           });
         }
