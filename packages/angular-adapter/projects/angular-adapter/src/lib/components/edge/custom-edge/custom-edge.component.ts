@@ -71,22 +71,22 @@ export class AngularAdapterCustomEdgeComponent {
   private prevPoints: Point[] | undefined;
 
   constructor() {
-    effect(() => {
-      const currentPoints = this.points();
-      const prevPoints = this.prevPoints;
-
-      if (prevPoints !== undefined && !this.compare(prevPoints, currentPoints)) {
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.data().id,
-          edgeChanges: {
-            points: currentPoints,
-            sourcePosition: currentPoints[0],
-            targetPosition: currentPoints[currentPoints.length - 1],
-          },
-        });
-      }
-
-      this.prevPoints = currentPoints;
-    });
+    // effect(() => {
+    //   const currentPoints = this.points();
+    //   const prevPoints = this.prevPoints;
+    //
+    //   if (prevPoints !== undefined && !this.compare(prevPoints, currentPoints)) {
+    //     this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
+    //       id: this.data().id,
+    //       edgeChanges: {
+    //         points: currentPoints,
+    //         sourcePosition: currentPoints[0],
+    //         targetPosition: currentPoints[currentPoints.length - 1],
+    //       },
+    //     });
+    //   }
+    //
+    //   this.prevPoints = currentPoints;
+    // });
   }
 }

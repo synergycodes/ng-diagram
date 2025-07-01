@@ -64,13 +64,31 @@ export const edgesRoutingMiddleware: Middleware = {
 
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
+        const isCustomEdgeRouting = !!edge.type;
         const isProperEdgeRouting =
           edge.routing === 'straight' || edge.routing === 'orthogonal' || edge.routing === undefined;
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
           helpers.checkIfNodeChanged(edge.target);
+
         const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
+        const shouldRouteCustomEdge = isCustomEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
+
+        if (shouldRouteCustomEdge) {
+          const { sourcePoint, targetPoint} = getPoints(edge, nodesMap);
+          const updatedLabels = edge.labels?.map((label) => ({
+            ...label,
+            position: getPointOnPath(edge.points|| [], label.positionOnEdge),
+          }));
+          edgesToUpdate.push({
+            id: edge.id,
+            sourcePosition: sourcePoint || undefined,
+            targetPosition: targetPoint || undefined,
+            // labels: updatedLabels,
+
+          });
+        }
 
         if (!shouldRoute) {
           return;
