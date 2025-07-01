@@ -53,9 +53,9 @@ describe('AngularAdapterCustomEdgeComponent', () => {
   });
 
   it('should have required edge input', () => {
-    fixture.componentRef.setInput('data', mockEdge );
-    fixture.componentRef.setInput('path', mockPath );
-    fixture.componentRef.setInput('points', mockEdge.points );
+    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('path', mockPath);
+    fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
     expect(component.data).toBeDefined();
@@ -66,8 +66,8 @@ describe('AngularAdapterCustomEdgeComponent', () => {
     mockEdge.points = [];
 
     fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', '' );
-    fixture.componentRef.setInput('points', mockEdge.points );
+    fixture.componentRef.setInput('path', '');
+    fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
     expect(component.path()).toBe('');
@@ -77,8 +77,8 @@ describe('AngularAdapterCustomEdgeComponent', () => {
     mockEdge.selected = true;
 
     fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', mockPath );
-    fixture.componentRef.setInput('points', mockEdge.points );
+    fixture.componentRef.setInput('path', mockPath);
+    fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('#888');
@@ -88,9 +88,9 @@ describe('AngularAdapterCustomEdgeComponent', () => {
     mockEdge.selected = false;
 
     fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', mockPath );
-    fixture.componentRef.setInput('points', mockEdge.points );
-    fixture.componentRef.setInput('customStroke','red' );
+    fixture.componentRef.setInput('path', mockPath);
+    fixture.componentRef.setInput('points', mockEdge.points);
+    fixture.componentRef.setInput('customStroke', 'red');
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('red');
@@ -98,9 +98,9 @@ describe('AngularAdapterCustomEdgeComponent', () => {
 
   it('should return proper marker when edge has source arrowhead', () => {
     fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', mockPath );
-    fixture.componentRef.setInput('points', mockEdge.points );
-    fixture.componentRef.setInput('customMarkerStart','arrowhead' );
+    fixture.componentRef.setInput('path', mockPath);
+    fixture.componentRef.setInput('points', mockEdge.points);
+    fixture.componentRef.setInput('customMarkerStart', 'arrowhead');
     fixture.detectChanges();
 
     expect(component.markerStart()).toBe('url(#arrowhead)');
@@ -108,9 +108,9 @@ describe('AngularAdapterCustomEdgeComponent', () => {
 
   it('should return proper marker when edge has target arrowhead', () => {
     fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', mockPath );
-    fixture.componentRef.setInput('points', mockEdge.points );
-    fixture.componentRef.setInput('customMarkerEnd','arrowhead' );
+    fixture.componentRef.setInput('path', mockPath);
+    fixture.componentRef.setInput('points', mockEdge.points);
+    fixture.componentRef.setInput('customMarkerEnd', 'arrowhead');
     fixture.detectChanges();
 
     expect(component.markerEnd()).toBe('url(#arrowhead)');
@@ -118,8 +118,8 @@ describe('AngularAdapterCustomEdgeComponent', () => {
 
   it('should return proper stroke opacity when edge is temporary', () => {
     fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
-    fixture.componentRef.setInput('path', mockPath );
-    fixture.componentRef.setInput('points', mockEdge.points );
+    fixture.componentRef.setInput('path', mockPath);
+    fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
     expect(component.strokeOpacity()).toBe(0.5);
