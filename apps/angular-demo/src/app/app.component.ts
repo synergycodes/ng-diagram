@@ -14,7 +14,7 @@ import { ImageNodeComponent } from './node-template/image-node/image-node.compon
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
-import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
+import { BezierEdgeComponent } from './edge-template/bezier-edge/bezier-edge.component';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +31,7 @@ export class AppComponent {
     ['resizable', ResizableNodeComponent],
     ['group', GroupNodeComponent],
   ]);
-  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<IEdgeTemplate>>([['button-edge', ButtonEdgeComponent]]);
+  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<IEdgeTemplate>>([['bezier-edge', BezierEdgeComponent]]);
   middlewares = signal<Middleware[]>([loggerMiddleware]);
 
   constructor() {
@@ -44,6 +44,7 @@ export class AppComponent {
         resizable: true,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
+      { id: '3', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
       {
         id: '4',
         type: 'group',
@@ -75,14 +76,13 @@ export class AppComponent {
       },
       {
         id: '2',
-        source: '1',
-        target: '2',
+        source: '2',
+        target: '3',
         data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-top',
+        sourcePort: 'port-right',
         targetPort: 'port-left',
-        routing: 'button-edge',
+        routing: 'bezier-edge',
+        type: 'bezier-edge',
       },
     ]);
   }

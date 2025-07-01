@@ -1,7 +1,7 @@
 import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortLocation } from '../../../types';
 import { getPointOnPath, isSamePoint } from '../../../utils';
 import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
-import { getSourceTarget } from './get-source-target.ts';
+import { getSourceTargetPositions } from './get-source-target-positions.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -19,7 +19,7 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
   ]);
 
 const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
-  const sourceTarget = getSourceTarget(edge, nodesMap);
+  const sourceTarget = getSourceTargetPositions(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
   const sourcePoint = source?.x
@@ -36,9 +36,7 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
     : undefined;
 
   const points =
-    // edge.routing === 'orthogonal'
-    // Todo
-    true
+    edge.routing === 'orthogonal'
       ? getOrthogonalPathPoints(source, target)
       : [sourcePoint, targetPoint].filter((point) => !!point);
 
@@ -73,6 +71,7 @@ export const edgesRoutingMiddleware: Middleware = {
           helpers.checkIfNodeChanged(edge.source) ||
           helpers.checkIfNodeChanged(edge.target);
         const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
+
         if (!shouldRoute) {
           return;
         }

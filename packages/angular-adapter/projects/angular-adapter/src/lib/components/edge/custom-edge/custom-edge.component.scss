@@ -1,0 +1,15 @@
+svg {
+  overflow: visible;
+  position: absolute;
+  cursor: pointer;
+
+  path {
+    pointer-events: visibleStroke;
+    cursor: pointer;
+  }
+}
+:host {
+   position: absolute;
+   user-select: none;
+ }
+

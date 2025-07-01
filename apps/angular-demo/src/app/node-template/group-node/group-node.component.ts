@@ -7,6 +7,7 @@ import { INodeTemplate, Node } from '@angularflow/angular-adapter';
   templateUrl: './group-node.component.html',
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class GroupNodeComponent implements INodeTemplate {
   data = input.required<Node>();
