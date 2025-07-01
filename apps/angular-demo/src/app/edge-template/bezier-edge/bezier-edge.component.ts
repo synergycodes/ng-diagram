@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
 import {
   AngularAdapterCustomEdgeComponent,
+  AngularAdapterEdgeLabelComponent,
   Edge,
   IEdgeTemplate,
   Point,
-  SourceTargetPositionService,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -12,26 +12,13 @@ import {
   templateUrl: './bezier-edge.component.html',
   styleUrls: ['./bezier-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AngularAdapterCustomEdgeComponent],
+  imports: [AngularAdapterCustomEdgeComponent, AngularAdapterEdgeLabelComponent, AngularAdapterEdgeLabelComponent],
 })
 export class BezierEdgeComponent implements IEdgeTemplate {
   data = input.required<Edge>();
-  private readonly sourceTargetProvider = inject(SourceTargetPositionService);
-
-  sourcePosition = computed<Point | undefined | unknown>(() => this.data()?.['sourcePosition']);
-  targetPosition = computed<Point | undefined | unknown>(() => this.data()?.['targetPosition']);
 
   points: Point[] = [];
   path: string = '';
-
-  private getSourceAndTarget() {
-    const edge = this.data();
-    if (!edge) return [];
-    const [source, target] = this.sourceTargetProvider.getSourceAndTargetPositions(edge);
-    if (!source || !target) return [];
-    return [source, target];
-  }
-
   private prevSourcePosition?: Point;
   private prevTargetPosition?: Point;
 
@@ -41,21 +28,30 @@ export class BezierEdgeComponent implements IEdgeTemplate {
       const currentTarget = this.data().targetPosition;
       const sourceChanged = this.prevSourcePosition !== undefined && this.prevSourcePosition !== currentSource;
       const targetChanged = this.prevTargetPosition !== undefined && this.prevTargetPosition !== currentTarget;
+
       if (sourceChanged || targetChanged || !this.path) {
         if (currentSource && currentTarget) {
           const points = this.bezierControlPoints(currentSource, currentTarget);
-          const path = points
-            ? `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`
+
+          this.path = points
+            ? points.length === 4
+              ? `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`
+              : points.length === 2
+                ? `M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y}`
+                : ''
             : '';
 
           this.points = points;
-          this.path = path;
         }
       }
 
       this.prevSourcePosition = currentSource;
       this.prevTargetPosition = currentTarget;
     });
+  }
+
+  onButtonClick() {
+    console.log('onClick');
   }
 
   bezierControlPoints = (source: Point, target: Point) => {

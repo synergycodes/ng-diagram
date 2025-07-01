@@ -76,18 +76,18 @@ export const edgesRoutingMiddleware: Middleware = {
         const shouldRouteCustomEdge = isCustomEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
 
         if (shouldRouteCustomEdge) {
-          const { sourcePoint, targetPoint} = getPoints(edge, nodesMap);
+          const { sourcePoint, targetPoint } = getPoints(edge, nodesMap);
+
           const updatedLabels = edge.labels?.map((label) => ({
             ...label,
-            position: getPointOnPath(edge.points|| [], label.positionOnEdge),
+            position: getPointOnPath(edge.points || [], label.positionOnEdge),
           }));
-          console.log('edeg',edge)
+
           edgesToUpdate.push({
             id: edge.id,
             sourcePosition: sourcePoint || undefined,
             targetPosition: targetPoint || undefined,
             labels: updatedLabels,
-
           });
         }
 

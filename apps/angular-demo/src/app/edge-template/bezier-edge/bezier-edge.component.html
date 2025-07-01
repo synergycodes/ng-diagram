@@ -1,6 +1,8 @@
 <angular-adapter-custom-edge
   [path]="path" [data]="data()" [points]="points" [customStroke]="'red'"
-  [customMarkerEnd]="'angularflow-arrow'"
+  [customMarkerEnd]="'angularflow-arrow'" [displayLabel]="false"
 >
-  test
+  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
+    <button (click)="onButtonClick()">Test</button>
+  </angular-adapter-edge-label>
 </angular-adapter-custom-edge>

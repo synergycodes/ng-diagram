@@ -62,6 +62,7 @@ export class AppComponent {
         resizable: true,
       },
     ]);
+
     this.model().setEdges([
       {
         id: '1',

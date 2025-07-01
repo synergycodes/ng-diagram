@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, isSamePoint, Point } from '@angularflow/core';
+import { Edge, equalPointsArrays, Point } from '@angularflow/core';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 import {
   PointerDownEventListenerDirective,
@@ -33,6 +33,7 @@ export class AngularAdapterCustomEdgeComponent {
   customStroke = input<string>();
   customMarkerStart = input<string>();
   customMarkerEnd = input<string>();
+  displayLabel = input<boolean>();
 
   stroke = computed(() => {
     if (this.customStroke()) return this.customStroke();
@@ -57,24 +58,13 @@ export class AngularAdapterCustomEdgeComponent {
 
   strokeOpacity = computed(() => (this.data().temporary ? 0.5 : 1));
 
-  compare = (path1: Point[], path2: Point[]) => {
-    if (path1.length !== path2.length) return false;
-
-    for (let i = 0; i < path1.length; i++) {
-      if (!isSamePoint(path1[i], path2[i])) {
-        return false;
-      }
-    }
-    return true;
-  };
-
   private prevPoints: Point[] | undefined;
 
   constructor() {
     effect(() => {
       const currentPoints = this.points();
       const prevPoints = this.prevPoints;
-      if (prevPoints !== undefined && !this.compare(prevPoints, currentPoints)) {
+      if (prevPoints !== undefined && !equalPointsArrays(prevPoints, currentPoints)) {
         this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
           id: this.data().id,
           edgeChanges: {
