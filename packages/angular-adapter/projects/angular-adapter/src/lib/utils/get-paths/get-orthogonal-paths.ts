@@ -1,5 +1,5 @@
 import { Point } from '@angularflow/core';
-import { Orientation } from '../types';
+import { Orientation } from '../../types';
 import { getStraightPath } from './get-straight-paths';
 
 // Todo: move to mock data?

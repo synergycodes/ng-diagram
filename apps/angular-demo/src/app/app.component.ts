@@ -83,7 +83,7 @@ export class AppComponent {
         targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-right',
         targetPort: 'port-left-1',
-        routing: 'orthogonal',
+        routing: 'bezier',
       },
       {
         id: '4',

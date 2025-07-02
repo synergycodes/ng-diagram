@@ -1,7 +1,17 @@
-import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortLocation } from '../../../types';
+import {
+  Edge,
+  FlowStateUpdate,
+  Middleware,
+  MiddlewareContext,
+  Node,
+  PortLocation,
+  ROUTING,
+  RoutingConfiguration,
+} from '../../../types';
 import { getPointOnPath, isSamePoint } from '../../../utils';
 import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
 import { getSourceTargetPositions } from './get-source-target-positions.ts';
+import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -18,7 +28,7 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
     'routing',
   ]);
 
-const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
+const getPoints = (edge: Edge, nodesMap: Map<string, Node>, config?: RoutingConfiguration) => {
   const sourceTarget = getSourceTargetPositions(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
@@ -35,11 +45,19 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>) => {
       }
     : undefined;
 
-  const points =
-    edge.routing === 'orthogonal'
-      ? getOrthogonalPathPoints(source, target)
-      : [sourcePoint, targetPoint].filter((point) => !!point);
+  let points = [];
 
+  switch (edge.routing) {
+    case 'orthogonal':
+      points = getOrthogonalPathPoints(source, target);
+      break;
+    case 'bezier':
+      points = getBezierPathPoints(source, target, config?.bezier?.bezierControlOffset);
+      break;
+    default:
+      points = [sourcePoint, targetPoint].filter((point) => !!point);
+      break;
+  }
   return { sourcePoint, targetPoint, points };
 };
 
@@ -65,8 +83,7 @@ export const edgesRoutingMiddleware: Middleware = {
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
         const isCustomEdgeRouting = !!edge.type;
-        const isProperEdgeRouting =
-          edge.routing === 'straight' || edge.routing === 'orthogonal' || edge.routing === undefined;
+        const isProperEdgeRouting = ROUTING.includes(edge.routing);
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
@@ -77,7 +94,8 @@ export const edgesRoutingMiddleware: Middleware = {
           isCustomEdgeRouting &&
           (isEdgeOrNodesChanged || modelActionType === 'init') &&
           edge.type &&
-          edge.type !== 'edge';
+          edge.type !== 'edge' &&
+          !isProperEdgeRouting;
 
         if (shouldRouteCustomEdge) {
           const { sourcePoint, targetPoint } = getPoints(edge, nodesMap);
@@ -99,7 +117,7 @@ export const edgesRoutingMiddleware: Middleware = {
           return;
         }
 
-        const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
+        const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap, metadata?.routingConfiguration);
 
         if (
           edge.points?.length === points.length &&

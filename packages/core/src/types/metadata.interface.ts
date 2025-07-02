@@ -29,6 +29,17 @@ export interface LayoutConfiguration {
 }
 
 /**
+ * Interface representing configurable properties of the routing.
+ */
+export interface RoutingConfiguration {
+  bezier?: {
+    bezierControlOffset?: number;
+  };
+  orthogonal?: {};
+  straight?: {};
+}
+
+/**
  * Interface representing the metadata of the diagram.
  */
 export interface Metadata {
@@ -37,6 +48,7 @@ export interface Metadata {
   nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
+  routingConfiguration?: RoutingConfiguration;
 
   [key: string]: unknown;
 }

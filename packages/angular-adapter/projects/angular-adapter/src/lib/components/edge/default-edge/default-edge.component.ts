@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Edge } from '@angularflow/core';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
-import { getOrthogonalPath } from '../../../utils/get-orthogonal-paths';
-import { getStraightPath } from '../../../utils/get-straight-paths';
+import { getOrthogonalPath } from '../../../utils/get-paths/get-orthogonal-paths';
+import { getStraightPath } from '../../../utils/get-paths/get-straight-paths';
 import { IEdgeTemplate } from '../../../types';
+import { getBezierPath } from '../../../utils/get-paths/get-bezier-paths';
 
 @Component({
   selector: 'angular-adapter-default-edge',
@@ -18,7 +19,9 @@ export class DefaultEdgeComponent implements IEdgeTemplate {
   path = computed(() =>
     this.data().routing === 'orthogonal'
       ? getOrthogonalPath(this.data().points || [])
-      : getStraightPath(this.data().points || [])
+      : this.data().routing === 'bezier'
+        ? getBezierPath(this.data().points || [])
+        : getStraightPath(this.data().points || [])
   );
   stroke = computed(() => (this.data().selected ? '#888' : '#bbb'));
   markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null));
