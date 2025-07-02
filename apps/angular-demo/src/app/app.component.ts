@@ -6,14 +6,12 @@ import {
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
-import { loggerMiddleware } from '@angularflow/logger-middleware';
+import { appMiddlewares } from './flow/flow.config';
 import { GroupNodeComponent } from './node-template/group-node/group-node.component';
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
-
-const appliedMiddlewares = [loggerMiddleware] as const satisfies Middleware[];
 
 @Component({
   selector: 'app-root',
@@ -30,7 +28,7 @@ export class AppComponent {
     ['resizable', ResizableNodeComponent],
     ['group', GroupNodeComponent],
   ]);
-  middlewares = signal<Middleware[]>(appliedMiddlewares);
+  middlewares = signal<Middleware[]>(appMiddlewares);
 
   constructor() {
     this.model().setNodes([

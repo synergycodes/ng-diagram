@@ -1,6 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
-import { Edge, Middleware, ModelAdapter, Node } from '@angularflow/core';
+import {
+  Edge,
+  Metadata,
+  MiddlewareChain,
+  MiddlewaresConfigFromMiddlewares,
+  ModelAdapter,
+  Node,
+} from '@angularflow/core';
 
 import {
   KeyDownEventListenerDirective,
@@ -44,7 +51,12 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     WheelEventListenerDirective,
   ],
 })
-export class AngularAdapterDiagramComponent<TAdapter extends ModelAdapter> {
+export class AngularAdapterDiagramComponent<
+  TMiddlewares extends MiddlewareChain = [],
+  TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
+    Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
+  >,
+> {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
@@ -56,7 +68,7 @@ export class AngularAdapterDiagramComponent<TAdapter extends ModelAdapter> {
   /**
    * The starting middlewares to use in the Flow Core.
    */
-  middlewares = input<Middleware[]>([]);
+  middlewares = input<TMiddlewares>([] as unknown as TMiddlewares);
 
   /**
    * The node template map to use for the diagram.
