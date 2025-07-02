@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, HostBinding, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, HostBinding, inject, input, output } from '@angular/core';
+import { RotateHandleConfiguration } from '@angularflow/core';
+import { FlowCoreProviderService } from '../../../../services';
 
 @Component({
   selector: 'angular-adapter-rotate-handle',
@@ -13,21 +15,17 @@ import { ChangeDetectionStrategy, Component, computed, HostBinding, input, outpu
 })
 export class RotateHandleComponent {
   isRotating = input.required<boolean>();
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  offset = input<{
-    top?: number | string;
-    left?: number | string;
-    right?: number | string;
-    bottom?: number | string;
-  }>();
+  metadata = this.getMetadata();
 
   computedOffset = computed(() => {
-    const current = this.offset() ?? {};
+    const current = this.metadata['rotateHandleOffset'] as RotateHandleConfiguration;
     return {
-      top: current.top ?? -20,
-      right: current.right ?? -36,
-      bottom: current.bottom,
-      left: current.left,
+      top: current?.top ?? -20,
+      right: current?.right ?? -36,
+      bottom: current?.bottom ?? null,
+      left: current?.left ?? null,
     };
   });
 
@@ -41,7 +39,7 @@ export class RotateHandleComponent {
     this.pointerDownEvent.emit({ event });
   }
 
-  private formatPositionValue(value?: string | number): string | null {
+  private formatPositionValue(value?: string | number | null): string | null {
     return value == null ? null : typeof value === 'number' ? `${value}px` : value;
   }
 
@@ -59,5 +57,9 @@ export class RotateHandleComponent {
 
   @HostBinding('style.bottom') get styleBottom() {
     return this.formatPositionValue(this.computedOffset().bottom);
+  }
+
+  private getMetadata() {
+    return this.flowCoreProvider.provide().getState().metadata;
   }
 }
