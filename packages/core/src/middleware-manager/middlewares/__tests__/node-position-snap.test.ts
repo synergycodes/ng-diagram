@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FlowCore } from '../../../flow-core';
 import { mockNode } from '../../../test-utils';
-import type { MiddlewareContext, Node } from '../../../types';
+import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../types';
 import { snapNumber } from '../../../utils';
 import type { MiddlewareExecutor } from '../../middleware-executor';
 import { nodePositionSnapMiddleware, NodePositionSnapMiddlewareMetadata } from '../node-position-snap';
 
-type Helpers = ReturnType<MiddlewareExecutor['helpers']>;
+type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
 
 const SNAP_GRID = 10;
 
@@ -14,7 +14,11 @@ describe('nodePositionSnapMiddleware', () => {
   let helpers: Partial<Helpers>;
   let nodesMap: Map<string, Node>;
   let flowCore: Pick<FlowCore, 'getNodeById'>;
-  let context: MiddlewareContext<NodePositionSnapMiddlewareMetadata>;
+  let context: MiddlewareContext<
+    [],
+    Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+    NodePositionSnapMiddlewareMetadata
+  >;
   let nextMock: ReturnType<typeof vi.fn>;
   let cancelMock: ReturnType<typeof vi.fn>;
 
@@ -36,7 +40,11 @@ describe('nodePositionSnapMiddleware', () => {
       middlewareMetadata: {
         snap: { x: SNAP_GRID, y: SNAP_GRID },
       },
-    } as unknown as MiddlewareContext<NodePositionSnapMiddlewareMetadata>;
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      NodePositionSnapMiddlewareMetadata
+    >;
   });
 
   it('should call next if no position property changed', () => {

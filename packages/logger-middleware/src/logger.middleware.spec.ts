@@ -1,11 +1,11 @@
-import type { FlowState, MiddlewareContext } from '@angularflow/core';
+import type { FlowState, Metadata, MiddlewareContext } from '@angularflow/core';
 import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
 import { loggerMiddleware, LoggerMiddlewareMetadata } from './logger.middleware';
 
 describe('LoggerMiddleware', () => {
   let consoleLogSpy: MockInstance;
   let initialState: FlowState;
-  let context: MiddlewareContext<LoggerMiddlewareMetadata>;
+  let context: MiddlewareContext<[], Metadata<Record<string, unknown>>, LoggerMiddlewareMetadata>;
   const nextMock = vi.fn();
 
   beforeEach(() => {
@@ -20,10 +20,10 @@ describe('LoggerMiddleware', () => {
       nodesMap: new Map(),
       edgesMap: new Map(),
       metadata: initialState.metadata,
-      history: [{ name: 'init', stateUpdate: { nodesToAdd: [] } }],
+      history: [],
       initialUpdate: { nodesToAdd: [] },
       middlewareMetadata: { enabled: true },
-    } as unknown as MiddlewareContext<LoggerMiddlewareMetadata>;
+    } as unknown as MiddlewareContext<[], Metadata<Record<string, unknown>>, LoggerMiddlewareMetadata>;
 
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {
       // do nothing
@@ -43,11 +43,11 @@ describe('LoggerMiddleware', () => {
       edges: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
       metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} },
     };
-    const newContext: MiddlewareContext<LoggerMiddlewareMetadata> = {
+    const newContext = {
       ...context,
       modelActionType: 'changeSelection',
       state,
-    };
+    } as unknown as MiddlewareContext<[], Metadata<Record<string, unknown>>, LoggerMiddlewareMetadata>;
 
     loggerMiddleware.execute(newContext, nextMock, () => null);
 

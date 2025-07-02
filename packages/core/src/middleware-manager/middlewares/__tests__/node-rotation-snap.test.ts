@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FlowCore } from '../../../flow-core';
 import { snapAngle } from '../../../input-event-handler/input-actions/rotate/snap-angle';
 import { mockNode } from '../../../test-utils';
-import type { MiddlewareContext, Node } from '../../../types';
+import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../types';
 import { nodeRotationSnapMiddleware, NodeRotationSnapMiddlewareMetadata } from '../node-rotation-snap';
 
 import type { MiddlewareExecutor } from '../../middleware-executor';
-type Helpers = ReturnType<MiddlewareExecutor['helpers']>;
+type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
 
 const SNAP_ANGLE = 15;
 
@@ -14,7 +14,11 @@ describe('nodeRotationSnapMiddleware', () => {
   let helpers: Partial<Helpers>;
   let nodesMap: Map<string, Node>;
   let flowCore: Pick<FlowCore, 'getNodeById'>;
-  let context: MiddlewareContext<NodeRotationSnapMiddlewareMetadata>;
+  let context: MiddlewareContext<
+    [],
+    Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+    NodeRotationSnapMiddlewareMetadata
+  >;
   let nextMock: ReturnType<typeof vi.fn>;
   let cancelMock: ReturnType<typeof vi.fn>;
 
@@ -37,7 +41,11 @@ describe('nodeRotationSnapMiddleware', () => {
         enabled: true,
         snap: SNAP_ANGLE,
       },
-    } as unknown as MiddlewareContext<NodeRotationSnapMiddlewareMetadata>;
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      NodeRotationSnapMiddlewareMetadata
+    >;
   });
 
   it('should call next if no angle property changed', () => {
