@@ -1,11 +1,12 @@
 import { FlowCore } from '../flow-core';
 import type {
-  CombinedMiddlewaresConfig,
   FlowState,
   FlowStateUpdate,
   Metadata,
   Middleware,
   MiddlewareChain,
+  MiddlewareConfigKeys,
+  MiddlewaresConfigFromMiddlewares,
   ModelActionType,
 } from '../types';
 import { defaultMiddlewares } from './default-middlewares';
@@ -13,8 +14,8 @@ import { MiddlewareExecutor } from './middleware-executor';
 
 export class MiddlewareManager<
   TCustomMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<CombinedMiddlewaresConfig<TCustomMiddlewares>> = Metadata<
-    CombinedMiddlewaresConfig<TCustomMiddlewares>
+  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>> = Metadata<
+    MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>
   >,
 > {
   private middlewareChain: MiddlewareChain = [];
@@ -41,14 +42,6 @@ export class MiddlewareManager<
       throw new Error(`Middleware ${middleware.name} already registered`);
     }
 
-    // Apply default metadata if it exists
-    if (middleware.defaultMetadata) {
-      this.applyMiddlewareConfig(
-        middleware.name as keyof TMetadata['middlewaresConfig'],
-        middleware.defaultMetadata as TMetadata['middlewaresConfig'][keyof TMetadata['middlewaresConfig']]
-      );
-    }
-
     this.middlewareChain.push(middleware);
     return () => this.unregister(middleware.name);
   }
@@ -57,10 +50,9 @@ export class MiddlewareManager<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregister(name: keyof TMetadata['middlewaresConfig']): void {
+  unregister(name: MiddlewareConfigKeys<TCustomMiddlewares>): void {
     const index = this.middlewareChain.findIndex((middleware) => middleware.name === name);
     if (index !== -1) {
-      this.removeMiddlewareConfig(name);
       this.middlewareChain.splice(index, 1);
     }
   }
@@ -72,11 +64,12 @@ export class MiddlewareManager<
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(initialState: FlowState<TMetadata>, stateUpdate: FlowStateUpdate, modelActionType: ModelActionType) {
-    const middlewareExecutor = new MiddlewareExecutor<TCustomMiddlewares, TMetadata>(
-      this.flowCore,
-      this.middlewareChain
-    );
+  execute(
+    initialState: FlowState<TMetadata>,
+    stateUpdate: FlowStateUpdate,
+    modelActionType: ModelActionType
+  ): Promise<FlowState<TMetadata> | undefined> {
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
     return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
   }
 
@@ -85,26 +78,41 @@ export class MiddlewareManager<
    * @param middlewareName - The name of the middleware to update
    * @param config - The configuration of the middleware
    */
-  applyMiddlewareConfig<TName extends keyof TMetadata['middlewaresConfig']>(
+  applyMiddlewareConfig<TName extends MiddlewareConfigKeys<TCustomMiddlewares>>(
     middlewareName: TName,
     config?: TMetadata['middlewaresConfig'][TName]
   ): void {
     const state = this.flowCore.getState();
 
-    (state.metadata.middlewaresConfig as Record<string, unknown>)[middlewareName as string] = config || null;
+    if (typeof config === 'undefined') {
+      // If config is undefined, remove the property
+      delete state.metadata.middlewaresConfig[middlewareName];
+    } else {
+      // Otherwise, assign the config
+      state.metadata.middlewaresConfig[middlewareName] = config;
+    }
 
     this.flowCore.setState(state);
   }
 
   /**
-   * Removes a middleware configuration
-   * @param middlewareName Name of the middleware to remove
+   * Gets the middleware configuration
+   * @param middlewareName Name of the middleware to get the configuration for
+   * @returns The middleware configuration
    */
-  removeMiddlewareConfig<TName extends keyof TMetadata['middlewaresConfig']>(middlewareName: TName): void {
+  getMiddlewareConfig<TName extends MiddlewareConfigKeys<TCustomMiddlewares>>(
+    middlewareName: TName
+  ): TMetadata['middlewaresConfig'][TName] {
     const state = this.flowCore.getState();
+    const middleware = this.middlewareChain.find((middleware) => middleware.name === middlewareName);
 
-    delete (state.metadata.middlewaresConfig as Record<string, unknown>)[middlewareName as string];
+    if (!middleware) {
+      console.warn(`[AngularFlow] Accessing middleware config for "${middlewareName}" not found`);
+    }
 
-    this.flowCore.setState(state);
+    const middlewareConfig = state.metadata.middlewaresConfig[middlewareName] ?? {};
+
+    // NOTE: This is not a deep merge
+    return { ...(middleware?.defaultMetadata ?? {}), ...middlewareConfig };
   }
 }

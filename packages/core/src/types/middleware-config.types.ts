@@ -1,8 +1,4 @@
-import { edgesRoutingMiddleware } from '../middleware-manager/middlewares/edges-routing/edges-routing';
-import { groupChildrenChangeExtent } from '../middleware-manager/middlewares/group-children-change-extent';
-import { groupChildrenMoveExtent } from '../middleware-manager/middlewares/group-children-move-extent';
-import { nodePositionSnapMiddleware } from '../middleware-manager/middlewares/node-position-snap';
-import { nodeRotationSnapMiddleware } from '../middleware-manager/middlewares/node-rotation-snap';
+import { defaultMiddlewares } from '../middleware-manager/default-middlewares';
 import type { Middleware } from './middleware.interface';
 
 // Helper type to extract config type from a middleware
@@ -21,14 +17,7 @@ export type MiddlewaresConfigFromMiddlewares<T extends readonly Middleware<any, 
 
 export type MiddlewareArray = readonly Middleware[];
 
-// Default middlewares type
-type DefaultMiddlewares = readonly [
-  typeof nodePositionSnapMiddleware,
-  typeof nodeRotationSnapMiddleware,
-  typeof groupChildrenChangeExtent,
-  typeof groupChildrenMoveExtent,
-  typeof edgesRoutingMiddleware,
-];
+type DefaultMiddlewares = typeof defaultMiddlewares;
 
 export type CombinedMiddlewaresConfig<TCustom extends MiddlewareArray> =
   MiddlewaresConfigFromMiddlewares<DefaultMiddlewares> & MiddlewaresConfigFromMiddlewares<TCustom>;

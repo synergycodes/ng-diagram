@@ -2,6 +2,7 @@ import type { FlowCore } from '../flow-core';
 import { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
 import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
+import { MiddlewaresConfigFromMiddlewares } from './middleware-config.types';
 import type { Node } from './node.interface';
 
 /**
@@ -45,8 +46,8 @@ export interface FlowState<TMetadata = Metadata> {
 /**
  * Type for the history update to be applied to the flow diagram
  */
-export interface MiddlewareHistoryUpdate {
-  name: string;
+export interface MiddlewareHistoryUpdate<TCustomMiddlewares extends MiddlewareChain> {
+  name: MiddlewareConfigKeys<TCustomMiddlewares>;
   stateUpdate: FlowStateUpdate;
 }
 
@@ -66,18 +67,27 @@ export interface FlowStateUpdate {
 /**
  * Type for the context of the middleware
  */
-export interface MiddlewareContext<TMiddlewareMetadata = unknown> {
-  initialState: FlowState;
-  state: FlowState;
+export interface MiddlewareContext<
+  TCustomMiddlewares extends MiddlewareChain = [],
+  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>> = Metadata<
+    MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>
+  >,
+  TMiddlewareMetadata = unknown,
+> {
+  initialState: FlowState<TMetadata>;
+  state: FlowState<TMetadata>;
   nodesMap: Map<string, Node>;
   edgesMap: Map<string, Edge>;
   modelActionType: ModelActionType;
   flowCore: FlowCore;
-  helpers: ReturnType<MiddlewareExecutor['helpers']>;
-  history: MiddlewareHistoryUpdate[];
+  helpers: ReturnType<MiddlewareExecutor<TCustomMiddlewares, TMetadata>['helpers']>;
+  history: MiddlewareHistoryUpdate<TCustomMiddlewares>[];
   initialUpdate: FlowStateUpdate;
   middlewareMetadata: TMiddlewareMetadata;
 }
+
+export type MiddlewareConfigKeys<TCustomMiddlewares extends MiddlewareChain> =
+  keyof MiddlewaresConfigFromMiddlewares<TCustomMiddlewares> & string;
 
 /**
  * Type for middleware function that transforms state
@@ -85,14 +95,18 @@ export interface MiddlewareContext<TMiddlewareMetadata = unknown> {
  * @template TName - Type of the name of the middleware (should be a string literal)
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface Middleware<TName extends string = string, TMetadata = any> {
+export interface Middleware<TName extends string = string, TMiddlewareMetadata = any> {
   name: TName;
   execute: (
-    context: MiddlewareContext<TMetadata>,
-    next: (stateUpdate?: FlowStateUpdate) => Promise<FlowState>,
+    context: MiddlewareContext<
+      MiddlewareChain,
+      Metadata<MiddlewaresConfigFromMiddlewares<MiddlewareChain>>,
+      TMiddlewareMetadata
+    >,
+    next: (stateUpdate?: FlowStateUpdate) => Promise<FlowState<TMiddlewareMetadata>>,
     cancel: () => void
   ) => Promise<void> | void;
-  defaultMetadata?: TMetadata;
+  defaultMetadata?: TMiddlewareMetadata;
 }
 
 /**

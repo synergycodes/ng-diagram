@@ -7,7 +7,6 @@ import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
-  CombinedMiddlewaresConfig,
   Edge,
   EnvironmentInfo,
   Event,
@@ -17,6 +16,8 @@ import type {
   Metadata,
   Middleware,
   MiddlewareChain,
+  MiddlewareConfigKeys,
+  MiddlewaresConfigFromMiddlewares,
   ModelActionType,
   ModelAdapter,
   Node,
@@ -26,8 +27,8 @@ import type {
 
 export class FlowCore<
   TMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<CombinedMiddlewaresConfig<TMiddlewares>> = Metadata<
-    CombinedMiddlewaresConfig<TMiddlewares>
+  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> = Metadata<
+    MiddlewaresConfigFromMiddlewares<TMiddlewares>
   >,
 > {
   private _model: ModelAdapter<TMetadata>;
@@ -118,7 +119,7 @@ export class FlowCore<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(name: keyof TMetadata['middlewaresConfig']): void {
+  unregisterMiddleware(name: MiddlewareConfigKeys<TMiddlewares>): void {
     this.middlewareManager.unregister(name);
   }
 
@@ -127,7 +128,7 @@ export class FlowCore<
    * @param name Name of the middleware to update
    * @param metadata Metadata to update
    */
-  updateMiddlewareConfig<TName extends keyof TMetadata['middlewaresConfig']>(
+  updateMiddlewareConfig<TName extends MiddlewareConfigKeys<TMiddlewares>>(
     name: TName,
     config: TMetadata['middlewaresConfig'][TName]
   ): void {
