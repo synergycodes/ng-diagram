@@ -2,20 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../flow-core';
 import { mockMetadata, mockNode } from '../test-utils';
 import type {
-  CombinedMiddlewaresConfig,
   FlowState,
   FlowStateUpdate,
   Metadata,
   Middleware,
+  MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
 } from '../types';
 import { MiddlewareManager } from './middleware-manager';
-import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
-import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
-import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
-import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
-import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
 // Define all mocks at the top level
 vi.mock('./middlewares/edges-routing', () => ({
@@ -37,7 +31,7 @@ type TestMiddlewares = [
   Middleware<'mockMiddleware2'>,
   Middleware<'mockMiddlewareWithMetadata', { enabled: boolean; threshold: number }>,
 ];
-type TestMetadata = Metadata<CombinedMiddlewaresConfig<TestMiddlewares>>;
+type TestMetadata = Metadata<MiddlewaresConfigFromMiddlewares<TestMiddlewares>>;
 
 describe('MiddlewareManager', () => {
   let flowCore: FlowCore<TestMiddlewares, TestMetadata>;
@@ -121,34 +115,11 @@ describe('MiddlewareManager', () => {
   });
 
   describe('constructor', () => {
-    it('should register edges routing middleware', () => {
-      const middlewareManager = new MiddlewareManager(flowCore);
-
-      middlewareManager.execute(initialState, stateUpdate, 'init');
-
-      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
-        nodeRotationSnapMiddleware,
-        groupChildrenChangeExtent,
-        groupChildrenMoveExtent,
-        treeLayoutMiddleware,
-        edgesRoutingMiddleware,
-        nodePositionSnapMiddleware,
-      ]);
-    });
-
     it('should register starting middlewares if they are provided', () => {
       const middlewareManager = new MiddlewareManager(flowCore, [mockMiddleware1] as unknown as TestMiddlewares);
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
-      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
-        nodeRotationSnapMiddleware,
-        groupChildrenChangeExtent,
-        groupChildrenMoveExtent,
-        treeLayoutMiddleware,
-        edgesRoutingMiddleware,
-        nodePositionSnapMiddleware,
-        mockMiddleware1,
-      ]);
+      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [mockMiddleware1]);
     });
   });
 

@@ -4,7 +4,7 @@ import { FlowCore } from './flow-core';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockMetadata, mockNode } from './test-utils';
-import { CombinedMiddlewaresConfig } from './types';
+import { MiddlewaresConfigFromMiddlewares } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
@@ -65,12 +65,12 @@ vi.mock('./model-lookup/model-lookup', () => ({
 
 describe('FlowCore', () => {
   let flowCore: FlowCore<MiddlewareChain>;
-  let mockModelAdapter: ModelAdapter<Metadata<CombinedMiddlewaresConfig<[]>>>;
+  let mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
-  let mockGetMetadata: Mock<() => Metadata<CombinedMiddlewaresConfig<[]>>>;
+  let mockGetMetadata: Mock<() => Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {

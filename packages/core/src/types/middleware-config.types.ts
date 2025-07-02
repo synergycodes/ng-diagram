@@ -1,4 +1,3 @@
-import { defaultMiddlewares } from '../middleware-manager/default-middlewares';
 import type { Middleware } from './middleware.interface';
 
 // Helper type to extract config type from a middleware
@@ -16,8 +15,3 @@ export type MiddlewaresConfigFromMiddlewares<T extends readonly Middleware<any, 
 };
 
 export type MiddlewareArray = readonly Middleware[];
-
-type DefaultMiddlewares = typeof defaultMiddlewares;
-
-export type CombinedMiddlewaresConfig<TCustom extends MiddlewareArray> =
-  MiddlewaresConfigFromMiddlewares<DefaultMiddlewares> & MiddlewaresConfigFromMiddlewares<TCustom>;

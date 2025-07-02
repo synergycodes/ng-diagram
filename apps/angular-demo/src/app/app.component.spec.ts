@@ -56,7 +56,7 @@ describe('AppComponent', () => {
 
   it('should initialize with logger middleware', () => {
     const middlewares = component.middlewares();
-    expect(middlewares.length).toBe(1);
-    expect(middlewares[0].name).toBe('logger');
+    expect(middlewares.length).toBe(7);
+    expect(middlewares[6].name).toBe('logger');
   });
 });

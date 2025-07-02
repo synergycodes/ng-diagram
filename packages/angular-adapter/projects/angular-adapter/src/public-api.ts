@@ -9,3 +9,12 @@ export * from './lib/directives';
 export { FlowCoreProviderService } from './lib/services';
 export * from './lib/types';
 export * from './lib/utils/get-paths';
+
+export {
+  edgesRoutingMiddleware,
+  groupChildrenChangeExtent,
+  groupChildrenMoveExtent,
+  nodePositionSnapMiddleware,
+  nodeRotationSnapMiddleware,
+  treeLayoutMiddleware,
+} from '@angularflow/core';

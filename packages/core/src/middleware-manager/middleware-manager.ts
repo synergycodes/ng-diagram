@@ -9,7 +9,6 @@ import type {
   MiddlewaresConfigFromMiddlewares,
   ModelActionType,
 } from '../types';
-import { defaultMiddlewares } from './default-middlewares';
 import { MiddlewareExecutor } from './middleware-executor';
 
 export class MiddlewareManager<
@@ -23,8 +22,6 @@ export class MiddlewareManager<
 
   constructor(flowCore: FlowCore<TCustomMiddlewares, TMetadata>, middlewares?: TCustomMiddlewares) {
     this.flowCore = flowCore;
-
-    defaultMiddlewares.forEach((middleware) => this.register(middleware));
 
     if (middlewares) {
       middlewares.forEach((middleware) => this.register(middleware));
