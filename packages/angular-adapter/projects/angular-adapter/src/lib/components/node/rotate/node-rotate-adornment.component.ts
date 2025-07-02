@@ -30,6 +30,13 @@ export class NodeRotateAdornmentComponent {
   private readonly eventMapper = inject(EventMapperService);
   private readonly portsService = inject(UpdatePortsService);
 
+  rotateHandleOffset = input<{
+    top?: number | string;
+    left?: number | string;
+    right?: number | string;
+    bottom?: number | string;
+  }>();
+
   /**
    * Returns the rotate handle HTMLElement, or null if not available.
    */
