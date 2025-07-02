@@ -38,8 +38,6 @@ describe('RotateHandleComponent', () => {
 
   it('should emit pointerDownEvent on pointer down', () => {
     const spy = vi.spyOn(component.pointerDownEvent, 'emit');
-    // const flowCoreProvider = TestBed.inject(FlowCoreProviderService);
-    // vi.spyOn(flowCoreProvider.provide().commandHandler, 'emit');
     const event = new Event('pointerdown') as PointerEvent;
     component.onPointerDown(event);
     expect(spy).toHaveBeenCalledWith({ event });
