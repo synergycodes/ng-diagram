@@ -1,7 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-
+import { AngularAdapterNodeComponent } from './angular-adapter-node.component';
 import { Component, input } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import {
   NodePositionDirective,
   NodeSizeDirective,
@@ -11,8 +12,6 @@ import {
   PointerUpEventListenerDirective,
   ZIndexDirective,
 } from '../../directives';
-import { AngularAdapterNodeComponent } from './angular-adapter-node.component';
-import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 
 @Component({
   selector: 'angular-adapter-node-resize-adornment',

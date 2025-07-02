@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Edge } from '@angularflow/core';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 import { DefaultEdgeComponent } from './default-edge.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AngularAdapterEdgeLabelComponent, Edge } from '../../../../public-api';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 @Component({
   selector: 'angular-adapter-edge-label',

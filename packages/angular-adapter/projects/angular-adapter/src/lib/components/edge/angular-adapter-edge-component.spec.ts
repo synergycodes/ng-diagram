@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-
+import { AngularAdapterEdgeComponent } from './angular-adapter-edge.component';
 import {
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
@@ -8,7 +8,6 @@ import {
   PointerUpEventListenerDirective,
   ZIndexDirective,
 } from '../../directives';
-import { AngularAdapterEdgeComponent } from './angular-adapter-edge.component';
 
 describe('AngularAdapterEdgeComponent', () => {
   let component: AngularAdapterEdgeComponent;

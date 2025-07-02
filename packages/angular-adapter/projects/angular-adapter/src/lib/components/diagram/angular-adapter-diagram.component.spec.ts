@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
+import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
+import { Middleware, ModelAdapter } from '@angularflow/core';
+import { FlowCoreProviderService } from '../../services';
 import {
   KeyDownEventListenerDirective,
   KeyPressEventListenerDirective,
@@ -13,8 +14,6 @@ import {
   PointerUpEventListenerDirective,
   WheelEventListenerDirective,
 } from '../../directives';
-import { FlowCoreProviderService } from '../../services';
-import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
   let component: AngularAdapterDiagramComponent;
