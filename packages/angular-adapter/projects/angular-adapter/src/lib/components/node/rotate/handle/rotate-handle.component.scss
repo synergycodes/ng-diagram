@@ -1,7 +1,7 @@
 :host {
   // TODO: Add a way to position the handle
-  left: 50%;
-  top: -32px;
+  right: -36px;
+  bottom: -36px;
   transform: translate(-50%, -50%);
   width: var(--node-rotate-handle-size, 20px);
   height: var(--node-rotate-handle-size, 20px);
