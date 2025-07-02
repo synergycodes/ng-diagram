@@ -9,7 +9,7 @@ import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import { EventMapper } from './types/event-mapper.interface';
 import type { Metadata } from './types/metadata.interface';
-import type { Middleware } from './types/middleware.interface';
+import type { Middleware, MiddlewareChain } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
@@ -64,7 +64,7 @@ vi.mock('./model-lookup/model-lookup', () => ({
 }));
 
 describe('FlowCore', () => {
-  let flowCore: FlowCore;
+  let flowCore: FlowCore<MiddlewareChain>;
   let mockModelAdapter: ModelAdapter<Metadata<CombinedMiddlewaresConfig<[]>>>;
   let mockRenderer: Renderer;
   let mockEventMapper: EventMapper;

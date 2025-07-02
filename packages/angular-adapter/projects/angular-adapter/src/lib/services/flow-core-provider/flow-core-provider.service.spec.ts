@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { FlowCore, ModelAdapter } from '@angularflow/core';
+import { FlowCore, Metadata, Middleware, MiddlewaresConfigFromMiddlewares, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { detectEnvironment } from './detect-environment';
 import { FlowCoreProviderService } from './flow-core-provider.service';
@@ -7,8 +7,10 @@ import { FlowCoreProviderService } from './flow-core-provider.service';
 vi.mock('./detect-environment');
 
 describe('FlowCoreProviderService', () => {
-  let service: FlowCoreProviderService;
-  const mockModelAdapter: ModelAdapter = {
+  const mockMiddlewares: [Middleware<'test'>] = [{ name: 'test', execute: vi.fn() }] as unknown as [Middleware<'test'>];
+  let service: FlowCoreProviderService<typeof mockMiddlewares>;
+
+  const mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<typeof mockMiddlewares>>> = {
     getNodes: vi.fn().mockReturnValue([]),
     getEdges: vi.fn().mockReturnValue([]),
     getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} }),
@@ -42,9 +44,7 @@ describe('FlowCoreProviderService', () => {
     });
 
     it('should initialize FlowCore with provided middlewares', () => {
-      const middlewares = [{ name: 'test', execute: vi.fn() }];
-
-      service.init(mockModelAdapter, middlewares);
+      service.init(mockModelAdapter, mockMiddlewares);
 
       // Verify that FlowCore was created successfully with middlewares
       const flowCore = service.provide();
