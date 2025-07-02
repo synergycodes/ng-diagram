@@ -2,7 +2,7 @@ import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Node } from '@angularflow/core';
 import { MockedFunction, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventMapperService, UpdatePortsService } from '../../../services';
+import { EventMapperService, FlowCoreProviderService, UpdatePortsService } from '../../../services';
 import { NodeRotateAdornmentComponent } from './node-rotate-adornment.component';
 
 interface MockEventMapperService {
@@ -99,6 +99,18 @@ describe('NodeRotateAdornmentComponent', () => {
       providers: [
         { provide: EventMapperService, useValue: mockEventMapper },
         { provide: UpdatePortsService, useValue: mockPortsService },
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            provide: vi.fn().mockReturnValue({
+              getState: () => ({
+                metadata: {
+                  viewport: { x: 0, y: 0, scale: 1 },
+                },
+              }),
+            }),
+          },
+        },
       ],
     }).compileComponents();
 
