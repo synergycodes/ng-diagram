@@ -1,10 +1,10 @@
 import type {
-  CombinedMiddlewaresConfig,
   Edge,
   EdgeLabel,
   EnvironmentInfo,
   KeyboardEvent,
   Metadata,
+  MiddlewaresConfigFromMiddlewares,
   Node,
   PointerEvent,
   Port,
@@ -111,7 +111,7 @@ export const getSampleRotateEvent = (overrides: Partial<RotateEvent> = {}): Rota
   };
 };
 
-export const mockMetadata: Metadata<CombinedMiddlewaresConfig<[]>> = {
+export const mockMetadata: Metadata<MiddlewaresConfigFromMiddlewares<[]>> = {
   viewport: { x: 0, y: 0, scale: 1 },
   middlewaresConfig: {
     'node-position-snap': { snap: { x: 10, y: 10 } },
