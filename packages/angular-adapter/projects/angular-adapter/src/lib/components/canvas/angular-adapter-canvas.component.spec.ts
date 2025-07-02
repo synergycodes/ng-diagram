@@ -4,7 +4,6 @@ import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.componen
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ViewportDirective } from '../../directives';
 import { By } from '@angular/platform-browser';
-import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
 
 @Component({
   selector: 'angular-adapter-node',
