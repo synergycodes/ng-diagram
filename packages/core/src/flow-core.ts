@@ -6,6 +6,7 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
+import { TransactionManager } from './transaction-manager/transaction-manager';
 import type {
   Edge,
   EnvironmentInfo,
@@ -40,6 +41,7 @@ export class FlowCore<
   readonly initializationGuard: InitializationGuard;
   readonly internalUpdater: InternalUpdater;
   readonly modelLookup: ModelLookup;
+  private transactionManager = new TransactionManager();
 
   constructor(
     modelAdapter: ModelAdapter<TMetadata>,
@@ -159,11 +161,38 @@ export class FlowCore<
   }
 
   /**
+   * Starts a transaction. All applyUpdate calls will be queued until stopTransaction is called.
+   * @param transactionName The name of the transaction (used as modelActionType)
+   */
+  startTransaction(transactionName: ModelActionType) {
+    this.transactionManager.startTransaction(transactionName);
+  }
+
+  /**
+   * Stops the transaction, applies all queued updates atomically, and runs the middleware chain once.
+   */
+  async stopTransaction() {
+    const transactionName = this.transactionManager.getTransactionName();
+    const { commandsCount, mergedUpdate } = this.transactionManager.stopTransaction();
+
+    if (commandsCount === 0) return;
+
+    if (transactionName) {
+      await this.applyUpdate(mergedUpdate, transactionName);
+    }
+  }
+
+  /**
    * Applies an update to the flow state
    * @param stateUpdate Partial state to apply
    * @param modelActionType Type of model action to apply
    */
   async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: ModelActionType): Promise<void> {
+    if (this.transactionManager.isActive()) {
+      this.transactionManager.queueUpdate(stateUpdate, modelActionType);
+      return;
+    }
+
     const finalState = await this.middlewareManager.execute(this.getState(), stateUpdate, modelActionType);
     if (finalState) {
       this.setState(finalState);
