@@ -84,7 +84,9 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         const dx = deltaX - (firstNode.position.x - moveState.initialNodePosition.x);
         const dy = deltaY - (firstNode.position.y - moveState.initialNodePosition.y);
 
-        flowCore.commandHandler.emit('moveNodesBy', {
+        flowCore.startTransaction('moveNodes');
+
+        await flowCore.commandHandler.emit('moveNodesBy', {
           delta: { x: dx, y: dy },
           nodes: selectedNodes,
         });
@@ -96,14 +98,16 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
 
         if (topLevelGroupNode) {
           if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
-            flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+            await flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
           }
         } else {
-          flowCore.commandHandler.emit('highlightGroupClear');
+          await flowCore.commandHandler.emit('highlightGroupClear');
         }
 
         moveState.lastX = x;
         moveState.lastY = y;
+
+        await flowCore.stopTransaction();
 
         break;
       }
@@ -136,14 +140,18 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           });
         }
 
+        flowCore.startTransaction('moveNodesStop');
+
         if (updateData.length > 0) {
           await flowCore.commandHandler.emit('updateNodes', { nodes: updateData });
         }
 
         // That means a group has been highlighted, so we need to clear it
         if (updateData.some((node) => Boolean(node.groupId))) {
-          flowCore.commandHandler.emit('highlightGroupClear');
+          await flowCore.commandHandler.emit('highlightGroupClear');
         }
+
+        await flowCore.stopTransaction();
 
         moveState.isMoving = false;
         moveState.lastX = 0;

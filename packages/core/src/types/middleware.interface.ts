@@ -32,7 +32,9 @@ export type ModelActionType =
   | 'rotateNodeBy'
   | 'highlightGroup'
   | 'highlightGroupClear'
-  | 'treeLayout';
+  | 'treeLayout'
+  | 'moveNodes'
+  | 'moveNodesStop';
 
 /**
  * Type for the state of the flow diagram
