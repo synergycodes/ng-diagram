@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, HostBinding, inject, input, output } from '@angular/core';
 import { RotateHandleConfiguration } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../../../services';
+import { ROTATE_HANDLER_RIGHT_OFFSET, ROTATE_HANDLER_TOP_OFFSET } from '../constants';
 
 @Component({
   selector: 'angular-adapter-rotate-handle',
@@ -22,10 +23,10 @@ export class RotateHandleComponent {
   computedOffset = computed(() => {
     const current = this.metadata['rotateHandleOffset'] as RotateHandleConfiguration;
     return {
-      top: current?.top ?? -20,
-      right: current?.right ?? -36,
-      bottom: current?.bottom ?? null,
-      left: current?.left ?? null,
+      top: current?.top ?? ROTATE_HANDLER_TOP_OFFSET,
+      right: current?.right ?? ROTATE_HANDLER_RIGHT_OFFSET,
+      bottom: current?.bottom,
+      left: current?.left,
     };
   });
 
