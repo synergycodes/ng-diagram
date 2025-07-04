@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RotateHandleComponent } from './rotate-handle.component';
+import { FlowCoreProviderService } from '../../../../services';
 
 describe('RotateHandleComponent', () => {
   let component: RotateHandleComponent;
@@ -9,6 +10,20 @@ describe('RotateHandleComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RotateHandleComponent],
+      providers: [
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            provide: vi.fn().mockReturnValue({
+              getState: () => ({
+                metadata: {
+                  viewport: { x: 0, y: 0, scale: 1 },
+                },
+              }),
+            }),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RotateHandleComponent);

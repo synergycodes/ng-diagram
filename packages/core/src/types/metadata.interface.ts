@@ -29,6 +29,16 @@ export interface LayoutConfiguration {
 }
 
 /**
+ * Interface representing configurable properties of the rotate handle offset.
+ */
+export interface RotateHandleConfiguration {
+  top?: number | string;
+  right?: number | string;
+  bottom?: number | string;
+  left?: number | string;
+}
+
+/**
  * Interface representing the metadata of the diagram.
  */
 export interface Metadata<TMiddlewaresMetadata = unknown> {
@@ -37,5 +47,6 @@ export interface Metadata<TMiddlewaresMetadata = unknown> {
   nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
+  rotateHandleOffset?: RotateHandleConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
 }
