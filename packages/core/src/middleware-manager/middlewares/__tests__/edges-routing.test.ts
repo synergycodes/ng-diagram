@@ -1,8 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
-import type { FlowState, MiddlewareContext, Node, Point } from '../../../types';
-import { edgesRoutingMiddleware } from '../edges-routing/edges-routing.ts';
+import type {
+  FlowState,
+  Metadata,
+  MiddlewareContext,
+  MiddlewaresConfigFromMiddlewares,
+  Node,
+  Point,
+} from '../../../types';
+import { edgesRoutingMiddleware, EdgesRoutingMiddlewareMetadata } from '../edges-routing/edges-routing.ts';
 
 vi.mock('../../../utils', () => ({
   getPortFlowPositionSide: (node: Node) => node.position,
@@ -13,7 +20,7 @@ vi.mock('../../../utils', () => ({
 describe('Edges Routing Middleware', () => {
   let flowCore: FlowCore;
   let initialState: FlowState;
-  let context: MiddlewareContext;
+  let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>, EdgesRoutingMiddlewareMetadata>;
   const nextMock = vi.fn();
   const anyEdgesAddedMock = vi.fn();
   const checkIfAnyNodePropsChangedMock = vi.fn();
@@ -46,7 +53,14 @@ describe('Edges Routing Middleware', () => {
       },
       history: [],
       initialUpdate: {},
-    } as unknown as MiddlewareContext;
+      middlewareMetadata: {
+        enabled: true,
+      },
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
   });
 
   it('should call next without update if model action and properties changes are not relevant for routing edges and temporary edge', () => {
@@ -61,7 +75,11 @@ describe('Edges Routing Middleware', () => {
   });
 
   it('should call next without update if there are no edges', () => {
-    context = { ...context, modelActionType: 'init', state: { ...initialState, edges: [] } };
+    context = {
+      ...context,
+      modelActionType: 'init',
+      state: { ...initialState, edges: [] } as unknown as FlowState<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>,
+    };
     anyEdgesAddedMock.mockReturnValue(false);
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
@@ -73,7 +91,9 @@ describe('Edges Routing Middleware', () => {
     context = {
       ...context,
       modelActionType: 'init',
-      state: { ...initialState, edges: [{ ...mockEdge, routing: 'custom-routing' }] },
+      state: { ...initialState, edges: [{ ...mockEdge, routing: 'custom-routing' }] } as unknown as FlowState<
+        Metadata<MiddlewaresConfigFromMiddlewares<[]>>
+      >,
     };
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
@@ -173,7 +193,11 @@ describe('Edges Routing Middleware', () => {
       state: newState,
       modelActionType: 'moveTemporaryEdge',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-    };
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
 
     checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
@@ -219,7 +243,11 @@ describe('Edges Routing Middleware', () => {
       state: newState,
       modelActionType: 'init',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-    };
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
@@ -265,7 +293,11 @@ describe('Edges Routing Middleware', () => {
       state: newState,
       modelActionType: 'init',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-    };
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
@@ -298,7 +330,11 @@ describe('Edges Routing Middleware', () => {
       state: newState,
       modelActionType: 'addNodes',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-    };
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
     checkIfAnyNodePropsChangedMock.mockReturnValue(true);
     checkIfEdgeChangedMock.mockReturnValue(false);
     checkIfNodeChangedMock.mockReturnValue(false);
@@ -334,7 +370,11 @@ describe('Edges Routing Middleware', () => {
       state: newState,
       modelActionType: 'addNodes',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-    };
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
     checkIfAnyNodePropsChangedMock.mockReturnValue(true);
     checkIfEdgeChangedMock.mockReturnValue(true);
     checkIfNodeChangedMock.mockReturnValue(false);

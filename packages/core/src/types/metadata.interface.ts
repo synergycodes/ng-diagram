@@ -1,6 +1,6 @@
-import { Edge } from './edge.interface';
-import { Node } from './node.interface';
-import { TreeLayoutConfig } from './tree-layout.interface.ts';
+import type { Edge } from './edge.interface';
+import type { Node } from './node.interface';
+import type { TreeLayoutConfig } from './tree-layout.interface.ts';
 
 /**
  * Interface representing the viewport of the diagram.
@@ -41,13 +41,12 @@ export interface RotateHandleConfiguration {
 /**
  * Interface representing the metadata of the diagram.
  */
-export interface Metadata {
+export interface Metadata<TMiddlewaresMetadata = unknown> {
   viewport: Viewport;
   temporaryEdge?: Edge | null;
   nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
   rotateHandleOffset?: RotateHandleConfiguration;
-
-  [key: string]: unknown;
+  middlewaresConfig: TMiddlewaresMetadata;
 }
