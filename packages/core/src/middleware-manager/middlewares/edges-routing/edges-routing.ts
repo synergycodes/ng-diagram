@@ -5,13 +5,13 @@ import {
   MiddlewareContext,
   Node,
   PortLocation,
-  ROUTING,
   RoutingConfiguration,
 } from '../../../types';
 import { getPointOnPath, isSamePoint } from '../../../utils';
 import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
 import { getSourceTargetPositions } from './get-source-target-positions.ts';
 import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
+import { isDefaultRouting } from './utils/isRouting.ts';
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -83,13 +83,14 @@ export const edgesRoutingMiddleware: Middleware = {
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
         const isCustomEdgeRouting = !!edge.type;
-        const isProperEdgeRouting = ROUTING.includes(edge.routing);
+        const isProperEdgeRouting = isDefaultRouting(edge.routing);
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
           helpers.checkIfNodeChanged(edge.target);
 
         const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
+
         const shouldRouteCustomEdge =
           isCustomEdgeRouting &&
           (isEdgeOrNodesChanged || modelActionType === 'init') &&
@@ -118,7 +119,6 @@ export const edgesRoutingMiddleware: Middleware = {
         }
 
         const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap, metadata?.routingConfiguration);
-
         if (
           edge.points?.length === points.length &&
           edge.points?.every((point, index) => isSamePoint(point, points[index]))

@@ -29,7 +29,8 @@ export interface Bounds {
 export type PortSide = 'top' | 'right' | 'bottom' | 'left';
 
 export const ROUTING = ['orthogonal', 'straight', 'bezier', undefined] as const;
-export type Routing = (typeof ROUTING)[number];
+export type DefaultRouting = (typeof ROUTING)[number];
+export type Routing = DefaultRouting | string;
 
 export type PortLocation = {
   side: PortSide;
