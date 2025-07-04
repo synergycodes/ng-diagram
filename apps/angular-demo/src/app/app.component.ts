@@ -73,6 +73,7 @@ export class AppComponent {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         type: 'bezier-edge',
+        routing: 'orthogonal'
       },
       {
         id: '2',
