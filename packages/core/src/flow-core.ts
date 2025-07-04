@@ -13,7 +13,11 @@ import type {
   EventMapper,
   FlowState,
   FlowStateUpdate,
+  Metadata,
   Middleware,
+  MiddlewareChain,
+  MiddlewareConfigKeys,
+  MiddlewaresConfigFromMiddlewares,
   ModelActionType,
   ModelAdapter,
   Node,
@@ -21,11 +25,16 @@ import type {
   Renderer,
 } from './types';
 
-export class FlowCore {
-  private _model: ModelAdapter;
+export class FlowCore<
+  TMiddlewares extends MiddlewareChain = [],
+  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> = Metadata<
+    MiddlewaresConfigFromMiddlewares<TMiddlewares>
+  >,
+> {
+  private _model: ModelAdapter<TMetadata>;
   readonly commandHandler: CommandHandler;
   readonly inputEventHandler: InputEventHandler;
-  readonly middlewareManager: MiddlewareManager;
+  readonly middlewareManager: MiddlewareManager<TMiddlewares, TMetadata>;
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
   readonly initializationGuard: InitializationGuard;
@@ -33,21 +42,21 @@ export class FlowCore {
   readonly modelLookup: ModelLookup;
 
   constructor(
-    modelAdapter: ModelAdapter,
+    modelAdapter: ModelAdapter<TMetadata>,
     private readonly renderer: Renderer,
     private readonly eventMapper: EventMapper,
     environment: EnvironmentInfo,
-    middlewares?: Middleware[]
+    middlewares?: TMiddlewares
   ) {
     this._model = modelAdapter;
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.inputEventHandler = new InputEventHandler(this);
-    this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
+    this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
 
     this.init();
   }
@@ -70,7 +79,7 @@ export class FlowCore {
    * Sets the new model and runs the init process
    * @param model Model
    */
-  set model(model: ModelAdapter) {
+  set model(model: ModelAdapter<TMetadata>) {
     this._model = model;
     this.init();
   }
@@ -78,7 +87,7 @@ export class FlowCore {
   /**
    * Gets the current model that flow core is using
    */
-  get model(): ModelAdapter {
+  get model(): ModelAdapter<TMetadata> {
     return this._model;
   }
 
@@ -110,14 +119,26 @@ export class FlowCore {
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(name: string): void {
+  unregisterMiddleware(name: MiddlewareConfigKeys<TMiddlewares>): void {
     this.middlewareManager.unregister(name);
+  }
+
+  /**
+   * Updates the configuration of a middleware
+   * @param name Name of the middleware to update
+   * @param metadata Metadata to update
+   */
+  updateMiddlewareConfig<TName extends MiddlewareConfigKeys<TMiddlewares>>(
+    name: TName,
+    config: TMetadata['middlewaresConfig'][TName]
+  ): void {
+    this.middlewareManager.applyMiddlewareConfig(name, config);
   }
 
   /**
    * Gets the current state of the flow
    */
-  getState(): FlowState {
+  getState(): FlowState<TMetadata> {
     return {
       nodes: this.model.getNodes(),
       edges: this.model.getEdges(),
@@ -129,7 +150,7 @@ export class FlowCore {
    * Sets the current state of the flow
    * @param state State to set
    */
-  setState(state: FlowState): void {
+  setState(state: FlowState<TMetadata>): void {
     this.model.setNodes(state.nodes);
     this.model.setEdges(state.edges);
     this.model.setMetadata(state.metadata);
@@ -203,30 +224,30 @@ export class FlowCore {
   }
 
   /**
-   * Gets all nodes in a range
-   * @param point Point
-   * @param range Range
-   * @returns Nodes
+   * Gets all nodes in a range from a point
+   * @param point Point to check from
+   * @param range Range to check in
+   * @returns Array of nodes in range
    */
   getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
     return getNodesInRange(this, point, range);
   }
 
   /**
-   * Gets the nearest node in a range
-   * @param point Point
-   * @param range Range
-   * @returns Node
+   * Gets the nearest node in a range from a point
+   * @param point Point to check from
+   * @param range Range to check in
+   * @returns Nearest node in range or null
    */
   getNearestNodeInRange(point: { x: number; y: number }, range: number): Node | null {
     return getNearestNodeInRange(this, point, range);
   }
 
   /**
-   * Gets the nearest port in a range
-   * @param point Point
-   * @param range Range
-   * @returns Port
+   * Gets the nearest port in a range from a point
+   * @param point Point to check from
+   * @param range Range to check in
+   * @returns Nearest port in range or null
    */
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return getNearestPortInRange(this, point, range);

@@ -1,9 +1,26 @@
 import type { Middleware, Node } from '../../types';
 import { calculateGroupRect } from '../../utils/group-size';
 
-export const groupChildrenChangeExtent: Middleware = {
+export interface GroupChildrenChangeExtentMiddlewareMetadata {
+  enabled: boolean;
+}
+
+export const groupChildrenChangeExtent: Middleware<
+  'group-children-change-extent',
+  GroupChildrenChangeExtentMiddlewareMetadata
+> = {
   name: 'group-children-change-extent',
-  execute: async ({ helpers, nodesMap }, next) => {
+  defaultMetadata: {
+    enabled: true,
+  },
+  execute: async ({ helpers, nodesMap, middlewareMetadata }, next) => {
+    const isEnabled = middlewareMetadata.enabled;
+
+    if (!isEnabled) {
+      next();
+      return;
+    }
+
     const hasGroupChanges = helpers.checkIfAnyNodePropsChanged(['groupId']);
 
     if (!hasGroupChanges) {

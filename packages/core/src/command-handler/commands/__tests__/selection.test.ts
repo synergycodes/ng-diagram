@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { mockEdge, mockNode } from '../../../test-utils';
+import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import { CommandHandler } from '../../command-handler';
 import { deselect, deselectAll, select } from '../selection';
 
@@ -24,7 +24,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       select(commandHandler, { name: 'select', nodeIds: ['node1'] });
@@ -45,7 +45,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       select(commandHandler, { name: 'select', edgeIds: ['edge1'] });
@@ -73,7 +73,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       select(commandHandler, {
@@ -98,7 +98,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       select(commandHandler, {
@@ -122,7 +122,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       deselect(commandHandler, { name: 'deselect', nodeIds: ['node1'] });
@@ -146,7 +146,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       deselect(commandHandler, { name: 'deselect', edgeIds: ['edge1'] });
@@ -167,7 +167,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       deselect(commandHandler, { name: 'deselect', nodeIds: ['node1'] });
@@ -190,7 +190,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       deselectAll(commandHandler);
@@ -217,7 +217,7 @@ describe('Selection Commands', () => {
       vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
         nodes,
         edges,
-        metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+        metadata: mockMetadata,
       });
 
       deselectAll(commandHandler);

@@ -8,6 +8,7 @@ export class SignalModelAdapter implements ModelAdapter {
   private edges = signal<Edge[]>([]);
   private metadata = signal<Metadata>({
     viewport: { x: 0, y: 0, scale: 1 },
+    middlewaresConfig: {},
   });
   private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void)[] = [];
 

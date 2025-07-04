@@ -5,22 +5,27 @@ import type {
   FlowStateUpdate,
   Metadata,
   MiddlewareChain,
+  MiddlewareConfigKeys,
   MiddlewareContext,
   MiddlewareHistoryUpdate,
+  MiddlewaresConfigFromMiddlewares,
   ModelActionType,
   Node,
 } from '../types';
 import { isSamePoint, isSameSize } from '../utils';
 
-export class MiddlewareExecutor {
-  readonly flowCore: FlowCore;
+export class MiddlewareExecutor<
+  TCustomMiddlewares extends MiddlewareChain,
+  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>>,
+> {
+  readonly flowCore: FlowCore<TCustomMiddlewares, TMetadata>;
   readonly middlewareChain: MiddlewareChain;
 
-  private history: MiddlewareHistoryUpdate[] = [];
-  private initialState!: FlowState;
+  private history: MiddlewareHistoryUpdate<TCustomMiddlewares>[] = [];
+  private initialState!: FlowState<TMetadata>;
   private initialStateUpdate!: FlowStateUpdate;
   private modelActionType!: ModelActionType;
-  private metadata: Metadata = { viewport: { x: 0, y: 0, scale: 1 } };
+  private metadata!: TMetadata;
   private edgesMap = new Map<string, Edge>();
   private nodesMap = new Map<string, Node>();
   private addedNodesIds = new Set<string>();
@@ -31,18 +36,19 @@ export class MiddlewareExecutor {
   private updatedPropsToEdgeIds = new Map<string, Set<string>>();
   private updatedNodeIdsToProps = new Map<string, Set<string>>();
   private updatedEdgeIdsToProps = new Map<string, Set<string>>();
-  private updatedMetadataProps = new Set<keyof Metadata>();
+  private updatedMetadataProps = new Set<keyof TMetadata>();
+  private updatedMiddlewaresMetadataProps = new Set<MiddlewareConfigKeys<TCustomMiddlewares>>();
 
-  constructor(flowCore: FlowCore, middlewareChain: MiddlewareChain) {
+  constructor(flowCore: FlowCore<TCustomMiddlewares, TMetadata>, middlewareChain: MiddlewareChain) {
     this.flowCore = flowCore;
     this.middlewareChain = middlewareChain;
   }
 
   async run(
-    initialState: FlowState,
+    initialState: FlowState<TMetadata>,
     stateUpdate: FlowStateUpdate,
     modelActionType: ModelActionType
-  ): Promise<FlowState | undefined> {
+  ): Promise<FlowState<TMetadata> | undefined> {
     this.initialState = initialState;
     this.modelActionType = modelActionType;
     this.metadata = initialState.metadata;
@@ -62,40 +68,50 @@ export class MiddlewareExecutor {
     checkIfEdgeRemoved: (id: string) => this.removedEdgesIds.has(id),
     checkIfAnyNodePropsChanged: (props: string[]) => props.some((prop) => this.updatedPropsToNodeIds.has(prop)),
     checkIfAnyEdgePropsChanged: (props: string[]) => props.some((prop) => this.updatedPropsToEdgeIds.has(prop)),
-    checkIfMetadataPropsChanged: (props: string[]) => props.some((prop) => this.updatedMetadataProps.has(prop)),
+    checkIfMetadataPropsChanged: (props: string[]) =>
+      props.some((prop) => this.updatedMetadataProps.has(prop as keyof TMetadata)),
     anyNodesAdded: () => this.addedNodesIds.size > 0,
     anyEdgesAdded: () => this.addedEdgesIds.size > 0,
     anyNodesRemoved: () => this.removedNodesIds.size > 0,
     anyEdgesRemoved: () => this.removedEdgesIds.size > 0,
     getAffectedNodeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToNodeIds.get(prop) ?? [])]),
     getAffectedEdgeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToEdgeIds.get(prop) ?? [])]),
+    hasMiddlewareMetadataChanged: (middlewareName: MiddlewareConfigKeys<TCustomMiddlewares>) =>
+      this.updatedMiddlewaresMetadataProps.has(middlewareName),
   });
 
-  private getState = (): FlowState => ({
+  private getState = (): FlowState<TMetadata> => ({
     nodes: Array.from(this.nodesMap.values()),
     edges: Array.from(this.edgesMap.values()),
     metadata: this.metadata,
   });
 
-  private getContext = (): MiddlewareContext => ({
+  private getContext = (
+    middlewareName: MiddlewareConfigKeys<TCustomMiddlewares>
+  ): MiddlewareContext<
+    TCustomMiddlewares,
+    TMetadata,
+    TMetadata['middlewaresConfig'][MiddlewareConfigKeys<TCustomMiddlewares>]
+  > => ({
     state: this.getState(),
     nodesMap: this.nodesMap,
     edgesMap: this.edgesMap,
     initialState: this.initialState,
     modelActionType: this.modelActionType,
-    flowCore: this.flowCore,
+    flowCore: this.flowCore as unknown as FlowCore<TCustomMiddlewares>,
     helpers: this.helpers(),
     history: this.history,
     initialUpdate: this.initialStateUpdate,
+    middlewareMetadata: this.flowCore.middlewareManager.getMiddlewareConfig(middlewareName),
   });
 
-  private resolveMiddlewares = (): Promise<FlowState | undefined> => {
-    return new Promise<FlowState | undefined>((finalResolve) => {
-      const resolvers: ((state: FlowState) => void)[] = [];
+  private resolveMiddlewares = (): Promise<FlowState<TMetadata> | undefined> => {
+    return new Promise<FlowState<TMetadata> | undefined>((finalResolve) => {
+      const resolvers: ((state: FlowState<TMetadata>) => void)[] = [];
       const middlewaresExecutedIndexes = new Set<number>();
 
       const dispatch = (i: number) =>
-        new Promise<FlowState>((resolve) => {
+        new Promise<FlowState<TMetadata>>((resolve) => {
           const middleware = this.middlewareChain[i];
 
           if (!middleware) {
@@ -107,8 +123,10 @@ export class MiddlewareExecutor {
             return;
           }
 
+          const middlewareName = middleware.name as MiddlewareConfigKeys<TCustomMiddlewares>;
+
           if (middlewaresExecutedIndexes.has(i)) {
-            throw new Error(`Middleware ${middleware.name} executed next() multiple times`);
+            throw new Error(`Middleware ${middlewareName} executed next() multiple times`);
           }
           middlewaresExecutedIndexes.add(i);
 
@@ -116,7 +134,7 @@ export class MiddlewareExecutor {
 
           const next = async (stateUpdate?: FlowStateUpdate) => {
             if (stateUpdate && Object.keys(stateUpdate).length > 0) {
-              this.applyStateUpdate(stateUpdate, middleware.name);
+              this.applyStateUpdate(stateUpdate, middlewareName);
             }
             const state = await dispatch(i + 1);
             return state;
@@ -128,14 +146,19 @@ export class MiddlewareExecutor {
             finalResolve(undefined);
           };
 
-          middleware.execute(this.getContext(), next, cancel);
+          const context = this.getContext(middlewareName);
+
+          middleware.execute(context, next, cancel);
         });
 
       dispatch(0);
     });
   };
 
-  private applyStateUpdate = (stateUpdate: FlowStateUpdate, middlewareName?: string) => {
+  private applyStateUpdate = (
+    stateUpdate: FlowStateUpdate,
+    middlewareName?: MiddlewareConfigKeys<TCustomMiddlewares>
+  ) => {
     if (middlewareName) {
       this.history.push({ name: middlewareName, stateUpdate });
     }
@@ -148,8 +171,13 @@ export class MiddlewareExecutor {
 
     if (stateUpdate.metadataUpdate) {
       Object.keys(stateUpdate.metadataUpdate ?? {}).forEach((key) => {
-        this.updatedMetadataProps.add(key as keyof Metadata);
+        this.updatedMetadataProps.add(key as keyof TMetadata);
       });
+      if (stateUpdate.metadataUpdate.middlewaresConfig) {
+        Object.keys(stateUpdate.metadataUpdate.middlewaresConfig).forEach((key) => {
+          this.updatedMiddlewaresMetadataProps.add(key as MiddlewareConfigKeys<TCustomMiddlewares>);
+        });
+      }
       this.metadata = { ...this.metadata, ...stateUpdate.metadataUpdate };
     }
   };

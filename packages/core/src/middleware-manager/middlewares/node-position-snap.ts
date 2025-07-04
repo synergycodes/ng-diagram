@@ -1,12 +1,25 @@
 import type { FlowStateUpdate, Middleware } from '../../types';
 import { snapNumber } from '../../utils';
 
-const SNAP_GRID = 10;
+export interface NodePositionSnapMiddlewareMetadata {
+  snap: {
+    x: number;
+    y: number;
+  };
+}
 
-export const nodePositionSnapMiddleware: Middleware = {
+export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePositionSnapMiddlewareMetadata> = {
   name: 'node-position-snap',
+  defaultMetadata: {
+    snap: {
+      x: 10,
+      y: 10,
+    },
+  },
   execute: (context, next, cancel) => {
     const { helpers, nodesMap, flowCore } = context;
+
+    const snapConfig = context.middlewareMetadata.snap;
 
     const shouldSnap = helpers.checkIfAnyNodePropsChanged(['position']);
 
@@ -24,8 +37,8 @@ export const nodePositionSnapMiddleware: Middleware = {
         continue;
       }
 
-      const snappedX = snapNumber(node.position.x, SNAP_GRID);
-      const snappedY = snapNumber(node.position.y, SNAP_GRID);
+      const snappedX = snapNumber(node.position.x, snapConfig.x ?? 10);
+      const snappedY = snapNumber(node.position.y, snapConfig.y ?? 10);
 
       const originalNode = flowCore.getNodeById(node.id);
 

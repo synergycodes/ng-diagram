@@ -1,21 +1,24 @@
-import { Injectable, inject } from '@angular/core';
-import { FlowCore, type Middleware, type ModelAdapter } from '@angularflow/core';
+import { inject, Injectable } from '@angular/core';
+import { FlowCore, Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares, ModelAdapter } from '@angularflow/core';
 
 import { EventMapperService } from '../event-mapper/event-mapper.service';
 import { RendererService } from '../renderer/renderer.service';
 import { detectEnvironment } from './detect-environment';
 
 @Injectable({ providedIn: 'root' })
-export class FlowCoreProviderService {
+export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> {
   private readonly renderer = inject(RendererService);
   private readonly eventMapper = inject(EventMapperService);
-  private flowCore: FlowCore | null = null;
+  private flowCore: FlowCore<TMiddlewares> | null = null;
 
-  init(model: ModelAdapter, middlewares: Middleware[] = []): void {
+  init(
+    model: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>,
+    middlewares: TMiddlewares = [] as unknown as TMiddlewares
+  ): void {
     this.flowCore = new FlowCore(model, this.renderer, this.eventMapper, detectEnvironment(), middlewares);
   }
 
-  provide(): FlowCore {
+  provide(): FlowCore<TMiddlewares> {
     if (!this.flowCore) {
       throw new Error('FlowCore not initialized');
     }

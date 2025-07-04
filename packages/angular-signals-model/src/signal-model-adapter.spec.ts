@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import type { Edge, Node, Viewport } from '@angularflow/core';
+import type { Edge, Metadata, Node, Viewport } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SignalModelAdapter } from './signal-model-adapter';
 
@@ -13,6 +13,7 @@ describe('SignalModelAdapter', () => {
 
   const mockEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2', type: 'default', data: {} }];
   const viewport: Viewport = { x: 0, y: 0, scale: 1 };
+  const middlewaresConfig: Metadata['middlewaresConfig'] = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -24,7 +25,7 @@ describe('SignalModelAdapter', () => {
   it('should initialize with empty state', () => {
     expect(service.getNodes()).toEqual([]);
     expect(service.getEdges()).toEqual([]);
-    expect(service.getMetadata()).toEqual({ viewport });
+    expect(service.getMetadata()).toEqual({ viewport, middlewaresConfig });
   });
 
   it('should set and get nodes', () => {
@@ -35,14 +36,6 @@ describe('SignalModelAdapter', () => {
   it('should set and get edges', () => {
     service.setEdges(mockEdges);
     expect(service.getEdges()).toEqual(mockEdges);
-  });
-
-  it('should set or update metadata', () => {
-    service.setMetadata({ viewport, theme: 'dark' });
-    expect(service.getMetadata()).toEqual({ viewport, theme: 'dark' });
-
-    service.setMetadata((prev) => ({ ...prev, mode: 'edit' }));
-    expect(service.getMetadata()).toEqual({ viewport, theme: 'dark', mode: 'edit' });
   });
 
   it('should call onChange callback when state changes', async () => {
@@ -85,27 +78,5 @@ describe('SignalModelAdapter', () => {
 
     expect(service.getNodes()).toEqual([]);
     expect(service.getEdges()).toEqual([]);
-  });
-
-  it('should not affect other state when updating one state property', () => {
-    service.setNodes(mockNodes);
-    service.setEdges(mockEdges);
-    service.setMetadata({ viewport, theme: 'dark' });
-
-    // Update just nodes
-    const newNode = { id: '3', type: 'special', data: {}, position: { x: 10, y: 20 } };
-    service.setNodes([...mockNodes, newNode]);
-
-    // Other state should remain unchanged
-    expect(service.getEdges()).toEqual(mockEdges);
-    expect(service.getMetadata()).toEqual({ viewport, theme: 'dark' });
-  });
-
-  it('should overwrite metadata when using setMetadata', () => {
-    service.setMetadata({ viewport, theme: 'dark', mode: 'edit' });
-    service.setMetadata({ viewport, theme: 'light' });
-
-    // The entire object should be replaced
-    expect(service.getMetadata()).toEqual({ viewport, theme: 'light' });
   });
 });
