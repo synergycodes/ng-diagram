@@ -34,7 +34,7 @@
     "@analogjs/vitest-angular": "^1.16.0",
     "@angular-devkit/build-angular": "^19.2.7",
     "@angular-eslint/builder": "^19.3.0",
-    "@angular/cli": "^19.2.7",
+    "@angular/cli": "^20.0.5",
     "@angular/compiler-cli": "^19.2.6",
     "@eslint/js": "^9.25.1",
     "angular-eslint": "19.3.0",
