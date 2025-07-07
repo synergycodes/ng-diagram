@@ -8,7 +8,7 @@ import {
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
-import { loggerMiddleware } from '@angularflow/logger-middleware';
+import { appMiddlewares } from './flow/flow.config';
 import { GroupNodeComponent } from './node-template/group-node/group-node.component';
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
@@ -25,7 +25,7 @@ import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/cu
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  model = signal<SignalModelAdapter>(new SignalModelAdapter());
+  model = signal(new SignalModelAdapter());
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],
@@ -36,7 +36,7 @@ export class AppComponent {
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
-  middlewares = signal<Middleware[]>([loggerMiddleware]);
+  middlewares = signal<Middleware[]>(appMiddlewares);
 
   constructor() {
     this.model().setNodes([
@@ -83,7 +83,6 @@ export class AppComponent {
         data: {},
         sourcePort: 'port-right',
         targetPort: 'port-left-1',
-        // routing: 'bezier',
         type: 'button-edge',
       },
       {

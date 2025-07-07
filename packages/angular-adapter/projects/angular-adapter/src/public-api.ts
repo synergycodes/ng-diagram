@@ -2,7 +2,7 @@
  * Public API Surface of angular-adapter
  */
 
-export type { Middleware, Node, Edge, getSourceTargetPositions, Point } from '@angularflow/core';
+export type { Edge, FlowCore, Metadata, Middleware, Node, Point } from '@angularflow/core';
 export * from './lib/components/diagram/angular-adapter-diagram.component';
 export * from './lib/components/port/angular-adapter-port.component';
 export * from './lib/components/edge-label/angular-adapter-edge-label.component';
@@ -14,3 +14,12 @@ export * from './lib/utils/get-paths/get-straight-paths';
 export * from './lib/utils/get-paths/get-orthogonal-paths';
 export * from './lib/utils/get-paths/get-bezier-paths';
 export * from './lib/services/';
+
+export {
+  edgesRoutingMiddleware,
+  groupChildrenChangeExtent,
+  groupChildrenMoveExtent,
+  nodePositionSnapMiddleware,
+  nodeRotationSnapMiddleware,
+  treeLayoutMiddleware,
+} from '@angularflow/core';

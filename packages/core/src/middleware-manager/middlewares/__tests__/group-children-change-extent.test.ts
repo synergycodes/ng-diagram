@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockGroupNode, mockNode } from '../../../test-utils';
-import type { MiddlewareContext, Node } from '../../../types';
-import { groupChildrenChangeExtent } from '../group-children-change-extent';
+import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../types';
+import {
+  groupChildrenChangeExtent,
+  GroupChildrenChangeExtentMiddlewareMetadata,
+} from '../group-children-change-extent';
 
 const mockCalculateGroupRect = vi.fn();
 vi.mock('../../../utils/group-size', () => ({
@@ -14,7 +17,11 @@ describe('groupChildrenChangeExtent Middleware', () => {
     getAffectedNodeIds: ReturnType<typeof vi.fn>;
   };
   let nodesMap: Map<string, Node>;
-  let context: MiddlewareContext;
+  let context: MiddlewareContext<
+    [],
+    Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+    GroupChildrenChangeExtentMiddlewareMetadata
+  >;
   const nextMock = vi.fn();
   const cancelMock = vi.fn();
 
@@ -27,7 +34,14 @@ describe('groupChildrenChangeExtent Middleware', () => {
     context = {
       helpers: helpers as unknown as MiddlewareContext['helpers'],
       nodesMap,
-    } as unknown as MiddlewareContext;
+      middlewareMetadata: {
+        enabled: true,
+      },
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      GroupChildrenChangeExtentMiddlewareMetadata
+    >;
     nextMock.mockReset();
     cancelMock.mockReset();
     mockCalculateGroupRect.mockReset();

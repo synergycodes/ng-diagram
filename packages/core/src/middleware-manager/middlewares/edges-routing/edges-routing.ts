@@ -13,6 +13,10 @@ import { getSourceTargetPositions } from './get-source-target-positions.ts';
 import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
 import { isDefaultRouting } from './utils/isRouting.ts';
 
+export interface EdgesRoutingMiddlewareMetadata {
+  enabled: boolean;
+}
+
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
   helpers.anyEdgesAdded() ||
@@ -61,8 +65,11 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, config?: RoutingConf
   return { sourcePoint, targetPoint, points };
 };
 
-export const edgesRoutingMiddleware: Middleware = {
+export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMiddlewareMetadata> = {
   name: 'edges-routing',
+  defaultMetadata: {
+    enabled: true,
+  },
   execute: (context, next) => {
     const {
       state: { edges, metadata },
@@ -70,6 +77,14 @@ export const edgesRoutingMiddleware: Middleware = {
       helpers,
       modelActionType,
     } = context;
+    // Access the typed middleware metadata
+    const isEnabled = context.middlewareMetadata.enabled;
+
+    if (!isEnabled) {
+      next();
+      return;
+    }
+
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
     const shouldUpdateTemporaryEdge = helpers.checkIfMetadataPropsChanged(['temporaryEdge']) && metadata.temporaryEdge;
 

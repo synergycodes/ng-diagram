@@ -1,26 +1,31 @@
 import { FlowCore } from '../flow-core';
-import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionType } from '../types';
+import type {
+  FlowState,
+  FlowStateUpdate,
+  Metadata,
+  Middleware,
+  MiddlewareChain,
+  MiddlewareConfigKeys,
+  MiddlewaresConfigFromMiddlewares,
+  ModelActionType,
+} from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { groupChildrenChangeExtent } from './middlewares/group-children-change-extent';
-import { groupChildrenMoveExtent } from './middlewares/group-children-move-extent';
-import { nodePositionSnapMiddleware } from './middlewares/node-position-snap';
-import { nodeRotationSnapMiddleware } from './middlewares/node-rotation-snap';
-import { edgesRoutingMiddleware } from './middlewares/edges-routing/edges-routing.ts';
-import { treeLayoutMiddleware } from './middlewares/tree-layout/tree-layout.ts';
 
-export class MiddlewareManager {
+export class MiddlewareManager<
+  TCustomMiddlewares extends MiddlewareChain = [],
+  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>> = Metadata<
+    MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>
+  >,
+> {
   private middlewareChain: MiddlewareChain = [];
-  readonly flowCore: FlowCore;
+  readonly flowCore: FlowCore<TCustomMiddlewares, TMetadata>;
 
-  constructor(flowCore: FlowCore, middlewares: Middleware[] = []) {
+  constructor(flowCore: FlowCore<TCustomMiddlewares, TMetadata>, middlewares?: TCustomMiddlewares) {
     this.flowCore = flowCore;
-    this.register(nodePositionSnapMiddleware);
-    this.register(nodeRotationSnapMiddleware);
-    this.register(groupChildrenChangeExtent);
-    this.register(groupChildrenMoveExtent);
-    this.register(treeLayoutMiddleware);
-    this.register(edgesRoutingMiddleware);
-    middlewares.forEach((middleware) => this.register(middleware));
+
+    if (middlewares) {
+      middlewares.forEach((middleware) => this.register(middleware));
+    }
   }
 
   /**
@@ -28,19 +33,21 @@ export class MiddlewareManager {
    * @param middleware Middleware to register
    * @returns Function to unregister the middleware
    */
-  register(middleware: Middleware): () => void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  register<T extends Middleware<any>>(middleware: T): () => void {
     if (this.middlewareChain.find((m) => m.name === middleware.name)) {
       throw new Error(`Middleware ${middleware.name} already registered`);
     }
+
     this.middlewareChain.push(middleware);
     return () => this.unregister(middleware.name);
   }
 
   /**
-   * Unregisters a middleware from the chain
+   * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregister(name: string): void {
+  unregister(name: MiddlewareConfigKeys<TCustomMiddlewares>): void {
     const index = this.middlewareChain.findIndex((middleware) => middleware.name === name);
     if (index !== -1) {
       this.middlewareChain.splice(index, 1);
@@ -54,8 +61,55 @@ export class MiddlewareManager {
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(initialState: FlowState, stateUpdate: FlowStateUpdate, modelActionType: ModelActionType) {
+  execute(
+    initialState: FlowState<TMetadata>,
+    stateUpdate: FlowStateUpdate,
+    modelActionType: ModelActionType
+  ): Promise<FlowState<TMetadata> | undefined> {
     const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
     return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
+  }
+
+  /**
+   * Assigns middleware configuration with full type safety
+   * @param middlewareName - The name of the middleware to update
+   * @param config - The configuration of the middleware
+   */
+  applyMiddlewareConfig<TName extends MiddlewareConfigKeys<TCustomMiddlewares>>(
+    middlewareName: TName,
+    config?: TMetadata['middlewaresConfig'][TName]
+  ): void {
+    const state = this.flowCore.getState();
+
+    if (typeof config === 'undefined') {
+      // If config is undefined, remove the property
+      delete state.metadata.middlewaresConfig[middlewareName];
+    } else {
+      // Otherwise, assign the config
+      state.metadata.middlewaresConfig[middlewareName] = config;
+    }
+
+    this.flowCore.setState(state);
+  }
+
+  /**
+   * Gets the middleware configuration
+   * @param middlewareName Name of the middleware to get the configuration for
+   * @returns The middleware configuration
+   */
+  getMiddlewareConfig<TName extends MiddlewareConfigKeys<TCustomMiddlewares>>(
+    middlewareName: TName
+  ): TMetadata['middlewaresConfig'][TName] {
+    const state = this.flowCore.getState();
+    const middleware = this.middlewareChain.find((middleware) => middleware.name === middlewareName);
+
+    if (!middleware) {
+      console.warn(`[AngularFlow] Accessing middleware config for "${middlewareName}" not found`);
+    }
+
+    const middlewareConfig = state.metadata.middlewaresConfig[middlewareName] ?? {};
+
+    // NOTE: This is not a deep merge
+    return { ...(middleware?.defaultMetadata ?? {}), ...middlewareConfig };
   }
 }
