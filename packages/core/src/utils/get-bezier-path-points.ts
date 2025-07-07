@@ -10,11 +10,7 @@ import { Point, PortLocation } from '../types';
  * @param bezierControlOffset distance between the end points and their respective control points
  * Higher values make the curve more "curved". Default is 100.
  */
-export const getBezierPathPoints = (
-  source: PortLocation,
-  target: PortLocation,
-  bezierControlOffset = 100
-): Point[] => {
+export const getBezierPathPoints = (source: PortLocation, target: PortLocation, bezierControlOffset = 100): Point[] => {
   if (!source || !target) return [];
 
   const point1 = { x: source.x + bezierControlOffset, y: source.y };
