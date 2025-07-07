@@ -45,8 +45,8 @@ export interface RoutingConfiguration {
   bezier?: {
     bezierControlOffset?: number;
   };
-  orthogonal?: { [key: string]: unknown };
-  straight?: { [key: string]: unknown };
+  orthogonal?: Record<string, unknown>;
+  straight?: Record<string, unknown>;
 }
 
 /**
