@@ -13,7 +13,7 @@ import { Point, PortLocation } from '../types';
 export const getBezierPathPoints = (
   source: PortLocation,
   target: PortLocation,
-  bezierControlOffset: number = 100
+  bezierControlOffset = 100
 ): Point[] => {
   if (!source || !target) return [];
 
