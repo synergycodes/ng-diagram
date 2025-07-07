@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   AngularAdapterCustomEdgeComponent,
   AngularAdapterEdgeLabelComponent,
