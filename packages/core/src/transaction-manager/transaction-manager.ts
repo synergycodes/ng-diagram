@@ -1,112 +1,97 @@
-import type { FlowStateUpdate, ModelActionType } from '../types';
+import type { FlowCore } from '../flow-core';
+import type { FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
+import { Transaction } from './transaction';
+import type { TransactionCallback, TransactionResult } from './transaction.types';
 
-/**
- * Manages transaction state for FlowCore, allowing grouping of state updates and atomic execution.
- */
-export class TransactionManager {
-  private active = false;
-  private queue: { update: FlowStateUpdate; actionType: ModelActionType }[] = [];
-  private transactionName: ModelActionType | null = null;
+export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
+  private transactionStack: Transaction[] = [];
 
-  /**
-   * Starts a new transaction. Throws if a transaction is already active.
-   * @param transactionName The name of the transaction
-   */
-  startTransaction(transactionName: ModelActionType) {
-    if (this.active) {
-      throw new Error('A transaction is already active. Only one transaction can be active at a time.');
+  constructor(private readonly flowCore: TFlowCore) {}
+
+  async transaction(callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback
+  ): Promise<TransactionResult>;
+  async transaction(
+    nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
+    callback?: TransactionCallback
+  ): Promise<TransactionResult> {
+    const [transactionName, transactionCallback] = this.parseArgs(nameOrCallback, callback);
+
+    const parentTransaction = this.getCurrentTransaction();
+    const transaction = new Transaction(transactionName, parentTransaction, this.flowCore);
+
+    this.transactionStack.push(transaction);
+
+    try {
+      // Execute callback with transaction context
+      await transactionCallback(transaction.context);
+
+      if (!transaction.isRolledBack()) {
+        if (parentTransaction) {
+          // Nested transaction - merge to parent
+          transaction.mergeToParent();
+        } else {
+          // Root transaction - apply changes
+          const { mergedUpdate, commandsCount } = transaction.getMergedUpdates();
+
+          return {
+            results: mergedUpdate,
+            commandsCount,
+          };
+        }
+      }
+
+      return {
+        results: {},
+        commandsCount: 0,
+      };
+    } catch (error) {
+      // Automatic rollback on error
+      transaction.rollback();
+      throw error;
+    } finally {
+      // Remove from stack
+      this.transactionStack.pop();
     }
-    this.active = true;
-    this.queue = [];
-    this.transactionName = transactionName;
   }
 
-  /**
-   * Queues a state update during an active transaction.
-   * @param update The state update to queue
-   * @param actionType The action type for the update
-   */
-  queueUpdate(update: FlowStateUpdate, actionType: ModelActionType) {
-    if (!this.active) {
+  queueUpdate(update: FlowStateUpdate, actionType: LooseAutocomplete<ModelActionType>): void {
+    const currentTransaction = this.getCurrentTransaction();
+
+    if (!currentTransaction) {
       throw new Error('No active transaction. Cannot queue update.');
     }
-    this.queue.push({ update, actionType });
+    currentTransaction.queueUpdate(update, actionType);
   }
 
-  /**
-   * Stops the transaction and returns all queued updates. Throws if no transaction is active.
-   * @returns The queued updates
-   */
-  stopTransaction() {
-    if (!this.active) {
-      throw new Error('No active transaction to stop.');
-    }
-    this.active = false;
-    const queued = this.queue;
-    this.queue = [];
-    this.transactionName = null;
-
-    return this.mergeQueuedUpdates(queued);
+  isActive(): boolean {
+    return this.transactionStack.length > 0;
   }
 
-  /**
-   * Returns whether a transaction is currently active.
-   */
-  isActive() {
-    return this.active;
+  getTransactionName(): LooseAutocomplete<ModelActionType> | null {
+    const current = this.getCurrentTransaction();
+
+    return current ? current.getState().name : null;
   }
 
-  /**
-   * Returns the name of the current transaction, or null if none is active.
-   */
-  getTransactionName(): ModelActionType | null {
-    return this.transactionName;
+  private getCurrentTransaction(): Transaction | null {
+    return this.transactionStack[this.transactionStack.length - 1] || null;
   }
 
-  /**
-   * Merges all queued updates into a single FlowStateUpdate and returns it with the last action type.
-   * This does not clear the queue or affect transaction state.
-   */
-  private mergeQueuedUpdates(queue: { update: FlowStateUpdate; actionType: ModelActionType }[]): {
-    mergedUpdate: FlowStateUpdate;
-    lastActionType?: ModelActionType;
-    commandsCount: number;
-  } {
-    const mergedUpdate: FlowStateUpdate = {};
-    let lastActionType: ModelActionType | undefined;
-
-    if (queue.length === 0) {
-      return { mergedUpdate, lastActionType, commandsCount: 0 };
+  private parseArgs(
+    nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
+    callback?: TransactionCallback
+  ): [LooseAutocomplete<ModelActionType>, TransactionCallback] {
+    if (typeof nameOrCallback === 'function') {
+      return ['Transaction' as ModelActionType, nameOrCallback];
     }
 
-    for (const { update, actionType } of queue) {
-      if (update.nodesToAdd) {
-        mergedUpdate.nodesToAdd = [...(mergedUpdate.nodesToAdd || []), ...update.nodesToAdd];
-      }
-      if (update.nodesToRemove) {
-        mergedUpdate.nodesToRemove = [...(mergedUpdate.nodesToRemove || []), ...update.nodesToRemove];
-      }
-      if (update.nodesToUpdate) {
-        mergedUpdate.nodesToUpdate = [...(mergedUpdate.nodesToUpdate || []), ...update.nodesToUpdate];
-      }
-      if (update.edgesToAdd) {
-        mergedUpdate.edgesToAdd = [...(mergedUpdate.edgesToAdd || []), ...update.edgesToAdd];
-      }
-      if (update.edgesToRemove) {
-        mergedUpdate.edgesToRemove = [...(mergedUpdate.edgesToRemove || []), ...update.edgesToRemove];
-      }
-      if (update.edgesToUpdate) {
-        mergedUpdate.edgesToUpdate = [...(mergedUpdate.edgesToUpdate || []), ...update.edgesToUpdate];
-      }
-      if (update.metadataUpdate) {
-        mergedUpdate.metadataUpdate = {
-          ...(mergedUpdate.metadataUpdate || {}),
-          ...update.metadataUpdate,
-        };
-      }
-      lastActionType = actionType;
+    if (!callback) {
+      throw new Error('Callback is required when transaction name is provided');
     }
 
-    return { mergedUpdate, lastActionType, commandsCount: queue.length };
+    return [nameOrCallback, callback];
   }
 }
