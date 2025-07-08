@@ -53,10 +53,10 @@ export class AngularAdapterCustomEdgeComponent {
   customMarkerEnd = input<string>();
   displayLabel = input<boolean>();
 
-  points = computed(() => (this.data().routing ? this.data().points : (this.pathAndPoints()?.points ?? [])));
+  points = computed(() => (this.routing() ? this.data().points : (this.pathAndPoints()?.points ?? [])));
 
   path = computed(() => {
-    const { routing } = this.data();
+    const routing = this.routing();
     if (!routing) return this.pathAndPoints()?.path ?? '';
 
     const points = this.points() || [];
@@ -95,8 +95,10 @@ export class AngularAdapterCustomEdgeComponent {
 
   constructor() {
     effect(() => {
+      const { sourcePosition, targetPosition } = this.data();
+
       const routing = this.routing?.();
-      if (!routing) return;
+      if (!routing || !sourcePosition || !targetPosition) return;
 
       if (this.prevRouting !== routing) {
         this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
