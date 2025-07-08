@@ -11,13 +11,12 @@ import { GroupNodeComponent } from './node-template/group-node/group-node.compon
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
-import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [AngularAdapterDiagramComponent, ToolbarComponent],
+  imports: [AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
