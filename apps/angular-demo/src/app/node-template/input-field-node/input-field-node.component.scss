@@ -89,3 +89,27 @@ input {
   border-radius: 2px;
   width: 150px;
 }
+
+angular-adapter-port {
+  width: 8px;
+  height: 8px;
+  border: 0.125rem solid #6f7480;
+  background: #ffffff;
+  transition-property: background-color, border-color, width, height;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.1s;
+}
+
+:host:hover angular-adapter-port {
+  width: 16px;
+  height: 16px;
+  border: 0.125rem solid #ffffff;
+  background: rgba(145, 64, 255, 1);
+}
+
+:host:active angular-adapter-port {
+  width: 16px;
+  height: 16px;
+  border: 0.125rem solid #ffffff;
+  background: rgba(145, 64, 255, 1);
+}

@@ -12,8 +12,8 @@ export const appMiddlewares = [
   nodeRotationSnapMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
-  edgesRoutingMiddleware,
   nodePositionSnapMiddleware,
+  edgesRoutingMiddleware,
   loggerMiddleware,
 ] as const satisfies Middleware[];
 
