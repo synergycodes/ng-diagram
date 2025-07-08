@@ -48,5 +48,10 @@ export interface Metadata<TMiddlewaresMetadata = unknown> {
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
   rotateHandleOffset?: RotateHandleConfiguration;
+  /**
+   * Defines the z-index value applied to selected elements.
+   * @default 1000
+   */
+  selectedZOrder?: number;
   middlewaresConfig: TMiddlewaresMetadata;
 }
