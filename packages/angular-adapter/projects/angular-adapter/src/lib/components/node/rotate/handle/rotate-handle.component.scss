@@ -1,39 +1,15 @@
 :host {
-  transform: translate(-50%, -50%);
-  width: var(--node-rotate-handle-size, 20px);
-  height: var(--node-rotate-handle-size, 20px);
-  background-color: var(--node-rotate-handle-bg, #ffffff);
-  border: 1px solid var(--node-rotate-handle-color, #1e90ff);
+  transform: translate(-10%, -50%);
+  width: 32px;
+  height: 32px;
+  background: rgba(111, 116, 128, 1);
   position: absolute;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
   z-index: 10;
   box-sizing: border-box;
-  outline: none;
-  transition: box-shadow 0.2s,
-  border-color 0.2s,
-  background 0.2s,
-  transform 0.1s;
   pointer-events: auto;
   cursor: grab;
-}
-
-:host(:hover),
-:host(:focus-visible) {
-  box-shadow: var(--node-rotate-handle-hover-shadow, 0 4px 16px rgba(30, 144, 255, 0.25));
-  border-color: var(--node-rotate-handle-hover-color, #005fcc);
-  outline: 2px solid var(--node-rotate-handle-hover-color, #005fcc);
-  outline-offset: 2px;
-}
-
-:host([data-rotating]),
-:host(.active),
-:host-context(.active) {
-  cursor: grabbing;
-  background: var(--node-rotate-handle-active-bg, #ffffff);
-  border-color: var(--node-rotate-handle-active-color, #005fcc);
-  box-shadow: var(--node-rotate-handle-active-shadow, 0 2px 12px rgba(30, 144, 255, 0.3));
-  outline: 2px solid var(--node-rotate-handle-active-color, #005fcc);
-  outline-offset: 2px;
-  transform: translate(-50%, -50%) scale(0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

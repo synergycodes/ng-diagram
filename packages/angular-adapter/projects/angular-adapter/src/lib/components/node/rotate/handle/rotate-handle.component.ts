@@ -1,12 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, HostBinding, inject, input, output } from '@angular/core';
 import { RotateHandleConfiguration } from '@angularflow/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { phosphorArrowCounterClockwise } from '@ng-icons/phosphor-icons/regular';
 import { FlowCoreProviderService } from '../../../../services';
 import { ROTATE_HANDLER_RIGHT_OFFSET, ROTATE_HANDLER_TOP_OFFSET } from '../constants';
 
 @Component({
   selector: 'angular-adapter-rotate-handle',
-  template: '',
+  template: '<ng-icon name="phosphorArrowCounterClockwise" size="16" color="white"></ng-icon>',
   standalone: true,
+  imports: [NgIcon],
+  providers: [provideIcons({ phosphorArrowCounterClockwise })],
   styleUrl: './rotate-handle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {

@@ -91,23 +91,44 @@ input {
 }
 
 angular-adapter-port {
-  width: 8px;
-  height: 8px;
+  /* Fixed size for edge connections - this is what the edge routing system sees */
+  width: 8px !important;
+  height: 8px !important;
   border: 0.125rem solid #6f7480;
   background: #ffffff;
-  transition-property: background-color, border-color, width, height;
+  border-radius: 50%;
+  transition-property: background-color, border-color;
   transition-timing-function: ease-in-out;
   transition-duration: 0.1s;
+  z-index: 2;
+
+  /* Visual resize effect using pseudo-element */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border: 0.125rem solid #6f7480;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition-property: background-color, border-color, width, height;
+    transition-timing-function: ease-in-out;
+    transition-duration: 0.1s;
+    pointer-events: none;
+  }
 }
 
-:host:hover angular-adapter-port {
+:host:hover angular-adapter-port::after {
   width: 16px;
   height: 16px;
   border: 0.125rem solid #ffffff;
   background: rgba(145, 64, 255, 1);
 }
 
-:host:active angular-adapter-port {
+:host:active angular-adapter-port::after {
   width: 16px;
   height: 16px;
   border: 0.125rem solid #ffffff;
