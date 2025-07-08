@@ -81,28 +81,12 @@
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
   color: #d5d8e0;
-}
-
-.user-form {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-group label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #d5d8e0;
-  margin: 0;
-}
-
-.form-input {
+.condition-select {
+  width: 100%;
   padding: 6px 8px;
   border: 1px solid #4d5059;
   border-radius: 4px;
@@ -112,38 +96,15 @@
   font-size: 12px;
   outline: none;
   transition: border-color 0.1s ease-in-out;
-  width: 100%;
-  box-sizing: border-box;
 }
 
-.form-input:focus {
+.condition-select:focus {
   border-color: rgba(145, 64, 255, 1);
 }
 
-.checkbox-group {
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  margin: 0;
-}
-
-.form-checkbox {
-  width: 16px;
-  height: 16px;
-  accent-color: rgba(145, 64, 255, 1);
-  cursor: pointer;
-  margin: 0;
+.condition-select option {
   background-color: #151516;
-  border: 1px solid #4d5059;
-  border-radius: 2px;
+  color: #d5d8e0;
 }
 
 input {

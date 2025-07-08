@@ -2,20 +2,19 @@ import { ChangeDetectionStrategy, Component, HostBinding, computed, input, model
 import { FormsModule } from '@angular/forms';
 import { AngularAdapterPortComponent, INodeTemplate, Node } from '@angularflow/angular-adapter';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { phosphorUser } from '@ng-icons/phosphor-icons/regular';
+import { phosphorQuestion } from '@ng-icons/phosphor-icons/regular';
 
 @Component({
-  selector: 'app-input-field-node',
+  selector: 'app-conditional-node',
   imports: [FormsModule, AngularAdapterPortComponent, NgIcon],
-  providers: [provideIcons({ phosphorUser })],
-  templateUrl: './input-field-node.component.html',
-  styleUrls: ['./input-field-node.component.scss'],
+  providers: [provideIcons({ phosphorQuestion })],
+  templateUrl: './conditional-node.component.html',
+  styleUrls: ['./conditional-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputFieldNodeComponent implements INodeTemplate {
+export class ConditionalNodeComponent implements INodeTemplate {
   text = model<string>('');
-  name = model<string>('');
-  address = model<string>('');
+  condition = model<string>('');
   data = input.required<Node>();
 
   // Computed property to check if node is selected

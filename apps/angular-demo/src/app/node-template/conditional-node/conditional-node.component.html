@@ -1,0 +1,34 @@
+<div class="header">
+  <div class="image">
+    <ng-icon name="phosphorQuestion" size="20" color="rgba(151, 71, 255, 1)"></ng-icon>
+  </div>
+  <div class="text-container">
+    <p>Conditional Node</p>
+    <p>Conditional logic</p>
+  </div>
+</div>
+<div class="content">
+  <select [(ngModel)]="condition" class="condition-select">
+    <option value="">Select condition</option>
+    <option value="option-a">Option A</option>
+    <option value="option-b">Option B</option>
+  </select>
+</div>
+<angular-adapter-port
+  id="port-left"
+  type="both"
+  style="top: 50%; left: 0; transform: translate(-50%, -50%)"
+  side="left"
+></angular-adapter-port>
+<angular-adapter-port
+  id="port-right-true"
+  type="both"
+  style="top: 25%; left: 100%; transform: translate(-50%, -50%)"
+  side="right"
+></angular-adapter-port>
+<angular-adapter-port
+  id="port-right-false"
+  type="both"
+  style="top: 75%; left: 100%; transform: translate(-50%, -50%)"
+  side="right"
+></angular-adapter-port>
