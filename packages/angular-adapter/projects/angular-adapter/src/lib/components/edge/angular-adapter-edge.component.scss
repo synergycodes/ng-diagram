@@ -11,5 +11,17 @@ svg {
   path {
     pointer-events: visibleStroke;
     cursor: pointer;
+    stroke: #4d5059;
+    stroke-width: 2px;
+    transition: stroke 0.1s ease-in;
   }
+}
+
+:host.hovered svg path,
+:host:hover svg path {
+  stroke: #6f7480;
+}
+
+:host svg path.selected {
+  stroke: rgba(145, 64, 255, 1);
 }

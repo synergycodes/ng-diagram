@@ -1,10 +1,9 @@
 <svg>
   <path
     class="flow__angular-adapter-edge__path"
+    [class.selected]="selected()"
     [attr.d]="path()"
-    [attr.stroke]="stroke()"
     [attr.fill]="'none'"
-    stroke-width="2"
     [attr.marker-start]="markerStart()"
     [attr.marker-end]="markerEnd()"
     [attr.stroke-opacity]="strokeOpacity()"
@@ -13,7 +12,7 @@
 </svg>
 <!-- TODO: Temporary solution. If edge templates will be implemented this code should be removed -->
 @if (!data().temporary) {
-  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
-    <div style="padding: 4px; background-color: white; border-radius: 5px; font-size: 10px">Label</div>
+  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5" [edgeHovered]="hovered()">
+    <div>Label</div>
   </angular-adapter-edge-label>
 }

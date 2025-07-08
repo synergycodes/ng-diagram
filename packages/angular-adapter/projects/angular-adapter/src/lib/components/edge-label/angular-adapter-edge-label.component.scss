@@ -1,3 +1,21 @@
 :host {
   position: absolute;
+  background: #151516;
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  color: #ffffff;
+  padding: 0.75rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 2px solid #4d5059;
+  transition: border-color 0.1s ease-in;
+  cursor: pointer;
+}
+
+:host:hover,
+:host.edge-hovered {
+  border-color: #6f7480;
+}
+
+:host.selected {
+  border-color: rgba(145, 64, 255, 1);
 }

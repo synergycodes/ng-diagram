@@ -23,7 +23,11 @@ import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.compon
   host: {
     '(pointerdown)': 'onPointerDown($event)',
     '(pointerup)': 'onPointerUp($event)',
+    '(pointerenter)': 'onPointerEnter($event)',
+    '(pointerleave)': 'onPointerLeave($event)',
     '[style.transform]': '`translate(${position().x}px, ${position().y}px) translate(-50%, -50%)`',
+    '[class.selected]': 'selected()',
+    '[class.edge-hovered]': 'edgeHovered()',
   },
 })
 export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
@@ -35,11 +39,13 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
 
   id = input.required<EdgeLabel['id']>();
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
+  edgeHovered = input<boolean>(false);
 
   edgeData = computed(() => this.edgeComponent.data());
 
   points = computed(() => this.edgeData()?.points);
   edgeId = computed(() => this.edgeData()?.id);
+  selected = computed(() => this.edgeData()?.selected || false);
   position = computed(
     () => this.edgeData()?.labels?.find((label) => label.id === this.id())?.position || { x: 0, y: 0 }
   );
@@ -114,6 +120,28 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
       button: event.button,
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
+    });
+
+    // Select the parent edge when label is clicked
+    this.selectParentEdge();
+  }
+
+  onPointerEnter(event: PointerEvent) {
+    event.stopPropagation();
+    // Trigger hover state on parent edge
+    this.edgeComponent.setHovered(true);
+  }
+
+  onPointerLeave(event: PointerEvent) {
+    event.stopPropagation();
+    // Trigger leave state on parent edge
+    this.edgeComponent.setHovered(false);
+  }
+
+  private selectParentEdge() {
+    // Emit a command to select the parent edge
+    this.flowCoreProvider.provide().commandHandler.emit('select', {
+      edgeIds: [this.edgeId()],
     });
   }
 

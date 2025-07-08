@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { Component } from '@angular/core';
+import { Edge } from '@angularflow/core';
 import {
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
@@ -8,10 +10,8 @@ import {
   PointerUpEventListenerDirective,
   ZIndexDirective,
 } from '../../directives';
-import { AngularAdapterEdgeComponent } from './angular-adapter-edge.component';
 import { AngularAdapterEdgeLabelComponent } from '../edge-label/angular-adapter-edge-label.component';
-import { Edge } from '@angularflow/core';
-import { Component } from '@angular/core';
+import { AngularAdapterEdgeComponent } from './angular-adapter-edge.component';
 
 @Component({
   selector: 'angular-adapter-edge-label',
@@ -124,7 +124,7 @@ describe('AngularAdapterEdgeComponent', () => {
     fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.stroke()).toBe('#888');
+    expect(component.selected()).toBe(true);
   });
 
   it('should return proper color when edge is not selected', () => {
@@ -133,7 +133,7 @@ describe('AngularAdapterEdgeComponent', () => {
     fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.stroke()).toBe('#bbb');
+    expect(component.selected()).toBe(false);
   });
 
   it('should return proper marker when edge has source arrowhead', () => {
