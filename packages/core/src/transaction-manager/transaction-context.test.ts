@@ -36,7 +36,7 @@ describe('createTransactionContext', () => {
     it('should call flowCore.commandHandler.emit when transaction is not rolled back', async () => {
       await context.emit('addNodes', { nodes: [mockNode] });
 
-      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('addNodes', { data: 'test' }, { extra: 'params' });
+      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('addNodes', { nodes: [mockNode] });
     });
 
     it('should throw error when transaction is rolled back', async () => {

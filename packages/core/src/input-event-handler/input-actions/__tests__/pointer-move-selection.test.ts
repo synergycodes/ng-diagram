@@ -6,7 +6,7 @@ import type { EventTarget, PointerEvent } from '../../../types';
 import { pointerMoveSelectionAction } from '../pointer-move-selection';
 
 describe('pointerMoveSelectionAction', () => {
-  const mockCommandHandler = { emit: vi.fn() };
+  let mockEmit = vi.fn();
   let mockEvent: PointerEvent;
   let mockTarget: EventTarget;
   let mockFlowCore: FlowCore;
@@ -22,6 +22,7 @@ describe('pointerMoveSelectionAction', () => {
     vi.clearAllMocks();
     mockTarget = { type: 'node', element: mockNode };
     mockEvent = getSamplePointerEvent({ type: 'pointerdown', x: 100, y: 100, target: mockTarget });
+    mockEmit = vi.fn();
 
     mockModelLookup = {
       getSelectedNodes: vi.fn().mockReturnValue([mockNode]),
@@ -35,13 +36,14 @@ describe('pointerMoveSelectionAction', () => {
     mockFlowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
-      commandHandler: mockCommandHandler,
+      commandHandler: { emit: mockEmit },
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       modelLookup: mockModelLookup,
       getNodesInRange: mockGetNodesInRange,
-      startTransaction: vi.fn(),
-      stopTransaction: vi.fn(),
+      transaction: vi.fn().mockImplementation(async (_name, callback) => {
+        await callback({ emit: mockEmit });
+      }),
     } as unknown as FlowCore;
   });
 
@@ -124,7 +126,7 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
         delta: { x: 10, y: 10 },
         nodes: [mockNode],
       });
@@ -132,7 +134,7 @@ describe('pointerMoveSelectionAction', () => {
 
     it('should not emit commands on pointerdown', () => {
       pointerMoveSelectionAction.action(mockEvent, mockFlowCore);
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockEmit).not.toHaveBeenCalled();
     });
   });
 
@@ -146,7 +148,7 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
         delta: { x: 10, y: 10 },
         nodes: [mockNode],
       });
@@ -158,7 +160,7 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockEmit).not.toHaveBeenCalled();
     });
 
     it('should emit highlightGroup when moving over a group', async () => {
@@ -172,8 +174,8 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       await pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('highlightGroup', { groupId: 'group1' });
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      expect(mockEmit).toHaveBeenCalledWith('highlightGroup', { groupId: 'group1' });
     });
 
     it('should emit highlightGroupClear when not moving over a group', async () => {
@@ -184,8 +186,8 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       await pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('highlightGroupClear');
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
     });
 
     it('should not highlight selected groups', async () => {
@@ -197,8 +199,8 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       await pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('highlightGroupClear');
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
     });
 
     it('should highlight top group when multiple groups are present', async () => {
@@ -211,8 +213,8 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       await pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('highlightGroup', { groupId: 'group2' });
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      expect(mockEmit).toHaveBeenCalledWith('highlightGroup', { groupId: 'group2' });
     });
 
     it('should calculate movement relative to start position', async () => {
@@ -235,11 +237,11 @@ describe('pointerMoveSelectionAction', () => {
       await pointerMoveSelectionAction.action(moveEvent2, mockFlowCore);
 
       // Only two moveNodesBy calls should be made
-      expect(mockCommandHandler.emit).toHaveBeenNthCalledWith(1, 'moveNodesBy', {
+      expect(mockEmit).toHaveBeenNthCalledWith(1, 'moveNodesBy', {
         delta: { x: delta, y: delta },
         nodes: [mockNode],
       });
-      expect(mockCommandHandler.emit).toHaveBeenNthCalledWith(3, 'moveNodesBy', {
+      expect(mockEmit).toHaveBeenNthCalledWith(3, 'moveNodesBy', {
         delta: { x: delta, y: delta },
         nodes: [updatedNode],
       });
@@ -254,7 +256,7 @@ describe('pointerMoveSelectionAction', () => {
       pointerMoveSelectionAction.action(moveEvent2, mockFlowCore);
 
       // Should not emit moveNodes
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveNodes', expect.any(Object));
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodes', expect.any(Object));
     });
   });
 
@@ -271,7 +273,7 @@ describe('pointerMoveSelectionAction', () => {
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
         nodes: [
           {
             id: mockNode.id,
@@ -288,7 +290,7 @@ describe('pointerMoveSelectionAction', () => {
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('updateNodes', expect.any(Object));
+      expect(mockEmit).not.toHaveBeenCalledWith('updateNodes', expect.any(Object));
     });
 
     it('should ungroup nodes when dropping outside of groups', () => {
@@ -299,7 +301,7 @@ describe('pointerMoveSelectionAction', () => {
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
         nodes: [
           {
             id: nodeWithGroup.id,
@@ -315,7 +317,7 @@ describe('pointerMoveSelectionAction', () => {
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('updateNodes', expect.any(Object));
+      expect(mockEmit).not.toHaveBeenCalledWith('updateNodes', expect.any(Object));
     });
 
     it('should clear group highlight after grouping', () => {
@@ -327,7 +329,7 @@ describe('pointerMoveSelectionAction', () => {
 
       // The highlightGroupClear is called with setTimeout, so we can't easily test it
       // But we can verify that updateNodes was called, which triggers the clear
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updateNodes', expect.any(Object));
+      expect(mockEmit).toHaveBeenCalledWith('updateNodes', expect.any(Object));
     });
 
     it('should reset move state after pointerup', () => {
@@ -339,7 +341,7 @@ describe('pointerMoveSelectionAction', () => {
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
       // Should not emit moveNodes
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveNodes', expect.any(Object));
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodes', expect.any(Object));
     });
 
     it('should handle multiple selected nodes for grouping', () => {
@@ -353,7 +355,7 @@ describe('pointerMoveSelectionAction', () => {
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
         nodes: [
           {
             id: 'node1',
@@ -373,14 +375,14 @@ describe('pointerMoveSelectionAction', () => {
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockEmit).not.toHaveBeenCalled();
     });
 
     it('should handle pointermove without pointerdown', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockEmit).not.toHaveBeenCalled();
     });
 
     it('should handle empty selected nodes array', () => {
@@ -393,12 +395,12 @@ describe('pointerMoveSelectionAction', () => {
       const moveEvent = getSamplePointerEvent({ type: 'pointermove', x: 110, y: 110, target: mockTarget });
       pointerMoveSelectionAction.action(moveEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockEmit).not.toHaveBeenCalled();
 
       const upEvent = getSamplePointerEvent({ type: 'pointerup', button: 0 });
       pointerMoveSelectionAction.action(upEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockEmit).not.toHaveBeenCalled();
     });
   });
 });
