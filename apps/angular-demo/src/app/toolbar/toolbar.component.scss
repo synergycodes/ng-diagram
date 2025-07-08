@@ -16,9 +16,9 @@
   }
 
   button {
-    background: #151516;
+    background: rgba(119, 6, 241, 1);
     color: #ffffff;
-    border: 1px solid #4d5059;
+    border: none;
     border-radius: 4px;
     padding: 8px 16px;
     font-family: 'Poppins', sans-serif;
@@ -29,13 +29,11 @@
     outline: none;
 
     &:hover {
-      border-color: rgba(145, 64, 255, 1);
-      background: #1a1b1d;
+      background: rgba(137, 26, 255, 1);
     }
 
     &:active {
-      background: rgba(145, 64, 255, 0.1);
-      border-color: rgba(145, 64, 255, 1);
+      background: rgba(119, 6, 241, 1);
     }
   }
 }
