@@ -9,7 +9,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { NodeSelectedDirective } from '../../../directives';
 import { EventMapperService, UpdatePortsService } from '../../../services';
 import { RotateHandleComponent } from './handle/rotate-handle.component';
 
@@ -19,7 +18,6 @@ import { RotateHandleComponent } from './handle/rotate-handle.component';
   styleUrl: './node-rotate-adornment.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RotateHandleComponent],
-  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
   host: {
     class: 'node-rotate-adornment',
   },

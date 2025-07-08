@@ -3,6 +3,7 @@ import { Node } from '@angularflow/core';
 
 import {
   NodePositionDirective,
+  NodeSelectedDirective,
   NodeSizeDirective,
   PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
@@ -22,6 +23,7 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
+    { directive: NodeSelectedDirective, inputs: ['data'] },
     { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
