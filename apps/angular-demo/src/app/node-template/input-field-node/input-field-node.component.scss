@@ -9,12 +9,19 @@
   box-sizing: border-box;
   gap: 0.5rem;
   flex-direction: column;
-  border: 0.0625rem solid rgba(145, 64, 255, 1);
-  transition: box-shadow 0.1s ease-in-out;
+  border: 0.0625rem solid #4d5059;
+  transition:
+    box-shadow 0.1s ease-in-out,
+    border-color 0.1s ease-in-out;
+}
+
+:host:hover {
+  border-color: rgba(145, 64, 255, 1);
 }
 
 /* Change box-shadow when node is selected */
 :host.node-selected {
+  border-color: rgba(145, 64, 255, 1);
   box-shadow: 0 0 0 4px rgba(145, 64, 255, 0.4);
 }
 
