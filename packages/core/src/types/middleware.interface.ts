@@ -86,9 +86,8 @@ export type MiddlewareArray = readonly Middleware[];
  */
 export interface MiddlewareContext<
   TCustomMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>> = Metadata<
-    MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TMetadata extends Metadata<any> = Metadata,
   TMiddlewareMetadata = unknown,
 > {
   initialState: FlowState<TMetadata>;
