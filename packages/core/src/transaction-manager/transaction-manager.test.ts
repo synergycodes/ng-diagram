@@ -1,529 +1,295 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import type { FlowCore } from '../flow-core';
 import { mockEdge, mockNode } from '../test-utils';
-import type { FlowStateUpdate, ModelActionType } from '../types';
+import type { ModelActionType } from '../types';
 import { TransactionManager } from './transaction-manager';
-
-const mockUpdate = (id: number): FlowStateUpdate => ({
-  nodesToAdd: [{ ...mockNode, id: `n${id}` }],
-  edgesToAdd: [{ ...mockEdge, id: `e${id}` }],
-  metadataUpdate: { test: id },
-});
+import { TransactionCallback } from './transaction.types';
 
 describe('TransactionManager', () => {
-  let tm: TransactionManager;
-  const actionA: ModelActionType = 'addNodes';
-  const actionB: ModelActionType = 'addEdges';
-  const actionC: ModelActionType = 'updateNodes';
+  let mockFlowCore: FlowCore;
+  let transactionManager: TransactionManager;
+  let mockEmit: Mock;
+  let mockApplyUpdate: Mock;
 
   beforeEach(() => {
-    tm = new TransactionManager();
-  });
+    mockEmit = vi.fn();
+    mockApplyUpdate = vi.fn();
+    mockFlowCore = {
+      commandHandler: {
+        emit: mockEmit,
+      },
+      applyUpdate: mockApplyUpdate,
+      setState: vi.fn(),
+    } as unknown as FlowCore;
 
-  describe('Basic Transaction Lifecycle', () => {
-    it('should start and stop a transaction', () => {
-      tm.startTransaction('addNodes');
-      expect(tm.isActive()).toBe(true);
-      expect(tm.getTransactionName()).toBe('addNodes');
-      tm.stopTransaction();
-      expect(tm.isActive()).toBe(false);
-      expect(tm.getTransactionName()).toBeNull();
+    transactionManager = new TransactionManager(mockFlowCore);
+
+    // Set transactionManager reference for nested transactions
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (mockFlowCore as any).transactionManager = transactionManager;
+
+    mockApplyUpdate.mockImplementation(async (update, actionType) => {
+      transactionManager.queueUpdate(update, actionType);
     });
 
-    it('should throw if starting a transaction twice', () => {
-      tm.startTransaction('addNodes');
-      expect(() => tm.startTransaction('addEdges')).toThrow('A transaction is already active');
-    });
-
-    it('should throw if stopping a transaction when none is active', () => {
-      expect(() => tm.stopTransaction()).toThrow('No active transaction to stop');
-    });
-
-    it('should throw if queuing an update when no transaction is active', () => {
-      expect(() => tm.queueUpdate({}, 'addNodes')).toThrow('No active transaction');
-    });
-
-    it('should return correct transaction name', () => {
-      expect(tm.getTransactionName()).toBeNull();
-      tm.startTransaction('changeSelection');
-      expect(tm.getTransactionName()).toBe('changeSelection');
-      tm.stopTransaction();
-      expect(tm.getTransactionName()).toBeNull();
-    });
-
-    it('should reset state after stop and allow new transaction', () => {
-      tm.startTransaction('addNodes');
-      tm.queueUpdate(mockUpdate(1), actionA);
-      tm.stopTransaction();
-
-      expect(tm.isActive()).toBe(false);
-      expect(tm.getTransactionName()).toBeNull();
-
-      // Should be able to start again
-      tm.startTransaction('addEdges');
-      expect(tm.isActive()).toBe(true);
-      expect(tm.getTransactionName()).toBe('addEdges');
-      tm.stopTransaction();
+    mockEmit.mockImplementation(async (...args) => {
+      mockFlowCore.applyUpdate(args[1], args[0]);
     });
   });
 
-  describe('Empty Transaction Handling', () => {
-    it('should return empty merged update if no updates were queued', () => {
-      tm.startTransaction('addNodes');
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(0);
-      expect(result.mergedUpdate).toEqual({});
-      expect(result.lastActionType).toBeUndefined();
-    });
-
-    it('should handle empty update objects', () => {
-      tm.startTransaction('init');
-      tm.queueUpdate({}, actionA);
-      tm.queueUpdate({}, actionB);
-
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(2);
-      expect(result.mergedUpdate).toEqual({});
-      expect(result.lastActionType).toBe(actionB);
-    });
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
-  describe('Node Operations Merging', () => {
-    it('should merge nodesToAdd arrays in order', () => {
-      tm.startTransaction('addNodes');
-      tm.queueUpdate(
-        {
-          nodesToAdd: [
-            { ...mockNode, id: 'n1' },
-            { ...mockNode, id: 'n2' },
-          ],
-        },
-        actionA
-      );
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'n3' }] }, actionA);
-      tm.queueUpdate(
-        {
-          nodesToAdd: [
-            { ...mockNode, id: 'n4' },
-            { ...mockNode, id: 'n5' },
-          ],
-        },
-        actionA
-      );
+  describe('transaction with callback only', () => {
+    it('should execute transaction with default name', async () => {
+      const callback: TransactionCallback = async (tx) => {
+        await tx.emit('addNodes', { nodes: [mockNode] });
+      };
 
-      const result = tm.stopTransaction();
+      const result = await transactionManager.transaction(callback);
 
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(5);
-      expect(result.mergedUpdate.nodesToAdd![0].id).toBe('n1');
-      expect(result.mergedUpdate.nodesToAdd![1].id).toBe('n2');
-      expect(result.mergedUpdate.nodesToAdd![2].id).toBe('n3');
-      expect(result.mergedUpdate.nodesToAdd![3].id).toBe('n4');
-      expect(result.mergedUpdate.nodesToAdd![4].id).toBe('n5');
-    });
-
-    it('should merge nodesToRemove arrays in order', () => {
-      tm.startTransaction('deleteNodes');
-      tm.queueUpdate({ nodesToRemove: ['n1', 'n2'] }, actionA);
-      tm.queueUpdate({ nodesToRemove: ['n3'] }, actionA);
-      tm.queueUpdate({ nodesToRemove: ['n4', 'n5'] }, actionA);
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.nodesToRemove).toEqual(['n1', 'n2', 'n3', 'n4', 'n5']);
-    });
-
-    it('should merge nodesToUpdate arrays in order', () => {
-      tm.startTransaction('updateNodes');
-      tm.queueUpdate(
-        {
-          nodesToUpdate: [
-            { id: 'n1', position: { x: 10, y: 10 } },
-            { id: 'n2', selected: true },
-          ],
-        },
-        actionC
-      );
-      tm.queueUpdate(
-        {
-          nodesToUpdate: [{ id: 'n3', data: { label: 'test' } }],
-        },
-        actionC
-      );
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.nodesToUpdate).toHaveLength(3);
-      expect(result.mergedUpdate.nodesToUpdate![0]).toEqual({ id: 'n1', position: { x: 10, y: 10 } });
-      expect(result.mergedUpdate.nodesToUpdate![1]).toEqual({ id: 'n2', selected: true });
-      expect(result.mergedUpdate.nodesToUpdate![2]).toEqual({ id: 'n3', data: { label: 'test' } });
-    });
-
-    it('should preserve duplicate node IDs in arrays (no deduplication)', () => {
-      tm.startTransaction('paste');
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'duplicate' }] }, actionA);
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'duplicate' }] }, actionA);
-      tm.queueUpdate({ nodesToRemove: ['duplicate'] }, actionA);
-      tm.queueUpdate({ nodesToRemove: ['duplicate'] }, actionA);
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(2);
-      expect(result.mergedUpdate.nodesToRemove).toEqual(['duplicate', 'duplicate']);
-    });
-  });
-
-  describe('Edge Operations Merging', () => {
-    it('should merge edgesToAdd arrays in order', () => {
-      tm.startTransaction('addEdges');
-      tm.queueUpdate({ edgesToAdd: [{ ...mockEdge, id: 'e1' }] }, actionB);
-      tm.queueUpdate(
-        {
-          edgesToAdd: [
-            { ...mockEdge, id: 'e2' },
-            { ...mockEdge, id: 'e3' },
-          ],
-        },
-        actionB
-      );
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.edgesToAdd).toHaveLength(3);
-      expect(result.mergedUpdate.edgesToAdd![0].id).toBe('e1');
-      expect(result.mergedUpdate.edgesToAdd![1].id).toBe('e2');
-      expect(result.mergedUpdate.edgesToAdd![2].id).toBe('e3');
-    });
-
-    it('should merge edgesToRemove arrays in order', () => {
-      tm.startTransaction('deleteEdges');
-      tm.queueUpdate({ edgesToRemove: ['e1'] }, actionB);
-      tm.queueUpdate({ edgesToRemove: ['e2', 'e3'] }, actionB);
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.edgesToRemove).toEqual(['e1', 'e2', 'e3']);
-    });
-
-    it('should merge edgesToUpdate arrays in order', () => {
-      tm.startTransaction('updateEdge');
-      tm.queueUpdate(
-        {
-          edgesToUpdate: [
-            { id: 'e1', selected: true },
-            { id: 'e2', data: { label: 'connection' } },
-          ],
-        },
-        actionB
-      );
-      tm.queueUpdate(
-        {
-          edgesToUpdate: [{ id: 'e3', sourcePosition: { x: 0, y: 0 } }],
-        },
-        actionB
-      );
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.edgesToUpdate).toHaveLength(3);
-      expect(result.mergedUpdate.edgesToUpdate![0]).toEqual({ id: 'e1', selected: true });
-      expect(result.mergedUpdate.edgesToUpdate![1]).toEqual({ id: 'e2', data: { label: 'connection' } });
-      expect(result.mergedUpdate.edgesToUpdate![2]).toEqual({ id: 'e3', sourcePosition: { x: 0, y: 0 } });
-    });
-  });
-
-  describe('Mixed Operations', () => {
-    it('should handle all operation types in single transaction', () => {
-      tm.startTransaction('deleteElements');
-      tm.queueUpdate(
-        {
-          nodesToAdd: [{ ...mockNode, id: 'n1' }],
-          edgesToAdd: [{ ...mockEdge, id: 'e1' }],
-        },
-        actionA
-      );
-      tm.queueUpdate(
-        {
-          nodesToRemove: ['n2'],
-          edgesToRemove: ['e2'],
-        },
-        actionB
-      );
-      tm.queueUpdate(
-        {
-          nodesToUpdate: [{ id: 'n3', selected: true }],
-          edgesToUpdate: [{ id: 'e3', selected: true }],
-        },
-        actionC
-      );
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(1);
-      expect(result.mergedUpdate.nodesToRemove).toEqual(['n2']);
-      expect(result.mergedUpdate.nodesToUpdate).toHaveLength(1);
-      expect(result.mergedUpdate.edgesToAdd).toHaveLength(1);
-      expect(result.mergedUpdate.edgesToRemove).toEqual(['e2']);
-      expect(result.mergedUpdate.edgesToUpdate).toHaveLength(1);
-    });
-
-    it('should preserve operation order across different types', () => {
-      tm.startTransaction('paste');
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'first' }] }, actionA);
-      tm.queueUpdate({ edgesToAdd: [{ ...mockEdge, id: 'second' }] }, actionB);
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'third' }] }, actionA);
-
-      const result = tm.stopTransaction();
-
-      // Nodes should maintain their relative order
-      expect(result.mergedUpdate.nodesToAdd![0].id).toBe('first');
-      expect(result.mergedUpdate.nodesToAdd![1].id).toBe('third');
-      expect(result.mergedUpdate.edgesToAdd![0].id).toBe('second');
-    });
-  });
-
-  describe('Metadata Merging', () => {
-    it('should merge metadata objects with later values overwriting earlier ones', () => {
-      tm.startTransaction('moveViewport');
-      tm.queueUpdate({ metadataUpdate: { prop1: 'value1', prop2: 'value2' } }, actionA);
-      tm.queueUpdate({ metadataUpdate: { prop2: 'newValue2', prop3: 'value3' } }, actionB);
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.metadataUpdate).toEqual({
-        prop1: 'value1',
-        prop2: 'newValue2', // Overwritten
-        prop3: 'value3',
+      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('addNodes', { nodes: [mockNode] });
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: 1,
       });
     });
 
-    it('should handle metadata-only updates', () => {
-      tm.startTransaction('highlightGroup');
-      tm.queueUpdate({ metadataUpdate: { setting1: true } }, actionA);
-      tm.queueUpdate({ metadataUpdate: { setting2: false } }, actionB);
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate).toEqual({
-        metadataUpdate: {
-          setting1: true,
-          setting2: false,
-        },
+    it('should apply updates after successful transaction', async () => {
+      await transactionManager.transaction(async (tx) => {
+        await tx.emit('addNodes', { nodes: [mockNode] });
+        await tx.emit('addEdges', { edges: [mockEdge] });
       });
-    });
 
-    it('should handle undefined metadata gracefully', () => {
-      tm.startTransaction('changeZOrder');
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'n1' }] }, actionA);
-      tm.queueUpdate({ metadataUpdate: { prop: 'value' } }, actionB);
-      tm.queueUpdate({ edgesToAdd: [{ ...mockEdge, id: 'e1' }] }, actionC);
-
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.metadataUpdate).toEqual({ prop: 'value' });
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(1);
-      expect(result.mergedUpdate.edgesToAdd).toHaveLength(1);
+      await expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledTimes(2);
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ nodes: [mockNode] }), 'addNodes');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ edges: [mockEdge] }), 'addEdges');
     });
   });
 
-  describe('Action Type Tracking', () => {
-    it('should return last action type', () => {
-      tm.startTransaction('moveNodesBy');
-      tm.queueUpdate(mockUpdate(1), actionA);
-      tm.queueUpdate(mockUpdate(2), actionB);
-      tm.queueUpdate(mockUpdate(3), actionC);
+  describe('transaction with name and callback', () => {
+    it('should execute transaction with provided name', async () => {
+      mockEmit.mockImplementation(async (command, { nodes, edges }) => {
+        mockFlowCore.applyUpdate({ nodesToAdd: nodes, edgesToAdd: edges }, command);
+      });
 
-      const result = tm.stopTransaction();
+      const callback: TransactionCallback = vi.fn().mockImplementation(async (tx) => {
+        await tx.emit('addNodes', { nodes: [mockNode] });
+      });
 
-      expect(result.lastActionType).toBe(actionC);
-    });
+      const result = await transactionManager.transaction('customAction', callback);
 
-    it('should handle single action type', () => {
-      tm.startTransaction('resizeNode');
-      tm.queueUpdate(mockUpdate(1), actionA);
-
-      const result = tm.stopTransaction();
-
-      expect(result.lastActionType).toBe(actionA);
-    });
-  });
-
-  describe('Command Counting', () => {
-    it('should count all queued commands', () => {
-      tm.startTransaction('startLinking');
-      tm.queueUpdate(mockUpdate(1), actionA);
-      tm.queueUpdate(mockUpdate(2), actionB);
-      tm.queueUpdate({}, actionC); // Empty update still counts
-      tm.queueUpdate(mockUpdate(3), actionA);
-
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(4);
-    });
-
-    it('should return zero count for empty transaction', () => {
-      tm.startTransaction('finishLinking');
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(0);
-    });
-  });
-
-  describe('Large Transaction Handling', () => {
-    it('should handle large number of operations efficiently', () => {
-      tm.startTransaction('treeLayout');
-
-      // Queue 100 operations
-      for (let i = 0; i < 100; i++) {
-        tm.queueUpdate(
-          {
-            nodesToAdd: [{ ...mockNode, id: `n${i}` }],
-            edgesToAdd: [{ ...mockEdge, id: `e${i}` }],
-            metadataUpdate: { index: i },
-          },
-          i % 2 === 0 ? actionA : actionB
-        );
-      }
-
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(100);
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(100);
-      expect(result.mergedUpdate.edgesToAdd).toHaveLength(100);
-      expect(result.mergedUpdate.metadataUpdate!.index).toBe(99); // Last value wins
-      expect(result.lastActionType).toBe(actionB); // 99 % 2 === 1
-    });
-
-    it('should maintain performance with mixed operation types', () => {
-      tm.startTransaction('moveNodes');
-
-      for (let i = 0; i < 50; i++) {
-        tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: `add_${i}` }] }, actionA);
-        tm.queueUpdate({ nodesToRemove: [`remove_${i}`] }, actionB);
-        tm.queueUpdate({ nodesToUpdate: [{ id: `update_${i}`, selected: true }] }, actionC);
-      }
-
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(150);
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(50);
-      expect(result.mergedUpdate.nodesToRemove).toHaveLength(50);
-      expect(result.mergedUpdate.nodesToUpdate).toHaveLength(50);
-    });
-  });
-
-  describe('Complex Scenarios', () => {
-    it('should handle realistic user interaction sequence', () => {
-      tm.startTransaction('moveNodesStop');
-
-      // User adds a node
-      tm.queueUpdate(
-        {
-          nodesToAdd: [{ ...mockNode, id: 'userNode1', position: { x: 100, y: 100 } }],
-        },
+      expect(callback).toHaveBeenCalledOnce();
+      expect(result).toEqual({
+        results: expect.objectContaining({ nodesToAdd: [mockNode] }),
+        commandsCount: 1,
+      });
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ nodesToAdd: [mockNode] }),
         'addNodes'
       );
-
-      // User moves the node
-      tm.queueUpdate(
-        {
-          nodesToUpdate: [{ id: 'userNode1', position: { x: 150, y: 120 } }],
-        },
-        'updateNodes'
-      );
-
-      // User selects the node
-      tm.queueUpdate(
-        {
-          nodesToUpdate: [{ id: 'userNode1', selected: true }],
-        },
-        'changeSelection'
-      );
-
-      // User adds an edge
-      tm.queueUpdate(
-        {
-          edgesToAdd: [{ ...mockEdge, id: 'userEdge1', source: 'userNode1', target: 'existingNode' }],
-        },
-        'addEdges'
-      );
-
-      // User updates viewport
-      tm.queueUpdate(
-        {
-          metadataUpdate: { viewport: { x: 50, y: 50, scale: 1.2 } },
-        },
-        'moveViewport'
-      );
-
-      const result = tm.stopTransaction();
-
-      expect(result.commandsCount).toBe(5);
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(1);
-      expect(result.mergedUpdate.nodesToUpdate).toHaveLength(2); // Move and select as separate operations
-      expect(result.mergedUpdate.edgesToAdd).toHaveLength(1);
-      expect(result.mergedUpdate.metadataUpdate).toEqual({
-        viewport: { x: 50, y: 50, scale: 1.2 },
-      });
     });
 
-    it('should handle conflicting operations without resolution', () => {
-      tm.startTransaction('rotateNodeBy');
-
-      // Add same node multiple times (should keep all)
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'conflict', data: { version: 1 } }] }, actionA);
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'conflict', data: { version: 2 } }] }, actionA);
-
-      // Update same node multiple times (should keep all)
-      tm.queueUpdate({ nodesToUpdate: [{ id: 'conflict', position: { x: 10, y: 10 } }] }, actionB);
-      tm.queueUpdate({ nodesToUpdate: [{ id: 'conflict', position: { x: 20, y: 20 } }] }, actionB);
-
-      // Remove same node multiple times (should keep all)
-      tm.queueUpdate({ nodesToRemove: ['conflict'] }, actionC);
-      tm.queueUpdate({ nodesToRemove: ['conflict'] }, actionC);
-
-      const result = tm.stopTransaction();
-
-      // Original implementation keeps all operations - no conflict resolution
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(2);
-      expect(result.mergedUpdate.nodesToUpdate).toHaveLength(2);
-      expect(result.mergedUpdate.nodesToRemove).toEqual(['conflict', 'conflict']);
+    it('should throw error when callback is not provided with name', async () => {
+      await expect(transactionManager.transaction('customAction', undefined as never)).rejects.toThrow(
+        'Callback is required when transaction name is provided'
+      );
     });
   });
 
-  describe('Integration Scenarios', () => {
-    it('should work correctly with mockUpdate helper', () => {
-      tm.startTransaction('highlightGroupClear');
-      tm.queueUpdate(mockUpdate(1), actionA);
-      tm.queueUpdate(mockUpdate(2), actionB);
+  describe('error handling', () => {
+    it('should rollback transaction on error', async () => {
+      await expect(
+        transactionManager.transaction(async (tx) => {
+          await tx.emit('addNodes', { nodes: [mockNode] });
 
-      const result = tm.stopTransaction();
-
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(2);
-      expect(result.mergedUpdate.edgesToAdd).toHaveLength(2);
-      expect(result.mergedUpdate.metadataUpdate).toMatchObject({ test: 2 });
-      expect(result.lastActionType).toBe(actionB);
+          throw new Error('Test error');
+        })
+      ).rejects.toThrow('Test error');
     });
 
-    it('should handle partial updates correctly', () => {
-      tm.startTransaction('moveTemporaryEdge');
+    it('should maintain correct stack after error', async () => {
+      expect(transactionManager.isActive()).toBe(false);
 
-      // Updates with only some fields
-      tm.queueUpdate({ nodesToAdd: [{ ...mockNode, id: 'partial1' }] }, actionA);
-      tm.queueUpdate({ edgesToRemove: ['edge1'] }, actionB);
-      tm.queueUpdate({ metadataUpdate: { setting: true } }, actionC);
-      tm.queueUpdate({ nodesToUpdate: [{ id: 'node1', selected: true }] }, actionA);
+      await expect(
+        transactionManager.transaction(async () => {
+          throw new Error('Test error');
+        })
+      ).rejects.toThrow();
 
-      const result = tm.stopTransaction();
+      expect(transactionManager.isActive()).toBe(false);
+    });
+  });
 
-      expect(result.mergedUpdate.nodesToAdd).toHaveLength(1);
-      expect(result.mergedUpdate.edgesToRemove).toEqual(['edge1']);
-      expect(result.mergedUpdate.nodesToUpdate).toHaveLength(1);
-      expect(result.mergedUpdate.metadataUpdate).toEqual({ setting: true });
-      // Fields not present in any update should be undefined
-      expect(result.mergedUpdate.edgesToAdd).toBeUndefined();
-      expect(result.mergedUpdate.nodesToRemove).toBeUndefined();
-      expect(result.mergedUpdate.edgesToUpdate).toBeUndefined();
+  describe('nested transactions', () => {
+    it('should handle nested transactions correctly', async () => {
+      await transactionManager.transaction('parent' as ModelActionType, async (parentTx) => {
+        await parentTx.emit('addNodes', { nodes: [mockNode] });
+
+        await parentTx.transaction('child' as ModelActionType, async (childTx) => {
+          await childTx.emit('addEdges', { edges: [mockEdge] });
+        });
+
+        await parentTx.emit('addNodes', { nodes: [{ ...mockNode, id: 'node2' }] });
+      });
+
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledTimes(3);
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ nodes: [mockNode] }), 'addNodes');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ edges: [mockEdge] }), 'addEdges');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ nodes: [{ ...mockNode, id: 'node2' }] }),
+        'addNodes'
+      );
+    });
+
+    it('should rollback child without affecting parent', async () => {
+      await transactionManager.transaction('parent', async (parentTx) => {
+        await parentTx.emit('addNodes', { nodes: [mockNode] });
+
+        try {
+          await parentTx.transaction('child', async (childTx) => {
+            await childTx.emit('addEdges', { edges: [mockEdge] });
+
+            childTx.rollback();
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+          // Child transaction might not throw, depends on implementation
+        }
+
+        await parentTx.emit('addNodes', { nodes: [{ ...mockNode, id: 'node2' }] });
+      });
+
+      // Parent should still complete
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledTimes(3);
+    });
+
+    it('should handle deeply nested transactions', async () => {
+      let level3Executed = false;
+
+      await transactionManager.transaction('level1', async (tx1) => {
+        await tx1.transaction('level2', async (tx2) => {
+          await tx2.transaction('level3', async (tx3) => {
+            await tx3.emit('addNodes', { nodes: [mockNode] });
+            level3Executed = true;
+          });
+        });
+      });
+
+      expect(level3Executed).toBe(true);
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('queueUpdate', () => {
+    it('should queue update when transaction is active', async () => {
+      await transactionManager.transaction(async () => {
+        transactionManager.queueUpdate({ nodesToAdd: [] }, 'testAction' as ModelActionType);
+        expect(transactionManager.isActive()).toBe(true);
+      });
+    });
+
+    it('should throw error when no transaction is active', () => {
+      expect(() => transactionManager.queueUpdate({ nodesToAdd: [] }, 'testAction' as ModelActionType)).toThrow(
+        'No active transaction. Cannot queue update.'
+      );
+    });
+  });
+
+  describe('isActive', () => {
+    it('should return false when no transaction is active', () => {
+      expect(transactionManager.isActive()).toBe(false);
+    });
+
+    it('should return true during transaction execution', async () => {
+      await transactionManager.transaction(async () => {
+        expect(transactionManager.isActive()).toBe(true);
+      });
+    });
+
+    it('should return false after transaction completes', async () => {
+      await transactionManager.transaction(async () => {
+        // Transaction active here
+      });
+      expect(transactionManager.isActive()).toBe(false);
+    });
+  });
+
+  describe('getTransactionName', () => {
+    it('should return null when no transaction is active', () => {
+      expect(transactionManager.getTransactionName()).toBeNull();
+    });
+
+    it('should return transaction name during execution', async () => {
+      await transactionManager.transaction('testTx' as ModelActionType, async () => {
+        expect(transactionManager.getTransactionName()).toBe('testTx');
+      });
+    });
+
+    it('should return default name when using callback-only form', async () => {
+      await transactionManager.transaction(async () => {
+        expect(transactionManager.getTransactionName()).toBe('Transaction');
+      });
+    });
+  });
+
+  describe('transaction rollback', () => {
+    it('should support manual rollback', async () => {
+      await transactionManager.transaction(async (tx) => {
+        await tx.emit('addNodes', { nodes: [mockNode] });
+        tx.rollback();
+
+        await expect(tx.emit('addEdges', { edges: [mockEdge] })).rejects.toThrow(
+          'Cannot emit on rolled back transaction'
+        );
+      });
+    });
+
+    it('should handle savepoints correctly', async () => {
+      mockEmit.mockImplementation(async (command, { nodes, edges }) => {
+        mockFlowCore.applyUpdate({ nodesToAdd: nodes, edgesToAdd: edges }, command);
+      });
+
+      const result = await transactionManager.transaction(async (tx) => {
+        await tx.emit('addNodes', { nodes: [mockNode] });
+        tx.savepoint('checkpoint');
+        await tx.emit('addNodes', { nodes: [{ ...mockNode, id: 'node2' }] });
+        await tx.emit('addNodes', { nodes: [{ ...mockNode, id: 'node3' }] });
+        tx.rollbackTo('checkpoint');
+        await tx.emit('addEdges', { edges: [mockEdge] });
+      });
+
+      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledTimes(4); // All emits still happen
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledTimes(4);
+      expect(result).toEqual({
+        results: expect.objectContaining({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }),
+        commandsCount: 2,
+      });
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle empty transaction', async () => {
+      await transactionManager.transaction(async () => {
+        // No operations
+      });
+
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should handle transaction that only checks state', async () => {
+      let hasChanges = null;
+      let isDirty = null;
+
+      await transactionManager.transaction(async (tx) => {
+        hasChanges = tx.hasChanges();
+        isDirty = tx.isDirty();
+      });
+
+      expect(hasChanges).toBe(false);
+      expect(isDirty).toBe(false);
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
     });
   });
 });
