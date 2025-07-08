@@ -1,16 +1,13 @@
-<div class="input-field-node">
-  <!-- we need to stop the event from propagating and reaching the document,
-    otherwise event will be captured and send to Input Event Handler -->
-  <input
-    type="text"
-    placeholder="Enter value..."
-    [(ngModel)]="text"
-    (keydown)="$event.stopPropagation()"
-    (keypress)="$event.stopPropagation()"
-    (keyup)="$event.stopPropagation()"
-  />
-  {{ text() }}
+<div class="header">
+  <div class="image">
+    <ng-icon name="phosphorAngularLogo" size="20" color="rgba(151, 71, 255, 1)"></ng-icon>
+  </div>
+  <div class="text-container">
+    <p>User Node</p>
+    <p>User information</p>
+  </div>
 </div>
+<div class="content">Content</div>
 <angular-adapter-port
   id="port-left"
   type="target"

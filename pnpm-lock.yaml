@@ -56,6 +56,12 @@ importers:
       '@angularflow/logger-middleware':
         specifier: workspace:*
         version: link:../../packages/logger-middleware
+      '@ng-icons/core':
+        specifier: ^32.0.0
+        version: 32.0.0(@angular/common@19.2.8(@angular/core@19.2.8(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@19.2.8(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+      '@ng-icons/phosphor-icons':
+        specifier: ^32.0.0
+        version: 32.0.0
       rxjs:
         specifier: ~7.8.2
         version: 7.8.2
@@ -2554,6 +2560,16 @@ packages:
     resolution: {integrity: sha512-MMXrty1NADxyMPgd7qZvDUYunhcPhxIA/jWP2joceOoPcAxOno/aS4jFuIHf2Dbb4HdhR+BlvgvDCy7QTXXyLQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
+
+  '@ng-icons/core@32.0.0':
+    resolution: {integrity: sha512-Wq6m+z5IkhWh9BI7P6HJUkOrI8Vqj2u5iot88OyUj3vi0Ei2yeVewVGE51Wwhy3J0+4EplRNLxEu+TZHkve0Fg==}
+    peerDependencies:
+      '@angular/common': '>=20.0.0'
+      '@angular/core': '>=20.0.0'
+      rxjs: ^6.5.3 || ^7.4.0
+
+  '@ng-icons/phosphor-icons@32.0.0':
+    resolution: {integrity: sha512-AQfXDv1n+noWMpHB8CTByP1FZ2WI/saresY/zQosyOOGj6TuTgtINpIeUAq5ibRT9TAQXi4QpUE66Cno3aHgIg==}
 
   '@ngtools/webpack@19.2.9':
     resolution: {integrity: sha512-CLfUauqi2Xp/jKGxp5wUwjqfVQWcBE09GMd51ovcCRLkgB2Kh26+CiVnGw5/lkBpISUCNdgN6nGiS+nfqMfFeQ==}
@@ -11885,6 +11901,17 @@ snapshots:
       - encoding
       - rollup
       - supports-color
+
+  '@ng-icons/core@32.0.0(@angular/common@19.2.8(@angular/core@19.2.8(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@19.2.8(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/common': 19.2.8(@angular/core@19.2.8(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+      '@angular/core': 19.2.8(rxjs@7.8.2)(zone.js@0.15.0)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ng-icons/phosphor-icons@32.0.0':
+    dependencies:
+      tslib: 2.8.1
 
   '@ngtools/webpack@19.2.9(@angular/compiler-cli@19.2.8(@angular/compiler@19.2.8)(typescript@5.8.3))(typescript@5.8.3)(webpack@5.98.0(esbuild@0.25.1))':
     dependencies:
