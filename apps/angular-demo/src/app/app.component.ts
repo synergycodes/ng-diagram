@@ -39,7 +39,6 @@ export class AppComponent {
         resizable: true,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {} },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, groupId: '2' },
       {
         id: '4',
         type: 'group',
@@ -68,27 +67,6 @@ export class AppComponent {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         routing: 'orthogonal',
-      },
-      {
-        id: '2',
-        source: '2',
-        target: '3',
-        data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-right',
-        targetPort: 'port-left-1',
-        routing: 'orthogonal',
-      },
-      {
-        id: '4',
-        source: '2',
-        target: '3',
-        data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
-        sourcePort: 'port-right',
-        targetPort: 'port-left-3',
       },
     ]);
   }

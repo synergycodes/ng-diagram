@@ -6,6 +6,7 @@ export const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
   source: '',
   target: '',
   data: {},
+  routing: 'orthogonal',
   temporary: true,
   ...partialEdge,
 });

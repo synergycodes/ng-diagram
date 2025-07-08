@@ -32,6 +32,12 @@ export const paste = async (commandHandler: CommandHandler) => {
     const newNodeId = crypto.randomUUID();
     nodeIdMap.set(node.id, newNodeId);
 
+    // Update ports to reference the new node ID
+    const updatedPorts = node.ports?.map((port) => ({
+      ...port,
+      nodeId: newNodeId,
+    }));
+
     return {
       ...node,
       id: newNodeId,
@@ -40,6 +46,7 @@ export const paste = async (commandHandler: CommandHandler) => {
         y: node.position.y + OFFSET,
       },
       selected: true,
+      ports: updatedPorts,
     };
   });
 
