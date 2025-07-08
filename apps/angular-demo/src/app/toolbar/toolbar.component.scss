@@ -1,0 +1,41 @@
+:host {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: flex-end;
+
+  & > div {
+    padding: 8px;
+    background: #27282b;
+    border: 0.0625rem solid #4d5059;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 8px;
+  }
+
+  button {
+    background: #151516;
+    color: #ffffff;
+    border: 1px solid #4d5059;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    outline: none;
+
+    &:hover {
+      border-color: rgba(145, 64, 255, 1);
+      background: #1a1b1d;
+    }
+
+    &:active {
+      background: rgba(145, 64, 255, 0.1);
+      border-color: rgba(145, 64, 255, 1);
+    }
+  }
+}
