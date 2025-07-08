@@ -11,12 +11,28 @@
 
 :host:hover {
   border-color: rgba(145, 64, 255, 1);
+
+  .group-node {
+    border-color: rgba(145, 64, 255, 1);
+  }
+
+  .group-node-header {
+    border-bottom-color: rgba(145, 64, 255, 1);
+  }
 }
 
 /* Change box-shadow when node is selected */
 :host.node-selected {
   border-color: rgba(145, 64, 255, 1);
   box-shadow: 0 0 0 4px rgba(145, 64, 255, 0.4);
+
+  .group-node {
+    border-color: rgba(145, 64, 255, 1);
+  }
+
+  .group-node-header {
+    border-bottom-color: rgba(145, 64, 255, 1);
+  }
 }
 
 .group-node {
@@ -28,6 +44,7 @@
   border-radius: 0.75rem;
   background: #27282b;
   border: 0.0625rem solid #4d5059;
+  transition: border-color 0.1s ease-in-out;
 
   &[data-highlight='true'] {
     background: #27282b;
@@ -43,6 +60,7 @@
   background: #151516;
   border-bottom: 1px solid #4d5059;
   min-width: 100px;
+  transition: border-bottom-color 0.1s ease-in-out;
 }
 
 .group-node-header-title {
