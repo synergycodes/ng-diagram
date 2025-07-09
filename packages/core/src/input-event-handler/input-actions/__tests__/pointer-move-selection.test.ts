@@ -261,7 +261,6 @@ describe('pointerMoveSelectionAction', () => {
           {
             id: mockNode.id,
             groupId: 'group1',
-            zOrder: mockGroupNode.zOrder! + 1,
           },
         ],
       });
@@ -344,12 +343,10 @@ describe('pointerMoveSelectionAction', () => {
           {
             id: 'node1',
             groupId: 'group1',
-            zOrder: mockGroupNode.zOrder! + 1,
           },
           {
             id: 'node2',
             groupId: 'group1',
-            zOrder: mockGroupNode.zOrder! + 1,
           },
         ],
       });
