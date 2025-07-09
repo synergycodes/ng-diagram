@@ -68,6 +68,8 @@ export interface Edge {
    * The z-order of the edge.
    */
   zOrder?: number;
+
+  userDefinedZOrder?: number;
   /**
    * The labels of the edge.
    */
