@@ -1,6 +1,6 @@
 import { Edge, Node } from '../../../../types';
 
-export function assignEdgeZOrder(edges: Edge[],  nodesWithZOrder: Node[], nodesMap: Map<string, Node>): Edge[] {
+export function assignEdgeZOrder(edges: Edge[], nodesWithZOrder: Node[], nodesMap: Map<string, Node>): Edge[] {
   const zOrderMap = new Map(nodesWithZOrder.map((n) => [n.id, n.zOrder ?? 0]));
 
   return edges.map((edge) => {
