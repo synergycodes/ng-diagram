@@ -9,6 +9,7 @@ export interface ZOrderMiddlewareMetadata {
 }
 
 const checkIfIsInit = (modelActionType: ModelActionType) => modelActionType === 'init';
+const checkIfIsEdgeAdded = (modelActionType: ModelActionType) => modelActionType === 'finishLinking';
 
 export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> = {
   name: 'z-order',
@@ -26,7 +27,8 @@ export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> =
     const isEnabled = context.middlewareMetadata.enabled;
     const isInit = checkIfIsInit(modelActionType);
     const shouldSnap = helpers.checkIfAnyNodePropsChanged(['selected', 'groupId']);
-    const shouldReOrder = isInit || shouldSnap;
+    const isEdgeAdded = checkIfIsEdgeAdded(modelActionType);
+    const shouldReOrder = isInit || shouldSnap || isEdgeAdded;
 
     if (!isEnabled || !shouldReOrder) {
       next();
@@ -71,16 +73,16 @@ export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> =
       nodesToUpdate.push({ id: node.id, zOrder: node.zOrder });
     }
 
-    if (!!nodesToUpdate.length) {
-      edgesWithZOrder = assignEdgeZOrder(edges, nodesWithZOrder, nodesMap);
+    if (isEdgeAdded) {
+      edgesWithZOrder = assignEdgeZOrder([edges[edges.length - 1]], nodesWithZOrder, nodesMap);
+    } else edgesWithZOrder = assignEdgeZOrder(edges, nodesWithZOrder, nodesMap);
 
-      for (const edge of edgesWithZOrder) {
-        const currentEdge = nodes.find((layoutNode) => layoutNode.id === edge.id);
-        if (!currentEdge || edge.zOrder === currentEdge.zOrder) {
-          continue;
-        }
-        edgesToUpdate.push({ id: edge.id, zOrder: edge.zOrder });
+    for (const edge of edgesWithZOrder) {
+      const currentEdge = edges.find((layoutNode) => layoutNode.id === edge.id);
+      if (!currentEdge || edge.zOrder === currentEdge.zOrder) {
+        continue;
       }
+      edgesToUpdate.push({ id: edge.id, zOrder: edge.zOrder });
     }
 
     next({
