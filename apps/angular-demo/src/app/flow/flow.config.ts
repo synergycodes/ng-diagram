@@ -1,5 +1,6 @@
 import type { Middleware } from '@angularflow/angular-adapter';
 import {
+  zOrderMiddleware,
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
@@ -10,6 +11,7 @@ import {
 import { loggerMiddleware } from '@angularflow/logger-middleware';
 
 export const appMiddlewares = [
+  zOrderMiddleware,
   nodeRotationSnapMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,

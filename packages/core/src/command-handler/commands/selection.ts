@@ -1,5 +1,4 @@
 import type { CommandHandler, Edge, FlowStateUpdate, Node } from '../../types';
-import { DEFAULT_SELECTED_Z_ORDER } from '../constants.ts';
 
 const changeSelection = (
   nodes: Node[],
@@ -16,7 +15,7 @@ const changeSelection = (
     if (!!node.selected === isSelected || (preserveSelection && !!node.selected)) {
       return;
     }
-    nodesToUpdate.push({ id: node.id, selected: isSelected, zOrder: isSelected ? DEFAULT_SELECTED_Z_ORDER : 0 });
+    nodesToUpdate.push({ id: node.id, selected: isSelected });
   });
   edges.forEach((edge) => {
     const isSelected = selectedEdgeIds.includes(edge.id);
