@@ -40,7 +40,9 @@ export class MiddlewareManager<
     }
 
     this.middlewareChain.push(middleware);
-    this.applyMiddlewareConfig(middleware.name, middleware.defaultMetadata);
+    if (middleware.defaultMetadata) {
+      this.applyMiddlewareConfig(middleware.name, middleware.defaultMetadata);
+    }
 
     return () => this.unregister(middleware.name);
   }
