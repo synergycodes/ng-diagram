@@ -8,7 +8,6 @@ export function assignEdgeZOrder(edges: Edge[], nodesWithZOrder: Node[], nodesMa
     const targetZ = zOrderMap.get(edge.target) ?? nodesMap.get(edge.target)?.zOrder ?? 0;
     const zOrder = Math.max(sourceZ, targetZ);
 
-    console.log(targetZ, zOrderMap.get(edge.target), nodesMap.get(edge.target)?.zOrder);
     return {
       ...edge,
       zOrder,
