@@ -68,8 +68,10 @@ export interface Edge {
    * The z-order of the edge.
    */
   zOrder?: number;
-
-  userDefinedZOrder?: number;
+  /**
+   * The z-index of the node. This value is set automatically
+   */
+  zIndex?: number;
   /**
    * The labels of the edge.
    */

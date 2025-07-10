@@ -2,11 +2,11 @@ import type { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, PortLo
 import { getPointOnPath, isSamePoint } from '../../../utils';
 import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
 import { getSourceTarget } from './get-source-target.ts';
-import { DEFAULT_SELECTED_Z_ORDER } from '../z-order/constants.ts';
+import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment/constants.ts';
 
 export interface EdgesRoutingMiddlewareMetadata {
   enabled: boolean;
-  selectedZOrder: number;
+  selectedZIndex: number;
 }
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
@@ -53,7 +53,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
   name: 'edges-routing',
   defaultMetadata: {
     enabled: true,
-    selectedZOrder: DEFAULT_SELECTED_Z_ORDER,
+    selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
   },
   execute: (context, next) => {
     const {
@@ -64,7 +64,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
     } = context;
     // Access the typed middleware metadata
     const isEnabled = context.middlewareMetadata.enabled;
-    const selectedZOrder = metadata.selectedZOrder || DEFAULT_SELECTED_Z_ORDER;
+    const selectedZIndex = metadata.selectedZIndex || DEFAULT_SELECTED_Z_INDEX;
 
     if (!isEnabled) {
       next();
@@ -127,7 +127,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
         points,
         sourcePosition: sourcePoint || undefined,
         targetPosition: targetPoint || undefined,
-        zOrder: selectedZOrder,
+        zIndex: selectedZIndex,
       };
     }
 

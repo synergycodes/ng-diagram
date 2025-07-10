@@ -52,6 +52,6 @@ export interface Metadata<TMiddlewaresMetadata = unknown> {
    * Defines the z-index value applied to selected elements.
    * @default 1000
    */
-  selectedZOrder?: number;
+  selectedZIndex?: number;
   middlewaresConfig: TMiddlewaresMetadata;
 }
