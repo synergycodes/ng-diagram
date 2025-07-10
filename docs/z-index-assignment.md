@@ -54,13 +54,46 @@ When `zOrder` is explicitly defined, the `middleware`:
 
 **Selection Behavior with Manual zOrder:**
 
-- If a node with a manual `zOrder` is `selected`: It's zIndex is temporarily overridden by `metadata.selectedZIndex` (or
+- If a node with a manual `zOrder` is `selected`: It's zIndex is temporarily overridden by `selectedZIndex` (or
   falls back to `DEFAULT_SELECTED_Z_INDEX`) to visually bring it to the front.
 - Once the element is `unselected`, its `original zOrder` value is `restored`.
 - **This approach ensures that**:
-  - Manual layering is always preserved.
-  - Selection does not permanently override your custom order.
-  - You retain full control over rendering layers.
+    - Manual layering is always preserved.
+    - Selection does not permanently override your custom order.
+    - You retain full control over rendering layers.
+
+#### Temporary Edge
+
+Temporary edges (e.g., those shown while dragging to create a connection) are also included in the `zIndex` layering
+system.
+
+- Rendered above all other elements using `DEFAULT_SELECTED_Z_INDEX`, this value can be overridden via the
+  `temporaryEdgeZIndex` from `metadata`,
+- Ensures visibility of `temporary edges` above `nodes`, `groups`, and other `edges`
+
+#### Middleware configuration
+
+```javascript
+    this.model().setMetadata({
+  middlewaresConfig: {
+    'z-index': {
+      enabled: boolean,
+      selectedZIndex: number,
+    },
+  },
+});
+```
+
+```javascript
+    this.model().setMetadata({
+  middlewaresConfig: {
+    'edges-routing': {
+      enabled: boolean,
+      temporaryEdgeZIndex: number,
+    },
+  },
+});
+```
 
 ## Consequences
 
