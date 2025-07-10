@@ -6,7 +6,7 @@ import {
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
-import { appMiddlewares } from './flow/flow.config';
+import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
 import { GroupNodeComponent } from './node-template/group-node/group-node.component';
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
@@ -21,7 +21,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  model = signal(new SignalModelAdapter());
+  model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],
