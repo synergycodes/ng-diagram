@@ -197,6 +197,18 @@ export interface WheelEvent extends BaseEvent {
 }
 
 /**
+ * Drop event interface
+ */
+export interface DropEvent extends BaseEvent {
+  type: 'drop';
+  data: Record<string, unknown>;
+  clientPosition: {
+    x: number;
+    y: number;
+  };
+}
+
+/**
  * Rotate event interface
  */
 export interface RotateEvent extends BaseEvent {
@@ -209,4 +221,4 @@ export interface RotateEvent extends BaseEvent {
 /**
  * Union type of all possible events
  */
-export type Event = KeyboardEvent | PointerEvent | WheelEvent | RotateEvent;
+export type Event = KeyboardEvent | PointerEvent | WheelEvent | RotateEvent | DropEvent;

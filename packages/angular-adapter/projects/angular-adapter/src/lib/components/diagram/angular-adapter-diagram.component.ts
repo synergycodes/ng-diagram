@@ -10,6 +10,7 @@ import {
 } from '@angularflow/core';
 
 import {
+  DropEventListenerDirective,
   KeyDownEventListenerDirective,
   KeyPressEventListenerDirective,
   KeyUpEventListenerDirective,
@@ -40,6 +41,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
+    DropEventListenerDirective,
     PointerDownEventListenerDirective,
     PointerEnterEventListenerDirective,
     PointerLeaveEventListenerDirective,

@@ -3,6 +3,7 @@ import {
   AngularAdapterDiagramComponent,
   INodeTemplate,
   Middleware,
+  Node,
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
@@ -11,13 +12,14 @@ import { GroupNodeComponent } from './node-template/group-node/group-node.compon
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
+import { AngularAdapterPaletteComponent } from './palette/angular-adapter-palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [AngularAdapterDiagramComponent, ToolbarComponent],
+  imports: [AngularAdapterDiagramComponent, ToolbarComponent, AngularAdapterPaletteComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
@@ -29,8 +31,20 @@ export class AppComponent {
     ['group', GroupNodeComponent],
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
+  paletteModel: Node[] = [
+    {
+      id: '1',
+      type: 'input-field',
+      position: { x: 500, y: 300 },
+      data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
+    },
+    { id: '2', type: 'image', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+    { id: '3', type: 'resizable', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+    { id: '4', type: 'group', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+  ];
 
   constructor() {
+    this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
     this.model().setNodes([
       {
         id: '1',

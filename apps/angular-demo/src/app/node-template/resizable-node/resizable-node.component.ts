@@ -22,6 +22,7 @@ export class ResizableNodeComponent implements INodeTemplate {
   sizeText = model<string>('');
   data = input.required<Node>();
   autoSize = computed(() => this.data().autoSize ?? true);
+  isPaletteNode = input<boolean>(false);
 
   setSize() {
     const [textWidth, textHeight] = this.sizeText().split(' ');

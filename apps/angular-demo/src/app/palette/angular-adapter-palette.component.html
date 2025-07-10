@@ -1,0 +1,8 @@
+@for (element of model(); track element.id) {
+  @let template = nodeTemplateMap().get(element.type);
+  @if (template) {
+    <div class="draggable" draggable="true" (dragstart)="onDragStart($event, element)">
+      <ng-container *ngComponentOutlet="template; inputs: { data: element.data, isPaletteNode: true }" />
+    </div>
+  }
+}
