@@ -6,7 +6,7 @@ import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment/constants.ts';
 
 export interface EdgesRoutingMiddlewareMetadata {
   enabled: boolean;
-  selectedZIndex: number;
+  temporaryEdgeZIndex: number;
 }
 
 const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
@@ -53,7 +53,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
   name: 'edges-routing',
   defaultMetadata: {
     enabled: true,
-    selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
+    temporaryEdgeZIndex: DEFAULT_SELECTED_Z_INDEX,
   },
   execute: (context, next) => {
     const {
@@ -61,10 +61,11 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       nodesMap,
       helpers,
       modelActionType,
+      middlewareMetadata,
     } = context;
     // Access the typed middleware metadata
-    const isEnabled = context.middlewareMetadata.enabled;
-    const selectedZIndex = metadata.selectedZIndex || DEFAULT_SELECTED_Z_INDEX;
+    const isEnabled = middlewareMetadata.enabled;
+    const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
 
     if (!isEnabled) {
       next();
@@ -127,7 +128,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
         points,
         sourcePosition: sourcePoint || undefined,
         targetPosition: targetPoint || undefined,
-        zIndex: selectedZIndex,
+        zIndex: temporaryEdgeZIndex,
       };
     }
 
