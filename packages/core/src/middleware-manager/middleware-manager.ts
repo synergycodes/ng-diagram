@@ -40,6 +40,10 @@ export class MiddlewareManager<
     }
 
     this.middlewareChain.push(middleware);
+    if (middleware.defaultMetadata) {
+      this.applyMiddlewareConfig(middleware.name, middleware.defaultMetadata);
+    }
+
     return () => this.unregister(middleware.name);
   }
 
@@ -51,6 +55,7 @@ export class MiddlewareManager<
     const index = this.middlewareChain.findIndex((middleware) => middleware.name === name);
     if (index !== -1) {
       this.middlewareChain.splice(index, 1);
+      this.applyMiddlewareConfig(name, undefined);
     }
   }
 
