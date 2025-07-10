@@ -63,7 +63,7 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
       for (const nodeId of helpers.getAffectedNodeIds(['selected'])) {
         const node = nodesMap.get(nodeId);
         if (!node) continue;
-        let baseZIndex = node.selected
+        const baseZIndex = node.selected
           ? selectedZIndex
           : node.groupId
             ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1
@@ -74,10 +74,7 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
       for (const nodeId of helpers.getAffectedNodeIds(['groupId'])) {
         const node = nodesMap.get(nodeId);
         if (!node || node?.selected) continue;
-        let baseZIndex = 0;
-        if (node.groupId) {
-          baseZIndex = (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1;
-        }
+        const baseZIndex = node.groupId ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1 : 0;
         nodesWithZIndex.push(...assignNodeZIndex(node, nodesMap, baseZIndex));
       }
     }
