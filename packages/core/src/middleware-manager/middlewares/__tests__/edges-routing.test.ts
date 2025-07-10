@@ -10,6 +10,7 @@ import type {
   Point,
 } from '../../../types';
 import { edgesRoutingMiddleware, EdgesRoutingMiddlewareMetadata } from '../edges-routing/edges-routing.ts';
+import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment/constants.ts';
 
 vi.mock('../../../utils', () => ({
   getPortFlowPositionSide: (node: Node) => node.position,
@@ -213,6 +214,7 @@ describe('Edges Routing Middleware', () => {
           ],
           sourcePosition: { x: 100, y: 100 },
           targetPosition: { x: 200, y: 200 },
+          zIndex: DEFAULT_SELECTED_Z_INDEX,
         },
       },
     });
