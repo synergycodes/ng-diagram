@@ -1,37 +1,40 @@
 import { Edge, FlowStateUpdate, Middleware, ModelActionType, Node } from '../../../types';
 import { DEFAULT_SELECTED_Z_ORDER } from './constants.ts';
-import { initializeZOrder } from './utils/initializeZOrder.ts';
-import { assignEdgesZOrder, assignEdgeZOrder } from './utils/assignEdgesZOrder.ts';
-import { assignNodeZOrder } from './utils/assignNodeZOrder.ts';
+import { initializeZOrder } from './utils/initialize-z-order.ts';
+import { assignEdgesZOrder, assignEdgeZOrder } from './utils/assign-edges-z-order.ts';
+import { assignNodeZOrder } from './utils/assign-node-z-order.ts';
 
 export interface ZOrderMiddlewareMetadata {
   enabled: boolean;
+  selectedZOrder: number;
 }
 
 const checkIfIsInit = (modelActionType: ModelActionType) => modelActionType === 'init';
-const checkIfIsEdgeAdded = (modelActionType: ModelActionType) =>
-  modelActionType === 'finishLinking' || modelActionType === 'startLinking';
+const checkIfIsEdgeAdded = (modelActionType: ModelActionType) => modelActionType === 'finishLinking';
 
 export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> = {
   name: 'z-order',
   defaultMetadata: {
     enabled: true,
+    selectedZOrder: DEFAULT_SELECTED_Z_ORDER,
   },
   execute: (context, next) => {
     const {
-      state: { edges, metadata, nodes },
+      state: { edges, nodes },
       nodesMap,
       edgesMap,
       helpers,
       modelActionType,
+      middlewareMetadata,
     } = context;
     // Access the typed middleware metadata
-    const isEnabled = context.middlewareMetadata.enabled;
+    const isEnabled = middlewareMetadata.enabled;
     const isInit = checkIfIsInit(modelActionType);
-    const shouldSnapNode = helpers.checkIfAnyNodePropsChanged(['selected', 'groupId']);
+    const shouldSnapSelectedNode = helpers.checkIfAnyNodePropsChanged(['selected']);
+    const shouldSnapGroupIdNode = helpers.checkIfAnyNodePropsChanged(['groupId']);
     const shouldSnapEdge = helpers.checkIfAnyEdgePropsChanged(['selected']);
     const isEdgeAdded = checkIfIsEdgeAdded(modelActionType);
-    const shouldReOrder = isInit || shouldSnapNode || isEdgeAdded || shouldSnapEdge;
+    const shouldReOrder = isInit || shouldSnapGroupIdNode || shouldSnapSelectedNode || isEdgeAdded || shouldSnapEdge;
 
     if (!isEnabled || !shouldReOrder) {
       next();
@@ -46,30 +49,33 @@ export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> =
     if (isInit) {
       nodesWithZOrder = initializeZOrder(nodesMap);
     }
+    const selectedZOrder = middlewareMetadata.selectedZOrder;
 
-    if (shouldSnapNode) {
-      const selectedZOrder = metadata.selectedZOrder || DEFAULT_SELECTED_Z_ORDER;
-
-      ['selected', 'groupId'].forEach((prop) => {
-        if (!helpers.checkIfAnyNodePropsChanged([prop])) return;
-        for (const nodeId of helpers.getAffectedNodeIds([prop])) {
-          const node = nodesMap.get(nodeId);
-          if (!node) continue;
-          if (prop === 'groupId' && node.selected) continue;
-
-          let baseZOrder = 0;
-          if (prop === 'selected' && node.selected) {
-            baseZOrder = selectedZOrder;
-          } else if (node.groupId) {
-            baseZOrder = (nodesMap.get(node.groupId)?.zOrder ?? -1) + 1;
-          }
-          assignNodeZOrder(node, nodesMap, nodesWithZOrder, baseZOrder);
+    if (shouldSnapSelectedNode) {
+      for (const nodeId of helpers.getAffectedNodeIds(['selected'])) {
+        const node = nodesMap.get(nodeId);
+        if (!node) continue;
+        let baseZOrder = node.selected
+          ? selectedZOrder
+          : node.groupId
+            ? (nodesMap.get(node.groupId)?.zOrder ?? -1) + 1
+            : 0;
+        nodesWithZOrder.push(...assignNodeZOrder(node, nodesMap, baseZOrder));
+      }
+    } else if (shouldSnapGroupIdNode) {
+      for (const nodeId of helpers.getAffectedNodeIds(['groupId'])) {
+        const node = nodesMap.get(nodeId);
+        if (!node || node?.selected) continue;
+        let baseZOrder = 0;
+        if (node.groupId) {
+          baseZOrder = (nodesMap.get(node.groupId)?.zOrder ?? -1) + 1;
         }
-      });
+        nodesWithZOrder.push(...assignNodeZOrder(node, nodesMap, baseZOrder));
+      }
     }
 
     for (const node of nodesWithZOrder) {
-      const currentNode = nodes.find((layoutNode) => layoutNode.id === node.id);
+      const currentNode = nodes.find((nodeData) => nodeData.id === node.id);
       if (!currentNode || node.zOrder === currentNode.zOrder) {
         continue;
       }
@@ -79,12 +85,7 @@ export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> =
     let newTemporaryEdge: Edge | undefined = undefined;
 
     if (isEdgeAdded) {
-      if (metadata?.temporaryEdge) {
-        const selectedZOrder = metadata.selectedZOrder || DEFAULT_SELECTED_Z_ORDER;
-        newTemporaryEdge = { ...metadata?.temporaryEdge, zOrder: selectedZOrder };
-      } else {
-        edgesWithZOrder = assignEdgesZOrder([edges[edges.length - 1]], nodesWithZOrder, nodesMap);
-      }
+      edgesWithZOrder = assignEdgesZOrder([edges[edges.length - 1]], nodesWithZOrder, nodesMap);
     }
 
     if (shouldSnapEdge) {
@@ -93,12 +94,19 @@ export const zOrderMiddleware: Middleware<'z-order', ZOrderMiddlewareMetadata> =
       for (const edgeId of helpers.getAffectedEdgeIds(['selected'])) {
         const edge = edgesMap.get(edgeId);
         if (!edge) continue;
-        edgesWithZOrder.push(edge.selected ? { ...edge, zOrder: 1000 } : assignEdgeZOrder(edge, zOrderMap, nodesMap));
+        edgesWithZOrder.push(
+          edge.selected
+            ? {
+                ...edge,
+                zOrder: selectedZOrder,
+              }
+            : assignEdgeZOrder(edge, zOrderMap, nodesMap)
+        );
       }
     } else edgesWithZOrder = assignEdgesZOrder(edges, nodesWithZOrder, nodesMap);
 
     for (const edge of edgesWithZOrder) {
-      const currentEdge = edges.find((layoutNode) => layoutNode.id === edge.id);
+      const currentEdge = edges.find((edgeData) => edgeData.id === edgeData.id);
       if (!currentEdge || edge.zOrder === currentEdge.zOrder) {
         continue;
       }
