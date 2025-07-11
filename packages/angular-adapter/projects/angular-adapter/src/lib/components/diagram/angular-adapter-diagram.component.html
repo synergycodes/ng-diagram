@@ -1,4 +1,11 @@
 <angular-adapter-canvas [viewport]="viewport()">
+  @for (edge of edges(); track edge.id) {
+    <angular-adapter-edge
+      class="flow__angular-adapter-edge"
+      [data]="edge"
+      [eventTarget]="{ type: 'edge', element: edge }"
+    />
+  }
   @for (node of nodes(); track node.id) {
     <angular-adapter-node
       class="flow__angular-adapter-node"
@@ -12,13 +19,6 @@
         <span>{{ node.id }}</span>
       }
     </angular-adapter-node>
-  }
-  @for (edge of edges(); track edge.id) {
-    <angular-adapter-edge
-      class="flow__angular-adapter-edge"
-      [data]="edge"
-      [eventTarget]="{ type: 'edge', element: edge }"
-    />
   }
   <angular-adapter-marker-arrow />
 </angular-adapter-canvas>

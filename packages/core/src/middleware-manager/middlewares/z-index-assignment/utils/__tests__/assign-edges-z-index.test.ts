@@ -1,0 +1,63 @@
+import { describe, expect, it } from 'vitest';
+import { assignEdgesZIndex, assignEdgeZIndex } from '../assign-edges-z-index.ts';
+
+describe('assignEdgeZIndex', () => {
+  const nodesMap = new Map([
+    ['1', { id: '1', zIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['2', { id: '2', zIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['3', { id: '3', type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['4', { id: '4', type: 'node', position: { x: 0, y: 0 }, data: {} }],
+  ]);
+
+  const zIndexMap = new Map([
+    ['1', 3],
+    ['1', 7],
+  ]);
+
+  it('should use zOrder if present', () => {
+    const edge = { id: '1', data: {}, source: '1', target: '2', zOrder: 99 };
+    const result = assignEdgeZIndex(edge, zIndexMap, nodesMap);
+    expect(result.zIndex).toBe(99);
+  });
+
+  it('should use max zIndex from zIndexMap for source and target', () => {
+    const edge = { id: '1', data: {}, source: '1', target: '2' };
+    const result = assignEdgeZIndex(edge, zIndexMap, nodesMap);
+    expect(result.zIndex).toBe(7);
+  });
+});
+
+describe('assignEdgesZIndex', () => {
+  const nodesWithZIndex = [
+    { id: '1', zIndex: 5, type: 'node', position: { x: 0, y: 0 }, data: {} },
+    {
+      id: '2',
+      zIndex: 2,
+      type: 'node',
+      position: { x: 0, y: 0 },
+      data: {},
+    },
+  ];
+
+  const nodesMap = new Map([
+    ['1', { id: '1', zIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['2', { id: '2', zIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['3', { id: '3', type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['4', { id: '4', type: 'node', position: { x: 0, y: 0 }, data: {} }],
+  ]);
+
+  it('should assign zIndex to all edges', () => {
+    const edges = [
+      { id: ' 1', source: '1', target: '2', data: {} },
+      { id: '2', source: '1', target: '3', data: {} },
+      { id: '3', source: '3', target: '2', data: {} },
+      { id: '4', source: '3', target: '4', zOrder: 42, data: {} },
+    ];
+    const result = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap);
+
+    expect(result[0].zIndex).toBe(5);
+    expect(result[1].zIndex).toBe(5);
+    expect(result[2].zIndex).toBe(2);
+    expect(result[3].zIndex).toBe(42);
+  });
+});

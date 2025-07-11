@@ -1,5 +1,6 @@
 import type { Middleware } from '@angularflow/angular-adapter';
 import {
+  zIndexMiddleware,
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
@@ -10,12 +11,13 @@ import {
 import { loggerMiddleware } from '@angularflow/logger-middleware';
 
 export const appMiddlewares = [
+  zIndexMiddleware,
   nodeRotationSnapMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
   treeLayoutMiddleware,
-  edgesRoutingMiddleware,
   nodePositionSnapMiddleware,
+  edgesRoutingMiddleware,
   loggerMiddleware,
 ] as const satisfies Middleware[];
 

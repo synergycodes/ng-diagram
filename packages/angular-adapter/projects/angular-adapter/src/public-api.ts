@@ -17,4 +17,5 @@ export {
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
+  zIndexMiddleware,
 } from '@angularflow/core';

@@ -38,6 +38,10 @@ export interface Node {
    */
   zOrder?: number;
   /**
+   * The z-index of the node. This value is set automatically
+   */
+  zIndex?: number;
+  /**
    * The ports of the node.
    */
   ports?: Port[];
