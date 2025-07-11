@@ -1,0 +1,8 @@
+<angular-adapter-custom-edge
+  [data]="data()" [routing]="'bezier'" [customStroke]="'red'"
+  [customMarkerEnd]="'angularflow-arrow'" [displayLabel]="false"
+>
+  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
+    <button (mousedown)="onButtonClick()">Test</button>
+  </angular-adapter-edge-label>
+</angular-adapter-custom-edge>

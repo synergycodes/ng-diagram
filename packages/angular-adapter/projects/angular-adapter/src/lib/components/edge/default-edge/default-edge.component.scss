@@ -1,0 +1,10 @@
+svg {
+  overflow: visible;
+  position: absolute;
+  cursor: pointer;
+
+  path {
+    pointer-events: visibleStroke;
+    cursor: pointer;
+  }
+}

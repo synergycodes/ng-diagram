@@ -26,6 +26,7 @@ import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
+import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 
 @Component({
   selector: 'angular-adapter-diagram',
@@ -35,6 +36,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     AngularAdapterNodeComponent,
     AngularAdapterEdgeComponent,
     MarkerArrowComponent,
+    DefaultEdgeComponent,
   ],
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',

@@ -4,8 +4,15 @@
       class="flow__angular-adapter-edge"
       [data]="edge"
       [eventTarget]="{ type: 'edge', element: edge }"
-    />
+    >
+      @if (getEdgeTemplate(edge.type)) {
+        <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
+      } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
+        <angular-adapter-default-edge [data]="edge" />
+      }
+    </angular-adapter-edge>
   }
+  <angular-adapter-marker-arrow />
   @for (node of nodes(); track node.id) {
     <angular-adapter-node
       class="flow__angular-adapter-node"
@@ -20,5 +27,4 @@
       }
     </angular-adapter-node>
   }
-  <angular-adapter-marker-arrow />
 </angular-adapter-canvas>

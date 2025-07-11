@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
-
-import { ViewportDirective } from '../../directives';
+import { Component } from '@angular/core';
 import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ViewportDirective } from '../../directives';
+import { By } from '@angular/platform-browser';
 
 @Component({
   selector: 'angular-adapter-node',

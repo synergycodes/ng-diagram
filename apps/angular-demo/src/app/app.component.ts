@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
+  EdgeTemplateMap,
+  IEdgeTemplate,
   INodeTemplate,
   Middleware,
   NodeTemplateMap,
@@ -11,7 +13,9 @@ import { GroupNodeComponent } from './node-template/group-node/group-node.compon
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
+import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
+import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +31,10 @@ export class AppComponent {
     ['image', ImageNodeComponent],
     ['resizable', ResizableNodeComponent],
     ['group', GroupNodeComponent],
+  ]);
+  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<IEdgeTemplate>>([
+    ['button-edge', ButtonEdgeComponent],
+    ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
 
@@ -64,22 +72,18 @@ export class AppComponent {
         source: '1',
         target: '2',
         data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-right',
         targetPort: 'port-left',
-        routing: 'orthogonal',
+        type: 'custom-bezier-edge',
       },
       {
         id: '2',
         source: '2',
         target: '3',
         data: {},
-        sourceArrowhead: 'angularflow-arrow',
-        targetArrowhead: 'angularflow-arrow',
         sourcePort: 'port-right',
         targetPort: 'port-left-1',
-        routing: 'orthogonal',
+        type: 'button-edge',
       },
       {
         id: '4',
