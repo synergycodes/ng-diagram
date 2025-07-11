@@ -116,7 +116,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           y: moveState.lastY,
         });
 
-        const updateData: { id: string; groupId?: string; zOrder?: number }[] = [];
+        const updateData: { id: string; groupId?: string }[] = [];
 
         for (const selectedNode of flowCore.modelLookup.getSelectedNodes()) {
           if (
@@ -133,7 +133,6 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           updateData.push({
             id: selectedNode.id,
             groupId: newGroupId,
-            ...(topLevelGroupNode ? { zOrder: ((topLevelGroupNode.zOrder || selectedNode.zOrder) ?? 0) + 1 } : {}),
           });
         }
 
