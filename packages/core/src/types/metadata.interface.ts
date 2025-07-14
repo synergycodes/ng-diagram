@@ -61,4 +61,5 @@ export interface Metadata<TMiddlewaresMetadata = unknown> {
   rotateHandleOffset?: RotateHandleConfiguration;
   routingConfiguration?: RoutingConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
+  [key: string]: unknown;
 }

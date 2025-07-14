@@ -6,6 +6,8 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
+import { TransactionManager } from './transaction-manager/transaction-manager';
+import { TransactionCallback, TransactionResult } from './transaction-manager/transaction.types';
 import type {
   Edge,
   EnvironmentInfo,
@@ -13,6 +15,7 @@ import type {
   EventMapper,
   FlowState,
   FlowStateUpdate,
+  LooseAutocomplete,
   Metadata,
   Middleware,
   MiddlewareChain,
@@ -40,6 +43,7 @@ export class FlowCore<
   readonly initializationGuard: InitializationGuard;
   readonly internalUpdater: InternalUpdater;
   readonly modelLookup: ModelLookup;
+  readonly transactionManager: TransactionManager;
 
   constructor(
     modelAdapter: ModelAdapter<TMetadata>,
@@ -57,6 +61,7 @@ export class FlowCore<
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
+    this.transactionManager = new TransactionManager(this);
 
     this.init();
   }
@@ -159,11 +164,70 @@ export class FlowCore<
   }
 
   /**
+   * Executes a function within a transaction context.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @example
+   * // Simple transaction
+   * await flowCore.transaction(async (tx) => {
+   *   await tx.emit('addNode', { node });
+   *   await tx.emit('selectNode', { nodeId: node.id });
+   * });
+   *
+   * // Named transaction
+   * await flowCore.transaction('batchUpdate', async (tx) => {
+   *   await tx.emit('updateNodes', { nodes });
+   *   if (error) {
+   *     tx.rollback(); // Discard all changes
+   *   }
+   * });
+   *
+   * // With savepoints
+   * await flowCore.transaction(async (tx) => {
+   *   await tx.emit('step1', {});
+   *   tx.savepoint('afterStep1');
+   *
+   *   await tx.emit('step2', {});
+   *   if (step2Failed) {
+   *     tx.rollbackTo('afterStep1');
+   *   }
+   * });
+   */
+  async transaction(callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(
+    nameOrCallback: ModelActionType | TransactionCallback,
+    callback?: TransactionCallback
+  ): Promise<TransactionResult> {
+    let results: TransactionResult;
+
+    if (typeof nameOrCallback === 'function') {
+      results = await this.transactionManager.transaction(nameOrCallback);
+    } else {
+      if (!callback) {
+        throw new Error('Callback is required when transaction name is provided');
+      }
+      results = await this.transactionManager.transaction(nameOrCallback, callback);
+    }
+
+    if (results.commandsCount > 0) {
+      await this.applyUpdate(results.results, nameOrCallback as ModelActionType);
+    }
+
+    return results;
+  }
+
+  /**
    * Applies an update to the flow state
    * @param stateUpdate Partial state to apply
    * @param modelActionType Type of model action to apply
    */
-  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: ModelActionType): Promise<void> {
+  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: LooseAutocomplete<ModelActionType>): Promise<void> {
+    if (this.transactionManager.isActive()) {
+      this.transactionManager.queueUpdate(stateUpdate, modelActionType);
+      return;
+    }
+
     const finalState = await this.middlewareManager.execute(this.getState(), stateUpdate, modelActionType);
     if (finalState) {
       this.setState(finalState);

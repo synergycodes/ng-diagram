@@ -13,7 +13,6 @@ export * from './command-handler.interface';
 export * from './input-event-handler.abstract';
 
 // Model and middleware types
-export * from './middleware-config.types';
 export * from './middleware.interface';
 export * from './model-adapter.interface';
 
