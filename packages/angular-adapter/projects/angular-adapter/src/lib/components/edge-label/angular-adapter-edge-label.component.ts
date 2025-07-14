@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { EdgeLabel, EdgeLabelTarget } from '@angularflow/core';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
-import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
+import { BatchResizeObserverService } from '../../services';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 
 @Component({

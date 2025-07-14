@@ -4,13 +4,6 @@ import { getInitialPositionSourceRight } from './get-initial-position-source-rig
 import { getInitialPositionSourceTop } from './get-initial-position-source-top.ts';
 import { Point, PortLocation, PortSide } from '../../../types';
 
-export enum Position {
-  Left = 'left',
-  Top = 'top',
-  Right = 'right',
-  Bottom = 'bottom',
-}
-
 const positionFunctionMap: Record<
   PortSide,
   (

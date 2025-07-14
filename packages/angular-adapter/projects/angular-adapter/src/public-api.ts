@@ -2,13 +2,18 @@
  * Public API Surface of angular-adapter
  */
 
-export type { DropEvent, Edge, FlowCore, Metadata, Middleware, Node } from '@angularflow/core';
+export type { DropEvent, Edge, FlowCore, Metadata, Middleware, Node, Point } from '@angularflow/core';
 export * from './lib/components/diagram/angular-adapter-diagram.component';
 export * from './lib/components/port/angular-adapter-port.component';
+export * from './lib/components/edge-label/angular-adapter-edge-label.component';
+export * from './lib/components/edge/custom-edge/custom-edge.component';
 export * from './lib/directives';
 export { FlowCoreProviderService, PaletteInteractionService } from './lib/services';
 export * from './lib/types';
-export * from './lib/utils/get-paths';
+export * from './lib/utils/get-paths/get-straight-paths';
+export * from './lib/utils/get-paths/get-orthogonal-paths';
+export * from './lib/utils/get-paths/get-bezier-paths';
+export * from './lib/services/';
 
 export {
   edgesRoutingMiddleware,
@@ -17,4 +22,5 @@ export {
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
+  zIndexMiddleware,
 } from '@angularflow/core';

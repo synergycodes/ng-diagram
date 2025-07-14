@@ -2,7 +2,6 @@ import type { FlowCore } from '../flow-core';
 import { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
 import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
-import { MiddlewaresConfigFromMiddlewares } from './middleware-config.types';
 import type { Node } from './node.interface';
 
 /**
@@ -32,7 +31,9 @@ export type ModelActionType =
   | 'rotateNodeBy'
   | 'highlightGroup'
   | 'highlightGroupClear'
-  | 'treeLayout';
+  | 'treeLayout'
+  | 'moveNodes'
+  | 'moveNodesStop';
 
 /**
  * Type for the state of the flow diagram
@@ -64,14 +65,29 @@ export interface FlowStateUpdate {
   metadataUpdate?: Partial<Metadata>;
 }
 
+// Helper type to extract config type from a middleware
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ExtractMiddlewareConfig<T> = T extends Middleware<any, infer M> ? M : never;
+
+// Helper type to extract the name from a middleware
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ExtractMiddlewareName<T> = T extends Middleware<infer N, any> ? N : never;
+
+// Type to create the config map from middleware array
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type MiddlewaresConfigFromMiddlewares<T extends readonly Middleware<any, any>[]> = {
+  [K in T[number] as ExtractMiddlewareName<K>]: ExtractMiddlewareConfig<K>;
+};
+
+export type MiddlewareArray = readonly Middleware[];
+
 /**
  * Type for the context of the middleware
  */
 export interface MiddlewareContext<
   TCustomMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>> = Metadata<
-    MiddlewaresConfigFromMiddlewares<TCustomMiddlewares>
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TMetadata extends Metadata<any> = Metadata,
   TMiddlewareMetadata = unknown,
 > {
   initialState: FlowState<TMetadata>;

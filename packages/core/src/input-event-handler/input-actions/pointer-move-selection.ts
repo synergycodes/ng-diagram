@@ -84,23 +84,25 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         const dx = deltaX - (firstNode.position.x - moveState.initialNodePosition.x);
         const dy = deltaY - (firstNode.position.y - moveState.initialNodePosition.y);
 
-        flowCore.commandHandler.emit('moveNodesBy', {
-          delta: { x: dx, y: dy },
-          nodes: selectedNodes,
-        });
+        await flowCore.transaction('moveNodes', async (tx) => {
+          await tx.emit('moveNodesBy', {
+            delta: { x: dx, y: dy },
+            nodes: selectedNodes,
+          });
 
-        const topLevelGroupNode = getTopGroupAtPoint(flowCore, {
-          x,
-          y,
-        });
+          const topLevelGroupNode = getTopGroupAtPoint(flowCore, {
+            x,
+            y,
+          });
 
-        if (topLevelGroupNode) {
-          if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
-            flowCore.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+          if (topLevelGroupNode) {
+            if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
+              await tx.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+            }
+          } else {
+            await tx.emit('highlightGroupClear');
           }
-        } else {
-          flowCore.commandHandler.emit('highlightGroupClear');
-        }
+        });
 
         moveState.lastX = x;
         moveState.lastY = y;
@@ -116,7 +118,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           y: moveState.lastY,
         });
 
-        const updateData: { id: string; groupId?: string; zOrder?: number }[] = [];
+        const updateData: { id: string; groupId?: string }[] = [];
 
         for (const selectedNode of flowCore.modelLookup.getSelectedNodes()) {
           if (
@@ -133,18 +135,19 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           updateData.push({
             id: selectedNode.id,
             groupId: newGroupId,
-            ...(topLevelGroupNode ? { zOrder: ((topLevelGroupNode.zOrder || selectedNode.zOrder) ?? 0) + 1 } : {}),
           });
         }
 
-        if (updateData.length > 0) {
-          await flowCore.commandHandler.emit('updateNodes', { nodes: updateData });
-        }
+        await flowCore.transaction('moveNodesStop', async (tx) => {
+          if (updateData.length > 0) {
+            await tx.emit('updateNodes', { nodes: updateData });
+          }
 
-        // That means a group has been highlighted, so we need to clear it
-        if (updateData.some((node) => Boolean(node.groupId))) {
-          flowCore.commandHandler.emit('highlightGroupClear');
-        }
+          // That means a group has been highlighted, so we need to clear it
+          if (updateData.some((node) => Boolean(node.groupId))) {
+            await tx.emit('highlightGroupClear');
+          }
+        });
 
         moveState.isMoving = false;
         moveState.lastX = 0;

@@ -1,4 +1,4 @@
-import type { Point, Size } from './utils';
+import { Point, Routing, Size } from './utils';
 
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
@@ -51,7 +51,7 @@ export interface Edge {
   /**
    * The routing of the edge.
    */
-  routing?: string;
+  routing?: Routing;
   /**
    * The position of the edge start.
    */
@@ -68,6 +68,10 @@ export interface Edge {
    * The z-order of the edge.
    */
   zOrder?: number;
+  /**
+   * The z-index of the node. This value is set automatically
+   */
+  zIndex?: number;
   /**
    * The labels of the edge.
    */

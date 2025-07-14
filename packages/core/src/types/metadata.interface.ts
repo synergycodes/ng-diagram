@@ -39,6 +39,17 @@ export interface RotateHandleConfiguration {
 }
 
 /**
+ * Interface representing configurable properties of the routing.
+ */
+export interface RoutingConfiguration {
+  bezier?: {
+    bezierControlOffset?: number;
+  };
+  orthogonal?: Record<string, unknown>;
+  straight?: Record<string, unknown>;
+}
+
+/**
  * Interface representing the metadata of the diagram.
  */
 export interface Metadata<TMiddlewaresMetadata = unknown> {
@@ -48,5 +59,7 @@ export interface Metadata<TMiddlewaresMetadata = unknown> {
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
   rotateHandleOffset?: RotateHandleConfiguration;
+  routingConfiguration?: RoutingConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
+  [key: string]: unknown;
 }

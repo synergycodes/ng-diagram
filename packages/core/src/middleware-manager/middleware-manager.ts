@@ -2,6 +2,7 @@ import { FlowCore } from '../flow-core';
 import type {
   FlowState,
   FlowStateUpdate,
+  LooseAutocomplete,
   Metadata,
   Middleware,
   MiddlewareChain,
@@ -40,6 +41,10 @@ export class MiddlewareManager<
     }
 
     this.middlewareChain.push(middleware);
+    if (middleware.defaultMetadata) {
+      this.applyMiddlewareConfig(middleware.name, middleware.defaultMetadata);
+    }
+
     return () => this.unregister(middleware.name);
   }
 
@@ -51,6 +56,7 @@ export class MiddlewareManager<
     const index = this.middlewareChain.findIndex((middleware) => middleware.name === name);
     if (index !== -1) {
       this.middlewareChain.splice(index, 1);
+      this.applyMiddlewareConfig(name, undefined);
     }
   }
 
@@ -64,10 +70,10 @@ export class MiddlewareManager<
   execute(
     initialState: FlowState<TMetadata>,
     stateUpdate: FlowStateUpdate,
-    modelActionType: ModelActionType
+    modelActionType: LooseAutocomplete<ModelActionType>
   ): Promise<FlowState<TMetadata> | undefined> {
     const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
-    return middlewareExecutor.run(initialState, stateUpdate, modelActionType);
+    return middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
   }
 
   /**

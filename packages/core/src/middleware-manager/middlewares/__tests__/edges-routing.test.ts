@@ -10,6 +10,7 @@ import type {
   Point,
 } from '../../../types';
 import { edgesRoutingMiddleware, EdgesRoutingMiddlewareMetadata } from '../edges-routing/edges-routing.ts';
+import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment/constants.ts';
 
 vi.mock('../../../utils', () => ({
   getPortFlowPositionSide: (node: Node) => node.position,
@@ -101,7 +102,7 @@ describe('Edges Routing Middleware', () => {
     expect(nextMock).toHaveBeenCalledWith({});
   });
 
-  it('should route only edges with routing set to straight or orthogonal or undefined and leave other edges unchanged', () => {
+  it('should route only edges with routing set to straight or orthogonal or undefined. If an edge has a defined type, then sourcePosition, targetPosition, and labels should be set. All other edges should remain unchanged.', () => {
     const newState = {
       nodes: [
         { ...mockNode, id: 'node-1', position: { x: 100, y: 100 } },
@@ -118,6 +119,7 @@ describe('Edges Routing Middleware', () => {
           target: 'node-2',
           targetPort: 'port-2',
           routing: 'custom-routing',
+          type: 'custom-routing',
         },
         {
           ...mockEdge,
@@ -153,6 +155,12 @@ describe('Edges Routing Middleware', () => {
 
     expect(nextMock).toHaveBeenCalledWith({
       edgesToUpdate: [
+        {
+          id: 'edge-1',
+          sourcePosition: { x: 100, y: 100 },
+          targetPosition: { x: 200, y: 200 },
+          labels: undefined,
+        },
         {
           id: 'edge-2',
           points: [{ x: 200, y: 200 }],
@@ -213,6 +221,7 @@ describe('Edges Routing Middleware', () => {
           ],
           sourcePosition: { x: 100, y: 100 },
           targetPosition: { x: 200, y: 200 },
+          zIndex: DEFAULT_SELECTED_Z_INDEX,
         },
       },
     });

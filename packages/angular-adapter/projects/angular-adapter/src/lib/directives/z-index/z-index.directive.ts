@@ -9,5 +9,5 @@ import { Edge, Node } from '@angularflow/core';
 })
 export class ZIndexDirective {
   data = input.required<Node | Edge>();
-  zIndex = computed(() => this.data().zOrder ?? 0);
+  zIndex = computed(() => this.data().zIndex ?? 0);
 }

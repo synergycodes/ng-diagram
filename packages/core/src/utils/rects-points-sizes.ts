@@ -102,3 +102,14 @@ export const getBoundsFromRect = (rect: Rect): Bounds => {
     maxY: rect.y + rect.height,
   };
 };
+
+export const equalPointsArrays = (path1: Point[], path2: Point[]) => {
+  if (path1.length !== path2.length) return false;
+
+  for (let i = 0; i < path1.length; i++) {
+    if (!isSamePoint(path1[i], path2[i])) {
+      return false;
+    }
+  }
+  return true;
+};
