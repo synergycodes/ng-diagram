@@ -1,19 +1,22 @@
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, Input } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
-import { PaletteInteractionService } from '@angularflow/angular-adapter';
+import { PaletteInteractionService, PaletteNode } from '@angularflow/angular-adapter';
+import { templateLabels } from '../../data/node-template';
 
 @Component({
   selector: 'app-node-preview',
   templateUrl: './node-preview.component.html',
+  styleUrls: ['./node-preview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgComponentOutlet],
 })
 export class NodePreviewComponent {
   private readonly paletteInteractionService = inject(PaletteInteractionService);
-  @Input() template!: any;
-  @Input() node!: any;
+  template = input.required<any>();
+  node = input.required<PaletteNode>();
+
+  nodeLabel = computed(() => templateLabels.get(this.node()?.type) ?? 'Unknown');
 
   onDragStart(event: DragEvent) {
-    this.paletteInteractionService.onDragStartFromPalette(event, this.node);
+    this.paletteInteractionService.onDragStartFromPalette(event, this.node());
   }
 }

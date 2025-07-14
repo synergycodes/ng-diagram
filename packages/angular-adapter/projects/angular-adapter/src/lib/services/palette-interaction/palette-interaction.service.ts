@@ -8,7 +8,6 @@ export class PaletteInteractionService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   onDragStartFromPalette(event: DragEvent, node: PaletteNode) {
-    console.log('on drag Start', event);
     if (event.dataTransfer) {
       if (event.target instanceof HTMLElement) {
         event.dataTransfer?.setDragImage(event?.target, 0, 0);
