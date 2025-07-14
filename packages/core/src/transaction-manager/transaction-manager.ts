@@ -28,7 +28,7 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
       // Execute callback with transaction context
       await transactionCallback(transaction.context);
 
-      if (!transaction.isRolledBack()) {
+      if (!transaction.isAborted()) {
         if (parentTransaction) {
           // Nested transaction - merge to parent
           transaction.mergeToParent();

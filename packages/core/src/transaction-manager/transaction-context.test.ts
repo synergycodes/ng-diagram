@@ -12,10 +12,10 @@ describe('createTransactionContext', () => {
 
   beforeEach(() => {
     mockTransaction = {
-      isRolledBack: vi.fn(() => false),
+      isAborted: vi.fn(() => false),
       rollback: vi.fn(),
       addSavepoint: vi.fn(),
-      rollbackToSavepoint: vi.fn(),
+      abort: vi.fn(),
       hasChanges: vi.fn(() => false),
       getQueue: vi.fn(() => []),
     } as unknown as Transaction;
@@ -40,7 +40,7 @@ describe('createTransactionContext', () => {
     });
 
     it('should throw error when transaction is rolled back', async () => {
-      vi.mocked(mockTransaction.isRolledBack).mockReturnValue(true);
+      vi.mocked(mockTransaction.isAborted).mockReturnValue(true);
 
       await expect(context.emit('addNodes', { nodes: [mockNode] })).rejects.toThrow(
         'Cannot emit on rolled back transaction'
@@ -56,11 +56,11 @@ describe('createTransactionContext', () => {
     });
   });
 
-  describe('rollback', () => {
-    it('should call transaction.rollback', () => {
-      context.rollback();
+  describe('abort', () => {
+    it('should call transaction.abort', () => {
+      context.abort();
 
-      expect(mockTransaction.rollback).toHaveBeenCalledOnce();
+      expect(mockTransaction.abort).toHaveBeenCalledOnce();
     });
   });
 
@@ -72,7 +72,7 @@ describe('createTransactionContext', () => {
     });
 
     it('should throw error when creating savepoint on rolled back transaction', () => {
-      vi.mocked(mockTransaction.isRolledBack).mockReturnValue(true);
+      vi.mocked(mockTransaction.isAborted).mockReturnValue(true);
 
       expect(() => context.savepoint('checkpoint1')).toThrow('Cannot create savepoint on rolled back transaction');
 
@@ -84,17 +84,17 @@ describe('createTransactionContext', () => {
     it('should rollback to savepoint when transaction is not rolled back', () => {
       context.rollbackTo('checkpoint1');
 
-      expect(mockTransaction.rollbackToSavepoint).toHaveBeenCalledWith('checkpoint1');
+      expect(mockTransaction.rollback).toHaveBeenCalledWith('checkpoint1');
     });
 
     it('should throw error when rolling back to savepoint on rolled back transaction', () => {
-      vi.mocked(mockTransaction.isRolledBack).mockReturnValue(true);
+      vi.mocked(mockTransaction.isAborted).mockReturnValue(true);
 
       expect(() => context.rollbackTo('checkpoint1')).toThrow(
         'Cannot rollback to savepoint on already rolled back transaction'
       );
 
-      expect(mockTransaction.rollbackToSavepoint).not.toHaveBeenCalled();
+      expect(mockTransaction.rollback).not.toHaveBeenCalled();
     });
   });
 
@@ -122,21 +122,21 @@ describe('createTransactionContext', () => {
 
     it('should return isDirty as true when has changes and not rolled back', () => {
       vi.mocked(mockTransaction.hasChanges).mockReturnValue(true);
-      vi.mocked(mockTransaction.isRolledBack).mockReturnValue(false);
+      vi.mocked(mockTransaction.isAborted).mockReturnValue(false);
 
       expect(context.isDirty()).toBe(true);
     });
 
     it('should return isDirty as false when rolled back', () => {
       vi.mocked(mockTransaction.hasChanges).mockReturnValue(true);
-      vi.mocked(mockTransaction.isRolledBack).mockReturnValue(true);
+      vi.mocked(mockTransaction.isAborted).mockReturnValue(true);
 
       expect(context.isDirty()).toBe(false);
     });
 
     it('should return isDirty as false when no changes', () => {
       vi.mocked(mockTransaction.hasChanges).mockReturnValue(false);
-      vi.mocked(mockTransaction.isRolledBack).mockReturnValue(false);
+      vi.mocked(mockTransaction.isAborted).mockReturnValue(false);
 
       expect(context.isDirty()).toBe(false);
     });

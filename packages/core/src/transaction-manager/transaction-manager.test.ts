@@ -151,7 +151,7 @@ describe('TransactionManager', () => {
           await parentTx.transaction('child', async (childTx) => {
             await childTx.emit('addEdges', { edges: [mockEdge] });
 
-            childTx.rollback();
+            childTx.abort();
           });
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
@@ -238,7 +238,7 @@ describe('TransactionManager', () => {
     it('should support manual rollback', async () => {
       await transactionManager.transaction(async (tx) => {
         await tx.emit('addNodes', { nodes: [mockNode] });
-        tx.rollback();
+        tx.abort();
 
         await expect(tx.emit('addEdges', { edges: [mockEdge] })).rejects.toThrow(
           'Cannot emit on rolled back transaction'

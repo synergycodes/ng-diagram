@@ -13,7 +13,7 @@ export function createTransactionContext<TFlowCore extends FlowCore>(
 ): TransactionContext {
   const context: TransactionContext = {
     emit: async (command, ...data) => {
-      if (transaction.isRolledBack()) {
+      if (transaction.isAborted()) {
         throw new Error('Cannot emit on rolled back transaction');
       }
 
@@ -21,22 +21,22 @@ export function createTransactionContext<TFlowCore extends FlowCore>(
       await flowCore.commandHandler.emit(command, ...data);
     },
 
-    rollback: () => {
-      transaction.rollback();
+    abort: () => {
+      transaction.abort();
     },
 
     savepoint: (name: string) => {
-      if (transaction.isRolledBack()) {
+      if (transaction.isAborted()) {
         throw new Error('Cannot create savepoint on rolled back transaction');
       }
       transaction.addSavepoint(name);
     },
 
     rollbackTo: (savepointName) => {
-      if (transaction.isRolledBack()) {
+      if (transaction.isAborted()) {
         throw new Error('Cannot rollback to savepoint on already rolled back transaction');
       }
-      transaction.rollbackToSavepoint(savepointName);
+      transaction.rollback(savepointName);
     },
 
     transaction: (name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult> => {
@@ -49,7 +49,7 @@ export function createTransactionContext<TFlowCore extends FlowCore>(
     },
 
     isDirty: (): boolean => {
-      return !transaction.isRolledBack() && transaction.hasChanges();
+      return !transaction.isAborted() && transaction.hasChanges();
     },
 
     getQueuedUpdates: () => {

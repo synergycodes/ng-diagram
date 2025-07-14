@@ -7,14 +7,14 @@ export interface TransactionState<TFlowCore extends FlowCore> {
   name: LooseAutocomplete<ModelActionType>;
   queue: { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[];
   savepoints: Map<string, number>;
-  isRolledBack: boolean;
+  isAborted: boolean;
   parent: Transaction<TFlowCore> | null;
 }
 
 export class Transaction<TFlowCore extends FlowCore = FlowCore> {
   private queue: { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[] = [];
   private savepoints = new Map<string, number>();
-  private _isRolledBack = false;
+  private _isAborted = false;
   private children: Transaction<TFlowCore>[] = [];
   private _context: TransactionContext | null = null;
 
@@ -38,22 +38,52 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     return this._context;
   }
 
-  isRolledBack(): boolean {
-    return this._isRolledBack;
+  /**
+   * Check if the transaction has been completely aborted
+   */
+  isAborted(): boolean {
+    return this._isAborted;
   }
 
-  rollback(): void {
-    this._isRolledBack = true;
+  /**
+   * Completely abort the transaction, making it unusable.
+   * This also aborts all child transactions.
+   */
+  abort(): void {
+    if (this._isAborted) return;
+
+    this._isAborted = true;
     this.queue = [];
-    // Rollback all children
-    this.children.forEach((child) => child.rollback());
+    this.savepoints.clear();
+    // Abort all children
+    this.children.forEach((child) => child.abort());
   }
 
+  /**
+   * Create a savepoint that can be rolled back to later
+   */
   addSavepoint(name: string): void {
+    this.ensureNotAborted();
     this.savepoints.set(name, this.queue.length);
   }
 
-  rollbackToSavepoint(savepointName: string): void {
+  /**
+   * Rollback to a savepoint or to the beginning of the transaction.
+   * Unlike abort(), this keeps the transaction active.
+   * @param savepointName - If provided, rollback to this savepoint. If not provided, rollback to the beginning.
+   */
+  rollback(savepointName?: string): void {
+    this.ensureNotAborted();
+
+    if (savepointName === undefined) {
+      // Rollback to the beginning (clear all updates but keep transaction active)
+      this.queue = [];
+      this.savepoints.clear();
+      // Rollback all children to beginning
+      this.children.forEach((child) => child.rollback());
+      return;
+    }
+
     const index = this.savepoints.get(savepointName);
     if (index === undefined) {
       throw new Error(`Savepoint '${savepointName}' not found`);
@@ -70,6 +100,37 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
       }
     });
     savepointsToRemove.forEach((name) => this.savepoints.delete(name));
+
+    // Rollback children that were created after this savepoint
+    // (This is a simplified approach - you might want more sophisticated child transaction handling)
+    this.children.forEach((child) => child.rollback());
+  }
+
+  /**
+   * Commit the transaction by merging changes to parent or applying them
+   */
+  commit(): void {
+    this.ensureNotAborted();
+    if (this.parent) {
+      this.mergeToParent();
+    }
+    // Note: If this is a root transaction, you might want to apply changes to the actual state here
+  }
+
+  /**
+   * Check if the transaction can be committed (not aborted and has changes)
+   */
+  canCommit(): boolean {
+    return !this._isAborted && this.hasChanges();
+  }
+
+  /**
+   * Ensure the transaction is not aborted, throwing an error if it is
+   */
+  private ensureNotAborted(): void {
+    if (this._isAborted) {
+      throw new Error('Cannot perform operation on aborted transaction');
+    }
   }
 
   hasChanges(): boolean {
@@ -81,9 +142,7 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
   }
 
   queueUpdate(update: FlowStateUpdate, actionType: LooseAutocomplete<ModelActionType>): void {
-    if (this._isRolledBack) {
-      throw new Error('Cannot queue update on rolled back transaction');
-    }
+    this.ensureNotAborted();
     this.queue.push({ update, actionType });
   }
 
@@ -92,13 +151,14 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
       name: this.name,
       queue: [...this.queue],
       savepoints: new Map(this.savepoints),
-      isRolledBack: this._isRolledBack,
+      isAborted: this._isAborted,
       parent: this.parent,
     };
   }
 
   mergeToParent(): void {
-    if (!this.parent || this._isRolledBack) {
+    this.ensureNotAborted();
+    if (!this.parent) {
       return;
     }
     this.queue.forEach((item) => {
@@ -107,7 +167,7 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
   }
 
   getMergedUpdates(): { mergedUpdate: FlowStateUpdate; commandsCount: number } {
-    if (this._isRolledBack) {
+    if (this._isAborted) {
       return { mergedUpdate: {}, commandsCount: 0 };
     }
 

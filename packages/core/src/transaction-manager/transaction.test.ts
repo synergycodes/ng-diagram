@@ -23,7 +23,7 @@ describe('Transaction', () => {
 
   describe('constructor', () => {
     it('should initialize with correct properties', () => {
-      expect(transaction.isRolledBack()).toBe(false);
+      expect(transaction.isAborted()).toBe(false);
       expect(transaction.hasChanges()).toBe(false);
       expect(transaction.getQueue()).toEqual([]);
     });
@@ -53,29 +53,29 @@ describe('Transaction', () => {
     });
   });
 
-  describe('rollback', () => {
-    it('should set rolled back state and clear queue', () => {
+  describe('abort', () => {
+    it('should set aborted state and clear queue', () => {
       transaction.queueUpdate({ nodesToAdd: [] }, 'test');
       expect(transaction.hasChanges()).toBe(true);
 
-      transaction.rollback();
+      transaction.abort();
 
-      expect(transaction.isRolledBack()).toBe(true);
+      expect(transaction.isAborted()).toBe(true);
       expect(transaction.hasChanges()).toBe(false);
       expect(transaction.getQueue()).toEqual([]);
     });
 
-    it('should rollback all children', () => {
+    it('should abort all children', () => {
       const child1 = new Transaction('child1', transaction, mockFlowCore as FlowCore);
       const child2 = new Transaction('child2', transaction, mockFlowCore as FlowCore);
 
       child1.queueUpdate({ nodesToAdd: [] }, 'test');
       child2.queueUpdate({ edgesToAdd: [] }, 'test');
 
-      transaction.rollback();
+      transaction.abort();
 
-      expect(child1.isRolledBack()).toBe(true);
-      expect(child2.isRolledBack()).toBe(true);
+      expect(child1.isAborted()).toBe(true);
+      expect(child2.isAborted()).toBe(true);
     });
   });
 
@@ -95,14 +95,14 @@ describe('Transaction', () => {
       transaction.queueUpdate({ edgesToAdd: [] }, 'add2');
       transaction.queueUpdate({ nodesToUpdate: [] }, 'add3');
 
-      transaction.rollbackToSavepoint('checkpoint1');
+      transaction.rollback('checkpoint1');
 
       expect(transaction.getQueue()).toHaveLength(1);
       expect(transaction.getQueue()[0].actionType).toBe('add1');
     });
 
     it('should throw error when savepoint not found', () => {
-      expect(() => transaction.rollbackToSavepoint('nonexistent')).toThrow("Savepoint 'nonexistent' not found");
+      expect(() => transaction.rollback('nonexistent')).toThrow("Savepoint 'nonexistent' not found");
     });
 
     it('should remove savepoints created after rollback point', () => {
@@ -113,11 +113,11 @@ describe('Transaction', () => {
       transaction.queueUpdate({ nodesToUpdate: [] }, 'add3');
       transaction.addSavepoint('checkpoint3');
 
-      transaction.rollbackToSavepoint('checkpoint1');
+      transaction.rollback('checkpoint1');
 
       // checkpoint2 and checkpoint3 should be removed
-      expect(() => transaction.rollbackToSavepoint('checkpoint2')).toThrow();
-      expect(() => transaction.rollbackToSavepoint('checkpoint3')).toThrow();
+      expect(() => transaction.rollback('checkpoint2')).toThrow();
+      expect(() => transaction.rollback('checkpoint3')).toThrow();
     });
   });
 
@@ -135,11 +135,11 @@ describe('Transaction', () => {
       expect(queue[1]).toEqual({ update: update2, actionType: 'action2' });
     });
 
-    it('should throw error when queuing on rolled back transaction', () => {
-      transaction.rollback();
+    it('should throw error when queuing on aborted back transaction', () => {
+      transaction.abort();
 
       expect(() => transaction.queueUpdate({ nodesToAdd: [] }, 'test')).toThrow(
-        'Cannot queue update on rolled back transaction'
+        'Cannot perform operation on aborted transaction'
       );
     });
   });
@@ -250,7 +250,7 @@ describe('Transaction', () => {
       expect(state.name).toBe('testTransaction');
       expect(state.queue).toHaveLength(1);
       expect(state.savepoints.get('checkpoint1')).toBe(1);
-      expect(state.isRolledBack).toBe(false);
+      expect(state.isAborted).toBe(false);
       expect(state.parent).toBeNull();
     });
   });
