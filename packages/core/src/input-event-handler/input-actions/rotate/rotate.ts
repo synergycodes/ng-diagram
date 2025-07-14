@@ -1,20 +1,23 @@
 import {
+  isPointer,
   isRotateEvent,
-  isRotateHandleTarget,
+  onRotateHandle,
   ResizeHandleTarget,
-  RotateEvent,
   type InputActionWithPredicate,
 } from '../../../types';
 import { getDistanceBetweenPoints } from '../../../utils/get-distance-between-points';
+import { and, targetIs } from '../input-actions.helpers';
 import { getRotationAngle } from './get-rotation-angle';
 
 const MIN_DISTANCE_TO_CENTER = 30;
 
 export const rotateAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    const { mouse, handle, center, target } = event as RotateEvent;
-    const nodeId = (target as ResizeHandleTarget).element.id;
+    if (!isRotateEvent(event)) return;
 
+    const nodeId = (event.target as ResizeHandleTarget).element.id;
+
+    const { mouse, handle, center } = event.data;
     const mouseToCenterDistance = getDistanceBetweenPoints(mouse, center);
 
     /*
@@ -36,5 +39,5 @@ export const rotateAction: InputActionWithPredicate = {
       angle,
     });
   },
-  predicate: (event) => isRotateHandleTarget(event.target) && isRotateEvent(event),
+  predicate: and(isRotateEvent, isPointer, targetIs(onRotateHandle)),
 };

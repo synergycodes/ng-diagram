@@ -1,5 +1,5 @@
 import { FlowCore } from '../../../flow-core';
-import { isResizeHandleTarget, Node, PointerEvent, ResizeHandlePosition } from '../../../types';
+import { isPointer, Node, onResizeHandle, PointerInputEvent, ResizeHandlePosition } from '../../../types';
 
 const MIN_NODE_SIZE = 50;
 
@@ -29,11 +29,13 @@ const resizeState: ResizeState = {
   draggingNode: null,
 };
 
-export function handlePointerEvent(flowCore: FlowCore, event: PointerEvent) {
-  const { x, y } = flowCore.clientToFlowPosition(event);
-  switch (event.type) {
-    case 'pointerdown':
-      if (isResizeHandleTarget(event.target)) {
+export function handlePointerEvent(flowCore: FlowCore, event: PointerInputEvent) {
+  if (!isPointer(event)) return;
+
+  const { x, y } = flowCore.clientToFlowPosition(event.position);
+  switch (event.phase) {
+    case 'start':
+      if (onResizeHandle(event.target)) {
         resizeState.isResizing = true;
         resizeState.handlePosition = event.target.position;
         resizeState.nodeId = event.target.element.id;
@@ -46,7 +48,7 @@ export function handlePointerEvent(flowCore: FlowCore, event: PointerEvent) {
         resizeState.draggingNode = flowCore.getNodeById(event.target.element.id);
       }
       break;
-    case 'pointermove':
+    case 'continue':
       if (resizeState.isResizing && resizeState.draggingNode) {
         const deltaX = x - resizeState.startX;
         const deltaY = y - resizeState.startY;
@@ -100,7 +102,7 @@ export function handlePointerEvent(flowCore: FlowCore, event: PointerEvent) {
         });
       }
       break;
-    case 'pointerup':
+    case 'end':
       resizeState.isResizing = false;
       resizeState.draggingNode = null;
       break;

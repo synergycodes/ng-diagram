@@ -1,11 +1,15 @@
 import {
-  isPointerDownEvent,
-  isPointerMoveEvent,
-  isPointerUpEvent,
-  isPortTarget,
+  isContinue,
+  isEnd,
+  isPointer,
+  isStart,
+  onPort,
   Port,
+  PortTarget,
+  withPrimaryButton,
   type InputActionWithPredicate,
 } from '../../types';
+import { and, or, targetIs } from './input-actions.helpers';
 
 let isLinking = false;
 
@@ -24,47 +28,69 @@ const isProperTargetPort = (targetPort: Port, source?: string, sourcePortId?: st
 
 export const linkingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    if (isPointerDownEvent(event) && isPortTarget(event.target) && event.target.element.type !== 'target') {
-      isLinking = true;
-      flowCore.commandHandler.emit('startLinking', {
-        source: event.target.element.nodeId,
-        sourcePort: event.target.element.id,
-      });
-    }
+    if (!isPointer(event)) return;
 
-    if (isPointerMoveEvent(event) && isLinking) {
-      const flowPosition = flowCore.clientToFlowPosition({ x: event.x, y: event.y });
-      const nearestPort = flowCore.getNearestPortInRange(flowPosition, 10);
-      const { temporaryEdge } = flowCore.getState().metadata;
-      if (nearestPort && isProperTargetPort(nearestPort, temporaryEdge?.source, temporaryEdge?.sourcePort)) {
-        flowCore.commandHandler.emit('moveTemporaryEdge', {
-          position: flowPosition,
-          target: nearestPort.nodeId,
-          targetPort: nearestPort.id,
+    switch (event.phase) {
+      case 'start': {
+        isLinking = true;
+        const target = event.target as PortTarget;
+
+        flowCore.commandHandler.emit('startLinking', {
+          source: target.element.nodeId,
+          sourcePort: target.element.id,
         });
-      } else {
-        flowCore.commandHandler.emit('moveTemporaryEdge', {
-          position: flowPosition,
-          target: '',
-          targetPort: '',
+        break;
+      }
+      case 'continue': {
+        if (!isLinking) break;
+
+        const flowPosition = flowCore.clientToFlowPosition(event.position);
+        const nearestPort = flowCore.getNearestPortInRange(flowPosition, 10);
+
+        const { temporaryEdge } = flowCore.getState().metadata;
+
+        if (nearestPort && isProperTargetPort(nearestPort, temporaryEdge?.source, temporaryEdge?.sourcePort)) {
+          flowCore.commandHandler.emit('moveTemporaryEdge', {
+            position: flowPosition,
+            target: nearestPort.nodeId,
+            targetPort: nearestPort.id,
+          });
+        } else {
+          flowCore.commandHandler.emit('moveTemporaryEdge', {
+            position: flowPosition,
+            target: '',
+            targetPort: '',
+          });
+        }
+
+        break;
+      }
+
+      case 'end': {
+        if (!isLinking) break;
+
+        isLinking = false;
+        const temporaryEdge = flowCore.getState().metadata.temporaryEdge;
+        flowCore.commandHandler.emit('finishLinking', {
+          target: temporaryEdge?.target,
+          targetPort: temporaryEdge?.targetPort,
         });
+
+        break;
       }
     }
-
-    if (isPointerUpEvent(event) && isLinking) {
-      isLinking = false;
-      const temporaryEdge = flowCore.getState().metadata.temporaryEdge;
-      flowCore.commandHandler.emit('finishLinking', {
-        target: temporaryEdge?.target,
-        targetPort: temporaryEdge?.targetPort,
-      });
-    }
   },
-  predicate: (event) =>
-    (isPointerDownEvent(event) &&
-      event.button === 0 &&
-      isPortTarget(event.target) &&
-      event.target.element.type !== 'target') ||
-    (isPointerMoveEvent(event) && isLinking) ||
-    (isPointerUpEvent(event) && event.button === 0),
+  predicate: and(
+    isPointer,
+    or(
+      and(
+        isStart,
+        withPrimaryButton,
+        targetIs(onPort),
+        (event) => (event.target as PortTarget).element.type !== 'target'
+      ),
+      and(isContinue, () => isLinking),
+      and(isEnd, withPrimaryButton)
+    )
+  ),
 };

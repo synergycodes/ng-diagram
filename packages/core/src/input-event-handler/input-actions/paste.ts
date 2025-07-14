@@ -1,13 +1,7 @@
-import { isKeyboardDownEvent, type InputActionWithPredicate } from '../../types';
+import { type InputActionWithPredicate } from '../../types';
+import { keyCombo } from './input-actions.helpers';
 
 export const pasteAction: InputActionWithPredicate = {
   action: (_, flowCore) => flowCore.commandHandler.emit('paste'),
-  predicate: (event, flowCore) => {
-    if (!isKeyboardDownEvent(event)) {
-      return false;
-    }
-
-    const modifierKey = flowCore.environment.os === 'MacOS' ? event.metaKey : event.ctrlKey;
-    return event.key === 'v' && modifierKey;
-  },
+  predicate: keyCombo('v', 'primary'),
 };

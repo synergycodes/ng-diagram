@@ -1,6 +1,7 @@
-import { isKeyboardDownEvent, type InputActionWithPredicate } from '../../types';
+import { type InputActionWithPredicate } from '../../types';
+import { isDeleteKey } from '../../types/event/event.guards';
 
 export const deleteSelectionAction: InputActionWithPredicate = {
   action: (_, flowCore) => flowCore.commandHandler.emit('deleteSelection'),
-  predicate: (event) => isKeyboardDownEvent(event) && (event.key === 'Backspace' || event.key === 'Delete'),
+  predicate: isDeleteKey,
 };

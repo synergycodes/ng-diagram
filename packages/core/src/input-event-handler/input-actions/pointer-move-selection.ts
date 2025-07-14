@@ -1,12 +1,8 @@
 import { FlowCore } from '../../flow-core';
-import {
-  isPointerDownEvent,
-  isPointerMoveEvent,
-  isPointerUpEvent,
-  Node,
-  Point,
-  type InputActionWithPredicate,
-} from '../../types';
+import { Node, Point, type InputActionWithPredicate } from '../../types';
+import { onNode } from '../../types/event/event-target.guards';
+import { isContinue, isEnd, isPanEvent, isPointer, isStart, withPrimaryButton } from '../../types/event/event.guards';
+import { and, or, targetIs } from './input-actions.helpers';
 
 interface MoveState {
   lastX: number;
@@ -38,9 +34,11 @@ const getTopGroupAtPoint = (flowCore: FlowCore, point: Point): Node | null => {
 
 export const pointerMoveSelectionAction: InputActionWithPredicate = {
   action: async (event, flowCore) => {
-    switch (event.type) {
-      case 'pointerdown': {
-        const { x, y } = flowCore.clientToFlowPosition(event);
+    if (!isPointer(event)) return;
+
+    switch (event.phase) {
+      case 'start': {
+        const { x, y } = flowCore.clientToFlowPosition(event.position);
 
         moveState.lastX = x;
         moveState.lastY = y;
@@ -50,7 +48,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         break;
       }
 
-      case 'pointermove': {
+      case 'continue': {
         if (!moveState.isMoving) return;
 
         const selectedNodes = flowCore.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
@@ -76,7 +74,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
           moveState.initialNodePosition = { ...firstNode.position };
         }
 
-        const { x, y } = flowCore.clientToFlowPosition(event);
+        const { x, y } = flowCore.clientToFlowPosition(event.position);
 
         const deltaX = x - moveState.startX;
         const deltaY = y - moveState.startY;
@@ -108,7 +106,7 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
         break;
       }
 
-      case 'pointerup': {
+      case 'end': {
         if (!moveState.isMoving) return;
 
         const topLevelGroupNode = getTopGroupAtPoint(flowCore, {
@@ -155,8 +153,13 @@ export const pointerMoveSelectionAction: InputActionWithPredicate = {
       }
     }
   },
-  predicate: (event) =>
-    (isPointerDownEvent(event) && event.button === 0 && event.target?.type === 'node') ||
-    (isPointerMoveEvent(event) && moveState.isMoving) ||
-    (isPointerUpEvent(event) && event.button === 0),
+  predicate: and(
+    isPointer,
+    isPanEvent,
+    or(
+      and(isStart, withPrimaryButton, targetIs(onNode)),
+      and(isContinue, () => moveState.isMoving),
+      and(isEnd, withPrimaryButton)
+    )
+  ),
 };

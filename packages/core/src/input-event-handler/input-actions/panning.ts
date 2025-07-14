@@ -1,4 +1,7 @@
-import { isPointerDownEvent, isPointerMoveEvent, isPointerUpEvent, type InputActionWithPredicate } from '../../types';
+import { type InputActionWithPredicate } from '../../types';
+import { onDiagram } from '../../types/event/event-target.guards';
+import { isContinue, isEnd, isPointer, isStart, withPrimaryButton } from '../../types/event/event.guards';
+import { and, or, targetIs } from './input-actions.helpers';
 
 interface MoveState {
   lastX: number;
@@ -16,32 +19,34 @@ const pointerIds = new Set<number>();
 
 export const panningAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    switch (event.type) {
-      case 'pointerdown':
+    if (!isPointer(event)) return;
+
+    switch (event.phase) {
+      case 'start':
         pointerIds.add(event.pointerId);
-        moveState.lastX = event.x;
-        moveState.lastY = event.y;
+        moveState.lastX = event.position.x;
+        moveState.lastY = event.position.y;
         moveState.isPanning = true;
         break;
-      case 'pointermove':
+      case 'continue':
         if (moveState.isPanning && pointerIds.size === 1) {
-          const x = event.x - moveState.lastX;
-          const y = event.y - moveState.lastY;
+          const x = event.position.x - moveState.lastX;
+          const y = event.position.y - moveState.lastY;
 
           flowCore.commandHandler.emit('moveViewportBy', { x, y });
 
-          moveState.lastX = event.x;
-          moveState.lastY = event.y;
+          moveState.lastX = event.position.x;
+          moveState.lastY = event.position.y;
         }
         break;
-      case 'pointerup':
+      case 'end':
         pointerIds.delete(event.pointerId);
         moveState.isPanning = false;
         break;
     }
   },
-  predicate: (event) =>
-    (isPointerDownEvent(event) && event.target?.type === 'diagram' && event.button === 0) ||
-    isPointerMoveEvent(event) ||
-    (isPointerUpEvent(event) && event.button === 0),
+  predicate: and(
+    isPointer,
+    or(and(isStart, targetIs(onDiagram), withPrimaryButton), isContinue, and(isEnd, withPrimaryButton))
+  ),
 };

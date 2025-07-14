@@ -1,23 +1,21 @@
-import {
-  isPointerDownEvent,
-  isResizeHandleTarget,
-  type Edge,
-  type EventTarget,
-  type InputActionWithPredicate,
-  type Node,
-} from '../../types';
+import { type Edge, type InputActionWithPredicate, type Node } from '../../types';
+import { onResizeHandle } from '../../types/event/event-target.guards';
+import { isPointer, isSelectEvent, withPrimaryModifier } from '../../types/event/event.guards';
+import { PointerInputEvent } from '../../types/event/event.interface';
+import { and, not, targetIs } from './input-actions.helpers';
 
 interface TargetElements {
   nodeIds: string[] | undefined;
   edgeIds: string[] | undefined;
 }
 
-const getTargetElementIds = (event: { target?: EventTarget }): TargetElements | null => {
+const getTargetElementIds = (event: PointerInputEvent): TargetElements | null => {
   if (!event.target || (event.target.type !== 'node' && event.target.type !== 'edge')) {
     return null;
   }
 
-  const target = event.target as EventTarget & { element: { id: string } };
+  const target = event.target;
+
   return {
     nodeIds: target.type === 'node' ? [target.element.id] : undefined,
     edgeIds: target.type === 'edge' ? [target.element.id] : undefined,
@@ -33,9 +31,8 @@ const findClickedElement = (targetElements: TargetElements, nodes: Node[], edges
 
 export const selectAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    if (!isPointerDownEvent(event)) {
-      return;
-    }
+    // Type guard to ensure we have a pointer event
+    if (!isPointer(event)) return;
 
     const targetElements = getTargetElementIds(event);
     if (!targetElements) {
@@ -46,7 +43,7 @@ export const selectAction: InputActionWithPredicate = {
     const { nodes, edges } = flowCore.getState();
     const clickedElement = findClickedElement(targetElements, nodes, edges);
     const isAlreadySelected = clickedElement?.selected;
-    const isModifierPressed = flowCore.environment.os === 'MacOS' ? event.metaKey : event.ctrlKey;
+    const isModifierPressed = withPrimaryModifier(event);
 
     if (isAlreadySelected && isModifierPressed) {
       flowCore.commandHandler.emit('deselect', targetElements);
@@ -58,5 +55,5 @@ export const selectAction: InputActionWithPredicate = {
       preserveSelection: isAlreadySelected || isModifierPressed,
     });
   },
-  predicate: (event) => isPointerDownEvent(event) && !isResizeHandleTarget(event.target),
+  predicate: and(isSelectEvent, not(targetIs(onResizeHandle))),
 };

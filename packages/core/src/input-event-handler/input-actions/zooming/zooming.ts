@@ -1,14 +1,16 @@
-import { isPointerEvent, isWheelEvent, type InputActionWithPredicate } from '../../../types';
+import { type InputActionWithPredicate } from '../../../types';
+import { isPointer, isWheel } from '../../../types/event/event.guards';
+import { or } from '../input-actions.helpers';
 import { handlePointerEvent } from './handle-pointer-event';
 import { handleWheelEvent } from './handle-wheel-event';
 
 export const zoomingAction: InputActionWithPredicate = {
   action: (event, flowCore) => {
-    if (isWheelEvent(event)) {
+    if (isWheel(event)) {
       handleWheelEvent(event, flowCore);
-    } else if (isPointerEvent(event)) {
+    } else if (isPointer(event)) {
       handlePointerEvent(event, flowCore);
     }
   },
-  predicate: (event) => isWheelEvent(event) || isPointerEvent(event),
+  predicate: or(isWheel, isPointer),
 };

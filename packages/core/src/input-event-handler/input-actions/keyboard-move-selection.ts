@@ -1,21 +1,20 @@
-import { CommandByName, isKeyboardDownEvent, type InputActionWithPredicate, type KeyboardEvent } from '../../types';
+import { CommandByName, type InputActionWithPredicate } from '../../types';
+import { isArrowKey, isKeyboard } from '../../types/event/event.guards';
+import { InputEvent, KeyboardInputEvent } from '../../types/event/event.interface';
 
 export const keyboardMoveSelectionAction: InputActionWithPredicate = {
-  action: (event, flowCore) => {
-    if (!isKeyboardDownEvent(event)) return;
-
+  action: (event: InputEvent, flowCore) => {
+    if (!isKeyboard(event)) return;
     const nodesToMove = flowCore.modelLookup.getSelectedNodesWithChildren();
 
     if (nodesToMove.length === 0) return;
 
     flowCore.commandHandler.emit('moveNodesBy', { nodes: nodesToMove, delta: getMoveNodesCommandDelta(event) });
   },
-  predicate: (event) =>
-    isKeyboardDownEvent(event) &&
-    (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown'),
+  predicate: isArrowKey,
 };
 
-function getMoveNodesCommandDelta(event: KeyboardEvent): CommandByName<'moveNodesBy'>['delta'] {
+function getMoveNodesCommandDelta(event: KeyboardInputEvent): CommandByName<'moveNodesBy'>['delta'] {
   const MOVEMENT_STEP = 10;
 
   switch (event.key) {

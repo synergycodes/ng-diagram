@@ -1,18 +1,18 @@
 import { FlowCore } from '../../../flow-core';
-import { WheelEvent } from '../../../types';
+import { WheelInputEvent } from '../../../types/event/event.interface';
 import { SCALE } from './zooming.config';
 
-export function handleWheelEvent(event: WheelEvent, flowCore: FlowCore) {
+export function handleWheelEvent(event: WheelInputEvent, flowCore: FlowCore) {
   let { x, y, scale } = flowCore.getState().metadata.viewport;
-  const beforeZoomX = (event.x - x) / scale;
-  const beforeZoomY = (event.y - y) / scale;
-  const zoomFactor = event.deltaY > 0 ? 1 - SCALE.STEP : 1 + SCALE.STEP;
+  const beforeZoomX = (event.position.x - x) / scale;
+  const beforeZoomY = (event.position.y - y) / scale;
+  const zoomFactor = event.delta.y > 0 ? 1 - SCALE.STEP : 1 + SCALE.STEP;
 
   scale *= zoomFactor;
   scale = Math.min(Math.max(SCALE.MIN, scale), SCALE.MAX);
 
-  const afterZoomX = (event.x - x) / scale;
-  const afterZoomY = (event.y - y) / scale;
+  const afterZoomX = (event.position.x - x) / scale;
+  const afterZoomY = (event.position.y - y) / scale;
 
   x += (afterZoomX - beforeZoomX) * scale;
   y += (afterZoomY - beforeZoomY) * scale;
