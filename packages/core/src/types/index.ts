@@ -1,7 +1,9 @@
 // Event types
 export * from './event-mapper.interface';
-export * from './event.guards';
-export * from './event.interface';
+export * from './event/event.guards';
+export * from './event/event.interface';
+export * from './event/event-target.interface';
+export * from './event/event-target.guards';
 
 // Flow diagram types
 export * from './edge.interface';

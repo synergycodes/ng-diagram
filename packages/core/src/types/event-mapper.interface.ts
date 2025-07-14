@@ -1,9 +1,9 @@
-import type { Event } from './event.interface';
+import type { InputEvent } from './event/event.interface';
 
 /**
  * Type for event listener callback function
  */
-export type EventListener = (event: Event) => void;
+export type EventListener = (event: InputEvent) => void;
 
 /**
  * Interface for handling UI-agnostic events
@@ -19,5 +19,5 @@ export interface EventMapper {
    * Emit an event to all registered listeners
    * @param event Event to emit
    */
-  emit(event: Event): void;
+  emit(...args: unknown[]): void;
 }
