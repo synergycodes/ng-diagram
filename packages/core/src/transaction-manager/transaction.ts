@@ -171,37 +171,36 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
       return { mergedUpdate: {}, commandsCount: 0 };
     }
 
-    const mergedUpdate: FlowStateUpdate = {};
     const commandsCount = this.queue.length;
 
-    // Merge all queued updates
+    const nodesToAddBatches: NonNullable<FlowStateUpdate['nodesToAdd']>[] = [];
+    const nodesToRemoveBatches: NonNullable<FlowStateUpdate['nodesToRemove']>[] = [];
+    const nodesToUpdateBatches: NonNullable<FlowStateUpdate['nodesToUpdate']>[] = [];
+    const edgesToAddBatches: NonNullable<FlowStateUpdate['edgesToAdd']>[] = [];
+    const edgesToRemoveBatches: NonNullable<FlowStateUpdate['edgesToRemove']>[] = [];
+    const edgesToUpdateBatches: NonNullable<FlowStateUpdate['edgesToUpdate']>[] = [];
+    const metadataUpdates: NonNullable<FlowStateUpdate['metadataUpdate']>[] = [];
+
     for (const { update } of this.queue) {
-      if (update.nodesToAdd) {
-        mergedUpdate.nodesToAdd = [...(mergedUpdate.nodesToAdd || []), ...update.nodesToAdd];
-      }
-      if (update.nodesToRemove) {
-        mergedUpdate.nodesToRemove = [...(mergedUpdate.nodesToRemove || []), ...update.nodesToRemove];
-      }
-      if (update.nodesToUpdate) {
-        mergedUpdate.nodesToUpdate = [...(mergedUpdate.nodesToUpdate || []), ...update.nodesToUpdate];
-      }
-      if (update.edgesToAdd) {
-        mergedUpdate.edgesToAdd = [...(mergedUpdate.edgesToAdd || []), ...update.edgesToAdd];
-      }
-      if (update.edgesToRemove) {
-        mergedUpdate.edgesToRemove = [...(mergedUpdate.edgesToRemove || []), ...update.edgesToRemove];
-      }
-      if (update.edgesToUpdate) {
-        mergedUpdate.edgesToUpdate = [...(mergedUpdate.edgesToUpdate || []), ...update.edgesToUpdate];
-      }
-      if (update.metadataUpdate) {
-        mergedUpdate.metadataUpdate = {
-          ...(mergedUpdate.metadataUpdate || {}),
-          ...update.metadataUpdate,
-        };
-      }
+      if (update.nodesToAdd?.length) nodesToAddBatches.push(update.nodesToAdd);
+      if (update.nodesToRemove?.length) nodesToRemoveBatches.push(update.nodesToRemove);
+      if (update.nodesToUpdate?.length) nodesToUpdateBatches.push(update.nodesToUpdate);
+      if (update.edgesToAdd?.length) edgesToAddBatches.push(update.edgesToAdd);
+      if (update.edgesToRemove?.length) edgesToRemoveBatches.push(update.edgesToRemove);
+      if (update.edgesToUpdate?.length) edgesToUpdateBatches.push(update.edgesToUpdate);
+      if (update.metadataUpdate) metadataUpdates.push(update.metadataUpdate);
     }
 
+    const mergedUpdate: FlowStateUpdate = {};
+    if (nodesToAddBatches.length > 0) mergedUpdate.nodesToAdd = nodesToAddBatches.flat();
+    if (nodesToRemoveBatches.length > 0) mergedUpdate.nodesToRemove = nodesToRemoveBatches.flat();
+    if (nodesToUpdateBatches.length > 0) mergedUpdate.nodesToUpdate = nodesToUpdateBatches.flat();
+    if (edgesToAddBatches.length > 0) mergedUpdate.edgesToAdd = edgesToAddBatches.flat();
+    if (edgesToRemoveBatches.length > 0) mergedUpdate.edgesToRemove = edgesToRemoveBatches.flat();
+    if (edgesToUpdateBatches.length > 0) mergedUpdate.edgesToUpdate = edgesToUpdateBatches.flat();
+    if (metadataUpdates.length > 0) {
+      mergedUpdate.metadataUpdate = Object.assign({}, ...metadataUpdates);
+    }
     return { mergedUpdate, commandsCount };
   }
 }
