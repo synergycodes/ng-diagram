@@ -39,6 +39,7 @@ export class NodeRotateAdornmentComponent {
 
   readonly isRotating = signal(false);
   readonly data = input.required<Node>();
+  readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.data() }));
   readonly showAdornment = computed(() => !!this.data().selected || this.isRotating());
 
   /**
@@ -87,21 +88,22 @@ export class NodeRotateAdornmentComponent {
     const hostRect = this.hostElement.nativeElement.getBoundingClientRect();
     const handleRect = this.rotateHandleElement?.getBoundingClientRect();
 
-    this.eventMapper.emit({
-      type: 'rotate',
-      timestamp: Date.now(),
-      target: { type: 'rotate-handle', element: this.data() },
-      mouse: { x: moveEvent.clientX, y: moveEvent.clientY },
-      center: {
-        x: hostRect.left + hostRect.width / 2,
-        y: hostRect.top + hostRect.height / 2,
+    this.eventMapper.emit(moveEvent, {
+      name: 'rotate',
+      target: this.eventTarget(),
+      data: {
+        mouse: { x: moveEvent.clientX, y: moveEvent.clientY },
+        center: {
+          x: hostRect.left + hostRect.width / 2,
+          y: hostRect.top + hostRect.height / 2,
+        },
+        handle: handleRect
+          ? {
+              x: handleRect.left + handleRect.width / 2,
+              y: handleRect.top + handleRect.height / 2,
+            }
+          : { x: 0, y: 0 },
       },
-      handle: handleRect
-        ? {
-            x: handleRect.left + handleRect.width / 2,
-            y: handleRect.top + handleRect.height / 2,
-          }
-        : { x: 0, y: 0 },
     });
   }
 

@@ -10,16 +10,9 @@ export class KeyPressEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
 
   onKeyPress(event: KeyboardEvent) {
-    this.eventMapperService.emit({
-      type: 'keypress',
+    this.eventMapperService.emit(event, {
+      name: 'press',
       target: { type: 'diagram' },
-      timestamp: Date.now(),
-      code: event.code,
-      key: event.key,
-      ctrlKey: event.ctrlKey,
-      shiftKey: event.shiftKey,
-      altKey: event.altKey,
-      metaKey: event.metaKey,
     });
   }
 }

@@ -1,5 +1,6 @@
-import { Directive, inject } from '@angular/core';
+import { Directive, inject, input } from '@angular/core';
 
+import { EventType } from '@angularflow/core';
 import { EventMapperService } from '../../../services';
 
 @Directive({
@@ -8,18 +9,12 @@ import { EventMapperService } from '../../../services';
 })
 export class PointerMoveEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
+  eventName = input<EventType>('unknown');
 
   onPointerMove(event: PointerEvent) {
-    this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointermove',
+    this.eventMapperService.emit(event, {
+      name: this.eventName(),
       target: { type: 'diagram' },
-      pressure: event.pressure,
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
     });
   }
 }

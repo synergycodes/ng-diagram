@@ -35,17 +35,12 @@ export class NodeResizeAdornmentComponent {
 
   onPointerEvent({ event, position }: { event: PointerEvent; position: ResizeHandlePosition }) {
     event.stopPropagation();
-    this.eventMapper.emit({
-      type: event.type as 'pointerdown' | 'pointerup',
-      pointerId: event.pointerId,
-      timestamp: Date.now(),
-      target: { type: 'resize-handle', position, element: this.data() },
-      x: event.clientX,
-      y: event.clientY,
-      pressure: event.pressure,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-      button: event.button,
+    this.eventMapper.emit(event, {
+      name: 'resize',
+      target: { type: 'resize-handle', element: this.data(), position },
+      data: {
+        handlePosition: position,
+      },
     });
   }
 }

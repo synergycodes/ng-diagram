@@ -12,15 +12,9 @@ export class WheelEventListenerDirective {
   onWheel(event: WheelEvent) {
     event.stopPropagation();
     event.preventDefault();
-    this.eventMapperService.emit({
-      type: 'wheel',
+    this.eventMapperService.emit(event, {
+      name: 'wheel',
       target: { type: 'diagram' },
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      deltaX: event.deltaX,
-      deltaY: event.deltaY,
-      deltaZ: event.deltaZ,
     });
   }
 }

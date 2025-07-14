@@ -1,15 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
-import {
-  NodePositionDirective,
-  NodeSizeDirective,
-  PointerDownEventListenerDirective,
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  ZIndexDirective,
-} from '../../directives';
+import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
+import { PointerEventListenerDirective } from '../../directives/event/pointer/pointer-event-listener.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
@@ -22,10 +15,7 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
+    { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
@@ -35,6 +25,7 @@ export class AngularAdapterNodeComponent {
   private readonly flowCore = inject(FlowCoreProviderService);
 
   data = input.required<Node>();
+  onDragEvent = 'drag';
 
   rotateHandleOffset = input<{
     top?: number | string;

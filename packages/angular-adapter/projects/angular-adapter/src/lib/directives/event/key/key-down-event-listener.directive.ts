@@ -10,16 +10,9 @@ export class KeyDownEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
 
   onKeyDown(event: KeyboardEvent) {
-    this.eventMapperService.emit({
-      type: 'keydown',
+    this.eventMapperService.emit(event, {
+      name: 'press',
       target: { type: 'diagram' },
-      timestamp: Date.now(),
-      code: event.code,
-      key: event.key,
-      ctrlKey: event.ctrlKey,
-      shiftKey: event.shiftKey,
-      altKey: event.altKey,
-      metaKey: event.metaKey,
     });
   }
 }

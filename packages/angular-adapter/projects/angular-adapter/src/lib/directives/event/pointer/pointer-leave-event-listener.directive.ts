@@ -1,5 +1,5 @@
 import { Directive, inject, input } from '@angular/core';
-import type { EventTarget } from '@angularflow/core';
+import type { EventTarget, EventType } from '@angularflow/core';
 
 import { EventMapperService } from '../../../services';
 import { ITargetedEventListener } from '../../../types';
@@ -12,19 +12,13 @@ export class PointerLeaveEventListenerDirective implements ITargetedEventListene
   private readonly eventMapperService = inject(EventMapperService);
 
   eventTarget = input<EventTarget>({ type: 'diagram' });
+  eventName = input<EventType>('unknown');
 
   onPointerLeave(event: PointerEvent) {
     event.stopPropagation();
-    this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointerleave',
+    this.eventMapperService.emit(event, {
+      name: this.eventName(),
       target: this.eventTarget(),
-      pressure: event.pressure,
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
     });
   }
 }
