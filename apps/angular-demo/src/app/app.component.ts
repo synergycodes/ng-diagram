@@ -42,10 +42,11 @@ export class AppComponent {
   paletteModel: PaletteNode[] = [
     {
       type: 'input-field',
+      data: {},
     },
     { type: 'image', data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-    { type: 'resizable' },
-    { type: 'group' },
+    { type: 'resizable', data: {} },
+    { type: 'group', data: {} },
   ];
 
   constructor() {
