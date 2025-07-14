@@ -3,7 +3,7 @@ import {
   AngularAdapterDiagramComponent,
   INodeTemplate,
   Middleware,
-  Node,
+  PaletteNode,
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
@@ -31,16 +31,13 @@ export class AppComponent {
     ['group', GroupNodeComponent],
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
-  paletteModel: Node[] = [
+  paletteModel: PaletteNode[] = [
     {
-      id: '1',
       type: 'input-field',
-      position: { x: 500, y: 300 },
-      data: {},
     },
-    { id: '2', type: 'image', position: { x: 500, y: 300 }, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-    { id: '3', type: 'resizable', position: { x: 500, y: 300 }, data: {} },
-    { id: '4', type: 'group', position: { x: 500, y: 300 }, data: {} },
+    { type: 'image', data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+    { type: 'resizable' },
+    { type: 'group' },
   ];
 
   constructor() {

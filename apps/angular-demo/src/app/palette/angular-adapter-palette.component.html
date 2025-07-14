@@ -1,4 +1,4 @@
-@for (element of model(); track element.id) {
+@for (element of model(); track element.type) {
   @let template = nodeTemplateMap().get(element.type);
   @if (template) {
     <div class="draggable" draggable="true" (dragstart)="onDragStart($event, element)">
