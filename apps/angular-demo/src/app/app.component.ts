@@ -48,7 +48,7 @@ export class AppComponent {
         resizable: true,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true, groupId: '2' },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
       {
         id: '4',
         type: 'group',
