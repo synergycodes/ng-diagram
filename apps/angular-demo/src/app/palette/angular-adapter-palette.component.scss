@@ -2,14 +2,28 @@
   position: absolute;
   left: 0;
   top: 0;
-  display: flex;
   width: 300px;
   height: 100vh;
   background: whitesmoke;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
   padding: 16px;
   box-sizing: border-box;
+
+  & > div {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 10px;
+    display: flex;
+    height: 100%;
+    position: relative;
+  }
+}
+
+.dragged-node {
+  position: absolute;
+  background-color: transparent;
+  top: -1000px;
+  left: -1000px;
+  pointer-events: none;
+  width: 100%;
 }

@@ -329,4 +329,11 @@ export class FlowCore<
         throw new Error(`The "${layout}" layout does not exist.`);
     }
   }
+
+  /**
+   * Returns the current zoom scale
+   */
+  getScale() {
+    return this.model.getMetadata().viewport.scale;
+  }
 }

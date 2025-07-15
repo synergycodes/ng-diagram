@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { DropEvent } from '@angularflow/core';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { PaletteNode } from '../../types';
@@ -6,12 +6,14 @@ import { PaletteNode } from '../../types';
 @Injectable({ providedIn: 'root' })
 export class PaletteInteractionService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  draggedNode = signal<PaletteNode | null>(null);
+
+  onMouseDown(node: PaletteNode) {
+    this.draggedNode.set(node);
+  }
 
   onDragStartFromPalette(event: DragEvent, node: PaletteNode) {
     if (event.dataTransfer) {
-      if (event.target instanceof HTMLElement) {
-        event.dataTransfer?.setDragImage(event?.target, 0, 0);
-      }
       event.dataTransfer?.setData('text/plain', JSON.stringify(node));
     }
   }
@@ -32,5 +34,6 @@ export class PaletteInteractionService {
         },
       ],
     });
+    this.draggedNode.set(null);
   }
 }
