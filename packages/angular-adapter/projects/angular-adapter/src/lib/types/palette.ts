@@ -1,4 +1,6 @@
+import { InputSignal } from '@angular/core';
+
 export interface PaletteNode {
   type: string;
-  data: any;
+  data: InputSignal<Node>;
 }
