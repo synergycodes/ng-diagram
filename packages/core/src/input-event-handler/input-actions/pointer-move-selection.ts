@@ -1,7 +1,14 @@
 import { FlowCore } from '../../flow-core';
 import { Node, Point, type InputActionWithPredicate } from '../../types';
-import { onNode } from '../../types/event/event-target.guards';
-import { isContinue, isEnd, isPanEvent, isPointer, isStart, withPrimaryButton } from '../../types/event/event.guards';
+import { onNode } from '../../types/__old__event/event-target.guards';
+import {
+  isContinue,
+  isEnd,
+  isPanEvent,
+  isPointer,
+  isStart,
+  withPrimaryButton,
+} from '../../types/__old__event/event.guards';
 import { and, or, targetIs } from './input-actions.helpers';
 
 interface MoveState {

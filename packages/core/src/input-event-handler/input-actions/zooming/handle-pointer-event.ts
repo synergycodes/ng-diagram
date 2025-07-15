@@ -1,5 +1,5 @@
 import { FlowCore } from '../../../flow-core';
-import { PointerInputEvent } from '../../../types/event/event.interface';
+import { PointerInputEvent } from '../../../types/__old__event/event.interface';
 import { SCALE } from './zooming.config';
 
 const eventCache: PointerInputEvent[] = [];

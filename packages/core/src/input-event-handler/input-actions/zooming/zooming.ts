@@ -1,5 +1,5 @@
 import { type InputActionWithPredicate } from '../../../types';
-import { isPointer, isWheel } from '../../../types/event/event.guards';
+import { isPointer, isWheel } from '../../../types/__old__event/event.guards';
 import { or } from '../input-actions.helpers';
 import { handlePointerEvent } from './handle-pointer-event';
 import { handleWheelEvent } from './handle-wheel-event';

@@ -1,19 +1,20 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
+  __OLD__EventListener,
+  __OLD__InputEvent,
   BaseInputEvent,
   BasePointerEvent,
   EventByName,
-  EventListener,
   EventMapper,
   EventTarget,
   EventType,
-  InputEvent,
   InputModifiers,
   InteractionPhase,
   KeyboardInputEvent,
   WheelInputEvent,
 } from '@angularflow/core';
 import { getOS } from '../flow-core-provider/detect-environment';
+import { InputEventsBusService } from '../input-events/input-events-bus.service';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent;
 
@@ -37,9 +38,14 @@ type EventEmitConfig<T extends EventType> =
     ? { name: T; target: EventTarget; data?: never }
     : { name: T; target: EventTarget; data: EventDataType<T> };
 
+/**
+ * @deprecated We're moving to an event bus approach
+ */
 @Injectable({ providedIn: 'root' })
 export class EventMapperService implements EventMapper {
-  private readonly listeners: EventListener[] = [];
+  private readonly eventBusService = inject(InputEventsBusService);
+
+  private readonly listeners: __OLD__EventListener[] = [];
 
   private readonly phaseMap: Record<string, InteractionPhase> = {
     // Keyboard
@@ -63,18 +69,26 @@ export class EventMapperService implements EventMapper {
     wheel: 'continue',
   };
 
-  register(eventListener: EventListener): void {
-    this.listeners.push(eventListener);
+  register(eventListener: __OLD__EventListener): void {
+    // TODO: Replace me with the actual event bus registration
+    this.eventBusService.register(eventListener);
+    // this.listeners.push(eventListener);
   }
 
+  /** @deprecated */
   emit<T extends EventType>(event: DomEvent, config: EventEmitConfig<T>): void {
     const domainEvent = this.constructEvent(event, config);
     console.log('emit', domainEvent);
 
-    this.listeners.forEach((listener) => listener(domainEvent));
+    this.eventBusService.emit(domainEvent);
+
+    // this.listeners.forEach((listener) => listener(domainEvent));
   }
 
-  private constructEvent<T extends EventType>(event: DomEvent, { name, target, data }: EventEmitConfig<T>): InputEvent {
+  private constructEvent<T extends EventType>(
+    event: DomEvent,
+    { name, target, data }: EventEmitConfig<T>
+  ): __OLD__InputEvent {
     const inputEvent: Omit<BaseInputEvent, 'source'> = {
       id: this.generateEventId(),
       timestamp: performance.now(),

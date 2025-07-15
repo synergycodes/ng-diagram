@@ -1,6 +1,6 @@
 import { type InputActionWithPredicate } from '../../types';
-import { onDiagram } from '../../types/event/event-target.guards';
-import { isContinue, isEnd, isPointer, isStart, withPrimaryButton } from '../../types/event/event.guards';
+import { onDiagram } from '../../types/__old__event/event-target.guards';
+import { isContinue, isEnd, isPointer, isStart, withPrimaryButton } from '../../types/__old__event/event.guards';
 import { and, or, targetIs } from './input-actions.helpers';
 
 interface MoveState {

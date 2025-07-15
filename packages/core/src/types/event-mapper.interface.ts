@@ -1,19 +1,21 @@
-import type { InputEvent } from './event/event.interface';
+import type { __OLD__InputEvent } from './__old__event/event.interface';
 
 /**
  * Type for event listener callback function
+ * @deprecated
  */
-export type EventListener = (event: InputEvent) => void;
+export type __OLD__EventListener = (event: __OLD__InputEvent) => void;
 
 /**
  * Interface for handling UI-agnostic events
+ * @deprecated We're moving to an event bus approach
  */
 export interface EventMapper {
   /**
    * Register an event listener for a specific event type
    * @param eventListener Event listener to register
    */
-  register(eventListener: EventListener): void;
+  register(eventListener: __OLD__EventListener): void;
 
   /**
    * Emit an event to all registered listeners

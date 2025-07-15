@@ -1,7 +1,7 @@
 import { type Edge, type InputActionWithPredicate, type Node } from '../../types';
-import { onResizeHandle } from '../../types/event/event-target.guards';
-import { isPointer, isSelectEvent, withPrimaryModifier } from '../../types/event/event.guards';
-import { PointerInputEvent } from '../../types/event/event.interface';
+import { onResizeHandle } from '../../types/__old__event/event-target.guards';
+import { isPointer, isSelectEvent, withPrimaryModifier } from '../../types/__old__event/event.guards';
+import { PointerInputEvent } from '../../types/__old__event/event.interface';
 import { and, not, targetIs } from './input-actions.helpers';
 
 interface TargetElements {

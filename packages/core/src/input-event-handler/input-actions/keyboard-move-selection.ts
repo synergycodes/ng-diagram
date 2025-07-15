@@ -1,9 +1,9 @@
 import { CommandByName, type InputActionWithPredicate } from '../../types';
-import { isArrowKey, isKeyboard } from '../../types/event/event.guards';
-import { InputEvent, KeyboardInputEvent } from '../../types/event/event.interface';
+import { isArrowKey, isKeyboard } from '../../types/__old__event/event.guards';
+import { __OLD__InputEvent, KeyboardInputEvent } from '../../types/__old__event/event.interface';
 
 export const keyboardMoveSelectionAction: InputActionWithPredicate = {
-  action: (event: InputEvent, flowCore) => {
+  action: (event: __OLD__InputEvent, flowCore) => {
     if (!isKeyboard(event)) return;
     const nodesToMove = flowCore.modelLookup.getSelectedNodesWithChildren();
 

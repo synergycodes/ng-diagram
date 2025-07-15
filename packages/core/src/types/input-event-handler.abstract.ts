@@ -1,5 +1,9 @@
+/**
+ * TODO: Check ig this is not deprecated
+ */
+
 import { FlowCore } from '../flow-core';
-import type { InputEvent } from './event/event.interface';
+import type { __OLD__InputEvent } from './__old__event/event.interface';
 
 /**
  * Type for action name
@@ -20,12 +24,12 @@ export type InputActionName =
 /**
  * Type for action function
  */
-export type InputAction = (event: InputEvent, flowCore: FlowCore) => void;
+export type InputAction = (event: __OLD__InputEvent, flowCore: FlowCore) => void;
 
 /**
  * Type for predicate function that determines if an action should be triggered
  */
-export type InputActionPredicate = (event: InputEvent, flowCore: FlowCore) => boolean;
+export type InputActionPredicate = (event: __OLD__InputEvent, flowCore: FlowCore) => boolean;
 
 /**
  * Type for action that can be either a name or a function
@@ -75,5 +79,5 @@ export abstract class InputEventHandler {
    * @param actionName Name of the action to invoke
    * @param event InputEvent to invoke the action with
    */
-  abstract invoke(actionName: InputActionName, event: InputEvent): void;
+  abstract invoke(actionName: InputActionName, event: __OLD__InputEvent): void;
 }

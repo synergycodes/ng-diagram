@@ -1,5 +1,5 @@
 import { FlowCore } from '../../../flow-core';
-import { WheelInputEvent } from '../../../types/event/event.interface';
+import { WheelInputEvent } from '../../../types/__old__event/event.interface';
 import { SCALE } from './zooming.config';
 
 export function handleWheelEvent(event: WheelInputEvent, flowCore: FlowCore) {

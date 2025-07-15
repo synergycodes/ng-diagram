@@ -7,9 +7,9 @@ import { ModelLookup } from './model-lookup/model-lookup';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import type {
+  __OLD__InputEvent,
   Edge,
   EnvironmentInfo,
-  InputEvent,
   EventMapper,
   FlowState,
   FlowStateUpdate,
@@ -102,7 +102,7 @@ export class FlowCore<
    * Registers a new event handler
    * @param handler Handler to register
    */
-  registerEventsHandler(handler: (event: InputEvent) => void): void {
+  registerEventsHandler(handler: (event: __OLD__InputEvent) => void): void {
     this.eventMapper.register((event) => handler(event));
   }
 
