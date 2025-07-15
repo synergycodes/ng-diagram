@@ -1,6 +1,6 @@
 import { Directive, inject } from '@angular/core';
 
-import { EventMapperService } from '../../../services';
+import { CursorPositionTrackerService, EventMapperService } from '../../../services';
 
 @Directive({
   selector: '[angularAdapterWheelEventListener]',
@@ -8,10 +8,15 @@ import { EventMapperService } from '../../../services';
 })
 export class WheelEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
+  private readonly cursorTracker = inject(CursorPositionTrackerService);
 
   onWheel(event: WheelEvent) {
     event.stopPropagation();
     event.preventDefault();
+
+    // Update cursor position tracker
+    this.cursorTracker.updatePosition(event.clientX, event.clientY);
+
     this.eventMapperService.emit({
       type: 'wheel',
       target: { type: 'diagram' },
@@ -21,6 +26,10 @@ export class WheelEventListenerDirective {
       deltaX: event.deltaX,
       deltaY: event.deltaY,
       deltaZ: event.deltaZ,
+      cursorPosition: {
+        x: event.clientX,
+        y: event.clientY,
+      },
     });
   }
 }

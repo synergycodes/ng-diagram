@@ -1,6 +1,6 @@
 import { Directive, inject } from '@angular/core';
 
-import { EventMapperService } from '../../../services';
+import { CursorPositionTrackerService, EventMapperService } from '../../../services';
 
 @Directive({
   selector: '[angularAdapterPointerMoveEventListener]',
@@ -8,8 +8,12 @@ import { EventMapperService } from '../../../services';
 })
 export class PointerMoveEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
+  private readonly cursorTracker = inject(CursorPositionTrackerService);
 
   onPointerMove(event: PointerEvent) {
+    // Update cursor position tracker
+    this.cursorTracker.updatePosition(event.clientX, event.clientY);
+
     this.eventMapperService.emit({
       pointerId: event.pointerId,
       type: 'pointermove',
@@ -20,6 +24,10 @@ export class PointerMoveEventListenerDirective {
       y: event.clientY,
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
+      cursorPosition: {
+        x: event.clientX,
+        y: event.clientY,
+      },
     });
   }
 }

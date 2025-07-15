@@ -11,49 +11,139 @@ export interface CopyCommand {
 
 export interface PasteCommand {
   name: 'paste';
+  position?: { x: number; y: number };
 }
 
-export const copy = async (commandHandler: CommandHandler) => {
-  const { nodes, edges } = commandHandler.flowCore.getState();
-
-  copiedNodes = nodes.filter((node) => node.selected);
-  copiedEdges = edges.filter((edge) => edge.selected);
-};
-
-export const paste = async (commandHandler: CommandHandler) => {
-  if (copiedNodes.length === 0 && copiedEdges.length === 0) {
-    return;
+/**
+ * Calculate the center point of a collection of nodes
+ */
+const calculateNodeCenter = (nodes: Node[]): { x: number; y: number } => {
+  if (nodes.length === 0) {
+    return { x: 0, y: 0 };
   }
 
-  const { nodes, edges } = commandHandler.flowCore.getState();
-  const nodeIdMap = new Map<string, string>();
+  const centerX = nodes.reduce((sum, node) => sum + node.position.x, 0) / nodes.length;
+  const centerY = nodes.reduce((sum, node) => sum + node.position.y, 0) / nodes.length;
 
-  const newNodes = copiedNodes.map((node) => {
+  return { x: centerX, y: centerY };
+};
+
+/**
+ * Calculate the paste position and offset based on command parameters
+ */
+const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): { x: number; y: number } => {
+  const center = calculateNodeCenter(copiedNodes);
+
+  if (!command.position) {
+    // Default behavior: offset from original center
+    return {
+      x: OFFSET,
+      y: OFFSET,
+    };
+  }
+
+  if (copiedNodes.length === 1) {
+    // Single node: center the node at cursor position, accounting for node size
+    const singleNode = copiedNodes[0];
+    const nodeWidth = singleNode.size?.width ?? 0;
+    const nodeHeight = singleNode.size?.height ?? 0;
+
+    // Calculate position so that cursor is at the center of the node
+    const targetX = command.position.x - nodeWidth / 2;
+    const targetY = command.position.y - nodeHeight / 2;
+
+    return {
+      x: targetX - singleNode.position.x,
+      y: targetY - singleNode.position.y,
+    };
+  }
+
+  // Multiple nodes: maintain relative positioning with center at cursor
+  return {
+    x: command.position.x - center.x,
+    y: command.position.y - center.y,
+  };
+};
+
+/**
+ * Update port nodeId references for a node
+ */
+const updatePortNodeIds = (node: Node): Node => {
+  if (!node.ports || node.ports.length === 0) {
+    return node;
+  }
+
+  const updatedPorts = node.ports.map((port) => ({
+    ...port,
+    nodeId: node.id, // Update nodeId reference only
+  }));
+
+  return {
+    ...node,
+    ports: updatedPorts,
+  };
+};
+
+/**
+ * Create new nodes with updated positions and IDs
+ */
+const createPastedNodes = (
+  copiedNodes: Node[],
+  offset: { x: number; y: number },
+  nodeIdMap: Map<string, string>
+): Node[] => {
+  return copiedNodes.map((node) => {
     const newNodeId = crypto.randomUUID();
     nodeIdMap.set(node.id, newNodeId);
 
-    return {
+    let newNode: Node = {
       ...node,
       id: newNodeId,
       position: {
-        x: node.position.x + OFFSET,
-        y: node.position.y + OFFSET,
+        x: node.position.x + offset.x,
+        y: node.position.y + offset.y,
       },
       selected: true,
     };
-  });
 
-  const newEdges = copiedEdges.map((edge) => {
+    // Update port nodeIds
+    newNode = updatePortNodeIds(newNode);
+
+    return newNode;
+  });
+};
+
+/**
+ * Create new edges with updated IDs and references
+ */
+const createPastedEdges = (copiedEdges: Edge[], nodeIdMap: Map<string, string>): Edge[] => {
+  return copiedEdges.map((edge) => {
     const newEdgeId = crypto.randomUUID();
-    return {
+    const newEdge: Edge = {
       ...edge,
       id: newEdgeId,
       source: nodeIdMap.get(edge.source) || edge.source,
       target: nodeIdMap.get(edge.target) || edge.target,
+      // Keep original port IDs since they're hardcoded in templates
+      sourcePort: edge.sourcePort,
+      targetPort: edge.targetPort,
       selected: true,
     };
-  });
 
+    return newEdge;
+  });
+};
+
+/**
+ * Create updates to deselect currently selected items
+ */
+const createDeselectUpdates = (
+  nodes: Node[],
+  edges: Edge[]
+): {
+  nodesToUpdate: FlowStateUpdate['nodesToUpdate'];
+  edgesToUpdate: FlowStateUpdate['edgesToUpdate'];
+} => {
   const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
   const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
 
@@ -62,11 +152,40 @@ export const paste = async (commandHandler: CommandHandler) => {
       nodesToUpdate.push({ id: node.id, selected: false });
     }
   });
+
   edges.forEach((edge) => {
     if (edge.selected) {
       edgesToUpdate.push({ id: edge.id, selected: false });
     }
   });
+
+  return { nodesToUpdate, edgesToUpdate };
+};
+
+export const copy = async (commandHandler: CommandHandler) => {
+  const { nodes, edges } = commandHandler.flowCore.getState();
+
+  copiedNodes = nodes.filter((node) => node.selected);
+  copiedEdges = edges.filter((edge) => edge.selected);
+};
+
+export const paste = async (commandHandler: CommandHandler, command: PasteCommand) => {
+  if (copiedNodes.length === 0 && copiedEdges.length === 0) {
+    return;
+  }
+
+  const { nodes, edges } = commandHandler.flowCore.getState();
+  const nodeIdMap = new Map<string, string>();
+
+  // Calculate paste offset
+  const offset = calculatePasteOffset(copiedNodes, command);
+
+  // Create new nodes and edges
+  const newNodes = createPastedNodes(copiedNodes, offset, nodeIdMap);
+  const newEdges = createPastedEdges(copiedEdges, nodeIdMap);
+
+  // Create deselect updates
+  const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);
 
   await commandHandler.flowCore.applyUpdate(
     { nodesToAdd: newNodes, edgesToAdd: newEdges, nodesToUpdate, edgesToUpdate },

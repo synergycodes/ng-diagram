@@ -90,6 +90,10 @@ export interface BaseEvent {
   type: string;
   timestamp: number;
   target: EventTarget;
+  cursorPosition?: {
+    x: number;
+    y: number;
+  };
 }
 
 /**

@@ -1,7 +1,7 @@
 import { Directive, inject, input } from '@angular/core';
 import type { EventTarget } from '@angularflow/core';
 
-import { EventMapperService } from '../../../services';
+import { CursorPositionTrackerService, EventMapperService } from '../../../services';
 import { ITargetedEventListener } from '../../../types';
 
 @Directive({
@@ -10,11 +10,16 @@ import { ITargetedEventListener } from '../../../types';
 })
 export class PointerUpEventListenerDirective implements ITargetedEventListener {
   private readonly eventMapperService = inject(EventMapperService);
+  private readonly cursorTracker = inject(CursorPositionTrackerService);
 
   eventTarget = input<EventTarget>({ type: 'diagram' });
 
   onPointerUp(event: PointerEvent) {
     event.stopPropagation();
+
+    // Update cursor position tracker
+    this.cursorTracker.updatePosition(event.clientX, event.clientY);
+
     this.eventMapperService.emit({
       pointerId: event.pointerId,
       type: 'pointerup',
@@ -26,6 +31,10 @@ export class PointerUpEventListenerDirective implements ITargetedEventListener {
       button: event.button,
       ctrlKey: event.ctrlKey,
       metaKey: event.metaKey,
+      cursorPosition: {
+        x: event.clientX,
+        y: event.clientY,
+      },
     });
   }
 }

@@ -1,7 +1,17 @@
 import { isKeyboardDownEvent, type InputActionWithPredicate } from '../../types';
 
 export const pasteAction: InputActionWithPredicate = {
-  action: (_, flowCore) => flowCore.commandHandler.emit('paste'),
+  action: (event, flowCore) => {
+    let pastePosition: { x: number; y: number } | undefined;
+
+    if (event.cursorPosition) {
+      // Convert client coordinates to flow coordinates
+      pastePosition = flowCore.clientToFlowPosition(event.cursorPosition);
+      console.log('Paste action triggered at cursor position:', pastePosition);
+    }
+
+    flowCore.commandHandler.emit('paste', pastePosition ? { position: pastePosition } : {});
+  },
   predicate: (event, flowCore) => {
     if (!isKeyboardDownEvent(event)) {
       return false;

@@ -1,3 +1,4 @@
+export * from './cursor-position-tracker/cursor-position-tracker.service';
 export * from './event-mapper/event-mapper.service';
 export * from './flow-core-provider/flow-core-provider.service';
 export * from './flow-resize-observer/batched-resize-observer.service';

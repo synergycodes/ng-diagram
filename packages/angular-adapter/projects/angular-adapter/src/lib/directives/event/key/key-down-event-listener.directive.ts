@@ -1,6 +1,6 @@
 import { Directive, inject } from '@angular/core';
 
-import { EventMapperService } from '../../../services';
+import { CursorPositionTrackerService, EventMapperService } from '../../../services';
 
 @Directive({
   selector: '[angularAdapterKeyDownEventListener]',
@@ -8,6 +8,7 @@ import { EventMapperService } from '../../../services';
 })
 export class KeyDownEventListenerDirective {
   private readonly eventMapperService = inject(EventMapperService);
+  private readonly cursorTracker = inject(CursorPositionTrackerService);
 
   onKeyDown(event: KeyboardEvent) {
     this.eventMapperService.emit({
@@ -20,6 +21,7 @@ export class KeyDownEventListenerDirective {
       shiftKey: event.shiftKey,
       altKey: event.altKey,
       metaKey: event.metaKey,
+      cursorPosition: this.cursorTracker.hasRecentPosition() ? this.cursorTracker.getLastPosition() : undefined,
     });
   }
 }

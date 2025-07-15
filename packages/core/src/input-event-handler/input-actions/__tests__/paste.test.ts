@@ -28,14 +28,27 @@ describe('Paste Action', () => {
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
       environment: mockEnvironment,
+      clientToFlowPosition: vi.fn().mockReturnValue({ x: 100, y: 200 }),
     } as unknown as FlowCore;
   });
 
   describe('action', () => {
-    it('should emit pase command', () => {
+    it('should emit paste command without position when no cursor position', () => {
       pasteAction.action(mockEvent, mockFlowCore);
 
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste');
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste', {});
+    });
+
+    it('should emit paste command with position when cursor position is available', () => {
+      const eventWithCursor = {
+        ...mockEvent,
+        cursorPosition: { x: 150, y: 250 },
+      };
+
+      pasteAction.action(eventWithCursor, mockFlowCore);
+
+      expect(mockFlowCore.clientToFlowPosition).toHaveBeenCalledWith({ x: 150, y: 250 });
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste', { position: { x: 100, y: 200 } });
     });
   });
 
