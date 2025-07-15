@@ -1,6 +1,4 @@
-import {
-  PaletteNode,
-} from '@angularflow/angular-adapter';
+import { PaletteNode } from '@angularflow/angular-adapter';
 
 export const paletteModel: PaletteNode[] = [
   {
