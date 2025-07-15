@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
-  AngularAdapterDiagramComponent,
   EdgeTemplateMap,
   IEdgeTemplate,
   Middleware,
   PaletteNode,
   NodeTemplateMap,
+  AngularAdapterDiagramComponent,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
@@ -20,7 +20,7 @@ import { nodeTemplateMap } from './data/node-template';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [AngularAdapterDiagramComponent, ToolbarComponent, AngularAdapterPaletteComponent],
+  imports: [ToolbarComponent, AngularAdapterPaletteComponent, AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {

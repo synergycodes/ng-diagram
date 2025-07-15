@@ -1,8 +1,13 @@
 import { Component, input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AngularAdapterDiagramComponent, Middleware, NodeTemplateMap } from '@angularflow/angular-adapter';
+import {
+  AngularAdapterDiagramComponent,
+  Middleware,
+  NodeTemplateMap,
+  FlowCoreProviderService,
+} from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppComponent } from './app.component';
 
@@ -18,12 +23,37 @@ class MockAngularAdapterDiagramComponent {
   middlewares = input.required<Middleware[]>();
 }
 
+class MockEventMapper {
+  private listener: (event: Event) => void = () => null;
+
+  register(callback: (event: Event) => void): void {
+    this.listener = callback;
+  }
+}
+
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
+  const mockGetScale = vi.fn(() => 1);
+  let mockEventMapper: MockEventMapper;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [AppComponent] })
+    mockEventMapper = new MockEventMapper();
+
+    await TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            provide: vi.fn().mockReturnValue({
+              getScale: mockGetScale,
+              registerEventsHandler: (handle: (event: Event) => void) => mockEventMapper.register(handle),
+            }),
+          },
+        },
+      ],
+      imports: [AppComponent],
+    })
       .overrideComponent(AppComponent, {
         remove: {
           imports: [AngularAdapterDiagramComponent],

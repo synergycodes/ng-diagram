@@ -6,6 +6,6 @@ export const paletteModel: PaletteNode[] = [
     data: {},
   },
   { type: 'image', data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-  { type: 'resizable', data: {} },
+  { type: 'resizable', data: {}, resizable: true },
   { type: 'group', data: {} },
 ];
