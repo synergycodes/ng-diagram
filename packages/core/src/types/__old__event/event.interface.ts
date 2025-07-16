@@ -1,3 +1,4 @@
+import { Point } from '../utils';
 import { EventTarget, ResizeHandlePosition } from './event-target.interface';
 
 /** @deprecated */
@@ -60,7 +61,7 @@ export interface BaseInputEvent {
 export interface BasePointerEvent extends BaseInputEvent {
   source: 'pointer';
   pointerId: number;
-  position: Coordinate;
+  position: Point;
   pressure: number;
   button?: number;
   pointerType: 'mouse' | 'touch' | 'pen';

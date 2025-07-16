@@ -36,6 +36,9 @@ export type InputActionPredicate = (event: __OLD__InputEvent, flowCore: FlowCore
  */
 export type InputActionOrInputActionName = InputActionName | InputAction;
 
+/**
+ * @deprecated
+ */
 export interface InputActionWithPredicate {
   action: InputAction;
   predicate: InputActionPredicate;
