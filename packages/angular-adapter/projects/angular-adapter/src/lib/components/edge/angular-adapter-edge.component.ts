@@ -19,7 +19,7 @@ import { ObjectSelectDirective } from '../../directives/__new__input-events/obje
     { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
     { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
     { directive: ZIndexDirective, inputs: ['data'] },
-    { directive: ObjectSelectDirective, inputs: ['selectTargetData: data', 'selectTargetType'] },
+    { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
   ],
 })
 export class AngularAdapterEdgeComponent {

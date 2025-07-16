@@ -1,6 +1,10 @@
 import { Directive, inject, input } from '@angular/core';
-import { __NEW__SelectEvent, Edge, Node } from '@angularflow/core';
+import { __NEW__NEW__BasePointerInputEvent, Edge, Node } from '@angularflow/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+
+type PointerSelectEvent = PointerEvent & {
+  selectHandled?: boolean;
+};
 
 @Directive({
   selector: '[angularAdapterObjectSelect]',
@@ -9,23 +13,26 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 export class ObjectSelectDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
-  selectTargetData = input.required<Node | Edge | undefined>();
-  selectTargetType = input.required<__NEW__SelectEvent['targetType']>();
+  targetData = input.required<Node | Edge | undefined>();
+  targetType = input.required<__NEW__NEW__BasePointerInputEvent['targetType']>();
 
-  onPointerDown(event: PointerEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    if (!this.selectTargetType()) {
-      throw new Error('targetType is required for ObjectSelectDirective');
+  onPointerDown(event: PointerSelectEvent) {
+    if (event.selectHandled) {
+      return;
     }
 
+    event.selectHandled = true;
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit<__NEW__SelectEvent>({
+    this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'select',
-      target: this.selectTargetData(),
-      targetType: this.selectTargetType(),
+      target: this.targetData(),
+      targetType: this.targetType(),
+      lastInputPoint: {
+        x: event.clientX,
+        y: event.clientY,
+      },
     });
   }
 }

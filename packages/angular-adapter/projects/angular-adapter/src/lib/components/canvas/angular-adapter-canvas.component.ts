@@ -10,7 +10,7 @@ import { ObjectSelectDirective } from '../../directives/__new__input-events/obje
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     { directive: ViewportDirective, inputs: ['viewport'] },
-    { directive: ObjectSelectDirective, inputs: ['selectTargetData', 'selectTargetType'] },
+    { directive: ObjectSelectDirective, inputs: ['targetData', 'targetType'] },
   ],
 })
 export class AngularAdapterCanvasComponent {}

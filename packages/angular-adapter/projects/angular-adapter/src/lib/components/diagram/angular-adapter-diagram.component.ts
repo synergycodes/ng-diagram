@@ -13,20 +13,20 @@ import {
   KeyDownEventListenerDirective,
   KeyPressEventListenerDirective,
   KeyUpEventListenerDirective,
-  PointerDownEventListenerDirective,
   PointerEnterEventListenerDirective,
   PointerLeaveEventListenerDirective,
   PointerMoveEventListenerDirective,
   PointerUpEventListenerDirective,
   WheelEventListenerDirective,
 } from '../../directives';
+import { __NEW__PanningDirective } from '../../directives/__new__input-events/panning/panning.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
+import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
-import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 
 @Component({
   selector: 'angular-adapter-diagram',
@@ -42,7 +42,8 @@ import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.componen
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    PointerDownEventListenerDirective,
+    { directive: __NEW__PanningDirective },
+    // PointerDownEventListenerDirective,
     PointerEnterEventListenerDirective,
     PointerLeaveEventListenerDirective,
     PointerMoveEventListenerDirective,

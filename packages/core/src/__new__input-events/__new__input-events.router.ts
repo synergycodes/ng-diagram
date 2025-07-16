@@ -1,6 +1,7 @@
 import { FlowCore } from '../flow-core';
 import { __NEW__InputEventName, __NEW__NEW__BaseInputEvent } from './__new__input-events.interface';
 import { __NEW__EventHandler } from './handlers/event-hander';
+import { __NEW__PanningHandler } from './handlers/panning/panning.handler';
 import { __NEW__SelectHandler } from './handlers/select/select.handler';
 
 export abstract class __NEW__InputEventsRouter {
@@ -22,6 +23,7 @@ export abstract class __NEW__InputEventsRouter {
 
   registerDefaultCallbacks(flow: FlowCore) {
     this.register('select', new __NEW__SelectHandler(flow));
+    this.register('panning', new __NEW__PanningHandler(flow));
     // TODO: Call register for each default event handler
   }
 }
