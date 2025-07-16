@@ -8,14 +8,14 @@ import {
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
+import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
+import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
 import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
 import { GroupNodeComponent } from './node-template/group-node/group-node.component';
 import { ImageNodeComponent } from './node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
 import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
-import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
-import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
 
 @Component({
   selector: 'app-root',
