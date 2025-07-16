@@ -45,19 +45,10 @@ export const paste = async (commandHandler: CommandHandler) => {
     };
 
     if (ports && Array.isArray(ports)) {
-      newNode.ports = ports.map((port) => {
-        const newPort = {
-          ...port,
-          nodeId: newNodeId,
-        };
-        if (port.position) {
-          newPort.position = {
-            x: port.position.x + OFFSET,
-            y: port.position.y + OFFSET,
-          };
-        }
-        return newPort;
-      });
+      newNode.ports = ports.map((port) => ({
+        ...port,
+        nodeId: newNodeId,
+      }));
     }
 
     return newNode;

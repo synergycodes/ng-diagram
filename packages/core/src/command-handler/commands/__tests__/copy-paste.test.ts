@@ -98,8 +98,6 @@ describe('Copy-Paste Commands', () => {
 
       const pastedPort = pastedNode.ports[0];
       expect(pastedPort.nodeId).toBe(pastedNode.id);
-      expect(pastedPort.position.x).toBe(port.position!.x + 20);
-      expect(pastedPort.position.y).toBe(port.position!.y + 20);
     });
   });
 });
