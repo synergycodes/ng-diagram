@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
-import type { Node } from '../../../types';
+import type { Node, Port } from '../../../types';
 import { CommandHandler } from '../../command-handler';
 import { copy, paste } from '../copy-paste';
 
@@ -76,6 +76,30 @@ describe('Copy-Paste Commands', () => {
 
       expect(update.nodesToUpdate).toEqual([{ id: 'node1', selected: false }]);
       expect(update.edgesToUpdate).toEqual([{ id: 'edge1', selected: false }]);
+    });
+
+    it('should paste ports with correct offset and nodeId', () => {
+      const port: Port = { id: 'port1', nodeId: 'node1', position: { x: 10, y: 15 }, type: 'source', side: 'right' };
+      commandHandler.flowCore.getState = () => ({
+        nodes: [{ ...mockNode, id: 'node1', selected: true, ports: [port], position: { x: 100, y: 200 } }],
+        edges: [],
+        metadata: mockMetadata,
+      });
+
+      copy(commandHandler);
+      paste(commandHandler);
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      expect(update.nodesToAdd).toHaveLength(1);
+      const pastedNode = update.nodesToAdd[0];
+      expect(pastedNode.ports).toHaveLength(1);
+
+      const pastedPort = pastedNode.ports[0];
+      expect(pastedPort.nodeId).toBe(pastedNode.id);
+      expect(pastedPort.position.x).toBe(port.position!.x + 20);
+      expect(pastedPort.position.y).toBe(port.position!.y + 20);
     });
   });
 });

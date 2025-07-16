@@ -32,8 +32,10 @@ export const paste = async (commandHandler: CommandHandler) => {
     const newNodeId = crypto.randomUUID();
     nodeIdMap.set(node.id, newNodeId);
 
-    return {
-      ...node,
+    const { ports, ...props } = node;
+
+    const newNode: Node = {
+      ...props,
       id: newNodeId,
       position: {
         x: node.position.x + OFFSET,
@@ -41,6 +43,24 @@ export const paste = async (commandHandler: CommandHandler) => {
       },
       selected: true,
     };
+
+    if (ports && Array.isArray(ports)) {
+      newNode.ports = ports.map((port) => {
+        const newPort = {
+          ...port,
+          nodeId: newNodeId,
+        };
+        if (port.position) {
+          newPort.position = {
+            x: port.position.x + OFFSET,
+            y: port.position.y + OFFSET,
+          };
+        }
+        return newPort;
+      });
+    }
+
+    return newNode;
   });
 
   const newEdges = copiedEdges.map((edge) => {
