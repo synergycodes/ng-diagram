@@ -1,3 +1,5 @@
+// MIGRATED TO NEW INPUT ACTIONS
+
 import { type Edge, type InputActionWithPredicate, type Node } from '../../types';
 import { onResizeHandle } from '../../types/__old__event/event-target.guards';
 import { isPointer, isSelectEvent, withPrimaryModifier } from '../../types/__old__event/event.guards';

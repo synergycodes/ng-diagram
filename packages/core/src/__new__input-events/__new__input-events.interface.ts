@@ -1,4 +1,4 @@
-export type __NEW__InputEventName = 'node-select';
+export type __NEW__InputEventName = 'select';
 
 export interface __NEW__NEW__BaseInputEvent {
   name: __NEW__InputEventName;

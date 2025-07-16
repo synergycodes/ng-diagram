@@ -1,8 +1,9 @@
-<angular-adapter-canvas [viewport]="viewport()">
+<angular-adapter-canvas [viewport]="viewport()" selectTargetType="diagram" [selectTargetData]="undefined">
   @for (edge of edges(); track edge.id) {
     <angular-adapter-edge
       class="flow__angular-adapter-edge"
       [data]="edge"
+      selectTargetType="edge"
       [eventTarget]="{ type: 'edge', element: edge }"
     >
       @if (getEdgeTemplate(edge.type)) {
@@ -14,7 +15,12 @@
   }
   <angular-adapter-marker-arrow />
   @for (node of nodes(); track node.id) {
-    <angular-adapter-node class="flow__angular-adapter-node" [attr.data-node-id]="node.id" [data]="node">
+    <angular-adapter-node
+      class="flow__angular-adapter-node"
+      [attr.data-node-id]="node.id"
+      [data]="node"
+      selectTargetType="node"
+    >
       <!-- [eventTarget]="{ type: 'node', element: node }" -->
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { data: node }" />

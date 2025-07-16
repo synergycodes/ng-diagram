@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Node } from '@angularflow/core';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
-import { NodeSelectDirective } from '../../directives/__new__input-events/node-select/node-select.directive';
+import { ObjectSelectDirective } from '../../directives/__new__input-events/object-select/object-select.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
@@ -16,7 +16,7 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
     // { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
-    { directive: NodeSelectDirective, inputs: ['data'] },
+    { directive: ObjectSelectDirective, inputs: ['selectTargetData: data', 'selectTargetType'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
@@ -26,6 +26,9 @@ export class AngularAdapterNodeComponent {
   private readonly flowCore = inject(FlowCoreProviderService);
 
   data = input.required<Node>();
+  targetType = 'node';
+
+  // TODO: Do we need that?
   onDragEvent = 'drag';
 
   rotateHandleOffset = input<{

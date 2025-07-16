@@ -1,7 +1,7 @@
 import { FlowCore } from '../flow-core';
 import { __NEW__InputEventName, __NEW__NEW__BaseInputEvent } from './__new__input-events.interface';
 import { __NEW__EventHandler } from './handlers/event-hander';
-import { NodeSelectHandler } from './handlers/node-select/node-select.handler';
+import { __NEW__SelectHandler } from './handlers/select/select.handler';
 
 export abstract class __NEW__InputEventsRouter {
   private handlers: Partial<Record<__NEW__InputEventName, __NEW__EventHandler<__NEW__NEW__BaseInputEvent>>> = {};
@@ -21,15 +21,7 @@ export abstract class __NEW__InputEventsRouter {
   }
 
   registerDefaultCallbacks(flow: FlowCore) {
-    this.register('node-select', new NodeSelectHandler(flow));
+    this.register('select', new __NEW__SelectHandler(flow));
     // TODO: Call register for each default event handler
   }
-  // registerHandler(event)
-  // This class is intended to be extended by other classes that will implement
-  // specific input event handling logic.
-
-  // Define abstract methods or properties here if needed.
-
-  // Example:
-  // abstract handleEvent(event: InputEvent): void;
 }
