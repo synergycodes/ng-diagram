@@ -65,8 +65,6 @@ export class AppComponent {
         data: { title: 'Group 2' },
         resizable: true,
       },
-      { id: '6', type: 'resizable', position: { x: 700, y: 500 }, data: {}, resizable: true },
-      { id: '7', type: 'resizable', position: { x: 700, y: 700 }, data: {}, resizable: true },
     ]);
     this.model().setEdges([
       {
