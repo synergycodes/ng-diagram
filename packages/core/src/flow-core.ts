@@ -1,8 +1,7 @@
+import { __NEW__InputEventsRouter } from './__new__input-events';
 import { CommandHandler } from './command-handler/command-handler';
 import { InitializationGuard } from './initialization-guard/initialization-guard';
 import { InputEventHandler } from './input-event-handler/input-event-handler';
-import { _NEW_InputEventsBus } from './input-events/input-events-bus';
-import { __NEW__InputEventHandler } from './input-events/new__input-events.handler';
 import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -36,7 +35,9 @@ export class FlowCore<
   private _model: ModelAdapter<TMetadata>;
   readonly commandHandler: CommandHandler;
   readonly inputEventHandler: InputEventHandler;
-  readonly __new__inputEventHandler: __NEW__InputEventHandler;
+  // readonly __new__inputEventHandler: __NEW__InputEventHandler;
+  // readonly __;
+  // readonly __new__inputEventsRouter: __NEW__InputEventsRouter;
   readonly middlewareManager: MiddlewareManager<TMiddlewares, TMetadata>;
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
@@ -48,7 +49,8 @@ export class FlowCore<
     modelAdapter: ModelAdapter<TMetadata>,
     private readonly renderer: Renderer,
     private readonly eventMapper: EventMapper,
-    public readonly __new__eventBus: _NEW_InputEventsBus,
+    // public readonly __new__eventBus: _NEW_InputEventsBus,
+    public readonly __new__inputEventsRouter: __NEW__InputEventsRouter,
     environment: EnvironmentInfo,
     middlewares?: TMiddlewares
   ) {
@@ -56,12 +58,15 @@ export class FlowCore<
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.inputEventHandler = new InputEventHandler(this);
-    this.__new__inputEventHandler = new __NEW__InputEventHandler(this); // __NEW__InputEventHandler
+    // TODO: Remove
+    // this.__new__inputEventHandler = new __NEW__InputEventHandler(this); // __NEW__InputEventHandler
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
+
+    this.__new__inputEventsRouter.registerDefaultCallbacks(this);
 
     this.init();
   }

@@ -29,6 +29,8 @@ export class PointerEventListenerDirective implements ITargetedEventListener, On
   }
 
   onPointerDown(event: PointerEvent) {
+    console.log('Pointer down event:', event);
+
     event.stopPropagation();
 
     // Capture the pointer for global tracking

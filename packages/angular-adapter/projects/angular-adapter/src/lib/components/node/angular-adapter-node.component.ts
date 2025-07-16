@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Node } from '@angularflow/core';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
-import { PointerEventListenerDirective } from '../../directives/event/pointer/pointer-event-listener.directive';
+import { NodeSelectDirective } from '../../directives/__new__input-events/node-select/node-select.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
@@ -15,7 +15,8 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
+    // { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
+    { directive: NodeSelectDirective, inputs: ['data'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],

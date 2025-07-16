@@ -1,4 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import { Injectable } from '@angular/core';
 import {
   __OLD__EventListener,
   __OLD__InputEvent,
@@ -14,14 +16,13 @@ import {
   WheelInputEvent,
 } from '@angularflow/core';
 import { getOS } from '../flow-core-provider/detect-environment';
-import { InputEventsBusService } from '../input-events/input-events-bus.service';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent;
 
-type EventData = {
-  target: EventTarget;
-  name: string;
-};
+// interface EventData {
+//   target: EventTarget;
+//   name: string;
+// }
 // Type guards
 const isKeyboardEvent = (event: DomEvent): event is KeyboardEvent => event instanceof KeyboardEvent;
 
@@ -43,7 +44,7 @@ type EventEmitConfig<T extends EventType> =
  */
 @Injectable({ providedIn: 'root' })
 export class EventMapperService implements EventMapper {
-  private readonly eventBusService = inject(InputEventsBusService);
+  // private readonly eventBusService = inject(InputEventsBusService);
 
   private readonly listeners: __OLD__EventListener[] = [];
 
@@ -69,19 +70,17 @@ export class EventMapperService implements EventMapper {
     wheel: 'continue',
   };
 
-  register(eventListener: __OLD__EventListener): void {
+  register(__eventListener: __OLD__EventListener): void {
     // TODO: Replace me with the actual event bus registration
-    this.eventBusService.register(eventListener);
+    // this.eventBusService.register(eventListener);
     // this.listeners.push(eventListener);
   }
 
   /** @deprecated */
   emit<T extends EventType>(event: DomEvent, config: EventEmitConfig<T>): void {
-    const domainEvent = this.constructEvent(event, config);
-    console.log('emit', domainEvent);
-
-    this.eventBusService.emit(domainEvent);
-
+    // const domainEvent = this.constructEvent(event, config);
+    // console.log('emit', domainEvent);
+    // this.eventBusService.emit(domainEvent);
     // this.listeners.forEach((listener) => listener(domainEvent));
   }
 

@@ -15,6 +15,8 @@ export class PointerDownEventListenerDirective implements ITargetedEventListener
   eventName = input<EventType>('unknown');
 
   onPointerDown(event: PointerEvent) {
+    console.log('lalalalala');
+
     event.stopPropagation();
     const currentTarget = event.currentTarget as HTMLElement;
     currentTarget.setPointerCapture(event.pointerId);
