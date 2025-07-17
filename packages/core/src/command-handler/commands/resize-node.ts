@@ -17,7 +17,10 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
     throw new Error(`Node with id ${command.id} not found.`);
   }
 
-  if (node.size?.width === command.size.width && node.size?.height === command.size.height) {
+  if (
+    (node.size?.width === command.size.width && node.size?.height === command.size.height) ||
+    (node.isGroup && !node.selected)
+  ) {
     return; // No-op if size is unchanged
   }
 
@@ -87,6 +90,10 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
+  if (!command.size || !command.position) {
+    return;
+  }
+
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
