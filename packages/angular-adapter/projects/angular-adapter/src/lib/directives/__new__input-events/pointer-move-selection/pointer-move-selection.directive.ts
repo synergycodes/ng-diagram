@@ -32,7 +32,7 @@ export class PointerMoveSelectionDirective {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'pointer-move-selection',
+      name: 'pointerMoveSelection',
       phase: 'start',
       target: this.targetData(),
       targetType: 'node',
@@ -62,10 +62,9 @@ export class PointerMoveSelectionDirective {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'pointer-move-selection',
+      name: 'pointerMoveSelection',
       phase: 'end',
-      // TODO: Add data
-      target: undefined,
+      target: this.targetData(),
       targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
@@ -75,14 +74,12 @@ export class PointerMoveSelectionDirective {
   };
 
   private onPointerMove = (event: PointerEvent) => {
-    // console.log('Pointer move selection event:', event);
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'pointer-move-selection',
+      name: 'pointerMoveSelection',
       phase: 'continue',
-      // TODO: Add data
-      target: undefined,
+      target: this.targetData(),
       targetType: 'node',
       lastInputPoint: {
         x: event.clientX,

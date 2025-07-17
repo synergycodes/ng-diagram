@@ -47,6 +47,8 @@ const isKeyComboPressed =
 
     return isKeyPressed(key)(event);
   };
+const isDeleteKeyPressed = (event: Event): boolean =>
+  isKeyboardEvent(event) && (event.key === 'Delete' || event.key === 'Backspace');
 
 export const BrowserInputsHelpers = {
   isPointerEvent,
@@ -65,6 +67,7 @@ export const BrowserInputsHelpers = {
   isArrowKeyPressed,
   isKeyPressed,
   isKeyComboPressed,
+  isDeleteKeyPressed,
   // Add other helper functions as needed
 };
 

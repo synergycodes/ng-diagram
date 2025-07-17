@@ -1,6 +1,7 @@
 import { FlowCore } from '../flow-core';
 import { __NEW__InputEventName, __NEW__NEW__BaseInputEvent } from './__new__input-events.interface';
 import { CopyEventHandler } from './handlers/copy/copy.handler';
+import { __NEW__DeleteSelectionEventHandler } from './handlers/delete-selection/delete-selection.handler';
 import { __NEW__EventHandler } from './handlers/event-hander';
 import { KeyboardMoveSelectionEventHandler } from './handlers/keyboard-move-selection/keyboard-move-selection.handler';
 import { KeyboardPanningEventHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
@@ -31,10 +32,11 @@ export abstract class __NEW__InputEventsRouter {
     this.register('copy', new CopyEventHandler(flow));
     this.register('select', new __NEW__SelectEventHandler(flow));
     this.register('panning', new __NEW__PanningEventHandler(flow));
-    this.register('keyboard-panning', new KeyboardPanningEventHandler(flow));
-    this.register('pointer-move-selection', new __NEW__PointerMoveSelectionEventHandler(flow));
-    this.register('keyboard-move-selection', new KeyboardMoveSelectionEventHandler(flow));
+    this.register('keyboardPanning', new KeyboardPanningEventHandler(flow));
+    this.register('pointerMoveSelection', new __NEW__PointerMoveSelectionEventHandler(flow));
+    this.register('keyboardMoveSelection', new KeyboardMoveSelectionEventHandler(flow));
     this.register('resize', new __NEW__ResizeEventHandler(flow));
     this.register('paste', new __NEW__PasteEventHandler(flow));
+    this.register('deleteSelection', new __NEW__DeleteSelectionEventHandler(flow));
   }
 }

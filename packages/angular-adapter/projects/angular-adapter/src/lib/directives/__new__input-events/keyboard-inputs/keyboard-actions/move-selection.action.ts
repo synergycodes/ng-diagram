@@ -22,7 +22,7 @@ export class MoveSelectionAction extends KeyboardAction {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'keyboard-move-selection',
+      name: 'keyboardMoveSelection',
       direction: this.getDirection(event),
     });
   }

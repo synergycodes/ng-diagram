@@ -25,7 +25,7 @@ export class PanWithArrowsAction extends KeyboardAction {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'keyboard-panning',
+      name: 'keyboardPanning',
       direction: this.getDirection(event),
     });
   }

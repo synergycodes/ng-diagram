@@ -6,10 +6,11 @@ export type __NEW__InputEventName =
   | 'copy'
   | 'paste'
   | 'select'
+  | 'deleteSelection'
   | 'panning'
-  | 'keyboard-panning'
-  | 'pointer-move-selection'
-  | 'keyboard-move-selection'
+  | 'keyboardPanning'
+  | 'pointerMoveSelection'
+  | 'keyboardMoveSelection'
   | 'resize';
 
 export type __NEW__InputPhase = 'start' | 'continue' | 'end';

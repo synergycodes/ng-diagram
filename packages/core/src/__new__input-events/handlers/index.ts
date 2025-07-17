@@ -1,4 +1,5 @@
 export * from './copy';
+export * from './delete-selection';
 export * from './keyboard-panning';
 export * from './panning';
 export * from './paste';
