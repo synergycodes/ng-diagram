@@ -64,6 +64,7 @@ describe('Copy Action', () => {
     });
 
     it('should return true when meta + c is pressed on MacOS', () => {
+      mockEnvironment.os = 'MacOS';
       mockEvent.metaKey = true;
 
       expect(copyAction.predicate(mockEvent, mockFlowCore)).toBe(true);

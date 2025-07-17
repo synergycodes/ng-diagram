@@ -10,6 +10,7 @@ export type InputActionName =
   | 'pointerMoveSelection'
   | 'deleteSelection'
   | 'copy'
+  | 'cut'
   | 'paste'
   | 'panning'
   | 'linking'
