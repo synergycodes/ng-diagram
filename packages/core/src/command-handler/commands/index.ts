@@ -15,6 +15,7 @@ import {
   updatePorts,
 } from './add-update-delete';
 import { copy, paste } from './copy-paste';
+import { cut } from './cut';
 import { deleteSelection } from './delete-selection';
 import { highlightGroup, highlightGroupClear } from './highlight-group';
 import { init } from './init';
@@ -57,6 +58,7 @@ export const commands: CommandMap = {
   updateEdge,
   deleteEdges,
   copy,
+  cut,
   paste,
   moveViewport,
   moveViewportBy,
