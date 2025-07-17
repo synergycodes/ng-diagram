@@ -11,8 +11,9 @@ interface GetEdgesToRemoveParams {
 }
 
 const getEdgesToRemove = ({ edges, nodesToDeleteIds }: GetEdgesToRemoveParams): string[] => {
+  const edgesToDeleteIds = new Set<string>(nodesToDeleteIds);
   return edges
-    .filter((edge) => edge.selected || nodesToDeleteIds.includes(edge.source) || nodesToDeleteIds.includes(edge.target))
+    .filter((edge) => edge.selected || edgesToDeleteIds.has(edge.source) || edgesToDeleteIds.has(edge.target))
     .map((edge) => edge.id);
 };
 
@@ -29,7 +30,6 @@ export const deleteSelection = async (commandHandler: CommandHandler) => {
   const nodesToDeleteIds = isAnyNodeSelected
     ? commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren().map((node) => node.id)
     : [];
-
   const edgesToDeleteIds = getEdgesToRemove({ edges, nodesToDeleteIds });
 
   if (nodesToDeleteIds.length === 0 && edgesToDeleteIds.length === 0) {
