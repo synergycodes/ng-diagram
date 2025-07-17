@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { getSamplePointerEvent, mockEdge, mockEnvironment, mockNode, mockPointerEvent } from '../../../test-utils';
-import { selectAction } from '../select';
+import { selectAction } from '../__migrated__select';
 
 describe('selectAction', () => {
   const mockCommandHandler = { emit: vi.fn() };

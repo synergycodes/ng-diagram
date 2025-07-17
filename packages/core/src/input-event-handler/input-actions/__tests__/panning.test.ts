@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { getSamplePointerEvent, mockEnvironment, mockNode } from '../../../test-utils';
 import type { EventTarget, PointerEvent } from '../../../types';
-import { panningAction } from '../panning';
+import { panningAction } from '../__migrated__panning';
 
 describe('panningAction', () => {
   const mockCommandHandler = { emit: vi.fn() };

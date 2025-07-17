@@ -1,3 +1,4 @@
+export * from './__new__input-events/keyboard-inputs/keyboard-inputs.directive';
 export * from './__new__input-events/panning/panning.directive';
 export * from './event';
 export * from './node-position/node-position.directive';

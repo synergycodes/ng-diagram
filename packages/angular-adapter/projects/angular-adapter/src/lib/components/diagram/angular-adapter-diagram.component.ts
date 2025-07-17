@@ -9,16 +9,7 @@ import {
   Node,
 } from '@angularflow/core';
 
-import {
-  KeyDownEventListenerDirective,
-  KeyPressEventListenerDirective,
-  KeyUpEventListenerDirective,
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerMoveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  WheelEventListenerDirective,
-} from '../../directives';
+import { KeyboardInputsDirective } from '../../directives/__new__input-events/keyboard-inputs/keyboard-inputs.directive';
 import { __NEW__PanningDirective } from '../../directives/__new__input-events/panning/panning.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
@@ -42,16 +33,17 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    { directive: __NEW__PanningDirective },
+    __NEW__PanningDirective,
+    KeyboardInputsDirective,
     // PointerDownEventListenerDirective,
-    PointerEnterEventListenerDirective,
-    PointerLeaveEventListenerDirective,
-    PointerMoveEventListenerDirective,
-    PointerUpEventListenerDirective,
-    KeyDownEventListenerDirective,
-    KeyUpEventListenerDirective,
-    KeyPressEventListenerDirective,
-    WheelEventListenerDirective,
+    // PointerEnterEventListenerDirective,
+    // PointerLeaveEventListenerDirective,
+    // PointerMoveEventListenerDirective,
+    // PointerUpEventListenerDirective,
+    // KeyDownEventListenerDirective,
+    // KeyUpEventListenerDirective,
+    // KeyPressEventListenerDirective,
+    // WheelEventListenerDirective,
   ],
 })
 export class AngularAdapterDiagramComponent<

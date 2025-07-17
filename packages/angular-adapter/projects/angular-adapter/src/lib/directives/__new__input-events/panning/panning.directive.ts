@@ -61,8 +61,6 @@ export class __NEW__PanningDirective {
   }
 
   private onMouseMove = (event: PointerEvent) => {
-    console.log('PANNING MOVE');
-
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,

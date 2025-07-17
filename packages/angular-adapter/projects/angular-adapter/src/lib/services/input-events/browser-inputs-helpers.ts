@@ -1,10 +1,19 @@
-const isPointer = (event: Event) => event instanceof PointerEvent;
+const isPointer = (event: Event): event is PointerEvent => event instanceof PointerEvent;
+const isKeyboard = (event: Event): event is KeyboardEvent => event instanceof KeyboardEvent;
 
+// Modifier predicates
+
+// Button predicates
 const withPrimaryButton = (event: Event) => isPointer(event) && (event.button === undefined || event.button === 0);
+const isArrowKey = (event: Event): boolean =>
+  isKeyboard(event) && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key);
 
 export const BrowserInputsHelpers = {
   isPointer,
+  isKeyboard,
+
   withPrimaryButton,
+  isArrowKey,
   // Add other helper functions as needed
 };
 

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { getSamplePointerEvent, mockEdge, mockEnvironment, mockGroupNode, mockNode } from '../../../test-utils';
 import type { EventTarget, PointerEvent } from '../../../types';
-import { pointerMoveSelectionAction } from '../pointer-move-selection';
+import { pointerMoveSelectionAction } from '../__migrated__pointer-move-selection';
 
 describe('pointerMoveSelectionAction', () => {
   const mockCommandHandler = { emit: vi.fn() };
