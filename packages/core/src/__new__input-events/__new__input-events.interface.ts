@@ -2,7 +2,7 @@ import { Edge } from '../types/edge.interface';
 import { Node } from '../types/node.interface';
 import { Point } from '../types/utils';
 
-export type __NEW__InputEventName = 'select' | 'panning';
+export type __NEW__InputEventName = 'select' | 'panning' | 'pointer-move-selection';
 
 export type __NEW__InputPhase = 'start' | 'continue' | 'end';
 

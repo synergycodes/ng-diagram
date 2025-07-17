@@ -3,6 +3,7 @@ import { Node } from '@angularflow/core';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
 import { ObjectSelectDirective } from '../../directives/__new__input-events/object-select/object-select.directive';
+import { PointerMoveSelectionDirective } from '../../directives/__new__input-events/pointer-move-selection/pointer-move-selection.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
@@ -17,6 +18,7 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
     { directive: NodePositionDirective, inputs: ['data'] },
     // { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
     { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
+    { directive: PointerMoveSelectionDirective },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],

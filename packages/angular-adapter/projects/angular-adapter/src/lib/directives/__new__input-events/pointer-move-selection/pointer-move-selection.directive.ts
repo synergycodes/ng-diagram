@@ -3,47 +3,48 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 import { PointerDragEvent } from '../../../types/event';
 
 @Directive({
-  selector: '[angularAdapterPanning]',
+  selector: '[angularAdapterPointerMoveSelection]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
     '(pointerup)': 'onPointerUp($event)',
+    // '(pointermove)': 'onPointerMove($event)',
   },
 })
-export class __NEW__PanningDirective {
+export class PointerMoveSelectionDirective {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   onPointerDown(event: PointerDragEvent): void {
-    if (event.moveSelectionHandled) {
-      return;
-    }
+    event.moveSelectionHandled = true;
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'panning',
+      name: 'pointer-move-selection',
       phase: 'start',
+      // TODO: Add data
       target: undefined,
-      targetType: 'diagram',
+      targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
         y: event.clientY,
       },
     });
 
-    this.elementRef.nativeElement.addEventListener('pointermove', this.onMouseMove);
+    this.elementRef.nativeElement.addEventListener('pointermove', this.onPointerMove);
   }
 
   onPointerUp(event: PointerEvent): void {
-    this.elementRef.nativeElement.removeEventListener('pointermove', this.onMouseMove);
+    this.elementRef.nativeElement.removeEventListener('pointermove', this.onPointerMove);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'panning',
+      name: 'pointer-move-selection',
       phase: 'end',
+      // TODO: Add data
       target: undefined,
-      targetType: 'diagram',
+      targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
         y: event.clientY,
@@ -51,16 +52,16 @@ export class __NEW__PanningDirective {
     });
   }
 
-  private onMouseMove = (event: PointerEvent) => {
-    console.log('PANNING MOVE');
-
+  private onPointerMove = (event: PointerEvent) => {
+    // console.log('Pointer move selection event:', event);
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'panning',
+      name: 'pointer-move-selection',
       phase: 'continue',
+      // TODO: Add data
       target: undefined,
-      targetType: 'diagram',
+      targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
         y: event.clientY,
