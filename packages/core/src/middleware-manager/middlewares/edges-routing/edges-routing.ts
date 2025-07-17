@@ -7,10 +7,12 @@ import {
   PortLocation,
   RoutingConfiguration,
 } from '../../../types';
-import { getPointOnPath, isSamePoint, getBezierPathPoints, getOrthogonalPathPoints } from '../../../utils';
+import { getOrthogonalPathPoints, isSamePoint } from '../../../utils';
 import { isDefaultRouting } from './utils/isRouting.ts';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getSourceTargetPositions } from './get-source-target-positions.ts';
+import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
+import { getPointOnPath } from '../../../utils/get-point-on-path/get-point-on-path.ts';
 
 export interface EdgesRoutingMiddlewareMetadata {
   enabled: boolean;
@@ -101,7 +103,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
         const isCustomEdgeRouting = !!edge.type;
-        const isProperEdgeRouting = isDefaultRouting(edge.routing);
+        const isProperEdgeRouting = edge.routing === undefined || isDefaultRouting(edge.routing);
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
@@ -117,11 +119,11 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
           !isProperEdgeRouting;
 
         if (shouldRouteCustomEdge) {
-          const { sourcePoint, targetPoint } = getPoints(edge, nodesMap);
+          const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
 
           const updatedLabels = edge.labels?.map((label) => ({
             ...label,
-            position: getPointOnPath(edge.points || [], label.positionOnEdge),
+            position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
           }));
 
           edgesToUpdate.push({
@@ -146,7 +148,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
 
         const updatedLabels = edge.labels?.map((label) => ({
           ...label,
-          position: getPointOnPath(points, label.positionOnEdge),
+          position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
         }));
         edgesToUpdate.push({
           id: edge.id,
