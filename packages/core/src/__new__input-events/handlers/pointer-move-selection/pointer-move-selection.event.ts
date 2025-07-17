@@ -3,5 +3,4 @@ import { __NEW__InputPhase, __NEW__NEW__BasePointerInputEvent } from '../../__ne
 export interface __NEW__PointerMoveSelectionEvent extends __NEW__NEW__BasePointerInputEvent {
   name: 'pointer-move-selection';
   phase: __NEW__InputPhase;
-  // selectedNodes: Node[];
 }

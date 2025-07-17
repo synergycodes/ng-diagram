@@ -1,5 +1,6 @@
 import { Directive, inject, input } from '@angular/core';
 import { __NEW__NEW__BasePointerInputEvent, Edge, Node } from '@angularflow/core';
+import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
 type PointerSelectEvent = PointerEvent & {
@@ -17,6 +18,10 @@ export class ObjectSelectDirective {
   targetType = input.required<__NEW__NEW__BasePointerInputEvent['targetType']>();
 
   onPointerDown(event: PointerSelectEvent) {
+    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+      return;
+    }
+
     if (event.selectHandled) {
       return;
     }

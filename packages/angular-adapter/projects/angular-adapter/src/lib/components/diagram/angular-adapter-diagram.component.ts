@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input } from '@angular/core';
 import {
   Edge,
   Metadata,
@@ -60,6 +60,7 @@ export class AngularAdapterDiagramComponent<
     Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
   >,
 > {
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
@@ -111,5 +112,9 @@ export class AngularAdapterDiagramComponent<
       return null;
     }
     return this.edgeTemplateMap().get(edgeType) ?? null;
+  }
+
+  getNativeElement(): HTMLElement {
+    return this.elementRef.nativeElement;
   }
 }

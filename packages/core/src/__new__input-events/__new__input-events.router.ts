@@ -3,6 +3,7 @@ import { __NEW__InputEventName, __NEW__NEW__BaseInputEvent } from './__new__inpu
 import { __NEW__EventHandler } from './handlers/event-hander';
 import { __NEW__PanningHandler } from './handlers/panning/panning.handler';
 import { __NEW__PointerMoveSelectionHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
+import { __NEW__ResizeHandler } from './handlers/resize/resize.handler';
 import { __NEW__SelectHandler } from './handlers/select/select.handler';
 
 export abstract class __NEW__InputEventsRouter {
@@ -26,6 +27,7 @@ export abstract class __NEW__InputEventsRouter {
     this.register('select', new __NEW__SelectHandler(flow));
     this.register('panning', new __NEW__PanningHandler(flow));
     this.register('pointer-move-selection', new __NEW__PointerMoveSelectionHandler(flow));
+    this.register('resize', new __NEW__ResizeHandler(flow)); // Assuming resize uses the same handler as select
     // TODO: Call register for each default event handler
   }
 }

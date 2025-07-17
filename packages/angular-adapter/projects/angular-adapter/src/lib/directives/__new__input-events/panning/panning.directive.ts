@@ -1,4 +1,5 @@
 import { Directive, ElementRef, inject } from '@angular/core';
+import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerDragEvent } from '../../../types/event';
 
@@ -14,6 +15,10 @@ export class __NEW__PanningDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   onPointerDown(event: PointerDragEvent): void {
+    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+      return;
+    }
+
     if (event.moveSelectionHandled) {
       return;
     }
@@ -35,6 +40,10 @@ export class __NEW__PanningDirective {
   }
 
   onPointerUp(event: PointerEvent): void {
+    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+      return;
+    }
+
     this.elementRef.nativeElement.removeEventListener('pointermove', this.onMouseMove);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);

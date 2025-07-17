@@ -1,3 +1,5 @@
+// MIGRATED TO NEW INPUT ACTIONS
+
 import { FlowCore } from '../../flow-core';
 import { Node, Point, type InputActionWithPredicate } from '../../types';
 import { onNode } from '../../types/__old__event/event-target.guards';

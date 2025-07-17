@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
-import { Node, NodeResizeAdornmentConfig, ResizeHandlePosition } from '@angularflow/core';
+import { Node, NodeResizeAdornmentConfig } from '@angularflow/core';
 
-import { EventMapperService, FlowCoreProviderService } from '../../../services';
+import { FlowCoreProviderService } from '../../../services';
 import { ResizeHandleComponent } from './handle/resize-handle.component';
 import { ResizeLineComponent } from './line/resize-line.component';
 import { HandlePosition, LinePosition } from './node-resize-adornment.types';
@@ -14,7 +14,6 @@ import { HandlePosition, LinePosition } from './node-resize-adornment.types';
   imports: [ResizeLineComponent, ResizeHandleComponent],
 })
 export class NodeResizeAdornmentComponent {
-  private readonly eventMapper = inject(EventMapperService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   data = input.required<Node>();
@@ -32,15 +31,4 @@ export class NodeResizeAdornmentComponent {
   backgroundColor = computed(() => this.nodeResizeAdornmentConfig().handleBackgroundColor);
   linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
   handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-
-  onPointerEvent({ event, position }: { event: PointerEvent; position: ResizeHandlePosition }) {
-    event.stopPropagation();
-    this.eventMapper.emit(event, {
-      name: 'resize',
-      target: { type: 'resize-handle', element: this.data(), position },
-      data: {
-        handlePosition: position,
-      },
-    });
-  }
 }

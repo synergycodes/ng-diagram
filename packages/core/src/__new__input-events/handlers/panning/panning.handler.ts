@@ -7,7 +7,6 @@ export class __NEW__PanningHandler extends __NEW__EventHandler<__NEW__PanningEve
   private isPanning = false;
 
   handle(event: __NEW__PanningEvent): void {
-    console.log('Panning event:', event);
     switch (event.phase) {
       case 'start': {
         this.lastPoint = event.lastInputPoint;

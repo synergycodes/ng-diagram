@@ -18,7 +18,7 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
     { directive: NodePositionDirective, inputs: ['data'] },
     // { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
     { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
-    { directive: PointerMoveSelectionDirective },
+    { directive: PointerMoveSelectionDirective, inputs: ['targetData: data'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],

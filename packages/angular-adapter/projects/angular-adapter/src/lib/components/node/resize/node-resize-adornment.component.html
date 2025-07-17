@@ -6,8 +6,8 @@
       [position]="position"
       [strokeWidth]="strokeWidth()"
       [color]="color()"
-      (pointerEvent)="onPointerEvent($event)"
-    ></angular-adapter-resize-line>
+      [targetData]="data()"
+    />
   }
   @for (position of handlePositions; track position) {
     <angular-adapter-resize-handle
@@ -16,7 +16,7 @@
       [strokeWidth]="strokeWidth()"
       [color]="color()"
       [backgroundColor]="backgroundColor()"
-      (pointerEvent)="onPointerEvent($event)"
-    ></angular-adapter-resize-handle>
+      [targetData]="data()"
+    />
   }
 }

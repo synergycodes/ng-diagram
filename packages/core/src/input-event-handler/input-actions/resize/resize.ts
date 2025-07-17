@@ -1,3 +1,5 @@
+// MIGRATED TO NEW INPUT ACTIONS
+
 import {
   isContinue,
   isEnd,
