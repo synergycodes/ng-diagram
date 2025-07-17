@@ -11,9 +11,9 @@ interface GetEdgesToRemoveParams {
 }
 
 const getEdgesToRemove = ({ edges, nodesToDeleteIds }: GetEdgesToRemoveParams): string[] => {
-  const edgesToDeleteIds = new Set<string>(nodesToDeleteIds);
+  const nodeIdsSet = new Set<string>(nodesToDeleteIds);
   return edges
-    .filter((edge) => edge.selected || edgesToDeleteIds.has(edge.source) || edgesToDeleteIds.has(edge.target))
+    .filter((edge) => edge.selected || nodeIdsSet.has(edge.source) || nodeIdsSet.has(edge.target))
     .map((edge) => edge.id);
 };
 
