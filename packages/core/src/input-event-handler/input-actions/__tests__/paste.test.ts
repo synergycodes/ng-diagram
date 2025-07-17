@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment } from '../../../test-utils';
 import type { KeyboardEvent } from '../../../types';
-import { pasteAction } from '../paste';
+import { pasteAction } from '../__migrated__paste';
 
 describe('Paste Action', () => {
   const mockCommandHandler = { emit: vi.fn() };

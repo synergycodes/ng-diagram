@@ -4,7 +4,7 @@ import { __NEW__ResizeEvent } from './resize.event';
 
 const MIN_NODE_SIZE = 50;
 
-export class __NEW__ResizeHandler extends __NEW__EventHandler<__NEW__ResizeEvent> {
+export class __NEW__ResizeEventHandler extends __NEW__EventHandler<__NEW__ResizeEvent> {
   isResizing = false;
   startWidth?: number;
   startHeight?: number;

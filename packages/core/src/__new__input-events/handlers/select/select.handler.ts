@@ -2,7 +2,7 @@ import { __new__withPrimaryModifier } from '../../../types/__old__event/event.gu
 import { __NEW__EventHandler } from '../event-hander';
 import { __NEW__NEW__SelectEvent } from './select.event';
 
-export class __NEW__SelectHandler extends __NEW__EventHandler<__NEW__NEW__SelectEvent> {
+export class __NEW__SelectEventHandler extends __NEW__EventHandler<__NEW__NEW__SelectEvent> {
   handle(event: __NEW__NEW__SelectEvent): void {
     const targetElements = this.getTargetElements(event);
     const isModifierPressed = __new__withPrimaryModifier(event);

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { __NEW__InputEventsRouter, __NEW__InputModifiers } from '@angularflow/core';
-import { getOS } from '../flow-core-provider/detect-environment';
+import { __NEW__InputEventsRouter } from '@angularflow/core';
+import { BrowserInputsHelpers } from './browser-inputs-helpers';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent;
 
@@ -8,20 +8,9 @@ type DomEvent = KeyboardEvent | WheelEvent | PointerEvent;
 export class InputEventsRouterService extends __NEW__InputEventsRouter {
   getBaseEvent(event: DomEvent) {
     return {
-      modifiers: this.getModifiers(event),
+      modifiers: BrowserInputsHelpers.getModifiers(event),
       id: this.generateEventId(),
       timestamp: performance.now(),
-    };
-  }
-
-  private getModifiers(event: DomEvent): __NEW__InputModifiers {
-    const isMac = getOS() === 'MacOS';
-
-    return {
-      primary: isMac ? event.metaKey : event.ctrlKey,
-      secondary: event.altKey,
-      shift: event.shiftKey,
-      meta: event.metaKey,
     };
   }
 

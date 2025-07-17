@@ -2,7 +2,7 @@ import { Point } from '../../../types';
 import { __NEW__EventHandler } from '../event-hander';
 import { __NEW__PanningEvent } from './panning.event';
 
-export class __NEW__PanningHandler extends __NEW__EventHandler<__NEW__PanningEvent> {
+export class __NEW__PanningEventHandler extends __NEW__EventHandler<__NEW__PanningEvent> {
   private lastPoint: Point | undefined;
   private isPanning = false;
 

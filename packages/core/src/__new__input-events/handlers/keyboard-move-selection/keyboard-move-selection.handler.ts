@@ -2,7 +2,7 @@ import { Point } from '../../../types';
 import { __NEW__EventHandler } from '../event-hander';
 import { __NEW__KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
-export class KeyboardMoveSelectionHandler extends __NEW__EventHandler<__NEW__KeyboardMoveSelectionEvent> {
+export class KeyboardMoveSelectionEventHandler extends __NEW__EventHandler<__NEW__KeyboardMoveSelectionEvent> {
   handle(event: __NEW__KeyboardMoveSelectionEvent): void {
     const nodesToMove = this.flow.modelLookup.getSelectedNodesWithChildren();
     if (nodesToMove.length === 0) {

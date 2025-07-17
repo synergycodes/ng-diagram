@@ -1,12 +1,14 @@
 import { FlowCore } from '../flow-core';
 import { __NEW__InputEventName, __NEW__NEW__BaseInputEvent } from './__new__input-events.interface';
+import { CopyEventHandler } from './handlers/copy/copy.handler';
 import { __NEW__EventHandler } from './handlers/event-hander';
-import { KeyboardMoveSelectionHandler } from './handlers/keyboard-move-selection/keyboard-move-selection.handler';
-import { KeyboardPanningHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
-import { __NEW__PanningHandler } from './handlers/panning/panning.handler';
-import { __NEW__PointerMoveSelectionHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
-import { __NEW__ResizeHandler } from './handlers/resize/resize.handler';
-import { __NEW__SelectHandler } from './handlers/select/select.handler';
+import { KeyboardMoveSelectionEventHandler } from './handlers/keyboard-move-selection/keyboard-move-selection.handler';
+import { KeyboardPanningEventHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
+import { __NEW__PanningEventHandler } from './handlers/panning/panning.handler';
+import { __NEW__PasteEventHandler } from './handlers/paste/paste.handler';
+import { __NEW__PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
+import { __NEW__ResizeEventHandler } from './handlers/resize/resize.handler';
+import { __NEW__SelectEventHandler } from './handlers/select/select.handler';
 
 export abstract class __NEW__InputEventsRouter {
   private handlers: Partial<Record<__NEW__InputEventName, __NEW__EventHandler<__NEW__NEW__BaseInputEvent>>> = {};
@@ -26,11 +28,13 @@ export abstract class __NEW__InputEventsRouter {
   }
 
   registerDefaultCallbacks(flow: FlowCore) {
-    this.register('select', new __NEW__SelectHandler(flow));
-    this.register('panning', new __NEW__PanningHandler(flow));
-    this.register('keyboard-panning', new KeyboardPanningHandler(flow));
-    this.register('pointer-move-selection', new __NEW__PointerMoveSelectionHandler(flow));
-    this.register('keyboard-move-selection', new KeyboardMoveSelectionHandler(flow));
-    this.register('resize', new __NEW__ResizeHandler(flow));
+    this.register('copy', new CopyEventHandler(flow));
+    this.register('select', new __NEW__SelectEventHandler(flow));
+    this.register('panning', new __NEW__PanningEventHandler(flow));
+    this.register('keyboard-panning', new KeyboardPanningEventHandler(flow));
+    this.register('pointer-move-selection', new __NEW__PointerMoveSelectionEventHandler(flow));
+    this.register('keyboard-move-selection', new KeyboardMoveSelectionEventHandler(flow));
+    this.register('resize', new __NEW__ResizeEventHandler(flow));
+    this.register('paste', new __NEW__PasteEventHandler(flow));
   }
 }

@@ -1,13 +1,13 @@
 import type { InputActionName, InputActionWithPredicate } from '../../types';
+import { copyAction } from './__migrated__copy';
 import { keyboardMoveSelectionAction } from './__migrated__keyboard-move-selection';
 import { panningAction } from './__migrated__panning';
+import { pasteAction } from './__migrated__paste';
 import { pointerMoveSelectionAction } from './__migrated__pointer-move-selection';
 import { resizeAction } from './__migrated__resize/resize';
 import { selectAction } from './__migrated__select';
-import { copyAction } from './copy';
 import { deleteSelectionAction } from './delete-selection';
 import { linkingAction } from './linking';
-import { pasteAction } from './paste';
 import { rotateAction } from './rotate/rotate';
 import { zoomingAction } from './zooming/zooming';
 

@@ -1,7 +1,9 @@
 import { Directive, inject } from '@angular/core';
 
+import { CopyAction } from './keyboard-actions/copy.action';
 import { MoveSelectionAction } from './keyboard-actions/move-selection.action';
 import { PanWithArrowsAction } from './keyboard-actions/pan-with-arrows.action';
+import { PasteAction } from './keyboard-actions/paste.action';
 
 @Directive({
   selector: '[angularAdapterKeyboardInputs]',
@@ -11,7 +13,12 @@ import { PanWithArrowsAction } from './keyboard-actions/pan-with-arrows.action';
   },
 })
 export class KeyboardInputsDirective {
-  private readonly actions = [inject(PanWithArrowsAction), inject(MoveSelectionAction)];
+  private readonly actions = [
+    inject(PanWithArrowsAction),
+    inject(MoveSelectionAction),
+    inject(CopyAction),
+    inject(PasteAction),
+  ];
 
   onPointerEnter(): void {
     document.addEventListener('keydown', this.onKeyDown);

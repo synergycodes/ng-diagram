@@ -3,6 +3,8 @@ import { Node } from '../types/node.interface';
 import { Point } from '../types/utils';
 
 export type __NEW__InputEventName =
+  | 'copy'
+  | 'paste'
   | 'select'
   | 'panning'
   | 'keyboard-panning'

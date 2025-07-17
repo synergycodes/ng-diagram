@@ -3,7 +3,7 @@ import { Point } from '../../../types/utils';
 import { __NEW__EventHandler } from '../event-hander';
 import { __NEW__PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
-export class __NEW__PointerMoveSelectionHandler extends __NEW__EventHandler<__NEW__PointerMoveSelectionEvent> {
+export class __NEW__PointerMoveSelectionEventHandler extends __NEW__EventHandler<__NEW__PointerMoveSelectionEvent> {
   private lastInputPoint: Point | undefined;
   private startPoint: Point | undefined;
   private initialNodePosition: Point | undefined;

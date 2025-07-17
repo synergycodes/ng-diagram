@@ -1,5 +1,7 @@
+export * from './copy';
 export * from './keyboard-panning';
 export * from './panning';
+export * from './paste';
 export * from './pointer-move-selection';
 export * from './resize';
 export * from './select';
