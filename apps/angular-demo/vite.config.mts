@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 import angular from '@analogjs/vite-plugin-angular';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +12,11 @@ export default defineConfig({
     setupFiles: ['src/test-setup.ts'],
     include: ['**/*.spec.ts'],
     reporters: ['default'],
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'html'],
+      reportsDirectory: 'coverage',
+    },
     typecheck: {
       tsconfig: './tsconfig.spec.json',
     },

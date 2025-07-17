@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 import angular from '@analogjs/vite-plugin-angular';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 // https://vitejs.dev/config/
 export default defineConfig({
