@@ -29,27 +29,27 @@ describe('getInitialPathPoints', () => {
     vi.clearAllMocks();
   });
 
-  it('should call top handler', () => {
+  it('calls getInitialPositionSourceTop when source side is "top"', () => {
     getInitialPathPoints({ ...source, side: 'top' }, { ...target, side: 'bottom' }, center);
     expect(getInitialPositionSourceTop).toHaveBeenCalled();
   });
 
-  it('should call right handler', () => {
+  it('calls getInitialPositionSourceRight when source side is "right"', () => {
     getInitialPathPoints({ ...source, side: 'right' }, { ...target, side: 'left' }, center);
     expect(getInitialPositionSourceRight).toHaveBeenCalled();
   });
 
-  it('should call bottom handler', () => {
+  it('calls getInitialPositionSourceBottom when source side is "bottom"', () => {
     getInitialPathPoints({ ...source, side: 'bottom' }, { ...target, side: 'top' }, center);
     expect(getInitialPositionSourceBottom).toHaveBeenCalled();
   });
 
-  it('should call left handler', () => {
+  it('calls getInitialPositionSourceLeft when source side is "left"', () => {
     getInitialPathPoints({ ...source, side: 'left' }, { ...target, side: 'right' }, center);
     expect(getInitialPositionSourceLeft).toHaveBeenCalled();
   });
 
-  it('should fallback to left handler for unknown side', () => {
+  it('falls back to getInitialPositionSourceLeft when source side is unknown', () => {
     getInitialPathPoints({ ...source, side: 'unknown' as PortSide }, { ...target, side: 'right' }, center);
     expect(getInitialPositionSourceLeft).toHaveBeenCalled();
   });
