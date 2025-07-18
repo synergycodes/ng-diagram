@@ -25,6 +25,9 @@ jobs:
       - name: Check code with ESLint
         run: pnpm run lint:check
 
+      - name: Check code with Prettier
+        run: pnpm run format:check
+
       - name: Build packages
         run: pnpm run build
 
