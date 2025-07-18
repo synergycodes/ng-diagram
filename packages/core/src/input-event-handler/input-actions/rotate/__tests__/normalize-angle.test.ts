@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeAngle } from './normalize-angle';
+import { normalizeAngle } from '../normalize-angle';
 
 describe('normalizeAngle', () => {
   it('should normalize positive angles', () => {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   doesRectsIntersect,
+  equalPointsArrays,
   getDistanceBetweenRects,
   getPointRangeRect,
   getRect,
@@ -48,6 +49,16 @@ describe('rects', () => {
       const result = getRect({ position: { x: 10, y: 10 }, size: { width: 10, height: 10 } });
 
       expect(result).toEqual({ x: 10, y: 10, width: 10, height: 10 });
+    });
+
+    it('should fallback width to 1 when size.width is 0', () => {
+      const result = getRect({ position: { x: 2, y: 3 }, size: { width: 0, height: 4 } });
+      expect(result).toEqual({ x: 2, y: 3, width: 1, height: 4 });
+    });
+
+    it('should fallback height to 1 when size.height is 0', () => {
+      const result = getRect({ position: { x: 5, y: 6 }, size: { width: 7, height: 0 } });
+      expect(result).toEqual({ x: 5, y: 6, width: 7, height: 1 });
     });
   });
 
@@ -168,6 +179,45 @@ describe('rects', () => {
       const size2 = { width: 15, height: 10 };
 
       expect(isSameSize(size1, size2)).toBe(false);
+    });
+  });
+
+  describe('equalPointsArrays', () => {
+    it('returns true for two empty arrays', () => {
+      expect(equalPointsArrays([], [])).toBe(true);
+    });
+
+    it('returns true for arrays with identical points', () => {
+      const a1 = [
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+      ];
+      const a2 = [
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+      ];
+      expect(equalPointsArrays(a1, a2)).toBe(true);
+    });
+
+    it('returns false for arrays of different lengths', () => {
+      const a1 = [{ x: 1, y: 2 }];
+      const a2 = [
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+      ];
+      expect(equalPointsArrays(a1, a2)).toBe(false);
+    });
+
+    it('returns false when any point differs', () => {
+      const a1 = [
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+      ];
+      const a2 = [
+        { x: 1, y: 2 },
+        { x: 5, y: 6 },
+      ];
+      expect(equalPointsArrays(a1, a2)).toBe(false);
     });
   });
 });
