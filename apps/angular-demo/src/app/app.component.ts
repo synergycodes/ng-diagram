@@ -1,26 +1,26 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
+  AngularAdapterDiagramComponent,
   EdgeTemplateMap,
   IEdgeTemplate,
   Middleware,
-  PaletteNode,
   NodeTemplateMap,
-  AngularAdapterDiagramComponent,
+  PaletteNode,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
-import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
-import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
-import { AngularAdapterPaletteComponent } from './palette/angular-adapter-palette.component';
-import { ToolbarComponent } from './toolbar/toolbar.component';
-import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
-import { paletteModel } from './data/palette-model';
 import { nodeTemplateMap } from './data/node-template';
+import { paletteModel } from './data/palette-model';
+import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
+import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
+import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
+import { PaletteComponent } from './palette/palette.component';
+import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, AngularAdapterPaletteComponent, AngularAdapterDiagramComponent],
+  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {

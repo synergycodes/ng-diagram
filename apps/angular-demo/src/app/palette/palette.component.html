@@ -1,0 +1,10 @@
+<div class="palette" angularAdapterPalette>
+  @for (paletteItem of model(); track paletteItem.type) {
+    <angular-adapter-palette-item [node]="paletteItem">
+      <app-node-preview [node]="paletteItem" />
+      <angular-adapter-palette-item-preview [type]="paletteItem.type">
+        <app-node-preview [node]="paletteItem" />
+      </angular-adapter-palette-item-preview>
+    </angular-adapter-palette-item>
+  }
+</div>

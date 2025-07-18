@@ -1,11 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { DropEvent } from '@angularflow/core';
-import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { PaletteNode } from '../../types';
+import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 
 @Injectable({ providedIn: 'root' })
-export class PaletteInteractionService {
+export class PaletteService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+
   draggedNode = signal<PaletteNode | null>(null);
 
   onMouseDown(node: PaletteNode) {
@@ -18,7 +19,16 @@ export class PaletteInteractionService {
     }
   }
 
-  handleDropFromPalette(event: DropEvent): void {
+  registerDropFromPalette(): void {
+    const flowCore = this.flowCoreProvider.provide();
+    flowCore.registerEventsHandler((event) => {
+      if (event.type === 'drop') {
+        this.handleDropFromPalette(event);
+      }
+    });
+  }
+
+  private handleDropFromPalette(event: DropEvent): void {
     const { data, clientPosition } = event;
     const node = data as unknown as PaletteNode;
     const flowCore = this.flowCoreProvider.provide();
