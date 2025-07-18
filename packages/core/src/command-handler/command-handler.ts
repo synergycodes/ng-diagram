@@ -40,6 +40,7 @@ export class CommandHandler implements CoreCommandHandler {
       : [WithoutName<CommandByName<K>>]
   ): Promise<void> {
     const callbacks = this.callbacks[commandName];
+
     if (callbacks) {
       const command = { name: commandName, ...props[0] } as CommandByName<K>;
       await Promise.all(callbacks.map((callback) => callback(command)));
@@ -53,23 +54,26 @@ export class CommandHandler implements CoreCommandHandler {
    * @returns Function to unregister the callback
    */
   register<K extends CommandName>(commandName: K, callback: CommandCallback<K>): () => void {
+    const callbacks = this.getCommandCallbacks(commandName);
+    callbacks.push(callback);
+
+    const unregister = () => {
+      const callbacks = this.getCommandCallbacks(commandName);
+      const filteredCallbacks = callbacks.filter(
+        (comparedCallback) => comparedCallback !== callback
+      ) as (typeof this.callbacks)[typeof commandName];
+
+      this.callbacks[commandName] = filteredCallbacks;
+    };
+
+    return unregister;
+  }
+
+  private getCommandCallbacks<K extends CommandName>(commandName: K): CommandCallback<K>[] {
     if (!this.callbacks[commandName]) {
       this.callbacks[commandName] = [];
     }
 
-    const callbacks = this.callbacks[commandName]! as CommandCallback<K>[];
-    callbacks.push(callback);
-
-    // Return unregister function
-    return () => {
-      const callbacks = this.callbacks[commandName]! as CommandCallback<K>[];
-      const index = callbacks.indexOf(callback);
-      if (index !== -1) {
-        callbacks.splice(index, 1);
-        if (callbacks.length === 0) {
-          this.callbacks[commandName] = undefined;
-        }
-      }
-    };
+    return this.callbacks[commandName];
   }
 }
