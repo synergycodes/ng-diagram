@@ -5,7 +5,7 @@ import {
   IEdgeTemplate,
   Middleware,
   NodeTemplateMap,
-  PaletteNode,
+  PaletteItem,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { nodeTemplateMap } from './data/node-template';
@@ -31,7 +31,7 @@ export class AppComponent {
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
-  paletteModel: PaletteNode[] = paletteModel;
+  paletteModel: PaletteItem[] = paletteModel;
 
   constructor() {
     this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));

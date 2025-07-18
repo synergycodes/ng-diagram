@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { PaletteNode } from '@angularflow/angular-adapter';
+import { PaletteItem } from '@angularflow/angular-adapter';
 import { templateLabels } from '../../data/node-template';
 
 @Component({
-  selector: 'app-node-preview',
-  templateUrl: './node-preview.component.html',
-  styleUrls: ['./node-preview.component.scss'],
+  selector: 'app-palette-item',
+  templateUrl: './palette-item.component.html',
+  styleUrls: ['./palette-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NodePreviewComponent {
-  node = input.required<PaletteNode>();
+export class PaletteItemComponent {
+  node = input.required<PaletteItem>();
   nodeLabel = computed(() => templateLabels.get(this.node()?.type) ?? 'Unknown');
 }

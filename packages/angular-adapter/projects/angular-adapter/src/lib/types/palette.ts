@@ -1,5 +1,3 @@
-export interface PaletteNode {
-  type: string;
-  data: Record<string, unknown>;
-  resizable?: boolean;
-}
+import { Node } from '@angularflow/core';
+
+export type PaletteItem = Pick<Node, 'type' | 'data' | 'isGroup' | 'resizable'>;

@@ -3,9 +3,10 @@ import {
   NgDiagramPaletteDirective,
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
-  PaletteNode,
+  PaletteItem,
 } from '@angularflow/angular-adapter';
-import { NodePreviewComponent } from './node-preview/node-preview.component';
+import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
+import { PaletteItemComponent } from './palette-item/palette-item.component';
 
 @Component({
   selector: 'app-palette',
@@ -13,13 +14,13 @@ import { NodePreviewComponent } from './node-preview/node-preview.component';
   styleUrls: ['./palette.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    NodePreviewComponent,
-    NodePreviewComponent,
+    PaletteItemComponent,
     NgDiagramPaletteItemComponent,
     NgDiagramPaletteItemPreviewComponent,
     NgDiagramPaletteDirective,
+    PaletteItemPreviewComponent,
   ],
 })
 export class PaletteComponent {
-  model = input.required<PaletteNode[]>();
+  model = input.required<PaletteItem[]>();
 }

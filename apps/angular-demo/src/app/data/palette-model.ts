@@ -1,11 +1,12 @@
-import { PaletteNode } from '@angularflow/angular-adapter';
+import { PaletteItem } from '@angularflow/angular-adapter';
+import { NodeTemplateType } from './node-template';
 
-export const paletteModel: PaletteNode[] = [
+export const paletteModel: PaletteItem[] = [
   {
-    type: 'input-field',
+    type: NodeTemplateType.InputFiled,
     data: {},
   },
-  { type: 'image', data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-  { type: 'resizable', data: {}, resizable: true },
-  { type: 'group', data: {} },
+  { type: NodeTemplateType.Image, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
+  { type: NodeTemplateType.Resizable, data: {}, resizable: true },
+  { type: NodeTemplateType.Group, data: {}, isGroup: true },
 ];
