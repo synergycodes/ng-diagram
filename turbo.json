@@ -18,7 +18,9 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "interruptible": true,
+      "dependsOn": ["^build"]
     },
     "test": {
       "dependsOn": ["^test"],
