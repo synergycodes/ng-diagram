@@ -42,13 +42,7 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
       const originalNode = flowCore.getNodeById(node.id);
 
       // Prevent unnecessary state updates if already snapped
-      if (
-        originalNode &&
-        (originalNode.position.x !== snappedX ||
-          originalNode.position.y !== snappedY ||
-          originalNode.size?.width !== node.size?.width ||
-          originalNode.size?.height !== node.size?.height)
-      ) {
+      if (originalNode && (originalNode.position.x !== snappedX || originalNode.position.y !== snappedY)) {
         let size;
 
         const prevWidth = originalNode.size?.width ?? 0;
