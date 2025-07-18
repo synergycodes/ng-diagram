@@ -65,6 +65,10 @@ async function handleGroupNodeResize(
     maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
   });
 
+  if (!command.size || !command.position) {
+    return;
+  }
+
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
