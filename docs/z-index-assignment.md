@@ -58,9 +58,9 @@ When `zOrder` is explicitly defined, the `middleware`:
   falls back to `DEFAULT_SELECTED_Z_INDEX`) to visually bring it to the front.
 - Once the element is `unselected`, its `original zOrder` value is `restored`.
 - **This approach ensures that**:
-    - Manual layering is always preserved.
-    - Selection does not permanently override your custom order.
-    - You retain full control over rendering layers.
+  - Manual layering is always preserved.
+  - Selection does not permanently override your custom order.
+  - You retain full control over rendering layers.
 
 #### Temporary Edge
 
@@ -74,7 +74,7 @@ system.
 #### Middleware configuration
 
 ```javascript
-    this.model().setMetadata({
+this.model().setMetadata({
   middlewaresConfig: {
     'z-index': {
       enabled: boolean,
@@ -85,7 +85,7 @@ system.
 ```
 
 ```javascript
-    this.model().setMetadata({
+this.model().setMetadata({
   middlewaresConfig: {
     'edges-routing': {
       enabled: boolean,
