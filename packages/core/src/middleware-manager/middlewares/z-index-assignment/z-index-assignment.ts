@@ -118,7 +118,7 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
     } else edgesWithZIndex = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap);
 
     for (const edge of edgesWithZIndex) {
-      const currentEdge = edges.find((edgeData) => edgeData.id === edgeData.id);
+      const currentEdge = edges.find((edgeData) => edgeData.id === edge.id);
       if (!currentEdge || edge.zIndex === currentEdge.zIndex) {
         continue;
       }
