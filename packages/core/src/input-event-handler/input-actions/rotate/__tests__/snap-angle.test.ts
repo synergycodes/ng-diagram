@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { snapAngle } from './snap-angle';
+import { snapAngle } from '../snap-angle';
 
 describe('snapAngle', () => {
   it('should snap to nearest step', () => {

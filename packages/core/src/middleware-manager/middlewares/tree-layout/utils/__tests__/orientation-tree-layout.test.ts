@@ -397,8 +397,6 @@ describe('makeTreeLayout', () => {
     });
 
     it('should handle very large trees', () => {
-      // Create a recursive tree with multiple levels
-      // Each level has multiple children to create a truly large tree
       const createLargeTree = (levelId: string, depth: number, childrenPerLevel: number): TreeNode => {
         if (depth === 0) {
           return createLeafNode(`leaf-${levelId}`, 0, 0, 25, 20);
