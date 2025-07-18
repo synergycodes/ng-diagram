@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment } from '../../../test-utils';
 import type { KeyboardEvent } from '../../../types';
-import { pasteAction } from '../paste';
+import { cutAction } from '../cut';
 
-describe('Paste Action', () => {
+describe('Cut Action', () => {
   const mockCommandHandler = { emit: vi.fn() };
   let mockEvent: KeyboardEvent;
   let mockFlowCore: FlowCore;
@@ -13,8 +13,8 @@ describe('Paste Action', () => {
     vi.clearAllMocks();
     mockEvent = {
       type: 'keydown',
-      key: 'v',
-      code: 'KeyV',
+      key: 'x',
+      code: 'KeyX',
       timestamp: Date.now(),
       target: { type: 'diagram' },
       ctrlKey: false,
@@ -22,7 +22,6 @@ describe('Paste Action', () => {
       altKey: false,
       metaKey: false,
     };
-
     mockFlowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
@@ -32,50 +31,44 @@ describe('Paste Action', () => {
   });
 
   describe('action', () => {
-    it('should emit pase command', () => {
-      pasteAction.action(mockEvent, mockFlowCore);
-
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste');
+    it('should emit cut command', () => {
+      cutAction.action(mockEvent, mockFlowCore);
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('cut');
     });
   });
 
   describe('predicate', () => {
     it('should return false if event is not a keyboard down event', () => {
       mockEvent.type = 'keyup';
-
-      expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(false);
+      expect(cutAction.predicate(mockEvent, mockFlowCore)).toBe(false);
     });
 
-    it('should return false when key is different from v', () => {
+    it('should return false when key is different from x', () => {
       mockEvent.key = 'a';
-
-      expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(false);
+      expect(cutAction.predicate(mockEvent, mockFlowCore)).toBe(false);
     });
 
     it('should return false when meta key is not pressed on MacOS', () => {
       mockEvent.metaKey = false;
-
-      expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(false);
+      expect(cutAction.predicate(mockEvent, mockFlowCore)).toBe(false);
     });
 
     it('should return false when ctrl key is not pressed on Windows', () => {
+      mockEnvironment.os = 'Windows';
       mockEvent.ctrlKey = false;
-
-      expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(false);
+      expect(cutAction.predicate(mockEvent, mockFlowCore)).toBe(false);
     });
 
-    it('should return true when meta + v is pressed on MacOS', () => {
+    it('should return true when meta + x is pressed on MacOS', () => {
       mockEnvironment.os = 'MacOS';
       mockEvent.metaKey = true;
-
-      expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(true);
+      expect(cutAction.predicate(mockEvent, mockFlowCore)).toBe(true);
     });
 
-    it('should return true when ctrl + v is pressed on Windows', () => {
+    it('should return true when ctrl + x is pressed on Windows', () => {
       mockEnvironment.os = 'Windows';
       mockEvent.ctrlKey = true;
-
-      expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(true);
+      expect(cutAction.predicate(mockEvent, mockFlowCore)).toBe(true);
     });
   });
 });

@@ -1,5 +1,6 @@
 import type { InputActionName, InputActionWithPredicate } from '../../types';
 import { copyAction } from './copy';
+import { cutAction } from './cut';
 import { deleteSelectionAction } from './delete-selection';
 import { keyboardMoveSelectionAction } from './keyboard-move-selection';
 import { linkingAction } from './linking';
@@ -23,4 +24,5 @@ export const inputActions: Record<InputActionName, InputActionWithPredicate> = {
   resize: resizeAction,
   zooming: zoomingAction,
   rotate: rotateAction,
+  cut: cutAction,
 };

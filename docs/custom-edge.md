@@ -45,17 +45,17 @@ interaction, etc.).
 #### How to Use a Basic Label
 
 ```html
-
 <angular-adapter-custom-edge
   [data]="data()"
   [routing]="'bezier'"
   [customStroke]="'red'"
-  [customMarkerEnd]="'angularflow-arrow'" [displayLabel]="true"
+  [customMarkerEnd]="'angularflow-arrow'"
+  [displayLabel]="true"
 />
 ```
 
 | Input               | Type                                                 | Required | Description                                                                |
-|---------------------|------------------------------------------------------|----------|----------------------------------------------------------------------------|
+| ------------------- | ---------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
 | `data`              | `Edge`                                               | Yes      | Edge data object (source, target, metadata, etc.).                         |
 | `routing`           | `string`                                             | No       | Path type: `'straight'`, `'bezier'`, `'orthogonal'`. Default: `'straight'` |
 | `customStroke`      | `string`                                             | No       | Custom stroke color.                                                       |
@@ -67,13 +67,7 @@ interaction, etc.).
 #### How to Use a Custom Path
 
 ```html
-
-<angular-adapter-custom-edge
-  [pathAndPoints]="pathAndPoints"
-  [data]="data()"
-  [customMarkerEnd]="'angularflow-arrow'"
-/>
-
+<angular-adapter-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [customMarkerEnd]="'angularflow-arrow'" />
 ```
 
 #### angular-adapter-edge-label
@@ -89,15 +83,9 @@ A flexible `label component` that allows attaching interactive content directly 
 `[positionOnEdge]` - Defines the position of the `label` along the edge path.
 
 ```html
-
-<angular-adapter-custom-edge
-  [data]="data()"
-  [displayLabel]="false"
->
+<angular-adapter-custom-edge [data]="data()" [displayLabel]="false">
   <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
     <button (mousedown)="onButtonClick()">Button</button>
   </angular-adapter-edge-label>
 </angular-adapter-custom-edge>
 ```
-
-
