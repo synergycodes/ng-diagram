@@ -4,9 +4,9 @@ import { NodeTemplateType } from './node-template';
 export const paletteModel: PaletteItem[] = [
   {
     type: NodeTemplateType.InputFiled,
-    data: {},
+    data: { label: 'Input Field' },
   },
-  { type: NodeTemplateType.Image, data: { imageUrl: 'https://tinyurl.com/bddnt44s' } },
-  { type: NodeTemplateType.Resizable, data: {}, resizable: true },
-  { type: NodeTemplateType.Group, data: {}, isGroup: true },
+  { type: NodeTemplateType.Image, data: { label: 'Image', imageUrl: 'https://tinyurl.com/bddnt44s' } },
+  { type: NodeTemplateType.Resizable, data: { label: 'Resizable' }, resizable: true },
+  { type: NodeTemplateType.Group, data: { label: 'Group' }, isGroup: true },
 ];

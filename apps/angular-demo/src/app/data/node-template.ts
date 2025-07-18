@@ -12,13 +12,6 @@ export enum NodeTemplateType {
   Group = 'group',
 }
 
-export const templateLabels = new Map<string, string>([
-  [NodeTemplateType.InputFiled, 'Input Field'],
-  [NodeTemplateType.Image, 'Image'],
-  [NodeTemplateType.Resizable, 'Resizable'],
-  [NodeTemplateType.Group, 'Group'],
-]);
-
 export const nodeTemplateMap: NodeTemplateMap = new Map<NodeTemplateType, Type<INodeTemplate>>([
   [NodeTemplateType.InputFiled, InputFieldNodeComponent],
   [NodeTemplateType.Image, ImageNodeComponent],

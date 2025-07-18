@@ -10,6 +10,6 @@ import { nodeTemplateMap } from '../../data/node-template';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaletteItemPreviewComponent {
-  node = input.required<PaletteItem>();
-  componentType = computed(() => nodeTemplateMap.get(this.node().type));
+  item = input.required<PaletteItem>();
+  componentType = computed(() => nodeTemplateMap.get(this.item().type));
 }

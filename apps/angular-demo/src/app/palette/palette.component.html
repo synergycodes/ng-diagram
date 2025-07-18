@@ -1,12 +1,12 @@
 <div class="palette" angularAdapterPalette>
   @for (paletteItem of model(); track paletteItem.type) {
-    <angular-adapter-palette-item [node]="paletteItem">
-      <app-palette-item [node]="paletteItem" />
+    <angular-adapter-palette-item [item]="paletteItem">
+      <app-palette-item [item]="paletteItem" />
       <angular-adapter-palette-item-preview [type]="paletteItem.type">
         @if (paletteItem.type === 'group') {
-          <app-palette-item-preview [node]="paletteItem" />
+          <app-palette-item-preview [item]="paletteItem" />
         } @else {
-          <app-palette-item [node]="paletteItem" />
+          <app-palette-item [item]="paletteItem" />
         }
       </angular-adapter-palette-item-preview>
     </angular-adapter-palette-item>

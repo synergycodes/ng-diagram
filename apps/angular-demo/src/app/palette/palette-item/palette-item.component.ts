@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { PaletteItem } from '@angularflow/angular-adapter';
-import { templateLabels } from '../../data/node-template';
 
 @Component({
   selector: 'app-palette-item',
@@ -9,6 +8,6 @@ import { templateLabels } from '../../data/node-template';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaletteItemComponent {
-  node = input.required<PaletteItem>();
-  nodeLabel = computed(() => templateLabels.get(this.node()?.type) ?? 'Unknown');
+  item = input.required<PaletteItem>();
+  nodeLabel = computed(() => this.item()?.data?.['label'] ?? 'Unknown');
 }

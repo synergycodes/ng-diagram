@@ -12,17 +12,17 @@ export class NgDiagramPaletteItemComponent {
   private paletteService = inject(PaletteService);
   private paletteItemPreviewComponent = contentChild(NgDiagramPaletteItemPreviewComponent);
 
-  node = input.required<PaletteItem>();
+  item = input.required<PaletteItem>();
 
   onDragStart(event: DragEvent) {
     const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();
     if (previewHtmlElement && previewHtmlElement.nativeElement) {
       event.dataTransfer?.setDragImage(previewHtmlElement.nativeElement, 0, 0);
     }
-    this.paletteService.onDragStartFromPalette(event, this.node());
+    this.paletteService.onDragStartFromPalette(event, this.item());
   }
 
   onMouseDown() {
-    this.paletteService.onMouseDown(this.node());
+    this.paletteService.onMouseDown(this.item());
   }
 }
