@@ -1,11 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Edge } from '@angularflow/core';
-import {
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  ZIndexDirective,
-} from '../../directives';
+import { ZIndexDirective } from '../../directives';
 import { ObjectSelectDirective } from '../../directives/__new__input-events/object-select/object-select.directive';
 
 @Component({
@@ -15,9 +10,9 @@ import { ObjectSelectDirective } from '../../directives/__new__input-events/obje
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     // { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
+    // { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
+    // { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
+    // { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
     { directive: ZIndexDirective, inputs: ['data'] },
     { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
   ],

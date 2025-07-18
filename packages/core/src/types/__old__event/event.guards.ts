@@ -1,4 +1,4 @@
-import { __NEW__NEW__BaseInputEvent } from '../../__new__input-events';
+import { BaseInputEvent } from '../../__new__input-events';
 import { InputActionPredicate } from '../input-event-handler.abstract';
 import {
   __OLD__InputEvent,
@@ -34,7 +34,7 @@ export const isEnd = (event: __OLD__InputEvent): boolean => event.phase === 'end
 export const isAbort = (event: __OLD__InputEvent): boolean => event.phase === 'abort';
 
 // Modifier predicates
-export const __new__withPrimaryModifier = (event: __NEW__NEW__BaseInputEvent): boolean => event.modifiers.primary;
+export const __new__withPrimaryModifier = (event: BaseInputEvent): boolean => event.modifiers.primary;
 
 export const withPrimaryModifier = (event: __OLD__InputEvent): boolean => event.modifiers.primary;
 export const withSecondaryModifier = (event: __OLD__InputEvent): boolean => event.modifiers.secondary;

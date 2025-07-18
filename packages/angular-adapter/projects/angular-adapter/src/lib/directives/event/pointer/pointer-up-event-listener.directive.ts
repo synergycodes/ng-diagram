@@ -1,24 +1,26 @@
-import { Directive, inject, input } from '@angular/core';
-import type { EventTarget, EventType } from '@angularflow/core';
+import { Directive } from '@angular/core';
 
-import { EventMapperService } from '../../../services';
-import { ITargetedEventListener } from '../../../types';
-
+/**
+ * @deprecated
+ */
 @Directive({
   selector: '[angularAdapterPointerUpEventListener]',
   host: { '(pointerup)': 'onPointerUp($event)' },
 })
-export class PointerUpEventListenerDirective implements ITargetedEventListener {
-  private readonly eventMapperService = inject(EventMapperService);
+export class PointerUpEventListenerDirective {
+  // eventTarget: InputSignal<EventTarget>;
+  // eventTarget: InputSignal<EventTarget>;
+  // private readonly eventMapperService = inject(EventMapperService);
 
-  eventTarget = input<EventTarget>({ type: 'diagram' });
-  eventName = input<EventType>('unknown');
+  // eventTarget = input<EventTarget>({ type: 'diagram' });
+  // eventName = input<EventType>('unknown');
 
   onPointerUp(event: PointerEvent) {
-    event.stopPropagation();
-    this.eventMapperService.emit(event, {
-      name: this.eventName(),
-      target: this.eventTarget(),
-    });
+    throw new Error('Directive deprecated');
+    // event.stopPropagation();
+    // this.eventMapperService.emit(event, {
+    //   name: this.eventName(),
+    //   target: this.eventTarget(),
+    // });
   }
 }

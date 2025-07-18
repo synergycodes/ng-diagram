@@ -1,4 +1,4 @@
-import { __NEW__InputModifiers } from '@angularflow/core';
+import { InputModifiers } from '@angularflow/core';
 import { getOS } from '../flow-core-provider/detect-environment';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent;
@@ -11,7 +11,7 @@ const isDomEvent = (event: Event): event is DomEvent =>
   isPointerEvent(event) || isKeyboardEvent(event) || isWheelEvent(event);
 
 // Modifier predicates
-const getModifiers = (event: DomEvent): __NEW__InputModifiers => {
+const getModifiers = (event: DomEvent): InputModifiers => {
   const isMac = getOS() === 'MacOS';
 
   return {
@@ -36,7 +36,7 @@ const isArrowKeyPressed = (event: Event): boolean =>
   isKeyboardEvent(event) && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key);
 const isKeyPressed = (key: string) => (event: Event) => isKeyboardEvent(event) && event.key === key;
 const isKeyComboPressed =
-  (key: string, ...modifiers: (keyof __NEW__InputModifiers)[]) =>
+  (key: string, ...modifiers: (keyof InputModifiers)[]) =>
   (event: Event): boolean => {
     const isKeyboard = isKeyboardEvent(event);
     if (!isKeyboard) return false;

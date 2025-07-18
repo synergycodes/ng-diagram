@@ -1,11 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
-import {
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  ZIndexDirective,
-} from '../../../directives';
+import { ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 import { getBezierPath } from '../../../utils/get-paths/get-bezier-paths';
 import { getOrthogonalPath } from '../../../utils/get-paths/get-orthogonal-paths';
@@ -35,9 +30,9 @@ import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapt
   hostDirectives: [
     // { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
     // { directive: ObjectSelectDirective, inputs: ['selectTargetData: data', 'selectTargetType'] },
-    { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
+    // { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
+    // { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
+    // { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [AngularAdapterEdgeLabelComponent],

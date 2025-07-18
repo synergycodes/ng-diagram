@@ -1,4 +1,4 @@
-import { __NEW__InputPhase, __NEW__NEW__BasePointerInputEvent } from '../../__new__input-events.interface';
+import { BasePointerInputEvent, InputEventPhase } from '../../__new__input-events.interface';
 
 export type ResizeDirection =
   | 'top-left'
@@ -10,8 +10,8 @@ export type ResizeDirection =
   | 'top'
   | 'bottom';
 
-export interface __NEW__ResizeEvent extends __NEW__NEW__BasePointerInputEvent {
+export interface __NEW__ResizeEvent extends BasePointerInputEvent {
   name: 'resize';
-  phase: __NEW__InputPhase;
+  phase: InputEventPhase;
   direction: ResizeDirection;
 }

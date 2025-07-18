@@ -1,7 +1,7 @@
 import { Direction } from '../../../types';
-import { __NEW__NEW__BaseInputEvent } from '../../__new__input-events.interface';
+import { BaseInputEvent } from '../../__new__input-events.interface';
 
-export interface __NEW__KeyboardMoveSelectionEvent extends __NEW__NEW__BaseInputEvent {
+export interface __NEW__KeyboardMoveSelectionEvent extends BaseInputEvent {
   name: 'keyboardMoveSelection';
   direction: Direction;
 }
