@@ -36,6 +36,7 @@ export class ResizableNodeComponent implements INodeTemplate {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
+      position: this.data().position
     });
   }
 

@@ -17,13 +17,13 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
     },
   },
   execute: (context, next, cancel) => {
-    const { helpers, nodesMap, flowCore } = context;
+    const { helpers, nodesMap, flowCore, modelActionType } = context;
 
     const snapConfig = context.middlewareMetadata.snap;
 
     const shouldSnap = helpers.checkIfAnyNodePropsChanged(['position']);
 
-    if (!shouldSnap) {
+    if (!shouldSnap || modelActionType === 'resizeNode') {
       next();
       return;
     }
@@ -44,30 +44,9 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
 
       // Prevent unnecessary state updates if already snapped
       if (originalNode && (originalNode.position.x !== snappedX || originalNode.position.y !== snappedY)) {
-        const hasWidthChanged = originalNode.size?.width !== node?.size?.width;
-        const isLeftResized = originalNode.position.x !== snappedX && hasWidthChanged;
-
-        const hasHeightChanged = originalNode.size?.height !== node?.size?.height;
-        const isTopResized = originalNode.position.y !== snappedY && hasHeightChanged;
-
-        let size;
-
-        if (isLeftResized || isTopResized) {
-          const originalRightBoundary = originalNode.position.x + (originalNode.size?.width ?? 0);
-          const originalBottomBoundary = originalNode.position.y + (originalNode.size?.height ?? 0);
-
-          const updatedWidth = isLeftResized ? originalRightBoundary - snappedX : (originalNode.size?.width ?? 0);
-          const updatedHeight = isTopResized ? originalBottomBoundary - snappedY : (originalNode.size?.height ?? 0);
-          size = {
-            width: updatedWidth,
-            height: updatedHeight,
-          };
-        }
-
         nodesToUpdate.push({
           id: node.id,
           position: { x: snappedX, y: snappedY },
-          ...(size ? { size } : {}),
         });
       }
     }
