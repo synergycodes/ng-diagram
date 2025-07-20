@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CommandHandler } from '../command-handler/command-handler';
 import { FlowCore } from '../flow-core';
 import { InitializationGuard } from '../initialization-guard/initialization-guard';
+import { PortBatchProcessor } from '../port-batch-processor/port-batch-processor';
 import { mockEdge, mockEdgeLabel, mockNode, mockPort } from '../test-utils';
 import { InternalUpdater } from './internal-updater';
 
@@ -12,11 +13,15 @@ describe('InternalUpdater', () => {
   let initializationGuard: InitializationGuard;
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
+  let portBatchProcessor: PortBatchProcessor;
 
   beforeEach(() => {
     commandHandler = {
       emit: vi.fn(),
     } as unknown as CommandHandler;
+    portBatchProcessor = {
+      process: vi.fn(),
+    } as unknown as PortBatchProcessor;
     initializationGuard = {
       isInitialized: false,
       initNodeSize: vi.fn(),
@@ -30,6 +35,7 @@ describe('InternalUpdater', () => {
       getEdgeById: getEdgeByIdMock,
       initializationGuard,
       commandHandler,
+      portBatchProcessor,
     } as unknown as FlowCore;
     internalUpdater = new InternalUpdater(flowCore);
   });
@@ -83,7 +89,7 @@ describe('InternalUpdater', () => {
 
       internalUpdater.addPort('node-1', mockPort);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('addPorts', { nodeId: 'node-1', ports: [mockPort] });
+      expect(portBatchProcessor.process).toHaveBeenCalled();
     });
   });
 
