@@ -1,5 +1,4 @@
-import { Edge, Node } from '../../../../types';
-import { TreeNode } from '../../../../types/tree-layout.interface.ts';
+import { Edge, Node, TreeNode } from '../../../../types';
 
 /**
  * Makes a map that shows, for each node, the top group it belongs to.

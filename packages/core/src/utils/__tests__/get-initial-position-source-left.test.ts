@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getInitialPositionSourceLeft } from '../edges-orthogonal-routing/initial-positions/get-initial-position-source-left.ts';
+import { getInitialPositionSourceLeft } from '../edges-orthogonal-routing';
 import * as config from '../edges-orthogonal-routing/constants.ts';
 
 describe('getInitialPositionSourceLeft', () => {

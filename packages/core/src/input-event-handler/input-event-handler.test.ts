@@ -115,8 +115,8 @@ describe('InputEventHandler', () => {
       const testAction = vi.fn();
 
       const predicate = () => true;
-      eventHandler.register(predicate, testAction);
-      eventHandler.unregister(predicate, testAction);
+      const unregister = eventHandler.register(predicate, testAction);
+      unregister();
 
       mockEventMapper.emit({} as Event);
 
@@ -125,8 +125,8 @@ describe('InputEventHandler', () => {
 
     it('should unregister newly registered default action by name', () => {
       const predicate = () => true;
-      eventHandler.register(predicate, 'select');
-      eventHandler.unregister(predicate, 'select');
+      const unregister = eventHandler.register(predicate, 'select');
+      unregister();
 
       mockEventMapper.emit({} as Event);
 

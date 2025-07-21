@@ -5,7 +5,7 @@ import {
   RotateEvent,
   type InputActionWithPredicate,
 } from '../../../types';
-import { getDistanceBetweenPoints } from '../../../utils/get-distance-between-points';
+import { getDistanceBetweenPoints } from '../../../utils';
 import { getRotationAngle } from './get-rotation-angle';
 
 const MIN_DISTANCE_TO_CENTER = 30;

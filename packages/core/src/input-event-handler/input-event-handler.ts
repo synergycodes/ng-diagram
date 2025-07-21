@@ -32,22 +32,26 @@ export class InputEventHandler extends CoreInputEventHandler {
 
   registerDefault(actionName: InputActionName): void {
     const actionWithPredicate = this.defaultActions.get(actionName);
+
     if (!actionWithPredicate) {
       throw new Error(`Default action "${actionName}" does not exist.`);
     }
+
     this.unregisterDefault(actionName);
     this.register(actionWithPredicate.predicate, actionWithPredicate.action);
   }
 
   unregisterDefault(actionName: InputActionName): void {
-    const actionWithPredicate = this.defaultActions.get(actionName);
-    if (!actionWithPredicate) {
+    const { action: actionToUnregister } = this.defaultActions.get(actionName) ?? {};
+
+    if (!actionToUnregister) {
       throw new Error(`Default action "${actionName}" does not exist.`);
     }
-    this.unregister(actionWithPredicate.predicate, actionWithPredicate.action);
+
+    this.registeredActions = this.registeredActions.filter(({ action }) => action !== actionToUnregister);
   }
 
-  register(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void {
+  register(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): () => void {
     const action =
       typeof actionOrActionName === 'string' ? this.defaultActions.get(actionOrActionName)?.action : actionOrActionName;
 
@@ -55,18 +59,15 @@ export class InputEventHandler extends CoreInputEventHandler {
       throw new Error(`Action "${actionOrActionName}" not found among default actions.`);
     }
 
-    this.registeredActions.push({ predicate, action });
-  }
+    const actionWithPredicate = { predicate, action };
 
-  unregister(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void {
-    this.registeredActions = this.registeredActions.filter(
-      (handler) =>
-        handler.predicate !== predicate ||
-        handler.action !==
-          (typeof actionOrActionName === 'string'
-            ? this.defaultActions.get(actionOrActionName)?.action
-            : actionOrActionName)
-    );
+    this.registeredActions.push(actionWithPredicate);
+
+    const unregister = () => {
+      this.registeredActions = this.registeredActions.filter((action) => action !== actionWithPredicate);
+    };
+
+    return unregister;
   }
 
   invoke(actionName: InputActionName, event: Event): void {

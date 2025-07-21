@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { getSamplePointerEvent, getSampleRotateEvent, mockNode } from '../../../../test-utils';
 import type { RotateEvent, RotateHandleTarget } from '../../../../types';
-import { getDistanceBetweenPoints } from '../../../../utils/get-distance-between-points';
+import { getDistanceBetweenPoints } from '../../../../utils';
 import { getRotationAngle } from '../get-rotation-angle';
 import { rotateAction } from '../rotate';
 

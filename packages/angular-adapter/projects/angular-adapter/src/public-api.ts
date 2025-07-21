@@ -10,9 +10,9 @@ export * from './lib/components/edge/custom-edge/custom-edge.component';
 export * from './lib/directives';
 export { FlowCoreProviderService } from './lib/services';
 export * from './lib/types';
-export * from './lib/utils/get-paths/get-straight-paths';
-export * from './lib/utils/get-paths/get-orthogonal-paths';
-export * from './lib/utils/get-paths/get-bezier-paths';
+export * from './lib/utils/get-path/get-straight-path';
+export * from './lib/utils/get-path/get-orthogonal-path';
+export * from './lib/utils/get-path/get-bezier-path';
 export * from './lib/services/';
 
 export {
