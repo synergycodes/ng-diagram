@@ -2,14 +2,17 @@ import { Component, input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   AngularAdapterDiagramComponent,
+  EdgeTemplateMap,
+  FlowCoreProviderService,
   Middleware,
   NodeTemplateMap,
-  FlowCoreProviderService,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppComponent } from './app.component';
+import { PaletteComponent } from './palette/palette.component';
+import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector -- Mocking library component that uses its own prefix
@@ -20,8 +23,23 @@ import { AppComponent } from './app.component';
 class MockAngularAdapterDiagramComponent {
   model = input.required<SignalModelAdapter>();
   nodeTemplateMap = input.required<NodeTemplateMap>();
+  edgeTemplateMap = input.required<EdgeTemplateMap>();
   middlewares = input.required<Middleware[]>();
 }
+
+@Component({
+  selector: 'app-toolbar',
+  template: '',
+  standalone: true,
+})
+class MockToolbarComponent {}
+
+@Component({
+  selector: 'app-palette',
+  template: '',
+  standalone: true,
+})
+class MockPaletteComponent {}
 
 class MockEventMapper {
   private listener: (event: Event) => void = () => null;
@@ -48,6 +66,7 @@ describe('AppComponent', () => {
             provide: vi.fn().mockReturnValue({
               getScale: mockGetScale,
               registerEventsHandler: (handle: (event: Event) => void) => mockEventMapper.register(handle),
+              getEnvironment: vi.fn(),
             }),
           },
         },
@@ -56,10 +75,10 @@ describe('AppComponent', () => {
     })
       .overrideComponent(AppComponent, {
         remove: {
-          imports: [AngularAdapterDiagramComponent],
+          imports: [AngularAdapterDiagramComponent, ToolbarComponent, PaletteComponent],
         },
         add: {
-          imports: [MockAngularAdapterDiagramComponent],
+          imports: [MockAngularAdapterDiagramComponent, MockToolbarComponent, MockPaletteComponent],
         },
       })
       .compileComponents();
