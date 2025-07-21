@@ -61,15 +61,9 @@ export abstract class InputEventHandler {
    * Register a new action handler with a predicate
    * @param predicate Function that determines when the action should be triggered
    * @param actionOrActionName Action to be triggered (either name or function)
+   * @returns A function to unregister the action handler
    */
   abstract register(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void;
-
-  /**
-   * Unregister an action handler with a predicate
-   * @param predicate Predicate function to unregister
-   * @param actionOrActionName Action to unregister
-   */
-  abstract unregister(predicate: InputActionPredicate, actionOrActionName: InputActionOrInputActionName): void;
 
   /**
    * Invoke an action handler
