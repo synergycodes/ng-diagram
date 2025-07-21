@@ -1,5 +1,5 @@
 import type { Bounds, CommandHandler, Node, Rect } from '../../types';
-import { getRectFromBounds, calculateGroupBounds } from '../../utils';
+import { getRectFromBounds, calculateGroupBounds, isSameSize } from '../../utils';
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';
@@ -15,11 +15,7 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
   if (!node) {
     throw new Error(`Node with id ${command.id} not found.`);
   }
-
-  if (
-    (node.size?.width === command.size.width && node.size?.height === command.size.height) ||
-    (node.isGroup && !node.selected)
-  ) {
+  if (isSameSize(node.size, command.size) || (node.isGroup && !node.selected)) {
     return; // No-op if size is unchanged
   }
 
@@ -93,7 +89,7 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
-  if (!command.size || !command.position) {
+  if (!command.size) {
     return;
   }
 
