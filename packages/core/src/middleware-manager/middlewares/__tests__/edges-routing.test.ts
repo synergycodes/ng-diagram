@@ -18,6 +18,10 @@ vi.mock('../../../utils', () => ({
   isSamePoint: (point1: Point, point2: Point) => point1.x === point2.x && point1.y === point2.y,
 }));
 
+vi.mock('../../../utils/get-point-on-path/get-point-on-path', () => ({
+  getPointOnPath: () => ({ x: 50, y: 50 }),
+}));
+
 describe('Edges Routing Middleware', () => {
   let flowCore: FlowCore;
   let initialState: FlowState;

@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core'
 import {
   AngularAdapterDiagramComponent,
   EdgeTemplateMap,
-  IEdgeTemplate,
-  INodeTemplate,
+  EdgeTemplate,
+  NodeTemplate,
   Middleware,
   NodeTemplateMap,
 } from '@angularflow/angular-adapter';
@@ -26,13 +26,13 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 })
 export class AppComponent {
   model = signal(new SignalModelAdapter<AppMiddlewares>());
-  nodeTemplateMap: NodeTemplateMap = new Map<string, Type<INodeTemplate>>([
+  nodeTemplateMap: NodeTemplateMap = new Map<string, Type<NodeTemplate>>([
     ['input-field', InputFieldNodeComponent],
     ['image', ImageNodeComponent],
     ['resizable', ResizableNodeComponent],
     ['group', GroupNodeComponent],
   ]);
-  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<IEdgeTemplate>>([
+  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
