@@ -1,5 +1,5 @@
 import { Point } from '../../../types';
-import { getDistanceBetweenPoints } from '../../../utils/get-distance-between-points';
+import { getDistanceBetweenPoints } from '../../../utils';
 
 interface RotationPoints {
   handle: Point;

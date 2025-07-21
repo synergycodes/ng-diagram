@@ -1,4 +1,4 @@
-import { clamp } from '../../../utils/clamp';
+import { clamp } from '../../../utils';
 import { normalizeAngle } from './normalize-angle';
 
 /** Epsilon for floating-point comparisons */

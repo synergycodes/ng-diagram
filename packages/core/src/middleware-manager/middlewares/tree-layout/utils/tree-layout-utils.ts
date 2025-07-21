@@ -1,6 +1,5 @@
-import { LayoutAngleType, TreeNode } from '../../../../types/tree-layout.interface.ts';
-import { getSign, isAngleVertical } from '../../../../utils/get-direction.ts';
-import { Bounds } from '../../../../types';
+import { LayoutAngleType, TreeNode, Bounds } from '../../../../types';
+import { getSign, isAngleVertical } from '../../../../utils';
 
 /**
  * Determines whether the given node is a leaf

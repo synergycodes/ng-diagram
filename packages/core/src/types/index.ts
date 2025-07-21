@@ -24,3 +24,9 @@ export * from './environment.interface';
 
 // Utils types
 export * from './utils';
+
+// TreeLayout types
+export * from './tree-layout.interface';
+
+// Node data types
+export * from './node-data.interface';
