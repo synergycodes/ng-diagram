@@ -1,5 +1,4 @@
-import type { CommandHandler } from '../../types';
-import type { Edge } from '../../types/edge.interface';
+import type { CommandHandler, Edge } from '../../types';
 
 export interface DeleteSelectionCommand {
   name: 'deleteSelection';

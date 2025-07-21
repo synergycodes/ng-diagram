@@ -1,4 +1,4 @@
-import { getInitialPathPoints } from './initial-positions/get-initial-path-points.ts';
+import { getInitialPathPoints } from './initial-positions';
 import { Point, PortLocation } from '../../types';
 
 /**

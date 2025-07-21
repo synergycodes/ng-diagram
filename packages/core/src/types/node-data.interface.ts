@@ -1,6 +1,6 @@
 import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface.ts';
 
-export interface LayoutConfiguration {
+export interface NodeLayoutConfiguration {
   tree?: {
     /**
      * Node layout direction: 0, 90, 180, 270.

@@ -7,12 +7,10 @@ import {
   PortLocation,
   RoutingConfiguration,
 } from '../../../types';
-import { getPointOnPath, isSamePoint } from '../../../utils';
-import { getOrthogonalPathPoints } from '../../../utils/edges-orthogonal-routing/get-orthogonal-path-points.ts';
+import { getPointOnPath, isSamePoint, getBezierPathPoints, getOrthogonalPathPoints } from '../../../utils';
 import { isDefaultRouting } from './utils/isRouting.ts';
-import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment/constants.ts';
+import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getSourceTargetPositions } from './get-source-target-positions.ts';
-import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
 
 export interface EdgesRoutingMiddlewareMetadata {
   enabled: boolean;

@@ -11,8 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { Port, PortTarget } from '@angularflow/core';
-import { EventMapperService, FlowCoreProviderService } from '../../services';
-import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
+import { EventMapperService, FlowCoreProviderService, BatchResizeObserverService } from '../../services';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
