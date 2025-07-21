@@ -11,7 +11,8 @@ export type InputEventName =
   | 'keyboardPanning'
   | 'pointerMoveSelection'
   | 'keyboardMoveSelection'
-  | 'resize';
+  | 'resize'
+  | 'zoom';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

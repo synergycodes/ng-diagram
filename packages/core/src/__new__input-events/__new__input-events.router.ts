@@ -10,6 +10,7 @@ import { __NEW__PasteEventHandler } from './handlers/paste/paste.handler';
 import { __NEW__PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
 import { __NEW__ResizeEventHandler } from './handlers/resize/resize.handler';
 import { __NEW__SelectEventHandler } from './handlers/select/select.handler';
+import { ZoomingEventHandler } from './handlers/zooming/zooming.handler';
 
 export abstract class __NEW__InputEventsRouter {
   private handlers: Partial<Record<InputEventName, __NEW__EventHandler<BaseInputEvent>>> = {};
@@ -38,5 +39,6 @@ export abstract class __NEW__InputEventsRouter {
     this.register('resize', new __NEW__ResizeEventHandler(flow));
     this.register('paste', new __NEW__PasteEventHandler(flow));
     this.register('deleteSelection', new __NEW__DeleteSelectionEventHandler(flow));
+    this.register('zoom', new ZoomingEventHandler(flow));
   }
 }

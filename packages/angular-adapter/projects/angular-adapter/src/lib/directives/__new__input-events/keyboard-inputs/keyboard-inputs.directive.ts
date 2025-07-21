@@ -9,8 +9,7 @@ import { PasteAction } from './keyboard-actions/paste.action';
 @Directive({
   selector: '[angularAdapterKeyboardInputs]',
   host: {
-    '(pointerenter)': 'onPointerEnter()',
-    '(pointerleave)': 'onPointerLeave()',
+    '(document:keydown)': 'onKeyDown($event)',
   },
 })
 export class KeyboardInputsDirective {
@@ -22,20 +21,12 @@ export class KeyboardInputsDirective {
     inject(DeleteSelectionAction),
   ];
 
-  onPointerEnter(): void {
-    document.addEventListener('keydown', this.onKeyDown);
-  }
-
-  onPointerLeave() {
-    document.removeEventListener('keydown', this.onKeyDown);
-  }
-
-  onKeyDown = (event: KeyboardEvent) => {
+  onKeyDown(event: KeyboardEvent) {
     for (const action of this.actions) {
       if (action.matches(event)) {
         action.handle(event);
         break;
       }
     }
-  };
+  }
 }

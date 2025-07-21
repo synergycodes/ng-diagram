@@ -1,5 +1,6 @@
 export * from './__new__input-events/keyboard-inputs/keyboard-inputs.directive';
 export * from './__new__input-events/panning/panning.directive';
+export * from './__new__input-events/zooming/zooming.directive';
 export * from './event';
 export * from './node-position/node-position.directive';
 export * from './node-selected/node-selected.directive';

@@ -8,6 +8,7 @@ import {
   treeLayoutMiddleware,
   zIndexMiddleware,
 } from '@angularflow/angular-adapter';
+import { loggerMiddleware } from '@angularflow/logger-middleware';
 
 export const appMiddlewares = [
   zIndexMiddleware,
@@ -17,7 +18,7 @@ export const appMiddlewares = [
   treeLayoutMiddleware,
   nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
-  // loggerMiddleware,
+  loggerMiddleware,
 ] as const satisfies Middleware[];
 
 export type AppMiddlewares = typeof appMiddlewares;
