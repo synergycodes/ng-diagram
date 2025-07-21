@@ -15,11 +15,7 @@ export class __NEW__PanningDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   onPointerDown(event: PointerInputEvent): void {
-    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
-      return;
-    }
-
-    if (event.moveSelectionHandled || event.zoomingHandled) {
+    if (!BrowserInputsHelpers.withPrimaryButton(event) || this.isHandled(event)) {
       return;
     }
 
@@ -61,7 +57,7 @@ export class __NEW__PanningDirective {
   }
 
   private onMouseMove = (event: PointerInputEvent) => {
-    if (event.moveSelectionHandled || event.zoomingHandled) {
+    if (this.isHandled(event)) {
       return;
     }
 
@@ -78,4 +74,8 @@ export class __NEW__PanningDirective {
       },
     });
   };
+
+  private isHandled(event: PointerInputEvent): boolean {
+    return !!(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled);
+  }
 }

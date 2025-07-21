@@ -16,10 +16,12 @@
   type="target"
   style="top: 50%; left: 0; transform: translate(-50%, -50%)"
   side="left"
-></angular-adapter-port>
+  [nodeData]="data()"
+/>
 <angular-adapter-port
   id="port-right"
   type="source"
   style="top: 50%; left: 100%; transform: translate(-50%, -50%)"
   side="right"
-></angular-adapter-port>
+  [nodeData]="data()"
+/>

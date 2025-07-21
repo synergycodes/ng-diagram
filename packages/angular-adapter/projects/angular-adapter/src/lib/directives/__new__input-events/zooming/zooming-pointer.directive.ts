@@ -21,6 +21,10 @@ export class ZoomingPointerDirective {
   private startDistance?: number;
 
   onPointerDown($event: PointerInputEvent) {
+    if (this.isHandled($event)) {
+      return;
+    }
+
     this.addEvent($event);
     if (this.eventCache.length !== 2) {
       return;
@@ -41,6 +45,10 @@ export class ZoomingPointerDirective {
   }
 
   onPointerUp($event: PointerInputEvent) {
+    if (this.isHandled($event)) {
+      return;
+    }
+
     this.removeEvent($event);
     if (this.eventCache.length < 2) {
       this.startPoint = undefined;
@@ -112,5 +120,9 @@ export class ZoomingPointerDirective {
   private updateCache(event: PointerEvent) {
     const index = this.eventCache.findIndex((cachedEvent) => cachedEvent.pointerId === event.pointerId);
     this.eventCache[index] = event;
+  }
+
+  private isHandled(event: PointerInputEvent): boolean {
+    return !!event.linkingHandled;
   }
 }

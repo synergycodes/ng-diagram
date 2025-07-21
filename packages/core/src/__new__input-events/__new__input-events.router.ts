@@ -5,6 +5,7 @@ import { __NEW__DeleteSelectionEventHandler } from './handlers/delete-selection/
 import { __NEW__EventHandler } from './handlers/event-hander';
 import { KeyboardMoveSelectionEventHandler } from './handlers/keyboard-move-selection/keyboard-move-selection.handler';
 import { KeyboardPanningEventHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
+import { LinkingEventHandler } from './handlers/linking/linking.handler';
 import { __NEW__PanningEventHandler } from './handlers/panning/panning.handler';
 import { __NEW__PasteEventHandler } from './handlers/paste/paste.handler';
 import { __NEW__PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
@@ -40,5 +41,6 @@ export abstract class __NEW__InputEventsRouter {
     this.register('paste', new __NEW__PasteEventHandler(flow));
     this.register('deleteSelection', new __NEW__DeleteSelectionEventHandler(flow));
     this.register('zoom', new ZoomingEventHandler(flow));
+    this.register('linking', new LinkingEventHandler(flow));
   }
 }

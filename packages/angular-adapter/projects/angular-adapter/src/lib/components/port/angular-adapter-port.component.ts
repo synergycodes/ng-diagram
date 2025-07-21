@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   effect,
   ElementRef,
   inject,
@@ -10,7 +9,8 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Port, PortTarget } from '@angularflow/core';
+import { Node, Port } from '@angularflow/core';
+import { LinkingInputDirective } from '../../directives/__new__input-events/linking/linking.directive';
 import { EventMapperService, FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
@@ -21,10 +21,9 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   styleUrl: './angular-adapter-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '(pointerdown)': 'onPointerDown($event)',
-    '(pointerup)': 'onPointerUp($event)',
     '[attr.data-port-id]': 'id()',
   },
+  hostDirectives: [{ directive: LinkingInputDirective, inputs: ['target: nodeData', 'portId: id'] }],
 })
 export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
@@ -36,7 +35,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   id = input.required<Port['id']>();
   type = input.required<Port['type']>();
   side = input.required<Port['side']>();
-  nodeData = computed(() => this.nodeComponent.data());
+  nodeData = input.required<Node>();
 
   lastSide = signal<Port['side'] | undefined>(undefined);
   lastType = signal<Port['type'] | undefined>(undefined);
@@ -90,35 +89,5 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
     });
 
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
-  }
-
-  onPointerDown(event: PointerEvent) {
-    event.stopPropagation();
-    const currentTarget = event.currentTarget as HTMLElement;
-    currentTarget.setPointerCapture(event.pointerId);
-
-    this.eventMapperService.emit(event, {
-      name: 'connection',
-      target: this.getEventTarget(),
-    });
-  }
-
-  onPointerUp(event: PointerEvent) {
-    event.stopPropagation();
-    this.eventMapperService.emit(event, {
-      name: 'connection',
-      target: this.getEventTarget(),
-    });
-  }
-
-  private getEventTarget(): PortTarget {
-    const port = this.nodeData()?.ports?.find((port) => port.id === this.id());
-    if (!port) {
-      throw new Error(`Port with id ${this.id()} on node ${this.nodeData()?.id} not found`);
-    }
-    return {
-      type: 'port',
-      element: port,
-    };
   }
 }

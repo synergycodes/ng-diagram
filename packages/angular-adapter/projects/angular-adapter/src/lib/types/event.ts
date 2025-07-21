@@ -8,4 +8,5 @@ export interface ITargetedEventListener {
 export interface PointerInputEvent extends PointerEvent {
   moveSelectionHandled?: boolean;
   zoomingHandled?: boolean;
+  linkingHandled?: boolean;
 }

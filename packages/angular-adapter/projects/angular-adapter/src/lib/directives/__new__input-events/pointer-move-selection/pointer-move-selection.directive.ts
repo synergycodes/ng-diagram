@@ -18,7 +18,7 @@ export class PointerMoveSelectionDirective {
   targetData = input.required<Node>();
 
   onPointerDown(event: PointerInputEvent): void {
-    if (event.zoomingHandled) {
+    if (this.isHandled(event)) {
       return;
     }
 
@@ -78,7 +78,7 @@ export class PointerMoveSelectionDirective {
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
-    if (event.zoomingHandled) {
+    if (this.isHandled(event)) {
       return;
     }
 
@@ -95,4 +95,8 @@ export class PointerMoveSelectionDirective {
       },
     });
   };
+
+  private isHandled(event: PointerInputEvent): boolean {
+    return !!(event.zoomingHandled || event.linkingHandled);
+  }
 }
