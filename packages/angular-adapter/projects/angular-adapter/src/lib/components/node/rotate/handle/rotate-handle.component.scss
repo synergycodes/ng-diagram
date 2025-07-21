@@ -10,10 +10,11 @@
   z-index: 10;
   box-sizing: border-box;
   outline: none;
-  transition: box-shadow 0.2s,
-  border-color 0.2s,
-  background 0.2s,
-  transform 0.1s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.1s;
   pointer-events: auto;
   cursor: grab;
 }
