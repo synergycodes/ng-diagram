@@ -15,6 +15,10 @@ export class InputEventsRouterService extends __NEW__InputEventsRouter {
   }
 
   private generateEventId(): string {
+    if (!crypto.randomUUID) {
+      console.warn('crypto.randomUUID is not supported, using fallback ID generation');
+      return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+    }
     // NOTE: Works only in https
     return crypto.randomUUID();
   }

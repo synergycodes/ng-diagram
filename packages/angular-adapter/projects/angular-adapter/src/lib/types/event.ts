@@ -5,6 +5,7 @@ export interface ITargetedEventListener {
   eventTarget: InputSignal<EventTarget>;
 }
 
-export interface PointerDragEvent extends PointerEvent {
+export interface PointerInputEvent extends PointerEvent {
   moveSelectionHandled?: boolean;
+  zoomingHandled?: boolean;
 }

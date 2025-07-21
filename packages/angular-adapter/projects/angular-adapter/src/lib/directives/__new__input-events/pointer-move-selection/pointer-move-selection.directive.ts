@@ -3,7 +3,7 @@ import { Node } from '@angularflow/core';
 import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerDragEvent } from '../../../types/event';
+import { PointerInputEvent } from '../../../types/event';
 
 @Directive({
   selector: '[angularAdapterPointerMoveSelection]',
@@ -17,7 +17,11 @@ export class PointerMoveSelectionDirective {
 
   targetData = input.required<Node>();
 
-  onPointerDown(event: PointerDragEvent): void {
+  onPointerDown(event: PointerInputEvent): void {
+    if (event.zoomingHandled) {
+      return;
+    }
+
     if (!BrowserInputsHelpers.withPrimaryButton(event)) {
       return;
     }
@@ -73,7 +77,11 @@ export class PointerMoveSelectionDirective {
     });
   };
 
-  private onPointerMove = (event: PointerEvent) => {
+  private onPointerMove = (event: PointerInputEvent) => {
+    if (event.zoomingHandled) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,

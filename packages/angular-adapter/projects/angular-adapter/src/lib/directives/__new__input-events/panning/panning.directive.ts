@@ -1,7 +1,7 @@
 import { Directive, ElementRef, inject } from '@angular/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerDragEvent } from '../../../types/event';
+import { PointerInputEvent } from '../../../types/event';
 
 @Directive({
   selector: '[angularAdapterPanning]',
@@ -14,12 +14,12 @@ export class __NEW__PanningDirective {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
-  onPointerDown(event: PointerDragEvent): void {
+  onPointerDown(event: PointerInputEvent): void {
     if (!BrowserInputsHelpers.withPrimaryButton(event)) {
       return;
     }
 
-    if (event.moveSelectionHandled) {
+    if (event.moveSelectionHandled || event.zoomingHandled) {
       return;
     }
 
@@ -60,7 +60,11 @@ export class __NEW__PanningDirective {
     });
   }
 
-  private onMouseMove = (event: PointerEvent) => {
+  private onMouseMove = (event: PointerInputEvent) => {
+    if (event.moveSelectionHandled || event.zoomingHandled) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
