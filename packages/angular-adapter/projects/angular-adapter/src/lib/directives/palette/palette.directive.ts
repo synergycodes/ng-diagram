@@ -1,5 +1,5 @@
 import { Directive, inject, OnInit } from '@angular/core';
-import { PaletteService } from '../../services/palette-interaction/palette.service';
+import { PaletteService } from '../../services/palette/palette.service';
 
 @Directive({
   selector: '[angularAdapterPalette]',

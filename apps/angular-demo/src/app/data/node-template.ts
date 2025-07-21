@@ -6,14 +6,14 @@ import { InputFieldNodeComponent } from '../node-template/input-field-node/input
 import { ResizableNodeComponent } from '../node-template/resizable-node/resizable-node.component';
 
 export enum NodeTemplateType {
-  InputFiled = 'input-field',
+  InputField = 'input-field',
   Image = 'image',
   Resizable = 'resizable',
   Group = 'group',
 }
 
 export const nodeTemplateMap: NodeTemplateMap = new Map<NodeTemplateType, Type<INodeTemplate>>([
-  [NodeTemplateType.InputFiled, InputFieldNodeComponent],
+  [NodeTemplateType.InputField, InputFieldNodeComponent],
   [NodeTemplateType.Image, ImageNodeComponent],
   [NodeTemplateType.Resizable, ResizableNodeComponent],
   [NodeTemplateType.Group, GroupNodeComponent],

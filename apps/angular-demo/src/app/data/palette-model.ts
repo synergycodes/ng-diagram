@@ -3,7 +3,7 @@ import { NodeTemplateType } from './node-template';
 
 export const paletteModel: PaletteItem[] = [
   {
-    type: NodeTemplateType.InputFiled,
+    type: NodeTemplateType.InputField,
     data: { label: 'Input Field' },
   },
   { type: NodeTemplateType.Image, data: { label: 'Image', imageUrl: 'https://tinyurl.com/bddnt44s' } },
