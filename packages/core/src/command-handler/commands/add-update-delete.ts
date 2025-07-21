@@ -100,9 +100,9 @@ export const addPorts = async (commandHandler: CommandHandler, command: AddPorts
     return;
   }
 
-  const existingPortIds = new Set((node.ports ?? []).map((port) => port.id));
-  const portsToAdd = ports.filter((port) => !existingPortIds.has(port.id));
-  const newPorts = [...(node.ports ?? []), ...portsToAdd];
+  const newPortIds = new Set(ports.map((port) => port.id));
+  const existingPortsToKeep = (node.ports ?? []).filter((port) => !newPortIds.has(port.id));
+  const newPorts = [...existingPortsToKeep, ...ports];
 
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: newPorts }] }, 'updateNode');
 };
