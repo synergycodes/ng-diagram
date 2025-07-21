@@ -22,10 +22,9 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
     const snapConfig = context.middlewareMetadata.snap;
 
     const shouldSnap = helpers.checkIfAnyNodePropsChanged(['position']);
-    const sizeChanged = helpers.checkIfAnyNodePropsChanged(['size']);
+    const sizeChanged = modelActionType === 'moveNodes' && helpers.checkIfAnyNodePropsChanged(['size']);
     const isCurrentlyResizing =
       modelActionType === 'resizeNode' && helpers.checkIfAnyNodePropsChanged(['size', 'position']);
-
     if (!shouldSnap && !isCurrentlyResizing && !sizeChanged) {
       next();
       return;
@@ -82,16 +81,12 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
         if (!node) {
           continue;
         }
-
+        const snappedX = snapNumber(node.position.x, snapConfig.x ?? 10);
+        const snappedY = snapNumber(node.position.y, snapConfig.y ?? 10);
         const originalNode = flowCore.getNodeById(node.id);
 
-        if (
-          originalNode &&
-          (originalNode.position.x !== node.position.x || originalNode.position.y !== node.position.y)
-        ) {
-          const snappedX = snapNumber(node.position.x, snapConfig.x ?? 10);
-          const snappedY = snapNumber(node.position.y, snapConfig.y ?? 10);
-
+        // Prevent unnecessary state updates if already snapped
+        if (originalNode && (originalNode.position.x !== snappedX || originalNode.position.y !== snappedY)) {
           nodesToUpdate.push({
             id: node.id,
             position: { x: snappedX, y: snappedY },

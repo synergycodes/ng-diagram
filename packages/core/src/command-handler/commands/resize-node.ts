@@ -89,7 +89,7 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
-  if (!command.size) {
+  if (!command.size || !command.position) {
     return;
   }
 
