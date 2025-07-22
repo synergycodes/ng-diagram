@@ -64,7 +64,7 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
           if (movedY) {
             height = Math.max(Math.round(originalNode.position.y + prevHeight) - snappedY, 0);
           } else {
-            height = snapNumber(Math.round(snapNumber(nodeHeight, snapConfig.y ?? 10)), snapConfig.x ?? 0);
+            height = snapNumber(Math.round(snapNumber(nodeHeight, snapConfig.y ?? 10)), snapConfig.y ?? 0);
           }
         }
 
