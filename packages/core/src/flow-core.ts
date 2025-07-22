@@ -4,6 +4,7 @@ import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
+import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import { TransactionManager } from './transaction-manager/transaction-manager';
@@ -44,6 +45,7 @@ export class FlowCore<
   readonly internalUpdater: InternalUpdater;
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
+  readonly portBatchProcessor: PortBatchProcessor;
 
   constructor(
     modelAdapter: ModelAdapter<TMetadata>,
@@ -62,6 +64,7 @@ export class FlowCore<
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
     this.transactionManager = new TransactionManager(this);
+    this.portBatchProcessor = new PortBatchProcessor();
 
     this.init();
   }
@@ -328,5 +331,12 @@ export class FlowCore<
       default:
         throw new Error(`The "${layout}" layout does not exist.`);
     }
+  }
+
+  /**
+   * Returns the current zoom scale
+   */
+  getScale() {
+    return this.model.getMetadata().viewport.scale;
   }
 }

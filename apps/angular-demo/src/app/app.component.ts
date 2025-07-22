@@ -1,44 +1,40 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
-  EdgeTemplateMap,
   EdgeTemplate,
-  NodeTemplate,
+  EdgeTemplateMap,
   Middleware,
   NodeTemplateMap,
+  PaletteItem,
 } from '@angularflow/angular-adapter';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
+import { nodeTemplateMap } from './data/node-template';
+import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
 import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
-import { GroupNodeComponent } from './node-template/group-node/group-node.component';
-import { ImageNodeComponent } from './node-template/image-node/image-node.component';
-import { InputFieldNodeComponent } from './node-template/input-field-node/input-field-node.component';
-import { ResizableNodeComponent } from './node-template/resizable-node/resizable-node.component';
+import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [AngularAdapterDiagramComponent, ToolbarComponent],
+  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   model = signal(new SignalModelAdapter<AppMiddlewares>());
-  nodeTemplateMap: NodeTemplateMap = new Map<string, Type<NodeTemplate>>([
-    ['input-field', InputFieldNodeComponent],
-    ['image', ImageNodeComponent],
-    ['resizable', ResizableNodeComponent],
-    ['group', GroupNodeComponent],
-  ]);
+  nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
+  paletteModel: PaletteItem[] = paletteModel;
 
   constructor() {
+    this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
     this.model().setNodes([
       {
         id: '1',

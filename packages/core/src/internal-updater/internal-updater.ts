@@ -45,7 +45,9 @@ export class InternalUpdater {
    */
   addPort(nodeId: string, port: Port) {
     if (this.flowCore.initializationGuard.isInitialized) {
-      this.flowCore.commandHandler.emit('addPorts', { nodeId, ports: [port] });
+      this.flowCore.portBatchProcessor.process(nodeId, port, (nodeId, ports) => {
+        this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
+      });
     } else {
       this.flowCore.initializationGuard.addPort(nodeId, port);
     }

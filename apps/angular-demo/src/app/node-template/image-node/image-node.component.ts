@@ -11,4 +11,5 @@ import { AngularAdapterPortComponent, NodeTemplate, Node } from '@angularflow/an
 export class ImageNodeComponent implements NodeTemplate {
   data = input.required<Node>();
   imageUrl = computed(() => this.data().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
+  isPaletteNode = input<boolean>(false);
 }

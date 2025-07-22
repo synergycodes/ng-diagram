@@ -12,4 +12,5 @@ import { AngularAdapterPortComponent, NodeTemplate, Node } from '@angularflow/an
 export class InputFieldNodeComponent implements NodeTemplate {
   text = model<string>('');
   data = input.required<Node>();
+  isPaletteNode = input<boolean>(false);
 }

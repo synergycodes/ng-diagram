@@ -10,6 +10,7 @@ import {
 } from '@angularflow/core';
 
 import {
+  DropEventListenerDirective,
   KeyDownEventListenerDirective,
   KeyPressEventListenerDirective,
   KeyUpEventListenerDirective,
@@ -42,6 +43,7 @@ import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.componen
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
+    DropEventListenerDirective,
     PointerDownEventListenerDirective,
     PointerEnterEventListenerDirective,
     PointerLeaveEventListenerDirective,

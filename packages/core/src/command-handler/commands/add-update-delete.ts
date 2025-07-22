@@ -99,7 +99,14 @@ export const addPorts = async (commandHandler: CommandHandler, command: AddPorts
   if (!node) {
     return;
   }
-  const newPorts = [...(node.ports ?? []), ...ports];
+
+  // Even though we have a separate method to update ports, this method also updates existing ports with matching IDs
+  // instead of skipping them. This ensures the adapter stays synchronized with the core.
+  // The front-end is considered the source of truth in this context.
+  const newPortIds = new Set(ports.map((port) => port.id));
+  const existingPortsToKeep = (node.ports ?? []).filter((port) => !newPortIds.has(port.id));
+  const newPorts = [...existingPortsToKeep, ...ports];
+
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: newPorts }] }, 'updateNode');
 };
 
