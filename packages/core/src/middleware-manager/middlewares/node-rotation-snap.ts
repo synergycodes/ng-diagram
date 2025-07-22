@@ -1,4 +1,4 @@
-import { snapAngle } from '../../input-event-handler/input-actions/rotate/snap-angle';
+import { snapAngle } from '../../input-events/handlers/rotate/snap-angle';
 import type { FlowStateUpdate, Middleware } from '../../types';
 
 export interface NodeRotationSnapMiddlewareMetadata {

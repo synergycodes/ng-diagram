@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
-import { InputEventHandler } from './input-event-handler/input-event-handler';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockMetadata, mockNode } from './test-utils';
 import { MiddlewaresConfigFromMiddlewares } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
-import { EventMapper } from './types/event-mapper.interface';
 import type { Metadata } from './types/metadata.interface';
 import type { Middleware, MiddlewareChain } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
@@ -67,7 +65,6 @@ describe('FlowCore', () => {
   let flowCore: FlowCore<MiddlewareChain>;
   let mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   let mockRenderer: Renderer;
-  let mockEventMapper: EventMapper;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
@@ -94,11 +91,6 @@ describe('FlowCore', () => {
     mockRenderer = {
       draw: vi.fn(),
     };
-
-    mockEventMapper = {
-      register: vi.fn(),
-      emit: vi.fn(),
-    } as unknown as EventMapper;
 
     // Reset all mocks
     vi.clearAllMocks();
@@ -231,14 +223,6 @@ describe('FlowCore', () => {
       expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
       expect(mockModelAdapter.setNodes).not.toHaveBeenCalled();
       expect(mockModelAdapter.setEdges).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('registerEventsHandler', () => {
-    it('should register the event handler', () => {
-      flowCore.registerEventsHandler(vi.fn());
-
-      expect(mockEventMapper.register).toHaveBeenCalled();
     });
   });
 

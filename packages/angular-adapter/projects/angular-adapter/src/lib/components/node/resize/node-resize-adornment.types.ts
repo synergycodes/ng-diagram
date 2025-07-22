@@ -1,5 +1,5 @@
-import { ResizeHandlePosition } from '@angularflow/core';
+import { ResizeDirection } from '@angularflow/core';
 
-export type LinePosition = Extract<ResizeHandlePosition, 'top' | 'right' | 'bottom' | 'left'>;
+export type LinePosition = Extract<ResizeDirection, 'top' | 'right' | 'bottom' | 'left'>;
 
-export type HandlePosition = Extract<ResizeHandlePosition, 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>;
+export type HandlePosition = Extract<ResizeDirection, 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>;

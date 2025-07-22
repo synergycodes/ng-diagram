@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { ViewportDirective } from '../../directives';
-import { ObjectSelectDirective } from '../../directives/__new__input-events/object-select/object-select.directive';
+import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
 
 @Component({
   selector: 'angular-adapter-canvas',

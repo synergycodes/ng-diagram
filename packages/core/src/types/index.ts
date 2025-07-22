@@ -1,10 +1,3 @@
-// Event types
-export * from './__old__event/event-target.guards';
-export * from './__old__event/event-target.interface';
-export * from './__old__event/event.guards';
-export * from './__old__event/event.interface';
-export * from './event-mapper.interface';
-
 // Flow diagram types
 export * from './edge.interface';
 export * from './metadata.interface';
@@ -12,7 +5,6 @@ export * from './node.interface';
 
 // Command and system types
 export * from './command-handler.interface';
-export * from './input-event-handler.abstract';
 
 // Model and middleware types
 export * from './middleware-config.types';

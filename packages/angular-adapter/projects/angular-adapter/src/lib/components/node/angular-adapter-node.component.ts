@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Node } from '@angularflow/core';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
-import { ObjectSelectDirective } from '../../directives/__new__input-events/object-select/object-select.directive';
-import { PointerMoveSelectionDirective } from '../../directives/__new__input-events/pointer-move-selection/pointer-move-selection.directive';
+import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
+import { PointerMoveSelectionDirective } from '../../directives/input-events/pointer-move-selection/pointer-move-selection.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';

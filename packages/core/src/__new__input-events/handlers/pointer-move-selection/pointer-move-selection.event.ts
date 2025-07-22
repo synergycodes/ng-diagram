@@ -1,6 +1,0 @@
-import { BasePointerInputEvent, InputEventPhase } from '../../__new__input-events.interface';
-
-export interface __NEW__PointerMoveSelectionEvent extends BasePointerInputEvent {
-  name: 'pointerMoveSelection';
-  phase: InputEventPhase;
-}

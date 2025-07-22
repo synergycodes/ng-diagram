@@ -10,10 +10,9 @@ import {
   signal,
 } from '@angular/core';
 import { Node, Port } from '@angularflow/core';
-import { LinkingInputDirective } from '../../directives/__new__input-events/linking/linking.directive';
-import { EventMapperService, FlowCoreProviderService } from '../../services';
+import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
+import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
-import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
   selector: 'angular-adapter-port',
@@ -28,8 +27,6 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
 export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly eventMapperService = inject(EventMapperService);
-  private readonly nodeComponent = inject(AngularAdapterNodeComponent);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<Port['id']>();
