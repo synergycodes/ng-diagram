@@ -27,14 +27,7 @@ import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapt
   templateUrl: './custom-edge.component.html',
   styleUrl: './custom-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [
-    // { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
-    // { directive: ObjectSelectDirective, inputs: ['selectTargetData: data', 'selectTargetType'] },
-    // { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
-    // { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
-    // { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: ZIndexDirective, inputs: ['data'] },
-  ],
+  hostDirectives: [{ directive: ZIndexDirective, inputs: ['data'] }],
   imports: [AngularAdapterEdgeLabelComponent],
 })
 export class AngularAdapterCustomEdgeComponent {

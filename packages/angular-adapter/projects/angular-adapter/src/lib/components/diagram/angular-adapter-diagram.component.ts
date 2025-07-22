@@ -9,10 +9,10 @@ import {
   Node,
 } from '@angularflow/core';
 
-import { KeyboardInputsDirective } from '../../directives/__new__input-events/keyboard-inputs/keyboard-inputs.directive';
-import { __NEW__PanningDirective } from '../../directives/__new__input-events/panning/panning.directive';
-import { ZoomingPointerDirective } from '../../directives/__new__input-events/zooming/zooming-pointer.directive';
-import { ZoomingWheelDirective } from '../../directives/__new__input-events/zooming/zooming-wheel.directive';
+import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
+import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
+import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
+import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
@@ -34,22 +34,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [
-    ZoomingPointerDirective,
-    ZoomingWheelDirective,
-    __NEW__PanningDirective,
-    KeyboardInputsDirective,
-    //
-    // PointerDownEventListenerDirective,
-    // PointerEnterEventListenerDirective,
-    // PointerLeaveEventListenerDirective,
-    // PointerMoveEventListenerDirective,
-    // PointerUpEventListenerDirective,
-    // KeyDownEventListenerDirective,
-    // KeyUpEventListenerDirective,
-    // KeyPressEventListenerDirective,
-    // WheelEventListenerDirective,
-  ],
+  hostDirectives: [ZoomingPointerDirective, ZoomingWheelDirective, PanningDirective, KeyboardInputsDirective],
 })
 export class AngularAdapterDiagramComponent<
   TMiddlewares extends MiddlewareChain = [],

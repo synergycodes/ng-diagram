@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, HostBinding, inject, input } from '@angular/core';
 import { Node, RotateHandleConfiguration } from '@angularflow/core';
-import { RotateHandleDirective } from '../../../../directives/__new__input-events/rotate/rotate.directive';
+import { RotateHandleDirective } from '../../../../directives/input-events/rotate/rotate.directive';
 import { FlowCoreProviderService } from '../../../../services';
 import { ROTATE_HANDLER_RIGHT_OFFSET, ROTATE_HANDLER_TOP_OFFSET } from '../constants';
 
@@ -32,17 +32,9 @@ export class RotateHandleComponent {
     };
   });
 
-  // TODO: Handle rotating event
-
-  // pointerDownEvent = output<{ event: PointerEvent }>();
-
   @HostBinding('attr.data-rotating') get pointerDownAttr() {
     return this.isRotating() ? 'true' : null;
   }
-
-  // onPointerDown(event: PointerEvent) {
-  //   this.pointerDownEvent.emit({ event });
-  // }
 
   private formatPositionValue(value?: string | number | null): string | null {
     return value == null ? null : typeof value === 'number' ? `${value}px` : value;

@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
-import { InputEventHandler } from './input-event-handler/input-event-handler';
+import { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockMetadata, mockNode } from './test-utils';
 import { MiddlewaresConfigFromMiddlewares } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
-import { EventMapper } from './types/event-mapper.interface';
 import type { Metadata } from './types/metadata.interface';
 import type { Middleware, MiddlewareChain } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
@@ -67,10 +66,10 @@ describe('FlowCore', () => {
   let flowCore: FlowCore<MiddlewareChain>;
   let mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   let mockRenderer: Renderer;
-  let mockEventMapper: EventMapper;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+  let mockEventRouter: InputEventsRouter;
   const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {
@@ -95,23 +94,24 @@ describe('FlowCore', () => {
       draw: vi.fn(),
     };
 
-    mockEventMapper = {
-      register: vi.fn(),
+    mockEventRouter = {
       emit: vi.fn(),
-    } as unknown as EventMapper;
+      register: vi.fn(),
+      registerDefaultCallbacks: vi.fn(),
+    } as unknown as InputEventsRouter;
 
     // Reset all mocks
     vi.clearAllMocks();
 
     // Create FlowCore instance
-    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, mockEnvironment);
+    flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventRouter, mockEnvironment);
   });
 
   describe('constructor', () => {
     it('should initialize with provided dependencies', () => {
       expect(vi.mocked(MiddlewareManager)).toHaveBeenCalled();
       expect(vi.mocked(CommandHandler)).toHaveBeenCalledWith(flowCore);
-      expect(vi.mocked(InputEventHandler)).toHaveBeenCalledWith(flowCore);
+      // expect(vi.mocked(InputEventHandler)).toHaveBeenCalledWith(flowCore);
     });
 
     it('should store the environment information', () => {
@@ -231,14 +231,6 @@ describe('FlowCore', () => {
       expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
       expect(mockModelAdapter.setNodes).not.toHaveBeenCalled();
       expect(mockModelAdapter.setEdges).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('registerEventsHandler', () => {
-    it('should register the event handler', () => {
-      flowCore.registerEventsHandler(vi.fn());
-
-      expect(mockEventMapper.register).toHaveBeenCalled();
     });
   });
 

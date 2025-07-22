@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { ResizeDirective } from '../../../../directives/__new__input-events/resize/resize.directive';
+import { ResizeDirective } from '../../../../directives/input-events/resize/resize.directive';
 import { HandlePosition } from '../node-resize-adornment.types';
 
 @Component({
