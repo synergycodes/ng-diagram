@@ -121,7 +121,7 @@ describe('FlowCore', () => {
     it('should pass starting middlewares to MiddlewareManager', () => {
       const middleware: Middleware = { name: 'test', execute: vi.fn() };
 
-      flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventMapper, mockEnvironment, [middleware]);
+      flowCore = new FlowCore(mockModelAdapter, mockRenderer, mockEventRouter, mockEnvironment, [middleware]);
 
       expect(MiddlewareManager).toHaveBeenCalledWith(flowCore, [middleware]);
     });

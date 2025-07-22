@@ -3,17 +3,6 @@ import type { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares } from
 import { Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  KeyDownEventListenerDirective,
-  KeyPressEventListenerDirective,
-  KeyUpEventListenerDirective,
-  PointerDownEventListenerDirective,
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerMoveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  WheelEventListenerDirective,
-} from '../../directives';
 import { FlowCoreProviderService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
@@ -88,51 +77,6 @@ describe('AngularAdapterDiagramComponent', () => {
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledTimes(1);
-  });
-
-  it('should have PointerDownEventListenerDirective as host directive', () => {
-    const pointerDownEventListenerDirective = fixture.debugElement.injector.get(PointerDownEventListenerDirective);
-    expect(pointerDownEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have PointerEnterEventListenerDirective as host directive', () => {
-    const pointerEnterEventListenerDirective = fixture.debugElement.injector.get(PointerEnterEventListenerDirective);
-    expect(pointerEnterEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have PointerLeaveEventListenerDirective as host directive', () => {
-    const pointerLeaveEventListenerDirective = fixture.debugElement.injector.get(PointerLeaveEventListenerDirective);
-    expect(pointerLeaveEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have PointerMoveEventListenerDirective as host directive', () => {
-    const pointerMoveEventListenerDirective = fixture.debugElement.injector.get(PointerMoveEventListenerDirective);
-    expect(pointerMoveEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have PointerUpEventListenerDirective as host directive', () => {
-    const pointerUpEventListenerDirective = fixture.debugElement.injector.get(PointerUpEventListenerDirective);
-    expect(pointerUpEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have KeyDownEventListenerDirective as host directive', () => {
-    const keyDownEventListenerDirective = fixture.debugElement.injector.get(KeyDownEventListenerDirective);
-    expect(keyDownEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have KeyPressEventListenerDirective as host directive', () => {
-    const keyPressEventListenerDirective = fixture.debugElement.injector.get(KeyPressEventListenerDirective);
-    expect(keyPressEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have KeyUpEventListenerDirective as host directive', () => {
-    const keyUpEventListenerDirective = fixture.debugElement.injector.get(KeyUpEventListenerDirective);
-    expect(keyUpEventListenerDirective).toBeTruthy();
-  });
-
-  it('should have KeyUpEventListenerDirective as host directive', () => {
-    const wheelEventListenerDirective = fixture.debugElement.injector.get(WheelEventListenerDirective);
-    expect(wheelEventListenerDirective).toBeTruthy();
   });
 
   describe('getNodeTemplate', () => {
