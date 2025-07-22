@@ -2,6 +2,7 @@ import { Directive, ElementRef, inject } from '@angular/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
+import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
 @Directive({
   selector: '[angularAdapterPanning]',
@@ -76,6 +77,10 @@ export class __NEW__PanningDirective {
   };
 
   private isHandled(event: PointerInputEvent): boolean {
+    if (ZoomingPointerDirective.IsZoomingPointer) {
+      return false;
+    }
+
     return !!(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }

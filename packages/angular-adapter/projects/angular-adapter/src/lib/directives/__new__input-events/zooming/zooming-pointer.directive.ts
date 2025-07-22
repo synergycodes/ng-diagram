@@ -1,128 +1,114 @@
 import { Directive, inject } from '@angular/core';
-import { Point, ZOOMING_CONFIG } from '@angularflow/core';
+import { ZOOMING_CONFIG } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
-import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types/event';
 
 @Directive({
   selector: '[angularAdapterZoomingPointer]',
   host: {
-    // '(pointerdown)': 'onPointerDown($event)',
-    // '(pointerup)': 'onPointerUp($event)',
-    // '(pointermove)': 'onPointerMove($event)',
+    '(touchstart)': 'onTouchStart($event)',
+    '(touchend)': 'onTouchEnd($event)',
+    '(touchmove)': 'onTouchMove($event)',
   },
 })
 export class ZoomingPointerDirective {
+  static IsZoomingPointer = false;
+
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly inputEventsRouterService = inject(InputEventsRouterService);
 
-  private eventCache: PointerInputEvent[] = [];
-  private startPoint?: Point;
-  private startDistance?: number;
+  private touchCache: Touch[] = [];
+  private lastDistance?: number;
 
-  onPointerDown($event: PointerInputEvent) {
-    if (this.isHandled($event)) {
-      return;
+  onTouchStart(event: TouchEvent) {
+    ZoomingPointerDirective.IsZoomingPointer = true;
+
+    // Add new touches to cache
+    for (const touch of event.changedTouches) {
+      this.touchCache.push(touch);
     }
 
-    this.addEvent($event);
-    if (this.eventCache.length !== 2) {
-      return;
-    }
-
-    const flow = this.flowCoreProvider.provide();
-    const { x, y, scale } = flow.getState().metadata.viewport;
-
-    this.startPoint = {
-      x: ((this.eventCache[0].clientX + this.eventCache[1].clientX) / 2 - x) / scale,
-      y: ((this.eventCache[0].clientY + this.eventCache[1].clientY) / 2 - y) / scale,
-    };
-    this.startDistance = this.computeDistance();
-
-    this.eventCache.forEach((event) => {
-      event.zoomingHandled = true;
-    });
-  }
-
-  onPointerUp($event: PointerInputEvent) {
-    if (this.isHandled($event)) {
-      return;
-    }
-
-    this.removeEvent($event);
-    if (this.eventCache.length < 2) {
-      this.startPoint = undefined;
-      this.startDistance = undefined;
+    // Initialize distance when we have exactly 2 touches
+    if (this.touchCache.length === 2) {
+      this.lastDistance = this.computeDistance();
     }
   }
 
-  onPointerMove($event: PointerInputEvent) {
-    this.updateCache($event);
+  onTouchEnd(event: TouchEvent) {
+    ZoomingPointerDirective.IsZoomingPointer = false;
 
-    if (this.eventCache.length !== 2 || this.startDistance === undefined || this.startPoint === undefined) {
-      return;
+    // Remove ended touches from cache
+    for (const touch of event.changedTouches) {
+      this.removeTouchFromCache(touch);
     }
 
-    this.eventCache.forEach((event) => {
-      event.zoomingHandled = true;
-    });
+    // Reset when we don't have 2 touches anymore
+    if (this.touchCache.length < 2) {
+      this.lastDistance = undefined;
+    }
+  }
+
+  onTouchMove(event: TouchEvent) {
+    ZoomingPointerDirective.IsZoomingPointer = true;
+
+    // Update cache with moved touches
+    for (const touch of event.changedTouches) {
+      this.updateTouchInCache(touch);
+    }
+
+    // Only zoom with exactly 2 touches and valid last distance
+    if (this.touchCache.length !== 2 || this.lastDistance === undefined) {
+      return;
+    }
 
     const flow = this.flowCoreProvider.provide();
     let { x, y, scale } = flow.getState().metadata.viewport;
 
-    this.startPoint = {
-      x: (this.eventCache[0].clientX + this.eventCache[1].clientX) / 2,
-      y: (this.eventCache[0].clientY + this.eventCache[1].clientY) / 2,
-    };
+    // Calculate current center and distance
+    const centerX = (this.touchCache[0].clientX + this.touchCache[1].clientX) / 2;
+    const centerY = (this.touchCache[0].clientY + this.touchCache[1].clientY) / 2;
+    const currentDistance = this.computeDistance();
 
-    const beforeZoomX = (this.startPoint.x - x) / scale;
-    const beforeZoomY = (this.startPoint.y - y) / scale;
-    const deltaDistance = this.computeDistance() / this.startDistance;
-    const zoomFactor = Math.min(Math.max(1 - ZOOMING_CONFIG.STEP, deltaDistance), 1 + ZOOMING_CONFIG.STEP);
+    // Calculate zoom factor based on distance change
+    const distanceRatio = currentDistance / this.lastDistance;
+    const zoomFactor = Math.min(Math.max(1 - ZOOMING_CONFIG.STEP, distanceRatio), 1 + ZOOMING_CONFIG.STEP);
+
+    // Apply zoom with center point preservation
+    const beforeZoomX = (centerX - x) / scale;
+    const beforeZoomY = (centerY - y) / scale;
 
     scale *= zoomFactor;
     scale = Math.min(Math.max(ZOOMING_CONFIG.MIN, scale), ZOOMING_CONFIG.MAX);
 
-    const afterZoomX = (this.startPoint.x - x) / scale;
-    const afterZoomY = (this.startPoint.y - y) / scale;
+    const afterZoomX = (centerX - x) / scale;
+    const afterZoomY = (centerY - y) / scale;
 
     x += (afterZoomX - beforeZoomX) * scale;
     y += (afterZoomY - beforeZoomY) * scale;
 
-    const baseEvent = this.inputEventsRouterService.getBaseEvent($event);
-    this.inputEventsRouterService.emit({
-      ...baseEvent,
-      name: 'zoom',
-      updatedViewport: {
-        x,
-        y,
-      },
-      updateScale: scale,
-    });
+    // Update for next iteration
+    this.lastDistance = currentDistance;
+
+    // Apply zoom
+    flow.commandHandler.emit('zoom', { x, y, scale });
   }
 
-  private addEvent(event: PointerInputEvent) {
-    this.eventCache.push(event);
-  }
-
-  private removeEvent(event: PointerInputEvent) {
-    const index = this.eventCache.findIndex((cachedEvent) => cachedEvent.pointerId === event.pointerId);
-    this.eventCache.splice(index, 1);
+  private removeTouchFromCache(touch: Touch) {
+    const index = this.touchCache.findIndex((cachedTouch) => cachedTouch.identifier === touch.identifier);
+    if (index !== -1) {
+      this.touchCache.splice(index, 1);
+    }
   }
 
   private computeDistance(): number {
     return Math.hypot(
-      this.eventCache[0].clientX - this.eventCache[1].clientX,
-      this.eventCache[0].clientY - this.eventCache[1].clientY
+      this.touchCache[0].clientX - this.touchCache[1].clientX,
+      this.touchCache[0].clientY - this.touchCache[1].clientY
     );
   }
 
-  private updateCache(event: PointerEvent) {
-    const index = this.eventCache.findIndex((cachedEvent) => cachedEvent.pointerId === event.pointerId);
-    this.eventCache[index] = event;
-  }
-
-  private isHandled(event: PointerInputEvent): boolean {
-    return !!event.linkingHandled;
+  private updateTouchInCache(touch: Touch) {
+    const index = this.touchCache.findIndex((cachedTouch) => cachedTouch.identifier === touch.identifier);
+    if (index !== -1) {
+      this.touchCache[index] = touch;
+    }
   }
 }

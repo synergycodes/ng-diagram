@@ -35,10 +35,11 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    __NEW__PanningDirective,
     ZoomingPointerDirective,
-    KeyboardInputsDirective,
     ZoomingWheelDirective,
+    __NEW__PanningDirective,
+    KeyboardInputsDirective,
+    //
     // PointerDownEventListenerDirective,
     // PointerEnterEventListenerDirective,
     // PointerLeaveEventListenerDirective,
