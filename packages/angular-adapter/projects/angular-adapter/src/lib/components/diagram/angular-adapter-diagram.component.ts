@@ -53,6 +53,8 @@ export class AngularAdapterDiagramComponent<
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
+  private readonly host: ElementRef;
+
   /**
    * The model to use in the diagram.
    */
@@ -78,18 +80,27 @@ export class AngularAdapterDiagramComponent<
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
-  constructor() {
+  constructor(host: ElementRef) {
+    this.host = host;
+    this.getOffset = this.getOffset.bind(this);
+
     // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
     // To fix this behavior we need to destroy the effect after the first run
     const effectRef = effect(
       () => {
-        this.flowCoreProvider.init(this.model(), this.middlewares());
+        // Bind getOffset once in the constructor and reuse the reference
+        this.flowCoreProvider.init(this.model(), this.middlewares(), this.getOffset);
         // Initialize the resize batch processor after FlowCore is ready
         this.flowResizeBatchProcessor.initialize();
         effectRef.destroy();
       },
       { manualCleanup: true }
     );
+  }
+
+  getOffset() {
+    const clientRect = this.host.nativeElement?.getBoundingClientRect();
+    return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
   }
 
   getNodeTemplate(nodeType: Node['type']) {
