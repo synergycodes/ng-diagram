@@ -7,9 +7,9 @@ import { PointerInputEvent } from '../../../types/event';
 @Directive({
   selector: '[angularAdapterZoomingPointer]',
   host: {
-    '(pointerdown)': 'onPointerDown($event)',
-    '(pointerup)': 'onPointerUp($event)',
-    '(pointermove)': 'onPointerMove($event)',
+    // '(pointerdown)': 'onPointerDown($event)',
+    // '(pointerup)': 'onPointerUp($event)',
+    // '(pointermove)': 'onPointerMove($event)',
   },
 })
 export class ZoomingPointerDirective {

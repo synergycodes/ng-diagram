@@ -5,5 +5,6 @@ export * from './panning';
 export * from './paste';
 export * from './pointer-move-selection';
 export * from './resize';
+export * from './rotate';
 export * from './select';
 export * from './zooming';

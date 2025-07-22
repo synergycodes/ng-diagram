@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../../flow-core';
-import { mockEnvironment, mockNode, mockPointerEvent, mockPort } from '../../../test-utils';
-import type { KeyboardEvent } from '../../../types';
+import { FlowCore } from '../../flow-core';
+import { mockEnvironment, mockNode, mockPointerEvent, mockPort } from '../../test-utils';
+import type { KeyboardEvent } from '../../types';
 import { linkingAction } from '../linking';
 
 const keyboardEvent = {

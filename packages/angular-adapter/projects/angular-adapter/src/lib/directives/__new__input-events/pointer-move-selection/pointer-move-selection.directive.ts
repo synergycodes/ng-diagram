@@ -97,6 +97,6 @@ export class PointerMoveSelectionDirective {
   };
 
   private isHandled(event: PointerInputEvent): boolean {
-    return !!(event.zoomingHandled || event.linkingHandled);
+    return !!(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }

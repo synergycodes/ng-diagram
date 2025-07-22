@@ -13,7 +13,8 @@ export type InputEventName =
   | 'keyboardMoveSelection'
   | 'resize'
   | 'zoom'
-  | 'linking';
+  | 'linking'
+  | 'rotate';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

@@ -10,6 +10,7 @@ import { __NEW__PanningEventHandler } from './handlers/panning/panning.handler';
 import { __NEW__PasteEventHandler } from './handlers/paste/paste.handler';
 import { __NEW__PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
 import { __NEW__ResizeEventHandler } from './handlers/resize/resize.handler';
+import { RotateEventHandler } from './handlers/rotate/rotate.handler';
 import { __NEW__SelectEventHandler } from './handlers/select/select.handler';
 import { ZoomingEventHandler } from './handlers/zooming/zooming.handler';
 
@@ -42,5 +43,6 @@ export abstract class __NEW__InputEventsRouter {
     this.register('deleteSelection', new __NEW__DeleteSelectionEventHandler(flow));
     this.register('zoom', new ZoomingEventHandler(flow));
     this.register('linking', new LinkingEventHandler(flow));
+    this.register('rotate', new RotateEventHandler(flow));
   }
 }

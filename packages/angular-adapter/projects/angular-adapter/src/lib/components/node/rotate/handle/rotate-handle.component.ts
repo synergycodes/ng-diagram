@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, HostBinding, inject, input, output } from '@angular/core';
-import { RotateHandleConfiguration } from '@angularflow/core';
+import { ChangeDetectionStrategy, Component, computed, HostBinding, inject, input } from '@angular/core';
+import { Node, RotateHandleConfiguration } from '@angularflow/core';
+import { RotateHandleDirective } from '../../../../directives/__new__input-events/rotate/rotate.directive';
 import { FlowCoreProviderService } from '../../../../services';
 import { ROTATE_HANDLER_RIGHT_OFFSET, ROTATE_HANDLER_TOP_OFFSET } from '../constants';
 
@@ -11,14 +12,15 @@ import { ROTATE_HANDLER_RIGHT_OFFSET, ROTATE_HANDLER_TOP_OFFSET } from '../const
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'node-rotate-handle',
-    '(pointerdown)': 'onPointerDown($event)',
   },
+  hostDirectives: [{ directive: RotateHandleDirective, inputs: ['target: data'] }],
 })
 export class RotateHandleComponent {
-  isRotating = input.required<boolean>();
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   metadata = this.getMetadata();
+  data = input.required<Node>();
+  isRotating = input.required<boolean>();
 
   computedOffset = computed(() => {
     const current = this.metadata['rotateHandleOffset'] as RotateHandleConfiguration;
@@ -30,15 +32,17 @@ export class RotateHandleComponent {
     };
   });
 
-  pointerDownEvent = output<{ event: PointerEvent }>();
+  // TODO: Handle rotating event
+
+  // pointerDownEvent = output<{ event: PointerEvent }>();
 
   @HostBinding('attr.data-rotating') get pointerDownAttr() {
     return this.isRotating() ? 'true' : null;
   }
 
-  onPointerDown(event: PointerEvent) {
-    this.pointerDownEvent.emit({ event });
-  }
+  // onPointerDown(event: PointerEvent) {
+  //   this.pointerDownEvent.emit({ event });
+  // }
 
   private formatPositionValue(value?: string | number | null): string | null {
     return value == null ? null : typeof value === 'number' ? `${value}px` : value;

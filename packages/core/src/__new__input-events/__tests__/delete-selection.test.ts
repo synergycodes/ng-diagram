@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../../flow-core';
-import { mockEnvironment } from '../../../test-utils';
-import type { KeyboardEvent, PointerEvent } from '../../../types';
+import { FlowCore } from '../../flow-core';
+import { mockEnvironment } from '../../test-utils';
+import type { KeyboardEvent, PointerEvent } from '../../types';
 import { deleteSelectionAction } from '../delete-selection';
 
 describe('deleteSelectionAction', () => {

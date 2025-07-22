@@ -76,6 +76,6 @@ export class __NEW__PanningDirective {
   };
 
   private isHandled(event: PointerInputEvent): boolean {
-    return !!(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled);
+    return !!(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }

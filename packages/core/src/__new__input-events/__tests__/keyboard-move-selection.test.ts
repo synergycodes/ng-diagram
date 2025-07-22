@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../../flow-core';
-import { mockEnvironment, mockNode } from '../../../test-utils';
-import type { EventTarget, KeyboardEvent } from '../../../types';
+import { FlowCore } from '../../flow-core';
+import { mockEnvironment, mockNode } from '../../test-utils';
+import type { EventTarget, KeyboardEvent } from '../../types';
 import { keyboardMoveSelectionAction } from '../__migrated__keyboard-move-selection';
 
 describe('keyboardMoveSelectionAction', () => {
