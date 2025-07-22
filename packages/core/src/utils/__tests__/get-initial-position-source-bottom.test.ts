@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { getInitialPositionSourceBottom } from '../edges-orthogonal-routing/initial-positions/get-initial-position-source-bottom.ts';
-import { POINT_DISTANCE } from '../edges-orthogonal-routing/constants.ts';
+import { getInitialPositionSourceBottom } from '../edges-orthogonal-routing';
+import { POINT_DISTANCE } from '../edges-orthogonal-routing';
 import * as config from '../edges-orthogonal-routing/constants.ts';
 
 describe('getInitialPositionSourceBottom', () => {

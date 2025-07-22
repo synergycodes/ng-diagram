@@ -60,12 +60,12 @@ export interface DeselectCommand {
 
 export const deselect = async (commandHandler: CommandHandler, { nodeIds, edgeIds }: DeselectCommand) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  const nodesToLeftSelected = nodes
-    .filter(({ id, selected }) => !nodeIds?.includes(id) && !!selected)
-    .map(({ id }) => id);
-  const edgesToLeftSelected = edges
-    .filter(({ id, selected }) => !edgeIds?.includes(id) && !!selected)
-    .map(({ id }) => id);
+  const nodeIdSet = new Set<string>(nodeIds);
+  const edgeIdSet = new Set<string>(edgeIds);
+
+  const nodesToLeftSelected = nodes.filter(({ id, selected }) => !nodeIdSet.has(id) && !!selected).map(({ id }) => id);
+
+  const edgesToLeftSelected = edges.filter(({ id, selected }) => !edgeIdSet.has(id) && !!selected).map(({ id }) => id);
   const { nodesToUpdate, edgesToUpdate } = changeSelection(
     nodes,
     edges,

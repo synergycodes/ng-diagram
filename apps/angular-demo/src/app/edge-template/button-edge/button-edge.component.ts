@@ -3,7 +3,7 @@ import {
   AngularAdapterCustomEdgeComponent,
   AngularAdapterEdgeLabelComponent,
   Edge,
-  IEdgeTemplate,
+  EdgeTemplate,
 } from '@angularflow/angular-adapter';
 
 /**
@@ -21,7 +21,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AngularAdapterCustomEdgeComponent, AngularAdapterEdgeLabelComponent],
 })
-export class ButtonEdgeComponent implements IEdgeTemplate {
+export class ButtonEdgeComponent implements EdgeTemplate {
   data = input.required<Edge>();
 
   onButtonClick() {

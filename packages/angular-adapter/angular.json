@@ -30,7 +30,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["projects/angular-adapter/**/*.ts", "projects/angular-adapter/**/*.html"],
+            "lintFilePatterns": ["projects/angular-adapter/src/**/*.ts", "projects/angular-adapter/src/**/*.html"],
             "eslintConfig": "projects/angular-adapter/eslint.config.js"
           }
         }

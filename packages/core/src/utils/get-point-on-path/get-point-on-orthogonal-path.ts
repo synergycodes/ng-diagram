@@ -1,4 +1,6 @@
-export const getPointOnPath = (points: { x: number; y: number }[], percentage: number) => {
+import { GetPointOnPathImplementation } from './types';
+
+export const getPointOnOrthogonalPath: GetPointOnPathImplementation = ({ points, percentage }) => {
   if (points.length < 2) return { x: 0, y: 0 };
 
   const finalPercentage = Math.min(Math.max(percentage, 0), 1);

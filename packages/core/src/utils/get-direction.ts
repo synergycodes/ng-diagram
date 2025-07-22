@@ -1,4 +1,4 @@
-import { LayoutAngleType } from '../types/tree-layout.interface.ts';
+import { LayoutAngleType } from '../types';
 
 export const isAngleVertical = (angle: LayoutAngleType) => angle === 90 || angle == 270;
 

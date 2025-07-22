@@ -1,6 +1,5 @@
-import type { CommandHandler } from '../../types';
-import type { Node } from '../../types/node.interface';
-import { isSamePoint } from '../../utils/rects-points-sizes';
+import type { CommandHandler, Node } from '../../types';
+import { isSamePoint } from '../../utils';
 
 export interface MoveNodesByCommand {
   name: 'moveNodesBy';

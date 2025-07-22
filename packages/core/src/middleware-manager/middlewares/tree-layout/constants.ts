@@ -1,5 +1,5 @@
 // Default
-import { TreeLayoutConfig } from '../../../types/tree-layout.interface.ts';
+import { TreeLayoutConfig } from '../../../types';
 
 export const TREE_LAYOUT_DEFAULT_CONFIG: TreeLayoutConfig = {
   siblingGap: 20,

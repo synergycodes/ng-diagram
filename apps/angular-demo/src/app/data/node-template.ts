@@ -1,5 +1,5 @@
 import { Type } from '@angular/core';
-import { INodeTemplate, NodeTemplateMap } from '@angularflow/angular-adapter';
+import { NodeTemplate, NodeTemplateMap } from '@angularflow/angular-adapter';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from '../node-template/input-field-node/input-field-node.component';
@@ -12,7 +12,7 @@ export enum NodeTemplateType {
   Group = 'group',
 }
 
-export const nodeTemplateMap: NodeTemplateMap = new Map<NodeTemplateType, Type<INodeTemplate>>([
+export const nodeTemplateMap: NodeTemplateMap = new Map<NodeTemplateType, Type<NodeTemplate>>([
   [NodeTemplateType.InputField, InputFieldNodeComponent],
   [NodeTemplateType.Image, ImageNodeComponent],
   [NodeTemplateType.Resizable, ResizableNodeComponent],

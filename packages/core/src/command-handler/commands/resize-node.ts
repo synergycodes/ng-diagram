@@ -1,6 +1,5 @@
 import type { Bounds, CommandHandler, Node, Rect } from '../../types';
-import { getRectFromBounds } from '../../utils';
-import { calculateGroupBounds } from '../../utils/group-size';
+import { getRectFromBounds, calculateGroupBounds } from '../../utils';
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';

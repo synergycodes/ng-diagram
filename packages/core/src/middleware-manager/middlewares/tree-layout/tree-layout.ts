@@ -7,9 +7,8 @@ import {
   remapEdges,
 } from './utils/build-tree-structure.ts';
 import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
-import { isAngleHorizontal } from '../../../utils/get-direction.ts';
 import { TREE_LAYOUT_DEFAULT_CONFIG } from './constants.ts';
-import { isSamePoint } from '../../../utils';
+import { isAngleHorizontal, isSamePoint } from '../../../utils';
 
 const checkIfShouldAutoTreeLayout = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||

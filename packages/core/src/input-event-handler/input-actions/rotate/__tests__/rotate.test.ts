@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../../flow-core';
-import { getSamplePointerEvent, getSampleRotateEvent, mockNode } from '../../../test-utils';
-import type { RotateEvent, RotateHandleTarget } from '../../../types';
-import { getDistanceBetweenPoints } from '../../../utils/get-distance-between-points';
-import { getRotationAngle } from './get-rotation-angle';
-import { rotateAction } from './rotate';
+import { FlowCore } from '../../../../flow-core';
+import { getSamplePointerEvent, getSampleRotateEvent, mockNode } from '../../../../test-utils';
+import type { RotateEvent, RotateHandleTarget } from '../../../../types';
+import { getDistanceBetweenPoints } from '../../../../utils';
+import { getRotationAngle } from '../get-rotation-angle';
+import { rotateAction } from '../rotate';
 
-vi.mock('./get-rotation-angle');
-vi.mock('../../../utils/get-distance-between-points');
+vi.mock('../get-rotation-angle');
+vi.mock('../../../../utils/get-distance-between-points');
 
 describe('rotateAction', () => {
   let flowCore: FlowCore;

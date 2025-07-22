@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
+  EdgeTemplate,
   EdgeTemplateMap,
-  IEdgeTemplate,
   Middleware,
   NodeTemplateMap,
   PaletteItem,
@@ -26,7 +26,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 export class AppComponent {
   model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
-  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<IEdgeTemplate>>([
+  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
