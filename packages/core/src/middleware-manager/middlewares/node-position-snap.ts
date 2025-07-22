@@ -42,15 +42,15 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
         const snappedX = snapNumber(node.position.x, snapConfig.x ?? 10);
         const snappedY = snapNumber(node.position.y, snapConfig.y ?? 10);
 
-        const prevWidth = originalNode.size?.width ?? 0,
-          prevHeight = originalNode.size?.height ?? 0;
-        const nodeWidth = node.size?.width ?? prevWidth,
-          nodeHeight = node.size?.height ?? prevHeight;
+        const prevWidth = originalNode.size?.width ?? 0;
+        const prevHeight = originalNode.size?.height ?? 0;
+        const nodeWidth = node.size?.width ?? prevWidth;
+        const nodeHeight = node.size?.height ?? prevHeight;
         const movedX = originalNode.position.x !== node.position.x;
         const movedY = originalNode.position.y !== node.position.y;
 
-        let width = nodeWidth,
-          height = nodeHeight;
+        let width = nodeWidth;
+        let height = nodeHeight;
 
         if (prevWidth !== nodeWidth) {
           if (movedX) {
