@@ -1,3 +1,16 @@
+:host {
+  &::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+  }
+}
+
 .resize-handle {
   position: absolute;
   width: 6px;
