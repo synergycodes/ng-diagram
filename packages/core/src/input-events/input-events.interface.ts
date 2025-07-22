@@ -4,6 +4,7 @@ import { Point } from '../types/utils';
 
 export type InputEventName =
   | 'copy'
+  | 'cut'
   | 'paste'
   | 'select'
   | 'deleteSelection'
@@ -14,7 +15,8 @@ export type InputEventName =
   | 'resize'
   | 'zoom'
   | 'linking'
-  | 'rotate';
+  | 'rotate'
+  | 'paletteDrop';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

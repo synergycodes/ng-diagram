@@ -11,17 +11,20 @@
   />
   {{ text() }}
 </div>
-<angular-adapter-port
-  id="port-left"
-  type="target"
-  style="top: 50%; left: 0; transform: translate(-50%, -50%)"
-  side="left"
-  [nodeData]="data()"
-/>
-<angular-adapter-port
-  id="port-right"
-  type="source"
-  style="top: 50%; left: 100%; transform: translate(-50%, -50%)"
-  side="right"
-  [nodeData]="data()"
-/>
+
+@if (!isPaletteNode()) {
+  <angular-adapter-port
+    id="port-left"
+    type="target"
+    style="top: 50%; left: 0; transform: translate(-50%, -50%)"
+    side="left"
+    [nodeData]="data()"
+  />
+  <angular-adapter-port
+    id="port-right"
+    type="source"
+    style="top: 50%; left: 100%; transform: translate(-50%, -50%)"
+    side="right"
+    [nodeData]="data()"
+  />
+}

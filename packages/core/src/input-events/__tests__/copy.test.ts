@@ -1,8 +1,8 @@
 // import { beforeEach, describe, expect, it, vi } from 'vitest';
-// import { FlowCore } from '../../flow-core';
-// import { mockEnvironment } from '../../test-utils';
-// import type { KeyboardEvent } from '../../types';
-// import { copyAction } from '../__migrated__copy';
+// import { FlowCore } from '../../../flow-core';
+// import { mockEnvironment } from '../../../test-utils';
+// import type { KeyboardEvent } from '../../../types';
+// import { copyAction } from '../copy';
 
 // describe('Copy Action', () => {
 //   const mockCommandHandler = { emit: vi.fn() };

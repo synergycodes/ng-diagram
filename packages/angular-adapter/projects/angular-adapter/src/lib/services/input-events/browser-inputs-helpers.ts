@@ -1,7 +1,7 @@
 import { InputModifiers } from '@angularflow/core';
 import { getOS } from '../flow-core-provider/detect-environment';
 
-type DomEvent = KeyboardEvent | WheelEvent | PointerEvent;
+type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent;
 
 // General type guards
 const isPointerEvent = (event: Event): event is PointerEvent => event instanceof PointerEvent;

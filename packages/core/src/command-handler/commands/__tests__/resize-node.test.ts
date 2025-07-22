@@ -43,11 +43,16 @@ describe('Resize Node Command', () => {
         size: { width: 0, height: 0 },
       });
 
-      resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } });
+      resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 100, height: 100 },
+        position: { x: 0, y: 0 },
+      });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 } }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, position: { x: 0, y: 0 } }],
         },
         'resizeNode'
       );
@@ -77,6 +82,7 @@ describe('Resize Node Command', () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
         size: { width: 0, height: 0 },
+        position: { x: 0, y: 0 },
         autoSize: true,
       });
 
@@ -84,12 +90,13 @@ describe('Resize Node Command', () => {
         name: 'resizeNode',
         id: '1',
         size: { width: 100, height: 100 },
+        position: { x: 0, y: 0 },
         disableAutoSize: true,
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, autoSize: false }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, autoSize: false, position: { x: 0, y: 0 } }],
         },
         'resizeNode'
       );
@@ -99,6 +106,7 @@ describe('Resize Node Command', () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
         size: { width: 0, height: 0 },
+        position: { x: 0, y: 0 },
         autoSize: true,
       });
 
@@ -106,12 +114,13 @@ describe('Resize Node Command', () => {
         name: 'resizeNode',
         id: '1',
         size: { width: 100, height: 100 },
+        position: { x: 0, y: 0 },
         disableAutoSize: false,
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, autoSize: true }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, position: { x: 0, y: 0 }, autoSize: true }],
         },
         'resizeNode'
       );
@@ -122,17 +131,19 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 0, height: 0 },
         autoSize: true,
+        position: { x: 0, y: 0 },
       });
 
       resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
         size: { width: 100, height: 100 },
+        position: { x: 0, y: 0 },
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 } }],
+          nodesToUpdate: [{ id: '1', size: { width: 100, height: 100 }, position: { x: 0, y: 0 } }],
         },
         'resizeNode'
       );

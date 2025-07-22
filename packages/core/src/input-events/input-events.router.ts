@@ -1,10 +1,12 @@
 import { FlowCore } from '../flow-core';
 import { CopyEventHandler } from './handlers/copy/copy.handler';
+import { CutEventHandler } from './handlers/cut/cut.handler';
 import { DeleteSelectionEventHandler } from './handlers/delete-selection/delete-selection.handler';
 import { EventHandler } from './handlers/event-hander';
 import { KeyboardMoveSelectionEventHandler } from './handlers/keyboard-move-selection/keyboard-move-selection.handler';
 import { KeyboardPanningEventHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
 import { LinkingEventHandler } from './handlers/linking/linking.handler';
+import { PaletteDropEventHandler } from './handlers/palette-drop/palette-drop.handler';
 import { PanningEventHandler } from './handlers/panning/panning.handler';
 import { PasteEventHandler } from './handlers/paste/paste.handler';
 import { PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
@@ -44,5 +46,7 @@ export abstract class InputEventsRouter {
     this.register('zoom', new ZoomingEventHandler(flow));
     this.register('linking', new LinkingEventHandler(flow));
     this.register('rotate', new RotateEventHandler(flow));
+    this.register('paletteDrop', new PaletteDropEventHandler(flow));
+    this.register('cut', new CutEventHandler(flow));
   }
 }

@@ -10,6 +10,7 @@ import {
 } from '@angularflow/core';
 
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
+import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
@@ -34,7 +35,13 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [ZoomingPointerDirective, ZoomingWheelDirective, PanningDirective, KeyboardInputsDirective],
+  hostDirectives: [
+    ZoomingPointerDirective,
+    ZoomingWheelDirective,
+    PanningDirective,
+    KeyboardInputsDirective,
+    PaletteDropDirective,
+  ],
 })
 export class AngularAdapterDiagramComponent<
   TMiddlewares extends MiddlewareChain = [],

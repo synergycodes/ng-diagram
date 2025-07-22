@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { INodeTemplate, Node } from '@angularflow/angular-adapter';
+import { NodeTemplate, Node } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-group-node',
@@ -8,8 +8,9 @@ import { INodeTemplate, Node } from '@angularflow/angular-adapter';
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupNodeComponent implements INodeTemplate {
+export class GroupNodeComponent implements NodeTemplate {
   data = input.required<Node>();
   groupTitle = computed(() => this.data().data?.['title'] ?? 'Group');
   highlighted = computed(() => this.data().highlighted ?? false);
+  isPaletteNode = input<boolean>(false);
 }

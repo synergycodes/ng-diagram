@@ -1,5 +1,5 @@
-import { getOffsetPoint } from '../get-offset-point.ts';
 import { Point, PortSide } from '../../../types';
+import { getOffsetPoint } from '../get-offset-point.ts';
 
 export const getInitialPositionSourceTop = (
   targetPortSide: PortSide,

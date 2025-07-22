@@ -53,8 +53,8 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           break;
         }
 
-        const deltaX = x - this.startX;
-        const deltaY = y - this.startY;
+        const deltaX = Math.round(x - this.startX);
+        const deltaY = Math.round(y - this.startY);
         let newWidth = this.startWidth;
         let newHeight = this.startHeight;
         let newX = this.startNodePositionX;

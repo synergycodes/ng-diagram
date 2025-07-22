@@ -1,5 +1,4 @@
-import type { CommandHandler } from '../../types';
-import type { Edge } from '../../types/edge.interface';
+import type { CommandHandler, Edge } from '../../types';
 
 export interface DeleteSelectionCommand {
   name: 'deleteSelection';
@@ -11,8 +10,9 @@ interface GetEdgesToRemoveParams {
 }
 
 const getEdgesToRemove = ({ edges, nodesToDeleteIds }: GetEdgesToRemoveParams): string[] => {
+  const nodeIdsSet = new Set<string>(nodesToDeleteIds);
   return edges
-    .filter((edge) => edge.selected || nodesToDeleteIds.includes(edge.source) || nodesToDeleteIds.includes(edge.target))
+    .filter((edge) => edge.selected || nodeIdsSet.has(edge.source) || nodeIdsSet.has(edge.target))
     .map((edge) => edge.id);
 };
 

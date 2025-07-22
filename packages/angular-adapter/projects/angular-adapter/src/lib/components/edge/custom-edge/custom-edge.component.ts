@@ -2,9 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
 import { ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
-import { getBezierPath } from '../../../utils/get-paths/get-bezier-paths';
-import { getOrthogonalPath } from '../../../utils/get-paths/get-orthogonal-paths';
-import { getStraightPath } from '../../../utils/get-paths/get-straight-paths';
+import { getPath } from '../../../utils/get-path/get-path';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 
 /**
@@ -45,14 +43,10 @@ export class AngularAdapterCustomEdgeComponent {
 
   path = computed(() => {
     const routing = this.routing();
+    const points = this.points() ?? [];
     if (!routing) return this.pathAndPoints()?.path ?? '';
 
-    const points = this.points() || [];
-    return routing === 'orthogonal'
-      ? getOrthogonalPath(points)
-      : routing === 'bezier'
-        ? getBezierPath(points)
-        : getStraightPath(points);
+    return getPath(routing, points);
   });
 
   stroke = computed(() => {

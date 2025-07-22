@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { AngularAdapterPortComponent, INodeTemplate, Node } from '@angularflow/angular-adapter';
+import { AngularAdapterPortComponent, NodeTemplate, Node } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-image-node',
@@ -8,7 +8,8 @@ import { AngularAdapterPortComponent, INodeTemplate, Node } from '@angularflow/a
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AngularAdapterPortComponent],
 })
-export class ImageNodeComponent implements INodeTemplate {
+export class ImageNodeComponent implements NodeTemplate {
   data = input.required<Node>();
   imageUrl = computed(() => this.data().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
+  isPaletteNode = input<boolean>(false);
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AngularAdapterPortComponent, INodeTemplate, Node } from '@angularflow/angular-adapter';
+import { AngularAdapterPortComponent, NodeTemplate, Node } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-input-field-node',
@@ -9,7 +9,8 @@ import { AngularAdapterPortComponent, INodeTemplate, Node } from '@angularflow/a
   styleUrls: ['./input-field-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputFieldNodeComponent implements INodeTemplate {
+export class InputFieldNodeComponent implements NodeTemplate {
   text = model<string>('');
   data = input.required<Node>();
+  isPaletteNode = input<boolean>(false);
 }

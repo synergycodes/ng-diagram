@@ -7,7 +7,6 @@ export * from './node.interface';
 export * from './command-handler.interface';
 
 // Model and middleware types
-export * from './middleware-config.types';
 export * from './middleware.interface';
 export * from './model-adapter.interface';
 
@@ -19,3 +18,9 @@ export * from './environment.interface';
 
 // Utils types
 export * from './utils';
+
+// TreeLayout types
+export * from './tree-layout.interface';
+
+// Node data types
+export * from './node-data.interface';

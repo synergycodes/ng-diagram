@@ -1,6 +1,7 @@
 import { Directive, inject } from '@angular/core';
 
 import { CopyAction } from './keyboard-actions/copy.action';
+import { CutAction } from './keyboard-actions/cut.action';
 import { DeleteSelectionAction } from './keyboard-actions/delete-selection.action';
 import { MoveSelectionAction } from './keyboard-actions/move-selection.action';
 import { PanWithArrowsAction } from './keyboard-actions/pan-with-arrows.action';
@@ -17,6 +18,7 @@ export class KeyboardInputsDirective {
     inject(PanWithArrowsAction),
     inject(MoveSelectionAction),
     inject(CopyAction),
+    inject(CutAction),
     inject(PasteAction),
     inject(DeleteSelectionAction),
   ];

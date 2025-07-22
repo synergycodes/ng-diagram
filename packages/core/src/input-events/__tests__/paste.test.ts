@@ -1,8 +1,8 @@
 // import { beforeEach, describe, expect, it, vi } from 'vitest';
-// import { FlowCore } from '../../flow-core';
-// import { mockEnvironment } from '../../test-utils';
-// import type { KeyboardEvent } from '../../types';
-// import { pasteAction } from '../__migrated__paste';
+// import { FlowCore } from '../../../flow-core';
+// import { mockEnvironment } from '../../../test-utils';
+// import type { KeyboardEvent } from '../../../types';
+// import { pasteAction } from '../paste';
 
 // describe('Paste Action', () => {
 //   const mockCommandHandler = { emit: vi.fn() };
@@ -65,6 +65,7 @@
 //     });
 
 //     it('should return true when meta + v is pressed on MacOS', () => {
+//       mockEnvironment.os = 'MacOS';
 //       mockEvent.metaKey = true;
 
 //       expect(pasteAction.predicate(mockEvent, mockFlowCore)).toBe(true);

@@ -1,12 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  AngularAdapterPortComponent,
-  FlowCoreProviderService,
-  INodeTemplate,
-  Node,
-} from '@angularflow/angular-adapter';
+import { AngularAdapterPortComponent, FlowCoreProviderService, NodeTemplate, Node } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-resizable-node',
@@ -15,13 +10,14 @@ import {
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResizableNodeComponent implements INodeTemplate {
+export class ResizableNodeComponent implements NodeTemplate {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   text = model<string>('');
   sizeText = model<string>('');
   data = input.required<Node>();
   autoSize = computed(() => this.data().autoSize ?? true);
+  isPaletteNode = input<boolean>(false);
 
   setSize() {
     const [textWidth, textHeight] = this.sizeText().split(' ');
@@ -36,6 +32,7 @@ export class ResizableNodeComponent implements INodeTemplate {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
+      position: this.data().position,
     });
   }
 

@@ -1,5 +1,5 @@
 import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
-import { getPointOnPath } from '../../utils';
+import { getPointOnPath } from '../../utils/get-point-on-path/get-point-on-path';
 
 export interface AddNodesCommand {
   name: 'addNodes';
@@ -99,7 +99,14 @@ export const addPorts = async (commandHandler: CommandHandler, command: AddPorts
   if (!node) {
     return;
   }
-  const newPorts = [...(node.ports ?? []), ...ports];
+
+  // Even though we have a separate method to update ports, this method also updates existing ports with matching IDs
+  // instead of skipping them. This ensures the adapter stays synchronized with the core.
+  // The front-end is considered the source of truth in this context.
+  const newPortIds = new Set(ports.map((port) => port.id));
+  const existingPortsToKeep = (node.ports ?? []).filter((port) => !newPortIds.has(port.id));
+  const newPorts = [...existingPortsToKeep, ...ports];
+
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: newPorts }] }, 'updateNode');
 };
 
@@ -162,7 +169,10 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
   const points = edge.points || [];
   const newLabels = [
     ...(edge.labels ?? []),
-    ...labels.map((label) => ({ ...label, position: getPointOnPath(points, label.positionOnEdge) })),
+    ...labels.map((label) => ({
+      ...label,
+      position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
+    })),
   ];
   await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
 };
@@ -183,7 +193,7 @@ export const updateEdgeLabel = async (commandHandler: CommandHandler, command: U
   const points = edge.points || [];
   const newLabels = edge.labels?.map((label) => {
     const positionOnEdge = labelChanges?.positionOnEdge ?? label.positionOnEdge;
-    const position = getPointOnPath(points, positionOnEdge);
+    const position = getPointOnPath({ points, percentage: positionOnEdge, routing: edge.routing });
     if (label.id !== labelId) {
       return { ...label, position };
     }

@@ -1,3 +1,4 @@
+import { TransactionContext } from '../../../transaction-manager/transaction.types';
 import { Node } from '../../../types/node.interface';
 import { Point } from '../../../types/utils';
 import { EventHandler } from '../event-hander';
@@ -38,17 +39,14 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
         const dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
 
-        this.flow.commandHandler.emit('moveNodesBy', {
-          delta: { x: dx, y: dy },
-          nodes: selectedNodes,
-        });
+        this.flow.transaction('moveNodes', async (tx) => {
+          await tx.emit('moveNodesBy', {
+            delta: { x: dx, y: dy },
+            nodes: selectedNodes,
+          });
 
-        this.flow.commandHandler.emit('moveNodesBy', {
-          delta: { x: dx, y: dy },
-          nodes: selectedNodes,
+          this.updateGroupHighlightOnDrag(tx, event.lastInputPoint, selectedNodes);
         });
-
-        this.updateGroupHighlightOnDrag(event.lastInputPoint, selectedNodes);
 
         this.lastInputPoint = event.lastInputPoint;
         break;
@@ -64,14 +62,14 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     }
   }
 
-  private updateGroupHighlightOnDrag(point: Point, selectedNodes: Node[]): void {
+  private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
     if (topLevelGroupNode) {
       if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
-        this.flow.commandHandler.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+        tx.emit('highlightGroup', { groupId: topLevelGroupNode.id });
       }
     } else {
-      this.flow.commandHandler.emit('highlightGroupClear');
+      tx.emit('highlightGroupClear');
     }
   }
 

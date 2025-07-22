@@ -1,7 +1,6 @@
-import { LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../../../types/tree-layout.interface.ts';
-import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils/get-direction.ts';
 import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
-import { Bounds } from '../../../../types';
+import { Bounds, LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../../../types';
+import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils';
 
 /**
  * Calculates the bounding box for all children nodes in a tree layout,

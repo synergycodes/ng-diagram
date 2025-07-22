@@ -1,5 +1,5 @@
 import type { Middleware, Node } from '../../types';
-import { calculateGroupRect } from '../../utils/group-size';
+import { calculateGroupRect } from '../../utils';
 
 export interface GroupChildrenChangeExtentMiddlewareMetadata {
   enabled: boolean;

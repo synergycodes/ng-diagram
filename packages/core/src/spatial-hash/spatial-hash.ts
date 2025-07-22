@@ -1,5 +1,4 @@
-import { Node } from '../types';
-import { Rect, RectWithId } from '../types/utils';
+import { Node, Rect, RectWithId } from '../types';
 import { doesRectsIntersect, getRect, isSameRect } from '../utils';
 
 export class SpatialHash {
