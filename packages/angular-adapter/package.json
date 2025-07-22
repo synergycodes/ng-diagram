@@ -2,8 +2,13 @@
   "name": "@angularflow/angular-adapter",
   "version": "0.0.0",
   "type": "module",
-  "main": "./dist/angular-adapter/fesm2022/angularflow-angular-adapter.mjs",
-  "types": "./dist/angular-adapter/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/angular-adapter/fesm2022/angularflow-angular-adapter.mjs",
+      "types": "./dist/angular-adapter/index.d.ts"
+    },
+    "./tokens.css": "./dist/angular-adapter/tokens.css"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
