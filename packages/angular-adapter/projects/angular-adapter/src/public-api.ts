@@ -6,6 +6,8 @@ export type { DropEvent, Edge, FlowCore, Metadata, Middleware, Node, Point } fro
 export * from './lib/components/diagram/angular-adapter-diagram.component';
 export * from './lib/components/edge-label/angular-adapter-edge-label.component';
 export * from './lib/components/edge/custom-edge/custom-edge.component';
+export * from './lib/components/node/resize/node-resize-adornment.component';
+export * from './lib/components/node/rotate/node-rotate-adornment.component';
 export * from './lib/components/palette/ng-diagram-palette-item-preview/ng-diagram-palette-item-preview.component';
 export * from './lib/components/palette/ng-diagram-palette-item/ng-diagram-palette-item.component';
 export * from './lib/components/port/angular-adapter-port.component';

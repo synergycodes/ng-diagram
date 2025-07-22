@@ -1,13 +1,21 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AngularAdapterPortComponent, NodeTemplate, Node } from '@angularflow/angular-adapter';
+import {
+  AngularAdapterPortComponent,
+  Node,
+  NodeResizeAdornmentComponent,
+  NodeRotateAdornmentComponent,
+  NodeSelectedDirective,
+  NodeTemplate,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-input-field-node',
-  imports: [FormsModule, AngularAdapterPortComponent],
+  imports: [FormsModule, AngularAdapterPortComponent, NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
   templateUrl: './input-field-node.component.html',
   styleUrls: ['./input-field-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
 })
 export class InputFieldNodeComponent implements NodeTemplate {
   text = model<string>('');

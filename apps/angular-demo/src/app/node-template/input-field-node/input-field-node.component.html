@@ -1,27 +1,20 @@
-<div class="input-field-node">
-  <!-- we need to stop the event from propagating and reaching the document,
+<angular-adapter-node-rotate-adornment [data]="data()" />
+<angular-adapter-node-resize-adornment [data]="data()">
+  <div class="input-field-node">
+    <!-- we need to stop the event from propagating and reaching the document,
     otherwise event will be captured and send to Input Event Handler -->
-  <input
-    type="text"
-    placeholder="Enter value..."
-    [(ngModel)]="text"
-    (keydown)="$event.stopPropagation()"
-    (keypress)="$event.stopPropagation()"
-    (keyup)="$event.stopPropagation()"
-  />
-  {{ text() }}
-</div>
-@if (!isPaletteNode()) {
-  <angular-adapter-port
-    id="port-left"
-    type="target"
-    style="top: 50%; left: 0; transform: translate(-50%, -50%)"
-    side="left"
-  ></angular-adapter-port>
-  <angular-adapter-port
-    id="port-right"
-    type="source"
-    style="top: 50%; left: 100%; transform: translate(-50%, -50%)"
-    side="right"
-  ></angular-adapter-port>
-}
+    <input
+      type="text"
+      placeholder="Enter value..."
+      [(ngModel)]="text"
+      (keydown)="$event.stopPropagation()"
+      (keypress)="$event.stopPropagation()"
+      (keyup)="$event.stopPropagation()"
+    />
+    {{ text() }}
+  </div>
+  @if (!isPaletteNode()) {
+    <angular-adapter-port id="port-left" type="target" side="left"></angular-adapter-port>
+    <angular-adapter-port id="port-right" type="source" side="right"></angular-adapter-port>
+  }
+</angular-adapter-node-resize-adornment>

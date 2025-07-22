@@ -12,4 +12,28 @@
   &:hover {
     background-color: rgb(63, 63, 63);
   }
+
+  &.left {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  &.right {
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.top {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.bottom {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }

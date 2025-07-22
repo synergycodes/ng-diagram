@@ -2,6 +2,8 @@
   "name": "@angularflow/angular-adapter",
   "version": "0.0.1",
   "type": "module",
+  "main": "./fesm2022/angularflow-angular-adapter.mjs",
+  "types": "./index.d.ts",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0",
@@ -14,5 +16,10 @@
   "devDependencies": {
     "vite": "^6.3.2",
     "vitest": "^3.1.2"
+  },
+  "exports": {
+    "./tokens.css": {
+      "default": "./tokens.css"
+    }
   }
 }

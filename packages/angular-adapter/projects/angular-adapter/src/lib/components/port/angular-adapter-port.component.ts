@@ -11,7 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { Port, PortTarget } from '@angularflow/core';
-import { EventMapperService, FlowCoreProviderService, BatchResizeObserverService } from '../../services';
+import { BatchResizeObserverService, EventMapperService, FlowCoreProviderService } from '../../services';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
 
 @Component({
@@ -23,6 +23,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     '(pointerdown)': 'onPointerDown($event)',
     '(pointerup)': 'onPointerUp($event)',
     '[attr.data-port-id]': 'id()',
+    '[class]': 'side()',
   },
 })
 export class AngularAdapterPortComponent implements OnInit, OnDestroy {

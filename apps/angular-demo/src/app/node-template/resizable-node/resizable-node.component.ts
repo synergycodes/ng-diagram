@@ -1,7 +1,13 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AngularAdapterPortComponent, FlowCoreProviderService, NodeTemplate, Node } from '@angularflow/angular-adapter';
+import {
+  AngularAdapterPortComponent,
+  FlowCoreProviderService,
+  Node,
+  NodeSelectedDirective,
+  NodeTemplate,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-resizable-node',
@@ -9,6 +15,7 @@ import { AngularAdapterPortComponent, FlowCoreProviderService, NodeTemplate, Nod
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
 })
 export class ResizableNodeComponent implements NodeTemplate {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
