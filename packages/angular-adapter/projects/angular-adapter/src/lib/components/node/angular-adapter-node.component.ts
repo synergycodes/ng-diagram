@@ -16,7 +16,6 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    // { directive: PointerEventListenerDirective, inputs: ['eventTarget', 'eventName: onDragEvent'] },
     { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
     { directive: PointerMoveSelectionDirective, inputs: ['targetData: data'] },
     { directive: ZIndexDirective, inputs: ['data'] },
@@ -29,9 +28,6 @@ export class AngularAdapterNodeComponent {
 
   data = input.required<Node>();
   targetType = 'node';
-
-  // TODO: Do we need that?
-  onDragEvent = 'drag';
 
   rotateHandleOffset = input<{
     top?: number | string;

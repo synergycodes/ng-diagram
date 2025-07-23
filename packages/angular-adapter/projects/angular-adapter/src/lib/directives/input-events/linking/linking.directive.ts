@@ -8,8 +8,6 @@ import { PointerInputEvent } from '../../../types';
   selector: '[angularAdapterLinkingInput]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
-    // '(pointerup)': 'onPointerUp($event)',
-    // '(pointermove)': 'onPointerMove($event)',
   },
 })
 export class LinkingInputDirective {
