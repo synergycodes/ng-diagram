@@ -44,7 +44,7 @@ export class FlowCore<
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
 
-  readonly getOffset: () => { x: number; y: number };
+  readonly getFlowOffset: () => { x: number; y: number };
 
   constructor(
     modelAdapter: ModelAdapter<TMetadata>,
@@ -52,7 +52,7 @@ export class FlowCore<
     public readonly inputEventsRouter: InputEventsRouter,
     environment: EnvironmentInfo,
     middlewares?: TMiddlewares,
-    getOffset?: () => { x: number; y: number }
+    getFlowOffset?: () => { x: number; y: number }
   ) {
     this._model = modelAdapter;
     this.environment = environment;
@@ -64,7 +64,7 @@ export class FlowCore<
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
     this.transactionManager = new TransactionManager(this);
     this.portBatchProcessor = new PortBatchProcessor();
-    this.getOffset = getOffset || (() => ({ x: 0, y: 0 }));
+    this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
 
@@ -238,7 +238,7 @@ export class FlowCore<
    */
   clientToFlowPosition(clientPosition: { x: number; y: number }): { x: number; y: number } {
     const { x: viewportX, y: viewportY, scale } = this.model.getMetadata().viewport;
-    const { x: flowOffsetX, y: flowOffsetY } = this.getOffset();
+    const { x: flowOffsetX, y: flowOffsetY } = this.getFlowOffset();
     return {
       x: (clientPosition.x - viewportX - flowOffsetX) / scale,
       y: (clientPosition.y - viewportY - flowOffsetY) / scale,
@@ -252,7 +252,7 @@ export class FlowCore<
    */
   flowToClientPosition(flowPosition: { x: number; y: number }): { x: number; y: number } {
     const { x: viewportX, y: viewportY, scale } = this.model.getMetadata().viewport;
-    const { x: flowOffsetX, y: flowOffsetY } = this.getOffset();
+    const { x: flowOffsetX, y: flowOffsetY } = this.getFlowOffset();
     return {
       x: flowPosition.x * scale + viewportX + flowOffsetX,
       y: flowPosition.y * scale + viewportY + flowOffsetY,
