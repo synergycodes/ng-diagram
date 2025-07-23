@@ -20,7 +20,11 @@ describe('PasteEventHandler', () => {
 
   describe('handle', () => {
     it('should emit paste command', () => {
-      handler.handle();
+      // TODO: Fix me
+      handler.handle({
+        name: 'paste',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste');
     });

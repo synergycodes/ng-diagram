@@ -9,6 +9,7 @@ import {
   Node,
 } from '@angularflow/core';
 
+import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
@@ -36,6 +37,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
+    CursorPositionTrackerDirective,
     ZoomingPointerDirective,
     ZoomingWheelDirective,
     PanningDirective,
