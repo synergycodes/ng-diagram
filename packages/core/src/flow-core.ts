@@ -1,8 +1,9 @@
 import { CommandHandler } from './command-handler/command-handler';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
-import { InitializationGuard } from './initialization-guard/initialization-guard';
+import { InitUpdater } from './updater/init-updater/init-updater';
 import { InputEventsRouter } from './input-events';
-import { InternalUpdater } from './internal-updater/internal-updater';
+import { InternalUpdater } from './updater/internal-updater/internal-updater';
+import { Updater } from './updater/updater.interface';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
@@ -38,12 +39,13 @@ export class FlowCore<
   >,
 > {
   private _model: ModelAdapter<TMetadata>;
+  private readonly initUpdater: InitUpdater;
+  private readonly internalUpdater: InternalUpdater;
+
   readonly commandHandler: CommandHandler;
   readonly middlewareManager: MiddlewareManager<TMiddlewares, TMetadata>;
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
-  readonly initializationGuard: InitializationGuard;
-  readonly internalUpdater: InternalUpdater;
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
@@ -64,7 +66,7 @@ export class FlowCore<
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.spatialHash = new SpatialHash();
-    this.initializationGuard = new InitializationGuard(this);
+    this.initUpdater = new InitUpdater(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
@@ -81,15 +83,17 @@ export class FlowCore<
   /**
    * Starts listening to model changes and emits init command
    */
-  private init() {
+  private async init() {
     this.render();
-    this.initializationGuard.start(() => {
-      this.model.onChange((state) => {
-        this.spatialHash.process(state.nodes);
-        this.render();
-      });
-      this.commandHandler.emit('init');
+
+    await this.initUpdater.start();
+
+    this.model.onChange((state) => {
+      this.spatialHash.process(state.nodes);
+      this.render();
     });
+
+    this.commandHandler.emit('init');
   }
 
   /**
@@ -341,5 +345,13 @@ export class FlowCore<
    */
   getScale() {
     return this.model.getMetadata().viewport.scale;
+  }
+
+  get updater(): Updater {
+    if (!this.initUpdater.isInitialized) {
+      return this.initUpdater;
+    }
+
+    return this.internalUpdater;
   }
 }

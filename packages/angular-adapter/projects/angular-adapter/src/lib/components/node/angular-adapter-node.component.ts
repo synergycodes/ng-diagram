@@ -38,7 +38,7 @@ export class AngularAdapterNodeComponent {
       // TODO: fix problem with DOM position resync after repaint
       setTimeout(() => {
         const portsData = this.portsService.getNodePortsData(this.id());
-        this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(this.id(), portsData);
+        this.flowCore.provide().updater.applyPortsSizesAndPositions(this.id(), portsData);
       }, 0);
     });
   }

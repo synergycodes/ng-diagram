@@ -19,7 +19,7 @@ describe('FlowResizeBatchProcessorService', () => {
     applyEdgeLabelSize: ReturnType<typeof vi.fn>;
   };
   let mockFlowCore: {
-    internalUpdater: typeof mockInternalUpdater;
+    updater: typeof mockInternalUpdater;
     getNodeById: ReturnType<typeof vi.fn>;
     getEdgeById: ReturnType<typeof vi.fn>;
   };
@@ -40,7 +40,7 @@ describe('FlowResizeBatchProcessorService', () => {
       applyEdgeLabelSize: vi.fn(),
     };
     mockFlowCore = {
-      internalUpdater: mockInternalUpdater,
+      updater: mockInternalUpdater,
       getNodeById: vi.fn(),
       getEdgeById: vi.fn(),
     };
