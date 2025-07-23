@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventMapperService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { NodeSizeDirective } from './node-size.directive';
 
@@ -32,7 +31,7 @@ describe('NodeSizeDirective', () => {
 
     await TestBed.configureTestingModule({
       imports: [TestComponent],
-      providers: [EventMapperService, { provide: BatchResizeObserverService, useValue: mockBatchResizeObserver }],
+      providers: [{ provide: BatchResizeObserverService, useValue: mockBatchResizeObserver }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { ResizeDirective } from '../../../../directives/input-events/resize/resize.directive';
 import { HandlePosition } from '../node-resize-adornment.types';
 
 @Component({
@@ -7,11 +8,10 @@ import { HandlePosition } from '../node-resize-adornment.types';
   template: '',
   styleUrl: './resize-handle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [{ directive: ResizeDirective, inputs: ['direction: position', 'targetData'] }],
   host: {
     '[class]': 'classes()',
     '[style]': 'styles()',
-    '(pointerdown)': 'pointerEvent.emit({ event: $event, position: position() })',
-    '(pointerup)': 'pointerEvent.emit({ event: $event, position: position() })',
   },
 })
 export class ResizeHandleComponent {
@@ -20,6 +20,7 @@ export class ResizeHandleComponent {
   strokeWidth = input.required<number>();
   color = input.required<string>();
   backgroundColor = input.required<string>();
+
   classes = computed(() => `resize-handle resize-handle--${this.position()}`);
   styles = computed(() => ({
     width: `${this.size()}px`,
@@ -28,6 +29,4 @@ export class ResizeHandleComponent {
     borderColor: this.color(),
     borderWidth: `${this.strokeWidth()}px`,
   }));
-
-  pointerEvent = output<{ event: PointerEvent; position: HandlePosition }>();
 }

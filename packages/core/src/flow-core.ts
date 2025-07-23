@@ -1,6 +1,6 @@
 import { CommandHandler } from './command-handler/command-handler';
 import { InitializationGuard } from './initialization-guard/initialization-guard';
-import { InputEventHandler } from './input-event-handler/input-event-handler';
+import { InputEventsRouter } from './input-events';
 import { InternalUpdater } from './internal-updater/internal-updater';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -12,8 +12,6 @@ import { TransactionCallback, TransactionResult } from './transaction-manager/tr
 import type {
   Edge,
   EnvironmentInfo,
-  Event,
-  EventMapper,
   FlowState,
   FlowStateUpdate,
   LooseAutocomplete,
@@ -37,7 +35,6 @@ export class FlowCore<
 > {
   private _model: ModelAdapter<TMetadata>;
   readonly commandHandler: CommandHandler;
-  readonly inputEventHandler: InputEventHandler;
   readonly middlewareManager: MiddlewareManager<TMiddlewares, TMetadata>;
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
@@ -50,14 +47,13 @@ export class FlowCore<
   constructor(
     modelAdapter: ModelAdapter<TMetadata>,
     private readonly renderer: Renderer,
-    private readonly eventMapper: EventMapper,
+    public readonly inputEventsRouter: InputEventsRouter,
     environment: EnvironmentInfo,
     middlewares?: TMiddlewares
   ) {
     this._model = modelAdapter;
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
-    this.inputEventHandler = new InputEventHandler(this);
     this.spatialHash = new SpatialHash();
     this.initializationGuard = new InitializationGuard(this);
     this.internalUpdater = new InternalUpdater(this);
@@ -65,6 +61,8 @@ export class FlowCore<
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
     this.transactionManager = new TransactionManager(this);
     this.portBatchProcessor = new PortBatchProcessor();
+
+    this.inputEventsRouter.registerDefaultCallbacks(this);
 
     this.init();
   }
@@ -104,14 +102,6 @@ export class FlowCore<
    */
   getEnvironment(): EnvironmentInfo {
     return this.environment;
-  }
-
-  /**
-   * Registers a new event handler
-   * @param handler Handler to register
-   */
-  registerEventsHandler(handler: (event: Event) => void): void {
-    this.eventMapper.register((event) => handler(event));
   }
 
   /**

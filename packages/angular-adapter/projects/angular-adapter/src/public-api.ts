@@ -2,7 +2,7 @@
  * Public API Surface of angular-adapter
  */
 
-export type { DropEvent, Edge, FlowCore, Metadata, Middleware, Node, Point } from '@angularflow/core';
+export type { Edge, FlowCore, Metadata, Middleware, Node, Point } from '@angularflow/core';
 export * from './lib/components/diagram/angular-adapter-diagram.component';
 export * from './lib/components/edge-label/angular-adapter-edge-label.component';
 export * from './lib/components/edge/custom-edge/custom-edge.component';

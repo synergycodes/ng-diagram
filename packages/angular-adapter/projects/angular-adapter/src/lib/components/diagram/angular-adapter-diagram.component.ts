@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input } from '@angular/core';
 import {
   Edge,
   Metadata,
@@ -9,25 +9,18 @@ import {
   Node,
 } from '@angularflow/core';
 
-import {
-  DropEventListenerDirective,
-  KeyDownEventListenerDirective,
-  KeyPressEventListenerDirective,
-  KeyUpEventListenerDirective,
-  PointerDownEventListenerDirective,
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerMoveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  WheelEventListenerDirective,
-} from '../../directives';
+import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
+import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
+import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
+import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
+import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
+import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
-import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 
 @Component({
   selector: 'angular-adapter-diagram',
@@ -43,16 +36,11 @@ import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.componen
   styleUrl: './angular-adapter-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    DropEventListenerDirective,
-    PointerDownEventListenerDirective,
-    PointerEnterEventListenerDirective,
-    PointerLeaveEventListenerDirective,
-    PointerMoveEventListenerDirective,
-    PointerUpEventListenerDirective,
-    KeyDownEventListenerDirective,
-    KeyUpEventListenerDirective,
-    KeyPressEventListenerDirective,
-    WheelEventListenerDirective,
+    ZoomingPointerDirective,
+    ZoomingWheelDirective,
+    PanningDirective,
+    KeyboardInputsDirective,
+    PaletteDropDirective,
   ],
 })
 export class AngularAdapterDiagramComponent<
@@ -61,6 +49,7 @@ export class AngularAdapterDiagramComponent<
     Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
   >,
 > {
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
@@ -112,5 +101,9 @@ export class AngularAdapterDiagramComponent<
       return null;
     }
     return this.edgeTemplateMap().get(edgeType) ?? null;
+  }
+
+  getNativeElement(): HTMLElement {
+    return this.elementRef.nativeElement;
   }
 }

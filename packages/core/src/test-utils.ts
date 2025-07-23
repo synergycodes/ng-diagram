@@ -1,16 +1,4 @@
-import type {
-  Edge,
-  EdgeLabel,
-  EnvironmentInfo,
-  KeyboardEvent,
-  Metadata,
-  MiddlewaresConfigFromMiddlewares,
-  Node,
-  PointerEvent,
-  Port,
-  RotateEvent,
-  WheelEvent,
-} from './types';
+import type { Edge, EdgeLabel, EnvironmentInfo, Metadata, MiddlewaresConfigFromMiddlewares, Node, Port } from './types';
 
 export const mockNode: Node = {
   id: 'node1',
@@ -41,74 +29,6 @@ export const mockEdge: Edge = {
     { x: 0, y: 0 },
     { x: 100, y: 100 },
   ],
-};
-
-export const mockPointerEvent: Omit<PointerEvent, 'type'> = {
-  pointerId: 0,
-  x: 0,
-  y: 0,
-  pressure: 0,
-  timestamp: 0,
-  target: { type: 'diagram' },
-  ctrlKey: false,
-  metaKey: false,
-};
-
-export function getSampleWheelEvent(overrides: Partial<WheelEvent> = {}): WheelEvent {
-  return {
-    type: 'wheel',
-    target: { type: 'diagram' },
-    timestamp: 1,
-    x: 0,
-    y: 0,
-    deltaX: 0,
-    deltaY: 0,
-    deltaZ: 0,
-    ...overrides,
-  };
-}
-
-export function getSamplePointerEvent(overrides: Partial<PointerEvent> = {}): PointerEvent {
-  return {
-    type: 'pointerdown',
-    pointerId: 0,
-    timestamp: 1,
-    target: { type: 'diagram' },
-    x: 0,
-    y: 0,
-    pressure: 0,
-    button: 0,
-    ctrlKey: false,
-    metaKey: false,
-    ...overrides,
-  };
-}
-
-export function getSampleKeyboardEvent(overrides: Partial<KeyboardEvent> = {}): KeyboardEvent {
-  return {
-    type: 'keydown',
-    timestamp: 1,
-    target: { type: 'diagram' },
-    key: 'a',
-    code: 'KeyA',
-    ctrlKey: false,
-    shiftKey: false,
-    altKey: false,
-    metaKey: false,
-    ...overrides,
-  };
-}
-
-export const getSampleRotateEvent = (overrides: Partial<RotateEvent> = {}): RotateEvent => {
-  return {
-    type: 'rotate',
-    timestamp: 1,
-    target: { type: 'rotate-handle', element: mockNode },
-    mouse: { x: 0, y: 0 },
-    handle: { x: 0, y: 0 },
-    center: { x: 0, y: 0 },
-    ...overrides,
-  };
 };
 
 export const mockMetadata: Metadata<MiddlewaresConfigFromMiddlewares<[]>> = {

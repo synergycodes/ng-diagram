@@ -1,6 +1,6 @@
 import { EnvironmentInfo } from '@angularflow/core';
 
-function getOS(): EnvironmentInfo['os'] {
+export function getOS(): EnvironmentInfo['os'] {
   const userAgent = window.navigator.userAgent;
   if (/iPhone|iPad|iPod/.test(userAgent)) {
     return 'iOS';

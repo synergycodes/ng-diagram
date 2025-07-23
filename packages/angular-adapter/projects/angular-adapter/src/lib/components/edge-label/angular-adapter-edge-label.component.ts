@@ -10,9 +10,8 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { EdgeLabel, EdgeLabelTarget } from '@angularflow/core';
-import { EventMapperService, FlowCoreProviderService } from '../../services';
-import { BatchResizeObserverService } from '../../services';
+import { EdgeLabel } from '@angularflow/core';
+import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 
 @Component({
@@ -21,8 +20,6 @@ import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.compon
   styleUrl: './angular-adapter-edge-label.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '(pointerdown)': 'onPointerDown($event)',
-    '(pointerup)': 'onPointerUp($event)',
     '[style.transform]': '`translate(${position().x}px, ${position().y}px) translate(-50%, -50%)`',
   },
 })
@@ -30,7 +27,6 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly edgeComponent = inject(AngularAdapterEdgeComponent);
-  private readonly eventMapperService = inject(EventMapperService);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<EdgeLabel['id']>();
@@ -81,50 +77,5 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
       labelIds: [this.id()],
     });
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
-  }
-
-  onPointerDown(event: PointerEvent) {
-    event.stopPropagation();
-    const currentTarget = event.currentTarget as HTMLElement;
-    currentTarget.setPointerCapture(event.pointerId);
-    this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointerdown',
-      target: this.getEventTarget(),
-      pressure: event.pressure,
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      button: event.button,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-    });
-  }
-
-  onPointerUp(event: PointerEvent) {
-    event.stopPropagation();
-    this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointerup',
-      target: this.getEventTarget(),
-      pressure: event.pressure,
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      button: event.button,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-    });
-  }
-
-  private getEventTarget(): EdgeLabelTarget {
-    const edgeLabel = this.edgeData()?.labels?.find((label) => label.id === this.id());
-    if (!edgeLabel) {
-      throw new Error(`Edge label with id ${this.id()} on edge ${this.edgeData()?.id} not found`);
-    }
-    return {
-      type: 'edge-label',
-      element: edgeLabel,
-    };
   }
 }
