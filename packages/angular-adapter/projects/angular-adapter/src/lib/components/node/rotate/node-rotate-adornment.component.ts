@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, ElementRef, input, signal, viewChild } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { NodeSelectedDirective } from '../../../directives';
 import { RotateHandleComponent } from './handle/rotate-handle.component';
 
 @Component({
@@ -9,7 +8,6 @@ import { RotateHandleComponent } from './handle/rotate-handle.component';
   styleUrl: './node-rotate-adornment.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RotateHandleComponent],
-  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
   host: {
     class: 'node-rotate-adornment',
   },

@@ -1,12 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { AngularAdapterPortComponent, NodeTemplate, Node } from '@angularflow/angular-adapter';
+import {
+  AngularAdapterPortComponent,
+  Node,
+  NodeRotateAdornmentComponent,
+  NodeSelectedDirective,
+  NodeTemplate,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-image-node',
   templateUrl: './image-node.component.html',
   styleUrls: ['./image-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AngularAdapterPortComponent],
+  imports: [AngularAdapterPortComponent, NodeRotateAdornmentComponent],
+  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
 })
 export class ImageNodeComponent implements NodeTemplate {
   data = input.required<Node>();

@@ -1,40 +1,45 @@
-:host {
-  transform: translate(-50%, -50%);
-  width: var(--node-rotate-handle-size, 20px);
-  height: var(--node-rotate-handle-size, 20px);
-  background-color: var(--node-rotate-handle-bg, #ffffff);
-  border: 1px solid var(--node-rotate-handle-color, #1e90ff);
-  position: absolute;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
-  z-index: 10;
-  box-sizing: border-box;
-  outline: none;
-  transition:
-    box-shadow 0.2s,
-    border-color 0.2s,
-    background 0.2s,
-    transform 0.1s;
-  pointer-events: auto;
-  cursor: grab;
+.content-projection {
+  width: 100%;
+  height: 100%;
 }
 
-:host(:hover),
-:host(:focus-visible) {
-  box-shadow: var(--node-rotate-handle-hover-shadow, 0 4px 16px rgba(30, 144, 255, 0.25));
-  border-color: var(--node-rotate-handle-hover-color, #005fcc);
-  outline: 2px solid var(--node-rotate-handle-hover-color, #005fcc);
-  outline-offset: 2px;
+:host(.rotate-handle) {
+  background-color: var(--ngd-rotate-handle-background-color);
+  border-radius: 50%;
+  transition: background-color 0.1s ease-in-out;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--ngd-rotate-handle-background-color-hover);
+  }
+
+  &[data-rotating],
+  &.active {
+    background-color: var(--ngd-rotate-handle-background-color-active);
+  }
+}
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--ngd-rotate-handle-size);
+  height: var(--ngd-rotate-handle-size);
+  position: absolute;
+  transform: translate(50%, -50%);
+  z-index: 10;
+  box-sizing: border-box;
+  pointer-events: auto;
+  cursor: grab;
+
+  top: var(--ngd-rotate-handle-top);
+  right: var(--ngd-rotate-handle-right);
+  bottom: var(--ngd-rotate-handle-bottom);
+  left: var(--ngd-rotate-handle-left);
 }
 
 :host([data-rotating]),
 :host(.active),
 :host-context(.active) {
   cursor: grabbing;
-  background: var(--node-rotate-handle-active-bg, #ffffff);
-  border-color: var(--node-rotate-handle-active-color, #005fcc);
-  box-shadow: var(--node-rotate-handle-active-shadow, 0 2px 12px rgba(30, 144, 255, 0.3));
-  outline: 2px solid var(--node-rotate-handle-active-color, #005fcc);
-  outline-offset: 2px;
-  transform: translate(-50%, -50%) scale(0.94);
 }

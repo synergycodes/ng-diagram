@@ -21,6 +21,7 @@ import { BatchResizeObserverService } from '../../services/flow-resize-observer/
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-port-id]': 'id()',
+    '[class]': 'side()',
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['target: nodeData', 'portId: id'] }],
 })

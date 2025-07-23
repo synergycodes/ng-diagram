@@ -11,15 +11,9 @@ import { LinePosition } from '../node-resize-adornment.types';
   hostDirectives: [{ directive: ResizeDirective, inputs: ['direction: position', 'targetData'] }],
   host: {
     '[class]': 'classes()',
-    '[style]': 'styles()',
   },
 })
 export class ResizeLineComponent {
   position = input.required<LinePosition>();
-  strokeWidth = input.required<number>();
-  color = input.required<string>();
   classes = computed(() => `resize-line resize-line--${this.position()}`);
-  styles = computed(() => ({
-    [`border-${this.position()}`]: `${this.strokeWidth()}px solid ${this.color()}`,
-  }));
 }

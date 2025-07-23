@@ -1,16 +1,26 @@
+// --ngd-port-size: 18px;
+// --ngd-port-background-color:
+
 :host {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  width: 8px;
-  height: 8px;
-  background-color: white;
-  border: 2px solid rgb(63, 63, 63);
   cursor: crosshair;
-  transition: background-color 0.2s ease-in-out;
+
+  box-sizing: content-box;
+  width: var(--ngd-port-size);
+  height: var(--ngd-port-size);
+
+  background: var(--ngd-port-background-color);
+  border: var(--ngd-port-border-size) solid var(--ngd-port-border-color);
+
+  transition-property: background-color, border-color, width, height;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.1s;
 
   &:hover {
-    background-color: rgb(63, 63, 63);
+    background-color: var(--ngd-port-background-color-hover);
+    border-color: var(--ngd-port-background-color-hover);
   }
 
   &::before {
@@ -22,5 +32,29 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
+  }
+
+  &.left {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  &.right {
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.top {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.bottom {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }

@@ -3,5 +3,12 @@
   "dest": "../../dist/angular-adapter",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": [
+    {
+      "glob": "*.css",
+      "input": "src/lib/styles",
+      "output": "."
+    }
+  ]
 }

@@ -1,3 +1,5 @@
 @if (showAdornment()) {
-  <angular-adapter-rotate-handle #handleNode [isRotating]="isRotating()" [data]="data()" />
+  <angular-adapter-rotate-handle [isRotating]="isRotating()" [data]="data()"
+    ><ng-content></ng-content
+  ></angular-adapter-rotate-handle>
 }
