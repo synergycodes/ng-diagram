@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   effect,
   ElementRef,
   inject,
@@ -10,9 +9,10 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Port, PortTarget } from '@angularflow/core';
-import { BatchResizeObserverService, EventMapperService, FlowCoreProviderService } from '../../services';
-import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
+import { Node, Port } from '@angularflow/core';
+import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
+import { FlowCoreProviderService } from '../../services';
+import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 
 @Component({
   selector: 'angular-adapter-port',
@@ -20,23 +20,20 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   styleUrl: './angular-adapter-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '(pointerdown)': 'onPointerDown($event)',
-    '(pointerup)': 'onPointerUp($event)',
     '[attr.data-port-id]': 'id()',
     '[class]': 'side()',
   },
+  hostDirectives: [{ directive: LinkingInputDirective, inputs: ['target: nodeData', 'portId: id'] }],
 })
 export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly eventMapperService = inject(EventMapperService);
-  private readonly nodeComponent = inject(AngularAdapterNodeComponent);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<Port['id']>();
   type = input.required<Port['type']>();
   side = input.required<Port['side']>();
-  nodeData = computed(() => this.nodeComponent.data());
+  nodeData = input.required<Node>();
 
   lastSide = signal<Port['side'] | undefined>(undefined);
   lastType = signal<Port['type'] | undefined>(undefined);
@@ -90,50 +87,5 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
     });
 
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
-  }
-
-  onPointerDown(event: PointerEvent) {
-    event.stopPropagation();
-    const currentTarget = event.currentTarget as HTMLElement;
-    currentTarget.setPointerCapture(event.pointerId);
-    this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointerdown',
-      target: this.getEventTarget(),
-      pressure: event.pressure,
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      button: event.button,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-    });
-  }
-
-  onPointerUp(event: PointerEvent) {
-    event.stopPropagation();
-    this.eventMapperService.emit({
-      pointerId: event.pointerId,
-      type: 'pointerup',
-      target: this.getEventTarget(),
-      pressure: event.pressure,
-      timestamp: Date.now(),
-      x: event.clientX,
-      y: event.clientY,
-      button: event.button,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-    });
-  }
-
-  private getEventTarget(): PortTarget {
-    const port = this.nodeData()?.ports?.find((port) => port.id === this.id());
-    if (!port) {
-      throw new Error(`Port with id ${this.id()} on node ${this.nodeData()?.id} not found`);
-    }
-    return {
-      type: 'port',
-      element: port,
-    };
   }
 }

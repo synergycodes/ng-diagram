@@ -1,15 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
-import {
-  PointerDownEventListenerDirective,
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  ZIndexDirective,
-} from '../../../directives';
+import { ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 import { getPath } from '../../../utils/get-path/get-path';
+import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
 
 /**
  * To create an edge with a custom path, you must provide the `pathAndPoints` property.
@@ -31,13 +25,7 @@ import { getPath } from '../../../utils/get-path/get-path';
   templateUrl: './custom-edge.component.html',
   styleUrl: './custom-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [
-    { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: ZIndexDirective, inputs: ['data'] },
-  ],
+  hostDirectives: [{ directive: ZIndexDirective, inputs: ['data'] }],
   imports: [AngularAdapterEdgeLabelComponent],
 })
 export class AngularAdapterCustomEdgeComponent {

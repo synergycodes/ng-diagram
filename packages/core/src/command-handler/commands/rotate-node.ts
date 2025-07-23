@@ -1,4 +1,4 @@
-import { normalizeAngle } from '../../input-event-handler/input-actions/rotate/normalize-angle';
+import { normalizeAngle } from '../../input-events/handlers/rotate/normalize-angle';
 import type { CommandHandler } from '../../types';
 
 export interface RotateNodeByCommand {

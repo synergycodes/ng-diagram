@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { ResizeDirective } from '../../../../directives/input-events/resize/resize.directive';
 import { LinePosition } from '../node-resize-adornment.types';
 
 @Component({
@@ -7,14 +8,12 @@ import { LinePosition } from '../node-resize-adornment.types';
   template: '',
   styleUrl: './resize-line.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [{ directive: ResizeDirective, inputs: ['direction: position', 'targetData'] }],
   host: {
     '[class]': 'classes()',
-    '(pointerdown)': 'pointerEvent.emit({ event: $event, position: position() })',
-    '(pointerup)': 'pointerEvent.emit({ event: $event, position: position() })',
   },
 })
 export class ResizeLineComponent {
   position = input.required<LinePosition>();
   classes = computed(() => `resize-line resize-line--${this.position()}`);
-  pointerEvent = output<{ event: PointerEvent; position: LinePosition }>();
 }

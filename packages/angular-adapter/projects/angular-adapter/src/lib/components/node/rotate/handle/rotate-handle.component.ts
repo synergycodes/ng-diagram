@@ -4,11 +4,11 @@ import {
   Component,
   ElementRef,
   HostBinding,
-  inject,
   input,
-  output,
   viewChild,
 } from '@angular/core';
+import { Node } from '@angularflow/core';
+import { RotateHandleDirective } from '../../../../directives/input-events/rotate/rotate.directive';
 
 @Component({
   selector: 'angular-adapter-rotate-handle',
@@ -17,15 +17,14 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.rotate-handle]': '!hasCustomHandle',
-    '(pointerdown)': 'onPointerDown($event)',
   },
+  hostDirectives: [{ directive: RotateHandleDirective, inputs: ['target: data'] }],
 })
 export class RotateHandleComponent implements AfterContentInit {
-  private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
 
+  data = input.required<Node>();
   isRotating = input.required<boolean>();
-  pointerDownEvent = output<{ event: PointerEvent }>();
 
   hasCustomHandle = false;
 
@@ -35,9 +34,5 @@ export class RotateHandleComponent implements AfterContentInit {
 
   @HostBinding('attr.data-rotating') get pointerDownAttr() {
     return this.isRotating() ? 'true' : null;
-  }
-
-  onPointerDown(event: PointerEvent) {
-    this.pointerDownEvent.emit({ event });
   }
 }

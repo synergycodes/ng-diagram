@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
-  NgDiagramPaletteDirective,
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
   PaletteItem,
@@ -17,7 +16,6 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
     PaletteItemComponent,
     NgDiagramPaletteItemComponent,
     NgDiagramPaletteItemPreviewComponent,
-    NgDiagramPaletteDirective,
     PaletteItemPreviewComponent,
   ],
 })

@@ -1,12 +1,12 @@
 import type { Middleware } from '@angularflow/angular-adapter';
 import {
-  zIndexMiddleware,
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
+  zIndexMiddleware,
 } from '@angularflow/angular-adapter';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
 

@@ -1,5 +1,5 @@
 @if (showAdornment()) {
-  <angular-adapter-rotate-handle [isRotating]="isRotating()" (pointerDownEvent)="onPointerDownEvent($event)"
+  <angular-adapter-rotate-handle [isRotating]="isRotating()" [data]="data()"
     ><ng-content></ng-content
   ></angular-adapter-rotate-handle>
 }

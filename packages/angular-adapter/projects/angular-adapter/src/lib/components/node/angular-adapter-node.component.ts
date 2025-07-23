@@ -1,15 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
-import {
-  NodePositionDirective,
-  NodeSizeDirective,
-  PointerDownEventListenerDirective,
-  PointerEnterEventListenerDirective,
-  PointerLeaveEventListenerDirective,
-  PointerUpEventListenerDirective,
-  ZIndexDirective,
-} from '../../directives';
+import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
+import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
+import { PointerMoveSelectionDirective } from '../../directives/input-events/pointer-move-selection/pointer-move-selection.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
@@ -22,10 +16,8 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: PointerDownEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerEnterEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerLeaveEventListenerDirective, inputs: ['eventTarget'] },
-    { directive: PointerUpEventListenerDirective, inputs: ['eventTarget'] },
+    { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
+    { directive: PointerMoveSelectionDirective, inputs: ['targetData: data'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
   imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
@@ -35,6 +27,7 @@ export class AngularAdapterNodeComponent {
   private readonly flowCore = inject(FlowCoreProviderService);
 
   data = input.required<Node>();
+  targetType = 'node';
 
   readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
   readonly id = computed(() => this.data().id);
