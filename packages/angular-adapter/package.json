@@ -7,7 +7,7 @@
       "import": "./dist/angular-adapter/fesm2022/angularflow-angular-adapter.mjs",
       "types": "./dist/angular-adapter/index.d.ts"
     },
-    "./tokens.css": "./dist/angular-adapter/tokens.css"
+    "./styles.css": "./dist/angular-adapter/styles.css"
   },
   "scripts": {
     "ng": "ng",

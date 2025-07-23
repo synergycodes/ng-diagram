@@ -15,8 +15,6 @@ describe('ResizeLineComponent', () => {
     fixture = TestBed.createComponent(ResizeLineComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('position', 'bottom');
-    fixture.componentRef.setInput('strokeWidth', 1);
-    fixture.componentRef.setInput('color', 'rgb(30, 144, 255)');
     fixture.detectChanges();
   });
 
@@ -26,11 +24,6 @@ describe('ResizeLineComponent', () => {
 
   it('should have proper position class', () => {
     expect(fixture.debugElement.classes).toHaveProperty('resize-line--bottom');
-  });
-
-  it('should have proper styles', () => {
-    const elementStyles = fixture.debugElement.nativeElement.style;
-    expect(elementStyles.borderBottom).toBe('1px solid rgb(30, 144, 255)');
   });
 
   it('should emit pointer down and up events', () => {

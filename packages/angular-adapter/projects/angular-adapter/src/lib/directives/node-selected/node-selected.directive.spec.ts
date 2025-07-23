@@ -14,7 +14,6 @@ class TestComponent {
 }
 
 describe('NodeSelectedDirective', () => {
-  let component: TestComponent;
   let fixture: ComponentFixture<TestComponent>;
   let divElement: HTMLElement;
 
@@ -24,7 +23,6 @@ describe('NodeSelectedDirective', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
-    component = fixture.componentInstance;
     divElement = fixture.debugElement.query(By.css('div')).nativeElement;
     fixture.detectChanges();
   });
@@ -34,18 +32,7 @@ describe('NodeSelectedDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should set transition style', () => {
-    expect(divElement.style.transition).toBe('box-shadow 0.1s ease-in-out');
-  });
-
   it('should set default box-shadow style', () => {
     expect(divElement.style.boxShadow).toBe('none');
-  });
-
-  it('should update box-shadow style when selected changes', () => {
-    component.data = { selected: true };
-    fixture.detectChanges();
-
-    expect(divElement.style.boxShadow).toBe('0 0 2px 4px rgba(30, 144, 255, 0.5)');
   });
 });

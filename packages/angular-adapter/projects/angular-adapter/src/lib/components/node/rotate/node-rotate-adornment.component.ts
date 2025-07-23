@@ -24,7 +24,7 @@ import { RotateHandleComponent } from './handle/rotate-handle.component';
 })
 export class NodeRotateAdornmentComponent {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
-  private readonly handleNode = viewChild('handleNode', { read: ElementRef<HTMLElement> });
+  private readonly handleNode = viewChild(RotateHandleComponent, { read: ElementRef<HTMLElement> });
   private readonly eventMapper = inject(EventMapperService);
 
   /**

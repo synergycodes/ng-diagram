@@ -36,13 +36,6 @@ export class AngularAdapterNodeComponent {
 
   data = input.required<Node>();
 
-  rotateHandleOffset = input<{
-    top?: number | string;
-    left?: number | string;
-    right?: number | string;
-    bottom?: number | string;
-  }>();
-
   readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
   readonly id = computed(() => this.data().id);
 

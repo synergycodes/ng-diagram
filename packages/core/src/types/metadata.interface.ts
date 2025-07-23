@@ -12,30 +12,10 @@ export interface Viewport {
 }
 
 /**
- * Interface representing configurable properties of the node resize adornment.
- */
-export interface NodeResizeAdornmentConfig {
-  color?: string;
-  strokeWidth?: number;
-  handleSize?: number;
-  handleBackgroundColor?: string;
-}
-
-/**
  * Interface representing configurable properties of the layouts.
  */
 export interface LayoutConfiguration {
   tree?: TreeLayoutConfig;
-}
-
-/**
- * Interface representing configurable properties of the rotate handle offset.
- */
-export interface RotateHandleConfiguration {
-  top?: number | string;
-  right?: number | string;
-  bottom?: number | string;
-  left?: number | string;
 }
 
 /**
@@ -55,10 +35,8 @@ export interface RoutingConfiguration {
 export interface Metadata<TMiddlewaresMetadata = unknown> {
   viewport: Viewport;
   temporaryEdge?: Edge | null;
-  nodeResizeAdornmentConfig?: NodeResizeAdornmentConfig;
   highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
-  rotateHandleOffset?: RotateHandleConfiguration;
   routingConfiguration?: RoutingConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
   [key: string]: unknown;

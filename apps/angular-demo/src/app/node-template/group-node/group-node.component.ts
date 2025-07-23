@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { NodeTemplate, Node } from '@angularflow/angular-adapter';
+import { Node, NodeResizeAdornmentComponent, NodeSelectedDirective, NodeTemplate } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-group-node',
-  imports: [],
+  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective],
   templateUrl: './group-node.component.html',
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

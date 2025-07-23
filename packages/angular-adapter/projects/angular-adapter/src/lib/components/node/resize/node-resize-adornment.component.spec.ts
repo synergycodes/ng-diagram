@@ -47,28 +47,6 @@ describe('NodeResizeAdornmentComponent', () => {
     expect(component.showAdornment()).toBe(true);
   });
 
-  it('should use default values for appearance when other values are not provided', () => {
-    expect(component.size()).toBe(6);
-    expect(component.strokeWidth()).toBe(1);
-    expect(component.color()).toBe('#1e90ff');
-    expect(component.backgroundColor()).toBe('#ffffff');
-  });
-
-  it('should use provided values for appearance when they are provided', () => {
-    mockGetMetadata.mockReturnValue({
-      nodeResizeAdornmentConfig: { handleSize: 10, strokeWidth: 2, color: '#ff0000', handleBackgroundColor: '#00ff00' },
-    });
-    fixture = TestBed.createComponent(NodeResizeAdornmentComponent);
-    component = fixture.componentInstance;
-    fixture.componentRef.setInput('data', { id: '1', type: 'default', position: { x: 0, y: 0 }, selected: false });
-    fixture.detectChanges();
-
-    expect(component.size()).toBe(10);
-    expect(component.strokeWidth()).toBe(2);
-    expect(component.color()).toBe('#ff0000');
-    expect(component.backgroundColor()).toBe('#00ff00');
-  });
-
   it('should stop event propagation', () => {
     const pointerEvent = new Event('pointerdown') as PointerEvent;
     const spy = vi.spyOn(pointerEvent, 'stopPropagation');

@@ -1,6 +1,8 @@
-<div class="group-node" [attr.data-highlight]="highlighted()">
-  <div class="group-node-header">
-    <div class="group-node-header-title">{{ groupTitle() }}</div>
+<angular-adapter-node-resize-adornment [data]="data()">
+  <div class="group-node" angularAdapterNodeSelected [data]="data()" [attr.data-highlight]="highlighted()">
+    <div class="group-node-header">
+      <div class="group-node-header-title">{{ groupTitle() }}</div>
+    </div>
+    <div class="group-node-content"></div>
   </div>
-  <div class="group-node-content"></div>
-</div>
+</angular-adapter-node-resize-adornment>

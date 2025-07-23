@@ -1,2 +1,0 @@
-export const ROTATE_HANDLER_TOP_OFFSET = -20;
-export const ROTATE_HANDLER_RIGHT_OFFSET = -36;
