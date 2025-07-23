@@ -12,4 +12,15 @@
   &:hover {
     background-color: rgb(63, 63, 63);
   }
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+  }
 }
