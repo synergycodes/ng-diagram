@@ -99,6 +99,7 @@ describe('ResizableNodeComponent', () => {
       disableAutoSize: true,
       id: '1',
       size: { width: 100, height: 200 },
+      position: { x: 0, y: 0 },
     });
   });
 
@@ -146,6 +147,7 @@ describe('ResizableNodeComponent', () => {
       id: '1',
       size: { width: 100, height: 200 },
       disableAutoSize: true,
+      position: { x: 0, y: 0 },
     });
   });
 

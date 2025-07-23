@@ -18,4 +18,11 @@
   --ngd-resize-line-border-width: 0.0625rem;
   --ngd-resize-line-border-style: solid;
   --ngd-resize-line-border-color: var(--ngd-transform-box);
+
+  --ngd-port-size: 0.5rem;
+  --ngd-port-background-color: var(--ngd-node-port-fill-default);
+  --ngd-port-border-size: 0.125rem;
+  --ngd-port-border-color: var(--ngd-node-port-stroke-default);
+  --ngd-port-background-color-hover: var(--ngd-node-port-fill-active);
+  --ngd-port-border-color-hover: var(--ngd-node-port-stroke-active);
 }

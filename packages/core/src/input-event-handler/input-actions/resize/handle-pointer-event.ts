@@ -48,8 +48,8 @@ export function handlePointerEvent(flowCore: FlowCore, event: PointerEvent) {
       break;
     case 'pointermove':
       if (resizeState.isResizing && resizeState.draggingNode) {
-        const deltaX = x - resizeState.startX;
-        const deltaY = y - resizeState.startY;
+        const deltaX = Math.round(x - resizeState.startX);
+        const deltaY = Math.round(y - resizeState.startY);
         let newWidth = resizeState.startWidth;
         let newHeight = resizeState.startHeight;
         let newX = resizeState.startNodePositionX;

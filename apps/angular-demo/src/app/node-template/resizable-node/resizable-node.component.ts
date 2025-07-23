@@ -39,6 +39,7 @@ export class ResizableNodeComponent implements NodeTemplate {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
+      position: this.data().position,
     });
   }
 
