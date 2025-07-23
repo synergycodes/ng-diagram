@@ -96,7 +96,9 @@ describe('Cut Command', () => {
     (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([nodes[0]]);
 
     await cut(commandHandler);
-    paste(commandHandler);
+    paste(commandHandler, {
+      name: 'paste',
+    });
 
     const updateCall = flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
     const updateCallWithNodesToAdd = updateCall.mock.calls.find((call) => call[0].nodesToAdd);
