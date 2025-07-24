@@ -38,7 +38,10 @@ describe('RotateEventHandler', () => {
 
   beforeEach(() => {
     mockCommandHandler = { emit: vi.fn() };
-    flowCore = { commandHandler: mockCommandHandler } as unknown as FlowCore;
+    flowCore = {
+      commandHandler: mockCommandHandler,
+      clientToFlowPosition: vi.fn().mockImplementation((point) => point),
+    } as unknown as FlowCore;
     instance = new RotateEventHandler(flowCore);
     vi.clearAllMocks();
   });
