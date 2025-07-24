@@ -1,5 +1,7 @@
-import type { Bounds, CommandHandler, Node, Rect } from '../../types';
-import { getRectFromBounds, calculateGroupBounds, isSameSize } from '../../utils';
+import type { Bounds, CommandHandler, Node } from '../../types';
+import { calculateGroupBounds, isSameSize } from '../../utils';
+
+export const MIN_NODE_SIZE = 200;
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';
@@ -7,6 +9,81 @@ export interface ResizeNodeCommand {
   size: Required<Node>['size'];
   position?: Node['position'];
   disableAutoSize?: boolean;
+}
+
+/**
+ * Applies minimum size constraints to a resize operation, adjusting position
+ * when necessary to maintain the resize operation's intent.
+ */
+function applyMinimumSizeConstraints(
+  requestedSize: Required<Node>['size'],
+  requestedPosition: Node['position'] | undefined,
+  originalPosition: Node['position']
+): { size: Required<Node>['size']; position: Node['position'] } {
+  const constrainedWidth = Math.max(requestedSize.width, MIN_NODE_SIZE);
+  const constrainedHeight = Math.max(requestedSize.height, MIN_NODE_SIZE);
+
+  if (!requestedPosition) {
+    return {
+      size: { width: constrainedWidth, height: constrainedHeight },
+      position: originalPosition,
+    };
+  }
+
+  let constrainedX = requestedPosition.x;
+  let constrainedY = requestedPosition.y;
+
+  // If width was constrained and position moved left from original, adjust it back
+  if (constrainedWidth !== requestedSize.width && requestedPosition.x < originalPosition.x) {
+    const widthDifference = constrainedWidth - requestedSize.width;
+    constrainedX = requestedPosition.x - widthDifference;
+  }
+
+  // If height was constrained and position moved up from original, adjust it back
+  if (constrainedHeight !== requestedSize.height && requestedPosition.y < originalPosition.y) {
+    const heightDifference = constrainedHeight - requestedSize.height;
+    constrainedY = requestedPosition.y - heightDifference;
+  }
+
+  return {
+    size: { width: constrainedWidth, height: constrainedHeight },
+    position: { x: constrainedX, y: constrainedY },
+  };
+}
+
+/**
+ * Applies children bounds constraints to ensure group fully contains all children.
+ * Expands the requested group bounds if necessary to accommodate children.
+ */
+export function applyChildrenBoundsConstraints(
+  requestedSize: Required<Node>['size'],
+  requestedPosition: Node['position'],
+  childrenBounds: Bounds
+): { size: Required<Node>['size']; position: Node['position'] } {
+  const requestedBounds: Bounds = {
+    minX: requestedPosition.x,
+    minY: requestedPosition.y,
+    maxX: requestedPosition.x + requestedSize.width,
+    maxY: requestedPosition.y + requestedSize.height,
+  };
+
+  const finalBounds: Bounds = {
+    minX: Math.min(requestedBounds.minX, childrenBounds.minX),
+    minY: Math.min(requestedBounds.minY, childrenBounds.minY),
+    maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
+    maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
+  };
+
+  return {
+    size: {
+      width: finalBounds.maxX - finalBounds.minX,
+      height: finalBounds.maxY - finalBounds.minY,
+    },
+    position: {
+      x: finalBounds.minX,
+      y: finalBounds.minY,
+    },
+  };
 }
 
 export async function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCommand) {
@@ -42,41 +119,31 @@ async function handleGroupNodeResize(
     return;
   }
 
-  const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
-
-  // Calculate the new bounds based on the resize request
-  const requestedBounds: Bounds = {
-    minX: command.position?.x ?? node.position.x,
-    minY: command.position?.y ?? node.position.y,
-    maxX: (command.position?.x ?? node.position.x) + command.size.width,
-    maxY: (command.position?.y ?? node.position.y) + command.size.height,
-  };
-
-  // Ensure the new bounds fully contain the children bounds
-  const newGroupRect: Rect = getRectFromBounds({
-    minX: Math.min(requestedBounds.minX, childrenBounds.minX),
-    minY: Math.min(requestedBounds.minY, childrenBounds.minY),
-    maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
-    maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
-  });
-
-  if (!command.size || !command.position) {
+  if (!command.size) {
     return;
   }
+
+  const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
+
+  const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
+    command.size,
+    command.position,
+    node.position
+  );
+
+  const { size: finalSize, position: finalPosition } = applyChildrenBoundsConstraints(
+    constrainedSize,
+    constrainedPosition,
+    childrenBounds
+  );
 
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {
           id: command.id,
-          size: {
-            width: newGroupRect.width,
-            height: newGroupRect.height,
-          },
-          position: {
-            x: newGroupRect.x,
-            y: newGroupRect.y,
-          },
+          size: finalSize,
+          position: finalPosition,
           autoSize: false,
         },
       ],
@@ -89,17 +156,27 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
-  if (!command.size || !command.position) {
+  if (!command.size) {
     return;
   }
+  const node = commandHandler.flowCore.getNodeById(command.id);
+  if (!node) {
+    return;
+  }
+
+  const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
+    command.size,
+    command.position,
+    node.position
+  );
 
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {
           id: command.id,
-          size: command.size,
-          ...(command.position && { position: command.position }),
+          size: constrainedSize,
+          position: constrainedPosition,
           ...(command.disableAutoSize !== undefined && { autoSize: !command.disableAutoSize }),
         },
       ],

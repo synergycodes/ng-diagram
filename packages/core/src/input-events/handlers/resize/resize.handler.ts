@@ -2,8 +2,6 @@ import { Node } from '../../../types/node.interface';
 import { EventHandler } from '../event-hander';
 import { ResizeEvent } from './resize.event';
 
-const MIN_NODE_SIZE = 50;
-
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
   isResizing = false;
   startWidth?: number;
@@ -62,44 +60,44 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
 
         switch (event.direction) {
           case 'top-left': {
-            newWidth = Math.max(this.startWidth - deltaX, MIN_NODE_SIZE);
+            newWidth = this.startWidth - deltaX;
             newX = this.startNodePositionX + (this.startWidth - newWidth);
-            newHeight = Math.max(this.startHeight - deltaY, MIN_NODE_SIZE);
+            newHeight = this.startHeight - deltaY;
             newY = this.startNodePositionY + (this.startHeight - newHeight);
             break;
           }
           case 'top': {
-            newHeight = Math.max(this.startHeight - deltaY, MIN_NODE_SIZE);
+            newHeight = this.startHeight - deltaY;
             newY = this.startNodePositionY + (this.startHeight - newHeight);
             break;
           }
           case 'top-right': {
-            newWidth = Math.max(this.startWidth + deltaX, MIN_NODE_SIZE);
-            newHeight = Math.max(this.startHeight - deltaY, MIN_NODE_SIZE);
+            newWidth = this.startWidth + deltaX;
+            newHeight = this.startHeight - deltaY;
             newY = this.startNodePositionY + (this.startHeight - newHeight);
             break;
           }
           case 'right': {
-            newWidth = Math.max(this.startWidth + deltaX, MIN_NODE_SIZE);
+            newWidth = this.startWidth + deltaX;
             break;
           }
           case 'bottom-right': {
-            newWidth = Math.max(this.startWidth + deltaX, MIN_NODE_SIZE);
-            newHeight = Math.max(this.startHeight + deltaY, MIN_NODE_SIZE);
+            newWidth = this.startWidth + deltaX;
+            newHeight = this.startHeight + deltaY;
             break;
           }
           case 'bottom': {
-            newHeight = Math.max(this.startHeight + deltaY, MIN_NODE_SIZE);
+            newHeight = this.startHeight + deltaY;
             break;
           }
           case 'bottom-left': {
-            newWidth = Math.max(this.startWidth - deltaX, MIN_NODE_SIZE);
+            newWidth = this.startWidth - deltaX;
             newX = this.startNodePositionX + (this.startWidth - newWidth);
-            newHeight = Math.max(this.startHeight + deltaY, MIN_NODE_SIZE);
+            newHeight = this.startHeight + deltaY;
             break;
           }
           case 'left': {
-            newWidth = Math.max(this.startWidth - deltaX, MIN_NODE_SIZE);
+            newWidth = this.startWidth - deltaX;
             newX = this.startNodePositionX + (this.startWidth - newWidth);
             break;
           }
