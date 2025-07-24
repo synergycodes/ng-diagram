@@ -88,33 +88,14 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
   private async handleDropOnGroup(point: Point) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
-    const updateData: { id: string; groupId?: string }[] = [];
 
-    for (const selectedNode of this.flow.modelLookup.getSelectedNodes()) {
-      if (
-        topLevelGroupNode &&
-        this.flow.modelLookup.wouldCreateCircularDependency(selectedNode.id, topLevelGroupNode.id)
-      ) {
-        continue;
-      }
-      const newGroupId = topLevelGroupNode?.id;
-      if (selectedNode.groupId === newGroupId) {
-        continue;
-      }
-
-      updateData.push({
-        id: selectedNode.id,
-        groupId: newGroupId,
-      });
+    if (!topLevelGroupNode) {
+      return;
     }
 
-    if (updateData.length > 0) {
-      await this.flow.commandHandler.emit('updateNodes', { nodes: updateData });
-    }
-
-    // That means a group has been highlighted, so we need to clear it
-    if (updateData.some((node) => Boolean(node.groupId))) {
-      this.flow.commandHandler.emit('highlightGroupClear');
-    }
+    this.flow.commandHandler.emit('addToGroup', {
+      groupId: topLevelGroupNode.id,
+      nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
+    });
   }
 }
