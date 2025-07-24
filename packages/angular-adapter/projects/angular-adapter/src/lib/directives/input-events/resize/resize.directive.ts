@@ -1,7 +1,6 @@
 import { Directive, inject, input } from '@angular/core';
 import { Node, ResizeDirection } from '@angularflow/core';
 
-import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
 @Directive({
@@ -12,22 +11,16 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 })
 export class ResizeDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
 
   direction = input.required<ResizeDirection>();
   targetData = input.required<Node>();
 
   onPointerDown(event: PointerEvent): void {
-    const containerElement = this.diagramComponent.getNativeElement();
-    if (!containerElement) {
-      throw new Error('Resize failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
     event.preventDefault();
     event.stopPropagation();
 
-    containerElement.addEventListener('pointermove', this.onPointerMove);
-    containerElement.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.onPointerUp);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -45,13 +38,8 @@ export class ResizeDirective {
   }
 
   onPointerUp = (event: PointerEvent) => {
-    const containerElement = this.diagramComponent.getNativeElement();
-    if (!containerElement) {
-      throw new Error('Resize failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
-    containerElement.removeEventListener('pointermove', this.onPointerMove);
-    containerElement.removeEventListener('pointerup', this.onPointerUp);
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({

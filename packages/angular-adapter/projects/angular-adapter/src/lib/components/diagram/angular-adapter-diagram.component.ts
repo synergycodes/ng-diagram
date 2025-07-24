@@ -115,8 +115,4 @@ export class AngularAdapterDiagramComponent<
     }
     return this.edgeTemplateMap().get(edgeType) ?? null;
   }
-
-  getNativeElement(): HTMLElement {
-    return this.elementRef.nativeElement;
-  }
 }
