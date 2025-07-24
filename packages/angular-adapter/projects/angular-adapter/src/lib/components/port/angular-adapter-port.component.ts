@@ -38,7 +38,6 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
   type = input.required<Port['type']>();
   side = input.required<Port['side']>();
   nodeData = computed(() => this.nodeComponent.data());
-  // nodeData = input.required<Node>();
 
   lastSide = signal<Port['side'] | undefined>(undefined);
   lastType = signal<Port['type'] | undefined>(undefined);
