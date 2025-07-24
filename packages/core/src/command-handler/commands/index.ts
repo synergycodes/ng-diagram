@@ -25,7 +25,7 @@ import {
   moveTemporaryEdge,
   startLinking,
   startLinkingFromPosition,
-} from './linking';
+} from './linking/';
 import { moveNodesBy } from './move';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { resizeNode } from './resize-node';
