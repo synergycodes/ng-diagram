@@ -26,6 +26,7 @@ describe('PasteEventHandler', () => {
 
     mockFlowCore = {
       commandHandler: mockCommandHandler,
+      clientToFlowPosition: vi.fn((x) => x),
     } as unknown as FlowCore;
 
     handler = new PasteEventHandler(mockFlowCore);
@@ -49,6 +50,19 @@ describe('PasteEventHandler', () => {
       });
 
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste', { position: point });
+    });
+
+    it('should convert client position to flow position', () => {
+      const point = { x: 100, y: 200 };
+      mockFlowCore.clientToFlowPosition = vi.fn().mockReturnValue({ x: 50, y: 100 });
+
+      handler.handle({
+        ...getMockEvent(),
+        lastInputPoint: point,
+      });
+
+      expect(mockFlowCore.clientToFlowPosition).toHaveBeenCalledWith(point);
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('paste', { position: { x: 50, y: 100 } });
     });
   });
 });
