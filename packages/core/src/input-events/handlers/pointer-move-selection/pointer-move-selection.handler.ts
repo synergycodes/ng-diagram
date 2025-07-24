@@ -32,7 +32,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           this.initialNodePosition = { ...firstNode.position };
         }
 
-        const { x, y } = this.flow.clientToFlowPosition(event.lastInputPoint);
+        const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
+        const { x, y } = pointer;
         const deltaX = x - this.startPoint.x;
         const deltaY = y - this.startPoint.y;
 
@@ -45,7 +46,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
             nodes: selectedNodes,
           });
 
-          this.updateGroupHighlightOnDrag(tx, event.lastInputPoint, selectedNodes);
+          this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
         });
 
         this.lastInputPoint = event.lastInputPoint;
