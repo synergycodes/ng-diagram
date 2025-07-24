@@ -10,7 +10,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
   private initialNodePosition: Point | undefined;
   private isMoving = false;
 
-  handle(event: PointerMoveSelectionEvent) {
+  async handle(event: PointerMoveSelectionEvent) {
     switch (event.phase) {
       case 'start': {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
@@ -54,7 +54,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       }
       case 'end': {
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
-        this.handleDropOnGroup(pointer);
+        await this.handleDropOnGroup(pointer);
 
         this.lastInputPoint = undefined;
         this.startPoint = undefined;

@@ -183,7 +183,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       });
     });
 
-    it('should clear group highlight after grouping', () => {
+    it('should clear group highlight after grouping', async () => {
       mockGetNodesInRange.mockReturnValue([mockGroupNode]);
       mockModelLookup.wouldCreateCircularDependency.mockReturnValue(false);
 
@@ -192,26 +192,26 @@ describe('PointerMoveSelectionEventHandler', () => {
         lastInputPoint: { x: 110, y: 110 },
       });
 
-      handler.handle(event);
+      await handler.handle(event);
 
       expect(mockEmit).toHaveBeenCalledWith('updateNodes', expect.any(Object));
       expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
     });
 
-    it('should reset move state after end', () => {
+    it('should reset move state after end', async () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'end',
         lastInputPoint: { x: 110, y: 110 },
       });
 
-      handler.handle(event);
+      await handler.handle(event);
 
       // Verify state is reset by trying to continue movement
       const continueEvent = getSamplePointerMoveSelectionEvent({
         phase: 'continue',
         lastInputPoint: { x: 120, y: 120 },
       });
-      handler.handle(continueEvent);
+      await handler.handle(continueEvent);
 
       // Should not emit moveNodesBy since movement state was reset
       expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', {
