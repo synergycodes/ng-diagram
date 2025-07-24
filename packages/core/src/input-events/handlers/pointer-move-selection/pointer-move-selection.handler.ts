@@ -10,7 +10,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
   private initialNodePosition: Point | undefined;
   private isMoving = false;
 
-  handle(event: PointerMoveSelectionEvent) {
+  async handle(event: PointerMoveSelectionEvent) {
     switch (event.phase) {
       case 'start': {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
@@ -32,7 +32,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           this.initialNodePosition = { ...firstNode.position };
         }
 
-        const { x, y } = this.flow.clientToFlowPosition(event.lastInputPoint);
+        const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
+        const { x, y } = pointer;
         const deltaX = x - this.startPoint.x;
         const deltaY = y - this.startPoint.y;
 
@@ -45,14 +46,15 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
             nodes: selectedNodes,
           });
 
-          this.updateGroupHighlightOnDrag(tx, event.lastInputPoint, selectedNodes);
+          this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
         });
 
         this.lastInputPoint = event.lastInputPoint;
         break;
       }
       case 'end': {
-        this.handleDropOnGroup(event.lastInputPoint);
+        const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
+        await this.handleDropOnGroup(pointer);
 
         this.lastInputPoint = undefined;
         this.startPoint = undefined;
@@ -84,8 +86,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     return groups.toSorted((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];
   }
 
-  // TODO: Test if drop works correctly
-  private handleDropOnGroup(point: Point) {
+  private async handleDropOnGroup(point: Point) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
     const updateData: { id: string; groupId?: string }[] = [];
 
@@ -108,7 +109,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     }
 
     if (updateData.length > 0) {
-      this.flow.commandHandler.emit('updateNodes', { nodes: updateData });
+      await this.flow.commandHandler.emit('updateNodes', { nodes: updateData });
     }
 
     // That means a group has been highlighted, so we need to clear it
