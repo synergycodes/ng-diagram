@@ -1,4 +1,4 @@
-import { Directive, inject, input } from '@angular/core';
+import { Directive, inject, input, signal } from '@angular/core';
 import { Node } from '@angularflow/core';
 import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -14,8 +14,12 @@ export class LinkingInputDirective {
   private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
-  target = input.required<Node>();
+  target = signal<Node | undefined>(undefined);
   portId = input.required<string>();
+
+  setTargetNode(node: Node) {
+    this.target.set(node);
+  }
 
   onPointerDown($event: PointerInputEvent) {
     $event.linkingHandled = true;
