@@ -11,7 +11,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(1, 0);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(0.057, 2);
     });
@@ -21,7 +21,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(0, 1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 5);
     });
@@ -31,7 +31,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(0, -1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(-90, 5);
     });
@@ -41,7 +41,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(-1, 0);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(180, 5);
     });
@@ -51,7 +51,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(-1, 0);
       const mouse = createPoint(1, 0);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(180, 5);
     });
@@ -63,7 +63,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(0.001, 0);
       const mouse = createPoint(0, 0.001);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 0);
     });
@@ -73,7 +73,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(2, 0);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(0, 1);
     });
@@ -83,7 +83,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(5, 5);
       const mouse = createPoint(5, 5);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(60, 1);
     });
@@ -95,7 +95,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(6, 5);
       const mouse = createPoint(5, 6);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 5);
     });
@@ -105,7 +105,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(-4, -5);
       const mouse = createPoint(-5, -4);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 1);
     });
@@ -115,7 +115,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(-1, 0);
       const mouse = createPoint(0, 1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(-90, 5);
     });
@@ -127,7 +127,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1000001, 1000000);
       const mouse = createPoint(1000000, 1000001);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 5);
     });
@@ -137,7 +137,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1.123, 0.456);
       const mouse = createPoint(0.123, 1.456);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 5);
     });
@@ -147,9 +147,9 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(0, 1);
 
-      const angle1 = getRotationAngle({ handle, center, mouse });
-      const angle2 = getRotationAngle({ handle, center, mouse });
-      const angle3 = getRotationAngle({ handle, center, mouse });
+      const angle1 = getRotationAngle({ handle, center, pointer: mouse });
+      const angle2 = getRotationAngle({ handle, center, pointer: mouse });
+      const angle3 = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle1).toBe(angle2);
       expect(angle2).toBe(angle3);
@@ -162,7 +162,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(1, 1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(45, 5);
     });
@@ -172,7 +172,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(1, -1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(-45, 5);
     });
@@ -182,7 +182,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(-1, 1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(135, 5);
     });
@@ -192,7 +192,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(-1, -1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(-135, 5);
     });
@@ -206,8 +206,8 @@ describe('getRotationAngle', () => {
       const mouseUp = createPoint(0, 1);
       const mouseDown = createPoint(0, -1);
 
-      const angleUp = getRotationAngle({ handle, center, mouse: mouseUp });
-      const angleDown = getRotationAngle({ handle, center, mouse: mouseDown });
+      const angleUp = getRotationAngle({ handle, center, pointer: mouseUp });
+      const angleDown = getRotationAngle({ handle, center, pointer: mouseDown });
 
       expect(angleUp).toBeCloseTo(-angleDown, 5);
     });
@@ -222,8 +222,8 @@ describe('getRotationAngle', () => {
       const handle2 = createPoint(11, 10);
       const mouse2 = createPoint(10, 11);
 
-      const angle1 = getRotationAngle({ handle: handle1, center: center1, mouse: mouse1 });
-      const angle2 = getRotationAngle({ handle: handle2, center: center2, mouse: mouse2 });
+      const angle1 = getRotationAngle({ handle: handle1, center: center1, pointer: mouse1 });
+      const angle2 = getRotationAngle({ handle: handle2, center: center2, pointer: mouse2 });
 
       expect(angle1).toBeCloseTo(angle2, 5);
     });
@@ -235,7 +235,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(Number.MAX_SAFE_INTEGER / 1000, 0);
       const mouse = createPoint(0, Number.MAX_SAFE_INTEGER / 1000);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).toBeCloseTo(90, 1);
     });
@@ -245,7 +245,7 @@ describe('getRotationAngle', () => {
       const handle = createPoint(1, 0);
       const mouse = createPoint(0, 1);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
 
       expect(angle).not.toBeNaN();
       expect(Number.isFinite(angle)).toBe(true);
@@ -263,7 +263,7 @@ describe('getRotationAngle', () => {
       const center = createPoint(0, 0);
       const handle = createPoint(1, 0);
 
-      const angle = getRotationAngle({ handle, center, mouse });
+      const angle = getRotationAngle({ handle, center, pointer: mouse });
       expect(angle).toBeGreaterThanOrEqual(-180);
       expect(angle).toBeLessThanOrEqual(180);
     });

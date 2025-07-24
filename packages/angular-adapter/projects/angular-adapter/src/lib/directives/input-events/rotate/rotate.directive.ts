@@ -1,6 +1,7 @@
 import { Directive, ElementRef, inject, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
+import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
 
@@ -14,6 +15,7 @@ export class RotateHandleDirective {
   private readonly elementRef = inject(ElementRef);
   private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   target = input.required<Node>();
 
@@ -80,11 +82,13 @@ export class RotateHandleDirective {
   }
 
   private getHandleCenter() {
+    const flowCore = this.flowCoreProvider.provide();
     const { top, height, left, width } = this.elementRef.nativeElement.getBoundingClientRect();
-    return {
+
+    return flowCore.clientToFlowPosition({
       x: left + width / 2,
       y: top + height / 2,
-    };
+    });
   }
 
   private getNodeCenter() {

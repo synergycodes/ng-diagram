@@ -4,11 +4,11 @@ import { getDistanceBetweenPoints } from '../../../utils';
 interface RotationPoints {
   handle: Point;
   center: Point;
-  mouse: Point;
+  pointer: Point;
 }
 
 // https://stackoverflow.com/a/49151174/6743808
-const getIsAnticlockwise = ({ handle, center, mouse }: RotationPoints) => {
+const getIsAnticlockwise = ({ handle, center, pointer: mouse }: RotationPoints) => {
   const x1 = handle.x - center.x;
   const y1 = handle.y - center.y;
   const x2 = mouse.x - center.x;
@@ -25,7 +25,7 @@ const getIsAnticlockwise = ({ handle, center, mouse }: RotationPoints) => {
 // The angle near the center is the one we are looking for.
 export const getRotationAngle = (params: RotationPoints) => {
   const isAntiClockwise = getIsAnticlockwise(params);
-  const { handle, center, mouse } = params;
+  const { handle, center, pointer: mouse } = params;
 
   const AB = Math.max(0.001, getDistanceBetweenPoints(center, handle));
   const BC = Math.max(0.001, getDistanceBetweenPoints(center, mouse));

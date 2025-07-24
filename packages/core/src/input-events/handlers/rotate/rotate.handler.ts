@@ -11,8 +11,10 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
     if (!target) {
       throw new Error('Rotate event must have a target Node');
     }
+
     const nodeId = target?.id;
-    const mouseToCenterDistance = getDistanceBetweenPoints(lastInputPoint, center);
+    const pointer = this.flow.clientToFlowPosition(lastInputPoint);
+    const pointerToCenterDistance = getDistanceBetweenPoints(pointer, center);
 
     /*
       Someone has a mouse near the center,
@@ -20,12 +22,12 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
 
       We just ignore that space and do not react.
     */
-    if (mouseToCenterDistance < MIN_DISTANCE_TO_CENTER) return;
+    if (pointerToCenterDistance < MIN_DISTANCE_TO_CENTER) return;
 
     const angle = getRotationAngle({
       handle,
       center,
-      mouse: lastInputPoint,
+      pointer,
     });
 
     this.flow.commandHandler.emit('rotateNodeBy', {
