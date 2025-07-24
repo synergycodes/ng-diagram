@@ -19,14 +19,14 @@ function applyMinimumSizeConstraints(
   requestedSize: Required<Node>['size'],
   requestedPosition: Node['position'] | undefined,
   originalPosition: Node['position']
-): { size: Required<Node>['size']; position: Node['position'] } {
+): { size: Required<Node>['size']; position: Node['position'] | undefined } {
   const constrainedWidth = Math.max(requestedSize.width, MIN_NODE_SIZE);
   const constrainedHeight = Math.max(requestedSize.height, MIN_NODE_SIZE);
 
   if (!requestedPosition) {
     return {
       size: { width: constrainedWidth, height: constrainedHeight },
-      position: originalPosition,
+      position: requestedPosition,
     };
   }
 
@@ -57,14 +57,15 @@ function applyMinimumSizeConstraints(
  */
 export function applyChildrenBoundsConstraints(
   requestedSize: Required<Node>['size'],
-  requestedPosition: Node['position'],
+  requestedPosition: Node['position'] | undefined,
+  originalPosition: Node['position'],
   childrenBounds: Bounds
 ): { size: Required<Node>['size']; position: Node['position'] } {
   const requestedBounds: Bounds = {
-    minX: requestedPosition.x,
-    minY: requestedPosition.y,
-    maxX: requestedPosition.x + requestedSize.width,
-    maxY: requestedPosition.y + requestedSize.height,
+    minX: requestedPosition?.x ?? originalPosition.x,
+    minY: requestedPosition?.y ?? originalPosition.y,
+    maxX: (requestedPosition?.x ?? originalPosition.x) + requestedSize.width,
+    maxY: (requestedPosition?.y ?? originalPosition.y) + requestedSize.height,
   };
 
   const finalBounds: Bounds = {
@@ -119,7 +120,7 @@ async function handleGroupNodeResize(
     return;
   }
 
-  if (!command.size) {
+  if (!command.size || !command.position) {
     return;
   }
 
@@ -134,6 +135,7 @@ async function handleGroupNodeResize(
   const { size: finalSize, position: finalPosition } = applyChildrenBoundsConstraints(
     constrainedSize,
     constrainedPosition,
+    node.position,
     childrenBounds
   );
 
@@ -156,7 +158,7 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
-  if (!command.size) {
+  if (!command.size || !command.position) {
     return;
   }
   const node = commandHandler.flowCore.getNodeById(command.id);
