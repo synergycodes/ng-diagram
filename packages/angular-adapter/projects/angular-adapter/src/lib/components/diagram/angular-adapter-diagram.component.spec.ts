@@ -71,7 +71,10 @@ describe('AngularAdapterDiagramComponent', () => {
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith(mockModel, middlewares);
+    const callArgs = spy.mock.calls[0];
+    expect(callArgs[0]).toBe(mockModel);
+    expect(callArgs[1]).toBe(middlewares);
+    expect(typeof callArgs[2]).toBe('function');
 
     fixture.componentRef.setInput('middlewares', [...middlewares]);
     fixture.detectChanges();

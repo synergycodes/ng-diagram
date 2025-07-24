@@ -13,9 +13,17 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
 
   init(
     model: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>,
-    middlewares: TMiddlewares = [] as unknown as TMiddlewares
+    middlewares: TMiddlewares = [] as unknown as TMiddlewares,
+    getFlowOffset: () => { x: number; y: number }
   ): void {
-    this.flowCore = new FlowCore(model, this.renderer, this.inputEventsRouter, detectEnvironment(), middlewares);
+    this.flowCore = new FlowCore(
+      model,
+      this.renderer,
+      this.inputEventsRouter,
+      detectEnvironment(),
+      middlewares,
+      getFlowOffset
+    );
   }
 
   provide(): FlowCore<TMiddlewares> {
