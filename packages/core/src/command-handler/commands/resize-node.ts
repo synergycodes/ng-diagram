@@ -97,6 +97,11 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
     return; // No-op if size is unchanged
   }
 
+  // Early return when position is missing - it was called by internal updater
+  if (!command.size || !command.position) {
+    return;
+  }
+
   if (node.isGroup) {
     await handleGroupNodeResize(commandHandler, command, node);
   } else {
@@ -117,10 +122,6 @@ async function handleGroupNodeResize(
   if (children.length === 0) {
     // if the group has no children, we fallback to single node mode
     await handleSingleNodeResize(commandHandler, command);
-    return;
-  }
-
-  if (!command.size || !command.position) {
     return;
   }
 
@@ -158,9 +159,6 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
-  if (!command.size || !command.position) {
-    return;
-  }
   const node = commandHandler.flowCore.getNodeById(command.id);
   if (!node) {
     return;
