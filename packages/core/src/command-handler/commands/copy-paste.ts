@@ -124,9 +124,6 @@ const createPastedEdges = (copiedEdges: Edge[], nodeIdMap: Map<string, string>):
       id: newEdgeId,
       source: nodeIdMap.get(edge.source) || edge.source,
       target: nodeIdMap.get(edge.target) || edge.target,
-      // Keep original port IDs since they're hardcoded in templates
-      sourcePort: edge.sourcePort,
-      targetPort: edge.targetPort,
       selected: true,
     };
 
