@@ -53,7 +53,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         break;
       }
       case 'end': {
-        this.handleDropOnGroup(event.lastInputPoint);
+        const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
+        this.handleDropOnGroup(pointer);
 
         this.lastInputPoint = undefined;
         this.startPoint = undefined;
@@ -85,8 +86,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     return groups.toSorted((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];
   }
 
-  // TODO: Test if drop works correctly
-  private handleDropOnGroup(point: Point) {
+  private async handleDropOnGroup(point: Point) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
     const updateData: { id: string; groupId?: string }[] = [];
 
@@ -109,7 +109,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     }
 
     if (updateData.length > 0) {
-      this.flow.commandHandler.emit('updateNodes', { nodes: updateData });
+      await this.flow.commandHandler.emit('updateNodes', { nodes: updateData });
     }
 
     // That means a group has been highlighted, so we need to clear it

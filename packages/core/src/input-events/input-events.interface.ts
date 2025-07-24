@@ -30,6 +30,9 @@ export interface BaseInputEvent {
 export interface BasePointerInputEvent extends BaseInputEvent {
   target: Node | Edge | undefined;
   targetType: 'node' | 'edge' | 'diagram';
+  /**
+   * The last input point in the client coordinates.
+   */
   lastInputPoint: Point;
 }
 
