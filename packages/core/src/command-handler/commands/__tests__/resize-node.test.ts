@@ -277,16 +277,16 @@ describe('Resize Node Command', () => {
         isGroup: false,
       });
 
-      // Simulating left-edge resize where position moved left but size was constrained
-      const requestedWidth = MIN_NODE_SIZE - 150; // This will be constrained to MIN_NODE_SIZE
+      // Simulating left-edge resize where left edge is dragged right, making the top-left corner move right
+      const requestedWidth = MIN_NODE_SIZE - 50; // This will be constrained to MIN_NODE_SIZE
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
         size: { width: requestedWidth, height: MIN_NODE_SIZE + 100 },
-        position: { x: 50, y: 100 }, // position moved left from original (100)
+        position: { x: 250, y: 100 }, // position moved right from original (100) due to left edge moving right
       });
 
-      const expectedXAdjustment = 50 - (MIN_NODE_SIZE - requestedWidth); // 50 - 150 = -100
+      const expectedXAdjustment = 250 - (MIN_NODE_SIZE - requestedWidth);
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
@@ -310,16 +310,16 @@ describe('Resize Node Command', () => {
         isGroup: false,
       });
 
-      // Simulating top-edge resize where position moved up but size was constrained
-      const requestedHeight = MIN_NODE_SIZE - 150; // This will be constrained to MIN_NODE_SIZE
+      // Simulating top-edge resize where top edge is dragged down, making the top-left corner move down
+      const requestedHeight = MIN_NODE_SIZE - 50; // This will be constrained to MIN_NODE_SIZE
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
         size: { width: MIN_NODE_SIZE + 100, height: requestedHeight },
-        position: { x: 100, y: 50 }, // position moved up from original (100)
+        position: { x: 100, y: 250 }, // position moved down from original (100) due to top edge moving down
       });
 
-      const expectedYAdjustment = 50 - (MIN_NODE_SIZE - requestedHeight); // 50 - 150 = -100
+      const expectedYAdjustment = 250 - (MIN_NODE_SIZE - requestedHeight);
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
@@ -335,7 +335,7 @@ describe('Resize Node Command', () => {
       );
     });
 
-    it('should adjust both X and Y positions when both dimensions are constrained during top-left resize', async () => {
+    it('should adjust both X and Y positions when both dimensions are constrained during top-left corner resize', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
         size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
@@ -343,17 +343,17 @@ describe('Resize Node Command', () => {
         isGroup: false,
       });
 
-      const requestedWidth = MIN_NODE_SIZE - 150; // both constrained to MIN_NODE_SIZE
-      const requestedHeight = MIN_NODE_SIZE - 125;
+      const requestedWidth = MIN_NODE_SIZE - 50; // both constrained to MIN_NODE_SIZE
+      const requestedHeight = MIN_NODE_SIZE - 50;
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
         size: { width: requestedWidth, height: requestedHeight },
-        position: { x: 50, y: 25 }, // both positions moved from original
+        position: { x: 250, y: 250 }, // both positions moved right/down from original due to top-left corner drag
       });
 
-      const expectedXAdjustment = 50 - (MIN_NODE_SIZE - requestedWidth); // 50 - 150 = -100
-      const expectedYAdjustment = 25 - (MIN_NODE_SIZE - requestedHeight); // 25 - 125 = -100
+      const expectedXAdjustment = 250 - (MIN_NODE_SIZE - requestedWidth);
+      const expectedYAdjustment = 250 - (MIN_NODE_SIZE - requestedHeight);
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
@@ -377,7 +377,7 @@ describe('Resize Node Command', () => {
         isGroup: false,
       });
 
-      // Right/bottom edge resize - position doesn't change, only size
+      // Right/bottom edge resize - position stays the same (top-left corner doesn't move)
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
@@ -392,6 +392,36 @@ describe('Resize Node Command', () => {
               id: '1',
               size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE },
               position: { x: 100, y: 100 }, // no position adjustment needed
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('should not adjust position when size is not constrained', async () => {
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        id: '1',
+        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        position: { x: 100, y: 100 },
+        isGroup: false,
+      });
+
+      // Left/top resize but size is above minimum - no constraint, no adjustment needed
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: MIN_NODE_SIZE + 50, height: MIN_NODE_SIZE + 25 }, // above minimum
+        position: { x: 150, y: 175 }, // position moved due to left/top edge drag
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: MIN_NODE_SIZE + 50, height: MIN_NODE_SIZE + 25 },
+              position: { x: 150, y: 175 }, // no adjustment - size wasn't constrained
             },
           ],
         },

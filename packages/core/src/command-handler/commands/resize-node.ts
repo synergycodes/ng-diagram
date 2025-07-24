@@ -33,14 +33,14 @@ function applyMinimumSizeConstraints(
   let constrainedX = requestedPosition.x;
   let constrainedY = requestedPosition.y;
 
-  // If width was constrained and position moved left from original, adjust it back
-  if (constrainedWidth !== requestedSize.width && requestedPosition.x < originalPosition.x) {
+  // If width was constrained and position moved right from original, adjust it back
+  if (constrainedWidth !== requestedSize.width && requestedPosition.x > originalPosition.x) {
     const widthDifference = constrainedWidth - requestedSize.width;
     constrainedX = requestedPosition.x - widthDifference;
   }
 
-  // If height was constrained and position moved up from original, adjust it back
-  if (constrainedHeight !== requestedSize.height && requestedPosition.y < originalPosition.y) {
+  // If height was constrained and position moved down from original, adjust it back
+  if (constrainedHeight !== requestedSize.height && requestedPosition.y > originalPosition.y) {
     const heightDifference = constrainedHeight - requestedSize.height;
     constrainedY = requestedPosition.y - heightDifference;
   }
