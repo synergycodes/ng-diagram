@@ -1,4 +1,5 @@
-import type { CommandHandler, Edge } from '../../types';
+import { FlowCore } from '../../flow-core';
+import type { CommandHandler, Edge, Port } from '../../types';
 import { getPortFlowPosition } from '../../utils';
 
 export const getTemporaryEdge = (partialEdge: Partial<Edge>) => ({
@@ -24,18 +25,18 @@ export interface StartLinkingCommand {
 }
 
 export const startLinking = async (commandHandler: CommandHandler, command: StartLinkingCommand) => {
-  const { source, sourcePort } = command;
+  const { source: sourceNodeId, sourcePort: sourcePortId } = command;
 
-  const sourceNode = commandHandler.flowCore.getNodeById(source);
+  const sourceNode = commandHandler.flowCore.getNodeById(sourceNodeId);
   if (!sourceNode) {
     return;
   }
 
-  if (sourcePort && sourceNode.ports?.find((port) => port.id === sourcePort)?.type === 'target') {
+  if (sourcePortId && sourceNode.ports?.find((port) => port.id === sourcePortId)?.type === 'target') {
     return;
   }
 
-  const position = sourcePort ? getPortFlowPosition(sourceNode, sourcePort) : sourceNode.position;
+  const position = sourcePortId ? getPortFlowPosition(sourceNode, sourcePortId) : sourceNode.position;
 
   if (!position) {
     return;
@@ -45,8 +46,8 @@ export const startLinking = async (commandHandler: CommandHandler, command: Star
     {
       metadataUpdate: {
         temporaryEdge: getTemporaryEdge({
-          source,
-          sourcePort,
+          source: sourceNodeId,
+          sourcePort: sourcePortId,
           sourcePosition: position,
           target: '',
           targetPosition: position,
@@ -86,38 +87,57 @@ export const startLinkingFromPosition = async (
 export interface MoveTemporaryEdgeCommand {
   name: 'moveTemporaryEdge';
   position: { x: number; y: number };
-  target?: string;
-  targetPort?: string;
 }
 
 export const moveTemporaryEdge = async (commandHandler: CommandHandler, command: MoveTemporaryEdgeCommand) => {
   const { metadata } = commandHandler.flowCore.getState();
-  const { position, target, targetPort: targetPortId } = command;
+  const { position } = command;
   const temporaryEdge = metadata.temporaryEdge;
 
   if (!temporaryEdge) {
     return;
   }
 
+  const targetPort = commandHandler.flowCore.getNearestPortInRange(position, 10);
+  const isProperTarget = targetPort && isProperTargetPort(targetPort, temporaryEdge.source, temporaryEdge.sourcePort);
+  const targetNodeId = isProperTarget ? targetPort.nodeId : '';
+  const targetPortId = isProperTarget ? targetPort.id : '';
+
   let newTemporaryEdge: Edge = temporaryEdge;
 
-  const targetNode = target ? commandHandler.flowCore.getNodeById(target) : null;
+  const targetNode = targetNodeId ? commandHandler.flowCore.getNodeById(targetNodeId) : null;
 
-  if (target && target === temporaryEdge.target && targetPortId === temporaryEdge.targetPort) {
+  // early return if the target port is the same as the temporary edge target port
+  if (targetNodeId && targetNodeId === temporaryEdge.target && targetPortId === temporaryEdge.targetPort) {
     return;
   }
 
-  if (target && targetNode) {
-    if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)) {
+  if (targetNodeId && targetNode) {
+    if (
+      !validateConnection(
+        commandHandler.flowCore,
+        temporaryEdge.source,
+        temporaryEdge.sourcePort,
+        targetNodeId,
+        targetPortId
+      )
+    ) {
       newTemporaryEdge = {
         ...temporaryEdge,
-        target,
+        target: '',
+        targetPort: '',
+        targetPosition: position,
+      };
+    } else if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)) {
+      newTemporaryEdge = {
+        ...temporaryEdge,
+        target: targetNodeId,
         targetPort: targetPortId,
       };
     } else {
       newTemporaryEdge = {
         ...temporaryEdge,
-        target,
+        target: targetNodeId,
         targetPort: '',
       };
     }
@@ -140,31 +160,48 @@ export const moveTemporaryEdge = async (commandHandler: CommandHandler, command:
 
 export interface FinishLinkingCommand {
   name: 'finishLinking';
-  target?: string;
-  targetPort?: string;
 }
 
-export const finishLinking = async (commandHandler: CommandHandler, command: FinishLinkingCommand) => {
+export const finishLinking = async (commandHandler: CommandHandler) => {
   const { metadata } = commandHandler.flowCore.getState();
-  const { target, targetPort } = command;
 
-  if (!metadata.temporaryEdge) {
+  const temporaryEdge = metadata.temporaryEdge;
+
+  if (!temporaryEdge) {
     return;
   }
 
-  const targetNode = target && commandHandler.flowCore.getNodeById(target);
+  const targetNodeId = temporaryEdge.target;
+  const targetPortId = temporaryEdge.targetPort;
+
+  const targetNode = targetNodeId && commandHandler.flowCore.getNodeById(targetNodeId);
+
+  if (
+    !validateConnection(
+      commandHandler.flowCore,
+      temporaryEdge.source,
+      temporaryEdge.sourcePort,
+      targetNodeId,
+      targetPortId,
+      true
+    )
+  ) {
+    await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    return;
+  }
 
   if (!targetNode) {
     await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     return;
   }
 
-  if (targetPort && targetNode.ports?.find((port) => port.id === targetPort)?.type === 'source') {
+  if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)?.type === 'source') {
     await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
     return;
   }
 
-  const targetPosition = !!target && !!targetPort ? getPortFlowPosition(targetNode, targetPort) : targetNode.position;
+  const targetPosition =
+    targetNodeId && targetPortId ? getPortFlowPosition(targetNode, targetPortId) : targetNode.position;
 
   if (!targetPosition) {
     await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
@@ -174,7 +211,7 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
   await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: { temporaryEdge: null },
-      edgesToAdd: [getFinalEdge(metadata.temporaryEdge, { target, targetPort, targetPosition })],
+      edgesToAdd: [getFinalEdge(temporaryEdge, { target: targetNodeId, targetPort: targetPortId, targetPosition })],
     },
     'finishLinking'
   );
@@ -203,4 +240,38 @@ export const finishLinkingToPosition = async (
     },
     'finishLinking'
   );
+};
+
+export const isProperTargetPort = (targetPort: Port, sourceNodeId?: string, sourcePortId?: string) => {
+  if (targetPort.type === 'source') {
+    return false;
+  }
+  if (sourceNodeId && targetPort.nodeId !== sourceNodeId) {
+    return true;
+  }
+  if (sourcePortId && targetPort.id !== sourcePortId) {
+    return true;
+  }
+  return false;
+};
+
+export const validateConnection = (
+  core: FlowCore,
+  sourceNodeId?: string,
+  sourcePortId?: string,
+  targetNodeId?: string,
+  targetPortId?: string,
+  isFinishLinking?: boolean
+) => {
+  const sourceNode = sourceNodeId ? core.getNodeById(sourceNodeId) : null;
+  const targetNode = targetNodeId ? core.getNodeById(targetNodeId) : null;
+  const sourcePort = sourcePortId ? sourceNode?.ports?.find((port) => port.id === sourcePortId) : null;
+
+  const targetPort = targetPortId ? targetNode?.ports?.find((port) => port.id === targetPortId) : null;
+
+  if (!isFinishLinking && !targetPort && sourcePort) {
+    return true;
+  }
+
+  return false;
 };

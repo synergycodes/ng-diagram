@@ -122,8 +122,6 @@ describe('Linking Commands', () => {
 
       commandHandler.emit('moveTemporaryEdge', {
         position: { x: 100, y: 100 },
-        target: 'node-1',
-        targetPort: 'port-1',
       });
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
@@ -138,8 +136,6 @@ describe('Linking Commands', () => {
 
       commandHandler.emit('moveTemporaryEdge', {
         position: { x: 100, y: 100 },
-        target: 'node-2',
-        targetPort: 'port-2',
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
@@ -165,7 +161,6 @@ describe('Linking Commands', () => {
 
       commandHandler.emit('moveTemporaryEdge', {
         position: { x: 100, y: 100 },
-        target: 'node-2',
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
