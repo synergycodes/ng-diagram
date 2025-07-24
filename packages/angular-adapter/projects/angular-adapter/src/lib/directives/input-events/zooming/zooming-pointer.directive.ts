@@ -1,5 +1,5 @@
 import { Directive, inject } from '@angular/core';
-import { ZOOMING_CONFIG } from '@angularflow/core';
+import { DEFAULT_ZOOMING_CONFIG } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 
 @Directive({
@@ -69,14 +69,17 @@ export class ZoomingPointerDirective {
 
     // Calculate zoom factor based on distance change
     const distanceRatio = currentDistance / this.lastDistance;
-    const zoomFactor = Math.min(Math.max(1 - ZOOMING_CONFIG.STEP, distanceRatio), 1 + ZOOMING_CONFIG.STEP);
+    const zoomFactor = Math.min(
+      Math.max(1 - DEFAULT_ZOOMING_CONFIG.STEP, distanceRatio),
+      1 + DEFAULT_ZOOMING_CONFIG.STEP
+    );
 
     // Apply zoom with center point preservation
     const beforeZoomX = (centerX - x) / scale;
     const beforeZoomY = (centerY - y) / scale;
 
     scale *= zoomFactor;
-    scale = Math.min(Math.max(ZOOMING_CONFIG.MIN, scale), ZOOMING_CONFIG.MAX);
+    scale = Math.min(Math.max(DEFAULT_ZOOMING_CONFIG.MIN, scale), DEFAULT_ZOOMING_CONFIG.MAX);
 
     const afterZoomX = (centerX - x) / scale;
     const afterZoomY = (centerY - y) / scale;
