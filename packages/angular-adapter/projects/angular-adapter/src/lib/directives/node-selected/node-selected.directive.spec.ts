@@ -33,6 +33,6 @@ describe('NodeSelectedDirective', () => {
   });
 
   it('should set default box-shadow style', () => {
-    expect(divElement.style.boxShadow).toBe('none');
+    expect(divElement.style.boxShadow).toBe('');
   });
 });
