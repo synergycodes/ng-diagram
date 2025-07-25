@@ -29,7 +29,8 @@ export const nodeRotationSnapMiddleware: Middleware<'node-rotation-snap', NodeRo
       return;
     }
 
-    const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
+    const nodesToSnap: FlowStateUpdate['nodesToUpdate'] = [];
+    const nodesToSkipSnapping: FlowStateUpdate['nodesToUpdate'] = [];
 
     for (const nodeId of helpers.getAffectedNodeIds(['angle'])) {
       const node = nodesMap.get(nodeId);
@@ -38,9 +39,14 @@ export const nodeRotationSnapMiddleware: Middleware<'node-rotation-snap', NodeRo
         continue;
       }
 
-      const shouldRotate = node.angle % snap !== 0;
+      if (!flowCore.config.nodeRotation.shouldSnapForNode(node)) {
+        nodesToSkipSnapping.push({ id: node.id });
+        continue;
+      }
 
-      if (!shouldRotate) {
+      const isSnapMeaningful = node.angle % snap !== 0;
+
+      if (!isSnapMeaningful) {
         continue;
       }
 
@@ -50,15 +56,19 @@ export const nodeRotationSnapMiddleware: Middleware<'node-rotation-snap', NodeRo
 
       // This prevents unnecessary state updates when the angle is already snapped
       if (originalNode && originalNode.angle !== snappedAngle) {
-        nodesToUpdate.push({ id: node.id, angle: snappedAngle });
+        nodesToSnap.push({ id: node.id, angle: snappedAngle });
       }
     }
 
-    if (nodesToUpdate.length === 0) {
+    if (nodesToSnap.length === 0 && nodesToSkipSnapping.length === 0) {
       cancel();
       return;
     }
 
-    next({ ...(nodesToUpdate.length > 0 ? { nodesToUpdate } : {}) });
+    const allNodesToUpdate = [...nodesToSnap, ...nodesToSkipSnapping];
+
+    next({
+      ...(allNodesToUpdate.length > 0 ? { nodesToUpdate: allNodesToUpdate } : {}),
+    });
   },
 };

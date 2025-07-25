@@ -110,9 +110,9 @@ describe('nodeRotationSnapMiddleware', () => {
 
     nodeRotationSnapMiddleware.execute(context, nextMock, cancelMock);
 
-    expect(cancelMock).toHaveBeenCalled();
+    expect(nextMock).toHaveBeenCalledWith({ nodesToUpdate: [{ id: 'node1' }] });
     expect(shouldSnapForNodeMock).toHaveBeenCalledWith({ ...mockNode, id: 'node1', angle: 17 });
-    expect(nextMock).not.toHaveBeenCalled();
+    expect(cancelMock).not.toHaveBeenCalled();
   });
 
   it('should snap angle if not snapped and update state', () => {
@@ -188,5 +188,39 @@ describe('nodeRotationSnapMiddleware', () => {
     nodeRotationSnapMiddleware.execute(context, nextMock, cancelMock);
 
     expect(cancelMock).toHaveBeenCalled();
+  });
+
+  it('should handle mixed scenario with nodes to snap and nodes to skip', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1', 'node2']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 17 });
+    nodesMap.set('node2', { ...mockNode, id: 'node2', angle: 23 });
+    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockImplementation((id: string) => ({
+      id,
+      angle: nodesMap.get(id)?.angle,
+    }));
+    shouldSnapForNodeMock.mockImplementation((node: Node) => node.id === 'node1');
+
+    nodeRotationSnapMiddleware.execute(context, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      nodesToUpdate: [{ id: 'node1', angle: snapAngle(17, SNAP_ANGLE) }, { id: 'node2' }],
+    });
+    expect(cancelMock).not.toHaveBeenCalled();
+  });
+
+  it('should handle only skipped nodes', () => {
+    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1', 'node2']);
+    nodesMap.set('node1', { ...mockNode, id: 'node1', angle: 17 });
+    nodesMap.set('node2', { ...mockNode, id: 'node2', angle: 23 });
+    shouldSnapForNodeMock.mockReturnValue(false);
+
+    nodeRotationSnapMiddleware.execute(context, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      nodesToUpdate: [{ id: 'node1' }, { id: 'node2' }],
+    });
+    expect(cancelMock).not.toHaveBeenCalled();
   });
 });
