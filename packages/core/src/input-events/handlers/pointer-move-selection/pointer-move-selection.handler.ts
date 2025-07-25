@@ -68,7 +68,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
     if (topLevelGroupNode) {
       if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
-        tx.emit('highlightGroup', { groupId: topLevelGroupNode.id });
+        tx.emit('highlightGroup', { groupId: topLevelGroupNode.id, nodes: selectedNodes });
       }
     } else {
       tx.emit('highlightGroupClear');

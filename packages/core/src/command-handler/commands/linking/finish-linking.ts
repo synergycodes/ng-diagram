@@ -63,7 +63,7 @@ export const finishLinking = async (commandHandler: CommandHandler): Promise<voi
     {
       metadataUpdate: { temporaryEdge: null },
       edgesToAdd: [
-        createFinalEdge(temporaryEdge, {
+        createFinalEdge(commandHandler.flowCore.config, temporaryEdge, {
           target: targetNodeId,
           targetPort: targetPortId,
           targetPosition: targetPosition || undefined,

@@ -25,6 +25,10 @@ export const addToGroup = async (commandHandler: CommandHandler, { groupId, node
       continue;
     }
 
+    if (!commandHandler.flowCore.config.grouping.canGroup(node, group)) {
+      continue;
+    }
+
     updateData.push({
       id: node.id,
       groupId,

@@ -1,4 +1,5 @@
 import { CommandHandler } from './command-handler/command-handler';
+import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InitializationGuard } from './initialization-guard/initialization-guard';
 import { InputEventsRouter } from './input-events';
 import { InternalUpdater } from './internal-updater/internal-updater';
@@ -12,6 +13,7 @@ import { TransactionCallback, TransactionResult } from './transaction-manager/tr
 import type {
   Edge,
   EnvironmentInfo,
+  FlowConfig,
   FlowState,
   FlowStateUpdate,
   LooseAutocomplete,
@@ -43,6 +45,7 @@ export class FlowCore<
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
+  readonly config: FlowConfig;
 
   readonly getFlowOffset: () => { x: number; y: number };
 
@@ -52,7 +55,8 @@ export class FlowCore<
     public readonly inputEventsRouter: InputEventsRouter,
     environment: EnvironmentInfo,
     middlewares?: TMiddlewares,
-    getFlowOffset?: () => { x: number; y: number }
+    getFlowOffset?: () => { x: number; y: number },
+    config: Partial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
     this.environment = environment;
@@ -65,6 +69,7 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.portBatchProcessor = new PortBatchProcessor();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
+    this.config = { ...defaultFlowConfig, ...config };
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
 

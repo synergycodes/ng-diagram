@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { CommandHandler } from '../../command-handler';
-import { applyChildrenBoundsConstraints, MIN_NODE_SIZE, resizeNode } from '../resize-node';
+import { applyChildrenBoundsConstraints, resizeNode } from '../resize-node';
 
 // Mock the utils module properly for vitest
 vi.mock('../../../utils', () => ({
@@ -18,12 +18,21 @@ describe('Resize Node Command', () => {
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
 
+  // Static minimum node size (width: 100, height: 100)
+  const MIN_WIDTH = 100;
+  const MIN_HEIGHT = 100;
+
   beforeEach(() => {
     flowCore = {
       applyUpdate: vi.fn(),
       getNodeById: vi.fn(),
       modelLookup: {
         getNodeChildren: vi.fn(),
+      },
+      config: {
+        resize: {
+          getMinNodeSize: vi.fn().mockReturnValue({ width: MIN_WIDTH, height: MIN_HEIGHT }),
+        },
       },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
@@ -47,7 +56,7 @@ describe('Resize Node Command', () => {
     it('should not call applyUpdate if new size is same as current size', () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 50, height: MIN_NODE_SIZE + 50 },
+        size: { width: 150, height: 150 },
       });
 
       // Mock isSameSize to return true for this test
@@ -56,7 +65,7 @@ describe('Resize Node Command', () => {
       resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 50, height: MIN_NODE_SIZE + 50 },
+        size: { width: 150, height: 150 },
       });
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
@@ -73,7 +82,7 @@ describe('Resize Node Command', () => {
       resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 200 }, // Using sizes above MIN_NODE_SIZE
+        size: { width: 200, height: 300 },
         position: { x: 0, y: 0 },
         disableAutoSize: true,
       });
@@ -83,7 +92,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 200 },
+              size: { width: 200, height: 300 },
               autoSize: false,
               position: { x: 0, y: 0 },
             },
@@ -104,7 +113,7 @@ describe('Resize Node Command', () => {
       resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 200 }, // Using sizes above MIN_NODE_SIZE
+        size: { width: 200, height: 300 },
         position: { x: 0, y: 0 },
         disableAutoSize: false,
       });
@@ -114,7 +123,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 200 },
+              size: { width: 200, height: 300 },
               position: { x: 0, y: 0 },
               autoSize: true,
             },
@@ -135,15 +144,13 @@ describe('Resize Node Command', () => {
       resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 200 }, // Using sizes above MIN_NODE_SIZE
+        size: { width: 200, height: 300 },
         position: { x: 0, y: 0 },
       });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          nodesToUpdate: [
-            { id: '1', size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 200 }, position: { x: 0, y: 0 } },
-          ],
+          nodesToUpdate: [{ id: '1', size: { width: 200, height: 300 }, position: { x: 0, y: 0 } }],
         },
         'resizeNode'
       );
@@ -154,7 +161,7 @@ describe('Resize Node Command', () => {
     it('should enforce minimum width constraint', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -162,7 +169,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE - 150, height: MIN_NODE_SIZE + 100 }, // width below minimum
+        size: { width: 50, height: 200 }, // width below minimum of 100
         position: { x: 100, y: 100 },
       });
 
@@ -171,7 +178,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE + 100 },
+              size: { width: 100, height: 200 }, // width constrained to minimum
               position: { x: 100, y: 100 },
             },
           ],
@@ -183,7 +190,7 @@ describe('Resize Node Command', () => {
     it('should enforce minimum height constraint', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -191,7 +198,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE - 150 }, // height below minimum
+        size: { width: 200, height: 50 }, // height below minimum of 100
         position: { x: 100, y: 100 },
       });
 
@@ -200,7 +207,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE },
+              size: { width: 200, height: 100 }, // height constrained to minimum
               position: { x: 100, y: 100 },
             },
           ],
@@ -212,7 +219,7 @@ describe('Resize Node Command', () => {
     it('should enforce both width and height constraints', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -220,7 +227,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE - 150, height: MIN_NODE_SIZE - 125 }, // both below minimum
+        size: { width: 50, height: 75 }, // both below minimum
         position: { x: 100, y: 100 },
       });
 
@@ -229,7 +236,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE },
+              size: { width: 100, height: 100 }, // both constrained to minimum
               position: { x: 100, y: 100 },
             },
           ],
@@ -241,7 +248,7 @@ describe('Resize Node Command', () => {
     it('should not modify size when above minimum constraints', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -249,7 +256,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 300 }, // both above minimum
+        size: { width: 300, height: 400 }, // both above minimum
         position: { x: 100, y: 100 },
       });
 
@@ -258,7 +265,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 300 },
+              size: { width: 300, height: 400 },
               position: { x: 100, y: 100 },
             },
           ],
@@ -272,28 +279,28 @@ describe('Resize Node Command', () => {
     it('should adjust X position when width is constrained during left-edge resize', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
 
       // Simulating left-edge resize where left edge is dragged right, making the top-left corner move right
-      const requestedWidth = MIN_NODE_SIZE - 50; // This will be constrained to MIN_NODE_SIZE
+      const requestedWidth = 50; // This will be constrained to 100
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: requestedWidth, height: MIN_NODE_SIZE + 100 },
+        size: { width: requestedWidth, height: 200 },
         position: { x: 250, y: 100 }, // position moved right from original (100) due to left edge moving right
       });
 
-      const expectedXAdjustment = 250 - (MIN_NODE_SIZE - requestedWidth);
+      const expectedXAdjustment = 250 - (100 - requestedWidth); // 250 - 50 = 200
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE + 100 },
+              size: { width: 100, height: 200 },
               position: { x: expectedXAdjustment, y: 100 },
             },
           ],
@@ -305,28 +312,28 @@ describe('Resize Node Command', () => {
     it('should adjust Y position when height is constrained during top-edge resize', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
 
       // Simulating top-edge resize where top edge is dragged down, making the top-left corner move down
-      const requestedHeight = MIN_NODE_SIZE - 50; // This will be constrained to MIN_NODE_SIZE
+      const requestedHeight = 50; // This will be constrained to 100
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: requestedHeight },
+        size: { width: 200, height: requestedHeight },
         position: { x: 100, y: 250 }, // position moved down from original (100) due to top edge moving down
       });
 
-      const expectedYAdjustment = 250 - (MIN_NODE_SIZE - requestedHeight);
+      const expectedYAdjustment = 250 - (100 - requestedHeight); // 250 - 50 = 200
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE },
+              size: { width: 200, height: 100 },
               position: { x: 100, y: expectedYAdjustment },
             },
           ],
@@ -338,13 +345,13 @@ describe('Resize Node Command', () => {
     it('should adjust both X and Y positions when both dimensions are constrained during top-left corner resize', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
 
-      const requestedWidth = MIN_NODE_SIZE - 50; // both constrained to MIN_NODE_SIZE
-      const requestedHeight = MIN_NODE_SIZE - 50;
+      const requestedWidth = 50; // both constrained to 100
+      const requestedHeight = 50;
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
@@ -352,15 +359,15 @@ describe('Resize Node Command', () => {
         position: { x: 250, y: 250 }, // both positions moved right/down from original due to top-left corner drag
       });
 
-      const expectedXAdjustment = 250 - (MIN_NODE_SIZE - requestedWidth);
-      const expectedYAdjustment = 250 - (MIN_NODE_SIZE - requestedHeight);
+      const expectedXAdjustment = 250 - (100 - requestedWidth); // 200
+      const expectedYAdjustment = 250 - (100 - requestedHeight); // 200
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE },
+              size: { width: 100, height: 100 },
               position: { x: expectedXAdjustment, y: expectedYAdjustment },
             },
           ],
@@ -372,7 +379,7 @@ describe('Resize Node Command', () => {
     it('should not adjust position when resizing from right/bottom edges', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -381,7 +388,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE - 150, height: MIN_NODE_SIZE - 125 }, // both constrained
+        size: { width: 50, height: 75 }, // both constrained
         position: { x: 100, y: 100 }, // position unchanged from original
       });
 
@@ -390,7 +397,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE },
+              size: { width: 100, height: 100 },
               position: { x: 100, y: 100 }, // no position adjustment needed
             },
           ],
@@ -402,7 +409,7 @@ describe('Resize Node Command', () => {
     it('should not adjust position when size is not constrained', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -411,7 +418,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE + 50, height: MIN_NODE_SIZE + 25 }, // above minimum
+        size: { width: 150, height: 125 }, // above minimum
         position: { x: 150, y: 175 }, // position moved due to left/top edge drag
       });
 
@@ -420,7 +427,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: MIN_NODE_SIZE + 50, height: MIN_NODE_SIZE + 25 },
+              size: { width: 150, height: 125 },
               position: { x: 150, y: 175 }, // no adjustment - size wasn't constrained
             },
           ],
@@ -434,7 +441,7 @@ describe('Resize Node Command', () => {
     it('should return early when requested position is undefined', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 150, y: 250 },
         isGroup: false,
       });
@@ -442,7 +449,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: '1',
-        size: { width: MIN_NODE_SIZE - 150, height: MIN_NODE_SIZE - 125 }, // both constrained
+        size: { width: 50, height: 75 }, // both constrained
         // position is undefined - should return early
       });
 
@@ -452,7 +459,7 @@ describe('Resize Node Command', () => {
     it('should return early when command has no size', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: '1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 100 },
+        size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
         isGroup: false,
       });
@@ -473,7 +480,7 @@ describe('Resize Node Command', () => {
     it('should expand group width when children extend beyond requested bounds', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -497,7 +504,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 150, height: MIN_NODE_SIZE + 50 }, // 350x250
+        size: { width: 350, height: 250 },
         position: { x: 100, y: 100 },
       });
 
@@ -506,7 +513,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE + 250, height: MIN_NODE_SIZE + 50 }, // 450x250 - width expanded to contain children
+              size: { width: 450, height: 250 }, // width expanded to contain children
               position: { x: 100, y: 100 },
               autoSize: false,
             },
@@ -519,7 +526,7 @@ describe('Resize Node Command', () => {
     it('should expand group height when children extend beyond requested bounds', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -541,7 +548,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 150, height: MIN_NODE_SIZE + 50 }, // 350x250
+        size: { width: 350, height: 250 },
         position: { x: 100, y: 100 },
       });
 
@@ -550,7 +557,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE + 150, height: MIN_NODE_SIZE + 180 }, // 350x380 - height expanded to contain children
+              size: { width: 350, height: 380 }, // height expanded to contain children
               position: { x: 100, y: 100 },
               autoSize: false,
             },
@@ -563,7 +570,7 @@ describe('Resize Node Command', () => {
     it('should adjust group position when children extend beyond left/top edges', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -585,7 +592,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 150, height: MIN_NODE_SIZE + 50 }, // 350x250
+        size: { width: 350, height: 250 },
         position: { x: 100, y: 100 },
       });
 
@@ -594,7 +601,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 90 }, // 400x290 - expanded to contain all children
+              size: { width: 400, height: 290 }, // expanded to contain all children
               position: { x: 50, y: 60 }, // position adjusted to contain children
               autoSize: false,
             },
@@ -607,7 +614,7 @@ describe('Resize Node Command', () => {
     it('should handle complex case with children bounds affecting all dimensions', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -629,7 +636,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 150, height: MIN_NODE_SIZE + 50 }, // 350x250
+        size: { width: 350, height: 250 },
         position: { x: 100, y: 100 },
       });
 
@@ -638,7 +645,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE + 290, height: MIN_NODE_SIZE + 240 }, // 490x440 - expanded in both dimensions
+              size: { width: 490, height: 440 }, // expanded in both dimensions
               position: { x: 80, y: 90 }, // adjusted in both dimensions
               autoSize: false,
             },
@@ -651,7 +658,7 @@ describe('Resize Node Command', () => {
     it('should apply minimum size constraints before children bounds constraints', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -671,7 +678,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE - 100, height: MIN_NODE_SIZE - 50 }, // 100x150 - both smaller than MIN_NODE_SIZE
+        size: { width: 50, height: 80 }, // both smaller than minimum 100x100
         position: { x: 100, y: 100 },
       });
 
@@ -680,7 +687,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE }, // minimum size applied
+              size: { width: 100, height: 100 }, // minimum size applied
               position: { x: 100, y: 100 },
               autoSize: false,
             },
@@ -693,7 +700,7 @@ describe('Resize Node Command', () => {
     it('should combine minimum size constraints with children bounds constraints', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -715,7 +722,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE - 50, height: MIN_NODE_SIZE - 20 }, // 150x180 - both smaller than MIN_NODE_SIZE, but children require more
+        size: { width: 80, height: 90 }, // both smaller than minimum, but children require more
         position: { x: 100, y: 100 },
       });
 
@@ -724,7 +731,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE, height: MIN_NODE_SIZE + 110 }, // 200x310 - width uses minimum, height uses children bounds
+              size: { width: 200, height: 310 }, // width uses children bounds (300-100), height uses children bounds (410-100)
               position: { x: 100, y: 100 },
               autoSize: false,
             },
@@ -737,7 +744,7 @@ describe('Resize Node Command', () => {
     it('should return early when group resize command has no size', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -760,7 +767,7 @@ describe('Resize Node Command', () => {
     it('should return early when group resize command has no position', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -772,7 +779,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 50 },
+        size: { width: 300, height: 250 },
         // position is undefined - should return early
       });
 
@@ -782,7 +789,7 @@ describe('Resize Node Command', () => {
     it('should fallback to single node resize when group has no children', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 200, height: MIN_NODE_SIZE + 100 }, // 400x300
+        size: { width: 400, height: 300 },
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
@@ -794,7 +801,7 @@ describe('Resize Node Command', () => {
       await resizeNode(commandHandler, {
         name: 'resizeNode',
         id: 'group1',
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 50 }, // 300x250
+        size: { width: 300, height: 250 },
         position: { x: 100, y: 100 },
       });
 
@@ -803,7 +810,7 @@ describe('Resize Node Command', () => {
           nodesToUpdate: [
             {
               id: 'group1',
-              size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 50 },
+              size: { width: 300, height: 250 },
               position: { x: 100, y: 100 },
             },
           ],
@@ -817,43 +824,43 @@ describe('Resize Node Command', () => {
     const originalPosition = { x: 100, y: 100 };
 
     it('should expand width when children extend beyond right edge', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
         minX: 120,
         minY: 120,
-        maxX: MIN_NODE_SIZE + 250, // 450 - extends beyond requested maxX of 400 (100 + 300)
+        maxX: 450, // extends beyond requested maxX of 400 (100 + 300)
         maxY: 250,
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 150, height: MIN_NODE_SIZE }, // 350x200 - width expanded from 300 to 350
+        size: { width: 350, height: 200 }, // width expanded from 300 to 350
         position: { x: 100, y: 100 },
       });
     });
 
     it('should expand height when children extend beyond bottom edge', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
         minX: 120,
         minY: 120,
         maxX: 350,
-        maxY: MIN_NODE_SIZE + 150, // 350 - extends beyond requested maxY of 300 (100 + 200)
+        maxY: 350, // extends beyond requested maxY of 300 (100 + 200)
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 50 }, // 300x250 - height expanded from 200 to 250
+        size: { width: 300, height: 250 }, // height expanded from 200 to 250
         position: { x: 100, y: 100 },
       });
     });
 
     it('should adjust position when children extend beyond left edge', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
         minX: 80, // extends left of requested minX of 100
@@ -865,13 +872,13 @@ describe('Resize Node Command', () => {
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 120, height: MIN_NODE_SIZE }, // 320x200 - width expanded to accommodate left extension
+        size: { width: 320, height: 200 }, // width expanded to accommodate left extension
         position: { x: 80, y: 100 }, // position adjusted left
       });
     });
 
     it('should adjust position when children extend beyond top edge', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
         minX: 120,
@@ -883,31 +890,31 @@ describe('Resize Node Command', () => {
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE + 20 }, // 300x220 - height expanded to accommodate top extension
+        size: { width: 300, height: 220 }, // height expanded to accommodate top extension
         position: { x: 100, y: 80 }, // position adjusted up
       });
     });
 
     it('should expand in all directions when children extend beyond all edges', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
         minX: 80, // extends left
         minY: 90, // extends up
-        maxX: MIN_NODE_SIZE + 250, // 450 - extends right
-        maxY: MIN_NODE_SIZE + 150, // 350 - extends down
+        maxX: 450, // extends right
+        maxY: 350, // extends down
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 170, height: MIN_NODE_SIZE + 60 }, // 370x260 - expanded in both dimensions
+        size: { width: 370, height: 260 }, // expanded in both dimensions
         position: { x: 80, y: 90 }, // adjusted in both dimensions
       });
     });
 
     it('should not modify bounds when children fit within requested bounds', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
         minX: 120, // within requested bounds
@@ -919,25 +926,25 @@ describe('Resize Node Command', () => {
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }, // 300x200 - unchanged
+        size: { width: 300, height: 200 }, // unchanged
         position: { x: 100, y: 100 }, // unchanged
       });
     });
 
     it('should handle undefined requestedPosition', () => {
-      const requestedSize = { width: MIN_NODE_SIZE + 100, height: MIN_NODE_SIZE }; // 300x200
+      const requestedSize = { width: 300, height: 200 };
       const requestedPosition = undefined;
       const childrenBounds = {
         minX: 80, // extends left of original position
         minY: 90, // extends up from original position
-        maxX: MIN_NODE_SIZE + 250, // 450 - extends right
-        maxY: MIN_NODE_SIZE + 150, // 350 - extends down
+        maxX: 450, // extends right
+        maxY: 350, // extends down
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
 
       expect(result).toEqual({
-        size: { width: MIN_NODE_SIZE + 170, height: MIN_NODE_SIZE + 60 }, // 370x260 - expanded in both dimensions
+        size: { width: 370, height: 260 }, // expanded in both dimensions
         position: { x: 80, y: 90 }, // adjusted based on children bounds
       });
     });

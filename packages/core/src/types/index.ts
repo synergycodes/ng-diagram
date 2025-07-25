@@ -1,5 +1,6 @@
 // Flow diagram types
 export * from './edge.interface';
+export * from './flow-config.interface';
 export * from './metadata.interface';
 export * from './node.interface';
 

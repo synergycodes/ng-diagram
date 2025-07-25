@@ -1,7 +1,5 @@
-import type { Bounds, CommandHandler, Node } from '../../types';
+import type { Bounds, CommandHandler, FlowConfig, Node } from '../../types';
 import { calculateGroupBounds, isSameSize } from '../../utils';
-
-export const MIN_NODE_SIZE = 200;
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';
@@ -16,12 +14,14 @@ export interface ResizeNodeCommand {
  * when necessary to maintain the resize operation's intent.
  */
 function applyMinimumSizeConstraints(
+  flowConfig: FlowConfig,
+  node: Node,
   requestedSize: Required<Node>['size'],
   requestedPosition: Node['position'] | undefined,
   originalPosition: Node['position']
 ): { size: Required<Node>['size']; position: Node['position'] | undefined } {
-  const constrainedWidth = Math.max(requestedSize.width, MIN_NODE_SIZE);
-  const constrainedHeight = Math.max(requestedSize.height, MIN_NODE_SIZE);
+  const constrainedWidth = Math.max(requestedSize.width, flowConfig.resize.getMinNodeSize(node).width);
+  const constrainedHeight = Math.max(requestedSize.height, flowConfig.resize.getMinNodeSize(node).height);
 
   if (!requestedPosition) {
     return {
@@ -128,6 +128,8 @@ async function handleGroupNodeResize(
   const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
 
   const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
+    commandHandler.flowCore.config,
+    node,
     command.size,
     command.position,
     node.position
@@ -165,6 +167,8 @@ async function handleSingleNodeResize(commandHandler: CommandHandler, command: R
   }
 
   const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
+    commandHandler.flowCore.config,
+    node,
     command.size,
     command.position,
     node.position

@@ -17,7 +17,10 @@ const getTargetPortInfo = (
   position: { x: number; y: number },
   temporaryEdge: Edge
 ): TargetPortInfo => {
-  const targetPort = commandHandler.flowCore.getNearestPortInRange(position, 10);
+  const targetPort = commandHandler.flowCore.getNearestPortInRange(
+    position,
+    commandHandler.flowCore.config.linking.portSnapDistance
+  );
   const isProperTarget = targetPort && isProperTargetPort(targetPort, temporaryEdge.source, temporaryEdge.sourcePort);
 
   return {
@@ -39,7 +42,7 @@ const createNewTemporaryEdge = (
   const sourcePort = temporaryEdge.sourcePort || '';
 
   const createFloatingEdge = () =>
-    createTemporaryEdge(commandHandler.flowCore, {
+    createTemporaryEdge(commandHandler.flowCore.config, {
       source,
       sourcePort,
       target: '',
@@ -69,7 +72,7 @@ const createNewTemporaryEdge = (
   }
 
   if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)) {
-    return createTemporaryEdge(commandHandler.flowCore, {
+    return createTemporaryEdge(commandHandler.flowCore.config, {
       source,
       sourcePort,
       target: targetNodeId,
@@ -78,7 +81,7 @@ const createNewTemporaryEdge = (
     });
   }
 
-  return createTemporaryEdge(commandHandler.flowCore, {
+  return createTemporaryEdge(commandHandler.flowCore.config, {
     source,
     sourcePort,
     target: targetNodeId,

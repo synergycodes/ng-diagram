@@ -15,7 +15,7 @@ export const startLinkingFromPosition = async (
   await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
-        temporaryEdge: createTemporaryEdge(commandHandler.flowCore, {
+        temporaryEdge: createTemporaryEdge(commandHandler.flowCore.config, {
           source: '',
           sourcePosition: position,
           target: '',
