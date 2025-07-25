@@ -29,6 +29,13 @@
   --ngd-resize-line-border-style: solid;
   --ngd-resize-line-border-color: var(--ngd-transform-box);
 
+  --ngd-resize-handle-size: 0.375rem;
+  --ngd-resize-handle-background-color: var(--ngd-ui-bg-primary-default);
+  --ngd-resize-handle-border-size: 0.0625rem;
+  --ngd-resize-handle-border-style: solid;
+  --ngd-resize-handle-border-color: var(--ngd-transform-box);
+  --ngd-resize-handle-border-radius: 0;
+
   --ngd-port-size: 0.25rem;
   --ngd-port-background-color: var(--ngd-node-port-fill-default);
   --ngd-port-border-color: var(--ngd-node-port-stroke-default);
