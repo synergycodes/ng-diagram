@@ -12,7 +12,7 @@ interface TargetPortInfo {
   isValid: boolean;
 }
 
-const getTargetPortInfo = (
+export const getTargetPortInfo = (
   commandHandler: CommandHandler,
   position: { x: number; y: number },
   temporaryEdge: Edge
@@ -30,7 +30,7 @@ const getTargetPortInfo = (
   };
 };
 
-const createNewTemporaryEdge = (
+export const createNewTemporaryEdge = (
   commandHandler: CommandHandler,
   temporaryEdge: Edge,
   targetPortInfo: TargetPortInfo,
@@ -90,7 +90,7 @@ const createNewTemporaryEdge = (
   });
 };
 
-const isSameTarget = (temporaryEdge: Edge, targetNodeId: string, targetPortId: string): boolean => {
+export const isSameTarget = (temporaryEdge: Edge, targetNodeId: string, targetPortId: string): boolean => {
   return targetNodeId === temporaryEdge.target && targetPortId === temporaryEdge.targetPort;
 };
 
