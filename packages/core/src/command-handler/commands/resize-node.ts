@@ -1,5 +1,5 @@
-import type { Bounds, CommandHandler, Node, Rect } from '../../types';
-import { getRectFromBounds, calculateGroupBounds, isSameSize } from '../../utils';
+import type { Bounds, CommandHandler, FlowConfig, Node } from '../../types';
+import { calculateGroupBounds, isSameSize } from '../../utils';
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';
@@ -7,6 +7,84 @@ export interface ResizeNodeCommand {
   size: Required<Node>['size'];
   position?: Node['position'];
   disableAutoSize?: boolean;
+}
+
+/**
+ * Applies minimum size constraints to a resize operation, adjusting position
+ * when necessary to maintain the resize operation's intent.
+ */
+function applyMinimumSizeConstraints(
+  flowConfig: FlowConfig,
+  node: Node,
+  requestedSize: Required<Node>['size'],
+  requestedPosition: Node['position'] | undefined,
+  originalPosition: Node['position']
+): { size: Required<Node>['size']; position: Node['position'] | undefined } {
+  const constrainedWidth = Math.max(requestedSize.width, flowConfig.resize.getMinNodeSize(node).width);
+  const constrainedHeight = Math.max(requestedSize.height, flowConfig.resize.getMinNodeSize(node).height);
+
+  if (!requestedPosition) {
+    return {
+      size: { width: constrainedWidth, height: constrainedHeight },
+      position: requestedPosition,
+    };
+  }
+
+  let constrainedX = requestedPosition.x;
+  let constrainedY = requestedPosition.y;
+
+  // If width was constrained and position moved right from original, adjust it back
+  if (constrainedWidth !== requestedSize.width && requestedPosition.x > originalPosition.x) {
+    const widthDifference = constrainedWidth - requestedSize.width;
+    constrainedX = requestedPosition.x - widthDifference;
+  }
+
+  // If height was constrained and position moved down from original, adjust it back
+  if (constrainedHeight !== requestedSize.height && requestedPosition.y > originalPosition.y) {
+    const heightDifference = constrainedHeight - requestedSize.height;
+    constrainedY = requestedPosition.y - heightDifference;
+  }
+
+  return {
+    size: { width: constrainedWidth, height: constrainedHeight },
+    position: { x: constrainedX, y: constrainedY },
+  };
+}
+
+/**
+ * Applies children bounds constraints to ensure group fully contains all children.
+ * Expands the requested group bounds if necessary to accommodate children.
+ */
+export function applyChildrenBoundsConstraints(
+  requestedSize: Required<Node>['size'],
+  requestedPosition: Node['position'] | undefined,
+  originalPosition: Node['position'],
+  childrenBounds: Bounds
+): { size: Required<Node>['size']; position: Node['position'] } {
+  const requestedBounds: Bounds = {
+    minX: requestedPosition?.x ?? originalPosition.x,
+    minY: requestedPosition?.y ?? originalPosition.y,
+    maxX: (requestedPosition?.x ?? originalPosition.x) + requestedSize.width,
+    maxY: (requestedPosition?.y ?? originalPosition.y) + requestedSize.height,
+  };
+
+  const finalBounds: Bounds = {
+    minX: Math.min(requestedBounds.minX, childrenBounds.minX),
+    minY: Math.min(requestedBounds.minY, childrenBounds.minY),
+    maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
+    maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
+  };
+
+  return {
+    size: {
+      width: finalBounds.maxX - finalBounds.minX,
+      height: finalBounds.maxY - finalBounds.minY,
+    },
+    position: {
+      x: finalBounds.minX,
+      y: finalBounds.minY,
+    },
+  };
 }
 
 export async function resizeNode(commandHandler: CommandHandler, command: ResizeNodeCommand) {
@@ -17,6 +95,11 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
   }
   if (isSameSize(node.size, command.size) || (node.isGroup && !node.selected)) {
     return; // No-op if size is unchanged
+  }
+
+  // Early return when position is missing - it was called by internal updater
+  if (!command.size || !command.position) {
+    return;
   }
 
   if (node.isGroup) {
@@ -44,39 +127,28 @@ async function handleGroupNodeResize(
 
   const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
 
-  // Calculate the new bounds based on the resize request
-  const requestedBounds: Bounds = {
-    minX: command.position?.x ?? node.position.x,
-    minY: command.position?.y ?? node.position.y,
-    maxX: (command.position?.x ?? node.position.x) + command.size.width,
-    maxY: (command.position?.y ?? node.position.y) + command.size.height,
-  };
+  const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
+    commandHandler.flowCore.config,
+    node,
+    command.size,
+    command.position,
+    node.position
+  );
 
-  // Ensure the new bounds fully contain the children bounds
-  const newGroupRect: Rect = getRectFromBounds({
-    minX: Math.min(requestedBounds.minX, childrenBounds.minX),
-    minY: Math.min(requestedBounds.minY, childrenBounds.minY),
-    maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
-    maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
-  });
-
-  if (!command.size || !command.position) {
-    return;
-  }
+  const { size: finalSize, position: finalPosition } = applyChildrenBoundsConstraints(
+    constrainedSize,
+    constrainedPosition,
+    node.position,
+    childrenBounds
+  );
 
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {
           id: command.id,
-          size: {
-            width: newGroupRect.width,
-            height: newGroupRect.height,
-          },
-          position: {
-            x: newGroupRect.x,
-            y: newGroupRect.y,
-          },
+          size: finalSize,
+          position: finalPosition,
           autoSize: false,
         },
       ],
@@ -89,17 +161,26 @@ async function handleGroupNodeResize(
  * Handles resizing of a single (non-group) node.
  */
 async function handleSingleNodeResize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
-  if (!command.size || !command.position) {
+  const node = commandHandler.flowCore.getNodeById(command.id);
+  if (!node) {
     return;
   }
+
+  const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
+    commandHandler.flowCore.config,
+    node,
+    command.size,
+    command.position,
+    node.position
+  );
 
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {
           id: command.id,
-          size: command.size,
-          ...(command.position && { position: command.position }),
+          size: constrainedSize,
+          position: constrainedPosition,
           ...(command.disableAutoSize !== undefined && { autoSize: !command.disableAutoSize }),
         },
       ],

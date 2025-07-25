@@ -7,6 +7,7 @@ import { mockEdge, mockMetadata, mockNode } from './test-utils';
 import { MiddlewaresConfigFromMiddlewares } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
+import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
 import type { Middleware, MiddlewareChain } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
@@ -133,6 +134,66 @@ describe('FlowCore', () => {
     it('should emit init command', () => {
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('init');
     });
+
+    it('should initialize with default getFlowOffset when not provided', () => {
+      expect(flowCore.getFlowOffset).toBeDefined();
+      expect(flowCore.getFlowOffset()).toEqual({ x: 0, y: 0 });
+    });
+
+    it('should use provided getFlowOffset function', () => {
+      const customGetFlowOffset = vi.fn().mockReturnValue({ x: 10, y: 20 });
+
+      flowCore = new FlowCore(
+        mockModelAdapter,
+        mockRenderer,
+        mockEventRouter,
+        mockEnvironment,
+        undefined,
+        customGetFlowOffset
+      );
+
+      expect(flowCore.getFlowOffset()).toEqual({ x: 10, y: 20 });
+      expect(customGetFlowOffset).toHaveBeenCalled();
+    });
+
+    it('should initialize with default config when not provided', () => {
+      expect(flowCore.config).toBeDefined();
+      expect(flowCore.config.computeNodeId).toBeDefined();
+      expect(flowCore.config.computeEdgeId).toBeDefined();
+      expect(flowCore.config.resize).toBeDefined();
+      expect(flowCore.config.linking).toBeDefined();
+      expect(flowCore.config.grouping).toBeDefined();
+      expect(flowCore.config.zoom).toBeDefined();
+      expect(flowCore.config.treeLayout).toBeDefined();
+      expect(flowCore.config.nodeRotation).toBeDefined();
+    });
+
+    it('should merge provided config with default config', () => {
+      const customConfig: Partial<FlowConfig> = {
+        zoom: {
+          min: 0.5,
+          max: 5.0,
+          step: 0.1,
+        },
+      };
+
+      flowCore = new FlowCore(
+        mockModelAdapter,
+        mockRenderer,
+        mockEventRouter,
+        mockEnvironment,
+        undefined,
+        undefined,
+        customConfig
+      );
+
+      expect(flowCore.config.zoom.min).toBe(0.5);
+      expect(flowCore.config.zoom.max).toBe(5.0);
+      expect(flowCore.config.zoom.step).toBe(0.1);
+      // Should still have default values for other config properties
+      expect(flowCore.config.computeNodeId).toBeDefined();
+      expect(flowCore.config.linking.portSnapDistance).toBe(10); // default value
+    });
   });
 
   describe('set model', () => {
@@ -242,6 +303,25 @@ describe('FlowCore', () => {
 
       expect(flowPosition).toEqual({ x: -85, y: -85 });
     });
+
+    it('should convert client position to flow position with flow offset', () => {
+      const customGetFlowOffset = vi.fn().mockReturnValue({ x: 50, y: 100 });
+      flowCore = new FlowCore(
+        mockModelAdapter,
+        mockRenderer,
+        mockEventRouter,
+        mockEnvironment,
+        undefined,
+        customGetFlowOffset
+      );
+
+      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
+      const clientPosition = { x: 30, y: 30 };
+      const flowPosition = flowCore.clientToFlowPosition(clientPosition);
+
+      // Expected calculation: (30 - 200 - 50) / 2 = -110, (30 - 200 - 100) / 2 = -135
+      expect(flowPosition).toEqual({ x: -110, y: -135 });
+    });
   });
 
   describe('flowToClientPosition', () => {
@@ -250,6 +330,25 @@ describe('FlowCore', () => {
       const flowPosition = { x: -85, y: -85 };
       const clientPosition = flowCore.flowToClientPosition(flowPosition);
 
+      expect(clientPosition).toEqual({ x: 30, y: 30 });
+    });
+
+    it('should convert flow position to client position with flow offset', () => {
+      const customGetFlowOffset = vi.fn().mockReturnValue({ x: 50, y: 100 });
+      flowCore = new FlowCore(
+        mockModelAdapter,
+        mockRenderer,
+        mockEventRouter,
+        mockEnvironment,
+        undefined,
+        customGetFlowOffset
+      );
+
+      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
+      const flowPosition = { x: -110, y: -135 };
+      const clientPosition = flowCore.flowToClientPosition(flowPosition);
+
+      // Expected calculation: -110 * 2 + 200 + 50 = 30, -135 * 2 + 200 + 100 = 30
       expect(clientPosition).toEqual({ x: 30, y: 30 });
     });
   });

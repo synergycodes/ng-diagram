@@ -39,3 +39,7 @@ export type PortLocation = {
 
 // More info: https://x.com/mattpocockuk/status/1671908303918473217
 export type LooseAutocomplete<T> = T | (string & {});
+
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends (...args: unknown[]) => unknown ? T[P] : T[P] extends object ? DeepPartial<T[P]> : T[P];
+};

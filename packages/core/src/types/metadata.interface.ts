@@ -1,6 +1,6 @@
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
-import type { TreeLayoutConfig } from './tree-layout.interface.ts';
+import type { GlobalTreeLayoutConfig } from './tree-layout.interface.ts';
 
 /**
  * Interface representing the viewport of the diagram.
@@ -15,7 +15,7 @@ export interface Viewport {
  * Interface representing configurable properties of the layouts.
  */
 export interface LayoutConfiguration {
-  tree?: TreeLayoutConfig;
+  tree?: GlobalTreeLayoutConfig;
 }
 
 /**

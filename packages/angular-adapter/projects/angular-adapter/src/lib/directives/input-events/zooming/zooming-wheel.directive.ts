@@ -1,5 +1,4 @@
 import { Directive, inject } from '@angular/core';
-import { ZOOMING_CONFIG } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
@@ -17,14 +16,16 @@ export class ZoomingWheelDirective {
     event.stopPropagation();
     event.preventDefault();
 
-    const zoomFactor = event.deltaY > 0 ? 1 - ZOOMING_CONFIG.STEP : 1 + ZOOMING_CONFIG.STEP;
+    const flow = this.flowCoreProvider.provide();
+    let { x, y, scale } = flow.getState().metadata.viewport;
 
-    let { x, y, scale } = this.flowCoreProvider.provide().getState().metadata.viewport;
+    const zoomFactor = event.deltaY > 0 ? 1 - flow.config.zoom.step : 1 + flow.config.zoom.step;
+
     const beforeZoomX = (event.clientX - x) / scale;
     const beforeZoomY = (event.clientY - y) / scale;
 
     scale *= zoomFactor;
-    scale = Math.min(Math.max(ZOOMING_CONFIG.MIN, scale), ZOOMING_CONFIG.MAX);
+    scale = Math.min(Math.max(flow.config.zoom.min, scale), flow.config.zoom.max);
 
     const afterZoomX = (event.clientX - x) / scale;
     const afterZoomY = (event.clientY - y) / scale;

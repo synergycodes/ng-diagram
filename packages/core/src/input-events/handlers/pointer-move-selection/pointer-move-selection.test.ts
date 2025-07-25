@@ -59,7 +59,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       getNodesInRange: mockGetNodesInRange,
       transaction: vi.fn().mockImplementation(async (_name, callback) => {
         const txContext = { emit: mockEmit };
-        await callback(txContext);
+        return await callback(txContext);
       }),
     } as unknown as FlowCore;
 
@@ -118,6 +118,139 @@ describe('PointerMoveSelectionEventHandler', () => {
 
       expect(mockEmit).not.toHaveBeenCalled();
     });
+
+    describe('group highlighting during drag', () => {
+      it('should highlight group when dragging over a group with nodes from different group', async () => {
+        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
+        const selectedNode = { ...mockNode, groupId: 'differentGroup' };
+
+        mockGetNodesInRange.mockReturnValue([targetGroup]);
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([selectedNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [selectedNode],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
+          groupId: 'targetGroup',
+          nodes: [selectedNode],
+        });
+      });
+
+      it('should highlight group when dragging over a group with ungrouped nodes', async () => {
+        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
+        const ungroupedNode = { ...mockNode, groupId: undefined };
+
+        mockGetNodesInRange.mockReturnValue([targetGroup]);
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([ungroupedNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [ungroupedNode],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
+          groupId: 'targetGroup',
+          nodes: [ungroupedNode],
+        });
+      });
+
+      it('should not highlight group when all selected nodes already belong to that group', async () => {
+        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
+        const nodeInSameGroup = { ...mockNode, groupId: 'targetGroup' };
+
+        mockGetNodesInRange.mockReturnValue([targetGroup]);
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([nodeInSameGroup]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+        expect(mockEmit).not.toHaveBeenCalledWith('highlightGroup', expect.any(Object));
+        expect(mockEmit).not.toHaveBeenCalledWith('highlightGroupClear');
+      });
+
+      it('should clear group highlight when not dragging over any group', async () => {
+        mockGetNodesInRange.mockReturnValue([]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+        expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
+      });
+
+      it('should select top-most group when multiple groups are at the same position', async () => {
+        const bottomGroup = { ...mockGroupNode, id: 'bottomGroup', isGroup: true, selected: false, zOrder: 1 };
+        const topGroup = { ...mockGroupNode, id: 'topGroup', isGroup: true, selected: false, zOrder: 10 };
+        const selectedNode = { ...mockNode, groupId: 'differentGroup' };
+
+        mockGetNodesInRange.mockReturnValue([bottomGroup, topGroup]);
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([selectedNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [selectedNode],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
+          groupId: 'topGroup',
+          nodes: [selectedNode],
+        });
+      });
+
+      it('should ignore selected groups when finding target group', async () => {
+        const selectedGroup = { ...mockGroupNode, id: 'selectedGroup', isGroup: true, selected: true };
+        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
+        const selectedNode = { ...mockNode, groupId: 'differentGroup' };
+
+        mockGetNodesInRange.mockReturnValue([selectedGroup, targetGroup]);
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([selectedNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [selectedNode],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
+          groupId: 'targetGroup',
+          nodes: [selectedNode],
+        });
+      });
+    });
   });
 
   describe('end phase', () => {
@@ -128,7 +261,6 @@ describe('PointerMoveSelectionEventHandler', () => {
 
     it('should group nodes when dropping on a valid group', () => {
       mockGetNodesInRange.mockReturnValue([mockGroupNode]);
-      mockModelLookup.wouldCreateCircularDependency.mockReturnValue(false);
 
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'end',
@@ -137,31 +269,13 @@ describe('PointerMoveSelectionEventHandler', () => {
 
       handler.handle(event);
 
-      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
-        nodes: [
-          {
-            id: mockNode.id,
-            groupId: 'group1',
-          },
-        ],
+      expect(mockEmit).toHaveBeenCalledWith('addToGroup', {
+        groupId: 'group1',
+        nodeIds: [mockNode.id],
       });
     });
 
-    it('should not group nodes when dropping on a group that would create circular dependency', () => {
-      mockGetNodesInRange.mockReturnValue([mockGroupNode]);
-      mockModelLookup.wouldCreateCircularDependency.mockReturnValue(true);
-
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'end',
-        lastInputPoint: { x: 110, y: 110 },
-      });
-
-      handler.handle(event);
-
-      expect(mockEmit).not.toHaveBeenCalledWith('updateNodes', expect.any(Object));
-    });
-
-    it('should ungroup nodes when dropping outside of groups', () => {
+    it('should not group nodes when dropping outside of groups', () => {
       const nodeWithGroup = { ...mockNode, groupId: 'existingGroup' };
       mockModelLookup.getSelectedNodes.mockReturnValue([nodeWithGroup]);
       mockGetNodesInRange.mockReturnValue([]);
@@ -173,29 +287,7 @@ describe('PointerMoveSelectionEventHandler', () => {
 
       handler.handle(event);
 
-      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
-        nodes: [
-          {
-            id: nodeWithGroup.id,
-            groupId: undefined,
-          },
-        ],
-      });
-    });
-
-    it('should clear group highlight after grouping', async () => {
-      mockGetNodesInRange.mockReturnValue([mockGroupNode]);
-      mockModelLookup.wouldCreateCircularDependency.mockReturnValue(false);
-
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'end',
-        lastInputPoint: { x: 110, y: 110 },
-      });
-
-      await handler.handle(event);
-
-      expect(mockEmit).toHaveBeenCalledWith('updateNodes', expect.any(Object));
-      expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
+      expect(mockEmit).not.toHaveBeenCalledWith('addToGroup', expect.any(Object));
     });
 
     it('should reset move state after end', async () => {

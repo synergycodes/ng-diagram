@@ -1,4 +1,3 @@
-import { Port } from '../../../types/node.interface';
 import { EventHandler } from '../event-hander';
 import { LinkingInputEvent } from './linking.event';
 
@@ -25,23 +24,10 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         if (!this.isLinking) break;
 
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
-        const nearestPort = this.flow.getNearestPortInRange(flowPosition, 10);
 
-        const { temporaryEdge } = this.flow.getState().metadata;
-
-        if (nearestPort && this.isProperTargetPort(nearestPort, temporaryEdge?.source, temporaryEdge?.sourcePort)) {
-          this.flow.commandHandler.emit('moveTemporaryEdge', {
-            position: flowPosition,
-            target: nearestPort.nodeId,
-            targetPort: nearestPort.id,
-          });
-        } else {
-          this.flow.commandHandler.emit('moveTemporaryEdge', {
-            position: flowPosition,
-            target: '',
-            targetPort: '',
-          });
-        }
+        this.flow.commandHandler.emit('moveTemporaryEdge', {
+          position: flowPosition,
+        });
 
         break;
       }
@@ -49,27 +35,14 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         if (!this.isLinking) break;
 
         this.isLinking = false;
-        const temporaryEdge = this.flow.getState().metadata.temporaryEdge;
+        const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
+
         this.flow.commandHandler.emit('finishLinking', {
-          target: temporaryEdge?.target,
-          targetPort: temporaryEdge?.targetPort,
+          position: flowPosition,
         });
 
         break;
       }
     }
-  }
-
-  private isProperTargetPort(targetPort: Port, source?: string, sourcePortId?: string) {
-    if (targetPort.type === 'source') {
-      return false;
-    }
-    if (source && targetPort.nodeId !== source) {
-      return true;
-    }
-    if (sourcePortId && targetPort.id !== sourcePortId) {
-      return true;
-    }
-    return false;
   }
 }

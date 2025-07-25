@@ -1,5 +1,6 @@
 // Flow diagram types
 export * from './edge.interface';
+export * from './flow-config.interface';
 export * from './metadata.interface';
 export * from './node.interface';
 
@@ -21,6 +22,3 @@ export * from './utils';
 
 // TreeLayout types
 export * from './tree-layout.interface';
-
-// Node data types
-export * from './node-data.interface';

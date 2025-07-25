@@ -1,4 +1,4 @@
-import type { CommandHandler, Edge, FlowStateUpdate, Node } from '../../types';
+import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node } from '../../types';
 
 const OFFSET = 20;
 
@@ -88,12 +88,13 @@ const updatePortNodeIds = (node: Node): Node => {
  * Create new nodes with updated positions and IDs
  */
 const createPastedNodes = (
+  config: FlowConfig,
   copiedNodes: Node[],
   offset: { x: number; y: number },
   nodeIdMap: Map<string, string>
 ): Node[] => {
   return copiedNodes.map((node) => {
-    const newNodeId = crypto.randomUUID();
+    const newNodeId = config.computeNodeId();
     nodeIdMap.set(node.id, newNodeId);
 
     let newNode: Node = {
@@ -116,9 +117,9 @@ const createPastedNodes = (
 /**
  * Create new edges with updated IDs and references
  */
-const createPastedEdges = (copiedEdges: Edge[], nodeIdMap: Map<string, string>): Edge[] => {
+const createPastedEdges = (config: FlowConfig, copiedEdges: Edge[], nodeIdMap: Map<string, string>): Edge[] => {
   return copiedEdges.map((edge) => {
-    const newEdgeId = crypto.randomUUID();
+    const newEdgeId = config.computeEdgeId();
     const newEdge: Edge = {
       ...edge,
       id: newEdgeId,
@@ -178,8 +179,8 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const offset = calculatePasteOffset(copiedNodes, command);
 
   // Create new nodes and edges
-  const newNodes = createPastedNodes(copiedNodes, offset, nodeIdMap);
-  const newEdges = createPastedEdges(copiedEdges, nodeIdMap);
+  const newNodes = createPastedNodes(commandHandler.flowCore.config, copiedNodes, offset, nodeIdMap);
+  const newEdges = createPastedEdges(commandHandler.flowCore.config, copiedEdges, nodeIdMap);
 
   // Create deselect updates
   const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);

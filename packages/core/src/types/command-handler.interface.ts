@@ -1,3 +1,4 @@
+import { AddToGroupCommand } from '../command-handler/commands/add-to-group';
 import {
   AddEdgeLabelsCommand,
   AddEdgesCommand,
@@ -73,7 +74,8 @@ export type Command =
   | DeleteEdgeLabelsCommand
   | RotateNodeByCommand
   | HighlightGroupCommand
-  | HighlightGroupClearCommand;
+  | HighlightGroupClearCommand
+  | AddToGroupCommand;
 
 /**
  * Type for command name

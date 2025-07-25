@@ -13,10 +13,16 @@ describe('Cut Command', () => {
       getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
     };
 
+    const mockConfig = {
+      computeNodeId: vi.fn().mockImplementation(() => `new-node-id`),
+      computeEdgeId: vi.fn().mockImplementation(() => `new-edge-id`),
+    };
+
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       modelLookup: mockModelLookup,
+      config: mockConfig,
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });
@@ -96,7 +102,7 @@ describe('Cut Command', () => {
     (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([nodes[0]]);
 
     await cut(commandHandler);
-    paste(commandHandler, {
+    await paste(commandHandler, {
       name: 'paste',
     });
 
@@ -106,8 +112,11 @@ describe('Cut Command', () => {
     expect(updateCallWithNodesToAdd).toBeDefined();
     const [update] = updateCallWithNodesToAdd!;
     expect(update.nodesToAdd).toHaveLength(1);
-    expect(update.nodesToAdd[0].id).not.toBe('1');
+    expect(update.nodesToAdd[0].id).toBe('new-node-id'); // Now using mocked config ID generation
     expect(update.nodesToAdd[0].selected).toBe(true);
     expect(update.edgesToAdd).toBeDefined();
+
+    // Verify config functions were called
+    expect(flowCore.config.computeNodeId).toHaveBeenCalled();
   });
 });

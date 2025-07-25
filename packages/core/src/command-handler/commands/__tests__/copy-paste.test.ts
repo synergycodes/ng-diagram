@@ -10,6 +10,10 @@ describe('Copy-Paste Commands', () => {
   const OFFSET = 20;
 
   beforeEach(() => {
+    // Mock ID generation functions
+    const mockComputeNodeId = vi.fn().mockImplementation(() => `generated-node-${Math.random()}`);
+    const mockComputeEdgeId = vi.fn().mockImplementation(() => `generated-edge-${Math.random()}`);
+
     commandHandler = {
       flowCore: {
         getState: () => ({
@@ -24,6 +28,10 @@ describe('Copy-Paste Commands', () => {
           metadata: mockMetadata,
         }),
         applyUpdate: vi.fn(),
+        config: {
+          computeNodeId: mockComputeNodeId,
+          computeEdgeId: mockComputeEdgeId,
+        },
       } as unknown as FlowCore,
     } as unknown as CommandHandler;
   });
@@ -168,7 +176,7 @@ describe('Copy-Paste Commands', () => {
     });
 
     describe('ID regeneration', () => {
-      it('should preserve port IDs but update nodeId references when pasting nodes', async () => {
+      it('should generate new IDs for nodes and preserve port IDs but update nodeId references', async () => {
         commandHandler.flowCore.getState = () => ({
           nodes: [
             {
@@ -193,6 +201,10 @@ describe('Copy-Paste Commands', () => {
 
         expect(update.nodesToAdd).toHaveLength(1);
         const pastedNode = update.nodesToAdd[0];
+
+        // Node should have a new generated ID
+        expect(pastedNode.id).not.toBe('node1');
+        expect(pastedNode.id).toMatch(/^generated-node-/);
 
         expect(pastedNode.ports).toHaveLength(2);
         // Port IDs should be preserved (not regenerated)
@@ -244,6 +256,10 @@ describe('Copy-Paste Commands', () => {
 
         const pastedEdge = update.edgesToAdd[0];
         const pastedNodes = update.nodesToAdd;
+
+        // Edge should have a new generated ID
+        expect(pastedEdge.id).not.toBe('edge1');
+        expect(pastedEdge.id).toMatch(/^generated-edge-/);
 
         // Edge should reference new node IDs
         expect(pastedNodes.some((node: Node) => node.id === pastedEdge.source)).toBe(true);

@@ -1,4 +1,6 @@
-import { makeTreeLayout } from './utils/orientation-tree-layout.ts';
+import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
+import { isAngleHorizontal, isSamePoint } from '../../../utils';
+import { TREE_LAYOUT_DEFAULT_CONFIG } from './constants.ts';
 import {
   buildGroupsHierarchy,
   buildTopGroupMap,
@@ -6,9 +8,7 @@ import {
   getNodeMap,
   remapEdges,
 } from './utils/build-tree-structure.ts';
-import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
-import { TREE_LAYOUT_DEFAULT_CONFIG } from './constants.ts';
-import { isAngleHorizontal, isSamePoint } from '../../../utils';
+import { makeTreeLayout } from './utils/orientation-tree-layout.ts';
 
 const checkIfShouldAutoTreeLayout = ({ helpers, modelActionType }: MiddlewareContext) =>
   modelActionType === 'init' ||
@@ -35,7 +35,7 @@ export const treeLayoutMiddleware: Middleware = {
     }
 
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
-    const nodeMap = getNodeMap(nodes);
+    const nodeMap = getNodeMap(context.flowCore.config.treeLayout, nodes);
     const topGroupMap = buildTopGroupMap(nodeMap);
     const remappedEdges = remapEdges(edges, topGroupMap);
 

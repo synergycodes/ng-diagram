@@ -1,4 +1,3 @@
-import { NodeLayoutConfiguration } from './node-data.interface.ts';
 import type { Point, PortSide, Size } from './utils';
 
 /**
@@ -66,10 +65,6 @@ export interface Node {
    * NOTE: group only property
    */
   highlighted?: boolean;
-  /**
-   * The layout for the node
-   */
-  layoutConfiguration?: NodeLayoutConfiguration;
 }
 
 /**
