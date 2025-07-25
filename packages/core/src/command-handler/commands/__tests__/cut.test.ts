@@ -14,8 +14,8 @@ describe('Cut Command', () => {
     };
 
     const mockConfig = {
-      computeNodeId: vi.fn().mockImplementation((node) => `new-${node.id}`),
-      computeEdgeId: vi.fn().mockImplementation((edge) => `new-${edge.id}`),
+      computeNodeId: vi.fn().mockImplementation(() => `new-node-id`),
+      computeEdgeId: vi.fn().mockImplementation(() => `new-edge-id`),
     };
 
     flowCore = {
@@ -112,11 +112,11 @@ describe('Cut Command', () => {
     expect(updateCallWithNodesToAdd).toBeDefined();
     const [update] = updateCallWithNodesToAdd!;
     expect(update.nodesToAdd).toHaveLength(1);
-    expect(update.nodesToAdd[0].id).toBe('new-1'); // Now using mocked config ID generation
+    expect(update.nodesToAdd[0].id).toBe('new-node-id'); // Now using mocked config ID generation
     expect(update.nodesToAdd[0].selected).toBe(true);
     expect(update.edgesToAdd).toBeDefined();
 
     // Verify config functions were called
-    expect(flowCore.config.computeNodeId).toHaveBeenCalledWith(nodes[0]);
+    expect(flowCore.config.computeNodeId).toHaveBeenCalled();
   });
 });

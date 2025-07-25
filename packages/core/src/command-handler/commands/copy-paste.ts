@@ -94,7 +94,7 @@ const createPastedNodes = (
   nodeIdMap: Map<string, string>
 ): Node[] => {
   return copiedNodes.map((node) => {
-    const newNodeId = config.computeNodeId(node);
+    const newNodeId = config.computeNodeId();
     nodeIdMap.set(node.id, newNodeId);
 
     let newNode: Node = {
@@ -119,7 +119,7 @@ const createPastedNodes = (
  */
 const createPastedEdges = (config: FlowConfig, copiedEdges: Edge[], nodeIdMap: Map<string, string>): Edge[] => {
   return copiedEdges.map((edge) => {
-    const newEdgeId = config.computeEdgeId(edge);
+    const newEdgeId = config.computeEdgeId();
     const newEdge: Edge = {
       ...edge,
       id: newEdgeId,

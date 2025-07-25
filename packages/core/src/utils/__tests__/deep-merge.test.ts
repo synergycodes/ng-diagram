@@ -264,18 +264,14 @@ describe('deepMerge', () => {
 
   describe('FlowConfig-like scenarios', () => {
     it('should handle complex configuration objects', () => {
-      interface TestNode {
-        id: string;
-      }
-
       interface TestEdge {
         id: string;
         type?: string;
         temp?: boolean;
       }
 
-      const computeNodeId = (node: TestNode) => `node-${node.id}`;
-      const computeEdgeId = (edge: TestEdge) => `edge-${edge.id}`;
+      const computeNodeId = () => `node-id`;
+      const computeEdgeId = () => `edge-id`;
       const validateConnection = () => true;
       const temporaryEdgeBuilder = (edge: TestEdge): TestEdge => ({ ...edge, temp: true });
 

@@ -127,16 +127,14 @@ export interface TreeLayoutConfig {
 export interface FlowConfig {
   /**
    * Computes a unique ID for a node.
-   * @param node The node to compute the ID for.
    * @returns The node's unique ID.
    */
-  computeNodeId: (node: Node & { id?: string }) => string;
+  computeNodeId: () => string;
   /**
    * Computes a unique ID for an edge.
-   * @param edge The edge to compute the ID for.
    * @returns The edge's unique ID.
    */
-  computeEdgeId: (edge: Edge & { id?: string }) => string;
+  computeEdgeId: () => string;
   /**
    * Configuration for node resizing.
    */

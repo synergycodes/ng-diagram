@@ -11,7 +11,7 @@ export class PaletteDropEventHandler extends EventHandler<PaletteDropInputEvent>
       nodes: [
         {
           ...node,
-          id: crypto.randomUUID() as string,
+          id: this.flow.config.computeNodeId(),
           position: this.flow.clientToFlowPosition({
             x: lastInputPoint.x,
             y: lastInputPoint.y,

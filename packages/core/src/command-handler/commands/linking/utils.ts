@@ -9,7 +9,7 @@ export const createFinalEdge = (config: FlowConfig, temporaryEdge: Edge, partial
   };
   return config.linking.finalEdgeDataBuilder({
     ...data,
-    id: config.computeEdgeId(data),
+    id: config.computeEdgeId(),
   });
 };
 
