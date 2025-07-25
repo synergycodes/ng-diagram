@@ -14,6 +14,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AngularAdapterPortComponent, NodeRotateAdornmentComponent],
   hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
+  host: {
+    '[class.ng-diagram-port-hoverable-over-node]': 'true',
+  },
 })
 export class ImageNodeComponent implements NodeTemplate {
   data = input.required<Node>();

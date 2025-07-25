@@ -10,7 +10,7 @@ export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   getPortData(port: HTMLElement): Required<Pick<Port, 'size' | 'position'>> {
-    const nodeElement = findParentWithClass(port, 'flow__angular-adapter-node');
+    const nodeElement = findParentWithClass(port, 'ng-diagram-node');
     if (!nodeElement) {
       throw new Error(`Parent node of port with id ${port.id} not found`);
     }
@@ -32,7 +32,7 @@ export class UpdatePortsService {
   }
 
   getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | 'size' | 'position'>>[] {
-    const node = document.querySelector(`.flow__angular-adapter-node[data-node-id="${nodeId}"]`) as HTMLElement;
+    const node = document.querySelector(`.ng-diagram-node[data-node-id="${nodeId}"]`) as HTMLElement;
     if (!node) {
       throw new Error(`Node with id ${nodeId} not found`);
     }

@@ -1,6 +1,3 @@
-// --ngd-port-size: 18px;
-// --ngd-port-background-color:
-
 :host {
   position: absolute;
   inset: 0;
@@ -11,17 +8,17 @@
   width: var(--ngd-port-size);
   height: var(--ngd-port-size);
 
+  transform: translate(-50%, -50%);
+
   background: var(--ngd-port-background-color);
   border: var(--ngd-port-border-size) solid var(--ngd-port-border-color);
 
-  transition-property: background-color, border-color, width, height;
+  transition-property: background-color, border-color, outline, box-shadow;
   transition-timing-function: ease-in-out;
   transition-duration: 0.1s;
+  transform-origin: center;
 
-  &:hover {
-    background-color: var(--ngd-port-background-color-hover);
-    border-color: var(--ngd-port-background-color-hover);
-  }
+  z-index: 2;
 
   &::before {
     content: '';
@@ -37,24 +34,20 @@
   &.left {
     top: 50%;
     left: 0;
-    transform: translate(-50%, -50%);
   }
 
   &.right {
     top: 50%;
     left: 100%;
-    transform: translate(-50%, -50%);
   }
 
   &.top {
     top: 0;
     left: 50%;
-    transform: translate(-50%, -50%);
   }
 
   &.bottom {
     top: 100%;
     left: 50%;
-    transform: translate(-50%, -50%);
   }
 }

@@ -4,7 +4,9 @@ import {
   Component,
   ElementRef,
   HostBinding,
+  HostListener,
   input,
+  signal,
   viewChild,
 } from '@angular/core';
 import { Node } from '@angularflow/core';
@@ -17,6 +19,7 @@ import { RotateHandleDirective } from '../../../../directives/input-events/rotat
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.rotate-handle]': '!hasCustomHandle',
+    '[class.ng-diagram-rotate-handle]': 'true',
   },
   hostDirectives: [{ directive: RotateHandleDirective, inputs: ['target: data'] }],
 })
@@ -24,7 +27,8 @@ export class RotateHandleComponent implements AfterContentInit {
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
 
   data = input.required<Node>();
-  isRotating = input.required<boolean>();
+
+  isRotating = signal(false);
 
   hasCustomHandle = false;
 
@@ -34,5 +38,13 @@ export class RotateHandleComponent implements AfterContentInit {
 
   @HostBinding('attr.data-rotating') get pointerDownAttr() {
     return this.isRotating() ? 'true' : null;
+  }
+
+  @HostListener('pointerdown') pointerDown() {
+    this.isRotating.set(true);
+  }
+
+  @HostListener('document:pointerup') pointerUp() {
+    this.isRotating.set(false);
   }
 }

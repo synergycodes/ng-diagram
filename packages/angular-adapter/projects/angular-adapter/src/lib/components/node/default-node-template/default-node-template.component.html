@@ -1,0 +1,10 @@
+<angular-adapter-node-rotate-adornment [data]="data()" />
+<angular-adapter-node-resize-adornment [data]="data()">
+  <div [class]="classes()" angularAdapterNodeSelected [data]="data()">
+    <span>{{ label() }}</span>
+  </div>
+  @if (!isPaletteNode()) {
+    <angular-adapter-port id="port-left" type="both" side="left" />
+    <angular-adapter-port id="port-right" type="both" side="right" />
+  }
+</angular-adapter-node-resize-adornment>

@@ -23,7 +23,7 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-port-id]': 'id()',
-    '[class]': 'side()',
+    '[class]': '`ng-diagram-port ${side()}`',
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['portId: id'] }],
 })

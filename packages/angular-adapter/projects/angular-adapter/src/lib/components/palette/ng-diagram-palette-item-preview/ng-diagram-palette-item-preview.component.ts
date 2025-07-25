@@ -30,7 +30,7 @@ export class NgDiagramPaletteItemPreviewComponent {
 
   type = input.required<string>();
 
-  isVisible = computed(() => this.paletteService.draggedNode()?.type === this.type());
+  isVisible = computed(() => (this.paletteService.draggedNode()?.type || '') === this.type());
 
   scale = computed(() => this.flowCore.getScale());
 }
