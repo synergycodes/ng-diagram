@@ -38,13 +38,13 @@ export const nodeRotationSnapMiddleware: Middleware<'node-rotation-snap', NodeRo
         continue;
       }
 
-      const shouldSnap = node.angle % snap !== 0;
+      const shouldRotate = node.angle % snap !== 0;
 
-      if (!shouldSnap) {
+      if (!shouldRotate) {
         continue;
       }
 
-      const snappedAngle = snapAngle(node.angle, snap);
+      const snappedAngle = snapAngle(node.angle, flowCore.config.nodeRotation.computeSnapAngleForNode(node) || snap);
 
       const originalNode = flowCore.getNodeById(node.id);
 

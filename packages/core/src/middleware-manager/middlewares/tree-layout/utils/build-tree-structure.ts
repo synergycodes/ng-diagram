@@ -1,4 +1,4 @@
-import { Edge, Node, TreeNode } from '../../../../types';
+import { Edge, Node, TreeLayoutConfig, TreeNode } from '../../../../types';
 
 /**
  * Makes a map that shows, for each node, the top group it belongs to.
@@ -75,9 +75,7 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   return result;
 };
 
-export const getNodeMap = (
-  nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutConfiguration' | 'type' | 'groupId'>[]
-) => {
+export const getNodeMap = (config: TreeLayoutConfig, nodes: Node[]) => {
   const nodeMap = new Map<string, TreeNode>();
   //  Each node is deeply copied and extended with a `children` array.
   nodes.forEach((node) => {
@@ -86,8 +84,8 @@ export const getNodeMap = (
       position: { ...node.position },
       size: node.size ? { ...node.size } : undefined,
       children: [],
-      layoutAngle: node?.layoutConfiguration?.tree?.layoutAngle,
-      layoutAlignment: node?.layoutConfiguration?.tree?.layoutAlignment,
+      layoutAngle: config.getLayoutAngleForNode(node) ?? undefined,
+      layoutAlignment: config.getLayoutAlignmentForNode(node) ?? undefined,
       type: node.type,
       groupId: node.groupId,
     });

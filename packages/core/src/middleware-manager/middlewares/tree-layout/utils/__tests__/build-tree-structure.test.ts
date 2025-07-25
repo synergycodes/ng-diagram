@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Edge, Node } from '../../../../../types';
+import { Edge, LayoutAlignmentType, LayoutAngleType, Node, TreeLayoutConfig } from '../../../../../types';
 import { TreeNode } from '../../../../../types/tree-layout.interface.ts';
 import {
   buildGroupsHierarchy,
@@ -12,6 +12,24 @@ import {
 type PartialNode = Pick<Node, 'id' | 'position' | 'size' | 'type' | 'groupId'>;
 type PartialEdge = Pick<Edge, 'source' | 'target'>;
 
+// Mock TreeLayoutConfig for testing with specific values for some tests
+const mockTreeLayoutConfigWithValues: TreeLayoutConfig = {
+  getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
+    if (node.id === 'node1') return 90;
+    return null;
+  },
+  getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
+    if (node.id === 'node1') return 'Parent';
+    return null;
+  },
+};
+
+// Mock TreeLayoutConfig for testing
+const mockTreeLayoutConfig: TreeLayoutConfig = {
+  getLayoutAngleForNode: (): LayoutAngleType | null => null,
+  getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
+};
+
 describe('buildTreeStructure', () => {
   it('should build a single root tree', () => {
     const nodes: PartialNode[] = [
@@ -19,7 +37,7 @@ describe('buildTreeStructure', () => {
       { id: 'child1', position: { x: 0, y: 0 }, size: { width: 50, height: 25 }, type: 'Test' },
       { id: 'child2', position: { x: 0, y: 0 }, size: { width: 50, height: 25 }, type: 'Test' },
     ];
-    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes as Node[]);
     const edges: PartialEdge[] = [
       { source: 'root', target: 'child1' },
       { source: 'root', target: 'child2' },
@@ -38,7 +56,7 @@ describe('buildTreeStructure', () => {
       { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'leaf', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes as Node[]);
     const edges: PartialEdge[] = [{ source: 'root', target: 'leaf' }];
 
     const nodesCopy = JSON.parse(JSON.stringify(nodes));
@@ -53,7 +71,7 @@ describe('buildTreeStructure', () => {
       { id: 'b', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'c', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes as Node[]);
     const edges: PartialEdge[] = [{ source: 'a', target: 'b' }];
 
     const { roots } = buildTreeStructure(nodeMap, edges);
@@ -69,7 +87,7 @@ describe('buildTreeStructure', () => {
       { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'child', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes as Node[]);
     const edges: PartialEdge[] = [
       { source: 'root', target: 'child' },
       { source: 'root', target: 'child' },
@@ -86,7 +104,7 @@ describe('buildTreeStructure', () => {
       { id: 'x', position: { x: 0, y: 0 }, type: 'Test' },
       { id: 'y', position: { x: 0, y: 0 }, type: 'Test' },
     ];
-    const nodeMap = new Map(nodes.map((node) => [node.id, { ...node, children: [] } as TreeNode]));
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes as Node[]);
     const edges: Edge[] = [];
 
     const { roots } = buildTreeStructure(nodeMap, edges);
@@ -260,28 +278,24 @@ describe('buildGroupsHierarchy', () => {
 
 describe('getNodeMap', () => {
   it('should create TreeNode map from Node array', () => {
-    const nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutConfiguration' | 'type' | 'groupId'>[] = [
+    const nodes: Node[] = [
       {
         id: 'node1',
         position: { x: 10, y: 20 },
         size: { width: 100, height: 50 },
         type: 'Test',
-        layoutConfiguration: {
-          tree: {
-            layoutAngle: 90,
-            layoutAlignment: 'Parent',
-          },
-        },
+        data: {},
       },
       {
         id: 'node2',
         position: { x: 30, y: 40 },
         type: 'Test',
         groupId: 'group1',
+        data: {},
       },
     ];
 
-    const nodeMap = getNodeMap(nodes);
+    const nodeMap = getNodeMap(mockTreeLayoutConfigWithValues, nodes);
 
     expect(nodeMap.size).toBe(2);
 
@@ -307,21 +321,17 @@ describe('getNodeMap', () => {
   });
 
   it('should handle nodes without size', () => {
-    const nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutConfiguration' | 'type' | 'groupId'>[] = [
-      { id: 'node1', position: { x: 0, y: 0 }, type: 'Test' },
-    ];
+    const nodes: Node[] = [{ id: 'node1', position: { x: 0, y: 0 }, type: 'Test', data: {} }];
 
-    const nodeMap = getNodeMap(nodes);
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes);
 
     expect(nodeMap.get('node1')!.size).toBeUndefined();
   });
 
-  it('should handle nodes without layoutConfiguration', () => {
-    const nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutConfiguration' | 'type' | 'groupId'>[] = [
-      { id: 'node1', position: { x: 0, y: 0 }, type: 'Test' },
-    ];
+  it('should handle nodes with default layout configuration', () => {
+    const nodes: Node[] = [{ id: 'node1', position: { x: 0, y: 0 }, type: 'Test', data: {} }];
 
-    const nodeMap = getNodeMap(nodes);
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes);
 
     const node = nodeMap.get('node1')!;
     expect(node.layoutAngle).toBeUndefined();
@@ -331,16 +341,17 @@ describe('getNodeMap', () => {
   it('should deep copy position and size objects', () => {
     const originalPosition = { x: 10, y: 20 };
     const originalSize = { width: 100, height: 50 };
-    const nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutConfiguration' | 'type' | 'groupId'>[] = [
+    const nodes: Node[] = [
       {
         id: 'node1',
         position: originalPosition,
         size: originalSize,
         type: 'Test',
+        data: {},
       },
     ];
 
-    const nodeMap = getNodeMap(nodes);
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes);
     const treeNode = nodeMap.get('node1')!;
 
     // Modify original objects
@@ -353,10 +364,66 @@ describe('getNodeMap', () => {
   });
 
   it('should handle empty nodes array', () => {
-    const nodes: Pick<Node, 'id' | 'position' | 'size' | 'layoutConfiguration' | 'type' | 'groupId'>[] = [];
+    const nodes: Node[] = [];
 
-    const nodeMap = getNodeMap(nodes);
+    const nodeMap = getNodeMap(mockTreeLayoutConfig, nodes);
 
     expect(nodeMap.size).toBe(0);
+  });
+});
+
+describe('TreeLayoutConfig integration', () => {
+  it('should use getLayoutAngleForNode return value', () => {
+    const mockConfig: TreeLayoutConfig = {
+      getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
+        if (node.id === 'special') return 180;
+        return 90;
+      },
+      getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
+    };
+
+    const nodes: Node[] = [
+      { id: 'normal', position: { x: 0, y: 0 }, type: 'Test', data: {} },
+      { id: 'special', position: { x: 0, y: 0 }, type: 'Test', data: {} },
+    ];
+
+    const nodeMap = getNodeMap(mockConfig, nodes);
+
+    expect(nodeMap.get('normal')!.layoutAngle).toBe(90);
+    expect(nodeMap.get('special')!.layoutAngle).toBe(180);
+  });
+
+  it('should use getLayoutAlignmentForNode return value', () => {
+    const mockConfig: TreeLayoutConfig = {
+      getLayoutAngleForNode: (): LayoutAngleType | null => null,
+      getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
+        if (node.id === 'center') return 'Subtree';
+        return 'Start';
+      },
+    };
+
+    const nodes: Node[] = [
+      { id: 'left', position: { x: 0, y: 0 }, type: 'Test', data: {} },
+      { id: 'center', position: { x: 0, y: 0 }, type: 'Test', data: {} },
+    ];
+
+    const nodeMap = getNodeMap(mockConfig, nodes);
+
+    expect(nodeMap.get('left')!.layoutAlignment).toBe('Start');
+    expect(nodeMap.get('center')!.layoutAlignment).toBe('Subtree');
+  });
+
+  it('should handle null return values from config methods', () => {
+    const mockConfig: TreeLayoutConfig = {
+      getLayoutAngleForNode: (): LayoutAngleType | null => null,
+      getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
+    };
+
+    const nodes: Node[] = [{ id: 'test', position: { x: 0, y: 0 }, type: 'Test', data: {} }];
+
+    const nodeMap = getNodeMap(mockConfig, nodes);
+
+    expect(nodeMap.get('test')!.layoutAngle).toBeUndefined();
+    expect(nodeMap.get('test')!.layoutAlignment).toBeUndefined();
   });
 });

@@ -10,7 +10,7 @@ export type LayoutAngleType = 0 | 90 | 180 | 270;
  */
 export type LayoutAlignmentType = 'Parent' | 'Subtree' | 'Start';
 
-export interface TreeLayoutConfig {
+export interface GlobalTreeLayoutConfig {
   // Configurable gap between sibling nodes in the same row/column
   siblingGap: number;
   // Configurable gap between parent and child nodes

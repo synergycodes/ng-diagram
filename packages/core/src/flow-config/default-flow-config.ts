@@ -1,9 +1,12 @@
+import { LayoutAlignmentType, LayoutAngleType } from '../types';
 import type { Edge } from '../types/edge.interface';
 import type {
   FlowConfig,
   GroupingConfig,
   LinkingConfig,
+  NodeRotationConfig,
   ResizeConfig,
+  TreeLayoutConfig,
   ZoomConfig,
 } from '../types/flow-config.interface';
 import { Size } from '../types/utils';
@@ -54,6 +57,23 @@ const defaultZoomConfig: ZoomConfig = {
   step: 0.05,
 };
 
+const defaultTreeLayoutConfig: TreeLayoutConfig = {
+  getLayoutAngleForNode: (): LayoutAngleType | null => {
+    return null;
+  },
+  getLayoutAlignmentForNode: (): LayoutAlignmentType | null => {
+    return null;
+  },
+};
+
+const defaultNodeRotationConfig: NodeRotationConfig = {
+  shouldSnapForNode: (): boolean => {
+    return true;
+  },
+  computeSnapAngleForNode: (): number | null => {
+    return null;
+  },
+};
 /**
  * Default configuration for the flow system.
  */
@@ -64,4 +84,6 @@ export const defaultFlowConfig: FlowConfig = {
   linking: defaultLinkingConfig,
   grouping: defaultGroupingConfig,
   zoom: defaultZoomConfig,
+  treeLayout: defaultTreeLayoutConfig,
+  nodeRotation: defaultNodeRotationConfig,
 };

@@ -1,7 +1,7 @@
 // Default
-import { TreeLayoutConfig } from '../../../types';
+import { GlobalTreeLayoutConfig } from '../../../types';
 
-export const TREE_LAYOUT_DEFAULT_CONFIG: TreeLayoutConfig = {
+export const TREE_LAYOUT_DEFAULT_CONFIG: GlobalTreeLayoutConfig = {
   siblingGap: 20,
   levelGap: 30,
   layoutAngle: 90,

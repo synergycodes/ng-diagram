@@ -1,5 +1,6 @@
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
+import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface';
 import { Size } from './utils';
 
 /**
@@ -85,6 +86,42 @@ export interface ZoomConfig {
 }
 
 /**
+ * Configuration for node rotation behavior.
+ */
+export interface NodeRotationConfig {
+  /**
+   * Determines if rotation snapping should be enabled for a node.
+   * @param node The node to check for rotation snapping.
+   * @returns True if rotation should snap, false otherwise.
+   */
+  shouldSnapForNode: (node: Node) => boolean;
+  /**
+   * Computes the snap angle for a node's rotation.
+   * @param node The node to compute the snap angle for.
+   * @returns The angle in degrees to snap to, or null if default snapping should be used.
+   */
+  computeSnapAngleForNode: (node: Node) => number | null;
+}
+
+/**
+ * Configuration for tree layout behavior.
+ */
+export interface TreeLayoutConfig {
+  /**
+   * Gets the layout angle for positioning a node in a tree structure.
+   * @param node The node to get the layout angle for.
+   * @returns The angle in degrees for the node's position in the tree, or null for default positioning.
+   */
+  getLayoutAngleForNode: (node: Node) => LayoutAngleType | null;
+  /**
+   * Gets the layout alignment for a node in a tree structure.
+   * @param node The node to get the alignment for.
+   * @returns The alignment type for the node, or null for default alignment.
+   */
+  getLayoutAlignmentForNode: (node: Node) => LayoutAlignmentType | null;
+}
+
+/**
  * The main configuration interface for the flow system.
  */
 export interface FlowConfig {
@@ -116,4 +153,7 @@ export interface FlowConfig {
    * Configuration for zooming.
    */
   zoom: ZoomConfig;
+
+  treeLayout: TreeLayoutConfig;
+  nodeRotation: NodeRotationConfig;
 }
