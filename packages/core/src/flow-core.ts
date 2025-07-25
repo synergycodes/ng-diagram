@@ -11,6 +11,7 @@ import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from '.
 import { TransactionManager } from './transaction-manager/transaction-manager';
 import { TransactionCallback, TransactionResult } from './transaction-manager/transaction.types';
 import type {
+  DeepPartial,
   Edge,
   EnvironmentInfo,
   FlowConfig,
@@ -28,6 +29,7 @@ import type {
   Port,
   Renderer,
 } from './types';
+import { deepMerge } from './utils';
 
 export class FlowCore<
   TMiddlewares extends MiddlewareChain = [],
@@ -56,7 +58,7 @@ export class FlowCore<
     environment: EnvironmentInfo,
     middlewares?: TMiddlewares,
     getFlowOffset?: () => { x: number; y: number },
-    config: Partial<FlowConfig> = {}
+    config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
     this.environment = environment;
@@ -69,7 +71,7 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.portBatchProcessor = new PortBatchProcessor();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
-    this.config = { ...defaultFlowConfig, ...config };
+    this.config = deepMerge(defaultFlowConfig, config);
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
 

@@ -63,7 +63,7 @@ export interface GroupingConfig {
    * @param group The group node.
    * @returns True if the node can be grouped, false otherwise.
    */
-  canGroup: (nodes: Node, group: Node) => boolean;
+  canGroup: (node: Node, group: Node) => boolean;
 }
 
 /**
