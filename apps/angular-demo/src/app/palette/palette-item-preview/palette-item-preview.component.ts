@@ -11,5 +11,5 @@ import { nodeTemplateMap } from '../../data/node-template';
 })
 export class PaletteItemPreviewComponent {
   item = input.required<PaletteItem>();
-  componentType = computed(() => nodeTemplateMap.get(this.item().type));
+  componentType = computed(() => nodeTemplateMap.get(this.item().type || ''));
 }

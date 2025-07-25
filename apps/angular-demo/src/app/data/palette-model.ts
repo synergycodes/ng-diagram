@@ -9,4 +9,6 @@ export const paletteModel: PaletteItem[] = [
   { type: NodeTemplateType.Image, data: { label: 'Image', imageUrl: 'https://tinyurl.com/bddnt44s' } },
   { type: NodeTemplateType.Resizable, data: { label: 'Resizable' }, resizable: true },
   { type: NodeTemplateType.Group, data: { label: 'Group' }, isGroup: true },
+  { data: { label: 'Default Node' }, resizable: true, rotatable: true },
+  { data: { label: 'Default Group' }, resizable: true, isGroup: true },
 ];

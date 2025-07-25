@@ -20,7 +20,7 @@ export interface Node {
   /**
    * The type of the node declared in nodeTemplateMap.
    */
-  type: string;
+  type?: string;
   /**
    * Whether the node is selected.
    */
@@ -49,6 +49,10 @@ export interface Node {
    * Whether the node is resizable.
    */
   resizable?: boolean;
+  /**
+   * Whether the node is rotatable.
+   */
+  rotatable?: boolean;
   /**
    * The angle of the node from 0 to 360.
    */

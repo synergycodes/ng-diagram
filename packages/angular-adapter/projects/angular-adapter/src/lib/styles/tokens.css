@@ -1,7 +1,7 @@
 /**
  * Do not edit directly, this file was auto-generated.
  */
-@import './primitives-mode-1.css';
+@import './primitives.css';
 
 html[data-theme='dark'] {
   --ngd-button-primary-bg-default: var(--ngd-colors-acc1-500);

@@ -16,6 +16,9 @@ import {
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
+  host: {
+    '[class.ng-diagram-port-hoverable]': 'true',
+  },
 })
 export class ResizableNodeComponent implements NodeTemplate {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);

@@ -22,6 +22,8 @@ import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.compon
 import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
+import { DefaultGroupTemplateComponent } from '../node/default-group-template/default-group-template.component';
+import { DefaultNodeTemplateComponent } from '../node/default-node-template/default-node-template.component';
 
 @Component({
   selector: 'angular-adapter-diagram',
@@ -32,6 +34,8 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
     AngularAdapterEdgeComponent,
     MarkerArrowComponent,
     DefaultEdgeComponent,
+    DefaultNodeTemplateComponent,
+    DefaultGroupTemplateComponent,
   ],
   templateUrl: './angular-adapter-diagram.component.html',
   styleUrl: './angular-adapter-diagram.component.scss',
@@ -106,7 +110,7 @@ export class AngularAdapterDiagramComponent<
   }
 
   getNodeTemplate(nodeType: Node['type']) {
-    return this.nodeTemplateMap().get(nodeType) ?? null;
+    return this.nodeTemplateMap().get(nodeType || '') ?? null;
   }
 
   getEdgeTemplate(edgeType: Edge['type']) {

@@ -1,17 +1,27 @@
 @import './tokens.css';
 
 :root {
+  --ngd-node-background-color: var(--ngd-node-bg-primary-default);
+  --ngd-node-border-color: var(--ngd-node-stroke-primary-default);
+  --ngd-node-border-color-hover: var(--ngd-node-stroke-primary-hover);
+  --ngd-node-border-radius: 0.75rem;
+  --ngd-node-border-size: 0.0625rem;
+
+  --ngd-group-border-color: var(--ngd-ui-stroke-primary-focus);
+  --ngd-group-border-color-hover: var(--ngd-pt-stroke-primary-default);
+  --ngd-group-border-color-highlight: var(--ngd-colors-acc1-500);
+  --ngd-group-box-shadow-color-highlight: var(--ngd-colors-acc1-500-50);
+  --ngd-group-border-radius: 0.75rem;
+
   --ngd-selected-node-box-shadow: 0 0 0 0.25rem var(--ngd-focus-ring-node-active);
-  --ngd-selected-node-outline: 1px solid var(--ngd-node-stroke-primary-hover);
+  --ngd-selected-node-outline: 0.0625rem solid var(--ngd-node-stroke-primary-hover);
 
   --ngd-rotate-handle-size: 2rem;
   --ngd-rotate-handle-distance: 2rem;
   --ngd-rotate-handle-background-color: var(--ngd-button-gray-bg-default);
   --ngd-rotate-handle-background-color-hover: var(--ngd-button-gray-bg-hover);
   --ngd-rotate-handle-background-color-active: var(--ngd-button-gray-bg-active);
-
   --ngd-rotate-handle-xy: calc(-0.7071 * var(--ngd-rotate-handle-distance));
-
   --ngd-rotate-handle-top: var(--ngd-rotate-handle-xy);
   --ngd-rotate-handle-right: var(--ngd-rotate-handle-xy);
 
@@ -19,10 +29,21 @@
   --ngd-resize-line-border-style: solid;
   --ngd-resize-line-border-color: var(--ngd-transform-box);
 
-  --ngd-port-size: 0.5rem;
+  --ngd-port-size: 0.25rem;
   --ngd-port-background-color: var(--ngd-node-port-fill-default);
-  --ngd-port-border-size: 0.125rem;
   --ngd-port-border-color: var(--ngd-node-port-stroke-default);
+  --ngd-port-border-size: 0.125rem;
   --ngd-port-background-color-hover: var(--ngd-node-port-fill-active);
   --ngd-port-border-color-hover: var(--ngd-node-port-stroke-active);
+  --ngd-port-border-size-hover: 0.25rem;
+}
+
+.ng-diagram-port-hoverable .ng-diagram-port:hover,
+.ng-diagram-port-hoverable-over-node:hover:not(:has(.ng-diagram-rotate-handle:hover)):not(:has([data-rotating]))
+  .ng-diagram-port {
+  background-color: var(--ngd-port-background-color-hover);
+  border-color: var(--ngd-port-background-color-hover);
+  outline: var(--ngd-port-border-size) solid var(--ngd-port-background-color-hover);
+
+  box-shadow: 0 0 0 var(--ngd-port-border-size-hover) var(--ngd-port-border-color-hover);
 }
