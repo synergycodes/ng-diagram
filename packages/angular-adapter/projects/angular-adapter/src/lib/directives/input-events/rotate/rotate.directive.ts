@@ -1,4 +1,4 @@
-import { Directive, ElementRef, inject, input } from '@angular/core';
+import { Directive, ElementRef, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '@angularflow/core';
 import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
@@ -11,13 +11,17 @@ import { PointerInputEvent } from '../../../types';
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class RotateHandleDirective {
+export class RotateHandleDirective implements OnDestroy {
   private readonly elementRef = inject(ElementRef);
   private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   target = input.required<Node>();
+
+  ngOnDestroy() {
+    this.cleanup();
+  }
 
   onPointerDown($event: PointerInputEvent) {
     $event.rotateHandled = true;

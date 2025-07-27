@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { FlowCore, FlowCoreProviderService } from '@angularflow/angular-adapter';
 import { AppMiddlewares } from './flow.config';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class FlowService {
   private flowCoreProvider = inject(FlowCoreProviderService);
 

@@ -1,4 +1,4 @@
-import { Directive, inject, input, signal } from '@angular/core';
+import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
 import { Node } from '@angularflow/core';
 import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -10,12 +10,17 @@ import { PointerInputEvent } from '../../../types';
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class LinkingInputDirective {
+export class LinkingInputDirective implements OnDestroy {
   private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   target = signal<Node | undefined>(undefined);
   portId = input.required<string>();
+
+  ngOnDestroy(): void {
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+  }
 
   setTargetNode(node: Node) {
     this.target.set(node);
@@ -67,4 +72,12 @@ export class LinkingInputDirective {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
   };
+
+  private getContainerElement(): HTMLElement {
+    const containerElement = this.diagramComponent.getNativeElement();
+    if (!containerElement) {
+      throw new Error('Linking failed: AngularAdapterDiagramComponent missing ElementRef');
+    }
+    return containerElement;
+  }
 }

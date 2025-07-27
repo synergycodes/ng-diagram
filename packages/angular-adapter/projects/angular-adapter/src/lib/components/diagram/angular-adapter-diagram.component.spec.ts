@@ -15,6 +15,7 @@ describe('AngularAdapterDiagramComponent', () => {
     AngularAdapterDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>
   >;
   const mockModel: ModelAdapter = {
+    destroy: vi.fn(),
     getNodes: vi.fn(),
     getEdges: vi.fn(),
     getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} })),
@@ -29,7 +30,15 @@ describe('AngularAdapterDiagramComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterDiagramComponent],
-      providers: [{ provide: FlowCoreProviderService, useValue: { init: vi.fn() } }],
+      providers: [
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            init: vi.fn(),
+            destroy: vi.fn(),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);

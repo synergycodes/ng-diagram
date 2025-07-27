@@ -1,4 +1,4 @@
-import { Directive, inject, input } from '@angular/core';
+import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node, ResizeDirection } from '@angularflow/core';
 
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -9,12 +9,16 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class ResizeDirective {
+export class ResizeDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   direction = input.required<ResizeDirection>();
   targetData = input.required<Node>();
 
+  ngOnDestroy() {
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+  }
   onPointerDown(event: PointerEvent): void {
     event.preventDefault();
     event.stopPropagation();

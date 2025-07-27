@@ -7,6 +7,12 @@ import type { Node } from './node.interface';
  */
 export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
   /**
+   * Destroy the model adapter and clean up resources
+   * This should be called when the model is no longer needed to prevent memory leaks
+   */
+  destroy(): void;
+
+  /**
    * Get all nodes in the model
    */
   getNodes(): Node[];

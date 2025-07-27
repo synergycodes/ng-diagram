@@ -1,4 +1,4 @@
-import { Directive, inject, input } from '@angular/core';
+import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '@angularflow/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -11,10 +11,15 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class PointerMoveSelectionDirective {
+export class PointerMoveSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   targetData = input.required<Node>();
+
+  ngOnDestroy() {
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+  }
 
   onPointerDown(event: PointerInputEvent): void {
     if (!this.shouldHandle(event)) {

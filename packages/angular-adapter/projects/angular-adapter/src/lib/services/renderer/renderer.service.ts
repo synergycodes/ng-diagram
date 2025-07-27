@@ -1,8 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { Edge, Node, Renderer, Viewport } from '@angularflow/core';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class RendererService implements Renderer {
+  clear(): void {
+    throw new Error('Method not implemented.');
+  }
   nodes = signal<Node[]>([]);
   edges = signal<Edge[]>([]);
   viewport = signal<Viewport>({

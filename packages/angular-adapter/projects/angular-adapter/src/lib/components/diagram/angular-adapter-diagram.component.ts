@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, OnDestroy } from '@angular/core';
 import {
   Edge,
   Metadata,
@@ -54,12 +54,12 @@ export class AngularAdapterDiagramComponent<
   TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
     Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
   >,
-> {
+> implements OnDestroy
+{
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
-  private readonly host: ElementRef;
 
   /**
    * The model to use in the diagram.
@@ -86,8 +86,7 @@ export class AngularAdapterDiagramComponent<
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
-  constructor(host: ElementRef) {
-    this.host = host;
+  constructor() {
     this.getFlowOffset = this.getFlowOffset.bind(this);
 
     // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
@@ -98,14 +97,19 @@ export class AngularAdapterDiagramComponent<
         this.flowCoreProvider.init(this.model(), this.middlewares(), this.getFlowOffset);
         // Initialize the resize batch processor after FlowCore is ready
         this.flowResizeBatchProcessor.initialize();
-        effectRef.destroy();
+
+        effectRef?.destroy();
       },
       { manualCleanup: true }
     );
   }
 
+  ngOnDestroy(): void {
+    this.flowCoreProvider.destroy();
+  }
+
   getFlowOffset() {
-    const clientRect = this.host.nativeElement?.getBoundingClientRect();
+    const clientRect = this.getNativeElement().getBoundingClientRect();
     return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
   }
 

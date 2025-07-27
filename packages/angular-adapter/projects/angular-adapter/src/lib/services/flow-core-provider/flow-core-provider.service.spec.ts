@@ -12,6 +12,7 @@ describe('FlowCoreProviderService', () => {
   let service: FlowCoreProviderService<typeof mockMiddlewares>;
 
   const mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<typeof mockMiddlewares>>> = {
+    destroy: vi.fn(),
     getNodes: vi.fn().mockReturnValue([]),
     getEdges: vi.fn().mockReturnValue([]),
     getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} }),
@@ -24,6 +25,9 @@ describe('FlowCoreProviderService', () => {
   };
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [FlowCoreProviderService],
+    });
     service = TestBed.inject(FlowCoreProviderService);
   });
 

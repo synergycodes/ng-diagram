@@ -12,6 +12,7 @@ export * from './lib/components/palette/ng-diagram-palette-item-preview/ng-diagr
 export * from './lib/components/palette/ng-diagram-palette-item/ng-diagram-palette-item.component';
 export * from './lib/components/port/angular-adapter-port.component';
 export * from './lib/directives';
+export * from './lib/ng-diagram.module';
 export * from './lib/services/';
 export * from './lib/types';
 export * from './lib/utils/get-path/get-bezier-path';

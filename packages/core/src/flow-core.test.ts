@@ -73,6 +73,7 @@ describe('FlowCore', () => {
   let flowCore: FlowCore<MiddlewareChain>;
   let mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   let mockRenderer: Renderer;
+  let mockDestroy: Mock;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
@@ -83,9 +84,11 @@ describe('FlowCore', () => {
     mockGetNodes = vi.fn().mockReturnValue([]);
     mockGetEdges = vi.fn().mockReturnValue([]);
     mockGetMetadata = vi.fn().mockReturnValue({});
+    mockDestroy = vi.fn();
 
     // Create mock implementations
     mockModelAdapter = {
+      destroy: mockDestroy,
       getNodes: mockGetNodes,
       getEdges: mockGetEdges,
       getMetadata: mockGetMetadata,

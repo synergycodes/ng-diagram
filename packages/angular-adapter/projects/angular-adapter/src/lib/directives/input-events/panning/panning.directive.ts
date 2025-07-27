@@ -1,4 +1,4 @@
-import { Directive, inject } from '@angular/core';
+import { Directive, inject, OnDestroy } from '@angular/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
@@ -12,8 +12,12 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
     '(pointerup)': 'onPointerUp($event)',
   },
 })
-export class PanningDirective {
+export class PanningDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+
+  ngOnDestroy(): void {
+    document.removeEventListener('pointermove', this.onMouseMove);
+  }
 
   onPointerDown(event: PointerInputEvent): void {
     if (!BrowserInputsHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {

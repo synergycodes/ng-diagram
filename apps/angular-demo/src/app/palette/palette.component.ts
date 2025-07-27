@@ -11,12 +11,13 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
   selector: 'app-palette',
   templateUrl: './palette.component.html',
   styleUrls: ['./palette.component.scss'],
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PaletteItemComponent,
+    PaletteItemPreviewComponent,
     NgDiagramPaletteItemComponent,
     NgDiagramPaletteItemPreviewComponent,
-    PaletteItemPreviewComponent,
   ],
 })
 export class PaletteComponent {
