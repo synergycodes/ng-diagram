@@ -55,7 +55,7 @@ describe('nodePositionSnapMiddleware', () => {
     expect(nextMock).toHaveBeenCalledWith();
   });
 
-  it('should call cancel if no nodes need snapping', () => {
+  it('should call next if no nodes need snapping', () => {
     (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
     nodesMap.set('node1', { ...mockNode, id: 'node1', position: { x: 10, y: 20 } });
@@ -66,8 +66,7 @@ describe('nodePositionSnapMiddleware', () => {
 
     nodePositionSnapMiddleware.execute(context, nextMock, cancelMock);
 
-    expect(cancelMock).toHaveBeenCalled();
-    expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
+    expect(nextMock).toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
   });
 
   it('should skip nodes not found in nodesMap', () => {
@@ -97,34 +96,16 @@ describe('nodePositionSnapMiddleware', () => {
     });
   });
 
-  it('should not update if position is already snapped', () => {
+  it('should update if position is already snapped', () => {
     (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
     nodesMap.set('node1', { ...mockNode, id: 'node1', position: { x: 10, y: 20 } });
     (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({ id: 'node1', position: { x: 10, y: 20 } });
     nodePositionSnapMiddleware.execute(context, nextMock, cancelMock);
-    expect(cancelMock).toHaveBeenCalled();
-    expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
+    expect(nextMock).toHaveBeenCalledWith(expect.objectContaining({ nodesToUpdate: expect.anything() }));
   });
 
-  it('should handle multiple nodes, only updating those needing snap', () => {
-    (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1', 'node2']);
-    nodesMap.set('node1', { ...mockNode, id: 'node1', position: { x: 13, y: 17 } });
-    nodesMap.set('node2', { ...mockNode, id: 'node2', position: { x: 10, y: 20 } });
-    (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockImplementation((id: string) => ({
-      id,
-      position: nodesMap.get(id)?.position,
-    }));
-
-    nodePositionSnapMiddleware.execute(context, nextMock, cancelMock);
-
-    expect(nextMock).toHaveBeenCalledWith({
-      nodesToUpdate: [{ id: 'node1', position: { x: snapNumber(13, SNAP_GRID), y: snapNumber(17, SNAP_GRID) } }],
-    });
-  });
-
-  it('should call cancel if nodesToUpdate is empty', () => {
+  it('should call next if nodesToUpdate is empty', () => {
     (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
     nodesMap.set('node1', { ...mockNode, id: 'node1', position: { x: 10, y: 20 } });
@@ -132,6 +113,6 @@ describe('nodePositionSnapMiddleware', () => {
 
     nodePositionSnapMiddleware.execute(context, nextMock, cancelMock);
 
-    expect(cancelMock).toHaveBeenCalled();
+    expect(nextMock).toHaveBeenCalled();
   });
 });

@@ -1,5 +1,4 @@
 import type { Edge } from './edge.interface';
-import type { Node } from './node.interface';
 import type { GlobalTreeLayoutConfig } from './tree-layout.interface.ts';
 
 /**
@@ -35,7 +34,6 @@ export interface RoutingConfiguration {
 export interface Metadata<TMiddlewaresMetadata = unknown> {
   viewport: Viewport;
   temporaryEdge?: Edge | null;
-  highlightedGroup?: Node['id'] | null;
   layoutConfiguration?: LayoutConfiguration;
   routingConfiguration?: RoutingConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
