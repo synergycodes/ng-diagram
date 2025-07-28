@@ -16,7 +16,7 @@ export class PanningDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   onPointerDown(event: PointerInputEvent): void {
-    if (!BrowserInputsHelpers.withPrimaryButton(event) || this.isHandled(event)) {
+    if (!BrowserInputsHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
 
@@ -58,7 +58,7 @@ export class PanningDirective {
   }
 
   private onMouseMove = (event: PointerInputEvent) => {
-    if (this.isHandled(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -76,15 +76,15 @@ export class PanningDirective {
     });
   };
 
-  private isHandled(event: PointerInputEvent): boolean {
-    if (shouldDiscardEvent(event, 'drag')) {
+  private shouldHandle(event: PointerInputEvent): boolean {
+    if (shouldDiscardEvent(event, 'pan')) {
       return false;
     }
 
     if (ZoomingPointerDirective.IsZoomingPointer) {
-      return false;
+      return true;
     }
 
-    return !!(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+    return !(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }

@@ -17,7 +17,7 @@ export class PointerMoveSelectionDirective {
   targetData = input.required<Node>();
 
   onPointerDown(event: PointerInputEvent): void {
-    if (this.isHandled(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -67,7 +67,7 @@ export class PointerMoveSelectionDirective {
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
-    if (this.isHandled(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -85,11 +85,11 @@ export class PointerMoveSelectionDirective {
     });
   };
 
-  private isHandled(event: PointerInputEvent): boolean {
+  private shouldHandle(event: PointerInputEvent): boolean {
     if (shouldDiscardEvent(event, 'drag')) {
       return false;
     }
 
-    return !!(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+    return !(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }
