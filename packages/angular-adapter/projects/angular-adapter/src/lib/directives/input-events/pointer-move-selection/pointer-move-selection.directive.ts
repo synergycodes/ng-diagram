@@ -3,6 +3,7 @@ import { Node } from '@angularflow/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
+import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
   selector: '[angularAdapterPointerMoveSelection]',
@@ -85,6 +86,10 @@ export class PointerMoveSelectionDirective {
   };
 
   private isHandled(event: PointerInputEvent): boolean {
+    if (shouldDiscardEvent(event, 'drag')) {
+      return false;
+    }
+
     return !!(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }

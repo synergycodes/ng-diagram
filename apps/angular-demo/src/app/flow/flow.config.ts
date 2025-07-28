@@ -18,11 +18,8 @@ const appMiddlewares = [
   treeLayoutMiddleware,
   nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
+  loggerMiddleware,
 ] as const satisfies Middleware[];
-
-if (import.meta.env['NODE_ENV'] === 'development') {
-  appMiddlewares.push(loggerMiddleware);
-}
 
 export { appMiddlewares };
 
