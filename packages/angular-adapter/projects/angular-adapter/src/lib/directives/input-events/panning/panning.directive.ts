@@ -3,6 +3,7 @@ import { BrowserInputsHelpers } from '../../../services/input-events/browser-inp
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
 import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
+import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
   selector: '[angularAdapterPanning]',
@@ -76,6 +77,10 @@ export class PanningDirective {
   };
 
   private isHandled(event: PointerInputEvent): boolean {
+    if (shouldDiscardEvent(event, 'drag')) {
+      return false;
+    }
+
     if (ZoomingPointerDirective.IsZoomingPointer) {
       return false;
     }
