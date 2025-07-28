@@ -75,7 +75,7 @@ export class AngularAdapterPortComponent implements OnInit, OnDestroy {
     this.lastSide.set(this.side());
     this.lastType.set(this.type());
 
-    this.flowCoreProvider.provide().internalUpdater.addPort(this.nodeData().id, {
+    this.flowCoreProvider.provide().updater.addPort(this.nodeData().id, {
       id: this.id(),
       type: this.type(),
       nodeId: this.nodeData().id,

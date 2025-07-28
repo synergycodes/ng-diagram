@@ -10,7 +10,7 @@ import {
 } from '@angularflow/angular-adapter';
 import { loggerMiddleware } from '@angularflow/logger-middleware';
 
-export const appMiddlewares = [
+const appMiddlewares = [
   zIndexMiddleware,
   nodeRotationSnapMiddleware,
   groupChildrenChangeExtent,
@@ -18,7 +18,12 @@ export const appMiddlewares = [
   treeLayoutMiddleware,
   nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
-  loggerMiddleware,
 ] as const satisfies Middleware[];
+
+if (import.meta.env['NODE_ENV'] === 'development') {
+  appMiddlewares.push(loggerMiddleware);
+}
+
+export { appMiddlewares };
 
 export type AppMiddlewares = typeof appMiddlewares;
