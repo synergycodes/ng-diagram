@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { GlobalTreeLayoutConfig, LayoutAngleType, TreeNode } from '../../../../../types/tree-layout.interface.ts';
-import { makeTreeLayout } from '../orientation-tree-layout.ts';
+import { GlobalTreeLayoutConfig, LayoutAngleType, TreeNode } from '../../../../types/tree-layout.interface.ts';
+import { makeTreeLayout } from './orientation-tree-layout.ts';
 
 describe('makeTreeLayout', () => {
   const createDefaultConfig = (): GlobalTreeLayoutConfig => ({

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Bounds } from '../../../../../types';
-import { LayoutAngleType, TreeNode } from '../../../../../types/tree-layout.interface.ts';
-import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren, shiftSubtree } from '../tree-layout-utils.ts';
+import { Bounds } from '../../../../types';
+import { LayoutAngleType, TreeNode } from '../../../../types/tree-layout.interface.ts';
+import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren, shiftSubtree } from './tree-layout-utils.ts';
 
 describe('isLeafNode', () => {
   it('should return true for node with no children', () => {

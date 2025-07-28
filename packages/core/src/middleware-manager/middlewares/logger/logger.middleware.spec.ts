@@ -1,6 +1,6 @@
-import type { FlowState, Metadata, MiddlewareContext } from '@angularflow/core';
 import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
-import { loggerMiddleware, LoggerMiddlewareMetadata } from './logger.middleware';
+import { FlowState, Metadata, MiddlewareContext } from '../../../types';
+import { loggerMiddleware, LoggerMiddlewareMetadata } from './logger';
 
 describe('LoggerMiddleware', () => {
   let consoleLogSpy: MockInstance;

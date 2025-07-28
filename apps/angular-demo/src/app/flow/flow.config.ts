@@ -7,8 +7,8 @@ import {
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
   zIndexMiddleware,
-} from '@angularflow/angular-adapter';
-import { loggerMiddleware } from '@angularflow/logger-middleware';
+  loggerMiddleware,
+} from '@angularflow/core';
 
 const appMiddlewares = [
   zIndexMiddleware,
