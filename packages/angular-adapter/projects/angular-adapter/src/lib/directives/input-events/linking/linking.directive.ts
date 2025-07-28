@@ -24,13 +24,8 @@ export class LinkingInputDirective {
   onPointerDown($event: PointerInputEvent) {
     $event.linkingHandled = true;
 
-    const diagramContainer = this.diagramComponent.getNativeElement();
-    if (!diagramContainer) {
-      throw new Error('Linking failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
-    diagramContainer.addEventListener('pointermove', this.onPointerMove);
-    diagramContainer.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.onPointerUp);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
@@ -58,11 +53,6 @@ export class LinkingInputDirective {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
-    const diagramContainer = this.diagramComponent.getNativeElement();
-    if (!diagramContainer) {
-      throw new Error('Linking failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -74,7 +64,7 @@ export class LinkingInputDirective {
       lastInputPoint: { x: $event.clientX, y: $event.clientY },
     });
 
-    diagramContainer.removeEventListener('pointermove', this.onPointerMove);
-    diagramContainer.removeEventListener('pointerup', this.onPointerUp);
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
   };
 }
