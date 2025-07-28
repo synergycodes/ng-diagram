@@ -34,6 +34,11 @@ export class InitUpdater extends BaseUpdater implements Updater {
   async start() {
     await this.checkIfInitialized();
 
+    // Call init to make sure all scheduled data is processed
+    for (const initializer of this.getInitializers()) {
+      initializer.init();
+    }
+
     this.isInitialized = true;
     return;
   }
