@@ -1,3 +1,5 @@
 @if (showAdornment()) {
-  <angular-adapter-rotate-handle [data]="data()"><ng-content></ng-content></angular-adapter-rotate-handle>
+  <angular-adapter-rotate-handle [data]="nodeData()">
+    <ng-content />
+  </angular-adapter-rotate-handle>
 }
