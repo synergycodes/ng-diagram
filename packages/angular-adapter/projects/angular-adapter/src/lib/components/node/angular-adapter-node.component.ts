@@ -5,8 +5,6 @@ import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../..
 import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
 import { PointerMoveSelectionDirective } from '../../directives/input-events/pointer-move-selection/pointer-move-selection.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
-import { NodeResizeAdornmentComponent } from './resize/node-resize-adornment.component';
-import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.component';
 
 @Component({
   selector: 'angular-adapter-node',
@@ -20,7 +18,6 @@ import { NodeRotateAdornmentComponent } from './rotate/node-rotate-adornment.com
     { directive: PointerMoveSelectionDirective, inputs: ['targetData: data'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
-  imports: [NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
 })
 export class AngularAdapterNodeComponent {
   private readonly portsService = inject(UpdatePortsService);
@@ -30,16 +27,28 @@ export class AngularAdapterNodeComponent {
   targetType = 'node';
 
   readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
+
   readonly id = computed(() => this.data().id);
+  readonly size = computed(() => this.data().size);
 
   constructor() {
+    this.setupPortSyncEffect();
+  }
+
+  private syncPorts(): void {
+    queueMicrotask(() => {
+      const id = this.id();
+      const portsData = this.portsService.getNodePortsData(id);
+
+      this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(id, portsData);
+    });
+  }
+
+  private setupPortSyncEffect(): void {
     effect(() => {
+      this.size();
       this.rotate();
-      // TODO: fix problem with DOM position resync after repaint
-      setTimeout(() => {
-        const portsData = this.portsService.getNodePortsData(this.id());
-        this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(this.id(), portsData);
-      }, 0);
+      this.syncPorts();
     });
   }
 }
