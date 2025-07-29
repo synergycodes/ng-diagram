@@ -3,11 +3,11 @@ import {
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
+  loggerMiddleware,
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
   zIndexMiddleware,
-  loggerMiddleware,
 } from '@angularflow/core';
 
 const appMiddlewares = [

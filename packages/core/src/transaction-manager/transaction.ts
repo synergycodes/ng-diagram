@@ -114,7 +114,6 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     if (this.parent) {
       this.mergeToParent();
     }
-    // Note: If this is a root transaction, you might want to apply changes to the actual state here
   }
 
   /**

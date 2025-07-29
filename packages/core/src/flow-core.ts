@@ -1,9 +1,6 @@
 import { CommandHandler } from './command-handler/command-handler';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
-import { InitUpdater } from './updater/init-updater/init-updater';
 import { InputEventsRouter } from './input-events';
-import { InternalUpdater } from './updater/internal-updater/internal-updater';
-import { Updater } from './updater/updater.interface';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
@@ -30,7 +27,10 @@ import type {
   Port,
   Renderer,
 } from './types';
-import { deepMerge } from './utils';
+import { InitUpdater } from './updater/init-updater/init-updater';
+import { InternalUpdater } from './updater/internal-updater/internal-updater';
+import { Updater } from './updater/updater.interface';
+import { deepMerge, Semaphore } from './utils';
 
 export class FlowCore<
   TMiddlewares extends MiddlewareChain = [],
@@ -41,6 +41,7 @@ export class FlowCore<
   private _model: ModelAdapter<TMetadata>;
   private readonly initUpdater: InitUpdater;
   private readonly internalUpdater: InternalUpdater;
+  private readonly updateSemaphore = new Semaphore(1);
 
   readonly commandHandler: CommandHandler;
   readonly middlewareManager: MiddlewareManager<TMiddlewares, TMetadata>;
@@ -236,9 +237,20 @@ export class FlowCore<
       return;
     }
 
-    const finalState = await this.middlewareManager.execute(this.getState(), stateUpdate, modelActionType);
-    if (finalState) {
-      this.setState(finalState);
+    // Acquire semaphore to ensure atomic updates
+    await this.updateSemaphore.acquire();
+
+    try {
+      // Get the current state - guaranteed to be fresh since we hold the lock
+      const currentState = this.getState();
+      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, modelActionType);
+
+      if (finalState) {
+        this.setState(finalState);
+      }
+    } finally {
+      // Always release the semaphore, even if an error occurs
+      this.updateSemaphore.release();
     }
   }
 
