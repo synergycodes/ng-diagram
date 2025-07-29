@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, signal, Type, ViewChild } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
   EdgeTemplate,
@@ -23,7 +23,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
@@ -32,6 +32,9 @@ export class AppComponent {
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
   paletteModel: PaletteItem[] = paletteModel;
+
+  @ViewChild(AngularAdapterDiagramComponent, { static: true })
+  diagramAdapter?: AngularAdapterDiagramComponent;
 
   constructor() {
     this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
@@ -106,5 +109,10 @@ export class AppComponent {
         targetPort: 'port-left-3',
       },
     ]);
+  }
+
+  ngAfterViewInit(): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).flowCore = (this.diagramAdapter as any).flowCoreProvider.provide();
   }
 }
