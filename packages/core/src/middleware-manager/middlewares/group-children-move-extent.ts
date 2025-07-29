@@ -1,6 +1,7 @@
 import { FlowCore } from '../../flow-core';
-import type { Middleware, MiddlewareContext, Node } from '../../types';
+import type { GroupNode, Middleware, MiddlewareContext, Node } from '../../types';
 import { calculateGroupRect } from '../../utils';
+import { isGroup } from '../../utils/is-group';
 
 export interface GroupChildrenMoveExtentMiddlewareMetadata {
   enabled: boolean;
@@ -54,8 +55,8 @@ export const groupChildrenMoveExtent: Middleware<
 /**
  * Find all groups that are affected by node position/size changes
  */
-function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map<string, Node>): Set<Node> {
-  const affectedGroups = new Set<Node>();
+function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map<string, Node>): Set<GroupNode> {
+  const affectedGroups = new Set<GroupNode>();
   const changedNodeIds = helpers.getAffectedNodeIds(['position', 'size']);
 
   for (const nodeId of changedNodeIds) {
@@ -63,7 +64,8 @@ function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map
     if (!node?.groupId) continue;
 
     const group = nodesMap.get(node.groupId);
-    if (group?.isGroup) {
+
+    if (group && isGroup(group)) {
       affectedGroups.add(group);
     }
   }
@@ -75,7 +77,7 @@ function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map
  * Calculate all necessary updates for groups and their ancestors
  */
 function calculateGroupUpdates(
-  affectedGroups: Set<Node>,
+  affectedGroups: Set<GroupNode>,
   nodesMap: Map<string, Node>,
   flowCore: FlowCore
 ): NodeUpdate[] {
@@ -99,7 +101,7 @@ function calculateGroupUpdates(
  * It's like bubbling the update up the hierarchy
  */
 function updateGroupHierarchy(
-  group: Node,
+  group: GroupNode,
   workingNodesMap: Map<string, Node>,
   flowCore: FlowCore,
   processedNodeIds: Set<string>

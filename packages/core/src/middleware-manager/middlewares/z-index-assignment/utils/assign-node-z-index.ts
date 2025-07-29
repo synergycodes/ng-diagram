@@ -1,4 +1,5 @@
 import { Node } from '../../../../types';
+import { isGroup } from '../../../../utils/is-group';
 
 /**
  * Recursively assigns zIndex to the given node and its children, returning a flat array of nodes with assigned zIndex.
@@ -25,7 +26,7 @@ export function assignNodeZIndex(
 
     let currentZIndex = zIndex;
 
-    if (currentNode.isGroup) {
+    if (isGroup(currentNode)) {
       const childNodes = childrenByGroupId.get(currentNode.id) || [];
 
       for (const childNode of childNodes) {

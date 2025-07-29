@@ -1,4 +1,5 @@
 import { Node } from '../../../../types';
+import { isGroup } from '../../../../utils/is-group';
 
 export function initializeZIndex(nodesMap: Map<string, Node>): Node[] {
   const rootNodes = Array.from(nodesMap.values()).filter((node) => !node.groupId);
@@ -15,7 +16,7 @@ function assignZIndex(node: Node, nodesMap: Map<string, Node>, output: Node[], c
   const zIndex = node?.zOrder ?? currentZIndex;
   output.push({ ...node, zIndex: zIndex });
 
-  if (!node.isGroup) return;
+  if (!isGroup(node)) return;
 
   const children = Array.from(nodesMap.values()).filter((n) => n.groupId === node.id);
 

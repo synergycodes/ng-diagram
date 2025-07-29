@@ -1,5 +1,6 @@
 import type { Middleware, Node } from '../../types';
 import { calculateGroupRect } from '../../utils';
+import { isGroup } from '../../utils/is-group';
 
 export interface GroupChildrenChangeExtentMiddlewareMetadata {
   enabled: boolean;
@@ -46,7 +47,7 @@ export const groupChildrenChangeExtent: Middleware<
 
     for (const groupId of affectedGroupIds) {
       const group = nodesMap.get(groupId);
-      if (!group || !group.isGroup) continue;
+      if (!group || !isGroup(group)) continue;
 
       const groupRect = calculateGroupRect(
         affectedNodes.map((id) => nodesMap.get(id)!),

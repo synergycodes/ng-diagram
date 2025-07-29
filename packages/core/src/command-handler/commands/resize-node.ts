@@ -1,5 +1,6 @@
-import type { Bounds, CommandHandler, FlowConfig, Node } from '../../types';
+import type { Bounds, CommandHandler, FlowConfig, GroupNode, Node } from '../../types';
 import { calculateGroupBounds, isSameSize } from '../../utils';
+import { isGroup } from '../../utils/is-group';
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';
@@ -101,8 +102,8 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
     return;
   }
 
-  if (isSameSize(node.size, command.size) || (node.isGroup && !node.selected)) {
-    return; // No-op if size is unchanged
+  if (isSameSize(node.size, command.size) || (isGroup(node) && !node.selected)) {
+    return;
   }
 
   // Early return when position is missing - it was called by internal updater
@@ -110,7 +111,7 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
     return;
   }
 
-  if (node.isGroup) {
+  if (isGroup(node)) {
     await handleGroupNodeResize(commandHandler, command, node);
   } else {
     await handleSingleNodeResize(commandHandler, command);
@@ -123,7 +124,7 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
 async function handleGroupNodeResize(
   commandHandler: CommandHandler,
   command: ResizeNodeCommand,
-  node: Node
+  node: GroupNode
 ): Promise<void> {
   const children = commandHandler.flowCore.modelLookup.getNodeChildren(command.id, { directOnly: false });
 

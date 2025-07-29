@@ -119,4 +119,8 @@ export class AngularAdapterDiagramComponent<
     }
     return this.edgeTemplateMap().get(edgeType) ?? null;
   }
+
+  isGroup(node: Node) {
+    return 'isGroup' in node;
+  }
 }

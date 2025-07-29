@@ -1,4 +1,4 @@
-import { Bounds, Node, Rect } from '../types';
+import { Bounds, GroupNode, Node, Rect } from '../types';
 import { getBoundsFromRect, getRect, getRectFromBounds } from './rects-points-sizes';
 
 interface CalculateGroupRectOptions {
@@ -7,7 +7,7 @@ interface CalculateGroupRectOptions {
 
 export const calculateGroupBounds = (
   childNodes: Node[],
-  group: Node,
+  group: GroupNode,
   { useGroupRect = true }: CalculateGroupRectOptions = {}
 ): Bounds => {
   if (!group.size?.width || !group.size?.height) {
@@ -44,7 +44,7 @@ export const calculateGroupBounds = (
 
 export const calculateGroupRect = (
   childNodes: Node[],
-  group: Node,
+  group: GroupNode,
   { useGroupRect = true }: CalculateGroupRectOptions = {}
 ): Rect => {
   const bounds = calculateGroupBounds(childNodes, group, { useGroupRect });

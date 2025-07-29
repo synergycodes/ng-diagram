@@ -1,4 +1,13 @@
-import type { Edge, EdgeLabel, EnvironmentInfo, Metadata, MiddlewaresConfigFromMiddlewares, Node, Port } from './types';
+import type {
+  Edge,
+  EdgeLabel,
+  EnvironmentInfo,
+  GroupNode,
+  Metadata,
+  MiddlewaresConfigFromMiddlewares,
+  Node,
+  Port,
+} from './types';
 
 export const mockNode: Node = {
   id: 'node1',
@@ -8,7 +17,7 @@ export const mockNode: Node = {
   data: {},
 };
 
-export const mockGroupNode: Node = {
+export const mockGroupNode: GroupNode = {
   id: 'group1',
   type: 'group',
   selected: false,
@@ -16,6 +25,7 @@ export const mockGroupNode: Node = {
   position: { x: 0, y: 0 },
   data: {},
   zOrder: 1,
+  highlighted: false,
 };
 
 export const mockEdge: Edge = {
