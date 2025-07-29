@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { CommandHandler } from '../../command-handler';
 import { applyChildrenBoundsConstraints, resizeNode } from '../resize-node';
+import type { GroupNode } from '../../../types/node.interface';
 
 // Mock the utils module properly for vitest
 vi.mock('../../../utils', () => ({
@@ -163,7 +164,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       await resizeNode(commandHandler, {
@@ -192,7 +192,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       await resizeNode(commandHandler, {
@@ -221,7 +220,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       await resizeNode(commandHandler, {
@@ -250,7 +248,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       await resizeNode(commandHandler, {
@@ -281,7 +278,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       // Simulating left-edge resize where left edge is dragged right, making the top-left corner move right
@@ -314,7 +310,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       // Simulating top-edge resize where top edge is dragged down, making the top-left corner move down
@@ -347,7 +342,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       const requestedWidth = 50; // both constrained to 100
@@ -381,7 +375,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       // Right/bottom edge resize - position stays the same (top-left corner doesn't move)
@@ -411,7 +404,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       // Left/top resize but size is above minimum - no constraint, no adjustment needed
@@ -443,7 +435,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 150, y: 250 },
-        isGroup: false,
       });
 
       await resizeNode(commandHandler, {
@@ -461,7 +452,6 @@ describe('Resize Node Command', () => {
         id: '1',
         size: { width: 200, height: 200 },
         position: { x: 100, y: 100 },
-        isGroup: false,
       });
 
       await resizeNode(commandHandler, {
@@ -484,7 +474,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       // Mock children that extend beyond the requested group bounds
       const children = [
@@ -530,7 +521,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [
         { id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } },
@@ -574,7 +566,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [
         { id: 'child1', position: { x: 50, y: 60 }, size: { width: 100, height: 80 } }, // extends left and up
@@ -618,7 +611,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [
         { id: 'child1', position: { x: 80, y: 90 }, size: { width: 50, height: 60 } }, // extends left and up
@@ -662,7 +656,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [{ id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } }];
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
@@ -704,7 +699,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [
         { id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } },
@@ -748,7 +744,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [{ id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } }];
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
@@ -771,7 +768,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       const children = [{ id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } }];
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
@@ -793,7 +791,8 @@ describe('Resize Node Command', () => {
         position: { x: 100, y: 100 },
         isGroup: true,
         selected: true,
-      });
+        highlighted: false,
+      } as GroupNode);
 
       // Mock no children
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
