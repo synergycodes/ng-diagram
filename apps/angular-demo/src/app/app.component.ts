@@ -1,9 +1,9 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, signal, Type, ViewChild } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
 import {
   EdgeTemplate,
   EdgeTemplateMap,
+  FlowCoreProviderService,
   Middleware,
   NgDiagramModule,
   NodeTemplateMap,
@@ -27,7 +27,8 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FlowService],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
+  flowCore = inject(FlowCoreProviderService);
   model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
@@ -39,9 +40,6 @@ export class AppComponent {
 
   // this is just for testing purposes
   isVisible = signal(true);
-
-  @ViewChild(AngularAdapterDiagramComponent, { static: true })
-  diagramAdapter?: AngularAdapterDiagramComponent;
 
   constructor() {
     this.setModel();
@@ -124,6 +122,6 @@ export class AppComponent {
 
   ngAfterViewInit(): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).flowCore = (this.diagramAdapter as any).flowCoreProvider.provide();
+    (window as any).flowCore = this.flowCore.provide();
   }
 }
