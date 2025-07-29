@@ -17,13 +17,3 @@ export * from './lib/types';
 export * from './lib/utils/get-path/get-bezier-path';
 export * from './lib/utils/get-path/get-orthogonal-path';
 export * from './lib/utils/get-path/get-straight-path';
-
-export {
-  edgesRoutingMiddleware,
-  groupChildrenChangeExtent,
-  groupChildrenMoveExtent,
-  nodePositionSnapMiddleware,
-  nodeRotationSnapMiddleware,
-  treeLayoutMiddleware,
-  zIndexMiddleware,
-} from '@angularflow/core';

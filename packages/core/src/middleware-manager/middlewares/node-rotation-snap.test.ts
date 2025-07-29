@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { FlowCore } from '../../../flow-core';
-import { snapAngle } from '../../../input-events/handlers/rotate/snap-angle';
-import { mockNode } from '../../../test-utils';
-import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../types';
-import { nodeRotationSnapMiddleware, NodeRotationSnapMiddlewareMetadata } from '../node-rotation-snap';
+import type { FlowCore } from '../../flow-core';
+import { snapAngle } from '../../input-events/handlers/rotate/snap-angle';
+import { mockNode } from '../../test-utils';
+import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../types';
+import { nodeRotationSnapMiddleware, NodeRotationSnapMiddlewareMetadata } from './node-rotation-snap';
 
-import type { MiddlewareExecutor } from '../../middleware-executor';
+import type { MiddlewareExecutor } from '../middleware-executor';
 
 type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
 

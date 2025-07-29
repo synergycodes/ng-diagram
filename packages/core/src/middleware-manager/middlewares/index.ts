@@ -5,3 +5,4 @@ export * from './node-position-snap';
 export * from './node-rotation-snap';
 export * from './tree-layout/tree-layout';
 export * from './z-index-assignment/z-index-assignment.ts';
+export * from './logger/logger';

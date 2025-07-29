@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FlowCore } from '../../flow-core';
-import { mockMetadata, mockNode } from '../../test-utils';
+import { FlowCore } from '../flow-core';
+import { mockMetadata, mockNode } from '../test-utils';
 import type {
   FlowState,
   FlowStateUpdate,
@@ -8,11 +8,11 @@ import type {
   Middleware,
   MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
-} from '../../types';
-import { MiddlewareManager } from '../middleware-manager';
+} from '../types';
+import { MiddlewareManager } from './middleware-manager';
 
 // Define all mocks at the top level
-vi.mock('../middlewares/edges-routing', () => ({
+vi.mock('./middlewares/edges-routing', () => ({
   edgesRoutingMiddleware: {
     name: 'edges-routing',
     execute: vi.fn().mockImplementation((state) => state),
@@ -20,7 +20,7 @@ vi.mock('../middlewares/edges-routing', () => ({
 }));
 
 const mockRun = vi.fn();
-vi.mock('../middleware-executor', () => ({
+vi.mock('./middleware-executor', () => ({
   MiddlewareExecutor: vi.fn().mockImplementation(() => ({
     run: mockRun,
   })),
@@ -44,7 +44,7 @@ describe('MiddlewareManager', () => {
   let mockModel: ModelAdapter<TestMetadata>;
 
   beforeEach(async () => {
-    const module = await import('../middleware-executor');
+    const module = await import('./middleware-executor');
     MiddlewareExecutor = module.MiddlewareExecutor;
 
     const getMetadataMock = vi.fn().mockReturnValue({

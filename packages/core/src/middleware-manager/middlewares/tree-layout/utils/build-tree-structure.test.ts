@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { Edge, LayoutAlignmentType, LayoutAngleType, Node, TreeLayoutConfig } from '../../../../../types';
-import { TreeNode } from '../../../../../types/tree-layout.interface.ts';
+import { Edge, LayoutAlignmentType, LayoutAngleType, Node, TreeLayoutConfig } from '../../../../types';
+import { TreeNode } from '../../../../types/tree-layout.interface.ts';
 import {
   buildGroupsHierarchy,
   buildTopGroupMap,
   buildTreeStructure,
   getNodeMap,
   remapEdges,
-} from '../build-tree-structure.ts';
+} from './build-tree-structure.ts';
 
 type PartialNode = Pick<Node, 'id' | 'position' | 'size' | 'type' | 'groupId'>;
 type PartialEdge = Pick<Edge, 'source' | 'target'>;
@@ -113,6 +113,31 @@ describe('buildTreeStructure', () => {
     expect(roots.map((r) => r.id).sort()).toEqual(['x', 'y']);
     expect(roots[0].children.length).toBe(0);
     expect(roots[1].children.length).toBe(0);
+  });
+
+  it('should apply layout configuration from TreeLayoutConfig', () => {
+    const configWithValues: TreeLayoutConfig = {
+      getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
+        return node.id === 'root' ? 270 : 90;
+      },
+      getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
+        return node.id === 'root' ? 'Subtree' : 'Start';
+      },
+    };
+
+    const nodes: PartialNode[] = [
+      { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
+      { id: 'child', position: { x: 0, y: 0 }, type: 'Test' },
+    ];
+    const nodeMap = getNodeMap(configWithValues, nodes as Node[]);
+
+    const rootNode = nodeMap.get('root')!;
+    const childNode = nodeMap.get('child')!;
+
+    expect(rootNode.layoutAngle).toBe(270);
+    expect(rootNode.layoutAlignment).toBe('Subtree');
+    expect(childNode.layoutAngle).toBe(90);
+    expect(childNode.layoutAlignment).toBe('Start');
   });
 });
 

@@ -1,4 +1,4 @@
-import type { Middleware } from '@angularflow/core';
+import { Middleware } from '../../../types';
 
 export interface LoggerMiddlewareMetadata {
   enabled: boolean;

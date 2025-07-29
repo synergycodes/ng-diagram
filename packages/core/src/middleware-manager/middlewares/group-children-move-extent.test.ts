@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockGroupNode, mockNode } from '../../../test-utils';
-import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../types';
-import { groupChildrenMoveExtent, GroupChildrenMoveExtentMiddlewareMetadata } from '../group-children-move-extent';
+import { mockGroupNode, mockNode } from '../../test-utils';
+import type { Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../types';
+import { groupChildrenMoveExtent, GroupChildrenMoveExtentMiddlewareMetadata } from './group-children-move-extent';
 
 const mockCalculateGroupRect = vi.fn();
-vi.mock('../../../utils/group-size', () => ({
+vi.mock('../../utils/group-size', () => ({
   calculateGroupRect: (...args: unknown[]) => mockCalculateGroupRect(...args),
 }));
 
