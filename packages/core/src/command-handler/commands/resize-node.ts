@@ -93,6 +93,14 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
   if (!node) {
     throw new Error(`Node with id ${command.id} not found.`);
   }
+
+  // The node is missing size, which can happen when a node is dropped from the palette
+  // and the initial size is not set. In this case, we handle it separately.
+  if (!node.size && command.size) {
+    await handleMissingInitialSize(commandHandler, command);
+    return;
+  }
+
   if (isSameSize(node.size, command.size) || (node.isGroup && !node.selected)) {
     return; // No-op if size is unchanged
   }
@@ -187,4 +195,31 @@ async function handleSingleNodeResize(commandHandler: CommandHandler, command: R
     },
     'resizeNode'
   );
+}
+
+/**
+ * Handles missing initial size in case of dropping from the palette
+ */
+async function handleMissingInitialSize(commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> {
+  const node = commandHandler.flowCore.getNodeById(command.id);
+  if (!node) {
+    return;
+  }
+
+  const { nodes, ...state } = commandHandler.flowCore.getState();
+
+  // HACK: This should be handled using command handler, but there are some issues due to async/await
+  const updatedNodes = nodes.map((node) => {
+    if (node.id === command.id) {
+      return {
+        ...node,
+        size: command.size,
+        autoSize: true,
+      };
+    }
+
+    return node;
+  });
+
+  commandHandler.flowCore.setState({ ...state, nodes: updatedNodes });
 }
