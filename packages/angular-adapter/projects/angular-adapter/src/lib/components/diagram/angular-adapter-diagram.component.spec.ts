@@ -3,7 +3,7 @@ import type { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares } from
 import { Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FlowCoreProviderService } from '../../services';
+import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -31,6 +31,22 @@ describe('AngularAdapterDiagramComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterDiagramComponent],
       providers: [
+        {
+          provide: RendererService,
+          useValue: {
+            clear: vi.fn(),
+            nodes: vi.fn(),
+            edges: vi.fn(),
+            viewport: vi.fn(() => ({ x: 0, y: 0, scale: 1 })),
+            draw: vi.fn(),
+          },
+        },
+        {
+          provide: FlowResizeBatchProcessorService,
+          useValue: {
+            initialize: vi.fn(),
+          },
+        },
         {
           provide: FlowCoreProviderService,
           useValue: {

@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { FlowCore, Metadata, Middleware, MiddlewaresConfigFromMiddlewares, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { InputEventsRouterService } from '../input-events/input-events-router.service';
+import { RendererService } from '../renderer/renderer.service';
 import { detectEnvironment } from './detect-environment';
 import { FlowCoreProviderService } from './flow-core-provider.service';
 
@@ -26,7 +28,7 @@ describe('FlowCoreProviderService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowCoreProviderService],
+      providers: [FlowCoreProviderService, RendererService, InputEventsRouterService],
     });
     service = TestBed.inject(FlowCoreProviderService);
   });

@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AngularAdapterCustomEdgeComponent } from './custom-edge.component';
+import { FlowCoreProviderService, RendererService } from '../../../services';
 import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
+import { AngularAdapterCustomEdgeComponent } from './custom-edge.component';
 
 @Component({
   selector: 'angular-adapter-custom-edge',
@@ -20,6 +21,7 @@ describe('AngularAdapterCustomEdgeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [FlowCoreProviderService, RendererService],
       imports: [AngularAdapterCustomEdgeComponent],
     })
       .overrideComponent(AngularAdapterCustomEdgeComponent, {
