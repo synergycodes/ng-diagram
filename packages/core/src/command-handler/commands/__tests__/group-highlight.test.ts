@@ -21,22 +21,29 @@ describe('Highlight Group Commands', () => {
       },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
+
+    highlightGroupClear(commandHandler);
+
+    (flowCore.applyUpdate as ReturnType<typeof vi.fn>).mockClear();
   });
 
   describe('highlightGroup', () => {
     it('should highlight a new group and unhighlight previous', async () => {
       const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
-      const groupNode = { id: 'newGroup', type: 'group', position: { x: 0, y: 0 }, data: {} };
+      const oldGroupNode = { id: 'oldGroup', type: 'group', position: { x: 0, y: 0 }, data: {} };
+      const newGroupNode = { id: 'newGroup', type: 'group', position: { x: 0, y: 0 }, data: {} };
 
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: 'oldGroup' } });
-      (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
+      (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(oldGroupNode);
       (flowCore.config.grouping.canGroup as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'oldGroup', nodes: testNodes });
 
+      (flowCore.applyUpdate as ReturnType<typeof vi.fn>).mockClear();
+
+      (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(newGroupNode);
       await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'newGroup', nodes: testNodes });
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadataUpdate: { highlightedGroup: 'newGroup' },
           nodesToUpdate: [
             { id: 'newGroup', highlighted: true },
             { id: 'oldGroup', highlighted: false },
@@ -50,7 +57,6 @@ describe('Highlight Group Commands', () => {
       const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
       const groupNode = { id: 'group1', type: 'group', position: { x: 0, y: 0 }, data: {} };
 
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: null } });
       (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
       (flowCore.config.grouping.canGroup as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
@@ -58,7 +64,6 @@ describe('Highlight Group Commands', () => {
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadataUpdate: { highlightedGroup: 'group1' },
           nodesToUpdate: [{ id: 'group1', highlighted: true }],
         },
         'highlightGroup'
@@ -67,8 +72,13 @@ describe('Highlight Group Commands', () => {
 
     it('should do nothing if the group is already highlighted', async () => {
       const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
+      const groupNode = { id: 'group1', type: 'group', position: { x: 0, y: 0 }, data: {} };
 
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: 'group1' } });
+      (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
+      (flowCore.config.grouping.canGroup as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'group1', nodes: testNodes });
+
+      (flowCore.applyUpdate as ReturnType<typeof vi.fn>).mockClear();
 
       await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'group1', nodes: testNodes });
 
@@ -78,7 +88,6 @@ describe('Highlight Group Commands', () => {
     it('should do nothing if the group does not exist', async () => {
       const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
 
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: null } });
       (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(null);
 
       await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'nonexistent', nodes: testNodes });
@@ -90,7 +99,6 @@ describe('Highlight Group Commands', () => {
       const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
       const groupNode = { id: 'group1', type: 'group', position: { x: 0, y: 0 }, data: {} };
 
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: null } });
       (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
       (flowCore.config.grouping.canGroup as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
@@ -102,13 +110,18 @@ describe('Highlight Group Commands', () => {
 
   describe('highlightGroupClear', () => {
     it('should clear highlight if a group is highlighted', async () => {
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: 'group1' } });
+      const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
+      const groupNode = { id: 'group1', type: 'group', position: { x: 0, y: 0 }, data: {} };
+      (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
+      (flowCore.config.grouping.canGroup as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'group1', nodes: testNodes });
+
+      (flowCore.applyUpdate as ReturnType<typeof vi.fn>).mockClear();
 
       await highlightGroupClear(commandHandler);
 
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
-          metadataUpdate: { highlightedGroup: null },
           nodesToUpdate: [{ id: 'group1', highlighted: false }],
         },
         'highlightGroupClear'
@@ -116,8 +129,6 @@ describe('Highlight Group Commands', () => {
     });
 
     it('should do nothing if no group is highlighted', async () => {
-      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ metadata: { highlightedGroup: null } });
-
       await highlightGroupClear(commandHandler);
 
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();

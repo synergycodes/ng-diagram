@@ -1,5 +1,7 @@
 import type { CommandHandler, Node } from '../../types';
 
+let highlightedGroupId: string | null = null;
+
 export interface HighlightGroupCommand {
   name: 'highlightGroup';
   groupId: Node['id'];
@@ -7,9 +9,9 @@ export interface HighlightGroupCommand {
 }
 
 export const highlightGroup = async (commandHandler: CommandHandler, { groupId, nodes }: HighlightGroupCommand) => {
-  const { highlightedGroup } = commandHandler.flowCore.getState().metadata;
-
-  if (highlightedGroup === groupId) return;
+  if (highlightedGroupId === groupId) {
+    return;
+  }
 
   const group = commandHandler.flowCore.modelLookup.getNodeById(groupId);
 
@@ -23,13 +25,14 @@ export const highlightGroup = async (commandHandler: CommandHandler, { groupId, 
 
   const nodesToUpdate = [{ id: groupId, highlighted: true }];
 
-  if (highlightedGroup) {
-    nodesToUpdate.push({ id: highlightedGroup, highlighted: false });
+  if (highlightedGroupId) {
+    nodesToUpdate.push({ id: highlightedGroupId, highlighted: false });
   }
+
+  highlightedGroupId = groupId;
 
   await commandHandler.flowCore.applyUpdate(
     {
-      metadataUpdate: { highlightedGroup: groupId },
       nodesToUpdate,
     },
     'highlightGroup'
@@ -41,15 +44,16 @@ export interface HighlightGroupClearCommand {
 }
 
 export const highlightGroupClear = async (commandHandler: CommandHandler) => {
-  const { highlightedGroup } = commandHandler.flowCore.getState().metadata;
-
-  if (!highlightedGroup) return;
+  if (!highlightedGroupId) {
+    return;
+  }
 
   await commandHandler.flowCore.applyUpdate(
     {
-      metadataUpdate: { highlightedGroup: null },
-      nodesToUpdate: [{ id: highlightedGroup, highlighted: false }],
+      nodesToUpdate: [{ id: highlightedGroupId, highlighted: false }],
     },
     'highlightGroupClear'
   );
+
+  highlightedGroupId = null;
 };
