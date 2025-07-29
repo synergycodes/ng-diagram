@@ -206,20 +206,43 @@ async function handleMissingInitialSize(commandHandler: CommandHandler, command:
     return;
   }
 
-  const { nodes, ...state } = commandHandler.flowCore.getState();
-
-  // HACK: This should be handled using command handler, but there are some issues due to async/await
-  const updatedNodes = nodes.map((node) => {
-    if (node.id === command.id) {
-      return {
-        ...node,
-        size: command.size,
-        autoSize: true,
-      };
-    }
-
-    return node;
+  await commandHandler.emit('updateNode', {
+    id: command.id,
+    nodeChanges: {
+      size: command.size,
+    },
   });
+  // const { nodes, ...state } = commandHandler.flowCore.getState();
 
-  commandHandler.flowCore.setState({ ...state, nodes: updatedNodes });
+  // // HACK: This should be handled using command handler, but there are some issues due to async/await
+  // const updatedNodes = nodes.map((node) => {
+  //   if (node.id === command.id) {
+  //     return {
+  //       ...node,
+  //       size: command.size,
+  //       autoSize: true,
+  //     };
+  //   }
+
+  //   return node;
+  // });
+
+  // commandHandler.flowCore.setState({ ...state, nodes: updatedNodes });
+
+  // const { nodes, ...state } = commandHandler.flowCore.getState();
+
+  // // HACK: This should be handled using command handler, but there are some issues due to async/await
+  // const updatedNodes = nodes.map((node) => {
+  //   if (node.id === command.id) {
+  //     return {
+  //       ...node,
+  //       size: command.size,
+  //       autoSize: true,
+  //     };
+  //   }
+
+  //   return node;
+  // });
+
+  // commandHandler.flowCore.setState({ ...state, nodes: updatedNodes });
 }

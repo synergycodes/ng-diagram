@@ -67,13 +67,13 @@ export class MiddlewareManager<
    * @param modelActionType Model action type which triggers the middleware
    * @returns State after all middlewares have been applied
    */
-  execute(
+  async execute(
     initialState: FlowState<TMetadata>,
     stateUpdate: FlowStateUpdate,
     modelActionType: LooseAutocomplete<ModelActionType>
   ): Promise<FlowState<TMetadata> | undefined> {
     const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
-    return middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
+    return await middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
   }
 
   /**
