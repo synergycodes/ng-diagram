@@ -73,7 +73,6 @@ export class FlowCore<
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
     this.transactionManager = new TransactionManager(this);
     this.portBatchProcessor = new PortBatchProcessor();
-
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
     this.config = deepMerge(defaultFlowConfig, config);
 
