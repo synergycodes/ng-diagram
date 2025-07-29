@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
+import { AngularAdapterNodeComponent } from '../angular-adapter-node.component';
 import { ResizeHandleComponent } from './handle/resize-handle.component';
 import { ResizeLineComponent } from './line/resize-line.component';
 import { HandlePosition, LinePosition } from './node-resize-adornment.types';
@@ -13,8 +13,11 @@ import { HandlePosition, LinePosition } from './node-resize-adornment.types';
   imports: [ResizeLineComponent, ResizeHandleComponent],
 })
 export class NodeResizeAdornmentComponent {
-  data = input.required<Node>();
-  showAdornment = computed(() => !!this.data().resizable && this.data().selected);
+  private readonly nodeComponent = inject(AngularAdapterNodeComponent);
+
+  nodeData = computed(() => this.nodeComponent.data());
+  showAdornment = computed(() => !!this.nodeData().resizable && this.nodeData().selected);
+
   linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
   handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 }

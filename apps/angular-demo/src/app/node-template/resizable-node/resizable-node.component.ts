@@ -5,13 +5,14 @@ import {
   AngularAdapterPortComponent,
   FlowCoreProviderService,
   Node,
+  NodeResizeAdornmentComponent,
   NodeSelectedDirective,
   NodeTemplate,
 } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-resizable-node',
-  imports: [FormsModule, DecimalPipe, AngularAdapterPortComponent],
+  imports: [FormsModule, DecimalPipe, AngularAdapterPortComponent, NodeResizeAdornmentComponent],
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
