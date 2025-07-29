@@ -1,5 +1,5 @@
 <angular-adapter-node-rotate-adornment [data]="data()" />
-<img [src]="imageUrl()" alt="Image" />
+<img draggable="false" data-no-drag="true" [src]="imageUrl()" alt="Image" />
 @if (!isPaletteNode()) {
   <angular-adapter-port id="port-left" type="both" side="left" />
   <angular-adapter-port id="port-top" type="both" side="top" />

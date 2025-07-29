@@ -1,8 +1,9 @@
-import { Directive, ElementRef, inject } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
 import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
+import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
   selector: '[angularAdapterPanning]',
@@ -12,11 +13,10 @@ import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
   },
 })
 export class PanningDirective {
-  private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   onPointerDown(event: PointerInputEvent): void {
-    if (!BrowserInputsHelpers.withPrimaryButton(event) || this.isHandled(event)) {
+    if (!BrowserInputsHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
 
@@ -33,7 +33,7 @@ export class PanningDirective {
       },
     });
 
-    this.elementRef.nativeElement.addEventListener('pointermove', this.onMouseMove);
+    document.addEventListener('pointermove', this.onMouseMove);
   }
 
   onPointerUp(event: PointerEvent): void {
@@ -41,7 +41,7 @@ export class PanningDirective {
       return;
     }
 
-    this.elementRef.nativeElement.removeEventListener('pointermove', this.onMouseMove);
+    document.removeEventListener('pointermove', this.onMouseMove);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -58,7 +58,7 @@ export class PanningDirective {
   }
 
   private onMouseMove = (event: PointerInputEvent) => {
-    if (this.isHandled(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -76,11 +76,15 @@ export class PanningDirective {
     });
   };
 
-  private isHandled(event: PointerInputEvent): boolean {
-    if (ZoomingPointerDirective.IsZoomingPointer) {
+  private shouldHandle(event: PointerInputEvent): boolean {
+    if (shouldDiscardEvent(event, 'pan')) {
       return false;
     }
 
-    return !!(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+    if (ZoomingPointerDirective.IsZoomingPointer) {
+      return true;
+    }
+
+    return !(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }

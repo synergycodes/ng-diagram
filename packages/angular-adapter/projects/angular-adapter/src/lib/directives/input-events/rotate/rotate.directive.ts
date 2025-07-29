@@ -22,11 +22,6 @@ export class RotateHandleDirective {
   onPointerDown($event: PointerInputEvent) {
     $event.rotateHandled = true;
 
-    const diagramContainer = this.diagramComponent.getNativeElement();
-    if (!diagramContainer) {
-      throw new Error('Rotate handle failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -40,9 +35,9 @@ export class RotateHandleDirective {
       center: this.getNodeCenter(),
     });
 
-    diagramContainer.addEventListener('pointermove', this.onPointerMove);
-    diagramContainer.addEventListener('pointerup', this.onPointerUp);
-    diagramContainer.addEventListener('pointercancel', this.onPointerCancel);
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointercancel', this.onPointerCancel);
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
@@ -71,14 +66,9 @@ export class RotateHandleDirective {
   };
 
   private cleanup() {
-    const diagramContainer = this.diagramComponent.getNativeElement();
-    if (!diagramContainer) {
-      throw new Error('Rotate handle failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
-    diagramContainer.removeEventListener('pointermove', this.onPointerMove);
-    diagramContainer.removeEventListener('pointerup', this.onPointerUp);
-    diagramContainer.removeEventListener('pointercancel', this.onPointerCancel);
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+    document.removeEventListener('pointercancel', this.onPointerCancel);
   }
 
   private getHandleCenter() {

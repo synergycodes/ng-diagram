@@ -14,6 +14,12 @@ import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
 
+vi.mock('./updater/init-updater/init-updater', () => ({
+  InitUpdater: vi.fn(() => ({
+    start: vi.fn(() => Promise.resolve()),
+  })),
+}));
+
 const mockMiddlewareManager = {
   register: vi.fn(),
   unregister: vi.fn(),

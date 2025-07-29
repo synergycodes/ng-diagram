@@ -16,7 +16,7 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
       y: 10,
     },
   },
-  execute: (context, next, cancel) => {
+  execute: (context, next) => {
     const { helpers, nodesMap, flowCore, modelActionType } = context;
 
     const snapConfig = context.middlewareMetadata.snap;
@@ -83,19 +83,15 @@ export const nodePositionSnapMiddleware: Middleware<'node-position-snap', NodePo
         }
         const snappedX = snapNumber(node.position.x, snapConfig.x ?? 10);
         const snappedY = snapNumber(node.position.y, snapConfig.y ?? 10);
-        const originalNode = flowCore.getNodeById(node.id);
 
-        // Prevent unnecessary state updates if already snapped
-        if (originalNode && (originalNode.position.x !== snappedX || originalNode.position.y !== snappedY)) {
-          nodesToUpdate.push({
-            id: node.id,
-            position: { x: snappedX, y: snappedY },
-          });
-        }
+        nodesToUpdate.push({
+          id: node.id,
+          position: { x: snappedX, y: snappedY },
+        });
       }
 
     if (nodesToUpdate.length === 0) {
-      cancel();
+      next();
       return;
     }
 

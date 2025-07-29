@@ -40,7 +40,7 @@ export class AngularAdapterNodeComponent {
       const id = this.id();
       const portsData = this.portsService.getNodePortsData(id);
 
-      this.flowCore.provide().internalUpdater.applyPortsSizesAndPositions(id, portsData);
+      this.flowCore.provide().updater.applyPortsSizesAndPositions(id, portsData);
     });
   }
 

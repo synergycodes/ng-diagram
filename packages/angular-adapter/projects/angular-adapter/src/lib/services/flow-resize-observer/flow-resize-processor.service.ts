@@ -132,7 +132,7 @@ export class FlowResizeBatchProcessorService {
     }
 
     updatesByNode.forEach((ports, nodeId) => {
-      flowCore.internalUpdater.applyPortsSizesAndPositions(nodeId, ports);
+      flowCore.updater.applyPortsSizesAndPositions(nodeId, ports);
     });
   }
 
@@ -153,10 +153,10 @@ export class FlowResizeBatchProcessorService {
         continue;
       }
 
-      flowCore.internalUpdater.applyNodeSize(metadata.nodeId, { size });
+      flowCore.updater.applyNodeSize(metadata.nodeId, size);
 
       const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
-      flowCore.internalUpdater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
+      flowCore.updater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
     }
   }
 
@@ -200,7 +200,7 @@ export class FlowResizeBatchProcessorService {
 
     updatesByEdge.forEach((labels, edgeId) => {
       labels.forEach(({ labelId, size }) => {
-        flowCore.internalUpdater.applyEdgeLabelSize(edgeId, labelId, size);
+        flowCore.updater.applyEdgeLabelSize(edgeId, labelId, size);
       });
     });
   }

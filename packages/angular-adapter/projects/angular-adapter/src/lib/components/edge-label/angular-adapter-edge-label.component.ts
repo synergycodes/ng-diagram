@@ -59,7 +59,7 @@ export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.lastPositionOnEdge.set(this.positionOnEdge());
-    this.flowCoreProvider.provide().internalUpdater.addEdgeLabel(this.edgeId(), {
+    this.flowCoreProvider.provide().updater.addEdgeLabel(this.edgeId(), {
       id: this.id(),
       positionOnEdge: this.positionOnEdge(),
     });

@@ -1,9 +1,9 @@
 import { Directive, inject, input } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
+import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
   selector: '[angularAdapterPointerMoveSelection]',
@@ -12,23 +12,17 @@ import { PointerInputEvent } from '../../../types/event';
   },
 })
 export class PointerMoveSelectionDirective {
-  private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   targetData = input.required<Node>();
 
   onPointerDown(event: PointerInputEvent): void {
-    if (this.isHandled(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
     if (!BrowserInputsHelpers.withPrimaryButton(event)) {
       return;
-    }
-
-    const containerElement = this.diagramComponent.getNativeElement();
-    if (!containerElement) {
-      throw new Error('Resize failed: AngularAdapterDiagramComponent missing ElementRef');
     }
 
     event.moveSelectionHandled = true;
@@ -46,8 +40,8 @@ export class PointerMoveSelectionDirective {
       },
     });
 
-    containerElement.addEventListener('pointermove', this.onPointerMove);
-    containerElement.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.onPointerUp);
   }
 
   onPointerUp = (event: PointerEvent): void => {
@@ -55,13 +49,8 @@ export class PointerMoveSelectionDirective {
       return;
     }
 
-    const containerElement = this.diagramComponent.getNativeElement();
-    if (!containerElement) {
-      throw new Error('Resize failed: AngularAdapterDiagramComponent missing ElementRef');
-    }
-
-    containerElement.removeEventListener('pointermove', this.onPointerMove);
-    containerElement.removeEventListener('pointerup', this.onPointerUp);
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -78,7 +67,7 @@ export class PointerMoveSelectionDirective {
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
-    if (this.isHandled(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -96,7 +85,11 @@ export class PointerMoveSelectionDirective {
     });
   };
 
-  private isHandled(event: PointerInputEvent): boolean {
-    return !!(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+  private shouldHandle(event: PointerInputEvent): boolean {
+    if (shouldDiscardEvent(event, 'drag')) {
+      return false;
+    }
+
+    return !(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 }
