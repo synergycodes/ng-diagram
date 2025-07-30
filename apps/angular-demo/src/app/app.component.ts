@@ -1,21 +1,16 @@
-import { NgIf } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Type, ViewChild } from '@angular/core';
 import {
+  AngularAdapterDiagramComponent,
   EdgeTemplate,
   EdgeTemplateMap,
   FlowCoreProviderService,
-  Middleware,
-  NgDiagramModule,
   NodeTemplateMap,
   PaletteItem,
 } from '@angularflow/angular-adapter';
-import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
-import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
-import { FlowService } from './flow/flow.service';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -23,28 +18,25 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, NgIf, NgDiagramModule],
+  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [FlowService],
 })
 export class AppComponent implements AfterViewInit {
   flowCore = inject(FlowCoreProviderService);
-  model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
-  middlewares = signal<Middleware[]>(appMiddlewares);
   paletteModel: PaletteItem[] = paletteModel;
 
-  constructor() {
-    this.setModel();
-  }
+  @ViewChild(AngularAdapterDiagramComponent, { static: true })
+  diagramAdapter?: AngularAdapterDiagramComponent;
 
-  setModel() {
-    this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
-    this.model().setNodes([
+  ngAfterViewInit(): void {
+    const { model } = this.flowCore.provide();
+    model.setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
+    model.setNodes([
       {
         id: '1',
         type: 'image',
@@ -85,7 +77,7 @@ export class AppComponent implements AfterViewInit {
         isGroup: true,
       },
     ]);
-    this.model().setEdges([
+    model.setEdges([
       {
         id: '1',
         source: '1',
@@ -115,10 +107,5 @@ export class AppComponent implements AfterViewInit {
         targetPort: 'port-left-3',
       },
     ]);
-  }
-
-  ngAfterViewInit(): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).flowCore = this.flowCore.provide();
   }
 }

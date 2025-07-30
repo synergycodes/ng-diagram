@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { FlowCore, Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares, ModelAdapter } from '@angularflow/core';
+import {
+  FlowConfig,
+  FlowCore,
+  Metadata,
+  MiddlewareChain,
+  MiddlewaresConfigFromMiddlewares,
+  ModelAdapter,
+} from '@angularflow/core';
 
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
 import { RendererService } from '../renderer/renderer.service';
@@ -14,7 +21,8 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
   init(
     model: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>,
     middlewares: TMiddlewares = [] as unknown as TMiddlewares,
-    getFlowOffset: () => { x: number; y: number }
+    getFlowOffset: () => { x: number; y: number },
+    config?: FlowConfig
   ): void {
     this.flowCore = new FlowCore(
       model,
@@ -22,7 +30,8 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
       this.inputEventsRouter,
       detectEnvironment(),
       middlewares,
-      getFlowOffset
+      getFlowOffset,
+      config
     );
   }
 
