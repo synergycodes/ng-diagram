@@ -1,5 +1,5 @@
 import { InjectionToken, ModuleWithProviders, NgModule, Provider } from '@angular/core';
-// import { SignalModelAdapter } from '@angularflow/angular-signals-model';
+import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import {
   edgesRoutingMiddleware,
   FlowConfig,
@@ -56,28 +56,28 @@ export function provideMiddlewares<TMiddlewares extends MiddlewareChain = AppMid
   };
 }
 
-// export function provideModel<TMiddlewares extends MiddlewareChain = AppMiddlewares>(
-//   modelFactory?: () => SignalModelAdapter<TMiddlewares>
-// ): Provider {
-//   return {
-//     provide: MODEL,
-//     useFactory: () => modelFactory?.() ?? new SignalModelAdapter<TMiddlewares>(),
-//   };
-// }
+export function provideModel<TMiddlewares extends MiddlewareChain = AppMiddlewares>(
+  modelFactory?: () => SignalModelAdapter<TMiddlewares>
+): Provider {
+  return {
+    provide: MODEL,
+    useFactory: () => modelFactory?.() ?? new SignalModelAdapter<TMiddlewares>(),
+  };
+}
 
 @NgModule()
 export class NgDiagramModule {
   static forRoot<TMiddlewares extends MiddlewareChain = AppMiddlewares>(
     config?: FlowConfig,
-    middlewares?: (defaults: AppMiddlewares) => TMiddlewares
-    // modelFactory?: () => SignalModelAdapter<TMiddlewares>
+    middlewares?: (defaults: AppMiddlewares) => TMiddlewares,
+    modelFactory?: () => SignalModelAdapter<TMiddlewares>
   ): ModuleWithProviders<NgDiagramModule> {
     return {
       ngModule: NgDiagramModule,
       providers: [
         { provide: DIAGRAM_CONFIG, useValue: config },
         provideMiddlewares<TMiddlewares>(middlewares),
-        // provideModel<TMiddlewares>(modelFactory),
+        provideModel<TMiddlewares>(modelFactory),
         FlowCoreProviderService,
         UpdatePortsService,
         RendererService,
