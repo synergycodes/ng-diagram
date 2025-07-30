@@ -34,7 +34,7 @@ export class AppComponent {
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
   paletteModel: PaletteItem[] = paletteModel;
-  debugMode = signal(true);
+  debugMode = signal(false);
 
   constructor() {
     this.setModel();
