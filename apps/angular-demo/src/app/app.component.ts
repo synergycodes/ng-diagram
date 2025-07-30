@@ -38,9 +38,6 @@ export class AppComponent implements AfterViewInit {
   middlewares = signal<Middleware[]>(appMiddlewares);
   paletteModel: PaletteItem[] = paletteModel;
 
-  // this is just for testing purposes
-  isVisible = signal(true);
-
   constructor() {
     this.setModel();
   }
