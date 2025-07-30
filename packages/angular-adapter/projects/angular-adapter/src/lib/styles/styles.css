@@ -11,6 +11,7 @@
   --ngd-group-border-color-hover: var(--ngd-pt-stroke-primary-default);
   --ngd-group-border-color-highlight: var(--ngd-colors-acc1-500);
   --ngd-group-box-shadow-color-highlight: var(--ngd-colors-acc1-500-50);
+  --ngd-group-background-color-highlight: var(--ngd-colors-gray-400);
   --ngd-group-border-radius: 0.75rem;
 
   --ngd-selected-node-box-shadow: 0 0 0 0.25rem var(--ngd-focus-ring-node-active);

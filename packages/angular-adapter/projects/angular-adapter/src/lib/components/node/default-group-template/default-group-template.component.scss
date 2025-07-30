@@ -1,6 +1,10 @@
 :host:hover {
   .ng-diagram-group {
     border-color: var(--ngd-group-border-color-hover);
+
+    &[data-highlighted='true'] {
+      border-color: var(--ngd-group-border-color-highlight);
+    }
   }
 }
 
@@ -19,8 +23,12 @@
 
   box-sizing: border-box;
 
-  &.highlight {
-    border: 1px solid var(--ngd-group-border-color-highlight);
-    box-shadow: 0px 0px 19px 0px var(--ngd-group-box-shadow-color-highlight) inset;
+  &[data-highlighted='true'] {
+    background: var(--ngd-group-background-color-highlight);
+    border: 2px solid var(--ngd-group-box-shadow-color-highlight);
+
+    :hover {
+      border-color: red;
+    }
   }
 }

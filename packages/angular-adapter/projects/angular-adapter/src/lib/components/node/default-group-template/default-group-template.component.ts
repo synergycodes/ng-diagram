@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { GroupNode } from '@angularflow/core';
 import { NodeSelectedDirective } from '../../../directives';
+import { NodeHighlightedDirective } from '../../../directives/node-highlighted/node-highlighted.directive';
 import { NodeTemplate } from '../../../types';
 import { NodeResizeAdornmentComponent } from '../resize/node-resize-adornment.component';
 
@@ -9,7 +10,7 @@ import { NodeResizeAdornmentComponent } from '../resize/node-resize-adornment.co
   templateUrl: './default-group-template.component.html',
   styleUrls: ['./default-group-template.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective],
+  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective, NodeHighlightedDirective],
 })
 export class DefaultGroupTemplateComponent implements NodeTemplate<GroupNode> {
   isPaletteNode = input<boolean>(false);
