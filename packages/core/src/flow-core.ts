@@ -376,7 +376,10 @@ export class FlowCore<
     if (debugMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).flowCore = this;
-      this.registerMiddleware(loggerMiddleware);
+
+      if (!this.middlewareManager.isRegistered(loggerMiddleware.name as MiddlewareConfigKeys<TMiddlewares>)) {
+        this.registerMiddleware(loggerMiddleware);
+      }
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).flowCore;
