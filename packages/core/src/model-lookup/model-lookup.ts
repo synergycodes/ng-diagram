@@ -1,5 +1,6 @@
 import { FlowCore } from '../flow-core';
-import type { Edge, Node } from '../types';
+import type { Edge, GroupNode, Node } from '../types';
+import { isGroup } from '../utils/is-group';
 
 export class ModelLookup {
   private _nodesMap = { map: new Map<string, Node>(), synchronized: false };
@@ -304,18 +305,27 @@ export class ModelLookup {
    * @param nodeId Node id
    * @returns Array of parent group Node objects, from closest parent to farthest ancestor
    */
-  public getParentChain(nodeId: string): Node[] {
-    const chain: Node[] = [];
+  public getParentChain(nodeId: string): GroupNode[] {
+    const chain: GroupNode[] = [];
     let current = this.getNodeById(nodeId);
 
     while (current && current.groupId) {
       const parent = this.getNodeById(current.groupId);
 
-      if (parent) {
-        chain.push(parent);
-        current = parent;
+      if (!parent) {
+        console.error(`Node ${current.id} has a non-existent parent`);
+        return chain;
       }
+
+      if (!isGroup(parent)) {
+        console.error(`Node ${current.id} has a non-group parent ${parent.id}`);
+        return chain;
+      }
+
+      chain.push(parent);
+      current = parent;
     }
+
     return chain;
   }
 }

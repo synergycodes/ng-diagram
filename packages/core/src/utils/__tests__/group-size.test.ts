@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { mockGroupNode, mockNode } from '../../test-utils';
-import type { Node } from '../../types';
+import type { GroupNode, Node } from '../../types';
 import { calculateGroupBounds, calculateGroupRect } from '../group-size';
 
 describe('Group Size Utils', () => {
   describe('calculateGroupBounds', () => {
     it('should return group bounds when no child nodes are present', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -23,7 +23,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should throw error if group has no size', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: undefined,
@@ -33,13 +33,13 @@ describe('Group Size Utils', () => {
     });
 
     it('should throw error if group has partial size', () => {
-      const groupWithWidthOnly: Node = {
+      const groupWithWidthOnly: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: undefined! },
       };
 
-      const groupWithHeightOnly: Node = {
+      const groupWithHeightOnly: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: undefined!, height: 150 },
@@ -50,7 +50,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should calculate bounds from single child node', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -73,7 +73,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should calculate bounds from multiple child nodes', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -103,7 +103,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should ignore group bounds when useGroupRect is false', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -133,7 +133,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should throw error if child node has partial size', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -141,7 +141,7 @@ describe('Group Size Utils', () => {
 
       const childNodes: Node[] = [
         {
-          ...mockNode,
+          ...mockGroupNode,
           position: { x: 50, y: 50 },
           size: { width: 50, height: undefined! }, // missing height
         },
@@ -151,7 +151,7 @@ describe('Group Size Utils', () => {
 
       const childNodesWithHeightOnly: Node[] = [
         {
-          ...mockNode,
+          ...mockGroupNode,
           position: { x: 300, y: 300 },
           size: { width: undefined!, height: 45 }, // missing width
         },
@@ -163,7 +163,7 @@ describe('Group Size Utils', () => {
 
   describe('calculateGroupRect', () => {
     it('should convert bounds to rect for empty group', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -180,7 +180,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should throw error if group has partial size', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: undefined! }, // missing height
@@ -190,7 +190,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should convert bounds to rect for group with children', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 150 },
@@ -198,12 +198,12 @@ describe('Group Size Utils', () => {
 
       const childNodes: Node[] = [
         {
-          ...mockNode,
+          ...mockGroupNode,
           position: { x: 50, y: 50 },
           size: { width: 50, height: 40 },
         },
         {
-          ...mockNode,
+          ...mockGroupNode,
           position: { x: 300, y: 300 },
           size: { width: 60, height: 45 },
         },
@@ -220,7 +220,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should handle nodes outside group bounds', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 100, height: 100 },
@@ -228,12 +228,12 @@ describe('Group Size Utils', () => {
 
       const childNodes: Node[] = [
         {
-          ...mockNode,
+          ...mockGroupNode,
           position: { x: 0, y: 0 },
           size: { width: 50, height: 50 },
         },
         {
-          ...mockNode,
+          ...mockGroupNode,
           position: { x: 300, y: 300 },
           size: { width: 50, height: 50 },
         },
@@ -250,7 +250,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should respect useGroupRect option', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 100, height: 100 },
@@ -283,7 +283,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should handle overlapping nodes', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 100, y: 100 },
         size: { width: 200, height: 200 },
@@ -313,7 +313,7 @@ describe('Group Size Utils', () => {
     });
 
     it('should handle nodes with negative positions', () => {
-      const group: Node = {
+      const group: GroupNode = {
         ...mockGroupNode,
         position: { x: 0, y: 0 },
         size: { width: 100, height: 100 },

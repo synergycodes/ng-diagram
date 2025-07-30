@@ -1,6 +1,7 @@
 import { TransactionContext } from '../../../transaction-manager/transaction.types';
 import { Node } from '../../../types/node.interface';
 import { Point } from '../../../types/utils';
+import { isGroup } from '../../../utils/is-group';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
@@ -80,7 +81,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     const nodes = this.flow.getNodesInRange(point, 1);
 
     // Get all groups at this position that are not selected
-    const groups = nodes.filter((node) => node.isGroup && !node.selected);
+    const groups = nodes.filter((node) => isGroup(node) && !node.selected);
 
     // Get the top group
     return groups.toSorted((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];

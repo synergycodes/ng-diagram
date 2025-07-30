@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { GroupNode } from '@angularflow/core';
 import { NodeSelectedDirective } from '../../../directives';
 import { NodeTemplate } from '../../../types';
 import { NodeResizeAdornmentComponent } from '../resize/node-resize-adornment.component';
@@ -11,9 +11,9 @@ import { NodeResizeAdornmentComponent } from '../resize/node-resize-adornment.co
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NodeResizeAdornmentComponent, NodeSelectedDirective],
 })
-export class DefaultGroupTemplateComponent implements NodeTemplate {
+export class DefaultGroupTemplateComponent implements NodeTemplate<GroupNode> {
   isPaletteNode = input<boolean>(false);
-  data = input.required<Node>();
+  data = input.required<GroupNode>();
 
   isSelected = computed(() => this.data().selected ?? false);
   highlighted = computed(() => this.data().highlighted ?? false);

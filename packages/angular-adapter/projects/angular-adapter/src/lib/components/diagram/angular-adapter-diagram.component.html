@@ -13,7 +13,7 @@
     <angular-adapter-node class="ng-diagram-node" [attr.data-node-id]="node.id" [data]="node" targetType="node">
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { data: node }" />
-      } @else if (node.isGroup) {
+      } @else if (isGroup(node)) {
         <angular-adapter-default-group-template [data]="node" />
       } @else {
         <angular-adapter-default-node-template [data]="node" />

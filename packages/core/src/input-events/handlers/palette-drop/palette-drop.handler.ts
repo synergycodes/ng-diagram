@@ -5,7 +5,7 @@ import { PaletteDropInputEvent } from './palette-drop.event';
 export class PaletteDropEventHandler extends EventHandler<PaletteDropInputEvent> {
   handle(event: PaletteDropInputEvent): void {
     const { data, lastInputPoint } = event;
-    const node = data as unknown as Pick<Node, 'type' | 'data' | 'isGroup' | 'resizable'>;
+    const node = data as unknown as Node;
 
     this.flow.commandHandler.emit('addNodes', {
       nodes: [

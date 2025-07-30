@@ -1,9 +1,22 @@
 import type { Point, PortSide, Size } from './utils';
 
+export type Node = SimpleNode | GroupNode;
+
+export interface GroupNode extends SimpleNode {
+  /**
+   * Flag indicating the node is a group
+   */
+  isGroup: true;
+  /**
+   * Whether the group is highlighted. For example, when a node is being dragged over it.
+   */
+  highlighted: boolean;
+}
+
 /**
  * Interface representing a node in the flow diagram
  */
-export interface Node {
+export interface SimpleNode {
   /**
    * The unique identifier for the node.
    */
@@ -60,15 +73,6 @@ export interface Node {
    * The id of the parent node.
    */
   groupId?: Node['id'];
-  /**
-   * Whether the node is treated as a group node.
-   */
-  isGroup?: boolean;
-  /**
-   * Whether the group is highlighted.
-   * NOTE: group only property
-   */
-  highlighted?: boolean;
 }
 
 /**
