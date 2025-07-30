@@ -81,6 +81,10 @@ export class FlowCore<
     this.init();
   }
 
+  destroy() {
+    this.model.destroy();
+  }
+
   /**
    * Starts listening to model changes and emits init command
    */

@@ -12,6 +12,7 @@ import { PasteAction } from './keyboard-actions/paste.action';
   host: {
     '(document:keydown)': 'onKeyDown($event)',
   },
+  providers: [PanWithArrowsAction, MoveSelectionAction, CopyAction, CutAction, PasteAction, DeleteSelectionAction],
 })
 export class KeyboardInputsDirective {
   private readonly actions = [

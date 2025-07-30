@@ -14,9 +14,9 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PaletteItemComponent,
+    PaletteItemPreviewComponent,
     NgDiagramPaletteItemComponent,
     NgDiagramPaletteItemPreviewComponent,
-    PaletteItemPreviewComponent,
   ],
 })
 export class PaletteComponent {

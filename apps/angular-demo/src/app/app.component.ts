@@ -1,9 +1,11 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, signal, Type, ViewChild } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
 import {
-  AngularAdapterDiagramComponent,
   EdgeTemplate,
   EdgeTemplateMap,
+  FlowCoreProviderService,
   Middleware,
+  NgDiagramModule,
   NodeTemplateMap,
   PaletteItem,
 } from '@angularflow/angular-adapter';
@@ -13,6 +15,7 @@ import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
 import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
+import { FlowService } from './flow/flow.service';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -20,10 +23,12 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent],
+  imports: [ToolbarComponent, PaletteComponent, NgIf, NgDiagramModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [FlowService],
 })
 export class AppComponent implements AfterViewInit {
+  flowCore = inject(FlowCoreProviderService);
   model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
@@ -33,10 +38,11 @@ export class AppComponent implements AfterViewInit {
   middlewares = signal<Middleware[]>(appMiddlewares);
   paletteModel: PaletteItem[] = paletteModel;
 
-  @ViewChild(AngularAdapterDiagramComponent, { static: true })
-  diagramAdapter?: AngularAdapterDiagramComponent;
-
   constructor() {
+    this.setModel();
+  }
+
+  setModel() {
     this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
     this.model().setNodes([
       {
@@ -113,6 +119,6 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).flowCore = (this.diagramAdapter as any).flowCoreProvider.provide();
+    (window as any).flowCore = this.flowCore.provide();
   }
 }

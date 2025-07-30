@@ -3,9 +3,7 @@ import { Port } from '@angularflow/core';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 

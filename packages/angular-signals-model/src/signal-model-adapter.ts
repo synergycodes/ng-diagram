@@ -1,4 +1,4 @@
-import { Injectable, effect, signal } from '@angular/core';
+import { EffectRef, Injectable, effect, signal } from '@angular/core';
 import type {
   Edge,
   Metadata,
@@ -12,6 +12,7 @@ import type {
 export class SignalModelAdapter<TMiddlewares extends MiddlewareChain = []>
   implements ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>
 {
+  private effectRef: EffectRef | null = null;
   // Internal state signals
   private nodes = signal<Node[]>([]);
   private edges = signal<Edge[]>([]);
@@ -28,7 +29,7 @@ export class SignalModelAdapter<TMiddlewares extends MiddlewareChain = []>
   }) => void)[] = [];
 
   constructor() {
-    effect(() => {
+    this.effectRef = effect(() => {
       const nodes = this.nodes();
       const edges = this.edges();
       const metadata = this.metadata();
@@ -36,6 +37,17 @@ export class SignalModelAdapter<TMiddlewares extends MiddlewareChain = []>
       for (const callback of this.callbacks) {
         callback({ nodes, edges, metadata });
       }
+    });
+  }
+
+  destroy(): void {
+    this.effectRef?.destroy();
+    this.callbacks = [];
+    this.nodes.set([]);
+    this.edges.set([]);
+    this.metadata.set({
+      viewport: { x: 0, y: 0, scale: 1 },
+      middlewaresConfig: {} as MiddlewaresConfigFromMiddlewares<TMiddlewares>,
     });
   }
 

@@ -5,7 +5,7 @@ import { BrowserInputsHelpers } from '../../../../services/input-events/browser-
 import { InputEventsRouterService } from '../../../../services/input-events/input-events-router.service';
 import { KeyboardAction } from './keyboard-action';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class MoveSelectionAction extends KeyboardAction {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);

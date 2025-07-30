@@ -1,6 +1,5 @@
-import { Directive, inject, input, signal } from '@angular/core';
+import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
 
@@ -10,12 +9,16 @@ import { PointerInputEvent } from '../../../types';
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class LinkingInputDirective {
-  private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
+export class LinkingInputDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   target = signal<Node | undefined>(undefined);
   portId = input.required<string>();
+
+  ngOnDestroy(): void {
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+  }
 
   setTargetNode(node: Node) {
     this.target.set(node);

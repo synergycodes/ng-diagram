@@ -6,9 +6,7 @@ import { InputEventsRouterService } from '../../../../services/input-events/inpu
 import { FlowCoreProviderService } from '../../../../services/flow-core-provider/flow-core-provider.service';
 import { KeyboardAction } from './keyboard-action';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PanWithArrowsAction extends KeyboardAction {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);

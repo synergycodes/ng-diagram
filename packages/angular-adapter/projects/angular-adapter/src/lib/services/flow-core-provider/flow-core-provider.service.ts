@@ -5,7 +5,7 @@ import { InputEventsRouterService } from '../input-events/input-events-router.se
 import { RendererService } from '../renderer/renderer.service';
 import { detectEnvironment } from './detect-environment';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> {
   private readonly renderer = inject(RendererService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
@@ -24,6 +24,13 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
       middlewares,
       getFlowOffset
     );
+  }
+
+  destroy(): void {
+    if (this.flowCore) {
+      this.flowCore.destroy();
+      this.flowCore = null;
+    }
   }
 
   provide(): FlowCore<TMiddlewares> {

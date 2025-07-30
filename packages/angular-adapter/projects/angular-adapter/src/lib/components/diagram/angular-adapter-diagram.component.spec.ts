@@ -3,7 +3,7 @@ import type { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares } from
 import { Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FlowCoreProviderService } from '../../services';
+import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -15,6 +15,7 @@ describe('AngularAdapterDiagramComponent', () => {
     AngularAdapterDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>
   >;
   const mockModel: ModelAdapter = {
+    destroy: vi.fn(),
     getNodes: vi.fn(),
     getEdges: vi.fn(),
     getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} })),
@@ -29,7 +30,31 @@ describe('AngularAdapterDiagramComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularAdapterDiagramComponent],
-      providers: [{ provide: FlowCoreProviderService, useValue: { init: vi.fn() } }],
+      providers: [
+        {
+          provide: RendererService,
+          useValue: {
+            clear: vi.fn(),
+            nodes: vi.fn(),
+            edges: vi.fn(),
+            viewport: vi.fn(() => ({ x: 0, y: 0, scale: 1 })),
+            draw: vi.fn(),
+          },
+        },
+        {
+          provide: FlowResizeBatchProcessorService,
+          useValue: {
+            initialize: vi.fn(),
+          },
+        },
+        {
+          provide: FlowCoreProviderService,
+          useValue: {
+            init: vi.fn(),
+            destroy: vi.fn(),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);

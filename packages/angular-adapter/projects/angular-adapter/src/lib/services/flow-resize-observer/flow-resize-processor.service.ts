@@ -8,9 +8,7 @@ interface ProcessedEntry {
   metadata: ObservedElementMetadata;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class FlowResizeBatchProcessorService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly updatePortsService = inject(UpdatePortsService);

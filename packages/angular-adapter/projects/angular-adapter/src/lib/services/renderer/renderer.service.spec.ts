@@ -7,6 +7,9 @@ describe('RendererService', () => {
   let service: RendererService;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [RendererService],
+    });
     service = TestBed.inject(RendererService);
   });
 
