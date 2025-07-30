@@ -2,12 +2,12 @@ import { computed, Directive, input } from '@angular/core';
 import { GroupNode } from '@angularflow/core';
 
 @Directive({
-  selector: '[angularAdapterNodeHighlighted]',
+  selector: '[angularAdapterGroupHighlighted]',
   host: {
     '[attr.data-highlighted]': 'highlighted()',
   },
 })
-export class NodeHighlightedDirective {
+export class GroupHighlightedDirective {
   data = input.required<GroupNode>();
   highlighted = computed(() => {
     return this.data().highlighted ?? false;

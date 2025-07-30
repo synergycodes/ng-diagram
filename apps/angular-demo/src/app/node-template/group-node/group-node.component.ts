@@ -1,15 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import {
-  NodeHighlightedDirective,
-  NodeResizeAdornmentComponent,
-  NodeSelectedDirective,
-  NodeTemplate,
-} from '@angularflow/angular-adapter';
+import { NodeResizeAdornmentComponent, NodeSelectedDirective, NodeTemplate } from '@angularflow/angular-adapter';
 import { GroupNode } from '@angularflow/core';
 
 @Component({
   selector: 'app-group-node',
-  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective, NodeHighlightedDirective],
+  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective],
   templateUrl: './group-node.component.html',
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

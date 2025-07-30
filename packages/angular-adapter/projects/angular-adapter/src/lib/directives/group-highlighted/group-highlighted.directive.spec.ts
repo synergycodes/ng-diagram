@@ -4,11 +4,11 @@ import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { GroupNode } from '@angularflow/core';
-import { NodeHighlightedDirective } from './node-highlighted.directive';
+import { GroupHighlightedDirective } from './group-highlighted.directive';
 
 @Component({
-  template: `<div [angularAdapterNodeHighlighted] [data]="data"></div>`,
-  imports: [NodeHighlightedDirective],
+  template: `<div [angularAdapterGroupHighlighted] [data]="data"></div>`,
+  imports: [GroupHighlightedDirective],
 })
 class TestComponent {
   data: GroupNode = {
@@ -24,7 +24,7 @@ class TestComponent {
   };
 }
 
-describe('NodeHighlightedDirective', () => {
+describe('GroupHighlightedDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
   let divElement: HTMLElement;
 
@@ -39,7 +39,7 @@ describe('NodeHighlightedDirective', () => {
   });
 
   it('should create', () => {
-    const directive = fixture.debugElement.query(By.directive(NodeHighlightedDirective));
+    const directive = fixture.debugElement.query(By.directive(GroupHighlightedDirective));
     expect(directive).toBeTruthy();
   });
 
