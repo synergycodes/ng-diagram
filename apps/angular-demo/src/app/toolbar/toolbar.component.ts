@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FlowService } from '../flow/flow.service';
 
 @Component({
@@ -10,6 +10,8 @@ import { FlowService } from '../flow/flow.service';
 })
 export class ToolbarComponent {
   private readonly flowCoreProvider = inject(FlowService);
+
+  toggleDebugModeClick = output<void>();
 
   onTreeLayoutClick(): void {
     this.flowCoreProvider.flowCore.layout('Tree');

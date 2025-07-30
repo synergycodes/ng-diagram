@@ -1,9 +1,7 @@
-import { NgIf } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   EdgeTemplate,
   EdgeTemplateMap,
-  FlowCoreProviderService,
   Middleware,
   NgDiagramModule,
   NodeTemplateMap,
@@ -23,12 +21,11 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, NgIf, NgDiagramModule],
+  imports: [ToolbarComponent, PaletteComponent, NgDiagramModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [FlowService],
 })
-export class AppComponent implements AfterViewInit {
-  flowCore = inject(FlowCoreProviderService);
+export class AppComponent {
   model = signal(new SignalModelAdapter<AppMiddlewares>());
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
@@ -37,6 +34,7 @@ export class AppComponent implements AfterViewInit {
   ]);
   middlewares = signal<Middleware[]>(appMiddlewares);
   paletteModel: PaletteItem[] = paletteModel;
+  debugMode = signal(true);
 
   constructor() {
     this.setModel();
@@ -115,10 +113,5 @@ export class AppComponent implements AfterViewInit {
         targetPort: 'port-left-3',
       },
     ]);
-  }
-
-  ngAfterViewInit(): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).flowCore = this.flowCore.provide();
   }
 }

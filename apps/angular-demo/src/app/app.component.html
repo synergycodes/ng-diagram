@@ -4,7 +4,8 @@
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
     [middlewares]="middlewares()"
+    [debugMode]="debugMode()"
   />
-  <app-toolbar />
+  <app-toolbar (toggleDebugModeClick)="debugMode.set(!debugMode())" />
   <app-palette [model]="paletteModel" />
 </div>

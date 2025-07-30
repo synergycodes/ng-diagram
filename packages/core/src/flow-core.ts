@@ -2,6 +2,7 @@ import { CommandHandler } from './command-handler/command-handler';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
+import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
 import { SpatialHash } from './spatial-hash/spatial-hash';
@@ -369,5 +370,17 @@ export class FlowCore<
     }
 
     return this.internalUpdater;
+  }
+
+  setDebugMode(debugMode: boolean): void {
+    if (debugMode) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).flowCore = this;
+      this.registerMiddleware(loggerMiddleware);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).flowCore;
+      this.unregisterMiddleware(loggerMiddleware.name as MiddlewareConfigKeys<TMiddlewares>);
+    }
   }
 }

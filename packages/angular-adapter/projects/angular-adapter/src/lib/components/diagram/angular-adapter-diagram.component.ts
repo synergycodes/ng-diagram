@@ -1,7 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import {
   Edge,
+  FlowCore,
   Metadata,
   MiddlewareChain,
   MiddlewaresConfigFromMiddlewares,
@@ -82,9 +92,13 @@ export class AngularAdapterDiagramComponent<
    */
   edgeTemplateMap = input<EdgeTemplateMap>(new Map());
 
+  debugMode = input<boolean>(false);
+
   nodes = this.renderer.nodes;
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
+
+  private flowCore = signal<FlowCore | undefined>(undefined);
 
   constructor() {
     this.getFlowOffset = this.getFlowOffset.bind(this);
@@ -98,10 +112,22 @@ export class AngularAdapterDiagramComponent<
         // Initialize the resize batch processor after FlowCore is ready
         this.flowResizeBatchProcessor.initialize();
 
+        const flowCore = this.flowCoreProvider.provide();
+        this.flowCore.set(flowCore);
+
         effectRef?.destroy();
       },
       { manualCleanup: true }
     );
+
+    effect(() => {
+      const flowCore = this.flowCore();
+      if (!flowCore) {
+        return;
+      }
+
+      flowCore.setDebugMode(this.debugMode());
+    });
   }
 
   ngOnDestroy(): void {
