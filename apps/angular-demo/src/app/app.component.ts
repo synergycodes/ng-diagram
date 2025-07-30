@@ -1,12 +1,14 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Type, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
+  createSignalModel,
   EdgeTemplate,
   EdgeTemplateMap,
-  FlowCoreProviderService,
+  NgDiagramModule,
   NodeTemplateMap,
   PaletteItem,
 } from '@angularflow/angular-adapter';
+import { DeepPartial, FlowConfig } from '@angularflow/core';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
@@ -19,12 +21,11 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent],
+  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent, NgDiagramModule],
   providers: [FlowService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements AfterViewInit {
-  flowCore = inject(FlowCoreProviderService);
+export class AppComponent {
   nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
@@ -32,13 +33,14 @@ export class AppComponent implements AfterViewInit {
   ]);
   paletteModel: PaletteItem[] = paletteModel;
 
-  @ViewChild(AngularAdapterDiagramComponent, { static: true })
-  diagramAdapter?: AngularAdapterDiagramComponent;
+  config: DeepPartial<FlowConfig> = {
+    zoom: {
+      max: 2,
+    },
+  };
 
-  ngAfterViewInit(): void {
-    const { model } = this.flowCore.provide();
-    model.setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
-    model.setNodes([
+  model = createSignalModel({
+    nodes: [
       {
         id: '1',
         type: 'image',
@@ -78,8 +80,8 @@ export class AppComponent implements AfterViewInit {
         resizable: true,
         isGroup: true,
       },
-    ]);
-    model.setEdges([
+    ],
+    edges: [
       {
         id: '1',
         source: '1',
@@ -108,6 +110,7 @@ export class AppComponent implements AfterViewInit {
         sourcePort: 'port-right',
         targetPort: 'port-left-3',
       },
-    ]);
-  }
+    ],
+    metadata: { viewport: { x: 300, y: 0, scale: 1 } },
+  });
 }

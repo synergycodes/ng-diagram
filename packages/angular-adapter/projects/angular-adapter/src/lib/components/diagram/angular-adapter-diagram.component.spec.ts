@@ -1,13 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Middleware, ModelAdapter } from '@angularflow/core';
+import {
+  Metadata,
+  Middleware,
+  MiddlewareChain,
+  MiddlewaresConfigFromMiddlewares,
+  ModelAdapter,
+} from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
-  let component: AngularAdapterDiagramComponent;
-  let fixture: ComponentFixture<AngularAdapterDiagramComponent>;
+  let component: AngularAdapterDiagramComponent<
+    MiddlewareChain,
+    ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>
+  >;
+  let fixture: ComponentFixture<
+    AngularAdapterDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>
+  >;
   const mockModel: ModelAdapter = {
     destroy: vi.fn(),
     getNodes: vi.fn(),

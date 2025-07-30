@@ -15,6 +15,8 @@ export * from './lib/directives';
 export * from './lib/ng-diagram.module';
 export * from './lib/services/';
 export * from './lib/types';
+export * from './lib/utils/create-middlewares';
+export * from './lib/utils/create-signal-model';
 export * from './lib/utils/get-path/get-bezier-path';
 export * from './lib/utils/get-path/get-orthogonal-path';
 export * from './lib/utils/get-path/get-straight-path';

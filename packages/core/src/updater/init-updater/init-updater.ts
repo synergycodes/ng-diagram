@@ -32,12 +32,12 @@ export class InitUpdater extends BaseUpdater implements Updater {
   }
 
   async start() {
-    // await this.checkIfInitialized();
+    await this.checkIfInitialized();
 
-    // // Call init to make sure all scheduled data is processed
-    // for (const initializer of this.getInitializers()) {
-    //   initializer.init();
-    // }
+    // Call init to make sure all scheduled data is processed
+    for (const initializer of this.getInitializers()) {
+      initializer.init();
+    }
 
     this.isInitialized = true;
     return;
@@ -96,19 +96,19 @@ export class InitUpdater extends BaseUpdater implements Updater {
     return `${edgeId}${ID_SEPARATOR}${labelId}`;
   }
 
-  // private getInitializers() {
-  //   return [
-  //     this.nodeSizeInitializer,
-  //     this.edgeLabelInitializer,
-  //     this.edgeLabelSizeInitializer,
-  //     this.portInitializer,
-  //     this.portRectInitializer,
-  //   ];
-  // }
+  private getInitializers() {
+    return [
+      this.nodeSizeInitializer,
+      this.edgeLabelInitializer,
+      this.edgeLabelSizeInitializer,
+      this.portInitializer,
+      this.portRectInitializer,
+    ];
+  }
 
-  // private async checkIfInitialized() {
-  //   return Promise.all(this.getInitializers().map((initializer) => initializer.waitForFinish()));
-  // }
+  private async checkIfInitialized() {
+    return Promise.all(this.getInitializers().map((initializer) => initializer.waitForFinish()));
+  }
 
   private createInitializers() {
     const { flowCore } = this;

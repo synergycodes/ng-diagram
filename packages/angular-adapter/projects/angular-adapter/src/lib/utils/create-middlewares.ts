@@ -1,16 +1,16 @@
-import type { Middleware } from '@angularflow/angular-adapter';
 import {
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
   loggerMiddleware,
+  MiddlewareChain,
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
   zIndexMiddleware,
 } from '@angularflow/core';
 
-const appMiddlewares = [
+export const BUILTIN_MIDDLEWARES = [
   zIndexMiddleware,
   nodeRotationSnapMiddleware,
   groupChildrenChangeExtent,
@@ -19,8 +19,12 @@ const appMiddlewares = [
   nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
   loggerMiddleware,
-] as const satisfies Middleware[];
+] as const satisfies MiddlewareChain;
 
-export { appMiddlewares };
+export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;
 
-export type AppMiddlewares = typeof appMiddlewares;
+export function createMiddlewares<TMiddlewares extends MiddlewareChain = AppMiddlewares>(
+  middlewares: (defaults: AppMiddlewares) => TMiddlewares
+): TMiddlewares {
+  return middlewares(BUILTIN_MIDDLEWARES);
+}

@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { FlowCore, FlowCoreProviderService } from '@angularflow/angular-adapter';
-import { AppMiddlewares } from './flow.config';
+import { AppMiddlewares, FlowCore, FlowCoreProviderService } from '@angularflow/angular-adapter';
 
 @Injectable()
 export class FlowService {

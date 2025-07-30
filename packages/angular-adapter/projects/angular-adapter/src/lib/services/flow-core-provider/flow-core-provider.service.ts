@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
+  DeepPartial,
   FlowConfig,
   FlowCore,
   Metadata,
@@ -22,7 +23,7 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
     model: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>,
     middlewares: TMiddlewares = [] as unknown as TMiddlewares,
     getFlowOffset: () => { x: number; y: number },
-    config?: FlowConfig
+    config?: DeepPartial<FlowConfig>
   ): void {
     this.flowCore = new FlowCore(
       model,

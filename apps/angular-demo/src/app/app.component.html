@@ -1,5 +1,10 @@
 <div class="diagram-container">
-  <angular-adapter-diagram [nodeTemplateMap]="nodeTemplateMap" [edgeTemplateMap]="edgeTemplateMap" />
+  <angular-adapter-diagram
+    [nodeTemplateMap]="nodeTemplateMap"
+    [edgeTemplateMap]="edgeTemplateMap"
+    [model]="model"
+    [config]="config"
+  />
   <app-toolbar />
   <app-palette [model]="paletteModel" />
 </div>

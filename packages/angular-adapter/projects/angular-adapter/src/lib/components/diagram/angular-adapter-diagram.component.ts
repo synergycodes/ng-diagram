@@ -1,16 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, OnDestroy } from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
+import type {
+  DeepPartial,
+  FlowConfig,
+  Metadata,
+  MiddlewareChain,
+  MiddlewaresConfigFromMiddlewares,
+  ModelAdapter,
+} from '@angularflow/core';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
-import { DIAGRAM_CONFIG, MIDDLEWARES, MODEL } from '../../ng-diagram.module';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
+import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
@@ -43,14 +51,28 @@ import { DefaultNodeTemplateComponent } from '../node/default-node-template/defa
     PaletteDropDirective,
   ],
 })
-export class AngularAdapterDiagramComponent implements OnDestroy {
+export class AngularAdapterDiagramComponent<
+  TMiddlewares extends MiddlewareChain = [],
+  TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
+    Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
+  >,
+> implements OnDestroy
+{
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
-  private readonly config = inject(DIAGRAM_CONFIG);
-  private readonly middlewares = inject(MIDDLEWARES);
-  private readonly model = inject(MODEL);
+
+  config = input<DeepPartial<FlowConfig>>();
+  /**
+   * The model to use in the diagram.
+   */
+  model = input.required<TAdapter>();
+
+  /**
+   * The starting middlewares to use in the Flow Core.
+   */
+  middlewares = input<TMiddlewares>(BUILTIN_MIDDLEWARES as unknown as TMiddlewares);
 
   /**
    * The node template map to use for the diagram.
@@ -70,9 +92,19 @@ export class AngularAdapterDiagramComponent implements OnDestroy {
   constructor() {
     this.getFlowOffset = this.getFlowOffset.bind(this);
 
-    this.flowCoreProvider.init(this.model, this.middlewares, this.getFlowOffset, this.config);
-    // Initialize the resize batch processor after FlowCore is ready
-    this.flowResizeBatchProcessor.initialize();
+    // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
+    // To fix this behavior we need to destroy the effect after the first run
+    const effectRef = effect(
+      () => {
+        // Bind getOffset once in the constructor and reuse the reference
+        this.flowCoreProvider.init(this.model(), this.middlewares(), this.getFlowOffset, this.config());
+        // Initialize the resize batch processor after FlowCore is ready
+        this.flowResizeBatchProcessor.initialize();
+
+        effectRef?.destroy();
+      },
+      { manualCleanup: true }
+    );
   }
 
   ngOnDestroy(): void {
