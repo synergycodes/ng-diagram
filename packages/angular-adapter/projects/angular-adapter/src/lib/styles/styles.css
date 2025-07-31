@@ -61,7 +61,10 @@
   box-shadow: 0px 0px 19px 0px var(--ngd-group-box-shadow-color-highlight) inset !important;
 }
 
-.ng-diagram-node .ng-diagram-node-selected {
-  transition: box-shadow 0.1s ease-in-out !important;
+.ng-diagram-node-selected {
   box-shadow: var(--ngd-selected-node-box-shadow) !important;
+}
+.ng-diagram-group-wrapper,
+.ng-diagram-node-wrapper {
+  transition: box-shadow 0.1s ease-in-out !important;
 }

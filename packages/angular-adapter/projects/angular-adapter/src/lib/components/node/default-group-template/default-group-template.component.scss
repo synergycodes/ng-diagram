@@ -1,10 +1,10 @@
 :host:hover {
-  .ng-diagram-group {
+  .ng-diagram-group-wrapper {
     border-color: var(--ngd-group-border-color-hover);
   }
 }
 
-.ng-diagram-group {
+.ng-diagram-group-wrapper {
   display: flex;
 
   border-radius: var(--ngd-group-border-radius);

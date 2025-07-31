@@ -28,5 +28,5 @@ export class DefaultNodeTemplateComponent implements NodeTemplate<SimpleNode> {
 
   label = computed(() => this.data().data['label'] || this.data().id);
   isSelected = computed(() => this.data().selected ?? false);
-  classes = computed(() => `node ${this.isSelected() ? 'isSelected' : ''}`);
+  classes = computed(() => `ng-diagram-node-wrapper node ${this.isSelected() ? 'isSelected' : ''}`);
 }

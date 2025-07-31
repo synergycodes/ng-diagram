@@ -16,6 +16,7 @@ import {
   hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
   host: {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
+    '[class.ng-diagram-node-wrapper]': 'true',
   },
 })
 export class ImageNodeComponent implements NodeTemplate {
