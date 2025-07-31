@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core'
 import {
   createSignalModel,
   NgDiagramComponent,
+  NgDiagramContextComponent,
   NgDiagramEdgeTemplate,
   NgDiagramEdgeTemplateMap,
-  NgDiagramModule,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
@@ -19,7 +19,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramModule],
+  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramContextComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {

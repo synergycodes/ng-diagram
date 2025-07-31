@@ -1,11 +1,13 @@
-<div class="diagram-container">
-  <ng-diagram
-    [nodeTemplateMap]="nodeTemplateMap"
-    [edgeTemplateMap]="edgeTemplateMap"
-    [model]="model"
-    [config]="config"
-    [debugMode]="debugMode()"
-  />
-  <app-toolbar (toggleDebugModeClick)="debugMode.set(!debugMode())" />
-  <app-palette [model]="paletteModel" />
-</div>
+<ng-diagram-context>
+  <div class="diagram-container">
+    <ng-diagram
+      [nodeTemplateMap]="nodeTemplateMap"
+      [edgeTemplateMap]="edgeTemplateMap"
+      [model]="model"
+      [config]="config"
+      [debugMode]="debugMode()"
+    />
+    <app-toolbar (toggleDebugModeClick)="debugMode.set(!debugMode())" />
+    <app-palette [model]="paletteModel" />
+  </div>
+</ng-diagram-context>
