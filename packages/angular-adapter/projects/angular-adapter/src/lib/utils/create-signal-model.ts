@@ -1,3 +1,4 @@
+import { Injector, runInInjectionContext } from '@angular/core';
 import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares, Model } from '@angularflow/core';
 
@@ -5,12 +6,17 @@ import { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares, Model } fr
  * Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
  */
 export function createSignalModel<TMiddlewares extends MiddlewareChain = []>(
-  model: Partial<Model<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>> = {}
+  model: Partial<Model<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>> = {},
+  injector?: Injector
 ) {
-  const modelAdapter = new SignalModelAdapter<TMiddlewares>();
-  modelAdapter.setNodes(model.nodes || []);
-  modelAdapter.setEdges(model.edges || []);
-  modelAdapter.setMetadata((prev) => ({ ...prev, ...model.metadata }));
+  const create = () => {
+    const adapter = new SignalModelAdapter<TMiddlewares>();
+    adapter.setNodes(model.nodes || []);
+    adapter.setEdges(model.edges || []);
+    adapter.setMetadata((prev) => ({ ...prev, ...model.metadata }));
 
-  return modelAdapter;
+    return adapter;
+  };
+
+  return injector ? runInInjectionContext(injector, create) : create();
 }
