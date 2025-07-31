@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import {
+  GroupNode,
   NgDiagramNodeTemplate,
   NodeResizeAdornmentComponent,
   NodeSelectedDirective,
 } from '@angularflow/angular-adapter';
-import { GroupNode } from '@angularflow/core';
 
 @Component({
   selector: 'app-group-node',

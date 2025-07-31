@@ -1,6 +1,5 @@
 import { Type } from '@angular/core';
-import { NgDiagramNodeTemplate, NgDiagramNodeTemplateMap } from '@angularflow/angular-adapter';
-import { GroupNode } from '@angularflow/core';
+import { GroupNode, NgDiagramNodeTemplate, NgDiagramNodeTemplateMap } from '@angularflow/angular-adapter';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from '../node-template/input-field-node/input-field-node.component';
