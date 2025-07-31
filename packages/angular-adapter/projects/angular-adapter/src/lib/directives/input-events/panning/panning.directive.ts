@@ -2,8 +2,8 @@ import { Directive, inject, OnDestroy } from '@angular/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
-import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
+import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
 @Directive({
   selector: '[angularAdapterPanning]',
@@ -62,10 +62,6 @@ export class PanningDirective implements OnDestroy {
   }
 
   private onMouseMove = (event: PointerInputEvent) => {
-    if (!this.shouldHandle(event)) {
-      return;
-    }
-
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
