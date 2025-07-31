@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
 import type {
@@ -52,18 +61,22 @@ import { DefaultNodeTemplateComponent } from '../node/default-node-template/defa
   ],
 })
 export class AngularAdapterDiagramComponent<
-  TMiddlewares extends MiddlewareChain = [],
-  TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
-    Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
-  >,
-> implements OnDestroy
+    TMiddlewares extends MiddlewareChain = [],
+    TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
+      Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
+    >,
+  >
+  implements OnInit, OnDestroy
 {
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
 
+  private initializedModel: TAdapter | null = null;
+
   config = input<DeepPartial<FlowConfig>>();
+
   /**
    * The model to use in the diagram.
    */
@@ -90,30 +103,22 @@ export class AngularAdapterDiagramComponent<
   viewport = this.renderer.viewport;
 
   constructor() {
-    this.getFlowOffset = this.getFlowOffset.bind(this);
+    effect(() => {
+      const model = this.model();
+      if (this.initializedModel != model) {
+        this.flowCoreProvider.destroy();
+        this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+        this.initializedModel = model;
+      }
+    });
+  }
 
-    // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
-    // To fix this behavior we need to destroy the effect after the first run
-    const effectRef = effect(
-      () => {
-        // Bind getOffset once in the constructor and reuse the reference
-        this.flowCoreProvider.init(this.model(), this.middlewares(), this.getFlowOffset, this.config());
-        // Initialize the resize batch processor after FlowCore is ready
-        this.flowResizeBatchProcessor.initialize();
-
-        effectRef?.destroy();
-      },
-      { manualCleanup: true }
-    );
+  ngOnInit(): void {
+    this.flowResizeBatchProcessor.initialize();
   }
 
   ngOnDestroy(): void {
     this.flowCoreProvider.destroy();
-  }
-
-  getFlowOffset() {
-    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
-    return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
   }
 
   getNodeTemplate(nodeType: Node['type']) {
@@ -130,4 +135,9 @@ export class AngularAdapterDiagramComponent<
   isGroup(node: Node) {
     return 'isGroup' in node;
   }
+
+  private getFlowOffset = () => {
+    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
+    return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
+  };
 }
