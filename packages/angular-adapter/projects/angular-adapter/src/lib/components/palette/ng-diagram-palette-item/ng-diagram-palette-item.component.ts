@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, contentChild, inject, input } from '@angular/core';
 import { PaletteService } from '../../../services';
-import { PaletteItem } from '../../../types';
+import { NgDiagramPaletteItem } from '../../../types';
 import { NgDiagramPaletteItemPreviewComponent } from '../ng-diagram-palette-item-preview/ng-diagram-palette-item-preview.component';
 
 @Component({
@@ -12,7 +12,7 @@ export class NgDiagramPaletteItemComponent {
   private paletteService = inject(PaletteService);
   private paletteItemPreviewComponent = contentChild(NgDiagramPaletteItemPreviewComponent);
 
-  item = input.required<PaletteItem>();
+  item = input.required<NgDiagramPaletteItem>();
 
   onDragStart(event: DragEvent) {
     const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();

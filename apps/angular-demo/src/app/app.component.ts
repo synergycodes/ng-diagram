@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
   createSignalModel,
-  EdgeTemplate,
-  EdgeTemplateMap,
+  NgDiagramEdgeTemplate,
+  NgDiagramEdgeTemplateMap,
   NgDiagramModule,
-  NodeTemplateMap,
-  PaletteItem,
+  NgDiagramNodeTemplateMap,
+  NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
-import { DeepPartial, FlowConfig } from '@angularflow/core';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
@@ -29,25 +28,26 @@ export class AppComponent implements OnInit {
   private readonly injector = inject(Injector);
 
   ngOnInit(): void {
+    //simulate model fetching
     setTimeout(() => {
-      this.model.set(this.getModel());
+      this.model = this.getModel();
     }, 5000);
   }
 
-  nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
-  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
+  paletteModel: NgDiagramPaletteItem[] = paletteModel;
+  nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
+  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map<string, Type<NgDiagramEdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
-  paletteModel: PaletteItem[] = paletteModel;
 
-  config: DeepPartial<FlowConfig> = {
+  config = {
     zoom: {
       max: 2,
     },
   };
 
-  model = signal(createSignalModel());
+  model = createSignalModel();
 
   private getModel() {
     return createSignalModel(

@@ -26,7 +26,7 @@ import { PanningDirective } from '../../directives/input-events/panning/panning.
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
-import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
+import { NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
@@ -90,13 +90,13 @@ export class AngularAdapterDiagramComponent<
   /**
    * The node template map to use for the diagram.
    */
-  nodeTemplateMap = input<NodeTemplateMap>(new Map());
+  nodeTemplateMap = input<NgDiagramNodeTemplateMap>(new Map());
 
   /**
    * The edge template map to use for the diagram.
    * Optional - if not provided, default edge rendering will be used.
    */
-  edgeTemplateMap = input<EdgeTemplateMap>(new Map());
+  edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new Map());
 
   nodes = this.renderer.nodes;
   edges = this.renderer.edges;

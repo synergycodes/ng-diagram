@@ -3,7 +3,7 @@ import {
   AngularAdapterCustomEdgeComponent,
   AngularAdapterEdgeLabelComponent,
   Edge,
-  EdgeTemplate,
+  NgDiagramEdgeTemplate,
 } from '@angularflow/angular-adapter';
 
 /**
@@ -21,7 +21,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AngularAdapterCustomEdgeComponent, AngularAdapterEdgeLabelComponent],
 })
-export class ButtonEdgeComponent implements EdgeTemplate {
+export class ButtonEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   onButtonClick() {

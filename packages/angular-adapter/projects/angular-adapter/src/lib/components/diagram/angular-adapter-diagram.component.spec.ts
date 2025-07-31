@@ -76,7 +76,7 @@ describe('AngularAdapterDiagramComponent', () => {
     expect(component.nodeTemplateMap().size).toBe(0);
   });
 
-  it('should call flowCoreProvider.init only once with provided model', () => {
+  it('should call flowCoreProvider.init every time the model reference changes', () => {
     const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
@@ -88,7 +88,7 @@ describe('AngularAdapterDiagramComponent', () => {
     fixture.componentRef.setInput('model', { ...mockModel });
     fixture.detectChanges();
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 
   it('should call flowCoreProvider.init only once with provided middlewares', () => {

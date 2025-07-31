@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms';
 import {
   AngularAdapterPortComponent,
   FlowCoreProviderService,
+  NgDiagramNodeTemplate,
   Node,
   NodeResizeAdornmentComponent,
   NodeSelectedDirective,
-  NodeTemplate,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -21,7 +21,7 @@ import {
     '[class.ng-diagram-port-hoverable]': 'true',
   },
 })
-export class ResizableNodeComponent implements NodeTemplate {
+export class ResizableNodeComponent implements NgDiagramNodeTemplate {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   text = model<string>('');

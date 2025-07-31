@@ -1,15 +1,15 @@
 import { Injectable, signal } from '@angular/core';
-import { PaletteItem } from '../../types';
+import { NgDiagramPaletteItem } from '../../types';
 
 @Injectable({ providedIn: 'root' })
 export class PaletteService {
-  draggedNode = signal<PaletteItem | null>(null);
+  draggedNode = signal<NgDiagramPaletteItem | null>(null);
 
-  onMouseDown(node: PaletteItem) {
+  onMouseDown(node: NgDiagramPaletteItem) {
     this.draggedNode.set(node);
   }
 
-  onDragStartFromPalette(event: DragEvent, node: PaletteItem) {
+  onDragStartFromPalette(event: DragEvent, node: NgDiagramPaletteItem) {
     if (event.dataTransfer) {
       event.dataTransfer?.setData('text/plain', JSON.stringify(node));
     }
