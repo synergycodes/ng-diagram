@@ -75,6 +75,8 @@ export class AngularAdapterDiagramComponent<
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
 
+  private flowCore = signal<FlowCore | undefined>(undefined);
+
   private initializedModel: TAdapter | null = null;
 
   config = input<DeepPartial<FlowConfig>>();
@@ -106,24 +108,18 @@ export class AngularAdapterDiagramComponent<
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
-  private flowCore = signal<FlowCore | undefined>(undefined);
-
   constructor() {
     effect(() => {
       const model = this.model();
       if (this.initializedModel != model) {
         this.flowCoreProvider.destroy();
         this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+
+        this.flowCore.set(this.flowCoreProvider.provide());
+
         this.initializedModel = model;
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.flowResizeBatchProcessor.initialize();
-
-    const flowCore = this.flowCoreProvider.provide();
-    this.flowCore.set(flowCore);
 
     effect(() => {
       const flowCore = this.flowCore();
@@ -133,6 +129,10 @@ export class AngularAdapterDiagramComponent<
 
       flowCore.setDebugMode(this.debugMode());
     });
+  }
+
+  ngOnInit(): void {
+    this.flowResizeBatchProcessor.initialize();
   }
 
   ngOnDestroy(): void {
