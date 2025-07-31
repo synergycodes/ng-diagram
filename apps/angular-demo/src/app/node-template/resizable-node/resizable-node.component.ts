@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, model } fr
 import { FormsModule } from '@angular/forms';
 import {
   AngularAdapterPortComponent,
-  FlowCoreProviderService,
   NgDiagramNodeTemplate,
+  NgDiagramService,
   Node,
   NodeResizeAdornmentComponent,
   NodeSelectedDirective,
@@ -22,7 +22,7 @@ import {
   },
 })
 export class ResizableNodeComponent implements NgDiagramNodeTemplate {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly ngDiagramService = inject(NgDiagramService);
 
   text = model<string>('');
   sizeText = model<string>('');
@@ -39,7 +39,7 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate {
       return;
     }
 
-    this.flowCoreProvider.provide().commandHandler.emit('resizeNode', {
+    this.ngDiagramService.getCommandHandler().emit('resizeNode', {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
@@ -49,7 +49,7 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate {
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
+    this.ngDiagramService.getCommandHandler().emit('updateNode', {
       id: this.data().id,
       nodeChanges: {
         autoSize: checked,

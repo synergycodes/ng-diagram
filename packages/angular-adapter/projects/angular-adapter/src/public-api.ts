@@ -13,7 +13,7 @@ export * from './lib/components/palette/ng-diagram-palette-item/ng-diagram-palet
 export * from './lib/components/port/angular-adapter-port.component';
 export * from './lib/directives';
 export * from './lib/ng-diagram.module';
-export * from './lib/services/';
+export * from './lib/services/ng-diagram.service';
 export * from './lib/types';
 export * from './lib/utils/create-middlewares';
 export * from './lib/utils/create-signal-model';

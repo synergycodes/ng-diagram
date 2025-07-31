@@ -105,7 +105,7 @@ export class FlowCore<
    * Sets the new model and runs the init process
    * @param model Model
    */
-  set model(model: ModelAdapter<TMetadata>) {
+  private set model(model: ModelAdapter<TMetadata>) {
     this._model = model;
     this.init();
   }

@@ -8,7 +8,12 @@ import {
 } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
+import {
+  FlowCoreProviderService,
+  FlowResizeBatchProcessorService,
+  PaletteService,
+  RendererService,
+} from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -57,6 +62,13 @@ describe('AngularAdapterDiagramComponent', () => {
           useValue: {
             init: vi.fn(),
             destroy: vi.fn(),
+          },
+        },
+        {
+          provide: PaletteService,
+          useValue: {
+            onMouseDown: vi.fn(),
+            onDragStartFromPalette: vi.fn(),
           },
         },
       ],

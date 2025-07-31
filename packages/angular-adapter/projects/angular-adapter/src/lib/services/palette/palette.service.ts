@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { NgDiagramPaletteItem } from '../../types';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class PaletteService {
   draggedNode = signal<NgDiagramPaletteItem | null>(null);
 

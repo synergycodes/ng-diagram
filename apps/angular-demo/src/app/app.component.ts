@@ -12,7 +12,6 @@ import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
-import { FlowService } from './flow/flow.service';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -21,7 +20,6 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent, NgDiagramModule],
-  providers: [FlowService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {

@@ -205,20 +205,6 @@ describe('FlowCore', () => {
     });
   });
 
-  describe('set model', () => {
-    it('should set new model', () => {
-      flowCore.model = { ...mockModelAdapter };
-
-      expect(flowCore.model).not.toBe(mockModelAdapter);
-    });
-
-    it('should reinitialize flow core', () => {
-      flowCore.model = { ...mockModelAdapter };
-
-      expect(flowCore.commandHandler.emit).toHaveBeenCalledWith('init');
-    });
-  });
-
   describe('get model', () => {
     it('should return the current model', () => {
       expect(flowCore.model).toBe(mockModelAdapter);
