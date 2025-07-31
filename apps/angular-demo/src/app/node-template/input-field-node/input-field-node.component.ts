@@ -16,9 +16,6 @@ import {
   styleUrls: ['./input-field-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
-  host: {
-    '[class.ng-diagram-node-wrapper]': 'true',
-  },
 })
 export class InputFieldNodeComponent implements NodeTemplate {
   text = model<string>('');

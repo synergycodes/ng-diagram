@@ -5,6 +5,7 @@ import { Node } from '@angularflow/core';
   selector: '[angularAdapterNodeSelected]',
   host: {
     '[class.ng-diagram-node-selected]': 'selected()',
+    '[class.ng-diagram-node-wrapper]': 'true',
   },
 })
 export class NodeSelectedDirective {
