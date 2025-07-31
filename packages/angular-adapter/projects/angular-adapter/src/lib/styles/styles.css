@@ -56,12 +56,12 @@
   box-shadow: 0 0 0 var(--ngd-port-border-size-hover) var(--ngd-port-border-color-hover);
 }
 
-angular-adapter-node .ng-diagram-group-highlight {
+.ng-diagram-node .ng-diagram-group-highlight {
   border: 1px solid var(--ngd-group-border-color-highlight) !important;
   box-shadow: 0px 0px 19px 0px var(--ngd-group-box-shadow-color-highlight) inset !important;
 }
 
-angular-adapter-node .ng-diagram-node-selected {
+.ng-diagram-node .ng-diagram-node-selected {
   transition: box-shadow 0.1s ease-in-out !important;
   box-shadow: var(--ngd-selected-node-box-shadow) !important;
 }
