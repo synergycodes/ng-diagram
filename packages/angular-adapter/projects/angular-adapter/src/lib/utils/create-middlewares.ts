@@ -2,7 +2,6 @@ import {
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
-  loggerMiddleware,
   MiddlewareChain,
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
@@ -18,7 +17,6 @@ export const BUILTIN_MIDDLEWARES = [
   treeLayoutMiddleware,
   nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
-  loggerMiddleware,
 ] as const satisfies MiddlewareChain;
 
 export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;

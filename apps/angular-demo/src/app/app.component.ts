@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, signal, Type } from '@angular/core';
 import {
   AngularAdapterDiagramComponent,
   createSignalModel,
@@ -38,6 +38,8 @@ export class AppComponent implements OnInit {
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
+
+  debugMode = signal(true);
 
   config = {
     zoom: {

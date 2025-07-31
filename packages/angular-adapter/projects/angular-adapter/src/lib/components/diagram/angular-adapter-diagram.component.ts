@@ -8,12 +8,14 @@ import {
   input,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
 import type {
   DeepPartial,
   FlowConfig,
+  FlowCore,
   Metadata,
   MiddlewareChain,
   MiddlewaresConfigFromMiddlewares,
@@ -98,9 +100,13 @@ export class AngularAdapterDiagramComponent<
    */
   edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new Map());
 
+  debugMode = input<boolean>(false);
+
   nodes = this.renderer.nodes;
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
+
+  private flowCore = signal<FlowCore | undefined>(undefined);
 
   constructor() {
     effect(() => {
@@ -115,6 +121,18 @@ export class AngularAdapterDiagramComponent<
 
   ngOnInit(): void {
     this.flowResizeBatchProcessor.initialize();
+
+    const flowCore = this.flowCoreProvider.provide();
+    this.flowCore.set(flowCore);
+
+    effect(() => {
+      const flowCore = this.flowCore();
+      if (!flowCore) {
+        return;
+      }
+
+      flowCore.setDebugMode(this.debugMode());
+    });
   }
 
   ngOnDestroy(): void {

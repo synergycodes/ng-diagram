@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { AppMiddlewares, NgDiagramService } from '@angularflow/angular-adapter';
 
 @Component({
@@ -10,6 +10,8 @@ import { AppMiddlewares, NgDiagramService } from '@angularflow/angular-adapter';
 })
 export class ToolbarComponent {
   private readonly ngDiagramService: NgDiagramService<AppMiddlewares> = inject(NgDiagramService<AppMiddlewares>);
+
+  toggleDebugModeClick = output<void>();
 
   onTreeLayoutClick(): void {
     this.ngDiagramService.layout('Tree');
