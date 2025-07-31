@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FlowCoreProviderService, RendererService } from '../../../services';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
-import { AngularAdapterCustomEdgeComponent } from './custom-edge.component';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
+import { BaseEdgeComponent } from './base-edge.component';
 
 @Component({
   selector: 'angular-adapter-custom-edge',
@@ -14,19 +14,19 @@ import { AngularAdapterCustomEdgeComponent } from './custom-edge.component';
 class MockAngularAdapterEdgeLabelComponent {}
 
 describe('AngularAdapterCustomEdgeComponent', () => {
-  let component: AngularAdapterCustomEdgeComponent;
-  let fixture: ComponentFixture<AngularAdapterCustomEdgeComponent>;
+  let component: BaseEdgeComponent;
+  let fixture: ComponentFixture<BaseEdgeComponent>;
   let mockEdge: Edge;
   let mockPath: string;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [FlowCoreProviderService, RendererService],
-      imports: [AngularAdapterCustomEdgeComponent],
+      imports: [BaseEdgeComponent],
     })
-      .overrideComponent(AngularAdapterCustomEdgeComponent, {
+      .overrideComponent(BaseEdgeComponent, {
         remove: {
-          imports: [AngularAdapterEdgeLabelComponent],
+          imports: [BaseEdgeLabelComponent],
         },
         add: {
           imports: [MockAngularAdapterEdgeLabelComponent],
@@ -34,7 +34,7 @@ describe('AngularAdapterCustomEdgeComponent', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(AngularAdapterCustomEdgeComponent);
+    fixture = TestBed.createComponent(BaseEdgeComponent);
     component = fixture.componentInstance;
 
     mockEdge = {

@@ -13,10 +13,3 @@
 </svg>
 
 <ng-content />
-
-<!-- TODO: Temporary solution. If edge templates will be implemented this code should be removed -->
-@if (!data().temporary && displayLabel()) {
-  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
-    <div style="padding: 4px; background-color: white; border-radius: 5px; font-size: 10px">Label</div>
-  </angular-adapter-edge-label>
-}

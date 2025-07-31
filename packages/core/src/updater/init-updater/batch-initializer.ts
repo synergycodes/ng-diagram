@@ -8,12 +8,16 @@ export class BatchInitializer<T> {
 
   isFinished = false;
 
-  constructor(onInit: (dataMap: Map<string, T>) => void) {
+  constructor(onInit: (dataMap: Map<string, T>) => void, init?: boolean) {
     this.onInit = onInit;
 
     this.finished = new Promise<void>((resolve) => {
       this.finish = resolve;
     });
+
+    if (init) {
+      this.finish();
+    }
   }
 
   waitForFinish(): Promise<void> {

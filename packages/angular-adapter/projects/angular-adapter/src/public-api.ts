@@ -4,8 +4,8 @@
 
 export type { Edge, FlowCore, Metadata, Middleware, Node, Point } from '@angularflow/core';
 export * from './lib/components/diagram/angular-adapter-diagram.component';
-export * from './lib/components/edge-label/angular-adapter-edge-label.component';
-export * from './lib/components/edge/custom-edge/custom-edge.component';
+export * from './lib/components/edge-label/base-edge-label.component';
+export * from './lib/components/edge/base-edge/base-edge.component';
 export * from './lib/components/node/resize/node-resize-adornment.component';
 export * from './lib/components/node/rotate/node-rotate-adornment.component';
 export * from './lib/components/palette/ng-diagram-palette-item-preview/ng-diagram-palette-item-preview.component';

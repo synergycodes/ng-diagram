@@ -1,6 +1,7 @@
 export * from './cursor-position-tracker/cursor-position-tracker.directive';
 export * from './input-events/keyboard-inputs/keyboard-inputs.directive';
 export * from './input-events/linking/linking.directive';
+export * from './input-events/object-selection/object-selection.directive';
 export * from './input-events/palette-drop/palette-drop.directive';
 export * from './input-events/panning/panning.directive';
 export * from './input-events/zooming/zooming-pointer.directive';

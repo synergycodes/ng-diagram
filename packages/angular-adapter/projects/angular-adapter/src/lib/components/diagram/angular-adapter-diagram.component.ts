@@ -28,7 +28,6 @@ import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zoo
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
-import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
@@ -41,7 +40,6 @@ import { DefaultNodeTemplateComponent } from '../node/default-node-template/defa
     CommonModule,
     AngularAdapterCanvasComponent,
     AngularAdapterNodeComponent,
-    AngularAdapterEdgeComponent,
     MarkerArrowComponent,
     DefaultEdgeComponent,
     DefaultNodeTemplateComponent,

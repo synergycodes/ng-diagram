@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { ViewportDirective } from '../../directives';
-import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
+import { DiagramSelectionDirective, ViewportDirective } from '../../directives';
 
 @Component({
   selector: 'angular-adapter-canvas',
@@ -10,7 +9,7 @@ import { ObjectSelectDirective } from '../../directives/input-events/object-sele
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     { directive: ViewportDirective, inputs: ['viewport'] },
-    { directive: ObjectSelectDirective, inputs: ['targetData', 'targetType'] },
+    { directive: DiagramSelectionDirective, inputs: ['targetData'] },
   ],
 })
 export class AngularAdapterCanvasComponent {}

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
-import { ZIndexDirective } from '../../../directives';
+import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 import { getPath } from '../../../utils/get-path/get-path';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
 
 /**
  * To create an edge with a custom path, you must provide the `pathAndPoints` property.
@@ -21,23 +21,25 @@ import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapt
  */
 
 @Component({
-  selector: 'angular-adapter-custom-edge',
-  templateUrl: './custom-edge.component.html',
-  styleUrl: './custom-edge.component.scss',
+  selector: 'ng-diagram-base-edge',
+  templateUrl: './base-edge.component.html',
+  styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: ZIndexDirective, inputs: ['data'] }],
-  imports: [AngularAdapterEdgeLabelComponent],
+  hostDirectives: [
+    { directive: ZIndexDirective, inputs: ['data'] },
+    { directive: EdgeSelectionDirective, inputs: ['targetData: data'] },
+  ],
+  imports: [BaseEdgeLabelComponent],
 })
-export class AngularAdapterCustomEdgeComponent {
+export class BaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   data = input.required<Edge>();
   pathAndPoints = input<{ path: string; points: Point[] }>();
   routing = input<Routing>();
-  customStroke = input<string>();
+  stroke = input<string>();
   customMarkerStart = input<string>();
   customMarkerEnd = input<string>();
-  displayLabel = input<boolean>();
 
   points = computed(() => (this.routing() ? this.data().points : (this.pathAndPoints()?.points ?? [])));
 
@@ -47,11 +49,6 @@ export class AngularAdapterCustomEdgeComponent {
     if (!routing) return this.pathAndPoints()?.path ?? '';
 
     return getPath(routing, points);
-  });
-
-  stroke = computed(() => {
-    if (this.customStroke()) return this.customStroke();
-    return this.data().selected ? '#888' : '#bbb';
   });
 
   markerStart = computed(() =>
@@ -71,6 +68,8 @@ export class AngularAdapterCustomEdgeComponent {
   );
 
   strokeOpacity = computed(() => (this.data().temporary ? 0.5 : 1));
+
+  labels = computed(() => this.data().labels ?? []);
 
   private prevRouting: string | undefined;
   private prevPoints: Point[] | undefined;
