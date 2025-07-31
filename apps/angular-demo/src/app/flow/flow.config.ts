@@ -3,7 +3,6 @@ import {
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
-  loggerMiddleware,
   nodePositionSnapMiddleware,
   nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
@@ -18,7 +17,6 @@ const appMiddlewares = [
   treeLayoutMiddleware,
   nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
-  loggerMiddleware,
 ] as const satisfies Middleware[];
 
 export { appMiddlewares };

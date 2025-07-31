@@ -29,6 +29,10 @@ export class MiddlewareManager<
     }
   }
 
+  isRegistered(name: MiddlewareConfigKeys<TCustomMiddlewares>): boolean {
+    return !!this.middlewareChain.find((m) => m.name === name);
+  }
+
   /**
    * Registers a new middleware in the chain
    * @param middleware Middleware to register
@@ -36,7 +40,7 @@ export class MiddlewareManager<
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register<T extends Middleware<any>>(middleware: T): () => void {
-    if (this.middlewareChain.find((m) => m.name === middleware.name)) {
+    if (this.isRegistered(middleware.name)) {
       throw new Error(`Middleware ${middleware.name} already registered`);
     }
 

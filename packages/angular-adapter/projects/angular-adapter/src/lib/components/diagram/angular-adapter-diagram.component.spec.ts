@@ -52,6 +52,7 @@ describe('AngularAdapterDiagramComponent', () => {
           useValue: {
             init: vi.fn(),
             destroy: vi.fn(),
+            provide: vi.fn(),
           },
         },
       ],
