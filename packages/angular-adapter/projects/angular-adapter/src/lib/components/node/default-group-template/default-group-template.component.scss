@@ -1,10 +1,6 @@
 :host:hover {
   .ng-diagram-group {
     border-color: var(--ngd-group-border-color-hover);
-
-    &.highlighted {
-      border-color: var(--ngd-group-border-color-highlight);
-    }
   }
 }
 
@@ -22,13 +18,4 @@
   height: 100%;
 
   box-sizing: border-box;
-
-  &.highlighted {
-    background: var(--ngd-group-background-color-highlight);
-    border: 2px solid var(--ngd-group-box-shadow-color-highlight);
-
-    :hover {
-      border-color: red;
-    }
-  }
 }

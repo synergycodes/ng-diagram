@@ -19,5 +19,5 @@ export class DefaultGroupTemplateComponent implements NodeTemplate<GroupNode> {
   isSelected = computed(() => this.data().selected ?? false);
   highlighted = computed(() => this.data().highlighted ?? false);
 
-  classes = computed(() => `ng-diagram-group ${this.highlighted() ? 'highlight' : ''}`);
+  classes = computed(() => `ng-diagram-group ${this.highlighted() ? 'ng-diagram-group-highlight' : ''}`);
 }

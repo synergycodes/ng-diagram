@@ -4,8 +4,7 @@ import { Node } from '@angularflow/core';
 @Directive({
   selector: '[angularAdapterNodeSelected]',
   host: {
-    '[style.transition]': '!selected() ? "box-shadow 0.1s ease-in-out" : null',
-    '[style.box-shadow]': 'selected() ? "var(--ngd-selected-node-box-shadow)" : null',
+    '[class.ng-diagram-node-selected]': 'selected()',
   },
 })
 export class NodeSelectedDirective {
