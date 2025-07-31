@@ -2,7 +2,7 @@
   .ng-diagram-group {
     border-color: var(--ngd-group-border-color-hover);
 
-    &[data-highlighted='true'] {
+    &.highlighted {
       border-color: var(--ngd-group-border-color-highlight);
     }
   }
@@ -23,7 +23,7 @@
 
   box-sizing: border-box;
 
-  &[data-highlighted='true'] {
+  &.highlighted {
     background: var(--ngd-group-background-color-highlight);
     border: 2px solid var(--ngd-group-box-shadow-color-highlight);
 

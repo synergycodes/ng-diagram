@@ -4,7 +4,7 @@ import { GroupNode } from '@angularflow/core';
 @Directive({
   selector: '[angularAdapterGroupHighlighted]',
   host: {
-    '[attr.data-highlighted]': 'highlighted()',
+    '[class.highlighted]': 'highlighted()',
   },
 })
 export class GroupHighlightedDirective {
