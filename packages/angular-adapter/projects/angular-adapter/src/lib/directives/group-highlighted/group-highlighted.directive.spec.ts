@@ -44,7 +44,7 @@ describe('GroupHighlightedDirective', () => {
   });
 
   it('should not set data-highlighted attribute by default', () => {
-    expect(divElement.getAttribute('data-highlighted')).toBe('false');
+    expect(divElement.classList.contains('highlighted')).toBe(false);
   });
 
   it('should set data-highlighted attribute when highlighted is true', () => {
@@ -53,7 +53,7 @@ describe('GroupHighlightedDirective', () => {
       highlighted: true,
     };
     fixture.detectChanges();
-    expect(divElement.getAttribute('data-highlighted')).toBe('true');
+    expect(divElement.classList.contains('highlighted')).toBe(true);
   });
 
   it('should set data-highlighted attribute to false when highlighted is false', () => {
@@ -62,6 +62,6 @@ describe('GroupHighlightedDirective', () => {
       highlighted: false,
     };
     fixture.detectChanges();
-    expect(divElement.getAttribute('data-highlighted')).toBe('false');
+    expect(divElement.classList.contains('highlighted')).toBe(false);
   });
 });
