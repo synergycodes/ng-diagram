@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, contentChild, inject, input } from '@angular/core';
 import { PaletteService } from '../../../services';
 import { NgDiagramPaletteItem } from '../../../types';
-import { NgDiagramPaletteItemPreviewComponent } from '../ng-diagram-palette-item-preview/ng-diagram-palette-item-preview.component';
+import { NgDiagramPaletteItemPreviewComponent } from '../item-preview/ng-diagram-palette-item-preview.component';
 
 @Component({
-  selector: 'angular-adapter-palette-item',
+  selector: 'ng-diagram-palette-item',
   templateUrl: './ng-diagram-palette-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

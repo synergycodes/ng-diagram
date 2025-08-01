@@ -8,7 +8,7 @@ type PointerSelectEvent = PointerEvent & {
 };
 
 @Directive({
-  selector: '[angularAdapterObjectSelect]',
+  selector: '[ngDiagramObjectSelect]',
   host: { '(pointerdown)': 'onPointerDown($event)' },
 })
 export class ObjectSelectDirective {

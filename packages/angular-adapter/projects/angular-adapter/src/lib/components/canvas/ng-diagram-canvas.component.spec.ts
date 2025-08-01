@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { Component } from '@angular/core';
-import { AngularAdapterCanvasComponent } from './angular-adapter-canvas.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ViewportDirective } from '../../directives';
 import { By } from '@angular/platform-browser';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ViewportDirective } from '../../directives';
+import { NgDiagramCanvasComponent } from './ng-diagram-canvas.component';
 
 @Component({
-  selector: 'angular-adapter-node',
+  selector: 'ng-diagram-node',
   template: '<ng-content />',
 })
 class MockAngularAdapterNodeComponent {}
@@ -18,28 +18,28 @@ class MockAngularAdapterNodeComponent {}
 class MockAngularAdapterEdgeComponent {}
 
 @Component({
-  selector: 'angular-adapter-canvas-test',
-  imports: [AngularAdapterCanvasComponent, MockAngularAdapterNodeComponent, MockAngularAdapterEdgeComponent],
+  selector: 'ng-diagram-canvas-test',
+  imports: [NgDiagramCanvasComponent, MockAngularAdapterNodeComponent, MockAngularAdapterEdgeComponent],
   template: `
-    <angular-adapter-canvas>
+    <ng-diagram-canvas>
       <angular-adapter-edge></angular-adapter-edge>
-      <angular-adapter-node>Node 1</angular-adapter-node>
-      <angular-adapter-node>Node 2</angular-adapter-node>
-    </angular-adapter-canvas>
+      <ng-diagram-node>Node 1</ng-diagram-node>
+      <ng-diagram-node>Node 2</ng-diagram-node>
+    </ng-diagram-canvas>
   `,
 })
 class TestComponent {}
 
 describe('AngularAdapterCanvasComponent', () => {
-  let component: AngularAdapterCanvasComponent;
-  let fixture: ComponentFixture<AngularAdapterCanvasComponent>;
+  let component: NgDiagramCanvasComponent;
+  let fixture: ComponentFixture<NgDiagramCanvasComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AngularAdapterCanvasComponent, TestComponent],
+      imports: [NgDiagramCanvasComponent, TestComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AngularAdapterCanvasComponent);
+    fixture = TestBed.createComponent(NgDiagramCanvasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -70,7 +70,7 @@ describe('AngularAdapterCanvasComponent', () => {
     });
 
     it('should project nodes into nodes container', () => {
-      const nodes = testFixture.debugElement.query(By.css('.nodes-container')).queryAll(By.css('angular-adapter-node'));
+      const nodes = testFixture.debugElement.query(By.css('.nodes-container')).queryAll(By.css('ng-diagram-node'));
 
       expect(nodes.length).toBe(2);
       expect(nodes[0].nativeElement.textContent).toBe('Node 1');

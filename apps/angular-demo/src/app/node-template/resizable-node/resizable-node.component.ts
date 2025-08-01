@@ -2,21 +2,21 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  AngularAdapterPortComponent,
+  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeSelectedDirective,
   NgDiagramNodeTemplate,
+  NgDiagramPortComponent,
   NgDiagramService,
   Node,
-  NodeResizeAdornmentComponent,
-  NodeSelectedDirective,
 } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-resizable-node',
-  imports: [FormsModule, DecimalPipe, AngularAdapterPortComponent, NodeResizeAdornmentComponent],
+  imports: [FormsModule, DecimalPipe, NgDiagramPortComponent, NgDiagramNodeResizeAdornmentComponent],
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
+  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['data'] }],
   host: {
     '[class.ng-diagram-port-hoverable]': 'true',
   },

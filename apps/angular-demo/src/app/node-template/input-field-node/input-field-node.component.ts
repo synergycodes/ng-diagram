@@ -1,21 +1,26 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  AngularAdapterPortComponent,
+  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeRotateAdornmentComponent,
+  NgDiagramNodeSelectedDirective,
   NgDiagramNodeTemplate,
+  NgDiagramPortComponent,
   Node,
-  NodeResizeAdornmentComponent,
-  NodeRotateAdornmentComponent,
-  NodeSelectedDirective,
 } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-input-field-node',
-  imports: [FormsModule, AngularAdapterPortComponent, NodeResizeAdornmentComponent, NodeRotateAdornmentComponent],
+  imports: [
+    FormsModule,
+    NgDiagramPortComponent,
+    NgDiagramNodeResizeAdornmentComponent,
+    NgDiagramNodeRotateAdornmentComponent,
+  ],
   templateUrl: './input-field-node.component.html',
   styleUrls: ['./input-field-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
+  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['data'] }],
 })
 export class InputFieldNodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');

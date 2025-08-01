@@ -3,14 +3,14 @@
  */
 
 export type { Edge, FlowCore, GroupNode, Metadata, Middleware, Node, Point } from '@angularflow/core';
-export * from './lib/components/diagram/angular-adapter-diagram.component';
+export * from './lib/components/diagram/ng-diagram.component';
 export * from './lib/components/edge-label/angular-adapter-edge-label.component';
 export * from './lib/components/edge/custom-edge/custom-edge.component';
-export * from './lib/components/node/resize/node-resize-adornment.component';
-export * from './lib/components/node/rotate/node-rotate-adornment.component';
-export * from './lib/components/palette/ng-diagram-palette-item-preview/ng-diagram-palette-item-preview.component';
-export * from './lib/components/palette/ng-diagram-palette-item/ng-diagram-palette-item.component';
-export * from './lib/components/port/angular-adapter-port.component';
+export * from './lib/components/node/resize/ng-diagram-node-resize-adornment.component';
+export * from './lib/components/node/rotate/ng-diagram-node-rotate-adornment.component';
+export * from './lib/components/palette/item-preview/ng-diagram-palette-item-preview.component';
+export * from './lib/components/palette/item/ng-diagram-palette-item.component';
+export * from './lib/components/port/ng-diagram-port.component';
 export * from './lib/directives';
 export * from './lib/ng-diagram.module';
 export * from './lib/services/ng-diagram.service';

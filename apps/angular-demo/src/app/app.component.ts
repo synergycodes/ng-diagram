@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, signal, Type } from '@angular/core';
 import {
-  AngularAdapterDiagramComponent,
   createSignalModel,
+  NgDiagramComponent,
   NgDiagramEdgeTemplate,
   NgDiagramEdgeTemplateMap,
   NgDiagramModule,
@@ -19,7 +19,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, AngularAdapterDiagramComponent, NgDiagramModule],
+  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {

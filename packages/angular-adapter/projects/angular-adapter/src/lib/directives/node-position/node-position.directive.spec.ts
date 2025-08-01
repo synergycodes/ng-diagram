@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { NodePositionDirective } from './node-position.directive';
 
 @Component({
-  template: `<div [angularAdapterNodePosition] [data]="data"></div>`,
+  template: `<div [ngDiagramNodePosition] [data]="data"></div>`,
   imports: [NodePositionDirective],
 })
 class TestComponent {

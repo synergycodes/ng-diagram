@@ -1,4 +1,4 @@
-<angular-adapter-canvas [viewport]="viewport()" targetType="diagram" [targetData]="undefined">
+<ng-diagram-canvas [viewport]="viewport()" targetType="diagram" [targetData]="undefined">
   @for (edge of edges(); track edge.id) {
     <angular-adapter-edge class="ng-diagram-edge" [data]="edge" targetType="edge">
       @if (getEdgeTemplate(edge.type)) {
@@ -10,14 +10,14 @@
   }
   <angular-adapter-marker-arrow />
   @for (node of nodes(); track node.id) {
-    <angular-adapter-node class="ng-diagram-node" [attr.data-node-id]="node.id" [data]="node" targetType="node">
+    <ng-diagram-node class="ng-diagram-node" [attr.data-node-id]="node.id" [data]="node" targetType="node">
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { data: node }" />
       } @else if (isGroup(node)) {
-        <angular-adapter-default-group-template [data]="node" />
+        <ng-diagram-default-group-template [data]="node" />
       } @else {
-        <angular-adapter-default-node-template [data]="node" />
+        <ng-diagram-default-node-template [data]="node" />
       }
-    </angular-adapter-node>
+    </ng-diagram-node>
   }
-</angular-adapter-canvas>
+</ng-diagram-canvas>

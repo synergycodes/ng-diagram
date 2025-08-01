@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ViewportDirective } from './viewport.directive';
 
 @Component({
-  template: `<div [angularAdapterViewport] [viewport]="viewport"></div>`,
+  template: `<div [ngDiagramViewport] [viewport]="viewport"></div>`,
   imports: [ViewportDirective],
 })
 class TestComponent {

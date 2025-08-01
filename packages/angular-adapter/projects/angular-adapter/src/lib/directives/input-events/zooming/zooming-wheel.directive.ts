@@ -3,7 +3,7 @@ import { FlowCoreProviderService } from '../../../services/flow-core-provider/fl
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
 @Directive({
-  selector: '[angularAdapterZooming]',
+  selector: '[ngDiagramZooming]',
   host: {
     '(wheel)': 'onWheel($event)',
   },

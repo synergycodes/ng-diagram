@@ -14,12 +14,12 @@ import { Port } from '@angularflow/core';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
 import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
-import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
+import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
 
 @Component({
-  selector: 'angular-adapter-port',
-  templateUrl: './angular-adapter-port.component.html',
-  styleUrl: './angular-adapter-port.component.scss',
+  selector: 'ng-diagram-port',
+  templateUrl: './ng-diagram-port.component.html',
+  styleUrl: './ng-diagram-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-port-id]': 'id()',
@@ -27,11 +27,11 @@ import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.compon
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['portId: id'] }],
 })
-export class AngularAdapterPortComponent implements OnInit, OnDestroy {
+export class NgDiagramPortComponent implements OnInit, OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
-  private readonly nodeComponent = inject(AngularAdapterNodeComponent);
+  private readonly nodeComponent = inject(NgDiagramNodeComponent);
   private readonly linkingInputDirective = inject(LinkingInputDirective);
 
   id = input.required<Port['id']>();

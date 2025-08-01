@@ -3,7 +3,7 @@ import { type Node } from '@angularflow/core';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 
 @Directive({
-  selector: '[angularAdapterNodeSize]',
+  selector: '[ngDiagramNodeSize]',
 })
 export class NodeSizeDirective implements OnDestroy, OnInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);

@@ -8,7 +8,7 @@ import { PanWithArrowsAction } from './keyboard-actions/pan-with-arrows.action';
 import { PasteAction } from './keyboard-actions/paste.action';
 
 @Directive({
-  selector: '[angularAdapterKeyboardInputs]',
+  selector: '[ngDiagramKeyboardInputs]',
   host: {
     '(document:keydown)': 'onKeyDown($event)',
   },

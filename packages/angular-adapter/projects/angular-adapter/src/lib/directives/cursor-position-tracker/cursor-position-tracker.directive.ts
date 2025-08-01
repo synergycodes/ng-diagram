@@ -2,7 +2,7 @@ import { Directive, inject } from '@angular/core';
 import { CursorPositionTrackerService } from '../../services/cursor-position-tracker/cursor-position-tracker.service';
 
 @Directive({
-  selector: '[angularAdapterCursorPositionTracker]',
+  selector: '[ngDiagramCursorPositionTracker]',
   host: {
     '(document:mousemove)': 'onMouseMove($event)',
   },

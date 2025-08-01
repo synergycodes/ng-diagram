@@ -14,15 +14,12 @@ import {
   PaletteService,
   RendererService,
 } from '../../services';
-import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
+import { NgDiagramComponent } from './ng-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
-  let component: AngularAdapterDiagramComponent<
-    MiddlewareChain,
-    ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>
-  >;
+  let component: NgDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>;
   let fixture: ComponentFixture<
-    AngularAdapterDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>
+    NgDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>
   >;
   const mockModel: ModelAdapter = {
     destroy: vi.fn(),
@@ -39,7 +36,7 @@ describe('AngularAdapterDiagramComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AngularAdapterDiagramComponent],
+      imports: [NgDiagramComponent],
       providers: [
         {
           provide: RendererService,
@@ -75,7 +72,7 @@ describe('AngularAdapterDiagramComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
+    fixture = TestBed.createComponent(NgDiagramComponent);
     fixture.componentRef.setInput('model', mockModel);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -92,7 +89,7 @@ describe('AngularAdapterDiagramComponent', () => {
   it('should call flowCoreProvider.init every time the model reference changes', () => {
     const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
 
-    fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
+    fixture = TestBed.createComponent(NgDiagramComponent);
     fixture.componentRef.setInput('model', mockModel);
     fixture.detectChanges();
 
@@ -108,7 +105,7 @@ describe('AngularAdapterDiagramComponent', () => {
     const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
     const middlewares: Middleware[] = [{ name: 'test', execute: vi.fn().mockImplementation((state) => state) }];
 
-    fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
+    fixture = TestBed.createComponent(NgDiagramComponent);
     fixture.componentRef.setInput('model', mockModel);
     fixture.componentRef.setInput('middlewares', middlewares);
     fixture.detectChanges();
