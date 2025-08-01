@@ -3,11 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NodeSelectedDirective } from './node-selected.directive';
+import { NgDiagramNodeSelectedDirective } from './ng-diagram-node-selected.directive';
 
 @Component({
-  template: `<div [angularAdapterNodeSelected] [data]="data"></div>`,
-  imports: [NodeSelectedDirective],
+  template: `<div [ngDiagramNodeSelected] [data]="data"></div>`,
+  imports: [NgDiagramNodeSelectedDirective],
 })
 class TestComponent {
   data = {};
@@ -28,7 +28,7 @@ describe('NodeSelectedDirective', () => {
   });
 
   it('should create', () => {
-    const directive = fixture.debugElement.query(By.directive(NodeSelectedDirective));
+    const directive = fixture.debugElement.query(By.directive(NgDiagramNodeSelectedDirective));
     expect(directive).toBeTruthy();
   });
 

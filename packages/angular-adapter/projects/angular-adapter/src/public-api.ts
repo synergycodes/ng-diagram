@@ -2,19 +2,21 @@
  * Public API Surface of angular-adapter
  */
 
-export type { Edge, FlowCore, Metadata, Middleware, Node, Point } from '@angularflow/core';
-export * from './lib/components/diagram/angular-adapter-diagram.component';
+export type { Edge, FlowCore, GroupNode, Metadata, Middleware, Node, Point } from '@angularflow/core';
+export * from './lib/components/diagram/ng-diagram.component';
 export * from './lib/components/edge-label/base-edge-label.component';
 export * from './lib/components/edge/base-edge/base-edge.component';
-export * from './lib/components/node/resize/node-resize-adornment.component';
-export * from './lib/components/node/rotate/node-rotate-adornment.component';
-export * from './lib/components/palette/ng-diagram-palette-item-preview/ng-diagram-palette-item-preview.component';
-export * from './lib/components/palette/ng-diagram-palette-item/ng-diagram-palette-item.component';
-export * from './lib/components/port/angular-adapter-port.component';
+export * from './lib/components/node/resize/ng-diagram-node-resize-adornment.component';
+export * from './lib/components/node/rotate/ng-diagram-node-rotate-adornment.component';
+export * from './lib/components/palette/item-preview/ng-diagram-palette-item-preview.component';
+export * from './lib/components/palette/item/ng-diagram-palette-item.component';
+export * from './lib/components/port/ng-diagram-port.component';
 export * from './lib/directives';
 export * from './lib/ng-diagram.module';
-export * from './lib/services/';
+export * from './lib/services/ng-diagram.service';
 export * from './lib/types';
+export * from './lib/utils/create-middlewares';
+export * from './lib/utils/create-signal-model';
 export * from './lib/utils/get-path/get-bezier-path';
 export * from './lib/utils/get-path/get-orthogonal-path';
 export * from './lib/utils/get-path/get-straight-path';

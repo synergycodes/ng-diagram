@@ -1,8 +1,9 @@
 import { Directive, inject } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
+import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
 @Directive({
-  selector: '[angularAdapterZoomingPointer]',
+  selector: '[ngDiagramZoomingPointer]',
   host: {
     '(touchstart)': 'onTouchStart($event)',
     '(touchend)': 'onTouchEnd($event)',
@@ -13,6 +14,7 @@ export class ZoomingPointerDirective {
   static IsZoomingPointer = false;
 
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly inputEventsRouterService = inject(InputEventsRouterService);
 
   private touchCache: Touch[] = [];
   private lastDistance?: number;
@@ -59,7 +61,6 @@ export class ZoomingPointerDirective {
     }
 
     const flow = this.flowCoreProvider.provide();
-    let { x, y, scale } = flow.getState().metadata.viewport;
 
     // Calculate current center and distance
     const centerX = (this.touchCache[0].clientX + this.touchCache[1].clientX) / 2;
@@ -70,24 +71,16 @@ export class ZoomingPointerDirective {
     const distanceRatio = currentDistance / this.lastDistance;
     const zoomFactor = Math.min(Math.max(1 - flow.config.zoom.step, distanceRatio), 1 + flow.config.zoom.step);
 
-    // Apply zoom with center point preservation
-    const beforeZoomX = (centerX - x) / scale;
-    const beforeZoomY = (centerY - y) / scale;
-
-    scale *= zoomFactor;
-    scale = Math.min(Math.max(flow.config.zoom.min, scale), flow.config.zoom.max);
-
-    const afterZoomX = (centerX - x) / scale;
-    const afterZoomY = (centerY - y) / scale;
-
-    x += (afterZoomX - beforeZoomX) * scale;
-    y += (afterZoomY - beforeZoomY) * scale;
-
     // Update for next iteration
     this.lastDistance = currentDistance;
 
-    // Apply zoom
-    flow.commandHandler.emit('zoom', { x, y, scale });
+    const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
+    this.inputEventsRouterService.emit({
+      ...baseEvent,
+      name: 'zoom',
+      centerPoint: { x: centerX, y: centerY },
+      zoomFactor: zoomFactor,
+    });
   }
 
   private removeTouchFromCache(touch: Touch) {

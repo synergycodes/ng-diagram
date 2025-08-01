@@ -11,7 +11,7 @@ import {
 import { FlowCoreProviderService, PaletteService } from '../../../services';
 
 @Component({
-  selector: 'angular-adapter-palette-item-preview',
+  selector: 'ng-diagram-palette-item-preview',
   templateUrl: './ng-diagram-palette-item-preview.component.html',
   styleUrl: './ng-diagram-palette-item-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

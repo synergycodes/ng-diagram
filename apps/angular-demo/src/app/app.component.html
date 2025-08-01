@@ -1,9 +1,9 @@
-<div class="diagram-container" #diagramContainer>
-  <angular-adapter-diagram
-    [model]="model()"
+<div class="diagram-container">
+  <ng-diagram
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
-    [middlewares]="middlewares()"
+    [model]="model"
+    [config]="config"
     [debugMode]="debugMode()"
   />
   <app-toolbar (toggleDebugModeClick)="debugMode.set(!debugMode())" />

@@ -1,19 +1,17 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
-  EdgeTemplate,
-  EdgeTemplateMap,
-  Middleware,
+  createSignalModel,
+  NgDiagramComponent,
+  NgDiagramEdgeTemplate,
+  NgDiagramEdgeTemplateMap,
   NgDiagramModule,
-  NodeTemplateMap,
-  PaletteItem,
+  NgDiagramNodeTemplateMap,
+  NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
-import { SignalModelAdapter } from '@angularflow/angular-signals-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
-import { AppMiddlewares, appMiddlewares } from './flow/flow.config';
-import { FlowService } from './flow/flow.service';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -21,28 +19,27 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, NgDiagramModule],
+  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [FlowService],
 })
 export class AppComponent {
-  model = signal(new SignalModelAdapter<AppMiddlewares>());
-  nodeTemplateMap: NodeTemplateMap = nodeTemplateMap;
-  edgeTemplateMap: EdgeTemplateMap = new Map<string, Type<EdgeTemplate>>([
+  paletteModel: NgDiagramPaletteItem[] = paletteModel;
+  nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
+  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map<string, Type<NgDiagramEdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
     ['custom-bezier-edge', CustomBezierEdgeComponent],
   ]);
-  middlewares = signal<Middleware[]>(appMiddlewares);
-  paletteModel: PaletteItem[] = paletteModel;
+
   debugMode = signal(true);
 
-  constructor() {
-    this.setModel();
-  }
+  config = {
+    zoom: {
+      max: 2,
+    },
+  };
 
-  setModel() {
-    this.model().setMetadata((metadata) => ({ ...metadata, viewport: { x: 300, y: 0, scale: 1 } }));
-    this.model().setNodes([
+  model = createSignalModel({
+    nodes: [
       {
         id: '1',
         type: 'image',
@@ -51,39 +48,39 @@ export class AppComponent {
         resizable: true,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
-      // { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
-      // {
-      //   id: '4',
-      //   type: 'group',
-      //   isGroup: true,
-      //   position: { x: 100, y: 400 },
-      //   data: { title: 'Group 1' },
-      //   resizable: true,
-      // },
-      // {
-      //   id: '5',
-      //   type: 'group',
-      //   isGroup: true,
-      //   position: { x: 300, y: 400 },
-      //   data: { title: 'Group 2' },
-      //   resizable: true,
-      // },
-      // {
-      //   id: '6',
-      //   position: { x: 500, y: 400 },
-      //   data: {},
-      //   resizable: true,
-      //   rotatable: true,
-      // },
-      // {
-      //   id: '7',
-      //   position: { x: 800, y: 400 },
-      //   data: {},
-      //   resizable: true,
-      //   isGroup: true,
-      // },
-    ]);
-    this.model().setEdges([
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
+      {
+        id: '4',
+        type: 'group',
+        isGroup: true,
+        position: { x: 100, y: 400 },
+        data: { title: 'Group 1' },
+        resizable: true,
+      },
+      {
+        id: '5',
+        type: 'group',
+        isGroup: true,
+        position: { x: 300, y: 400 },
+        data: { title: 'Group 2' },
+        resizable: true,
+      },
+      {
+        id: '6',
+        position: { x: 500, y: 400 },
+        data: {},
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '7',
+        position: { x: 800, y: 400 },
+        data: {},
+        resizable: true,
+        isGroup: true,
+      },
+    ],
+    edges: [
       {
         id: '1',
         source: '1',
@@ -93,25 +90,26 @@ export class AppComponent {
         targetPort: 'port-left',
         type: 'custom-bezier-edge',
       },
-      // {
-      //   id: '2',
-      //   source: '2',
-      //   target: '3',
-      //   data: {},
-      //   sourcePort: 'port-right',
-      //   targetPort: 'port-left-1',
-      //   type: 'button-edge',
-      // },
-      // {
-      //   id: '4',
-      //   source: '2',
-      //   target: '3',
-      //   data: {},
-      //   sourceArrowhead: 'angularflow-arrow',
-      //   targetArrowhead: 'angularflow-arrow',
-      //   sourcePort: 'port-right',
-      //   targetPort: 'port-left-3',
-      // },
-    ]);
-  }
+      {
+        id: '2',
+        source: '2',
+        target: '3',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left-1',
+        type: 'button-edge',
+      },
+      {
+        id: '4',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left-3',
+      },
+    ],
+    metadata: { viewport: { x: 300, y: 0, scale: 1 } },
+  });
 }

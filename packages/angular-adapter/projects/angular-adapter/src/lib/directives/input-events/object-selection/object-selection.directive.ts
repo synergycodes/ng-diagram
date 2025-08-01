@@ -17,12 +17,12 @@ abstract class ObjectSelectionDirective {
       return;
     }
 
-    // Do we need it?
-    // if (event.selectHandled) {
-    //   return;
-    // }
+    // Prevent duplicate select events — without this, selection can toggle unintentionally.
+    if (event.selectHandled) {
+      return;
+    }
 
-    // event.selectHandled = true;
+    event.selectHandled = true;
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -41,14 +41,17 @@ abstract class ObjectSelectionDirective {
 @Directive()
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'diagram';
+  override readonly targetData = input.required<Node | Edge | undefined>();
 }
 
 @Directive()
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'edge';
+  override readonly targetData = input.required<Node | Edge | undefined>();
 }
 
 @Directive()
 export class NodeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'node';
+  override readonly targetData = input.required<Node | Edge | undefined>();
 }

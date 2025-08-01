@@ -3,7 +3,7 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 import { PaletteService } from '../../../services/palette/palette.service';
 
 @Directive({
-  selector: '[angularAdapterPaletteDrop]',
+  selector: '[ngDiagramPaletteDrop]',
   host: {
     '(drop)': 'onDrop($event)',
     '(dragover)': 'onDragOver($event)',

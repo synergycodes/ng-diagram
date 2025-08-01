@@ -3,4 +3,5 @@ export interface PointerInputEvent extends PointerEvent {
   zoomingHandled?: boolean;
   linkingHandled?: boolean;
   rotateHandled?: boolean;
+  selectHandled?: boolean;
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { InputEventsRouter } from '@angularflow/core';
 import { BrowserInputsHelpers } from './browser-inputs-helpers';
 
-type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent;
+type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent | TouchEvent;
 
 @Injectable({ providedIn: 'root' })
 export class InputEventsRouterService extends InputEventsRouter {

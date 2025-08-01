@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { DefaultEdgeComponent } from './default-edge.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AngularAdapterEdgeLabelComponent, Edge } from '../../../../public-api';
+import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
+import { DefaultEdgeComponent } from './default-edge.component';
 
 @Component({
   selector: 'angular-adapter-edge-label',
@@ -22,7 +23,7 @@ describe('DefaultEdgeComponent', () => {
     })
       .overrideComponent(DefaultEdgeComponent, {
         remove: {
-          imports: [AngularAdapterEdgeLabelComponent],
+          imports: [BaseEdgeLabelComponent],
         },
         add: {
           imports: [MockAngularAdapterEdgeLabelComponent],

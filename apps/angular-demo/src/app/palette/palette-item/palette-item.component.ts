@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { PaletteItem } from '@angularflow/angular-adapter';
+import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-palette-item',
@@ -8,6 +8,6 @@ import { PaletteItem } from '@angularflow/angular-adapter';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaletteItemComponent {
-  item = input.required<PaletteItem>();
+  item = input.required<NgDiagramPaletteItem>();
   nodeLabel = computed(() => this.item()?.data?.['label'] ?? 'Unknown');
 }

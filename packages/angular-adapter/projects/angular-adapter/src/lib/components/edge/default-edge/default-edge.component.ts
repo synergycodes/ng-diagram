@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Edge } from '@angularflow/core';
-import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
-import { EdgeTemplate } from '../../../types';
+import { NgDiagramEdgeTemplate } from '../../../types';
 import { getPath } from '../../../utils/get-path/get-path';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
 
 @Component({
   selector: 'angular-adapter-default-edge',
@@ -11,7 +11,7 @@ import { getPath } from '../../../utils/get-path/get-path';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BaseEdgeLabelComponent],
 })
-export class DefaultEdgeComponent implements EdgeTemplate {
+export class DefaultEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   path = computed(() => {

@@ -1,4 +1,5 @@
 export * from './cursor-position-tracker/cursor-position-tracker.directive';
+export * from './group-highlighted/ng-diagram-group-highlighted.directive';
 export * from './input-events/keyboard-inputs/keyboard-inputs.directive';
 export * from './input-events/linking/linking.directive';
 export * from './input-events/object-selection/object-selection.directive';
@@ -7,7 +8,7 @@ export * from './input-events/panning/panning.directive';
 export * from './input-events/zooming/zooming-pointer.directive';
 export * from './input-events/zooming/zooming-wheel.directive';
 export * from './node-position/node-position.directive';
-export * from './node-selected/node-selected.directive';
+export * from './node-selected/ng-diagram-node-selected.directive';
 export * from './node-size/node-size.directive';
 export * from './viewport/viewport.directive';
 export * from './z-index/z-index.directive';

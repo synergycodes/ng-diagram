@@ -6,7 +6,7 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
 import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
 @Directive({
-  selector: '[angularAdapterPanning]',
+  selector: '[ngDiagramPanning]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
     '(pointerup)': 'onPointerUp($event)',

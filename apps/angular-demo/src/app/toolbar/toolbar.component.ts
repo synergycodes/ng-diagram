@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { FlowService } from '../flow/flow.service';
+import { AppMiddlewares, NgDiagramService } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-toolbar',
@@ -9,24 +9,23 @@ import { FlowService } from '../flow/flow.service';
   styleUrl: './toolbar.component.scss',
 })
 export class ToolbarComponent {
-  private readonly flowCoreProvider = inject(FlowService);
+  private readonly ngDiagramService: NgDiagramService<AppMiddlewares> = inject(NgDiagramService<AppMiddlewares>);
 
   toggleDebugModeClick = output<void>();
 
   onTreeLayoutClick(): void {
-    this.flowCoreProvider.flowCore.layout('Tree');
+    this.ngDiagramService.layout('Tree');
   }
 
   onToggleGroupChildrenClick(): void {
-    const flowCore = this.flowCoreProvider.flowCore;
-    const model = flowCore.model;
+    const model = this.ngDiagramService.getModel();
     const metadata = model.getMetadata();
 
     const moveExtentEnabled = metadata.middlewaresConfig['group-children-move-extent'].enabled;
     const changeExtentEnabled = metadata.middlewaresConfig['group-children-change-extent'].enabled;
 
     // Toggle both middlewares
-    flowCore.updateMiddlewareConfig('group-children-move-extent', { enabled: !moveExtentEnabled });
-    flowCore.updateMiddlewareConfig('group-children-change-extent', { enabled: !changeExtentEnabled });
+    this.ngDiagramService.updateMiddlewareConfig('group-children-move-extent', { enabled: !moveExtentEnabled });
+    this.ngDiagramService.updateMiddlewareConfig('group-children-change-extent', { enabled: !changeExtentEnabled });
   }
 }

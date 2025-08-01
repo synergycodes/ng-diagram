@@ -3,6 +3,6 @@ import { BaseInputEvent } from '../../input-events.interface';
 
 export interface ZoomingEvent extends BaseInputEvent {
   name: 'zoom';
-  updatedViewport: Point;
-  updateScale: number;
+  centerPoint: Point;
+  zoomFactor: number;
 }

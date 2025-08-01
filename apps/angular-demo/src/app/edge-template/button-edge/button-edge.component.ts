@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { BaseEdgeComponent, BaseEdgeLabelComponent, Edge, EdgeTemplate } from '@angularflow/angular-adapter';
+import { BaseEdgeComponent, BaseEdgeLabelComponent, Edge, NgDiagramEdgeTemplate } from '@angularflow/angular-adapter';
 
 /**
  * The example below demonstrates how to create a custom edge with:
@@ -16,7 +16,7 @@ import { BaseEdgeComponent, BaseEdgeLabelComponent, Edge, EdgeTemplate } from '@
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BaseEdgeComponent, BaseEdgeLabelComponent],
 })
-export class ButtonEdgeComponent implements EdgeTemplate {
+export class ButtonEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   onButtonClick() {

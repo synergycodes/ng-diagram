@@ -2,24 +2,19 @@
   display: flex;
   width: 100%;
   height: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
 }
 
 .group-node {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 
   gap: 16px;
-  border-radius: 16px;
   background: rgba(255, 255, 255, 0.85);
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &[data-highlight='true'] {
-    background: rgba(221, 221, 221, 0.85);
-    border: 1px solid #000;
-  }
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .group-node-header {

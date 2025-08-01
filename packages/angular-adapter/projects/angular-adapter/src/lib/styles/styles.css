@@ -11,7 +11,9 @@
   --ngd-group-border-color-hover: var(--ngd-pt-stroke-primary-default);
   --ngd-group-border-color-highlight: var(--ngd-colors-acc1-500);
   --ngd-group-box-shadow-color-highlight: var(--ngd-colors-acc1-500-50);
+  --ngd-group-background-color-highlight: var(--ngd-colors-gray-400);
   --ngd-group-border-radius: 0.75rem;
+  --ngd-group-highlight-size: 1.25rem;
 
   --ngd-selected-node-box-shadow: 0 0 0 0.25rem var(--ngd-focus-ring-node-active);
   --ngd-selected-node-outline: 0.0625rem solid var(--ngd-node-stroke-primary-hover);
@@ -53,4 +55,20 @@
   outline: var(--ngd-port-border-size) solid var(--ngd-port-background-color-hover);
 
   box-shadow: 0 0 0 var(--ngd-port-border-size-hover) var(--ngd-port-border-color-hover);
+}
+
+.ng-diagram-node-wrapper {
+  &:not(.ng-diagram-node-selected) {
+    transition: box-shadow 0.1s ease-in-out;
+  }
+
+  &.ng-diagram-group-highlight,
+  &.ng-diagram-group.ng-diagram-group-highlight {
+    border-color: var(--ngd-group-border-color-highlight);
+    box-shadow: 0px 0px var(--ngd-group-highlight-size) 0px var(--ngd-group-box-shadow-color-highlight) inset;
+  }
+
+  &.ng-diagram-node-selected {
+    box-shadow: var(--ngd-selected-node-box-shadow);
+  }
 }
