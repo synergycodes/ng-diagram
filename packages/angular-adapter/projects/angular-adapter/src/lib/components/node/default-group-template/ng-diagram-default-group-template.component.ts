@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { GroupNode } from '@angularflow/core';
-import { NgDiagramNodeSelectedDirective } from '../../../directives';
+import { NgDiagramGroupHighlightedDirective, NgDiagramNodeSelectedDirective } from '../../../directives';
 import { NgDiagramNodeTemplate } from '../../../types';
 import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node-resize-adornment.component';
 
@@ -9,7 +9,7 @@ import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node
   templateUrl: './ng-diagram-default-group-template.component.html',
   styleUrls: ['./ng-diagram-default-group-template.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective],
+  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, NgDiagramGroupHighlightedDirective],
 })
 export class NgDiagramDefaultGroupTemplateComponent implements NgDiagramNodeTemplate<GroupNode> {
   isPaletteNode = input<boolean>(false);
