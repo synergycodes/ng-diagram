@@ -1,5 +1,5 @@
-@if (showAdornment()) {
-  <ng-diagram-rotate-handle [data]="nodeData()">
+@if (isRenderedOnCanvas() && showAdornment() && nodeData()) {
+  <ng-diagram-rotate-handle [data]="nodeData()!">
     <ng-content />
   </ng-diagram-rotate-handle>
 }

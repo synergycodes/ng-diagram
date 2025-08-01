@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injector, signal, Type } from '@angular/core';
 import {
   createSignalModel,
   NgDiagramComponent,
@@ -22,15 +22,8 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   private readonly injector = inject(Injector);
-
-  ngOnInit(): void {
-    //simulate model fetching
-    setTimeout(() => {
-      this.model = this.getModel();
-    }, 5000);
-  }
 
   paletteModel: NgDiagramPaletteItem[] = paletteModel;
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
@@ -47,7 +40,7 @@ export class AppComponent implements OnInit {
     },
   };
 
-  model = createSignalModel();
+  model = this.getModel();
 
   private getModel() {
     return createSignalModel(

@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 
-import { NgDiagramNodeComponent } from '../ng-diagram-node.component';
+import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramResizeHandleComponent } from './handle/ng-diagram-resize-handle.component';
 import { NgDiagramResizeLineComponent } from './line/ng-diagram-resize-line.component';
 import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment.types';
@@ -12,11 +12,9 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgDiagramResizeLineComponent, NgDiagramResizeHandleComponent],
 })
-export class NgDiagramNodeResizeAdornmentComponent {
-  private readonly nodeComponent = inject(NgDiagramNodeComponent);
-
-  nodeData = computed(() => this.nodeComponent.data());
-  showAdornment = computed(() => !!this.nodeData().resizable && this.nodeData().selected);
+export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
+  nodeData = computed(() => this.nodeComponent?.data());
+  showAdornment = computed(() => !!this.nodeData()?.resizable && this.nodeData()?.selected);
 
   linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
   handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];

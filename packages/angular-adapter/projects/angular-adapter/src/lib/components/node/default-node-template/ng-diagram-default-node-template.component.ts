@@ -24,7 +24,6 @@ import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node
 })
 export class NgDiagramDefaultNodeTemplateComponent implements NgDiagramNodeTemplate<SimpleNode> {
   data = input.required<Node>();
-  isPaletteNode = input<boolean>(false);
 
   label = computed(() => this.data().data['label'] || this.data().id);
   isSelected = computed(() => this.data().selected ?? false);

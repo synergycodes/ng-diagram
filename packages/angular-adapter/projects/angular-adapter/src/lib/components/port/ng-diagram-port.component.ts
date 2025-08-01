@@ -14,7 +14,7 @@ import { Port } from '@angularflow/core';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
 import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
-import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
+import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
 
 @Component({
   selector: 'ng-diagram-port',
@@ -24,47 +24,51 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
   host: {
     '[attr.data-port-id]': 'id()',
     '[class]': '`ng-diagram-port ${side()}`',
+    '[style.display]': 'isRenderedOnCanvas() ? "block" : "none"',
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['portId: id'] }],
 })
-export class NgDiagramPortComponent implements OnInit, OnDestroy {
+export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
-  private readonly nodeComponent = inject(NgDiagramNodeComponent);
   private readonly linkingInputDirective = inject(LinkingInputDirective);
 
   id = input.required<Port['id']>();
   type = input.required<Port['type']>();
   side = input.required<Port['side']>();
-  nodeData = computed(() => this.nodeComponent.data());
+  nodeData = computed(() => this.nodeComponent?.data());
 
   lastSide = signal<Port['side'] | undefined>(undefined);
   lastType = signal<Port['type'] | undefined>(undefined);
   private isInitialized = signal(false);
 
   constructor() {
+    super();
     effect(() => {
-      if (this.isInitialized() && this.lastSide() !== this.side()) {
+      const nodeData = this.nodeData();
+      if (this.isInitialized() && nodeData && this.lastSide() !== this.side()) {
         this.lastSide.set(this.side());
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-          nodeId: this.nodeData().id,
+          nodeId: nodeData.id,
           ports: [{ portId: this.id(), portChanges: { side: this.side() } }],
         });
       }
     });
 
     effect(() => {
-      if (this.isInitialized() && this.nodeData()) {
-        this.linkingInputDirective.setTargetNode(this.nodeData());
+      const nodeData = this.nodeData();
+      if (this.isInitialized() && nodeData) {
+        this.linkingInputDirective.setTargetNode(nodeData);
       }
     });
 
     effect(() => {
-      if (this.isInitialized() && this.lastType() !== this.type()) {
+      const nodeData = this.nodeData();
+      if (this.isInitialized() && this.lastType() !== this.type() && nodeData) {
         this.lastType.set(this.type());
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-          nodeId: this.nodeData().id,
+          nodeId: nodeData.id,
           ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
         });
       }
@@ -74,25 +78,34 @@ export class NgDiagramPortComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.lastSide.set(this.side());
     this.lastType.set(this.type());
+    const nodeData = this.nodeData();
+    if (!nodeData) {
+      return;
+    }
 
-    this.flowCoreProvider.provide().updater.addPort(this.nodeData().id, {
+    this.flowCoreProvider.provide().updater.addPort(nodeData.id, {
       id: this.id(),
       type: this.type(),
-      nodeId: this.nodeData().id,
+      nodeId: nodeData.id,
       side: this.side(),
     });
 
     this.batchResizeObserver.observe(this.hostElement.nativeElement, {
       type: 'port',
-      nodeId: this.nodeData().id,
+      nodeId: nodeData.id,
       portId: this.id(),
     });
     this.isInitialized.set(true);
   }
 
   ngOnDestroy(): void {
+    const nodeData = this.nodeData();
+    if (!nodeData) {
+      return;
+    }
+
     this.flowCoreProvider.provide().commandHandler.emit('deletePorts', {
-      nodeId: this.nodeData().id,
+      nodeId: nodeData.id,
       portIds: [this.id()],
     });
 

@@ -3,7 +3,6 @@ import { GroupNode, Node, SimpleNode } from '@angularflow/core';
 
 export interface NgDiagramNodeTemplate<NodeType extends Node = SimpleNode> {
   data: InputSignal<NodeType>;
-  isPaletteNode: InputSignal<boolean>;
 }
 
 export type NgDiagramNodeTemplateMap = Map<

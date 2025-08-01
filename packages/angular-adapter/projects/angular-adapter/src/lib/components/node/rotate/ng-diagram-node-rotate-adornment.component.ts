@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { NgDiagramNodeComponent } from '../ng-diagram-node.component';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handle.component';
 
 @Component({
@@ -12,11 +12,9 @@ import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handl
     class: 'node-rotate-adornment',
   },
 })
-export class NgDiagramNodeRotateAdornmentComponent {
-  private readonly nodeComponent = inject(NgDiagramNodeComponent);
-
-  readonly nodeData = computed(() => this.nodeComponent.data());
+export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase {
+  readonly nodeData = computed(() => this.nodeComponent?.data());
   readonly isRotating = signal(false);
   readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.nodeData() }));
-  readonly showAdornment = computed(() => !!this.nodeData().selected && this.nodeData().rotatable);
+  readonly showAdornment = computed(() => !!this.nodeData()?.selected && this.nodeData()?.rotatable);
 }
