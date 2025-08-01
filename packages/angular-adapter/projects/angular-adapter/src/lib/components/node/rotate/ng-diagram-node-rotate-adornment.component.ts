@@ -16,5 +16,7 @@ export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase 
   readonly nodeData = computed(() => this.nodeComponent?.data());
   readonly isRotating = signal(false);
   readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.nodeData() }));
-  readonly showAdornment = computed(() => !!this.nodeData()?.selected && this.nodeData()?.rotatable);
+  readonly showAdornment = computed(
+    () => !!this.nodeData()?.selected && this.nodeData()?.rotatable && this.isRenderedOnCanvas()
+  );
 }

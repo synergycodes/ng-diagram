@@ -14,7 +14,9 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
 })
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
   nodeData = computed(() => this.nodeComponent?.data());
-  showAdornment = computed(() => !!this.nodeData()?.resizable && this.nodeData()?.selected);
+  showAdornment = computed(
+    () => !!this.nodeData()?.resizable && this.nodeData()?.selected && this.isRenderedOnCanvas()
+  );
 
   linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
   handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];

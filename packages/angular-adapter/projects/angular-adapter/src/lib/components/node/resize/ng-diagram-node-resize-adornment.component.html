@@ -1,6 +1,6 @@
 <ng-content></ng-content>
 
-@if (isRenderedOnCanvas() && showAdornment() && nodeData()) {
+@if (showAdornment()) {
   @for (position of linePositions; track position) {
     <ng-diagram-resize-line [position]="position" [targetData]="nodeData()!" />
   }
