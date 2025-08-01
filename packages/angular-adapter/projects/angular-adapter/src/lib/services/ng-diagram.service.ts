@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import {
   Edge,
   EnvironmentInfo,
@@ -51,7 +51,7 @@ export class NgDiagramService<
    * Returns the current zoom scale
    */
   getScale() {
-    return this.flowCore.getScale();
+    return computed(() => this.flowCore.getScale());
   }
 
   /**
