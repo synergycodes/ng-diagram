@@ -7,7 +7,7 @@ import { GroupNode } from '@angularflow/core';
 import { NgDiagramGroupHighlightedDirective } from './ng-diagram-group-highlighted.directive';
 
 @Component({
-  template: `<div [angularAdapterGroupHighlighted] [data]="data"></div>`,
+  template: `<div [ngDiagramGroupHighlighted] [data]="data"></div>`,
   imports: [NgDiagramGroupHighlightedDirective],
 })
 class TestComponent {
