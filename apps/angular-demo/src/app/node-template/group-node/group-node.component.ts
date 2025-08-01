@@ -1,20 +1,20 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import {
   GroupHighlightedDirective,
-  NodeResizeAdornmentComponent,
-  NodeSelectedDirective,
-  NodeTemplate,
+  GroupNode,
+  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeSelectedDirective,
+  NgDiagramNodeTemplate,
 } from '@angularflow/angular-adapter';
-import { GroupNode } from '@angularflow/core';
 
 @Component({
   selector: 'app-group-node',
-  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective, GroupHighlightedDirective],
+  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, GroupHighlightedDirective],
   templateUrl: './group-node.component.html',
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupNodeComponent implements NodeTemplate<GroupNode> {
+export class GroupNodeComponent implements NgDiagramNodeTemplate<GroupNode> {
   data = input.required<GroupNode>();
   groupTitle = computed(() => this.data().data?.['title'] ?? 'Group');
   highlighted = computed(() => this.data().highlighted ?? false);

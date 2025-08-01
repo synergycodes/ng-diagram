@@ -2,7 +2,7 @@ import { Directive, inject } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 
 @Directive({
-  selector: '[angularAdapterZoomingPointer]',
+  selector: '[ngDiagramZoomingPointer]',
   host: {
     '(touchstart)': 'onTouchStart($event)',
     '(touchend)': 'onTouchEnd($event)',

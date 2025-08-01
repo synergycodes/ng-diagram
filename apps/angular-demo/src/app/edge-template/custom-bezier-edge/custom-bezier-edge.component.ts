@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
-import { AngularAdapterCustomEdgeComponent, Edge, EdgeTemplate, Point } from '@angularflow/angular-adapter';
+import { AngularAdapterCustomEdgeComponent, Edge, NgDiagramEdgeTemplate, Point } from '@angularflow/angular-adapter';
 
 /**
  * The example below demonstrates how to create a custom edge with:
@@ -16,7 +16,7 @@ import { AngularAdapterCustomEdgeComponent, Edge, EdgeTemplate, Point } from '@a
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AngularAdapterCustomEdgeComponent],
 })
-export class CustomBezierEdgeComponent implements EdgeTemplate {
+export class CustomBezierEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   points: Point[] = [];

@@ -4,7 +4,7 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 import { PointerInputEvent } from '../../../types';
 
 @Directive({
-  selector: '[angularAdapterLinkingInput]',
+  selector: '[ngDiagramLinkingInput]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

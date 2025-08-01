@@ -1,4 +1,5 @@
-<div>
-  <button (mousedown)="onTreeLayoutClick()">Tree Layout</button>
-  <button (mousedown)="onToggleGroupChildrenClick()">Toggle Group Children</button>
+<div style="display: flex; gap: 8px">
+  <button (click)="toggleDebugModeClick.emit()">Toggle debug mode</button>
+  <button (click)="onTreeLayoutClick()">Tree Layout</button>
+  <button (click)="onToggleGroupChildrenClick()">Toggle Group Children</button>
 </div>

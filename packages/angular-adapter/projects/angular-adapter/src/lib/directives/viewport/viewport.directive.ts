@@ -2,7 +2,7 @@ import { Directive, input } from '@angular/core';
 import { Viewport } from '@angularflow/core';
 
 @Directive({
-  selector: '[angularAdapterViewport]',
+  selector: '[ngDiagramViewport]',
   host: {
     '[style.transform]': '`translate(${viewport().x}px, ${viewport().y}px) scale(${viewport().scale})`',
   },

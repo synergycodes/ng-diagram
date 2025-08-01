@@ -10,6 +10,7 @@ export * from './command-handler.interface';
 // Model and middleware types
 export * from './middleware.interface';
 export * from './model-adapter.interface';
+export * from './model.interface';
 
 // Renderer types
 export * from './renderer.interface';

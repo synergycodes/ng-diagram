@@ -2,7 +2,7 @@ import { computed, Directive, input } from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
 @Directive({
-  selector: '[angularAdapterZIndex]',
+  selector: '[ngDiagramZIndex]',
   host: {
     '[style.z-index]': 'zIndex()',
   },

@@ -1,19 +1,19 @@
 import { Directive, ElementRef, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { AngularAdapterDiagramComponent } from '../../../components/diagram/angular-adapter-diagram.component';
+import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
 
 @Directive({
-  selector: '[angularAdapterRotateHandle]',
+  selector: '[ngDiagramRotateHandle]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
 export class RotateHandleDirective implements OnDestroy {
   private readonly elementRef = inject(ElementRef);
-  private readonly diagramComponent = inject(AngularAdapterDiagramComponent);
+  private readonly diagramComponent = inject(NgDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 

@@ -6,7 +6,7 @@ import { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
-  selector: '[angularAdapterPointerMoveSelection]',
+  selector: '[ngDiagramPointerMoveSelection]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },
@@ -72,10 +72,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
-    if (!this.shouldHandle(event)) {
-      return;
-    }
-
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,

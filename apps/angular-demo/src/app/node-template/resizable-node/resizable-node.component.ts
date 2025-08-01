@@ -2,27 +2,27 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  AngularAdapterPortComponent,
-  FlowCoreProviderService,
+  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeSelectedDirective,
+  NgDiagramNodeTemplate,
+  NgDiagramPortComponent,
+  NgDiagramService,
   Node,
-  NodeResizeAdornmentComponent,
-  NodeSelectedDirective,
-  NodeTemplate,
 } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-resizable-node',
-  imports: [FormsModule, DecimalPipe, AngularAdapterPortComponent, NodeResizeAdornmentComponent],
+  imports: [FormsModule, DecimalPipe, NgDiagramPortComponent, NgDiagramNodeResizeAdornmentComponent],
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: NodeSelectedDirective, inputs: ['data'] }],
+  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['data'] }],
   host: {
     '[class.ng-diagram-port-hoverable]': 'true',
   },
 })
-export class ResizableNodeComponent implements NodeTemplate {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+export class ResizableNodeComponent implements NgDiagramNodeTemplate {
+  private readonly ngDiagramService = inject(NgDiagramService);
 
   text = model<string>('');
   sizeText = model<string>('');
@@ -39,7 +39,7 @@ export class ResizableNodeComponent implements NodeTemplate {
       return;
     }
 
-    this.flowCoreProvider.provide().commandHandler.emit('resizeNode', {
+    this.ngDiagramService.getCommandHandler().emit('resizeNode', {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
@@ -49,7 +49,7 @@ export class ResizableNodeComponent implements NodeTemplate {
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
+    this.ngDiagramService.getCommandHandler().emit('updateNode', {
       id: this.data().id,
       nodeChanges: {
         autoSize: checked,

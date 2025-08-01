@@ -6,7 +6,7 @@ import { BatchResizeObserverService } from '../../services/flow-resize-observer/
 import { NodeSizeDirective } from './node-size.directive';
 
 @Component({
-  template: `<div angularAdapterNodeSize [data]="data"></div>`,
+  template: `<div ngDiagramNodeSize [data]="data"></div>`,
   imports: [NodeSizeDirective],
 })
 class TestComponent {

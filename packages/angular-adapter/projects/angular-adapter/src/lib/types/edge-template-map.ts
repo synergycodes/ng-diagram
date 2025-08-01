@@ -1,8 +1,8 @@
 import { InputSignal, Type } from '@angular/core';
 import { Edge } from '@angularflow/core';
 
-export interface EdgeTemplate {
+export interface NgDiagramEdgeTemplate {
   data: InputSignal<Edge>;
 }
 
-export type EdgeTemplateMap = Map<string, Type<EdgeTemplate>>;
+export type NgDiagramEdgeTemplateMap = Map<string, Type<NgDiagramEdgeTemplate>>;

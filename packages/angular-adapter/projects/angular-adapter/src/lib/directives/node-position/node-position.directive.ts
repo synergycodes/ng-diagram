@@ -2,7 +2,7 @@ import { computed, Directive, input } from '@angular/core';
 import { Node } from '@angularflow/core';
 
 @Directive({
-  selector: '[angularAdapterNodePosition]',
+  selector: '[ngDiagramNodePosition]',
   host: {
     '[style.transform]': '`translate(${position().x}px, ${position().y}px)`',
     '[style.transform-origin]': '"0 0"',

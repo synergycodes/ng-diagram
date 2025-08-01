@@ -49,7 +49,6 @@ Model Lookup maintains several data structures to access model data:
 ## Important Notes
 
 1. **Cache Management**
-
    - The descendants cache is cleared when the model state changes
    - Cache entries are computed only when required
 
