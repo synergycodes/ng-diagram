@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Injector, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   createSignalModel,
   NgDiagramComponent,
@@ -23,8 +23,6 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  private readonly injector = inject(Injector);
-
   paletteModel: NgDiagramPaletteItem[] = paletteModel;
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map<string, Type<NgDiagramEdgeTemplate>>([
@@ -40,85 +38,78 @@ export class AppComponent {
     },
   };
 
-  model = this.getModel();
-
-  private getModel() {
-    return createSignalModel(
+  model = createSignalModel({
+    nodes: [
       {
-        nodes: [
-          {
-            id: '1',
-            type: 'image',
-            position: { x: 100, y: 200 },
-            data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
-            resizable: true,
-          },
-          { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
-          { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
-          {
-            id: '4',
-            type: 'group',
-            isGroup: true,
-            position: { x: 100, y: 400 },
-            data: { title: 'Group 1' },
-            resizable: true,
-          },
-          {
-            id: '5',
-            type: 'group',
-            isGroup: true,
-            position: { x: 300, y: 400 },
-            data: { title: 'Group 2' },
-            resizable: true,
-          },
-          {
-            id: '6',
-            position: { x: 500, y: 400 },
-            data: {},
-            resizable: true,
-            rotatable: true,
-          },
-          {
-            id: '7',
-            position: { x: 800, y: 400 },
-            data: {},
-            resizable: true,
-            isGroup: true,
-          },
-        ],
-        edges: [
-          {
-            id: '1',
-            source: '1',
-            target: '2',
-            data: {},
-            sourcePort: 'port-right',
-            targetPort: 'port-left',
-            type: 'custom-bezier-edge',
-          },
-          {
-            id: '2',
-            source: '2',
-            target: '3',
-            data: {},
-            sourcePort: 'port-right',
-            targetPort: 'port-left-1',
-            type: 'button-edge',
-          },
-          {
-            id: '4',
-            source: '2',
-            target: '3',
-            data: {},
-            sourceArrowhead: 'angularflow-arrow',
-            targetArrowhead: 'angularflow-arrow',
-            sourcePort: 'port-right',
-            targetPort: 'port-left-3',
-          },
-        ],
-        metadata: { viewport: { x: 300, y: 0, scale: 1 } },
+        id: '1',
+        type: 'image',
+        position: { x: 100, y: 200 },
+        data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
+        resizable: true,
       },
-      this.injector
-    );
-  }
+      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
+      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
+      {
+        id: '4',
+        type: 'group',
+        isGroup: true,
+        position: { x: 100, y: 400 },
+        data: { title: 'Group 1' },
+        resizable: true,
+      },
+      {
+        id: '5',
+        type: 'group',
+        isGroup: true,
+        position: { x: 300, y: 400 },
+        data: { title: 'Group 2' },
+        resizable: true,
+      },
+      {
+        id: '6',
+        position: { x: 500, y: 400 },
+        data: {},
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '7',
+        position: { x: 800, y: 400 },
+        data: {},
+        resizable: true,
+        isGroup: true,
+      },
+    ],
+    edges: [
+      {
+        id: '1',
+        source: '1',
+        target: '2',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        type: 'custom-bezier-edge',
+      },
+      {
+        id: '2',
+        source: '2',
+        target: '3',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left-1',
+        type: 'button-edge',
+      },
+      {
+        id: '4',
+        source: '2',
+        target: '3',
+        data: {},
+        sourceArrowhead: 'angularflow-arrow',
+        targetArrowhead: 'angularflow-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left-3',
+      },
+    ],
+    metadata: { viewport: { x: 300, y: 0, scale: 1 } },
+  });
 }

@@ -2,7 +2,7 @@
   @for (paletteItem of model(); track paletteItem.type || $index) {
     <ng-diagram-palette-item [item]="paletteItem">
       <app-palette-item [item]="paletteItem" />
-      <ng-diagram-palette-item-preview [type]="paletteItem.type || ''">
+      <ng-diagram-palette-item-preview [scale]="scale()" [type]="paletteItem.type || ''">
         <app-palette-item-preview [item]="paletteItem" />
       </ng-diagram-palette-item-preview>
     </ng-diagram-palette-item>

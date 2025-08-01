@@ -8,7 +8,7 @@ import {
   Signal,
   viewChild,
 } from '@angular/core';
-import { FlowCoreProviderService, PaletteService } from '../../../services';
+import { PaletteService } from '../../../services';
 import { detectEnvironment } from '../../../utils/detect-environment';
 
 @Component({
@@ -18,9 +18,7 @@ import { detectEnvironment } from '../../../utils/detect-environment';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgDiagramPaletteItemPreviewComponent {
-  private flowCoreProvider = inject(FlowCoreProviderService);
   private paletteService = inject(PaletteService);
-
   private browser = detectEnvironment().browser;
 
   isSafari = this.browser === 'Safari';
@@ -29,8 +27,7 @@ export class NgDiagramPaletteItemPreviewComponent {
   preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
 
   type = input.required<string>();
+  scale = input.required<number>();
 
   isVisible = computed(() => (this.paletteService.draggedNode()?.type || '') === this.type());
-
-  scale = computed(() => this.flowCoreProvider.provide().getScale());
 }
