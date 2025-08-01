@@ -18,7 +18,7 @@ import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
 
 @Component({
   selector: 'ng-diagram-port',
-  templateUrl: './ng-diagram-port.component.html',
+  template: '',
   styleUrl: './ng-diagram-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
