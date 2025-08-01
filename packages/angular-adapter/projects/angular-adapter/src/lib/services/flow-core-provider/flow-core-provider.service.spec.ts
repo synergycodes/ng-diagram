@@ -6,7 +6,7 @@ import { InputEventsRouterService } from '../input-events/input-events-router.se
 import { RendererService } from '../renderer/renderer.service';
 import { FlowCoreProviderService } from './flow-core-provider.service';
 
-vi.mock('./detect-environment');
+vi.mock('../../utils/detect-environment');
 
 describe('FlowCoreProviderService', () => {
   const mockMiddlewares: [Middleware<'test'>] = [{ name: 'test', execute: vi.fn() }] as unknown as [Middleware<'test'>];
