@@ -4,10 +4,24 @@ import { ZoomingEvent } from './zooming.event';
 export class ZoomingEventHandler extends EventHandler<ZoomingEvent> {
   handle(event: ZoomingEvent): void {
     const {
-      updatedViewport: { x, y },
-      updateScale,
+      centerPoint: { x: centerX, y: centerY },
+      zoomFactor,
     } = event;
 
-    this.flow.commandHandler.emit('zoom', { x, y, scale: updateScale });
+    let { x, y, scale } = this.flow.getState().metadata.viewport;
+    // Apply zoom with center point preservation
+    const beforeZoomX = (centerX - x) / scale;
+    const beforeZoomY = (centerY - y) / scale;
+
+    scale *= zoomFactor;
+    scale = Math.min(Math.max(this.flow.config.zoom.min, scale), this.flow.config.zoom.max);
+
+    const afterZoomX = (centerX - x) / scale;
+    const afterZoomY = (centerY - y) / scale;
+
+    x += (afterZoomX - beforeZoomX) * scale;
+    y += (afterZoomY - beforeZoomY) * scale;
+
+    this.flow.commandHandler.emit('zoom', { x, y, scale: scale });
   }
 }
