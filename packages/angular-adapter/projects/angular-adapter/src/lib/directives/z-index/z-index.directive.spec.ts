@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ZIndexDirective } from './z-index.directive';
 
 @Component({
-  template: `<div [angularAdapterZIndex] [data]="data"></div>`,
+  template: `<div [ngDiagramZIndex] [data]="data"></div>`,
   imports: [ZIndexDirective],
 })
 class TestComponent {

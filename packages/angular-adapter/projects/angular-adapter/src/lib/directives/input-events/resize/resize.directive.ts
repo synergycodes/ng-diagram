@@ -4,7 +4,7 @@ import { Node, ResizeDirection } from '@angularflow/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
 @Directive({
-  selector: '[angularAdapterResize]',
+  selector: '[ngDiagramResize]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

@@ -13,9 +13,9 @@ import { Node } from '@angularflow/core';
 import { RotateHandleDirective } from '../../../../directives/input-events/rotate/rotate.directive';
 
 @Component({
-  selector: 'angular-adapter-rotate-handle',
-  templateUrl: './rotate-handle.component.html',
-  styleUrls: ['./rotate-handle.component.scss'],
+  selector: 'ng-diagram-rotate-handle',
+  templateUrl: './ng-diagram-rotate-handle.component.html',
+  styleUrls: ['./ng-diagram-rotate-handle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.rotate-handle]': '!hasCustomHandle',
@@ -23,7 +23,7 @@ import { RotateHandleDirective } from '../../../../directives/input-events/rotat
   },
   hostDirectives: [{ directive: RotateHandleDirective, inputs: ['target: data'] }],
 })
-export class RotateHandleComponent implements AfterContentInit {
+export class NgDiagramRotateHandleComponent implements AfterContentInit {
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
 
   data = input.required<Node>();

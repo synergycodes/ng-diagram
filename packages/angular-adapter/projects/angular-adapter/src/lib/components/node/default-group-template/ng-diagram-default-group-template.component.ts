@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { GroupNode } from '@angularflow/core';
-import { NodeSelectedDirective } from '../../../directives';
+import { NgDiagramNodeSelectedDirective } from '../../../directives';
 import { NgDiagramNodeTemplate } from '../../../types';
-import { NodeResizeAdornmentComponent } from '../resize/node-resize-adornment.component';
+import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node-resize-adornment.component';
 
 @Component({
-  selector: 'angular-adapter-default-group-template',
-  templateUrl: './default-group-template.component.html',
-  styleUrls: ['./default-group-template.component.scss'],
+  selector: 'ng-diagram-default-group-template',
+  templateUrl: './ng-diagram-default-group-template.component.html',
+  styleUrls: ['./ng-diagram-default-group-template.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NodeResizeAdornmentComponent, NodeSelectedDirective],
+  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective],
 })
-export class DefaultGroupTemplateComponent implements NgDiagramNodeTemplate<GroupNode> {
+export class NgDiagramDefaultGroupTemplateComponent implements NgDiagramNodeTemplate<GroupNode> {
   isPaletteNode = input<boolean>(false);
   data = input.required<GroupNode>();
 

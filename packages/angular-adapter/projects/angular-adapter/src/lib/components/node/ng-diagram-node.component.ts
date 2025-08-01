@@ -7,9 +7,9 @@ import { PointerMoveSelectionDirective } from '../../directives/input-events/poi
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 
 @Component({
-  selector: 'angular-adapter-node',
-  templateUrl: './angular-adapter-node.component.html',
-  styleUrl: './angular-adapter-node.component.scss',
+  selector: 'ng-diagram-node',
+  templateUrl: './ng-diagram-node.component.html',
+  styleUrl: './ng-diagram-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
@@ -19,7 +19,7 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
 })
-export class AngularAdapterNodeComponent {
+export class NgDiagramNodeComponent {
   private readonly portsService = inject(UpdatePortsService);
   private readonly flowCore = inject(FlowCoreProviderService);
 

@@ -6,7 +6,7 @@ import { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
-  selector: '[angularAdapterPointerMoveSelection]',
+  selector: '[ngDiagramPointerMoveSelection]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

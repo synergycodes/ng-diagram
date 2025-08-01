@@ -30,28 +30,28 @@ import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zoo
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
-import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
+import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
-import { AngularAdapterNodeComponent } from '../node/angular-adapter-node.component';
-import { DefaultGroupTemplateComponent } from '../node/default-group-template/default-group-template.component';
-import { DefaultNodeTemplateComponent } from '../node/default-node-template/default-node-template.component';
+import { NgDiagramDefaultGroupTemplateComponent } from '../node/default-group-template/ng-diagram-default-group-template.component';
+import { NgDiagramDefaultNodeTemplateComponent } from '../node/default-node-template/ng-diagram-default-node-template.component';
+import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
 
 @Component({
-  selector: 'angular-adapter-diagram',
+  selector: 'ng-diagram',
   imports: [
     CommonModule,
-    AngularAdapterCanvasComponent,
-    AngularAdapterNodeComponent,
+    NgDiagramCanvasComponent,
+    NgDiagramNodeComponent,
     AngularAdapterEdgeComponent,
     MarkerArrowComponent,
     DefaultEdgeComponent,
-    DefaultNodeTemplateComponent,
-    DefaultGroupTemplateComponent,
+    NgDiagramDefaultNodeTemplateComponent,
+    NgDiagramDefaultGroupTemplateComponent,
   ],
-  templateUrl: './angular-adapter-diagram.component.html',
-  styleUrl: './angular-adapter-diagram.component.scss',
+  templateUrl: './ng-diagram.component.html',
+  styleUrl: './ng-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     CursorPositionTrackerDirective,
@@ -62,7 +62,7 @@ import { DefaultNodeTemplateComponent } from '../node/default-node-template/defa
     PaletteDropDirective,
   ],
 })
-export class AngularAdapterDiagramComponent<
+export class NgDiagramComponent<
     TMiddlewares extends MiddlewareChain = [],
     TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
       Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>

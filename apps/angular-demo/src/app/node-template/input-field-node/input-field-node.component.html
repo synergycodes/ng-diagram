@@ -1,5 +1,5 @@
-<angular-adapter-node-rotate-adornment />
-<angular-adapter-node-resize-adornment>
+<ng-diagram-node-rotate-adornment />
+<ng-diagram-node-resize-adornment>
   <div class="input-field-node">
     <!-- we need to stop the event from propagating and reaching the document,
     otherwise event will be captured and send to Input Event Handler -->
@@ -16,7 +16,7 @@
     {{ text() }}
   </div>
   @if (!isPaletteNode()) {
-    <angular-adapter-port id="port-left" type="target" side="left" />
-    <angular-adapter-port id="port-right" type="source" side="right" />
+    <ng-diagram-port id="port-left" type="target" side="left" />
+    <ng-diagram-port id="port-right" type="source" side="right" />
   }
-</angular-adapter-node-resize-adornment>
+</ng-diagram-node-resize-adornment>
