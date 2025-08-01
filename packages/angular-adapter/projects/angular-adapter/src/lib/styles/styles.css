@@ -57,14 +57,14 @@
 }
 
 .ng-diagram-node .ng-diagram-group-highlight {
-  border: 1px solid var(--ngd-group-border-color-highlight) !important;
-  box-shadow: 0px 0px 19px 0px var(--ngd-group-box-shadow-color-highlight) inset !important;
+  border: 1px solid var(--ngd-group-border-color-highlight);
+  box-shadow: 0px 0px 19px 0px var(--ngd-group-box-shadow-color-highlight) inset;
 }
 
 .ng-diagram-node-selected {
-  box-shadow: var(--ngd-selected-node-box-shadow) !important;
+  box-shadow: var(--ngd-selected-node-box-shadow);
 }
 
 .ng-diagram-node-wrapper {
-  transition: box-shadow 0.1s ease-in-out !important;
+  transition: box-shadow 0.1s ease-in-out;
 }

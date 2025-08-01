@@ -5,6 +5,7 @@ import { GroupNode } from '@angularflow/core';
   selector: '[angularAdapterGroupHighlighted]',
   host: {
     '[class.ng-diagram-group-highlight]': 'highlighted()',
+    '[class.ng-diagram-node-wrapper]': 'true',
   },
 })
 export class GroupHighlightedDirective {
