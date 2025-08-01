@@ -4,14 +4,14 @@ import {
   groupChildrenMoveExtent,
   MiddlewareChain,
   nodePositionSnapMiddleware,
-  nodeRotationSnapMiddleware,
+  // nodeRotationSnapMiddleware,
   treeLayoutMiddleware,
   zIndexMiddleware,
 } from '@angularflow/core';
 
 export const BUILTIN_MIDDLEWARES = [
   zIndexMiddleware,
-  nodeRotationSnapMiddleware,
+  // nodeRotationSnapMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
   treeLayoutMiddleware,

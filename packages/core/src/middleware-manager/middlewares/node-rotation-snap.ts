@@ -6,6 +6,9 @@ export interface NodeRotationSnapMiddlewareMetadata {
   enabled: boolean;
 }
 
+/**
+ * @deprecated: We're moving snapping to the command handler.
+ */
 export const nodeRotationSnapMiddleware: Middleware<'node-rotation-snap', NodeRotationSnapMiddlewareMetadata> = {
   name: 'node-rotation-snap',
   defaultMetadata: {
