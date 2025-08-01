@@ -35,13 +35,11 @@ Separate the position and rotation transforms into nested DOM elements, where ea
 ### Implementation Details
 
 - **Position Wrapper**: Handles only the translation transform
-
   - Provides clean x,y coordinates
   - Position can be queried independently of rotation
   - `transform: translate(node.position.x, node.position.y)`
 
 - **Rotation Wrapper**: Handles only the rotation transform
-
   - Rotation happens in local coordinate space
   - Can work with different transform-origin values
   - `transform: rotate(${node.angle}deg)`

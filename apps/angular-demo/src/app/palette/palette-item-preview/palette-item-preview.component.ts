@@ -1,6 +1,6 @@
 import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { PaletteItem } from '@angularflow/angular-adapter';
+import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
 import { nodeTemplateMap } from '../../data/node-template';
 
 @Component({
@@ -10,6 +10,6 @@ import { nodeTemplateMap } from '../../data/node-template';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaletteItemPreviewComponent {
-  item = input.required<PaletteItem>();
+  item = input.required<NgDiagramPaletteItem>();
   componentType = computed(() => nodeTemplateMap.get(this.item().type || ''));
 }

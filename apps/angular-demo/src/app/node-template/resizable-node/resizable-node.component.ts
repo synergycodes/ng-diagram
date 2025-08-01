@@ -3,11 +3,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, model } fr
 import { FormsModule } from '@angular/forms';
 import {
   AngularAdapterPortComponent,
-  FlowCoreProviderService,
+  NgDiagramNodeTemplate,
+  NgDiagramService,
   Node,
   NodeResizeAdornmentComponent,
   NodeSelectedDirective,
-  NodeTemplate,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -21,8 +21,8 @@ import {
     '[class.ng-diagram-port-hoverable]': 'true',
   },
 })
-export class ResizableNodeComponent implements NodeTemplate {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+export class ResizableNodeComponent implements NgDiagramNodeTemplate {
+  private readonly ngDiagramService = inject(NgDiagramService);
 
   text = model<string>('');
   sizeText = model<string>('');
@@ -39,7 +39,7 @@ export class ResizableNodeComponent implements NodeTemplate {
       return;
     }
 
-    this.flowCoreProvider.provide().commandHandler.emit('resizeNode', {
+    this.ngDiagramService.getCommandHandler().emit('resizeNode', {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
@@ -49,7 +49,7 @@ export class ResizableNodeComponent implements NodeTemplate {
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.flowCoreProvider.provide().commandHandler.emit('updateNode', {
+    this.ngDiagramService.getCommandHandler().emit('updateNode', {
       id: this.data().id,
       nodeChanges: {
         autoSize: checked,

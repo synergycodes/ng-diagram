@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Node, SimpleNode } from '@angularflow/core';
 import { NodeSelectedDirective } from '../../../directives';
-import { NodeTemplate } from '../../../types';
+import { NgDiagramNodeTemplate } from '../../../types';
 import { AngularAdapterPortComponent } from '../../port/angular-adapter-port.component';
 import { NodeResizeAdornmentComponent } from '../resize/node-resize-adornment.component';
 import { NodeRotateAdornmentComponent } from '../rotate/node-rotate-adornment.component';
@@ -22,7 +22,7 @@ import { NodeRotateAdornmentComponent } from '../rotate/node-rotate-adornment.co
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class DefaultNodeTemplateComponent implements NodeTemplate<SimpleNode> {
+export class DefaultNodeTemplateComponent implements NgDiagramNodeTemplate<SimpleNode> {
   data = input.required<Node>();
   isPaletteNode = input<boolean>(false);
 

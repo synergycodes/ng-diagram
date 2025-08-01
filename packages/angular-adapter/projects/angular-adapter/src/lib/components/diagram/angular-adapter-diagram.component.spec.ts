@@ -1,9 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import type { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares } from '@angularflow/core';
-import { Middleware, ModelAdapter } from '@angularflow/core';
+import {
+  Metadata,
+  Middleware,
+  MiddlewareChain,
+  MiddlewaresConfigFromMiddlewares,
+  ModelAdapter,
+} from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
+import {
+  FlowCoreProviderService,
+  FlowResizeBatchProcessorService,
+  PaletteService,
+  RendererService,
+} from '../../services';
 import { AngularAdapterDiagramComponent } from './angular-adapter-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -55,6 +65,13 @@ describe('AngularAdapterDiagramComponent', () => {
             provide: vi.fn(),
           },
         },
+        {
+          provide: PaletteService,
+          useValue: {
+            onMouseDown: vi.fn(),
+            onDragStartFromPalette: vi.fn(),
+          },
+        },
       ],
     }).compileComponents();
 
@@ -72,7 +89,7 @@ describe('AngularAdapterDiagramComponent', () => {
     expect(component.nodeTemplateMap().size).toBe(0);
   });
 
-  it('should call flowCoreProvider.init only once with provided model', () => {
+  it('should call flowCoreProvider.init every time the model reference changes', () => {
     const spy = vi.spyOn(TestBed.inject(FlowCoreProviderService), 'init');
 
     fixture = TestBed.createComponent(AngularAdapterDiagramComponent);
@@ -84,7 +101,7 @@ describe('AngularAdapterDiagramComponent', () => {
     fixture.componentRef.setInput('model', { ...mockModel });
     fixture.detectChanges();
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 
   it('should call flowCoreProvider.init only once with provided middlewares', () => {

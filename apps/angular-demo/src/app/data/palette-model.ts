@@ -1,7 +1,7 @@
-import { PaletteItem } from '@angularflow/angular-adapter';
+import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
 import { NodeTemplateType } from './node-template';
 
-export const paletteModel: PaletteItem[] = [
+export const paletteModel: NgDiagramPaletteItem[] = [
   {
     type: NodeTemplateType.InputField,
     data: { label: 'Input Field' },

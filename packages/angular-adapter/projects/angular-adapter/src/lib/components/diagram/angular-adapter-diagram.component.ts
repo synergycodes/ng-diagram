@@ -7,18 +7,20 @@ import {
   inject,
   input,
   OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core';
-import {
-  Edge,
+import { Edge, Node } from '@angularflow/core';
+
+import type {
+  DeepPartial,
+  FlowConfig,
   FlowCore,
   Metadata,
   MiddlewareChain,
   MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
-  Node,
 } from '@angularflow/core';
-
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
@@ -26,7 +28,8 @@ import { PanningDirective } from '../../directives/input-events/panning/panning.
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
-import { EdgeTemplateMap, NodeTemplateMap } from '../../types';
+import { NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
+import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
 import { AngularAdapterCanvasComponent } from '../canvas/angular-adapter-canvas.component';
 import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
 import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
@@ -60,16 +63,23 @@ import { DefaultNodeTemplateComponent } from '../node/default-node-template/defa
   ],
 })
 export class AngularAdapterDiagramComponent<
-  TMiddlewares extends MiddlewareChain = [],
-  TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
-    Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
-  >,
-> implements OnDestroy
+    TMiddlewares extends MiddlewareChain = [],
+    TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
+      Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
+    >,
+  >
+  implements OnInit, OnDestroy
 {
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
+
+  private flowCore = signal<FlowCore | undefined>(undefined);
+
+  private initializedModel: TAdapter | null = null;
+
+  config = input<DeepPartial<FlowConfig>>();
 
   /**
    * The model to use in the diagram.
@@ -79,18 +89,18 @@ export class AngularAdapterDiagramComponent<
   /**
    * The starting middlewares to use in the Flow Core.
    */
-  middlewares = input<TMiddlewares>([] as unknown as TMiddlewares);
+  middlewares = input<TMiddlewares>(BUILTIN_MIDDLEWARES as unknown as TMiddlewares);
 
   /**
    * The node template map to use for the diagram.
    */
-  nodeTemplateMap = input<NodeTemplateMap>(new Map());
+  nodeTemplateMap = input<NgDiagramNodeTemplateMap>(new Map());
 
   /**
    * The edge template map to use for the diagram.
    * Optional - if not provided, default edge rendering will be used.
    */
-  edgeTemplateMap = input<EdgeTemplateMap>(new Map());
+  edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new Map());
 
   debugMode = input<boolean>(false);
 
@@ -98,27 +108,18 @@ export class AngularAdapterDiagramComponent<
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
-  private flowCore = signal<FlowCore | undefined>(undefined);
-
   constructor() {
-    this.getFlowOffset = this.getFlowOffset.bind(this);
+    effect(() => {
+      const model = this.model();
+      if (this.initializedModel != model) {
+        this.flowCoreProvider.destroy();
+        this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
 
-    // this effect was run every time nodes, edges or metadata changed - signals implementation of modelAdapter causes this?
-    // To fix this behavior we need to destroy the effect after the first run
-    const effectRef = effect(
-      () => {
-        // Bind getOffset once in the constructor and reuse the reference
-        this.flowCoreProvider.init(this.model(), this.middlewares(), this.getFlowOffset);
-        // Initialize the resize batch processor after FlowCore is ready
-        this.flowResizeBatchProcessor.initialize();
+        this.flowCore.set(this.flowCoreProvider.provide());
 
-        const flowCore = this.flowCoreProvider.provide();
-        this.flowCore.set(flowCore);
-
-        effectRef?.destroy();
-      },
-      { manualCleanup: true }
-    );
+        this.initializedModel = model;
+      }
+    });
 
     effect(() => {
       const flowCore = this.flowCore();
@@ -130,13 +131,12 @@ export class AngularAdapterDiagramComponent<
     });
   }
 
-  ngOnDestroy(): void {
-    this.flowCoreProvider.destroy();
+  ngOnInit(): void {
+    this.flowResizeBatchProcessor.initialize();
   }
 
-  getFlowOffset() {
-    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
-    return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
+  ngOnDestroy(): void {
+    this.flowCoreProvider.destroy();
   }
 
   getNodeTemplate(nodeType: Node['type']) {
@@ -153,4 +153,9 @@ export class AngularAdapterDiagramComponent<
   isGroup(node: Node) {
     return 'isGroup' in node;
   }
+
+  private getFlowOffset = () => {
+    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
+    return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
+  };
 }

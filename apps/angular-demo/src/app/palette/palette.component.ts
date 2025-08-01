@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
+  NgDiagramPaletteItem,
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
-  PaletteItem,
 } from '@angularflow/angular-adapter';
 import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
 import { PaletteItemComponent } from './palette-item/palette-item.component';
@@ -20,5 +20,5 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
   ],
 })
 export class PaletteComponent {
-  model = input.required<PaletteItem[]>();
+  model = input.required<NgDiagramPaletteItem[]>();
 }

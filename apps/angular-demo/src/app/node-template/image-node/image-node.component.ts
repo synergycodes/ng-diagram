@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import {
   AngularAdapterPortComponent,
+  NgDiagramNodeTemplate,
   Node,
   NodeRotateAdornmentComponent,
   NodeSelectedDirective,
-  NodeTemplate,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -18,7 +18,7 @@ import {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class ImageNodeComponent implements NodeTemplate {
+export class ImageNodeComponent implements NgDiagramNodeTemplate {
   data = input.required<Node>();
   imageUrl = computed(() => this.data().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
   isPaletteNode = input<boolean>(false);
