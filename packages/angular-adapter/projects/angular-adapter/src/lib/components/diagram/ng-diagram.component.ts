@@ -31,8 +31,10 @@ import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererServi
 import { NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
 import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
+import { BaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 import { DefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { MarkerArrowComponent } from '../edge/markers/marker-arrow.component';
+import { NgDiagramEdgeComponent } from '../edge/ng-diagram-edge.component';
 import { NgDiagramDefaultGroupTemplateComponent } from '../node/default-group-template/ng-diagram-default-group-template.component';
 import { NgDiagramDefaultNodeTemplateComponent } from '../node/default-node-template/ng-diagram-default-node-template.component';
 import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
@@ -47,6 +49,8 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
     DefaultEdgeComponent,
     NgDiagramDefaultNodeTemplateComponent,
     NgDiagramDefaultGroupTemplateComponent,
+    BaseEdgeComponent,
+    NgDiagramEdgeComponent,
   ],
   templateUrl: './ng-diagram.component.html',
   styleUrl: './ng-diagram.component.scss',

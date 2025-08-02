@@ -1,10 +1,12 @@
 <ng-diagram-canvas [viewport]="viewport()" [targetData]="undefined">
   @for (edge of edges(); track edge.id) {
-    @if (getEdgeTemplate(edge.type)) {
-      <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
-    } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
-      <angular-adapter-default-edge [data]="edge" />
-    }
+    <ng-diagram-edge>
+      @if (getEdgeTemplate(edge.type)) {
+        <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
+      } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
+        <angular-adapter-default-edge [data]="edge" />
+      }
+    </ng-diagram-edge>
   }
   <angular-adapter-marker-arrow />
   @for (node of nodes(); track node.id) {

@@ -141,7 +141,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       });
 
       flowCore.setState({ ...state, edges: updatedEdges });
-    }, true);
+    });
 
     const edgeLabelSizeInitializer = new BatchInitializer<Size>((edgeLabelSizeMap) => {
       const { edges, ...state } = flowCore.getState();
@@ -160,7 +160,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       }));
 
       flowCore.setState({ ...state, edges: updatedEdges });
-    }, true);
+    });
 
     const portInitializer = new BatchInitializer<Port>((portMap) => {
       const { nodes, ...state } = flowCore.getState();
