@@ -8,7 +8,7 @@
       }
     </ng-diagram-edge>
   }
-  <angular-adapter-marker-arrow />
+  <ng-diagram-marker-arrow />
   @for (node of nodes(); track node.id) {
     <ng-diagram-node class="ng-diagram-node" [attr.data-node-id]="node.id" [data]="node">
       @if (getNodeTemplate(node.type)) {

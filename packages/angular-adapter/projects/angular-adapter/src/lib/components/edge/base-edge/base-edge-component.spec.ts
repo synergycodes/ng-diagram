@@ -4,7 +4,7 @@ import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FlowCoreProviderService, RendererService } from '../../../services';
 import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
-import { BaseEdgeComponent } from './base-edge.component';
+import { NgDiagramBaseEdgeComponent } from './base-edge.component';
 
 @Component({
   selector: 'angular-adapter-custom-edge',
@@ -13,18 +13,18 @@ import { BaseEdgeComponent } from './base-edge.component';
 })
 class MockAngularAdapterEdgeLabelComponent {}
 
-describe('AngularAdapterCustomEdgeComponent', () => {
-  let component: BaseEdgeComponent;
-  let fixture: ComponentFixture<BaseEdgeComponent>;
+describe('NgDiagramBaseEdgeComponent', () => {
+  let component: NgDiagramBaseEdgeComponent;
+  let fixture: ComponentFixture<NgDiagramBaseEdgeComponent>;
   let mockEdge: Edge;
   let mockPath: string;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [FlowCoreProviderService, RendererService],
-      imports: [BaseEdgeComponent],
+      imports: [NgDiagramBaseEdgeComponent],
     })
-      .overrideComponent(BaseEdgeComponent, {
+      .overrideComponent(NgDiagramBaseEdgeComponent, {
         remove: {
           imports: [BaseEdgeLabelComponent],
         },
@@ -34,7 +34,7 @@ describe('AngularAdapterCustomEdgeComponent', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(BaseEdgeComponent);
+    fixture = TestBed.createComponent(NgDiagramBaseEdgeComponent);
     component = fixture.componentInstance;
 
     mockEdge = {
@@ -75,24 +75,13 @@ describe('AngularAdapterCustomEdgeComponent', () => {
     expect(component.path()).toBe('');
   });
 
-  it('should return proper color when edge is selected', () => {
-    mockEdge.selected = true;
-
-    fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', mockPath);
-    fixture.componentRef.setInput('points', mockEdge.points);
-    fixture.detectChanges();
-
-    expect(component.stroke()).toBe('#888');
-  });
-
   it('should return proper color when edge is not selected', () => {
     mockEdge.selected = false;
 
     fixture.componentRef.setInput('data', mockEdge);
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
-    fixture.componentRef.setInput('customStroke', 'red');
+    fixture.componentRef.setInput('stroke', 'red');
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('red');

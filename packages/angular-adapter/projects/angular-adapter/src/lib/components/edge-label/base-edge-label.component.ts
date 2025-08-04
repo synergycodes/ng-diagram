@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { EdgeLabel } from '@angularflow/core';
 import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
-import { BaseEdgeComponent } from '../edge/base-edge/base-edge.component';
+import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 
 @Component({
   selector: 'ng-diagram-base-edge-label',
@@ -26,7 +26,7 @@ import { BaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly hostElement = inject(ElementRef<HTMLElement>);
-  private readonly edgeComponent = inject(BaseEdgeComponent);
+  private readonly edgeComponent = inject(NgDiagramBaseEdgeComponent);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<EdgeLabel['id']>();

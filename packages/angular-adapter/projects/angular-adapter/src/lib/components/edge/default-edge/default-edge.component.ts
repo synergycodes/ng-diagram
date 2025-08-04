@@ -2,26 +2,24 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { Edge } from '@angularflow/core';
 import { NgDiagramEdgeTemplate } from '../../../types';
 import { getPath } from '../../../utils/get-path/get-path';
-import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
+import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
 
 @Component({
   selector: 'angular-adapter-default-edge',
   templateUrl: './default-edge.component.html',
-  styleUrl: './default-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent],
 })
-export class DefaultEdgeComponent implements NgDiagramEdgeTemplate {
+export class NgDiagramDefaultEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   path = computed(() => {
     const { routing, points } = this.data();
-
-    return getPath(routing, points || []);
+    return { path: getPath(routing, points || []), points: points || [] };
   });
 
   stroke = computed(() => (this.data().selected ? '#888' : '#bbb'));
-  markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null));
-  markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : null));
+  markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : undefined));
+  markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : undefined));
   strokeOpacity = computed(() => (this.data().temporary ? 0.5 : 1));
 }

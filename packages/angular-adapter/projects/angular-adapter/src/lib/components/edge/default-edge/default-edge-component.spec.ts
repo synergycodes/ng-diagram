@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
-import { DefaultEdgeComponent } from './default-edge.component';
+import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
+import { NgDiagramDefaultEdgeComponent } from './default-edge.component';
 
 @Component({
   selector: 'angular-adapter-edge-label',
@@ -12,18 +12,18 @@ import { DefaultEdgeComponent } from './default-edge.component';
 })
 class MockAngularAdapterEdgeLabelComponent {}
 
-describe('DefaultEdgeComponent', () => {
-  let component: DefaultEdgeComponent;
-  let fixture: ComponentFixture<DefaultEdgeComponent>;
+describe('NgDiagramDefaultEdgeComponent', () => {
+  let component: NgDiagramDefaultEdgeComponent;
+  let fixture: ComponentFixture<NgDiagramDefaultEdgeComponent>;
   let mockEdge: Edge;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DefaultEdgeComponent],
+      imports: [NgDiagramDefaultEdgeComponent],
     })
-      .overrideComponent(DefaultEdgeComponent, {
+      .overrideComponent(NgDiagramDefaultEdgeComponent, {
         remove: {
-          imports: [BaseEdgeLabelComponent],
+          imports: [NgDiagramBaseEdgeComponent],
         },
         add: {
           imports: [MockAngularAdapterEdgeLabelComponent],
@@ -31,7 +31,7 @@ describe('DefaultEdgeComponent', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(DefaultEdgeComponent);
+    fixture = TestBed.createComponent(NgDiagramDefaultEdgeComponent);
     component = fixture.componentInstance;
 
     mockEdge = {
@@ -67,7 +67,19 @@ describe('DefaultEdgeComponent', () => {
     fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.path()).toBe('M 10 20 L 30 40');
+    expect(component.path()).toStrictEqual({
+      path: 'M 10 20 L 30 40',
+      points: [
+        {
+          x: 10,
+          y: 20,
+        },
+        {
+          x: 30,
+          y: 40,
+        },
+      ],
+    });
   });
 
   it('should handle edge with no points', () => {
@@ -76,7 +88,10 @@ describe('DefaultEdgeComponent', () => {
     fixture.componentRef.setInput('data', mockEdge);
     fixture.detectChanges();
 
-    expect(component.path()).toBe('');
+    expect(component.path()).toStrictEqual({
+      path: '',
+      points: [],
+    });
   });
 
   it('should return proper color when edge is selected', () => {

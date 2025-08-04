@@ -3,7 +3,6 @@ import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 import { getPath } from '../../../utils/get-path/get-path';
-import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
 
 /**
  * To create an edge with a custom path, you must provide the `pathAndPoints` property.
@@ -29,9 +28,8 @@ import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.compone
     { directive: ZIndexDirective, inputs: ['data'] },
     { directive: EdgeSelectionDirective, inputs: ['targetData: data'] },
   ],
-  imports: [BaseEdgeLabelComponent],
 })
-export class BaseEdgeComponent {
+export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   data = input.required<Edge>();

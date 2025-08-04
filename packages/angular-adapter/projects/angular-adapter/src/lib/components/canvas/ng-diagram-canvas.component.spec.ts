@@ -12,7 +12,7 @@ import { NgDiagramCanvasComponent } from './ng-diagram-canvas.component';
 class MockAngularAdapterNodeComponent {}
 
 @Component({
-  selector: 'angular-adapter-edge',
+  selector: 'ng-diagram-edge',
   template: '<ng-content />',
 })
 class MockAngularAdapterEdgeComponent {}
@@ -22,7 +22,7 @@ class MockAngularAdapterEdgeComponent {}
   imports: [NgDiagramCanvasComponent, MockAngularAdapterNodeComponent, MockAngularAdapterEdgeComponent],
   template: `
     <ng-diagram-canvas>
-      <angular-adapter-edge></angular-adapter-edge>
+      <ng-diagram-edge></ng-diagram-edge>
       <ng-diagram-node>Node 1</ng-diagram-node>
       <ng-diagram-node>Node 2</ng-diagram-node>
     </ng-diagram-canvas>
@@ -78,7 +78,7 @@ describe('AngularAdapterCanvasComponent', () => {
     });
 
     it('should project edges into edges container', () => {
-      const edges = testFixture.debugElement.query(By.css('.edges-container')).queryAll(By.css('angular-adapter-edge'));
+      const edges = testFixture.debugElement.query(By.css('.edges-container')).queryAll(By.css('ng-diagram-edge'));
 
       expect(edges.length).toBe(1);
     });

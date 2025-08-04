@@ -1,13 +1,7 @@
-<svg>
-  <path
-    class="ng-diagram-edge__path"
-    [attr.d]="path()"
-    [attr.stroke]="stroke()"
-    [attr.fill]="'none'"
-    stroke-width="2"
-    [attr.marker-start]="markerStart()"
-    [attr.marker-end]="markerEnd()"
-    [attr.stroke-opacity]="strokeOpacity()"
-  />
-  <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
-</svg>
+<ng-diagram-base-edge
+  [data]="data()"
+  [pathAndPoints]="path()"
+  [stroke]="stroke()"
+  [customMarkerEnd]="markerEnd()"
+  [customMarkerStart]="markerStart()"
+></ng-diagram-base-edge>
