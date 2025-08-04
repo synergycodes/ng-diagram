@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import {
   BaseEdgeLabelComponent,
   Edge,
@@ -23,6 +23,9 @@ import {
 })
 export class ButtonEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
+
+  selected = computed(() => this.data().selected);
+  stroke = computed(() => (this.selected() ? 'var(--border-color-selected)' : 'var(--border-color)'));
 
   onButtonClick() {
     console.log('onClick');

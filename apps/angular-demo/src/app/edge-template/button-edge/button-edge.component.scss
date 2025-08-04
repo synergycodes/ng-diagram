@@ -1,3 +1,16 @@
+:host {
+  --border-color: red;
+  --border-color-selected: #9f0000;
+}
+
 button {
   pointer-events: all;
+  background-color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+
+  &.selected {
+    border-color: var(--border-color-selected);
+  }
 }

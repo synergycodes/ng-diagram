@@ -1,5 +1,5 @@
-<ng-diagram-base-edge [data]="data()" [routing]="'bezier'" [stroke]="'red'" [customMarkerEnd]="'ng-diagram-arrow'">
+<ng-diagram-base-edge [data]="data()" [routing]="'bezier'" [stroke]="stroke()" [customMarkerEnd]="'ng-diagram-arrow'">
   <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
-    <button (mousedown)="onButtonClick()">Test</button>
+    <button (mousedown)="onButtonClick()" [class]="selected() ? 'selected' : null">Test</button>
   </ng-diagram-base-edge-label>
 </ng-diagram-base-edge>
