@@ -1,5 +1,5 @@
 import { InputModifiers } from '@angularflow/core';
-import { getOS } from '../flow-core-provider/detect-environment';
+import { getOS } from '../../utils/detect-environment';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent | TouchEvent;
 

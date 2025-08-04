@@ -8,7 +8,8 @@ import {
   Signal,
   viewChild,
 } from '@angular/core';
-import { FlowCoreProviderService, PaletteService } from '../../../services';
+import { PaletteService } from '../../../services';
+import { detectEnvironment } from '../../../utils/detect-environment';
 
 @Component({
   selector: 'ng-diagram-palette-item-preview',
@@ -17,11 +18,8 @@ import { FlowCoreProviderService, PaletteService } from '../../../services';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgDiagramPaletteItemPreviewComponent {
-  private flowCoreProvider = inject(FlowCoreProviderService);
   private paletteService = inject(PaletteService);
-
-  private flowCore = this.flowCoreProvider.provide();
-  private browser = this.flowCore.getEnvironment().browser;
+  private browser = detectEnvironment().browser;
 
   isSafari = this.browser === 'Safari';
   isChrome = this.browser === 'Chrome';
@@ -29,8 +27,7 @@ export class NgDiagramPaletteItemPreviewComponent {
   preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
 
   type = input.required<string>();
+  scale = input.required<number>();
 
   isVisible = computed(() => (this.paletteService.draggedNode()?.type || '') === this.type());
-
-  scale = computed(() => this.flowCore.getScale());
 }

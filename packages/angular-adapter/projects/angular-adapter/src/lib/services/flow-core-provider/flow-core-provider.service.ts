@@ -9,9 +9,9 @@ import {
   ModelAdapter,
 } from '@angularflow/core';
 
+import { detectEnvironment } from '../../utils/detect-environment';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
 import { RendererService } from '../renderer/renderer.service';
-import { detectEnvironment } from './detect-environment';
 
 @Injectable()
 export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> {

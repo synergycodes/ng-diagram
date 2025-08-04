@@ -21,5 +21,4 @@ import {
 export class ImageNodeComponent implements NgDiagramNodeTemplate {
   data = input.required<Node>();
   imageUrl = computed(() => this.data().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
-  isPaletteNode = input<boolean>(false);
 }

@@ -12,7 +12,6 @@ import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node
   imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, NgDiagramGroupHighlightedDirective],
 })
 export class NgDiagramDefaultGroupTemplateComponent implements NgDiagramNodeTemplate<GroupNode> {
-  isPaletteNode = input<boolean>(false);
   data = input.required<GroupNode>();
 
   isSelected = computed(() => this.data().selected ?? false);
