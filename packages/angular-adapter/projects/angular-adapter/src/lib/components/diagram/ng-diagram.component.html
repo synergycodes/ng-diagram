@@ -4,7 +4,7 @@
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
       } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
-        <angular-adapter-default-edge [data]="edge" />
+        <ng-diagram-default-edge [data]="edge" />
       }
     </ng-diagram-edge>
   }
