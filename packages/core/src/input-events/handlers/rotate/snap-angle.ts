@@ -1,4 +1,4 @@
-import { clamp } from '../../../utils';
+import { NgDiagramMath } from '../../../math';
 import { normalizeAngle } from './normalize-angle';
 
 /** Epsilon for floating-point comparisons */
@@ -31,7 +31,7 @@ export function snapAngle(angle: number, step: number): number {
 
   const isAngleBellowOneStep = Math.abs(numberOfStepsToAdd) === 1 && Math.abs(angle) < step;
 
-  const snapIfLessThanDegrees = clamp({
+  const snapIfLessThanDegrees = NgDiagramMath.clamp({
     min: 1,
     max: step / 2 - 1,
     value: Math.floor(step / 2 - 1),

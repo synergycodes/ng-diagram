@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
+import { NgDiagramMath } from '../../../../math';
 import { mockNode } from '../../../../test-utils';
-import { getDistanceBetweenPoints } from '../../../../utils';
-import { getRotationAngle } from '../get-rotation-angle';
 import { RotateInputEvent } from '../rotate.event';
 import { RotateEventHandler } from '../rotate.handler';
 
 vi.mock('../get-rotation-angle');
-vi.mock('../../../../utils/get-distance-between-points');
+vi.mock('../../../../math', () => ({
+  NgDiagramMath: {
+    distanceBetweenPoints: vi.fn(),
+    angleBetweenPoints: vi.fn(),
+  },
+}));
 
 function getSampleRotateEvent(overrides: Partial<RotateInputEvent> = {}): RotateInputEvent {
   return {
@@ -48,7 +52,7 @@ describe('RotateEventHandler', () => {
 
   describe('handle', () => {
     it('should not emit if mouse is too close to center', () => {
-      (getDistanceBetweenPoints as unknown as ReturnType<typeof vi.fn>).mockReturnValue(10);
+      (NgDiagramMath.distanceBetweenPoints as unknown as ReturnType<typeof vi.fn>).mockReturnValue(10);
       const event = getSampleRotateEvent({ target: node });
 
       instance.handle(event);
@@ -56,8 +60,8 @@ describe('RotateEventHandler', () => {
     });
 
     it('should emit rotateNodeBy with correct params if distance is sufficient', () => {
-      vi.mocked(getDistanceBetweenPoints).mockReturnValue(50);
-      vi.mocked(getRotationAngle).mockReturnValue(42);
+      vi.mocked(NgDiagramMath.distanceBetweenPoints).mockReturnValue(50);
+      vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(42);
       const event = getSampleRotateEvent({ target: node });
 
       instance.handle(event);

@@ -1,5 +1,5 @@
+import { NgDiagramMath } from '../../../math';
 import { Point } from '../../../types';
-import { getDistanceBetweenPoints } from '../../../utils';
 
 interface RotationPoints {
   handle: Point;
@@ -27,9 +27,9 @@ export const getRotationAngle = (params: RotationPoints) => {
   const isAntiClockwise = getIsAnticlockwise(params);
   const { handle, center, pointer: mouse } = params;
 
-  const AB = Math.max(0.001, getDistanceBetweenPoints(center, handle));
-  const BC = Math.max(0.001, getDistanceBetweenPoints(center, mouse));
-  const AC = Math.max(0.001, getDistanceBetweenPoints(mouse, handle));
+  const AB = Math.max(0.001, NgDiagramMath.distanceBetweenPoints(center, handle));
+  const BC = Math.max(0.001, NgDiagramMath.distanceBetweenPoints(center, mouse));
+  const AC = Math.max(0.001, NgDiagramMath.distanceBetweenPoints(mouse, handle));
 
   const radians = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
   const degrees = (radians * 180) / Math.PI;

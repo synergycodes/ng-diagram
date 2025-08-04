@@ -1,3 +1,4 @@
+import { NgDiagramMath } from '../../../math';
 import { EventHandler } from '../event-hander';
 import { ZoomingEvent } from './zooming.event';
 
@@ -14,7 +15,11 @@ export class ZoomingEventHandler extends EventHandler<ZoomingEvent> {
     const beforeZoomY = (centerY - y) / scale;
 
     scale *= zoomFactor;
-    scale = Math.min(Math.max(this.flow.config.zoom.min, scale), this.flow.config.zoom.max);
+    scale = NgDiagramMath.clamp({
+      min: this.flow.config.zoom.min,
+      value: scale,
+      max: this.flow.config.zoom.max,
+    });
 
     const afterZoomX = (centerX - x) / scale;
     const afterZoomY = (centerY - y) / scale;
