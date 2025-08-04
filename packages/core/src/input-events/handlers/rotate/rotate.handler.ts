@@ -24,8 +24,6 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
     if (pointerToCenterDistance < MIN_DISTANCE_TO_CENTER) return;
 
     const angle = NgDiagramMath.angleBetweenPoints(handle, center, pointer);
-    console.log('Rotate angle:', angle, 'degrees');
-
     this.flow.commandHandler.emit('rotateNodeBy', {
       nodeId,
       angle,

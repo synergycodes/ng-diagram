@@ -1,4 +1,6 @@
+import { NgDiagramMath } from '../../math';
 import type { CommandHandler } from '../../types';
+import type { Node } from '../../types/node.interface';
 
 export interface RotateNodeByCommand {
   name: 'rotateNodeBy';
@@ -12,25 +14,47 @@ export const rotateNodeBy = async (commandHandler: CommandHandler, { nodeId, ang
     return;
   }
 
-  const { computeSnapAngleForNode, shouldSnapForNode, defaultSnapAngle } = commandHandler.flowCore.config.nodeRotation;
+  const { shouldSnapForNode } = commandHandler.flowCore.config.nodeRotation;
   if (shouldSnapForNode(node)) {
+    return await rotateNodeWithSnap(commandHandler, node, angle);
+  }
+
+  const nextAngle = NgDiagramMath.normalizeAngle((node.angle ?? 0) + angle);
+  await commandHandler.flowCore.applyUpdate(
+    {
+      nodesToUpdate: [
+        {
+          id: nodeId,
+          angle: nextAngle,
+        },
+      ],
+    },
+    'rotateNodeBy'
+  );
+};
+
+const rotateNodeWithSnap = async (commandHandler: CommandHandler, node: Node, angle: number) => {
+  const { computeSnapAngleForNode, defaultSnapAngle } = commandHandler.flowCore.config.nodeRotation;
+  const snapAngle = computeSnapAngleForNode(node) ?? defaultSnapAngle;
+
+  const nextAngle = NgDiagramMath.normalizeAngle((node.angle ?? 0) + angle);
+  const isSnapMeaningful = (nextAngle ?? 0) % snapAngle !== 0;
+
+  if (!isSnapMeaningful) {
     return;
   }
 
-  const snapAngle = computeSnapAngleForNode(node) ?? defaultSnapAngle;
-  // TODO: Calculate snapAngle
+  const snappedAngle = NgDiagramMath.snapAngle(nextAngle ?? 0, snapAngle);
 
-  return;
-
-  // await commandHandler.flowCore.applyUpdate(
-  //   {
-  //     nodesToUpdate: [
-  //       {
-  //         id: nodeId,
-  //         angle: normalizeAngle((node.angle ?? 0) + angle),
-  //       },
-  //     ],
-  //   },
-  //   'rotateNodeBy'
-  // );
+  await commandHandler.flowCore.applyUpdate(
+    {
+      nodesToUpdate: [
+        {
+          id: node.id,
+          angle: snappedAngle,
+        },
+      ],
+    },
+    'rotateNodeBy'
+  );
 };
