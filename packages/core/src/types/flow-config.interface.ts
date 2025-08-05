@@ -1,7 +1,7 @@
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
 import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface';
-import { Size } from './utils';
+import { Point, Size } from './utils';
 
 /**
  * Configuration for node resizing behavior.
@@ -109,6 +109,51 @@ export interface NodeRotationConfig {
 }
 
 /**
+ * Configuration for node dragging behavior.
+ */
+export interface SnappingConfig {
+  /**
+   * Determines if a node should snap to grid while dragging.
+   * @param node The node being dragged.
+   * @returns True if the node should snap to grid, false otherwise.
+   */
+  shouldSnapDragForNode: (node: Node) => boolean;
+
+  /**
+   * Determines if a node should snap to grid while resizing.
+   * @param node The node being resized.
+   * @returns True if the node should snap to grid, false otherwise.
+   */
+  shouldSnapResizeForNode: (node: Node) => boolean;
+
+  /**
+   * Computes the snap point for a node while dragging. If null is returned, a default snap point will be used.
+   * @param node The node to compute the snap point for dragging.
+   * @returns The snap point for the node while dragging, or null.
+   */
+  computeSnapForNodeDrag: (node: Node) => Point | null;
+
+  /**
+   * Computes the snap point for a node while resizing. If null is returned, a default snap point will be used.
+   * @param node The node to compute the snap point for resizing.
+   * @returns The snap point for the node while resizing, or null.
+   */
+  computeSnapForNodeSize: (node: Node) => Point | null;
+
+  /**
+   * The default snap point for node dragging.
+   * @default { x: 10, y: 10 }
+   */
+  defaultDragSnap: Point;
+
+  /**
+   * The default snap point for node resizing.
+   * @default { x: 10, y: 10 }
+   */
+  defaultResizeSnap: Point;
+}
+
+/**
  * Configuration for tree layout behavior.
  */
 export interface TreeLayoutConfig {
@@ -159,4 +204,5 @@ export interface FlowConfig {
 
   treeLayout: TreeLayoutConfig;
   nodeRotation: NodeRotationConfig;
+  snapping: SnappingConfig;
 }

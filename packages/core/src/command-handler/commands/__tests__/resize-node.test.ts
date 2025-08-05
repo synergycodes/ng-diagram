@@ -34,6 +34,10 @@ describe('Resize Node Command', () => {
         resize: {
           getMinNodeSize: vi.fn().mockReturnValue({ width: MIN_WIDTH, height: MIN_HEIGHT }),
         },
+        snapping: {
+          shouldSnapDragForNode: vi.fn().mockReturnValue(false),
+          shouldSnapResizeForNode: vi.fn().mockReturnValue(false),
+        },
       },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);

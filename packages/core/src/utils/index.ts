@@ -4,7 +4,6 @@ export * from './get-port-flow-position';
 export * from './group-size';
 export * from './rects-points-sizes';
 export * from './semaphore';
-export * from './snap-number';
 
 // Routing
 export * from './edges-orthogonal-routing';
