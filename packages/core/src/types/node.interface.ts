@@ -70,6 +70,13 @@ export interface SimpleNode {
    */
   angle?: number;
   /**
+   * The rotation center point as normalized values (0-1).
+   * If not specified, defaults to the node's center { x: 0.5, y: 0.5 }.
+   * Example: { x: 0, y: 0 } for top-left corner, { x: 1, y: 1 } for bottom-right.
+   * The actual pixel position is calculated as: position + size * rotationCenter
+   */
+  rotationCenter?: Point;
+  /**
    * The id of the parent node.
    */
   groupId?: Node['id'];

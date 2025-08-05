@@ -1,5 +1,6 @@
 import { Bounds, GroupNode, Node, Rect } from '../types';
 import { getBoundsFromRect, getRect, getRectFromBounds } from './rects-points-sizes';
+import { getRotatedNodeBounds } from './rotated-bounds';
 
 interface CalculateGroupRectOptions {
   useGroupRect?: boolean;
@@ -27,7 +28,8 @@ export const calculateGroupBounds = (
         throw new Error(`calculateGroupBounds: child node ${node.id} does not have both width and height defined`);
       }
 
-      const nodeBounds = getBoundsFromRect(getRect(node));
+      // Use rotated bounds if the node has an angle, otherwise use regular bounds
+      const nodeBounds = node.angle ? getRotatedNodeBounds(node) : getBoundsFromRect(getRect(node));
 
       acc.minX = Math.min(acc.minX, nodeBounds.minX);
       acc.minY = Math.min(acc.minY, nodeBounds.minY);

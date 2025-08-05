@@ -47,6 +47,8 @@ export class AppComponent {
         position: { x: 100, y: 200 },
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
         resizable: true,
+        rotatable: true,
+        rotationCenter: { x: 0.1, y: 0.1 }, // Rotate around point at 10% from top-left
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
       { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
@@ -57,6 +59,7 @@ export class AppComponent {
         position: { x: 100, y: 400 },
         data: { title: 'Group 1' },
         resizable: true,
+        size: { width: 300, height: 200 },
       },
       {
         id: '5',
@@ -69,9 +72,11 @@ export class AppComponent {
       {
         id: '6',
         position: { x: 500, y: 400 },
-        data: {},
+        data: { label: 'Bottom-right rotation' },
         resizable: true,
         rotatable: true,
+        size: { width: 150, height: 100 },
+        rotationCenter: { x: 1, y: 1 }, // Rotate around bottom-right corner
       },
       {
         id: '7',
@@ -79,6 +84,18 @@ export class AppComponent {
         data: {},
         resizable: true,
         isGroup: true,
+      },
+      {
+        id: '8',
+        type: 'resizable',
+        position: { x: 150, y: 450 },
+        data: { label: 'Rotated in group' },
+        resizable: true,
+        rotatable: true,
+        angle: 45,
+        size: { width: 100, height: 60 },
+        groupId: '4', // Add to Group 1
+        rotationCenter: { x: 0, y: 0.5 }, // Rotate around left-center edge
       },
     ],
     edges: [

@@ -88,10 +88,15 @@ export class RotateHandleDirective implements OnDestroy {
   private getNodeCenter() {
     const { x, y } = this.target().position;
     const { width, height } = this.target().size || { width: 0, height: 0 };
+    const { rotationCenter } = this.target();
+
+    // Use custom rotation center if specified (normalized 0-1), otherwise default to center (0.5, 0.5)
+    const centerX = rotationCenter ? rotationCenter.x : 0.5;
+    const centerY = rotationCenter ? rotationCenter.y : 0.5;
 
     return {
-      x: x + width / 2,
-      y: y + height / 2,
+      x: x + width * centerX,
+      y: y + height * centerY,
     };
   }
 }

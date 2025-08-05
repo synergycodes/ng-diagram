@@ -27,6 +27,15 @@ export class NgDiagramNodeComponent {
 
   readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
 
+  readonly transformOrigin = computed(() => {
+    const rotationCenter = this.data().rotationCenter;
+    if (rotationCenter) {
+      // Convert normalized values (0-1) to percentages
+      return `${rotationCenter.x * 100}% ${rotationCenter.y * 100}%`;
+    }
+    return '50% 50%'; // Default to center
+  });
+
   readonly id = computed(() => this.data().id);
   readonly size = computed(() => this.data().size);
 

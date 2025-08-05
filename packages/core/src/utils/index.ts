@@ -4,6 +4,7 @@ export * from './get-port-flow-position';
 export * from './group-size';
 export * from './is-group';
 export * from './rects-points-sizes';
+export * from './rotated-bounds';
 export * from './semaphore';
 
 // Routing
