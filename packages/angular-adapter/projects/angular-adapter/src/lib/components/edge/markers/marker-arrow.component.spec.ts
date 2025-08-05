@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MarkerArrowComponent } from './marker-arrow.component';
+import { NgDiagramMarkerArrowComponent } from './marker-arrow.component';
 
 describe('MarkerArrowComponent', () => {
-  let component: MarkerArrowComponent;
-  let fixture: ComponentFixture<MarkerArrowComponent>;
+  let component: NgDiagramMarkerArrowComponent;
+  let fixture: ComponentFixture<NgDiagramMarkerArrowComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MarkerArrowComponent],
+      imports: [NgDiagramMarkerArrowComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MarkerArrowComponent);
+    fixture = TestBed.createComponent(NgDiagramMarkerArrowComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -12,21 +12,21 @@ import {
 } from '@angular/core';
 import { EdgeLabel } from '@angularflow/core';
 import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
-import { AngularAdapterEdgeComponent } from '../edge/angular-adapter-edge.component';
+import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 
 @Component({
-  selector: 'angular-adapter-edge-label',
-  templateUrl: './angular-adapter-edge-label.component.html',
-  styleUrl: './angular-adapter-edge-label.component.scss',
+  selector: 'ng-diagram-base-edge-label',
+  templateUrl: './base-edge-label.component.html',
+  styleUrl: './base-edge-label.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.transform]': '`translate(${position().x}px, ${position().y}px) translate(-50%, -50%)`',
   },
 })
-export class AngularAdapterEdgeLabelComponent implements OnInit, OnDestroy {
+export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly hostElement = inject(ElementRef<HTMLElement>);
-  private readonly edgeComponent = inject(AngularAdapterEdgeComponent);
+  private readonly edgeComponent = inject(NgDiagramBaseEdgeComponent);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
   id = input.required<EdgeLabel['id']>();

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { ViewportDirective } from '../../directives';
-import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
+import { Edge, Node } from '@angularflow/core';
+import { DiagramSelectionDirective, ViewportDirective } from '../../directives';
 
 @Component({
   selector: 'ng-diagram-canvas',
@@ -10,7 +10,9 @@ import { ObjectSelectDirective } from '../../directives/input-events/object-sele
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     { directive: ViewportDirective, inputs: ['viewport'] },
-    { directive: ObjectSelectDirective, inputs: ['targetData', 'targetType'] },
+    { directive: DiagramSelectionDirective, inputs: ['targetData'] },
   ],
 })
-export class NgDiagramCanvasComponent {}
+export class NgDiagramCanvasComponent {
+  targetData = input.required<Node | Edge | undefined>();
+}

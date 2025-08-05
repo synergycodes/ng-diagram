@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FlowCoreProviderService, RendererService } from '../../../services';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
-import { AngularAdapterCustomEdgeComponent } from './custom-edge.component';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
+import { NgDiagramBaseEdgeComponent } from './base-edge.component';
 
 @Component({
   selector: 'angular-adapter-custom-edge',
@@ -13,20 +13,20 @@ import { AngularAdapterCustomEdgeComponent } from './custom-edge.component';
 })
 class MockAngularAdapterEdgeLabelComponent {}
 
-describe('AngularAdapterCustomEdgeComponent', () => {
-  let component: AngularAdapterCustomEdgeComponent;
-  let fixture: ComponentFixture<AngularAdapterCustomEdgeComponent>;
+describe('NgDiagramBaseEdgeComponent', () => {
+  let component: NgDiagramBaseEdgeComponent;
+  let fixture: ComponentFixture<NgDiagramBaseEdgeComponent>;
   let mockEdge: Edge;
   let mockPath: string;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [FlowCoreProviderService, RendererService],
-      imports: [AngularAdapterCustomEdgeComponent],
+      imports: [NgDiagramBaseEdgeComponent],
     })
-      .overrideComponent(AngularAdapterCustomEdgeComponent, {
+      .overrideComponent(NgDiagramBaseEdgeComponent, {
         remove: {
-          imports: [AngularAdapterEdgeLabelComponent],
+          imports: [BaseEdgeLabelComponent],
         },
         add: {
           imports: [MockAngularAdapterEdgeLabelComponent],
@@ -34,7 +34,7 @@ describe('AngularAdapterCustomEdgeComponent', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(AngularAdapterCustomEdgeComponent);
+    fixture = TestBed.createComponent(NgDiagramBaseEdgeComponent);
     component = fixture.componentInstance;
 
     mockEdge = {
@@ -75,24 +75,13 @@ describe('AngularAdapterCustomEdgeComponent', () => {
     expect(component.path()).toBe('');
   });
 
-  it('should return proper color when edge is selected', () => {
-    mockEdge.selected = true;
-
-    fixture.componentRef.setInput('data', mockEdge);
-    fixture.componentRef.setInput('path', mockPath);
-    fixture.componentRef.setInput('points', mockEdge.points);
-    fixture.detectChanges();
-
-    expect(component.stroke()).toBe('#888');
-  });
-
   it('should return proper color when edge is not selected', () => {
     mockEdge.selected = false;
 
     fixture.componentRef.setInput('data', mockEdge);
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
-    fixture.componentRef.setInput('customStroke', 'red');
+    fixture.componentRef.setInput('stroke', 'red');
     fixture.detectChanges();
 
     expect(component.stroke()).toBe('red');
@@ -118,12 +107,13 @@ describe('AngularAdapterCustomEdgeComponent', () => {
     expect(component.markerEnd()).toBe('url(#arrowhead)');
   });
 
-  it('should return proper stroke opacity when edge is temporary', () => {
+  it('should add class "temporary" when edge is temporary', () => {
     fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
-    expect(component.strokeOpacity()).toBe(0.5);
+    const pathElement = fixture.nativeElement.querySelector('path');
+    expect(pathElement.classList.contains('temporary')).toBe(true);
   });
 });

@@ -1,11 +1,11 @@
-<angular-adapter-custom-edge
+<ng-diagram-base-edge
+  class="custom-edge"
   [data]="data()"
   [routing]="'bezier'"
-  [customStroke]="'red'"
-  [customMarkerEnd]="'angularflow-arrow'"
-  [displayLabel]="false"
+  stroke="var(--border-color)"
+  [customMarkerEnd]="'ng-diagram-arrow'"
 >
-  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
+  <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
     <button (mousedown)="onButtonClick()">Test</button>
-  </angular-adapter-edge-label>
-</angular-adapter-custom-edge>
+  </ng-diagram-base-edge-label>
+</ng-diagram-base-edge>
