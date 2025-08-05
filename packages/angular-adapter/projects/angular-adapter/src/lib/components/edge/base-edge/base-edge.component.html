@@ -1,10 +1,10 @@
 <svg>
   <path
-    class="ng-diagram-edge__path"
+    [class]="`ng-diagram-edge__path ${selected() ? 'selected' : null} ${temporary() ? 'temporary' : null}`"
     [attr.d]="path()"
     [attr.stroke]="stroke()"
     [attr.fill]="'none'"
-    stroke-width="2"
+    [attr.stroke-width]="strokeWidth()"
     [attr.marker-start]="markerStart()"
     [attr.marker-end]="markerEnd()"
     [attr.stroke-opacity]="strokeOpacity()"

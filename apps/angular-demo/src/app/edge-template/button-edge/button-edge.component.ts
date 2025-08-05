@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import {
   BaseEdgeLabelComponent,
   Edge,
@@ -19,13 +19,13 @@ import {
   templateUrl: './button-edge.component.html',
   styleUrls: ['./button-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class ButtonEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   selected = computed(() => this.data().selected);
-  stroke = computed(() => (this.selected() ? 'var(--border-color-selected)' : 'var(--border-color)'));
 
   onButtonClick() {
     console.log('onClick');

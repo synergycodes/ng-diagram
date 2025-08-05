@@ -39,6 +39,8 @@ export class NgDiagramBaseEdgeComponent {
   stroke = input<string>();
   customMarkerStart = input<string>();
   customMarkerEnd = input<string>();
+  strokeOpacity = input<number>(1);
+  strokeWidth = input<number>(2);
 
   points = computed(() => (this.routing() ? this.data().points : (this.pathAndPoints()?.points ?? [])));
 
@@ -66,7 +68,8 @@ export class NgDiagramBaseEdgeComponent {
         : null
   );
 
-  strokeOpacity = computed(() => (this.data().temporary ? 0.5 : 1));
+  selected = computed(() => this.data().selected);
+  temporary = computed(() => this.data().temporary);
 
   labels = computed(() => this.data().labels ?? []);
 

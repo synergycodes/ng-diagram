@@ -1,16 +1,24 @@
-:host {
+:root {
   --border-color: red;
   --border-color-selected: #9f0000;
 }
 
-button {
-  pointer-events: all;
-  background-color: white;
-  border: 2px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
+.custom-edge {
+  &:has(.ng-diagram-edge__path.selected) {
+    .ng-diagram-edge__path.selected {
+      stroke: var(--border-color-selected);
+    }
 
-  &.selected {
-    border-color: var(--border-color-selected);
+    button {
+      border-color: var(--border-color-selected);
+    }
+  }
+
+  button {
+    pointer-events: all;
+    background-color: white;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
   }
 }

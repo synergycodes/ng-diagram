@@ -94,24 +94,6 @@ describe('NgDiagramDefaultEdgeComponent', () => {
     });
   });
 
-  it('should return proper color when edge is selected', () => {
-    mockEdge.selected = true;
-
-    fixture.componentRef.setInput('data', mockEdge);
-    fixture.detectChanges();
-
-    expect(component.stroke()).toBe('#888');
-  });
-
-  it('should return proper color when edge is not selected', () => {
-    mockEdge.selected = false;
-
-    fixture.componentRef.setInput('data', mockEdge);
-    fixture.detectChanges();
-
-    expect(component.stroke()).toBe('#bbb');
-  });
-
   it('should return proper marker when edge has source arrowhead', () => {
     mockEdge.sourceArrowhead = 'arrowhead';
 
@@ -128,13 +110,5 @@ describe('NgDiagramDefaultEdgeComponent', () => {
     fixture.detectChanges();
 
     expect(component.markerEnd()).toBe('url(#arrowhead)');
-  });
-
-  it('should return proper stroke opacity when edge is temporary', () => {
-    fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
-
-    fixture.detectChanges();
-
-    expect(component.strokeOpacity()).toBe(0.5);
   });
 });
