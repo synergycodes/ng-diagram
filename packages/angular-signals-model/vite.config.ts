@@ -10,6 +10,8 @@ export default defineConfig({
     reporters: ['default'],
   },
   build: {
+    sourcemap: process.env.NODE_ENV === 'development',
+    minify: process.env.NODE_ENV !== 'development',
     lib: {
       entry: 'src/index.ts',
       name: 'AngularSignalsModel',

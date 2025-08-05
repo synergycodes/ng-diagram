@@ -1,4 +1,5 @@
 {
+  "globalEnv": ["NODE_ENV"],
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
