@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import {
-  AngularAdapterCustomEdgeComponent,
-  AngularAdapterEdgeLabelComponent,
+  BaseEdgeLabelComponent,
   Edge,
+  NgDiagramBaseEdgeComponent,
   NgDiagramEdgeTemplate,
 } from '@angularflow/angular-adapter';
 
@@ -19,10 +19,13 @@ import {
   templateUrl: './button-edge.component.html',
   styleUrls: ['./button-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AngularAdapterCustomEdgeComponent, AngularAdapterEdgeLabelComponent],
+  encapsulation: ViewEncapsulation.None,
+  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class ButtonEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
+
+  selected = computed(() => this.data().selected);
 
   onButtonClick() {
     console.log('onClick');

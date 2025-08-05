@@ -1,9 +1,14 @@
+import { NgDiagramMath } from '../../math';
 import { GetPointOnPathImplementation } from './types';
 
 export const getPointOnOrthogonalPath: GetPointOnPathImplementation = ({ points, percentage }) => {
   if (points.length < 2) return { x: 0, y: 0 };
 
-  const finalPercentage = Math.min(Math.max(percentage, 0), 1);
+  const finalPercentage = NgDiagramMath.clamp({
+    min: 0,
+    value: percentage,
+    max: 1,
+  });
 
   // Step 1: Calculate segment lengths and total length
   const lengths: number[] = [];

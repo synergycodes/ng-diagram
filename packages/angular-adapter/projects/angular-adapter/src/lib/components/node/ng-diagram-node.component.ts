@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Node } from '@angularflow/core';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
-import { ObjectSelectDirective } from '../../directives/input-events/object-select/object-select.directive';
+import { NodeSelectionDirective } from '../../directives/input-events/object-selection/object-selection.directive';
 import { PointerMoveSelectionDirective } from '../../directives/input-events/pointer-move-selection/pointer-move-selection.directive';
 import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 
@@ -14,7 +14,7 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['data'] },
     { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: ObjectSelectDirective, inputs: ['targetData: data', 'targetType'] },
+    { directive: NodeSelectionDirective, inputs: ['targetData: data'] },
     { directive: PointerMoveSelectionDirective, inputs: ['targetData: data'] },
     { directive: ZIndexDirective, inputs: ['data'] },
   ],
@@ -24,7 +24,6 @@ export class NgDiagramNodeComponent {
   private readonly flowCore = inject(FlowCoreProviderService);
 
   data = input.required<Node>();
-  targetType = 'node';
 
   readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
 

@@ -1,3 +1,4 @@
+import { NgDiagramMath } from '../../math';
 import { GetPointOnPathImplementation } from './types';
 
 export const getPointOnBezierPath: GetPointOnPathImplementation = ({ points, percentage }) => {
@@ -12,7 +13,7 @@ export const getPointOnBezierPath: GetPointOnPathImplementation = ({ points, per
     return { x, y };
   }
 
-  const t = Math.min(Math.max(percentage, 0), 1);
+  const t = NgDiagramMath.clamp({ min: 0, value: percentage, max: 1 });
 
   // Cubic Bézier curve formula: B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
   const [p0, p1, p2, p3] = points;

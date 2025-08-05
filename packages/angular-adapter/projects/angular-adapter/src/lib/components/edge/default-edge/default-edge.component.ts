@@ -1,27 +1,26 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { Edge } from '@angularflow/core';
 import { NgDiagramEdgeTemplate } from '../../../types';
 import { getPath } from '../../../utils/get-path/get-path';
-import { AngularAdapterEdgeLabelComponent } from '../../edge-label/angular-adapter-edge-label.component';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
+import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
 
 @Component({
-  selector: 'angular-adapter-default-edge',
+  selector: 'ng-diagram-default-edge',
   templateUrl: './default-edge.component.html',
-  styleUrl: './default-edge.component.scss',
+  styleUrls: ['./default-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AngularAdapterEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  encapsulation: ViewEncapsulation.None,
 })
-export class DefaultEdgeComponent implements NgDiagramEdgeTemplate {
+export class NgDiagramDefaultEdgeComponent implements NgDiagramEdgeTemplate {
   data = input.required<Edge>();
 
   path = computed(() => {
     const { routing, points } = this.data();
-
-    return getPath(routing, points || []);
+    return { path: getPath(routing, points || []), points: points || [] };
   });
 
-  stroke = computed(() => (this.data().selected ? '#888' : '#bbb'));
-  markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : null));
-  markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : null));
-  strokeOpacity = computed(() => (this.data().temporary ? 0.5 : 1));
+  markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : undefined));
+  markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : undefined));
 }
