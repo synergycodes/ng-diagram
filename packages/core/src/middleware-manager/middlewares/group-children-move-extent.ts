@@ -21,7 +21,7 @@ export const groupChildrenMoveExtent: Middleware<
   defaultMetadata: {
     enabled: true,
   },
-  execute: ({ helpers, nodesMap, flowCore, middlewareMetadata }, next) => {
+  execute: ({ helpers, nodesMap, flowCore, middlewareMetadata, modelActionType }, next) => {
     const isEnabled = middlewareMetadata.enabled;
 
     if (!isEnabled) {
@@ -29,13 +29,13 @@ export const groupChildrenMoveExtent: Middleware<
       return;
     }
 
-    // Early exit if no relevant changes (including rotation)
-    if (!helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle'])) {
+    // Early exit if no relevant changes (including rotation) and not init
+    if (!helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle']) && modelActionType !== 'init') {
       next();
       return;
     }
 
-    const affectedGroups = findAffectedGroups(helpers, nodesMap);
+    const affectedGroups = findAffectedGroups(helpers, nodesMap, modelActionType);
     if (affectedGroups.size === 0) {
       next();
       return;
@@ -52,20 +52,35 @@ export const groupChildrenMoveExtent: Middleware<
 };
 
 /**
- * Find all groups that are affected by node position/size/angle changes
+ * Find all groups that are affected by node position/size/angle changes or during init
  */
-function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map<string, Node>): Set<GroupNode> {
+function findAffectedGroups(
+  helpers: MiddlewareContext['helpers'],
+  nodesMap: Map<string, Node>,
+  modelActionType: MiddlewareContext['modelActionType']
+): Set<GroupNode> {
   const affectedGroups = new Set<GroupNode>();
-  const changedNodeIds = helpers.getAffectedNodeIds(['position', 'size', 'angle']);
 
-  for (const nodeId of changedNodeIds) {
-    const node = nodesMap.get(nodeId);
-    if (!node?.groupId) continue;
+  if (modelActionType === 'init') {
+    // During init, check all groups
+    for (const node of nodesMap.values()) {
+      if (isGroup(node)) {
+        affectedGroups.add(node);
+      }
+    }
+  } else {
+    // For other actions, only check groups with changed children
+    const changedNodeIds = helpers.getAffectedNodeIds(['position', 'size', 'angle']);
 
-    const group = nodesMap.get(node.groupId);
+    for (const nodeId of changedNodeIds) {
+      const node = nodesMap.get(nodeId);
+      if (!node?.groupId) continue;
 
-    if (group && isGroup(group)) {
-      affectedGroups.add(group);
+      const group = nodesMap.get(node.groupId);
+
+      if (group && isGroup(group)) {
+        affectedGroups.add(group);
+      }
     }
   }
 

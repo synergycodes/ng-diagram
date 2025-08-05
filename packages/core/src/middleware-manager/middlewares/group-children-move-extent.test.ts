@@ -417,6 +417,46 @@ describe('groupChildrenMoveExtent Middleware', () => {
     });
   });
 
+  it('should handle init action and resize all groups', () => {
+    context.modelActionType = 'init';
+    helpers.checkIfAnyNodePropsChanged.mockReturnValue(false); // No changes, it's init
+
+    // Set up a group with a rotated child
+    nodesMap.set('node1', {
+      ...mockNode,
+      id: 'node1',
+      groupId: 'group1',
+      position: { x: 110, y: 110 },
+      size: { width: 100, height: 50 },
+      angle: 45, // Rotated node
+    });
+    nodesMap.set('group1', {
+      ...mockGroupNode,
+      id: 'group1',
+      position: { x: 100, y: 100 },
+      size: { width: 50, height: 50 }, // Too small for the rotated child
+    });
+
+    flowCore.modelLookup.getParentChain.mockReturnValue([]);
+    flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+
+    // Mock the group rect calculation to simulate proper size for rotated child
+    mockCalculateGroupRect.mockReturnValue({ x: 85, y: 85, width: 150, height: 150 });
+
+    groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      nodesToUpdate: [
+        {
+          id: 'group1',
+          position: { x: 85, y: 85 },
+          size: { width: 150, height: 150 },
+          autoSize: false,
+        },
+      ],
+    });
+  });
+
   it('should handle multiple nodes with different angles in the same group', () => {
     helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
     helpers.getAffectedNodeIds.mockReturnValue(['node1', 'node2']);

@@ -62,14 +62,6 @@ export class AppComponent {
         size: { width: 300, height: 200 },
       },
       {
-        id: '5',
-        type: 'group',
-        isGroup: true,
-        position: { x: 300, y: 400 },
-        data: { title: 'Group 2' },
-        resizable: true,
-      },
-      {
         id: '6',
         position: { x: 500, y: 400 },
         data: { label: 'Bottom-right rotation' },
