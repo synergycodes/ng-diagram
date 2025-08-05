@@ -1,9 +1,11 @@
 import { TransactionContext } from '../../../transaction-manager/transaction.types';
 import { Node } from '../../../types/node.interface';
-import { Point } from '../../../types/utils';
+import { Point, ScreenEdge } from '../../../types/utils';
 import { isGroup } from '../../../utils/is-group';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
+
+export const EDGE_PANNING_FORCE = 15;
 
 export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSelectionEvent> {
   private lastInputPoint: Point | undefined;
@@ -49,6 +51,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
           this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
         });
+        this.panDiagramOnScreenEdge(event.currentScreenEdge);
 
         this.lastInputPoint = event.lastInputPoint;
         break;
@@ -98,5 +101,46 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       groupId: topLevelGroupNode.id,
       nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
     });
+  }
+
+  private panDiagramOnScreenEdge(screenEdge: ScreenEdge) {
+    if (!screenEdge) {
+      return;
+    }
+    let x = 0;
+    let y = 0;
+    switch (screenEdge) {
+      case 'left':
+        x = EDGE_PANNING_FORCE;
+        break;
+      case 'right':
+        x = -EDGE_PANNING_FORCE;
+        break;
+      case 'top':
+        y = EDGE_PANNING_FORCE;
+        break;
+      case 'bottom':
+        y = -EDGE_PANNING_FORCE;
+        break;
+      case 'topleft':
+        x = EDGE_PANNING_FORCE;
+        y = EDGE_PANNING_FORCE;
+        break;
+      case 'topright':
+        x = -EDGE_PANNING_FORCE;
+        y = EDGE_PANNING_FORCE;
+        break;
+      case 'bottomleft':
+        x = EDGE_PANNING_FORCE;
+        y = -EDGE_PANNING_FORCE;
+        break;
+      case 'bottomright':
+        x = -EDGE_PANNING_FORCE;
+        y = -EDGE_PANNING_FORCE;
+        break;
+      default:
+        throw new Error(`Unknown screen edge: ${screenEdge}`);
+    }
+    this.flow.commandHandler.emit('moveViewportBy', { x, y });
   }
 }

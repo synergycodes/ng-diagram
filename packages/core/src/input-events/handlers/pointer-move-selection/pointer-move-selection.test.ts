@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockGroupNode, mockNode } from '../../../test-utils';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
-import { PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
+import { EDGE_PANNING_FORCE, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
 
 function getSamplePointerMoveSelectionEvent(
   overrides: Partial<PointerMoveSelectionEvent> = {}
@@ -22,6 +22,7 @@ function getSamplePointerMoveSelectionEvent(
       shift: false,
       meta: false,
     },
+    currentScreenEdge: null,
     ...overrides,
   };
 }
@@ -83,6 +84,17 @@ describe('PointerMoveSelectionEventHandler', () => {
         delta: { x: 10, y: 10 },
         nodes: [mockNode],
       });
+    });
+
+    it('should not pan during start phase even with screen edge', () => {
+      const event = getSamplePointerMoveSelectionEvent({
+        phase: 'start',
+        currentScreenEdge: 'left',
+      });
+
+      handler.handle(event);
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
     });
   });
 
@@ -251,6 +263,174 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
       });
     });
+
+    describe('screen edge panning', () => {
+      it('should pan left when dragging near left edge', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'left',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
+      });
+
+      it('should pan right when dragging near right edge', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'right',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: 0 });
+      });
+
+      it('should pan up when dragging near top edge', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'top',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: EDGE_PANNING_FORCE });
+      });
+
+      it('should pan down when dragging near bottom edge', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'bottom',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: -EDGE_PANNING_FORCE });
+      });
+
+      it('should pan diagonally when dragging near top-left corner', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'topleft',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: EDGE_PANNING_FORCE });
+      });
+
+      it('should pan diagonally when dragging near top-right corner', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'topright',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: EDGE_PANNING_FORCE });
+      });
+
+      it('should pan diagonally when dragging near bottom-left corner', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'bottomleft',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
+      });
+
+      it('should pan diagonally when dragging near bottom-right corner', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'bottomright',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
+      });
+
+      it('should not pan when currentScreenEdge is null', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: null,
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+        expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+      });
+
+      it('should both move nodes and pan viewport when dragging on screen edge', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'left',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
+      });
+
+      it('should handle multiple screen edge changes during drag', () => {
+        // First continue with left edge
+        const leftEvent = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 105, y: 105 },
+          currentScreenEdge: 'left',
+        });
+
+        handler.handle(leftEvent);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
+
+        // Reset mocks but keep the same mock implementation
+        mockEmit.mockClear();
+
+        // Then continue with right edge
+        const rightEvent = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'right',
+        });
+
+        handler.handle(rightEvent);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: 0 });
+      });
+
+      it('should not pan when no nodes are selected even with screen edge', () => {
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: 110, y: 110 },
+          currentScreenEdge: 'left',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+      });
+    });
   });
 
   describe('end phase', () => {
@@ -310,6 +490,17 @@ describe('PointerMoveSelectionEventHandler', () => {
         delta: { x: 20, y: 20 },
         nodes: [mockNode],
       });
+    });
+
+    it('should not pan during end phase even with screen edge', () => {
+      const event = getSamplePointerMoveSelectionEvent({
+        phase: 'end',
+        currentScreenEdge: 'left',
+      });
+
+      handler.handle(event);
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
     });
   });
 });

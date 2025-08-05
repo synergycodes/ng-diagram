@@ -154,6 +154,10 @@ export class NgDiagramComponent<
     return 'isGroup' in node;
   }
 
+  getBoundingClientRect() {
+    return this.elementRef.nativeElement.getBoundingClientRect();
+  }
+
   private getFlowOffset = () => {
     const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
     return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };

@@ -155,4 +155,37 @@ describe('AngularAdapterDiagramComponent', () => {
       expect(component.getEdgeTemplate('test-type')).toBe(mockTemplate);
     });
   });
+
+  describe('getBoundingClientRect', () => {
+    it('should return the element bounding client rect', () => {
+      const mockRect = {
+        left: 10,
+        top: 20,
+        right: 100,
+        bottom: 80,
+        width: 90,
+        height: 60,
+        x: 10,
+        y: 20,
+        toJSON: vi.fn(),
+      };
+
+      const getBoundingClientRectSpy = vi
+        .spyOn(fixture.nativeElement, 'getBoundingClientRect')
+        .mockReturnValue(mockRect);
+
+      const result = component.getBoundingClientRect();
+
+      expect(getBoundingClientRectSpy).toHaveBeenCalled();
+      expect(result).toBe(mockRect);
+    });
+
+    it('should call getBoundingClientRect on the native element', () => {
+      const getBoundingClientRectSpy = vi.spyOn(fixture.nativeElement, 'getBoundingClientRect');
+
+      component.getBoundingClientRect();
+
+      expect(getBoundingClientRectSpy).toHaveBeenCalledTimes(1);
+    });
+  });
 });

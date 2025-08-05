@@ -1,9 +1,12 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { Node, ScreenEdge } from '@angularflow/core';
+import { NgDiagramComponent } from '../../../../public-api';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
+
+const EDGE_PANNING_THRESHOLD = 10;
 
 @Directive({
   selector: '[ngDiagramPointerMoveSelection]',
@@ -13,6 +16,7 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
 })
 export class PointerMoveSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly diagramComponent = inject(NgDiagramComponent);
 
   targetData = input.required<Node>();
 
@@ -43,6 +47,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         x: event.clientX,
         y: event.clientY,
       },
+      currentScreenEdge: null,
     });
 
     document.addEventListener('pointermove', this.onPointerMove);
@@ -68,11 +73,13 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         x: event.clientX,
         y: event.clientY,
       },
+      currentScreenEdge: null,
     });
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    const screenEdge = this.isScreenEdge(event.clientX, event.clientY);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'pointerMoveSelection',
@@ -83,6 +90,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         x: event.clientX,
         y: event.clientY,
       },
+      currentScreenEdge: screenEdge,
     });
   };
 
@@ -92,5 +100,25 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     }
 
     return !(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+  }
+
+  private isScreenEdge(x: number, y: number): ScreenEdge {
+    const bbox = this.diagramComponent.getBoundingClientRect();
+    const localX = x - bbox.left;
+    const localY = y - bbox.top;
+    const innerWidth = bbox.width;
+    const innerHeight = bbox.height;
+
+    if (localX < EDGE_PANNING_THRESHOLD && localY < EDGE_PANNING_THRESHOLD) return 'topleft';
+    if (localX < EDGE_PANNING_THRESHOLD && localY > innerHeight - EDGE_PANNING_THRESHOLD) return 'bottomleft';
+    if (localX < EDGE_PANNING_THRESHOLD) return 'left';
+    if (localX > innerWidth - EDGE_PANNING_THRESHOLD && localY < EDGE_PANNING_THRESHOLD) return 'topright';
+    if (localX > innerWidth - EDGE_PANNING_THRESHOLD && localY > innerHeight - EDGE_PANNING_THRESHOLD)
+      return 'bottomright';
+    if (localX > innerWidth - EDGE_PANNING_THRESHOLD) return 'right';
+    if (localY < EDGE_PANNING_THRESHOLD) return 'top';
+    if (localY > innerHeight - EDGE_PANNING_THRESHOLD) return 'bottom';
+
+    return null;
   }
 }
