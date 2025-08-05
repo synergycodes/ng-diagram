@@ -23,6 +23,12 @@
       "interruptible": true,
       "dependsOn": ["^build"]
     },
+    "docs:dev": {
+      "cache": false,
+      "persistent": true,
+      "interruptible": true,
+      "dependsOn": ["^build"]
+    },
     "test": {
       "dependsOn": ["^test"],
       "outputs": []
