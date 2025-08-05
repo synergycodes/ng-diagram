@@ -25,5 +25,4 @@ import {
 export class InputFieldNodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');
   data = input.required<Node>();
-  isPaletteNode = input<boolean>(false);
 }

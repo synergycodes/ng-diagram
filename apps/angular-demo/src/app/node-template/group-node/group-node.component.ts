@@ -18,5 +18,4 @@ export class GroupNodeComponent implements NgDiagramNodeTemplate<GroupNode> {
   data = input.required<GroupNode>();
   groupTitle = computed(() => this.data().data?.['title'] ?? 'Group');
   highlighted = computed(() => this.data().highlighted ?? false);
-  isPaletteNode = input<boolean>(false);
 }

@@ -15,8 +15,6 @@
     />
     {{ text() }}
   </div>
-  @if (!isPaletteNode()) {
-    <ng-diagram-port id="port-left" type="target" side="left" />
-    <ng-diagram-port id="port-right" type="source" side="right" />
-  }
+  <ng-diagram-port id="port-left" type="target" side="left" />
+  <ng-diagram-port id="port-right" type="source" side="right" />
 </ng-diagram-node-resize-adornment>
