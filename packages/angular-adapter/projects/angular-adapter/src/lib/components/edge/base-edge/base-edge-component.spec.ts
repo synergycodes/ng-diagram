@@ -107,12 +107,13 @@ describe('NgDiagramBaseEdgeComponent', () => {
     expect(component.markerEnd()).toBe('url(#arrowhead)');
   });
 
-  it('should return proper stroke opacity when edge is temporary', () => {
+  it('should add class "temporary" when edge is temporary', () => {
     fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
-    expect(component.strokeOpacity()).toBe(0.5);
+    const pathElement = fixture.nativeElement.querySelector('path');
+    expect(pathElement.classList.contains('temporary')).toBe(true);
   });
 });

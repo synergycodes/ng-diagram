@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation 
 import { Edge } from '@angularflow/core';
 import { NgDiagramEdgeTemplate } from '../../../types';
 import { getPath } from '../../../utils/get-path/get-path';
+import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
 import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
 
 @Component({
@@ -9,7 +10,7 @@ import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
   templateUrl: './default-edge.component.html',
   styleUrls: ['./default-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgDiagramBaseEdgeComponent],
+  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
   encapsulation: ViewEncapsulation.None,
 })
 export class NgDiagramDefaultEdgeComponent implements NgDiagramEdgeTemplate {
