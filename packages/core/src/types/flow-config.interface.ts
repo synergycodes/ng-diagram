@@ -101,6 +101,11 @@ export interface NodeRotationConfig {
    * @returns The angle in degrees to snap to, or null if default snapping should be used.
    */
   computeSnapAngleForNode: (node: Node) => number | null;
+  /**
+   * The default snap angle in degrees. Used if computeSnapAngleForNode returns null.
+   * @default 15
+   */
+  defaultSnapAngle: number;
 }
 
 /**

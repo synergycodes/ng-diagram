@@ -73,6 +73,7 @@ const defaultNodeRotationConfig: NodeRotationConfig = {
   computeSnapAngleForNode: (): number | null => {
     return null;
   },
+  defaultSnapAngle: 30,
 };
 /**
  * Default configuration for the flow system.

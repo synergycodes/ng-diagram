@@ -1,5 +1,5 @@
-import { clamp } from '../../../utils';
-import { normalizeAngle } from './normalize-angle';
+import { clamp } from '../clamp/clamp';
+import { normalizeAngle } from '../normalize-angle/normalize-angle';
 
 /** Epsilon for floating-point comparisons */
 const EPSILON = 0.0001;
