@@ -1,8 +1,8 @@
 import { Edge, FlowStateUpdate, Middleware, ModelActionType, Node } from '../../../types';
 import { DEFAULT_SELECTED_Z_INDEX } from './constants.ts';
-import { initializeZIndex } from './utils/initialize-z-index.ts';
 import { assignEdgesZIndex, assignEdgeZIndex } from './utils/assign-edges-z-index.ts';
 import { assignNodeZIndex } from './utils/assign-node-z-index.ts';
+import { initializeZIndex } from './utils/initialize-z-index.ts';
 
 export interface ZIndexMiddlewareMetadata {
   enabled: boolean;
@@ -61,6 +61,10 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
     // Partial for Node
     if (shouldSnapSelectedNode) {
       for (const nodeId of helpers.getAffectedNodeIds(['selected'])) {
+        if (nodesWithZIndex.some((n) => n.id === nodeId)) {
+          // If the node is already processed, skip it
+          continue;
+        }
         const node = nodesMap.get(nodeId);
         if (!node) continue;
         const baseZIndex = node.selected
@@ -72,6 +76,10 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
       }
     } else if (shouldSnapGroupIdNode) {
       for (const nodeId of helpers.getAffectedNodeIds(['groupId'])) {
+        if (nodesWithZIndex.some((n) => n.id === nodeId)) {
+          // If the node is already processed, skip it
+          continue;
+        }
         const node = nodesMap.get(nodeId);
         if (!node || node?.selected) continue;
         const baseZIndex = node.groupId ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1 : 0;
