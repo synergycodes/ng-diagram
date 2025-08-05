@@ -1,4 +1,4 @@
-import { Directive, inject, input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Directive, inject, Injector, input, OnDestroy } from '@angular/core';
 import { Node, ScreenEdge } from '@angularflow/core';
 import { NgDiagramComponent } from '../../../../public-api';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
@@ -14,15 +14,21 @@ const EDGE_PANNING_THRESHOLD = 10;
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class PointerMoveSelectionDirective implements OnDestroy {
+export class PointerMoveSelectionDirective implements OnDestroy, AfterViewInit {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private readonly diagramComponent = inject(NgDiagramComponent);
+  private diagramComponent: NgDiagramComponent | null = null;
 
   targetData = input.required<Node>();
+
+  constructor(private readonly injector: Injector) {}
 
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+  }
+
+  ngAfterViewInit() {
+    this.diagramComponent = this.injector.get(NgDiagramComponent, null) as NgDiagramComponent | null;
   }
 
   onPointerDown(event: PointerInputEvent): void {
@@ -103,7 +109,10 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   private isScreenEdge(x: number, y: number): ScreenEdge {
-    const bbox = this.diagramComponent.getBoundingClientRect();
+    const bbox = this.diagramComponent?.getBoundingClientRect();
+    if (!bbox) {
+      return null;
+    }
     const localX = x - bbox.left;
     const localY = y - bbox.top;
     const innerWidth = bbox.width;
