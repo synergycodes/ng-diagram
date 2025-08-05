@@ -341,5 +341,123 @@ describe('Group Size Utils', () => {
         height: 150, // from y=-50 to y=100 (50 + 50)
       });
     });
+
+    it('should handle rotated child nodes', () => {
+      const group: GroupNode = {
+        ...mockGroupNode,
+        position: { x: 100, y: 100 },
+        size: { width: 200, height: 200 },
+      };
+
+      const childNodes: Node[] = [
+        {
+          ...mockNode,
+          position: { x: 150, y: 150 },
+          size: { width: 100, height: 50 },
+          angle: 90, // Rotated 90 degrees
+        },
+      ];
+
+      const rect = calculateGroupRect(childNodes, group);
+
+      // After 90-degree rotation, the 100x50 rectangle becomes 50x100
+      // Centered at (200, 175), so bounds are (175, 125) to (225, 225)
+      expect(rect).toEqual({
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+      });
+    });
+
+    it('should expand group to fit rotated child nodes', () => {
+      const group: GroupNode = {
+        ...mockGroupNode,
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+      };
+
+      const childNodes: Node[] = [
+        {
+          ...mockNode,
+          position: { x: 25, y: 25 },
+          size: { width: 50, height: 50 },
+          angle: 45, // Rotated 45 degrees
+        },
+      ];
+
+      const rect = calculateGroupRect(childNodes, group);
+
+      // 45-degree rotation of a square expands its bounds
+      // Group bounds should still encompass the rotated child
+
+      expect(rect.x).toBeCloseTo(0);
+      expect(rect.y).toBeCloseTo(0);
+      expect(rect.width).toBeCloseTo(100);
+      expect(rect.height).toBeCloseTo(100);
+    });
+
+    it('should handle child nodes with custom rotation centers', () => {
+      const group: GroupNode = {
+        ...mockGroupNode,
+        position: { x: 0, y: 0 },
+        size: { width: 200, height: 200 },
+      };
+
+      const childNodes: Node[] = [
+        {
+          ...mockNode,
+          position: { x: 50, y: 50 },
+          size: { width: 40, height: 20 },
+          angle: 90,
+          rotationCenter: { x: 0, y: 0 }, // Rotate around top-left corner
+        },
+      ];
+
+      const rect = calculateGroupRect(childNodes, group);
+
+      // Rotating around top-left corner keeps that point fixed
+      expect(rect.x).toBeCloseTo(0);
+      expect(rect.y).toBeCloseTo(0);
+      expect(rect.width).toBeCloseTo(200);
+      expect(rect.height).toBeCloseTo(200);
+    });
+
+    it('should handle multiple rotated nodes with different angles', () => {
+      const group: GroupNode = {
+        ...mockGroupNode,
+        position: { x: 0, y: 0 },
+        size: { width: 300, height: 300 },
+      };
+
+      const childNodes: Node[] = [
+        {
+          ...mockNode,
+          position: { x: 50, y: 50 },
+          size: { width: 50, height: 30 },
+          angle: 0, // No rotation
+        },
+        {
+          ...mockNode,
+          position: { x: 150, y: 150 },
+          size: { width: 50, height: 30 },
+          angle: 45, // 45-degree rotation
+        },
+        {
+          ...mockNode,
+          position: { x: 250, y: 250 },
+          size: { width: 50, height: 30 },
+          angle: 90, // 90-degree rotation
+        },
+      ];
+
+      const rect = calculateGroupRect(childNodes, group);
+
+      // Should encompass all rotated nodes
+      expect(rect.x).toBe(0);
+      expect(rect.y).toBe(0);
+      expect(rect.width).toBe(300);
+      expect(rect.height).toBe(300);
+    });
   });
 });

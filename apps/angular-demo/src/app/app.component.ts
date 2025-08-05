@@ -97,6 +97,18 @@ export class AppComponent {
         groupId: '4', // Add to Group 1
         rotationCenter: { x: 0, y: 0.5 }, // Rotate around left-center edge
       },
+      {
+        id: '9',
+        type: 'resizable',
+        position: { x: 250, y: 500 },
+        data: { label: 'Another rotated' },
+        resizable: true,
+        rotatable: true,
+        angle: -30,
+        size: { width: 80, height: 40 },
+        groupId: '4', // Also in Group 1
+        rotationCenter: { x: 0.5, y: 0.5 }, // Rotate around center
+      },
     ],
     edges: [
       {

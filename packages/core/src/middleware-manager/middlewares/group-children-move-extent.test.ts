@@ -380,4 +380,74 @@ describe('groupChildrenMoveExtent Middleware', () => {
       ],
     });
   });
+
+  it('should update group when child node angle changes', () => {
+    helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+    helpers.getAffectedNodeIds.mockReturnValue(['node1']);
+    nodesMap.set('node1', {
+      ...mockNode,
+      id: 'node1',
+      groupId: 'group1',
+      position: { x: 100, y: 100 },
+      size: { width: 100, height: 50 },
+      angle: 45, // Rotated node
+    });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    flowCore.modelLookup.getParentChain.mockReturnValue([]);
+    flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+
+    // Mock the group rect calculation to simulate expansion due to rotation
+    mockCalculateGroupRect.mockReturnValue({ x: 80, y: 80, width: 140, height: 140 });
+
+    groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+    // Should be called with angle as one of the checked properties
+    expect(helpers.checkIfAnyNodePropsChanged).toHaveBeenCalledWith(['position', 'size', 'angle']);
+    expect(helpers.getAffectedNodeIds).toHaveBeenCalledWith(['position', 'size', 'angle']);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      nodesToUpdate: [
+        {
+          id: 'group1',
+          position: { x: 80, y: 80 },
+          size: { width: 140, height: 140 },
+          autoSize: false,
+        },
+      ],
+    });
+  });
+
+  it('should handle multiple nodes with different angles in the same group', () => {
+    helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+    helpers.getAffectedNodeIds.mockReturnValue(['node1', 'node2']);
+    nodesMap.set('node1', {
+      ...mockNode,
+      id: 'node1',
+      groupId: 'group1',
+      angle: 0, // No rotation
+    });
+    nodesMap.set('node2', {
+      ...mockNode,
+      id: 'node2',
+      groupId: 'group1',
+      angle: 90, // 90-degree rotation
+    });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    flowCore.modelLookup.getParentChain.mockReturnValue([]);
+    flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1', 'node2']);
+    mockCalculateGroupRect.mockReturnValue({ x: 0, y: 0, width: 400, height: 400 });
+
+    groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      nodesToUpdate: [
+        {
+          id: 'group1',
+          position: { x: 0, y: 0 },
+          size: { width: 400, height: 400 },
+          autoSize: false,
+        },
+      ],
+    });
+  });
 });

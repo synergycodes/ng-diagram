@@ -29,8 +29,8 @@ export const groupChildrenMoveExtent: Middleware<
       return;
     }
 
-    // Early exit if no relevant changes
-    if (!helpers.checkIfAnyNodePropsChanged(['position', 'size'])) {
+    // Early exit if no relevant changes (including rotation)
+    if (!helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle'])) {
       next();
       return;
     }
@@ -52,11 +52,11 @@ export const groupChildrenMoveExtent: Middleware<
 };
 
 /**
- * Find all groups that are affected by node position/size changes
+ * Find all groups that are affected by node position/size/angle changes
  */
 function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map<string, Node>): Set<GroupNode> {
   const affectedGroups = new Set<GroupNode>();
-  const changedNodeIds = helpers.getAffectedNodeIds(['position', 'size']);
+  const changedNodeIds = helpers.getAffectedNodeIds(['position', 'size', 'angle']);
 
   for (const nodeId of changedNodeIds) {
     const node = nodesMap.get(nodeId);
