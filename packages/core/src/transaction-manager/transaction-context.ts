@@ -1,7 +1,7 @@
 import type { FlowCore } from '../flow-core';
 import { ModelActionType } from '../types';
+import type { TransactionCallback, TransactionContext, TransactionResult } from '../types/transaction.interface';
 import type { Transaction } from './transaction';
-import type { TransactionCallback, TransactionContext, TransactionResult } from './transaction.types';
 
 /**
  * Factory function to create a TransactionContext

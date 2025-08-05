@@ -1,7 +1,7 @@
 import type { FlowCore } from '../flow-core';
 import type { FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
+import type { TransactionContext } from '../types/transaction.interface';
 import { createTransactionContext } from './transaction-context';
-import type { TransactionContext } from './transaction.types';
 
 export interface TransactionState<TFlowCore extends FlowCore> {
   name: LooseAutocomplete<ModelActionType>;

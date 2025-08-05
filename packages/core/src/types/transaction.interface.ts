@@ -1,4 +1,4 @@
-import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
+import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType } from '.';
 
 export interface TransactionContext {
   // Command emission

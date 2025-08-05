@@ -1,5 +1,5 @@
-import { TransactionContext } from '../../../transaction-manager/transaction.types';
 import { Node } from '../../../types/node.interface';
+import { TransactionContext } from '../../../types/transaction.interface';
 import { Point } from '../../../types/utils';
 import { isGroup } from '../../../utils/is-group';
 import { EventHandler } from '../event-hander';
