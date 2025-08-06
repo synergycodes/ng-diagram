@@ -1,5 +1,5 @@
 import { Node } from '../../../../types';
-import { isGroup } from '../../../../utils/is-group';
+import { isGroup } from '../../../../utils';
 
 /**
  * Recursively assigns zIndex to the given node and its children, returning a flat array of nodes with assigned zIndex.

@@ -2,9 +2,9 @@ export * from './deep-merge';
 export * from './get-point-on-path/get-point-on-path';
 export * from './get-port-flow-position';
 export * from './group-size';
+export * from './is-group';
 export * from './rects-points-sizes';
 export * from './semaphore';
-export * from './snap-number';
 
 // Routing
 export * from './edges-orthogonal-routing';
