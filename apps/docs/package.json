@@ -15,9 +15,23 @@
     "check-types": "astro check"
   },
   "dependencies": {
+    "@analogjs/astro-angular": "^1.19.4",
+    "@angular-devkit/build-angular": "^20.1.4",
+    "@angular/animations": "^20.1.4",
+    "@angular/common": "^20.1.4",
+    "@angular/compiler": "^20.1.4",
+    "@angular/compiler-cli": "^20.1.4",
+    "@angular/core": "^20.1.4",
+    "@angular/language-service": "^20.1.4",
+    "@angular/platform-browser": "^20.1.4",
+    "@angular/platform-browser-dynamic": "^20.1.4",
+    "@angular/platform-server": "^20.1.4",
     "@astrojs/starlight": "^0.35.2",
     "astro": "^5.6.1",
-    "sharp": "^0.34.2"
+    "rxjs": "^7.8.2",
+    "sharp": "^0.34.2",
+    "tslib": "^2.8.1",
+    "zone.js": "^0.15.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
