@@ -12,7 +12,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
       case 'start': {
         const node = this.flow.getNodeById(event.target.id);
         if (node && node.size) {
-          this.flow.actionStateManager.setResizeState({
+          this.flow.actionStateManager.resize = {
             startX: x,
             startY: y,
             startWidth: node.size.width,
@@ -20,14 +20,14 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
             startNodePositionX: node.position.x,
             startNodePositionY: node.position.y,
             draggingNode: node,
-          });
+          };
         }
 
         break;
       }
 
       case 'continue': {
-        const resizeState = this.flow.actionStateManager.getResizeState();
+        const resizeState = this.flow.actionStateManager.resize;
         if (!resizeState) {
           break;
         }
@@ -94,7 +94,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
         break;
       }
       case 'end': {
-        this.flow.actionStateManager.clearResizeState();
+        this.flow.actionStateManager.clearResize();
         break;
       }
     }

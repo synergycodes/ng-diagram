@@ -1,67 +1,41 @@
 import type { ActionState, LinkingActionState, ResizeActionState } from '../types/action-state.interface';
 
+/**
+ * Manages temporary state during ongoing actions
+ * (e.g., resizing or linking) until the action completes.
+ */
 export class ActionStateManager {
-  private actionState: ActionState = {};
+  private state: ActionState = {};
 
-  /**
-   * Gets the current resize state
-   * @returns Current resize state or undefined
-   */
-  getResizeState(): ResizeActionState | undefined {
-    return this.actionState.resize;
+  get resize(): ResizeActionState | undefined {
+    return this.state.resize;
   }
 
-  /**
-   * Gets the current linking state
-   * @returns Current linking state or undefined
-   */
-  getLinkingState(): LinkingActionState | undefined {
-    return this.actionState.linking;
+  set resize(value: ResizeActionState | undefined) {
+    this.state.resize = value;
   }
 
-  /**
-   * Checks if resizing is currently active
-   * @returns True if resizing is active
-   */
+  get linking(): LinkingActionState | undefined {
+    return this.state.linking;
+  }
+
+  set linking(value: LinkingActionState | undefined) {
+    this.state.linking = value;
+  }
+
+  clearResize() {
+    this.state.resize = undefined;
+  }
+
+  clearLinking() {
+    this.state.linking = undefined;
+  }
+
   isResizing(): boolean {
-    return !!this.actionState.resize;
+    return !!this.state.resize;
   }
 
-  /**
-   * Checks if linking is currently active
-   * @returns True if linking is active
-   */
   isLinking(): boolean {
-    return !!this.actionState.linking;
-  }
-
-  /**
-   * Sets the resize state
-   * @param resizeState Resize state to set
-   */
-  setResizeState(resizeState: ResizeActionState): void {
-    this.actionState.resize = resizeState;
-  }
-
-  /**
-   * Sets the linking state
-   * @param linkingState Linking state to set
-   */
-  setLinkingState(linkingState: LinkingActionState): void {
-    this.actionState.linking = linkingState;
-  }
-
-  /**
-   * Clears the resize state
-   */
-  clearResizeState(): void {
-    this.actionState.resize = undefined;
-  }
-
-  /**
-   * Clears the linking state
-   */
-  clearLinkingState(): void {
-    this.actionState.linking = undefined;
+    return !!this.state.linking;
   }
 }

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockNode } from '../../../test-utils';
+import type { LinkingActionState } from '../../../types/action-state.interface';
 import { LinkingInputEvent } from './linking.event';
 import { LinkingEventHandler } from './linking.handler';
 
@@ -27,9 +28,9 @@ function getSampleLinkingEvent(overrides: Partial<LinkingInputEvent> = {}): Link
 describe('LinkingEventHandler', () => {
   const mockCommandHandler = { emit: vi.fn() };
   const mockActionStateManager = {
-    setLinkingState: vi.fn(),
-    getLinkingState: vi.fn().mockReturnValue(undefined),
-    clearLinkingState: vi.fn(),
+    linking: undefined as LinkingActionState | undefined,
+    clearLinking: vi.fn(),
+    isLinking: vi.fn(),
   };
   let mockFlowCore: FlowCore;
   let instance: LinkingEventHandler;
@@ -53,6 +54,8 @@ describe('LinkingEventHandler', () => {
   describe('handle', () => {
     describe('start phase', () => {
       it('should emit startLinking command when phase is start', () => {
+        const spy = vi.spyOn(mockFlowCore.actionStateManager, 'linking', 'set');
+
         const event = getSampleLinkingEvent({
           phase: 'start',
           target: { ...mockNode, id: 'node-1' },
@@ -65,7 +68,8 @@ describe('LinkingEventHandler', () => {
           source: 'node-1',
           sourcePort: 'port-1',
         });
-        expect(mockFlowCore.actionStateManager.setLinkingState).toHaveBeenCalledWith({
+
+        expect(spy).toHaveBeenCalledWith({
           sourceNodeId: 'node-1',
           sourcePortId: 'port-1',
         });
@@ -93,7 +97,8 @@ describe('LinkingEventHandler', () => {
         instance.handle(startEvent);
         vi.clearAllMocks();
 
-        mockActionStateManager.getLinkingState.mockReturnValue({ sourceNodeId: 'node-1', sourcePortId: 'port-1' });
+        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1' };
+        mockActionStateManager.isLinking.mockReturnValue(true);
       });
 
       it('should emit moveTemporaryEdge command with converted position', () => {
@@ -115,7 +120,8 @@ describe('LinkingEventHandler', () => {
       });
 
       it('should not emit when not linking', () => {
-        mockActionStateManager.getLinkingState.mockReturnValue(undefined);
+        mockActionStateManager.linking = undefined;
+        mockActionStateManager.isLinking.mockReturnValue(false);
 
         const event = getSampleLinkingEvent({
           phase: 'continue',
@@ -139,7 +145,8 @@ describe('LinkingEventHandler', () => {
         instance.handle(startEvent);
         vi.clearAllMocks();
 
-        mockActionStateManager.getLinkingState.mockReturnValue({ sourceNodeId: 'node-1', sourcePortId: 'port-1' });
+        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1' };
+        mockActionStateManager.isLinking.mockReturnValue(true);
       });
 
       it('should emit finishLinking command with converted position and set isLinking to false', () => {
@@ -158,11 +165,12 @@ describe('LinkingEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', {
           position: flowPosition,
         });
-        expect(mockFlowCore.actionStateManager.clearLinkingState).toHaveBeenCalled();
+        expect(mockActionStateManager.linking).toBe(undefined);
       });
 
       it('should not emit when not linking', () => {
-        mockActionStateManager.getLinkingState.mockReturnValue(undefined);
+        mockActionStateManager.linking = undefined;
+        mockActionStateManager.isLinking.mockReturnValue(false);
 
         const event = getSampleLinkingEvent({
           phase: 'end',
@@ -172,7 +180,7 @@ describe('LinkingEventHandler', () => {
         instance.handle(event);
 
         expect(mockCommandHandler.emit).not.toHaveBeenCalled();
-        expect(mockFlowCore.actionStateManager.clearLinkingState).not.toHaveBeenCalled();
+        expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
       });
     });
   });
