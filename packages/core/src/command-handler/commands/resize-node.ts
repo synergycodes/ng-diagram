@@ -103,6 +103,10 @@ export const resizeNode = async (commandHandler: CommandHandler, command: Resize
     return;
   }
 
+  if (!command.size) {
+    return;
+  }
+
   if (isSameSize(node.size, command.size) || (isGroup(node) && !node.selected)) {
     return;
   }
@@ -147,7 +151,7 @@ const handleGroupNodeResize = async (
     childrenBounds
   );
 
-  await appplySnappingIfNeeded(commandHandler, node, finalPosition ?? node.position, finalSize, true);
+  await appplySnappingIfNeeded(commandHandler, node, finalPosition, finalSize, true);
 };
 
 /**
@@ -167,29 +171,7 @@ const handleSingleNodeResize = async (commandHandler: CommandHandler, command: R
     node.position
   );
 
-  const updateData: Partial<Node> & { id: Node['id'] } = {
-    id: command.id,
-    size: constrainedSize,
-    ...(command.disableAutoSize !== undefined && { autoSize: !command.disableAutoSize }),
-  };
-
-  if (command.position) {
-    updateData.position = constrainedPosition;
-  }
-
-  await commandHandler.flowCore.applyUpdate(
-    {
-      nodesToUpdate: [updateData],
-    },
-    'resizeNode'
-  );
-  await appplySnappingIfNeeded(
-    commandHandler,
-    node,
-    constrainedPosition ?? node.position,
-    constrainedSize,
-    command.disableAutoSize
-  );
+  await appplySnappingIfNeeded(commandHandler, node, constrainedPosition, constrainedSize, command.disableAutoSize);
 };
 
 /**
@@ -212,23 +194,26 @@ const handleMissingInitialSize = async (commandHandler: CommandHandler, command:
 const appplySnappingIfNeeded = async (
   commandHandler: CommandHandler,
   node: Node,
-  nextPosition: Node['position'],
+  nextPosition: Node['position'] | undefined,
   nextSize: Node['size'],
   nextDisableAutoSize: boolean | undefined
 ) => {
   const flowConfig = commandHandler.flowCore.config;
 
   if (!flowConfig.snapping.shouldSnapResizeForNode(node)) {
+    const updateData: Partial<Node> & { id: Node['id'] } = {
+      id: node.id,
+      size: nextSize,
+      ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
+    };
+
+    if (nextPosition) {
+      updateData.position = nextPosition;
+    }
+
     return await commandHandler.flowCore.applyUpdate(
       {
-        nodesToUpdate: [
-          {
-            id: node.id,
-            size: nextSize,
-            position: nextPosition,
-            ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
-          },
-        ],
+        nodesToUpdate: [updateData],
       },
       'resizeNode'
     );
@@ -239,13 +224,13 @@ const appplySnappingIfNeeded = async (
 const computeAndApplySnapping = async (
   commandHandler: CommandHandler,
   node: Node,
-  nextPosition: Node['position'],
+  nextPosition: Node['position'] | undefined,
   nextSize: Node['size'],
   nextDisableAutoSize: boolean | undefined
 ) => {
   const { computeSnapForNodeSize, defaultResizeSnap } = commandHandler.flowCore.config.snapping;
   const snapping = computeSnapForNodeSize(node) ?? defaultResizeSnap;
-  const snappedPosition = NgDiagramMath.snapPoint(nextPosition, snapping);
+  const snappedPosition = nextPosition && NgDiagramMath.snapPoint(nextPosition, snapping);
 
   // For groups, use simpler snapping since their bounds are constrained by children
   if (isGroup(node)) {
@@ -254,16 +239,19 @@ const computeAndApplySnapping = async (
       height: NgDiagramMath.snapNumber(nextSize!.height, snapping.y),
     };
 
+    const updateData: Partial<Node> & { id: Node['id'] } = {
+      id: node.id,
+      size: snappedSize,
+      ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
+    };
+
+    if (snappedPosition) {
+      updateData.position = snappedPosition;
+    }
+
     await commandHandler.flowCore.applyUpdate(
       {
-        nodesToUpdate: [
-          {
-            id: node.id,
-            size: snappedSize,
-            position: snappedPosition,
-            ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
-          },
-        ],
+        nodesToUpdate: [updateData],
       },
       'resizeNode'
     );
@@ -274,14 +262,14 @@ const computeAndApplySnapping = async (
   const prevHeight = node.size?.height ?? 0;
   const nodeWidth = nextSize?.width ?? prevWidth;
   const nodeHeight = nextSize?.height ?? prevHeight;
-  const movedX = node.position.x !== nextPosition.x;
-  const movedY = node.position.y !== nextPosition.y;
+  const movedX = nextPosition && node.position.x !== nextPosition.x;
+  const movedY = nextPosition && node.position.y !== nextPosition.y;
 
   let width = nodeWidth;
   let height = nodeHeight;
 
   if (prevWidth !== nodeWidth) {
-    if (movedX) {
+    if (snappedPosition && movedX) {
       width = Math.round(node.position.x + prevWidth) - snappedPosition.x;
     } else {
       width = NgDiagramMath.snapNumber(nextSize!.width, snapping.x);
@@ -289,26 +277,29 @@ const computeAndApplySnapping = async (
   }
 
   if (prevHeight !== nodeHeight) {
-    if (movedY) {
+    if (snappedPosition && movedY) {
       height = Math.max(Math.round(node.position.y + prevHeight) - snappedPosition.y, 0);
     } else {
       height = NgDiagramMath.snapNumber(nextSize!.height, snapping.y);
     }
   }
 
+  const updateData: Partial<Node> & { id: Node['id'] } = {
+    id: node.id,
+    size: {
+      width,
+      height,
+    },
+    ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
+  };
+
+  if (snappedPosition) {
+    updateData.position = snappedPosition;
+  }
+
   await commandHandler.flowCore.applyUpdate(
     {
-      nodesToUpdate: [
-        {
-          id: node.id,
-          size: {
-            width,
-            height,
-          },
-          position: snappedPosition,
-          ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
-        },
-      ],
+      nodesToUpdate: [updateData],
     },
     'resizeNode'
   );
