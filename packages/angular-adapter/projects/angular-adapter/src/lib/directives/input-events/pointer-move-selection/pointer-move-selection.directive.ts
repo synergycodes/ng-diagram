@@ -1,6 +1,6 @@
-import { AfterViewInit, Directive, inject, Injector, input, OnDestroy } from '@angular/core';
-import { Node, ScreenEdge } from '@angularflow/core';
-import { NgDiagramComponent } from '../../../../public-api';
+import { Directive, inject, input, OnDestroy } from '@angular/core';
+import { ContainerEdge, NgDiagramMath, Node } from '@angularflow/core';
+import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
@@ -14,21 +14,15 @@ const EDGE_PANNING_THRESHOLD = 10;
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class PointerMoveSelectionDirective implements OnDestroy, AfterViewInit {
+export class PointerMoveSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private diagramComponent: NgDiagramComponent | null = null;
+  private readonly diagramComponent = inject(NgDiagramComponent);
 
   targetData = input.required<Node>();
-
-  constructor(private readonly injector: Injector) {}
 
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
-  }
-
-  ngAfterViewInit() {
-    this.diagramComponent = this.injector.get(NgDiagramComponent, null) as NgDiagramComponent | null;
   }
 
   onPointerDown(event: PointerInputEvent): void {
@@ -53,7 +47,7 @@ export class PointerMoveSelectionDirective implements OnDestroy, AfterViewInit {
         x: event.clientX,
         y: event.clientY,
       },
-      currentScreenEdge: null,
+      currentDiagramEdge: null,
     });
 
     document.addEventListener('pointermove', this.onPointerMove);
@@ -79,13 +73,13 @@ export class PointerMoveSelectionDirective implements OnDestroy, AfterViewInit {
         x: event.clientX,
         y: event.clientY,
       },
-      currentScreenEdge: null,
+      currentDiagramEdge: null,
     });
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    const screenEdge = this.isScreenEdge(event.clientX, event.clientY);
+    const screenEdge = this.getDiagramEdge(event.clientX, event.clientY);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'pointerMoveSelection',
@@ -96,7 +90,7 @@ export class PointerMoveSelectionDirective implements OnDestroy, AfterViewInit {
         x: event.clientX,
         y: event.clientY,
       },
-      currentScreenEdge: screenEdge,
+      currentDiagramEdge: screenEdge,
     });
   };
 
@@ -108,26 +102,9 @@ export class PointerMoveSelectionDirective implements OnDestroy, AfterViewInit {
     return !(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
   }
 
-  private isScreenEdge(x: number, y: number): ScreenEdge {
-    const bbox = this.diagramComponent?.getBoundingClientRect();
-    if (!bbox) {
-      return null;
-    }
-    const localX = x - bbox.left;
-    const localY = y - bbox.top;
-    const innerWidth = bbox.width;
-    const innerHeight = bbox.height;
-
-    if (localX < EDGE_PANNING_THRESHOLD && localY < EDGE_PANNING_THRESHOLD) return 'topleft';
-    if (localX < EDGE_PANNING_THRESHOLD && localY > innerHeight - EDGE_PANNING_THRESHOLD) return 'bottomleft';
-    if (localX < EDGE_PANNING_THRESHOLD) return 'left';
-    if (localX > innerWidth - EDGE_PANNING_THRESHOLD && localY < EDGE_PANNING_THRESHOLD) return 'topright';
-    if (localX > innerWidth - EDGE_PANNING_THRESHOLD && localY > innerHeight - EDGE_PANNING_THRESHOLD)
-      return 'bottomright';
-    if (localX > innerWidth - EDGE_PANNING_THRESHOLD) return 'right';
-    if (localY < EDGE_PANNING_THRESHOLD) return 'top';
-    if (localY > innerHeight - EDGE_PANNING_THRESHOLD) return 'bottom';
-
-    return null;
+  private getDiagramEdge(x: number, y: number): ContainerEdge {
+    const bbox = this.diagramComponent.getBoundingClientRect();
+    const edge = NgDiagramMath.detectContainerEdge(bbox, { x, y }, EDGE_PANNING_THRESHOLD);
+    return edge;
   }
 }

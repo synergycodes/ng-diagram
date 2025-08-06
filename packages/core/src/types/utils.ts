@@ -28,7 +28,7 @@ export interface Bounds {
 
 export type PortSide = 'top' | 'right' | 'bottom' | 'left';
 export type Direction = 'top' | 'bottom' | 'left' | 'right';
-export type ScreenEdge =
+export type ContainerEdge =
   | 'left'
   | 'right'
   | 'top'

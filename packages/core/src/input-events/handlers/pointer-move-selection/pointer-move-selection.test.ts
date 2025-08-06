@@ -22,7 +22,7 @@ function getSamplePointerMoveSelectionEvent(
       shift: false,
       meta: false,
     },
-    currentScreenEdge: null,
+    currentDiagramEdge: null,
     ...overrides,
   };
 }
@@ -89,7 +89,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     it('should not pan during start phase even with screen edge', () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'start',
-        currentScreenEdge: 'left',
+        currentDiagramEdge: 'left',
       });
 
       handler.handle(event);
@@ -269,7 +269,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'left',
+          currentDiagramEdge: 'left',
         });
 
         handler.handle(event);
@@ -281,7 +281,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'right',
+          currentDiagramEdge: 'right',
         });
 
         handler.handle(event);
@@ -293,7 +293,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'top',
+          currentDiagramEdge: 'top',
         });
 
         handler.handle(event);
@@ -305,7 +305,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'bottom',
+          currentDiagramEdge: 'bottom',
         });
 
         handler.handle(event);
@@ -317,7 +317,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'topleft',
+          currentDiagramEdge: 'topleft',
         });
 
         handler.handle(event);
@@ -329,7 +329,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'topright',
+          currentDiagramEdge: 'topright',
         });
 
         handler.handle(event);
@@ -341,7 +341,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'bottomleft',
+          currentDiagramEdge: 'bottomleft',
         });
 
         handler.handle(event);
@@ -353,7 +353,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'bottomright',
+          currentDiagramEdge: 'bottomright',
         });
 
         handler.handle(event);
@@ -361,11 +361,11 @@ describe('PointerMoveSelectionEventHandler', () => {
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
       });
 
-      it('should not pan when currentScreenEdge is null', () => {
+      it('should not pan when currentDiagramEdge is null', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: null,
+          currentDiagramEdge: null,
         });
 
         handler.handle(event);
@@ -378,7 +378,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'left',
+          currentDiagramEdge: 'left',
         });
 
         handler.handle(event);
@@ -395,7 +395,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const leftEvent = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 105, y: 105 },
-          currentScreenEdge: 'left',
+          currentDiagramEdge: 'left',
         });
 
         handler.handle(leftEvent);
@@ -409,7 +409,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const rightEvent = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'right',
+          currentDiagramEdge: 'right',
         });
 
         handler.handle(rightEvent);
@@ -423,7 +423,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
-          currentScreenEdge: 'left',
+          currentDiagramEdge: 'left',
         });
 
         handler.handle(event);
@@ -495,7 +495,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     it('should not pan during end phase even with screen edge', () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'end',
-        currentScreenEdge: 'left',
+        currentDiagramEdge: 'left',
       });
 
       handler.handle(event);

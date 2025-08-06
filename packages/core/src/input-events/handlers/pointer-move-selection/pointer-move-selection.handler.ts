@@ -1,6 +1,6 @@
 import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
-import { Point, ScreenEdge } from '../../../types/utils';
+import { ContainerEdge, Point } from '../../../types/utils';
 import { isGroup } from '../../../utils/is-group';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
@@ -51,7 +51,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
           this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
         });
-        this.panDiagramOnScreenEdge(event.currentScreenEdge);
+        this.panDiagramOnScreenEdge(event.currentDiagramEdge);
 
         this.lastInputPoint = event.lastInputPoint;
         break;
@@ -103,7 +103,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     });
   }
 
-  private panDiagramOnScreenEdge(screenEdge: ScreenEdge) {
+  private panDiagramOnScreenEdge(screenEdge: ContainerEdge) {
     if (!screenEdge) {
       return;
     }
