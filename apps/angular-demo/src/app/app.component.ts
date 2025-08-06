@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core'
 import {
   createSignalModel,
   NgDiagramComponent,
+  NgDiagramConfig,
   NgDiagramEdgeTemplate,
   NgDiagramEdgeTemplateMap,
   NgDiagramModule,
@@ -32,7 +33,7 @@ export class AppComponent {
 
   debugMode = signal(true);
 
-  config = {
+  config: NgDiagramConfig = {
     zoom: {
       max: 2,
     },

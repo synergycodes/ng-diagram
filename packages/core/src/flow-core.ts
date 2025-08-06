@@ -8,7 +8,6 @@ import { PortBatchProcessor } from './port-batch-processor/port-batch-processor'
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import { TransactionManager } from './transaction-manager/transaction-manager';
-import { TransactionCallback, TransactionResult } from './transaction-manager/transaction.types';
 import type {
   DeepPartial,
   Edge,
@@ -28,6 +27,7 @@ import type {
   Port,
   Renderer,
 } from './types';
+import { TransactionCallback, TransactionResult } from './types/transaction.interface';
 import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
