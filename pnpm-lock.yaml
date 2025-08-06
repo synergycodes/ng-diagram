@@ -156,6 +156,9 @@ importers:
       '@angular/platform-server':
         specifier: ^20.1.4
         version: 20.1.4(@angular/common@20.1.4(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@20.1.4)(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.1.4(@angular/animations@20.1.4(@angular/common@20.1.4(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.1.4(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+      '@angularflow/angular-adapter':
+        specifier: workspace:*
+        version: link:../../packages/angular-adapter
       '@astrojs/starlight':
         specifier: ^0.35.2
         version: 0.35.2(astro@5.12.8(@netlify/blobs@9.1.2)(@types/node@24.1.0)(db0@0.3.2)(encoding@0.1.13)(ioredis@5.6.1)(jiti@2.5.1)(less@4.3.0)(rollup@4.46.2)(sass-embedded@1.89.2)(sass@1.89.2)(terser@5.43.1)(typescript@5.8.3)(yaml@2.8.0))
@@ -202,6 +205,12 @@ importers:
       globals:
         specifier: ^16.3.0
         version: 16.3.0
+      prettier:
+        specifier: ^3.5.3
+        version: 3.6.2
+      prettier-plugin-astro:
+        specifier: ^0.14.1
+        version: 0.14.1
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -22470,7 +22479,6 @@ snapshots:
       '@astrojs/compiler': 2.12.2
       prettier: 3.6.2
       sass-formatter: 0.7.9
-    optional: true
 
   prettier@2.8.7:
     optional: true
@@ -23002,8 +23010,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  s.color@0.0.15:
-    optional: true
+  s.color@0.0.15: {}
 
   safe-buffer@5.1.2: {}
 
@@ -23098,7 +23105,6 @@ snapshots:
   sass-formatter@0.7.9:
     dependencies:
       suf-log: 2.5.3
-    optional: true
 
   sass-loader@16.0.5(@rspack/core@1.4.10(@swc/helpers@0.5.17))(sass-embedded@1.89.2)(sass@1.85.0)(webpack@5.98.0(esbuild@0.25.4)):
     dependencies:
@@ -23636,7 +23642,6 @@ snapshots:
   suf-log@2.5.3:
     dependencies:
       s.color: 0.0.15
-    optional: true
 
   supports-color@10.0.0: {}
 

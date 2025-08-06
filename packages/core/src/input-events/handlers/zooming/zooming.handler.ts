@@ -10,9 +10,10 @@ export class ZoomingEventHandler extends EventHandler<ZoomingEvent> {
     } = event;
 
     let { x, y, scale } = this.flow.getState().metadata.viewport;
+
     // Apply zoom with center point preservation
-    const beforeZoomX = (centerX - x) / scale;
-    const beforeZoomY = (centerY - y) / scale;
+    const beforeZoomX = (centerX - x - this.flow.getFlowOffset().x) / scale;
+    const beforeZoomY = (centerY - y - this.flow.getFlowOffset().y) / scale;
 
     scale *= zoomFactor;
     scale = NgDiagramMath.clamp({
@@ -21,8 +22,8 @@ export class ZoomingEventHandler extends EventHandler<ZoomingEvent> {
       max: this.flow.config.zoom.max,
     });
 
-    const afterZoomX = (centerX - x) / scale;
-    const afterZoomY = (centerY - y) / scale;
+    const afterZoomX = (centerX - x - this.flow.getFlowOffset().x) / scale;
+    const afterZoomY = (centerY - y - this.flow.getFlowOffset().y) / scale;
 
     x += (afterZoomX - beforeZoomX) * scale;
     y += (afterZoomY - beforeZoomY) * scale;

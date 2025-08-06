@@ -1,5 +1,16 @@
 ---
-import { HelloComponent } from '../angular/diagram.component';
+import { DiagramComponent } from '../angular/diagram/diagram.component';
 ---
 
-<HelloComponent client:load />
+<div class="diagram-container">
+  <DiagramComponent client:only="angular" />
+</div>
+
+<style>
+  .diagram-container {
+    width: 100%;
+    height: 20rem;
+    border: 5px solid var(--ngd-ui-border-default);
+    background-color: var(--ngd-ui-bg-tertiary-default) ;
+  }
+</style>

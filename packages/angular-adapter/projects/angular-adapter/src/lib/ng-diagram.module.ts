@@ -6,6 +6,7 @@ import { InputEventsRouterService } from './services/input-events/input-events-r
 import { NgDiagramService } from './services/ng-diagram.service';
 import { RendererService } from './services/renderer/renderer.service';
 import { UpdatePortsService } from './services/update-ports/update-ports.service';
+import { CursorPositionTrackerService } from './services/cursor-position-tracker/cursor-position-tracker.service';
 
 @NgModule({
   providers: [
@@ -16,6 +17,7 @@ import { UpdatePortsService } from './services/update-ports/update-ports.service
     InputEventsRouterService,
     FlowResizeBatchProcessorService,
     NgDiagramService,
+    CursorPositionTrackerService,
   ],
 })
 export class NgDiagramModule {}

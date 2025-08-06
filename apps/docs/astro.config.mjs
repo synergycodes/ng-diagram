@@ -11,10 +11,15 @@ export default defineConfig({
         transformFilter: (_code, id) => {
           return id.includes('src/components/angular');
         },
+        inlineStylesExtension: 'scss|sass|less',
+        include: ['@angular/compiler'],
+        jit: true,
       },
     }),
     starlight({
       title: 'NgDiagram',
+      customCss: ['./src/styles/custom.css'],
+      markdown: {},
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/synergycodes/angularflow' }],
       sidebar: [
         {

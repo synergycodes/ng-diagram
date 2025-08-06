@@ -1,0 +1,9 @@
+@layer reset, starlight;
+@import '@angularflow/angular-adapter/styles.css';
+
+@layer reset {
+  * {
+    margin: 0;
+    box-sizing: border-box;
+  }
+}

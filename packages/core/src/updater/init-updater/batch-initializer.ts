@@ -6,8 +6,6 @@ export class BatchInitializer<T> {
   dataToInitialize = new Map<string, T>();
   private onInit: (dataMap: Map<string, T>) => void;
 
-  isFinished = false;
-
   constructor(onInit: (dataMap: Map<string, T>) => void) {
     this.onInit = onInit;
 
@@ -16,13 +14,19 @@ export class BatchInitializer<T> {
     });
   }
 
+  batchChange(key: string, value: T): void {
+    this.dataToInitialize.set(key, value);
+
+    this.scheduleInit();
+  }
+
   waitForFinish(): Promise<void> {
+    this.scheduleInit();
+
     return this.finished;
   }
 
-  scheduleInit(key: string, value: T): void {
-    this.dataToInitialize.set(key, value);
-
+  scheduleInit(): void {
     if (this.isScheduled) {
       return;
     }
@@ -35,7 +39,7 @@ export class BatchInitializer<T> {
     this.onInit(this.dataToInitialize);
     this.dataToInitialize.clear();
 
-    this.isFinished = true;
+    this.isScheduled = false;
     this.finish();
   }
 }
