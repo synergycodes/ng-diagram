@@ -63,9 +63,7 @@ export class NodeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'node';
   override readonly targetData = input.required<Node | Edge | undefined>();
 
-  constructor(private el: ElementRef<HTMLElement>) {
-    super();
-  }
+  private el = inject(ElementRef<HTMLElement>);
 
   protected override shouldHandle(event: PointerInputEvent): boolean {
     return (event.target as HTMLElement).localName !== this.el.nativeElement.localName;
