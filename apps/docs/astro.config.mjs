@@ -19,16 +19,19 @@ export default defineConfig({
     starlight({
       title: 'NgDiagram',
       customCss: ['./src/styles/custom.css'],
-      markdown: {},
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/synergycodes/angularflow' }],
       sidebar: [
         {
-          label: 'Guides',
-          items: [{ label: 'Example Guide', slug: 'guides/example' }],
+          label: 'Intro',
+          autogenerate: { directory: 'intro' },
         },
         {
-          label: 'Reference',
-          autogenerate: { directory: 'reference' },
+          label: 'Internals',
+          autogenerate: { directory: 'internals' },
+        },
+        {
+          label: 'Examples',
+          autogenerate: { directory: 'examples' },
         },
       ],
     }),
