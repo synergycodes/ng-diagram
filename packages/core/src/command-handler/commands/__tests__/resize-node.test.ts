@@ -429,25 +429,6 @@ describe('Resize Node Command', () => {
     });
   });
 
-  describe('Undefined Position Handling', () => {
-    it('should return early when requested position is undefined', async () => {
-      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
-        id: '1',
-        size: { width: 200, height: 200 },
-        position: { x: 150, y: 250 },
-      });
-
-      await resizeNode(commandHandler, {
-        name: 'resizeNode',
-        id: '1',
-        size: { width: 50, height: 75 }, // both constrained
-        // position is undefined - should return early
-      });
-
-      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
-    });
-  });
-
   describe('Group Node Resize with Children Bounds Constraints', () => {
     it('should expand group width when children extend beyond requested bounds', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({

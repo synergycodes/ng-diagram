@@ -22,7 +22,7 @@ describe('InternalUpdater', () => {
     portBatchProcessor = {
       process: vi.fn(),
     } as unknown as PortBatchProcessor;
-    actionStateManager = {} as unknown as ActionStateManager;
+    actionStateManager = { isResizing: vi.fn().mockReturnValue(false) } as unknown as ActionStateManager;
     flowCore = {
       getNodeById: getNodeByIdMock,
       getEdgeById: getEdgeByIdMock,
