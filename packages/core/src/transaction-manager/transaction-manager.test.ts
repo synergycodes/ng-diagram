@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import type { FlowCore } from '../flow-core';
 import { mockEdge, mockNode } from '../test-utils';
 import type { ModelActionType } from '../types';
+import { TransactionCallback } from '../types/transaction.interface';
 import { TransactionManager } from './transaction-manager';
-import { TransactionCallback } from './transaction.types';
 
 describe('TransactionManager', () => {
   let mockFlowCore: FlowCore;

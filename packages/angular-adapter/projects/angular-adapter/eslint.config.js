@@ -11,7 +11,7 @@ export default tseslint.config(
         'error',
         {
           type: 'attribute',
-          // prefix: 'ngDiagram',
+          prefix: 'ngDiagram',
           style: 'camelCase',
         },
       ],
@@ -19,7 +19,7 @@ export default tseslint.config(
         'error',
         {
           type: 'element',
-          // prefix: 'ng-diagram',
+          prefix: 'ng-diagram',
           style: 'kebab-case',
         },
       ],
