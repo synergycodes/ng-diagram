@@ -1,7 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FlowCore } from '../../../../flow-core';
 import { mockEdge, mockNode } from '../../../../test-utils';
-import type { Edge, Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../../types';
+import type {
+  Edge,
+  FlowStateUpdate,
+  Metadata,
+  MiddlewareContext,
+  MiddlewaresConfigFromMiddlewares,
+  Node,
+} from '../../../../types';
 import type { MiddlewareExecutor } from '../../../middleware-executor';
 import { DEFAULT_SELECTED_Z_INDEX } from '../constants';
 import { zIndexMiddleware, ZIndexMiddlewareMetadata } from '../z-index-assignment';
@@ -495,6 +502,182 @@ describe('zIndexMiddleware', () => {
       expect(nextMock).toHaveBeenCalledWith({
         nodesToUpdate: [{ id: 'node1', zIndex: customSelectedZIndex }],
       });
+    });
+  });
+
+  describe('duplicate processing prevention', () => {
+    it('should not reprocess nodes that were already processed during init when selection changes', () => {
+      const node1 = { ...mockNode, id: 'node1', selected: false, zIndex: 0 };
+      const node2 = { ...mockNode, id: 'node2', selected: false, zIndex: 0 };
+
+      nodesMap.set('node1', node1);
+      nodesMap.set('node2', node2);
+      context.state.nodes = [node1, node2];
+
+      // First, init action processes all nodes
+      context.modelActionType = 'init';
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Reset the mock
+      nextMock.mockClear();
+
+      // Now node1 becomes selected
+      const selectedNode1 = { ...node1, selected: true };
+      nodesMap.set('node1', selectedNode1);
+      context.state.nodes = [selectedNode1, node2];
+      context.modelActionType = 'updateNode';
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1', 'node2']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Should only update node1 (selected), not node2 (already processed in init)
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [{ id: 'node1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+      });
+    });
+
+    it('should process node only once when multiple conditions are true', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
+      const childNode = {
+        ...mockNode,
+        id: 'child1',
+        groupId: 'group1',
+        selected: true,
+        zIndex: 0,
+      };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+
+      // Both selected and groupId conditions are true
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation(
+        (props) => props.includes('selected') || props.includes('groupId')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Should process node only once with selected z-index (selected takes precedence)
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [{ id: 'child1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+      });
+
+      // Verify no duplicate updates
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      const nodeIds = updates.map((u) => u.id);
+      expect(nodeIds).toHaveLength(1);
+      expect(new Set(nodeIds).size).toBe(nodeIds.length);
+    });
+
+    it('should not create duplicate entries in nodesWithZIndex array', () => {
+      // Test scenario where a node might be affected by multiple conditions
+      // Node1: affected by both selected and groupId changes
+      const node1 = { ...mockNode, id: 'node1', selected: true, groupId: 'group1', zIndex: 0 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
+
+      nodesMap.set('node1', node1);
+      nodesMap.set('group1', groupNode);
+      context.state.nodes = [node1, groupNode];
+
+      // Both selected and groupId conditions are true
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) => {
+        if (props.includes('selected')) return true;
+        if (props.includes('groupId')) return true;
+        return false;
+      });
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+
+      // Node1 is affected by both conditions
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockImplementation((props) => {
+        if (props.includes('selected')) return ['node1'];
+        if (props.includes('groupId')) return ['node1']; // same node in both conditions
+        return [];
+      });
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Node1 should be processed only once (by the first condition that matches - selected)
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      const nodeIds = updates.map((u) => u.id);
+
+      expect(nodeIds.length).toBe(1);
+      expect(nodeIds[0]).toBe('node1');
+      expect(updates[0].zIndex).toBe(DEFAULT_SELECTED_Z_INDEX); // selected takes precedence
+    });
+
+    it('should allow zOrder to override previous processing (intentional behavior)', () => {
+      // This is by design: zOrder represents explicit user intent (e.g., bringToFront/sendToBack)
+      // and should always override any previous z-index calculations
+      const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 15, zIndex: 0 };
+
+      nodesMap.set('node1', node1);
+      context.state.nodes = [node1];
+
+      // Both selected and zOrder conditions are true
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) => {
+        if (props.includes('selected')) return true;
+        if (props.includes('zOrder')) return true;
+        return false;
+      });
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+
+      // Node1 is affected by both conditions
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockImplementation((props) => {
+        if (props.includes('selected')) return ['node1'];
+        if (props.includes('zOrder')) return ['node1'];
+        return [];
+      });
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // The zOrder condition intentionally allows duplicate processing
+      // This ensures that explicit zOrder changes (user actions like bringToFront)
+      // always take precedence over automatic z-index calculations
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+
+      // The node is processed twice:
+      // 1. By shouldSnapSelectedNode: uses assignNodeZIndex which respects zOrder for selected nodes
+      // 2. By shouldSnapZOrderNode: directly assigns the zOrder value
+      expect(updates.length).toBe(2);
+      expect(updates.every((u) => u.id === 'node1')).toBe(true);
+      expect(updates.every((u) => u.zIndex === 15)).toBe(true);
+    });
+
+    it('should ensure zOrder changes always update zIndex even if node was already processed', () => {
+      // This test demonstrates why zOrder doesn't use processedNodeIds check
+      // Scenario: A selected node gets a new zOrder via bringToFront command
+      const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 100, zIndex: DEFAULT_SELECTED_Z_INDEX };
+
+      nodesMap.set('node1', node1);
+      context.state.nodes = [node1];
+
+      // Only zOrder changed (node was already selected)
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) => {
+        if (props.includes('zOrder')) return true;
+        return false;
+      });
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Even though the node might have been processed during init or selection,
+      // the zOrder change must still update the zIndex to reflect user's explicit intent
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      expect(updates.length).toBe(1);
+      expect(updates[0].id).toBe('node1');
+      expect(updates[0].zIndex).toBe(100); // New zOrder value overrides previous zIndex
     });
   });
 

@@ -26,8 +26,8 @@ export function assignNodeZIndex(
 
     let currentZIndex = zIndex;
 
-    if (isGroup(currentNode)) {
-      const childNodes = childrenByGroupId.get(currentNode.id) || [];
+    if (isGroup(nodeWithZIndex)) {
+      const childNodes = childrenByGroupId.get(nodeWithZIndex.id) || [];
 
       for (const childNode of childNodes) {
         currentZIndex += 1;
