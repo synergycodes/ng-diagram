@@ -85,7 +85,7 @@ export class SpatialHash {
     const expandedWidth = width + rightOffset - leftOffset;
     const expandedHeight = height + bottomOffset - topOffset;
 
-    if (!node.angle || node.angle % 1 === 0) {
+    if (!node.angle || node.angle === 0) {
       return {
         id: node.id,
         x: expandedX,
