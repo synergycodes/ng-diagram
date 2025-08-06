@@ -1,4 +1,4 @@
-import { Directive, HostListener, inject, input } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, input } from '@angular/core';
 import { BasePointerInputEvent, Edge, Node } from '@angularflow/core';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -11,9 +11,11 @@ abstract class ObjectSelectionDirective {
   targetData = input.required<Node | Edge | undefined>();
   abstract targetType: BasePointerInputEvent['targetType'];
 
+  protected abstract shouldHandle(event: PointerInputEvent): boolean;
+
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
-    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+    if (!BrowserInputsHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
 
@@ -42,16 +44,30 @@ abstract class ObjectSelectionDirective {
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'diagram';
   override readonly targetData = input.required<Node | Edge | undefined>();
+  override shouldHandle(): boolean {
+    return true;
+  }
 }
 
 @Directive()
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'edge';
   override readonly targetData = input.required<Node | Edge | undefined>();
+  override shouldHandle(): boolean {
+    return true;
+  }
 }
 
 @Directive()
 export class NodeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'node';
   override readonly targetData = input.required<Node | Edge | undefined>();
+
+  constructor(private el: ElementRef<HTMLElement>) {
+    super();
+  }
+
+  protected override shouldHandle(event: PointerInputEvent): boolean {
+    return (event.target as HTMLElement).localName !== this.el.nativeElement.localName;
+  }
 }
