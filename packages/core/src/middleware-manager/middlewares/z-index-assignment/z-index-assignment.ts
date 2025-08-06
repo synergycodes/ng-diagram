@@ -51,17 +51,19 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
     const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
     let nodesWithZIndex: Node[] = [];
+    const processedNodeIds = new Set<string>();
     let edgesWithZIndex: Edge[] = [];
 
     if (isInit) {
       nodesWithZIndex = initializeZIndex(nodesMap);
+      nodesWithZIndex.forEach((node) => processedNodeIds.add(node.id));
     }
     const selectedZIndex = middlewareMetadata.selectedZIndex;
 
     // Partial for Node
     if (shouldSnapSelectedNode) {
       for (const nodeId of helpers.getAffectedNodeIds(['selected'])) {
-        if (nodesWithZIndex.some((n) => n.id === nodeId)) {
+        if (processedNodeIds.has(nodeId)) {
           // If the node is already processed, skip it
           continue;
         }
@@ -72,18 +74,22 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
           : node.groupId
             ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1
             : 0;
-        nodesWithZIndex.push(...assignNodeZIndex(node, nodesMap, baseZIndex, node.selected));
+        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex, node.selected);
+        nodesWithZIndex.push(...assignedNodes);
+        assignedNodes.forEach((n) => processedNodeIds.add(n.id));
       }
     } else if (shouldSnapGroupIdNode) {
       for (const nodeId of helpers.getAffectedNodeIds(['groupId'])) {
-        if (nodesWithZIndex.some((n) => n.id === nodeId)) {
+        if (processedNodeIds.has(nodeId)) {
           // If the node is already processed, skip it
           continue;
         }
         const node = nodesMap.get(nodeId);
         if (!node || node?.selected) continue;
         const baseZIndex = node.groupId ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1 : 0;
-        nodesWithZIndex.push(...assignNodeZIndex(node, nodesMap, baseZIndex));
+        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex);
+        nodesWithZIndex.push(...assignedNodes);
+        assignedNodes.forEach((n) => processedNodeIds.add(n.id));
       }
     }
 
@@ -92,6 +98,7 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
         const node = nodesMap.get(nodeId);
         if (!node) continue;
         nodesWithZIndex.push({ ...node, zIndex: node.zOrder });
+        processedNodeIds.add(node.id);
       }
     }
 
