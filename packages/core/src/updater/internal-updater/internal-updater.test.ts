@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ActionStateManager } from '../../action-state-manager/action-state-manager';
 import { CommandHandler } from '../../command-handler/command-handler';
 import { FlowCore } from '../../flow-core';
 import { PortBatchProcessor } from '../../port-batch-processor/port-batch-processor';
@@ -12,6 +13,7 @@ describe('InternalUpdater', () => {
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
   let portBatchProcessor: PortBatchProcessor;
+  let actionStateManager: ActionStateManager;
 
   beforeEach(() => {
     commandHandler = {
@@ -20,11 +22,13 @@ describe('InternalUpdater', () => {
     portBatchProcessor = {
       process: vi.fn(),
     } as unknown as PortBatchProcessor;
+    actionStateManager = {} as unknown as ActionStateManager;
     flowCore = {
       getNodeById: getNodeByIdMock,
       getEdgeById: getEdgeByIdMock,
       commandHandler,
       portBatchProcessor,
+      actionStateManager,
     } as unknown as FlowCore;
     internalUpdater = new InternalUpdater(flowCore);
   });

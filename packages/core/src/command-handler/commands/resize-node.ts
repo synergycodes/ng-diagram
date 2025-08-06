@@ -106,11 +106,6 @@ export async function resizeNode(commandHandler: CommandHandler, command: Resize
     return;
   }
 
-  // Early return when position is missing - it was called by internal updater
-  if (!command.size || !command.position) {
-    return;
-  }
-
   if (isGroup(node)) {
     await handleGroupNodeResize(commandHandler, command, node);
   } else {
@@ -183,16 +178,19 @@ async function handleSingleNodeResize(commandHandler: CommandHandler, command: R
     node.position
   );
 
+  const updateData: Partial<Node> & { id: Node['id'] } = {
+    id: command.id,
+    size: constrainedSize,
+    ...(command.disableAutoSize !== undefined && { autoSize: !command.disableAutoSize }),
+  };
+
+  if (command.position) {
+    updateData.position = constrainedPosition;
+  }
+
   await commandHandler.flowCore.applyUpdate(
     {
-      nodesToUpdate: [
-        {
-          id: command.id,
-          size: constrainedSize,
-          position: constrainedPosition,
-          ...(command.disableAutoSize !== undefined && { autoSize: !command.disableAutoSize }),
-        },
-      ],
+      nodesToUpdate: [updateData],
     },
     'resizeNode'
   );

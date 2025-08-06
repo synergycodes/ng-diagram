@@ -20,7 +20,7 @@ export class InternalUpdater extends BaseUpdater implements Updater {
     const node = this.flowCore.getNodeById(nodeId);
 
     // If the node size is the same the ports should be the same too
-    if (!node || isSameRect(getRect(node), getRect({ size }))) {
+    if (!node || isSameRect(getRect(node), getRect({ size })) || this.flowCore.actionStateManager.isResizing()) {
       return;
     }
 

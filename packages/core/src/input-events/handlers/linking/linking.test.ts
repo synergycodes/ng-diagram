@@ -26,6 +26,11 @@ function getSampleLinkingEvent(overrides: Partial<LinkingInputEvent> = {}): Link
 
 describe('LinkingEventHandler', () => {
   const mockCommandHandler = { emit: vi.fn() };
+  const mockActionStateManager = {
+    setLinkingState: vi.fn(),
+    getLinkingState: vi.fn().mockReturnValue(undefined),
+    clearLinkingState: vi.fn(),
+  };
   let mockFlowCore: FlowCore;
   let instance: LinkingEventHandler;
   const mockClientToFlowPosition = vi.fn();
@@ -38,6 +43,7 @@ describe('LinkingEventHandler', () => {
     mockFlowCore = {
       commandHandler: mockCommandHandler,
       environment: mockEnvironment,
+      actionStateManager: mockActionStateManager,
       clientToFlowPosition: mockClientToFlowPosition,
     } as unknown as FlowCore;
 
@@ -59,7 +65,10 @@ describe('LinkingEventHandler', () => {
           source: 'node-1',
           sourcePort: 'port-1',
         });
-        expect(instance.isLinking).toBe(true);
+        expect(mockFlowCore.actionStateManager.setLinkingState).toHaveBeenCalledWith({
+          sourceNodeId: 'node-1',
+          sourcePortId: 'port-1',
+        });
       });
 
       it('should throw error if target is null', () => {
@@ -83,6 +92,8 @@ describe('LinkingEventHandler', () => {
         });
         instance.handle(startEvent);
         vi.clearAllMocks();
+
+        mockActionStateManager.getLinkingState.mockReturnValue({ sourceNodeId: 'node-1', sourcePortId: 'port-1' });
       });
 
       it('should emit moveTemporaryEdge command with converted position', () => {
@@ -104,7 +115,7 @@ describe('LinkingEventHandler', () => {
       });
 
       it('should not emit when not linking', () => {
-        instance.isLinking = false;
+        mockActionStateManager.getLinkingState.mockReturnValue(undefined);
 
         const event = getSampleLinkingEvent({
           phase: 'continue',
@@ -127,6 +138,8 @@ describe('LinkingEventHandler', () => {
         });
         instance.handle(startEvent);
         vi.clearAllMocks();
+
+        mockActionStateManager.getLinkingState.mockReturnValue({ sourceNodeId: 'node-1', sourcePortId: 'port-1' });
       });
 
       it('should emit finishLinking command with converted position and set isLinking to false', () => {
@@ -145,11 +158,11 @@ describe('LinkingEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', {
           position: flowPosition,
         });
-        expect(instance.isLinking).toBe(false);
+        expect(mockFlowCore.actionStateManager.clearLinkingState).toHaveBeenCalled();
       });
 
       it('should not emit when not linking', () => {
-        instance.isLinking = false;
+        mockActionStateManager.getLinkingState.mockReturnValue(undefined);
 
         const event = getSampleLinkingEvent({
           phase: 'end',
@@ -159,7 +172,7 @@ describe('LinkingEventHandler', () => {
         instance.handle(event);
 
         expect(mockCommandHandler.emit).not.toHaveBeenCalled();
-        expect(instance.isLinking).toBe(false);
+        expect(mockFlowCore.actionStateManager.clearLinkingState).not.toHaveBeenCalled();
       });
     });
   });
