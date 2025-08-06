@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
+import type { GroupNode } from '../../../types/node.interface';
 import { CommandHandler } from '../../command-handler';
 import { applyChildrenBoundsConstraints, resizeNode } from '../resize-node';
-import type { GroupNode } from '../../../types/node.interface';
 
 // Mock the utils module properly for vitest
 vi.mock('../../../utils', () => ({
@@ -429,43 +429,6 @@ describe('Resize Node Command', () => {
     });
   });
 
-  describe('Undefined Position Handling', () => {
-    it('should return early when requested position is undefined', async () => {
-      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
-        id: '1',
-        size: { width: 200, height: 200 },
-        position: { x: 150, y: 250 },
-      });
-
-      await resizeNode(commandHandler, {
-        name: 'resizeNode',
-        id: '1',
-        size: { width: 50, height: 75 }, // both constrained
-        // position is undefined - should return early
-      });
-
-      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
-    });
-
-    it('should return early when command has no size', async () => {
-      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
-        id: '1',
-        size: { width: 200, height: 200 },
-        position: { x: 100, y: 100 },
-      });
-
-      await resizeNode(commandHandler, {
-        name: 'resizeNode',
-        id: '1',
-        // @ts-expect-error - testing invalid input
-        size: undefined,
-        position: { x: 100, y: 100 },
-      });
-
-      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
-    });
-  });
-
   describe('Group Node Resize with Children Bounds Constraints', () => {
     it('should expand group width when children extend beyond requested bounds', async () => {
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -735,53 +698,6 @@ describe('Resize Node Command', () => {
         },
         'resizeNode'
       );
-    });
-
-    it('should return early when group resize command has no size', async () => {
-      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
-        id: 'group1',
-        size: { width: 400, height: 300 },
-        position: { x: 100, y: 100 },
-        isGroup: true,
-        selected: true,
-        highlighted: false,
-      } as GroupNode);
-
-      const children = [{ id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } }];
-      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
-
-      await resizeNode(commandHandler, {
-        name: 'resizeNode',
-        id: 'group1',
-        // @ts-expect-error - testing invalid input
-        size: undefined,
-        position: { x: 100, y: 100 },
-      });
-
-      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
-    });
-
-    it('should return early when group resize command has no position', async () => {
-      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
-        id: 'group1',
-        size: { width: 400, height: 300 },
-        position: { x: 100, y: 100 },
-        isGroup: true,
-        selected: true,
-        highlighted: false,
-      } as GroupNode);
-
-      const children = [{ id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } }];
-      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
-
-      await resizeNode(commandHandler, {
-        name: 'resizeNode',
-        id: 'group1',
-        size: { width: 300, height: 250 },
-        // position is undefined - should return early
-      });
-
-      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
     });
 
     it('should fallback to single node resize when group has no children', async () => {

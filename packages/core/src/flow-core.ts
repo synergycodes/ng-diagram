@@ -1,3 +1,4 @@
+import { ActionStateManager } from './action-state-manager/action-state-manager';
 import { CommandHandler } from './command-handler/command-handler';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
@@ -51,6 +52,8 @@ export class FlowCore<
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
+  readonly actionStateManager: ActionStateManager;
+
   readonly config: FlowConfig;
 
   readonly getFlowOffset: () => { x: number; y: number };
@@ -73,6 +76,7 @@ export class FlowCore<
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
     this.transactionManager = new TransactionManager(this);
+    this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
     this.config = deepMerge(defaultFlowConfig, config);

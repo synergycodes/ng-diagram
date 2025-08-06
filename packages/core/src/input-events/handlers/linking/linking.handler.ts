@@ -2,8 +2,6 @@ import { EventHandler } from '../event-hander';
 import { LinkingInputEvent } from './linking.event';
 
 export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
-  isLinking = false;
-
   handle(event: LinkingInputEvent): void {
     switch (event.phase) {
       case 'start': {
@@ -12,7 +10,11 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
           throw new Error('Linking event must have a target Node');
         }
 
-        this.isLinking = true;
+        this.flow.actionStateManager.linking = {
+          sourceNodeId,
+          sourcePortId: event.portId,
+        };
+
         this.flow.commandHandler.emit('startLinking', {
           source: sourceNodeId,
           sourcePort: event.portId,
@@ -21,7 +23,7 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         break;
       }
       case 'continue': {
-        if (!this.isLinking) break;
+        if (!this.flow.actionStateManager.isLinking()) break;
 
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
@@ -32,9 +34,9 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         break;
       }
       case 'end': {
-        if (!this.isLinking) break;
+        if (!this.flow.actionStateManager.isLinking()) break;
 
-        this.isLinking = false;
+        this.flow.actionStateManager.linking = undefined;
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
         this.flow.commandHandler.emit('finishLinking', {
