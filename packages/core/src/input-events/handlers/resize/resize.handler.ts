@@ -32,54 +32,55 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           break;
         }
 
-        const deltaX = Math.round(x - resizeState.startX);
-        const deltaY = Math.round(y - resizeState.startY);
-        let newWidth = resizeState.startWidth;
-        let newHeight = resizeState.startHeight;
-        let newX = resizeState.startNodePositionX;
-        let newY = resizeState.startNodePositionY;
+        const { startHeight, startNodePositionX, startNodePositionY, startWidth, startX, startY } = resizeState;
+        const deltaX = Math.round(x - startX);
+        const deltaY = Math.round(y - startY);
+        let newWidth = startWidth;
+        let newHeight = startHeight;
+        let newX = startNodePositionX;
+        let newY = startNodePositionY;
 
         switch (event.direction) {
           case 'top-left': {
-            newWidth = resizeState.startWidth - deltaX;
-            newX = resizeState.startNodePositionX + (resizeState.startWidth - newWidth);
-            newHeight = resizeState.startHeight - deltaY;
-            newY = resizeState.startNodePositionY + (resizeState.startHeight - newHeight);
+            newWidth = startWidth - deltaX;
+            newX = startNodePositionX + (startWidth - newWidth);
+            newHeight = startHeight - deltaY;
+            newY = startNodePositionY + (startHeight - newHeight);
             break;
           }
           case 'top': {
-            newHeight = resizeState.startHeight - deltaY;
-            newY = resizeState.startNodePositionY + (resizeState.startHeight - newHeight);
+            newHeight = startHeight - deltaY;
+            newY = startNodePositionY + (startHeight - newHeight);
             break;
           }
           case 'top-right': {
-            newWidth = resizeState.startWidth + deltaX;
-            newHeight = resizeState.startHeight - deltaY;
-            newY = resizeState.startNodePositionY + (resizeState.startHeight - newHeight);
+            newWidth = startWidth + deltaX;
+            newHeight = startHeight - deltaY;
+            newY = startNodePositionY + (startHeight - newHeight);
             break;
           }
           case 'right': {
-            newWidth = resizeState.startWidth + deltaX;
+            newWidth = startWidth + deltaX;
             break;
           }
           case 'bottom-right': {
-            newWidth = resizeState.startWidth + deltaX;
-            newHeight = resizeState.startHeight + deltaY;
+            newWidth = startWidth + deltaX;
+            newHeight = startHeight + deltaY;
             break;
           }
           case 'bottom': {
-            newHeight = resizeState.startHeight + deltaY;
+            newHeight = startHeight + deltaY;
             break;
           }
           case 'bottom-left': {
-            newWidth = resizeState.startWidth - deltaX;
-            newX = resizeState.startNodePositionX + (resizeState.startWidth - newWidth);
-            newHeight = resizeState.startHeight + deltaY;
+            newWidth = startWidth - deltaX;
+            newX = startNodePositionX + (startWidth - newWidth);
+            newHeight = startHeight + deltaY;
             break;
           }
           case 'left': {
-            newWidth = resizeState.startWidth - deltaX;
-            newX = resizeState.startNodePositionX + (resizeState.startWidth - newWidth);
+            newWidth = startWidth - deltaX;
+            newX = startNodePositionX + (startWidth - newWidth);
             break;
           }
         }
