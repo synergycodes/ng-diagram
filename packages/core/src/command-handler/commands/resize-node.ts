@@ -1,7 +1,6 @@
 import { NgDiagramMath } from '../../math';
 import type { Bounds, CommandHandler, FlowConfig, GroupNode, Node } from '../../types';
-import { calculateGroupBounds, isSameSize } from '../../utils';
-import { isGroup } from '../../utils/is-group';
+import { calculateGroupBounds, isGroup, isSameSize } from '../../utils';
 
 export interface ResizeNodeCommand {
   name: 'resizeNode';
@@ -221,6 +220,51 @@ const appplySnappingIfNeeded = async (
   return await computeAndApplySnapping(commandHandler, node, nextPosition, nextSize, nextDisableAutoSize);
 };
 
+/**
+ * Calculates snapped dimensions considering position changes when resizing from edges.
+ * When resizing from left/top edges, the size must be calculated relative to the snapped position
+ * to maintain the opposite edge's position and prevent jittering.
+ */
+const calculateSnappedDimensions = (
+  node: Node,
+  nextPosition: Node['position'] | undefined,
+  nextSize: Node['size'],
+  snappedPosition: Node['position'] | undefined,
+  snapping: { x: number; y: number }
+): { width: number; height: number } => {
+  const prevWidth = node.size?.width ?? 0;
+  const prevHeight = node.size?.height ?? 0;
+  const nodeWidth = nextSize?.width ?? prevWidth;
+  const nodeHeight = nextSize?.height ?? prevHeight;
+  const movedX = nextPosition && node.position.x !== nextPosition.x;
+  const movedY = nextPosition && node.position.y !== nextPosition.y;
+
+  let width = nodeWidth;
+  let height = nodeHeight;
+
+  // Calculate width considering position snap when resizing from left edge
+  if (prevWidth !== nodeWidth) {
+    if (snappedPosition && movedX) {
+      // Maintain right edge position when left edge moves
+      width = Math.round(node.position.x + prevWidth) - snappedPosition.x;
+    } else {
+      width = NgDiagramMath.snapNumber(nodeWidth, snapping.x);
+    }
+  }
+
+  // Calculate height considering position snap when resizing from top edge
+  if (prevHeight !== nodeHeight) {
+    if (snappedPosition && movedY) {
+      // Maintain bottom edge position when top edge moves
+      height = Math.max(Math.round(node.position.y + prevHeight) - snappedPosition.y, 0);
+    } else {
+      height = NgDiagramMath.snapNumber(nodeHeight, snapping.y);
+    }
+  }
+
+  return { width, height };
+};
+
 const computeAndApplySnapping = async (
   commandHandler: CommandHandler,
   node: Node,
@@ -232,64 +276,11 @@ const computeAndApplySnapping = async (
   const snapping = computeSnapForNodeSize(node) ?? defaultResizeSnap;
   const snappedPosition = nextPosition && NgDiagramMath.snapPoint(nextPosition, snapping);
 
-  // For groups, use simpler snapping since their bounds are constrained by children
-  if (isGroup(node)) {
-    const snappedSize = {
-      width: NgDiagramMath.snapNumber(nextSize!.width, snapping.x),
-      height: NgDiagramMath.snapNumber(nextSize!.height, snapping.y),
-    };
-
-    const updateData: Partial<Node> & { id: Node['id'] } = {
-      id: node.id,
-      size: snappedSize,
-      ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
-    };
-
-    if (snappedPosition) {
-      updateData.position = snappedPosition;
-    }
-
-    await commandHandler.flowCore.applyUpdate(
-      {
-        nodesToUpdate: [updateData],
-      },
-      'resizeNode'
-    );
-    return;
-  }
-
-  const prevWidth = node.size?.width ?? 0;
-  const prevHeight = node.size?.height ?? 0;
-  const nodeWidth = nextSize?.width ?? prevWidth;
-  const nodeHeight = nextSize?.height ?? prevHeight;
-  const movedX = nextPosition && node.position.x !== nextPosition.x;
-  const movedY = nextPosition && node.position.y !== nextPosition.y;
-
-  let width = nodeWidth;
-  let height = nodeHeight;
-
-  if (prevWidth !== nodeWidth) {
-    if (snappedPosition && movedX) {
-      width = Math.round(node.position.x + prevWidth) - snappedPosition.x;
-    } else {
-      width = NgDiagramMath.snapNumber(nextSize!.width, snapping.x);
-    }
-  }
-
-  if (prevHeight !== nodeHeight) {
-    if (snappedPosition && movedY) {
-      height = Math.max(Math.round(node.position.y + prevHeight) - snappedPosition.y, 0);
-    } else {
-      height = NgDiagramMath.snapNumber(nextSize!.height, snapping.y);
-    }
-  }
+  const { width, height } = calculateSnappedDimensions(node, nextPosition, nextSize, snappedPosition, snapping);
 
   const updateData: Partial<Node> & { id: Node['id'] } = {
     id: node.id,
-    size: {
-      width,
-      height,
-    },
+    size: { width, height },
     ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
   };
 

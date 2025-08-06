@@ -1,6 +1,6 @@
 import { FlowCore } from '../flow-core';
 import type { Edge, GroupNode, Node } from '../types';
-import { isGroup } from '../utils/is-group';
+import { isGroup } from '../utils';
 
 export class ModelLookup {
   private _nodesMap = { map: new Map<string, Node>(), synchronized: false };

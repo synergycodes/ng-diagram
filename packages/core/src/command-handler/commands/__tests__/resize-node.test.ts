@@ -8,12 +8,14 @@ import { applyChildrenBoundsConstraints, resizeNode } from '../resize-node';
 vi.mock('../../../utils', () => ({
   calculateGroupBounds: vi.fn(),
   isSameSize: vi.fn(),
+  isGroup: vi.fn(),
 }));
 
 // Import the mocked functions after the mock is declared
-import { calculateGroupBounds, isSameSize } from '../../../utils';
+import { calculateGroupBounds, isSameSize, isGroup } from '../../../utils';
 const mockCalculateGroupBounds = vi.mocked(calculateGroupBounds);
 const mockIsSameSize = vi.mocked(isSameSize);
+const mockIsGroup = vi.mocked(isGroup);
 
 describe('Resize Node Command', () => {
   let flowCore: FlowCore;
@@ -45,6 +47,7 @@ describe('Resize Node Command', () => {
     // Reset mocks
     vi.clearAllMocks();
     mockIsSameSize.mockReturnValue(false); // Default to different sizes so resize proceeds
+    mockIsGroup.mockReturnValue(false); // Default to non-group nodes
   });
 
   describe('resizeNode', () => {
@@ -435,6 +438,7 @@ describe('Resize Node Command', () => {
 
   describe('Group Node Resize with Children Bounds Constraints', () => {
     it('should expand group width when children extend beyond requested bounds', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
@@ -482,6 +486,7 @@ describe('Resize Node Command', () => {
     });
 
     it('should expand group height when children extend beyond requested bounds', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
@@ -527,6 +532,7 @@ describe('Resize Node Command', () => {
     });
 
     it('should adjust group position when children extend beyond left/top edges', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
@@ -572,6 +578,7 @@ describe('Resize Node Command', () => {
     });
 
     it('should handle complex case with children bounds affecting all dimensions', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
@@ -617,6 +624,7 @@ describe('Resize Node Command', () => {
     });
 
     it('should apply minimum size constraints before children bounds constraints', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
@@ -660,6 +668,7 @@ describe('Resize Node Command', () => {
     });
 
     it('should combine minimum size constraints with children bounds constraints', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
@@ -705,6 +714,7 @@ describe('Resize Node Command', () => {
     });
 
     it('should fallback to single node resize when group has no children', async () => {
+      mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
         id: 'group1',
         size: { width: 400, height: 300 },
