@@ -1,5 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
 import {
+  ActionState,
   Edge,
   EnvironmentInfo,
   FlowCore,
@@ -69,6 +70,14 @@ export class NgDiagramService<
    */
   getEnvironment(): EnvironmentInfo {
     return this.flowCore.getEnvironment();
+  }
+
+  /**
+   * Returns the current action state (readonly)
+   * This includes information about ongoing actions like resizing and linking
+   */
+  getActionState(): Readonly<ActionState> {
+    return this.flowCore.actionStateManager.getState();
   }
 
   /**

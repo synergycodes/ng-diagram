@@ -7,6 +7,10 @@ import type { ActionState, LinkingActionState, ResizeActionState } from '../type
 export class ActionStateManager {
   private state: ActionState = {};
 
+  getState(): Readonly<ActionState> {
+    return this.state;
+  }
+
   get resize(): ResizeActionState | undefined {
     return this.state.resize;
   }
