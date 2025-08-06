@@ -150,7 +150,7 @@ const handleGroupNodeResize = async (
     childrenBounds
   );
 
-  await appplySnappingIfNeeded(commandHandler, node, finalPosition, finalSize, true);
+  await applySnappingIfNeeded(commandHandler, node, finalPosition, finalSize, true);
 };
 
 /**
@@ -170,7 +170,7 @@ const handleSingleNodeResize = async (commandHandler: CommandHandler, command: R
     node.position
   );
 
-  await appplySnappingIfNeeded(commandHandler, node, constrainedPosition, constrainedSize, command.disableAutoSize);
+  await applySnappingIfNeeded(commandHandler, node, constrainedPosition, constrainedSize, command.disableAutoSize);
 };
 
 /**
@@ -190,7 +190,7 @@ const handleMissingInitialSize = async (commandHandler: CommandHandler, command:
   });
 };
 
-const appplySnappingIfNeeded = async (
+const applySnappingIfNeeded = async (
   commandHandler: CommandHandler,
   node: Node,
   nextPosition: Node['position'] | undefined,
