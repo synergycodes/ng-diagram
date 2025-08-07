@@ -14,6 +14,8 @@ import {
   PaletteService,
   RendererService,
 } from '../../services';
+import { CursorPositionTrackerService } from '../../services/cursor-position-tracker/cursor-position-tracker.service';
+import { InputEventsRouterService } from '../../services/input-events/input-events-router.service';
 import { NgDiagramComponent } from './ng-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -69,6 +71,8 @@ describe('AngularAdapterDiagramComponent', () => {
             onDragStartFromPalette: vi.fn(),
           },
         },
+        CursorPositionTrackerService,
+        InputEventsRouterService,
       ],
     }).compileComponents();
 
