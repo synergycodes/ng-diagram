@@ -1,5 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
 import {
+  ActionState,
   Edge,
   EnvironmentInfo,
   FlowCore,
@@ -8,8 +9,11 @@ import {
   MiddlewareChain,
   MiddlewareConfigKeys,
   MiddlewaresConfigFromMiddlewares,
+  ModelActionType,
   Node,
   Port,
+  TransactionCallback,
+  TransactionResult,
 } from '@angularflow/core';
 import { FlowCoreProviderService } from './flow-core-provider/flow-core-provider.service';
 
@@ -66,6 +70,14 @@ export class NgDiagramService<
    */
   getEnvironment(): EnvironmentInfo {
     return this.flowCore.getEnvironment();
+  }
+
+  /**
+   * Returns the current action state (readonly)
+   * This includes information about ongoing actions like resizing and linking
+   */
+  getActionState(): Readonly<ActionState> {
+    return this.flowCore.actionStateManager.getState();
   }
 
   /**
@@ -143,5 +155,52 @@ export class NgDiagramService<
    */
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return this.flowCore.getNearestPortInRange(point, range);
+  }
+
+  /**
+   * Executes a function within a transaction context.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @example
+   * // Simple transaction
+   * await ngDiagramService.transaction(async (tx) => {
+   *   await tx.emit('addNode', { node });
+   *   await tx.emit('selectNode', { nodeId: node.id });
+   * });
+   *
+   * // Named transaction
+   * await ngDiagramService.transaction('batchUpdate', async (tx) => {
+   *   await tx.emit('updateNodes', { nodes });
+   *   if (error) {
+   *     tx.rollback(); // Discard all changes
+   *   }
+   * });
+   *
+   * // With savepoints
+   * await ngDiagramService.transaction(async (tx) => {
+   *   await tx.emit('step1', {});
+   *   tx.savepoint('afterStep1');
+   *
+   *   await tx.emit('step2', {});
+   *   if (step2Failed) {
+   *     tx.rollbackTo('afterStep1');
+   *   }
+   * });
+   */
+  async transaction(callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(
+    nameOrCallback: ModelActionType | TransactionCallback,
+    callback?: TransactionCallback
+  ): Promise<TransactionResult> {
+    if (typeof nameOrCallback === 'function') {
+      return this.flowCore.transaction(nameOrCallback);
+    }
+
+    if (!callback) {
+      throw new Error('Callback is required when transaction name is provided');
+    }
+
+    return this.flowCore.transaction(nameOrCallback, callback);
   }
 }

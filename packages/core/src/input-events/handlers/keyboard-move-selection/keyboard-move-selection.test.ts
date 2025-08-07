@@ -36,6 +36,11 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       modelLookup: {
         getSelectedNodesWithChildren: vi.fn().mockReturnValue([mockNode]),
       },
+      config: {
+        snapping: {
+          defaultDragSnap: { x: 10, y: 10 },
+        },
+      },
     } as unknown as FlowCore;
 
     instance = new KeyboardMoveSelectionEventHandler(mockFlowCore);

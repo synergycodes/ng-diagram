@@ -1,7 +1,7 @@
 import type { FlowCore } from '../flow-core';
 import type { FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
+import type { TransactionCallback, TransactionResult } from '../types/transaction.interface';
 import { Transaction } from './transaction';
-import type { TransactionCallback, TransactionResult } from './transaction.types';
 
 export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
   private transactionStack: Transaction[] = [];

@@ -13,8 +13,6 @@ import {
 import { Edge, Node } from '@angularflow/core';
 
 import type {
-  DeepPartial,
-  FlowConfig,
   FlowCore,
   Metadata,
   MiddlewareChain,
@@ -28,10 +26,9 @@ import { PanningDirective } from '../../directives/input-events/panning/panning.
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
-import { NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
+import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
 import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
-import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 import { NgDiagramDefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { NgDiagramMarkerArrowComponent } from '../edge/markers/marker-arrow.component';
 import { NgDiagramEdgeComponent } from '../edge/ng-diagram-edge.component';
@@ -49,7 +46,6 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
     NgDiagramDefaultEdgeComponent,
     NgDiagramDefaultNodeTemplateComponent,
     NgDiagramDefaultGroupTemplateComponent,
-    NgDiagramBaseEdgeComponent,
     NgDiagramEdgeComponent,
   ],
   templateUrl: './ng-diagram.component.html',
@@ -81,7 +77,10 @@ export class NgDiagramComponent<
 
   private initializedModel: TAdapter | null = null;
 
-  config = input<DeepPartial<FlowConfig>>();
+  /**
+   * Global configuration options for the diagram.
+   */
+  config = input<NgDiagramConfig>();
 
   /**
    * The model to use in the diagram.
@@ -89,7 +88,12 @@ export class NgDiagramComponent<
   model = input.required<TAdapter>();
 
   /**
-   * The starting middlewares to use in the Flow Core.
+   * Optional — the initial middlewares to use.
+   * When provided, the middleware list can be modified to add new items,
+   * replace existing ones, or override the defaults.
+   *
+   * ⚠️ Use with caution — incorrectly implemented custom middlewares
+   * can degrade performance or completely break the data flow.
    */
   middlewares = input<TMiddlewares>(BUILTIN_MIDDLEWARES as unknown as TMiddlewares);
 
@@ -104,6 +108,10 @@ export class NgDiagramComponent<
    */
   edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new Map());
 
+  /**
+   * Enables or disables debug mode for the diagram.
+   * When enabled, additional console logs are printed.
+   */
   debugMode = input<boolean>(false);
 
   nodes = this.renderer.nodes;

@@ -1,17 +1,7 @@
-import { Node } from '../../../types/node.interface';
 import { EventHandler } from '../event-hander';
 import { ResizeEvent } from './resize.event';
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
-  isResizing = false;
-  startWidth?: number;
-  startHeight?: number;
-  startX?: number;
-  startY?: number;
-  startNodePositionX?: number;
-  startNodePositionY?: number;
-  draggingNode?: Node;
-
   handle(event: ResizeEvent): void {
     if (!event.target) {
       throw new Error('Resize event must have a target Node');
@@ -20,85 +10,77 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
     const { x, y } = this.flow.clientToFlowPosition(event.lastInputPoint);
     switch (event.phase) {
       case 'start': {
-        this.isResizing = true;
-
-        this.startX = x;
-        this.startY = y;
-
         const node = this.flow.getNodeById(event.target.id);
         if (node && node.size) {
-          this.startWidth = node.size.width;
-          this.startHeight = node.size.height;
-          this.startNodePositionX = node.position.x;
-          this.startNodePositionY = node.position.y;
-          this.draggingNode = node;
+          this.flow.actionStateManager.resize = {
+            startX: x,
+            startY: y,
+            startWidth: node.size.width,
+            startHeight: node.size.height,
+            startNodePositionX: node.position.x,
+            startNodePositionY: node.position.y,
+            draggingNode: node,
+          };
         }
 
         break;
       }
 
       case 'continue': {
-        if (
-          !this.isResizing ||
-          !this.draggingNode ||
-          !this.startX ||
-          !this.startY ||
-          !this.startWidth ||
-          !this.startHeight ||
-          !this.startNodePositionX ||
-          !this.startNodePositionY
-        ) {
+        const resizeState = this.flow.actionStateManager.resize;
+        if (!resizeState) {
           break;
         }
 
-        const deltaX = Math.round(x - this.startX);
-        const deltaY = Math.round(y - this.startY);
-        let newWidth = this.startWidth;
-        let newHeight = this.startHeight;
-        let newX = this.startNodePositionX;
-        let newY = this.startNodePositionY;
+        const { startHeight, startNodePositionX, startNodePositionY, startWidth, startX, startY } = resizeState;
+        const deltaX = Math.round(x - startX);
+        const deltaY = Math.round(y - startY);
+        let newWidth = startWidth;
+        let newHeight = startHeight;
+        let newX = startNodePositionX;
+        let newY = startNodePositionY;
 
         switch (event.direction) {
           case 'top-left': {
-            newWidth = this.startWidth - deltaX;
-            newX = this.startNodePositionX + (this.startWidth - newWidth);
-            newHeight = this.startHeight - deltaY;
-            newY = this.startNodePositionY + (this.startHeight - newHeight);
+            newWidth = startWidth - deltaX;
+            newX = startNodePositionX + (startWidth - newWidth);
+            newHeight = startHeight - deltaY;
+            newY = startNodePositionY + (startHeight - newHeight);
             break;
           }
           case 'top': {
-            newHeight = this.startHeight - deltaY;
-            newY = this.startNodePositionY + (this.startHeight - newHeight);
+            newHeight = startHeight - deltaY;
+            newY = startNodePositionY + (startHeight - newHeight);
             break;
           }
           case 'top-right': {
-            newWidth = this.startWidth + deltaX;
-            newHeight = this.startHeight - deltaY;
-            newY = this.startNodePositionY + (this.startHeight - newHeight);
+            newWidth = startWidth + deltaX;
+            newHeight = startHeight - deltaY;
+            newY = startNodePositionY + (startHeight - newHeight);
             break;
           }
           case 'right': {
-            newWidth = this.startWidth + deltaX;
+            newWidth = startWidth + deltaX;
             break;
           }
           case 'bottom-right': {
-            newWidth = this.startWidth + deltaX;
-            newHeight = this.startHeight + deltaY;
+            newWidth = startWidth + deltaX;
+            newHeight = startHeight + deltaY;
             break;
           }
           case 'bottom': {
-            newHeight = this.startHeight + deltaY;
+            newHeight = startHeight + deltaY;
             break;
           }
           case 'bottom-left': {
-            newWidth = this.startWidth - deltaX;
-            newX = this.startNodePositionX + (this.startWidth - newWidth);
-            newHeight = this.startHeight + deltaY;
+            newWidth = startWidth - deltaX;
+            newX = startNodePositionX + (startWidth - newWidth);
+            newHeight = startHeight + deltaY;
             break;
           }
           case 'left': {
-            newWidth = this.startWidth - deltaX;
-            newX = this.startNodePositionX + (this.startWidth - newWidth);
+            newWidth = startWidth - deltaX;
+            newX = startNodePositionX + (startWidth - newWidth);
             break;
           }
         }
@@ -112,8 +94,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
         break;
       }
       case 'end': {
-        this.isResizing = false;
-        this.draggingNode = undefined;
+        this.flow.actionStateManager.clearResize();
         break;
       }
     }

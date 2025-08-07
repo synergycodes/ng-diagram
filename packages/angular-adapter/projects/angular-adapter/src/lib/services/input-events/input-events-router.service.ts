@@ -4,7 +4,7 @@ import { BrowserInputsHelpers } from './browser-inputs-helpers';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent | TouchEvent;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class InputEventsRouterService extends InputEventsRouter {
   getBaseEvent(event: DomEvent) {
     return {

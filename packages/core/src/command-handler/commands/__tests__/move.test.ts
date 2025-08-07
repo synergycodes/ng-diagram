@@ -16,6 +16,16 @@ describe('Move Selection Commands', () => {
       modelLookup: {
         getSelectedNodesWithChildren: vi.fn().mockReturnValue([{ id: '1', position: { x: 0, y: 0 }, selected: true }]),
       },
+      config: {
+        snapping: {
+          shouldSnapDragForNode: vi.fn().mockReturnValue(false),
+          shouldSnapResizeForNode: vi.fn().mockReturnValue(false),
+          computeSnapForNodeDrag: vi.fn().mockReturnValue(null),
+          computeSnapForNodeSize: vi.fn().mockReturnValue(null),
+          defaultDragSnap: { x: 10, y: 10 },
+          defaultResizeSnap: { x: 10, y: 10 },
+        },
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });

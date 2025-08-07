@@ -3,6 +3,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   build: {
+    sourcemap: process.env.NODE_ENV === 'development',
+    minify: process.env.NODE_ENV !== 'development',
     lib: {
       entry: 'src/index.ts',
       name: 'Core',

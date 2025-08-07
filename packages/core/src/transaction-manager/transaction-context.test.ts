@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FlowCore } from '../flow-core';
 import { mockNode } from '../test-utils';
+import type { TransactionContext } from '../types/transaction.interface';
 import { Transaction } from './transaction';
 import { createTransactionContext } from './transaction-context';
-import type { TransactionContext } from './transaction.types';
 
 describe('createTransactionContext', () => {
   let mockTransaction: Transaction;

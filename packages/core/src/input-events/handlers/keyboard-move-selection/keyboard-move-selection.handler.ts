@@ -13,17 +13,19 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
   }
 
   private getDelta(event: KeyboardMoveSelectionEvent): Point {
-    const MOVEMENT_STEP = 10;
+    const {
+      defaultDragSnap: { x: snapX, y: snapY },
+    } = this.flow.config.snapping;
 
     switch (event.direction) {
       case 'top':
-        return { x: 0, y: -MOVEMENT_STEP };
+        return { x: 0, y: -snapY };
       case 'bottom':
-        return { x: 0, y: MOVEMENT_STEP };
+        return { x: 0, y: snapY };
       case 'left':
-        return { x: -MOVEMENT_STEP, y: 0 };
+        return { x: -snapX, y: 0 };
       case 'right':
-        return { x: MOVEMENT_STEP, y: 0 };
+        return { x: snapX, y: 0 };
       default:
         throw new Error(`Unknown direction: ${event.direction}`);
     }

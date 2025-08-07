@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ActionStateManager } from '../../action-state-manager/action-state-manager';
 import { CommandHandler } from '../../command-handler/command-handler';
 import { FlowCore } from '../../flow-core';
 import { PortBatchProcessor } from '../../port-batch-processor/port-batch-processor';
@@ -8,10 +9,12 @@ import { InternalUpdater } from './internal-updater';
 describe('InternalUpdater', () => {
   const getNodeByIdMock = vi.fn();
   const getEdgeByIdMock = vi.fn();
+  const isResizing = vi.fn().mockReturnValue(false);
   let internalUpdater: InternalUpdater;
   let flowCore: FlowCore;
   let commandHandler: CommandHandler;
   let portBatchProcessor: PortBatchProcessor;
+  let actionStateManager: ActionStateManager;
 
   beforeEach(() => {
     commandHandler = {
@@ -20,11 +23,13 @@ describe('InternalUpdater', () => {
     portBatchProcessor = {
       process: vi.fn(),
     } as unknown as PortBatchProcessor;
+    actionStateManager = { isResizing } as unknown as ActionStateManager;
     flowCore = {
       getNodeById: getNodeByIdMock,
       getEdgeById: getEdgeByIdMock,
       commandHandler,
       portBatchProcessor,
+      actionStateManager,
     } as unknown as FlowCore;
     internalUpdater = new InternalUpdater(flowCore);
   });
@@ -57,6 +62,15 @@ describe('InternalUpdater', () => {
 
     it('should not call anything if node does not exist', () => {
       getNodeByIdMock.mockReturnValue(null);
+
+      internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
+
+      expect(commandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should not call anything if manual resizing action is in progress', () => {
+      getNodeByIdMock.mockReturnValue(null);
+      isResizing.mockReturnValue(true);
 
       internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
 

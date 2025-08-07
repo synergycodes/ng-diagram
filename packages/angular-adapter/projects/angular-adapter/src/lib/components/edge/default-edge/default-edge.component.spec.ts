@@ -6,11 +6,11 @@ import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
 import { NgDiagramDefaultEdgeComponent } from './default-edge.component';
 
 @Component({
-  selector: 'angular-adapter-edge-label',
+  selector: 'ng-diagram-edge-label',
   template: '', // Empty mock template
   standalone: true,
 })
-class MockAngularAdapterEdgeLabelComponent {}
+class MockNgDiagramEdgeLabelComponent {}
 
 describe('NgDiagramDefaultEdgeComponent', () => {
   let component: NgDiagramDefaultEdgeComponent;
@@ -26,7 +26,7 @@ describe('NgDiagramDefaultEdgeComponent', () => {
           imports: [NgDiagramBaseEdgeComponent],
         },
         add: {
-          imports: [MockAngularAdapterEdgeLabelComponent],
+          imports: [MockNgDiagramEdgeLabelComponent],
         },
       })
       .compileComponents();
