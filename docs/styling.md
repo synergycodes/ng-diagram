@@ -191,4 +191,4 @@ For cases where directives can't be used (outside node templates), you can apply
 2. **Use component variables for specific adjustments** - Override `--ngd-*` variables for precise control
 3. **Leverage utility classes** - Use provided classes for consistent behavior
 4. **Use directives for state management** - Let directives handle selection and highlight states
-5. **Maintain layer separation** - Don't use primitives or tokens directly in components
+5. **Maintain layer separation** - Use component variables instead of applying primitives or tokens directly within components.
