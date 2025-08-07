@@ -56,7 +56,13 @@
   .ng-diagram-port {
   background-color: var(--ngd-port-background-color-hover);
   border-color: var(--ngd-port-background-color-hover);
-  outline: var(--ngd-port-border-size) solid var(--ngd-port-background-color-hover);
+  /*
+    Temporary 1px offset solution fixing the issue with white space being rendered
+    between the outline and the border of the port. `transform: scale()` could be
+    used instead, but it's causing visual distortions on the whole page in Safari.
+  */
+  outline: calc(1px + var(--ngd-port-border-size)) solid var(--ngd-port-background-color-hover);
+  outline-offset: -1px;
 
   box-shadow: 0 0 0 var(--ngd-port-border-size-hover) var(--ngd-port-border-color-hover);
 }

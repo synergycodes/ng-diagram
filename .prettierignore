@@ -2,10 +2,12 @@
 dist
 .angular
 coverage
+.astro
 
 # Package management
 node_modules
 pnpm-lock.yaml
+.pnpm-store
 
 # Misc
 .git
