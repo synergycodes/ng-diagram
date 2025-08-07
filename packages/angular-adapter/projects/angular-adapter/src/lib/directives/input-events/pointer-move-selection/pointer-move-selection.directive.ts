@@ -7,6 +7,8 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 import { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
+const FPS_60 = 1000 / 60;
+
 @Directive({
   selector: '[ngDiagramPointerMoveSelection]',
   host: {
@@ -20,9 +22,13 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
   targetData = input.required<Node>();
 
+  private edgePanningInterval: number | null = null;
+  private currentEdge: ContainerEdge = null;
+
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    this.stopEdgePanning();
   }
 
   onPointerDown(event: PointerInputEvent): void {
@@ -61,6 +67,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    this.stopEdgePanning();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -80,6 +87,16 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   private onPointerMove = (event: PointerInputEvent) => {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     const screenEdge = this.getDiagramEdge(event.clientX, event.clientY);
+
+    if (screenEdge !== this.currentEdge) {
+      this.currentEdge = screenEdge;
+      if (screenEdge) {
+        this.startEdgePanning(event.clientX, event.clientY);
+      } else {
+        this.stopEdgePanning();
+      }
+    }
+
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'pointerMoveSelection',
@@ -107,5 +124,30 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     const bbox = this.diagramComponent.getBoundingClientRect();
     const edge = NgDiagramMath.detectContainerEdge(bbox, { x, y }, threshold);
     return edge;
+  }
+
+  private startEdgePanning(x: number, y: number): void {
+    this.stopEdgePanning();
+
+    this.edgePanningInterval = window.setInterval(() => {
+      const baseEvent = this.inputEventsRouter.getBaseEvent({} as PointerEvent);
+
+      this.inputEventsRouter.emit({
+        ...baseEvent,
+        name: 'pointerMoveSelection',
+        phase: 'continue',
+        target: this.targetData(),
+        targetType: 'node',
+        lastInputPoint: { x, y },
+        currentDiagramEdge: this.currentEdge,
+      });
+    }, FPS_60);
+  }
+
+  private stopEdgePanning(): void {
+    if (this.edgePanningInterval != null) {
+      window.clearInterval(this.edgePanningInterval);
+      this.edgePanningInterval = null;
+    }
   }
 }
