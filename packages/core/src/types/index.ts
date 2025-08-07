@@ -26,3 +26,6 @@ export * from './tree-layout.interface';
 
 // Transaction types
 export * from './transaction.interface';
+
+// Action state types
+export * from './action-state.interface';

@@ -1,7 +1,6 @@
 import { FlowCore } from '../../flow-core';
 import type { GroupNode, Middleware, MiddlewareContext, Node } from '../../types';
-import { calculateGroupRect } from '../../utils';
-import { isGroup } from '../../utils/is-group';
+import { calculateGroupRect, isGroup } from '../../utils';
 
 export interface GroupChildrenMoveExtentMiddlewareMetadata {
   enabled: boolean;

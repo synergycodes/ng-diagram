@@ -6,10 +6,11 @@ import type {
   LinkingConfig,
   NodeRotationConfig,
   ResizeConfig,
+  SnappingConfig,
   TreeLayoutConfig,
   ZoomConfig,
 } from '../types/flow-config.interface';
-import { Size } from '../types/utils';
+import { Point, Size } from '../types/utils';
 
 const defaultComputeNodeId = (): string => {
   return crypto.randomUUID();
@@ -75,6 +76,24 @@ const defaultNodeRotationConfig: NodeRotationConfig = {
   },
   defaultSnapAngle: 30,
 };
+
+const defaultNodeDraggingConfig: SnappingConfig = {
+  shouldSnapDragForNode: (): boolean => {
+    return true;
+  },
+  shouldSnapResizeForNode: (): boolean => {
+    return true;
+  },
+  computeSnapForNodeDrag: (): Point | null => {
+    return null;
+  },
+  computeSnapForNodeSize: (): Point | null => {
+    return null;
+  },
+  defaultDragSnap: { x: 10, y: 10 },
+  defaultResizeSnap: { x: 10, y: 10 },
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -87,4 +106,5 @@ export const defaultFlowConfig: FlowConfig = {
   zoom: defaultZoomConfig,
   treeLayout: defaultTreeLayoutConfig,
   nodeRotation: defaultNodeRotationConfig,
+  snapping: defaultNodeDraggingConfig,
 };

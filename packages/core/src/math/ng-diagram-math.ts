@@ -4,6 +4,8 @@ import { detectContainerEdge } from './detect-container-edge/detect-container-ed
 import { distanceBetweenPoints } from './distance-between-points/distance-between-points';
 import { normalizeAngle } from './normalize-angle/normalize-angle';
 import { snapAngle } from './snap-angle/snap-angle';
+import { snapNumber } from './snap-number/snap-number';
+import { snapPoint } from './snap-point/snap-point';
 
 export const NgDiagramMath = {
   clamp,
@@ -12,4 +14,6 @@ export const NgDiagramMath = {
   normalizeAngle,
   snapAngle,
   detectContainerEdge,
+  snapNumber,
+  snapPoint,
 };

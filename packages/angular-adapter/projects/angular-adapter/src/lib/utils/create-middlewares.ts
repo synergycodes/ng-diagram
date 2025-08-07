@@ -3,7 +3,6 @@ import {
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
   MiddlewareChain,
-  nodePositionSnapMiddleware,
   treeLayoutMiddleware,
   zIndexMiddleware,
 } from '@angularflow/core';
@@ -13,7 +12,6 @@ export const BUILTIN_MIDDLEWARES = [
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
   treeLayoutMiddleware,
-  nodePositionSnapMiddleware,
   edgesRoutingMiddleware,
 ] as const satisfies MiddlewareChain;
 

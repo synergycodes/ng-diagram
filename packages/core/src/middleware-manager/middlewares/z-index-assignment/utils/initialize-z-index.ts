@@ -1,5 +1,5 @@
 import { Node } from '../../../../types';
-import { isGroup } from '../../../../utils/is-group';
+import { isGroup } from '../../../../utils';
 
 export function initializeZIndex(nodesMap: Map<string, Node>): Node[] {
   const rootNodes = Array.from(nodesMap.values()).filter((node) => !node.groupId);

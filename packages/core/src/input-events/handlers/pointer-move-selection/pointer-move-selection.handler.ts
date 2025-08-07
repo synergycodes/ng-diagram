@@ -1,7 +1,7 @@
 import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
 import { ContainerEdge, Point } from '../../../types/utils';
-import { isGroup } from '../../../utils/is-group';
+import { isGroup } from '../../../utils';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 

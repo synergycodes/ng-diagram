@@ -1,6 +1,5 @@
 import type { Middleware, Node } from '../../types';
-import { calculateGroupRect } from '../../utils';
-import { isGroup } from '../../utils/is-group';
+import { calculateGroupRect, isGroup } from '../../utils';
 
 export interface GroupChildrenChangeExtentMiddlewareMetadata {
   enabled: boolean;
