@@ -1,7 +1,5 @@
 import type { CommandHandler, Node } from '../../types';
 
-let highlightedGroupId: string | null = null;
-
 export interface HighlightGroupCommand {
   name: 'highlightGroup';
   groupId: Node['id'];
@@ -9,7 +7,10 @@ export interface HighlightGroupCommand {
 }
 
 export const highlightGroup = async (commandHandler: CommandHandler, { groupId, nodes }: HighlightGroupCommand) => {
-  if (highlightedGroupId === groupId) {
+  const highlightGroupState = commandHandler.flowCore.actionStateManager.highlightGroup;
+  const currentHighlightedGroupId = highlightGroupState?.highlightedGroupId;
+
+  if (currentHighlightedGroupId === groupId) {
     return;
   }
 
@@ -25,11 +26,14 @@ export const highlightGroup = async (commandHandler: CommandHandler, { groupId, 
 
   const nodesToUpdate = [{ id: groupId, highlighted: true }];
 
-  if (highlightedGroupId) {
-    nodesToUpdate.push({ id: highlightedGroupId, highlighted: false });
+  if (currentHighlightedGroupId) {
+    nodesToUpdate.push({ id: currentHighlightedGroupId, highlighted: false });
   }
 
-  highlightedGroupId = groupId;
+  // Update the action state
+  commandHandler.flowCore.actionStateManager.highlightGroup = {
+    highlightedGroupId: groupId,
+  };
 
   await commandHandler.flowCore.applyUpdate(
     {
@@ -44,16 +48,20 @@ export interface HighlightGroupClearCommand {
 }
 
 export const highlightGroupClear = async (commandHandler: CommandHandler) => {
-  if (!highlightedGroupId) {
+  const highlightGroupState = commandHandler.flowCore.actionStateManager.highlightGroup;
+  const currentHighlightedGroupId = highlightGroupState?.highlightedGroupId;
+
+  if (!currentHighlightedGroupId) {
     return;
   }
 
   await commandHandler.flowCore.applyUpdate(
     {
-      nodesToUpdate: [{ id: highlightedGroupId, highlighted: false }],
+      nodesToUpdate: [{ id: currentHighlightedGroupId, highlighted: false }],
     },
     'highlightGroupClear'
   );
 
-  highlightedGroupId = null;
+  // Clear the action state
+  commandHandler.flowCore.actionStateManager.clearHighlightGroup();
 };

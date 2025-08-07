@@ -1,4 +1,10 @@
-import type { ActionState, LinkingActionState, ResizeActionState } from '../types/action-state.interface';
+import type {
+  ActionState,
+  CopyPasteActionState,
+  HighlightGroupActionState,
+  LinkingActionState,
+  ResizeActionState,
+} from '../types/action-state.interface';
 
 /**
  * Manages temporary state during ongoing actions
@@ -27,12 +33,36 @@ export class ActionStateManager {
     this.state.linking = value;
   }
 
+  get copyPaste(): CopyPasteActionState | undefined {
+    return this.state.copyPaste;
+  }
+
+  set copyPaste(value: CopyPasteActionState | undefined) {
+    this.state.copyPaste = value;
+  }
+
+  get highlightGroup(): HighlightGroupActionState | undefined {
+    return this.state.highlightGroup;
+  }
+
+  set highlightGroup(value: HighlightGroupActionState | undefined) {
+    this.state.highlightGroup = value;
+  }
+
   clearResize() {
     this.state.resize = undefined;
   }
 
   clearLinking() {
     this.state.linking = undefined;
+  }
+
+  clearCopyPaste() {
+    this.state.copyPaste = undefined;
+  }
+
+  clearHighlightGroup() {
+    this.state.highlightGroup = undefined;
   }
 
   isResizing(): boolean {
