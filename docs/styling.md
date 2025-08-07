@@ -1,6 +1,6 @@
 # Styling
 
-AngularFlow provides a comprehensive design system with clear separation of concerns through CSS layers. The styling system is built on primitives, tokens, and component variables that work together to provide consistent theming and customization options.
+ngDiagram offers a well-structured design system with clear separation of concerns. Its styling system is based on a minimal but sufficient set of primitives, tokens, and component variables that enable consistent theming and customization across all library components.
 
 ## Design System Architecture
 
@@ -67,10 +67,17 @@ Component-specific CSS variables that use tokens for consistent styling:
 
 ### Default Themes
 
-AngularFlow supports both light and dark themes out of the box. The theme is controlled by the `data-theme` attribute on the `html` element:
+ngDiagram supports both light and dark themes out of the box:
 
-- `data-theme="light"` - Light theme (default)
-- `data-theme="dark"` - Dark theme
+- **Light theme** - Applied by default (no HTML attribute needed)
+- **Dark theme** - Applied when `data-theme="dark"` is set on the `html` element
+
+```html
+<!-- Dark theme (optional) -->
+<html lang="en" data-theme="dark">
+  <!-- Dark theme is applied -->
+</html>
+```
 
 ### Customization
 
