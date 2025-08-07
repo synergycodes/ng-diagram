@@ -15,6 +15,7 @@ export interface GroupNode extends SimpleNode {
 
 /**
  * Interface representing a node in the flow diagram
+ * @category Types
  */
 export interface SimpleNode {
   /**

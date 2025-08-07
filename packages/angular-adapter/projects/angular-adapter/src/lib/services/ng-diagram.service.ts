@@ -17,6 +17,9 @@ import {
 } from '@angularflow/core';
 import { FlowCoreProviderService } from './flow-core-provider/flow-core-provider.service';
 
+// Type alias to work around Angular compiler issue with generic MiddlewareConfigKeys
+type MiddlewareConfigKeysType<T extends MiddlewareChain> = keyof MiddlewaresConfigFromMiddlewares<T> & string;
+
 @Injectable()
 export class NgDiagramService<
   TMiddlewares extends MiddlewareChain = [],
@@ -93,7 +96,7 @@ export class NgDiagramService<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(name: MiddlewareConfigKeys<TMiddlewares>): void {
+  unregisterMiddleware(name: MiddlewareConfigKeysType<TMiddlewares>): void {
     return this.flowCore.unregisterMiddleware(name);
   }
 
@@ -102,7 +105,7 @@ export class NgDiagramService<
    * @param name Name of the middleware to update
    * @param metadata Metadata to update
    */
-  updateMiddlewareConfig<TName extends MiddlewareConfigKeys<TMiddlewares>>(
+  updateMiddlewareConfig<TName extends MiddlewareConfigKeysType<TMiddlewares>>(
     name: TName,
     config: TMetadata['middlewaresConfig'][TName]
   ) {

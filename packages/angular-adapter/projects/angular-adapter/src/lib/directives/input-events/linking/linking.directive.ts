@@ -3,6 +3,9 @@ import { Node } from '@angularflow/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
 
+/**
+ * @category Directives
+ */
 @Directive({
   selector: '[ngDiagramLinkingInput]',
   host: {

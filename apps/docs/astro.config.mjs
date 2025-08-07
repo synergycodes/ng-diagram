@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightTypeDoc from 'starlight-typedoc';
 
 import angular from '@analogjs/astro-angular';
 
@@ -28,11 +29,33 @@ export default defineConfig({
         {
           label: 'Internals',
           autogenerate: { directory: 'internals' },
+          collapsed: true,
         },
         {
           label: 'Examples',
           autogenerate: { directory: 'examples' },
+          collapsed: true,
         },
+        {
+          label: 'API',
+          autogenerate: { directory: 'api' },
+          collapsed: true,
+        },
+      ],
+      plugins: [
+        starlightTypeDoc({
+          entryPoints: ['../../packages/angular-adapter/projects/angular-adapter/src/public-api.ts'],
+          tsconfig: '../../packages/angular-adapter/tsconfig.json',
+          sidebar: {
+            collapsed: true,
+          },
+          typeDoc: {
+            router: 'category',
+            disableSources: true,
+            entryFileName: '_readme',
+          },
+          watch: true,
+        }),
       ],
     }),
   ],

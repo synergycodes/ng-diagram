@@ -36,6 +36,10 @@ import { NgDiagramDefaultGroupTemplateComponent } from '../node/default-group-te
 import { NgDiagramDefaultNodeTemplateComponent } from '../node/default-node-template/ng-diagram-default-node-template.component';
 import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
 
+/**
+ * Diagram component
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram',
   imports: [
