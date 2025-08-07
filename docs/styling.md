@@ -32,20 +32,20 @@ Base color values and fundamental design tokens defined in `primitives`. These a
 
 ### 2. Tokens
 
-Semantic design tokens that map primitives to specific use cases, supporting both light and dark themes:
+Semantic design tokens that map primitives to specific use cases, supporting themes:
 
 ```css
+:root {
+  --ngd-node-bg-primary-default: var(--ngd-colors-gray-100);
+  --ngd-node-stroke-primary-default: var(--ngd-colors-gray-400);
+  --ngd-node-stroke-primary-hover: var(--ngd-colors-acc1-500);
+  /* ... more tokens */
+}
+
 html[data-theme='dark'] {
   --ngd-node-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-node-stroke-primary-default: var(--ngd-colors-gray-600);
   --ngd-node-stroke-primary-hover: var(--ngd-colors-acc1-400);
-  /* ... more tokens */
-}
-
-html[data-theme='light'] {
-  --ngd-node-bg-primary-default: var(--ngd-colors-gray-100);
-  --ngd-node-stroke-primary-default: var(--ngd-colors-gray-400);
-  --ngd-node-stroke-primary-hover: var(--ngd-colors-acc1-500);
   /* ... more tokens */
 }
 ```
@@ -131,6 +131,8 @@ Applied to individual ports. The port is highlighted only when the cursor hovers
 
 ## Directives
 
+> **Note:** Directives require access to node/group data. When used outside of node templates, they won't work. For manual control, use CSS classes instead.
+
 ### NgDiagramNodeSelectedDirective
 
 Automatically adds selection styling based on the node's `selected` property:
@@ -163,34 +165,23 @@ Adds highlight styling to groups based on the `highlighted` property:
 - Provides inner outline and background highlight
 - Indicates when dragging elements can be added to the group
 
-## Usage Examples
+### Manual CSS Classes
 
-### Custom Node with Default Styling
+For cases where directives can't be used (outside node templates), you can apply styling manually:
 
 ```html
-<div class="custom-node ng-diagram-port-hoverable-over-node" ngDiagramNodeSelected [data]="nodeData">
-  <div class="ng-diagram-port"></div>
-  <div class="ng-diagram-port"></div>
+<!-- Selection styling -->
+<div class="ng-diagram-node-wrapper ng-diagram-node-selected">
+  <!-- Node content -->
+</div>
+
+<!-- Group highlight styling -->
+<div class="ng-diagram-node-wrapper ng-diagram-group-highlight">
+  <!-- Group content -->
 </div>
 ```
 
-### Custom Group with Highlight Support
-
-```html
-<div class="custom-group" ngDiagramNodeSelected ngDiagramGroupHighlighted [data]="groupData">
-  <div class="group-content">
-    <!-- Group content -->
-  </div>
-</div>
-```
-
-### Custom Port with Individual Hover
-
-```html
-<div class="custom-port ng-diagram-port ng-diagram-port-hoverable">
-  <!-- Port content -->
-</div>
-```
+> **Important:** Always use `ng-diagram-node-wrapper` together with these classes to ensure proper transition effects.
 
 ## Best Practices
 
