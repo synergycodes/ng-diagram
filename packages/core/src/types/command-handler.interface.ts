@@ -29,7 +29,7 @@ import {
 import { MoveNodesByCommand } from '../command-handler/commands/move';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
-import { RotateNodeByCommand } from '../command-handler/commands/rotate-node';
+import { RotateNodeToCommand } from '../command-handler/commands/rotate-node';
 import { DeselectAllCommand, DeselectCommand, SelectCommand } from '../command-handler/commands/selection';
 import { BringToFrontCommand, SendToBackCommand } from '../command-handler/commands/z-order';
 import { ZoomCommand } from '../command-handler/commands/zoom';
@@ -72,7 +72,7 @@ export type Command =
   | AddEdgeLabelsCommand
   | UpdateEdgeLabelCommand
   | DeleteEdgeLabelsCommand
-  | RotateNodeByCommand
+  | RotateNodeToCommand
   | HighlightGroupCommand
   | HighlightGroupClearCommand
   | AddToGroupCommand;

@@ -4,6 +4,7 @@ import type {
   HighlightGroupActionState,
   LinkingActionState,
   ResizeActionState,
+  RotationActionState,
 } from '../types/action-state.interface';
 
 /**
@@ -49,6 +50,14 @@ export class ActionStateManager {
     this.state.highlightGroup = value;
   }
 
+  get rotation(): RotationActionState | undefined {
+    return this.state.rotation;
+  }
+
+  set rotation(value: RotationActionState | undefined) {
+    this.state.rotation = value;
+  }
+
   clearResize() {
     this.state.resize = undefined;
   }
@@ -65,11 +74,19 @@ export class ActionStateManager {
     this.state.highlightGroup = undefined;
   }
 
+  clearRotation() {
+    this.state.rotation = undefined;
+  }
+
   isResizing(): boolean {
     return !!this.state.resize;
   }
 
   isLinking(): boolean {
     return !!this.state.linking;
+  }
+
+  isRotating(): boolean {
+    return !!this.state.rotation;
   }
 }

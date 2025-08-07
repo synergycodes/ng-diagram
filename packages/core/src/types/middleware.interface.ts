@@ -28,7 +28,7 @@ export type ModelActionType =
   | 'finishLinking'
   | 'zoom'
   | 'changeZOrder'
-  | 'rotateNodeBy'
+  | 'rotateNodeTo'
   | 'highlightGroup'
   | 'highlightGroupClear'
   | 'treeLayout'
