@@ -1,6 +1,8 @@
 # Styling
 
-ngDiagram offers a well-structured design system with clear separation of concerns. Its styling system is based on a minimal but sufficient set of primitives, tokens, and component variables that enable consistent theming and customization across all library components.
+ngDiagram provides a well-structured design system with a clear separation of concerns. Its styling is based on a minimal yet sufficient set of primitives, tokens, and component-level variables that support consistent theming and easy customization across all library components.
+
+In addition to the design system, the library includes components, directives, and CSS classes to help you build consistent and interactive diagram interfaces.
 
 ## Design System Architecture
 
@@ -74,7 +76,7 @@ ngDiagram supports both light and dark themes out of the box:
 
 ```html
 <!-- Dark theme (optional) -->
-<html lang="en" data-theme="dark">
+<html data-theme="dark">
   <!-- Dark theme is applied -->
 </html>
 ```
