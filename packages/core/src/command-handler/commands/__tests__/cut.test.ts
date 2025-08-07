@@ -18,11 +18,16 @@ describe('Cut Command', () => {
       computeEdgeId: vi.fn().mockImplementation(() => `new-edge-id`),
     };
 
+    const mockActionStateManager = {
+      copyPaste: undefined,
+    };
+
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       modelLookup: mockModelLookup,
       config: mockConfig,
+      actionStateManager: mockActionStateManager,
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });

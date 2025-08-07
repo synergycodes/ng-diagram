@@ -2,9 +2,6 @@ import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node } from '..
 
 const OFFSET = 20;
 
-let copiedNodes: Node[] = [];
-let copiedEdges: Edge[] = [];
-
 export interface CopyCommand {
   name: 'copy';
 }
@@ -163,12 +160,19 @@ const createDeselectUpdates = (
 export const copy = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
 
-  copiedNodes = nodes.filter((node) => node.selected);
-  copiedEdges = edges.filter((edge) => edge.selected);
+  const copiedNodes = nodes.filter((node) => node.selected);
+  const copiedEdges = edges.filter((edge) => edge.selected);
+
+  commandHandler.flowCore.actionStateManager.copyPaste = {
+    copiedNodes,
+    copiedEdges,
+  };
 };
 
 export const paste = async (commandHandler: CommandHandler, command: PasteCommand) => {
-  if (copiedNodes.length === 0 && copiedEdges.length === 0) {
+  const copyPasteState = commandHandler.flowCore.actionStateManager.copyPaste;
+
+  if (!copyPasteState || (copyPasteState.copiedNodes.length === 0 && copyPasteState.copiedEdges.length === 0)) {
     return;
   }
 
@@ -176,11 +180,11 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const nodeIdMap = new Map<string, string>();
 
   // Calculate paste offset
-  const offset = calculatePasteOffset(copiedNodes, command);
+  const offset = calculatePasteOffset(copyPasteState.copiedNodes, command);
 
   // Create new nodes and edges
-  const newNodes = createPastedNodes(commandHandler.flowCore.config, copiedNodes, offset, nodeIdMap);
-  const newEdges = createPastedEdges(commandHandler.flowCore.config, copiedEdges, nodeIdMap);
+  const newNodes = createPastedNodes(commandHandler.flowCore.config, copyPasteState.copiedNodes, offset, nodeIdMap);
+  const newEdges = createPastedEdges(commandHandler.flowCore.config, copyPasteState.copiedEdges, nodeIdMap);
 
   // Create deselect updates
   const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);

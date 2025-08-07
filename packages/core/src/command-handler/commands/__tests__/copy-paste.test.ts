@@ -14,6 +14,10 @@ describe('Copy-Paste Commands', () => {
     const mockComputeNodeId = vi.fn().mockImplementation(() => `generated-node-${Math.random()}`);
     const mockComputeEdgeId = vi.fn().mockImplementation(() => `generated-edge-${Math.random()}`);
 
+    const mockActionStateManager = {
+      copyPaste: undefined,
+    };
+
     commandHandler = {
       flowCore: {
         getState: () => ({
@@ -32,6 +36,7 @@ describe('Copy-Paste Commands', () => {
           computeNodeId: mockComputeNodeId,
           computeEdgeId: mockComputeEdgeId,
         },
+        actionStateManager: mockActionStateManager,
       } as unknown as FlowCore,
     } as unknown as CommandHandler;
   });

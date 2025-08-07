@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Edge } from '@angularflow/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FlowCoreProviderService, RendererService } from '../../../services';
+import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
 import { NgDiagramBaseEdgeComponent } from './base-edge.component';
 
@@ -21,7 +22,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [FlowCoreProviderService, RendererService],
+      providers: [FlowCoreProviderService, RendererService, InputEventsRouterService],
       imports: [NgDiagramBaseEdgeComponent],
     })
       .overrideComponent(NgDiagramBaseEdgeComponent, {
