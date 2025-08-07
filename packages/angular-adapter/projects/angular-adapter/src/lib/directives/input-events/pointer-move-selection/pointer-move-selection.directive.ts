@@ -88,6 +88,17 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     const screenEdge = this.getDiagramEdge(event.clientX, event.clientY);
 
+    // Calculate distance from edge for gradual panning
+    let distanceFromEdge: number | undefined;
+    if (screenEdge) {
+      const containerBounds = this.diagramComponent.getBoundingClientRect();
+      distanceFromEdge = NgDiagramMath.calculateDistanceFromEdge(
+        containerBounds,
+        { x: event.clientX, y: event.clientY },
+        screenEdge
+      );
+    }
+
     if (screenEdge !== this.currentEdge) {
       this.currentEdge = screenEdge;
       if (screenEdge) {
@@ -108,6 +119,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         y: event.clientY,
       },
       currentDiagramEdge: screenEdge,
+      distanceFromEdge,
     });
   };
 
@@ -132,6 +144,13 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     this.edgePanningInterval = window.setInterval(() => {
       const baseEvent = this.inputEventsRouter.getBaseEvent({} as PointerEvent);
 
+      // Calculate distance from edge for gradual panning
+      let distanceFromEdge: number | undefined;
+      if (this.currentEdge) {
+        const containerBounds = this.diagramComponent.getBoundingClientRect();
+        distanceFromEdge = NgDiagramMath.calculateDistanceFromEdge(containerBounds, { x, y }, this.currentEdge);
+      }
+
       this.inputEventsRouter.emit({
         ...baseEvent,
         name: 'pointerMoveSelection',
@@ -140,6 +159,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         targetType: 'node',
         lastInputPoint: { x, y },
         currentDiagramEdge: this.currentEdge,
+        distanceFromEdge,
       });
     }, FPS_60);
   }

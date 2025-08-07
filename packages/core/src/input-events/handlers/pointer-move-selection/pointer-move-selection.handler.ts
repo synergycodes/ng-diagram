@@ -1,3 +1,4 @@
+import { NgDiagramMath } from '../../../math';
 import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
 import { ContainerEdge, Point } from '../../../types/utils';
@@ -49,7 +50,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
           this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
         });
-        this.panDiagramOnScreenEdge(event.currentDiagramEdge);
+        this.panDiagramOnScreenEdge(event.currentDiagramEdge, event.distanceFromEdge);
 
         this.lastInputPoint = event.lastInputPoint;
         break;
@@ -101,10 +102,56 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     });
   }
 
-  private panDiagramOnScreenEdge(screenEdge: ContainerEdge) {
+  private panDiagramOnScreenEdge(screenEdge: ContainerEdge, distanceFromEdge?: number) {
     if (!screenEdge) {
       return;
     }
+
+    // If distanceFromEdge is provided, use gradual panning
+    if (distanceFromEdge !== undefined) {
+      const maxForce = this.flow.config.selectionMoving.edgePanningForce;
+      const threshold = this.flow.config.selectionMoving.edgePanningThreshold;
+
+      const force = NgDiagramMath.calculateGradualForce(distanceFromEdge, maxForce, threshold);
+
+      if (force === 0) {
+        return;
+      }
+
+      // Apply force in the correct direction based on edge
+      let x = 0;
+      let y = 0;
+      switch (screenEdge) {
+        case 'left':
+        case 'topleft':
+        case 'bottomleft':
+          x = force;
+          break;
+        case 'right':
+        case 'topright':
+        case 'bottomright':
+          x = -force;
+          break;
+      }
+
+      switch (screenEdge) {
+        case 'top':
+        case 'topleft':
+        case 'topright':
+          y = force;
+          break;
+        case 'bottom':
+        case 'bottomleft':
+        case 'bottomright':
+          y = -force;
+          break;
+      }
+
+      this.flow.commandHandler.emit('moveViewportBy', { x, y });
+      return;
+    }
+
+    // Fallback to old behavior (constant force)
     const force = this.flow.config.selectionMoving.edgePanningForce;
     let x = 0;
     let y = 0;

@@ -96,8 +96,8 @@ const defaultNodeDraggingConfig: SnappingConfig = {
 };
 
 const defaultSelectionMovingConfig: SelectionMovingConfig = {
-  edgePanningForce: 15,
-  edgePanningThreshold: 10,
+  edgePanningForce: 30,
+  edgePanningThreshold: 100,
 };
 
 /**

@@ -5,4 +5,5 @@ export interface PointerMoveSelectionEvent extends BasePointerInputEvent {
   name: 'pointerMoveSelection';
   phase: InputEventPhase;
   currentDiagramEdge: ContainerEdge;
+  distanceFromEdge?: number;
 }
