@@ -1,13 +1,11 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { ContainerEdge, NgDiagramMath, Node } from '@angularflow/core';
+import { ContainerEdge, FPS_60, NgDiagramMath, Node } from '@angularflow/core';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
-
-const FPS_60 = 1000 / 60;
 
 @Directive({
   selector: '[ngDiagramPointerMoveSelection]',

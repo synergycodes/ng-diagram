@@ -76,6 +76,7 @@ export class NgDiagramComponent<
   private flowCore = signal<FlowCore | undefined>(undefined);
 
   private initializedModel: TAdapter | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   /**
    * Global configuration options for the diagram.
@@ -143,10 +144,12 @@ export class NgDiagramComponent<
 
   ngOnInit(): void {
     this.flowResizeBatchProcessor.initialize();
+    this.setupViewportSizeTracking();
   }
 
   ngOnDestroy(): void {
     this.flowCoreProvider.destroy();
+    this.cleanupViewportSizeTracking();
   }
 
   getNodeTemplate(nodeType: Node['type']) {
@@ -172,4 +175,55 @@ export class NgDiagramComponent<
     const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
     return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
   };
+
+  private setupViewportSizeTracking(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        const { width, height } = entry.contentRect;
+        this.updateViewportSize(width, height);
+      }
+    });
+
+    this.resizeObserver.observe(this.elementRef.nativeElement);
+
+    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+    this.updateViewportSize(rect.width, rect.height);
+  }
+
+  private cleanupViewportSizeTracking(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+  }
+
+  private updateViewportSize(width: number, height: number): void {
+    const flowCore = this.flowCore();
+    if (!flowCore) {
+      return;
+    }
+
+    const currentMetadata = flowCore.getState().metadata;
+    const currentViewport = currentMetadata.viewport;
+
+    if (currentViewport.width !== width || currentViewport.height !== height) {
+      flowCore.applyUpdate(
+        {
+          metadataUpdate: {
+            viewport: {
+              ...currentViewport,
+              width,
+              height,
+            },
+          },
+        },
+        'updateViewportSize'
+      );
+    }
+  }
 }
