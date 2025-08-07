@@ -1,6 +1,6 @@
 import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
-import { Point } from '../../../types/utils';
+import { ContainerEdge, Point } from '../../../types/utils';
 import { isGroup } from '../../../utils';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
@@ -49,6 +49,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
           this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
         });
+        this.panDiagramOnScreenEdge(event.currentDiagramEdge);
 
         this.lastInputPoint = event.lastInputPoint;
         break;
@@ -98,5 +99,47 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       groupId: topLevelGroupNode.id,
       nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
     });
+  }
+
+  private panDiagramOnScreenEdge(screenEdge: ContainerEdge) {
+    if (!screenEdge) {
+      return;
+    }
+    const force = this.flow.config.selectionMoving.edgePanningForce;
+    let x = 0;
+    let y = 0;
+    switch (screenEdge) {
+      case 'left':
+        x = force;
+        break;
+      case 'right':
+        x = -force;
+        break;
+      case 'top':
+        y = force;
+        break;
+      case 'bottom':
+        y = -force;
+        break;
+      case 'topleft':
+        x = force;
+        y = force;
+        break;
+      case 'topright':
+        x = -force;
+        y = force;
+        break;
+      case 'bottomleft':
+        x = force;
+        y = -force;
+        break;
+      case 'bottomright':
+        x = -force;
+        y = -force;
+        break;
+      default:
+        throw new Error(`Unknown screen edge: ${screenEdge}`);
+    }
+    this.flow.commandHandler.emit('moveViewportBy', { x, y });
   }
 }

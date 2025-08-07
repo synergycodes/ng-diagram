@@ -171,6 +171,18 @@ export interface TreeLayoutConfig {
   getLayoutAlignmentForNode: (node: Node) => LayoutAlignmentType | null;
 }
 
+export interface SelectionMovingConfig {
+  /**
+   * Distance in pixels to move the screen while dragging nodes near the edge of the viewport.
+   */
+  edgePanningForce: number;
+  /**
+   * The threshold in pixels for edge panning to start.
+   * If the mouse pointer is within this distance from the edge of the viewport, panning will be triggered.
+   */
+  edgePanningThreshold: number;
+}
+
 /**
  * The main configuration interface for the flow system.
  */
@@ -205,4 +217,9 @@ export interface FlowConfig {
   treeLayout: TreeLayoutConfig;
   nodeRotation: NodeRotationConfig;
   snapping: SnappingConfig;
+
+  /**
+   * Configuration for selection moving behavior.
+   */
+  selectionMoving: SelectionMovingConfig;
 }

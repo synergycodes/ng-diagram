@@ -28,6 +28,16 @@ export interface Bounds {
 
 export type PortSide = 'top' | 'right' | 'bottom' | 'left';
 export type Direction = 'top' | 'bottom' | 'left' | 'right';
+export type ContainerEdge =
+  | 'left'
+  | 'right'
+  | 'top'
+  | 'bottom'
+  | 'topleft'
+  | 'topright'
+  | 'bottomleft'
+  | 'bottomright'
+  | null;
 
 export const ROUTING = ['orthogonal', 'straight', 'bezier'] as const;
 export type DefaultRouting = (typeof ROUTING)[number];
