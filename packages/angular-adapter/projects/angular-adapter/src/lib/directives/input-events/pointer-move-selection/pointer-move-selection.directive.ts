@@ -1,12 +1,11 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { ContainerEdge, NgDiagramMath, Node } from '@angularflow/core';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
+import { FlowCoreProviderService } from '../../../services';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
-
-const EDGE_PANNING_THRESHOLD = 10;
 
 @Directive({
   selector: '[ngDiagramPointerMoveSelection]',
@@ -17,6 +16,7 @@ const EDGE_PANNING_THRESHOLD = 10;
 export class PointerMoveSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly diagramComponent = inject(NgDiagramComponent);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   targetData = input.required<Node>();
 
@@ -103,8 +103,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   private getDiagramEdge(x: number, y: number): ContainerEdge {
+    const threshold = this.flowCoreProvider.provide().config.selectionMoving.edgePanningThreshold;
     const bbox = this.diagramComponent.getBoundingClientRect();
-    const edge = NgDiagramMath.detectContainerEdge(bbox, { x, y }, EDGE_PANNING_THRESHOLD);
+    const edge = NgDiagramMath.detectContainerEdge(bbox, { x, y }, threshold);
     return edge;
   }
 }

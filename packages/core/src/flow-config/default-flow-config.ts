@@ -6,6 +6,7 @@ import type {
   LinkingConfig,
   NodeRotationConfig,
   ResizeConfig,
+  SelectionMovingConfig,
   SnappingConfig,
   TreeLayoutConfig,
   ZoomConfig,
@@ -94,6 +95,11 @@ const defaultNodeDraggingConfig: SnappingConfig = {
   defaultResizeSnap: { x: 10, y: 10 },
 };
 
+const defaultSelectionMovingConfig: SelectionMovingConfig = {
+  edgePanningForce: 15,
+  edgePanningThreshold: 10,
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -107,4 +113,5 @@ export const defaultFlowConfig: FlowConfig = {
   treeLayout: defaultTreeLayoutConfig,
   nodeRotation: defaultNodeRotationConfig,
   snapping: defaultNodeDraggingConfig,
+  selectionMoving: defaultSelectionMovingConfig,
 };

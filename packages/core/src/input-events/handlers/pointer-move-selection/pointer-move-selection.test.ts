@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockGroupNode, mockNode } from '../../../test-utils';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
-import { EDGE_PANNING_FORCE, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
+import { PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
 
 function getSamplePointerMoveSelectionEvent(
   overrides: Partial<PointerMoveSelectionEvent> = {}
@@ -26,6 +26,8 @@ function getSamplePointerMoveSelectionEvent(
     ...overrides,
   };
 }
+
+const EDGE_PANNING_FORCE = 15;
 
 describe('PointerMoveSelectionEventHandler', () => {
   let handler: PointerMoveSelectionEventHandler;
@@ -62,6 +64,12 @@ describe('PointerMoveSelectionEventHandler', () => {
         const txContext = { emit: mockEmit };
         return await callback(txContext);
       }),
+      config: {
+        selectionMoving: {
+          edgePanningForce: EDGE_PANNING_FORCE,
+          edgePanningThreshold: 10,
+        },
+      },
     } as unknown as FlowCore;
 
     handler = new PointerMoveSelectionEventHandler(mockFlowCore);

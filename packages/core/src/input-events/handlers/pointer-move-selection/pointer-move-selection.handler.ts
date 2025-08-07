@@ -5,8 +5,6 @@ import { isGroup } from '../../../utils';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
-export const EDGE_PANNING_FORCE = 15;
-
 export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSelectionEvent> {
   private lastInputPoint: Point | undefined;
   private startPoint: Point | undefined;
@@ -107,36 +105,37 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     if (!screenEdge) {
       return;
     }
+    const force = this.flow.config.selectionMoving.edgePanningForce;
     let x = 0;
     let y = 0;
     switch (screenEdge) {
       case 'left':
-        x = EDGE_PANNING_FORCE;
+        x = force;
         break;
       case 'right':
-        x = -EDGE_PANNING_FORCE;
+        x = -force;
         break;
       case 'top':
-        y = EDGE_PANNING_FORCE;
+        y = force;
         break;
       case 'bottom':
-        y = -EDGE_PANNING_FORCE;
+        y = -force;
         break;
       case 'topleft':
-        x = EDGE_PANNING_FORCE;
-        y = EDGE_PANNING_FORCE;
+        x = force;
+        y = force;
         break;
       case 'topright':
-        x = -EDGE_PANNING_FORCE;
-        y = EDGE_PANNING_FORCE;
+        x = -force;
+        y = force;
         break;
       case 'bottomleft':
-        x = EDGE_PANNING_FORCE;
-        y = -EDGE_PANNING_FORCE;
+        x = force;
+        y = -force;
         break;
       case 'bottomright':
-        x = -EDGE_PANNING_FORCE;
-        y = -EDGE_PANNING_FORCE;
+        x = -force;
+        y = -force;
         break;
       default:
         throw new Error(`Unknown screen edge: ${screenEdge}`);
