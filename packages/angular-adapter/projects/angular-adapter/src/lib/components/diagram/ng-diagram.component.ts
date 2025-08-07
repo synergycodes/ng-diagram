@@ -19,6 +19,7 @@ import type {
   MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
 } from '@angularflow/core';
+
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
@@ -28,6 +29,7 @@ import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zoo
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
+import { NgDiagramBackgroundComponent } from '../background/ng-diagram-background.component';
 import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
 import { NgDiagramDefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { NgDiagramMarkerArrowComponent } from '../edge/markers/marker-arrow.component';
@@ -47,6 +49,7 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
     NgDiagramDefaultNodeTemplateComponent,
     NgDiagramDefaultGroupTemplateComponent,
     NgDiagramEdgeComponent,
+    NgDiagramBackgroundComponent,
   ],
   templateUrl: './ng-diagram.component.html',
   styleUrl: './ng-diagram.component.scss',

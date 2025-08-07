@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
   createSignalModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
   NgDiagramContextComponent,
@@ -20,7 +21,13 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramContextComponent],
+  imports: [
+    ToolbarComponent,
+    PaletteComponent,
+    NgDiagramComponent,
+    NgDiagramContextComponent,
+    NgDiagramBackgroundComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
