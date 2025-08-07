@@ -18,7 +18,6 @@ describe('Cut Command', () => {
       computeEdgeId: vi.fn().mockImplementation(() => `new-edge-id`),
     };
 
-    // Mock action state manager
     const mockActionStateManager = {
       copyPaste: undefined,
     };

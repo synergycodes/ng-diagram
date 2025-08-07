@@ -14,7 +14,6 @@ describe('Copy-Paste Commands', () => {
     const mockComputeNodeId = vi.fn().mockImplementation(() => `generated-node-${Math.random()}`);
     const mockComputeEdgeId = vi.fn().mockImplementation(() => `generated-edge-${Math.random()}`);
 
-    // Mock action state manager
     const mockActionStateManager = {
       copyPaste: undefined,
     };

@@ -8,7 +8,6 @@ describe('Highlight Group Commands', () => {
   let commandHandler: CommandHandler;
 
   beforeEach(() => {
-    // Mock action state manager
     const mockActionStateManager = {
       highlightGroup: undefined,
       clearHighlightGroup: vi.fn(),

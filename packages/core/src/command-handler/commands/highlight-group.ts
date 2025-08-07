@@ -30,7 +30,6 @@ export const highlightGroup = async (commandHandler: CommandHandler, { groupId, 
     nodesToUpdate.push({ id: currentHighlightedGroupId, highlighted: false });
   }
 
-  // Update the action state
   commandHandler.flowCore.actionStateManager.highlightGroup = {
     highlightedGroupId: groupId,
   };
@@ -62,6 +61,5 @@ export const highlightGroupClear = async (commandHandler: CommandHandler) => {
     'highlightGroupClear'
   );
 
-  // Clear the action state
   commandHandler.flowCore.actionStateManager.clearHighlightGroup();
 };
