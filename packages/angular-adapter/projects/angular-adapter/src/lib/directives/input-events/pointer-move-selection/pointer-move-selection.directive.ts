@@ -130,7 +130,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   private getDiagramEdge(x: number, y: number): ContainerEdge {
-    const threshold = this.flowCoreProvider.provide().config.selectionMoving.edgePanningThreshold;
+    const threshold = this.flowCoreProvider.provide().config.selectionMoving.pointerEdgePanningThreshold;
     const bbox = this.diagramComponent.getBoundingClientRect();
     const edge = NgDiagramMath.detectContainerEdge(bbox, { x, y }, threshold);
     return edge;

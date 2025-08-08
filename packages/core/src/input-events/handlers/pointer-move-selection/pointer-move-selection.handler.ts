@@ -109,8 +109,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
     // If distanceFromEdge is provided, use gradual panning
     if (distanceFromEdge !== undefined) {
-      const maxForce = this.flow.config.selectionMoving.edgePanningForce;
-      const threshold = this.flow.config.selectionMoving.edgePanningThreshold;
+      const maxForce = this.flow.config.selectionMoving.pointerEdgePanningForce;
+      const threshold = this.flow.config.selectionMoving.pointerEdgePanningThreshold;
 
       const force = NgDiagramMath.calculateGradualForce(distanceFromEdge, maxForce, threshold);
 
@@ -152,7 +152,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     }
 
     // Fallback to old behavior (constant force)
-    const force = this.flow.config.selectionMoving.edgePanningForce;
+    const force = this.flow.config.selectionMoving.pointerEdgePanningForce;
     let x = 0;
     let y = 0;
     switch (screenEdge) {

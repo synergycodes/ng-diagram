@@ -66,8 +66,8 @@ describe('PointerMoveSelectionEventHandler', () => {
       }),
       config: {
         selectionMoving: {
-          edgePanningForce: EDGE_PANNING_FORCE,
-          edgePanningThreshold: 50,
+          pointerEdgePanningForce: EDGE_PANNING_FORCE,
+          pointerEdgePanningThreshold: 50,
         },
       },
     } as unknown as FlowCore;

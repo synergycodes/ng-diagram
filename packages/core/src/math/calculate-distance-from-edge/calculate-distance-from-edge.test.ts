@@ -39,32 +39,32 @@ describe('calculateDistanceFromEdge', () => {
     expect(result).toBe(20);
   });
 
-  it('should calculate Manhattan distance for topleft corner', () => {
+  it('should calculate Chebyshev distance for topleft corner', () => {
     const clientPosition = { x: 110, y: 60 }; // 10px from left, 10px from top
     const result = calculateDistanceFromEdge(containerBox, clientPosition, 'topleft');
 
-    expect(result).toBe(20); // 10 + 10
+    expect(result).toBe(10); // max(10,10) = 10
   });
 
-  it('should calculate Manhattan distance for topright corner', () => {
+  it('should calculate Chebyshev distance for topright corner', () => {
     const clientPosition = { x: 490, y: 60 }; // 10px from right, 10px from top
     const result = calculateDistanceFromEdge(containerBox, clientPosition, 'topright');
 
-    expect(result).toBe(20); // 10 + 10
+    expect(result).toBe(10); // max(10,10) = 10
   });
 
-  it('should calculate Manhattan distance for bottomleft corner', () => {
+  it('should calculate Chebyshev distance for bottomleft corner', () => {
     const clientPosition = { x: 110, y: 340 }; // 10px from left, 10px from bottom
     const result = calculateDistanceFromEdge(containerBox, clientPosition, 'bottomleft');
 
-    expect(result).toBe(20); // 10 + 10
+    expect(result).toBe(10); // max(10,10) = 10
   });
 
-  it('should calculate Manhattan distance for bottomright corner', () => {
+  it('should calculate Chebyshev distance for bottomright corner', () => {
     const clientPosition = { x: 490, y: 340 }; // 10px from right, 10px from bottom
     const result = calculateDistanceFromEdge(containerBox, clientPosition, 'bottomright');
 
-    expect(result).toBe(20); // 10 + 10
+    expect(result).toBe(10); // max(10,10) = 10
   });
 
   it('should return 0 when exactly at the edge', () => {

@@ -173,14 +173,23 @@ export interface TreeLayoutConfig {
 
 export interface SelectionMovingConfig {
   /**
-   * Distance in pixels to move the screen while dragging nodes near the edge of the viewport.
+   * Distance in pixels to move the screen while dragging nodes with pointer near the edge of the viewport.
    */
-  edgePanningForce: number;
+  pointerEdgePanningForce: number;
   /**
-   * The threshold in pixels for edge panning to start.
+   * The threshold in pixels for edge panning to start while using pointer.
    * If the mouse pointer is within this distance from the edge of the viewport, panning will be triggered.
    */
-  edgePanningThreshold: number;
+  pointerEdgePanningThreshold: number;
+  /**
+   * Distance in pixels to move the screen while moving nodes with keyboard near the edge of the viewport.
+   */
+  keyboardEdgePanningForce: number;
+  /**
+   * The threshold in pixels for edge panning to start while using keyboard.
+   * If the keyboard is within this distance from the edge of the viewport, panning will be triggered.
+   */
+  keyboardEdgePanningThreshold: number;
 }
 
 /**
