@@ -44,6 +44,9 @@ export class AppComponent {
     zoom: {
       max: 2,
     },
+    background: {
+      dotSize: 40,
+    },
   };
 
   model = createSignalModel({
