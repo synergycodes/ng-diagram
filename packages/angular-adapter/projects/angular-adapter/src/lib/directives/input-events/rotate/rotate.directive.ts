@@ -1,7 +1,5 @@
-import { Directive, ElementRef, inject, input, OnDestroy } from '@angular/core';
+import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
-import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
 
@@ -12,12 +10,9 @@ import { PointerInputEvent } from '../../../types';
   },
 })
 export class RotateHandleDirective implements OnDestroy {
-  private readonly elementRef = inject(ElementRef);
-  private readonly diagramComponent = inject(NgDiagramComponent);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  target = input.required<Node>();
+  targetData = input.required<Node>();
 
   ngOnDestroy() {
     this.cleanup();
@@ -30,12 +25,12 @@ export class RotateHandleDirective implements OnDestroy {
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'rotate',
-      target: this.target(),
+      phase: 'start',
+      target: this.targetData(),
       lastInputPoint: {
         x: $event.clientX,
         y: $event.clientY,
       },
-      handle: this.getHandleCenter(),
       center: this.getNodeCenter(),
     });
 
@@ -51,21 +46,45 @@ export class RotateHandleDirective implements OnDestroy {
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'rotate',
-      target: this.target(),
+      phase: 'continue',
+      target: this.targetData(),
       lastInputPoint: {
         x: $event.clientX,
         y: $event.clientY,
       },
-      handle: this.getHandleCenter(),
       center: this.getNodeCenter(),
     });
   };
 
-  onPointerUp = () => {
+  onPointerUp = ($event: PointerInputEvent) => {
+    const baseEvent = this.inputEventsRouter.getBaseEvent($event);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'rotate',
+      phase: 'end',
+      target: this.targetData(),
+      lastInputPoint: {
+        x: $event.clientX,
+        y: $event.clientY,
+      },
+      center: this.getNodeCenter(),
+    });
     this.cleanup();
   };
 
-  onPointerCancel = () => {
+  onPointerCancel = ($event: PointerInputEvent) => {
+    const baseEvent = this.inputEventsRouter.getBaseEvent($event);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'rotate',
+      phase: 'end',
+      target: this.targetData(),
+      lastInputPoint: {
+        x: $event.clientX,
+        y: $event.clientY,
+      },
+      center: this.getNodeCenter(),
+    });
     this.cleanup();
   };
 
@@ -75,19 +94,9 @@ export class RotateHandleDirective implements OnDestroy {
     document.removeEventListener('pointercancel', this.onPointerCancel);
   }
 
-  private getHandleCenter() {
-    const flowCore = this.flowCoreProvider.provide();
-    const { top, height, left, width } = this.elementRef.nativeElement.getBoundingClientRect();
-
-    return flowCore.clientToFlowPosition({
-      x: left + width / 2,
-      y: top + height / 2,
-    });
-  }
-
   private getNodeCenter() {
-    const { x, y } = this.target().position;
-    const { width, height } = this.target().size || { width: 0, height: 0 };
+    const { x, y } = this.targetData().position;
+    const { width, height } = this.targetData().size || { width: 0, height: 0 };
 
     return {
       x: x + width / 2,

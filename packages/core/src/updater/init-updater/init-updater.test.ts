@@ -9,6 +9,7 @@ vi.mock(import('./batch-initializer'), () => ({ BatchInitializer: vi.fn() }));
 BatchInitializer.prototype.waitForFinish = vi.fn();
 BatchInitializer.prototype.init = vi.fn(() => Promise.resolve());
 BatchInitializer.prototype.scheduleInit = vi.fn();
+BatchInitializer.prototype.batchChange = vi.fn();
 
 describe('InitUpdater', () => {
   const stateMock = { nodes: [], edges: [], metadata: {} };
@@ -55,7 +56,7 @@ describe('InitUpdater', () => {
 
       initUpdater.applyNodeSize('node-1', size);
 
-      expect(BatchInitializer.prototype.scheduleInit).toHaveBeenCalledWith('node-1', size);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith('node-1', size);
     });
   });
 
@@ -63,7 +64,7 @@ describe('InitUpdater', () => {
     it('should schedule port initialization with compound id', () => {
       initUpdater.addPort('node-1', mockPort);
 
-      expect(BatchInitializer.prototype.scheduleInit).toHaveBeenCalledWith(`node-1->${mockPort.id}`, mockPort);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith(`node-1->${mockPort.id}`, mockPort);
     });
   });
 
@@ -75,7 +76,7 @@ describe('InitUpdater', () => {
         { id: 'port-1', size: { width: 100, height: 100 }, position: { x: 0, y: 0 } },
       ]);
 
-      expect(BatchInitializer.prototype.scheduleInit).not.toHaveBeenCalled();
+      expect(BatchInitializer.prototype.batchChange).not.toHaveBeenCalled();
     });
 
     it('should schedule port rect initialization for changed ports', () => {
@@ -89,7 +90,7 @@ describe('InitUpdater', () => {
         { id: 'port-1', size: { width: 100, height: 100 }, position: { x: 10, y: 10 } },
       ]);
 
-      expect(BatchInitializer.prototype.scheduleInit).toHaveBeenCalledWith('node-1->port-1', {
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith('node-1->port-1', {
         width: 100,
         height: 100,
         x: 10,
@@ -110,7 +111,7 @@ describe('InitUpdater', () => {
         >,
       ]);
 
-      expect(BatchInitializer.prototype.scheduleInit).not.toHaveBeenCalled();
+      expect(BatchInitializer.prototype.batchChange).not.toHaveBeenCalled();
     });
   });
 
@@ -118,7 +119,7 @@ describe('InitUpdater', () => {
     it('should schedule edge label initialization', () => {
       initUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
 
-      expect(BatchInitializer.prototype.scheduleInit).toHaveBeenCalledWith('edge-1', mockEdgeLabel);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith('edge-1', mockEdgeLabel);
     });
   });
 
@@ -128,7 +129,7 @@ describe('InitUpdater', () => {
 
       initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size);
 
-      expect(BatchInitializer.prototype.scheduleInit).toHaveBeenCalledWith('edge-1->label-1', size);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith('edge-1->label-1', size);
     });
   });
 });

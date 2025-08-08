@@ -18,9 +18,7 @@ export type ObservedElementMetadata =
       nodeId: string;
     };
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class BatchResizeObserverService implements OnDestroy {
   private readonly ngZone = inject(NgZone);
 

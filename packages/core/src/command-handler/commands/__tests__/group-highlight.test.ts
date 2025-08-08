@@ -8,6 +8,11 @@ describe('Highlight Group Commands', () => {
   let commandHandler: CommandHandler;
 
   beforeEach(() => {
+    const mockActionStateManager = {
+      highlightGroup: undefined,
+      clearHighlightGroup: vi.fn(),
+    };
+
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
@@ -19,6 +24,7 @@ describe('Highlight Group Commands', () => {
           canGroup: vi.fn(),
         },
       },
+      actionStateManager: mockActionStateManager,
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
 

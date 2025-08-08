@@ -1,4 +1,11 @@
-import type { ActionState, LinkingActionState, ResizeActionState } from '../types/action-state.interface';
+import type {
+  ActionState,
+  CopyPasteActionState,
+  HighlightGroupActionState,
+  LinkingActionState,
+  ResizeActionState,
+  RotationActionState,
+} from '../types/action-state.interface';
 
 /**
  * Manages temporary state during ongoing actions
@@ -27,6 +34,30 @@ export class ActionStateManager {
     this.state.linking = value;
   }
 
+  get copyPaste(): CopyPasteActionState | undefined {
+    return this.state.copyPaste;
+  }
+
+  set copyPaste(value: CopyPasteActionState | undefined) {
+    this.state.copyPaste = value;
+  }
+
+  get highlightGroup(): HighlightGroupActionState | undefined {
+    return this.state.highlightGroup;
+  }
+
+  set highlightGroup(value: HighlightGroupActionState | undefined) {
+    this.state.highlightGroup = value;
+  }
+
+  get rotation(): RotationActionState | undefined {
+    return this.state.rotation;
+  }
+
+  set rotation(value: RotationActionState | undefined) {
+    this.state.rotation = value;
+  }
+
   clearResize() {
     this.state.resize = undefined;
   }
@@ -35,11 +66,27 @@ export class ActionStateManager {
     this.state.linking = undefined;
   }
 
+  clearCopyPaste() {
+    this.state.copyPaste = undefined;
+  }
+
+  clearHighlightGroup() {
+    this.state.highlightGroup = undefined;
+  }
+
+  clearRotation() {
+    this.state.rotation = undefined;
+  }
+
   isResizing(): boolean {
     return !!this.state.resize;
   }
 
   isLinking(): boolean {
     return !!this.state.linking;
+  }
+
+  isRotating(): boolean {
+    return !!this.state.rotation;
   }
 }

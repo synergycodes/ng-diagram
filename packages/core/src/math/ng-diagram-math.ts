@@ -10,9 +10,9 @@ import { snapNumber } from './snap-number/snap-number';
 import { snapPoint } from './snap-point/snap-point';
 
 export const NgDiagramMath = {
+  angleBetweenPoints,
   clamp,
   distanceBetweenPoints,
-  angleBetweenPoints,
   normalizeAngle,
   snapAngle,
   detectContainerEdge,

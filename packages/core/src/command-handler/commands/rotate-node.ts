@@ -1,60 +1,46 @@
 import { NgDiagramMath } from '../../math';
 import type { CommandHandler } from '../../types';
-import type { Node } from '../../types/node.interface';
 
-export interface RotateNodeByCommand {
-  name: 'rotateNodeBy';
+export interface RotateNodeToCommand {
+  name: 'rotateNodeTo';
   nodeId: string;
   angle: number;
 }
 
-export const rotateNodeBy = async (commandHandler: CommandHandler, { nodeId, angle }: RotateNodeByCommand) => {
+export const rotateNodeTo = async (commandHandler: CommandHandler, { nodeId, angle }: RotateNodeToCommand) => {
   const node = commandHandler.flowCore.getNodeById(nodeId);
-  if (!node || angle === 0) {
+  if (!node) {
     return;
   }
 
-  const { shouldSnapForNode } = commandHandler.flowCore.config.nodeRotation;
-  if (shouldSnapForNode(node)) {
-    return await rotateNodeWithSnap(commandHandler, node, angle);
+  const currentAngle = node.angle ?? 0;
+  if (currentAngle === angle) {
+    return;
   }
 
-  const nextAngle = NgDiagramMath.normalizeAngle((node.angle ?? 0) + angle);
+  const { shouldSnapForNode, computeSnapAngleForNode, defaultSnapAngle } = commandHandler.flowCore.config.nodeRotation;
+  const normalizedAngle = NgDiagramMath.normalizeAngle(angle);
+
+  let finalAngle = normalizedAngle;
+
+  if (shouldSnapForNode(node)) {
+    const snapAngle = computeSnapAngleForNode(node) ?? defaultSnapAngle;
+    finalAngle = NgDiagramMath.snapAngle(normalizedAngle, snapAngle);
+
+    if (finalAngle === currentAngle) {
+      return;
+    }
+  }
+
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToUpdate: [
         {
           id: nodeId,
-          angle: nextAngle,
+          angle: finalAngle,
         },
       ],
     },
-    'rotateNodeBy'
-  );
-};
-
-const rotateNodeWithSnap = async (commandHandler: CommandHandler, node: Node, angle: number) => {
-  const { computeSnapAngleForNode, defaultSnapAngle } = commandHandler.flowCore.config.nodeRotation;
-  const snapAngle = computeSnapAngleForNode(node) ?? defaultSnapAngle;
-
-  const nextAngle = NgDiagramMath.normalizeAngle((node.angle ?? 0) + angle);
-  const isSnapMeaningful = (nextAngle ?? 0) % snapAngle !== 0;
-
-  if (!isSnapMeaningful) {
-    return;
-  }
-
-  const snappedAngle = NgDiagramMath.snapAngle(nextAngle ?? 0, snapAngle);
-
-  await commandHandler.flowCore.applyUpdate(
-    {
-      nodesToUpdate: [
-        {
-          id: node.id,
-          angle: snappedAngle,
-        },
-      ],
-    },
-    'rotateNodeBy'
+    'rotateNodeTo'
   );
 };

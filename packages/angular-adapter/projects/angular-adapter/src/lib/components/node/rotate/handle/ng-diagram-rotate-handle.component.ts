@@ -21,7 +21,7 @@ import { RotateHandleDirective } from '../../../../directives/input-events/rotat
     '[class.rotate-handle]': '!hasCustomHandle',
     '[class.ng-diagram-rotate-handle]': 'true',
   },
-  hostDirectives: [{ directive: RotateHandleDirective, inputs: ['target: data'] }],
+  hostDirectives: [{ directive: RotateHandleDirective, inputs: ['targetData: data'] }],
 })
 export class NgDiagramRotateHandleComponent implements AfterContentInit {
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');

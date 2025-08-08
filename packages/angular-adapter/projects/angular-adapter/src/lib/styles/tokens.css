@@ -1,5 +1,26 @@
 @import './primitives.css';
 
+/* DEFAULT LIGHT THEME */
+:root {
+  --ngd-ui-bg-primary-default: var(--ngd-colors-gray-100);
+  --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-300);
+  --ngd-ui-stroke-primary-focus: var(--ngd-colors-gray-500);
+  --ngd-pt-stroke-primary-default: var(--ngd-colors-gray-600);
+  --ngd-node-bg-primary-default: var(--ngd-colors-gray-100);
+  --ngd-node-stroke-primary-default: var(--ngd-colors-gray-400);
+  --ngd-node-stroke-primary-hover: var(--ngd-colors-acc1-500);
+  --ngd-node-port-fill-default: var(--ngd-colors-gray-100);
+  --ngd-node-port-fill-active: var(--ngd-colors-acc1-500);
+  --ngd-node-port-stroke-default: var(--ngd-colors-gray-500);
+  --ngd-node-port-stroke-active: var(--ngd-colors-gray-100);
+  --ngd-transform-box: var(--ngd-colors-acc4-500);
+  --ngd-focus-ring-node-active: var(--ngd-colors-acc1-500-40);
+  --ngd-button-gray-bg-default: var(--ngd-colors-gray-500);
+  --ngd-button-gray-bg-hover: var(--ngd-colors-gray-600);
+  --ngd-button-gray-bg-active: var(--ngd-colors-gray-650);
+}
+
+/* OPTIONAL DARK THEME */
 html[data-theme='dark'] {
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-800);
@@ -17,23 +38,4 @@ html[data-theme='dark'] {
   --ngd-button-gray-bg-default: var(--ngd-colors-gray-650);
   --ngd-button-gray-bg-hover: var(--ngd-colors-gray-600);
   --ngd-button-gray-bg-active: var(--ngd-colors-gray-500);
-}
-
-html[data-theme='light'] {
-  --ngd-ui-bg-primary-default: var(--ngd-colors-gray-100);
-  --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-300);
-  --ngd-ui-stroke-primary-focus: var(--ngd-colors-gray-500);
-  --ngd-pt-stroke-primary-default: var(--ngd-colors-gray-600);
-  --ngd-node-bg-primary-default: var(--ngd-colors-gray-100);
-  --ngd-node-stroke-primary-default: var(--ngd-colors-gray-400);
-  --ngd-node-stroke-primary-hover: var(--ngd-colors-acc1-500);
-  --ngd-node-port-fill-default: var(--ngd-colors-gray-100);
-  --ngd-node-port-fill-active: var(--ngd-colors-acc1-500);
-  --ngd-node-port-stroke-default: var(--ngd-colors-gray-500);
-  --ngd-node-port-stroke-active: var(--ngd-colors-gray-100);
-  --ngd-transform-box: var(--ngd-colors-acc4-500);
-  --ngd-focus-ring-node-active: var(--ngd-colors-acc1-500-40);
-  --ngd-button-gray-bg-default: var(--ngd-colors-gray-500);
-  --ngd-button-gray-bg-hover: var(--ngd-colors-gray-600);
-  --ngd-button-gray-bg-active: var(--ngd-colors-gray-650);
 }

@@ -5,7 +5,7 @@ export interface CursorPosition extends Point {
   timestamp: number;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class CursorPositionTrackerService {
   private _lastPosition: CursorPosition = { x: 0, y: 0, timestamp: 0 };
 

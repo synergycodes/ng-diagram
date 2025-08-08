@@ -46,13 +46,13 @@ export class InitUpdater extends BaseUpdater implements Updater {
   }
 
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
-    this.nodeSizeInitializer.scheduleInit(nodeId, size);
+    this.nodeSizeInitializer.batchChange(nodeId, size);
   }
 
   addPort(nodeId: string, port: Port) {
     const key = this.getCompoundId(nodeId, port.id);
 
-    this.portInitializer.scheduleInit(key, port);
+    this.portInitializer.batchChange(key, port);
   }
 
   applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
@@ -71,18 +71,18 @@ export class InitUpdater extends BaseUpdater implements Updater {
 
       const key = this.getCompoundId(nodeId, id);
 
-      this.portRectInitializer.scheduleInit(key, { ...size, ...position });
+      this.portRectInitializer.batchChange(key, { ...size, ...position });
     }
   }
 
   addEdgeLabel(edgeId: string, label: EdgeLabel) {
-    this.edgeLabelInitializer.scheduleInit(edgeId, label);
+    this.edgeLabelInitializer.batchChange(edgeId, label);
   }
 
   applyEdgeLabelSize(edgeId: string, labelId: string, size: Size) {
     const key = this.getCompoundId(edgeId, labelId);
 
-    this.edgeLabelSizeInitializer.scheduleInit(key, size);
+    this.edgeLabelSizeInitializer.batchChange(key, size);
   }
 
   private splitCompoundId(id: string) {
