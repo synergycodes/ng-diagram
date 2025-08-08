@@ -96,7 +96,7 @@ const defaultNodeDraggingConfig: SnappingConfig = {
 };
 
 const defaultSelectionMovingConfig: SelectionMovingConfig = {
-  pointerEdgePanningForce: 20,
+  pointerEdgePanningForce: 10,
   pointerEdgePanningThreshold: 150,
   keyboardEdgePanningForce: 10,
   keyboardEdgePanningThreshold: 10,

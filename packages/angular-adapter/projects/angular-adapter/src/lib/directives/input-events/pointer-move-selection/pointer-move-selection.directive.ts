@@ -22,6 +22,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
   private edgePanningInterval: number | null = null;
   private currentEdge: ContainerEdge = null;
+  private storedDistanceFromEdge: number | undefined;
 
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
@@ -100,8 +101,10 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     if (screenEdge !== this.currentEdge) {
       this.currentEdge = screenEdge;
       if (screenEdge) {
+        this.storedDistanceFromEdge = distanceFromEdge;
         this.startEdgePanning(event.clientX, event.clientY);
       } else {
+        this.storedDistanceFromEdge = undefined;
         this.stopEdgePanning();
       }
     }
@@ -142,12 +145,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     this.edgePanningInterval = window.setInterval(() => {
       const baseEvent = this.inputEventsRouter.getBaseEvent({} as PointerEvent);
 
-      let distanceFromEdge: number | undefined;
-      if (this.currentEdge) {
-        const containerBounds = this.diagramComponent.getBoundingClientRect();
-        distanceFromEdge = NgDiagramMath.calculateDistanceFromEdge(containerBounds, { x, y }, this.currentEdge);
-      }
-
       this.inputEventsRouter.emit({
         ...baseEvent,
         name: 'pointerMoveSelection',
@@ -156,7 +153,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         targetType: 'node',
         lastInputPoint: { x, y },
         currentDiagramEdge: this.currentEdge,
-        distanceFromEdge,
+        distanceFromEdge: this.storedDistanceFromEdge,
       });
     }, FPS_60);
   }
@@ -166,5 +163,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       window.clearInterval(this.edgePanningInterval);
       this.edgePanningInterval = null;
     }
+    this.storedDistanceFromEdge = undefined;
   }
 }

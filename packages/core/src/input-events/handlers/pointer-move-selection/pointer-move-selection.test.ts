@@ -23,6 +23,7 @@ function getSamplePointerMoveSelectionEvent(
       meta: false,
     },
     currentDiagramEdge: null,
+    distanceFromEdge: undefined,
     ...overrides,
   };
 }
@@ -282,6 +283,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
       });
 
@@ -294,6 +299,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: 0 });
       });
 
@@ -306,6 +315,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: EDGE_PANNING_FORCE });
       });
 
@@ -318,6 +331,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: -EDGE_PANNING_FORCE });
       });
 
@@ -330,6 +347,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: EDGE_PANNING_FORCE });
       });
 
@@ -342,6 +363,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: EDGE_PANNING_FORCE });
       });
 
@@ -354,6 +379,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
       });
 
@@ -366,6 +395,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(event);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
       });
 
@@ -408,6 +441,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(leftEvent);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 5, y: 5 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
 
         // Reset mocks but keep the same mock implementation
@@ -422,6 +459,10 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         handler.handle(rightEvent);
 
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [mockNode],
+        });
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: 0 });
       });
 

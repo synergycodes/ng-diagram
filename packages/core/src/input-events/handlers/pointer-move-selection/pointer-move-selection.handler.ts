@@ -36,11 +36,20 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
         const { x, y } = pointer;
+
         const deltaX = x - this.startPoint.x;
         const deltaY = y - this.startPoint.y;
 
-        const dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
-        const dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
+        let dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
+        let dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
+
+        // if at the edge use panning force for delta
+        if (event.currentDiagramEdge && event.distanceFromEdge !== undefined) {
+          const maxForce = this.flow.config.selectionMoving.pointerEdgePanningForce;
+          const threshold = this.flow.config.selectionMoving.pointerEdgePanningThreshold;
+          const force = NgDiagramMath.calculateGradualForce(event.distanceFromEdge, maxForce, threshold);
+          [dx, dy] = this.applyPanningForce(force, event.currentDiagramEdge);
+        }
 
         this.flow.transaction('moveNodes', async (tx) => {
           await tx.emit('moveNodesBy', {
@@ -102,6 +111,39 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     });
   }
 
+  private applyPanningForce(force: number, currentDiagramEdge: ContainerEdge) {
+    let x = 0;
+    let y = 0;
+
+    switch (currentDiagramEdge) {
+      case 'left':
+      case 'topleft':
+      case 'bottomleft':
+        x += force;
+        break;
+      case 'right':
+      case 'topright':
+      case 'bottomright':
+        x -= force;
+        break;
+    }
+
+    switch (currentDiagramEdge) {
+      case 'top':
+      case 'topleft':
+      case 'topright':
+        y += force;
+        break;
+      case 'bottom':
+      case 'bottomleft':
+      case 'bottomright':
+        y -= force;
+        break;
+    }
+
+    return [x, y];
+  }
+
   private panDiagramOnScreenEdge(screenEdge: ContainerEdge, distanceFromEdge?: number) {
     if (!screenEdge) {
       return;
@@ -120,33 +162,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       force = this.flow.config.selectionMoving.pointerEdgePanningForce;
     }
 
-    let x = 0;
-    let y = 0;
-    switch (screenEdge) {
-      case 'left':
-      case 'topleft':
-      case 'bottomleft':
-        x = force;
-        break;
-      case 'right':
-      case 'topright':
-      case 'bottomright':
-        x = -force;
-        break;
-    }
-
-    switch (screenEdge) {
-      case 'top':
-      case 'topleft':
-      case 'topright':
-        y = force;
-        break;
-      case 'bottom':
-      case 'bottomleft':
-      case 'bottomright':
-        y = -force;
-        break;
-    }
+    const [x, y] = this.applyPanningForce(force, screenEdge);
 
     this.flow.commandHandler.emit('moveViewportBy', { x, y });
   }
