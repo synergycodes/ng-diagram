@@ -49,8 +49,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           });
 
           this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
+          this.panDiagramOnScreenEdge(event.currentDiagramEdge, event.distanceFromEdge);
         });
-        this.panDiagramOnScreenEdge(event.currentDiagramEdge, event.distanceFromEdge);
 
         this.lastInputPoint = event.lastInputPoint;
         break;
@@ -106,87 +106,48 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     if (!screenEdge) {
       return;
     }
-
-    // If distanceFromEdge is provided, use gradual panning
+    let force = 0;
     if (distanceFromEdge !== undefined) {
       const maxForce = this.flow.config.selectionMoving.pointerEdgePanningForce;
       const threshold = this.flow.config.selectionMoving.pointerEdgePanningThreshold;
 
-      const force = NgDiagramMath.calculateGradualForce(distanceFromEdge, maxForce, threshold);
+      force = NgDiagramMath.calculateGradualForce(distanceFromEdge, maxForce, threshold);
 
       if (force === 0) {
         return;
       }
-
-      // Apply force in the correct direction based on edge
-      let x = 0;
-      let y = 0;
-      switch (screenEdge) {
-        case 'left':
-        case 'topleft':
-        case 'bottomleft':
-          x = force;
-          break;
-        case 'right':
-        case 'topright':
-        case 'bottomright':
-          x = -force;
-          break;
-      }
-
-      switch (screenEdge) {
-        case 'top':
-        case 'topleft':
-        case 'topright':
-          y = force;
-          break;
-        case 'bottom':
-        case 'bottomleft':
-        case 'bottomright':
-          y = -force;
-          break;
-      }
-
-      this.flow.commandHandler.emit('moveViewportBy', { x, y });
-      return;
+    } else {
+      force = this.flow.config.selectionMoving.pointerEdgePanningForce;
     }
 
-    // Fallback to old behavior (constant force)
-    const force = this.flow.config.selectionMoving.pointerEdgePanningForce;
     let x = 0;
     let y = 0;
     switch (screenEdge) {
       case 'left':
+      case 'topleft':
+      case 'bottomleft':
         x = force;
         break;
       case 'right':
+      case 'topright':
+      case 'bottomright':
         x = -force;
         break;
+    }
+
+    switch (screenEdge) {
       case 'top':
+      case 'topleft':
+      case 'topright':
         y = force;
         break;
       case 'bottom':
-        y = -force;
-        break;
-      case 'topleft':
-        x = force;
-        y = force;
-        break;
-      case 'topright':
-        x = -force;
-        y = force;
-        break;
       case 'bottomleft':
-        x = force;
-        y = -force;
-        break;
       case 'bottomright':
-        x = -force;
         y = -force;
         break;
-      default:
-        throw new Error(`Unknown screen edge: ${screenEdge}`);
     }
+
     this.flow.commandHandler.emit('moveViewportBy', { x, y });
   }
 }

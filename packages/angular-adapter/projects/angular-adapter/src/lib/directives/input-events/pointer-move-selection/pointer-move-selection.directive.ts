@@ -142,7 +142,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     this.edgePanningInterval = window.setInterval(() => {
       const baseEvent = this.inputEventsRouter.getBaseEvent({} as PointerEvent);
 
-      // Calculate distance from edge for gradual panning
       let distanceFromEdge: number | undefined;
       if (this.currentEdge) {
         const containerBounds = this.diagramComponent.getBoundingClientRect();
