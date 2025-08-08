@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { AfterContentInit, Component, ContentChildren, effect, inject, Input, QueryList, signal } from '@angular/core';
+import { AfterContentInit, Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { FlowCoreProviderService } from '../../services';
 import { DottedBackgroundComponent } from './default/dotted/dotted-background.component';
 import { LogoBackgroundComponent } from './default/logo/logo-background.component';
@@ -7,15 +7,13 @@ import { LogoBackgroundComponent } from './default/logo/logo-background.componen
 @Component({
   selector: 'ng-diagram-background',
   templateUrl: './ng-diagram-background.component.html',
+  styleUrls: ['./ng-diagram-background.component.scss'],
   imports: [NgIf, LogoBackgroundComponent, DottedBackgroundComponent],
 })
 export class NgDiagramBackgroundComponent implements AfterContentInit {
+  private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  @Input() class?: string;
-  @Input() style?: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @ContentChildren('*', { descendants: true }) content!: QueryList<any>;
   hasContent = false;
   showLogo = signal(false);
 
@@ -28,6 +26,6 @@ export class NgDiagramBackgroundComponent implements AfterContentInit {
   }
 
   ngAfterContentInit() {
-    this.hasContent = this.content.length > 0;
+    this.hasContent = (this.custom()?.nativeElement?.childNodes?.length ?? 0) > 0;
   }
 }

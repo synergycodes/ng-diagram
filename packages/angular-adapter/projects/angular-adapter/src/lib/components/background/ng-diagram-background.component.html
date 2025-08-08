@@ -1,4 +1,6 @@
-<ng-content *ngIf="hasContent"></ng-content>
+<div #contentProjection class="content-projection">
+  <ng-content></ng-content>
+</div>
 <div *ngIf="!hasContent">
   <ng-diagram-logo-background *ngIf="showLogo()" />
   <ng-diagram-dotted-background *ngIf="!showLogo()" />
