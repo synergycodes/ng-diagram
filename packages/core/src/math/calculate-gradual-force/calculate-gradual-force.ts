@@ -12,7 +12,6 @@ export const calculateGradualForce = (distanceFromEdge: number, maxForce: number
     return 0;
   }
 
-  // Linear interpolation: force decreases as distance increases
   const forceRatio = 1 - distanceFromEdge / threshold;
   return maxForce * forceRatio;
 };

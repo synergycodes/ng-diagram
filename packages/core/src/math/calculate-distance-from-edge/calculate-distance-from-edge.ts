@@ -29,13 +29,13 @@ export const calculateDistanceFromEdge = (containerBox: Rect, clientPosition: Po
     case 'bottom':
       return innerHeight - localY;
     case 'topleft':
-      return localX + localY; // Manhattan distance
+      return Math.max(localX, localY);
     case 'topright':
-      return innerWidth - localX + localY; // Manhattan distance
+      return Math.max(innerWidth - localX, localY);
     case 'bottomleft':
-      return localX + (innerHeight - localY); // Manhattan distance
+      return Math.max(localX, innerHeight - localY);
     case 'bottomright':
-      return innerWidth - localX + innerHeight - localY; // Manhattan distance
+      return Math.max(innerWidth - localX, innerHeight - localY);
     default:
       return Infinity;
   }
