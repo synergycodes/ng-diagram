@@ -1,28 +1,24 @@
-import { effect, inject } from '@angular/core';
+import { effect, ElementRef, inject, Signal } from '@angular/core';
 import { Viewport } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../services';
 
 export abstract class BackgroundPatternBase {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  protected setupPatternEffect() {
+  protected setupPatternEffect(backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>) {
     effect(() => {
       const viewport = this.flowCoreProvider.provide().getViewport();
 
-      if (viewport) {
-        const backgroundPattern = this.getBackgroundPattern();
-        if (backgroundPattern) {
-          const size = this.getPatternSize(backgroundPattern, viewport.scale);
-          this.setPatternSize(backgroundPattern, size);
-          this.setPatternTransform(backgroundPattern, viewport, size);
-          this.setPatternFill(backgroundPattern, viewport.scale);
-        }
+      if (viewport && backgroundPattern) {
+        const pattern = backgroundPattern();
+        if (!pattern) return;
+
+        const size = this.getPatternSize(pattern.nativeElement, viewport.scale);
+        this.setPatternSize(pattern.nativeElement, size);
+        this.setPatternTransform(pattern.nativeElement, viewport, size);
+        this.setPatternFill(pattern.nativeElement, viewport.scale);
       }
     });
-  }
-
-  private getBackgroundPattern(): SVGPatternElement | null {
-    return document.getElementById('ng-diagram-background') as SVGPatternElement | null;
   }
 
   private getPatternSize(pattern: SVGPatternElement, scale: number): number {
