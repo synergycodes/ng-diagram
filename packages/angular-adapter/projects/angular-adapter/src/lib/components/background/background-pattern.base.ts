@@ -1,16 +1,14 @@
 // background-pattern.base.ts
 import { effect, inject } from '@angular/core';
 import { Viewport } from '@angularflow/core';
-import { NgDiagramService } from '../../services/ng-diagram.service';
-import { AppMiddlewares } from '../../utils/create-middlewares';
+import { FlowCoreProviderService } from '../../services';
 
 export abstract class BackgroundPatternBase {
-  private readonly ngDiagramService: NgDiagramService<AppMiddlewares> = inject(NgDiagramService<AppMiddlewares>);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   protected setupPatternEffect() {
     effect(() => {
-      const model = this.ngDiagramService.getModel();
-      const { viewport } = model.getMetadata();
+      const viewport = this.flowCoreProvider.provide().getViewport();
 
       if (viewport) {
         const backgroundPattern = this.getBackgroundPattern();
