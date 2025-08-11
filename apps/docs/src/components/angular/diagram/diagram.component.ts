@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
   createSignalModel,
   NgDiagramComponent,
-  NgDiagramModule,
+  NgDiagramContextComponent,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
 
@@ -11,7 +11,7 @@ import {
   selector: 'diagram',
   templateUrl: './diagram.component.html',
   styleUrl: './diagram.component.scss',
-  imports: [NgDiagramComponent, NgDiagramModule],
+  imports: [NgDiagramComponent, NgDiagramContextComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiagramComponent {
