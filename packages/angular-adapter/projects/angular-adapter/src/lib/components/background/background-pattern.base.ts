@@ -5,12 +5,14 @@ import { FlowCoreProviderService } from '../../services';
 export abstract class BackgroundPatternBase {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  protected setupPatternEffect(backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>) {
+  protected abstract readonly backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>;
+
+  constructor() {
     effect(() => {
       const viewport = this.flowCoreProvider.provide().getViewport();
 
-      if (viewport && backgroundPattern) {
-        const pattern = backgroundPattern();
+      if (viewport) {
+        const pattern = this.backgroundPattern();
         if (!pattern) return;
 
         const size = this.getPatternSize(pattern.nativeElement, viewport.scale);

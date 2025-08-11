@@ -7,10 +7,5 @@ import { BackgroundPatternBase } from '../../background-pattern.base';
   styleUrl: './logo-background.component.scss',
 })
 export class LogoBackgroundComponent extends BackgroundPatternBase {
-  private readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
-
-  constructor() {
-    super();
-    this.setupPatternEffect(this.backgroundPattern);
-  }
+  protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 }

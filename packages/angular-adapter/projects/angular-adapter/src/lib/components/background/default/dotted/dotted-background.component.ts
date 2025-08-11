@@ -9,13 +9,8 @@ import { BackgroundPatternBase } from '../../background-pattern.base';
 })
 export class DottedBackgroundComponent extends BackgroundPatternBase {
   private readonly flowCore = inject(FlowCoreProviderService);
-  private readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
-  dotSize = 60;
 
-  constructor() {
-    super();
+  protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
-    this.dotSize = this.flowCore.provide().config.background.dotSize;
-    this.setupPatternEffect(this.backgroundPattern);
-  }
+  dotSize = this.flowCore.provide().config.background.dotSize;
 }
