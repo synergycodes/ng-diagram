@@ -16,7 +16,11 @@ export abstract class BackgroundPatternBase {
   });
 
   fill = computed(() => {
-    return this.viewport().scale > 0.4 ? 'var(--ngd-background-dot-color)' : 'none';
+    return this.viewport().scale > 0.3 ? 'var(--ngd-background-dot-color)' : 'none';
+  });
+
+  fillOpacity = computed(() => {
+    return this.viewport().scale - 0.2;
   });
 
   patternTransform = computed(() => {
