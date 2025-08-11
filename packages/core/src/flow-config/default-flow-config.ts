@@ -1,6 +1,7 @@
 import { LayoutAlignmentType, LayoutAngleType } from '../types';
 import type { Edge } from '../types/edge.interface';
 import type {
+  BackgroundConfig,
   FlowConfig,
   GroupingConfig,
   LinkingConfig,
@@ -59,6 +60,10 @@ const defaultZoomConfig: ZoomConfig = {
   step: 0.05,
 };
 
+const defaultBackgroundConfig: BackgroundConfig = {
+  dotSize: 60,
+};
+
 const defaultTreeLayoutConfig: TreeLayoutConfig = {
   getLayoutAngleForNode: (): LayoutAngleType | null => {
     return null;
@@ -110,6 +115,7 @@ export const defaultFlowConfig: FlowConfig = {
   linking: defaultLinkingConfig,
   grouping: defaultGroupingConfig,
   zoom: defaultZoomConfig,
+  background: defaultBackgroundConfig,
   treeLayout: defaultTreeLayoutConfig,
   nodeRotation: defaultNodeRotationConfig,
   snapping: defaultNodeDraggingConfig,

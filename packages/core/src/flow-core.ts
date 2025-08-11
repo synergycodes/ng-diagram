@@ -368,6 +368,13 @@ export class FlowCore<
     return this.model.getMetadata().viewport.scale;
   }
 
+  /**
+   * Returns the current viewport
+   */
+  getViewport() {
+    return this.model.getMetadata().viewport;
+  }
+
   get updater(): Updater {
     if (!this.initUpdater.isInitialized) {
       return this.initUpdater;

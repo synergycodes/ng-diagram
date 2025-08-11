@@ -3,6 +3,11 @@
   display: flex;
   position: relative;
   overflow: hidden;
-  background-color: var(--ngd-ui-bg-tertiary-default);
+  background-color: var(--ngd-background-color);
   touch-action: none;
+
+  .diagram-background-container {
+    width: 100%;
+    height: 100%;
+  }
 }
