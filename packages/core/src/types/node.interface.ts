@@ -1,7 +1,15 @@
 import type { Point, PortSide, Size } from './utils';
 
+/**
+ * Interface representing all possible node types in the diagram
+ * @category Types
+ */
 export type Node = SimpleNode | GroupNode;
 
+/**
+ * Interface representing a group node in the diagram
+ * @category Types
+ */
 export interface GroupNode extends SimpleNode {
   /**
    * Flag indicating the node is a group
@@ -14,7 +22,7 @@ export interface GroupNode extends SimpleNode {
 }
 
 /**
- * Interface representing a node in the flow diagram
+ * Interface representing the most basic node in the diagram
  * @category Types
  */
 export interface SimpleNode {

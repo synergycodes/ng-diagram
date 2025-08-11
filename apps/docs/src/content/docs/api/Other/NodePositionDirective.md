@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NodePositionDirective"
+title: 'NodePositionDirective'
 ---
 
 ## Constructors
@@ -19,9 +19,9 @@ title: "NodePositionDirective"
 
 ### data
 
-> **data**: `InputSignal`\<[`Node`](/api/other/node/)\>
+> **data**: `InputSignal`\<[`Node`](/api/types/node/)\>
 
-***
+---
 
 ### position
 

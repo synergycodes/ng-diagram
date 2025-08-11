@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "PointerInputEvent"
+title: 'PointerInputEvent'
 ---
 
 ## Extends
@@ -11,15 +11,15 @@ title: "PointerInputEvent"
 
 ## Properties
 
-### \[PROPAGATION\_STOPPED\_SYMBOL\]?
+### \[PROPAGATION_STOPPED_SYMBOL\]?
 
-> `optional` **\[PROPAGATION\_STOPPED\_SYMBOL\]**: `boolean`
+> `optional` **\[PROPAGATION_STOPPED_SYMBOL\]**: `boolean`
 
 #### Inherited from
 
 `PointerEvent.[PROPAGATION_STOPPED_SYMBOL]`
 
-***
+---
 
 ### altitudeAngle
 
@@ -31,7 +31,7 @@ title: "PointerInputEvent"
 
 `PointerEvent.altitudeAngle`
 
-***
+---
 
 ### altKey
 
@@ -43,17 +43,17 @@ title: "PointerInputEvent"
 
 `PointerEvent.altKey`
 
-***
+---
 
-### AT\_TARGET
+### AT_TARGET
 
-> `readonly` **AT\_TARGET**: `2`
+> `readonly` **AT_TARGET**: `2`
 
 #### Inherited from
 
 `PointerEvent.AT_TARGET`
 
-***
+---
 
 ### azimuthAngle
 
@@ -65,7 +65,7 @@ title: "PointerInputEvent"
 
 `PointerEvent.azimuthAngle`
 
-***
+---
 
 ### bubbles
 
@@ -79,17 +79,17 @@ Returns true or false depending on how event was initialized. True if event goes
 
 `PointerEvent.bubbles`
 
-***
+---
 
-### BUBBLING\_PHASE
+### BUBBLING_PHASE
 
-> `readonly` **BUBBLING\_PHASE**: `3`
+> `readonly` **BUBBLING_PHASE**: `3`
 
 #### Inherited from
 
 `PointerEvent.BUBBLING_PHASE`
 
-***
+---
 
 ### button
 
@@ -101,7 +101,7 @@ Returns true or false depending on how event was initialized. True if event goes
 
 `PointerEvent.button`
 
-***
+---
 
 ### buttons
 
@@ -113,7 +113,7 @@ Returns true or false depending on how event was initialized. True if event goes
 
 `PointerEvent.buttons`
 
-***
+---
 
 ### cancelable
 
@@ -127,7 +127,7 @@ Returns true or false depending on how event was initialized. Its return value d
 
 `PointerEvent.cancelable`
 
-***
+---
 
 ### ~~cancelBubble~~
 
@@ -141,17 +141,17 @@ Returns true or false depending on how event was initialized. Its return value d
 
 `PointerEvent.cancelBubble`
 
-***
+---
 
-### CAPTURING\_PHASE
+### CAPTURING_PHASE
 
-> `readonly` **CAPTURING\_PHASE**: `1`
+> `readonly` **CAPTURING_PHASE**: `1`
 
 #### Inherited from
 
 `PointerEvent.CAPTURING_PHASE`
 
-***
+---
 
 ### clientX
 
@@ -163,7 +163,7 @@ Returns true or false depending on how event was initialized. Its return value d
 
 `PointerEvent.clientX`
 
-***
+---
 
 ### clientY
 
@@ -175,7 +175,7 @@ Returns true or false depending on how event was initialized. Its return value d
 
 `PointerEvent.clientY`
 
-***
+---
 
 ### composed
 
@@ -189,7 +189,7 @@ Returns true or false depending on how event was initialized. True if event invo
 
 `PointerEvent.composed`
 
-***
+---
 
 ### ctrlKey
 
@@ -201,7 +201,7 @@ Returns true or false depending on how event was initialized. True if event invo
 
 `PointerEvent.ctrlKey`
 
-***
+---
 
 ### currentTarget
 
@@ -215,7 +215,7 @@ Returns the object whose event listener's callback is currently being invoked.
 
 [`PointerInputEvent`](/api/other/pointerinputevent/).[`currentTarget`](/api/other/pointerinputevent/#currenttarget)
 
-***
+---
 
 ### defaultPrevented
 
@@ -229,7 +229,7 @@ Returns true if preventDefault() was invoked successfully to indicate cancelatio
 
 `PointerEvent.defaultPrevented`
 
-***
+---
 
 ### detail
 
@@ -241,7 +241,7 @@ Returns true if preventDefault() was invoked successfully to indicate cancelatio
 
 `PointerEvent.detail`
 
-***
+---
 
 ### eventPhase
 
@@ -255,7 +255,7 @@ Returns the event's phase, which is one of NONE, CAPTURING_PHASE, AT_TARGET, and
 
 `PointerEvent.eventPhase`
 
-***
+---
 
 ### height
 
@@ -267,7 +267,7 @@ Returns the event's phase, which is one of NONE, CAPTURING_PHASE, AT_TARGET, and
 
 `PointerEvent.height`
 
-***
+---
 
 ### isPrimary
 
@@ -279,7 +279,7 @@ Returns the event's phase, which is one of NONE, CAPTURING_PHASE, AT_TARGET, and
 
 `PointerEvent.isPrimary`
 
-***
+---
 
 ### isTrusted
 
@@ -293,7 +293,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.isTrusted`
 
-***
+---
 
 ### layerX
 
@@ -305,7 +305,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.layerX`
 
-***
+---
 
 ### layerY
 
@@ -317,13 +317,13 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.layerY`
 
-***
+---
 
 ### linkingHandled?
 
 > `optional` **linkingHandled**: `boolean`
 
-***
+---
 
 ### metaKey
 
@@ -335,7 +335,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.metaKey`
 
-***
+---
 
 ### movementX
 
@@ -347,7 +347,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.movementX`
 
-***
+---
 
 ### movementY
 
@@ -359,13 +359,13 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.movementY`
 
-***
+---
 
 ### moveSelectionHandled?
 
 > `optional` **moveSelectionHandled**: `boolean`
 
-***
+---
 
 ### NONE
 
@@ -375,7 +375,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.NONE`
 
-***
+---
 
 ### offsetX
 
@@ -387,7 +387,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.offsetX`
 
-***
+---
 
 ### offsetY
 
@@ -399,7 +399,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.offsetY`
 
-***
+---
 
 ### pageX
 
@@ -411,7 +411,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.pageX`
 
-***
+---
 
 ### pageY
 
@@ -423,7 +423,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.pageY`
 
-***
+---
 
 ### pointerId
 
@@ -435,7 +435,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.pointerId`
 
-***
+---
 
 ### pointerType
 
@@ -447,7 +447,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.pointerType`
 
-***
+---
 
 ### pressure
 
@@ -459,7 +459,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.pressure`
 
-***
+---
 
 ### relatedTarget
 
@@ -471,7 +471,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.relatedTarget`
 
-***
+---
 
 ### ~~returnValue~~
 
@@ -485,13 +485,13 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.returnValue`
 
-***
+---
 
 ### rotateHandled?
 
 > `optional` **rotateHandled**: `boolean`
 
-***
+---
 
 ### screenX
 
@@ -503,7 +503,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.screenX`
 
-***
+---
 
 ### screenY
 
@@ -515,13 +515,13 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.screenY`
 
-***
+---
 
 ### selectHandled?
 
 > `optional` **selectHandled**: `boolean`
 
-***
+---
 
 ### shiftKey
 
@@ -533,7 +533,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.shiftKey`
 
-***
+---
 
 ### ~~srcElement~~
 
@@ -547,7 +547,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 [`PointerInputEvent`](/api/other/pointerinputevent/).[`srcElement`](/api/other/pointerinputevent/#srcelement)
 
-***
+---
 
 ### tangentialPressure
 
@@ -559,7 +559,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 `PointerEvent.tangentialPressure`
 
-***
+---
 
 ### target
 
@@ -573,7 +573,7 @@ Returns the object to which event is dispatched (its target).
 
 [`PointerInputEvent`](/api/other/pointerinputevent/).[`target`](/api/other/pointerinputevent/#target)
 
-***
+---
 
 ### tiltX
 
@@ -585,7 +585,7 @@ Returns the object to which event is dispatched (its target).
 
 `PointerEvent.tiltX`
 
-***
+---
 
 ### tiltY
 
@@ -597,7 +597,7 @@ Returns the object to which event is dispatched (its target).
 
 `PointerEvent.tiltY`
 
-***
+---
 
 ### timeStamp
 
@@ -611,7 +611,7 @@ Returns the event's timestamp as the number of milliseconds measured relative to
 
 `PointerEvent.timeStamp`
 
-***
+---
 
 ### twist
 
@@ -623,7 +623,7 @@ Returns the event's timestamp as the number of milliseconds measured relative to
 
 `PointerEvent.twist`
 
-***
+---
 
 ### type
 
@@ -637,7 +637,7 @@ Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 `PointerEvent.type`
 
-***
+---
 
 ### view
 
@@ -649,7 +649,7 @@ Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 `PointerEvent.view`
 
-***
+---
 
 ### ~~which~~
 
@@ -663,7 +663,7 @@ Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 `PointerEvent.which`
 
-***
+---
 
 ### width
 
@@ -675,7 +675,7 @@ Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 `PointerEvent.width`
 
-***
+---
 
 ### x
 
@@ -687,7 +687,7 @@ Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 `PointerEvent.x`
 
-***
+---
 
 ### y
 
@@ -699,7 +699,7 @@ Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 `PointerEvent.y`
 
-***
+---
 
 ### zoomingHandled?
 
@@ -723,7 +723,7 @@ Returns the invocation target objects of event's path (objects on which listener
 
 `PointerEvent.composedPath`
 
-***
+---
 
 ### getCoalescedEvents()
 
@@ -741,7 +741,7 @@ Available only in secure contexts.
 
 `PointerEvent.getCoalescedEvents`
 
-***
+---
 
 ### getModifierState()
 
@@ -763,7 +763,7 @@ Available only in secure contexts.
 
 `PointerEvent.getModifierState`
 
-***
+---
 
 ### getPredictedEvents()
 
@@ -779,7 +779,7 @@ Available only in secure contexts.
 
 `PointerEvent.getPredictedEvents`
 
-***
+---
 
 ### ~~initEvent()~~
 
@@ -811,7 +811,7 @@ Available only in secure contexts.
 
 `PointerEvent.initEvent`
 
-***
+---
 
 ### ~~initMouseEvent()~~
 
@@ -891,7 +891,7 @@ Available only in secure contexts.
 
 `PointerEvent.initMouseEvent`
 
-***
+---
 
 ### ~~initUIEvent()~~
 
@@ -931,7 +931,7 @@ Available only in secure contexts.
 
 `PointerEvent.initUIEvent`
 
-***
+---
 
 ### preventDefault()
 
@@ -949,7 +949,7 @@ If invoked when the cancelable attribute value is true, and while executing a li
 
 `PointerEvent.preventDefault`
 
-***
+---
 
 ### stopImmediatePropagation()
 
@@ -967,7 +967,7 @@ Invoking this method prevents event from reaching any registered event listeners
 
 `PointerEvent.stopImmediatePropagation`
 
-***
+---
 
 ### stopPropagation()
 

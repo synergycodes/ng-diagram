@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "AppMiddlewares"
+title: 'AppMiddlewares'
 ---
 
-> **AppMiddlewares** = *typeof* [`BUILTIN_MIDDLEWARES`](/api/other/builtin_middlewares/)
+> **AppMiddlewares** = _typeof_ [`BUILTIN_MIDDLEWARES`](/api/other/builtin_middlewares/)

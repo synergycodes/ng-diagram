@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramComponent"
+title: 'NgDiagramComponent'
 ---
 
 Diagram component
@@ -11,11 +11,11 @@ Diagram component
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* `MiddlewareChain` = \[\]
+`TMiddlewares` _extends_ `MiddlewareChain` = \[\]
 
 ### TAdapter
 
-`TAdapter` *extends* `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
+`TAdapter` _extends_ `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
 
 ## Implements
 
@@ -40,7 +40,7 @@ Diagram component
 
 Global configuration options for the diagram.
 
-***
+---
 
 ### debugMode
 
@@ -49,13 +49,13 @@ Global configuration options for the diagram.
 Enables or disables debug mode for the diagram.
 When enabled, additional console logs are printed.
 
-***
+---
 
 ### edges
 
 > **edges**: `WritableSignal`\<[`Edge`](/api/other/edge/)[]\>
 
-***
+---
 
 ### edgeTemplateMap
 
@@ -64,7 +64,7 @@ When enabled, additional console logs are printed.
 The edge template map to use for the diagram.
 Optional - if not provided, default edge rendering will be used.
 
-***
+---
 
 ### middlewares
 
@@ -77,7 +77,7 @@ replace existing ones, or override the defaults.
 ⚠️ Use with caution — incorrectly implemented custom middlewares
 can degrade performance or completely break the data flow.
 
-***
+---
 
 ### model
 
@@ -85,13 +85,13 @@ can degrade performance or completely break the data flow.
 
 The model to use in the diagram.
 
-***
+---
 
 ### nodes
 
-> **nodes**: `WritableSignal`\<[`Node`](/api/other/node/)[]\>
+> **nodes**: `WritableSignal`\<[`Node`](/api/types/node/)[]\>
 
-***
+---
 
 ### nodeTemplateMap
 
@@ -99,7 +99,7 @@ The model to use in the diagram.
 
 The node template map to use for the diagram.
 
-***
+---
 
 ### viewport
 
@@ -115,7 +115,7 @@ The node template map to use for the diagram.
 
 `DOMRect`
 
-***
+---
 
 ### getEdgeTemplate()
 
@@ -131,23 +131,58 @@ The node template map to use for the diagram.
 
 `null` \| `Type$1`\<[`NgDiagramEdgeTemplate`](/api/other/ngdiagramedgetemplate/)\>
 
-***
+---
 
 ### getNodeTemplate()
 
-> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<`SimpleNode`\>\> \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<[`GroupNode`](/api/other/groupnode/)\>\>
+> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<`SimpleNode`\>\> \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<[`GroupNode`](/api/types/groupnode/)\>\>
+
+Retrieves the custom Angular component template for rendering a specific node type.
+
+This method performs a lookup in the node template map to find a custom component
+for the given node type. If no custom template is registered, it returns null,
+which will cause the diagram to fall back to the default node template.
 
 #### Parameters
 
 ##### nodeType
 
+The type identifier of the node to get a template for.
+
 `undefined` | `string`
 
 #### Returns
 
-`null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<`SimpleNode`\>\> \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<[`GroupNode`](/api/other/groupnode/)\>\>
+`null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<`SimpleNode`\>\> \| `Type$1`\<[`NgDiagramNodeTemplate`](/api/other/ngdiagramnodetemplate/)\<[`GroupNode`](/api/types/groupnode/)\>\>
 
-***
+The Angular component class registered for the node type, or
+null if no custom template is registered for this type
+
+#### Example
+
+Basic usage in template:
+
+```typescript
+// In your component
+const nodeTemplates = new Map([
+  ['database', DatabaseNodeComponent],
+  ['api', ApiNodeComponent],
+]);
+
+// The method will return DatabaseNodeComponent for database nodes
+const dbTemplate = this.getNodeTemplate('database'); // Returns DatabaseNodeComponent
+```
+
+#### See
+
+- [nodeTemplateMap](/api/components/ngdiagramcomponent/#nodetemplatemap) - The input property where templates are registered
+- [NgDiagramNodeTemplateMap](/api/other/ngdiagramnodetemplatemap/) - Type definition for the template map
+
+#### Throws
+
+This method does not throw exceptions - it handles all edge cases gracefully
+
+---
 
 ### isGroup()
 
@@ -157,13 +192,13 @@ The node template map to use for the diagram.
 
 ##### node
 
-[`Node`](/api/other/node/)
+[`Node`](/api/types/node/)
 
 #### Returns
 
 `node is GroupNode`
 
-***
+---
 
 ### ngOnDestroy()
 
@@ -180,7 +215,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `OnDestroy.ngOnDestroy`
 
-***
+---
 
 ### ngOnInit()
 

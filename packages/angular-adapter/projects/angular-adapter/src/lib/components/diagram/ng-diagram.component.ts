@@ -156,6 +156,35 @@ export class NgDiagramComponent<
     this.cleanupViewportSizeTracking();
   }
 
+  /**
+   * Retrieves the custom Angular component template for rendering a specific node type.
+   *
+   * This method performs a lookup in the node template map to find a custom component
+   * for the given node type. If no custom template is registered, it returns null,
+   * which will cause the diagram to fall back to the default node template.
+   *
+   * @param nodeType - The type identifier of the node to get a template for.
+   *
+   * @returns The Angular component class registered for the node type, or
+   * null if no custom template is registered for this type
+   *
+   * @example
+   * Basic usage in template:
+   * ```typescript
+   * // In your component
+   * const nodeTemplates = new Map([
+   *   ['database', DatabaseNodeComponent],
+   *   ['api', ApiNodeComponent]
+   * ]);
+   *
+   * // The method will return DatabaseNodeComponent for database nodes
+   * const dbTemplate = this.getNodeTemplate('database'); // Returns DatabaseNodeComponent
+   * ```
+   * @see {@link nodeTemplateMap} - The input property where templates are registered
+   * @see {@link NgDiagramNodeTemplateMap} - Type definition for the template map
+   *
+   * @throws This method does not throw exceptions - it handles all edge cases gracefully
+   */
   getNodeTemplate(nodeType: Node['type']) {
     return this.nodeTemplateMap().get(nodeType || '') ?? null;
   }

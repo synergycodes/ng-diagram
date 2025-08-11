@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NodeSizeDirective"
+title: 'NodeSizeDirective'
 ---
 
 ## Implements
@@ -26,25 +26,25 @@ title: "NodeSizeDirective"
 
 > **autoSize**: `Signal`\<`boolean`\>
 
-***
+---
 
 ### data
 
-> **data**: `InputSignal`\<[`Node`](/api/other/node/)\>
+> **data**: `InputSignal`\<[`Node`](/api/types/node/)\>
 
-***
+---
 
 ### id
 
 > **id**: `Signal`\<`string`\>
 
-***
+---
 
 ### size
 
 > **size**: `Signal`\<`undefined` \| `Size`\>
 
-***
+---
 
 ### sizeState
 
@@ -67,7 +67,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `OnDestroy.ngOnDestroy`
 
-***
+---
 
 ### ngOnInit()
 

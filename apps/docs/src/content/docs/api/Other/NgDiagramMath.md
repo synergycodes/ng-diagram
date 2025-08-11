@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramMath"
+title: 'NgDiagramMath'
 ---
 
 > **NgDiagramMath** = `object`
@@ -27,7 +27,7 @@ title: "NgDiagramMath"
 
 `number`
 
-***
+---
 
 ### clamp()
 
@@ -53,7 +53,7 @@ title: "NgDiagramMath"
 
 `number`
 
-***
+---
 
 ### detectContainerEdge()
 
@@ -77,7 +77,7 @@ title: "NgDiagramMath"
 
 `ContainerEdge`
 
-***
+---
 
 ### distanceBetweenPoints()
 
@@ -97,7 +97,7 @@ title: "NgDiagramMath"
 
 `number`
 
-***
+---
 
 ### normalizeAngle()
 
@@ -113,7 +113,7 @@ title: "NgDiagramMath"
 
 `number`
 
-***
+---
 
 ### snapAngle()
 
@@ -141,7 +141,7 @@ The snapping step (e.g., 5 for 5-degree increments)
 
 The snapped angle (in degrees)
 
-***
+---
 
 ### snapNumber()
 
@@ -161,7 +161,7 @@ The snapped angle (in degrees)
 
 `number`
 
-***
+---
 
 ### snapPoint()
 

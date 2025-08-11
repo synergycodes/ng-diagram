@@ -2,18 +2,18 @@
 editUrl: false
 next: false
 prev: false
-title: "FlowCore"
+title: 'FlowCore'
 ---
 
 ## Type Parameters
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* `MiddlewareChain` = \[\]
+`TMiddlewares` _extends_ `MiddlewareChain` = \[\]
 
 ### TMetadata
 
-`TMetadata` *extends* [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\> = [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>
+`TMetadata` _extends_ [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\> = [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>
 
 ## Properties
 
@@ -21,25 +21,25 @@ title: "FlowCore"
 
 > `readonly` **actionStateManager**: `ActionStateManager`
 
-***
+---
 
 ### commandHandler
 
 > `readonly` **commandHandler**: `CommandHandler`
 
-***
+---
 
 ### config
 
 > `readonly` **config**: `FlowConfig`
 
-***
+---
 
 ### environment
 
 > `readonly` **environment**: `EnvironmentInfo`
 
-***
+---
 
 ### getFlowOffset()
 
@@ -57,37 +57,37 @@ title: "FlowCore"
 
 > **y**: `number`
 
-***
+---
 
 ### inputEventsRouter
 
 > `readonly` **inputEventsRouter**: `InputEventsRouter`
 
-***
+---
 
 ### middlewareManager
 
 > `readonly` **middlewareManager**: `MiddlewareManager`\<`TMiddlewares`, `TMetadata`\>
 
-***
+---
 
 ### modelLookup
 
 > `readonly` **modelLookup**: `ModelLookup`
 
-***
+---
 
 ### portBatchProcessor
 
 > `readonly` **portBatchProcessor**: `PortBatchProcessor`
 
-***
+---
 
 ### spatialHash
 
 > `readonly` **spatialHash**: `SpatialHash`
 
-***
+---
 
 ### transactionManager
 
@@ -131,7 +131,7 @@ Type of model action to apply
 
 `Promise`\<`void`\>
 
-***
+---
 
 ### clientToFlowPosition()
 
@@ -167,7 +167,7 @@ Flow position
 
 > **y**: `number`
 
-***
+---
 
 ### destroy()
 
@@ -177,7 +177,7 @@ Flow position
 
 `void`
 
-***
+---
 
 ### flowToClientPosition()
 
@@ -213,7 +213,7 @@ Client position
 
 > **y**: `number`
 
-***
+---
 
 ### getEdgeById()
 
@@ -235,7 +235,7 @@ Edge id
 
 Edge
 
-***
+---
 
 ### getEnvironment()
 
@@ -247,11 +247,11 @@ Gets the current environment information
 
 `EnvironmentInfo`
 
-***
+---
 
 ### getNearestNodeInRange()
 
-> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/api/other/node/)
+> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/api/types/node/)
 
 Gets the nearest node in a range from a point
 
@@ -277,11 +277,11 @@ Range to check in
 
 #### Returns
 
-`null` \| [`Node`](/api/other/node/)
+`null` \| [`Node`](/api/types/node/)
 
 Nearest node in range or null
 
-***
+---
 
 ### getNearestPortInRange()
 
@@ -315,11 +315,11 @@ Range to check in
 
 Nearest port in range or null
 
-***
+---
 
 ### getNodeById()
 
-> **getNodeById**(`nodeId`): `null` \| [`Node`](/api/other/node/)
+> **getNodeById**(`nodeId`): `null` \| [`Node`](/api/types/node/)
 
 Gets a node by id
 
@@ -333,15 +333,15 @@ Node id
 
 #### Returns
 
-`null` \| [`Node`](/api/other/node/)
+`null` \| [`Node`](/api/types/node/)
 
 Node
 
-***
+---
 
 ### getNodesInRange()
 
-> **getNodesInRange**(`point`, `range`): [`Node`](/api/other/node/)[]
+> **getNodesInRange**(`point`, `range`): [`Node`](/api/types/node/)[]
 
 Gets all nodes in a range from a point
 
@@ -367,11 +367,11 @@ Range to check in
 
 #### Returns
 
-[`Node`](/api/other/node/)[]
+[`Node`](/api/types/node/)[]
 
 Array of nodes in range
 
-***
+---
 
 ### getScale()
 
@@ -383,7 +383,7 @@ Returns the current zoom scale
 
 `number`
 
-***
+---
 
 ### getState()
 
@@ -395,7 +395,7 @@ Gets the current state of the flow
 
 `FlowState`\<`TMetadata`\>
 
-***
+---
 
 ### layout()
 
@@ -413,7 +413,7 @@ Sets the layout
 
 `void`
 
-***
+---
 
 ### registerMiddleware()
 
@@ -439,7 +439,7 @@ Function to unregister the middleware
 
 `void`
 
-***
+---
 
 ### setDebugMode()
 
@@ -455,7 +455,7 @@ Function to unregister the middleware
 
 `void`
 
-***
+---
 
 ### setState()
 
@@ -475,7 +475,7 @@ State to set
 
 `void`
 
-***
+---
 
 ### transaction()
 
@@ -575,7 +575,7 @@ await flowCore.transaction(async (tx) => {
 });
 ```
 
-***
+---
 
 ### unregisterMiddleware()
 
@@ -595,7 +595,7 @@ Name of the middleware to unregister
 
 `void`
 
-***
+---
 
 ### updateMiddlewareConfig()
 
@@ -607,7 +607,7 @@ Updates the configuration of a middleware
 
 ##### TName
 
-`TName` *extends* `string`
+`TName` _extends_ `string`
 
 #### Parameters
 
@@ -620,6 +620,8 @@ Name of the middleware to update
 ##### config
 
 `TMetadata`\[`"middlewaresConfig"`\]\[`TName`\]
+
+Config of the middleware to update
 
 #### Returns
 

@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "ZIndexDirective"
+title: 'ZIndexDirective'
 ---
 
 ## Constructors
@@ -19,9 +19,9 @@ title: "ZIndexDirective"
 
 ### data
 
-> **data**: `InputSignal`\<[`Node`](/api/other/node/) \| [`Edge`](/api/other/edge/)\>
+> **data**: `InputSignal`\<[`Node`](/api/types/node/) \| [`Edge`](/api/other/edge/)\>
 
-***
+---
 
 ### zIndex
 

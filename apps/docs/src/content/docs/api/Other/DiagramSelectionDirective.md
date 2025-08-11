@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "DiagramSelectionDirective"
+title: 'DiagramSelectionDirective'
 ---
 
 ## Extends
@@ -27,13 +27,13 @@ title: "DiagramSelectionDirective"
 
 ### targetData
 
-> `readonly` **targetData**: `InputSignal`\<`undefined` \| [`Node`](/api/other/node/) \| [`Edge`](/api/other/edge/)\>
+> `readonly` **targetData**: `InputSignal`\<`undefined` \| [`Node`](/api/types/node/) \| [`Edge`](/api/other/edge/)\>
 
 #### Overrides
 
 `ObjectSelectionDirective.targetData`
 
-***
+---
 
 ### targetType
 

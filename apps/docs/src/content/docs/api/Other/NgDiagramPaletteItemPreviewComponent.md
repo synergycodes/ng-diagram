@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramPaletteItemPreviewComponent"
+title: 'NgDiagramPaletteItemPreviewComponent'
 ---
 
 ## Constructors
@@ -21,31 +21,31 @@ title: "NgDiagramPaletteItemPreviewComponent"
 
 > **isChrome**: `boolean`
 
-***
+---
 
 ### isSafari
 
 > **isSafari**: `boolean`
 
-***
+---
 
 ### isVisible
 
 > **isVisible**: `Signal`\<`boolean`\>
 
-***
+---
 
 ### preview
 
 > **preview**: `Signal`\<`undefined` \| `ElementRef`\<`HTMLElement`\>\>
 
-***
+---
 
 ### scale
 
 > **scale**: `InputSignal`\<`number`\>
 
-***
+---
 
 ### type
 

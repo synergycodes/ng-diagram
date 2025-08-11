@@ -7,3 +7,8 @@
     box-sizing: border-box;
   }
 }
+
+/* Hide page title in navigation */
+.site-title span {
+  display: none;
+}

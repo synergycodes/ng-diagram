@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "createSignalModel"
+title: 'createSignalModel'
 ---
 
 > **createSignalModel**\<`TMiddlewares`\>(`model`, `injector?`): `SignalModelAdapter`\<`TMiddlewares`\>
@@ -13,7 +13,7 @@ Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* `MiddlewareChain` = \[\]
+`TMiddlewares` _extends_ `MiddlewareChain` = \[\]
 
 ## Parameters
 

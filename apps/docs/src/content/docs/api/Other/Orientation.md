@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "Orientation"
+title: 'Orientation'
 ---
 
 ## Enumeration Members
@@ -11,7 +11,7 @@ title: "Orientation"
 
 > **Horizontal**: `"horizontal"`
 
-***
+---
 
 ### Vertical
 

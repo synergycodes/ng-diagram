@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramGroupHighlightedDirective"
+title: 'NgDiagramGroupHighlightedDirective'
 ---
 
 ## Constructors
@@ -19,9 +19,9 @@ title: "NgDiagramGroupHighlightedDirective"
 
 ### data
 
-> **data**: `InputSignal`\<[`GroupNode`](/api/other/groupnode/)\>
+> **data**: `InputSignal`\<[`GroupNode`](/api/types/groupnode/)\>
 
-***
+---
 
 ### highlighted
 

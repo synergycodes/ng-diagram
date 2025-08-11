@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "LinkingInputDirective"
+title: 'LinkingInputDirective'
 ---
 
 ## Implements
@@ -25,11 +25,11 @@ title: "LinkingInputDirective"
 
 > **portId**: `InputSignal`\<`string`\>
 
-***
+---
 
 ### target
 
-> **target**: `WritableSignal`\<`undefined` \| [`Node`](/api/other/node/)\>
+> **target**: `WritableSignal`\<`undefined` \| [`Node`](/api/types/node/)\>
 
 ## Methods
 
@@ -48,7 +48,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `OnDestroy.ngOnDestroy`
 
-***
+---
 
 ### onPointerDown()
 
@@ -64,7 +64,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `void`
 
-***
+---
 
 ### onPointerMove()
 
@@ -80,7 +80,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `void`
 
-***
+---
 
 ### onPointerUp()
 
@@ -96,7 +96,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `void`
 
-***
+---
 
 ### setTargetNode()
 
@@ -106,7 +106,7 @@ before a directive, pipe, or service instance is destroyed.
 
 ##### node
 
-[`Node`](/api/other/node/)
+[`Node`](/api/types/node/)
 
 #### Returns
 

@@ -2,18 +2,18 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramService"
+title: 'NgDiagramService'
 ---
 
 ## Type Parameters
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* `MiddlewareChain` = \[\]
+`TMiddlewares` _extends_ `MiddlewareChain` = \[\]
 
 ### TMetadata
 
-`TMetadata` *extends* [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\> = [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>
+`TMetadata` _extends_ [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\> = [`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>
 
 ## Constructors
 
@@ -38,7 +38,7 @@ This includes information about ongoing actions like resizing and linking
 
 `Readonly`\<`ActionState`\>
 
-***
+---
 
 ### getCommandHandler()
 
@@ -47,6 +47,7 @@ This includes information about ongoing actions like resizing and linking
 Returns diagram's command system for programmatic control.
 
 The command handler allows you to:
+
 - Emit system commands (select, move, copy, paste, etc.)
 - Listen for command events
 - Programmatically control diagram behavior
@@ -58,7 +59,7 @@ or integrating with external systems that need to control the diagram.
 
 `CommandHandler`
 
-***
+---
 
 ### getEdgeById()
 
@@ -80,7 +81,7 @@ Edge id
 
 Edge
 
-***
+---
 
 ### getEnvironment()
 
@@ -92,7 +93,7 @@ Gets the current environment information
 
 `EnvironmentInfo`
 
-***
+---
 
 ### getModel()
 
@@ -104,11 +105,11 @@ Returns the current model that NgDiagram instance is using
 
 `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
 
-***
+---
 
 ### getNearestNodeInRange()
 
-> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/api/other/node/)
+> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/api/types/node/)
 
 Gets the nearest node in a range from a point
 
@@ -134,11 +135,11 @@ Range to check in
 
 #### Returns
 
-`null` \| [`Node`](/api/other/node/)
+`null` \| [`Node`](/api/types/node/)
 
 Nearest node in range or null
 
-***
+---
 
 ### getNearestPortInRange()
 
@@ -172,11 +173,11 @@ Range to check in
 
 Nearest port in range or null
 
-***
+---
 
 ### getNodeById()
 
-> **getNodeById**(`nodeId`): `null` \| [`Node`](/api/other/node/)
+> **getNodeById**(`nodeId`): `null` \| [`Node`](/api/types/node/)
 
 Gets a node by id
 
@@ -190,15 +191,15 @@ Node id
 
 #### Returns
 
-`null` \| [`Node`](/api/other/node/)
+`null` \| [`Node`](/api/types/node/)
 
 Node
 
-***
+---
 
 ### getNodesInRange()
 
-> **getNodesInRange**(`point`, `range`): [`Node`](/api/other/node/)[]
+> **getNodesInRange**(`point`, `range`): [`Node`](/api/types/node/)[]
 
 Gets all nodes in a range from a point
 
@@ -224,11 +225,11 @@ Range to check in
 
 #### Returns
 
-[`Node`](/api/other/node/)[]
+[`Node`](/api/types/node/)[]
 
 Array of nodes in range
 
-***
+---
 
 ### getScale()
 
@@ -240,7 +241,7 @@ Returns the current zoom scale
 
 `Signal`\<`number`\>
 
-***
+---
 
 ### layout()
 
@@ -258,7 +259,7 @@ Sets the layout
 
 `void`
 
-***
+---
 
 ### registerMiddleware()
 
@@ -284,7 +285,7 @@ Function to unregister the middleware
 
 `void`
 
-***
+---
 
 ### transaction()
 
@@ -384,7 +385,7 @@ await ngDiagramService.transaction(async (tx) => {
 });
 ```
 
-***
+---
 
 ### unregisterMiddleware()
 
@@ -396,7 +397,7 @@ Unregister a middleware from the chain
 
 ##### name
 
-`MiddlewareConfigKeysType`\<`TMiddlewares`\>
+`MiddlewareConfigKeys`\<`TMiddlewares`\>
 
 Name of the middleware to unregister
 
@@ -404,7 +405,7 @@ Name of the middleware to unregister
 
 `void`
 
-***
+---
 
 ### updateMiddlewareConfig()
 
@@ -416,7 +417,7 @@ Updates the configuration of a middleware
 
 ##### TName
 
-`TName` *extends* `string`
+`TName` _extends_ `string`
 
 #### Parameters
 
@@ -429,6 +430,8 @@ Name of the middleware to update
 ##### config
 
 `TMetadata`\[`"middlewaresConfig"`\]\[`TName`\]
+
+Config of the middleware to update
 
 #### Returns
 

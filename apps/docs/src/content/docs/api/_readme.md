@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "@angularflow/angular-adapter"
+title: '@angularflow/angular-adapter'
 ---
 
 ## Components
@@ -12,6 +12,10 @@ title: "@angularflow/angular-adapter"
 ## Directives
 
 - [LinkingInputDirective](/api/directives/linkinginputdirective/)
+
+## Middlewares
+
+- [loggerMiddleware](/api/middlewares/loggermiddleware/)
 
 ## Other
 
@@ -42,7 +46,6 @@ title: "@angularflow/angular-adapter"
 - [ZoomingWheelDirective](/api/other/zoomingwheeldirective/)
 - [Edge](/api/other/edge/)
 - [FlowCore](/api/other/flowcore/)
-- [GroupNode](/api/other/groupnode/)
 - [Metadata](/api/other/metadata/)
 - [Middleware](/api/other/middleware/)
 - [NgDiagramEdgeTemplate](/api/other/ngdiagramedgetemplate/)
@@ -54,11 +57,10 @@ title: "@angularflow/angular-adapter"
 - [NgDiagramMath](/api/other/ngdiagrammath/)
 - [NgDiagramNodeTemplateMap](/api/other/ngdiagramnodetemplatemap/)
 - [NgDiagramPaletteItem](/api/other/ngdiagrampaletteitem/)
-- [Node](/api/other/node/)
-- [BUILTIN\_MIDDLEWARES](/api/other/builtin_middlewares/)
+- [BUILTIN_MIDDLEWARES](/api/other/builtin_middlewares/)
 - [getBezierPath](/api/other/getbezierpath/)
 - [getStraightPath](/api/other/getstraightpath/)
-- [MAX\_ORTHOGONAL\_RADIUS](/api/other/max_orthogonal_radius/)
+- [MAX_ORTHOGONAL_RADIUS](/api/other/max_orthogonal_radius/)
 - [createMiddlewares](/api/other/createmiddlewares/)
 - [createSignalModel](/api/other/createsignalmodel/)
 - [getOrthogonalPath](/api/other/getorthogonalpath/)
@@ -66,4 +68,6 @@ title: "@angularflow/angular-adapter"
 
 ## Types
 
+- [GroupNode](/api/types/groupnode/)
 - [Point](/api/types/point/)
+- [Node](/api/types/node/)

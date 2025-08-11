@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "Edge"
+title: 'Edge'
 ---
 
 Interface representing an edge (connection) between nodes in the flow diagram
@@ -15,7 +15,7 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 The data associated with the edge.
 
-***
+---
 
 ### id
 
@@ -23,7 +23,7 @@ The data associated with the edge.
 
 The unique identifier for the edge.
 
-***
+---
 
 ### labels?
 
@@ -31,7 +31,7 @@ The unique identifier for the edge.
 
 The labels of the edge.
 
-***
+---
 
 ### points?
 
@@ -39,7 +39,7 @@ The labels of the edge.
 
 The points of the edge defining the path.
 
-***
+---
 
 ### routing?
 
@@ -47,7 +47,7 @@ The points of the edge defining the path.
 
 The routing of the edge.
 
-***
+---
 
 ### selected?
 
@@ -55,7 +55,7 @@ The routing of the edge.
 
 Whether the edge is selected
 
-***
+---
 
 ### source
 
@@ -63,7 +63,7 @@ Whether the edge is selected
 
 The source node of the edge. If empty string it will use sourcePosition.
 
-***
+---
 
 ### sourceArrowhead?
 
@@ -71,7 +71,7 @@ The source node of the edge. If empty string it will use sourcePosition.
 
 The id of the source arrowhead of the edge.
 
-***
+---
 
 ### sourcePort?
 
@@ -79,7 +79,7 @@ The id of the source arrowhead of the edge.
 
 The port of the source node.
 
-***
+---
 
 ### sourcePosition?
 
@@ -87,7 +87,7 @@ The port of the source node.
 
 The position of the edge start.
 
-***
+---
 
 ### target
 
@@ -95,7 +95,7 @@ The position of the edge start.
 
 The target node of the edge. If empty string it will use targetPosition.
 
-***
+---
 
 ### targetArrowhead?
 
@@ -103,7 +103,7 @@ The target node of the edge. If empty string it will use targetPosition.
 
 The id of the target arrowhead of the edge.
 
-***
+---
 
 ### targetPort?
 
@@ -111,7 +111,7 @@ The id of the target arrowhead of the edge.
 
 The port of the target node.
 
-***
+---
 
 ### targetPosition?
 
@@ -119,7 +119,7 @@ The port of the target node.
 
 The position of the edge end.
 
-***
+---
 
 ### temporary?
 
@@ -127,7 +127,7 @@ The position of the edge end.
 
 Whether the edge is temporary.
 
-***
+---
 
 ### type?
 
@@ -135,7 +135,7 @@ Whether the edge is temporary.
 
 The type of the edge declared in edgeTemplateMap.
 
-***
+---
 
 ### zIndex?
 
@@ -143,7 +143,7 @@ The type of the edge declared in edgeTemplateMap.
 
 The z-index of the node. This value is set automatically
 
-***
+---
 
 ### zOrder?
 

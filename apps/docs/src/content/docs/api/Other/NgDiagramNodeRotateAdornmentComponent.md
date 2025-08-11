@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramNodeRotateAdornmentComponent"
+title: 'NgDiagramNodeRotateAdornmentComponent'
 ---
 
 ## Extends
@@ -27,9 +27,9 @@ title: "NgDiagramNodeRotateAdornmentComponent"
 
 ### eventTarget
 
-> `readonly` **eventTarget**: `Signal`\<\{ `element`: `undefined` \| [`Node`](/api/other/node/); `type`: `"rotate-handle"`; \}\>
+> `readonly` **eventTarget**: `Signal`\<\{ `element`: `undefined` \| [`Node`](/api/types/node/); `type`: `"rotate-handle"`; \}\>
 
-***
+---
 
 ### isRenderedOnCanvas
 
@@ -42,19 +42,19 @@ Returns true when the node component is available.
 
 `NodeContextGuardBase.isRenderedOnCanvas`
 
-***
+---
 
 ### isRotating
 
 > `readonly` **isRotating**: `WritableSignal`\<`boolean`\>
 
-***
+---
 
 ### nodeData
 
-> `readonly` **nodeData**: `Signal`\<`undefined` \| [`Node`](/api/other/node/)\>
+> `readonly` **nodeData**: `Signal`\<`undefined` \| [`Node`](/api/types/node/)\>
 
-***
+---
 
 ### showAdornment
 

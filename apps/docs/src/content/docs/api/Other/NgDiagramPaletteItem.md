@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramPaletteItem"
+title: 'NgDiagramPaletteItem'
 ---
 
 > **NgDiagramPaletteItem** = `SimpleNodeData` \| `GroupNodeData`

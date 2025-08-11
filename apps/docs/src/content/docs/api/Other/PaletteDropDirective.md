@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "PaletteDropDirective"
+title: 'PaletteDropDirective'
 ---
 
 ## Constructors
@@ -31,7 +31,7 @@ title: "PaletteDropDirective"
 
 `void`
 
-***
+---
 
 ### onDrop()
 

@@ -19,6 +19,10 @@ export default defineConfig({
     }),
     starlight({
       title: 'NgDiagram',
+      logo: {
+        light: './src/assets/ng-diagram-logo-black.svg',
+        dark: './src/assets/ng-diagram-logo-white.svg',
+      },
       customCss: ['./src/styles/custom.css'],
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/synergycodes/angularflow' }],
       sidebar: [
@@ -38,17 +42,14 @@ export default defineConfig({
         },
         {
           label: 'API',
-          autogenerate: { directory: 'api' },
-          collapsed: true,
+          autogenerate: { directory: 'api', collapsed: true },
+          collapsed: false,
         },
       ],
       plugins: [
         starlightTypeDoc({
           entryPoints: ['../../packages/angular-adapter/projects/angular-adapter/src/public-api.ts'],
-          tsconfig: '../../packages/angular-adapter/tsconfig.json',
-          sidebar: {
-            collapsed: true,
-          },
+          tsconfig: '../../packages/angular-adapter/projects/angular-adapter/tsconfig.lib.json',
           typeDoc: {
             router: 'category',
             disableSources: true,

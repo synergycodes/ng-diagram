@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramPaletteItemComponent"
+title: 'NgDiagramPaletteItemComponent'
 ---
 
 ## Constructors
@@ -37,7 +37,7 @@ title: "NgDiagramPaletteItemComponent"
 
 `void`
 
-***
+---
 
 ### onMouseDown()
 

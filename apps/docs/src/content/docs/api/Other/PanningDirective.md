@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "PanningDirective"
+title: 'PanningDirective'
 ---
 
 ## Implements
@@ -36,7 +36,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `OnDestroy.ngOnDestroy`
 
-***
+---
 
 ### onPointerDown()
 
@@ -52,7 +52,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `void`
 
-***
+---
 
 ### onPointerUp()
 

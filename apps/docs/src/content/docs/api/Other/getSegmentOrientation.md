@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "getSegmentOrientation"
+title: 'getSegmentOrientation'
 ---
 
 > **getSegmentOrientation**(`startX`, `endX`): [`Orientation`](/api/other/orientation/)

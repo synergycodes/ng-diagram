@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramPortComponent"
+title: 'NgDiagramPortComponent'
 ---
 
 ## Extends
@@ -34,7 +34,7 @@ title: "NgDiagramPortComponent"
 
 > **id**: `InputSignal`\<`string`\>
 
-***
+---
 
 ### isRenderedOnCanvas
 
@@ -47,31 +47,31 @@ Returns true when the node component is available.
 
 `NodeContextGuardBase.isRenderedOnCanvas`
 
-***
+---
 
 ### lastSide
 
 > **lastSide**: `WritableSignal`\<`undefined` \| `PortSide`\>
 
-***
+---
 
 ### lastType
 
 > **lastType**: `WritableSignal`\<`undefined` \| `"source"` \| `"target"` \| `"both"`\>
 
-***
+---
 
 ### nodeData
 
-> **nodeData**: `Signal`\<`undefined` \| [`Node`](/api/other/node/)\>
+> **nodeData**: `Signal`\<`undefined` \| [`Node`](/api/types/node/)\>
 
-***
+---
 
 ### side
 
 > **side**: `InputSignal`\<`PortSide`\>
 
-***
+---
 
 ### type
 
@@ -94,7 +94,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `OnDestroy.ngOnDestroy`
 
-***
+---
 
 ### ngOnInit()
 

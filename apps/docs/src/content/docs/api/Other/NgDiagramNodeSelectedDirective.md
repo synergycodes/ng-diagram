@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramNodeSelectedDirective"
+title: 'NgDiagramNodeSelectedDirective'
 ---
 
 ## Constructors
@@ -19,9 +19,9 @@ title: "NgDiagramNodeSelectedDirective"
 
 ### data
 
-> **data**: `InputSignal`\<[`Node`](/api/other/node/)\>
+> **data**: `InputSignal`\<[`Node`](/api/types/node/)\>
 
-***
+---
 
 ### selected
 

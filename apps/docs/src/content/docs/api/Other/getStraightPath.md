@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "getStraightPath"
+title: 'getStraightPath'
 ---
 
 > `const` **getStraightPath**: `GetPathImplementation`

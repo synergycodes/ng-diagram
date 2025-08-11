@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "Middleware"
+title: 'Middleware'
 ---
 
 Type for middleware function that transforms state
@@ -15,7 +15,7 @@ Type of the metadata of the middleware
 
 ### TName
 
-`TName` *extends* `string` = `string`
+`TName` _extends_ `string` = `string`
 
 Type of the name of the middleware (should be a string literal)
 
@@ -29,7 +29,7 @@ Type of the name of the middleware (should be a string literal)
 
 > `optional` **defaultMetadata**: `TMiddlewareMetadata`
 
-***
+---
 
 ### execute()
 
@@ -53,7 +53,7 @@ Type of the name of the middleware (should be a string literal)
 
 `void` \| `Promise`\<`void`\>
 
-***
+---
 
 ### name
 

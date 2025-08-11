@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "BaseEdgeLabelComponent"
+title: 'BaseEdgeLabelComponent'
 ---
 
 ## Implements
@@ -26,31 +26,31 @@ title: "BaseEdgeLabelComponent"
 
 > **edgeData**: `Signal`\<[`Edge`](/api/other/edge/)\>
 
-***
+---
 
 ### edgeId
 
 > **edgeId**: `Signal`\<`string`\>
 
-***
+---
 
 ### id
 
 > **id**: `InputSignal`\<`string`\>
 
-***
+---
 
 ### points
 
 > **points**: `Signal`\<`undefined` \| [`Point`](/api/types/point/)[]\>
 
-***
+---
 
 ### position
 
 > **position**: `Signal`\<[`Point`](/api/types/point/)\>
 
-***
+---
 
 ### positionOnEdge
 
@@ -73,7 +73,7 @@ before a directive, pipe, or service instance is destroyed.
 
 `OnDestroy.ngOnDestroy`
 
-***
+---
 
 ### ngOnInit()
 

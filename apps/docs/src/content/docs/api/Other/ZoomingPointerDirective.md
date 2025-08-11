@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "ZoomingPointerDirective"
+title: 'ZoomingPointerDirective'
 ---
 
 ## Constructors
@@ -37,7 +37,7 @@ title: "ZoomingPointerDirective"
 
 `void`
 
-***
+---
 
 ### onTouchMove()
 
@@ -53,7 +53,7 @@ title: "ZoomingPointerDirective"
 
 `void`
 
-***
+---
 
 ### onTouchStart()
 

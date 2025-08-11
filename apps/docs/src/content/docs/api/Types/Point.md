@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "Point"
+title: 'Point'
 ---
 
 Interface representing a point in the flow diagram
@@ -13,7 +13,7 @@ Interface representing a point in the flow diagram
 
 > **x**: `number`
 
-***
+---
 
 ### y
 

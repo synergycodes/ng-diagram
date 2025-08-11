@@ -2,14 +2,14 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramNodeTemplate"
+title: 'NgDiagramNodeTemplate'
 ---
 
 ## Type Parameters
 
 ### NodeType
 
-`NodeType` *extends* [`Node`](/api/other/node/) = `SimpleNode`
+`NodeType` _extends_ [`Node`](/api/types/node/) = `SimpleNode`
 
 ## Properties
 

@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "NgDiagramNodeResizeAdornmentComponent"
+title: 'NgDiagramNodeResizeAdornmentComponent'
 ---
 
 ## Extends
@@ -29,7 +29,7 @@ title: "NgDiagramNodeResizeAdornmentComponent"
 
 > **handlePositions**: `HandlePosition`[]
 
-***
+---
 
 ### isRenderedOnCanvas
 
@@ -42,19 +42,19 @@ Returns true when the node component is available.
 
 `NodeContextGuardBase.isRenderedOnCanvas`
 
-***
+---
 
 ### linePositions
 
 > **linePositions**: `LinePosition`[]
 
-***
+---
 
 ### nodeData
 
-> **nodeData**: `Signal`\<`undefined` \| [`Node`](/api/other/node/)\>
+> **nodeData**: `Signal`\<`undefined` \| [`Node`](/api/types/node/)\>
 
-***
+---
 
 ### showAdornment
 
