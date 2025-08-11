@@ -40,16 +40,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const deltaX = x - this.startPoint.x;
         const deltaY = y - this.startPoint.y;
 
-        let dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
-        let dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
-
-        // if at the edge use panning force for delta
-        if (event.currentDiagramEdge && event.distanceFromEdge !== undefined) {
-          const maxForce = this.flow.config.selectionMoving.pointerEdgePanningForce;
-          const threshold = this.flow.config.selectionMoving.pointerEdgePanningThreshold;
-          const force = NgDiagramMath.calculateGradualForce(event.distanceFromEdge, maxForce, threshold);
-          [dx, dy] = this.applyPanningForce(force, event.currentDiagramEdge);
-        }
+        const dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
+        const dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
 
         this.flow.transaction('moveNodes', async (tx) => {
           await tx.emit('moveNodesBy', {
@@ -58,7 +50,10 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           });
 
           this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
-          this.panDiagramOnScreenEdge(event.currentDiagramEdge, event.distanceFromEdge);
+
+          if (event.currentDiagramEdge) {
+            this.panDiagramOnScreenEdge(event.currentDiagramEdge, event.distanceFromEdge);
+          }
         });
 
         this.lastInputPoint = event.lastInputPoint;
@@ -148,11 +143,11 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     if (!screenEdge) {
       return;
     }
+
     let force = 0;
     if (distanceFromEdge !== undefined) {
       const maxForce = this.flow.config.selectionMoving.pointerEdgePanningForce;
       const threshold = this.flow.config.selectionMoving.pointerEdgePanningThreshold;
-
       force = NgDiagramMath.calculateGradualForce(distanceFromEdge, maxForce, threshold);
 
       if (force === 0) {
