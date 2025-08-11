@@ -2,10 +2,11 @@
   <pattern
     #backgroundPattern
     id="ng-diagram-background"
-    fill="var(--ngd-background-dot-color)"
+    [attr.fill]="fill()"
     [attr.staticWidth]="dotSize"
-    [attr.width]="dotSize"
-    [attr.height]="dotSize"
+    [attr.width]="size() || dotSize"
+    [attr.height]="size() || dotSize"
+    [attr.patternTransform]="patternTransform()"
     x="0"
     y="0"
     patternUnits="userSpaceOnUse"

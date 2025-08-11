@@ -15,7 +15,7 @@ export class NgDiagramBackgroundComponent implements AfterContentInit {
 
   private scale = computed(() => this.flowCoreProvider.provide().getScale());
 
-  showLogo = computed(() => this.scale() > 1.7);
+  showLogo = computed(() => this.scale() === 2);
   hasContent = false;
 
   ngAfterContentInit() {
