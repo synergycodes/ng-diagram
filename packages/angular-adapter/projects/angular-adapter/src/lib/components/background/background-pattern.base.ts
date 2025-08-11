@@ -1,4 +1,3 @@
-// background-pattern.base.ts
 import { effect, inject } from '@angular/core';
 import { Viewport } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../services';

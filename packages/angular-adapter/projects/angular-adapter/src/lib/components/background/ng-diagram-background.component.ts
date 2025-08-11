@@ -1,5 +1,4 @@
-import { NgIf } from '@angular/common';
-import { AfterContentInit, Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { AfterContentInit, Component, computed, ElementRef, inject, viewChild } from '@angular/core';
 import { FlowCoreProviderService } from '../../services';
 import { DottedBackgroundComponent } from './default/dotted/dotted-background.component';
 import { LogoBackgroundComponent } from './default/logo/logo-background.component';
@@ -8,22 +7,16 @@ import { LogoBackgroundComponent } from './default/logo/logo-background.componen
   selector: 'ng-diagram-background',
   templateUrl: './ng-diagram-background.component.html',
   styleUrls: ['./ng-diagram-background.component.scss'],
-  imports: [NgIf, LogoBackgroundComponent, DottedBackgroundComponent],
+  imports: [LogoBackgroundComponent, DottedBackgroundComponent],
 })
 export class NgDiagramBackgroundComponent implements AfterContentInit {
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  hasContent = false;
-  showLogo = signal(false);
+  private scale = computed(() => this.flowCoreProvider.provide().getScale());
 
-  constructor() {
-    effect(() => {
-      const flowCore = this.flowCoreProvider.provide();
-      const scale = flowCore.getViewport().scale;
-      this.showLogo.set(scale > 1.7);
-    });
-  }
+  showLogo = computed(() => this.scale() > 1.7);
+  hasContent = false;
 
   ngAfterContentInit() {
     this.hasContent = (this.custom()?.nativeElement?.childNodes?.length ?? 0) > 0;
