@@ -14,3 +14,5 @@ pnpm-lock.yaml
 .DS_Store
 
 **/dist
+
+**/src/content/docs/api/**/*.md

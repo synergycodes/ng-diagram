@@ -19,6 +19,7 @@ import type {
   MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
 } from '@angularflow/core';
+
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
@@ -28,6 +29,7 @@ import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zoo
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
+import { NgDiagramBackgroundComponent } from '../background/ng-diagram-background.component';
 import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
 import { NgDiagramDefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { NgDiagramMarkerArrowComponent } from '../edge/markers/marker-arrow.component';
@@ -36,6 +38,10 @@ import { NgDiagramDefaultGroupTemplateComponent } from '../node/default-group-te
 import { NgDiagramDefaultNodeTemplateComponent } from '../node/default-node-template/ng-diagram-default-node-template.component';
 import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
 
+/**
+ * Diagram component
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram',
   imports: [
@@ -47,6 +53,7 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
     NgDiagramDefaultNodeTemplateComponent,
     NgDiagramDefaultGroupTemplateComponent,
     NgDiagramEdgeComponent,
+    NgDiagramBackgroundComponent,
   ],
   templateUrl: './ng-diagram.component.html',
   styleUrl: './ng-diagram.component.scss',
@@ -152,6 +159,35 @@ export class NgDiagramComponent<
     this.cleanupViewportSizeTracking();
   }
 
+  /**
+   * Retrieves the custom Angular component template for rendering a specific node type.
+   *
+   * This method performs a lookup in the node template map to find a custom component
+   * for the given node type. If no custom template is registered, it returns null,
+   * which will cause the diagram to fall back to the default node template.
+   *
+   * @param nodeType - The type identifier of the node to get a template for.
+   *
+   * @returns The Angular component class registered for the node type, or
+   * null if no custom template is registered for this type
+   *
+   * @example
+   * Basic usage in template:
+   * ```typescript
+   * // In your component
+   * const nodeTemplates = new Map([
+   *   ['database', DatabaseNodeComponent],
+   *   ['api', ApiNodeComponent]
+   * ]);
+   *
+   * // The method will return DatabaseNodeComponent for database nodes
+   * const dbTemplate = this.getNodeTemplate('database'); // Returns DatabaseNodeComponent
+   * ```
+   * @see {@link nodeTemplateMap} - The input property where templates are registered
+   * @see {@link NgDiagramNodeTemplateMap} - Type definition for the template map
+   *
+   * @throws This method does not throw exceptions - it handles all edge cases gracefully
+   */
   getNodeTemplate(nodeType: Node['type']) {
     return this.nodeTemplateMap().get(nodeType || '') ?? null;
   }

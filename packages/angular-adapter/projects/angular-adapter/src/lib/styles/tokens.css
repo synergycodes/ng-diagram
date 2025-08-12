@@ -3,7 +3,7 @@
 /* DEFAULT LIGHT THEME */
 :root {
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-100);
-  --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-300);
+  --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-200);
   --ngd-ui-stroke-primary-focus: var(--ngd-colors-gray-500);
   --ngd-pt-stroke-primary-default: var(--ngd-colors-gray-600);
   --ngd-node-bg-primary-default: var(--ngd-colors-gray-100);
@@ -25,7 +25,7 @@ html[data-theme='dark'] {
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-800);
   --ngd-ui-stroke-primary-focus: var(--ngd-colors-gray-500);
-  --ngd-pt-stroke-primary-default: var(--ngd-colors-gray-300);
+  --ngd-pt-stroke-primary-default: var(--ngd-colors-gray-200);
   --ngd-node-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-node-stroke-primary-default: var(--ngd-colors-gray-600);
   --ngd-node-stroke-primary-hover: var(--ngd-colors-acc1-400);

@@ -2,8 +2,19 @@
  * Public API Surface of angular-adapter
  */
 
-export type { Edge, FlowCore, GroupNode, Metadata, Middleware, NgDiagramMath, Node, Point } from '@angularflow/core';
+export type {
+  Edge,
+  FlowCore,
+  GroupNode,
+  Metadata,
+  Middleware,
+  NgDiagramMath,
+  Node,
+  Point,
+  loggerMiddleware,
+} from '@angularflow/core';
 export * from './lib/components/context/ng-diagram-context.component';
+export * from './lib/components/background/ng-diagram-background.component';
 export * from './lib/components/diagram/ng-diagram.component';
 export * from './lib/components/edge-label/base-edge-label.component';
 export * from './lib/components/edge/base-edge/base-edge.component';

@@ -85,6 +85,13 @@ export interface ZoomConfig {
   step: number;
 }
 
+export interface BackgroundConfig {
+  /**
+   * The size of the dots in the background.
+   */
+  dotSize: number;
+}
+
 /**
  * Configuration for node rotation behavior.
  */
@@ -213,6 +220,11 @@ export interface FlowConfig {
    * Configuration for zooming.
    */
   zoom: ZoomConfig;
+
+  /**
+   * Configuration for background behavior.
+   */
+  background: BackgroundConfig;
 
   treeLayout: TreeLayoutConfig;
   nodeRotation: NodeRotationConfig;

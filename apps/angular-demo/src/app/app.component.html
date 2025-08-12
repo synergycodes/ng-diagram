@@ -6,7 +6,9 @@
       [model]="model"
       [config]="config"
       [debugMode]="debugMode()"
-    />
+    >
+      <ng-diagram-background></ng-diagram-background>
+    </ng-diagram>
     <app-toolbar (toggleDebugModeClick)="debugMode.set(!debugMode())" />
     <app-palette [model]="paletteModel" />
   </div>
