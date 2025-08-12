@@ -1,5 +1,5 @@
 import '@angular/compiler';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   createSignalModel,
   NgDiagramComponent,
@@ -15,8 +15,6 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiagramComponent {
-  debugMode = signal(true);
-
   config = {
     zoom: {
       max: 5,
