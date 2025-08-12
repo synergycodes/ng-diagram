@@ -27,6 +27,11 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
     return this.flowCore.getNodeById(nodeId);
   }
 
+  /**
+   * Updates the data of a node
+   * @param nodeId Node id
+   * @param data New data to set for the node (can be strongly typed)
+   */
   updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T) {
     this.flowCore.commandHandler.emit('updateNode', {
       id: nodeId,
@@ -34,15 +39,6 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
         data: data,
       },
     });
-  }
-
-  /**
-   * Gets an edge by id
-   * @param edgeId Edge id
-   * @returns Edge
-   */
-  getEdgeById(edgeId: string): Edge | null {
-    return this.flowCore.getEdgeById(edgeId) || null;
   }
 
   /**
@@ -73,5 +69,28 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
    */
   getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
     return this.flowCore.getNearestPortInRange(point, range) || null;
+  }
+
+  /**
+   * Gets an edge by id
+   * @param edgeId Edge id
+   * @returns Edge
+   */
+  getEdgeById(edgeId: string): Edge | null {
+    return this.flowCore.getEdgeById(edgeId) || null;
+  }
+
+  /**
+   * Updates the data of an edge
+   * @param edgeId Edge id
+   * @param data New data to set for the edge (can be strongly typed)
+   */
+  updateEdgeData<T extends Record<string, unknown> | undefined>(edgeId: string, data: T) {
+    this.flowCore.commandHandler.emit('updateEdge', {
+      id: edgeId,
+      edgeChanges: {
+        data: data,
+      },
+    });
   }
 }

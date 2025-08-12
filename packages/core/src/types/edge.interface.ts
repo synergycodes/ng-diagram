@@ -3,7 +3,8 @@ import { Point, Routing, Size } from './utils';
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
  */
-export interface Edge {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Edge<T = any> {
   /**
    * The unique identifier for the edge.
    */
@@ -19,7 +20,7 @@ export interface Edge {
   /**
    * The data associated with the edge.
    */
-  data: Record<string, unknown>;
+  data: T;
   /**
    * The points of the edge defining the path.
    */
