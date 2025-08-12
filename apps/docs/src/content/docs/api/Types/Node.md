@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: 'Node'
+title: "Node"
 ---
 
 > **Node** = `SimpleNode` \| [`GroupNode`](/api/types/groupnode/)

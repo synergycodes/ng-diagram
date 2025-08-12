@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: 'loggerMiddleware'
+title: "loggerMiddleware"
 ---
 
 > **loggerMiddleware** = [`Middleware`](/api/other/middleware/)\<`"logger"`, `LoggerMiddlewareMetadata`\>

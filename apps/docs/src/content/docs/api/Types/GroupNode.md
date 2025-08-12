@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: 'GroupNode'
+title: "GroupNode"
 ---
 
 Interface representing a group node in the diagram
@@ -23,7 +23,7 @@ The angle of the node from 0 to 360.
 
 `SimpleNode.angle`
 
----
+***
 
 ### autoSize?
 
@@ -35,7 +35,7 @@ Whether the size of the node is automatically resized based on the content.
 
 `SimpleNode.autoSize`
 
----
+***
 
 ### data
 
@@ -47,7 +47,7 @@ The data associated with the node.
 
 `SimpleNode.data`
 
----
+***
 
 ### groupId?
 
@@ -59,7 +59,7 @@ The id of the parent node.
 
 `SimpleNode.groupId`
 
----
+***
 
 ### highlighted
 
@@ -67,7 +67,7 @@ The id of the parent node.
 
 Whether the group is highlighted. For example, when a node is being dragged over it.
 
----
+***
 
 ### id
 
@@ -79,7 +79,7 @@ The unique identifier for the node.
 
 `SimpleNode.id`
 
----
+***
 
 ### isGroup
 
@@ -87,7 +87,7 @@ The unique identifier for the node.
 
 Flag indicating the node is a group
 
----
+***
 
 ### ports?
 
@@ -99,7 +99,7 @@ The ports of the node.
 
 `SimpleNode.ports`
 
----
+***
 
 ### position
 
@@ -111,7 +111,7 @@ The position of the node in the diagram.
 
 `SimpleNode.position`
 
----
+***
 
 ### resizable?
 
@@ -123,7 +123,7 @@ Whether the node is resizable.
 
 `SimpleNode.resizable`
 
----
+***
 
 ### rotatable?
 
@@ -135,7 +135,7 @@ Whether the node is rotatable.
 
 `SimpleNode.rotatable`
 
----
+***
 
 ### selected?
 
@@ -147,7 +147,7 @@ Whether the node is selected.
 
 `SimpleNode.selected`
 
----
+***
 
 ### size?
 
@@ -159,7 +159,7 @@ The size of the node.
 
 `SimpleNode.size`
 
----
+***
 
 ### type?
 
@@ -171,7 +171,7 @@ The type of the node declared in nodeTemplateMap.
 
 `SimpleNode.type`
 
----
+***
 
 ### zIndex?
 
@@ -183,7 +183,7 @@ The z-index of the node. This value is set automatically
 
 `SimpleNode.zIndex`
 
----
+***
 
 ### zOrder?
 
