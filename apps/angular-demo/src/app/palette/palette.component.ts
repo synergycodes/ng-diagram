@@ -3,7 +3,7 @@ import {
   NgDiagramPaletteItem,
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
-  NgDiagramService,
+  NgDiagramViewportService,
 } from '@angularflow/angular-adapter';
 import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
 import { PaletteItemComponent } from './palette-item/palette-item.component';
@@ -23,5 +23,5 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
 export class PaletteComponent {
   model = input.required<NgDiagramPaletteItem[]>();
 
-  scale = inject(NgDiagramService).getScale();
+  scale = inject(NgDiagramViewportService).getScale();
 }

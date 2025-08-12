@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Node, SimpleNode } from '@angularflow/core';
+import { Node } from '@angularflow/core';
 import { NgDiagramNodeSelectedDirective } from '../../../directives';
 import { NgDiagramNodeTemplate } from '../../../types';
 import { NgDiagramPortComponent } from '../../port/ng-diagram-port.component';
@@ -22,10 +22,10 @@ import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class NgDiagramDefaultNodeTemplateComponent implements NgDiagramNodeTemplate<SimpleNode> {
-  data = input.required<Node>();
+export class NgDiagramDefaultNodeTemplateComponent implements NgDiagramNodeTemplate<{ label: string } | undefined> {
+  data = input.required<Node<{ label: string } | undefined>>();
 
-  label = computed(() => this.data().data['label'] || this.data().id);
+  label = computed(() => this.data().data?.label || this.data().id);
   isSelected = computed(() => this.data().selected ?? false);
   classes = computed(() => `node ${this.isSelected() ? 'isSelected' : ''}`);
 }

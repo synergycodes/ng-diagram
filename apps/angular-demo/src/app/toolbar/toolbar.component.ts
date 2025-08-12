@@ -18,8 +18,7 @@ export class ToolbarComponent {
   }
 
   onToggleGroupChildrenClick(): void {
-    const model = this.ngDiagramService.getModel();
-    const metadata = model.getMetadata();
+    const metadata = this.ngDiagramService.getMetadata();
 
     const moveExtentEnabled = metadata.middlewaresConfig['group-children-move-extent'].enabled;
     const changeExtentEnabled = metadata.middlewaresConfig['group-children-change-extent'].enabled;

@@ -1,7 +1,6 @@
-import { computed, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   ActionState,
-  Edge,
   EnvironmentInfo,
   FlowCore,
   Metadata,
@@ -10,12 +9,10 @@ import {
   MiddlewareConfigKeys,
   MiddlewaresConfigFromMiddlewares,
   ModelActionType,
-  Node,
-  Port,
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
-import { FlowCoreProviderService } from './flow-core-provider/flow-core-provider.service';
+import { FlowCoreProviderService } from '../services/flow-core-provider/flow-core-provider.service';
 
 @Injectable()
 export class NgDiagramService<
@@ -31,10 +28,10 @@ export class NgDiagramService<
   }
 
   /**
-   * Returns the current model that NgDiagram instance is using
+   * Returns the current metadata
    */
-  getModel() {
-    return this.flowCore.model;
+  getMetadata(): Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> {
+    return this.flowCore.model.getMetadata();
   }
 
   /**
@@ -50,12 +47,6 @@ export class NgDiagramService<
    */
   getCommandHandler() {
     return this.flowCore.commandHandler;
-  }
-  /**
-   * Returns the current zoom scale
-   */
-  getScale() {
-    return computed(() => this.flowCore.getScale());
   }
 
   /**
@@ -107,54 +98,6 @@ export class NgDiagramService<
     config: TMetadata['middlewaresConfig'][TName]
   ) {
     this.flowCore.updateMiddlewareConfig(name, config);
-  }
-
-  /**
-   * Gets a node by id
-   * @param nodeId Node id
-   * @returns Node
-   */
-  getNodeById(nodeId: string): Node | null {
-    return this.flowCore.getNodeById(nodeId);
-  }
-
-  /**
-   * Gets an edge by id
-   * @param edgeId Edge id
-   * @returns Edge
-   */
-  getEdgeById(edgeId: string): Edge | null {
-    return this.flowCore.getEdgeById(edgeId);
-  }
-
-  /**
-   * Gets all nodes in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Array of nodes in range
-   */
-  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
-    return this.flowCore.getNodesInRange(point, range);
-  }
-
-  /**
-   * Gets the nearest node in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Nearest node in range or null
-   */
-  getNearestNodeInRange(point: { x: number; y: number }, range: number): Node | null {
-    return this.flowCore.getNearestNodeInRange(point, range);
-  }
-
-  /**
-   * Gets the nearest port in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Nearest port in range or null
-   */
-  getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
-    return this.flowCore.getNearestPortInRange(point, range);
   }
 
   /**
