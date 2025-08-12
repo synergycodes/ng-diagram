@@ -4,13 +4,15 @@ import type { Point, PortSide, Size } from './utils';
  * Interface representing all possible node types in the diagram
  * @category Types
  */
-export type Node = SimpleNode | GroupNode;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Node<T = any> = SimpleNode<T> | GroupNode<T>;
 
 /**
  * Interface representing a group node in the diagram
  * @category Types
  */
-export interface GroupNode extends SimpleNode {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface GroupNode<T = any> extends SimpleNode<T> {
   /**
    * Flag indicating the node is a group
    */
@@ -25,7 +27,8 @@ export interface GroupNode extends SimpleNode {
  * Interface representing the most basic node in the diagram
  * @category Types
  */
-export interface SimpleNode {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface SimpleNode<T = any> {
   /**
    * The unique identifier for the node.
    */
@@ -37,7 +40,7 @@ export interface SimpleNode {
   /**
    * The data associated with the node.
    */
-  data: Record<string, unknown>;
+  data: T;
   /**
    * The type of the node declared in nodeTemplateMap.
    */
@@ -81,7 +84,7 @@ export interface SimpleNode {
   /**
    * The id of the parent node.
    */
-  groupId?: Node['id'];
+  groupId?: Node<T>['id'];
 }
 
 /**

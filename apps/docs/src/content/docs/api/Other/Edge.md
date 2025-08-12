@@ -7,11 +7,17 @@ title: "Edge"
 
 Interface representing an edge (connection) between nodes in the flow diagram
 
+## Type Parameters
+
+### T
+
+`T` = `any`
+
 ## Properties
 
 ### data
 
-> **data**: `Record`\<`string`, `unknown`\>
+> **data**: `T`
 
 The data associated with the edge.
 

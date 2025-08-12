@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import {
   GroupNode,
   NgDiagramGroupHighlightedDirective,
+  NgDiagramGroupNodeTemplate,
   NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeSelectedDirective,
-  NgDiagramNodeTemplate,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -14,8 +14,8 @@ import {
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupNodeComponent implements NgDiagramNodeTemplate<GroupNode> {
-  data = input.required<GroupNode>();
-  groupTitle = computed(() => this.data().data?.['title'] ?? 'Group');
+export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<{ title: string }> {
+  data = input.required<GroupNode<{ title: string }>>();
+  groupTitle = computed(() => this.data().data?.title ?? 'Group');
   highlighted = computed(() => this.data().highlighted ?? false);
 }

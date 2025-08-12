@@ -24,7 +24,9 @@ export * from './lib/components/palette/item-preview/ng-diagram-palette-item-pre
 export * from './lib/components/palette/item/ng-diagram-palette-item.component';
 export * from './lib/components/port/ng-diagram-port.component';
 export * from './lib/directives';
-export * from './lib/services/ng-diagram.service';
+export * from './lib/public-services/ng-diagram-model.service';
+export * from './lib/public-services/ng-diagram-viewport.service';
+export * from './lib/public-services/ng-diagram.service';
 export * from './lib/types';
 export * from './lib/utils/create-middlewares';
 export * from './lib/utils/create-signal-model';

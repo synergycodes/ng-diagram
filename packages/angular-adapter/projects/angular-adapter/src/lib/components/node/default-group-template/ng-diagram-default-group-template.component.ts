@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { GroupNode } from '@angularflow/core';
 import { NgDiagramGroupHighlightedDirective, NgDiagramNodeSelectedDirective } from '../../../directives';
-import { NgDiagramNodeTemplate } from '../../../types';
+import { NgDiagramGroupNodeTemplate } from '../../../types';
 import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node-resize-adornment.component';
 
 @Component({
@@ -11,7 +11,7 @@ import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, NgDiagramGroupHighlightedDirective],
 })
-export class NgDiagramDefaultGroupTemplateComponent implements NgDiagramNodeTemplate<GroupNode> {
+export class NgDiagramDefaultGroupTemplateComponent implements NgDiagramGroupNodeTemplate {
   data = input.required<GroupNode>();
 
   isSelected = computed(() => this.data().selected ?? false);

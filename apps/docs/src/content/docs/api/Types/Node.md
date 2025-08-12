@@ -5,6 +5,12 @@ prev: false
 title: "Node"
 ---
 
-> **Node** = `SimpleNode` \| [`GroupNode`](/api/types/groupnode/)
+> **Node**\<`T`\> = `SimpleNode`\<`T`\> \| [`GroupNode`](/api/types/groupnode/)\<`T`\>
 
 Interface representing all possible node types in the diagram
+
+## Type Parameters
+
+### T
+
+`T` = `any`

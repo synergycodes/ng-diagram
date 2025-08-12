@@ -9,7 +9,13 @@ Interface representing a group node in the diagram
 
 ## Extends
 
-- `SimpleNode`
+- `SimpleNode`\<`T`\>
+
+## Type Parameters
+
+### T
+
+`T` = `any`
 
 ## Properties
 
@@ -39,7 +45,7 @@ Whether the size of the node is automatically resized based on the content.
 
 ### data
 
-> **data**: `Record`\<`string`, `unknown`\>
+> **data**: `T`
 
 The data associated with the node.
 

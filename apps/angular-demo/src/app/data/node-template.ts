@@ -1,5 +1,9 @@
 import { Type } from '@angular/core';
-import { GroupNode, NgDiagramNodeTemplate, NgDiagramNodeTemplateMap } from '@angularflow/angular-adapter';
+import {
+  NgDiagramGroupNodeTemplate,
+  NgDiagramNodeTemplate,
+  NgDiagramNodeTemplateMap,
+} from '@angularflow/angular-adapter';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from '../node-template/input-field-node/input-field-node.component';
@@ -14,7 +18,7 @@ export enum NodeTemplateType {
 
 export const nodeTemplateMap: NgDiagramNodeTemplateMap = new Map<
   NodeTemplateType,
-  Type<NgDiagramNodeTemplate> | Type<NgDiagramNodeTemplate<GroupNode>>
+  Type<NgDiagramNodeTemplate> | Type<NgDiagramGroupNodeTemplate>
 >([
   [NodeTemplateType.InputField, InputFieldNodeComponent],
   [NodeTemplateType.Image, ImageNodeComponent],

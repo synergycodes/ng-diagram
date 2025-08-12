@@ -2,6 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  NgDiagramModelService,
   NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeSelectedDirective,
   NgDiagramNodeTemplate,
@@ -21,13 +22,20 @@ import {
     '[class.ng-diagram-port-hoverable]': 'true',
   },
 })
-export class ResizableNodeComponent implements NgDiagramNodeTemplate {
-  private readonly ngDiagramService = inject(NgDiagramService);
+export class ResizableNodeComponent implements NgDiagramNodeTemplate<{ text: string }> {
+  private readonly diagramService = inject(NgDiagramService);
+  private readonly modelService = inject(NgDiagramModelService);
 
-  text = model<string>('');
+  text = computed(() => this.data()?.data?.text || '');
   sizeText = model<string>('');
-  data = input.required<Node>();
+  data = input.required<Node<{ text: string }>>();
   autoSize = computed(() => this.data().autoSize ?? true);
+
+  updateText(event: Event) {
+    this.modelService.updateNodeData<{ text: string }>(this.data().id, {
+      text: (event.target as HTMLInputElement).value,
+    });
+  }
 
   setSize() {
     const [textWidth, textHeight] = this.sizeText().split(' ');
@@ -38,7 +46,7 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate {
       return;
     }
 
-    this.ngDiagramService.getCommandHandler().emit('resizeNode', {
+    this.diagramService.getCommandHandler()?.emit('resizeNode', {
       id: this.data().id,
       size: { width, height },
       disableAutoSize: true,
@@ -48,7 +56,7 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate {
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.ngDiagramService.getCommandHandler().emit('updateNode', {
+    this.diagramService.getCommandHandler()?.emit('updateNode', {
       id: this.data().id,
       nodeChanges: {
         autoSize: checked,
