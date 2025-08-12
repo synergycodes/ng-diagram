@@ -100,7 +100,7 @@ export class NgDiagramService<
   /**
    * Updates the configuration of a middleware
    * @param name Name of the middleware to update
-   * @param metadata Metadata to update
+   * @param config Config of the middleware to update
    */
   updateMiddlewareConfig<TName extends MiddlewareConfigKeys<TMiddlewares>>(
     name: TName,

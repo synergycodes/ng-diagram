@@ -14,6 +14,10 @@ export interface Size {
   height: number;
 }
 
+/**
+ * Interface representing a point in the flow diagram
+ * @category Types
+ */
 export interface Point {
   x: number;
   y: number;

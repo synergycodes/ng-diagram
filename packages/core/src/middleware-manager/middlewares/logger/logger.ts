@@ -4,6 +4,10 @@ export interface LoggerMiddlewareMetadata {
   enabled: boolean;
 }
 
+/**
+ * Middleware used for logging NgDiagram internal events and state changes
+ * @category Middlewares
+ */
 export const loggerMiddleware: Middleware<'logger', LoggerMiddlewareMetadata> = {
   name: 'logger',
   defaultMetadata: {
