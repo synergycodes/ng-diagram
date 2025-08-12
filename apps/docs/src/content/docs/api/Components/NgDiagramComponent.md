@@ -81,7 +81,7 @@ The node template map to use for the diagram.
 
 ### getNodeTemplate()
 
-> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<`NgDiagramNodeTemplate`\<`SimpleNode`\>\> \| `Type$1`\<`NgDiagramNodeTemplate`\<[`GroupNode`](/api/types/groupnode/)\>\>
+> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<`NgDiagramNodeTemplate`\<`any`, `SimpleNode`\<`any`\>\>\> \| `Type$1`\<`NgDiagramGroupNodeTemplate`\<`any`\>\>
 
 Retrieves the custom Angular component template for rendering a specific node type.
 
@@ -99,7 +99,7 @@ The type identifier of the node to get a template for.
 
 #### Returns
 
-`null` \| `Type$1`\<`NgDiagramNodeTemplate`\<`SimpleNode`\>\> \| `Type$1`\<`NgDiagramNodeTemplate`\<[`GroupNode`](/api/types/groupnode/)\>\>
+`null` \| `Type$1`\<`NgDiagramNodeTemplate`\<`any`, `SimpleNode`\<`any`\>\>\> \| `Type$1`\<`NgDiagramGroupNodeTemplate`\<`any`\>\>
 
 The Angular component class registered for the node type, or
 null if no custom template is registered for this type
