@@ -1,0 +1,89 @@
+---
+import { Code, Tabs, TabItem } from '@astrojs/starlight/components';
+import { loadExamples } from './load-examples';
+
+interface Props {
+  dirName: string;
+}
+
+const { dirName } = Astro.props;
+const examples = await loadExamples(dirName);
+---
+
+<Tabs>
+  {examples.map(
+    ({ fileName, content, extension }) => <TabItem label={fileName}>
+      <Code class="code-container" code={content} lang={extension} />
+    </TabItem>
+  )}
+</Tabs>
+
+<script>
+  const tabsContainer = document.querySelector('starlight-tabs');
+
+  function centerSelectedTab() {
+    if (!tabsContainer) return;
+
+    const tablistWrapper = tabsContainer.querySelector('.tablist-wrapper');
+    const tablist = tabsContainer.querySelector('[role="tablist"]');
+    const selectedTab = tabsContainer.querySelector('[aria-selected="true"]');
+
+    if (!tablistWrapper || !tablist || !selectedTab) return;
+
+    const containerRect = tablistWrapper.getBoundingClientRect();
+    const selectedTabRect = selectedTab.getBoundingClientRect();
+
+    const containerCenter = containerRect.left + containerRect.width / 2;
+    const selectedTabCenter = selectedTabRect.left + selectedTabRect.width / 2;
+    const scrollOffset = selectedTabCenter - containerCenter;
+
+    tablistWrapper.scrollLeft += scrollOffset;
+  }
+
+  tabsContainer?.addEventListener('click', ({ target }) => {
+    const isProperTarget = (target
+      && target instanceof HTMLElement
+      && target.closest('[role="tab"]')
+    );
+
+    if (!isProperTarget) {
+      return;
+    }
+
+    centerSelectedTab();
+  });
+</script>
+
+<style>
+  :global(starlight-tabs) {
+    text-wrap: nowrap;
+
+    .tablist-wrapper {
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      font-family: monospace;
+
+      ::-webkit-scrollbar {
+          display: none;
+      }
+      scrollbar-width: none;
+
+      .tab a {
+        padding: 0 0.5rem;
+      }
+    }
+
+    [role="tablist"] {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+  }
+
+  .code-container {
+    height: 30rem;
+
+    .frame, code, pre {
+      height: 100%;
+    }
+  }
+</style>

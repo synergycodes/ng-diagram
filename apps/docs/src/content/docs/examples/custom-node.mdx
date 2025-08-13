@@ -5,7 +5,7 @@ description: Example of how to create a custom node in NgDiagram
 
 ## Context
 
-Each scenario requires its own dedicated implementation.  
+Each scenario requires its own dedicated implementation.
 To handle this, you can use **Custom Nodes**.
 
 Defining a custom node is straightforward — it only requires:
@@ -13,11 +13,14 @@ Defining a custom node is straightforward — it only requires:
 1. Adding your component to the configuration by defining custom node types in `nodeTemplateMap` and passing them to the diagram.
 2. Assigning `type` value for the node you want to customize. The type value must match the node type identifier in your diagram configuration.
 
-Inside the custom node component, you can create **any Angular component template** you need and leverage the functionalities of the base node.  
+Inside the custom node component, you can create **any Angular component template** you need and leverage the functionalities of the base node.
 You can include anything inside the Custom Node, including controls from **external libraries**.
 
 Once created, the custom node component will be rendered directly on the diagram, allowing you to build any type of graph from it.
 
-import CustomNode from '../../../components/angular/examples/custom-node/custom-node.astro';
+import CustomNode from '@examples/custom-node/custom-node.astro';
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 
 <CustomNode />
+
+<ExampleViewer dirName="custom-node" />
