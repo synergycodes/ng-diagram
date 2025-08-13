@@ -1,5 +1,6 @@
 @layer reset, starlight;
 @import '@angularflow/angular-adapter/styles.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 @layer reset {
   * {

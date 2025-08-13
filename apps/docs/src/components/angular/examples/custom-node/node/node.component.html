@@ -1,0 +1,22 @@
+<div class="node">
+  <div class="node-header">
+    <div>
+      {{ node().data.name }}
+    </div>
+    <div>
+      <mat-chip>{{ selectedState }}</mat-chip>
+    </div>
+  </div>
+  <div class="node-body" title="{{ node().data.tooltip }}">
+    {{ node().data.description }}
+    <form>
+      <mat-form-field>
+        <mat-select [(ngModel)]="selectedState" name="state">
+          <mat-option value="Active">Active</mat-option>
+          <mat-option value="Inactive">Inactive</mat-option>
+          <mat-option value="Error">Error</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </div>
+</div>

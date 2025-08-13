@@ -52,7 +52,6 @@
 
   /* change to 400 when ready*/
   --ngd-background-dot-color: var(--ngd-colors-gray-500);
-  --ngd-background-color: var(--ngd-colors-gray-200);
 }
 
 .ng-diagram-port-hoverable .ng-diagram-port:hover,

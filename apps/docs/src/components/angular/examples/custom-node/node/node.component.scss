@@ -1,0 +1,58 @@
+:host {
+  --mdc-chip-label-text-size: 10px;
+  --mat-form-field-container-vertical-padding: 8px;
+  --mat-form-field-container-height: 30px;
+
+  .node {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border: 1px solid var(--ngd-node-stroke-primary-default);
+    border-radius: 10px;
+    background-color: var(--ngd-node-bg-primary-default);
+
+    &-header {
+      font-weight: bold;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      vertical-align: middle;
+      align-items: center;
+      justify-items: center;
+
+      .mat-mdc-chip {
+        font-size: 11px;
+        height: 20px;
+        margin-bottom: 10px;
+      }
+    }
+
+    &-body {
+      font-size: 12px;
+      cursor: help;
+
+      form {
+        height: 50px;
+        margin-top: 8px;
+
+        .mat-mdc-form-field {
+          width: 120px;
+        }
+      }
+    }
+
+    &-button {
+      margin-top: 8px;
+      padding: 4px 8px;
+      font-size: 12px;
+      border: 1px solid var(--ngd-node-stroke-primary-default);
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--ngd-node-stroke-primary-hover);
+      }
+    }
+  }
+}
