@@ -12,23 +12,23 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
   styleUrl: './ng-diagram-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    { directive: NodeSizeDirective, inputs: ['data'] },
-    { directive: NodePositionDirective, inputs: ['data'] },
-    { directive: NodeSelectionDirective, inputs: ['targetData: data'] },
-    { directive: PointerMoveSelectionDirective, inputs: ['targetData: data'] },
-    { directive: ZIndexDirective, inputs: ['data'] },
+    { directive: NodeSizeDirective, inputs: ['node'] },
+    { directive: NodePositionDirective, inputs: ['node'] },
+    { directive: NodeSelectionDirective, inputs: ['targetData: node'] },
+    { directive: PointerMoveSelectionDirective, inputs: ['targetData: node'] },
+    { directive: ZIndexDirective, inputs: ['data: node'] },
   ],
 })
 export class NgDiagramNodeComponent {
   private readonly portsService = inject(UpdatePortsService);
   private readonly flowCore = inject(FlowCoreProviderService);
 
-  data = input.required<Node>();
+  node = input.required<Node>();
 
-  readonly rotate = computed(() => (this.data().angle ? `rotate(${this.data().angle}deg)` : ''));
+  readonly rotate = computed(() => (this.node().angle ? `rotate(${this.node().angle}deg)` : ''));
 
-  readonly id = computed(() => this.data().id);
-  readonly size = computed(() => this.data().size);
+  readonly id = computed(() => this.node().id);
+  readonly size = computed(() => this.node().size);
 
   constructor() {
     this.setupPortSyncEffect();

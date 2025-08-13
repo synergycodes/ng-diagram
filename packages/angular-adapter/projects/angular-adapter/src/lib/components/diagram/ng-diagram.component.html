@@ -5,21 +5,21 @@
   @for (edge of edges(); track edge.id) {
     <ng-diagram-edge>
       @if (getEdgeTemplate(edge.type)) {
-        <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { data: edge }" />
+        <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { edge }" />
       } @else if (edge.type === 'straight' || edge.type === 'orthogonal' || !edge.type) {
-        <ng-diagram-default-edge [data]="edge" />
+        <ng-diagram-default-edge [edge]="edge" />
       }
     </ng-diagram-edge>
   }
   <ng-diagram-marker-arrow />
   @for (node of nodes(); track node.id) {
-    <ng-diagram-node class="ng-diagram-node" [attr.data-node-id]="node.id" [data]="node">
+    <ng-diagram-node class="ng-diagram-node" [attr.data-node-id]="node.id" [node]="node">
       @if (getNodeTemplate(node.type)) {
-        <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { data: node }" />
+        <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { node }" />
       } @else if (isGroup(node)) {
-        <ng-diagram-default-group-template [data]="node" />
+        <ng-diagram-default-group-template [node]="node" />
       } @else {
-        <ng-diagram-default-node-template [data]="node" />
+        <ng-diagram-default-node-template [node]="node" />
       }
     </ng-diagram-node>
   }

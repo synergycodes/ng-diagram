@@ -10,10 +10,10 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
   private readonly renderer = inject(Renderer2);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
-  data = input.required<Node>();
-  size = computed(() => this.data().size);
-  autoSize = computed(() => this.data().autoSize ?? true);
-  id = computed(() => this.data().id);
+  node = input.required<Node>();
+  size = computed(() => this.node().size);
+  autoSize = computed(() => this.node().autoSize ?? true);
+  id = computed(() => this.node().id);
 
   sizeState = computed(() => ({
     size: this.size(),

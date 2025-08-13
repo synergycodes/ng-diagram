@@ -20,9 +20,9 @@ import {
   templateUrl: './input-field-node.component.html',
   styleUrls: ['./input-field-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['data'] }],
+  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['node'] }],
 })
 export class InputFieldNodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');
-  data = input.required<Node>();
+  node = input.required<Node>();
 }

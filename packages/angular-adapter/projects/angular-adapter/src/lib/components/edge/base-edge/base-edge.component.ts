@@ -25,14 +25,14 @@ import { getPath } from '../../../utils/get-path/get-path';
   styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    { directive: ZIndexDirective, inputs: ['data'] },
-    { directive: EdgeSelectionDirective, inputs: ['targetData: data'] },
+    { directive: ZIndexDirective, inputs: ['data: edge'] },
+    { directive: EdgeSelectionDirective, inputs: ['targetData: edge'] },
   ],
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  data = input.required<Edge>();
+  edge = input.required<Edge>();
   pathAndPoints = input<{ path: string; points: Point[] }>();
   routing = input<Routing>();
   stroke = input<string>();
@@ -41,7 +41,7 @@ export class NgDiagramBaseEdgeComponent {
   strokeOpacity = input<number>(1);
   strokeWidth = input<number>(2);
 
-  points = computed(() => (this.routing() ? this.data().points : (this.pathAndPoints()?.points ?? [])));
+  points = computed(() => (this.routing() ? this.edge().points : (this.pathAndPoints()?.points ?? [])));
 
   path = computed(() => {
     const routing = this.routing();
@@ -54,37 +54,37 @@ export class NgDiagramBaseEdgeComponent {
   markerStart = computed(() =>
     this.customMarkerStart()
       ? `url(#${this.customMarkerStart()})`
-      : this.data()?.targetArrowhead
-        ? `url(#${this.data().targetArrowhead})`
+      : this.edge()?.targetArrowhead
+        ? `url(#${this.edge().targetArrowhead})`
         : null
   );
 
   markerEnd = computed(() =>
     this.customMarkerEnd()
       ? `url(#${this.customMarkerEnd()})`
-      : this.data()?.sourceArrowhead
-        ? `url(#${this.data().sourceArrowhead})`
+      : this.edge()?.sourceArrowhead
+        ? `url(#${this.edge().sourceArrowhead})`
         : null
   );
 
-  selected = computed(() => this.data().selected);
-  temporary = computed(() => this.data().temporary);
+  selected = computed(() => this.edge().selected);
+  temporary = computed(() => this.edge().temporary);
 
-  labels = computed(() => this.data().labels ?? []);
+  labels = computed(() => this.edge().labels ?? []);
 
   private prevRouting: string | undefined;
   private prevPoints: Point[] | undefined;
 
   constructor() {
     effect(() => {
-      const { sourcePosition, targetPosition } = this.data();
+      const { sourcePosition, targetPosition } = this.edge();
 
       const routing = this.routing?.();
       if (!routing || !sourcePosition || !targetPosition) return;
 
       if (this.prevRouting !== routing) {
         this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.data().id,
+          id: this.edge().id,
           edgeChanges: { routing },
         });
         this.prevRouting = routing;
@@ -97,7 +97,7 @@ export class NgDiagramBaseEdgeComponent {
       const currentPoints = this.points() || [];
       if (this.prevPoints && !equalPointsArrays(this.prevPoints, currentPoints)) {
         this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.data().id,
+          id: this.edge().id,
           edgeChanges: { points: currentPoints },
         });
       }

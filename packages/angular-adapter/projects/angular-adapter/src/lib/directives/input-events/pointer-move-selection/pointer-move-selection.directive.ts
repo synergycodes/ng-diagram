@@ -18,7 +18,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   private readonly diagramComponent = inject(NgDiagramComponent);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  targetData = input.required<Node>();
+  targetData = input<Node>();
 
   private edgePanningInterval: number | null = null;
   private currentEdge: ContainerEdge = null;
@@ -38,6 +38,11 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     event.moveSelectionHandled = true;
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
@@ -45,7 +50,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       ...baseEvent,
       name: 'pointerMoveSelection',
       phase: 'start',
-      target: this.targetData(),
+      target: targetData,
       targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
@@ -63,6 +68,11 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();
@@ -72,7 +82,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       ...baseEvent,
       name: 'pointerMoveSelection',
       phase: 'end',
-      target: this.targetData(),
+      target: targetData,
       targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
@@ -83,6 +93,11 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     const screenEdge = this.getDiagramEdge(event.clientX, event.clientY);
 
@@ -99,7 +114,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       ...baseEvent,
       name: 'pointerMoveSelection',
       phase: 'continue',
-      target: this.targetData(),
+      target: targetData,
       targetType: 'node',
       lastInputPoint: {
         x: event.clientX,
@@ -128,13 +143,18 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     this.stopEdgePanning();
 
     this.edgePanningInterval = window.setInterval(() => {
+      const targetData = this.targetData();
+      if (!targetData) {
+        return;
+      }
+
       const baseEvent = this.inputEventsRouter.getBaseEvent({} as PointerEvent);
 
       this.inputEventsRouter.emit({
         ...baseEvent,
         name: 'pointerMoveSelection',
         phase: 'continue',
-        target: this.targetData(),
+        target: targetData,
         targetType: 'node',
         lastInputPoint: { x, y },
         currentDiagramEdge: this.currentEdge,

@@ -56,19 +56,19 @@ describe('NgDiagramBaseEdgeComponent', () => {
   });
 
   it('should have required edge input', () => {
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
 
-    expect(component.data).toBeDefined();
-    expect(component.data().id).toBe('test-edge');
+    expect(component.edge).toBeDefined();
+    expect(component.edge().id).toBe('test-edge');
   });
 
   it('should handle edge with no points', () => {
     mockEdge.points = [];
 
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.componentRef.setInput('path', '');
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();
@@ -79,7 +79,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
   it('should return proper color when edge is not selected', () => {
     mockEdge.selected = false;
 
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.componentRef.setInput('stroke', 'red');
@@ -89,7 +89,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
   });
 
   it('should return proper marker when edge has source arrowhead', () => {
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.componentRef.setInput('customMarkerStart', 'arrowhead');
@@ -99,7 +99,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
   });
 
   it('should return proper marker when edge has target arrowhead', () => {
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.componentRef.setInput('customMarkerEnd', 'arrowhead');
@@ -109,7 +109,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
   });
 
   it('should add class "temporary" when edge is temporary', () => {
-    fixture.componentRef.setInput('data', { ...mockEdge, temporary: true });
+    fixture.componentRef.setInput('edge', { ...mockEdge, temporary: true });
     fixture.componentRef.setInput('path', mockPath);
     fixture.componentRef.setInput('points', mockEdge.points);
     fixture.detectChanges();

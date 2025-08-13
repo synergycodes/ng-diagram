@@ -13,7 +13,7 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
   imports: [NgDiagramResizeLineComponent, NgDiagramResizeHandleComponent],
 })
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
-  nodeData = computed(() => this.nodeComponent?.data());
+  nodeData = computed(() => this.nodeComponent?.node());
   showAdornment = computed(
     () => !!this.nodeData()?.resizable && this.nodeData()?.selected && this.isRenderedOnCanvas()
   );

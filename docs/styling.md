@@ -140,7 +140,7 @@ Applied to individual ports. The port is highlighted only when the cursor hovers
 Automatically adds selection styling based on the node's `selected` property:
 
 ```html
-<div ngDiagramNodeSelected [data]="nodeData">
+<div ngDiagramNodeSelected [node]="node">
   <!-- Node content -->
 </div>
 ```
@@ -156,7 +156,7 @@ Automatically adds selection styling based on the node's `selected` property:
 Adds highlight styling to groups based on the `highlighted` property:
 
 ```html
-<div ngDiagramGroupHighlighted [data]="groupData">
+<div ngDiagramGroupHighlighted [node]="node">
   <!-- Group content -->
 </div>
 ```

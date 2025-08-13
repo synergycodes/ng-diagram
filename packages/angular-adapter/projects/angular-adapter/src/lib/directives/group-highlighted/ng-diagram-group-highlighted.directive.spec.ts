@@ -7,11 +7,11 @@ import { GroupNode } from '@angularflow/core';
 import { NgDiagramGroupHighlightedDirective } from './ng-diagram-group-highlighted.directive';
 
 @Component({
-  template: `<div [ngDiagramGroupHighlighted] [data]="data"></div>`,
+  template: `<div [ngDiagramGroupHighlighted] [node]="node"></div>`,
   imports: [NgDiagramGroupHighlightedDirective],
 })
 class TestComponent {
-  data: GroupNode = {
+  node: GroupNode = {
     id: '1',
     position: { x: 0, y: 0 },
     data: {},
@@ -48,8 +48,8 @@ describe('GroupHighlightedDirective', () => {
   });
 
   it('should set data-highlighted attribute when highlighted is true', () => {
-    fixture.componentInstance.data = {
-      ...fixture.componentInstance.data,
+    fixture.componentInstance.node = {
+      ...fixture.componentInstance.node,
       highlighted: true,
     };
     fixture.detectChanges();
@@ -57,8 +57,8 @@ describe('GroupHighlightedDirective', () => {
   });
 
   it('should set data-highlighted attribute to false when highlighted is false', () => {
-    fixture.componentInstance.data = {
-      ...fixture.componentInstance.data,
+    fixture.componentInstance.node = {
+      ...fixture.componentInstance.node,
       highlighted: false,
     };
     fixture.detectChanges();

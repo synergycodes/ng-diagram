@@ -13,12 +13,12 @@ import {
   styleUrls: ['./image-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgDiagramPortComponent, NgDiagramNodeRotateAdornmentComponent],
-  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['data'] }],
+  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['node'] }],
   host: {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
 export class ImageNodeComponent implements NgDiagramNodeTemplate {
-  data = input.required<Node>();
-  imageUrl = computed(() => this.data().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
+  node = input.required<Node>();
+  imageUrl = computed(() => this.node().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
 }
