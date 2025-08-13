@@ -14,13 +14,13 @@ import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class NgDiagramDefaultEdgeComponent implements NgDiagramEdgeTemplate {
-  data = input.required<Edge>();
+  edge = input.required<Edge>();
 
   path = computed(() => {
-    const { routing, points } = this.data();
+    const { routing, points } = this.edge();
     return { path: getPath(routing, points || []), points: points || [] };
   });
 
-  markerStart = computed(() => (this.data().sourceArrowhead ? `url(#${this.data().sourceArrowhead})` : undefined));
-  markerEnd = computed(() => (this.data().targetArrowhead ? `url(#${this.data().targetArrowhead})` : undefined));
+  markerStart = computed(() => (this.edge().sourceArrowhead ? `url(#${this.edge().sourceArrowhead})` : undefined));
+  markerEnd = computed(() => (this.edge().targetArrowhead ? `url(#${this.edge().targetArrowhead})` : undefined));
 }

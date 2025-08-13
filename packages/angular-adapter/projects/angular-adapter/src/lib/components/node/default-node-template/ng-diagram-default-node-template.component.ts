@@ -23,9 +23,9 @@ import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node
   },
 })
 export class NgDiagramDefaultNodeTemplateComponent implements NgDiagramNodeTemplate<{ label: string } | undefined> {
-  data = input.required<Node<{ label: string } | undefined>>();
+  node = input.required<Node<{ label: string } | undefined>>();
 
-  label = computed(() => this.data().data?.label || this.data().id);
-  isSelected = computed(() => this.data().selected ?? false);
+  label = computed(() => this.node().data?.label || this.node().id);
+  isSelected = computed(() => this.node().selected ?? false);
   classes = computed(() => `node ${this.isSelected() ? 'isSelected' : ''}`);
 }

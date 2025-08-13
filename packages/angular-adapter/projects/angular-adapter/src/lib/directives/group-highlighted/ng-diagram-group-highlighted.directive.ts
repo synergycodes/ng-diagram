@@ -9,8 +9,8 @@ import { GroupNode } from '@angularflow/core';
   },
 })
 export class NgDiagramGroupHighlightedDirective {
-  data = input.required<GroupNode>();
+  node = input.required<GroupNode>();
   highlighted = computed(() => {
-    return this.data().highlighted ?? false;
+    return this.node().highlighted ?? false;
   });
 }

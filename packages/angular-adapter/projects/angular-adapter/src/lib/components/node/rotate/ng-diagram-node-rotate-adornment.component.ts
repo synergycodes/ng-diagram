@@ -13,7 +13,7 @@ import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handl
   },
 })
 export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase {
-  readonly nodeData = computed(() => this.nodeComponent?.data());
+  readonly nodeData = computed(() => this.nodeComponent?.node());
   readonly isRotating = signal(false);
   readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.nodeData() }));
   readonly showAdornment = computed(

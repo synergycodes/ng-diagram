@@ -12,7 +12,7 @@ import { PointerInputEvent } from '../../../types';
 export class RotateHandleDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
-  targetData = input.required<Node>();
+  targetData = input<Node>();
 
   ngOnDestroy() {
     this.cleanup();
@@ -21,17 +21,22 @@ export class RotateHandleDirective implements OnDestroy {
   onPointerDown($event: PointerInputEvent) {
     $event.rotateHandled = true;
 
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'rotate',
       phase: 'start',
-      target: this.targetData(),
+      target: targetData,
       lastInputPoint: {
         x: $event.clientX,
         y: $event.clientY,
       },
-      center: this.getNodeCenter(),
+      center: this.getNodeCenter(targetData),
     });
 
     document.addEventListener('pointermove', this.onPointerMove);
@@ -42,48 +47,63 @@ export class RotateHandleDirective implements OnDestroy {
   onPointerMove = ($event: PointerInputEvent) => {
     $event.rotateHandled = true;
 
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'rotate',
       phase: 'continue',
-      target: this.targetData(),
+      target: targetData,
       lastInputPoint: {
         x: $event.clientX,
         y: $event.clientY,
       },
-      center: this.getNodeCenter(),
+      center: this.getNodeCenter(targetData),
     });
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'rotate',
       phase: 'end',
-      target: this.targetData(),
+      target: targetData,
       lastInputPoint: {
         x: $event.clientX,
         y: $event.clientY,
       },
-      center: this.getNodeCenter(),
+      center: this.getNodeCenter(targetData),
     });
     this.cleanup();
   };
 
   onPointerCancel = ($event: PointerInputEvent) => {
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'rotate',
       phase: 'end',
-      target: this.targetData(),
+      target: targetData,
       lastInputPoint: {
         x: $event.clientX,
         y: $event.clientY,
       },
-      center: this.getNodeCenter(),
+      center: this.getNodeCenter(targetData),
     });
     this.cleanup();
   };
@@ -94,9 +114,9 @@ export class RotateHandleDirective implements OnDestroy {
     document.removeEventListener('pointercancel', this.onPointerCancel);
   }
 
-  private getNodeCenter() {
-    const { x, y } = this.targetData().position;
-    const { width, height } = this.targetData().size || { width: 0, height: 0 };
+  private getNodeCenter(targetData: Node) {
+    const { x, y } = targetData.position;
+    const { width, height } = targetData.size || { width: 0, height: 0 };
 
     return {
       x: x + width / 2,

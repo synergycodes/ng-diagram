@@ -17,7 +17,7 @@ import { Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate, Point } from '
   imports: [NgDiagramBaseEdgeComponent],
 })
 export class CustomBezierEdgeComponent implements NgDiagramEdgeTemplate {
-  data = input.required<Edge>();
+  edge = input.required<Edge>();
 
   points: Point[] = [];
   path = '';
@@ -27,7 +27,7 @@ export class CustomBezierEdgeComponent implements NgDiagramEdgeTemplate {
 
   constructor() {
     effect(() => {
-      const { sourcePosition, targetPosition } = this.data();
+      const { sourcePosition, targetPosition } = this.edge();
       const changed =
         this.prevSourcePosition !== sourcePosition || this.prevTargetPosition !== targetPosition || !this.path;
 

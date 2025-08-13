@@ -1,7 +1,7 @@
 <ng-diagram-node-resize-adornment>
   <div class="resizable-node">
     <div class="resizable-node-header">
-      width: {{ data().size?.width | number: '1.0-0' }}, height: {{ data().size?.height | number: '1.0-0' }}
+      width: {{ node().size?.width | number: '1.0-0' }}, height: {{ node().size?.height | number: '1.0-0' }}
     </div>
     <div class="size-control">
       <input
@@ -18,7 +18,7 @@
         <input
           class="auto-size-checkbox"
           type="checkbox"
-          [checked]="data().autoSize"
+          [checked]="node().autoSize"
           (change)="onSizeControlChange($event)"
           (keydown)="$event.stopPropagation()"
           (keypress)="$event.stopPropagation()"

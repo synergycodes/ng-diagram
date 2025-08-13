@@ -37,7 +37,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   id = input.required<Port['id']>();
   type = input.required<Port['type']>();
   side = input.required<Port['side']>();
-  nodeData = computed(() => this.nodeComponent?.data());
+  nodeData = computed(() => this.nodeComponent?.node());
 
   lastSide = signal<Port['side'] | undefined>(undefined);
   lastType = signal<Port['type'] | undefined>(undefined);

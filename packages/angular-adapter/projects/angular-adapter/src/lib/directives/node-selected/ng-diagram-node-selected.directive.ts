@@ -9,6 +9,6 @@ import { Node } from '@angularflow/core';
   },
 })
 export class NgDiagramNodeSelectedDirective {
-  data = input.required<Node>();
-  selected = computed(() => this.data().selected ?? false);
+  node = input.required<Node>();
+  selected = computed(() => this.node().selected ?? false);
 }

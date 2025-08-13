@@ -23,9 +23,9 @@ import {
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class ButtonEdgeComponent implements NgDiagramEdgeTemplate {
-  data = input.required<Edge>();
+  edge = input.required<Edge>();
 
-  selected = computed(() => this.data().selected);
+  selected = computed(() => this.edge().selected);
 
   onButtonClick() {
     console.log('onClick');

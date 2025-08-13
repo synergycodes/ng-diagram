@@ -32,7 +32,7 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
   id = input.required<EdgeLabel['id']>();
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
 
-  edgeData = computed(() => this.edgeComponent.data());
+  edgeData = computed(() => this.edgeComponent.edge());
 
   points = computed(() => this.edgeData()?.points);
   edgeId = computed(() => this.edgeData()?.id);

@@ -51,11 +51,11 @@ describe('NgDiagramDefaultEdgeComponent', () => {
   });
 
   it('should have required edge input', () => {
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
-    expect(component.data).toBeDefined();
-    expect(component.data().id).toBe('test-edge');
+    expect(component.edge).toBeDefined();
+    expect(component.edge().id).toBe('test-edge');
   });
 
   it('should calculate path from edge points', () => {
@@ -64,7 +64,7 @@ describe('NgDiagramDefaultEdgeComponent', () => {
       { x: 30, y: 40 },
     ];
 
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
     expect(component.path()).toStrictEqual({
@@ -85,7 +85,7 @@ describe('NgDiagramDefaultEdgeComponent', () => {
   it('should handle edge with no points', () => {
     mockEdge.points = [];
 
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
     expect(component.path()).toStrictEqual({
@@ -97,7 +97,7 @@ describe('NgDiagramDefaultEdgeComponent', () => {
   it('should return proper marker when edge has source arrowhead', () => {
     mockEdge.sourceArrowhead = 'arrowhead';
 
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
     expect(component.markerStart()).toBe('url(#arrowhead)');
@@ -106,7 +106,7 @@ describe('NgDiagramDefaultEdgeComponent', () => {
   it('should return proper marker when edge has target arrowhead', () => {
     mockEdge.targetArrowhead = 'arrowhead';
 
-    fixture.componentRef.setInput('data', mockEdge);
+    fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
     expect(component.markerEnd()).toBe('url(#arrowhead)');

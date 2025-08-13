@@ -15,7 +15,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<{ title: string }> {
-  data = input.required<GroupNode<{ title: string }>>();
-  groupTitle = computed(() => this.data().data?.title ?? 'Group');
-  highlighted = computed(() => this.data().highlighted ?? false);
+  node = input.required<GroupNode<{ title: string }>>();
+  groupTitle = computed(() => this.node().data?.title ?? 'Group');
+  highlighted = computed(() => this.node().highlighted ?? false);
 }

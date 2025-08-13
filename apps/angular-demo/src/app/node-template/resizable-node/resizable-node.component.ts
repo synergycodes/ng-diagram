@@ -17,7 +17,7 @@ import {
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['data'] }],
+  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['node'] }],
   host: {
     '[class.ng-diagram-port-hoverable]': 'true',
   },
@@ -26,13 +26,13 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate<{ text: str
   private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
 
-  text = computed(() => this.data()?.data?.text || '');
+  text = computed(() => this.node()?.data?.text || '');
   sizeText = model<string>('');
-  data = input.required<Node<{ text: string }>>();
-  autoSize = computed(() => this.data().autoSize ?? true);
+  node = input.required<Node<{ text: string }>>();
+  autoSize = computed(() => this.node().autoSize ?? true);
 
   updateText(event: Event) {
-    this.modelService.updateNodeData<{ text: string }>(this.data().id, {
+    this.modelService.updateNodeData<{ text: string }>(this.node().id, {
       text: (event.target as HTMLInputElement).value,
     });
   }
@@ -47,17 +47,17 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate<{ text: str
     }
 
     this.diagramService.getCommandHandler()?.emit('resizeNode', {
-      id: this.data().id,
+      id: this.node().id,
       size: { width, height },
       disableAutoSize: true,
-      position: this.data().position,
+      position: this.node().position,
     });
   }
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
     this.diagramService.getCommandHandler()?.emit('updateNode', {
-      id: this.data().id,
+      id: this.node().id,
       nodeChanges: {
         autoSize: checked,
       },

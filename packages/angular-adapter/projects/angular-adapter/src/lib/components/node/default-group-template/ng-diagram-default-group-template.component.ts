@@ -12,10 +12,10 @@ import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node
   imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, NgDiagramGroupHighlightedDirective],
 })
 export class NgDiagramDefaultGroupTemplateComponent implements NgDiagramGroupNodeTemplate {
-  data = input.required<GroupNode>();
+  node = input.required<GroupNode>();
 
-  isSelected = computed(() => this.data().selected ?? false);
-  highlighted = computed(() => this.data().highlighted ?? false);
+  isSelected = computed(() => this.node().selected ?? false);
+  highlighted = computed(() => this.node().highlighted ?? false);
 
   classes = computed(() => `ng-diagram-group ${this.highlighted() ? 'highlight' : ''}`);
 }

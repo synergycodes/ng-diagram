@@ -6,11 +6,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { NgDiagramNodeSelectedDirective } from './ng-diagram-node-selected.directive';
 
 @Component({
-  template: `<div [ngDiagramNodeSelected] [data]="data"></div>`,
+  template: `<div [ngDiagramNodeSelected] [node]="node"></div>`,
   imports: [NgDiagramNodeSelectedDirective],
 })
 class TestComponent {
-  data = {};
+  node = {};
 }
 
 describe('NodeSelectedDirective', () => {

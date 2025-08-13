@@ -9,6 +9,6 @@ import { Node } from '@angularflow/core';
   },
 })
 export class NodePositionDirective {
-  data = input.required<Node>();
-  position = computed(() => this.data().position);
+  node = input.required<Node>();
+  position = computed(() => this.node().position);
 }
