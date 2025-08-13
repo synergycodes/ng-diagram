@@ -2,7 +2,7 @@
 title: Styling
 description: How to style and customize NgDiagram components
 sidebar:
-  order: 2
+  order: 3
 ---
 
 ngDiagram provides a well-structured design system with a clear separation of concerns. Its styling is based on a minimal yet sufficient set of primitives, tokens, and component-level variables that support consistent theming and easy customization across all library components.
@@ -13,7 +13,7 @@ In addition to the design system, the library includes components, directives, a
 
 The styling system consists of three distinct layers:
 
-### 1. Primitives
+### Primitives
 
 Base color values and fundamental design tokens defined in `primitives`. These are the foundation colors that power the entire design system:
 
@@ -37,7 +37,7 @@ Base color values and fundamental design tokens defined in `primitives`. These a
 
 > **Note:** The actual color values are defined in the library. Override these variables to customize the color palette for your design system.
 
-### 2. Tokens
+### Tokens
 
 Semantic design tokens that map primitives to specific use cases, supporting themes:
 
@@ -57,7 +57,7 @@ html[data-theme='dark'] {
 }
 ```
 
-### 3. Component Variables
+### Component Variables
 
 Component-specific CSS variables that use tokens for consistent styling:
 
