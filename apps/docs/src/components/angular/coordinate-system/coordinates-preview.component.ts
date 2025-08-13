@@ -18,7 +18,7 @@ import { NgDiagramViewportService } from '@angularflow/angular-adapter';
       flex-direction: column;
       position: absolute;
       padding: 0.5rem;
-      color: var(--ngd-node-border-color);
+      color: var(--ngd-txt-primary-default);
     }
   `,
 })
