@@ -1,14 +1,14 @@
 <div class="node">
   <div class="node-header">
     <div>
-      {{ data().data.name }}
+      {{ node().data.name }}
     </div>
     <div>
       <mat-chip>{{ selectedState }}</mat-chip>
     </div>
   </div>
-  <div class="node-body" title="{{ data().data.tooltip }}">
-    {{ data().data.description }}
+  <div class="node-body" title="{{ node().data.tooltip }}">
+    {{ node().data.description }}
     <form>
       <mat-form-field>
         <mat-select [(ngModel)]="selectedState" name="state">

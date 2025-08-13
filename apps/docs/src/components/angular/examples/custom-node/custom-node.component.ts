@@ -5,12 +5,16 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type NgDiagramConfig,
+  type NgDiagramGroupNodeTemplate,
   type NgDiagramNodeTemplate,
   type NgDiagramNodeTemplateMap,
 } from '@angularflow/angular-adapter';
 
 import { NodeComponent } from './node/node.component';
 
+enum NodeTemplateType {
+  CustomNodeType = 'customNodeType',
+}
 @Component({
   selector: 'customnode',
   templateUrl: './custom-node.component.html',
@@ -19,9 +23,10 @@ import { NodeComponent } from './node/node.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomNodeComponent {
-  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map<string, Type<NgDiagramNodeTemplate>>([
-    ['customNodeType', NodeComponent],
-  ]);
+  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map<
+    NodeTemplateType,
+    Type<NgDiagramNodeTemplate> | Type<NgDiagramGroupNodeTemplate>
+  >([[NodeTemplateType.CustomNodeType, NodeComponent]]);
 
   config = {
     zoom: {

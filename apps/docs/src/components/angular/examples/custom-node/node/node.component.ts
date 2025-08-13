@@ -15,6 +15,7 @@ import { NgDiagramPortComponent, type NgDiagramNodeTemplate, type Node } from '@
 export class NodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');
   data = input.required<Node>();
+  node = input.required<Node>();
 
   selectedState: string = 'Active';
 }
