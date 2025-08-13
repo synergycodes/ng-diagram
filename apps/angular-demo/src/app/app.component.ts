@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
+  Edge,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
@@ -49,6 +50,9 @@ export class AppComponent {
     },
     snapping: {
       computeSnapForNodeDrag: true,
+    },
+    linking: {
+      finalEdgeDataBuilder: (edge: Edge) => ({ ...edge, routing: 'bezier' }),
     },
   };
 

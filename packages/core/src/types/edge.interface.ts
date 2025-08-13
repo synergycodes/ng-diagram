@@ -1,4 +1,5 @@
-import { Point, Routing, Size } from './utils';
+import { Point, Size } from './utils';
+import { RoutingName } from '../routing-manager/types';
 
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
@@ -53,7 +54,7 @@ export interface Edge<T = any> {
   /**
    * The routing of the edge.
    */
-  routing?: Routing;
+  routing?: RoutingName;
   /**
    * The position of the edge start.
    */
@@ -78,6 +79,14 @@ export interface Edge<T = any> {
    * The labels of the edge.
    */
   labels?: EdgeLabel[];
+  /**
+   * Static path configuration for the edge.
+   * When provided, these points will be used instead of calculated routing.
+   */
+  staticPath?: {
+    points: Point[];
+    svgPath?: string;
+  };
 }
 
 /**

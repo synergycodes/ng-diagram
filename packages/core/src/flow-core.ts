@@ -6,6 +6,7 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
+import { RoutingManager } from './routing-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
 import { TransactionManager } from './transaction-manager/transaction-manager';
@@ -53,6 +54,7 @@ export class FlowCore<
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
   readonly actionStateManager: ActionStateManager;
+  readonly routingManager: RoutingManager;
 
   readonly config: FlowConfig;
 
@@ -78,6 +80,7 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
+    this.routingManager = new RoutingManager();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
     this.config = deepMerge(defaultFlowConfig, config);
 

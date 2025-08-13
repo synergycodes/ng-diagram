@@ -1,3 +1,4 @@
+import { RoutingManager } from '../../../routing-manager';
 import {
   Edge,
   FlowStateUpdate,
@@ -7,12 +8,10 @@ import {
   PortLocation,
   RoutingConfiguration,
 } from '../../../types';
-import { getOrthogonalPathPoints, isSamePoint } from '../../../utils';
-import { isDefaultRouting } from './utils/isRouting.ts';
+import { isSamePoint } from '../../../utils';
+import { getPointOnPath } from '../../../utils/get-point-on-path/get-point-on-path.ts';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getSourceTargetPositions } from './get-source-target-positions.ts';
-import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
-import { getPointOnPath } from '../../../utils/get-point-on-path/get-point-on-path.ts';
 
 export interface EdgesRoutingMiddlewareMetadata {
   enabled: boolean;
@@ -34,7 +33,12 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
     'routing',
   ]);
 
-const getPoints = (edge: Edge, nodesMap: Map<string, Node>, config?: RoutingConfiguration) => {
+const getPoints = (
+  edge: Edge,
+  nodesMap: Map<string, Node>,
+  routingManager: RoutingManager,
+  config?: RoutingConfiguration
+) => {
   const sourceTarget = getSourceTargetPositions(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
@@ -53,17 +57,18 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, config?: RoutingConf
 
   let points = [];
 
-  switch (edge.routing) {
-    case 'orthogonal':
-      points = getOrthogonalPathPoints(source, target);
-      break;
-    case 'bezier':
-      points = getBezierPathPoints(source, target, config?.bezier?.bezierControlOffset);
-      break;
-    default:
-      points = [sourcePoint, targetPoint].filter((point) => !!point);
-      break;
+  // If edge has staticPath, use the provided points directly
+  if (edge.staticPath?.points) {
+    points = edge.staticPath.points;
+  } else if (edge.routing && routingManager.hasRouting(edge.routing)) {
+    // Use RoutingManager for registered routings
+    const result = routingManager.calculateRouting(edge.routing, source, target, config);
+    points = result.points;
+  } else {
+    // Fallback to straight line if routing not found or not specified
+    points = [sourcePoint, targetPoint].filter((point) => !!point);
   }
+
   return { sourcePoint, targetPoint, points };
 };
 
@@ -80,10 +85,12 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       helpers,
       modelActionType,
       middlewareMetadata,
+      flowCore,
     } = context;
     // Access the typed middleware metadata
     const isEnabled = middlewareMetadata.enabled;
     const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
+    const routingManager = flowCore.routingManager;
 
     if (!isEnabled) {
       next();
@@ -103,7 +110,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
         const isCustomEdgeRouting = !!edge.type;
-        const isProperEdgeRouting = edge.routing === undefined || isDefaultRouting(edge.routing);
+        const isProperEdgeRouting = edge.routing === undefined || edge.routing;
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
@@ -119,7 +126,12 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
           !isProperEdgeRouting;
 
         if (shouldRouteCustomEdge) {
-          const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
+          const { sourcePoint, targetPoint, points } = getPoints(
+            edge,
+            nodesMap,
+            routingManager,
+            metadata?.routingConfiguration
+          );
 
           const updatedLabels = edge.labels?.map((label) => ({
             ...label,
@@ -138,7 +150,12 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
           return;
         }
 
-        const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap, metadata?.routingConfiguration);
+        const { sourcePoint, targetPoint, points } = getPoints(
+          edge,
+          nodesMap,
+          routingManager,
+          metadata?.routingConfiguration
+        );
         if (
           edge.points?.length === points.length &&
           edge.points?.every((point, index) => isSamePoint(point, points[index]))
@@ -163,7 +180,12 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
 
     if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {
       const edge = metadata.temporaryEdge;
-      const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
+      const { sourcePoint, targetPoint, points } = getPoints(
+        edge,
+        nodesMap,
+        routingManager,
+        metadata?.routingConfiguration
+      );
 
       newTemporaryEdge = {
         ...metadata.temporaryEdge,

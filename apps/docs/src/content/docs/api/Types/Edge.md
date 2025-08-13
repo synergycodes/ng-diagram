@@ -95,6 +95,23 @@ The position of the edge start.
 
 ***
 
+### staticPath?
+
+> `optional` **staticPath**: `object`
+
+Static path configuration for the edge.
+When provided, these points will be used instead of calculated routing.
+
+#### points
+
+> **points**: [`Point`](/api/types/point/)[]
+
+#### svgPath?
+
+> `optional` **svgPath**: `string`
+
+***
+
 ### target
 
 > **target**: `string`

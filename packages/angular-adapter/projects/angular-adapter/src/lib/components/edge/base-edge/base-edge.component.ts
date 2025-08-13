@@ -1,22 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
+import { Edge } from '@angularflow/core';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
-import { getPath } from '../../../utils/get-path/get-path';
 
 /**
- * To create an edge with a custom path, you must provide the `pathAndPoints` property.
- * If you want to use one of the default edge types, set the `routing` property in `edge`
- * or provide the `routing` property as a component prop
+ * Base edge component that handles edge rendering.
  *
- * - For custom paths:
- *  - Provide the `pathAndPoints` prop to the component with your custom `path` string and `points` array.
- *
- * - For default paths:
- *   - Set `routing` in `edge` to one of the supported types (e.g., `'straight'`, `'bezier'`, `'orthogonal'`).
- *   - Or provide the `routing` property as a component prop
- *   - The edge will automatically generate its path based on the routing type and provided points.
- *
+ * Path can be determined in several ways (in order of priority):
+ * 1. If edge has staticPath with svgPath - use that directly
+ * 2. If routing prop is provided or edge has routing property - use RoutingManager to generate path
+ * 3. Otherwise - middleware will calculate path based on default routing
  */
 
 @Component({
@@ -33,22 +26,43 @@ export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   edge = input.required<Edge>();
-  pathAndPoints = input<{ path: string; points: Point[] }>();
-  routing = input<Routing>();
+  routing = input<string>();
   stroke = input<string>();
   customMarkerStart = input<string>();
   customMarkerEnd = input<string>();
   strokeOpacity = input<number>(1);
   strokeWidth = input<number>(2);
 
-  points = computed(() => (this.routing() ? this.edge().points : (this.pathAndPoints()?.points ?? [])));
+  points = computed(() => this.edge().points ?? []);
 
   path = computed(() => {
-    const routing = this.routing();
-    const points = this.points() ?? [];
-    if (!routing) return this.pathAndPoints()?.path ?? '';
+    const edge = this.edge();
+    const routingName = this.routing() ?? edge.routing;
+    const flowCore = this.flowCoreProvider.provide();
 
-    return getPath(routing, points);
+    // Use static SVG path if provided
+    if (edge.staticPath?.svgPath) {
+      return edge.staticPath.svgPath;
+    }
+
+    // Generate SVG path from points using the routing
+    const points = this.points();
+    if (points.length === 0) return '';
+
+    if (routingName && flowCore.routingManager.hasRouting(routingName)) {
+      const routing = flowCore.routingManager.getRouting(routingName)!;
+      return routing.generateSvgPath(points);
+    }
+
+    // Fallback to simple straight line path
+    if (points.length === 1) return `M ${points[0].x},${points[0].y}`;
+
+    const pathSegments = points.map((point, index) => {
+      if (index === 0) return `M ${point.x},${point.y}`;
+      return `L ${point.x},${point.y}`;
+    });
+
+    return pathSegments.join(' ');
   });
 
   markerStart = computed(() =>
@@ -73,15 +87,13 @@ export class NgDiagramBaseEdgeComponent {
   labels = computed(() => this.edge().labels ?? []);
 
   private prevRouting: string | undefined;
-  private prevPoints: Point[] | undefined;
 
   constructor() {
     effect(() => {
-      const { sourcePosition, targetPosition } = this.edge();
+      const routing = this.routing();
+      if (!routing) return;
 
-      const routing = this.routing?.();
-      if (!routing || !sourcePosition || !targetPosition) return;
-
+      // Update edge routing if component input changes
       if (this.prevRouting !== routing) {
         this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
           id: this.edge().id,
@@ -89,19 +101,6 @@ export class NgDiagramBaseEdgeComponent {
         });
         this.prevRouting = routing;
       }
-    });
-
-    effect(() => {
-      if (!this.pathAndPoints() || this.routing()) return;
-
-      const currentPoints = this.points() || [];
-      if (this.prevPoints && !equalPointsArrays(this.prevPoints, currentPoints)) {
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.edge().id,
-          edgeChanges: { points: currentPoints },
-        });
-      }
-      this.prevPoints = currentPoints;
     });
   }
 }

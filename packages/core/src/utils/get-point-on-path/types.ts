@@ -1,7 +1,8 @@
-import { Point, Routing } from '../../types';
+import { RoutingName } from '../../routing-manager';
+import { Point } from '../../types';
 
 export type GetPointOnPathOptions = GetPointOnPathImplementationOptions & {
-  routing?: Routing;
+  routing?: RoutingName;
 };
 
 export type GetPointOnPathImplementation = (options: GetPointOnPathImplementationOptions) => Point;

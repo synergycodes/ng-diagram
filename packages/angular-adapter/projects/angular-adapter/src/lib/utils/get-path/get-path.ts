@@ -1,12 +1,12 @@
 import { DefaultRouting, Point, Routing } from '@angularflow/core';
-import { GetPathImplementation } from './types';
 import { getBezierPath } from './get-bezier-path';
-import { getStraightPath } from './get-straight-path';
 import { getOrthogonalPath } from './get-orthogonal-path';
+import { getStraightPath } from './get-straight-path';
+import { GetPathImplementation } from './types';
 
 export const getPath = (routing: Routing | undefined, points: Point[]) => {
   const getPathImplenentation = routing
-    ? GET_PATH_MAP[(routing ?? 'orthogonal') as keyof GetPathMap]
+    ? GET_PATH_MAP[(routing ?? 'orthogonal') as unknown as keyof GetPathMap]
     : getOrthogonalPath;
 
   return getPathImplenentation(points);

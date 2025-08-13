@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
-import { Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate, Point } from '@angularflow/angular-adapter';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate } from '@angularflow/angular-adapter';
 
 /**
  * The example below demonstrates how to create a custom edge with:
- * - a custom path shape for the edge,
+ * - a custom path shape for the edge using staticPath,
  * - dynamic line color customization,
  * - and a customizable markerEnd (arrowhead).
  *
@@ -19,47 +19,32 @@ import { Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate, Point } from '
 export class CustomBezierEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
 
-  points: Point[] = [];
-  path = '';
+  customEdge = computed(() => {
+    const edge = this.edge();
+    const { sourcePosition, targetPosition } = edge;
 
-  private prevSourcePosition?: Point;
-  private prevTargetPosition?: Point;
+    if (!sourcePosition || !targetPosition) {
+      return edge;
+    }
 
-  constructor() {
-    effect(() => {
-      const { sourcePosition, targetPosition } = this.edge();
-      const changed =
-        this.prevSourcePosition !== sourcePosition || this.prevTargetPosition !== targetPosition || !this.path;
+    // Calculate custom bezier control points
+    const points = [
+      sourcePosition,
+      { x: sourcePosition.x + 100, y: sourcePosition.y },
+      { x: targetPosition.x - 100, y: targetPosition.y },
+      targetPosition,
+    ];
 
-      if (changed && sourcePosition && targetPosition) {
-        const points = this.bezierControlPoints(sourcePosition, targetPosition);
-        this.path =
-          points?.length === 4
-            ? `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`
-            : points?.length === 2
-              ? `M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y}`
-              : '';
-        this.points = points;
-      }
+    // Generate custom SVG path
+    const svgPath = `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`;
 
-      this.prevSourcePosition = sourcePosition;
-      this.prevTargetPosition = targetPosition;
-    });
-  }
-
-  bezierControlPoints = (source: Point, target: Point) => {
-    if (!source || !target) return [];
-
-    const c1 = { x: source.x + 100, y: source.y };
-    const c2 = { x: target.x - 100, y: target.y };
-
-    return [source, c1, c2, target];
-  };
-
-  get pathAndPoints() {
+    // Return edge with staticPath
     return {
-      points: this.points,
-      path: this.path,
+      ...edge,
+      staticPath: {
+        points,
+        svgPath,
+      },
     };
-  }
+  });
 }

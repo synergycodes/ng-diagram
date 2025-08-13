@@ -9,6 +9,7 @@ import {
   MiddlewareConfigKeys,
   MiddlewaresConfigFromMiddlewares,
   ModelActionType,
+  Routing,
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
@@ -98,6 +99,53 @@ export class NgDiagramService<
     config: TMetadata['middlewaresConfig'][TName]
   ) {
     this.flowCore.updateMiddlewareConfig(name, config);
+  }
+
+  /**
+   * Registers a custom routing implementation
+   * @param routing Routing implementation to register
+   * @example
+   * const customRouting: Routing = {
+   *   name: 'custom',
+   *   calculatePoints: (source, target) => [...],
+   *   generateSvgPath: (points) => '...'
+   * };
+   * ngDiagramService.registerRouting(customRouting);
+   */
+  registerRouting(routing: Routing): void {
+    this.flowCore.routingManager.registerRouting(routing);
+  }
+
+  /**
+   * Unregisters a routing implementation
+   * @param name Name of the routing to unregister
+   */
+  unregisterRouting(name: string): void {
+    this.flowCore.routingManager.unregisterRouting(name);
+  }
+
+  /**
+   * Gets all registered routing names
+   * @returns Array of registered routing names
+   */
+  getRegisteredRoutings(): string[] {
+    return this.flowCore.routingManager.getRegisteredRoutings();
+  }
+
+  /**
+   * Sets the default routing to use when not specified on edges
+   * @param name Name of the routing to set as default
+   */
+  setDefaultRouting(name: string): void {
+    this.flowCore.routingManager.setDefaultRouting(name);
+  }
+
+  /**
+   * Gets the current default routing name
+   * @returns Name of the default routing
+   */
+  getDefaultRouting(): string {
+    return this.flowCore.routingManager.getDefaultRouting();
   }
 
   /**
