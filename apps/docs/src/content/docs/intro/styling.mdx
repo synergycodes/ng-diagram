@@ -123,17 +123,22 @@ Applied to node containers. When the cursor hovers over the node, all ports are 
 
 #### `.ng-diagram-port-hoverable`
 
-Applied to individual ports. The port is highlighted only when the cursor hovers directly over it.
+Applied to node containers as well. The port is highlighted only when the cursor hovers directly over it.
 
 ```html
 <!-- Node with hoverable ports -->
 <div class="ng-diagram-port-hoverable-over-node">
-  <div class="ng-diagram-port"></div>
-  <div class="ng-diagram-port"></div>
+  <!-- Node content -->
+  <ng-diagram-port id="port-left" type="both" side="left" />
+  <ng-diagram-port id="port-right" type="both" side="right" />
 </div>
 
 <!-- Individual hoverable port -->
-<div class="ng-diagram-port ng-diagram-port-hoverable"></div>
+<div class="ng-diagram-port-hoverable">
+  <!-- Node content -->
+  <ng-diagram-port id="port-left" type="both" side="left" />
+  <ng-diagram-port id="port-right" type="both" side="right" />
+</div>
 ```
 
 ## Directives
@@ -176,6 +181,9 @@ Adds highlight styling to groups based on the `highlighted` property:
 
 For cases where directives can't be used (outside node templates), you can apply styling manually:
 
+- `ng-diagram-node-selected`
+- `ng-diagram-group-highlight`
+
 ```html
 <!-- Selection styling -->
 <div class="ng-diagram-node-wrapper ng-diagram-node-selected">
@@ -195,5 +203,5 @@ For cases where directives can't be used (outside node templates), you can apply
 1. **Use primitives for global color changes** - Override `--ngd-colors-*` variables for brand consistency
 2. **Use component variables for specific adjustments** - Override `--ngd-*` variables for precise control
 3. **Leverage utility classes** - Use provided classes for consistent behavior
-4. **Use directives for state management** - Let directives handle selection and highlight states
+4. **Use directives for visual state management** - Let directives handle selection and highlight states
 5. **Maintain layer separation** - Use component variables instead of applying primitives or tokens directly within components.
