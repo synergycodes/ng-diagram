@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { Edge, FlowCore, MiddlewareChain, Node, Port } from '@angularflow/core';
 import { FlowCoreProviderService } from '../services';
 
@@ -91,6 +91,21 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
       edgeChanges: {
         data: data,
       },
+    });
+  }
+
+  /**
+   * Gets the current selection state as a reactive signal
+   * This signal automatically updates when selection changes or when selected nodes/edges are modified
+   * @returns Signal containing the current selection
+   */
+  getSelection() {
+    return computed(() => {
+      const { nodes, edges } = this.flowCore.getState();
+      return {
+        nodes: nodes.filter((node) => node.selected),
+        edges: edges.filter((edge) => edge.selected),
+      };
     });
   }
 }

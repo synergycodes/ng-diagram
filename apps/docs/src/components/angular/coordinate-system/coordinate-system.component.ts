@@ -1,7 +1,12 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, createSignalModel } from '@angularflow/angular-adapter';
+import {
+  NgDiagramComponent,
+  NgDiagramContextComponent,
+  createSignalModel,
+  type AppMiddlewares,
+} from '@angularflow/angular-adapter';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
 @Component({
@@ -25,20 +30,25 @@ import { CoordinatesPreview } from './coordinates-preview.component';
   `,
 })
 export class NgDiagramComponentContainer {
-  model = createSignalModel({
+  model = createSignalModel<AppMiddlewares>({
+    metadata: {
+      viewport: {
+        x: 5,
+        y: 85,
+        scale: 1,
+      },
+    },
     nodes: [
       { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
-      { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },
-    ],
-    edges: [
+      { id: '2', position: { x: 410, y: 150 }, data: { label: 'Node 2' }, groupId: '3' },
       {
-        id: '1',
-        source: '1',
-        sourcePort: 'port-right',
-        targetPort: 'port-left',
-        target: '2',
+        id: '3',
+        isGroup: true,
+        position: { x: 390, y: 100 },
+        size: { width: 220, height: 140 },
         data: {},
       },
     ],
+    edges: [],
   });
 }
