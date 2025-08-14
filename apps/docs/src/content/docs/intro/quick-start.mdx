@@ -24,15 +24,12 @@ import { NgDiagramComponent, NgDiagramContextComponent, createSignalModel } from
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
   template: `
-    <div class="diagram">
-      <ng-diagram-context>
-        <ng-diagram [model]="model" />
-      </ng-diagram-context>
-      <div></div>
-    </div>
+    <ng-diagram-context>
+      <ng-diagram [model]="model" />
+    </ng-diagram-context>
   `,
   styles: `
-    .diagram {
+    :host {
       flex: 1;
       display: flex;
       height: 100%;
