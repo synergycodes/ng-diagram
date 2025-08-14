@@ -11,8 +11,8 @@ import { NgDiagramModelService, NgDiagramViewportService } from '@angularflow/an
     <span>x: {{ viewport().x | number: '1.0-2' }}</span>
     <span>y: {{ viewport().y | number: '1.0-2' }}</span>
     <span>scale: {{ scale() | number: '1.0-2' }}</span>
-    <span>selection x: {{ selection()?.nodes[0]?.position?.x || '-' }}</span>
-    <span>selection y: {{ selection()?.nodes[0]?.position?.y || '-' }}</span>
+    <span>selection x: {{ selection()?.nodes[0]?.position?.x ?? '-' }}</span>
+    <span>selection y: {{ selection()?.nodes[0]?.position?.y ?? '-' }}</span>
   `,
   styles: `
     :host {
