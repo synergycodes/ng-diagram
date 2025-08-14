@@ -14,7 +14,7 @@ The diagram has a **global coordinate system** with its origin at the top-left c
 ### Key Characteristics
 
 - **Origin Point**: (0, 0) is located at the top-left corner of the diagram container
-- **Positive X**: Move the viewport left
+- **Positive X**: Move the viewport right
 - **Positive Y**: Move the viewport up
 - **Units**: All coordinates are in pixels
 
@@ -71,8 +71,8 @@ Groups follow the same positioning rules as regular nodes:
 
 **Group Behavior:**
 
-- Groups are positioned at their top-left corner
-- Child nodes within groups maintain their relative positions
+- Groups are positioned the same as nodes - at their top-left corner
+- Child nodes within groups retain their global positions - their coordinates are not recalculated or adjusted when added to a group
 - When a group moves, all its children move with it
 
 ### Edge Labels
@@ -83,7 +83,7 @@ Edge labels are positioned using **absolute coordinates** along the edge path:
 {
   id: 'label1',
   positionOnEdge: 0.5, // 50% along the edge path (0 = start, 1 = end)
-  position: { x: 0, y: 0 }, // Absolute position (calculated automatically)
+  position: { x: 0, y: 0 }, // Absolute position relative to viewport's origin (calculated automatically)
   // ... other properties
 }
 ```
@@ -114,20 +114,20 @@ The viewport represents the visible area of the diagram:
 
 ### Coordinate Transformations
 
-ngDiagram provides methods to convert between different coordinate systems:
+The `NgDiagramService` offers methods for converting between different coordinate systems in `ngDiagram`:
 
 **Client to Flow Position:**
 
 ```typescript
 // Convert screen coordinates to diagram coordinates
-const flowPosition = flowCore.clientToFlowPosition({ x: 150, y: 200 });
+const flowPosition = service.clientToFlowPosition({ x: 150, y: 200 });
 ```
 
 **Flow to Client Position:**
 
 ```typescript
 // Convert diagram coordinates to screen coordinates
-const clientPosition = flowCore.flowToClientPosition({ x: 100, y: 150 });
+const clientPosition = service.flowToClientPosition({ x: 100, y: 150 });
 ```
 
 ### Reading Viewport Data in Real-Time
