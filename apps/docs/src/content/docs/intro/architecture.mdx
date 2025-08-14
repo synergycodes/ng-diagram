@@ -1,6 +1,53 @@
 ---
 title: Architecture
 description: Understanding the overall architecture of NgDiagram
+sidebar:
+  order: 2
 ---
 
-# Architecture
+ngDiagram follows a layered architecture that separates concerns and enables extensibility. This design makes it easy to understand, customize, and extend for your specific needs.
+
+### 1. Components Layer
+
+The user-facing components that render the diagram and handle user interactions:
+
+- **ng-diagram**: Main component that renders the entire diagram, handles user interactions, and orchestrates all functionality
+- **ng-diagram-resize-adornment** and **ng-diagram-rotate-adornment**: Utility components that can be embedded in custom node templates to provide resize and rotation functionality
+- **ng-diagram-palette-item**: Drag and drop component that can be placed anywhere in your application to create palette functionality
+- **ng-diagram-base-edge**: Foundation component for building custom edge templates with advanced styling and behavior
+
+### 2. Services Layer
+
+Specialized services provide different levels of control and functionality:
+
+- **NgDiagramService**: Provides advanced control and middleware management. It gives you access to the command system for programmatic control, middleware registration and configuration, transaction handling for atomic operations, and access to action state
+- **NgDiagramModelService**: Handles model-specific operations and spatial queries. It provides methods for updating node and edge data, finding elements by ID, performing spatial queries to find nearby nodes and ports, and accessing the underlying model adapter
+- **NgDiagramViewportService**: Manages viewport and scale operations. It provides reactive signals for the current viewport position and zoom scale, enabling components to reactively respond to viewport changes
+
+All services are scoped within `ng-diagram-context`, enabling multiple diagrams on the same page with isolated state and behavior.
+
+### 3. Command System
+
+Commands provide precise instructions for what needs to be done in the diagram. This system ensures data consistency and enables powerful features:
+
+- **Atomic Operations**: Each command represents a single, well-defined action that can be executed, undone, or redone
+- **Transaction Support**: Commands can be grouped into transactions for atomic execution, ensuring data consistency
+- **Extensible**: Custom commands can be added for specific use cases, enabling domain-specific operations
+
+### 4. Middleware System
+
+Middleware intercepts between the engine and state, enabling behavior extension without modifying core code:
+
+- **Plugin Architecture**: Add, remove, or modify behaviors without changing core code, making the system highly extensible
+- **Processing Pipeline**: Middleware processes data transformations in sequence, allowing for complex business logic
+- **Configurable**: Each middleware can be enabled/disabled and configured at runtime, providing flexibility
+
+### 5. Data Model
+
+The foundation that stores diagram state and provides the data layer:
+
+- **Nodes**: Visual elements with position, data, and behavior that represent entities in your diagram
+- **Edges**: Connections between nodes with routing and styling that represent relationships
+- **Metadata**: Viewport state, middleware configurations, and other settings that control diagram behavior
+
+The default Signal Model uses Angular signals for reactive state management, providing excellent performance and real-time updates. For advanced use cases, custom model adapters can integrate with external data sources like databases or APIs.

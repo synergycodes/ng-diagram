@@ -3,4 +3,159 @@ title: Coordinate System
 description: Understanding the coordinate system used in NgDiagram
 ---
 
-# Coordinate System
+import NgDiagramComponentContainer from '../../../components/angular/coordinate-system/coordinate-system.astro';
+
+ngDiagram uses a coordinate system that enables precise positioning of all diagram elements. Understanding this system is crucial for creating accurate diagrams and implementing custom behaviors.
+
+## Diagram Origin
+
+The diagram has a **global coordinate system** with its origin at the top-left corner of the diagram container. This origin serves as the reference point for all positioning calculations.
+
+### Key Characteristics
+
+- **Origin Point**: (0, 0) is located at the top-left corner of the diagram container
+- **Positive X**: Moving the viewport to the right increases values
+- **Positive Y**: Moving the viewport down increases values
+- **Units**: All coordinates are in pixels
+
+> In other words, as you drag the diagram right or down, the coordinates of elements increase along the X and Y axes.
+
+## Element Positioning
+
+### Nodes
+
+Nodes are positioned using **absolute coordinates** relative to the diagram origin:
+
+```typescript
+{
+  id: 'node1',
+  position: { x: 100, y: 200 }, // 100px from left, 200px from top
+  // ... other properties
+}
+```
+
+**Positioning Behavior:**
+
+- The `position` property defines the top-left corner of the node
+- Nodes are positioned using CSS `transform: translate(x, y)`
+- Position is independent of the node's size or content
+
+### Ports
+
+Ports have **absolute positioning** within their parent node:
+
+**Default Side Positioning:**
+
+- **Left side**: `top: 50%, left: 0` (center of left edge)
+- **Right side**: `top: 50%, left: 100%` (center of right edge)
+- **Top side**: `top: 0, left: 50%` (center of top edge)
+- **Bottom side**: `top: 100%, left: 50%` (center of bottom edge)
+
+**Custom Positioning:**
+Ports can be positioned anywhere within the node using CSS properties:
+
+```html
+<ng-diagram-port id="custom-port" type="target" side="left" style="top: 25%; left: 0" />
+```
+
+### Groups
+
+Groups follow the same positioning rules as regular nodes:
+
+```typescript
+{
+  id: 'group1',
+  isGroup: true,
+  position: { x: 300, y: 400 }, // Group's top-left corner
+  // ... other properties
+}
+```
+
+**Group Behavior:**
+
+- Groups are positioned the same as nodes - at their top-left corner
+- Child nodes within groups retain their global positions - their coordinates are not recalculated or adjusted when added to a group
+- When a group moves, all its children move with it
+
+### Edge Labels
+
+Edge labels are positioned using **absolute coordinates** along the edge path:
+
+```typescript
+{
+  id: 'label1',
+  positionOnEdge: 0.5, // 50% along the edge path (0 = start, 1 = end)
+  position: { x: 0, y: 0 }, // Absolute position relative to viewport's origin (calculated automatically)
+  // ... other properties
+}
+```
+
+**Label Positioning:**
+
+- `positionOnEdge`: Value from 0 to 1 indicating position along the edge
+- `position`: Absolute coordinates calculated by the system
+- Labels are positioned using `transform: translate(x, y) translate(-50%, -50%)` for center alignment
+
+## Viewport and Scaling
+
+### Viewport Coordinates
+
+The viewport represents the visible area of the diagram:
+
+```typescript
+{
+  viewport: {
+    x: 100,    // Horizontal offset from diagram origin
+    y: 50,     // Vertical offset from diagram origin
+    scale: 1.5, // Zoom level (1.0 = 100%)
+    width: 800, // Viewport width
+    height: 600 // Viewport height
+  }
+}
+```
+
+### Coordinate Transformations
+
+The `NgDiagramService` offers methods for converting between different coordinate systems in `ngDiagram`:
+
+**Client to Flow Position:**
+
+```typescript
+// Convert screen coordinates to diagram coordinates
+const flowPosition = service.clientToFlowPosition({ x: 150, y: 200 });
+```
+
+**Flow to Client Position:**
+
+```typescript
+// Convert diagram coordinates to screen coordinates
+const clientPosition = service.flowToClientPosition({ x: 100, y: 150 });
+```
+
+### Reading Viewport Data in Real-Time
+
+Use the `NgDiagramViewportService` to access viewport information reactively:
+
+```typescript
+import { NgDiagramViewportService } from '@angularflow/angular-adapter';
+
+export class MyComponent {
+  private viewportService = inject(NgDiagramViewportService);
+
+  // Get reactive viewport data
+  viewport = this.viewportService.getViewport();
+  scale = this.viewportService.getScale();
+
+  // Access current values
+  currentViewport = this.viewport();
+  currentScale = this.scale();
+}
+```
+
+**Available Viewport Properties:**
+
+- `x`, `y`: Current pan offset
+- `scale`: Current zoom level
+- `width`, `height`: Viewport dimensions
+
+<NgDiagramComponentContainer />

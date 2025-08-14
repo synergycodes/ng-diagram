@@ -1,9 +1,9 @@
 ---
-import { DiagramComponent } from '../angular/diagram/diagram.component';
+import { NgDiagramComponentContainer } from './quick-start.component';
 ---
 
-<div class="diagram-container">
-  <DiagramComponent client:only="angular" />
+<div class="diagram-container not-content">
+  <NgDiagramComponentContainer client:only="angular" />
 </div>
 
 <style>
@@ -13,4 +13,4 @@ import { DiagramComponent } from '../angular/diagram/diagram.component';
     border: 5px solid var(--ngd-ui-border-default);
     background-color: var(--ngd-ui-bg-tertiary-default);
   }
-</style>
+</style> 

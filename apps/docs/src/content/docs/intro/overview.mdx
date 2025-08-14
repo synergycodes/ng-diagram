@@ -1,0 +1,82 @@
+---
+title: Overview
+description: Understanding the what is ngDiagram
+sidebar:
+  order: 1
+---
+
+## What is ngDiagram?
+
+ngDiagram is a powerful diagramming library for Angular applications that enables you to create interactive diagrams, node-based editors, and visual programming interfaces.
+
+### What You Can Build
+
+With ngDiagram, you can create:
+
+- **Flow Diagrams**: Process flows, decision trees, and workflow visualizations
+- **Node-Based Editors**: Visual programming interfaces and data flow editors
+- **Network Diagrams**: System architectures and network topologies
+- **Mind Maps**: Hierarchical information structures and brainstorming tools
+- **Circuit Diagrams**: Electronic schematics and technical drawings
+- **Custom Visualizations**: Any diagram type with custom node and edge templates
+
+### Key Features
+
+ngDiagram provides a complete toolkit for creating interactive diagrams with:
+
+- **Interactive Elements**: Draggable, resizable, and rotatable nodes with smooth animations
+- **Customizable Connections**: Customizable edges with various routing options (straight, curved, orthogonal)
+- **Consistent Styling**: Built-in design system with CSS variables and themes for consistent styling across your diagrams. More details can be found in the [Styling](../styling) section
+- **Groups**: Containers for other nodes that can be moved together, with automatic sizing based on their contents
+- **Extensible Architecture**: Plugin-based system for custom behaviors and business logic
+- **Reactive State Management**: Built on Angular signals for optimal performance and real-time updates
+- **Type Safety**: Full TypeScript support with generic templates for compile-time error checking
+
+## Understanding Diagram Elements
+
+Before diving into the technical architecture, let's understand the fundamental elements that make up any diagram:
+
+### Nodes
+
+Nodes are the primary visual elements in your diagram. They represent entities, processes, or data points in your system.
+
+**Key Concepts:**
+
+- **Visual Representation**: Each node has a position, size, and visual appearance
+- **Data Container**: Nodes can store custom data for your application logic
+- **Interactive Behavior**: Nodes can be draggable, resizable, rotatable, and selectable
+- **Grouping**: Nodes can be organized into groups for better visual organization
+- **Templates**: Custom visual representations for different node types - can be used any Angular component as a node template, enabling rich, dynamic content and interaction
+
+### Ports
+
+Ports are connection points on nodes where edges can start or end. They provide structured connection points and enable validation.
+
+**Key Concepts:**
+
+- **Connection Points**: Ports define where edges can connect on a node
+- **Positioning**: Ports can be placed on any side of a node (left, right, top, bottom) in the center of the node's edge by default. They can also be precisely positioned using CSS properties (top, left, bottom, right)
+
+### Edges
+
+Edges connect nodes and represent relationships, data flow, or dependencies between elements.
+
+**Key Concepts:**
+
+- **Connection Points**: Edges connect from one node to another
+- **Routing**: Edges can follow different paths (straight, curved, orthogonal)
+- **Ports**: Edges can connect to specific connection points on nodes
+- **Styling**: Custom visual appearance with colors, line styles, and arrows
+- **Validation**: Connection rules can be enforced during edge creation
+
+### Viewport
+
+The viewport is the working space where all diagram interactions happen. It represents the visible area of the diagram and can be manipulated by the user.
+
+**Key Concepts:**
+
+- **Working Area**: The viewport is where all nodes, edges, and interactions take place
+- **Zoom Control**: Users can zoom in to see details or zoom out for an overview
+- **Panning**: The viewport can be moved around to navigate different areas of the diagram
+- **Coordinate System**: All elements are positioned relative to the viewport's coordinate system
+- **Responsive**: The viewport adapts to different screen sizes and orientations

@@ -85,7 +85,7 @@ const defaultNodeRotationConfig: NodeRotationConfig = {
 
 const defaultNodeDraggingConfig: SnappingConfig = {
   shouldSnapDragForNode: (): boolean => {
-    return true;
+    return false;
   },
   shouldSnapResizeForNode: (): boolean => {
     return true;

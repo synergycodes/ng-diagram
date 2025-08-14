@@ -18,6 +18,8 @@
   background-color: var(--ngd-node-bg-primary-default);
   border: var(--ngd-node-border-size) solid var(--ngd-node-border-color);
 
+  color: var(--ngd-txt-primary-default);
+
   border-radius: var(--ngd-node-border-radius);
 
   &.isSelected {

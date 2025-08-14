@@ -47,6 +47,9 @@ export class AppComponent {
     background: {
       dotSize: 40,
     },
+    snapping: {
+      computeSnapForNodeDrag: true,
+    },
   };
 
   model = createSignalModel({
