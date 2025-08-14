@@ -2,3 +2,26 @@
 title: Sidebar with Editing Properties
 description: Example of how to implement a sidebar with editing properties in NgDiagram
 ---
+
+Creating a sidebar for reading and updating node properties in NgDiagram is **simple** and requires minimal code. This example demonstrates how to build an interactive properties panel that automatically updates when nodes are selected and allows real-time editing of node attributes.
+
+The sidebar is implemented using just a few key concepts:
+
+1. **Selection Tracking**: Uses `NgDiagramModelService.getSelection()` to track selected nodes
+2. **Computed Properties**: Angular computed signals automatically update the UI when node properties change
+3. **Simple Update Methods**: Direct calls to `updateNodeData()` and `updateNode()` for property modifications
+
+## How It Works
+
+The sidebar component automatically:
+
+- Observes the current selection using the model service
+- Displays the selected node's properties (label, resizable, rotatable)
+- Updates the node in real-time when properties are changed
+- Disables controls when no node is selected
+
+This pattern makes it easy to create property editors for any node attributes you need to expose to users.
+
+import Sidebar from '../../../components/angular/examples/properties-sidebar/properties-sidebar.astro';
+
+<Sidebar />

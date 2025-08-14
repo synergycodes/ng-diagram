@@ -47,8 +47,17 @@ const isKeyComboPressed =
 
     return isKeyPressed(key)(event);
   };
-const isDeleteKeyPressed = (event: Event): boolean =>
-  isKeyboardEvent(event) && (event.key === 'Delete' || event.key === 'Backspace');
+const isDeleteKeyPressed = (event: Event): boolean => {
+  if (!isKeyboardEvent(event)) return false;
+
+  const target = event.target as HTMLElement | null;
+  const isEditable =
+    target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+  if (isEditable) return false;
+
+  return event.key === 'Delete' || event.key === 'Backspace';
+};
 
 export const BrowserInputsHelpers = {
   isPointerEvent,

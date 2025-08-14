@@ -42,6 +42,18 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
   }
 
   /**
+   * Updates the properties of a node
+   * @param nodeId Node id
+   * @param node New node properties
+   */
+  updateNode(nodeId: string, node: Partial<Node>) {
+    this.flowCore.commandHandler.emit('updateNode', {
+      id: nodeId,
+      nodeChanges: { ...node },
+    });
+  }
+
+  /**
    * Gets all nodes in a range from a point
    * @param point Point to check from
    * @param range Range to check in
