@@ -24,7 +24,6 @@ title: "@angularflow/angular-adapter"
 - [Metadata](/api/other/metadata/)
 - [Middleware](/api/other/middleware/)
 - [MAX\_ORTHOGONAL\_RADIUS](/api/other/max_orthogonal_radius/)
-- [createSignalModel](/api/other/createsignalmodel/)
 - [getOrthogonalPath](/api/other/getorthogonalpath/)
 - [getSegmentOrientation](/api/other/getsegmentorientation/)
 

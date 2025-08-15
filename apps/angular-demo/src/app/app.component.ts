@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import {
-  createSignalModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
@@ -10,6 +9,7 @@ import {
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';

@@ -6,12 +6,12 @@ export type {
   Edge,
   FlowCore,
   GroupNode,
+  loggerMiddleware,
   Metadata,
   Middleware,
   NgDiagramMath,
   Node,
   Point,
-  loggerMiddleware,
 } from '@angularflow/core';
 export * from './lib/components/background/ng-diagram-background.component';
 export * from './lib/components/context/ng-diagram-context.component';
@@ -29,7 +29,6 @@ export * from './lib/public-services/ng-diagram-viewport.service';
 export * from './lib/public-services/ng-diagram.service';
 export * from './lib/types';
 export * from './lib/utils/create-middlewares';
-export * from './lib/utils/create-signal-model';
 export * from './lib/utils/get-path/get-bezier-path';
 export * from './lib/utils/get-path/get-orthogonal-path';
 export * from './lib/utils/get-path/get-straight-path';

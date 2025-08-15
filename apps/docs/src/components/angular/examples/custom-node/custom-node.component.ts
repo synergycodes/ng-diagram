@@ -1,7 +1,6 @@
 import '@angular/compiler';
 import { ChangeDetectionStrategy, Component, Type } from '@angular/core';
 import {
-  createSignalModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type NgDiagramConfig,
@@ -9,6 +8,7 @@ import {
   type NgDiagramNodeTemplate,
   type NgDiagramNodeTemplateMap,
 } from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
 
 import { NodeComponent } from './node/node.component';
 

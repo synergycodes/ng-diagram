@@ -1,12 +1,8 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-import {
-  NgDiagramComponent,
-  NgDiagramContextComponent,
-  createSignalModel,
-  type AppMiddlewares,
-} from '@angularflow/angular-adapter';
+import { NgDiagramComponent, NgDiagramContextComponent, type AppMiddlewares } from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
 @Component({
