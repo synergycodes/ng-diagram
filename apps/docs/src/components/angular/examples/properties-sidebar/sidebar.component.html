@@ -1,34 +1,30 @@
 <div class="sidebar">
-  @if (isEnabled()) {
-    <div class="vertical">
-      <span>Label</span>
-      <input [value]="label()" [disabled]="!isEnabled()" (input)="onInput($event.target.value)" />
-    </div>
-    <div class="horizontal">
-      <input
-        #isResizableCheckbox
-        type="checkbox"
-        id="isResizable"
-        name="isResizable"
-        [checked]="isResizable()"
-        [disabled]="!isEnabled()"
-        (change)="onIsResizableChange(isResizableCheckbox.checked)"
-      />
-      <label for="isResizable">Is Resizable</label>
-    </div>
-    <div class="horizontal">
-      <input
-        #isRotatableCheckbox
-        type="checkbox"
-        id="isRotatable"
-        name="isRotatable"
-        [checked]="isRotatable()"
-        [disabled]="!isEnabled()"
-        (change)="onIsRotatableChange(isRotatableCheckbox.checked)"
-      />
-      <label for="isRotatable">Is Rotatable</label>
-    </div>
-  } @else {
-    <div>Select a node to see its details</div>
-  }
+  <div class="vertical">
+    <span>Selected node</span>
+    <input [value]="label()" [disabled]="!isEnabled()" (input)="onInput($event.target.value)" />
+  </div>
+  <div class="horizontal">
+    <input
+      #isResizableCheckbox
+      type="checkbox"
+      id="isResizable"
+      name="isResizable"
+      [checked]="isResizable()"
+      [disabled]="!isEnabled()"
+      (change)="onIsResizableChange(isResizableCheckbox.checked)"
+    />
+    <label for="isResizable">Is Resizable</label>
+  </div>
+  <div class="horizontal">
+    <input
+      #isRotatableCheckbox
+      type="checkbox"
+      id="isRotatable"
+      name="isRotatable"
+      [checked]="isRotatable()"
+      [disabled]="!isEnabled()"
+      (change)="onIsRotatableChange(isRotatableCheckbox.checked)"
+    />
+    <label for="isRotatable">Is Rotatable</label>
+  </div>
 </div>
