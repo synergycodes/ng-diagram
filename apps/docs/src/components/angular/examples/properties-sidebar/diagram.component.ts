@@ -1,13 +1,9 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-import {
-  NgDiagramComponent,
-  NgDiagramContextComponent,
-  createSignalModel,
-  type AppMiddlewares,
-} from '@angularflow/angular-adapter';
-import { SidebarContainer } from './properties-sidebar.component';
+import { NgDiagramComponent, NgDiagramContextComponent, type AppMiddlewares } from '@angularflow/angular-adapter';
+import { SidebarContainer } from './sidebar.component';
+import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent, SidebarContainer],
