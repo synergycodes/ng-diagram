@@ -1,7 +1,8 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, createSignalModel } from '@angularflow/angular-adapter';
+import { NgDiagramComponent, NgDiagramContextComponent } from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],

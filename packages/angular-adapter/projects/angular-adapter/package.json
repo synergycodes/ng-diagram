@@ -5,10 +5,9 @@
   "main": "./fesm2022/angularflow-angular-adapter.mjs",
   "types": "./index.d.ts",
   "peerDependencies": {
-    "@angular/common": "^19.2.0",
-    "@angular/core": "^19.2.0",
-    "@angularflow/core": "workspace:*",
-    "@angularflow/angular-signals-model": "workspace:*"
+    "@angular/common": ">19",
+    "@angular/core": ">19",
+    "@angularflow/core": "workspace:*"
   },
   "dependencies": {
     "tslib": "^2.3.0"

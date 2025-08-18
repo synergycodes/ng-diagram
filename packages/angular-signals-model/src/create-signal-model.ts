@@ -1,6 +1,6 @@
 import { Injector, runInInjectionContext } from '@angular/core';
-import { SignalModelAdapter } from '@angularflow/angular-signals-model';
-import { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares, Model } from '@angularflow/core';
+import type { Metadata, MiddlewareChain, MiddlewaresConfigFromMiddlewares, Model } from '@angularflow/core';
+import { SignalModelAdapter } from './signal-model-adapter';
 
 /**
  * Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
