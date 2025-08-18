@@ -51,7 +51,7 @@
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
     "jsdom": "^26.1.0",
-    "ng-packagr": "^19.2.2",
+    "ng-packagr": "^20.1.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "8.31.0",
     "vite": "^6.3.5",
