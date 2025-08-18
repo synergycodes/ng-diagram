@@ -5,8 +5,8 @@
   "main": "./fesm2022/angularflow-angular-adapter.mjs",
   "types": "./index.d.ts",
   "peerDependencies": {
-    "@angular/common": "^19.2.0",
-    "@angular/core": "^19.2.0",
+    "@angular/common": ">19",
+    "@angular/core": ">19",
     "@angularflow/core": "workspace:*"
   },
   "dependencies": {

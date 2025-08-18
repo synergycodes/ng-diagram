@@ -15,7 +15,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build && node scripts/fix-package-json.js",
-    "publish:package": "cd dist/angular-adapter && npm publish --registry http://localhost:4873/",
+    "publish:local": "cd dist/angular-adapter && npm publish --registry http://localhost:4873/",
     "prepublish": "pnpm build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
