@@ -15,12 +15,32 @@ import { NodeComponent } from './node/node.component';
 enum NodeTemplateType {
   CustomNodeType = 'customNodeType',
 }
+
 @Component({
   selector: 'customnode',
-  templateUrl: './custom-node.component.html',
-  styleUrl: './custom-node.component.scss',
   imports: [NgDiagramComponent, NgDiagramContextComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <ng-diagram-context>
+      <div class="not-content diagram">
+        <ng-diagram [model]="model" [config]="config" [nodeTemplateMap]="nodeTemplateMap" />
+      </div>
+    </ng-diagram-context>
+  `,
+  styles: [
+    `
+      :host {
+        flex: 1;
+        display: flex;
+      }
+      .diagram {
+        flex: 1;
+        display: flex;
+        height: 20rem;
+        font-family: 'Poppins', sans-serif;
+      }
+    `,
+  ],
 })
 export class CustomNodeComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map<
