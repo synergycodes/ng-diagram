@@ -162,6 +162,7 @@ export const makeTreeLayout = (
       const delta = { x: offsetX - parentNode.position.x, y: offsetY - parentNode.position.y };
       groupLayout(parentNode.groupChildren, delta);
     }
+
     parentNode.position.x = offsetX;
     parentNode.position.y = offsetY;
     return {
