@@ -1,0 +1,20 @@
+{
+  "name": "ng-diagram",
+  "version": "0.0.1",
+  "description": "Angular diagramming library - Work in progress",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "angular",
+    "diagram",
+    "flowchart",
+    "graph",
+    "visualization"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  }
+}
