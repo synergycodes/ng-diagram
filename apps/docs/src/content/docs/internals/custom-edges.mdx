@@ -3,4 +3,113 @@ title: Custom Edges
 description: How to create and implement custom edges in NgDiagram
 ---
 
-# Custom Edges
+Default edges in NgDiagram provide support for several different routing algorithms (straight, orthogonal, bezier), custom arrowheads, stroke and can be styled using CSS.
+
+To have more fine-grained control over edge rendering (like custom routing), create a custom edge by implementing `NgDiagramEdgeTemplate` and using `NgDiagramBaseEdgeComponent`.
+
+## Basic Custom Edge
+
+import BasicCustomEdge from '@components/angular/custom-edges/basic-custom-edge.astro';
+
+<BasicCustomEdge />
+
+```typescript
+@Component({
+  selector: 'custom-edge',
+  template: `<ng-diagram-base-edge [edge]="edge()" [pathAndPoints]="pathAndPoints()" [stroke]="'blue'" />`,
+  imports: [NgDiagramBaseEdgeComponent],
+})
+export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
+  edge = input.required<Edge>();
+
+  pathAndPoints = computed(() => ({
+    path: this.generateCustomPath(),
+    points: this.getControlPoints(),
+  }));
+
+  private generateCustomPath(): string {
+    const { sourcePosition, targetPosition } = this.edge();
+
+    // Custom path logic here
+    return `M ${sourcePosition.x},${sourcePosition.y} L ${targetPosition.x},${targetPosition.y}`;
+  }
+}
+```
+
+## Custom Routing
+
+Implement bezier curves or other routing algorithms:
+
+```typescript
+export class CustomBezierEdgeComponent implements NgDiagramEdgeTemplate {
+  bezierControlPoints = (source: Point, target: Point) => {
+    const c1 = { x: source.x + 100, y: source.y };
+    const c2 = { x: target.x - 100, y: target.y };
+    return [source, c1, c2, target];
+  };
+
+  pathAndPoints = computed(() => {
+    const { sourcePosition, targetPositionk } = this.edge();
+    const points = this.bezierControlPoints(sourcePosition, targetPosition);
+    const path = `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`;
+    return { path, points };
+  });
+}
+```
+
+## Styling & Markers
+
+```typescript
+@Component({
+  template: `
+    <ng-diagram-base-edge
+      [edge]="edge()"
+      [pathAndPoints]="pathAndPoints()"
+      [stroke]="edgeColor()"
+      [strokeWidth]="2"
+      [customMarkerEnd]="'ng-diagram-arrow'"
+    />
+  `,
+})
+export class StyledEdgeComponent {
+  edgeColor = computed(() => (this.edge().selected ? '#9140ff' : '#6f7480'));
+}
+```
+
+## Adding Labels
+
+```typescript
+@Component({
+  template: `
+    <ng-diagram-base-edge [edge]="edge()" [pathAndPoints]="pathAndPoints()">
+      <ng-diagram-base-edge-label [id]="'label-1'" [positionOnEdge]="0.5">
+        <div class="edge-label">{{ edge().data?.label }}</div>
+      </ng-diagram-base-edge-label>
+    </ng-diagram-base-edge>
+  `,
+  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+})
+export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {
+  edge = input.required<Edge>();
+}
+```
+
+## Registration
+
+Register custom edges in your diagram:
+
+```typescript
+@Component({
+  template: `<ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />`,
+})
+export class DiagramComponent {
+  edgeTemplateMap = new Map([
+    ['custom-bezier', CustomBezierEdgeComponent],
+    ['styled-edge', StyledEdgeComponent],
+  ]);
+
+  model = createModel({
+    edges: [{ id: 'e1', type: 'custom-bezier', source: 'n1', target: 'n2' }],
+  });
+}
+```
