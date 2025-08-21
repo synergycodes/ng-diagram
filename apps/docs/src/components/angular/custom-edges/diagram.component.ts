@@ -26,12 +26,21 @@ import { CustomEdgeComponent } from './custom-edge.component';
   `,
 })
 export class Diagram {
+  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([
+    ['custom', CustomEdgeComponent],
+  ]);
+
   model = createSignalModel<AppMiddlewares>({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.88 },
     },
     nodes: [
-      { id: '1', position: { x: 150, y: 150 }, data: { label: 'Node 1' }, rotatable: true },
+      {
+        id: '1',
+        position: { x: 150, y: 150 },
+        data: { label: 'Node 1' },
+        rotatable: true,
+      },
       { id: '2', position: { x: 500, y: 150 }, data: { label: 'Node 2' } },
     ],
     edges: [
@@ -41,10 +50,9 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
+        type: 'custom',
         data: {},
       },
     ],
   });
-
-  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([['custom', CustomEdgeComponent]]);
 }

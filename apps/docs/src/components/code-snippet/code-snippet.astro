@@ -1,0 +1,27 @@
+---
+import { Code } from "@astrojs/starlight/components";
+import type { ComponentProps } from 'astro/types';
+import { getAngularFileSource } from "./get-angular-file-source";
+
+interface Props extends ComponentProps<typeof Code> {
+  /**
+  * path to the file relative to the angular directory
+  */
+  relativePath: string;
+
+  /**
+  * range of lines to be used as a source
+  */
+  range?: [number, number];
+}
+
+const { relativePath, range, ...rest } = Astro.props;
+
+const { content, extension } = await getAngularFileSource(relativePath);
+
+const clippedContent = range
+  ? content.split('\n').slice(range[0] - 1, range[1]).join('\n')
+  : content;
+---
+
+<Code lang={extension} {...rest} code={clippedContent} />
