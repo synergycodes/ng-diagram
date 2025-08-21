@@ -2,7 +2,10 @@ import '@angular/compiler';
 
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
-import { NgDiagramModelService, NgDiagramViewportService } from '@angularflow/angular-adapter';
+import {
+  NgDiagramModelService,
+  NgDiagramViewportService,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'coordinates-preview',
@@ -11,8 +14,22 @@ import { NgDiagramModelService, NgDiagramViewportService } from '@angularflow/an
     <span>x: {{ viewport().x | number: '1.0-2' }}</span>
     <span>y: {{ viewport().y | number: '1.0-2' }}</span>
     <span>scale: {{ scale() | number: '1.0-2' }}</span>
-    <span>selection x: {{ selectionPosition() != null ? (selectionPosition().x | number: '1.0-2') : '-' }}</span>
-    <span>selection y: {{ selectionPosition() != null ? (selectionPosition().y | number: '1.0-2') : '-' }}</span>
+    <span
+      >selection x:
+      {{
+        selectionPosition() != null
+          ? (selectionPosition().x | number: '1.0-2')
+          : '-'
+      }}</span
+    >
+    <span
+      >selection y:
+      {{
+        selectionPosition() != null
+          ? (selectionPosition().y | number: '1.0-2')
+          : '-'
+      }}</span
+    >
   `,
   styles: `
     :host {

@@ -1,12 +1,12 @@
-import { Component, input, computed } from "@angular/core";
+import { Component, input, computed } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
-} from "@angularflow/angular-adapter";
+} from '@angularflow/angular-adapter';
 
 @Component({
-  selector: "sinusoid-edge",
+  selector: 'sinusoid-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
     [pathAndPoints]="pathAndPoints()"
@@ -27,7 +27,7 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
     const { sourcePosition, targetPosition } = this.edge();
 
     if (!sourcePosition || !targetPosition) {
-      return "";
+      return '';
     }
 
     const startX = sourcePosition.x;
@@ -37,7 +37,7 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
 
     // Calculate distance and angle between points
     const distance = Math.sqrt(
-      Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2),
+      Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)
     );
     const angle = Math.atan2(endY - startY, endX - startX);
 

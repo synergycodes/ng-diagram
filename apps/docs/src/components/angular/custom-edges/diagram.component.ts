@@ -1,14 +1,14 @@
-import "@angular/compiler";
+import '@angular/compiler';
 
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
   type NgDiagramEdgeTemplateMap,
-} from "@angularflow/angular-adapter";
-import { createSignalModel } from "@angularflow/angular-signals-model";
-import { CustomEdgeComponent } from "./custom-edge.component";
+} from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
+import { CustomEdgeComponent } from './custom-edge.component';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -27,7 +27,7 @@ import { CustomEdgeComponent } from "./custom-edge.component";
 })
 export class Diagram {
   edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([
-    ["custom", CustomEdgeComponent],
+    ['custom', CustomEdgeComponent],
   ]);
 
   model = createSignalModel<AppMiddlewares>({
@@ -36,21 +36,21 @@ export class Diagram {
     },
     nodes: [
       {
-        id: "1",
+        id: '1',
         position: { x: 150, y: 150 },
-        data: { label: "Node 1" },
+        data: { label: 'Node 1' },
         rotatable: true,
       },
-      { id: "2", position: { x: 500, y: 150 }, data: { label: "Node 2" } },
+      { id: '2', position: { x: 500, y: 150 }, data: { label: 'Node 2' } },
     ],
     edges: [
       {
-        id: "1",
-        source: "1",
-        sourcePort: "port-right",
-        targetPort: "port-left",
-        target: "2",
-        type: "custom",
+        id: '1',
+        source: '1',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        target: '2',
+        type: 'custom',
         data: {},
       },
     ],

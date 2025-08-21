@@ -1,7 +1,11 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, type AppMiddlewares } from '@angularflow/angular-adapter';
+import {
+  NgDiagramComponent,
+  NgDiagramContextComponent,
+  type AppMiddlewares,
+} from '@angularflow/angular-adapter';
 import { SidebarContainer } from './sidebar.component';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 
@@ -31,7 +35,12 @@ export class NgDiagramPropertiesSidebarContainer {
       viewport: { x: -45, y: 80, scale: 0.88 },
     },
     nodes: [
-      { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' }, rotatable: true },
+      {
+        id: '1',
+        position: { x: 100, y: 150 },
+        data: { label: 'Node 1' },
+        rotatable: true,
+      },
       { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },
     ],
     edges: [

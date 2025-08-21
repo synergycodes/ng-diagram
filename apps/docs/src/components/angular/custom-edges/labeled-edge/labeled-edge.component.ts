@@ -1,13 +1,13 @@
-import { Component, input } from "@angular/core";
+import { Component, input } from '@angular/core';
 import {
   BaseEdgeLabelComponent,
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
-} from "@angularflow/angular-adapter";
+} from '@angularflow/angular-adapter';
 
 @Component({
-  selector: "labeled-edge",
+  selector: 'labeled-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
     [pathAndPoints]="pathAndPoints()"

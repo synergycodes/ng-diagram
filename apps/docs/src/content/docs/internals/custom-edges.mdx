@@ -5,13 +5,13 @@ description: How to create and implement custom edges in NgDiagram
 
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
-## Customization default edges
+## Customizing Default Edges
 
-Default edges in NgDiagram can be customized through:
+NgDiagram's default edges offer several customization options:
 
-- custom arrowheads (need to be defined as SVG markers)
-- styling with CSS variables
-- using provided routing algorithms (straight, orthogonal, bezier)
+- Custom arrowheads (defined as SVG markers)
+- CSS variable styling
+- Built-in routing algorithms (straight, orthogonal, bezier)
 
 import DefaultEdge from '@components/angular/custom-edges/default-edge/default-edge.astro';
 
@@ -24,17 +24,17 @@ import DefaultEdge from '@components/angular/custom-edges/default-edge/default-e
   mark={[{ range: '9-18' }, { range: '28-30' }, { range: '55-56' }]}
 />
 
-## Custom Edge implementation
+## Implementing Custom Edges
 
-To have more fine-grained control over edge rendering (like custom routing), create a custom edge by implementing `NgDiagramEdgeTemplate` and using `NgDiagramBaseEdgeComponent`.
+For more precise control over edge rendering, including routing, you can create a custom edge by implementing `NgDiagramEdgeTemplate` and using `NgDiagramBaseEdgeComponent`.
 
-The most basic custom edge component could look like this:
+Here's a basic custom edge component:
 
 <CodeSnippet relativePath="custom-edges/custom-edge.component.ts" range={[8, 28]} />
 
-## Registration
+## Registering Custom Edge Types
 
-Custom edge types need to be registered in the `edgeTemplateMap` that is passed to `NgDiagram` component.
+Custom edge types need to be registered in the `edgeTemplateMap` and passed to the `NgDiagram` component.
 
 <CodeSnippet
   relativePath="custom-edges/diagram.component.ts"
@@ -45,7 +45,7 @@ Custom edge types need to be registered in the `edgeTemplateMap` that is passed 
 
 ## Custom Routing
 
-To achieve custom routing you need to pass a `pathAndPoints` property of the `NgDiagramBaseEdgeComponent`. The example below shows how to create a sinusoidal edge between nodes.
+To use custom routing set the `pathAndPoints` property of `NgDiagramBaseEdgeComponent`. The `path` property defines the SVG path data for the edge, while `points` defines the control points for the edge's routing. The following example demonstrates how to create a sinusoidal edge between nodes:
 
 import SinusoidEdge from '@components/angular/custom-edges/sinusoid-edge/sinusoid-edge.astro';
 
@@ -58,9 +58,9 @@ import SinusoidEdge from '@components/angular/custom-edges/sinusoid-edge/sinusoi
   mark={[5, { range: '14-17' }]}
 />
 
-## Adding Labels
+## Adding Edge Labels
 
-To create a labeled edge, you can use the `BaseEdgeLabelComponent` within your custom edge component. Here's an example:
+To add labels to your custom edges, integrate the `BaseEdgeLabelComponent` within your custom edge component. Here's an implementation example:
 
 import LabeledEdge from '@components/angular/custom-edges/labeled-edge/labeled-edge.astro';
 

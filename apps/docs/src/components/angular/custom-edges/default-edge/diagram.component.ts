@@ -1,12 +1,12 @@
-import "@angular/compiler";
+import '@angular/compiler';
 
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
-} from "@angularflow/angular-adapter";
-import { createSignalModel } from "@angularflow/angular-signals-model";
+} from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -48,22 +48,22 @@ export class Diagram {
     },
     nodes: [
       {
-        id: "1",
+        id: '1',
         position: { x: 150, y: 100 },
-        data: { label: "Node 1" },
+        data: { label: 'Node 1' },
         rotatable: true,
       },
-      { id: "2", position: { x: 500, y: 200 }, data: { label: "Node 2" } },
+      { id: '2', position: { x: 500, y: 200 }, data: { label: 'Node 2' } },
     ],
     edges: [
       {
-        id: "1",
-        source: "1",
-        sourcePort: "port-right",
-        targetPort: "port-left",
-        target: "2",
-        sourceArrowhead: "custom-arrowhead",
-        routing: "bezier",
+        id: '1',
+        source: '1',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        target: '2',
+        sourceArrowhead: 'custom-arrowhead',
+        routing: 'bezier',
         data: {},
       },
     ],
