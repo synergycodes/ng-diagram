@@ -18,6 +18,7 @@ import { getPath } from '../../../utils/get-path/get-path';
  *   - The edge will automatically generate its path based on the routing type and provided points.
  *
  */
+
 @Component({
   selector: 'ng-diagram-base-edge',
   templateUrl: './base-edge.component.html',

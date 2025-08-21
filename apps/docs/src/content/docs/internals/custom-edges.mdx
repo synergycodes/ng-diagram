@@ -5,83 +5,70 @@ description: How to create and implement custom edges in NgDiagram
 
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
-Default edges in NgDiagram provide support for several different routing algorithms (straight, orthogonal, bezier), custom arrowheads, stroke and can be styled using CSS.
+## Customization default edges
+
+Default edges in NgDiagram can be customized through:
+
+- custom arrowheads (need to be defined as SVG markers)
+- styling with CSS variables
+- using provided routing algorithms (straight, orthogonal, bezier)
+
+import DefaultEdge from '@components/angular/custom-edges/default-edge/default-edge.astro';
+
+<DefaultEdge />
+
+<CodeSnippet
+  relativePath="custom-edges/default-edge/diagram.component.ts"
+  range={[10, 70]}
+  collapse={['24-27', '36-47', '50-54']}
+  mark={[{ range: '9-18' }, { range: '28-30' }, { range: '55-56' }]}
+/>
+
+## Custom Edge implementation
 
 To have more fine-grained control over edge rendering (like custom routing), create a custom edge by implementing `NgDiagramEdgeTemplate` and using `NgDiagramBaseEdgeComponent`.
+
+The most basic custom edge component could look like this:
+
+<CodeSnippet relativePath="custom-edges/custom-edge.component.ts" range={[8, 28]} />
 
 ## Registration
 
 Custom edge types need to be registered in the `edgeTemplateMap` that is passed to `NgDiagram` component.
 
 <CodeSnippet
-  relativePath='custom-edges/diagram.component.ts'
+  relativePath="custom-edges/diagram.component.ts"
   range={[13, 60]}
-  collapse={["8-14", "20-45"]}
-  mark={[5, { range: "17-19"}, "[edgeTemplateMap]=\"edgeTemplateMap\""]}
+  collapse={['8-14', '20-45']}
+  mark={[5, { range: '17-19' }, '[edgeTemplateMap]="edgeTemplateMap"']}
 />
 
 ## Custom Routing
 
-import BasicCustomEdge from '@components/angular/custom-edges/basic-custom-edge.astro';
+To achieve custom routing you need to pass a `pathAndPoints` property of the `NgDiagramBaseEdgeComponent`. The example below shows how to create a sinusoidal edge between nodes.
 
-<BasicCustomEdge />
+import SinusoidEdge from '@components/angular/custom-edges/sinusoid-edge/sinusoid-edge.astro';
 
-```typescript
-@Component({
-  selector: 'custom-edge',
-  template: `<ng-diagram-base-edge [edge]="edge()" [pathAndPoints]="pathAndPoints()" [stroke]="'blue'" />`,
-  imports: [NgDiagramBaseEdgeComponent],
-})
-export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
-  edge = input.required<Edge>();
+<SinusoidEdge />
 
-  pathAndPoints = computed(() => ({
-    path: this.generateCustomPath(),
-    points: this.getControlPoints(),
-  }));
-
-  private generateCustomPath(): string {
-    const { sourcePosition, targetPosition } = this.edge();
-
-    // Custom path logic here
-    return `M ${sourcePosition.x},${sourcePosition.y} L ${targetPosition.x},${targetPosition.y}`;
-  }
-}
-```
-
-## Styling & Markers
-
-```typescript
-@Component({
-  template: `
-    <ng-diagram-base-edge
-      [edge]="edge()"
-      [pathAndPoints]="pathAndPoints()"
-      [stroke]="edgeColor()"
-      [strokeWidth]="2"
-      [customMarkerEnd]="'ng-diagram-arrow'"
-    />
-  `,
-})
-export class StyledEdgeComponent {
-  edgeColor = computed(() => (this.edge().selected ? '#9140ff' : '#6f7480'));
-}
-```
+<CodeSnippet
+  relativePath="custom-edges/sinusoid-edge/sinusoid-edge.component.ts"
+  range={[8, 75]}
+  collapse={['20-62']}
+  mark={[5, { range: '14-17' }]}
+/>
 
 ## Adding Labels
 
-```typescript
-@Component({
-  template: `
-    <ng-diagram-base-edge [edge]="edge()" [pathAndPoints]="pathAndPoints()">
-      <ng-diagram-base-edge-label [id]="'label-1'" [positionOnEdge]="0.5">
-        <div class="edge-label">{{ edge().data?.label }}</div>
-      </ng-diagram-base-edge-label>
-    </ng-diagram-base-edge>
-  `,
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
-})
-export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {
-  edge = input.required<Edge>();
-}
-```
+To create a labeled edge, you can use the `BaseEdgeLabelComponent` within your custom edge component. Here's an example:
+
+import LabeledEdge from '@components/angular/custom-edges/labeled-edge/labeled-edge.astro';
+
+<LabeledEdge />
+
+<CodeSnippet
+  relativePath="custom-edges/labeled-edge/labeled-edge.component.ts"
+  range={[8, 35]}
+  collapse={[15, 24]}
+  mark={{ range: '8-10' }}
+/>

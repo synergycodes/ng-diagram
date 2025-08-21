@@ -8,7 +8,7 @@ import {
   type NgDiagramEdgeTemplateMap,
 } from "@angularflow/angular-adapter";
 import { createSignalModel } from "@angularflow/angular-signals-model";
-import { CustomEdgeComponent } from "./custom-edge.component";
+import { LabeledEdgeComponent } from "./labeled-edge.component";
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -27,7 +27,7 @@ import { CustomEdgeComponent } from "./custom-edge.component";
 })
 export class Diagram {
   edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([
-    ["custom", CustomEdgeComponent],
+    ["labeled", LabeledEdgeComponent],
   ]);
 
   model = createSignalModel<AppMiddlewares>({
@@ -50,7 +50,8 @@ export class Diagram {
         sourcePort: "port-right",
         targetPort: "port-left",
         target: "2",
-        type: "custom",
+        type: "labeled",
+        labels: [{ id: "label1", positionOnEdge: 0.5 }],
         data: {},
       },
     ],
