@@ -17,7 +17,11 @@ import { NodeComponent } from './node/node.component';
   template: `
     <div (contextmenu)="onDiagramRightClick($event)">
       <div class="not-content diagram">
-        <ng-diagram [model]="model" [config]="config" [nodeTemplateMap]="nodeTemplateMap" />
+        <ng-diagram
+          [model]="model"
+          [config]="config"
+          [nodeTemplateMap]="nodeTemplateMap"
+        />
       </div>
       <menu></menu>
     </div>
@@ -41,7 +45,9 @@ import { NodeComponent } from './node/node.component';
 export class ContextMenuExampleComponent {
   private contextMenuService = inject(ContextMenuService);
   private readonly modelService = inject(NgDiagramModelService);
-  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([['customNodeType', NodeComponent]]);
+  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
+    ['customNodeType', NodeComponent],
+  ]);
 
   config = {
     zoom: {
@@ -68,7 +74,10 @@ export class ContextMenuExampleComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    const cursorPosition = this.modelService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
+    const cursorPosition = this.modelService.clientToFlowViewportPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
     this.contextMenuService.showDiagramMenu(cursorPosition);
   }
 }

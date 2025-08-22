@@ -1,4 +1,10 @@
-<div #menu class="menu" [style.top.px]="menuPosition().y" [style.left.px]="menuPosition().x" [class.show]="showMenu()">
+<div
+  #menu
+  class="menu"
+  [style.top.px]="menuPosition().y"
+  [style.left.px]="menuPosition().x"
+  [class.show]="showMenu()"
+>
   <ul>
     @if (nodeContext()) {
       <li (click)="onCopy()">Copy</li>

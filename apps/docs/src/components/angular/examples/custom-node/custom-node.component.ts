@@ -23,7 +23,11 @@ enum NodeTemplateType {
   template: `
     <ng-diagram-context>
       <div class="not-content diagram">
-        <ng-diagram [model]="model" [config]="config" [nodeTemplateMap]="nodeTemplateMap" />
+        <ng-diagram
+          [model]="model"
+          [config]="config"
+          [nodeTemplateMap]="nodeTemplateMap"
+        />
       </div>
     </ng-diagram-context>
   `,

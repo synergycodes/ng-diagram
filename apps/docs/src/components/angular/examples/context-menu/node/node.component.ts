@@ -15,10 +15,19 @@ import { ContextMenuService } from '../menu/menu.service';
 
 @Component({
   selector: 'node',
-  imports: [NgDiagramPortComponent, MatSelectModule, MatFormFieldModule, FormsModule, MatInputModule, MatChipsModule],
+  imports: [
+    NgDiagramPortComponent,
+    MatSelectModule,
+    MatFormFieldModule,
+    FormsModule,
+    MatInputModule,
+    MatChipsModule,
+  ],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
-  hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['node'] }],
+  hostDirectives: [
+    { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
+  ],
 })
 export class NodeComponent implements NgDiagramNodeTemplate {
   private readonly contextMenuService = inject(ContextMenuService);
@@ -35,7 +44,10 @@ export class NodeComponent implements NgDiagramNodeTemplate {
       // Additionally selects the node on right click
       this.modelService.setSelection([this.node().id]);
 
-      const cursorPosition = this.modelService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
+      const cursorPosition = this.modelService.clientToFlowViewportPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
       this.contextMenuService.showMenu(cursorPosition);
     }
   }

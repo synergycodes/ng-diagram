@@ -25,7 +25,10 @@ export class MenuComponent {
   }
 
   onPaste(event: MouseEvent) {
-    const position = this.modelService.clientToFlowPosition({ x: event.clientX, y: event.clientY });
+    const position = this.modelService.clientToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
     this.modelService.pasteSelection(position);
   }
 
