@@ -28,7 +28,7 @@ export interface Routing {
   /**
    * Generates SVG path string from points
    */
-  computeSvgPath(points: Point[]): string;
+  computeSvgPath(points: Point[], config?: RoutingConfiguration): string;
 
   /**
    * Gets a point on the path at a given percentage (0-1)
@@ -63,4 +63,8 @@ export interface RoutingManagerConfig {
    * Default routing to use when not specified
    */
   defaultRouting?: RoutingName;
+  /**
+   * Function to get routing configuration dynamically
+   */
+  getRoutingConfiguration?: () => RoutingConfiguration;
 }

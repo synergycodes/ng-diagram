@@ -28,6 +28,7 @@ export interface RoutingConfiguration {
   };
   orthogonal?: {
     firstLastSegmentLength?: number;
+    maxCornerRadius?: number;
   };
   straight?: Record<string, unknown>;
 }

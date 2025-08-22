@@ -1,16 +1,14 @@
 import { Point } from '../../../types';
 
-/** Maximum radius for orthogonal corners. */
-export const MAX_ORTHOGONAL_RADIUS = 16;
-
 /**
  * Generates an orthogonal SVG path string with rounded corners.
  * Creates smooth transitions at corners using arc segments.
  *
  * @param points - An array of points through which the path should pass.
+ * @param maxRadius - Maximum radius for rounded corners (default: 16).
  * @returns A string representing the SVG path data for the orthogonal path.
  */
-export const computeOrthogonalPath = (points: Point[] = []): string => {
+export const computeOrthogonalPath = (points: Point[] = [], maxRadius = 16): string => {
   // Handle edge cases
   if (points.length === 0) return '';
   if (points.length === 1) return `M ${points[0].x},${points[0].y}`;
@@ -30,7 +28,7 @@ export const computeOrthogonalPath = (points: Point[] = []): string => {
     // Calculate dynamic radius based on the distance between points
     const dx = nextPoint.x - prevPoint.x;
     const dy = nextPoint.y - prevPoint.y;
-    const radius = Math.min(Math.abs(dx) / 2, Math.abs(dy) / 2, MAX_ORTHOGONAL_RADIUS);
+    const radius = Math.min(Math.abs(dx) / 2, Math.abs(dy) / 2, maxRadius);
 
     // Determine relative positions for direction calculation
     const isPreviousPointToTheLeft = prevPoint.x < point.x;

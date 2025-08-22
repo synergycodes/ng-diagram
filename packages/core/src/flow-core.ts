@@ -80,7 +80,9 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
-    this.routingManager = new RoutingManager();
+    this.routingManager = new RoutingManager({
+      getRoutingConfiguration: () => this.model.getMetadata().routingConfiguration || {},
+    });
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
     this.config = deepMerge(defaultFlowConfig, config);
 

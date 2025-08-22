@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeOrthogonalPath, MAX_ORTHOGONAL_RADIUS } from '../compute-orthogonal-path';
+import { computeOrthogonalPath } from '../compute-orthogonal-path';
 
 describe('computeOrthogonalPath', () => {
   describe('edge cases', () => {
@@ -122,15 +122,16 @@ describe('computeOrthogonalPath', () => {
       expect(result).toContain('A10,10');
     });
 
-    it('should cap radius at MAX_ORTHOGONAL_RADIUS', () => {
+    it('should cap radius at provided maxRadius parameter', () => {
       const points = [
         { x: 0, y: 0 },
         { x: 0, y: 100 }, // 100px apart
         { x: 100, y: 100 },
       ];
-      const result = computeOrthogonalPath(points);
-      // Radius should be min(100/2, 100/2, 16) = 16
-      expect(result).toContain(`A${MAX_ORTHOGONAL_RADIUS},${MAX_ORTHOGONAL_RADIUS}`);
+      const customMaxRadius = 20;
+      const result = computeOrthogonalPath(points, customMaxRadius);
+      // Radius should be min(100/2, 100/2, 20) = 20
+      expect(result).toContain('A20,20');
     });
   });
 

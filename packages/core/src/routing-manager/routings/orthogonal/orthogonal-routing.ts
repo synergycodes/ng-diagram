@@ -15,8 +15,9 @@ export class OrthogonalRouting implements Routing {
     return computeOrthogonalPoints(source, target, firstLastSegmentLength);
   }
 
-  computeSvgPath(points: Point[]): string {
-    return computeOrthogonalPath(points);
+  computeSvgPath(points: Point[], config?: RoutingConfiguration): string {
+    const maxCornerRadius = config?.orthogonal?.maxCornerRadius ?? 16;
+    return computeOrthogonalPath(points, maxCornerRadius);
   }
 
   computePointOnPath(points: Point[], percentage: number): Point {

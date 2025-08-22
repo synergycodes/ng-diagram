@@ -15,9 +15,11 @@ export const BUILT_IN_ROUTINGS = ['orthogonal', 'bezier', 'straight'] as const;
 export class RoutingManager {
   private routings = new Map<string, Routing>();
   private defaultRouting: RoutingName;
+  private getRoutingConfig: () => RoutingConfiguration;
 
   constructor(config: RoutingManagerConfig = {}) {
     this.defaultRouting = config.defaultRouting || 'orthogonal';
+    this.getRoutingConfig = config.getRoutingConfiguration || (() => ({}));
 
     // Register built-in routings
     this.registerRouting(new OrthogonalRouting());
@@ -66,12 +68,7 @@ export class RoutingManager {
   /**
    * Computes the points for a given routing
    */
-  computePoints(
-    routingName: RoutingName | undefined,
-    source: PortLocation,
-    target: PortLocation,
-    config?: RoutingConfiguration
-  ): Point[] {
+  computePoints(routingName: RoutingName | undefined, source: PortLocation, target: PortLocation): Point[] {
     const name = routingName || this.defaultRouting;
     const routing = this.routings.get(name);
 
@@ -79,7 +76,7 @@ export class RoutingManager {
       throw new Error(`Routing '${name}' not found`);
     }
 
-    return routing.computePoints(source, target, config);
+    return routing.computePoints(source, target, this.getRoutingConfig());
   }
 
   /**
@@ -93,7 +90,7 @@ export class RoutingManager {
       throw new Error(`Routing '${name}' not found`);
     }
 
-    return routing.computeSvgPath(points);
+    return routing.computeSvgPath(points, this.getRoutingConfig());
   }
 
   /**

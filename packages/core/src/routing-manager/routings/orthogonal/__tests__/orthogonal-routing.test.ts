@@ -148,7 +148,7 @@ describe('OrthogonalRouting', () => {
 
       const result = routing.computeSvgPath(points);
 
-      expect(spy).toHaveBeenCalledWith(points);
+      expect(spy).toHaveBeenCalledWith(points, 16);
       expect(spy).toHaveBeenCalledTimes(1);
       expect(result).toBe(expectedPath);
     });
@@ -162,7 +162,7 @@ describe('OrthogonalRouting', () => {
 
       const result = routing.computeSvgPath(points);
 
-      expect(spy).toHaveBeenCalledWith(points);
+      expect(spy).toHaveBeenCalledWith(points, 16);
       expect(result).toBe('');
     });
 
@@ -175,7 +175,7 @@ describe('OrthogonalRouting', () => {
 
       const result = routing.computeSvgPath(points);
 
-      expect(spy).toHaveBeenCalledWith(points);
+      expect(spy).toHaveBeenCalledWith(points, 16);
       expect(result).toBe(expectedPath);
     });
 
@@ -191,7 +191,7 @@ describe('OrthogonalRouting', () => {
 
       const result = routing.computeSvgPath(points);
 
-      expect(spy).toHaveBeenCalledWith(points);
+      expect(spy).toHaveBeenCalledWith(points, 16);
       expect(result).toBe(expectedPath);
     });
 
@@ -212,7 +212,26 @@ describe('OrthogonalRouting', () => {
 
       const result = routing.computeSvgPath(points);
 
-      expect(spy).toHaveBeenCalledWith(points);
+      expect(spy).toHaveBeenCalledWith(points, 16);
+      expect(result).toBe(expectedPath);
+    });
+
+    it('should use custom maxCornerRadius from config', () => {
+      const points = [
+        { x: 0, y: 0 },
+        { x: 50, y: 0 },
+        { x: 50, y: 100 },
+        { x: 100, y: 100 },
+      ];
+      const config = { orthogonal: { maxCornerRadius: 25 } };
+      const expectedPath = 'M 0,0 L25,0 A25,25,0,0,1,50,25 L50,75 A25,25,0,0,0,75,100 L 100,100';
+
+      const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
+      spy.mockReturnValue(expectedPath);
+
+      const result = routing.computeSvgPath(points, config);
+
+      expect(spy).toHaveBeenCalledWith(points, 25);
       expect(result).toBe(expectedPath);
     });
   });
@@ -401,7 +420,7 @@ describe('OrthogonalRouting', () => {
 
     it('should have correct method signatures', () => {
       expect(routing.computePoints.length).toBe(3); // Now accepts optional config
-      expect(routing.computeSvgPath.length).toBe(1);
+      expect(routing.computeSvgPath.length).toBe(2); // Now accepts optional config
       expect(routing.computePointOnPath.length).toBe(2);
     });
 
