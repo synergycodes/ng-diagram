@@ -1,7 +1,11 @@
 <div class="sidebar">
   <div class="vertical">
     <span>Selected node</span>
-    <input [value]="label()" [disabled]="!isEnabled()" (input)="onInput($event.target.value)" />
+    <input
+      [value]="label()"
+      [disabled]="!isEnabled()"
+      (input)="onInput($event.target.value)"
+    />
   </div>
   <div class="horizontal">
     <input

@@ -4,11 +4,22 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { NgDiagramPortComponent, type NgDiagramNodeTemplate, type Node } from '@angularflow/angular-adapter';
+import {
+  NgDiagramPortComponent,
+  type NgDiagramNodeTemplate,
+  type Node,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'node',
-  imports: [NgDiagramPortComponent, MatSelectModule, MatFormFieldModule, FormsModule, MatInputModule, MatChipsModule],
+  imports: [
+    NgDiagramPortComponent,
+    MatSelectModule,
+    MatFormFieldModule,
+    FormsModule,
+    MatInputModule,
+    MatChipsModule,
+  ],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
 })

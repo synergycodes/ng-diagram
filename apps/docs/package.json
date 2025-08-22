@@ -31,6 +31,8 @@
     "@angularflow/angular-adapter": "workspace:*",
     "@angularflow/angular-signals-model": "workspace:*",
     "@astrojs/starlight": "^0.35.2",
+    "@expressive-code/plugin-collapsible-sections": "^0.41.3",
+    "@expressive-code/plugin-line-numbers": "^0.41.3",
     "astro": "^5.6.1",
     "rxjs": "~7.8.2",
     "sharp": "^0.34.2",

@@ -6,16 +6,28 @@ import {
   NgDiagramContextComponent,
   type AppMiddlewares,
 } from '@angularflow/angular-adapter';
-import { SidebarContainer } from './sidebar.component';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, SidebarContainer],
+  imports: [NgDiagramContextComponent, NgDiagramComponent],
   template: `
     <ng-diagram-context>
       <ng-diagram [model]="model" />
-      <sidebar-container />
     </ng-diagram-context>
+    <svg height="0" width="0">
+      <defs>
+        <marker
+          id="custom-arrowhead"
+          markerWidth="10"
+          markerHeight="10"
+          refX="8"
+          refY="5"
+          orient="auto"
+        >
+          <circle cx="5" cy="5" r="4" fill="red" />
+        </marker>
+      </defs>
+    </svg>
   `,
   styles: `
     :host {
@@ -23,25 +35,25 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
       display: flex;
       height: 100%;
 
-      .coordinates {
-        display: flex;
-      }
+      --ngd-default-edge-stroke: white;
+      --ngd-default-edge-stroke-hover: gray;
+      --ngd-default-edge-stroke-selected: blue;
     }
   `,
 })
-export class NgDiagramPropertiesSidebarContainer {
+export class Diagram {
   model = createSignalModel<AppMiddlewares>({
     metadata: {
-      viewport: { x: -45, y: 80, scale: 0.88 },
+      viewport: { x: 0, y: 0, scale: 0.88 },
     },
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 150 },
+        position: { x: 150, y: 100 },
         data: { label: 'Node 1' },
         rotatable: true,
       },
-      { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },
+      { id: '2', position: { x: 500, y: 200 }, data: { label: 'Node 2' } },
     ],
     edges: [
       {
@@ -50,6 +62,8 @@ export class NgDiagramPropertiesSidebarContainer {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
+        sourceArrowhead: 'custom-arrowhead',
+        routing: 'bezier',
         data: {},
       },
     ],
