@@ -73,6 +73,46 @@ describe('OrthogonalRouting', () => {
       expect(result).toEqual(expectedPoints);
     });
 
+    it('should use default firstLastSegmentLength when config value is negative', () => {
+      const source = { x: 10, y: 20, side: 'left' as PortSide };
+      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const config = { orthogonal: { firstLastSegmentLength: -10 } };
+      const expectedPoints = [
+        { x: 10, y: 20 },
+        { x: 55, y: 20 },
+        { x: 55, y: 120 },
+        { x: 100, y: 120 },
+      ];
+
+      const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
+      spy.mockReturnValue(expectedPoints);
+
+      const result = routing.computePoints(source, target, config);
+
+      expect(spy).toHaveBeenCalledWith(source, target, 20); // Should use default 20
+      expect(result).toEqual(expectedPoints);
+    });
+
+    it('should accept zero as valid firstLastSegmentLength', () => {
+      const source = { x: 10, y: 20, side: 'left' as PortSide };
+      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const config = { orthogonal: { firstLastSegmentLength: 0 } };
+      const expectedPoints = [
+        { x: 10, y: 20 },
+        { x: 55, y: 20 },
+        { x: 55, y: 120 },
+        { x: 100, y: 120 },
+      ];
+
+      const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
+      spy.mockReturnValue(expectedPoints);
+
+      const result = routing.computePoints(source, target, config);
+
+      expect(spy).toHaveBeenCalledWith(source, target, 0);
+      expect(result).toEqual(expectedPoints);
+    });
+
     it('should handle different port sides', () => {
       const testCases = [
         { source: { x: 0, y: 0, side: 'top' as PortSide }, target: { x: 100, y: 100, side: 'bottom' as PortSide } },
@@ -232,6 +272,44 @@ describe('OrthogonalRouting', () => {
       const result = routing.computeSvgPath(points, config);
 
       expect(spy).toHaveBeenCalledWith(points, 25);
+      expect(result).toBe(expectedPath);
+    });
+
+    it('should use default maxCornerRadius when config value is negative', () => {
+      const points = [
+        { x: 0, y: 0 },
+        { x: 50, y: 0 },
+        { x: 50, y: 100 },
+        { x: 100, y: 100 },
+      ];
+      const config = { orthogonal: { maxCornerRadius: -5 } };
+      const expectedPath = 'M 0,0 L16,0 A16,16,0,0,1,50,16 L50,84 A16,16,0,0,0,66,100 L 100,100';
+
+      const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
+      spy.mockReturnValue(expectedPath);
+
+      const result = routing.computeSvgPath(points, config);
+
+      expect(spy).toHaveBeenCalledWith(points, 16); // Should use default 16
+      expect(result).toBe(expectedPath);
+    });
+
+    it('should accept zero as valid maxCornerRadius', () => {
+      const points = [
+        { x: 0, y: 0 },
+        { x: 50, y: 0 },
+        { x: 50, y: 100 },
+        { x: 100, y: 100 },
+      ];
+      const config = { orthogonal: { maxCornerRadius: 0 } };
+      const expectedPath = 'M 0,0 L 50,0 L 50,100 L 100,100'; // No rounded corners
+
+      const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
+      spy.mockReturnValue(expectedPath);
+
+      const result = routing.computeSvgPath(points, config);
+
+      expect(spy).toHaveBeenCalledWith(points, 0);
       expect(result).toBe(expectedPath);
     });
   });

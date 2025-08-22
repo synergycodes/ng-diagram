@@ -21,6 +21,13 @@ export interface LayoutConfiguration {
 
 /**
  * Interface representing configurable properties of the routing.
+ *
+ * Built-in routing configurations:
+ * - `bezier`: Configuration for bezier curve routing
+ * - `orthogonal`: Configuration for orthogonal (right-angled) routing
+ *
+ * Custom routing configurations can be added using any other string key.
+ * The `straight` routing doesn't require any configuration.
  */
 export interface RoutingConfiguration {
   bezier?: {
@@ -30,7 +37,12 @@ export interface RoutingConfiguration {
     firstLastSegmentLength?: number;
     maxCornerRadius?: number;
   };
-  straight?: Record<string, unknown>;
+
+  /**
+   * Allow custom routing configurations.
+   * Users can add their own routing config with any key except the built-in ones.
+   */
+  [routingName: string]: Record<string, unknown> | undefined;
 }
 
 /**

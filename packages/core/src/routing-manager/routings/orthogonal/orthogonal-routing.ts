@@ -11,12 +11,14 @@ export class OrthogonalRouting implements Routing {
   name = 'orthogonal';
 
   computePoints(source: PortLocation, target: PortLocation, config?: RoutingConfiguration): Point[] {
-    const firstLastSegmentLength = config?.orthogonal?.firstLastSegmentLength ?? 20;
+    const configValue = config?.orthogonal?.firstLastSegmentLength;
+    const firstLastSegmentLength = configValue != null && configValue >= 0 ? configValue : 20;
     return computeOrthogonalPoints(source, target, firstLastSegmentLength);
   }
 
   computeSvgPath(points: Point[], config?: RoutingConfiguration): string {
-    const maxCornerRadius = config?.orthogonal?.maxCornerRadius ?? 16;
+    const configValue = config?.orthogonal?.maxCornerRadius;
+    const maxCornerRadius = configValue != null && configValue >= 0 ? configValue : 16;
     return computeOrthogonalPath(points, maxCornerRadius);
   }
 
