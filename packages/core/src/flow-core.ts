@@ -292,6 +292,19 @@ export class FlowCore<
   }
 
   /**
+   * Converts a client position to a position relative to the flow viewport
+   * @param clientPosition Client position
+   * @returns position on the flow viewport
+   */
+  clientToFlowViewportPosition(clientPosition: { x: number; y: number }): { x: number; y: number } {
+    const { x: flowOffsetX, y: flowOffsetY } = this.getFlowOffset();
+    return {
+      x: clientPosition.x - flowOffsetX,
+      y: clientPosition.y - flowOffsetY,
+    };
+  }
+
+  /**
    * Renders the flow
    */
   private render(): void {

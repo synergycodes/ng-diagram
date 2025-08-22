@@ -1,0 +1,17 @@
+<div
+  #menu
+  class="menu"
+  [style.top.px]="menuPosition().y"
+  [style.left.px]="menuPosition().x"
+  [class.show]="showMenu()"
+>
+  <ul>
+    @if (nodeContext()) {
+      <li (click)="onCopy()">Copy</li>
+      <li (click)="onDelete()">Delete</li>
+    } @else {
+      <li (click)="onSelectAll()">Select All</li>
+      <li (click)="onPaste($event)">Paste</li>
+    }
+  </ul>
+</div>
