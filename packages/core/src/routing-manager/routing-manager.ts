@@ -1,8 +1,8 @@
-import { PortLocation, RoutingConfiguration } from '../types';
-import { BezierRouting } from './routings/bezier-routing';
-import { OrthogonalRouting } from './routings/orthogonal-routing';
-import { StraightRouting } from './routings/straight-routing';
-import { Routing, RoutingManagerConfig, RoutingName, RoutingResult } from './types';
+import { Point, PortLocation, RoutingConfiguration } from '../types';
+import { BezierRouting } from './routings/bezier/bezier-routing';
+import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
+import { StraightRouting } from './routings/straight/straight-routing';
+import { Routing, RoutingManagerConfig, RoutingName } from './types';
 
 /**
  * Built-in routing names
@@ -64,14 +64,14 @@ export class RoutingManager {
   }
 
   /**
-   * Calculates routing for an edge
+   * Computes the points for a given routing
    */
-  calculateRouting(
+  computePoints(
     routingName: RoutingName | undefined,
     source: PortLocation,
     target: PortLocation,
     config?: RoutingConfiguration
-  ): RoutingResult {
+  ): Point[] {
     const name = routingName || this.defaultRouting;
     const routing = this.routings.get(name);
 
@@ -79,13 +79,50 @@ export class RoutingManager {
       throw new Error(`Routing '${name}' not found`);
     }
 
-    const points = routing.calculatePoints(source, target, config);
-    const svgPath = routing.generateSvgPath(points);
+    return routing.calculatePoints(source, target, config);
+  }
 
-    return {
-      points,
-      svgPath,
-    };
+  /**
+   * Computes the SVG path for given points and routing
+   */
+  computePath(routingName: RoutingName | undefined, points: Point[]): string {
+    const name = routingName || this.defaultRouting;
+    const routing = this.routings.get(name);
+
+    if (!routing) {
+      throw new Error(`Routing '${name}' not found`);
+    }
+
+    return routing.generateSvgPath(points);
+  }
+
+  /**
+   * Computes a point on the path at a given percentage
+   * Uses the routing's getPointOnPath method if available
+   * Falls back to linear interpolation if not implemented
+   */
+  computePointOnPath(routingName: RoutingName | undefined, points: Point[], percentage: number): Point {
+    const name = routingName || this.defaultRouting;
+    const routing = this.routings.get(name);
+
+    if (!routing) {
+      throw new Error(`Routing '${name}' not found`);
+    }
+
+    // Use routing's implementation if available
+    if (routing.getPointOnPath) {
+      return routing.getPointOnPath(points, percentage);
+    }
+
+    // Fallback to simple linear interpolation between first and last points
+    if (points.length < 2) return points[0] || { x: 0, y: 0 };
+
+    const startPoint = points[0];
+    const endPoint = points[points.length - 1];
+    const x = startPoint.x + (endPoint.x - startPoint.x) * percentage;
+    const y = startPoint.y + (endPoint.y - startPoint.y) * percentage;
+
+    return { x, y };
   }
 
   /**

@@ -9,7 +9,6 @@ import {
   RoutingConfiguration,
 } from '../../../types';
 import { isSamePoint } from '../../../utils';
-import { getPointOnPath } from '../../../utils/get-point-on-path/get-point-on-path.ts';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getSourceTargetPositions } from './get-source-target-positions.ts';
 
@@ -62,8 +61,7 @@ const getPoints = (
     points = edge.staticPath.points;
   } else if (edge.routing && routingManager.hasRouting(edge.routing)) {
     // Use RoutingManager for registered routings
-    const result = routingManager.calculateRouting(edge.routing, source, target, config);
-    points = result.points;
+    points = routingManager.computePoints(edge.routing, source, target, config);
   } else {
     // Fallback to straight line if routing not found or not specified
     points = [sourcePoint, targetPoint].filter((point) => !!point);
@@ -135,7 +133,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
 
           const updatedLabels = edge.labels?.map((label) => ({
             ...label,
-            position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
+            position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
           }));
 
           edgesToUpdate.push({
@@ -165,7 +163,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
 
         const updatedLabels = edge.labels?.map((label) => ({
           ...label,
-          position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
+          position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
         }));
         edgesToUpdate.push({
           id: edge.id,

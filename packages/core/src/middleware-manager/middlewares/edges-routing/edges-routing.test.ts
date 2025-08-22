@@ -35,7 +35,25 @@ describe('Edges Routing Middleware', () => {
   const checkIfNodeChangedMock = vi.fn();
 
   beforeEach(() => {
-    flowCore = {} as unknown as FlowCore;
+    vi.clearAllMocks();
+
+    const mockRoutingManager = {
+      hasRouting: vi.fn().mockReturnValue(true),
+      computePoints: vi.fn().mockImplementation((_routing, source, target) => {
+        // Return mock points based on source and target
+        if (!source || !target) return [];
+        return [
+          { x: source.x, y: source.y },
+          { x: target.x, y: target.y },
+        ];
+      }),
+      computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+    };
+
+    flowCore = {
+      routingManager: mockRoutingManager,
+    } as unknown as FlowCore;
+
     initialState = {
       nodes: [mockNode],
       edges: [mockEdge],
@@ -93,12 +111,34 @@ describe('Edges Routing Middleware', () => {
   });
 
   it('should call next without update if there are no edges to route', () => {
+    // Update mock to return false for 'custom-routing'
+    const customRoutingManager = {
+      hasRouting: vi.fn().mockImplementation((routing) => {
+        return routing === 'straight' || routing === 'orthogonal' || routing === 'bezier';
+      }),
+      computePoints: vi.fn(),
+      computePointOnPath: vi.fn(),
+    };
+
+    // Create a custom edge with routing that's not registered
+    const customEdge = {
+      ...mockEdge,
+      id: 'custom-edge',
+      routing: 'custom-routing',
+      points: [
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+      ], // Has existing points
+    };
+
     context = {
       ...context,
       modelActionType: 'init',
-      state: { ...initialState, edges: [{ ...mockEdge, routing: 'custom-routing' }] } as unknown as FlowState<
-        Metadata<MiddlewaresConfigFromMiddlewares<[]>>
-      >,
+      state: {
+        ...initialState,
+        edges: [customEdge],
+      } as unknown as FlowState<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>,
+      flowCore: { routingManager: customRoutingManager } as unknown as FlowCore,
     };
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
@@ -107,10 +147,26 @@ describe('Edges Routing Middleware', () => {
   });
 
   it('should route only edges with routing set to straight or orthogonal or undefined. If an edge has a defined type, then sourcePosition, targetPosition, and labels should be set. All other edges should remain unchanged.', () => {
+    // Update mock to only return true for known routings
+    const mockRoutingManager = {
+      hasRouting: vi.fn().mockImplementation((routing) => {
+        return routing === 'straight' || routing === 'orthogonal' || routing === 'bezier';
+      }),
+      computePoints: vi.fn().mockImplementation((_routing, source, target) => {
+        if (!source || !target) return [];
+        return [
+          { x: source.x, y: source.y },
+          { x: target.x, y: target.y },
+        ];
+      }),
+      computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+    };
+
     const newState = {
       nodes: [
         { ...mockNode, id: 'node-1', position: { x: 100, y: 100 } },
         { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+        { ...mockNode, id: 'node-3', position: { x: 300, y: 300 } },
       ],
 
       edges: [
@@ -148,11 +204,16 @@ describe('Edges Routing Middleware', () => {
       ],
       metadata: { ...mockMetadata },
     };
+    // Setup mocks for this test
+    checkIfEdgeChangedMock.mockReturnValue(true);
+    checkIfNodeChangedMock.mockReturnValue(true);
+
     context = {
       ...context,
       state: newState,
       modelActionType: 'init',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+      flowCore: { routingManager: mockRoutingManager } as unknown as FlowCore,
     };
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
@@ -161,21 +222,31 @@ describe('Edges Routing Middleware', () => {
       edgesToUpdate: [
         {
           id: 'edge-1',
+          points: [
+            { x: 100, y: 100 },
+            { x: 200, y: 200 },
+          ],
           sourcePosition: { x: 100, y: 100 },
           targetPosition: { x: 200, y: 200 },
           labels: undefined,
         },
         {
           id: 'edge-2',
-          points: [{ x: 200, y: 200 }],
+          points: [
+            { x: 200, y: 200 },
+            { x: 300, y: 300 },
+          ],
           sourcePosition: { x: 200, y: 200 },
-          targetPosition: undefined,
+          targetPosition: { x: 300, y: 300 },
           labels: undefined,
         },
         {
           id: 'edge-3',
-          points: [{ x: 100, y: 100 }],
-          sourcePosition: undefined,
+          points: [
+            { x: 300, y: 300 },
+            { x: 100, y: 100 },
+          ],
+          sourcePosition: { x: 300, y: 300 },
           targetPosition: { x: 100, y: 100 },
           labels: undefined,
         },

@@ -49,7 +49,7 @@ The points of the edge defining the path.
 
 ### routing?
 
-> `optional` **routing**: `Routing`
+> `optional` **routing**: `RoutingName`
 
 The routing of the edge.
 

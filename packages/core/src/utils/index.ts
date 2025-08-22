@@ -1,15 +1,8 @@
 export * from './constants';
 export * from './deep-merge';
-export * from './get-point-on-path/get-point-on-path';
+export * from './get-direction';
 export * from './get-port-flow-position';
 export * from './group-size';
 export * from './is-group';
 export * from './rects-points-sizes';
 export * from './semaphore';
-
-// Routing
-export * from './edges-orthogonal-routing';
-export * from './get-bezier-path-points';
-export * from './get-direction';
-export * from './get-point-on-path/get-point-on-path';
-export * from './get-port-flow-position';

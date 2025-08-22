@@ -29,6 +29,15 @@ export interface Routing {
    * Generates SVG path string from points
    */
   generateSvgPath(points: Point[]): string;
+
+  /**
+   * Gets a point on the path at a given percentage (0-1)
+   * Used for positioning labels on the edge
+   * @param points - The points defining the path
+   * @param percentage - Position along the path (0 = start, 1 = end)
+   * @returns The point at the given percentage along the path
+   */
+  getPointOnPath?(points: Point[], percentage: number): Point;
 }
 
 /**

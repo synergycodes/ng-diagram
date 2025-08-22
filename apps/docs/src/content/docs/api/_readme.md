@@ -22,9 +22,6 @@ title: "@angularflow/angular-adapter"
 - [NgDiagramBaseEdgeComponent](/api/other/ngdiagrambaseedgecomponent/)
 - [Metadata](/api/other/metadata/)
 - [Middleware](/api/other/middleware/)
-- [MAX\_ORTHOGONAL\_RADIUS](/api/other/max_orthogonal_radius/)
-- [getOrthogonalPath](/api/other/getorthogonalpath/)
-- [getSegmentOrientation](/api/other/getsegmentorientation/)
 
 ## Types
 

@@ -50,8 +50,7 @@ export class NgDiagramBaseEdgeComponent {
     if (points.length === 0) return '';
 
     if (routingName && flowCore.routingManager.hasRouting(routingName)) {
-      const routing = flowCore.routingManager.getRouting(routingName)!;
-      return routing.generateSvgPath(points);
+      return flowCore.routingManager.computePath(routingName, points);
     }
 
     // Fallback to simple straight line path
