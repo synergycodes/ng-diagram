@@ -59,7 +59,8 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
       // Calculate perpendicular offset using sine wave
       // Fade out amplitude as we approach the end to ensure smooth connection
       const fadeFactor = i < segments - 5 ? 1 : (segments - i) / 5;
-      const sineOffset = Math.sin(t * 2 * Math.PI * frequency) * amplitude * fadeFactor;
+      const sineOffset =
+        Math.sin(t * 2 * Math.PI * frequency) * amplitude * fadeFactor;
       const perpAngle = angle + Math.PI / 2;
 
       const x = baseX + Math.cos(perpAngle) * sineOffset;

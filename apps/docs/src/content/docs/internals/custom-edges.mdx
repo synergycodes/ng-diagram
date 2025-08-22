@@ -5,6 +5,11 @@ description: How to create and implement custom edges in NgDiagram
 
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
+NgDiagram provides two approaches for edge customization:
+
+- [**Default edge customization**](#customizing-default-edges) - For simpler styling needs like custom colors, arrowheads, and using built-in routing algorithms, you can customize the default edges with CSS variables and edge data parameters.
+- [**Custom edge components**](#implementing-custom-edges) - For more complex requirements such as custom routing logic, animations, or unique visual representations, you can create fully custom edge components by implementing `NgDiagramEdgeTemplate`.
+
 ## Customizing Default Edges
 
 NgDiagram's default edges offer several customization options:
@@ -54,7 +59,7 @@ import SinusoidEdge from '@components/angular/custom-edges/sinusoid-edge/sinusoi
 <CodeSnippet
   relativePath="custom-edges/sinusoid-edge/sinusoid-edge.component.ts"
   range={[8, 75]}
-  collapse={['20-62']}
+  collapse={['20-67']}
   mark={[5, { range: '14-17' }]}
 />
 
@@ -69,6 +74,6 @@ import LabeledEdge from '@components/angular/custom-edges/labeled-edge/labeled-e
 <CodeSnippet
   relativePath="custom-edges/labeled-edge/labeled-edge.component.ts"
   range={[8, 35]}
-  collapse={[15, 24]}
+  collapse={['15-24']}
   mark={{ range: '8-10' }}
 />
