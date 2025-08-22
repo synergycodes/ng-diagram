@@ -52,12 +52,12 @@ _Example_
 // custom-edges.mdx
 
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
-import DefaultEdge from '@components/angular/custom-edges/default-edge/default-edge.astro';
+import DefaultEdge from '@components/angular/edges/custom-edges/default-edge/default-edge.astro';
 
 <DefaultEdge />
 
 <CodeSnippet
-  relativePath="custom-edges/default-edge/diagram.component.ts"
+  relativePath="edges/custom-edges/default-edge/diagram.component.ts"
   range={[10, 70]}
   collapse={['24-27', '36-47', '50-54']}
   mark={[{ range: '9-18' }, { range: '28-30' }, { range: '55-56' }]}

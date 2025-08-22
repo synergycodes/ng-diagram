@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightTypeDoc from 'starlight-typedoc';
+import starlightAutoSidebar from 'starlight-auto-sidebar';
 
 import angular from '@analogjs/astro-angular';
 
@@ -47,6 +48,7 @@ export default defineConfig({
         },
       ],
       plugins: [
+        starlightAutoSidebar(),
         starlightTypeDoc({
           entryPoints: ['../../packages/angular-adapter/projects/angular-adapter/src/public-api.ts'],
           tsconfig: '../../packages/angular-adapter/projects/angular-adapter/tsconfig.lib.json',

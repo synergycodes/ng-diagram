@@ -14,55 +14,56 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
     <ng-diagram-context>
       <ng-diagram [model]="model" />
     </ng-diagram-context>
-    <svg height="0" width="0">
-      <defs>
-        <marker
-          id="custom-arrowhead"
-          markerWidth="10"
-          markerHeight="10"
-          refX="8"
-          refY="5"
-          orient="auto"
-        >
-          <circle cx="5" cy="5" r="4" fill="red" />
-        </marker>
-      </defs>
-    </svg>
   `,
   styles: `
     :host {
       flex: 1;
       display: flex;
       height: 100%;
-
-      --ngd-default-edge-stroke: white;
-      --ngd-default-edge-stroke-hover: gray;
-      --ngd-default-edge-stroke-selected: blue;
     }
   `,
 })
 export class Diagram {
   model = createSignalModel<AppMiddlewares>({
     metadata: {
-      viewport: { x: 0, y: 0, scale: 0.88 },
+      viewport: { x: 0, y: 0, scale: 0.7 },
     },
     nodes: [
       {
-        id: '1',
-        position: { x: 150, y: 100 },
+        id: 'source-node',
+        position: { x: 200, y: 250 },
         data: { label: 'Node 1' },
         rotatable: true,
       },
-      { id: '2', position: { x: 500, y: 200 }, data: { label: 'Node 2' } },
+      { id: '2', position: { x: 600, y: 50 }, data: { label: 'Straight' } },
+      { id: '3', position: { x: 600, y: 200 }, data: { label: 'Orthogonal' } },
+      { id: '4', position: { x: 600, y: 350 }, data: { label: 'Bezier' } },
     ],
     edges: [
       {
         id: '1',
-        source: '1',
+        source: 'source-node',
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
-        sourceArrowhead: 'custom-arrowhead',
+        routing: 'straight',
+        data: {},
+      },
+      {
+        id: '2',
+        source: 'source-node',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        target: '3',
+        routing: 'orthogonal',
+        data: {},
+      },
+      {
+        id: '3',
+        source: 'source-node',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        target: '4',
         routing: 'bezier',
         data: {},
       },

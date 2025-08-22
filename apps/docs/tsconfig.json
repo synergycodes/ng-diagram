@@ -6,7 +6,8 @@
     "baseUrl": ".",
     "paths": {
       "@examples/*": ["src/components/angular/examples/*"],
-      "@components/*": ["src/components/*"]
+      "@components/*": ["src/components/*"],
+      "@assets/*": ["src/assets/*"]
     },
     "plugins": [
       {

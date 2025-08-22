@@ -1,0 +1,55 @@
+---
+title: Custom Edges
+description: How to create and implement custom edges in NgDiagram
+sidebar:
+  order: 1
+---
+
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+When NgDiagram's default edge customizations are not sufficient, you can create custom edges that provide more precise control over edge rendering, including routing.
+
+You can create a custom edge by extending `NgDiagramBaseEdgeComponent` and implementing `NgDiagramEdgeTemplate`
+
+<CodeSnippet relativePath="edges/custom-edges/custom-edge.component.ts" range={[8, 28]} />
+
+## Registering Custom Edge Types
+
+Custom edge types need to be registered in the `edgeTemplateMap` and passed to the `NgDiagram` component.
+
+<CodeSnippet
+  relativePath="edges/custom-edges/diagram.component.ts"
+  range={[13, 60]}
+  collapse={['8-14', '20-45']}
+  mark={[5, { range: '17-19' }, '[edgeTemplateMap]="edgeTemplateMap"']}
+/>
+
+## Custom Routing
+
+To use custom routing set the `pathAndPoints` property of `NgDiagramBaseEdgeComponent`. The `path` property defines the SVG path data for the edge, while `points` defines the control points for the edge's routing. The following example demonstrates how to create a sinusoidal edge between nodes:
+
+import SinusoidEdge from '@components/angular/edges/custom-edges/sinusoid-edge/sinusoid-edge.astro';
+
+<SinusoidEdge />
+
+<CodeSnippet
+  relativePath="edges/custom-edges/sinusoid-edge/sinusoid-edge.component.ts"
+  range={[8, 75]}
+  collapse={['20-67']}
+  mark={[5, { range: '14-17' }]}
+/>
+
+## Adding Edge Labels
+
+To add labels to your custom edges, integrate the `BaseEdgeLabelComponent` within your custom edge component. Here's an implementation example:
+
+import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
+
+<LabeledEdge />
+
+<CodeSnippet
+  relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts"
+  range={[8, 35]}
+  collapse={['15-24']}
+  mark={{ range: '8-10' }}
+/>

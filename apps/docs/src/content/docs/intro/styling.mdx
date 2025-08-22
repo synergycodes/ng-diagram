@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ngDiagram provides a well-structured design system with a clear separation of concerns. Its styling is based on a minimal yet sufficient set of primitives, tokens, and component-level variables that support consistent theming and easy customization across all library components.
 
 In addition to the design system, the library includes components, directives, and CSS classes to help you build consistent and interactive diagram interfaces.
@@ -196,7 +198,9 @@ For cases where directives can't be used (outside node templates), you can apply
 </div>
 ```
 
-> **Important:** Always use `ng-diagram-node-wrapper` together with these classes to ensure proper transition effects.
+<Aside type="caution" title="Important">
+  Always use `ng-diagram-node-wrapper` together with these classes to ensure proper transition effects.
+</Aside>
 
 ## Best Practices
 
