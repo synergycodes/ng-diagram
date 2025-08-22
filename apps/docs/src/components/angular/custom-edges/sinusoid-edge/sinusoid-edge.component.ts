@@ -44,12 +44,12 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
     // Sinusoidal wave parameters
     const amplitude = 20;
     const frequency = Math.max(2, distance / 100);
-    const segments = 50 * distance;
+    const segments = Math.max(20, Math.floor(distance / 5));
 
     let path = `M ${startX},${startY}`;
 
-    // Generate sinusoidal curve points
-    for (let i = 1; i <= segments; i++) {
+    // Generate sinusoidal curve points (stop before the final point)
+    for (let i = 1; i < segments; i++) {
       const t = i / segments;
 
       // Base position along the straight line
@@ -57,7 +57,9 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
       const baseY = startY + (endY - startY) * t;
 
       // Calculate perpendicular offset using sine wave
-      const sineOffset = Math.sin(t * 2 * Math.PI * frequency) * amplitude;
+      // Fade out amplitude as we approach the end to ensure smooth connection
+      const fadeFactor = i < segments - 5 ? 1 : (segments - i) / 5;
+      const sineOffset = Math.sin(t * 2 * Math.PI * frequency) * amplitude * fadeFactor;
       const perpAngle = angle + Math.PI / 2;
 
       const x = baseX + Math.cos(perpAngle) * sineOffset;
@@ -65,6 +67,9 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
 
       path += ` L ${x},${y}`;
     }
+
+    // Always end exactly at the target position
+    path += ` L ${endX},${endY}`;
 
     return path;
   }
