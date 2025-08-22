@@ -25,14 +25,14 @@ describe('OrthogonalRouting', () => {
 
     it('should implement Routing interface', () => {
       expect(routing).toHaveProperty('name');
-      expect(routing).toHaveProperty('calculatePoints');
-      expect(routing).toHaveProperty('generateSvgPath');
-      expect(routing).toHaveProperty('getPointOnPath');
+      expect(routing).toHaveProperty('computePoints');
+      expect(routing).toHaveProperty('computeSvgPath');
+      expect(routing).toHaveProperty('computePointOnPath');
     });
   });
 
-  describe('calculatePoints', () => {
-    it('should call computeOrthogonalPoints with correct parameters', () => {
+  describe('computePoints', () => {
+    it('should call computeOrthogonalPoints with default firstLastSegmentLength', () => {
       const source = { x: 10, y: 20, side: 'left' as PortSide };
       const target = { x: 100, y: 120, side: 'right' as PortSide };
       const expectedPoints = [
@@ -45,9 +45,30 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue(expectedPoints);
 
-      const result = routing.calculatePoints(source, target);
+      const result = routing.computePoints(source, target);
 
-      expect(spy).toHaveBeenCalledWith(source, target);
+      expect(spy).toHaveBeenCalledWith(source, target, 20);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(expectedPoints);
+    });
+
+    it('should call computeOrthogonalPoints with custom firstLastSegmentLength from config', () => {
+      const source = { x: 10, y: 20, side: 'left' as PortSide };
+      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const config = { orthogonal: { firstLastSegmentLength: 30 } };
+      const expectedPoints = [
+        { x: 10, y: 20 },
+        { x: 55, y: 20 },
+        { x: 55, y: 120 },
+        { x: 100, y: 120 },
+      ];
+
+      const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
+      spy.mockReturnValue(expectedPoints);
+
+      const result = routing.computePoints(source, target, config);
+
+      expect(spy).toHaveBeenCalledWith(source, target, 30);
       expect(spy).toHaveBeenCalledTimes(1);
       expect(result).toEqual(expectedPoints);
     });
@@ -67,8 +88,8 @@ describe('OrthogonalRouting', () => {
       ]);
 
       testCases.forEach((testCase) => {
-        routing.calculatePoints(testCase.source, testCase.target);
-        expect(spy).toHaveBeenCalledWith(testCase.source, testCase.target);
+        routing.computePoints(testCase.source, testCase.target);
+        expect(spy).toHaveBeenCalledWith(testCase.source, testCase.target, 20);
       });
 
       expect(spy).toHaveBeenCalledTimes(testCases.length);
@@ -86,9 +107,9 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 50 },
       ]);
 
-      const result = routing.calculatePoints(source, target);
+      const result = routing.computePoints(source, target);
 
-      expect(spy).toHaveBeenCalledWith(source, target);
+      expect(spy).toHaveBeenCalledWith(source, target, 20);
       expect(result).toHaveLength(4);
     });
 
@@ -104,15 +125,15 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 100 },
       ]);
 
-      const result = routing.calculatePoints(source, target);
+      const result = routing.computePoints(source, target);
 
-      expect(spy).toHaveBeenCalledWith(source, target);
+      expect(spy).toHaveBeenCalledWith(source, target, 20);
       expect(result[0]).toEqual({ x: -50, y: -100 });
       expect(result[result.length - 1]).toEqual({ x: 50, y: 100 });
     });
   });
 
-  describe('generateSvgPath', () => {
+  describe('computeSvgPath', () => {
     it('should call computeOrthogonalPath with correct points', () => {
       const points = [
         { x: 0, y: 0 },
@@ -125,7 +146,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
       spy.mockReturnValue(expectedPath);
 
-      const result = routing.generateSvgPath(points);
+      const result = routing.computeSvgPath(points);
 
       expect(spy).toHaveBeenCalledWith(points);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -139,7 +160,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
       spy.mockReturnValue(expectedPath);
 
-      const result = routing.generateSvgPath(points);
+      const result = routing.computeSvgPath(points);
 
       expect(spy).toHaveBeenCalledWith(points);
       expect(result).toBe('');
@@ -152,7 +173,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
       spy.mockReturnValue(expectedPath);
 
-      const result = routing.generateSvgPath(points);
+      const result = routing.computeSvgPath(points);
 
       expect(spy).toHaveBeenCalledWith(points);
       expect(result).toBe(expectedPath);
@@ -168,7 +189,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
       spy.mockReturnValue(expectedPath);
 
-      const result = routing.generateSvgPath(points);
+      const result = routing.computeSvgPath(points);
 
       expect(spy).toHaveBeenCalledWith(points);
       expect(result).toBe(expectedPath);
@@ -189,14 +210,14 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
       spy.mockReturnValue(expectedPath);
 
-      const result = routing.generateSvgPath(points);
+      const result = routing.computeSvgPath(points);
 
       expect(spy).toHaveBeenCalledWith(points);
       expect(result).toBe(expectedPath);
     });
   });
 
-  describe('getPointOnPath', () => {
+  describe('computePointOnPath', () => {
     it('should call computeOrthogonalPointOnPath with correct parameters', () => {
       const points = [
         { x: 0, y: 0 },
@@ -209,7 +230,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointOnPathModule, 'computeOrthogonalPointOnPath');
       spy.mockReturnValue(expectedPoint);
 
-      const result = routing.getPointOnPath(points, percentage);
+      const result = routing.computePointOnPath(points, percentage);
 
       expect(spy).toHaveBeenCalledWith(points, percentage);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -227,7 +248,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointOnPathModule, 'computeOrthogonalPointOnPath');
       spy.mockReturnValue(expectedPoint);
 
-      const result = routing.getPointOnPath(points, 0);
+      const result = routing.computePointOnPath(points, 0);
 
       expect(spy).toHaveBeenCalledWith(points, 0);
       expect(result).toEqual(expectedPoint);
@@ -244,7 +265,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointOnPathModule, 'computeOrthogonalPointOnPath');
       spy.mockReturnValue(expectedPoint);
 
-      const result = routing.getPointOnPath(points, 1);
+      const result = routing.computePointOnPath(points, 1);
 
       expect(spy).toHaveBeenCalledWith(points, 1);
       expect(result).toEqual(expectedPoint);
@@ -268,7 +289,7 @@ describe('OrthogonalRouting', () => {
 
       testCases.forEach((testCase) => {
         spy.mockReturnValue(testCase.expected);
-        const result = routing.getPointOnPath(points, testCase.percentage);
+        const result = routing.computePointOnPath(points, testCase.percentage);
         expect(spy).toHaveBeenCalledWith(points, testCase.percentage);
         expect(result).toEqual(testCase.expected);
       });
@@ -283,7 +304,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointOnPathModule, 'computeOrthogonalPointOnPath');
       spy.mockReturnValue(expectedPoint);
 
-      const result = routing.getPointOnPath(points, 0.5);
+      const result = routing.computePointOnPath(points, 0.5);
 
       expect(spy).toHaveBeenCalledWith(points, 0.5);
       expect(result).toEqual(expectedPoint);
@@ -299,7 +320,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointOnPathModule, 'computeOrthogonalPointOnPath');
       spy.mockReturnValue(expectedPoint);
 
-      const result = routing.getPointOnPath(points, -0.5);
+      const result = routing.computePointOnPath(points, -0.5);
 
       expect(spy).toHaveBeenCalledWith(points, -0.5);
       expect(result).toEqual(expectedPoint);
@@ -315,7 +336,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointOnPathModule, 'computeOrthogonalPointOnPath');
       spy.mockReturnValue(expectedPoint);
 
-      const result = routing.getPointOnPath(points, 1.5);
+      const result = routing.computePointOnPath(points, 1.5);
 
       expect(spy).toHaveBeenCalledWith(points, 1.5);
       expect(result).toEqual(expectedPoint);
@@ -332,17 +353,17 @@ describe('OrthogonalRouting', () => {
       const source = { x: 0, y: 0, side: 'right' as PortSide };
       const target = { x: 100, y: 100, side: 'bottom' as PortSide };
 
-      const points = routing.calculatePoints(source, target);
+      const points = routing.computePoints(source, target);
       expect(points).toBeDefined();
       expect(points.length).toBeGreaterThanOrEqual(2);
       expect(points[0]).toEqual({ x: 0, y: 0 });
       expect(points[points.length - 1]).toEqual({ x: 100, y: 100 });
 
-      const svgPath = routing.generateSvgPath(points);
+      const svgPath = routing.computeSvgPath(points);
       expect(svgPath).toBeDefined();
       expect(svgPath).toContain('M');
 
-      const pointOnPath = routing.getPointOnPath(points, 0.5);
+      const pointOnPath = routing.computePointOnPath(points, 0.5);
       expect(pointOnPath).toBeDefined();
       expect(pointOnPath).toHaveProperty('x');
       expect(pointOnPath).toHaveProperty('y');
@@ -358,9 +379,9 @@ describe('OrthogonalRouting', () => {
       ];
 
       configurations.forEach((config) => {
-        const points = routing.calculatePoints(config.source, config.target);
-        const svgPath = routing.generateSvgPath(points);
-        const midPoint = routing.getPointOnPath(points, 0.5);
+        const points = routing.computePoints(config.source, config.target);
+        const svgPath = routing.computeSvgPath(points);
+        const midPoint = routing.computePointOnPath(points, 0.5);
 
         expect(points).toBeDefined();
         expect(points.length).toBeGreaterThanOrEqual(2);
@@ -373,15 +394,15 @@ describe('OrthogonalRouting', () => {
   describe('Routing interface compliance', () => {
     it('should have all required Routing interface properties', () => {
       expect(typeof routing.name).toBe('string');
-      expect(typeof routing.calculatePoints).toBe('function');
-      expect(typeof routing.generateSvgPath).toBe('function');
-      expect(typeof routing.getPointOnPath).toBe('function');
+      expect(typeof routing.computePoints).toBe('function');
+      expect(typeof routing.computeSvgPath).toBe('function');
+      expect(typeof routing.computePointOnPath).toBe('function');
     });
 
     it('should have correct method signatures', () => {
-      expect(routing.calculatePoints.length).toBe(2);
-      expect(routing.generateSvgPath.length).toBe(1);
-      expect(routing.getPointOnPath.length).toBe(2);
+      expect(routing.computePoints.length).toBe(3); // Now accepts optional config
+      expect(routing.computeSvgPath.length).toBe(1);
+      expect(routing.computePointOnPath.length).toBe(2);
     });
 
     it('should return correct types from methods', () => {
@@ -391,13 +412,13 @@ describe('OrthogonalRouting', () => {
       const source = { x: 0, y: 0, side: 'left' as PortSide };
       const target = { x: 100, y: 100, side: 'right' as PortSide };
 
-      const points = routing.calculatePoints(source, target);
+      const points = routing.computePoints(source, target);
       expect(Array.isArray(points)).toBe(true);
 
-      const svgPath = routing.generateSvgPath(points);
+      const svgPath = routing.computeSvgPath(points);
       expect(typeof svgPath).toBe('string');
 
-      const pointOnPath = routing.getPointOnPath(points, 0.5);
+      const pointOnPath = routing.computePointOnPath(points, 0.5);
       expect(pointOnPath).toHaveProperty('x');
       expect(pointOnPath).toHaveProperty('y');
       expect(typeof pointOnPath.x).toBe('number');

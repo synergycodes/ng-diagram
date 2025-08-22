@@ -15,12 +15,12 @@ describe('StraightRouting', () => {
     });
   });
 
-  describe('calculatePoints', () => {
+  describe('computePoints', () => {
     it('should return two points for straight line', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 300, side: 'left' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: 100, y: 200 });
@@ -31,7 +31,7 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 50, y: 50, side: 'right' };
       const target: PortLocation = { x: 50, y: 50, side: 'left' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: 50, y: 50 });
@@ -42,7 +42,7 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: -100, y: -200, side: 'left' };
       const target: PortLocation = { x: -50, y: -150, side: 'right' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: -100, y: -200 });
@@ -53,7 +53,7 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 10.5, y: 20.7, side: 'top' };
       const target: PortLocation = { x: 30.3, y: 40.1, side: 'bottom' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: 10.5, y: 20.7 });
@@ -64,7 +64,7 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 0, y: 100, side: 'right' };
       const target: PortLocation = { x: 200, y: 100, side: 'left' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       expect(points[0]).toEqual({ x: 0, y: 100 });
       expect(points[1]).toEqual({ x: 200, y: 100 });
@@ -74,21 +74,21 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 100, y: 0, side: 'bottom' };
       const target: PortLocation = { x: 100, y: 200, side: 'top' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       expect(points[0]).toEqual({ x: 100, y: 0 });
       expect(points[1]).toEqual({ x: 100, y: 200 });
     });
   });
 
-  describe('generateSvgPath', () => {
+  describe('computeSvgPath', () => {
     it('should generate line path for 2 points', () => {
       const points = [
         { x: 0, y: 0 },
         { x: 100, y: 100 },
       ];
 
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,0 L 100,100');
     });
@@ -96,13 +96,13 @@ describe('StraightRouting', () => {
     it('should generate move command for single point', () => {
       const points = [{ x: 50, y: 75 }];
 
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 50,75');
     });
 
     it('should return empty string for empty array', () => {
-      const path = straightRouting.generateSvgPath([]);
+      const path = straightRouting.computeSvgPath([]);
 
       expect(path).toBe('');
     });
@@ -115,7 +115,7 @@ describe('StraightRouting', () => {
         { x: 150, y: 75 },
       ];
 
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,0 L 50,25 L 100,50 L 150,75');
     });
@@ -126,7 +126,7 @@ describe('StraightRouting', () => {
         { x: 50, y: 100 },
       ];
 
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M -50,-100 L 50,100');
     });
@@ -137,7 +137,7 @@ describe('StraightRouting', () => {
         { x: 30.75, y: 40.5 },
       ];
 
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 10.5,20.25 L 30.75,40.5');
     });
@@ -148,20 +148,20 @@ describe('StraightRouting', () => {
         { x: 0, y: 100 },
       ];
 
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,0 L 0,100');
     });
   });
 
-  describe('getPointOnPath', () => {
+  describe('computePointOnPath', () => {
     it('should return start point at 0%', () => {
       const points = [
         { x: 0, y: 0 },
         { x: 100, y: 100 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0);
+      const point = straightRouting.computePointOnPath(points, 0);
 
       expect(point).toEqual({ x: 0, y: 0 });
     });
@@ -172,7 +172,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 1);
+      const point = straightRouting.computePointOnPath(points, 1);
 
       expect(point).toEqual({ x: 100, y: 100 });
     });
@@ -183,7 +183,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 50, y: 50 });
     });
@@ -194,7 +194,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 200 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.25);
+      const point = straightRouting.computePointOnPath(points, 0.25);
 
       expect(point).toEqual({ x: 25, y: 50 });
     });
@@ -205,7 +205,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 200 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.75);
+      const point = straightRouting.computePointOnPath(points, 0.75);
 
       expect(point).toEqual({ x: 75, y: 150 });
     });
@@ -216,7 +216,7 @@ describe('StraightRouting', () => {
         { x: 110, y: 120 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, -0.5);
+      const point = straightRouting.computePointOnPath(points, -0.5);
 
       expect(point).toEqual({ x: 10, y: 20 }); // Clamped to start point
     });
@@ -227,7 +227,7 @@ describe('StraightRouting', () => {
         { x: 110, y: 120 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 1.5);
+      const point = straightRouting.computePointOnPath(points, 1.5);
 
       expect(point).toEqual({ x: 110, y: 120 }); // Clamped to end point
     });
@@ -235,13 +235,13 @@ describe('StraightRouting', () => {
     it('should handle single point', () => {
       const points = [{ x: 50, y: 75 }];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 50, y: 75 });
     });
 
     it('should return (0,0) for empty array', () => {
-      const point = straightRouting.getPointOnPath([], 0.5);
+      const point = straightRouting.computePointOnPath([], 0.5);
 
       expect(point).toEqual({ x: 0, y: 0 });
     });
@@ -252,7 +252,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 50 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 0, y: 0 });
     });
@@ -263,7 +263,7 @@ describe('StraightRouting', () => {
         { x: 30.5, y: 40.5 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 20.5, y: 30.5 });
     });
@@ -274,7 +274,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 50 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 50, y: 50 });
     });
@@ -285,7 +285,7 @@ describe('StraightRouting', () => {
         { x: 50, y: 100 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 50, y: 50 });
     });
@@ -298,7 +298,7 @@ describe('StraightRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = straightRouting.getPointOnPath(points, 0.5);
+      const point = straightRouting.computePointOnPath(points, 0.5);
 
       // Should interpolate between first and last, ignoring middle points
       expect(point).toEqual({ x: 50, y: 50 });
@@ -311,15 +311,15 @@ describe('StraightRouting', () => {
       const target: PortLocation = { x: 90, y: 80, side: 'left' };
 
       // Calculate points
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
       expect(points).toHaveLength(2);
 
       // Generate SVG path
-      const path = straightRouting.generateSvgPath(points);
+      const path = straightRouting.computeSvgPath(points);
       expect(path).toBe('M 10,20 L 90,80');
 
       // Get point on path
-      const midPoint = straightRouting.getPointOnPath(points, 0.5);
+      const midPoint = straightRouting.computePointOnPath(points, 0.5);
       expect(midPoint).toEqual({ x: 50, y: 50 });
     });
 
@@ -327,15 +327,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: -50, y: -100, side: 'top' };
       const target: PortLocation = { x: 150, y: 200, side: 'bottom' };
 
-      const points = straightRouting.calculatePoints(source, target);
-      const path = straightRouting.generateSvgPath(points);
+      const points = straightRouting.computePoints(source, target);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M -50,-100 L 150,200');
 
       // Check various points along the path
-      const point25 = straightRouting.getPointOnPath(points, 0.25);
-      const point50 = straightRouting.getPointOnPath(points, 0.5);
-      const point75 = straightRouting.getPointOnPath(points, 0.75);
+      const point25 = straightRouting.computePointOnPath(points, 0.25);
+      const point50 = straightRouting.computePointOnPath(points, 0.5);
+      const point75 = straightRouting.computePointOnPath(points, 0.75);
 
       expect(point25).toEqual({ x: 0, y: -25 });
       expect(point50).toEqual({ x: 50, y: 50 });
@@ -346,30 +346,30 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 100, y: 100, side: 'right' };
       const target: PortLocation = { x: 100, y: 100, side: 'left' };
 
-      const points = straightRouting.calculatePoints(source, target);
-      const path = straightRouting.generateSvgPath(points);
+      const points = straightRouting.computePoints(source, target);
+      const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 100,100 L 100,100');
 
       // Any percentage should return the same point
-      expect(straightRouting.getPointOnPath(points, 0)).toEqual({ x: 100, y: 100 });
-      expect(straightRouting.getPointOnPath(points, 0.5)).toEqual({ x: 100, y: 100 });
-      expect(straightRouting.getPointOnPath(points, 1)).toEqual({ x: 100, y: 100 });
+      expect(straightRouting.computePointOnPath(points, 0)).toEqual({ x: 100, y: 100 });
+      expect(straightRouting.computePointOnPath(points, 0.5)).toEqual({ x: 100, y: 100 });
+      expect(straightRouting.computePointOnPath(points, 1)).toEqual({ x: 100, y: 100 });
     });
 
     it('should properly clamp out-of-range percentages', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 100, y: 0, side: 'left' };
 
-      const points = straightRouting.calculatePoints(source, target);
+      const points = straightRouting.computePoints(source, target);
 
       // Test clamping behavior
-      const pointNeg2 = straightRouting.getPointOnPath(points, -2);
-      const pointNeg05 = straightRouting.getPointOnPath(points, -0.5);
-      const point0 = straightRouting.getPointOnPath(points, 0);
-      const point1 = straightRouting.getPointOnPath(points, 1);
-      const point15 = straightRouting.getPointOnPath(points, 1.5);
-      const point10 = straightRouting.getPointOnPath(points, 10);
+      const pointNeg2 = straightRouting.computePointOnPath(points, -2);
+      const pointNeg05 = straightRouting.computePointOnPath(points, -0.5);
+      const point0 = straightRouting.computePointOnPath(points, 0);
+      const point1 = straightRouting.computePointOnPath(points, 1);
+      const point15 = straightRouting.computePointOnPath(points, 1.5);
+      const point10 = straightRouting.computePointOnPath(points, 10);
 
       // All negative values should clamp to start
       expect(pointNeg2).toEqual({ x: 0, y: 0 });

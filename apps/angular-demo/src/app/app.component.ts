@@ -52,7 +52,7 @@ export class AppComponent {
       computeSnapForNodeDrag: true,
     },
     linking: {
-      finalEdgeDataBuilder: (edge: Edge) => ({ ...edge, routing: 'bezier' }),
+      finalEdgeDataBuilder: (edge: Edge) => ({ ...edge, routing: 'orthogonal' }),
     },
   };
 
@@ -86,6 +86,13 @@ export class AppComponent {
       {
         id: '6',
         position: { x: 500, y: 400 },
+        data: {},
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '8',
+        position: { x: 900, y: 400 },
         data: {},
         resizable: true,
         rotatable: true,
@@ -126,6 +133,17 @@ export class AppComponent {
         targetArrowhead: 'ng-diagram-arrow',
         sourcePort: 'port-right',
         targetPort: 'port-left-3',
+      },
+      {
+        id: '4',
+        source: '6',
+        target: '8',
+        data: {},
+        sourceArrowhead: 'ng-diagram-arrow',
+        targetArrowhead: 'ng-diagram-arrow',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        routing: 'orthogonal',
       },
     ],
     metadata: { viewport: { x: 300, y: 0, scale: 1 } },

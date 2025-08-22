@@ -1,11 +1,11 @@
 <ng-diagram-base-edge
   class="custom-edge"
   [edge]="edge()"
-  [routing]="'bezier'"
+  [routing]="'orthogonal'"
   stroke="var(--border-color)"
   [customMarkerEnd]="'ng-diagram-arrow'"
 >
-  <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
+  <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.4">
     <button (mousedown)="onButtonClick()">Test</button>
   </ng-diagram-base-edge-label>
 </ng-diagram-base-edge>

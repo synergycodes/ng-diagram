@@ -5,10 +5,11 @@ export const getPathPointsFromBottom = (
   targetPortSide: PortSide,
   xySource: Point,
   xyTarget: Point,
-  xyCenter: Point
+  xyCenter: Point,
+  firstLastSegmentLength = 20
 ) => {
-  const sourcePort = getOffsetPoint({ x: xySource.x, y: xySource.y }, 'bottom');
-  const targetPort = getOffsetPoint({ x: xyTarget.x, y: xyTarget.y }, targetPortSide);
+  const sourcePort = getOffsetPoint({ x: xySource.x, y: xySource.y }, 'bottom', firstLastSegmentLength);
+  const targetPort = getOffsetPoint({ x: xyTarget.x, y: xyTarget.y }, targetPortSide, firstLastSegmentLength);
 
   if (targetPortSide === 'bottom') {
     if (sourcePort.y > targetPort.y) {

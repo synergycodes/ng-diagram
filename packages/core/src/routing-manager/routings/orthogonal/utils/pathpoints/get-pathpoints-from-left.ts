@@ -1,9 +1,15 @@
 import { Point, PortSide } from '../../../../../types';
 import { getOffsetPoint } from '../get-offset-point.ts';
 
-export const getPathPointsFromLeft = (targetPortSide: PortSide, xySource: Point, xyTarget: Point, xyCenter: Point) => {
-  const sourcePort = getOffsetPoint({ x: xySource.x, y: xySource.y }, 'left');
-  const targetPort = getOffsetPoint({ x: xyTarget.x, y: xyTarget.y }, targetPortSide);
+export const getPathPointsFromLeft = (
+  targetPortSide: PortSide,
+  xySource: Point,
+  xyTarget: Point,
+  xyCenter: Point,
+  firstLastSegmentLength = 20
+) => {
+  const sourcePort = getOffsetPoint({ x: xySource.x, y: xySource.y }, 'left', firstLastSegmentLength);
+  const targetPort = getOffsetPoint({ x: xyTarget.x, y: xyTarget.y }, targetPortSide, firstLastSegmentLength);
 
   if (targetPortSide === 'left') {
     if (sourcePort.x > targetPort.x) {

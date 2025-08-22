@@ -1,4 +1,4 @@
-import { Point, PortLocation } from '../../../types';
+import { Point, PortLocation, RoutingConfiguration } from '../../../types';
 import { Routing } from '../../types';
 import { computeOrthogonalPath } from './compute-orthogonal-path';
 import { computeOrthogonalPointOnPath } from './compute-orthogonal-point-on-path';
@@ -10,15 +10,16 @@ import { computeOrthogonalPoints } from './compute-orthogonal-points';
 export class OrthogonalRouting implements Routing {
   name = 'orthogonal';
 
-  calculatePoints(source: PortLocation, target: PortLocation): Point[] {
-    return computeOrthogonalPoints(source, target);
+  computePoints(source: PortLocation, target: PortLocation, config?: RoutingConfiguration): Point[] {
+    const firstLastSegmentLength = config?.orthogonal?.firstLastSegmentLength ?? 20;
+    return computeOrthogonalPoints(source, target, firstLastSegmentLength);
   }
 
-  generateSvgPath(points: Point[]): string {
+  computeSvgPath(points: Point[]): string {
     return computeOrthogonalPath(points);
   }
 
-  getPointOnPath(points: Point[], percentage: number): Point {
+  computePointOnPath(points: Point[], percentage: number): Point {
     return computeOrthogonalPointOnPath(points, percentage);
   }
 }

@@ -23,12 +23,12 @@ export interface Routing {
   /**
    * Calculates the points for the edge path
    */
-  calculatePoints(source: PortLocation, target: PortLocation, config?: RoutingConfiguration): Point[];
+  computePoints(source: PortLocation, target: PortLocation, config?: RoutingConfiguration): Point[];
 
   /**
    * Generates SVG path string from points
    */
-  generateSvgPath(points: Point[]): string;
+  computeSvgPath(points: Point[]): string;
 
   /**
    * Gets a point on the path at a given percentage (0-1)
@@ -37,7 +37,7 @@ export interface Routing {
    * @param percentage - Position along the path (0 = start, 1 = end)
    * @returns The point at the given percentage along the path
    */
-  getPointOnPath?(points: Point[], percentage: number): Point;
+  computePointOnPath?(points: Point[], percentage: number): Point;
 }
 
 /**

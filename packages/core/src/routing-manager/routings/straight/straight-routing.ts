@@ -8,13 +8,13 @@ import { Routing } from '../../types';
 export class StraightRouting implements Routing {
   name = 'straight';
 
-  calculatePoints(source: PortLocation, target: PortLocation): Point[] {
+  computePoints(source: PortLocation, target: PortLocation): Point[] {
     const sourcePoint = { x: source.x, y: source.y };
     const targetPoint = { x: target.x, y: target.y };
     return [sourcePoint, targetPoint];
   }
 
-  generateSvgPath(points: Point[]): string {
+  computeSvgPath(points: Point[]): string {
     if (points.length === 0) return '';
     if (points.length === 1) return `M ${points[0].x},${points[0].y}`;
 
@@ -26,7 +26,7 @@ export class StraightRouting implements Routing {
     return pathSegments.join(' ');
   }
 
-  getPointOnPath(points: Point[], percentage: number): Point {
+  computePointOnPath(points: Point[], percentage: number): Point {
     if (points.length < 2) return points[0] || { x: 0, y: 0 };
 
     const clampedPercentage = NgDiagramMath.clamp({ min: 0, value: percentage, max: 1 });

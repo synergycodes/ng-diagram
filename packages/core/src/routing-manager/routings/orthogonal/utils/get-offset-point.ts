@@ -1,19 +1,19 @@
 import { Point, PortSide } from '../../../../types';
-import { POINT_DISTANCE } from './constants.ts';
 
 /**
  * Calculates the offset point based on the given position.
  *
  * @param point - The original point with x and y coordinates.
  * @param position - The position assigned to Handle (Left, Right, Top, Bottom).
+ * @param distance - The distance to offset from the point (default: 20).
  * @returns An object containing the new x and y coordinates after applying the offset.
  */
-export const getOffsetPoint = (point: Point, position: PortSide) => {
+export const getOffsetPoint = (point: Point, position: PortSide, distance = 20) => {
   const offset = {
-    left: { x: -POINT_DISTANCE, y: 0 },
-    right: { x: POINT_DISTANCE, y: 0 },
-    top: { x: 0, y: -POINT_DISTANCE },
-    bottom: { x: 0, y: POINT_DISTANCE },
+    left: { x: -distance, y: 0 },
+    right: { x: distance, y: 0 },
+    top: { x: 0, y: -distance },
+    bottom: { x: 0, y: distance },
   }[position] || { x: 0, y: 0 };
 
   return {

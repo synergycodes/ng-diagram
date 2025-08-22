@@ -79,7 +79,7 @@ export class RoutingManager {
       throw new Error(`Routing '${name}' not found`);
     }
 
-    return routing.calculatePoints(source, target, config);
+    return routing.computePoints(source, target, config);
   }
 
   /**
@@ -93,7 +93,7 @@ export class RoutingManager {
       throw new Error(`Routing '${name}' not found`);
     }
 
-    return routing.generateSvgPath(points);
+    return routing.computeSvgPath(points);
   }
 
   /**
@@ -110,8 +110,8 @@ export class RoutingManager {
     }
 
     // Use routing's implementation if available
-    if (routing.getPointOnPath) {
-      return routing.getPointOnPath(points, percentage);
+    if (routing.computePointOnPath) {
+      return routing.computePointOnPath(points, percentage);
     }
 
     // Fallback to simple linear interpolation between first and last points

@@ -26,7 +26,9 @@ export interface RoutingConfiguration {
   bezier?: {
     bezierControlOffset?: number;
   };
-  orthogonal?: Record<string, unknown>;
+  orthogonal?: {
+    firstLastSegmentLength?: number;
+  };
   straight?: Record<string, unknown>;
 }
 

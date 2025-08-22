@@ -15,12 +15,12 @@ describe('BezierRouting', () => {
     });
   });
 
-  describe('calculatePoints', () => {
+  describe('computePoints', () => {
     it('should calculate points with default offset', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
 
-      const points = bezierRouting.calculatePoints(source, target);
+      const points = bezierRouting.computePoints(source, target);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 200 }); // source
@@ -36,7 +36,7 @@ describe('BezierRouting', () => {
         bezier: { bezierControlOffset: 50 },
       };
 
-      const points = bezierRouting.calculatePoints(source, target, config);
+      const points = bezierRouting.computePoints(source, target, config);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 200 }); // source
@@ -49,7 +49,7 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 200, y: 100, side: 'bottom' };
       const target: PortLocation = { x: 200, y: 400, side: 'top' };
 
-      const points = bezierRouting.calculatePoints(source, target);
+      const points = bezierRouting.computePoints(source, target);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 200, y: 100 }); // source
@@ -62,7 +62,7 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 100, y: 100, side: 'right' };
       const target: PortLocation = { x: 300, y: 300, side: 'bottom' };
 
-      const points = bezierRouting.calculatePoints(source, target);
+      const points = bezierRouting.computePoints(source, target);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 100 }); // source
@@ -78,7 +78,7 @@ describe('BezierRouting', () => {
         bezier: { bezierControlOffset: 0 },
       };
 
-      const points = bezierRouting.calculatePoints(source, target, config);
+      const points = bezierRouting.computePoints(source, target, config);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 200 });
@@ -91,7 +91,7 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 200, y: 0, side: 'left' };
 
-      const points = bezierRouting.calculatePoints(source, target, undefined);
+      const points = bezierRouting.computePoints(source, target, undefined);
 
       expect(points).toHaveLength(4);
       // Should use default offset of 100
@@ -104,7 +104,7 @@ describe('BezierRouting', () => {
       const target: PortLocation = { x: 200, y: 0, side: 'left' };
       const config: RoutingConfiguration = {};
 
-      const points = bezierRouting.calculatePoints(source, target, config);
+      const points = bezierRouting.computePoints(source, target, config);
 
       expect(points).toHaveLength(4);
       // Should use default offset of 100
@@ -113,7 +113,7 @@ describe('BezierRouting', () => {
     });
   });
 
-  describe('generateSvgPath', () => {
+  describe('computeSvgPath', () => {
     it('should generate cubic bezier path for 4 points', () => {
       const points = [
         { x: 0, y: 100 },
@@ -122,7 +122,7 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,100 C 25,0 75,0 100,100');
     });
@@ -133,7 +133,7 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,0 L 100,100');
     });
@@ -141,13 +141,13 @@ describe('BezierRouting', () => {
     it('should generate move command for single point', () => {
       const points = [{ x: 50, y: 50 }];
 
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
 
       expect(path).toBe('M 50,50');
     });
 
     it('should return empty string for empty array', () => {
-      const path = bezierRouting.generateSvgPath([]);
+      const path = bezierRouting.computeSvgPath([]);
 
       expect(path).toBe('');
     });
@@ -161,13 +161,13 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,0 L 25,50 L 50,25 L 75,75 L 100,100');
     });
   });
 
-  describe('getPointOnPath', () => {
+  describe('computePointOnPath', () => {
     it('should return start point at 0%', () => {
       const points = [
         { x: 0, y: 0 },
@@ -176,7 +176,7 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = bezierRouting.getPointOnPath(points, 0);
+      const point = bezierRouting.computePointOnPath(points, 0);
 
       expect(point).toEqual({ x: 0, y: 0 });
     });
@@ -189,7 +189,7 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = bezierRouting.getPointOnPath(points, 1);
+      const point = bezierRouting.computePointOnPath(points, 1);
 
       expect(point).toEqual({ x: 100, y: 100 });
     });
@@ -202,7 +202,7 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = bezierRouting.getPointOnPath(points, 0.5);
+      const point = bezierRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 50, y: 50 });
     });
@@ -215,8 +215,8 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const pointNegative = bezierRouting.getPointOnPath(points, -0.5);
-      const pointOverOne = bezierRouting.getPointOnPath(points, 1.5);
+      const pointNegative = bezierRouting.computePointOnPath(points, -0.5);
+      const pointOverOne = bezierRouting.computePointOnPath(points, 1.5);
 
       expect(pointNegative).toEqual({ x: 0, y: 0 }); // clamped to 0
       expect(pointOverOne).toEqual({ x: 100, y: 100 }); // clamped to 1
@@ -228,7 +228,7 @@ describe('BezierRouting', () => {
         { x: 100, y: 100 },
       ];
 
-      const point = bezierRouting.getPointOnPath(points, 0.5);
+      const point = bezierRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 50, y: 50 });
     });
@@ -236,13 +236,13 @@ describe('BezierRouting', () => {
     it('should return (0,0) for single point', () => {
       const points = [{ x: 50, y: 50 }];
 
-      const point = bezierRouting.getPointOnPath(points, 0.5);
+      const point = bezierRouting.computePointOnPath(points, 0.5);
 
       expect(point).toEqual({ x: 0, y: 0 });
     });
 
     it('should return (0,0) for empty array', () => {
-      const point = bezierRouting.getPointOnPath([], 0.5);
+      const point = bezierRouting.computePointOnPath([], 0.5);
 
       expect(point).toEqual({ x: 0, y: 0 });
     });
@@ -254,10 +254,10 @@ describe('BezierRouting', () => {
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
 
       // Calculate points
-      const points = bezierRouting.calculatePoints(source, target);
+      const points = bezierRouting.computePoints(source, target);
 
       // Generate SVG path
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
 
       expect(path).toBe('M 100,200 C 200,200 300,200 400,200');
     });
@@ -270,19 +270,19 @@ describe('BezierRouting', () => {
       };
 
       // Calculate points with custom offset
-      const points = bezierRouting.calculatePoints(source, target, config);
+      const points = bezierRouting.computePoints(source, target, config);
 
       expect(points).toHaveLength(4);
       expect(points[1]).toEqual({ x: 0, y: 25 }); // source control (bottom +25)
       expect(points[2]).toEqual({ x: 100, y: 75 }); // target control (top -25)
 
       // Generate SVG path
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
 
       expect(path).toBe('M 0,0 C 0,25 100,75 100,100');
 
       // Get point on path
-      const midPoint = bezierRouting.getPointOnPath(points, 0.5);
+      const midPoint = bezierRouting.computePointOnPath(points, 0.5);
 
       expect(midPoint.x).toBeCloseTo(50, 1);
       expect(midPoint.y).toBeCloseTo(50, 1); // Midpoint for this specific curve
@@ -292,20 +292,20 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: -50, y: -50, side: 'left' };
       const target: PortLocation = { x: 150, y: 150, side: 'right' };
 
-      const points = bezierRouting.calculatePoints(source, target);
+      const points = bezierRouting.computePoints(source, target);
 
       expect(points[0]).toEqual({ x: -50, y: -50 });
       expect(points[1]).toEqual({ x: -150, y: -50 }); // left -100
       expect(points[2]).toEqual({ x: 250, y: 150 }); // right +100
       expect(points[3]).toEqual({ x: 150, y: 150 });
 
-      const path = bezierRouting.generateSvgPath(points);
+      const path = bezierRouting.computeSvgPath(points);
       expect(path).toBe('M -50,-50 C -150,-50 250,150 150,150');
 
       // Check various points along the path
-      const quarterPoint = bezierRouting.getPointOnPath(points, 0.25);
-      const halfPoint = bezierRouting.getPointOnPath(points, 0.5);
-      const threeQuarterPoint = bezierRouting.getPointOnPath(points, 0.75);
+      const quarterPoint = bezierRouting.computePointOnPath(points, 0.25);
+      const halfPoint = bezierRouting.computePointOnPath(points, 0.5);
+      const threeQuarterPoint = bezierRouting.computePointOnPath(points, 0.75);
 
       // These should be different points along the curve
       expect(quarterPoint).not.toEqual(halfPoint);

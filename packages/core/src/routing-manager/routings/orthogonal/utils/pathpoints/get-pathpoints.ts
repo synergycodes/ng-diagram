@@ -10,7 +10,8 @@ const positionFunctionMap: Record<
     targetPosition: PortSide,
     xySource: Point,
     xyTarget: Point,
-    xyCenter: Point
+    xyCenter: Point,
+    firstLastSegmentLength: number
   ) =>
     | {
         x: number;
@@ -32,9 +33,21 @@ const positionFunctionMap: Record<
  * @param source
  * @param target
  * @param xyCenter The center point of the path
+ * @param firstLastSegmentLength The length of the first and last segments
  * @returns An array of points representing the orthogonal path.
  */
-export const getPathPoints = (source: PortLocation, target: PortLocation, xyCenter: Point) => {
+export const getPathPoints = (
+  source: PortLocation,
+  target: PortLocation,
+  xyCenter: Point,
+  firstLastSegmentLength = 20
+) => {
   const getPositionFunction = positionFunctionMap[source.side] || getPathPointsFromLeft;
-  return getPositionFunction(target.side, { x: source.x, y: source.y }, { x: target.x, y: target.y }, xyCenter);
+  return getPositionFunction(
+    target.side,
+    { x: source.x, y: source.y },
+    { x: target.x, y: target.y },
+    xyCenter,
+    firstLastSegmentLength
+  );
 };

@@ -107,8 +107,8 @@ export class NgDiagramService<
    * @example
    * const customRouting: Routing = {
    *   name: 'custom',
-   *   calculatePoints: (source, target) => [...],
-   *   generateSvgPath: (points) => '...'
+   *   computePoints: (source, target) => [...],
+   *   computeSvgPath: (points) => '...'
    * };
    * ngDiagramService.registerRouting(customRouting);
    */
