@@ -3,4 +3,128 @@ title: Save State
 description: Example of how to save and restore state in NgDiagram
 ---
 
-# Save State
+import SaveState from '../../../components/angular/examples/save-state/save-state.astro';
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+
+This example demonstrates how to implement save state to the diagram in NgDiagram using Angular features.
+
+## Save State Overview
+
+The save state functionality allows users to persist the current diagram (nodes and edges) in local storage, restore it later, or clear the saved state.
+
+### Key Features
+
+- **Persistence**: Saves the diagram state to local storage.
+- **Restoration**: Loads the saved state back into the diagram.
+- **Clear**: Removes the saved state from local storage.
+
+## Implementation Details
+
+### Save State Service
+
+The `SaveStateService` manages saving, loading, and clearing the diagram state using Angular signals and effects:
+
+```typescript
+@Injectable()
+export class SaveStateService {
+  private KEY = 'ngDiagramSaveStateKey';
+
+  state = signal<string | null>(localStorage.getItem(this.KEY));
+  stateSync = effect(() => {
+    if (this.state() === null) {
+      localStorage.removeItem(this.KEY);
+    } else {
+      localStorage.setItem(this.KEY, this.state() as string);
+    }
+  });
+
+  save(newState: string): void {
+    this.state.set(newState);
+  }
+
+  load(): { nodes: Node[]; edges: Edge[] } | null {
+    try {
+      const serializedState = this.state();
+      return serializedState ? JSON.parse(serializedState) : null;
+    } catch (e) {
+      console.error('SaveStateService: Error loading state', e);
+      return null;
+    }
+  }
+
+  clear(): void {
+    this.state.set(null);
+  }
+}
+```
+
+### NavBar Component
+
+The navigation bar provides buttons for saving, loading, and clearing the diagram state. Button states are reactive:
+
+```typescript
+@Component({
+  selector: 'nav-bar',
+  template: `
+    <div>
+      <button (click)="save()">Save</button>
+      <button (click)="load()" [disabled]="!isSaved()">Load</button>
+      <button class="clear" (click)="clear()" [disabled]="!isSaved()">Clear</button>
+    </div>
+  `,
+})
+export class NavBarComponent {
+  private readonly saveStateService = inject(SaveStateService);
+  private readonly modelService = inject(NgDiagramModelService);
+  isSaved = computed(() => {
+    return this.saveStateService.state() !== null;
+  });
+
+  save(): void {
+    const model = this.modelService.getModel().export();
+    this.saveStateService.save(model);
+  }
+
+  load(): void {
+    const model = this.saveStateService.load();
+
+    if (model) {
+      this.modelService.getModel().import(model);
+    }
+  }
+
+  clear(): void {
+    if (window.confirm('Are you sure you want to clear the saved state?')) {
+      this.saveStateService.clear();
+    }
+  }
+}
+```
+
+### Example Component Structure
+
+The example wraps the diagram and navigation bar in a context provider, ensuring services are available:
+
+```typescript
+@Component({
+  selector: 'save-state-wrapper',
+  imports: [NgDiagramContextComponent, SaveStateExampleComponent],
+  template: `
+    <ng-diagram-context>
+      <save-state-example></save-state-example>
+    </ng-diagram-context>
+  `,
+  providers: [NgDiagramModelService, SaveStateService],
+})
+export class SaveStateWrapperComponent {}
+```
+
+## Actions
+
+- **Save**: Serializes and stores the current diagram state.
+- **Load**: Restores the diagram from the saved state.
+- **Clear**: Removes the saved state from local
+
+<SaveState />
+
+<ExampleViewer dirName="save-state" />
