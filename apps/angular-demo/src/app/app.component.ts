@@ -146,6 +146,9 @@ export class AppComponent {
         routing: 'orthogonal',
       },
     ],
-    metadata: { viewport: { x: 300, y: 0, scale: 1 } },
+    metadata: {
+      viewport: { x: 300, y: 0, scale: 1 },
+      routingConfiguration: { orthogonal: { firstLastSegmentLength: 20, maxCornerRadius: 10 } },
+    },
   });
 }

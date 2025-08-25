@@ -56,6 +56,12 @@ export interface Edge<T = any> {
    */
   routing?: RoutingName;
   /**
+   * The routing mode of the edge.
+   * 'auto' (default): Points are computed automatically based on routing algorithm
+   * 'manual': Points are provided by the user and routing algorithm is used to render the path
+   */
+  routingMode?: 'manual' | 'auto';
+  /**
    * The position of the edge start.
    */
   sourcePosition?: Point;
@@ -79,14 +85,6 @@ export interface Edge<T = any> {
    * The labels of the edge.
    */
   labels?: EdgeLabel[];
-  /**
-   * Static path configuration for the edge.
-   * When provided, these points will be used instead of calculated routing.
-   */
-  staticPath?: {
-    points: Point[];
-    svgPath?: string;
-  };
 }
 
 /**

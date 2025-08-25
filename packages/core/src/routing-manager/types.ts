@@ -1,4 +1,4 @@
-import { Point, PortLocation, RoutingConfiguration } from '../types';
+import { Edge, Node, Point, Port, PortLocation, RoutingConfiguration } from '../types';
 import { BUILT_IN_ROUTINGS } from './routing-manager';
 
 /**
@@ -12,6 +12,46 @@ export type BuiltInRoutingName = (typeof BUILT_IN_ROUTINGS)[number];
 export type RoutingName = BuiltInRoutingName | (string & {});
 
 /**
+ * Context object containing all information needed for routing computation
+ */
+export interface RoutingContext {
+  /**
+   * Source port location
+   */
+  source: PortLocation;
+
+  /**
+   * Target port location
+   */
+  target: PortLocation;
+
+  /**
+   * The edge being routed
+   */
+  edge: Edge;
+
+  /**
+   * Source node
+   */
+  sourceNode: Node;
+
+  /**
+   * Target node
+   */
+  targetNode: Node;
+
+  /**
+   * Source port (if edge is connected to a specific port)
+   */
+  sourcePort?: Port;
+
+  /**
+   * Target port (if edge is connected to a specific port)
+   */
+  targetPort?: Port;
+}
+
+/**
  * Interface for routing implementations
  */
 export interface Routing {
@@ -21,9 +61,9 @@ export interface Routing {
   name: string;
 
   /**
-   * Calculates the points for the edge path
+   * Calculates the points for the edge path using full context
    */
-  computePoints(source: PortLocation, target: PortLocation, config?: RoutingConfiguration): Point[];
+  computePoints(context: RoutingContext, config?: RoutingConfiguration): Point[];
 
   /**
    * Generates SVG path string from points

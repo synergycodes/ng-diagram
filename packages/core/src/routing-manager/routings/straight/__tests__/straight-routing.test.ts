@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { PortLocation } from '../../../../types';
+import { Edge, Node, PortLocation } from '../../../../types';
+import { RoutingContext } from '../../../types';
 import { StraightRouting } from '../straight-routing';
 
 describe('StraightRouting', () => {
@@ -20,7 +21,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 300, side: 'left' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 300, y: 250 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: 100, y: 200 });
@@ -31,7 +40,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 50, y: 50, side: 'right' };
       const target: PortLocation = { x: 50, y: 50, side: 'left' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 0, y: 25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: 50, y: 50 });
@@ -42,7 +59,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: -100, y: -200, side: 'left' };
       const target: PortLocation = { x: -50, y: -150, side: 'right' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -150, y: -225 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: -100, y: -175 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: -100, y: -200 });
@@ -53,7 +78,25 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 10.5, y: 20.7, side: 'top' };
       const target: PortLocation = { x: 30.3, y: 40.1, side: 'bottom' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: {
+          id: 'node1',
+          position: { x: -39.5, y: -4.3 },
+          size: { width: 100, height: 50 },
+          data: {},
+        } as Node,
+        targetNode: {
+          id: 'node2',
+          position: { x: -19.7, y: 15.1 },
+          size: { width: 100, height: 50 },
+          data: {},
+        } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       expect(points).toHaveLength(2);
       expect(points[0]).toEqual({ x: 10.5, y: 20.7 });
@@ -64,7 +107,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 0, y: 100, side: 'right' };
       const target: PortLocation = { x: 200, y: 100, side: 'left' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 150, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       expect(points[0]).toEqual({ x: 0, y: 100 });
       expect(points[1]).toEqual({ x: 200, y: 100 });
@@ -74,7 +125,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 100, y: 0, side: 'bottom' };
       const target: PortLocation = { x: 100, y: 200, side: 'top' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 50, y: 175 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       expect(points[0]).toEqual({ x: 100, y: 0 });
       expect(points[1]).toEqual({ x: 100, y: 200 });
@@ -310,8 +369,16 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 10, y: 20, side: 'right' };
       const target: PortLocation = { x: 90, y: 80, side: 'left' };
 
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -40, y: -5 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 40, y: 55 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
       // Calculate points
-      const points = straightRouting.computePoints(source, target);
+      const points = straightRouting.computePoints(context);
       expect(points).toHaveLength(2);
 
       // Generate SVG path
@@ -327,7 +394,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: -50, y: -100, side: 'top' };
       const target: PortLocation = { x: 150, y: 200, side: 'bottom' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -100, y: -125 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 100, y: 175 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
       const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M -50,-100 L 150,200');
@@ -346,7 +421,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 100, y: 100, side: 'right' };
       const target: PortLocation = { x: 100, y: 100, side: 'left' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
       const path = straightRouting.computeSvgPath(points);
 
       expect(path).toBe('M 100,100 L 100,100');
@@ -361,7 +444,15 @@ describe('StraightRouting', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 100, y: 0, side: 'left' };
 
-      const points = straightRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = straightRouting.computePoints(context);
 
       // Test clamping behavior
       const pointNeg2 = straightRouting.computePointOnPath(points, -2);

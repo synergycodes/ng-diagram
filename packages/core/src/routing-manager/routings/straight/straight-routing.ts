@@ -1,6 +1,6 @@
 import { NgDiagramMath } from '../../../math';
-import { Point, PortLocation } from '../../../types';
-import { Routing } from '../../types';
+import { Point } from '../../../types';
+import { Routing, RoutingContext } from '../../types';
 
 /**
  * Straight line routing implementation
@@ -8,7 +8,8 @@ import { Routing } from '../../types';
 export class StraightRouting implements Routing {
   name = 'straight';
 
-  computePoints(source: PortLocation, target: PortLocation): Point[] {
+  computePoints(context: RoutingContext): Point[] {
+    const { source, target } = context;
     const sourcePoint = { x: source.x, y: source.y };
     const targetPoint = { x: target.x, y: target.y };
     return [sourcePoint, targetPoint];

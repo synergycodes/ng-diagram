@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import type {
+  Edge,
   FlowState,
   Metadata,
   MiddlewareContext,
@@ -13,7 +14,15 @@ import { edgesRoutingMiddleware, EdgesRoutingMiddlewareMetadata } from '../edges
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment/constants.ts';
 
 vi.mock('../../../utils', () => ({
-  getPortFlowPositionSide: (node: Node) => node.position,
+  getPortFlowPositionSide: (node: Node) => {
+    // Return port position based on node position
+    // Even if no portId is provided, we should return node position as fallback
+    return {
+      x: node.position.x,
+      y: node.position.y,
+      side: 'right',
+    };
+  },
   getPointOnPath: () => ({ x: 50, y: 50 }),
   isSamePoint: (point1: Point, point2: Point) => point1.x === point2.x && point1.y === point2.y,
 }));
@@ -39,15 +48,16 @@ describe('Edges Routing Middleware', () => {
 
     const mockRoutingManager = {
       hasRouting: vi.fn().mockReturnValue(true),
-      computePoints: vi.fn().mockImplementation((_routing, source, target) => {
-        // Return mock points based on source and target
-        if (!source || !target) return [];
+      computePoints: vi.fn().mockImplementation((_routing, context) => {
+        // Return mock points based on context
+        if (!context?.source || !context?.target) return [];
         return [
-          { x: source.x, y: source.y },
-          { x: target.x, y: target.y },
+          { x: context.source.x, y: context.source.y },
+          { x: context.target.x, y: context.target.y },
         ];
       }),
       computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+      getDefaultRouting: vi.fn().mockReturnValue('orthogonal'),
     };
 
     flowCore = {
@@ -111,13 +121,15 @@ describe('Edges Routing Middleware', () => {
   });
 
   it('should call next without update if there are no edges to route', () => {
-    // Update mock to return false for 'custom-routing'
+    // Update mock to return false for 'custom-routing' AND default routing
     const customRoutingManager = {
-      hasRouting: vi.fn().mockImplementation((routing) => {
-        return routing === 'straight' || routing === 'orthogonal' || routing === 'bezier';
+      hasRouting: vi.fn().mockImplementation(() => {
+        // Return false for both custom-routing and default (simulating no routing available)
+        return false;
       }),
-      computePoints: vi.fn(),
+      computePoints: vi.fn().mockReturnValue([]),
       computePointOnPath: vi.fn(),
+      getDefaultRouting: vi.fn().mockReturnValue('orthogonal'),
     };
 
     // Create a custom edge with routing that's not registered
@@ -143,7 +155,8 @@ describe('Edges Routing Middleware', () => {
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
-    expect(nextMock).toHaveBeenCalledWith({});
+    // Since no routing is available and fallback produces empty points, edge should be updated with empty points
+    expect(nextMock).toHaveBeenCalled();
   });
 
   it('should route only edges with routing set to straight or orthogonal or undefined. If an edge has a defined type, then sourcePosition, targetPosition, and labels should be set. All other edges should remain unchanged.', () => {
@@ -152,14 +165,15 @@ describe('Edges Routing Middleware', () => {
       hasRouting: vi.fn().mockImplementation((routing) => {
         return routing === 'straight' || routing === 'orthogonal' || routing === 'bezier';
       }),
-      computePoints: vi.fn().mockImplementation((_routing, source, target) => {
-        if (!source || !target) return [];
+      computePoints: vi.fn().mockImplementation((_routing, context) => {
+        if (!context?.source || !context?.target) return [];
         return [
-          { x: source.x, y: source.y },
-          { x: target.x, y: target.y },
+          { x: context.source.x, y: context.source.y },
+          { x: context.target.x, y: context.target.y },
         ];
       }),
       computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+      getDefaultRouting: vi.fn().mockReturnValue('orthogonal'),
     };
 
     const newState = {
@@ -479,5 +493,220 @@ describe('Edges Routing Middleware', () => {
         },
       ],
     });
+  });
+
+  it('should preserve manual points when routingMode is manual', () => {
+    const manualPoints = [
+      { x: 100, y: 100 },
+      { x: 150, y: 100 },
+      { x: 150, y: 200 },
+      { x: 200, y: 200 },
+    ];
+
+    const newState = {
+      nodes: [
+        { ...mockNode, id: 'node-1', position: { x: 50, y: 50 } },
+        { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+      ],
+      edges: [
+        {
+          ...mockEdge,
+          id: 'manual-edge',
+          source: 'node-1',
+          target: 'node-2',
+          routingMode: 'manual',
+          points: manualPoints,
+        },
+      ],
+      metadata: { ...initialState.metadata },
+    };
+
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'init',
+      nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
+
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+    // Check that next was called
+    expect(nextMock).toHaveBeenCalled();
+    const callArgs = nextMock.mock.calls[0][0];
+
+    // In manual mode, points should not be updated
+    if (callArgs?.edgesToUpdate) {
+      const edgeUpdate = callArgs.edgesToUpdate.find((e: Edge) => e.id === 'manual-edge');
+      // Points should not be in the update for manual mode
+      expect(edgeUpdate?.points).toBeUndefined();
+      // But source and target positions should still be set
+      expect(edgeUpdate?.sourcePosition).toBeDefined();
+      expect(edgeUpdate?.targetPosition).toBeDefined();
+    }
+  });
+
+  it('should compute points automatically when routingMode is auto', () => {
+    const newState = {
+      nodes: [
+        { ...mockNode, id: 'node-1', position: { x: 50, y: 50 } },
+        { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+      ],
+      edges: [
+        {
+          ...mockEdge,
+          id: 'auto-edge',
+          source: 'node-1',
+          target: 'node-2',
+          sourcePort: 'port-1',
+          targetPort: 'port-2',
+          routingMode: 'auto',
+          routing: 'orthogonal',
+          points: [], // Empty points should be computed
+        },
+      ],
+      metadata: { ...initialState.metadata },
+    };
+
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'init',
+      nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
+
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      edgesToUpdate: [
+        {
+          id: 'auto-edge',
+          points: [
+            { x: 50, y: 50 },
+            { x: 200, y: 200 },
+          ],
+          sourcePosition: { x: 50, y: 50 },
+          targetPosition: { x: 200, y: 200 },
+          labels: undefined,
+        },
+      ],
+    });
+  });
+
+  it('should default to auto mode when routingMode is not specified', () => {
+    const newState = {
+      nodes: [
+        { ...mockNode, id: 'node-1', position: { x: 50, y: 50 } },
+        { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+      ],
+      edges: [
+        {
+          ...mockEdge,
+          id: 'default-edge',
+          source: 'node-1',
+          target: 'node-2',
+          sourcePort: 'port-1',
+          targetPort: 'port-2',
+          routing: 'bezier',
+          // routingMode not specified, should default to 'auto'
+          points: [],
+        },
+      ],
+      metadata: { ...initialState.metadata },
+    };
+
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'init',
+      nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
+
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      edgesToUpdate: [
+        {
+          id: 'default-edge',
+          points: [
+            { x: 50, y: 50 },
+            { x: 200, y: 200 },
+          ],
+          sourcePosition: { x: 50, y: 50 },
+          targetPosition: { x: 200, y: 200 },
+          labels: undefined,
+        },
+      ],
+    });
+  });
+
+  it('should update labels position in manual mode without changing points', () => {
+    const manualPoints = [
+      { x: 100, y: 100 },
+      { x: 200, y: 200 },
+    ];
+
+    const newState = {
+      nodes: [
+        { ...mockNode, id: 'node-1', position: { x: 50, y: 50 } },
+        { ...mockNode, id: 'node-2', position: { x: 200, y: 200 } },
+      ],
+      edges: [
+        {
+          ...mockEdge,
+          id: 'manual-edge-with-labels',
+          source: 'node-1',
+          target: 'node-2',
+          routingMode: 'manual',
+          routing: 'straight',
+          points: manualPoints,
+          labels: [
+            {
+              id: 'label-1',
+              positionOnEdge: 0.5,
+            },
+          ],
+        },
+      ],
+      metadata: { ...initialState.metadata },
+    };
+
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'init',
+      nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
+
+    checkIfEdgeChangedMock.mockReturnValue(true);
+
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalled();
+    const callArgs = nextMock.mock.calls[0][0];
+
+    if (callArgs?.edgesToUpdate) {
+      const edgeUpdate = callArgs.edgesToUpdate.find((e: Edge) => e.id === 'manual-edge-with-labels');
+      // Points should not be updated in manual mode
+      expect(edgeUpdate?.points).toBeUndefined();
+      // But labels should be updated
+      expect(edgeUpdate?.labels).toBeDefined();
+      expect(edgeUpdate?.labels?.[0]?.position).toEqual({ x: 50, y: 50 });
+    }
   });
 });

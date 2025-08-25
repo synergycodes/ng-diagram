@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Point, PortSide } from '../../../../types';
+import { Edge, Node, Point, PortLocation, PortSide } from '../../../../types';
+import { RoutingContext } from '../../../types';
 import * as computeOrthogonalPathModule from '../compute-orthogonal-path';
 import * as computeOrthogonalPointOnPathModule from '../compute-orthogonal-point-on-path';
 import * as computeOrthogonalPointsModule from '../compute-orthogonal-points';
@@ -33,8 +34,15 @@ describe('OrthogonalRouting', () => {
 
   describe('computePoints', () => {
     it('should call computeOrthogonalPoints with default firstLastSegmentLength', () => {
-      const source = { x: 10, y: 20, side: 'left' as PortSide };
-      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const source: PortLocation = { x: 10, y: 20, side: 'left' };
+      const target: PortLocation = { x: 100, y: 120, side: 'right' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
       const expectedPoints = [
         { x: 10, y: 20 },
         { x: 55, y: 20 },
@@ -45,7 +53,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue(expectedPoints);
 
-      const result = routing.computePoints(source, target);
+      const result = routing.computePoints(context);
 
       expect(spy).toHaveBeenCalledWith(source, target, 20);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -53,8 +61,15 @@ describe('OrthogonalRouting', () => {
     });
 
     it('should call computeOrthogonalPoints with custom firstLastSegmentLength from config', () => {
-      const source = { x: 10, y: 20, side: 'left' as PortSide };
-      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const source: PortLocation = { x: 10, y: 20, side: 'left' };
+      const target: PortLocation = { x: 100, y: 120, side: 'right' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
       const config = { orthogonal: { firstLastSegmentLength: 30 } };
       const expectedPoints = [
         { x: 10, y: 20 },
@@ -66,7 +81,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue(expectedPoints);
 
-      const result = routing.computePoints(source, target, config);
+      const result = routing.computePoints(context, config);
 
       expect(spy).toHaveBeenCalledWith(source, target, 30);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -74,8 +89,15 @@ describe('OrthogonalRouting', () => {
     });
 
     it('should use default firstLastSegmentLength when config value is negative', () => {
-      const source = { x: 10, y: 20, side: 'left' as PortSide };
-      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const source: PortLocation = { x: 10, y: 20, side: 'left' };
+      const target: PortLocation = { x: 100, y: 120, side: 'right' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
       const config = { orthogonal: { firstLastSegmentLength: -10 } };
       const expectedPoints = [
         { x: 10, y: 20 },
@@ -87,15 +109,22 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue(expectedPoints);
 
-      const result = routing.computePoints(source, target, config);
+      const result = routing.computePoints(context, config);
 
       expect(spy).toHaveBeenCalledWith(source, target, 20); // Should use default 20
       expect(result).toEqual(expectedPoints);
     });
 
     it('should accept zero as valid firstLastSegmentLength', () => {
-      const source = { x: 10, y: 20, side: 'left' as PortSide };
-      const target = { x: 100, y: 120, side: 'right' as PortSide };
+      const source: PortLocation = { x: 10, y: 20, side: 'left' };
+      const target: PortLocation = { x: 100, y: 120, side: 'right' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
       const config = { orthogonal: { firstLastSegmentLength: 0 } };
       const expectedPoints = [
         { x: 10, y: 20 },
@@ -107,7 +136,7 @@ describe('OrthogonalRouting', () => {
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue(expectedPoints);
 
-      const result = routing.computePoints(source, target, config);
+      const result = routing.computePoints(context, config);
 
       expect(spy).toHaveBeenCalledWith(source, target, 0);
       expect(result).toEqual(expectedPoints);
@@ -128,7 +157,14 @@ describe('OrthogonalRouting', () => {
       ]);
 
       testCases.forEach((testCase) => {
-        routing.computePoints(testCase.source, testCase.target);
+        const context: RoutingContext = {
+          source: testCase.source,
+          target: testCase.target,
+          edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+          sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+          targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        };
+        routing.computePoints(context);
         expect(spy).toHaveBeenCalledWith(testCase.source, testCase.target, 20);
       });
 
@@ -136,8 +172,15 @@ describe('OrthogonalRouting', () => {
     });
 
     it('should handle same source and target positions', () => {
-      const source = { x: 50, y: 50, side: 'top' as PortSide };
-      const target = { x: 50, y: 50, side: 'bottom' as PortSide };
+      const source: PortLocation = { x: 50, y: 50, side: 'top' };
+      const target: PortLocation = { x: 50, y: 50, side: 'bottom' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 0, y: 25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
 
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue([
@@ -147,15 +190,22 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 50 },
       ]);
 
-      const result = routing.computePoints(source, target);
+      const result = routing.computePoints(context);
 
       expect(spy).toHaveBeenCalledWith(source, target, 20);
       expect(result).toHaveLength(4);
     });
 
     it('should handle negative coordinates', () => {
-      const source = { x: -50, y: -100, side: 'left' as PortSide };
-      const target = { x: 50, y: 100, side: 'right' as PortSide };
+      const source: PortLocation = { x: -50, y: -100, side: 'left' };
+      const target: PortLocation = { x: 50, y: 100, side: 'right' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -100, y: -125 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 0, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
 
       const spy = vi.spyOn(computeOrthogonalPointsModule, 'computeOrthogonalPoints');
       spy.mockReturnValue([
@@ -165,7 +215,7 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 100 },
       ]);
 
-      const result = routing.computePoints(source, target);
+      const result = routing.computePoints(context);
 
       expect(spy).toHaveBeenCalledWith(source, target, 20);
       expect(result[0]).toEqual({ x: -50, y: -100 });
@@ -447,10 +497,17 @@ describe('OrthogonalRouting', () => {
 
     it('should work with actual implementations for simple L-shape', () => {
       const routing = new OrthogonalRouting();
-      const source = { x: 0, y: 0, side: 'right' as PortSide };
-      const target = { x: 100, y: 100, side: 'bottom' as PortSide };
+      const source: PortLocation = { x: 0, y: 0, side: 'right' };
+      const target: PortLocation = { x: 100, y: 100, side: 'bottom' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
 
-      const points = routing.computePoints(source, target);
+      const points = routing.computePoints(context);
       expect(points).toBeDefined();
       expect(points.length).toBeGreaterThanOrEqual(2);
       expect(points[0]).toEqual({ x: 0, y: 0 });
@@ -476,7 +533,14 @@ describe('OrthogonalRouting', () => {
       ];
 
       configurations.forEach((config) => {
-        const points = routing.computePoints(config.source, config.target);
+        const context: RoutingContext = {
+          source: config.source,
+          target: config.target,
+          edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+          sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+          targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        };
+        const points = routing.computePoints(context);
         const svgPath = routing.computeSvgPath(points);
         const midPoint = routing.computePointOnPath(points, 0.5);
 
@@ -497,8 +561,8 @@ describe('OrthogonalRouting', () => {
     });
 
     it('should have correct method signatures', () => {
-      expect(routing.computePoints.length).toBe(3); // Now accepts optional config
-      expect(routing.computeSvgPath.length).toBe(2); // Now accepts optional config
+      expect(routing.computePoints.length).toBe(2); // Accepts context and optional config
+      expect(routing.computeSvgPath.length).toBe(2); // Accepts points and optional config
       expect(routing.computePointOnPath.length).toBe(2);
     });
 
@@ -506,10 +570,17 @@ describe('OrthogonalRouting', () => {
       vi.restoreAllMocks();
       const routing = new OrthogonalRouting();
 
-      const source = { x: 0, y: 0, side: 'left' as PortSide };
-      const target = { x: 100, y: 100, side: 'right' as PortSide };
+      const source: PortLocation = { x: 0, y: 0, side: 'left' };
+      const target: PortLocation = { x: 100, y: 100, side: 'right' };
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
 
-      const points = routing.computePoints(source, target);
+      const points = routing.computePoints(context);
       expect(Array.isArray(points)).toBe(true);
 
       const svgPath = routing.computeSvgPath(points);

@@ -3,7 +3,7 @@ import { Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate } from '@angula
 
 /**
  * The example below demonstrates how to create a custom edge with:
- * - a custom path shape for the edge using staticPath,
+ * - a custom path shape for the edge using manual routing mode,
  * - dynamic line color customization,
  * - and a customizable markerEnd (arrowhead).
  *
@@ -35,16 +35,12 @@ export class CustomBezierEdgeComponent implements NgDiagramEdgeTemplate {
       targetPosition,
     ];
 
-    // Generate custom SVG path
-    const svgPath = `M ${points[0].x},${points[0].y} C ${points[1].x},${points[1].y} ${points[2].x},${points[2].y} ${points[3].x},${points[3].y}`;
-
-    // Return edge with staticPath
+    // Return edge with manual routing mode
     return {
       ...edge,
-      staticPath: {
-        points,
-        svgPath,
-      },
+      routingMode: 'manual' as const,
+      routing: 'bezier', // Use bezier routing to render the manual points
+      points,
     };
   });
 }

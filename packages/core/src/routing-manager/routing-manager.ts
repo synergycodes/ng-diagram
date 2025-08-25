@@ -1,8 +1,8 @@
-import { Point, PortLocation, RoutingConfiguration } from '../types';
+import { Point, RoutingConfiguration } from '../types';
 import { BezierRouting } from './routings/bezier/bezier-routing';
 import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
 import { StraightRouting } from './routings/straight/straight-routing';
-import { Routing, RoutingManagerConfig, RoutingName } from './types';
+import { Routing, RoutingContext, RoutingManagerConfig, RoutingName } from './types';
 
 /**
  * Built-in routing names
@@ -68,7 +68,7 @@ export class RoutingManager {
   /**
    * Computes the points for a given routing
    */
-  computePoints(routingName: RoutingName | undefined, source: PortLocation, target: PortLocation): Point[] {
+  computePoints(routingName: RoutingName | undefined, context: RoutingContext): Point[] {
     const name = routingName || this.defaultRouting;
     const routing = this.routings.get(name);
 
@@ -76,7 +76,7 @@ export class RoutingManager {
       throw new Error(`Routing '${name}' not found`);
     }
 
-    return routing.computePoints(source, target, this.getRoutingConfig());
+    return routing.computePoints(context, this.getRoutingConfig());
   }
 
   /**

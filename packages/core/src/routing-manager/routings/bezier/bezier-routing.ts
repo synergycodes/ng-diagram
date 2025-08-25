@@ -1,5 +1,5 @@
-import { Point, PortLocation, RoutingConfiguration } from '../../../types';
-import { Routing } from '../../types';
+import { Point, RoutingConfiguration } from '../../../types';
+import { Routing, RoutingContext } from '../../types';
 import { computeBezierPath } from './compute-bezier-path';
 import { computeBezierPointOnPath } from './compute-bezier-point-on-path';
 import { computeBezierPoints } from './compute-bezier-points';
@@ -10,8 +10,12 @@ import { computeBezierPoints } from './compute-bezier-points';
 export class BezierRouting implements Routing {
   name = 'bezier';
 
-  computePoints(source: PortLocation, target: PortLocation, config?: RoutingConfiguration): Point[] {
+  computePoints(context: RoutingContext, config?: RoutingConfiguration): Point[] {
+    const { source, target } = context;
     const bezierControlOffset = config?.bezier?.bezierControlOffset ?? 100;
+
+    // Now we have access to edge, nodes, and ports for more sophisticated routing
+    // For example, we could adjust control offset based on node distance or type
     return computeBezierPoints(source, target, bezierControlOffset);
   }
 

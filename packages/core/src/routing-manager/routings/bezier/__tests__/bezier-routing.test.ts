@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { PortLocation, RoutingConfiguration } from '../../../../types';
+import { Edge, Node, PortLocation, RoutingConfiguration } from '../../../../types';
+import { RoutingContext } from '../../../types';
 import { BezierRouting } from '../bezier-routing';
 
 describe('BezierRouting', () => {
@@ -20,7 +21,15 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
 
-      const points = bezierRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 200 }); // source
@@ -36,7 +45,15 @@ describe('BezierRouting', () => {
         bezier: { bezierControlOffset: 50 },
       };
 
-      const points = bezierRouting.computePoints(source, target, config);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context, config);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 200 }); // source
@@ -49,7 +66,15 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 200, y: 100, side: 'bottom' };
       const target: PortLocation = { x: 200, y: 400, side: 'top' };
 
-      const points = bezierRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 0, y: 300 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 200, y: 100 }); // source
@@ -62,7 +87,15 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 100, y: 100, side: 'right' };
       const target: PortLocation = { x: 300, y: 300, side: 'bottom' };
 
-      const points = bezierRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 200, y: 250 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 100 }); // source
@@ -78,7 +111,15 @@ describe('BezierRouting', () => {
         bezier: { bezierControlOffset: 0 },
       };
 
-      const points = bezierRouting.computePoints(source, target, config);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context, config);
 
       expect(points).toHaveLength(4);
       expect(points[0]).toEqual({ x: 100, y: 200 });
@@ -91,7 +132,15 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 200, y: 0, side: 'left' };
 
-      const points = bezierRouting.computePoints(source, target, undefined);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 150, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context, undefined);
 
       expect(points).toHaveLength(4);
       // Should use default offset of 100
@@ -104,7 +153,15 @@ describe('BezierRouting', () => {
       const target: PortLocation = { x: 200, y: 0, side: 'left' };
       const config: RoutingConfiguration = {};
 
-      const points = bezierRouting.computePoints(source, target, config);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 150, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context, config);
 
       expect(points).toHaveLength(4);
       // Should use default offset of 100
@@ -253,8 +310,16 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
 
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
       // Calculate points
-      const points = bezierRouting.computePoints(source, target);
+      const points = bezierRouting.computePoints(context);
 
       // Generate SVG path
       const path = bezierRouting.computeSvgPath(points);
@@ -269,8 +334,16 @@ describe('BezierRouting', () => {
         bezier: { bezierControlOffset: 25 },
       };
 
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
       // Calculate points with custom offset
-      const points = bezierRouting.computePoints(source, target, config);
+      const points = bezierRouting.computePoints(context, config);
 
       expect(points).toHaveLength(4);
       expect(points[1]).toEqual({ x: 0, y: 25 }); // source control (bottom +25)
@@ -292,7 +365,15 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: -50, y: -50, side: 'left' };
       const target: PortLocation = { x: 150, y: 150, side: 'right' };
 
-      const points = bezierRouting.computePoints(source, target);
+      const context: RoutingContext = {
+        source,
+        target,
+        edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
+        sourceNode: { id: 'node1', position: { x: -100, y: -75 }, size: { width: 100, height: 50 }, data: {} } as Node,
+        targetNode: { id: 'node2', position: { x: 100, y: 125 }, size: { width: 100, height: 50 }, data: {} } as Node,
+      };
+
+      const points = bezierRouting.computePoints(context);
 
       expect(points[0]).toEqual({ x: -50, y: -50 });
       expect(points[1]).toEqual({ x: -150, y: -50 }); // left -100
