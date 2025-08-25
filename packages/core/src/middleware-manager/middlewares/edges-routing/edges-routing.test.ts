@@ -159,11 +159,11 @@ describe('Edges Routing Middleware', () => {
     expect(nextMock).toHaveBeenCalled();
   });
 
-  it('should route only edges with routing set to straight or orthogonal or undefined. If an edge has a defined type, then sourcePosition, targetPosition, and labels should be set. All other edges should remain unchanged.', () => {
+  it('should route only edges with routing set to polyline or orthogonal or undefined. If an edge has a defined type, then sourcePosition, targetPosition, and labels should be set. All other edges should remain unchanged.', () => {
     // Update mock to only return true for known routings
     const mockRoutingManager = {
       hasRouting: vi.fn().mockImplementation((routing) => {
-        return routing === 'straight' || routing === 'orthogonal' || routing === 'bezier';
+        return routing === 'polyline' || routing === 'orthogonal' || routing === 'bezier';
       }),
       computePoints: vi.fn().mockImplementation((_routing, context) => {
         if (!context?.source || !context?.target) return [];
@@ -203,7 +203,7 @@ describe('Edges Routing Middleware', () => {
           sourcePort: 'port-2',
           target: 'node-3',
           targetPort: 'port-3',
-          routing: 'straight',
+          routing: 'polyline',
         },
         {
           ...mockEdge,
@@ -669,7 +669,7 @@ describe('Edges Routing Middleware', () => {
           source: 'node-1',
           target: 'node-2',
           routingMode: 'manual',
-          routing: 'straight',
+          routing: 'polyline',
           points: manualPoints,
           labels: [
             {

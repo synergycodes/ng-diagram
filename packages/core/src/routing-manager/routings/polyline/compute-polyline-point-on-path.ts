@@ -2,16 +2,26 @@ import { NgDiagramMath } from '../../../math';
 import { Point } from '../../../types';
 
 /**
- * Computes a point on a polynomial (polyline) path at a given percentage
+ * Computes a point on a polyline path at a given percentage
  * @param points - Array of points defining the polyline path
  * @param percentage - Position along the path (0 = start, 1 = end)
  * @returns The point at the given percentage along the path
  */
-export const computePolynomialPointOnPath = (points: Point[], percentage: number): Point => {
+export const computePolylinePointOnPath = (points: Point[], percentage: number): Point => {
   if (points.length < 2) return points[0] || { x: 0, y: 0 };
 
   const clampedPercentage = NgDiagramMath.clamp({ min: 0, value: percentage, max: 1 });
 
+  // For 2 points, use simple linear interpolation
+  if (points.length === 2) {
+    const startPoint = points[0];
+    const endPoint = points[1];
+    const x = startPoint.x + (endPoint.x - startPoint.x) * clampedPercentage;
+    const y = startPoint.y + (endPoint.y - startPoint.y) * clampedPercentage;
+    return { x, y };
+  }
+
+  // For multiple points, calculate position along the entire path
   // Calculate total path length
   let totalLength = 0;
   const segmentLengths: number[] = [];

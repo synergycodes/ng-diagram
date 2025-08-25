@@ -1,13 +1,14 @@
 import { Point } from '../../../types';
 import { Routing, RoutingContext } from '../../types';
-import { computePolynomialPointOnPath } from './compute-polynomial-point-on-path';
+import { computePolylinePointOnPath } from './compute-polyline-point-on-path';
 
 /**
- * Polynomial (polyline) routing implementation
- * Connects multiple points with straight line segments
+ * Polyline routing implementation
+ * Connects points with straight line segments
+ * Supports both auto mode (2 points) and manual mode (multiple points)
  */
-export class PolynomialRouting implements Routing {
-  name = 'polynomial';
+export class PolylineRouting implements Routing {
+  name = 'polyline';
 
   computePoints(context: RoutingContext): Point[] {
     const { source, target, edge } = context;
@@ -15,7 +16,7 @@ export class PolynomialRouting implements Routing {
     const targetPoint = { x: target.x, y: target.y };
 
     // If edge has manual points provided, use them
-    if (edge.points && edge.points.length > 2) {
+    if (edge.routingMode === 'manual' && edge.points && edge.points.length > 2) {
       // Ensure source and target are at the ends
       const points = [...edge.points];
       points[0] = sourcePoint;
@@ -23,7 +24,7 @@ export class PolynomialRouting implements Routing {
       return points;
     }
 
-    // Default to straight line if no intermediate points
+    // Default to straight line (2-point polyline)
     return [sourcePoint, targetPoint];
   }
 
@@ -41,6 +42,6 @@ export class PolynomialRouting implements Routing {
   }
 
   computePointOnPath(points: Point[], percentage: number): Point {
-    return computePolynomialPointOnPath(points, percentage);
+    return computePolylinePointOnPath(points, percentage);
   }
 }

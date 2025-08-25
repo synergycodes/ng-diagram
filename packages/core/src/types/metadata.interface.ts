@@ -27,7 +27,7 @@ export interface LayoutConfiguration {
  * - `orthogonal`: Configuration for orthogonal (right-angled) routing
  *
  * Custom routing configurations can be added using any other string key.
- * The `straight` routing doesn't require any configuration.
+ * The `polyline` routing doesn't require any configuration.
  */
 export interface RoutingConfiguration {
   bezier?: {

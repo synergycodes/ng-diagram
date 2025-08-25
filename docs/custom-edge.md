@@ -18,7 +18,7 @@ within Angular applications.
 
 ### This component allows you to:
 
-- Use one of the built-in path generators (e.g., `straight`, `bezier`, `orthogonal`),
+- Use one of the built-in path generators (e.g., `polyline`, `bezier`, `orthogonal`),
 - Or define your own `custom path` using any `logic` you like,
 - Add custom elements (e.g., `icons`, `buttons`, `badges`) directly inside the edge,
 - Optionally use the built-in 'label' renderer via `angular-adapter-edge-label`
@@ -57,7 +57,7 @@ interaction, etc.).
 | Input               | Type                                                 | Required | Description                                                                |
 | ------------------- | ---------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
 | `data`              | `Edge`                                               | Yes      | Edge data object (source, target, metadata, etc.).                         |
-| `routing`           | `string`                                             | No       | Path type: `'straight'`, `'bezier'`, `'orthogonal'`. Default: `'straight'` |
+| `routing`           | `string`                                             | No       | Path type: `'polyline'`, `'bezier'`, `'orthogonal'`. Default: `'polyline'` |
 | `customStroke`      | `string`                                             | No       | Custom stroke color.                                                       |
 | `customMarkerStart` | `string`                                             | No       | Custom marker start                                                        |
 | `customMarkerEnd`   | `string`                                             | No       | Custom marker end                                                          |

@@ -1,14 +1,13 @@
 import { Point, RoutingConfiguration } from '../types';
 import { BezierRouting } from './routings/bezier/bezier-routing';
 import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
-import { PolynomialRouting } from './routings/polynomial/polynomial-routing';
-import { StraightRouting } from './routings/straight/straight-routing';
+import { PolylineRouting } from './routings/polyline/polyline-routing';
 import { Routing, RoutingContext, RoutingManagerConfig, RoutingName } from './types';
 
 /**
  * Built-in routing names
  */
-export const BUILT_IN_ROUTINGS = ['orthogonal', 'bezier', 'straight', 'polynomial'] as const;
+export const BUILT_IN_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as const;
 
 /**
  * Manages routing implementations for edges
@@ -25,8 +24,7 @@ export class RoutingManager {
     // Register built-in routings
     this.registerRouting(new OrthogonalRouting());
     this.registerRouting(new BezierRouting());
-    this.registerRouting(new StraightRouting());
-    this.registerRouting(new PolynomialRouting());
+    this.registerRouting(new PolylineRouting());
   }
 
   /**
