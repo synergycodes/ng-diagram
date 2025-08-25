@@ -1,5 +1,4 @@
-import { RoutingManager } from '../../../routing-manager';
-import { RoutingContext } from '../../../routing-manager/types';
+import { EdgeRoutingContext, EdgeRoutingManager } from '../../../edge-routing-manager';
 import { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point, PortLocation } from '../../../types';
 import { isSamePoint } from '../../../utils';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
@@ -26,7 +25,7 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
     'routingMode',
   ]);
 
-const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: RoutingManager) => {
+const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: EdgeRoutingManager) => {
   const sourceTarget = getSourceTargetPositions(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
@@ -65,9 +64,9 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: Rout
     const targetPort = edge.targetPort ? targetNode.ports?.find((p) => p.id === edge.targetPort) : undefined;
 
     // Create routing context with full information
-    const context: RoutingContext = {
-      source,
-      target,
+    const context: EdgeRoutingContext = {
+      sourcePoint: source,
+      targetPoint: target,
       edge,
       sourceNode,
       targetNode,
@@ -110,7 +109,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
     // Access the typed middleware metadata
     const isEnabled = middlewareMetadata.enabled;
     const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
-    const routingManager = flowCore.routingManager;
+    const routingManager = flowCore.edgeRoutingManager;
 
     if (!isEnabled) {
       next();
@@ -129,8 +128,6 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
 
     if (shouldRouteEdges) {
       edges.forEach((edge) => {
-        const isCustomEdgeRouting = !!edge.type;
-        const isProperEdgeRouting = edge.routing === undefined || edge.routing;
         const isEdgeOrNodesChanged =
           helpers.checkIfEdgeChanged(edge.id) ||
           helpers.checkIfNodeChanged(edge.source) ||
@@ -139,32 +136,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
         // Manual mode edges don't update points unless explicitly changed
         const isManualMode = edge.routingMode === 'manual';
 
-        const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
-
-        const shouldRouteCustomEdge =
-          isCustomEdgeRouting &&
-          (isEdgeOrNodesChanged || modelActionType === 'init') &&
-          edge.type &&
-          edge.type !== 'edge' &&
-          !isProperEdgeRouting;
-
-        if (shouldRouteCustomEdge) {
-          const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap, routingManager);
-
-          const updatedLabels = edge.labels?.map((label) => ({
-            ...label,
-            position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
-          }));
-
-          edgesToUpdate.push({
-            id: edge.id,
-            sourcePosition: sourcePoint || undefined,
-            targetPosition: targetPoint || undefined,
-            labels: updatedLabels,
-            // Don't update points for manual mode unless explicitly changed
-            ...(isManualMode ? {} : { points }),
-          });
-        }
+        const shouldRoute = isEdgeOrNodesChanged || modelActionType === 'init';
 
         if (!shouldRoute) {
           return;
@@ -172,22 +144,18 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
 
         const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap, routingManager);
 
-        // For manual mode, only update if points actually changed
         if (isManualMode) {
-          // Update labels position based on current points
           const updatedLabels = edge.labels?.map((label) => ({
             ...label,
             position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
           }));
 
-          // Only push update if something changed (labels, source/target positions)
           if (updatedLabels?.length || sourcePoint || targetPoint) {
             edgesToUpdate.push({
               id: edge.id,
               sourcePosition: sourcePoint || undefined,
               targetPosition: targetPoint || undefined,
               labels: updatedLabels,
-              // Don't update points for manual mode
             });
           }
         } else {
@@ -216,6 +184,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
         }
       });
     }
+
     let newTemporaryEdge: Edge | undefined = undefined;
 
     if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {

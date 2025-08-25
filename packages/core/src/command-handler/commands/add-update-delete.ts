@@ -166,12 +166,12 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
     return;
   }
   const points = edge.points || [];
-  const routingManager = commandHandler.flowCore.routingManager;
+  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
   const newLabels = [
     ...(edge.labels ?? []),
     ...labels.map((label) => ({
       ...label,
-      position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
+      position: edgeRoutingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
     })),
   ];
   await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
@@ -191,10 +191,10 @@ export const updateEdgeLabel = async (commandHandler: CommandHandler, command: U
     return;
   }
   const points = edge.points || [];
-  const routingManager = commandHandler.flowCore.routingManager;
+  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
   const newLabels = edge.labels?.map((label) => {
     const positionOnEdge = labelChanges?.positionOnEdge ?? label.positionOnEdge;
-    const position = routingManager.computePointOnPath(edge.routing, points, positionOnEdge);
+    const position = edgeRoutingManager.computePointOnPath(edge.routing, points, positionOnEdge);
     if (label.id !== labelId) {
       return { ...label, position };
     }

@@ -49,9 +49,19 @@ The points of the edge defining the path.
 
 ### routing?
 
-> `optional` **routing**: `RoutingName`
+> `optional` **routing**: `EdgeRoutingName`
 
 The routing of the edge.
+
+***
+
+### routingMode?
+
+> `optional` **routingMode**: `"manual"` \| `"auto"`
+
+The routing mode of the edge.
+'auto' (default): Points are computed automatically based on routing algorithm
+'manual': Points are provided by the user and routing algorithm is used to render the path
 
 ***
 
@@ -92,23 +102,6 @@ The port of the source node.
 > `optional` **sourcePosition**: [`Point`](/api/types/point/)
 
 The position of the edge start.
-
-***
-
-### staticPath?
-
-> `optional` **staticPath**: `object`
-
-Static path configuration for the edge.
-When provided, these points will be used instead of calculated routing.
-
-#### points
-
-> **points**: [`Point`](/api/types/point/)[]
-
-#### svgPath?
-
-> `optional` **svgPath**: `string`
 
 ***
 

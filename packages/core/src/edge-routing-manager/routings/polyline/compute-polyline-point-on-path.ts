@@ -2,10 +2,32 @@ import { NgDiagramMath } from '../../../math';
 import { Point } from '../../../types';
 
 /**
- * Computes a point on a polyline path at a given percentage
- * @param points - Array of points defining the polyline path
- * @param percentage - Position along the path (0 = start, 1 = end)
- * @returns The point at the given percentage along the path
+ * Computes a point along a polyline at a given percentage of its total length.
+ *
+ * @remarks
+ * - If `points.length < 2`, returns the first point if present, otherwise `{ x: 0, y: 0 }`.
+ * - The `percentage` is clamped to `[0, 1]` via {@link NgDiagramMath.clamp}.
+ * - With exactly two points, this performs simple linear interpolation.
+ * - With more than two points, it measures distance along each segment and
+ *   interpolates within the segment that contains the target distance.
+ *
+ * @param points - Array of {@link Point} values defining the polyline path (in order).
+ * @param percentage - Position along the path in `[0, 1]` (0 = start, 1 = end). Values
+ * outside this range are clamped.
+ * @returns The {@link Point} located at the given percentage along the path.
+ *
+ * @example
+ * ```ts
+ * // Straight line from (0,0) to (10,0)
+ * computePolylinePointOnPath([{x:0,y:0},{x:10,y:0}], 0.5); // -> { x: 5, y: 0 }
+ * ```
+ *
+ * @example
+ * ```ts
+ * // L-shaped path: (0,0) -> (10,0) -> (10,10)
+ * // Total length = 20. At 25% (distance 5) we are at (5,0).
+ * computePolylinePointOnPath([{x:0,y:0},{x:10,y:0},{x:10,y:10}], 0.25); // -> { x: 5, y: 0 }
+ * ```
  */
 export const computePolylinePointOnPath = (points: Point[], percentage: number): Point => {
   if (points.length < 2) return points[0] || { x: 0, y: 0 };

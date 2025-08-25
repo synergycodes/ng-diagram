@@ -1,5 +1,5 @@
+import { EdgeRoutingName } from '../edge-routing-manager/types';
 import { Point, Size } from './utils';
-import { RoutingName } from '../routing-manager/types';
 
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
@@ -54,7 +54,7 @@ export interface Edge<T = any> {
   /**
    * The routing of the edge.
    */
-  routing?: RoutingName;
+  routing?: EdgeRoutingName;
   /**
    * The routing mode of the edge.
    * 'auto' (default): Points are computed automatically based on routing algorithm

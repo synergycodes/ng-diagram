@@ -2,13 +2,26 @@ import { NgDiagramMath } from '../../../math';
 import { Point } from '../../../types';
 
 /**
- * Calculates a point on an orthogonal path at a given percentage along its length.
- * The path is treated as a series of connected line segments, and the point
- * is calculated by linear interpolation along the total path length.
+ * Computes a point along an orthogonal path at the given percentage of its total length.
  *
- * @param points - Array of points defining the orthogonal path
- * @param percentage - Position along the path (0 = start, 1 = end, 0.5 = middle)
- * @returns The point at the specified percentage along the path
+ * @remarks
+ * - The path is treated as a series of connected line segments.
+ * - The distance traveled along the path is measured, and then linear interpolation
+ *   is applied within the segment that contains the target distance.
+ * - If `points.length < 2`, returns `{x:0,y:0}`.
+ * - The `percentage` is clamped to `[0,1]` using {@link NgDiagramMath.clamp}.
+ *
+ * @param points - Array of {@link Point} values defining the orthogonal path.
+ * @param percentage - Position along the path in `[0, 1]` (0 = start, 1 = end, 0.5 = halfway).
+ * @returns The interpolated {@link Point} at the specified percentage along the path.
+ *
+ * @example
+ * ```ts
+ * // Multi-segment orthogonal path
+ * const path = [{x:0,y:0},{x:10,y:0},{x:10,y:10}];
+ * computeOrthogonalPointOnPath(path, 0.75);
+ * // -> Point 75% of the way along total path length
+ * ```
  */
 export const computeOrthogonalPointOnPath = (points: Point[], percentage: number): Point => {
   // Handle edge cases
@@ -21,7 +34,7 @@ export const computeOrthogonalPointOnPath = (points: Point[], percentage: number
     max: 1,
   });
 
-  // Step 1: Calculate the length of each segment and total path length
+  // Calculate the length of each segment and total path length
   const lengths: number[] = [];
   let totalLength = 0;
 
@@ -37,7 +50,7 @@ export const computeOrthogonalPointOnPath = (points: Point[], percentage: number
   const targetLength = totalLength * finalPercentage;
   let accumulated = 0;
 
-  // Step 2: Find which segment contains the target point
+  // Find which segment contains the target point
   for (let i = 0; i < lengths.length; i++) {
     const segmentLength = lengths[i];
 
@@ -48,7 +61,7 @@ export const computeOrthogonalPointOnPath = (points: Point[], percentage: number
       const remaining = targetLength - accumulated;
       const segmentPercent = remaining / segmentLength;
 
-      // Step 3: Linearly interpolate within the segment
+      // Linearly interpolate within the segment
       const x = segmentStart.x + (segmentEnd.x - segmentStart.x) * segmentPercent;
       const y = segmentStart.y + (segmentEnd.y - segmentStart.y) * segmentPercent;
 

@@ -1,12 +1,29 @@
 import { Point } from '../../../types';
 
 /**
- * Generates an orthogonal SVG path string with rounded corners.
- * Creates smooth transitions at corners using arc segments.
+ * Generates an SVG path string for an orthogonal path,
+ * optionally with rounded corners.
  *
- * @param points - An array of points through which the path should pass.
- * @param maxRadius - Maximum radius for rounded corners (default: 16).
- * @returns A string representing the SVG path data for the orthogonal path.
+ * @remarks
+ * - If `points.length === 0`, returns an empty string.
+ * - If `points.length === 1`, returns a simple move command (`M`).
+ * - If `points.length === 2`, returns a straight line (`M … L …`).
+ * - For more points, it generates orthogonal segments with arcs at corners.
+ *   Rounded corners use the SVG `A` command and are limited by `maxRadius`
+ *   as well as the distance between points (to avoid overlapping arcs).
+ * - Consecutive points closer than 1px may be skipped for stability.
+ *
+ * @param points - Array of {@link Point} values through which the path should pass.
+ * @param [maxRadius=16] - Maximum radius for rounded corners. The actual radius may be reduced
+ * based on segment distances.
+ * @returns An SVG path string suitable for the `d` attribute of an `<path>` element.
+ *
+ * @example
+ * ```ts
+ * // Orthogonal path with a corner and rounded radius
+ * computeOrthogonalPath([{x:0,y:0},{x:0,y:50},{x:50,y:50}], 10);
+ * // "M 0,0 L0,40 A10,10,0,0,1,10,50 L 50,50"
+ * ```
  */
 export const computeOrthogonalPath = (points: Point[] = [], maxRadius = 16): string => {
   // Handle edge cases

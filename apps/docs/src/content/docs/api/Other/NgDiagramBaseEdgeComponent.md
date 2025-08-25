@@ -7,7 +7,7 @@ title: "NgDiagramBaseEdgeComponent"
 
 Base edge component that handles edge rendering.
 
-Path can be determined in several ways (in order of priority):
-1. If edge has staticPath with svgPath - use that directly
-2. If routing prop is provided or edge has routing property - use RoutingManager to generate path
-3. Otherwise - middleware will calculate path based on default routing
+Path is determined based on edge routing mode:
+- Auto mode (default): Path is computed from source/target positions using routing algorithm
+- Manual mode: Path is computed from user-provided points using routing algorithm
+The routing algorithm determines how the path is rendered (orthogonal, bezier, polyline, etc.)

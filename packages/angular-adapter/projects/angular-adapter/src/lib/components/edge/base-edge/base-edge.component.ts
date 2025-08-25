@@ -9,7 +9,7 @@ import { FlowCoreProviderService } from '../../../services';
  * Path is determined based on edge routing mode:
  * - Auto mode (default): Path is computed from source/target positions using routing algorithm
  * - Manual mode: Path is computed from user-provided points using routing algorithm
- * The routing algorithm determines how the path is rendered (orthogonal, bezier, straight, etc.)
+ * The routing algorithm determines how the path is rendered (orthogonal, bezier, polyline, etc.)
  */
 
 @Component({
@@ -44,14 +44,14 @@ export class NgDiagramBaseEdgeComponent {
     const points = this.points();
     if (points.length === 0) return '';
 
-    if (routingName && flowCore.routingManager.hasRouting(routingName)) {
-      return flowCore.routingManager.computePath(routingName, points);
+    if (routingName && flowCore.edgeRoutingManager.hasRouting(routingName)) {
+      return flowCore.edgeRoutingManager.computePath(routingName, points);
     }
 
     // Use default routing if available
-    const defaultRouting = flowCore.routingManager.getDefaultRouting();
-    if (flowCore.routingManager.hasRouting(defaultRouting)) {
-      return flowCore.routingManager.computePath(defaultRouting, points);
+    const defaultRouting = flowCore.edgeRoutingManager.getDefaultRouting();
+    if (flowCore.edgeRoutingManager.hasRouting(defaultRouting)) {
+      return flowCore.edgeRoutingManager.computePath(defaultRouting, points);
     }
 
     // Fallback to simple straight line path

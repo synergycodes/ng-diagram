@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Edge, Node, PortLocation, RoutingConfiguration } from '../../../../types';
-import { RoutingContext } from '../../../types';
+import { Edge, EdgeRoutingConfig, Node, PortLocation } from '../../../../types';
+import { EdgeRoutingContext } from '../../../types';
 import { BezierRouting } from '../bezier-routing';
 
 describe('BezierRouting', () => {
@@ -10,20 +10,14 @@ describe('BezierRouting', () => {
     bezierRouting = new BezierRouting();
   });
 
-  describe('name property', () => {
-    it('should have name "bezier"', () => {
-      expect(bezierRouting.name).toBe('bezier');
-    });
-  });
-
   describe('computePoints', () => {
     it('should calculate points with default offset', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -41,13 +35,14 @@ describe('BezierRouting', () => {
     it('should calculate points with custom offset from config', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
-      const config: RoutingConfiguration = {
+      const config: EdgeRoutingConfig = {
+        defaultRouting: 'polyline',
         bezier: { bezierControlOffset: 50 },
       };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -66,9 +61,9 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 200, y: 100, side: 'bottom' };
       const target: PortLocation = { x: 200, y: 400, side: 'top' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 0, y: 300 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -87,9 +82,9 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 100, y: 100, side: 'right' };
       const target: PortLocation = { x: 300, y: 300, side: 'bottom' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 200, y: 250 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -107,13 +102,14 @@ describe('BezierRouting', () => {
     it('should handle zero offset', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
-      const config: RoutingConfiguration = {
+      const config: EdgeRoutingConfig = {
+        defaultRouting: 'polyline',
         bezier: { bezierControlOffset: 0 },
       };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -132,9 +128,9 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 200, y: 0, side: 'left' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 150, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -151,11 +147,11 @@ describe('BezierRouting', () => {
     it('should handle config without bezier property', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 200, y: 0, side: 'left' };
-      const config: RoutingConfiguration = {};
+      const config: EdgeRoutingConfig = { defaultRouting: 'polyline' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 150, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -290,12 +286,12 @@ describe('BezierRouting', () => {
       expect(point).toEqual({ x: 50, y: 50 });
     });
 
-    it('should return (0,0) for single point', () => {
+    it('should return first point for single point', () => {
       const points = [{ x: 50, y: 50 }];
 
       const point = bezierRouting.computePointOnPath(points, 0.5);
 
-      expect(point).toEqual({ x: 0, y: 0 });
+      expect(point).toEqual({ x: 50, y: 50 });
     });
 
     it('should return (0,0) for empty array', () => {
@@ -310,9 +306,9 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: 100, y: 200, side: 'right' };
       const target: PortLocation = { x: 400, y: 200, side: 'left' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -330,13 +326,14 @@ describe('BezierRouting', () => {
     it('should work with custom configuration', () => {
       const source: PortLocation = { x: 0, y: 0, side: 'bottom' };
       const target: PortLocation = { x: 100, y: 100, side: 'top' };
-      const config: RoutingConfiguration = {
+      const config: EdgeRoutingConfig = {
+        defaultRouting: 'polyline',
         bezier: { bezierControlOffset: 25 },
       };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -365,9 +362,9 @@ describe('BezierRouting', () => {
       const source: PortLocation = { x: -50, y: -50, side: 'left' };
       const target: PortLocation = { x: 150, y: 150, side: 'right' };
 
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -100, y: -75 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 100, y: 125 }, size: { width: 100, height: 50 }, data: {} } as Node,

@@ -1,9 +1,9 @@
 import './set.polyfill';
 
+export * from './edge-routing-manager';
 export * from './flow-core';
 export * from './input-events';
 export * from './math';
-export * from './routing-manager';
 export * from './types';
 export * from './utils';
 

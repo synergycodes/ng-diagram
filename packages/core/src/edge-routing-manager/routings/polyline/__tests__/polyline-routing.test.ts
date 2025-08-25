@@ -1,14 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Edge, Node, PortLocation } from '../../../../types';
-import { RoutingContext } from '../../../types';
+import { EdgeRoutingContext } from '../../../types';
 import { PolylineRouting } from '../polyline-routing';
 
 describe('PolylineRouting', () => {
   let routing: PolylineRouting;
 
-  const createContext = (sourcePos: PortLocation, targetPos: PortLocation, edge?: Partial<Edge>): RoutingContext => ({
-    source: sourcePos,
-    target: targetPos,
+  const createContext = (
+    sourcePos: PortLocation,
+    targetPos: PortLocation,
+    edge?: Partial<Edge>
+  ): EdgeRoutingContext => ({
+    sourcePoint: sourcePos,
+    targetPoint: targetPos,
     edge: { id: 'edge1', source: 'node1', target: 'node2', data: {}, ...edge } as Edge,
     sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
     targetNode: { id: 'node2', position: { x: 300, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -48,43 +52,10 @@ describe('PolylineRouting', () => {
       const points = routing.computePoints(context);
 
       expect(points).toHaveLength(4);
-      expect(points[0]).toEqual({ x: 100, y: 50 }); // Source position
+      expect(points[0]).toEqual({ x: 0, y: 0 });
       expect(points[1]).toEqual({ x: 150, y: 50 });
       expect(points[2]).toEqual({ x: 250, y: 150 });
-      expect(points[3]).toEqual({ x: 300, y: 150 }); // Target position
-    });
-
-    it('should return straight line when manual mode has 2 or fewer points', () => {
-      const source: PortLocation = { x: 100, y: 50, side: 'right' };
-      const target: PortLocation = { x: 300, y: 50, side: 'left' };
-      const context = createContext(source, target, {
-        routingMode: 'manual',
-        points: [
-          { x: 0, y: 0 },
-          { x: 400, y: 0 },
-        ],
-      });
-
-      const points = routing.computePoints(context);
-
-      expect(points).toHaveLength(2);
-      expect(points[0]).toEqual({ x: 100, y: 50 });
-      expect(points[1]).toEqual({ x: 300, y: 50 });
-    });
-
-    it('should handle empty manual points array', () => {
-      const source: PortLocation = { x: 100, y: 50, side: 'right' };
-      const target: PortLocation = { x: 300, y: 50, side: 'left' };
-      const context = createContext(source, target, {
-        routingMode: 'manual',
-        points: [],
-      });
-
-      const points = routing.computePoints(context);
-
-      expect(points).toHaveLength(2);
-      expect(points[0]).toEqual({ x: 100, y: 50 });
-      expect(points[1]).toEqual({ x: 300, y: 50 });
+      expect(points[3]).toEqual({ x: 999, y: 999 });
     });
 
     it('should handle undefined routing mode (defaults to auto)', () => {
@@ -247,12 +218,6 @@ describe('PolylineRouting', () => {
       const points: { x: number; y: number }[] = [];
 
       expect(routing.computePointOnPath(points, 0.5)).toEqual({ x: 0, y: 0 });
-    });
-  });
-
-  describe('name', () => {
-    it('should have name "polyline"', () => {
-      expect(routing.name).toBe('polyline');
     });
   });
 });

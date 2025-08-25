@@ -2,6 +2,7 @@ import { LayoutAlignmentType, LayoutAngleType } from '../types';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
+  EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
   LinkingConfig,
@@ -105,6 +106,17 @@ const defaultSelectionMovingConfig: SelectionMovingConfig = {
   edgePanningThreshold: 10,
 };
 
+const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
+  defaultRouting: 'polyline',
+  bezier: {
+    bezierControlOffset: 100,
+  },
+  orthogonal: {
+    maxCornerRadius: 15,
+    firstLastSegmentLength: 20,
+  },
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -120,4 +132,5 @@ export const defaultFlowConfig: FlowConfig = {
   nodeRotation: defaultNodeRotationConfig,
   snapping: defaultNodeDraggingConfig,
   selectionMoving: defaultSelectionMovingConfig,
+  edgeRouting: defaultEdgeRoutingConfig,
 };

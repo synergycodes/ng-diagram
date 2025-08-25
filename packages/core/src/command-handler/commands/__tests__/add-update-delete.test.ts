@@ -15,7 +15,7 @@ describe('Add Update Delete Command', () => {
       applyUpdate: vi.fn(),
       getNodeById: getNodeByIdMock,
       getEdgeById: getEdgeByIdMock,
-      routingManager: {
+      edgeRoutingManager: {
         computePointOnPath: vi.fn().mockImplementation((_routing, _points, percentage) => {
           // Simple mock implementation for testing
           if (percentage === 0) return { x: 0, y: 0 };

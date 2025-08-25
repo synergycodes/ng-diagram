@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PortSide } from '../../../../types';
+import type { PortSide } from '../../../../types/index.ts';
 
 vi.mock('../utils/pathpoints/get-pathpoints-from-top.ts', () => ({
   getPathPointsFromTop: vi.fn(),

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Edge, Node, Point, PortLocation, PortSide } from '../../../../types';
-import { RoutingContext } from '../../../types';
+import { EdgeRoutingContext } from '../../../types';
 import * as computeOrthogonalPathModule from '../compute-orthogonal-path';
 import * as computeOrthogonalPointOnPathModule from '../compute-orthogonal-point-on-path';
 import * as computeOrthogonalPointsModule from '../compute-orthogonal-points';
@@ -18,27 +18,13 @@ describe('OrthogonalRouting', () => {
     vi.clearAllMocks();
   });
 
-  describe('constructor', () => {
-    it('should create an instance with correct name', () => {
-      expect(routing).toBeDefined();
-      expect(routing.name).toBe('orthogonal');
-    });
-
-    it('should implement Routing interface', () => {
-      expect(routing).toHaveProperty('name');
-      expect(routing).toHaveProperty('computePoints');
-      expect(routing).toHaveProperty('computeSvgPath');
-      expect(routing).toHaveProperty('computePointOnPath');
-    });
-  });
-
   describe('computePoints', () => {
     it('should call computeOrthogonalPoints with default firstLastSegmentLength', () => {
       const source: PortLocation = { x: 10, y: 20, side: 'left' };
       const target: PortLocation = { x: 100, y: 120, side: 'right' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -63,14 +49,14 @@ describe('OrthogonalRouting', () => {
     it('should call computeOrthogonalPoints with custom firstLastSegmentLength from config', () => {
       const source: PortLocation = { x: 10, y: 20, side: 'left' };
       const target: PortLocation = { x: 100, y: 120, side: 'right' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
       };
-      const config = { orthogonal: { firstLastSegmentLength: 30 } };
+      const config = { defaultRouting: 'polyline', orthogonal: { firstLastSegmentLength: 30 } };
       const expectedPoints = [
         { x: 10, y: 20 },
         { x: 55, y: 20 },
@@ -91,14 +77,14 @@ describe('OrthogonalRouting', () => {
     it('should use default firstLastSegmentLength when config value is negative', () => {
       const source: PortLocation = { x: 10, y: 20, side: 'left' };
       const target: PortLocation = { x: 100, y: 120, side: 'right' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
       };
-      const config = { orthogonal: { firstLastSegmentLength: -10 } };
+      const config = { defaultRouting: 'polyline', orthogonal: { firstLastSegmentLength: -10 } };
       const expectedPoints = [
         { x: 10, y: 20 },
         { x: 55, y: 20 },
@@ -118,14 +104,14 @@ describe('OrthogonalRouting', () => {
     it('should accept zero as valid firstLastSegmentLength', () => {
       const source: PortLocation = { x: 10, y: 20, side: 'left' };
       const target: PortLocation = { x: 100, y: 120, side: 'right' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
       };
-      const config = { orthogonal: { firstLastSegmentLength: 0 } };
+      const config = { defaultRouting: 'polyline', orthogonal: { firstLastSegmentLength: 0 } };
       const expectedPoints = [
         { x: 10, y: 20 },
         { x: 55, y: 20 },
@@ -157,9 +143,9 @@ describe('OrthogonalRouting', () => {
       ]);
 
       testCases.forEach((testCase) => {
-        const context: RoutingContext = {
-          source: testCase.source,
-          target: testCase.target,
+        const context: EdgeRoutingContext = {
+          sourcePoint: testCase.source,
+          targetPoint: testCase.target,
           edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
           sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
           targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -174,9 +160,9 @@ describe('OrthogonalRouting', () => {
     it('should handle same source and target positions', () => {
       const source: PortLocation = { x: 50, y: 50, side: 'top' };
       const target: PortLocation = { x: 50, y: 50, side: 'bottom' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: 0, y: 25 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 0, y: 25 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -199,9 +185,9 @@ describe('OrthogonalRouting', () => {
     it('should handle negative coordinates', () => {
       const source: PortLocation = { x: -50, y: -100, side: 'left' };
       const target: PortLocation = { x: 50, y: 100, side: 'right' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -100, y: -125 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 0, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -313,7 +299,7 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 100 },
         { x: 100, y: 100 },
       ];
-      const config = { orthogonal: { maxCornerRadius: 25 } };
+      const config = { defaultRouting: 'polyline', orthogonal: { maxCornerRadius: 25 } };
       const expectedPath = 'M 0,0 L25,0 A25,25,0,0,1,50,25 L50,75 A25,25,0,0,0,75,100 L 100,100';
 
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
@@ -332,7 +318,7 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 100 },
         { x: 100, y: 100 },
       ];
-      const config = { orthogonal: { maxCornerRadius: -5 } };
+      const config = { defaultRouting: 'polyline', orthogonal: { maxCornerRadius: -5 } };
       const expectedPath = 'M 0,0 L16,0 A16,16,0,0,1,50,16 L50,84 A16,16,0,0,0,66,100 L 100,100';
 
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
@@ -351,7 +337,7 @@ describe('OrthogonalRouting', () => {
         { x: 50, y: 100 },
         { x: 100, y: 100 },
       ];
-      const config = { orthogonal: { maxCornerRadius: 0 } };
+      const config = { defaultRouting: 'polyline', orthogonal: { maxCornerRadius: 0 } };
       const expectedPath = 'M 0,0 L 50,0 L 50,100 L 100,100'; // No rounded corners
 
       const spy = vi.spyOn(computeOrthogonalPathModule, 'computeOrthogonalPath');
@@ -499,9 +485,9 @@ describe('OrthogonalRouting', () => {
       const routing = new OrthogonalRouting();
       const source: PortLocation = { x: 0, y: 0, side: 'right' };
       const target: PortLocation = { x: 100, y: 100, side: 'bottom' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -533,9 +519,9 @@ describe('OrthogonalRouting', () => {
       ];
 
       configurations.forEach((config) => {
-        const context: RoutingContext = {
-          source: config.source,
-          target: config.target,
+        const context: EdgeRoutingContext = {
+          sourcePoint: config.source,
+          targetPoint: config.target,
           edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
           sourceNode: { id: 'node1', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node,
           targetNode: { id: 'node2', position: { x: 100, y: 100 }, size: { width: 100, height: 50 }, data: {} } as Node,
@@ -572,9 +558,9 @@ describe('OrthogonalRouting', () => {
 
       const source: PortLocation = { x: 0, y: 0, side: 'left' };
       const target: PortLocation = { x: 100, y: 100, side: 'right' };
-      const context: RoutingContext = {
-        source,
-        target,
+      const context: EdgeRoutingContext = {
+        sourcePoint: source,
+        targetPoint: target,
         edge: { id: 'test-edge', source: 'node1', target: 'node2', data: {} } as Edge,
         sourceNode: { id: 'node1', position: { x: -50, y: -25 }, size: { width: 100, height: 50 }, data: {} } as Node,
         targetNode: { id: 'node2', position: { x: 50, y: 75 }, size: { width: 100, height: 50 }, data: {} } as Node,

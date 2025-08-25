@@ -50,10 +50,10 @@ describe('Edges Routing Middleware', () => {
       hasRouting: vi.fn().mockReturnValue(true),
       computePoints: vi.fn().mockImplementation((_routing, context) => {
         // Return mock points based on context
-        if (!context?.source || !context?.target) return [];
+        if (!context?.sourcePoint || !context?.targetPoint) return [];
         return [
-          { x: context.source.x, y: context.source.y },
-          { x: context.target.x, y: context.target.y },
+          { x: context.sourcePoint.x, y: context.sourcePoint.y },
+          { x: context.targetPoint.x, y: context.targetPoint.y },
         ];
       }),
       computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
@@ -61,7 +61,7 @@ describe('Edges Routing Middleware', () => {
     };
 
     flowCore = {
-      routingManager: mockRoutingManager,
+      edgeRoutingManager: mockRoutingManager,
     } as unknown as FlowCore;
 
     initialState = {
@@ -150,7 +150,7 @@ describe('Edges Routing Middleware', () => {
         ...initialState,
         edges: [customEdge],
       } as unknown as FlowState<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>,
-      flowCore: { routingManager: customRoutingManager } as unknown as FlowCore,
+      flowCore: { edgeRoutingManager: customRoutingManager } as unknown as FlowCore,
     };
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);
@@ -166,10 +166,10 @@ describe('Edges Routing Middleware', () => {
         return routing === 'polyline' || routing === 'orthogonal' || routing === 'bezier';
       }),
       computePoints: vi.fn().mockImplementation((_routing, context) => {
-        if (!context?.source || !context?.target) return [];
+        if (!context?.sourcePoint || !context?.targetPoint) return [];
         return [
-          { x: context.source.x, y: context.source.y },
-          { x: context.target.x, y: context.target.y },
+          { x: context.sourcePoint.x, y: context.sourcePoint.y },
+          { x: context.targetPoint.x, y: context.targetPoint.y },
         ];
       }),
       computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
@@ -227,7 +227,7 @@ describe('Edges Routing Middleware', () => {
       state: newState,
       modelActionType: 'init',
       nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      flowCore: { routingManager: mockRoutingManager } as unknown as FlowCore,
+      flowCore: { edgeRoutingManager: mockRoutingManager } as unknown as FlowCore,
     };
 
     edgesRoutingMiddleware.execute(context, nextMock, () => null);

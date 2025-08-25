@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import {
   ActionState,
+  EdgeRouting,
   EnvironmentInfo,
   FlowCore,
   Metadata,
@@ -9,7 +10,6 @@ import {
   MiddlewareConfigKeys,
   MiddlewaresConfigFromMiddlewares,
   ModelActionType,
-  Routing,
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
@@ -112,8 +112,8 @@ export class NgDiagramService<
    * };
    * ngDiagramService.registerRouting(customRouting);
    */
-  registerRouting(routing: Routing): void {
-    this.flowCore.routingManager.registerRouting(routing);
+  registerRouting(routing: EdgeRouting): void {
+    this.flowCore.edgeRoutingManager.registerRouting(routing);
   }
 
   /**
@@ -121,7 +121,7 @@ export class NgDiagramService<
    * @param name Name of the routing to unregister
    */
   unregisterRouting(name: string): void {
-    this.flowCore.routingManager.unregisterRouting(name);
+    this.flowCore.edgeRoutingManager.unregisterRouting(name);
   }
 
   /**
@@ -129,7 +129,7 @@ export class NgDiagramService<
    * @returns Array of registered routing names
    */
   getRegisteredRoutings(): string[] {
-    return this.flowCore.routingManager.getRegisteredRoutings();
+    return this.flowCore.edgeRoutingManager.getRegisteredRoutings();
   }
 
   /**
@@ -137,7 +137,7 @@ export class NgDiagramService<
    * @param name Name of the routing to set as default
    */
   setDefaultRouting(name: string): void {
-    this.flowCore.routingManager.setDefaultRouting(name);
+    this.flowCore.edgeRoutingManager.setDefaultRouting(name);
   }
 
   /**
@@ -145,7 +145,7 @@ export class NgDiagramService<
    * @returns Name of the default routing
    */
   getDefaultRouting(): string {
-    return this.flowCore.routingManager.getDefaultRouting();
+    return this.flowCore.edgeRoutingManager.getDefaultRouting();
   }
 
   /**
