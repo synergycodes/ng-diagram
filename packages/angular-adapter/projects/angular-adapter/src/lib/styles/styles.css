@@ -85,3 +85,11 @@
     box-shadow: var(--ngd-selected-node-box-shadow);
   }
 }
+
+ng-diagram {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
