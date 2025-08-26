@@ -9,7 +9,6 @@ import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
   selector: '[ngDiagramPanning]',
   host: {
     '(pointerdown)': 'onPointerDown($event)',
-    '(pointerup)': 'onPointerUp($event)',
   },
 })
 export class PanningDirective implements OnDestroy {
@@ -17,12 +16,16 @@ export class PanningDirective implements OnDestroy {
 
   ngOnDestroy(): void {
     document.removeEventListener('pointermove', this.onMouseMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
   }
 
   onPointerDown(event: PointerInputEvent): void {
     if (!BrowserInputsHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
+
+    event.preventDefault();
+    event.stopPropagation();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -38,14 +41,19 @@ export class PanningDirective implements OnDestroy {
     });
 
     document.addEventListener('pointermove', this.onMouseMove);
+    document.addEventListener('pointerup', this.onPointerUp);
   }
 
-  onPointerUp(event: PointerEvent): void {
+  onPointerUp = (event: PointerEvent): void => {
     if (!BrowserInputsHelpers.withPrimaryButton(event)) {
       return;
     }
 
+    event.preventDefault();
+    event.stopPropagation();
+
     document.removeEventListener('pointermove', this.onMouseMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -59,9 +67,12 @@ export class PanningDirective implements OnDestroy {
         y: event.clientY,
       },
     });
-  }
+  };
 
   private onMouseMove = (event: PointerInputEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,

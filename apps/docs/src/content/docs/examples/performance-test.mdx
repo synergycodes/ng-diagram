@@ -3,4 +3,10 @@ title: Performance Test
 description: Example of how to test performance in NgDiagram
 ---
 
-# Performance Test
+This example demonstrates the performance capabilities of the Angular Flow library by rendering 500 nodes arranged in a 25x20 grid with almost 500 connections.
+
+import Sidebar from '@examples/performance-test/performance-test.astro';
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+
+<Sidebar />
+<ExampleViewer dirName="stress-test" />
