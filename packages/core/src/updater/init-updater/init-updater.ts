@@ -76,7 +76,8 @@ export class InitUpdater extends BaseUpdater implements Updater {
   }
 
   addEdgeLabel(edgeId: string, label: EdgeLabel) {
-    this.edgeLabelInitializer.batchChange(edgeId, label);
+    const key = this.getCompoundId(edgeId, label.id);
+    this.edgeLabelInitializer.batchChange(key, label);
   }
 
   applyEdgeLabelSize(edgeId: string, labelId: string, size: Size) {
@@ -132,10 +133,17 @@ export class InitUpdater extends BaseUpdater implements Updater {
     const edgeLabelInitializer = new BatchInitializer<EdgeLabel>((edgeLabelMap) => {
       const { edges, ...state } = flowCore.getState();
 
+      const edgeLabelsMap = new Map<string, EdgeLabel[]>();
+
+      for (const [key, label] of edgeLabelMap.entries()) {
+        const { entityId: edgeId } = this.splitCompoundId(key);
+        edgeLabelsMap.set(edgeId, [...(edgeLabelsMap.get(edgeId) || []), label]);
+      }
+
       const updatedEdges = edges.map((edge) => {
-        const label = edgeLabelMap.get(edge.id);
-        if (label) {
-          return { ...edge, labels: [...(edge.labels ?? []), label] };
+        const labels = edgeLabelsMap.get(edge.id);
+        if (labels) {
+          return { ...edge, labels: [...(edge.labels ?? []), ...labels] };
         }
         return edge;
       });

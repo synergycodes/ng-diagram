@@ -53,17 +53,12 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: Edge
     const sourceNode = nodesMap.get(edge.source);
     const targetNode = nodesMap.get(edge.target);
 
-    if (!sourceNode || !targetNode) {
-      // Fallback if nodes not found
-      points = [sourcePoint, targetPoint].filter((point) => !!point);
-      return { sourcePoint, targetPoint, points };
-    }
+    // Find ports if nodes exist
+    const sourcePort =
+      sourceNode && edge.sourcePort ? sourceNode.ports?.find((p) => p.id === edge.sourcePort) : undefined;
+    const targetPort =
+      targetNode && edge.targetPort ? targetNode.ports?.find((p) => p.id === edge.targetPort) : undefined;
 
-    // Find ports if they exist
-    const sourcePort = edge.sourcePort ? sourceNode.ports?.find((p) => p.id === edge.sourcePort) : undefined;
-    const targetPort = edge.targetPort ? targetNode.ports?.find((p) => p.id === edge.targetPort) : undefined;
-
-    // Create routing context with full information
     const context: EdgeRoutingContext = {
       sourcePoint: source,
       targetPoint: target,
@@ -77,12 +72,10 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: Edge
     if (edge.routing && routingManager.hasRouting(edge.routing)) {
       points = routingManager.computePoints(edge.routing, context);
     } else {
-      // Use default routing or fallback to straight line
       const defaultRouting = routingManager.getDefaultRouting();
       if (routingManager.hasRouting(defaultRouting)) {
         points = routingManager.computePoints(defaultRouting, context);
       } else {
-        // Final fallback to straight line
         points = [sourcePoint, targetPoint].filter((point) => !!point);
       }
     }

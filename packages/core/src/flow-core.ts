@@ -81,7 +81,10 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
-    this.edgeRoutingManager = new EdgeRoutingManager('polyline', () => this.config.edgeRouting || {});
+    this.edgeRoutingManager = new EdgeRoutingManager(
+      this.config.edgeRouting.defaultRouting,
+      () => this.config.edgeRouting || {}
+    );
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
 
     this.inputEventsRouter.registerDefaultCallbacks(this);

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge } from '@angularflow/core';
+import { Edge, equalPointsArrays, Point, RoutingMode } from '@angularflow/core';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 
@@ -45,7 +45,8 @@ export class NgDiagramBaseEdgeComponent {
     if (points.length === 0) return '';
 
     if (routingName && flowCore.edgeRoutingManager.hasRouting(routingName)) {
-      return flowCore.edgeRoutingManager.computePath(routingName, points);
+      const path = flowCore.edgeRoutingManager.computePath(routingName, points);
+      return path;
     }
 
     // Use default routing if available
@@ -55,14 +56,7 @@ export class NgDiagramBaseEdgeComponent {
     }
 
     // Fallback to simple straight line path
-    if (points.length === 1) return `M ${points[0].x},${points[0].y}`;
-
-    const pathSegments = points.map((point, index) => {
-      if (index === 0) return `M ${point.x},${point.y}`;
-      return `L ${point.x},${point.y}`;
-    });
-
-    return pathSegments.join(' ');
+    return `M ${points[0].x},${points[0].y}`;
   });
 
   markerStart = computed(() =>
@@ -87,20 +81,61 @@ export class NgDiagramBaseEdgeComponent {
   labels = computed(() => this.edge().labels ?? []);
 
   private prevRouting: string | undefined;
+  private prevRoutingMode: RoutingMode | undefined;
+  private prevPoints: Point[] | undefined;
 
   constructor() {
-    effect(() => {
-      const routing = this.routing();
-      if (!routing) return;
+    // Sync edge properties from custom components back to the model
+    effect(() => this.syncEdgePropertiesToModel());
+  }
 
-      // Update edge routing if component input changes
-      if (this.prevRouting !== routing) {
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.edge().id,
-          edgeChanges: { routing },
-        });
-        this.prevRouting = routing;
+  private syncEdgePropertiesToModel(): void {
+    const edge = this.edge();
+    const edgeChanges: Partial<Edge> = {};
+    let hasChanges = false;
+
+    hasChanges = this.checkRoutingChanges(edge, edgeChanges) || hasChanges;
+    hasChanges = this.checkRoutingModeChanges(edge, edgeChanges) || hasChanges;
+    hasChanges = this.checkPointsChanges(edge, edgeChanges) || hasChanges;
+
+    // Emit update if any changes detected
+    if (hasChanges) {
+      this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
+        id: edge.id,
+        edgeChanges,
+      });
+    }
+  }
+
+  private checkRoutingChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
+    const routing = this.routing() ?? edge.routing;
+    if (routing && this.prevRouting !== routing) {
+      edgeChanges.routing = routing;
+      this.prevRouting = routing;
+      return true;
+    }
+    return false;
+  }
+
+  private checkRoutingModeChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
+    if (edge.routingMode && this.prevRoutingMode !== edge.routingMode) {
+      edgeChanges.routingMode = edge.routingMode;
+      this.prevRoutingMode = edge.routingMode;
+      return true;
+    }
+    return false;
+  }
+
+  private checkPointsChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
+    if (edge.routingMode === 'manual' && edge.points && edge.points.length > 0) {
+      // Only update if points actually changed (not on initial render with model points)
+      if (this.prevPoints && !equalPointsArrays(this.prevPoints, edge.points)) {
+        edgeChanges.points = edge.points;
+        this.prevPoints = edge.points;
+        return true;
       }
-    });
+      this.prevPoints = edge.points;
+    }
+    return false;
   }
 }

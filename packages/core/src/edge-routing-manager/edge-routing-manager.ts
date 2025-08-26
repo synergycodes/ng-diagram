@@ -17,11 +17,8 @@ export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as co
  * You can register custom routings at runtime via {@link EdgeRoutingManager.registerRouting}.
  */
 export class EdgeRoutingManager {
-  /** @internal */
   private routings = new Map<string, EdgeRouting>();
-  /** @internal */
   private defaultRouting: EdgeRoutingName;
-  /** @internal */
   private getRoutingConfig: () => EdgeRoutingConfig;
 
   /**

@@ -1,6 +1,8 @@
 import { EdgeRoutingName } from '../edge-routing-manager/types';
 import { Point, Size } from './utils';
 
+export type RoutingMode = 'manual' | 'auto';
+
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
  * @category Types
@@ -60,7 +62,7 @@ export interface Edge<T = any> {
    * 'auto' (default): Points are computed automatically based on routing algorithm
    * 'manual': Points are provided by the user and routing algorithm is used to render the path
    */
-  routingMode?: 'manual' | 'auto';
+  routingMode?: RoutingMode;
   /**
    * The position of the edge start.
    */

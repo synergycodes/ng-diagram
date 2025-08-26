@@ -709,4 +709,104 @@ describe('Edges Routing Middleware', () => {
       expect(edgeUpdate?.labels?.[0]?.position).toEqual({ x: 50, y: 50 });
     }
   });
+
+  it('should route temporary edge even when target node does not exist', () => {
+    const newState = {
+      ...initialState,
+      nodes: [{ ...mockNode, id: 'node-1', position: { x: 100, y: 100 } }],
+      edges: [], // Clear edges to focus on temporary edge
+      metadata: {
+        ...initialState.metadata,
+        temporaryEdge: {
+          ...mockEdge,
+          points: [],
+          source: 'node-1',
+          sourcePort: 'port-1',
+          target: 'non-existent-node', // Node doesn't exist
+          targetPort: 'port-2',
+          sourcePosition: { x: 100, y: 100 },
+          targetPosition: { x: 200, y: 200 }, // But positions are valid
+          routing: 'orthogonal',
+        },
+      },
+    };
+
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'moveTemporaryEdge',
+      nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
+
+    checkIfMetadataPropsChangedMock.mockReturnValue(true);
+
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      metadataUpdate: {
+        temporaryEdge: {
+          ...newState.metadata.temporaryEdge,
+          points: [
+            { x: 100, y: 100 },
+            { x: 200, y: 200 },
+          ],
+          sourcePosition: { x: 100, y: 100 },
+          targetPosition: { x: 200, y: 200 },
+          zIndex: DEFAULT_SELECTED_Z_INDEX,
+        },
+      },
+    });
+  });
+
+  it('should route edge even when both nodes do not exist but positions are valid', () => {
+    const newState = {
+      ...initialState,
+      nodes: [], // No nodes exist
+      edges: [
+        {
+          ...mockEdge,
+          id: 'edge-without-nodes',
+          source: 'non-existent-node-1',
+          target: 'non-existent-node-2',
+          sourcePosition: { x: 50, y: 50 },
+          targetPosition: { x: 200, y: 200 },
+          routing: 'polyline',
+          points: [],
+        },
+      ],
+      metadata: { ...initialState.metadata },
+    };
+
+    context = {
+      ...context,
+      state: newState,
+      modelActionType: 'init',
+      nodesMap: new Map(), // Empty nodes map
+    } as unknown as MiddlewareContext<
+      [],
+      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+      EdgesRoutingMiddlewareMetadata
+    >;
+
+    edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledWith({
+      edgesToUpdate: [
+        {
+          id: 'edge-without-nodes',
+          points: [
+            { x: 50, y: 50 },
+            { x: 200, y: 200 },
+          ],
+          sourcePosition: { x: 50, y: 50 },
+          targetPosition: { x: 200, y: 200 },
+          labels: undefined,
+        },
+      ],
+    });
+  });
 });

@@ -33,12 +33,12 @@ export interface EdgeRoutingContext {
   /**
    * Source node
    */
-  sourceNode: Node;
+  sourceNode?: Node;
 
   /**
    * Target node
    */
-  targetNode: Node;
+  targetNode?: Node;
 
   /**
    * Source port (if edge is connected to a specific port)

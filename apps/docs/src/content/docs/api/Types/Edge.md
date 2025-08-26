@@ -57,7 +57,7 @@ The routing of the edge.
 
 ### routingMode?
 
-> `optional` **routingMode**: `"manual"` \| `"auto"`
+> `optional` **routingMode**: `RoutingMode`
 
 The routing mode of the edge.
 'auto' (default): Points are computed automatically based on routing algorithm

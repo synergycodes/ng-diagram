@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../flow-core';
 import { mockEdgeLabel, mockNode, mockPort } from '../../test-utils';
-import { InitUpdater } from './init-updater';
 import { BatchInitializer } from './batch-initializer';
+import { InitUpdater } from './init-updater';
 
 // Mock BatchInitializer
 vi.mock(import('./batch-initializer'), () => ({ BatchInitializer: vi.fn() }));
@@ -116,10 +116,25 @@ describe('InitUpdater', () => {
   });
 
   describe('addEdgeLabel', () => {
-    it('should schedule edge label initialization', () => {
+    it('should schedule edge label initialization with compound id', () => {
       initUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
 
-      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith('edge-1', mockEdgeLabel);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith(`edge-1->${mockEdgeLabel.id}`, mockEdgeLabel);
+    });
+
+    it('should handle multiple labels for the same edge', () => {
+      const label1 = { ...mockEdgeLabel, id: 'label-1' };
+      const label2 = { ...mockEdgeLabel, id: 'label-2' };
+      const label3 = { ...mockEdgeLabel, id: 'label-3' };
+
+      initUpdater.addEdgeLabel('edge-1', label1);
+      initUpdater.addEdgeLabel('edge-1', label2);
+      initUpdater.addEdgeLabel('edge-1', label3);
+
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith(`edge-1->label-1`, label1);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith(`edge-1->label-2`, label2);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledWith(`edge-1->label-3`, label3);
+      expect(BatchInitializer.prototype.batchChange).toHaveBeenCalledTimes(3);
     });
   });
 
