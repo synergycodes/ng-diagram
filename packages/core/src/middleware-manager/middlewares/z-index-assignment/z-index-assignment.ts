@@ -110,9 +110,10 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
       nodesToUpdate.push({ id: node.id, zIndex: node.zIndex });
     }
 
+    const addedEdge = edges.at(-1);
     // Partial for Edge
-    if (isEdgeAdded) {
-      edgesWithZIndex = assignEdgesZIndex([edges[edges.length - 1]], nodesWithZIndex, nodesMap);
+    if (isEdgeAdded && addedEdge) {
+      edgesWithZIndex = assignEdgesZIndex([addedEdge], nodesWithZIndex, nodesMap);
     }
 
     if (shouldSnapEdge) {
