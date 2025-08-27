@@ -128,13 +128,12 @@ export class NgDiagramBaseEdgeComponent {
 
   private checkPointsChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
     if (edge.routingMode === 'manual' && edge.points && edge.points.length > 0) {
-      // Only update if points actually changed (not on initial render with model points)
-      if (this.prevPoints && !equalPointsArrays(this.prevPoints, edge.points)) {
+      // Update on initial render (when prevPoints is undefined) or when points changed
+      if (!this.prevPoints || !equalPointsArrays(this.prevPoints, edge.points)) {
         edgeChanges.points = edge.points;
         this.prevPoints = edge.points;
         return true;
       }
-      this.prevPoints = edge.points;
     }
     return false;
   }
