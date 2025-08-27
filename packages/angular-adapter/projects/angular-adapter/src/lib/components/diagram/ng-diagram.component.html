@@ -1,7 +1,7 @@
 <div class="diagram-background-container">
   <ng-content select="ng-diagram-background"></ng-content>
 </div>
-<ng-diagram-canvas [viewport]="viewport()" [targetData]="undefined">
+<ng-diagram-canvas [viewport]="viewport()">
   @for (edge of edges(); track edge.id) {
     <ng-diagram-edge>
       @if (getEdgeTemplate(edge.type)) {
