@@ -183,6 +183,9 @@ importers:
       astro:
         specifier: ^5.6.1
         version: 5.12.8(@netlify/blobs@9.1.2)(@types/node@24.1.0)(db0@0.3.2)(encoding@0.1.13)(ioredis@5.6.1)(jiti@2.5.1)(less@4.2.2)(rollup@4.46.2)(sass-embedded@1.89.2)(sass@1.85.0)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.0)
+      html-to-image:
+        specifier: 1.11.11
+        version: 1.11.11
       rxjs:
         specifier: ~7.8.2
         version: 7.8.2
@@ -6121,6 +6124,9 @@ packages:
 
   html-escaper@3.0.3:
     resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
+
+  html-to-image@1.11.11:
+    resolution: {integrity: sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==}
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
@@ -18241,6 +18247,8 @@ snapshots:
   html-escaper@2.0.2: {}
 
   html-escaper@3.0.3: {}
+
+  html-to-image@1.11.11: {}
 
   html-void-elements@3.0.0: {}
 

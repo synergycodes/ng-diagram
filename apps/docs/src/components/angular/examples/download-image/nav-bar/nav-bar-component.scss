@@ -1,0 +1,21 @@
+.nav-bar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  justify-content: end;
+  padding: 2px 16px;
+  background-color: var(--ngd-node-stroke-primary-defaultx);
+
+  & > button {
+    cursor: pointer;
+    border: none;
+
+    &:disabled {
+      cursor: not-allowed;
+
+      &.clear {
+        background: none;
+      }
+    }
+  }
+}
