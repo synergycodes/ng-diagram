@@ -92,11 +92,11 @@ export class NgDiagramBaseEdgeComponent {
   private syncEdgePropertiesToModel(): void {
     const edge = this.edge();
     const edgeChanges: Partial<Edge> = {};
-    let hasChanges = false;
 
-    hasChanges = this.checkRoutingChanges(edge, edgeChanges) || hasChanges;
-    hasChanges = this.checkRoutingModeChanges(edge, edgeChanges) || hasChanges;
-    hasChanges = this.checkPointsChanges(edge, edgeChanges) || hasChanges;
+    const hasChanges =
+      this.checkRoutingChanges(edge, edgeChanges) ||
+      this.checkRoutingModeChanges(edge, edgeChanges) ||
+      this.checkPointsChanges(edge, edgeChanges);
 
     // Emit update if any changes detected
     if (hasChanges) {

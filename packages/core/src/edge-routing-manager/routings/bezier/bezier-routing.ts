@@ -4,6 +4,8 @@ import { computeBezierPath } from './compute-bezier-path';
 import { computeBezierPointOnPath } from './compute-bezier-point-on-path';
 import { computeBezierPoints } from './compute-bezier-points';
 
+const CONTROL_POINT_OFFSET_FALLBACK = 100;
+
 /**
  * Bezier curve routing implementation.
  *
@@ -31,10 +33,8 @@ export class BezierRouting implements EdgeRouting {
    */
   computePoints(context: EdgeRoutingContext, config?: EdgeRoutingConfig): Point[] {
     const { sourcePoint, targetPoint } = context;
-    const bezierControlOffset = config?.bezier?.bezierControlOffset ?? 100;
+    const bezierControlOffset = config?.bezier?.bezierControlOffset ?? CONTROL_POINT_OFFSET_FALLBACK;
 
-    // Now we have access to edge, nodes, and ports for more sophisticated routing
-    // For example, we could adjust control offset based on node distance or type
     return computeBezierPoints(sourcePoint, targetPoint, bezierControlOffset);
   }
 

@@ -25,10 +25,42 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
     'routingMode',
   ]);
 
+/**
+ * Checks if the required ports for an edge are properly initialized with position and size.
+ * Returns true only if all required ports have their geometry data.
+ */
+const areEdgePortsInitialized = (edge: Edge, sourceNode?: Node, targetNode?: Node): boolean => {
+  if (edge.sourcePort && sourceNode?.ports) {
+    const sourcePort = sourceNode.ports.find((p) => p.id === edge.sourcePort);
+    if (sourcePort && (!sourcePort.position || !sourcePort.size)) {
+      return false;
+    }
+  }
+
+  if (edge.targetPort && targetNode?.ports) {
+    const targetPort = targetNode.ports.find((p) => p.id === edge.targetPort);
+    if (targetPort && (!targetPort.position || !targetPort.size)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: EdgeRoutingManager) => {
+  const sourceNode = nodesMap.get(edge.source);
+  const targetNode = nodesMap.get(edge.target);
+
+  // If ports are not initialized yet, return empty to hide edge temporarily
+  // To fix blinking when initializing ports and edges
+  if (!areEdgePortsInitialized(edge, sourceNode, targetNode)) {
+    return { sourcePoint: undefined, targetPoint: undefined, points: [] };
+  }
+
   const sourceTarget = getSourceTargetPositions(edge, nodesMap);
   const source = sourceTarget[0] as PortLocation;
   const target = sourceTarget[1] as PortLocation;
+
   const sourcePoint = source?.x
     ? {
         x: source.x,
@@ -50,10 +82,6 @@ const getPoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: Edge
     points = edge.points;
   } else {
     // Auto mode: compute points using routing algorithm
-    const sourceNode = nodesMap.get(edge.source);
-    const targetNode = nodesMap.get(edge.target);
-
-    // Find ports if nodes exist
     const sourcePort =
       sourceNode && edge.sourcePort ? sourceNode.ports?.find((p) => p.id === edge.sourcePort) : undefined;
     const targetPort =
@@ -146,8 +174,8 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
           if (updatedLabels?.length || sourcePoint || targetPoint) {
             edgesToUpdate.push({
               id: edge.id,
-              sourcePosition: sourcePoint || undefined,
-              targetPosition: targetPoint || undefined,
+              sourcePosition: sourcePoint,
+              targetPosition: targetPoint,
               labels: updatedLabels,
             });
           }
@@ -170,8 +198,8 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
           edgesToUpdate.push({
             id: edge.id,
             points,
-            sourcePosition: sourcePoint || undefined,
-            targetPosition: targetPoint || undefined,
+            sourcePosition: sourcePoint,
+            targetPosition: targetPoint,
             labels: updatedLabels,
           });
         }
@@ -187,8 +215,8 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       newTemporaryEdge = {
         ...metadata.temporaryEdge,
         points,
-        sourcePosition: sourcePoint || undefined,
-        targetPosition: targetPoint || undefined,
+        sourcePosition: sourcePoint,
+        targetPosition: targetPoint,
         zIndex: temporaryEdgeZIndex,
       };
     }
