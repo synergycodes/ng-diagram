@@ -20,7 +20,6 @@ title: "@angularflow/angular-adapter"
 ## Other
 
 - [NgDiagramBaseEdgeComponent](/api/other/ngdiagrambaseedgecomponent/)
-- [Edge](/api/other/edge/)
 - [Metadata](/api/other/metadata/)
 - [Middleware](/api/other/middleware/)
 - [MAX\_ORTHOGONAL\_RADIUS](/api/other/max_orthogonal_radius/)
@@ -29,6 +28,7 @@ title: "@angularflow/angular-adapter"
 
 ## Types
 
+- [Edge](/api/types/edge/)
 - [GroupNode](/api/types/groupnode/)
 - [Point](/api/types/point/)
 - [Node](/api/types/node/)

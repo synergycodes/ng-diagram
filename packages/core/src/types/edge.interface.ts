@@ -2,6 +2,7 @@ import { Point, Routing, Size } from './utils';
 
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
+ * @category Types
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface Edge<T = any> {

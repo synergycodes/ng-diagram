@@ -1,0 +1,130 @@
+---
+title: Edges
+description: Understanding how edges work in NgDiagram
+sidebar:
+  order: 0
+---
+
+import { Image } from 'astro:assets';
+import { LinkCard } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+Edges are the connections between nodes in NgDiagram. They represent relationships, data flow, or dependencies between different components in your diagram.
+
+## Edge Properties
+
+Edges have numerous parameters affecting their appearance and behavior.
+Here are the required properties of an edge:
+
+```typescript
+interface Edge<T = any> {
+  id: string; // ID of the edge
+  source: string; // ID of the source node
+  sourcePort: string; // ID of the port on the source node
+  target: string; // ID of the target node
+  targetPort: string; // ID of the port on the target node
+  data: T; // Custom data associated with the edge
+  // ...optional properties
+}
+```
+
+<LinkCard
+  icon="list-format"
+  title="Edge API"
+  href="/api/types/edge"
+  description="See detailed edge properties reference"
+/>
+
+## Adding Edges to a Diagram
+
+To add edges to your diagram, include them in the `edges` array of your model:
+
+<CodeSnippet
+  relativePath="edges/edges/minimal-diagram.component.ts"
+  range={[19, 70]}
+  collapse={['3-20']}
+  mark={[{ range: '21-30' }]}
+/>
+
+## Default Edge
+
+NgDiagram provides a default edge implementation that handles most common use cases. The default edge:
+
+- Automatically calculates the path between connected nodes
+- Supports three [built-in routing algorithms](/internals/edges/routing)
+- Can display arrowheads at either end
+
+### Customization
+
+NgDiagram's default edges offer several customization options:
+
+- Custom arrowheads (defined as SVG markers)
+- CSS variable based styling (stroke, hover / selection states etc.)
+- [Built-in routing algorithms](/internals/edges/routing)
+
+import DefaultEdge from '@components/angular/edges/edges/default-edge/default-edge.astro';
+
+<DefaultEdge />
+
+<CodeSnippet
+  relativePath="edges/edges/default-edge/diagram.component.ts"
+  range={[10, 70]}
+  collapse={['24-27', '36-47', '50-55']}
+  mark={[{ range: '9-18' }, { range: '28-30' }, { range: '56-57' }]}
+/>
+
+Use Custom Edges for even more control over edge look and functionality
+
+<LinkCard
+  title="Custom Edges"
+  href="/internals/edges/custom-edges"
+  description="Provide your edges with unique styles and behaviors"
+/>
+
+<LinkCard title="Arrowheads" href="/internals/edges/arrowheads" description="Create custom arrowheads" />
+
+## Ports
+
+Ports are connection points on nodes where edges can start or end. Each port has an ID unique within its node. These IDs (along with their parent node IDs) are used to specify the exact position where edges should be attached.
+
+<CodeSnippet
+  relativePath="edges/edges/minimal-diagram.component.ts"
+  range={[19, 70]}
+  collapse={['3-21']}
+  mark={[25, 27]}
+/>
+
+<LinkCard
+  title="Ports"
+  href="/internals/nodes/ports"
+  description="Read more about ports and how they work in NgDiagram"
+/>
+
+## Routing
+
+Edges can be routed using three [built-in routing algorithms](/internals/edges/routing):
+
+- `polyline`: Draws a polyline (straight line by default)
+- `orthogonal`: Draws a series of horizontal and vertical lines
+- `bezier`: Draws a bezier curve
+
+import Routing from '@components/angular/edges/edges/routing/routing.astro';
+
+<Routing />
+
+<LinkCard
+  title="Routing"
+  href="/internals/edges/routing"
+  description="Learn about routing algorithms and how to customize them in NgDiagram"
+/>
+
+{/* TODO: Figure out what should be written here about assigning static points */}
+
+## Further reading
+
+<LinkCard
+  title="Layout"
+  href="/internals/layout"
+  description="Learn about layout algorithms and how to customize them in NgDiagram"
+/>
+<LinkCard title="Labels" href="/internals/edges/labels" description="See how to add labels to edges in NgDiagram" />
