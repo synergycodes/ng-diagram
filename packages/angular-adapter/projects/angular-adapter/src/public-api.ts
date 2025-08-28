@@ -29,6 +29,3 @@ export * from './lib/public-services/ng-diagram-viewport.service';
 export * from './lib/public-services/ng-diagram.service';
 export * from './lib/types';
 export * from './lib/utils/create-middlewares';
-export * from './lib/utils/get-path/get-bezier-path';
-export * from './lib/utils/get-path/get-orthogonal-path';
-export * from './lib/utils/get-path/get-straight-path';

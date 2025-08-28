@@ -1,3 +1,4 @@
+import { EdgeRoutingName } from '../edge-routing-manager';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
 import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface';
@@ -191,6 +192,30 @@ export interface SelectionMovingConfig {
 }
 
 /**
+ * Interface representing configurable properties of the edge routing.
+ *
+ * Built-in edge routing configurations:
+ * - `bezier`: Configuration for bezier curve routing
+ * - `orthogonal`: Configuration for orthogonal routing
+ */
+export interface EdgeRoutingConfig {
+  defaultRouting: EdgeRoutingName;
+
+  bezier?: {
+    bezierControlOffset?: number;
+  };
+  orthogonal?: {
+    firstLastSegmentLength?: number;
+    maxCornerRadius?: number;
+  };
+
+  /**
+   * Allow custom edge routing configurations.
+   */
+  [edgeRoutingName: string]: Record<string, unknown> | EdgeRoutingName | undefined;
+}
+
+/**
  * The main configuration interface for the flow system.
  */
 export interface FlowConfig {
@@ -220,6 +245,11 @@ export interface FlowConfig {
    * Configuration for zooming.
    */
   zoom: ZoomConfig;
+
+  /**
+   * Configuration for edge routing.
+   */
+  edgeRouting: EdgeRoutingConfig;
 
   /**
    * Configuration for background behavior.

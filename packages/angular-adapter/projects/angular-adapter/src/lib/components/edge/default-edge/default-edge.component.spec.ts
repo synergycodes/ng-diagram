@@ -58,42 +58,6 @@ describe('NgDiagramDefaultEdgeComponent', () => {
     expect(component.edge().id).toBe('test-edge');
   });
 
-  it('should calculate path from edge points', () => {
-    mockEdge.points = [
-      { x: 10, y: 20 },
-      { x: 30, y: 40 },
-    ];
-
-    fixture.componentRef.setInput('edge', mockEdge);
-    fixture.detectChanges();
-
-    expect(component.path()).toStrictEqual({
-      path: 'M 10 20 L 30 40',
-      points: [
-        {
-          x: 10,
-          y: 20,
-        },
-        {
-          x: 30,
-          y: 40,
-        },
-      ],
-    });
-  });
-
-  it('should handle edge with no points', () => {
-    mockEdge.points = [];
-
-    fixture.componentRef.setInput('edge', mockEdge);
-    fixture.detectChanges();
-
-    expect(component.path()).toStrictEqual({
-      path: '',
-      points: [],
-    });
-  });
-
   it('should return proper marker when edge has source arrowhead', () => {
     mockEdge.sourceArrowhead = 'arrowhead';
 

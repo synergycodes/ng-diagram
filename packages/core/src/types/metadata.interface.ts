@@ -20,24 +20,12 @@ export interface LayoutConfiguration {
 }
 
 /**
- * Interface representing configurable properties of the routing.
- */
-export interface RoutingConfiguration {
-  bezier?: {
-    bezierControlOffset?: number;
-  };
-  orthogonal?: Record<string, unknown>;
-  straight?: Record<string, unknown>;
-}
-
-/**
  * Interface representing the metadata of the diagram.
  */
 export interface Metadata<TMiddlewaresMetadata = unknown> {
   viewport: Viewport;
   temporaryEdge?: Edge | null;
   layoutConfiguration?: LayoutConfiguration;
-  routingConfiguration?: RoutingConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
   [key: string]: unknown;
 }

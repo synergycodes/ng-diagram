@@ -49,9 +49,19 @@ The points of the edge defining the path.
 
 ### routing?
 
-> `optional` **routing**: `Routing`
+> `optional` **routing**: `EdgeRoutingName`
 
 The routing of the edge.
+
+***
+
+### routingMode?
+
+> `optional` **routingMode**: `RoutingMode`
+
+The routing mode of the edge.
+'auto' (default): Points are computed automatically based on routing algorithm
+'manual': Points are provided by the user and routing algorithm is used to render the path
 
 ***
 

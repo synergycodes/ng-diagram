@@ -13,7 +13,8 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
-import { CustomBezierEdgeComponent } from './edge-template/custom-bezier-edge/custom-bezier-edge.component';
+import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
+import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -35,7 +36,8 @@ export class AppComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map<string, Type<NgDiagramEdgeTemplate>>([
     ['button-edge', ButtonEdgeComponent],
-    ['custom-bezier-edge', CustomBezierEdgeComponent],
+    ['custom-polyline-edge', CustomPolylineEdgeComponent],
+    ['labelled-edge', LabelledEdgeComponent],
   ]);
 
   debugMode = signal(true);
@@ -50,6 +52,9 @@ export class AppComponent {
     snapping: {
       computeSnapForNodeDrag: true,
     },
+    edgeRouting: {
+      defaultRouting: 'orthogonal',
+    },
   };
 
   model = createSignalModel({
@@ -57,41 +62,74 @@ export class AppComponent {
       {
         id: '1',
         type: 'image',
-        position: { x: 100, y: 200 },
+        position: { x: 100, y: 50 },
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
         resizable: true,
       },
-      { id: '2', type: 'input-field', position: { x: 400, y: 250 }, data: {}, resizable: true },
+      { id: '2', type: 'input-field', position: { x: 400, y: 100 }, data: {}, resizable: true },
       { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
       {
         id: '4',
-        type: 'group',
-        isGroup: true,
-        position: { x: 100, y: 400 },
-        data: { title: 'Group 1' },
+        position: { x: 800, y: 350 },
+        data: {},
         resizable: true,
+        isGroup: true,
       },
       {
         id: '5',
-        type: 'group',
-        isGroup: true,
-        position: { x: 300, y: 400 },
-        data: { title: 'Group 2' },
+        position: { x: 100, y: 250 },
+        data: { label: 'edge is manual' },
         resizable: true,
+        rotatable: true,
       },
       {
         id: '6',
-        position: { x: 500, y: 400 },
-        data: {},
+        position: { x: 463, y: 382 },
+        data: { label: "so it's ok it's unconnected after move" },
         resizable: true,
         rotatable: true,
       },
       {
         id: '7',
-        position: { x: 800, y: 400 },
+        position: { x: 100, y: 450 },
         data: {},
         resizable: true,
-        isGroup: true,
+        rotatable: true,
+      },
+      {
+        id: '8',
+        position: { x: 550, y: 550 },
+        data: {},
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '9',
+        position: { x: 100, y: 650 },
+        data: { label: 'just bezier edge' },
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '10',
+        position: { x: 450, y: 750 },
+        data: {},
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '11',
+        position: { x: 600, y: 650 },
+        data: { label: 'test linking' },
+        resizable: true,
+        rotatable: true,
+      },
+      {
+        id: '12',
+        position: { x: 1000, y: 550 },
+        data: {},
+        resizable: true,
+        rotatable: true,
       },
     ],
     edges: [
@@ -102,7 +140,7 @@ export class AppComponent {
         data: {},
         sourcePort: 'port-right',
         targetPort: 'port-left',
-        type: 'custom-bezier-edge',
+        routing: 'orthogonal',
       },
       {
         id: '2',
@@ -114,16 +152,48 @@ export class AppComponent {
         type: 'button-edge',
       },
       {
-        id: '4',
-        source: '2',
-        target: '3',
-        data: {},
-        sourceArrowhead: 'ng-diagram-arrow',
-        targetArrowhead: 'ng-diagram-arrow',
+        id: '3',
+        source: '5',
+        target: '6',
+        data: { labelPosition: '0.45' },
         sourcePort: 'port-right',
-        targetPort: 'port-left-3',
+        targetPort: 'port-left',
+        type: 'labelled-edge',
+        routing: 'orthogonal',
+        routingMode: 'manual',
+        points: [
+          { x: 300, y: 274 },
+          { x: 380, y: 274 },
+          { x: 380, y: 314 },
+          { x: 420, y: 314 },
+          { x: 420, y: 354 },
+          { x: 380, y: 354 },
+          { x: 380, y: 407 },
+          { x: 460, y: 407 },
+        ],
+      },
+      {
+        id: '4',
+        source: '7',
+        target: '8',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        type: 'custom-polyline-edge',
+      },
+      {
+        id: '5',
+        source: '9',
+        target: '10',
+        data: { labelPosition: 0.7 },
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        type: 'labelled-edge',
+        routing: 'bezier',
       },
     ],
-    metadata: { viewport: { x: 300, y: 0, scale: 1 } },
+    metadata: {
+      viewport: { x: 300, y: 0, scale: 1 },
+    },
   });
 }

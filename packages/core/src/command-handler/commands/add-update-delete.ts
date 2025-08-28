@@ -1,5 +1,4 @@
 import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
-import { getPointOnPath } from '../../utils/get-point-on-path/get-point-on-path';
 
 export interface AddNodesCommand {
   name: 'addNodes';
@@ -167,11 +166,12 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
     return;
   }
   const points = edge.points || [];
+  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
   const newLabels = [
     ...(edge.labels ?? []),
     ...labels.map((label) => ({
       ...label,
-      position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
+      position: edgeRoutingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
     })),
   ];
   await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
@@ -191,9 +191,10 @@ export const updateEdgeLabel = async (commandHandler: CommandHandler, command: U
     return;
   }
   const points = edge.points || [];
+  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
   const newLabels = edge.labels?.map((label) => {
     const positionOnEdge = labelChanges?.positionOnEdge ?? label.positionOnEdge;
-    const position = getPointOnPath({ points, percentage: positionOnEdge, routing: edge.routing });
+    const position = edgeRoutingManager.computePointOnPath(edge.routing, points, positionOnEdge);
     if (label.id !== labelId) {
       return { ...label, position };
     }

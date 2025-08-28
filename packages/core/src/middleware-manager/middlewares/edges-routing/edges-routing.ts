@@ -1,25 +1,18 @@
-import {
-  Edge,
-  FlowStateUpdate,
-  Middleware,
-  MiddlewareContext,
-  Node,
-  PortLocation,
-  RoutingConfiguration,
-} from '../../../types';
-import { getOrthogonalPathPoints, isSamePoint } from '../../../utils';
-import { isDefaultRouting } from './utils/isRouting.ts';
+import { EdgeRoutingManager } from '../../../edge-routing-manager';
+import { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point } from '../../../types';
+import { isSamePoint } from '../../../utils';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
-import { getSourceTargetPositions } from './get-source-target-positions.ts';
-import { getBezierPathPoints } from '../../../utils/get-bezier-path-points.ts';
-import { getPointOnPath } from '../../../utils/get-point-on-path/get-point-on-path.ts';
+import { getEdgePoints } from './get-edge-points';
 
 export interface EdgesRoutingMiddlewareMetadata {
   enabled: boolean;
   temporaryEdgeZIndex: number;
 }
 
-const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext) =>
+/**
+ * Determines if edges should be re-routed based on changes in the flow state.
+ */
+export const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext): boolean =>
   modelActionType === 'init' ||
   helpers.anyEdgesAdded() ||
   helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'ports']) ||
@@ -32,39 +25,149 @@ const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext
     'source',
     'target',
     'routing',
+    'routingMode',
   ]);
 
-const getPoints = (edge: Edge, nodesMap: Map<string, Node>, config?: RoutingConfiguration) => {
-  const sourceTarget = getSourceTargetPositions(edge, nodesMap);
-  const source = sourceTarget[0] as PortLocation;
-  const target = sourceTarget[1] as PortLocation;
-  const sourcePoint = source?.x
-    ? {
-        x: source.x,
-        y: source.y,
-      }
-    : undefined;
-  const targetPoint = target?.x
-    ? {
-        x: target.x,
-        y: target.y,
-      }
-    : undefined;
+/**
+ * Determines if a specific edge should be routed based on changes.
+ */
+export const shouldRouteEdge = (
+  edge: Edge,
+  helpers: MiddlewareContext['helpers'],
+  modelActionType: MiddlewareContext['modelActionType']
+): boolean => {
+  const isEdgeOrNodesChanged =
+    helpers.checkIfEdgeChanged(edge.id) ||
+    helpers.checkIfNodeChanged(edge.source) ||
+    helpers.checkIfNodeChanged(edge.target);
 
-  let points = [];
+  return isEdgeOrNodesChanged || modelActionType === 'init';
+};
 
-  switch (edge.routing) {
-    case 'orthogonal':
-      points = getOrthogonalPathPoints(source, target);
-      break;
-    case 'bezier':
-      points = getBezierPathPoints(source, target, config?.bezier?.bezierControlOffset);
-      break;
-    default:
-      points = [sourcePoint, targetPoint].filter((point) => !!point);
-      break;
+/**
+ * Checks if points have changed between old and new arrays.
+ */
+export const havePointsChanged = (oldPoints: Point[] | undefined, newPoints: Point[]): boolean => {
+  if (!oldPoints) return true;
+  if (oldPoints.length !== newPoints.length) return true;
+  return !oldPoints.every((point, index) => isSamePoint(point, newPoints[index]));
+};
+
+/**
+ * Updates label positions based on edge points.
+ */
+export const updateLabelPositions = (edge: Edge, points: Point[], routingManager: EdgeRoutingManager) => {
+  return edge.labels?.map((label) => ({
+    ...label,
+    position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
+  }));
+};
+
+/**
+ * Processes a single edge for manual routing mode.
+ */
+export const processManualModeEdge = (
+  edge: Edge,
+  sourcePoint: Point | undefined,
+  targetPoint: Point | undefined,
+  points: Point[],
+  routingManager: EdgeRoutingManager
+): (Partial<Edge> & { id: string }) | null => {
+  const updatedLabels = updateLabelPositions(edge, points, routingManager);
+
+  if (updatedLabels?.length || sourcePoint || targetPoint) {
+    return {
+      id: edge.id,
+      sourcePosition: sourcePoint,
+      targetPosition: targetPoint,
+      labels: updatedLabels,
+    };
   }
-  return { sourcePoint, targetPoint, points };
+  return null;
+};
+
+/**
+ * Processes a single edge for auto routing mode.
+ */
+export const processAutoModeEdge = (
+  edge: Edge,
+  sourcePoint: Point | undefined,
+  targetPoint: Point | undefined,
+  points: Point[],
+  routingManager: EdgeRoutingManager
+): (Partial<Edge> & { id: string }) | null => {
+  // Skip if points haven't changed
+  if (!havePointsChanged(edge.points, points)) {
+    return null;
+  }
+
+  const updatedLabels = updateLabelPositions(edge, points, routingManager);
+
+  return {
+    id: edge.id,
+    points,
+    sourcePosition: sourcePoint,
+    targetPosition: targetPoint,
+    labels: updatedLabels,
+  };
+};
+
+/**
+ * Processes edges that need routing updates.
+ */
+export const processEdgesForRouting = (
+  edges: Edge[],
+  nodesMap: Map<string, Node>,
+  routingManager: EdgeRoutingManager,
+  helpers: MiddlewareContext['helpers'],
+  modelActionType: MiddlewareContext['modelActionType']
+): NonNullable<FlowStateUpdate['edgesToUpdate']> => {
+  const edgesToUpdate: NonNullable<FlowStateUpdate['edgesToUpdate']> = [];
+
+  edges.forEach((edge) => {
+    if (!shouldRouteEdge(edge, helpers, modelActionType)) {
+      return;
+    }
+
+    const { sourcePoint, targetPoint, points } = getEdgePoints(edge, nodesMap, routingManager);
+
+    // Skip if we don't have valid points (e.g., ports not initialized)
+    if (!points || points.length === 0) {
+      return;
+    }
+
+    const isManualMode = edge.routingMode === 'manual';
+
+    const update = isManualMode
+      ? processManualModeEdge(edge, sourcePoint, targetPoint, points, routingManager)
+      : processAutoModeEdge(edge, sourcePoint, targetPoint, points, routingManager);
+
+    if (update) {
+      edgesToUpdate.push(update);
+    }
+  });
+
+  return edgesToUpdate;
+};
+
+/**
+ * Creates an updated temporary edge with new routing.
+ */
+export const createUpdatedTemporaryEdge = (
+  temporaryEdge: Edge,
+  nodesMap: Map<string, Node>,
+  routingManager: EdgeRoutingManager,
+  zIndex: number
+): Edge => {
+  const { sourcePoint, targetPoint, points } = getEdgePoints(temporaryEdge, nodesMap, routingManager);
+
+  return {
+    ...temporaryEdge,
+    points,
+    sourcePosition: sourcePoint,
+    targetPosition: targetPoint,
+    zIndex,
+  };
 };
 
 export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMiddlewareMetadata> = {
@@ -80,15 +183,16 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       helpers,
       modelActionType,
       middlewareMetadata,
+      flowCore,
     } = context;
-    // Access the typed middleware metadata
-    const isEnabled = middlewareMetadata.enabled;
-    const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
 
-    if (!isEnabled) {
+    if (!middlewareMetadata.enabled) {
       next();
       return;
     }
+
+    const routingManager = flowCore.edgeRoutingManager;
+    const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
 
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
     const shouldUpdateTemporaryEdge = helpers.checkIfMetadataPropsChanged(['temporaryEdge']) && metadata.temporaryEdge;
@@ -98,81 +202,14 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       return;
     }
 
-    const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
+    const edgesToUpdate = shouldRouteEdges
+      ? processEdgesForRouting(edges, nodesMap, routingManager, helpers, modelActionType)
+      : [];
 
-    if (shouldRouteEdges) {
-      edges.forEach((edge) => {
-        const isCustomEdgeRouting = !!edge.type;
-        const isProperEdgeRouting = edge.routing === undefined || isDefaultRouting(edge.routing);
-        const isEdgeOrNodesChanged =
-          helpers.checkIfEdgeChanged(edge.id) ||
-          helpers.checkIfNodeChanged(edge.source) ||
-          helpers.checkIfNodeChanged(edge.target);
-
-        const shouldRoute = isProperEdgeRouting && (isEdgeOrNodesChanged || modelActionType === 'init');
-
-        const shouldRouteCustomEdge =
-          isCustomEdgeRouting &&
-          (isEdgeOrNodesChanged || modelActionType === 'init') &&
-          edge.type &&
-          edge.type !== 'edge' &&
-          !isProperEdgeRouting;
-
-        if (shouldRouteCustomEdge) {
-          const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
-
-          const updatedLabels = edge.labels?.map((label) => ({
-            ...label,
-            position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
-          }));
-
-          edgesToUpdate.push({
-            id: edge.id,
-            sourcePosition: sourcePoint || undefined,
-            targetPosition: targetPoint || undefined,
-            labels: updatedLabels,
-          });
-        }
-
-        if (!shouldRoute) {
-          return;
-        }
-
-        const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap, metadata?.routingConfiguration);
-        if (
-          edge.points?.length === points.length &&
-          edge.points?.every((point, index) => isSamePoint(point, points[index]))
-        ) {
-          return;
-        }
-
-        const updatedLabels = edge.labels?.map((label) => ({
-          ...label,
-          position: getPointOnPath({ points, percentage: label.positionOnEdge, routing: edge.routing }),
-        }));
-        edgesToUpdate.push({
-          id: edge.id,
-          points,
-          sourcePosition: sourcePoint || undefined,
-          targetPosition: targetPoint || undefined,
-          labels: updatedLabels,
-        });
-      });
-    }
-    let newTemporaryEdge: Edge | undefined = undefined;
-
-    if (shouldUpdateTemporaryEdge && metadata.temporaryEdge) {
-      const edge = metadata.temporaryEdge;
-      const { sourcePoint, targetPoint, points } = getPoints(edge, nodesMap);
-
-      newTemporaryEdge = {
-        ...metadata.temporaryEdge,
-        points,
-        sourcePosition: sourcePoint || undefined,
-        targetPosition: targetPoint || undefined,
-        zIndex: temporaryEdgeZIndex,
-      };
-    }
+    const newTemporaryEdge =
+      shouldUpdateTemporaryEdge && metadata.temporaryEdge
+        ? createUpdatedTemporaryEdge(metadata.temporaryEdge, nodesMap, routingManager, temporaryEdgeZIndex)
+        : undefined;
 
     next({
       ...(edgesToUpdate.length > 0 ? { edgesToUpdate } : {}),

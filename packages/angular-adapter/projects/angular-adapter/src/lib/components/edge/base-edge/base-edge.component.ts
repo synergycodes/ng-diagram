@@ -1,22 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, Point, Routing } from '@angularflow/core';
+import { Edge, equalPointsArrays, Point, RoutingMode } from '@angularflow/core';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
-import { getPath } from '../../../utils/get-path/get-path';
 
 /**
- * To create an edge with a custom path, you must provide the `pathAndPoints` property.
- * If you want to use one of the default edge types, set the `routing` property in `edge`
- * or provide the `routing` property as a component prop
+ * Base edge component that handles edge rendering.
  *
- * - For custom paths:
- *  - Provide the `pathAndPoints` prop to the component with your custom `path` string and `points` array.
- *
- * - For default paths:
- *   - Set `routing` in `edge` to one of the supported types (e.g., `'straight'`, `'bezier'`, `'orthogonal'`).
- *   - Or provide the `routing` property as a component prop
- *   - The edge will automatically generate its path based on the routing type and provided points.
- *
+ * Path is determined based on edge routing mode:
+ * - Auto mode (default): Path is computed from source/target positions using routing algorithm
+ * - Manual mode: Path is computed from user-provided points using routing algorithm
+ * The routing algorithm determines how the path is rendered (orthogonal, bezier, polyline, etc.)
  */
 
 @Component({
@@ -33,22 +26,37 @@ export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   edge = input.required<Edge>();
-  pathAndPoints = input<{ path: string; points: Point[] }>();
-  routing = input<Routing>();
+  routing = input<string>();
   stroke = input<string>();
   customMarkerStart = input<string>();
   customMarkerEnd = input<string>();
   strokeOpacity = input<number>(1);
   strokeWidth = input<number>(2);
 
-  points = computed(() => (this.routing() ? this.edge().points : (this.pathAndPoints()?.points ?? [])));
+  points = computed(() => this.edge().points ?? []);
 
   path = computed(() => {
-    const routing = this.routing();
-    const points = this.points() ?? [];
-    if (!routing) return this.pathAndPoints()?.path ?? '';
+    const edge = this.edge();
+    const routingName = this.routing() ?? edge.routing;
+    const flowCore = this.flowCoreProvider.provide();
 
-    return getPath(routing, points);
+    // Generate SVG path from points using the routing
+    const points = this.points();
+    if (points.length === 0) return '';
+
+    if (routingName && flowCore.edgeRoutingManager.hasRouting(routingName)) {
+      const path = flowCore.edgeRoutingManager.computePath(routingName, points);
+      return path;
+    }
+
+    // Use default routing if available
+    const defaultRouting = flowCore.edgeRoutingManager.getDefaultRouting();
+    if (flowCore.edgeRoutingManager.hasRouting(defaultRouting)) {
+      return flowCore.edgeRoutingManager.computePath(defaultRouting, points);
+    }
+
+    // Fallback to simple straight line path
+    return `M ${points[0].x},${points[0].y}`;
   });
 
   markerStart = computed(() =>
@@ -73,35 +81,60 @@ export class NgDiagramBaseEdgeComponent {
   labels = computed(() => this.edge().labels ?? []);
 
   private prevRouting: string | undefined;
+  private prevRoutingMode: RoutingMode | undefined;
   private prevPoints: Point[] | undefined;
 
   constructor() {
-    effect(() => {
-      const { sourcePosition, targetPosition } = this.edge();
+    // Sync edge properties from custom components back to the model
+    effect(() => this.syncEdgePropertiesToModel());
+  }
 
-      const routing = this.routing?.();
-      if (!routing || !sourcePosition || !targetPosition) return;
+  private syncEdgePropertiesToModel(): void {
+    const edge = this.edge();
+    const edgeChanges: Partial<Edge> = {};
 
-      if (this.prevRouting !== routing) {
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.edge().id,
-          edgeChanges: { routing },
-        });
-        this.prevRouting = routing;
+    const hasChanges =
+      this.checkRoutingChanges(edge, edgeChanges) ||
+      this.checkRoutingModeChanges(edge, edgeChanges) ||
+      this.checkPointsChanges(edge, edgeChanges);
+
+    // Emit update if any changes detected
+    if (hasChanges) {
+      this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
+        id: edge.id,
+        edgeChanges,
+      });
+    }
+  }
+
+  private checkRoutingChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
+    const routing = this.routing() ?? edge.routing;
+    if (routing && this.prevRouting !== routing) {
+      edgeChanges.routing = routing;
+      this.prevRouting = routing;
+      return true;
+    }
+    return false;
+  }
+
+  private checkRoutingModeChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
+    if (edge.routingMode && this.prevRoutingMode !== edge.routingMode) {
+      edgeChanges.routingMode = edge.routingMode;
+      this.prevRoutingMode = edge.routingMode;
+      return true;
+    }
+    return false;
+  }
+
+  private checkPointsChanges(edge: Edge, edgeChanges: Partial<Edge>): boolean {
+    if (edge.routingMode === 'manual' && edge.points && edge.points.length > 0) {
+      // Update on initial render (when prevPoints is undefined) or when points changed
+      if (!this.prevPoints || !equalPointsArrays(this.prevPoints, edge.points)) {
+        edgeChanges.points = edge.points;
+        this.prevPoints = edge.points;
+        return true;
       }
-    });
-
-    effect(() => {
-      if (!this.pathAndPoints() || this.routing()) return;
-
-      const currentPoints = this.points() || [];
-      if (this.prevPoints && !equalPointsArrays(this.prevPoints, currentPoints)) {
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdge', {
-          id: this.edge().id,
-          edgeChanges: { points: currentPoints },
-        });
-      }
-      this.prevPoints = currentPoints;
-    });
+    }
+    return false;
   }
 }

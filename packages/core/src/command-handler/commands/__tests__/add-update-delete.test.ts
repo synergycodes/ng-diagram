@@ -15,6 +15,14 @@ describe('Add Update Delete Command', () => {
       applyUpdate: vi.fn(),
       getNodeById: getNodeByIdMock,
       getEdgeById: getEdgeByIdMock,
+      edgeRoutingManager: {
+        computePointOnPath: vi.fn().mockImplementation((_routing, _points, percentage) => {
+          // Simple mock implementation for testing
+          if (percentage === 0) return { x: 0, y: 0 };
+          if (percentage === 1) return { x: 100, y: 100 };
+          return { x: 50, y: 50 };
+        }),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });

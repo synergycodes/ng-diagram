@@ -43,10 +43,6 @@ export type ContainerEdge =
   | 'bottomright'
   | null;
 
-export const ROUTING = ['orthogonal', 'straight', 'bezier'] as const;
-export type DefaultRouting = (typeof ROUTING)[number];
-export type Routing = LooseAutocomplete<DefaultRouting>;
-
 export type PortLocation = {
   side: PortSide;
 } & Point;

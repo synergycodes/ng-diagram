@@ -1,5 +1,6 @@
 import { ActionStateManager } from './action-state-manager/action-state-manager';
 import { CommandHandler } from './command-handler/command-handler';
+import { EdgeRoutingManager } from './edge-routing-manager';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -53,6 +54,7 @@ export class FlowCore<
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
   readonly actionStateManager: ActionStateManager;
+  readonly edgeRoutingManager: EdgeRoutingManager;
 
   readonly config: FlowConfig;
 
@@ -68,6 +70,7 @@ export class FlowCore<
     config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
+    this.config = deepMerge(defaultFlowConfig, config);
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.spatialHash = new SpatialHash();
@@ -78,8 +81,11 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
+    this.edgeRoutingManager = new EdgeRoutingManager(
+      this.config.edgeRouting.defaultRouting,
+      () => this.config.edgeRouting || {}
+    );
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
-    this.config = deepMerge(defaultFlowConfig, config);
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
 

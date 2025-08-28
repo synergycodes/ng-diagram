@@ -1,0 +1,14 @@
+<ng-diagram-base-edge
+  class="custom-polyline-edge"
+  [edge]="customEdge()"
+  stroke="#6366f1"
+  [strokeWidth]="2"
+  [customMarkerEnd]="'ng-diagram-arrow'"
+>
+  <ng-diagram-base-edge-label [id]="'polyline-label'" [positionOnEdge]="0.2">
+    <div class="polyline-label">Semi auto</div>
+  </ng-diagram-base-edge-label>
+  <ng-diagram-base-edge-label [id]="'polyline-label2'" [positionOnEdge]="0.8">
+    <div class="polyline-label">manual path</div>
+  </ng-diagram-base-edge-label>
+</ng-diagram-base-edge>
