@@ -1,5 +1,5 @@
 import '@angular/compiler';
-import { Component } from '@angular/core';
+import { Component, inject, Injector } from '@angular/core';
 import {
   NgDiagramComponent,
   NgDiagramModelService,
@@ -13,7 +13,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
   imports: [NgDiagramComponent, NavBarComponent],
   template: `
     <div>
-      <nav-bar></nav-bar>
+      <nav-bar (loadModel)="loadModel($event)"></nav-bar>
       <div class="not-content diagram">
         <ng-diagram [model]="model" [config]="config" />
       </div>
@@ -37,6 +37,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
   providers: [NgDiagramModelService],
 })
 export class SaveStateExampleComponent {
+  private injector = inject(Injector);
   config = {
     zoom: {
       max: 3,
@@ -64,4 +65,8 @@ export class SaveStateExampleComponent {
     edges: [],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
+
+  loadModel(model: any): void {
+    this.model = createSignalModel(model, this.injector);
+  }
 }

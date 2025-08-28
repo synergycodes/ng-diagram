@@ -98,6 +98,7 @@ describe('FlowCore', () => {
       onChange: vi.fn(),
       undo: vi.fn(),
       redo: vi.fn(),
+      toJSON: vi.fn(),
     };
 
     mockRenderer = {

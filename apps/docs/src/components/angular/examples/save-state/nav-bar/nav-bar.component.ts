@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { NgDiagramModelService } from '@angularflow/angular-adapter';
 import { SaveStateService } from '../save.service';
 
@@ -17,6 +17,8 @@ import { SaveStateService } from '../save.service';
   styleUrls: ['./nav-bar.component.scss'],
 })
 export class NavBarComponent {
+  loadModel = output<any>();
+
   private readonly saveStateService = inject(SaveStateService);
   private readonly modelService = inject(NgDiagramModelService);
   isSaved = computed(() => {
@@ -27,7 +29,7 @@ export class NavBarComponent {
   private statusTimeout: ReturnType<typeof setTimeout> | null = null;
 
   save(): void {
-    const model = this.modelService.export();
+    const model = this.modelService.toJSON();
     this.saveStateService.save(model);
     this.showStatus('State has been successfully saved!');
   }
@@ -36,7 +38,7 @@ export class NavBarComponent {
     const model = this.saveStateService.load();
 
     if (model) {
-      this.modelService.import(model);
+      this.loadModel.emit(model);
       this.showStatus('State has been loaded!');
     }
   }

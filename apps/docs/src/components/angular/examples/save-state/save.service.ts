@@ -1,5 +1,9 @@
 import { effect, Injectable, signal } from '@angular/core';
-import { type Edge, type Node } from '@angularflow/angular-adapter';
+import {
+  type Edge,
+  type Metadata,
+  type Node,
+} from '@angularflow/angular-adapter';
 
 @Injectable()
 export class SaveStateService {
@@ -18,7 +22,7 @@ export class SaveStateService {
     this.state.set(newState);
   }
 
-  load(): { nodes: Node[]; edges: Edge[] } | null {
+  load(): { nodes: Node[]; edges: Edge[]; metadata: Metadata } | null {
     try {
       const serializedState = this.state();
       return serializedState ? JSON.parse(serializedState) : null;

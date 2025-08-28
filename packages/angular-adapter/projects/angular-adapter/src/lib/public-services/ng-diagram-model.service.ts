@@ -121,24 +121,8 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
     });
   }
 
-  export(): string {
-    const model = this.getModel();
-    return JSON.stringify({ nodes: model.getNodes(), edges: model.getEdges() });
-  }
-
-  async import({ nodes, edges }: { nodes: Node[]; edges: Edge[] }): Promise<void> {
-    try {
-      await this.flowCore.commandHandler.emit('clearModel');
-
-      if (nodes?.length) {
-        await this.flowCore.commandHandler.emit('addNodes', { nodes });
-      }
-      if (edges?.length) {
-        await this.flowCore.commandHandler.emit('addEdges', { edges });
-      }
-    } catch (error) {
-      console.error('Error importing model:', error);
-    }
+  toJSON(): string {
+    return this.flowCore.model.toJSON();
   }
 
   /**

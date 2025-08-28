@@ -24,6 +24,7 @@ describe('FlowCoreProviderService', () => {
     onChange: vi.fn(),
     undo: vi.fn(),
     redo: vi.fn(),
+    toJSON: vi.fn(),
   };
 
   beforeEach(() => {
