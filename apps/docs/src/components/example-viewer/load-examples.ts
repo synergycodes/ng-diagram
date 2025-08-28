@@ -20,5 +20,23 @@ export async function loadExamples(dirName: string) {
     })
   );
 
-  return fileContents;
+  const sortedFileContents = fileContents.sort((a, b) => {
+    const extensionOrder = ['ts', 'html', 'css'];
+    const aIndex = extensionOrder.indexOf(a.extension);
+    const bIndex = extensionOrder.indexOf(b.extension);
+
+    // Sort by extension priority
+    if (aIndex !== -1 && bIndex !== -1) {
+      if (aIndex !== bIndex) return aIndex - bIndex;
+    } else if (aIndex !== -1) {
+      return -1;
+    } else if (bIndex !== -1) {
+      return 1;
+    }
+
+    // If same extension or both not in priority list, sort alphabetically by fileName
+    return a.fileName.localeCompare(b.fileName);
+  });
+
+  return sortedFileContents;
 }

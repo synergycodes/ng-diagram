@@ -4,3 +4,33 @@ description: Example of how to create a custom edge in NgDiagram
 ---
 
 # Custom Edge
+
+This example demonstrates how to create custom edges in NgDiagram with unique visual styles and interactive elements. It showcases three different edge types:
+
+1. **Default Edge**:
+   - a standard edge parametrized through model data
+   - enhanced with a custom circular arrowhead marker defined in SVG
+
+2. **Labeled Edge**:
+   - a custom edge with adjusted stroke width dynamically changing on selection
+   - features interactive button label positioned at its midpoint
+
+3. **Sinusoid Edge**:
+   - a custom wave-shaped edge with adjusted stroke color
+   - renders a sinusoidal curve between nodes
+
+The example illustrates key concepts including:
+
+- Creating custom edge components that implement `NgDiagramEdgeTemplate`
+- Adjusting parameters of `NgDiagramBaseEdgeComponent` in custom edges
+- Registering edge types using the `edgeTemplateMap`
+- Defining custom SVG markers for arrowheads
+- Adding interactive elements with `BaseEdgeLabelComponent`
+- Generating complex path calculations for non-standard edge shapes
+
+import CustomEdge from '@examples/custom-edge/custom-edge.astro';
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+
+<CustomEdge />
+
+<ExampleViewer dirName="custom-edge" />
