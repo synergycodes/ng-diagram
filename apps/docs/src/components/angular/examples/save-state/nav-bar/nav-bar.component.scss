@@ -7,7 +7,7 @@
 
   & .status {
     flex: 1;
-    background: lightgreen;
+    background: var(--ngd-node-stroke-primary-default);
     padding: 2px 12px;
 
     &:empty {
