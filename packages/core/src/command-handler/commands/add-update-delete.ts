@@ -31,12 +31,12 @@ export const updateNodes = async (commandHandler: CommandHandler, command: Updat
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: nodes }, 'updateNodes');
 };
 
-export interface DeleteNodesCommand {
-  name: 'deleteNodes';
+export interface DeleteElementsCommand {
+  name: 'deleteElements';
   ids: string[];
 }
 
-export const deleteNodes = async (commandHandler: CommandHandler, command: DeleteNodesCommand) => {
+export const deleteElements = async (commandHandler: CommandHandler, command: DeleteElementsCommand) => {
   const { edges } = commandHandler.flowCore.getState();
   const { ids } = command;
   const edgesToDeleteIds = new Set<string>();
@@ -51,7 +51,7 @@ export const deleteNodes = async (commandHandler: CommandHandler, command: Delet
       nodesToRemove: Array.from(nodesToDeleteIds),
       edgesToRemove: edgesToDeleteIds.size > 0 ? Array.from(edgesToDeleteIds) : [],
     },
-    'deleteNodes'
+    'deleteElements'
   );
 };
 
@@ -66,7 +66,7 @@ export const clearModel = async (commandHandler: CommandHandler) => {
       nodesToRemove: nodes.map((node) => node.id),
       edgesToRemove: edges.map((edge) => edge.id),
     },
-    'deleteNodes'
+    'deleteElements'
   );
 };
 

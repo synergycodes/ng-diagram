@@ -7,7 +7,7 @@ import {
   ClearModelCommand,
   DeleteEdgeLabelsCommand,
   DeleteEdgesCommand,
-  DeleteNodesCommand,
+  DeleteElementsCommand,
   DeletePortsCommand,
   UpdateEdgeCommand,
   UpdateEdgeLabelCommand,
@@ -49,7 +49,7 @@ export type Command =
   | AddNodesCommand
   | UpdateNodeCommand
   | UpdateNodesCommand
-  | DeleteNodesCommand
+  | DeleteElementsCommand
   | AddEdgesCommand
   | UpdateEdgeCommand
   | DeleteEdgesCommand
