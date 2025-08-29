@@ -52,9 +52,9 @@ describe('Add Update Delete Command', () => {
       metadata: {},
     });
 
-    commandHandler.emit('deleteElements', { ids: ['1'] });
+    commandHandler.emit('deleteNodes', { ids: ['1'] });
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToRemove: ['1'], edgesToRemove: ['1'] }, 'deleteElements');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToRemove: ['1'], edgesToRemove: ['1'] }, 'deleteNodes');
   });
 
   it('should add edges to the flow', () => {
@@ -91,7 +91,7 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       { nodesToRemove: ['1', '2'], edgesToRemove: ['1'] },
-      'deleteElements'
+      'clearModel'
     );
   });
 
