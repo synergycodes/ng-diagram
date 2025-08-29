@@ -63,6 +63,7 @@ describe('MiddlewareManager', () => {
       onChange: vi.fn(),
       undo: vi.fn(),
       redo: vi.fn(),
+      toJSON: vi.fn(),
     } as unknown as ModelAdapter<TestMetadata>;
 
     flowCore = {

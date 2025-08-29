@@ -1,6 +1,61 @@
 ---
-title: Save State
+title: Save Persistence
 description: Example of how to save and restore state in NgDiagram
+sidebar:
+  order: 0
 ---
 
-# Save State
+import { Image } from 'astro:assets';
+import { LinkCard } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import SaveState from '../../../components/angular/examples/save-state/save-state.astro';
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+
+This example demonstrates how to implement save to the diagram in NgDiagram using Angular features.
+
+## Save Persistence Overview
+
+The save functionality allows users to persist the current diagram (nodes and edges) in local storage, restore it later, or clear the saved state.
+
+### Key Features
+
+- **Persistence**: Saves the diagram state to local storage.
+- **Restoration**: Loads the saved state back into the diagram.
+- **Clear**: Removes the saved state from local storage.
+
+## Implementation Details
+
+### Save Persistence Service
+
+The `SaveStateService` manages saving, loading, and clearing the diagram state using Angular signals and effects:
+
+<CodeSnippet
+  relativePath="examples/save-state/save.service.ts"
+  range={[1, 34]}
+  collapse={['1-3']}
+  mark={[{ range: '10-14' }]}
+/>
+
+### NavBar Component
+
+The navigation bar provides buttons for saving, loading, and clearing the diagram state. Button states are reactive:
+
+<CodeSnippet
+  relativePath="examples/save-state/nav-bar/nav-bar.component.ts"
+  range={[1, 63]}
+  collapse={['1-4', '20-61']}
+  mark={[{ range: '8-15' }]}
+/>
+
+### Component Structure
+
+The example wraps the diagram and navigation bar in a context provider, ensuring services are available.
+
+## Actions
+
+- **Save**: Serializes and stores the current diagram state.
+- **Load**: Restores the diagram from the saved state.
+- **Clear**: Removes the saved state from local
+
+<SaveState />
+<ExampleViewer dirName="save-state" />

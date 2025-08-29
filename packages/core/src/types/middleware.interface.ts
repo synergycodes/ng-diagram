@@ -16,6 +16,7 @@ export type ModelActionType =
   | 'updateNode'
   | 'updateNodes'
   | 'deleteNodes'
+  | 'clearModel'
   | 'addEdges'
   | 'updateEdge'
   | 'deleteEdges'

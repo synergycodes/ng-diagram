@@ -121,6 +121,10 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
     });
   }
 
+  toJSON(): string {
+    return this.flowCore.model.toJSON();
+  }
+
   /**
    * Sets the selection state
    * @param nodeIds Nodes to select

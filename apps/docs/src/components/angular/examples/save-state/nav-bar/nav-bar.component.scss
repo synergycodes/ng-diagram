@@ -1,0 +1,34 @@
+.nav-bar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  justify-content: end;
+  padding: 2px 16px;
+
+  & .status {
+    flex: 1;
+    background: var(--ngd-node-stroke-primary-default);
+    padding: 2px 12px;
+
+    &:empty {
+      background: none;
+    }
+  }
+
+  & > button {
+    cursor: pointer;
+    border: none;
+
+    &.clear {
+      background: darkred;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+
+      &.clear {
+        background: none;
+      }
+    }
+  }
+}

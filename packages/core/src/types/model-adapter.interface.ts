@@ -66,4 +66,9 @@ export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
    * Redo the last undone change
    */
   redo(): void;
+
+  /**
+   * Convert the model to a JSON string
+   */
+  toJSON(): string;
 }

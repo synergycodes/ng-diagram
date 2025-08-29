@@ -78,6 +78,23 @@ describe('Add Update Delete Command', () => {
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edgesToRemove: ['1'] }, 'deleteEdges');
   });
 
+  it('should clear the entire model', () => {
+    const node1 = { ...mockNode, id: '1', selected: true };
+    const node2 = { ...mockNode, id: '2', selected: false };
+    const edge = { ...mockEdge, id: '1', selected: false, source: '1', target: '2' };
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [node1, node2],
+      edges: [edge],
+      metadata: {},
+    });
+    commandHandler.emit('clearModel');
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToRemove: ['1', '2'], edgesToRemove: ['1'] },
+      'clearModel'
+    );
+  });
+
   it('should add ports to a node', () => {
     const node = { ...mockNode, id: '1' };
     const port = { ...mockPort, id: '1' };

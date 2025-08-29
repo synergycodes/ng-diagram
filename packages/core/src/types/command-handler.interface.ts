@@ -4,6 +4,7 @@ import {
   AddEdgesCommand,
   AddNodesCommand,
   AddPortsCommand,
+  ClearModelCommand,
   DeleteEdgeLabelsCommand,
   DeleteEdgesCommand,
   DeleteNodesCommand,
@@ -75,7 +76,8 @@ export type Command =
   | RotateNodeToCommand
   | HighlightGroupCommand
   | HighlightGroupClearCommand
-  | AddToGroupCommand;
+  | AddToGroupCommand
+  | ClearModelCommand;
 
 /**
  * Type for command name

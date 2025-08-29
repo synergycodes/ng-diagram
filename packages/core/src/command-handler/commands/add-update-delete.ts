@@ -55,6 +55,21 @@ export const deleteNodes = async (commandHandler: CommandHandler, command: Delet
   );
 };
 
+export interface ClearModelCommand {
+  name: 'clearModel';
+}
+
+export const clearModel = async (commandHandler: CommandHandler) => {
+  const { edges, nodes } = commandHandler.flowCore.getState();
+  await commandHandler.flowCore.applyUpdate(
+    {
+      nodesToRemove: nodes.map((node) => node.id),
+      edgesToRemove: edges.map((edge) => edge.id),
+    },
+    'clearModel'
+  );
+};
+
 export interface AddEdgesCommand {
   name: 'addEdges';
   edges: Edge[];
