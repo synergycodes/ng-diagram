@@ -91,7 +91,7 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       { nodesToRemove: ['1', '2'], edgesToRemove: ['1'] },
-      'clearModel'
+      'deleteElements'
     );
   });
 
