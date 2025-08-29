@@ -17,6 +17,7 @@ import { SaveStateService } from '../save.service';
   styleUrls: ['./nav-bar.component.scss'],
 })
 export class NavBarComponent {
+  //TODO - change any type to the correct one
   loadModel = output<any>();
 
   private readonly saveStateService = inject(SaveStateService);

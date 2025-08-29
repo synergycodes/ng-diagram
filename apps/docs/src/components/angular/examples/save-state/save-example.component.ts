@@ -66,6 +66,7 @@ export class SaveStateExampleComponent {
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 
+  //TODO - change any type to the correct one
   loadModel(model: any): void {
     this.model = createSignalModel(model, this.injector);
   }

@@ -101,12 +101,12 @@ export class SignalModelAdapter<TMiddlewares extends MiddlewareChain = []>
   }
 
   toJSON(): string {
-    const { viewport } = this.metadata();
+    const metadata = this.metadata();
     return JSON.stringify({
       /* eslint-disable @typescript-eslint/no-unused-vars */
       nodes: this.nodes().map(({ selected, ...rest }) => rest),
       edges: this.edges().map(({ points, sourcePosition, targetPosition, ...rest }) => rest),
-      metadata: { ...viewport },
+      metadata,
       /* eslint-enable @typescript-eslint/no-unused-vars */
     });
   }
