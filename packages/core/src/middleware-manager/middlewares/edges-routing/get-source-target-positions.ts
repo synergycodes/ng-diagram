@@ -1,6 +1,5 @@
 import type { Edge, Node, PortSide } from '../../../types';
 import { getPortFlowPositionSide } from '../../../utils';
-import { getHandlePosition } from './get-rotated-position.ts';
 
 /**
  * Calculates and returns the source and target positions for a given edge based on the connected nodes.
@@ -21,15 +20,10 @@ export const getPoint = (node: Node, defaultSide: PortSide, portId?: string, pos
   if (!node || !portId) {
     return { ...position, side: defaultSide };
   }
+
   const portPosition = getPortFlowPositionSide(node, portId);
-  const angle = node?.angle;
-  if (angle != null && portPosition?.side) {
-    const newPortSide = getHandlePosition(portPosition?.side, angle);
-    if (newPortSide !== portPosition?.side) {
-      portPosition.side = newPortSide;
-    }
-  }
-  return portPosition;
+
+  return portPosition || { ...position, side: defaultSide };
 };
 
 const getPosition = (
