@@ -28,6 +28,25 @@ vi.mock('../../../../utils', () => ({
   }),
 }));
 
+vi.mock('../../../../utils/compute-floating-edge-side', () => ({
+  computeFloatingEndSide: vi.fn().mockImplementation((node, _portId, cursorPosition) => {
+    // Simple mock that returns different sides based on cursor position relative to a fixed point
+    if (!node) return 'left';
+    const nodeCenter = {
+      x: node.position.x + 50,
+      y: node.position.y + 25,
+    };
+    const dx = cursorPosition.x - nodeCenter.x;
+    const dy = cursorPosition.y - nodeCenter.y;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      return dx > 0 ? 'left' : 'right';
+    } else {
+      return dy > 0 ? 'top' : 'bottom';
+    }
+  }),
+}));
+
 describe('getSourceTargetPositions', () => {
   it('should return source and target positions for edge with nodes', () => {
     const edge: Edge = {
@@ -172,6 +191,122 @@ describe('getSourceTargetPositions', () => {
     expect(result).toHaveLength(2);
     expect(result[0].side).toBe('right');
     expect(result[1].side).toBe('left');
+  });
+
+  describe('temporary edges', () => {
+    it('should compute dynamic side for temporary edge with floating target', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        temporary: true,
+        source: 'node-1',
+        target: '', // No target node
+        sourcePort: 'port-1',
+        targetPosition: { x: 50, y: 100 }, // Cursor position below the source
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-1',
+          {
+            ...mockNode,
+            id: 'node-1',
+            position: { x: 0, y: 0 },
+            ports: [
+              {
+                ...mockPort,
+                id: 'port-1',
+                side: 'right',
+                position: { x: 90, y: 45 },
+                size: { width: 10, height: 10 },
+              },
+            ],
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].side).toBe('right'); // Source side remains default
+      expect(result[1].side).toBe('top'); // Target side computed dynamically (cursor is below, not to the right)
+    });
+
+    it('should compute dynamic side for temporary edge with floating source', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        temporary: true,
+        source: '', // No source node
+        target: 'node-2',
+        sourcePosition: { x: 250, y: -50 }, // Cursor position above the target
+        targetPosition: { x: 200, y: 50 },
+        targetPort: 'port-2',
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-2',
+          {
+            ...mockNode,
+            id: 'node-2',
+            position: { x: 200, y: 0 },
+            ports: [
+              {
+                ...mockPort,
+                id: 'port-2',
+                side: 'left',
+                position: { x: 0, y: 45 },
+                size: { width: 10, height: 10 },
+              },
+            ],
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].side).toBe('bottom'); // Source side computed dynamically (cursor is above, not to the left)
+      expect(result[1].side).toBe('left'); // Target side remains default
+    });
+
+    it('should use default sides for temporary edge without floating ends', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        temporary: true,
+        source: 'node-1',
+        target: 'node-2',
+      };
+
+      const nodesMap = new Map<string, Node>([
+        ['node-1', { ...mockNode, id: 'node-1', position: { x: 0, y: 0 } }],
+        ['node-2', { ...mockNode, id: 'node-2', position: { x: 100, y: 100 } }],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].side).toBe('right'); // Default source side
+      expect(result[1].side).toBe('left'); // Default target side
+    });
+
+    it('should handle temporary edge with no nodes and positions', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        temporary: true,
+        source: '',
+        target: '',
+        sourcePosition: { x: 50, y: 50 },
+        targetPosition: { x: 150, y: 150 },
+      };
+
+      const nodesMap = new Map<string, Node>();
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({ x: 50, y: 50, side: 'right' });
+      expect(result[1]).toEqual({ x: 150, y: 150, side: 'left' });
+    });
   });
 });
 
