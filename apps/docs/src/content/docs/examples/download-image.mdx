@@ -1,12 +1,89 @@
 ---
 title: Download Image
-description: Example of how to download the diagram as an image in NgDiagram
+description: Example of how to download the flow as an image in NgDiagram
+sidebar:
+  order: 1
 ---
 
-### Download Image aaa
-
+import { Image } from 'astro:assets';
+import { LinkCard } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import DownloadImage from '../../../components/angular/examples/download-image/download-image.astro';
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 
+This example demonstrates how to export the current flow as an image using Angular features and the `html-to-image` library.
+
+## Download Image Overview
+
+The download functionality allows users to export the flow as a image, capturing the current state and layout.
+
+### Key Features
+
+- **Export**: Downloads the flow as a PNG image.
+- **Bounding Box Calculation**: Ensures the exported image includes all nodes with proper margins.
+
+## Implementation Details
+
+### Download Image Service
+
+The `DownloadImageService` handles the logic for exporting the flow as an image. It uses the `html-to-image` library and calculates the bounding box to ensure all nodes are included:
+
+<CodeSnippet
+  relativePath="examples/download-image/download-image.service.ts"
+  range={[1, 34]}
+  collapse={['1-7']}
+  mark={[{ range: '11-33' }]}
+/>
+
+### Helper Functions
+
+Helper functions manage the download process and calculate the bounding box for the flow:
+
+<CodeSnippet
+  relativePath="examples/download-image/download-image.helper.ts"
+  range={[1, 61]}
+  collapse={['1-29']}
+  mark={[{ range: '44-59' }]}
+/>
+
+### NavBar Component
+
+The navigation bar provides a button to trigger the download action.
+
+To accurately calculate the bounding box for the entire flow, all nodes are pulled and passed to the calculation.
+Also it passes the flow element reference to the service.
+
+<CodeSnippet
+  relativePath="examples/download-image/nav-bar/nav-bar.component.ts"
+  range={[1, 38]}
+  collapse={['1-5']}
+  mark={[{ range: '21-29' }]}
+/>
+
+### Download Image Component
+
+This component renders the flow and navigation bar, wiring up the download functionality:
+
+<CodeSnippet
+  relativePath="examples/download-image/download-image.component.ts"
+  range={[1, 189]}
+  collapse={['1-10', '50-184', '22-36']}
+/>
+
+### Wrapper Component
+
+The wrapper provides context and service providers for the example:
+
+<CodeSnippet
+  relativePath="examples/download-image/download-image-wrapper.component.ts"
+  range={[1, 24]}
+  collapse={['1-6', '15-24']}
+  mark={[{ range: '13-22' }]}
+/>
+
+## Actions
+
+- **Download**: Exports the current flow as a PNG image using the bounding box and margin settings.
+
 <DownloadImage />
-<ExampleViewer dirName="save-state" />
+<ExampleViewer dirName="download-image" />
