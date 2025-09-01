@@ -5,6 +5,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
+  type Edge,
   type Node,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
@@ -24,11 +25,11 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
     }
   `,
 })
-export class NgDiagramStressTestContainer {
+export class NgDiagramPerformanceTestComponent {
   model = createSignalModel<AppMiddlewares>(this.generateModelData());
 
   generateModelData() {
-    const nodes: Node[] = this.generateNodes();
+    const nodes = this.generateNodes();
     const edges = this.generateEdges(nodes);
 
     return {
@@ -65,9 +66,9 @@ export class NgDiagramStressTestContainer {
     }).sort((a, b) => Number(a.id) - Number(b.id));
   }
 
-  private generateEdges(nodes: Node[]) {
-    return nodes.slice(0, -1).map((node, i) => {
-      const next = nodes[i + 1];
+  private generateEdges(nodes: Node[]): Edge[] {
+    return nodes.slice(0, -1).map((node, index) => {
+      const next = nodes[index + 1];
       return {
         id: `edge-${node.id}`,
         source: node.id,
