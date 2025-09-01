@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "NODE_ENV=development turbo watch dev --filter=!docs",
-    "docs:dev": "turbo watch docs:dev",
+    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs",
+    "docs:dev": "cross-env NODE_ENV=development turbo watch docs:dev",
     "lint:check": "turbo run lint:check",
     "lint:fix": "turbo run lint:fix",
     "format:check": "prettier . --check",
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@vitest/coverage-istanbul": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
+    "cross-env": "^10.0.0",
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "turbo": "^2.5.0",
