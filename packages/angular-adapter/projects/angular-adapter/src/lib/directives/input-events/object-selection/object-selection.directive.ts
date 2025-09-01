@@ -41,7 +41,7 @@ abstract class ObjectSelectionDirective {
 @Directive()
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'diagram';
-  override readonly targetData = input.required<Node | Edge | undefined>();
+  override readonly targetData = input<Node | Edge | undefined>();
 }
 
 @Directive()

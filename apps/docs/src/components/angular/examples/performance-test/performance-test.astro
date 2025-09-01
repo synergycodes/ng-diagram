@@ -1,0 +1,17 @@
+---
+import { NgDiagramPerformanceTestComponent } from './diagram.component';
+---
+
+<div class="diagram-container not-content">
+  <NgDiagramPerformanceTestComponent client:only="angular" />
+</div>
+
+<style>
+  .diagram-container {
+    width: 100%;
+    height: 30rem;
+    border: 5px solid var(--ngd-ui-border-default);
+    background-color: var(--ngd-ui-bg-tertiary-default) ;
+    position: relative;
+  }
+</style>
