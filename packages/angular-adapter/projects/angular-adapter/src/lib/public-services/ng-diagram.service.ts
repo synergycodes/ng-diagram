@@ -29,6 +29,11 @@ export class NgDiagramService<
   }
 
   /**
+   * Returns whether the diagram is initialized
+   */
+  isInitialized = this.flowCoreProvider.isInitialized;
+
+  /**
    * Returns the current metadata
    */
   getMetadata(): Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> {
