@@ -24,12 +24,12 @@ The download functionality allows users to export the flow as a image, capturing
 
 ## Implementation Details
 
-### Download Image Service
+### Generate Image Service
 
-The `DownloadImageService` handles the logic for exporting the flow as an image. It uses the `html-to-image` library and calculates the bounding box to ensure all nodes are included:
+The `GenerateImageService` handles the logic for exporting the flow as an image. It uses the `html-to-image` library and calculates the bounding box to ensure all nodes are included:
 
 <CodeSnippet
-  relativePath="examples/download-image/download-image.service.ts"
+  relativePath="examples/download-image/generate-image.service.ts"
   range={[1, 34]}
   collapse={['1-7']}
   mark={[{ range: '11-33' }]}
@@ -40,7 +40,7 @@ The `DownloadImageService` handles the logic for exporting the flow as an image.
 Helper functions manage the download process and calculate the bounding box for the flow:
 
 <CodeSnippet
-  relativePath="examples/download-image/download-image.helper.ts"
+  relativePath="examples/download-image/generate-image.helper.ts"
   range={[1, 61]}
   collapse={['1-29']}
   mark={[{ range: '44-59' }]}

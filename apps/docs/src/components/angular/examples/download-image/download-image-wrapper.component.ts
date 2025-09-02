@@ -2,7 +2,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import { NgDiagramContextComponent } from '@angularflow/angular-adapter';
 import { DownloadImageComponent } from './download-image.component';
-import { DownloadImageService } from './download-image.service';
+import { GenerateImageService } from './generate-image.service';
 
 @Component({
   selector: 'download-image-wrapper',
@@ -22,6 +22,6 @@ import { DownloadImageService } from './download-image.service';
       }
     `,
   ],
-  providers: [DownloadImageService],
+  providers: [GenerateImageService],
 })
 export class DownloadImageWrapperComponent {}
