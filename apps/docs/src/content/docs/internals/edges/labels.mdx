@@ -16,7 +16,7 @@ To display a label on an edge, use the `BaseEdgeLabelComponent` in the implement
 
 import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
 
-{/* <LabeledEdge /> */}
+<LabeledEdge />
 
 <CodeSnippet
   relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts"
@@ -26,7 +26,7 @@ import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/lab
 
 ## Label Positioning
 
-Based on the usage of the `BaseEdgeLabelComponent`, NgDiagram tracks the label's position and size, ensuring they remain aligned with the edge's path. The `positionOnEdge` property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/internals/edges/routing).
+The `positionOnEdge` property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/internals/edges/routing).
 
 ## Adding labels
 
@@ -39,10 +39,22 @@ import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-
 
 <AddingLabels />
 
+**Edge component**
+
 <CodeSnippet
   relativePath="edges/labels/adding-labels/modifiable-label-edge.component.ts"
-  range={[8, 42]}
-  mark={[{ range: '7-14' }, { range: '23-33' }]}
+  range={[8, 50]}
+  mark={[{ range: '7-14' }, { range: '31-41' }]}
+  collapse={['17-24']}
+/>
+
+**Label Panel**
+
+<CodeSnippet
+  relativePath="edges/labels/adding-labels/label-panel.component.ts"
+  range={[8, 60]}
+  mark={[{ range: '5-11' }, { range: '40-51' }]}
+  collapse={['12-30', '35-39']}
 />
 
 ## Multiple Labels
@@ -57,9 +69,5 @@ import MultipleLabels from '@components/angular/edges/labels/multiple-labels/mul
 <CodeSnippet
   relativePath="edges/labels/multiple-labels/multiple-labels-edge.component.ts"
   range={[8, 63]}
-  mark={[
-    { range: '10-17' },
-    { range: '21-37' },
-    { range: '43-51' }
-  ]}
+  mark={[{ range: '10-17' }, { range: '21-37' }, { range: '45-53' }]}
 />

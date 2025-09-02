@@ -16,11 +16,19 @@ import {
       <ng-diagram-base-edge-label
         [id]="label().id"
         [positionOnEdge]="label().positionOnEdge"
+        class="label"
       >
         {{ label().content }}
       </ng-diagram-base-edge-label>
     }
   </ng-diagram-base-edge>`,
+  styles: `
+    .label {
+      background: #444;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+    }
+  `,
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate {

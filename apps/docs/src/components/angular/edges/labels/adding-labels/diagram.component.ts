@@ -1,6 +1,6 @@
 import '@angular/compiler';
 
-import { Component, computed } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   NgDiagramComponent,
@@ -10,20 +10,20 @@ import {
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component';
+import { LabelPanel } from './label-panel.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, FormsModule],
+  selector: 'diagram',
+  imports: [
+    NgDiagramContextComponent,
+    NgDiagramComponent,
+    FormsModule,
+    LabelPanel,
+  ],
   template: `
     <ng-diagram-context>
       <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-      <div class="panel">
-        @if (isEdgeSelected()) {
-          <input [(ngModel)]="label" />
-        } @else {
-          Select an edge
-        }
-        <button (click)="onSetLabel()">Set Label</button>
-      </div>
+      <label-panel />
     </ng-diagram-context>
   `,
   styles: `
@@ -33,33 +33,9 @@ import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component'
       display: flex;
       height: 100%;
     }
-
-    .panel {
-      z-index: 1;
-      background: #222;
-      position: absolute;
-      width: 8rem;
-      right: 0;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-
-      input {
-        width: calc(100% - 2rem);
-      }
-    }
   `,
 })
 export class Diagram {
-  selectedEdge = computed(() =>
-    this.model.getEdges().find((edge) => edge.selected)
-  );
-  isEdgeSelected = computed(() => !!this.selectedEdge());
-  label = '';
-
   edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([
     ['modifiable-label', ModifiableLabelEdgeComponent],
   ]);
@@ -103,25 +79,4 @@ export class Diagram {
       },
     ],
   });
-
-  onSetLabel() {
-    const edges = this.model.getEdges();
-
-    const edgeToUpdate = edges.find((edge) => edge.selected);
-
-    if (!edgeToUpdate) {
-      return;
-    }
-
-    const updatedEdge = {
-      ...edgeToUpdate,
-      data: {
-        label: this.label,
-      },
-    };
-
-    this.model.setEdges(
-      edges.map((edge) => (edge.id === edgeToUpdate.id ? updatedEdge : edge))
-    );
-  }
 }
