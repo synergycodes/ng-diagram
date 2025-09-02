@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import {
   DeepPartial,
   FlowConfig,
@@ -18,6 +18,9 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
   private readonly renderer = inject(RendererService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private flowCore: FlowCore<TMiddlewares> | null = null;
+  private _isInitialized = signal(false);
+
+  readonly isInitialized = this._isInitialized.asReadonly();
 
   init(
     model: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>,
@@ -34,12 +37,14 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
       getFlowOffset,
       config
     );
+    this._isInitialized.set(true);
   }
 
   destroy(): void {
     if (this.flowCore) {
       this.flowCore.destroy();
       this.flowCore = null;
+      this._isInitialized.set(false);
     }
   }
 
