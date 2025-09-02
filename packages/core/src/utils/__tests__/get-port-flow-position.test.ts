@@ -59,6 +59,50 @@ describe('getFlowPortPosition', () => {
 
     expect(position).toEqual({ x: 160, y: 155 });
   });
+
+  describe('with node rotation', () => {
+    it('should adjust port position for 90 degree rotation', () => {
+      const position = getPortFlowPosition(
+        {
+          ...mockNode,
+          angle: 90,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      // Top port rotated 90 degrees becomes right side
+      expect(position).toEqual({ x: 160, y: 155 });
+    });
+
+    it('should adjust port position for 180 degree rotation', () => {
+      const position = getPortFlowPosition(
+        {
+          ...mockNode,
+          angle: 180,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      // Left port rotated 180 degrees becomes right side
+      expect(position).toEqual({ x: 160, y: 155 });
+    });
+
+    it('should adjust port position for 270 degree rotation', () => {
+      const position = getPortFlowPosition(
+        {
+          ...mockNode,
+          angle: 270,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      // Bottom port rotated 270 degrees becomes right side
+      expect(position).toEqual({ x: 160, y: 155 });
+    });
+  });
 });
 
 describe('getPortFlowPositionSide', () => {
@@ -113,5 +157,85 @@ describe('getPortFlowPositionSide', () => {
       mockPort.id
     );
     expect(position).toEqual({ x: 160, y: 155, side: 'right' });
+  });
+
+  describe('with node rotation', () => {
+    it('should rotate port side 90 degrees clockwise', () => {
+      const position = getPortFlowPositionSide(
+        {
+          ...mockNode,
+          angle: 90,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      expect(position).toEqual({ x: 160, y: 155, side: 'right' });
+    });
+
+    it('should rotate port side 180 degrees', () => {
+      const position = getPortFlowPositionSide(
+        {
+          ...mockNode,
+          angle: 180,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      expect(position).toEqual({ x: 155, y: 160, side: 'bottom' });
+    });
+
+    it('should rotate port side 270 degrees clockwise', () => {
+      const position = getPortFlowPositionSide(
+        {
+          ...mockNode,
+          angle: 270,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      expect(position).toEqual({ x: 150, y: 155, side: 'left' });
+    });
+
+    it('should handle rotation for right side port', () => {
+      const position = getPortFlowPositionSide(
+        {
+          ...mockNode,
+          angle: 90,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      expect(position).toEqual({ x: 155, y: 160, side: 'bottom' });
+    });
+
+    it('should handle zero rotation', () => {
+      const position = getPortFlowPositionSide(
+        {
+          ...mockNode,
+          angle: 0,
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      expect(position).toEqual({ x: 155, y: 150, side: 'top' });
+    });
+
+    it('should handle rotation greater than 360 degrees', () => {
+      const position = getPortFlowPositionSide(
+        {
+          ...mockNode,
+          angle: 450, // 450 % 360 = 90
+          position: { x: 100, y: 100 },
+          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        },
+        mockPort.id
+      );
+      expect(position).toEqual({ x: 160, y: 155, side: 'right' });
+    });
   });
 });

@@ -1,4 +1,5 @@
 import { angleBetweenPoints } from './angle-between-points/angle-between-points';
+import { angleToSide } from './angle-to-side/angle-to-side';
 import { clamp } from './clamp/clamp';
 import { detectContainerEdge } from './detect-container-edge/detect-container-edge';
 import { distanceBetweenPoints } from './distance-between-points/distance-between-points';
@@ -9,6 +10,7 @@ import { snapPoint } from './snap-point/snap-point';
 
 export const NgDiagramMath = {
   angleBetweenPoints,
+  angleToSide,
   clamp,
   distanceBetweenPoints,
   normalizeAngle,
