@@ -9,44 +9,45 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 
-When NgDiagram's default node is not sufficient, you can create custom nodes that provide flexibility to render any kind of content such as shapes, icons, Angular components, images, buttons or even more advanced structures.
+When NgDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
 
 This allows you to build interactive and highly customized flow elements.
 
-You can create a custom node by extending `NgDiagramNodeTemplate` and implementing `CustomNodeComponent`
+You can create a custom node by extending `NgDiagramNodeTemplate` and implementing `CustomNodeComponent`.
 
 <CodeSnippet relativePath="nodes/custom-node/node.component.ts" range={[1, 45]} collapse={['1-6']} mark={[42]} />
 
 <CustomNode />
 
-## Registering Custom Node types
+## Registering Custom Node Types
 
-If you want to register a custom node it needs to be registered in `nodeTemplateMap`.
+To register a custom node, you need to add it to the `nodeTemplateMap`.
 
-Map associates a string key `customNodeType` with a value `CustomNodeComponent`, which is a reference to an Angular component class.
+The map associates a string key, such as `customNodeType`, with a value like `CustomNodeComponent`, which is a reference to an Angular component class.
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[44, 46]} />
-After it is registered it need to be passed to the `NgDiagram` component.
+
+After registering, you need to pass the map to the `NgDiagram` component.
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[20, 24]} mark={[4]} />
 
-## Setting a proper type to the node
+## Setting the Proper Type for the Node
 
-Assigning the type property as `customNodeType` for the node allows you to precisely control which template is used to render each node.
+Assigning the `type` property as `customNodeType` for the node allows you to precisely control which template is used to render each node.
 
 This approach makes your diagram highly extensible and flexible, as you can easily introduce new node types and associate them with different components.
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[55, 62]} mark={[5]} />
 
-## Custom appearance
+## Custom Appearance
 
 This component receives the node data as input and provides its own template and styles for rendering.
 In the example, the node displays a header and some content, but you can fully customize its appearance and behavior.
 
-## Using Node definition properties
+## Using Node Definition Properties
 
 By using this approach, creating custom node components that implement `NgDiagramNodeTemplate` and receive the node data as input you gain full access to the `Node` definition and all its properties.
-This means your custom node can utilize any property defined in the `Node` interface, such as
+This means your custom node can utilize any property defined in the `Node` interface, such as:
 
 ```typescript
 interface SimpleNode<T = any> {
@@ -74,7 +75,7 @@ interface SimpleNode<T = any> {
   description="See detailed node properties reference"
 />
 
-## Extending with NgDiagram functionalities
+## Extending with NgDiagram Functionalities
 
 We also expose advanced behaviors like resizing, rotating, or customizing ports, enhancing the user experience with minimal effort.
 
