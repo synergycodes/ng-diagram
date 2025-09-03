@@ -36,7 +36,6 @@ enum NodeTemplateType {
       :host {
         flex: 1;
         display: flex;
-
         .diagram {
           flex: 1;
           display: flex;
