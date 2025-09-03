@@ -1,4 +1,73 @@
 ---
 title: Labels
 description: Understanding how labels on edges work in NgDiagram
+sidebar:
+  order: 3
 ---
+
+import { LinkCard } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
+
+## Using Labels in Edge Components
+
+To display a label on an edge, use the `BaseEdgeLabelComponent` in the implementation of your edge component:
+
+import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
+
+<LabeledEdge />
+
+<CodeSnippet
+  relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts"
+  range={[8, 33]}
+  mark={[{ range: '4-6' }]}
+/>
+
+## Label Positioning
+
+The `positionOnEdge` property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/internals/edges/routing).
+
+## Adding labels
+
+Labels can be added and modified dynamically. One way to achieve this is by using diagram's model. The `ModifiableLabelEdgeComponent` shows how to map such data into an actual label implementation.
+
+Click on an edge to select it in the example below. Then fill the label's name and click "Set Label".
+It'll modify selected edge's data to include a new `label` property.
+
+import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-labels.astro';
+
+<AddingLabels />
+
+**Edge component**
+
+<CodeSnippet
+  relativePath="edges/labels/adding-labels/modifiable-label-edge.component.ts"
+  range={[8, 50]}
+  mark={[{ range: '7-14' }, { range: '31-41' }]}
+  collapse={['17-24']}
+/>
+
+**Label Panel**
+
+<CodeSnippet
+  relativePath="edges/labels/adding-labels/label-panel.component.ts"
+  range={[8, 60]}
+  mark={[{ range: '5-11' }, { range: '40-51' }]}
+  collapse={['12-30', '35-39']}
+/>
+
+## Multiple Labels
+
+NgDiagram supports multiple labels and they can be used to display images, shapes, or any other content.
+The example below demonstrates how to add multiple labels to an edge to create a flow animation.
+
+import MultipleLabels from '@components/angular/edges/labels/multiple-labels/multiple-labels.astro';
+
+<MultipleLabels />
+
+<CodeSnippet
+  relativePath="edges/labels/multiple-labels/multiple-labels-edge.component.ts"
+  range={[8, 63]}
+  mark={[{ range: '10-17' }, { range: '21-37' }, { range: '45-53' }]}
+/>
