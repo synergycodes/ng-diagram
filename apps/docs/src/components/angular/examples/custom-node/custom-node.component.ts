@@ -36,12 +36,13 @@ enum NodeTemplateType {
       :host {
         flex: 1;
         display: flex;
-      }
-      .diagram {
-        flex: 1;
-        display: flex;
-        height: 20rem;
-        font-family: 'Poppins', sans-serif;
+
+        .diagram {
+          flex: 1;
+          display: flex;
+          height: 20rem;
+          font-family: 'Poppins', sans-serif;
+        }
       }
     `,
   ],
@@ -62,16 +63,41 @@ export class CustomNodeComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 50 },
+        position: { x: 80, y: 100 },
         type: 'customNodeType',
         data: {
           name: 'Node 1',
           description: 'This is Node 1',
           tooltip: 'Node 1 is a custom node',
         },
+        rotatable: true,
+        resizable: true,
+      },
+      {
+        id: '2',
+        position: { x: 450, y: 100 },
+        type: 'customNodeType',
+        data: {
+          name: 'Node 2',
+          description: 'This is Node 2',
+          tooltip: 'Node 2 is a custom node',
+        },
+        rotatable: true,
+        resizable: true,
+        angle: 30,
       },
     ],
-    edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1.25 } },
+    edges: [
+      {
+        id: '1',
+        source: '1',
+        target: '2',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        sourceArrowhead: 'ng-diagram-arrow',
+      },
+    ],
+    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 }
