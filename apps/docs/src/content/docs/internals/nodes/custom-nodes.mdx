@@ -1,6 +1,112 @@
 ---
 title: Custom Nodes
 description: How to create and implement custom nodes in NgDiagram
+sidebar:
+  order: 1
 ---
 
-# Custom Nodes
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import { LinkCard } from '@astrojs/starlight/components';
+import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
+
+When NgDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
+
+This allows you to build interactive and highly customized flow elements.
+
+You can create a custom node by extending `NgDiagramNodeTemplate` and implementing `CustomNodeComponent`.
+
+<CodeSnippet relativePath="nodes/custom-node/node.component.ts" range={[1, 45]} collapse={['1-6']} mark={[42]} />
+
+<CustomNode />
+
+<LinkCard
+  icon="list-format"
+  title="Custom Node Example"
+  href="/examples/custom-node"
+  description="For more comprehensive example please check here."
+/>
+
+## Registering Custom Node Types
+
+To register a custom node, you need to add it to the `nodeTemplateMap`.
+
+The map associates a string key, such as `myType`, with a value like `CustomNodeComponent`, which is a reference to an Angular component class.
+
+<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[44, 46]} />
+
+After registering, you need to pass the map to the `NgDiagram` component.
+
+<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[20, 24]} mark={[4]} />
+
+## Setting the Proper Type for the Node
+
+Assigning the `type` property as `myType` for the node allows you to precisely control which template is used to render each node.
+
+This approach makes your diagram highly extensible and flexible, as you can easily introduce new node types and associate them with different components.
+
+<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[55, 62]} mark={[5]} />
+
+## Custom Appearance
+
+Above component receives the node data as input and provides its own template and styles for rendering.
+In the example, the node displays a header and some content, but you can fully customize its appearance and behavior.
+
+## Using Node Definition Properties
+
+By using this approach—creating custom node components that implement NgDiagramNodeTemplate and receive the node data as input—you gain full access to the Node definition and all its properties.
+This means your custom node can leverage any property defined in the Node interface, such as:
+
+```typescript
+interface SimpleNode<T = any> {
+  id: string; // The unique identifier for the node.
+  position: Point; // The position of the node in the diagram.
+  data: T; // The data associated with the node.
+  type?: string; // The type of the node declared in nodeTemplateMap.
+  selected?: boolean; // Whether the node is selected.
+  size?: Size; // The size of the node.
+  autoSize?: boolean; // Whether the size of the node is automatically resized based on the content.
+  zOrder?: number; // The z-order of the node.
+  zIndex?: number; // The z-index of the node. This value is set automatically.
+  ports?: Port[]; // The ports of the node.
+  resizable?: boolean; // Whether the node is resizable.
+  rotatable?: boolean; // Whether the node is rotatable.
+  angle?: number; // The angle of the node from 0 to 360.
+  groupId?: Node<T>['id']; // The id of the parent node.
+}
+```
+
+<LinkCard
+  icon="list-format"
+  title="Node API"
+  href="/api/types/node"
+  description="See detailed node properties reference"
+/>
+
+## Extending with NgDiagram Functionalities
+
+We also expose advanced behaviors like resizing, rotating, or customizing ports, enhancing the user experience with minimal effort.
+
+Integrating these functionalities is straightforward simply place the corresponding components in your node’s template.
+
+As a result, your custom nodes are not only visually flexible, but also deeply integrated with the diagram’s data model, making them powerful and adaptable for complex scenarios.
+
+<LinkCard
+  icon="list-format"
+  title="Resizing"
+  href="/internals/nodes/resizing"
+  description="Resizing functionality for your Custom Node"
+/>
+
+<LinkCard
+  icon="list-format"
+  title="Rotating"
+  href="/internals/nodes/rotation"
+  description="Rotation functionality for your Custom Node"
+/>
+
+<LinkCard
+  icon="list-format"
+  title="Custom Ports"
+  href="/internals/nodes/ports"
+  description="Custom ports in your Custom Node"
+/>
