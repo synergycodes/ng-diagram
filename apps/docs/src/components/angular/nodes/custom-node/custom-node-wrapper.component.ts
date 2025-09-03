@@ -30,12 +30,13 @@ import { CustomNodeComponent } from './node.component';
       :host {
         flex: 1;
         display: flex;
-      }
-      .diagram {
-        flex: 1;
-        display: flex;
-        height: 20rem;
-        font-family: 'Poppins', sans-serif;
+
+        .diagram {
+          flex: 1;
+          display: flex;
+          height: 20rem;
+          font-family: 'Poppins', sans-serif;
+        }
       }
     `,
   ],
