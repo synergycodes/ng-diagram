@@ -42,7 +42,7 @@ import { CustomNodeComponent } from './node.component';
 })
 export class CustomNodeWrapperComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
-    ['customNodeType', CustomNodeComponent],
+    ['myType', CustomNodeComponent],
   ]);
 
   config = {
@@ -56,7 +56,7 @@ export class CustomNodeWrapperComponent {
       {
         id: '1',
         position: { x: 100, y: 100 },
-        type: 'customNodeType',
+        type: 'myType',
         data: {},
       },
     ],
