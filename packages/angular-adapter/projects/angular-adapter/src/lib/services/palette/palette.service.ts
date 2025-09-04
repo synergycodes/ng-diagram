@@ -4,9 +4,11 @@ import { NgDiagramPaletteItem } from '../../types';
 @Injectable()
 export class PaletteService {
   draggedNode = signal<NgDiagramPaletteItem | null>(null);
+  previewId = signal<string | null>(null);
 
-  onMouseDown(node: NgDiagramPaletteItem) {
+  onMouseDown(node: NgDiagramPaletteItem, previewId: string) {
     this.draggedNode.set(node);
+    this.previewId.set(previewId);
   }
 
   onDragStartFromPalette(event: DragEvent, node: NgDiagramPaletteItem) {

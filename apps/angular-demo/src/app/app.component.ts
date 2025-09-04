@@ -67,7 +67,15 @@ export class AppComponent {
         resizable: true,
       },
       { id: '2', type: 'input-field', position: { x: 400, y: 100 }, data: {}, resizable: true },
-      { id: '3', type: 'resizable', position: { x: 700, y: 200 }, data: {}, resizable: true },
+      {
+        id: '3',
+        type: 'resizable',
+        position: { x: 700, y: 200 },
+        size: { width: 300, height: 400 },
+        autoSize: false,
+        data: {},
+        angle: 45,
+      },
       {
         id: '4',
         position: { x: 800, y: 350 },

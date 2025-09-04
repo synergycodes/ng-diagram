@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, contentChild, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, contentChild, inject, input, ViewEncapsulation } from '@angular/core';
 import { PaletteService } from '../../../services';
 import { NgDiagramPaletteItem } from '../../../types';
 import { NgDiagramPaletteItemPreviewComponent } from '../item-preview/ng-diagram-palette-item-preview.component';
@@ -6,7 +6,11 @@ import { NgDiagramPaletteItemPreviewComponent } from '../item-preview/ng-diagram
 @Component({
   selector: 'ng-diagram-palette-item',
   templateUrl: './ng-diagram-palette-item.component.html',
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    style: `width: 100%;`,
+  },
 })
 export class NgDiagramPaletteItemComponent {
   private paletteService = inject(PaletteService);
@@ -23,6 +27,6 @@ export class NgDiagramPaletteItemComponent {
   }
 
   onMouseDown() {
-    this.paletteService.onMouseDown(this.item());
+    this.paletteService.onMouseDown(this.item(), this.paletteItemPreviewComponent()?.id || '');
   }
 }
