@@ -1,4 +1,3 @@
-import type { Edge } from './edge.interface';
 import type { GlobalTreeLayoutConfig } from './tree-layout.interface.ts';
 
 /**
@@ -24,7 +23,6 @@ export interface LayoutConfiguration {
  */
 export interface Metadata<TMiddlewaresMetadata = unknown> {
   viewport: Viewport;
-  temporaryEdge?: Edge | null;
   layoutConfiguration?: LayoutConfiguration;
   middlewaresConfig: TMiddlewaresMetadata;
   [key: string]: unknown;

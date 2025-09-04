@@ -1,5 +1,8 @@
 import { Component, HostListener, inject } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import {
+  NgDiagramModelService,
+  NgDiagramService,
+} from '@angularflow/angular-adapter';
 import { ContextMenuService } from './menu.service';
 
 @Component({
@@ -9,6 +12,7 @@ import { ContextMenuService } from './menu.service';
 })
 export class MenuComponent {
   private contextMenuService = inject(ContextMenuService);
+  private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
 
   showMenu = this.contextMenuService.visibility;
@@ -25,7 +29,7 @@ export class MenuComponent {
   }
 
   onPaste(event: MouseEvent) {
-    const position = this.modelService.clientToFlowPosition({
+    const position = this.diagramService.clientToFlowPosition({
       x: event.clientX,
       y: event.clientY,
     });

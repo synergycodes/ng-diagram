@@ -10,6 +10,7 @@ import {
   MiddlewareConfigKeys,
   MiddlewaresConfigFromMiddlewares,
   ModelActionType,
+  Point,
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
@@ -198,5 +199,32 @@ export class NgDiagramService<
     }
 
     return this.flowCore.transaction(nameOrCallback, callback);
+  }
+
+  /**
+   * Converts a client position to a flow position
+   * @param clientPosition Client position to convert
+   * @returns Flow position
+   */
+  clientToFlowPosition(clientPosition: Point): Point {
+    return this.flowCore.clientToFlowPosition(clientPosition);
+  }
+
+  /**
+   * Converts a flow position to a client position
+   * @param flowPosition Flow position to convert
+   * @returns Client position
+   */
+  flowToClientPosition(flowPosition: Point): Point {
+    return this.flowCore.flowToClientPosition(flowPosition);
+  }
+
+  /**
+   * Converts a client position to a position relative to the flow viewport
+   * @param clientPosition Client position
+   * @returns position on the flow viewport
+   */
+  clientToFlowViewportPosition(clientPosition: Point): Point {
+    return this.flowCore.clientToFlowViewportPosition(clientPosition);
   }
 }

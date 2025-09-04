@@ -26,16 +26,24 @@ export const startLinking = async (commandHandler: CommandHandler, command: Star
     return;
   }
 
+  const temporaryEdge = createTemporaryEdge(commandHandler.flowCore.config, {
+    source: sourceNodeId,
+    sourcePort: sourcePortId,
+    sourcePosition: position,
+    target: '',
+    targetPosition: position,
+  });
+
+  commandHandler.flowCore.actionStateManager.linking = {
+    temporaryEdge,
+    sourceNodeId,
+    sourcePortId,
+  };
+
   await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
-        temporaryEdge: createTemporaryEdge(commandHandler.flowCore.config, {
-          source: sourceNodeId,
-          sourcePort: sourcePortId,
-          sourcePosition: position,
-          target: '',
-          targetPosition: position,
-        }),
+        temporaryEdge,
       },
     },
     'startLinking'

@@ -6,8 +6,8 @@ export interface FinishLinkingCommand {
   name: 'finishLinking';
 }
 
-const clearTemporaryEdge = async (commandHandler: CommandHandler): Promise<void> => {
-  await commandHandler.flowCore.applyUpdate({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+const clearTemporaryEdge = (commandHandler: CommandHandler): void => {
+  commandHandler.flowCore.actionStateManager.clearLinking();
 };
 
 const validateTarget = (
@@ -36,8 +36,7 @@ const validateTarget = (
 };
 
 export const finishLinking = async (commandHandler: CommandHandler): Promise<void> => {
-  const { metadata } = commandHandler.flowCore.getState();
-  const temporaryEdge = metadata.temporaryEdge;
+  const temporaryEdge = commandHandler.flowCore.actionStateManager.linking?.temporaryEdge;
 
   if (!temporaryEdge) {
     return;
@@ -48,20 +47,19 @@ export const finishLinking = async (commandHandler: CommandHandler): Promise<voi
   const targetPortId = targetPort || undefined;
 
   if (!validateConnection(commandHandler.flowCore, source, sourcePort, targetNodeId, targetPortId, true)) {
-    await clearTemporaryEdge(commandHandler);
+    clearTemporaryEdge(commandHandler);
     return;
   }
 
   const { isValid, targetPosition } = validateTarget(commandHandler, targetNodeId, targetPortId);
 
   if (!isValid) {
-    await clearTemporaryEdge(commandHandler);
+    clearTemporaryEdge(commandHandler);
     return;
   }
 
   await commandHandler.flowCore.applyUpdate(
     {
-      metadataUpdate: { temporaryEdge: null },
       edgesToAdd: [
         createFinalEdge(commandHandler.flowCore.config, temporaryEdge, {
           target: targetNodeId,
@@ -72,4 +70,6 @@ export const finishLinking = async (commandHandler: CommandHandler): Promise<voi
     },
     'finishLinking'
   );
+
+  commandHandler.flowCore.actionStateManager.clearLinking();
 };

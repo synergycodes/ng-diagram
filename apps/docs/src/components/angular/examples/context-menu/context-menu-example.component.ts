@@ -4,6 +4,7 @@ import {
   NgDiagramComponent,
   NgDiagramModelService,
   NgDiagramNodeTemplateMap,
+  NgDiagramService,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
@@ -44,7 +45,7 @@ import { NodeComponent } from './node/node.component';
 })
 export class ContextMenuExampleComponent {
   private contextMenuService = inject(ContextMenuService);
-  private readonly modelService = inject(NgDiagramModelService);
+  private readonly diagramService = inject(NgDiagramService);
   nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['customNodeType', NodeComponent],
   ]);
@@ -74,7 +75,7 @@ export class ContextMenuExampleComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    const cursorPosition = this.modelService.clientToFlowViewportPosition({
+    const cursorPosition = this.diagramService.clientToFlowViewportPosition({
       x: event.clientX,
       y: event.clientY,
     });

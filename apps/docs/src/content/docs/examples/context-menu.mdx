@@ -80,7 +80,7 @@ onRightClick(event: MouseEvent) {
     // Additionally selects the node on right click
     this.modelService.setSelection([this.node().id]);
 
-    const cursorPosition = this.modelService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
+    const cursorPosition = this.diagramService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
     this.contextMenuService.showMenu(cursorPosition);
   }
 }
@@ -95,7 +95,7 @@ onDiagramRightClick(event: MouseEvent) {
   event.preventDefault();
   event.stopPropagation();
 
-  const cursorPosition = this.modelService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
+  const cursorPosition = this.diagramService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
   this.contextMenuService.showDiagramMenu(cursorPosition);
 }
 ```

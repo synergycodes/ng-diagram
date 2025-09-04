@@ -95,9 +95,8 @@ export const isSameTarget = (temporaryEdge: Edge, targetNodeId: string, targetPo
 };
 
 export const moveTemporaryEdge = async (commandHandler: CommandHandler, command: MoveTemporaryEdgeCommand) => {
-  const { metadata } = commandHandler.flowCore.getState();
   const { position } = command;
-  const temporaryEdge = metadata.temporaryEdge;
+  const temporaryEdge = commandHandler.flowCore.actionStateManager.linking?.temporaryEdge;
 
   if (!temporaryEdge) {
     return;
@@ -113,6 +112,8 @@ export const moveTemporaryEdge = async (commandHandler: CommandHandler, command:
   }
 
   const newTemporaryEdge = createNewTemporaryEdge(commandHandler, temporaryEdge, targetPortInfo, position);
+
+  commandHandler.flowCore.actionStateManager.linking.temporaryEdge = newTemporaryEdge;
 
   await commandHandler.flowCore.applyUpdate(
     {

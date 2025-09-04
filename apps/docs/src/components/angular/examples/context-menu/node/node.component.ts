@@ -8,6 +8,7 @@ import {
   NgDiagramModelService,
   NgDiagramNodeSelectedDirective,
   NgDiagramPortComponent,
+  NgDiagramService,
   type NgDiagramNodeTemplate,
   type Node,
 } from '@angularflow/angular-adapter';
@@ -31,6 +32,7 @@ import { ContextMenuService } from '../menu/menu.service';
 })
 export class NodeComponent implements NgDiagramNodeTemplate {
   private readonly contextMenuService = inject(ContextMenuService);
+  private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
 
   text = model<string>('');
@@ -44,7 +46,7 @@ export class NodeComponent implements NgDiagramNodeTemplate {
       // Additionally selects the node on right click
       this.modelService.setSelection([this.node().id]);
 
-      const cursorPosition = this.modelService.clientToFlowViewportPosition({
+      const cursorPosition = this.diagramService.clientToFlowViewportPosition({
         x: event.clientX,
         y: event.clientY,
       });

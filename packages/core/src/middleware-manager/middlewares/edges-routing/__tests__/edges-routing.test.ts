@@ -57,6 +57,11 @@ describe('Edges Routing Middleware', () => {
 
     flowCore = {
       edgeRoutingManager: mockRoutingManager,
+      actionStateManager: {
+        linking: {
+          temporaryEdge: null,
+        },
+      },
     } as unknown as FlowCore;
 
     initialState = {
@@ -378,20 +383,20 @@ describe('Edges Routing Middleware', () => {
 
   describe('Temporary Edge Processing', () => {
     it('should process temporary edge', () => {
+      const temporaryEdge = {
+        ...mockEdge,
+        id: 'temp-edge',
+        source: 'node-1',
+        target: '',
+        targetPosition: { x: 200, y: 200 },
+        points: [],
+      };
+
+      flowCore.actionStateManager.linking = { temporaryEdge };
+
       const newState = {
         ...initialState,
         nodes: [{ ...mockNode, id: 'node-1', position: { x: 100, y: 100 } }],
-        metadata: {
-          ...mockMetadata,
-          temporaryEdge: {
-            ...mockEdge,
-            id: 'temp-edge',
-            source: 'node-1',
-            target: '',
-            targetPosition: { x: 200, y: 200 },
-            points: [],
-          },
-        },
       };
 
       context = {
@@ -400,8 +405,6 @@ describe('Edges Routing Middleware', () => {
         modelActionType: 'moveTemporaryEdge',
         nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
       };
-
-      checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
       edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
@@ -420,21 +423,20 @@ describe('Edges Routing Middleware', () => {
       const customZIndex = 9999;
       context.middlewareMetadata.temporaryEdgeZIndex = customZIndex;
 
+      const temporaryEdge = {
+        ...mockEdge,
+        id: 'temp-edge',
+        source: 'node-1',
+        targetPosition: { x: 200, y: 200 },
+      };
+
+      flowCore.actionStateManager.linking = { temporaryEdge };
+
       const newState = {
         ...initialState,
-        metadata: {
-          ...mockMetadata,
-          temporaryEdge: {
-            ...mockEdge,
-            id: 'temp-edge',
-            source: 'node-1',
-            targetPosition: { x: 200, y: 200 },
-          },
-        },
       };
 
       context.state = newState;
-      checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
       edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
@@ -443,12 +445,10 @@ describe('Edges Routing Middleware', () => {
     });
 
     it('should not process temporary edge if metadata has not changed', () => {
+      flowCore.actionStateManager.linking = null;
+
       const newState = {
         ...initialState,
-        metadata: {
-          ...mockMetadata,
-          temporaryEdge: mockEdge,
-        },
       };
 
       context = {
@@ -457,7 +457,6 @@ describe('Edges Routing Middleware', () => {
         modelActionType: 'updateNodes',
       };
 
-      checkIfMetadataPropsChangedMock.mockReturnValue(false);
       checkIfAnyNodePropsChangedMock.mockReturnValue(false);
       checkIfAnyEdgePropsChangedMock.mockReturnValue(false);
       anyEdgesAddedMock.mockReturnValue(false);

@@ -32,6 +32,13 @@ describe('startLinkingFromPosition', () => {
           temporaryEdgeDataBuilder: vi.fn(),
         },
       },
+      actionStateManager: {
+        linking: {
+          temporaryEdge: null,
+        },
+        clearLinking: vi.fn(),
+        isLinking: vi.fn(() => !!mockFlowCore.actionStateManager.linking),
+      },
     };
 
     mockCommandHandler = {
@@ -77,6 +84,8 @@ describe('startLinkingFromPosition', () => {
         },
         'startLinking'
       );
+
+      expect(mockFlowCore.actionStateManager.linking).toEqual({ temporaryEdge: mockTemporaryEdge });
     });
   });
 

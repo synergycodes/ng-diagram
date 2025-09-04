@@ -62,6 +62,13 @@ describe('finishLinking', () => {
       getNodeById: vi.fn(),
       applyUpdate: vi.fn(),
       config: {},
+      actionStateManager: {
+        linking: {
+          temporaryEdge: null,
+        },
+        clearLinking: vi.fn(),
+        isLinking: vi.fn(() => !!mockFlowCore.actionStateManager.linking),
+      },
     };
 
     mockCommandHandler = {
@@ -72,17 +79,13 @@ describe('finishLinking', () => {
   });
 
   it('should return early when no temporary edge exists', async () => {
-    mockFlowCore.getState.mockReturnValue({ metadata: {} });
-
+    mockFlowCore.actionStateManager.linking = null;
     await finishLinking(mockCommandHandler);
-
     expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
   });
 
   it('should clear temporary edge when connection validation fails', async () => {
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
     mockValidateConnection.mockReturnValue(false);
 
     await finishLinking(mockCommandHandler);
@@ -96,20 +99,18 @@ describe('finishLinking', () => {
       true
     );
 
-    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
   it('should clear temporary edge when target node does not exist', async () => {
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
     mockValidateConnection.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(null);
 
     await finishLinking(mockCommandHandler);
 
     expect(mockFlowCore.getNodeById).toHaveBeenCalledWith('target-node');
-    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
   it('should clear temporary edge when target port is source type', async () => {
@@ -127,21 +128,17 @@ describe('finishLinking', () => {
       ],
     };
 
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
     mockValidateConnection.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(targetNodeWithSourcePort);
 
     await finishLinking(mockCommandHandler);
 
-    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
   it('should clear temporary edge when target position cannot be determined', async () => {
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
     mockValidateConnection.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
     mockGetPortFlowPosition.mockReturnValue(null); // No position available
@@ -149,7 +146,7 @@ describe('finishLinking', () => {
     await finishLinking(mockCommandHandler);
 
     expect(mockGetPortFlowPosition).toHaveBeenCalledWith(mockTargetNode, 'target-port');
-    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ metadataUpdate: { temporaryEdge: null } }, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
   it('should create final edge when all validations pass with port', async () => {
@@ -161,9 +158,7 @@ describe('finishLinking', () => {
       data: {},
     };
 
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
     mockValidateConnection.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
     mockGetPortFlowPosition.mockReturnValue(targetPosition);
@@ -179,11 +174,12 @@ describe('finishLinking', () => {
 
     expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        metadataUpdate: { temporaryEdge: null },
         edgesToAdd: [finalEdge],
       },
       'finishLinking'
     );
+
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
   it('should create final edge using node position when no port specified', async () => {
@@ -194,9 +190,7 @@ describe('finishLinking', () => {
     };
     const finalEdge = { id: 'final-edge', source: 'source-node', target: 'target-node', data: {} };
 
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: temporaryEdgeWithoutPort },
-    });
+    mockFlowCore.actionStateManager.linking = { temporaryEdge: temporaryEdgeWithoutPort };
     mockValidateConnection.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
     mockCreateFinalEdge.mockReturnValue(finalEdge);
@@ -211,10 +205,11 @@ describe('finishLinking', () => {
 
     expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        metadataUpdate: { temporaryEdge: null },
         edgesToAdd: [finalEdge],
       },
       'finishLinking'
     );
+
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 });

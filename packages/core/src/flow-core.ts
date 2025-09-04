@@ -315,7 +315,8 @@ export class FlowCore<
    */
   private render(): void {
     const { nodes, edges, metadata } = this.getState();
-    const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
+    const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
+    const finalEdges = temporaryEdge ? [...edges, temporaryEdge] : edges;
     this.renderer.draw(nodes, finalEdges, metadata.viewport);
   }
 

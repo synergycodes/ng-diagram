@@ -14,6 +14,7 @@ export interface ResizeActionState {
 export interface LinkingActionState {
   sourceNodeId: string;
   sourcePortId: string;
+  temporaryEdge: Edge | null;
 }
 
 export interface CopyPasteActionState {
