@@ -6,7 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
-  type NgDiagramEdgeTemplateMap,
+  NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component';
@@ -36,7 +36,7 @@ import { LabelPanel } from './label-panel.component';
   `,
 })
 export class Diagram {
-  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([
+  edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['modifiable-label', ModifiableLabelEdgeComponent],
   ]);
 

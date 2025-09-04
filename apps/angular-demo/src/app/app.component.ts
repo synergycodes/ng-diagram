@@ -1,10 +1,9 @@
-import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
   NgDiagramContextComponent,
-  NgDiagramEdgeTemplate,
   NgDiagramEdgeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
@@ -34,7 +33,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 export class AppComponent {
   paletteModel: NgDiagramPaletteItem[] = paletteModel;
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
-  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map<string, Type<NgDiagramEdgeTemplate>>([
+  edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['button-edge', ButtonEdgeComponent],
     ['custom-polyline-edge', CustomPolylineEdgeComponent],
     ['labelled-edge', LabelledEdgeComponent],
