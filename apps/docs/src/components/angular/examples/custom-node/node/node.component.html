@@ -1,22 +1,29 @@
-<div class="node">
-  <div class="node-header">
-    <div>
-      {{ node().data.name }}
+<ng-diagram-node-rotate-adornment />
+<ng-diagram-node-resize-adornment>
+  <div class="node">
+    <div class="node-header">
+      <div>
+        {{ node().data.name }}
+      </div>
+      <div>
+        <mat-chip>{{ selectedState }}</mat-chip>
+      </div>
     </div>
-    <div>
-      <mat-chip>{{ selectedState }}</mat-chip>
+    <div class="node-body" title="{{ node().data.tooltip }}">
+      {{ node().data.description }}
+      <form>
+        <mat-form-field>
+          <mat-select [(ngModel)]="selectedState" name="state">
+            <mat-option value="Active">Active</mat-option>
+            <mat-option value="Inactive">Inactive</mat-option>
+            <mat-option value="Error">Error</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
     </div>
   </div>
-  <div class="node-body" title="{{ node().data.tooltip }}">
-    {{ node().data.description }}
-    <form>
-      <mat-form-field>
-        <mat-select [(ngModel)]="selectedState" name="state">
-          <mat-option value="Active">Active</mat-option>
-          <mat-option value="Inactive">Inactive</mat-option>
-          <mat-option value="Error">Error</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </form>
-  </div>
-</div>
+  <ng-diagram-port id="port-left" type="both" side="left" />
+  <ng-diagram-port id="port-top" type="both" side="top" />
+  <ng-diagram-port id="port-right" type="both" side="right" />
+  <ng-diagram-port id="port-bottom" type="both" side="bottom" />
+</ng-diagram-node-resize-adornment>

@@ -18,9 +18,49 @@ You can include anything inside the Custom Node, including controls from **exter
 
 Once created, the custom node component will be rendered directly on the diagram, allowing you to build any type of graph from it.
 
+Custom nodes in NgDiagram are highly flexible and can utilize built-in selection, rotation, resizing, and port functionalities.
+This allows you to create interactive and visually rich diagrams tailored to your application's needs.
+
+---
+
+## Example
+
+Below is an example of a custom node implementation using NgDiagram built-in features:
+
 import CustomNode from '@examples/custom-node/custom-node.astro';
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import { LinkCard } from '@astrojs/starlight/components';
 
 <CustomNode />
 
 <ExampleViewer dirName="custom-node" />
+
+---
+
+## Built-in Node Features
+
+Custom nodes in NgDiagram can leverage several built-in features to enhance user interaction and diagram usability:
+
+### Selection
+
+Nodes can be selected by clicking on them. Selection state can be styled or used to trigger additional logic in your custom node component. The selection directive `NgDiagramNodeSelectedDirective` allowing you to easily highlight or interact with selected nodes.
+
+### Rotating
+
+Nodes can be rotated using the built-in rotate adornment `NgDiagramNodeRotateAdornmentComponent`. This provides a UI handle for users to rotate nodes directly on the diagram. You can enable rotation by setting the `rotatable` property on your node model.
+
+<LinkCard icon="list-format" title="Rotation" href="/internals/nodes/rotation" description="Rotation functionality" />
+
+### Resizing
+
+Nodes can be resized using the resize adornment `NgDiagramNodeResizeAdornmentComponent`. This adds handles to the node for resizing. Enable this feature by setting the `resizable` property on your node model.
+
+<LinkCard icon="list-format" title="Resizing" href="/internals/nodes/resizing" description="Resizing functionality" />
+
+### Ports
+
+Ports allow nodes to connect with edges. You can define multiple ports on your custom node and specify their position (e.g., left, right, top, bottom).
+If you use the port position property, it will align the port in the middle of the edge, but you can customize this with CSS if needed.
+Use the `NgDiagramPortComponent` to add ports in your node template. Each port can be configured for source, target, or both.
+
+<LinkCard icon="list-format" title="Ports" href="/internals/nodes/ports" description="Ports functionality" />
