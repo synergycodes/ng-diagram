@@ -1,0 +1,31 @@
+<div class="node" (contextmenu)="onRightClick($event)">
+  <div class="node-header">
+    <span>{{ node().data.name }}</span>
+  </div>
+  <div class="node-body">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  </div>
+</div>
+<ng-diagram-port
+  id="port-left"
+  type="target"
+  side="left"
+  [attr.style]="
+    node().data.cssClass
+      ? null
+      : 'top: 25%;background-color: darkslategray;border-radius: 4px;'
+  "
+/>
+<ng-diagram-port
+  id="port-top"
+  type="source"
+  side="top"
+  style="top: 5px; left: 200px"
+/>
+<ng-diagram-port
+  id="port-right"
+  class="{{ node().data.cssClass }}"
+  type="both"
+  side="right"
+/>
+<ng-diagram-port id="port-bottom" type="both" side="bottom" />
