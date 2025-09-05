@@ -1,13 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  ElementRef,
-  inject,
-  input,
-  Signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, Signal, viewChild } from '@angular/core';
+import { NgDiagramViewportService } from '../../../public-services/ng-diagram-viewport.service';
 import { PaletteService } from '../../../services';
 import { detectEnvironment } from '../../../utils/detect-environment';
 
@@ -21,13 +13,14 @@ export class NgDiagramPaletteItemPreviewComponent {
   private paletteService = inject(PaletteService);
   private browser = detectEnvironment().browser;
 
+  id = crypto.randomUUID();
+
+  scale = inject(NgDiagramViewportService).getScale();
+
   isSafari = this.browser === 'Safari';
   isChrome = this.browser === 'Chrome';
 
   preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
 
-  type = input.required<string>();
-  scale = input.required<number>();
-
-  isVisible = computed(() => (this.paletteService.draggedNode()?.type || '') === this.type());
+  isVisible = computed(() => this.paletteService.previewId() === this.id);
 }

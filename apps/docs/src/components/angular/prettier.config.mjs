@@ -1,4 +1,4 @@
-import baseConfig from '../../../../../prettier.config.js';
+import baseConfig from '../../../../../prettier.config.mjs';
 
 /**
  * @type {import("prettier").Config}
