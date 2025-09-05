@@ -107,6 +107,18 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
   }
 
   /**
+   * Updates the properties of a node
+   * @param edgeId Edge id
+   * @param edge New edge properties
+   */
+  updateEdge(edgeId: string, edge: Partial<Edge>) {
+    this.flowCore.commandHandler.emit('updateEdge', {
+      id: edgeId,
+      edgeChanges: { ...edge },
+    });
+  }
+
+  /**
    * Gets the current selection state as a reactive signal
    * This signal automatically updates when selection changes or when selected nodes/edges are modified
    * @returns Signal containing the current selection
