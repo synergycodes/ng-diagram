@@ -1,0 +1,26 @@
+<div class="node">
+  <div class="node-header">
+    <span>{{ node().data.name }}</span>
+  </div>
+  <div class="node-body">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  </div>
+</div>
+<ng-diagram-port
+  id="port-left"
+  type="target"
+  side="left"
+  [style.backgroundColor]="node().data.leftPortColor"
+/>
+<ng-diagram-port
+  id="port-top"
+  type="source"
+  side="top"
+  style="top: 15px; left: 200px"
+/>
+<ng-diagram-port
+  id="port-right"
+  class="some-custom-class"
+  type="both"
+  side="right"
+/>
