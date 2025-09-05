@@ -14,10 +14,10 @@ import type { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
     .node-preview {
       display: flex;
       justify-content: center;
-      border: 0.0625rem solid #ccc;
+      background-color: var(--ngd-node-bg-primary-default);
+      border: var(--ngd-node-border-size) solid var(--ngd-node-border-color);
       border-radius: 0.75rem;
       padding: 0.5rem;
-      background: #ffffff;
       cursor: pointer;
     }
   `,
