@@ -19,14 +19,14 @@ const layoutOptions = {
 
 export async function performLayout(nodes: Node[], edges: Edge[]) {
   const nodesToLayout = nodes.map(
-    ({ size, ...node }): ElkNode => ({
-      id: node.id,
+    ({ id: nodeId, size, ports }): ElkNode => ({
+      id: nodeId,
       ...size,
       layoutOptions: {
         portConstraints: 'FIXED_POS',
       },
-      ports: node.ports?.map(({ id, position, size: portSize }) => ({
-        id: `${node.id}:${id}`,
+      ports: ports?.map(({ id: portId, position, size: portSize }) => ({
+        id: `${nodeId}:${portId}`,
         ...portSize,
         ...position,
       })),
