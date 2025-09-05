@@ -10,7 +10,7 @@
   id="port-left"
   type="target"
   side="left"
-  [attr.style]="node().data.leftPortColor ? null : 'background-color: red'"
+  [style.backgroundColor]="node().data.leftPortColor"
 />
 <ng-diagram-port
   id="port-top"
