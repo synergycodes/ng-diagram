@@ -1,5 +1,5 @@
-import { type Node, type Edge } from '@angularflow/angular-adapter';
-import ELK, { type ElkNode, type ElkExtendedEdge } from 'elkjs';
+import { type Edge, type Node } from '@angularflow/angular-adapter';
+import ELK, { type ElkExtendedEdge, type ElkNode } from 'elkjs';
 
 const elk = new ELK();
 const layoutOptions = {
@@ -19,12 +19,13 @@ const layoutOptions = {
 
 export async function performLayout(nodes: Node[], edges: Edge[]) {
   const nodesToLayout = nodes.map(
-    ({ size, ports, position, ...node }): ElkNode => ({
-      ...position,
-      ...node,
+    ({ size, ...node }): ElkNode => ({
+      id: node.id,
       ...size,
-      layoutOptions,
-      ports: ports?.map(({ id, position, size: portSize }) => ({
+      layoutOptions: {
+        portConstraints: 'FIXED_POS',
+      },
+      ports: node.ports?.map(({ id, position, size: portSize }) => ({
         id: `${node.id}:${id}`,
         ...portSize,
         ...position,
@@ -77,8 +78,10 @@ export async function performLayout(nodes: Node[], edges: Edge[]) {
 
     const points = getLayoutPoints(elkEdge);
 
+    //TODO: When events are implemented change routingMode to auto when node is moved
     return {
       ...edge,
+      routingMode: 'manual',
       points,
     };
   });
