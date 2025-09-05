@@ -46,7 +46,6 @@ export class LayoutButtonsComponent {
     );
 
     for (const node of finalNodes) {
-      console.log(node.position.y);
       this.modelService.updateNode(node.id, node);
     }
 
