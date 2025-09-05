@@ -3,10 +3,62 @@ title: Custom Ports
 description: Example of how to create custom ports in NgDiagram
 ---
 
-# Custom Ports
-
 import CustomPorts from '@examples/custom-ports/custom-ports.astro';
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+# Custom Ports
+
+This example demonstrates how to create custom ports in NgDiagram by customizing their appearance and behavior.
+
+## Key Concepts
+
+- **Custom Port Styling:**  
+  Ports can be styled individually using CSS classes, inline styles, or by overriding CSS variables used in port styling.
+
+- **Dynamic Port Rendering:**  
+  Ports are rendered using the `<ng-diagram-port>` component, which supports various attributes.
+
+- **Node Template Customization:**  
+  The node template `NodeComponent` defines how ports are arranged and styled within each node.
+
+- **Port Binding:**  
+  Ports have a `type` property to set the connection type for each port. You can set it to `'both'`, `'target'`, or `'source'`.
+
+- **Port Positioning:**  
+  Ports have a `side` property to set their placement.  
+  To further customize port placement, you can use CSS styling.
+
+## Example Overview
+
+Two nodes are rendered, each with four ports (left, top, right, bottom).
+
+- The right port of the second node uses a custom CSS class taken from node data for a unique look and styling.
+- The top port has a changed inline position in both nodes.
+- The left port is customized with inline styles based on a property passed from node data.
+- The bottom port has no changes.
+
+## Example Code
+
+### Node Template HTML
+
+<CodeSnippet relativePath="examples/custom-ports/node/node.component.html" range={[1, 32]} mark={[{ range: '9-31' }]} />
+
+### Custom Port CSS
+
+<CodeSnippet
+  relativePath="examples/custom-ports/node/node.component.scss"
+  range={[1, 32]}
+  mark={[{ range: '23-31' }]}
+  collapse={['1-21']}
+/>
+
+## Usage
+
+- Assign a custom CSS class to a node's port via node data.
+- Style the port using CSS for unique shapes or hover effects.
+- Override CSS variables used in `NgDiagramPortComponent`.
+- Use inline styles for quick adjustments.
 
 <CustomPorts />
 
