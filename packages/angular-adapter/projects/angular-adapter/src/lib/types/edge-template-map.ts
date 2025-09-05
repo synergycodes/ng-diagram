@@ -5,4 +5,4 @@ export interface NgDiagramEdgeTemplate {
   edge: InputSignal<Edge>;
 }
 
-export type NgDiagramEdgeTemplateMap = Map<string, Type<NgDiagramEdgeTemplate>>;
+export class NgDiagramEdgeTemplateMap extends Map<string, Type<NgDiagramEdgeTemplate>> {}

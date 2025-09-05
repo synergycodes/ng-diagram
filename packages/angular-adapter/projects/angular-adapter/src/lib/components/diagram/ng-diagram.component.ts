@@ -108,13 +108,13 @@ export class NgDiagramComponent<
   /**
    * The node template map to use for the diagram.
    */
-  nodeTemplateMap = input<NgDiagramNodeTemplateMap>(new Map());
+  nodeTemplateMap = input<NgDiagramNodeTemplateMap>(new NgDiagramNodeTemplateMap());
 
   /**
    * The edge template map to use for the diagram.
    * Optional - if not provided, default edge rendering will be used.
    */
-  edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new Map());
+  edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new NgDiagramEdgeTemplateMap());
 
   /**
    * Enables or disables debug mode for the diagram.

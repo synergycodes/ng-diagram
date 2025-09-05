@@ -3,8 +3,8 @@ import { Component, inject } from '@angular/core';
 import {
   NgDiagramComponent,
   NgDiagramModelService,
+  NgDiagramNodeTemplateMap,
   type NgDiagramConfig,
-  type NgDiagramNodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 import { MenuComponent } from './menu/menu.component';
@@ -45,7 +45,7 @@ import { NodeComponent } from './node/node.component';
 export class ContextMenuExampleComponent {
   private contextMenuService = inject(ContextMenuService);
   private readonly modelService = inject(NgDiagramModelService);
-  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
+  nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['customNodeType', NodeComponent],
   ]);
 

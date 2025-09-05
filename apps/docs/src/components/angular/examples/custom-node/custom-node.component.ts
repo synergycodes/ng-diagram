@@ -1,12 +1,10 @@
 import '@angular/compiler';
-import { ChangeDetectionStrategy, Component, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type NgDiagramConfig,
-  type NgDiagramGroupNodeTemplate,
-  type NgDiagramNodeTemplate,
-  type NgDiagramNodeTemplateMap,
+  NgDiagramNodeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 
@@ -47,10 +45,9 @@ enum NodeTemplateType {
   ],
 })
 export class CustomNodeComponent {
-  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map<
-    NodeTemplateType,
-    Type<NgDiagramNodeTemplate> | Type<NgDiagramGroupNodeTemplate>
-  >([[NodeTemplateType.CustomNodeType, NodeComponent]]);
+  nodeTemplateMap = new NgDiagramNodeTemplateMap([
+    [NodeTemplateType.CustomNodeType, NodeComponent],
+  ]);
 
   config = {
     zoom: {

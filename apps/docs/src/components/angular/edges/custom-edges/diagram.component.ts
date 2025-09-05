@@ -5,7 +5,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
-  type NgDiagramEdgeTemplateMap,
+  NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 import { CustomEdgeComponent } from './custom-edge.component';
@@ -26,7 +26,7 @@ import { CustomEdgeComponent } from './custom-edge.component';
   `,
 })
 export class Diagram {
-  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map([
+  edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['custom', CustomEdgeComponent],
   ]);
 

@@ -5,8 +5,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
-  type NgDiagramEdgeTemplate,
-  type NgDiagramEdgeTemplateMap,
+  NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { createSignalModel } from '@angularflow/angular-signals-model';
 import { LabeledEdgeComponent } from './labeled-edge.component';
@@ -28,10 +27,7 @@ import { CircleArrowheadComponent } from './circle-arrowhead.component';
   styleUrls: ['diagram.css', 'edges.css'],
 })
 export class Diagram {
-  edgeTemplateMap: NgDiagramEdgeTemplateMap = new Map<
-    string,
-    Type<NgDiagramEdgeTemplate>
-  >([
+  edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['labeled', LabeledEdgeComponent],
     ['sinusoid', SinusoidEdgeComponent],
   ]);
