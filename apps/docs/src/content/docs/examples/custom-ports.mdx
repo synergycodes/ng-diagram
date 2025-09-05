@@ -31,16 +31,15 @@ This example demonstrates how to create custom ports in NgDiagram by customizing
 
 Two nodes are rendered, each with four ports (left, top, right, bottom).
 
-- The right port of the second node uses a custom CSS class taken from node data for a unique look and styling.
+- The right port of the second node uses a data property to apply red background.
 - The top port has a changed inline position in both nodes.
-- The left port is customized with inline styles based on a property passed from node data.
-- The bottom port has no changes.
+- The left port is customized with styles based on class property.
 
 ## Example Code
 
 ### Node Template HTML
 
-<CodeSnippet relativePath="examples/custom-ports/node/node.component.html" range={[1, 32]} mark={[{ range: '9-31' }]} />
+<CodeSnippet relativePath="examples/custom-ports/node/node.component.html" range={[1, 27]} mark={[{ range: '9-27' }]} />
 
 ### Custom Port CSS
 

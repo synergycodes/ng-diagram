@@ -10,11 +10,8 @@ import {
   imports: [NgDiagramPortComponent],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
-  host: {
-    '[class.ng-diagram-port-hoverable-over-node]': 'true',
-  },
 })
 export class NodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');
-  node = input.required<Node<{ name: string; cssClass: string }>>();
+  node = input.required<Node<{ name: string; leftPortColor: string }>>();
 }

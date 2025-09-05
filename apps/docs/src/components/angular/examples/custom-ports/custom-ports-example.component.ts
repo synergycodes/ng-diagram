@@ -66,7 +66,7 @@ export class CustomPortsExampleComponent {
         type: 'myType',
         data: {
           name: 'Custom Node 2',
-          cssClass: 'some-custom-class',
+          leftPortColor: 'red',
         },
       },
     ],

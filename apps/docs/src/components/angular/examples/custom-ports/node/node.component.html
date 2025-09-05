@@ -1,4 +1,4 @@
-<div class="node" (contextmenu)="onRightClick($event)">
+<div class="node">
   <div class="node-header">
     <span>{{ node().data.name }}</span>
   </div>
@@ -10,22 +10,17 @@
   id="port-left"
   type="target"
   side="left"
-  [attr.style]="
-    node().data.cssClass
-      ? null
-      : 'top: 25%;background-color: red;border-radius: 4px;'
-  "
+  [attr.style]="node().data.leftPortColor ? null : 'background-color: red'"
 />
 <ng-diagram-port
   id="port-top"
   type="source"
   side="top"
-  style="top: 5px; left: 200px"
+  style="top: 25px; left: 200px"
 />
 <ng-diagram-port
   id="port-right"
-  class="{{ node().data.cssClass }}"
+  class="some-custom-class"
   type="both"
   side="right"
 />
-<ng-diagram-port id="port-bottom" type="both" side="bottom" />
