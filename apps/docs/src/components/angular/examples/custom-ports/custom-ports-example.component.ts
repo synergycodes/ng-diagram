@@ -26,12 +26,12 @@ import { NodeComponent } from './node/node.component';
       :host {
         width: 100%;
         height: 100%;
-      }
-      .diagram {
-        flex: 1;
-        display: flex;
-        height: 20rem;
-        font-family: 'Poppins', sans-serif;
+        .diagram {
+          flex: 1;
+          display: flex;
+          height: 20rem;
+          font-family: 'Poppins', sans-serif;
+        }
       }
     `,
   ],
