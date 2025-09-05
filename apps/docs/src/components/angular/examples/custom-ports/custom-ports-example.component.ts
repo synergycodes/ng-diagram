@@ -44,6 +44,7 @@ export class CustomPortsExampleComponent {
   ]);
 
   config = {
+    edgeRouting: { defaultRouting: 'orthogonal' },
     zoom: {
       max: 3,
     },
@@ -78,7 +79,6 @@ export class CustomPortsExampleComponent {
         sourcePort: 'port-bottom',
         targetPort: 'port-left',
         sourceArrowhead: 'ng-diagram-arrow',
-        routing: 'orthogonal',
       },
       {
         id: '2',
@@ -88,7 +88,6 @@ export class CustomPortsExampleComponent {
         sourcePort: 'port-top',
         targetPort: 'port-right',
         sourceArrowhead: 'ng-diagram-arrow',
-        routing: 'orthogonal',
       },
       {
         id: '3',
@@ -98,7 +97,6 @@ export class CustomPortsExampleComponent {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         sourceArrowhead: 'ng-diagram-arrow',
-        routing: 'orthogonal',
       },
     ],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
