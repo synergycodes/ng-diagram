@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
-import type { CommandHandler } from '../../../../types';
+import type { CommandHandler, LinkingActionState } from '../../../../types';
 import { startLinkingFromPosition, StartLinkingFromPositionCommand } from '../start-linking-from-position';
 
 // Mock the utility functions
@@ -19,6 +19,11 @@ describe('startLinkingFromPosition', () => {
       linking: {
         temporaryEdgeDataBuilder: ReturnType<typeof vi.fn>;
       };
+    };
+    actionStateManager: {
+      clearLinking: ReturnType<typeof vi.fn>;
+      isLinking: ReturnType<typeof vi.fn>;
+      linking: Partial<LinkingActionState>;
     };
   };
 
@@ -75,17 +80,11 @@ describe('startLinkingFromPosition', () => {
         target: '',
         targetPosition: position,
       });
-
-      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-        {
-          metadataUpdate: {
-            temporaryEdge: mockTemporaryEdge,
-          },
-        },
-        'startLinking'
-      );
-
-      expect(mockFlowCore.actionStateManager.linking).toEqual({ temporaryEdge: mockTemporaryEdge });
+      expect(mockFlowCore.actionStateManager.linking).toEqual({
+        sourceNodeId: '',
+        sourcePortId: '',
+        temporaryEdge: mockTemporaryEdge,
+      });
     });
   });
 

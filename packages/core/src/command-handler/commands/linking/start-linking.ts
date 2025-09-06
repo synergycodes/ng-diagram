@@ -37,15 +37,6 @@ export const startLinking = async (commandHandler: CommandHandler, command: Star
   commandHandler.flowCore.actionStateManager.linking = {
     temporaryEdge,
     sourceNodeId,
-    sourcePortId,
+    sourcePortId: sourcePortId ?? '',
   };
-
-  await commandHandler.flowCore.applyUpdate(
-    {
-      metadataUpdate: {
-        temporaryEdge,
-      },
-    },
-    'startLinking'
-  );
 };

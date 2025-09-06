@@ -392,7 +392,7 @@ describe('Edges Routing Middleware', () => {
         points: [],
       };
 
-      flowCore.actionStateManager.linking = { temporaryEdge };
+      flowCore.actionStateManager.linking = { temporaryEdge, sourceNodeId: 'node-1', sourcePortId: '' };
 
       const newState = {
         ...initialState,
@@ -401,7 +401,7 @@ describe('Edges Routing Middleware', () => {
 
       context = {
         ...context,
-        state: newState,
+        state: newState as typeof context.state,
         modelActionType: 'moveTemporaryEdge',
         nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
       };
@@ -430,13 +430,13 @@ describe('Edges Routing Middleware', () => {
         targetPosition: { x: 200, y: 200 },
       };
 
-      flowCore.actionStateManager.linking = { temporaryEdge };
+      flowCore.actionStateManager.linking = { temporaryEdge, sourceNodeId: '', sourcePortId: '' };
 
       const newState = {
         ...initialState,
       };
 
-      context.state = newState;
+      context.state = newState as typeof context.state;
 
       edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
@@ -445,7 +445,7 @@ describe('Edges Routing Middleware', () => {
     });
 
     it('should not process temporary edge if metadata has not changed', () => {
-      flowCore.actionStateManager.linking = null;
+      flowCore.actionStateManager.linking = { temporaryEdge: null, sourceNodeId: '', sourcePortId: '' };
 
       const newState = {
         ...initialState,
@@ -453,7 +453,7 @@ describe('Edges Routing Middleware', () => {
 
       context = {
         ...context,
-        state: newState,
+        state: newState as typeof context.state,
         modelActionType: 'updateNodes',
       };
 

@@ -19,7 +19,11 @@ export const startLinkingFromPosition = async (
     targetPosition: position,
   });
 
-  commandHandler.flowCore.actionStateManager.linking = { temporaryEdge };
+  commandHandler.flowCore.actionStateManager.linking = {
+    sourceNodeId: '',
+    sourcePortId: '',
+    temporaryEdge,
+  };
 
   await commandHandler.flowCore.applyUpdate(
     {

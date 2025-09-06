@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockNode } from '../../../test-utils';
-import type { Edge, LinkingState } from '../../../types';
+import type { Edge, LinkingActionState } from '../../../types';
 import { LinkingInputEvent } from './linking.event';
 import { LinkingEventHandler } from './linking.handler';
 
@@ -28,7 +28,7 @@ function getSampleLinkingEvent(overrides: Partial<LinkingInputEvent> = {}): Link
 describe('LinkingEventHandler', () => {
   let mockCommandHandler: { emit: ReturnType<typeof vi.fn> };
   let mockActionStateManager: {
-    linking: LinkingState | undefined;
+    linking: LinkingActionState | undefined;
     clearLinking: ReturnType<typeof vi.fn>;
     isLinking: ReturnType<typeof vi.fn>;
   };

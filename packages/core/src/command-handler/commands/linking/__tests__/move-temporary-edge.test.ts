@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockNode, mockPort } from '../../../../test-utils';
-import type { CommandHandler, Edge, Node, Port } from '../../../../types';
+import type { CommandHandler, Edge, LinkingActionState, Node, Port } from '../../../../types';
 import { moveTemporaryEdge, MoveTemporaryEdgeCommand } from '../move-temporary-edge';
 
 // Mock the utility functions
@@ -24,6 +24,11 @@ describe('moveTemporaryEdge', () => {
     getNodeById: ReturnType<typeof vi.fn>;
     applyUpdate: ReturnType<typeof vi.fn>;
     config: { linking: { portSnapDistance: number } };
+    actionStateManager: {
+      clearLinking: ReturnType<typeof vi.fn>;
+      isLinking: ReturnType<typeof vi.fn>;
+      linking: Partial<LinkingActionState>;
+    };
   };
 
   const mockTemporaryEdge: Edge = {
@@ -73,7 +78,7 @@ describe('moveTemporaryEdge', () => {
   });
 
   it('should return early when no temporary edge exists', async () => {
-    mockFlowCore.actionStateManager.linking = null;
+    mockFlowCore.actionStateManager.linking.temporaryEdge = null;
 
     const command: MoveTemporaryEdgeCommand = {
       name: 'moveTemporaryEdge',
@@ -107,7 +112,7 @@ describe('moveTemporaryEdge', () => {
   });
 
   it('should create floating edge when no target port found', async () => {
-    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
+    mockFlowCore.actionStateManager.linking.temporaryEdge = mockTemporaryEdge;
     mockFlowCore.getNearestPortInRange.mockReturnValue(null);
 
     const floatingEdge = { ...mockTemporaryEdge, target: '', targetPort: '' };
@@ -135,7 +140,7 @@ describe('moveTemporaryEdge', () => {
   });
 
   it('should create connected edge when valid target found', async () => {
-    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
+    mockFlowCore.actionStateManager.linking.temporaryEdge = mockTemporaryEdge;
     mockFlowCore.getNearestPortInRange.mockReturnValue(mockTargetPort);
     mockIsProperTargetPort.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
@@ -170,7 +175,7 @@ describe('moveTemporaryEdge', () => {
   });
 
   it('should create floating edge when connection validation fails', async () => {
-    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
+    mockFlowCore.actionStateManager.linking.temporaryEdge = mockTemporaryEdge;
     mockFlowCore.getNearestPortInRange.mockReturnValue(mockTargetPort);
     mockIsProperTargetPort.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
@@ -204,7 +209,7 @@ describe('moveTemporaryEdge', () => {
   });
 
   it('should use port snap distance for target detection', async () => {
-    mockFlowCore.actionStateManager.linking = { temporaryEdge: mockTemporaryEdge };
+    mockFlowCore.actionStateManager.linking.temporaryEdge = mockTemporaryEdge;
     mockFlowCore.getNearestPortInRange.mockReturnValue(null);
     mockCreateTemporaryEdge.mockReturnValue(mockTemporaryEdge);
 

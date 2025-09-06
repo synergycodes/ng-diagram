@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockNode } from '../../../../test-utils';
-import type { CommandHandler, Edge, Node } from '../../../../types';
+import type { CommandHandler, Edge, LinkingActionState, Node } from '../../../../types';
 import { finishLinking } from '../finish-linking';
 
 // Mock the utility functions
@@ -27,6 +27,11 @@ describe('finishLinking', () => {
     getNodeById: ReturnType<typeof vi.fn>;
     applyUpdate: ReturnType<typeof vi.fn>;
     config: object;
+    actionStateManager: {
+      clearLinking: ReturnType<typeof vi.fn>;
+      linking: Partial<LinkingActionState>;
+      isLinking: ReturnType<typeof vi.fn>;
+    };
   };
 
   const mockTemporaryEdge: Edge = {
@@ -79,7 +84,7 @@ describe('finishLinking', () => {
   });
 
   it('should return early when no temporary edge exists', async () => {
-    mockFlowCore.actionStateManager.linking = null;
+    mockFlowCore.actionStateManager.linking.temporaryEdge = null;
     await finishLinking(mockCommandHandler);
     expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
   });
@@ -190,7 +195,7 @@ describe('finishLinking', () => {
     };
     const finalEdge = { id: 'final-edge', source: 'source-node', target: 'target-node', data: {} };
 
-    mockFlowCore.actionStateManager.linking = { temporaryEdge: temporaryEdgeWithoutPort };
+    mockFlowCore.actionStateManager.linking.temporaryEdge = temporaryEdgeWithoutPort;
     mockValidateConnection.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
     mockCreateFinalEdge.mockReturnValue(finalEdge);

@@ -113,7 +113,11 @@ export const moveTemporaryEdge = async (commandHandler: CommandHandler, command:
 
   const newTemporaryEdge = createNewTemporaryEdge(commandHandler, temporaryEdge, targetPortInfo, position);
 
-  commandHandler.flowCore.actionStateManager.linking.temporaryEdge = newTemporaryEdge;
+  commandHandler.flowCore.actionStateManager.linking = {
+    temporaryEdge: newTemporaryEdge,
+    sourceNodeId: '',
+    sourcePortId: '',
+  };
 
   await commandHandler.flowCore.applyUpdate(
     {
