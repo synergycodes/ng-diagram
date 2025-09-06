@@ -16,7 +16,7 @@ export class NgDiagramViewportService<TMiddlewares extends MiddlewareChain = []>
   /**
    * Returns a computed signal for the viewport that safely handles uninitialized state
    */
-  getViewport() {
+  get viewport() {
     return computed(() => {
       return this.flowCore?.model.getMetadata().viewport || { x: 0, y: 0, scale: 1 };
     });
@@ -25,7 +25,7 @@ export class NgDiagramViewportService<TMiddlewares extends MiddlewareChain = []>
   /**
    * Returns a computed signal for the scale that safely handles uninitialized state
    */
-  getScale() {
+  get scale() {
     return computed(() => {
       return this.flowCore?.getScale() || 1;
     });

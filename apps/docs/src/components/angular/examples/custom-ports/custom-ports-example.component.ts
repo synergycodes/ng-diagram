@@ -1,5 +1,5 @@
 import '@angular/compiler';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   NgDiagramComponent,
   NgDiagramModelService,
@@ -38,7 +38,6 @@ import { NodeComponent } from './node/node.component';
   providers: [NgDiagramModelService],
 })
 export class CustomPortsExampleComponent {
-  private readonly modelService = inject(NgDiagramModelService);
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
     ['myType', NodeComponent],
   ]);
