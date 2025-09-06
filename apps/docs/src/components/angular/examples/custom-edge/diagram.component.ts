@@ -1,13 +1,14 @@
 import '@angular/compiler';
 
-import { Component, Type } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
+  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
+import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 import { SinusoidEdgeComponent } from './sinusoid-edge.component';

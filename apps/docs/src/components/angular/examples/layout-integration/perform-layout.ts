@@ -58,7 +58,7 @@ export async function performLayout(nodes: Node[], edges: Edge[]) {
     } = node;
 
     const { x = baseX, y = baseY } = laidOutNodes?.find(
-      ({ id }) => id === node.id
+      ({ id }: any) => id === node.id
     ) ?? {
       x: baseX,
       y: baseY,
@@ -71,7 +71,7 @@ export async function performLayout(nodes: Node[], edges: Edge[]) {
   });
 
   const updatedEdges: Edge[] = edges.map((edge) => {
-    const elkEdge = laidOutEdges?.find(({ id }) => id === edge.id);
+    const elkEdge = laidOutEdges?.find(({ id }: any) => id === edge.id);
     if (!elkEdge) {
       return edge;
     }
