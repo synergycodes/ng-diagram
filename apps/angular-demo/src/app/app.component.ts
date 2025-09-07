@@ -49,7 +49,7 @@ export class AppComponent {
       dotSize: 40,
     },
     snapping: {
-      computeSnapForNodeDrag: true,
+      shouldSnapDragForNode: () => true,
     },
     edgeRouting: {
       defaultRouting: 'orthogonal',
