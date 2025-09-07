@@ -28,22 +28,22 @@ describe('SignalModelAdapter', () => {
     expect(service.getMetadata()).toEqual({ viewport, middlewaresConfig });
   });
 
-  it('should set and get nodes', () => {
-    service.setNodes(mockNodes);
+  it('should update and get nodes', () => {
+    service.updateNodes(mockNodes);
     expect(service.getNodes()).toEqual(mockNodes);
   });
 
   it('should set and get edges', () => {
-    service.setEdges(mockEdges);
+    service.updateEdges(mockEdges);
     expect(service.getEdges()).toEqual(mockEdges);
   });
 
-  it('should call onChange callback when state changes', async () => {
+  it('should call onChange callbupdate when state changes', async () => {
     const callback = vi.fn();
     service.onChange(callback);
 
     // Triggers reactivity
-    service.setNodes(mockNodes);
+    service.updateNodes(mockNodes);
 
     await new Promise((resolve) => setTimeout(resolve));
 
@@ -52,8 +52,8 @@ describe('SignalModelAdapter', () => {
   });
 
   it('should support functional updates to nodes', () => {
-    service.setNodes(mockNodes);
-    service.setNodes((prev) => [...prev, { id: '3', type: 'default', data: {}, position: { x: 0, y: 0 } }]);
+    service.updateNodes(mockNodes);
+    service.updateNodes((prev) => [...prev, { id: '3', type: 'default', data: {}, position: { x: 0, y: 0 } }]);
 
     const updatedNodes = service.getNodes();
     expect(updatedNodes.length).toBe(3);
@@ -61,8 +61,8 @@ describe('SignalModelAdapter', () => {
   });
 
   it('should support functional updates to edges', () => {
-    service.setEdges(mockEdges);
-    service.setEdges((prev) => [...prev, { id: 'e1-3', source: '1', target: '3', type: 'default', data: {} }]);
+    service.updateEdges(mockEdges);
+    service.updateEdges((prev) => [...prev, { id: 'e1-3', source: '1', target: '3', type: 'default', data: {} }]);
 
     const updatedEdges = service.getEdges();
     expect(updatedEdges.length).toBe(2);
@@ -70,11 +70,11 @@ describe('SignalModelAdapter', () => {
   });
 
   it('should handle empty arrays when setting nodes and edges', () => {
-    service.setNodes(mockNodes);
-    service.setEdges(mockEdges);
+    service.updateNodes(mockNodes);
+    service.updateEdges(mockEdges);
 
-    service.setNodes([]);
-    service.setEdges([]);
+    service.updateNodes([]);
+    service.updateEdges([]);
 
     expect(service.getNodes()).toEqual([]);
     expect(service.getEdges()).toEqual([]);
