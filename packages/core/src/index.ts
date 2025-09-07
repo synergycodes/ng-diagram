@@ -9,4 +9,4 @@ export * from './utils';
 
 export * from './middleware-manager/middlewares';
 
-export { DEFAULT_GROUP_SIZE, DEFAULT_MIN_NODE_SIZE, DEFAULT_NODE_SIZE } from './flow-config/default-flow-config';
+export { DEFAULT_NODE_MIN_SIZE } from './flow-config/default-flow-config';

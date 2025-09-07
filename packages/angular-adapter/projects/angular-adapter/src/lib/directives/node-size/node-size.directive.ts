@@ -1,7 +1,10 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { DEFAULT_GROUP_SIZE, DEFAULT_MIN_NODE_SIZE, DEFAULT_NODE_SIZE, isGroup, type Node } from '@angularflow/core';
+import { DEFAULT_NODE_MIN_SIZE, isGroup, type Node } from '@angularflow/core';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
+
+export const DEFAULT_NODE_SIZE = { width: '11.25rem', height: '2rem' };
+export const DEFAULT_GROUP_SIZE = { width: '9.0625rem', height: '9.0625rem' };
 
 /**
  * Directive that manages node sizing behavior in the diagram.
@@ -12,9 +15,8 @@ import { BatchResizeObserverService } from '../../services/flow-resize-observer/
  *
  * Size configuration priority:
  * 1. Explicit size from node data (when autoSize=false)
- * 2. Config-provided default size via `getDefaultNodeSize`
- * 3. Fallback sizes for default node types
- * 4. User's CSS (for custom node types without config)
+ * 2. Built-in defaults for default node types (no type specified)
+ * 3. User's CSS (for custom node types)
  */
 @Directive({
   selector: '[ngDiagramNodeSize]',
@@ -92,89 +94,60 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
     this.renderer.setStyle(element, 'height', `${height}px`);
 
     if (minSize || isDefaultNodeType) {
-      const minWidth = minSize?.width ?? DEFAULT_MIN_NODE_SIZE.width;
-      const minHeight = minSize?.height ?? DEFAULT_MIN_NODE_SIZE.height;
+      const minWidth = minSize?.width ?? DEFAULT_NODE_MIN_SIZE.width;
+      const minHeight = minSize?.height ?? DEFAULT_NODE_MIN_SIZE.height;
       this.renderer.setStyle(element, 'min-width', `${minWidth}px`);
       this.renderer.setStyle(element, 'min-height', `${minHeight}px`);
     }
   }
 
   /**
-   * Applies auto-sizing to the node based on configuration or defaults.
-   * For custom nodes without config, resets inline styles to let CSS take control.
+   * Applies auto-sizing to the node based on built-in defaults.
+   * For custom nodes, resets inline styles to let CSS take control.
    *
    * @param node - The node to size
    */
   private applyAutoSize(node: Node): void {
-    const defaultSize = this.getDefaultSize(node);
-
-    if (!defaultSize) {
+    if (node.type) {
       this.resetExplicitSizes();
       return;
     }
 
     if (isGroup(node)) {
-      this.applyGroupSize(defaultSize);
+      this.applyDefaultGroupSize();
     } else {
-      this.applyNodeSize(defaultSize);
+      this.applyDefaultNodeSize();
     }
   }
 
   /**
-   * Determines the default size for a node in auto-size mode.
-   *
-   * Priority order:
-   * 1. Size from config's `getDefaultNodeSize` function
-   * 2. Fallback sizes for default node types
-   * 3. null for custom node types without config
-   *
-   * @param node - The node to get default size for
-   * @returns Default size or null if no defaults apply
-   */
-  private getDefaultSize(node: Node): { width: number; height: number } | null {
-    const flowCore = this.flowCoreProvider.provide();
-    const defaultSize = flowCore.config.getDefaultNodeSize?.(node);
-
-    if (defaultSize) {
-      return defaultSize;
-    }
-
-    const isDefaultNodeType = !node.type;
-    if (isDefaultNodeType) {
-      return isGroup(node) ? DEFAULT_GROUP_SIZE : DEFAULT_NODE_SIZE;
-    }
-
-    return null;
-  }
-
-  /**
-   * Applies sizing for group nodes.
-   * Groups get both explicit dimensions and minimum constraints to ensure
+   * Applies sizing for default group nodes.
+   * Default groups get both explicit dimensions and minimum constraints to ensure
    * their bounds are visually apparent even when empty.
    *
    * @param size - The size to apply
    */
-  private applyGroupSize(size: { width: number; height: number }): void {
+  private applyDefaultGroupSize(): void {
     const element = this.hostElement.nativeElement;
-    this.renderer.setStyle(element, 'width', `${size.width}px`);
-    this.renderer.setStyle(element, 'height', `${size.height}px`);
-    this.renderer.setStyle(element, 'min-width', `${size.width}px`);
-    this.renderer.setStyle(element, 'min-height', `${size.height}px`);
+    this.renderer.setStyle(element, 'width', DEFAULT_GROUP_SIZE.width);
+    this.renderer.setStyle(element, 'height', DEFAULT_GROUP_SIZE.height);
+    this.renderer.setStyle(element, 'min-width', DEFAULT_GROUP_SIZE.width);
+    this.renderer.setStyle(element, 'min-height', DEFAULT_GROUP_SIZE.height);
   }
 
   /**
-   * Applies sizing for regular (non-group) nodes.
-   * Regular nodes use flexible sizing with minimum constraints,
+   * Applies sizing for default nodes.
+   * Default nodes use flexible sizing with minimum constraints,
    * allowing content to expand beyond the minimum if needed.
    *
    * @param size - The minimum size to apply
    */
-  private applyNodeSize(size: { width: number; height: number }): void {
+  private applyDefaultNodeSize(): void {
     const element = this.hostElement.nativeElement;
     this.renderer.setStyle(element, 'width', 'unset');
     this.renderer.setStyle(element, 'height', 'unset');
-    this.renderer.setStyle(element, 'min-width', `${size.width}px`);
-    this.renderer.setStyle(element, 'min-height', `${size.height}px`);
+    this.renderer.setStyle(element, 'min-width', DEFAULT_NODE_SIZE.width);
+    this.renderer.setStyle(element, 'min-height', DEFAULT_NODE_SIZE.height);
   }
 
   /**

@@ -13,9 +13,8 @@ Handles two sizing modes:
 
 Size configuration priority:
 1. Explicit size from node data (when autoSize=false)
-2. Config-provided default size via `getDefaultNodeSize`
-3. Fallback sizes for default node types
-4. User's CSS (for custom node types without config)
+2. Built-in defaults for default node types (no type specified)
+3. User's CSS (for custom node types)
 
 ## Implements
 

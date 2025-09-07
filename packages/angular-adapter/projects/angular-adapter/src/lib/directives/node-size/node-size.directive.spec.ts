@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DEFAULT_GROUP_SIZE, DEFAULT_NODE_SIZE, type Node } from '@angularflow/core';
+import { type Node } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
-import { NodeSizeDirective } from './node-size.directive';
+import { DEFAULT_GROUP_SIZE, DEFAULT_NODE_SIZE, NodeSizeDirective } from './node-size.directive';
 
 @Component({
   template: `<div ngDiagramNodeSize [node]="data"></div>`,
@@ -42,7 +42,6 @@ describe('NodeSizeDirective', () => {
         resize: {
           getMinNodeSize: vi.fn().mockReturnValue({ width: 20, height: 20 }),
         },
-        getDefaultNodeSize: vi.fn(),
       },
     };
 
@@ -134,31 +133,28 @@ describe('NodeSizeDirective', () => {
 
   describe('Auto Sizing - Default Node Types', () => {
     it('should apply default size for regular nodes without type', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue(null);
       component.data = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
       fixture.detectChanges();
 
       expect(element.style.width).toBe('unset');
       expect(element.style.height).toBe('unset');
-      expect(element.style.minWidth).toBe(`${DEFAULT_NODE_SIZE.width}px`);
-      expect(element.style.minHeight).toBe(`${DEFAULT_NODE_SIZE.height}px`);
+      expect(element.style.minWidth).toBe(DEFAULT_NODE_SIZE.width);
+      expect(element.style.minHeight).toBe(DEFAULT_NODE_SIZE.height);
     });
 
     it('should apply default size for group nodes without type', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue(null);
       component.data = { id: 'group1', position: { x: 0, y: 0 }, data: {}, isGroup: true };
       fixture.detectChanges();
 
-      expect(element.style.width).toBe(`${DEFAULT_GROUP_SIZE.width}px`);
-      expect(element.style.height).toBe(`${DEFAULT_GROUP_SIZE.height}px`);
-      expect(element.style.minWidth).toBe(`${DEFAULT_GROUP_SIZE.width}px`);
-      expect(element.style.minHeight).toBe(`${DEFAULT_GROUP_SIZE.height}px`);
+      expect(element.style.width).toBe(DEFAULT_GROUP_SIZE.width);
+      expect(element.style.height).toBe(DEFAULT_GROUP_SIZE.height);
+      expect(element.style.minWidth).toBe(DEFAULT_GROUP_SIZE.width);
+      expect(element.style.minHeight).toBe(DEFAULT_GROUP_SIZE.height);
     });
   });
 
   describe('Auto Sizing - Custom Node Types', () => {
-    it('should reset styles for custom nodes without config', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue(null);
+    it('should reset styles for custom nodes', () => {
       component.data = { id: 'node1', type: 'custom', position: { x: 0, y: 0 }, data: {} };
       fixture.detectChanges();
 
@@ -168,62 +164,14 @@ describe('NodeSizeDirective', () => {
       expect(element.style.minHeight).toBe('unset');
     });
 
-    it('should apply config size for custom nodes when provided', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue({ width: 250, height: 150 });
-      component.data = { id: 'node1', type: 'custom', position: { x: 0, y: 0 }, data: {} };
+    it('should reset styles for custom group nodes', () => {
+      component.data = { id: 'group1', type: 'custom-group', position: { x: 0, y: 0 }, data: {}, isGroup: true };
       fixture.detectChanges();
 
       expect(element.style.width).toBe('unset');
       expect(element.style.height).toBe('unset');
-      expect(element.style.minWidth).toBe('250px');
-      expect(element.style.minHeight).toBe('150px');
-    });
-
-    it('should apply config size for custom group nodes', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue({ width: 300, height: 300 });
-      component.data = { id: 'group1', type: 'custom-group', position: { x: 0, y: 0 }, data: {}, isGroup: true };
-      fixture.detectChanges();
-
-      expect(element.style.width).toBe('300px');
-      expect(element.style.height).toBe('300px');
-      expect(element.style.minWidth).toBe('300px');
-      expect(element.style.minHeight).toBe('300px');
-    });
-  });
-
-  describe('Configuration Priority', () => {
-    it('should prioritize config size over fallback for default nodes', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue({ width: 300, height: 200 });
-      component.data = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
-      fixture.detectChanges();
-
-      expect(element.style.minWidth).toBe('300px');
-      expect(element.style.minHeight).toBe('200px');
-    });
-
-    it('should use fallback when getDefaultNodeSize is not provided', () => {
-      mockFlowCore.config.getDefaultNodeSize = undefined;
-      component.data = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
-      fixture.detectChanges();
-
-      expect(element.style.minWidth).toBe(`${DEFAULT_NODE_SIZE.width}px`);
-      expect(element.style.minHeight).toBe(`${DEFAULT_NODE_SIZE.height}px`);
-    });
-
-    it('should handle when config returns null for specific nodes', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockImplementation((node: Node) => {
-        return node.type === 'special' ? { width: 400, height: 100 } : null;
-      });
-
-      // Default node - should use fallback
-      component.data = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
-      fixture.detectChanges();
-      expect(element.style.minWidth).toBe(`${DEFAULT_NODE_SIZE.width}px`);
-
-      // Special node - should use config
-      component.data = { id: 'node2', type: 'special', position: { x: 0, y: 0 }, data: {} };
-      fixture.detectChanges();
-      expect(element.style.minWidth).toBe('400px');
+      expect(element.style.minWidth).toBe('unset');
+      expect(element.style.minHeight).toBe('unset');
     });
   });
 
@@ -242,28 +190,26 @@ describe('NodeSizeDirective', () => {
   });
 
   describe('Group vs Regular Node Behavior', () => {
-    it('should apply fixed dimensions for groups in auto-size mode', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue({ width: 200, height: 200 });
+    it('should apply fixed dimensions for default groups in auto-size mode', () => {
       component.data = { id: 'group1', position: { x: 0, y: 0 }, data: {}, isGroup: true };
       fixture.detectChanges();
 
       // Groups should get both width/height and min-width/min-height
-      expect(element.style.width).toBe('200px');
-      expect(element.style.height).toBe('200px');
-      expect(element.style.minWidth).toBe('200px');
-      expect(element.style.minHeight).toBe('200px');
+      expect(element.style.width).toBe(DEFAULT_GROUP_SIZE.width);
+      expect(element.style.height).toBe(DEFAULT_GROUP_SIZE.height);
+      expect(element.style.minWidth).toBe(DEFAULT_GROUP_SIZE.width);
+      expect(element.style.minHeight).toBe(DEFAULT_GROUP_SIZE.height);
     });
 
-    it('should apply flexible sizing for regular nodes in auto-size mode', () => {
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue({ width: 150, height: 50 });
+    it('should apply flexible sizing for default regular nodes in auto-size mode', () => {
       component.data = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
       fixture.detectChanges();
 
       // Regular nodes should only get min-width/min-height
       expect(element.style.width).toBe('unset');
       expect(element.style.height).toBe('unset');
-      expect(element.style.minWidth).toBe('150px');
-      expect(element.style.minHeight).toBe('50px');
+      expect(element.style.minWidth).toBe(DEFAULT_NODE_SIZE.width);
+      expect(element.style.minHeight).toBe(DEFAULT_NODE_SIZE.height);
     });
   });
 
@@ -289,11 +235,10 @@ describe('NodeSizeDirective', () => {
       expect(element.style.width).toBe('200px');
 
       // Switch to auto size
-      mockFlowCore.config.getDefaultNodeSize.mockReturnValue({ width: 180, height: 32 });
       component.data = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
       fixture.detectChanges();
       expect(element.style.width).toBe('unset');
-      expect(element.style.minWidth).toBe('180px');
+      expect(element.style.minWidth).toBe(DEFAULT_NODE_SIZE.width);
     });
   });
 });

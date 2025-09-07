@@ -230,12 +230,6 @@ export interface FlowConfig {
    */
   computeEdgeId: () => string;
   /**
-   * Returns the default size for a node when it's in autoSize mode.
-   * If not provided or returns null, no default sizing is applied.
-   * @param node The node to compute the default size for.
-   */
-  getDefaultNodeSize?: (node: Node) => Size | null;
-  /**
    * Configuration for node resizing.
    */
   resize: ResizeConfig;
