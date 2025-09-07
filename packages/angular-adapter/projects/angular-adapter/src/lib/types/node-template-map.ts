@@ -1,13 +1,18 @@
-import { InputSignal, Type } from '@angular/core';
-import { GroupNode, Node, SimpleNode } from '@angularflow/core';
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface NgDiagramNodeTemplate<TData = any, NodeType extends Node<TData> = SimpleNode<TData>> {
+import { InputSignal, Type } from '@angular/core';
+import { DataObject, GroupNode, Node, SimpleNode } from '@angularflow/core';
+
+export interface NgDiagramNodeTemplate<
+  Data extends DataObject = DataObject,
+  NodeType extends Node<Data> = SimpleNode<Data>,
+> {
   node: InputSignal<NodeType>;
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-export interface NgDiagramGroupNodeTemplate<TData = any> extends NgDiagramNodeTemplate<TData, GroupNode<TData>> {}
+export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject>
+  extends NgDiagramNodeTemplate<Data, GroupNode<Data>> {}
 export class NgDiagramNodeTemplateMap extends Map<
   string,
-  Type<NgDiagramNodeTemplate> | Type<NgDiagramGroupNodeTemplate>
+  Type<NgDiagramNodeTemplate<any>> | Type<NgDiagramGroupNodeTemplate<any>>
 > {}

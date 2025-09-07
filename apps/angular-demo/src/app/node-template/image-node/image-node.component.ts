@@ -18,7 +18,11 @@ import {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class ImageNodeComponent implements NgDiagramNodeTemplate {
-  node = input.required<Node>();
-  imageUrl = computed(() => this.node().data?.['imageUrl'] ?? 'https://placehold.jp/150x150.png');
+export class ImageNodeComponent implements NgDiagramNodeTemplate<ImageNodeData> {
+  node = input.required<Node<ImageNodeData>>();
+  imageUrl = computed(() => this.node().data?.imageUrl ?? 'https://placehold.jp/150x150.png');
+}
+
+interface ImageNodeData {
+  imageUrl: string;
 }

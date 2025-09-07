@@ -1,5 +1,5 @@
 import { EdgeRoutingName } from '../edge-routing-manager/types';
-import { Point, Size } from './utils';
+import { DataObject, Point, Size } from './utils';
 
 export type RoutingMode = 'manual' | 'auto';
 
@@ -7,8 +7,7 @@ export type RoutingMode = 'manual' | 'auto';
  * Interface representing an edge (connection) between nodes in the flow diagram
  * @category Types
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface Edge<T = any> {
+export interface Edge<T extends DataObject = DataObject> {
   /**
    * The unique identifier for the edge.
    */

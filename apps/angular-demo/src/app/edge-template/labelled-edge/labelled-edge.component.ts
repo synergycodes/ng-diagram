@@ -20,7 +20,11 @@ import {
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class LabelledEdgeComponent implements NgDiagramEdgeTemplate {
-  edge = input.required<Edge>();
+  edge = input.required<Edge<Data>>();
 
   selected = computed(() => this.edge().selected);
+}
+
+interface Data {
+  labelPosition?: number;
 }

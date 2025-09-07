@@ -11,7 +11,12 @@ import {
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
 })
-export class NodeComponent implements NgDiagramNodeTemplate {
+export class NodeComponent implements NgDiagramNodeTemplate<Data> {
   text = model<string>('');
-  node = input.required<Node<{ name: string; leftPortColor: string }>>();
+  node = input.required<Node<Data>>();
 }
+
+type Data = {
+  name: string;
+  leftPortColor: string;
+};

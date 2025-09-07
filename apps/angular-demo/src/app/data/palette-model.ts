@@ -1,7 +1,7 @@
 import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
 import { NodeTemplateType } from './node-template';
 
-export const paletteModel: NgDiagramPaletteItem[] = [
+export const paletteModel: NgDiagramPaletteItem<Data>[] = [
   {
     type: NodeTemplateType.InputField,
     data: { label: 'Input Field' },
@@ -12,3 +12,8 @@ export const paletteModel: NgDiagramPaletteItem[] = [
   { data: { label: 'Default Node' }, resizable: true, rotatable: true },
   { data: { label: 'Default Group' }, resizable: true, isGroup: true },
 ];
+
+interface Data {
+  label: string;
+  imageUrl?: string;
+}

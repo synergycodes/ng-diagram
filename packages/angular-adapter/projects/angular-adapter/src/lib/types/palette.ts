@@ -1,9 +1,15 @@
 import { GroupNode, SimpleNode } from '@angularflow/core';
 
-export type NgDiagramPaletteItem = SimpleNodeData | GroupNodeData;
+export type NgDiagramPaletteItem<Data extends object = BasePaletteItemData> =
+  | SimpleNodeData<Data>
+  | GroupNodeData<Data>;
 
-type SimpleNodeData = Pick<
-  SimpleNode,
+type SimpleNodeData<Data extends object = BasePaletteItemData> = Pick<
+  SimpleNode<Data>,
   'type' | 'data' | 'resizable' | 'rotatable' | 'size' | 'angle' | 'autoSize' | 'zOrder'
 >;
-type GroupNodeData = SimpleNodeData & Pick<GroupNode, 'isGroup'>;
+type GroupNodeData<Data extends object = BasePaletteItemData> = SimpleNodeData<Data> & Pick<GroupNode, 'isGroup'>;
+
+interface BasePaletteItemData {
+  label: string;
+}

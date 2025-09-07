@@ -31,7 +31,9 @@ import {
   `,
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
-export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate {
+export class ModifiableLabelEdgeComponent
+  implements NgDiagramEdgeTemplate<MultiLabelEdgeData>
+{
   edge = input.required<Edge<MultiLabelEdgeData>>();
 
   selected = computed(() => this.edge().selected);

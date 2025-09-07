@@ -22,10 +22,14 @@ import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class NgDiagramDefaultNodeTemplateComponent implements NgDiagramNodeTemplate<{ label: string } | undefined> {
-  node = input.required<Node<{ label: string } | undefined>>();
+export class NgDiagramDefaultNodeTemplateComponent implements NgDiagramNodeTemplate<{ label?: string }> {
+  node = input.required<Node<{ label?: string }>>();
 
-  label = computed(() => this.node().data?.label || this.node().id);
+  label = computed(() => {
+    const data = this.node().data;
+    return 'label' in data ? data.label : this.node().id;
+  });
+
   isSelected = computed(() => this.node().selected ?? false);
   classes = computed(() => `node ${this.isSelected() ? 'isSelected' : ''}`);
 }

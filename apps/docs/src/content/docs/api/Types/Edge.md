@@ -11,7 +11,7 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 ### T
 
-`T` = `any`
+`T` *extends* `DataObject` = `DataObject`
 
 ## Properties
 
