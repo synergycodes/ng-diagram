@@ -14,6 +14,11 @@ import type {
   ZoomConfig,
 } from '../types/flow-config.interface';
 import { Point, Size } from '../types/utils';
+import { isGroup } from '../utils';
+
+export const DEFAULT_NODE_SIZE = { width: 180, height: 32 };
+export const DEFAULT_GROUP_SIZE = { width: 145, height: 145 };
+export const DEFAULT_MIN_NODE_SIZE = { width: 20, height: 20 };
 
 const defaultComputeNodeId = (): string => {
   return crypto.randomUUID();
@@ -24,10 +29,9 @@ const defaultComputeEdgeId = (): string => {
 };
 
 const defaultResizeConfig: ResizeConfig = {
-  getMinNodeSize: (): Size => ({
-    width: 100,
-    height: 100,
-  }),
+  getMinNodeSize: (): Size => {
+    return { ...DEFAULT_MIN_NODE_SIZE };
+  },
 };
 
 const defaultLinkingConfig: LinkingConfig = {
@@ -123,6 +127,16 @@ const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
 export const defaultFlowConfig: FlowConfig = {
   computeNodeId: defaultComputeNodeId,
   computeEdgeId: defaultComputeEdgeId,
+  getDefaultNodeSize: (node): Size | null => {
+    // Default sizes for built-in node types
+    if (!node.type) {
+      if (isGroup(node)) {
+        return { ...DEFAULT_GROUP_SIZE };
+      }
+      return { ...DEFAULT_NODE_SIZE };
+    }
+    return null;
+  },
   resize: defaultResizeConfig,
   linking: defaultLinkingConfig,
   grouping: defaultGroupingConfig,
