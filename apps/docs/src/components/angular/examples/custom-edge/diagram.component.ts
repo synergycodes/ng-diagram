@@ -2,15 +2,15 @@ import '@angular/compiler';
 
 import { Component, Type } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
+import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 import { SinusoidEdgeComponent } from './sinusoid-edge.component';
-import { CircleArrowheadComponent } from './circle-arrowhead.component';
 
 @Component({
   imports: [
@@ -32,7 +32,7 @@ export class Diagram {
     ['sinusoid', SinusoidEdgeComponent],
   ]);
 
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: { x: -30, y: -30, scale: 0.7 },
     },

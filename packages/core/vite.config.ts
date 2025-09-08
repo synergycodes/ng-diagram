@@ -14,6 +14,10 @@ export default defineConfig({
     rollupOptions: {
       external: [],
     },
+    target: 'es2020',
+  },
+  esbuild: {
+    target: 'es2020',
   },
   plugins: [
     dts({

@@ -3,12 +3,12 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
 
 @Component({
@@ -32,7 +32,7 @@ export class Diagram {
     ['multiple-labels', MultipleLabelsEdgeComponent],
   ]);
 
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.7 },
     },

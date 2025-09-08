@@ -2,10 +2,10 @@ import '@angular/compiler';
 
 import { Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -23,7 +23,7 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
   `,
 })
 export class NgDiagramComponentContainer {
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
       { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },

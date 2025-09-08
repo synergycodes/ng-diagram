@@ -1,6 +1,6 @@
 {
   "name": "@angularflow/core",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

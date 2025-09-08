@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
@@ -8,7 +9,6 @@ import {
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
@@ -56,7 +56,7 @@ export class AppComponent {
     },
   };
 
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       {
         id: '1',

@@ -2,11 +2,11 @@ import '@angular/compiler';
 
 import { Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -36,7 +36,7 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
   `,
 })
 export class Diagram {
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: { x: 222, y: 130, scale: 1.6 },
     },

@@ -1,11 +1,11 @@
 import '@angular/compiler';
 import { Component, inject, Injector } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramModelService,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 
 @Component({
@@ -44,7 +44,7 @@ export class SaveStateExampleComponent {
     },
   } satisfies NgDiagramConfig;
 
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       {
         id: '1',
@@ -68,6 +68,6 @@ export class SaveStateExampleComponent {
 
   //TODO - change any type to the correct one
   loadModel(model: any): void {
-    this.model = createSignalModel(model, this.injector);
+    this.model = initializeModel(model, this.injector);
   }
 }

@@ -5,7 +5,7 @@ import { SignalModelAdapter } from './signal-model-adapter';
 /**
  * Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
  */
-export function createSignalModel<TMiddlewares extends MiddlewareChain = []>(
+export function initializeModel<TMiddlewares extends MiddlewareChain = []>(
   model: Partial<Model<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>> = {},
   injector?: Injector
 ) {

@@ -2,12 +2,12 @@ import '@angular/compiler';
 
 import { Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
   type NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { Palette } from './palette.component';
 
 @Component({
@@ -33,7 +33,7 @@ export class NgDiagramComponentContainer {
     { data: { label: 'Default Group' }, resizable: true, isGroup: true },
   ];
 
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: {
         x: 272,
