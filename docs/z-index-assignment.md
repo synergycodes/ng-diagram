@@ -54,7 +54,7 @@ When `zOrder` is explicitly defined, the `middleware`:
 
 **Selection Behavior with Manual zOrder:**
 
-- If a node with a manual `zOrder` is `selected` and `elevateOnSelection` is enabled: Its zIndex is temporarily 
+- If a node with a manual `zOrder` is `selected` and `elevateOnSelection` is enabled: Its zIndex is temporarily
   overridden by `selectedZIndex` to visually bring it to the front.
 - Once the element is `unselected`, its `original zOrder` value is `restored`.
 - **This approach ensures that**:
@@ -77,10 +77,10 @@ The z-index behavior can be configured through the diagram config:
 ```typescript
 const config: NgDiagramConfig = {
   zIndex: {
-    enabled: true,                      // Enable/disable z-index middleware
-    selectedZIndex: 1000,                // Z-index for selected elements
-    edgesAboveConnectedNodes: false,    // Whether edges appear above their connected nodes
-    elevateOnSelection: true,            // Whether selection elevates elements
+    enabled: true, // Enable/disable z-index middleware
+    selectedZIndex: 1000, // Z-index for selected elements
+    edgesAboveConnectedNodes: false, // Whether edges appear above their connected nodes
+    elevateOnSelection: true, // Whether selection elevates elements
   },
 };
 ```
