@@ -48,6 +48,9 @@ export class CustomPortsExampleComponent {
     zoom: {
       max: 3,
     },
+    zIndex: {
+      edgesAboveConnectedNodes: true,
+    },
   } satisfies NgDiagramConfig;
 
   model = createSignalModel({

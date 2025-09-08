@@ -192,6 +192,28 @@ export interface SelectionMovingConfig {
 }
 
 /**
+ * Configuration for z-index layering behavior.
+ */
+export interface ZIndexConfig {
+  /**
+   * Whether z-index middleware is enabled.
+   */
+  enabled: boolean;
+  /**
+   * The z-index value for selected elements.
+   */
+  selectedZIndex: number;
+  /**
+   * Whether edges should appear above their connected nodes.
+   */
+  edgesAboveConnectedNodes: boolean;
+  /**
+   * Whether selected elements should be elevated to selectedZIndex.
+   */
+  elevateOnSelection: boolean;
+}
+
+/**
  * Interface representing configurable properties of the edge routing.
  *
  * Built-in edge routing configurations:
@@ -264,4 +286,9 @@ export interface FlowConfig {
    * Configuration for selection moving behavior.
    */
   selectionMoving: SelectionMovingConfig;
+
+  /**
+   * Configuration for z-index layering behavior.
+   */
+  zIndex: ZIndexConfig;
 }
