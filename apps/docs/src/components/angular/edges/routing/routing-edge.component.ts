@@ -8,7 +8,10 @@ import {
 
 @Component({
   selector: 'routing-edge',
-  template: `<ng-diagram-base-edge [edge]="edge()" stroke="var(--ngd-default-edge-stroke)">
+  template: `<ng-diagram-base-edge
+    [edge]="edge()"
+    stroke="var(--ngd-default-edge-stroke)"
+  >
     <ng-diagram-base-edge-label [id]="'routing-label'" [positionOnEdge]="0.5">
       <div class="routing-label">
         {{ getRoutingName() }}

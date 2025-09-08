@@ -41,9 +41,24 @@ export class Diagram {
         data: { label: 'Source' },
         rotatable: true,
       },
-      { id: '2', position: { x: 600, y: 50 }, data: { label: 'Target 1' }, rotatable: true },
-      { id: '3', position: { x: 600, y: 200 }, data: { label: 'Target 2' }, rotatable: true },
-      { id: '4', position: { x: 600, y: 350 }, data: { label: 'Target 3' }, rotatable: true },
+      {
+        id: '2',
+        position: { x: 600, y: 50 },
+        data: { label: 'Target 1' },
+        rotatable: true,
+      },
+      {
+        id: '3',
+        position: { x: 600, y: 200 },
+        data: { label: 'Target 2' },
+        rotatable: true,
+      },
+      {
+        id: '4',
+        position: { x: 600, y: 350 },
+        data: { label: 'Target 3' },
+        rotatable: true,
+      },
     ],
     edges: [
       {
