@@ -5,14 +5,16 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
+  NgDiagramEdgeTemplateMap,
   type AppMiddlewares,
 } from '@angularflow/angular-adapter';
+import { RoutingEdgeComponent } from './routing-edge.component';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
   template: `
     <ng-diagram-context>
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
     </ng-diagram-context>
   `,
   styles: `
@@ -24,6 +26,10 @@ import {
   `,
 })
 export class Diagram {
+  edgeTemplateMap = new NgDiagramEdgeTemplateMap([
+    ['routing-edge', RoutingEdgeComponent],
+  ]);
+
   model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.7 },
@@ -32,12 +38,12 @@ export class Diagram {
       {
         id: 'source-node',
         position: { x: 200, y: 250 },
-        data: { label: 'Node 1' },
+        data: { label: 'Source' },
         rotatable: true,
       },
-      { id: '2', position: { x: 600, y: 50 }, data: { label: 'Straight' } },
-      { id: '3', position: { x: 600, y: 200 }, data: { label: 'Orthogonal' } },
-      { id: '4', position: { x: 600, y: 350 }, data: { label: 'Bezier' } },
+      { id: '2', position: { x: 600, y: 50 }, data: { label: 'Target 1' }, rotatable: true },
+      { id: '3', position: { x: 600, y: 200 }, data: { label: 'Target 2' }, rotatable: true },
+      { id: '4', position: { x: 600, y: 350 }, data: { label: 'Target 3' }, rotatable: true },
     ],
     edges: [
       {
@@ -46,7 +52,8 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
-        routing: 'straight',
+        routing: 'polyline',
+        type: 'routing-edge',
         data: {},
       },
       {
@@ -56,6 +63,7 @@ export class Diagram {
         targetPort: 'port-left',
         target: '3',
         routing: 'orthogonal',
+        type: 'routing-edge',
         data: {},
       },
       {
@@ -65,6 +73,7 @@ export class Diagram {
         targetPort: 'port-left',
         target: '4',
         routing: 'bezier',
+        type: 'routing-edge',
         data: {},
       },
     ],

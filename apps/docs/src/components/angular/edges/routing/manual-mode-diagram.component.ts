@@ -1,0 +1,66 @@
+import '@angular/compiler';
+
+import { Component } from '@angular/core';
+import {
+  NgDiagramComponent,
+  NgDiagramContextComponent,
+  type AppMiddlewares,
+} from '@angularflow/angular-adapter';
+import { createSignalModel } from '@angularflow/angular-signals-model';
+
+@Component({
+  imports: [NgDiagramContextComponent, NgDiagramComponent],
+  template: `
+    <ng-diagram-context>
+      <ng-diagram [model]="model" />
+    </ng-diagram-context>
+  `,
+  styles: `
+    :host {
+      flex: 1;
+      display: flex;
+      height: 100%;
+    }
+  `,
+})
+export class ManualModeDiagram {
+  model = createSignalModel<AppMiddlewares>({
+    metadata: {
+      viewport: { x: 0, y: 0, scale: 0.9 },
+    },
+    nodes: [
+      {
+        id: 'node1',
+        position: { x: 100, y: 150 },
+        data: { label: 'Move me!' },
+        rotatable: true,
+      },
+      {
+        id: 'node2',
+        position: { x: 500, y: 150 },
+        data: { label: 'Move me too!' },
+        rotatable: true,
+      },
+    ],
+    edges: [
+      {
+        id: 'manual-edge',
+        source: 'node1',
+        sourcePort: 'port-right',
+        target: 'node2',
+        targetPort: 'port-left',
+        routing: 'orthogonal',
+        routingMode: 'manual',
+        points: [
+          { x: 285, y: 172 },
+          { x: 345, y: 172 },
+          { x: 345, y: 100 },
+          { x: 445, y: 100 },
+          { x: 445, y: 172 },
+          { x: 500, y: 172 },
+        ],
+        data: {},
+      },
+    ],
+  });
+}
