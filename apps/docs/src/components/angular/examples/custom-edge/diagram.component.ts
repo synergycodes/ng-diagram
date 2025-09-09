@@ -9,7 +9,6 @@ import {
   type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { CircleArrowheadComponent } from './circle-arrowhead.component';
-import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 import { SinusoidEdgeComponent } from './sinusoid-edge.component';
 
