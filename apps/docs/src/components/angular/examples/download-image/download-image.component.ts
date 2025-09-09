@@ -19,21 +19,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
       </div>
     </div>
   `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-
-        .diagram {
-          flex: 1;
-          display: flex;
-          height: 24rem;
-          font-family: 'Poppins', sans-serif;
-        }
-      }
-    `,
-  ],
+  styleUrl: './download-image.component.scss',
   providers: [NgDiagramModelService],
 })
 export class DownloadImageComponent {

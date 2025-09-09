@@ -25,21 +25,7 @@ import { CustomNodeComponent } from './node.component';
       </div>
     </ng-diagram-context>
   `,
-  styles: [
-    `
-      :host {
-        flex: 1;
-        display: flex;
-
-        .diagram {
-          flex: 1;
-          display: flex;
-          height: 20rem;
-          font-family: 'Poppins', sans-serif;
-        }
-      }
-    `,
-  ],
+  styleUrl: './custom-node-wrapper.component.scss',
 })
 export class CustomNodeWrapperComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
