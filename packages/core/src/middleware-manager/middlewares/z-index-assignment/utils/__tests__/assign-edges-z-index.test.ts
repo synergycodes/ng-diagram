@@ -25,6 +25,18 @@ describe('assignEdgeZIndex', () => {
     const result = assignEdgeZIndex(edge, zIndexMap, nodesMap);
     expect(result.zIndex).toBe(7);
   });
+
+  it('should add 1 to max zIndex when edgesAboveConnectedNodes is true', () => {
+    const edge = { id: '1', data: {}, source: '1', target: '2' };
+    const result = assignEdgeZIndex(edge, zIndexMap, nodesMap, true);
+    expect(result.zIndex).toBe(8);
+  });
+
+  it('should still respect zOrder when edgesAboveConnectedNodes is true', () => {
+    const edge = { id: '1', data: {}, source: '1', target: '2', zOrder: 99 };
+    const result = assignEdgeZIndex(edge, zIndexMap, nodesMap, true);
+    expect(result.zIndex).toBe(99);
+  });
 });
 
 describe('assignEdgesZIndex', () => {
@@ -59,5 +71,20 @@ describe('assignEdgesZIndex', () => {
     expect(result[1].zIndex).toBe(5);
     expect(result[2].zIndex).toBe(2);
     expect(result[3].zIndex).toBe(42);
+  });
+
+  it('should add 1 to zIndex when edgesAboveConnectedNodes is true', () => {
+    const edges = [
+      { id: '1', source: '1', target: '2', data: {} },
+      { id: '2', source: '1', target: '3', data: {} },
+      { id: '3', source: '3', target: '2', data: {} },
+      { id: '4', source: '3', target: '4', zOrder: 42, data: {} },
+    ];
+    const result = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap, true);
+
+    expect(result[0].zIndex).toBe(6); // 5 + 1
+    expect(result[1].zIndex).toBe(6); // 5 + 1
+    expect(result[2].zIndex).toBe(3); // 2 + 1
+    expect(result[3].zIndex).toBe(42); // zOrder is respected
   });
 });

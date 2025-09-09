@@ -11,7 +11,7 @@ import type {
 } from '../../../../types';
 import type { MiddlewareExecutor } from '../../../middleware-executor';
 import { DEFAULT_SELECTED_Z_INDEX } from '../constants';
-import { zIndexMiddleware, ZIndexMiddlewareMetadata } from '../z-index-assignment';
+import { zIndexMiddleware } from '../z-index-assignment';
 
 type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
 
@@ -19,7 +19,7 @@ describe('zIndexMiddleware', () => {
   let helpers: Partial<Helpers>;
   let nodesMap: Map<string, Node>;
   let edgesMap: Map<string, Edge>;
-  let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>, ZIndexMiddlewareMetadata>;
+  let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   let nextMock: ReturnType<typeof vi.fn>;
   let cancelMock: ReturnType<typeof vi.fn>;
 
@@ -43,27 +43,23 @@ describe('zIndexMiddleware', () => {
       helpers: helpers as Helpers,
       nodesMap,
       edgesMap,
-      flowCore: {} as FlowCore,
+      flowCore: {
+        config: {
+          zIndex: {
+            enabled: true,
+            selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
+            edgesAboveConnectedNodes: false,
+            elevateOnSelection: true,
+          },
+        },
+      } as FlowCore,
       modelActionType: 'updateNode',
-      middlewareMetadata: {
-        enabled: true,
-        selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
-      },
-    } as unknown as MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>, ZIndexMiddlewareMetadata>;
-  });
-
-  describe('default metadata', () => {
-    it('should have correct default metadata', () => {
-      expect(zIndexMiddleware.defaultMetadata).toEqual({
-        enabled: true,
-        selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
-      });
-    });
+    } as unknown as MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   });
 
   describe('execution conditions', () => {
     it('should call next() without changes when middleware is disabled', () => {
-      context.middlewareMetadata.enabled = false;
+      context.flowCore.config.zIndex.enabled = false;
       context.modelActionType = 'init';
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
@@ -485,7 +481,7 @@ describe('zIndexMiddleware', () => {
 
     it('should handle custom selectedZIndex configuration', () => {
       const customSelectedZIndex = 2000;
-      context.middlewareMetadata.selectedZIndex = customSelectedZIndex;
+      context.flowCore.config.zIndex.selectedZIndex = customSelectedZIndex;
 
       const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
       nodesMap.set('node1', selectedNode);
@@ -501,6 +497,50 @@ describe('zIndexMiddleware', () => {
 
       expect(nextMock).toHaveBeenCalledWith({
         nodesToUpdate: [{ id: 'node1', zIndex: customSelectedZIndex }],
+      });
+    });
+
+    it('should not elevate selected nodes when elevateOnSelection is false', () => {
+      context.flowCore.config.zIndex.elevateOnSelection = false;
+
+      const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 5 };
+      nodesMap.set('node1', selectedNode);
+      context.state.nodes = [selectedNode];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Should use base z-index (0) instead of selectedZIndex
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [{ id: 'node1', zIndex: 0 }],
+      });
+    });
+
+    it('should not elevate selected edges when elevateOnSelection is false', () => {
+      context.flowCore.config.zIndex.elevateOnSelection = false;
+
+      const node1 = { ...mockNode, id: 'node1', zIndex: 5 };
+      const node2 = { ...mockNode, id: 'node2', zIndex: 3 };
+      const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true, zIndex: 0 };
+
+      nodesMap.set('node1', node1);
+      nodesMap.set('node2', node2);
+      edgesMap.set('edge1', selectedEdge);
+      context.state.edges = [selectedEdge];
+
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      (helpers.getAffectedEdgeIds as ReturnType<typeof vi.fn>).mockReturnValue(['edge1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      // Should use max of source/target z-index (5) instead of selectedZIndex
+      expect(nextMock).toHaveBeenCalledWith({
+        edgesToUpdate: [{ id: 'edge1', zIndex: 5 }],
       });
     });
   });

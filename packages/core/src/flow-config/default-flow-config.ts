@@ -11,6 +11,7 @@ import type {
   SelectionMovingConfig,
   SnappingConfig,
   TreeLayoutConfig,
+  ZIndexConfig,
   ZoomConfig,
 } from '../types/flow-config.interface';
 import { Point, Size } from '../types/utils';
@@ -117,6 +118,13 @@ const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
   },
 };
 
+const defaultZIndexConfig: ZIndexConfig = {
+  enabled: true,
+  selectedZIndex: 1000,
+  edgesAboveConnectedNodes: false,
+  elevateOnSelection: true,
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -133,4 +141,5 @@ export const defaultFlowConfig: FlowConfig = {
   snapping: defaultNodeDraggingConfig,
   selectionMoving: defaultSelectionMovingConfig,
   edgeRouting: defaultEdgeRoutingConfig,
+  zIndex: defaultZIndexConfig,
 };

@@ -1,23 +1,13 @@
 import { Edge, FlowStateUpdate, Middleware, ModelActionType, Node } from '../../../types';
-import { DEFAULT_SELECTED_Z_INDEX } from './constants.ts';
 import { assignEdgesZIndex, assignEdgeZIndex } from './utils/assign-edges-z-index.ts';
 import { assignNodeZIndex } from './utils/assign-node-z-index.ts';
 import { initializeZIndex } from './utils/initialize-z-index.ts';
 
-export interface ZIndexMiddlewareMetadata {
-  enabled: boolean;
-  selectedZIndex: number;
-}
-
 const checkIfIsInit = (modelActionType: ModelActionType) => modelActionType === 'init';
 const checkIfIsEdgeAdded = (modelActionType: ModelActionType) => modelActionType === 'finishLinking';
 
-export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> = {
+export const zIndexMiddleware: Middleware<'z-index'> = {
   name: 'z-index',
-  defaultMetadata: {
-    enabled: true,
-    selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
-  },
   execute: (context, next) => {
     const {
       state: { edges, nodes },
@@ -25,10 +15,11 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
       edgesMap,
       helpers,
       modelActionType,
-      middlewareMetadata,
+      flowCore,
     } = context;
-    // Access the typed middleware metadata
-    const isEnabled = middlewareMetadata.enabled;
+
+    const config = flowCore.config.zIndex;
+    const isEnabled = config.enabled;
     const isInit = checkIfIsInit(modelActionType);
     const shouldSnapSelectedNode = helpers.checkIfAnyNodePropsChanged(['selected']);
     const shouldSnapGroupIdNode = helpers.checkIfAnyNodePropsChanged(['groupId']);
@@ -58,7 +49,7 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
       nodesWithZIndex = initializeZIndex(nodesMap);
       nodesWithZIndex.forEach((node) => processedNodeIds.add(node.id));
     }
-    const selectedZIndex = middlewareMetadata.selectedZIndex;
+    const selectedZIndex = config.selectedZIndex;
 
     // Partial for Node
     if (shouldSnapSelectedNode) {
@@ -69,12 +60,15 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
         }
         const node = nodesMap.get(nodeId);
         if (!node) continue;
-        const baseZIndex = node.selected
-          ? selectedZIndex
-          : node.groupId
-            ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1
-            : 0;
-        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex, node.selected);
+        const baseZIndex =
+          node.selected && config.elevateOnSelection
+            ? selectedZIndex
+            : node.zOrder !== undefined
+              ? node.zOrder
+              : node.groupId
+                ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1
+                : 0;
+        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex, node.selected && config.elevateOnSelection);
         nodesWithZIndex.push(...assignedNodes);
         assignedNodes.forEach((n) => processedNodeIds.add(n.id));
       }
@@ -113,7 +107,7 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
     const addedEdge = edges.at(-1);
     // Partial for Edge
     if (isEdgeAdded && addedEdge) {
-      edgesWithZIndex = assignEdgesZIndex([addedEdge], nodesWithZIndex, nodesMap);
+      edgesWithZIndex = assignEdgesZIndex([addedEdge], nodesWithZIndex, nodesMap, config.edgesAboveConnectedNodes);
     }
 
     if (shouldSnapEdge) {
@@ -123,15 +117,15 @@ export const zIndexMiddleware: Middleware<'z-index', ZIndexMiddlewareMetadata> =
         const edge = edgesMap.get(edgeId);
         if (!edge) continue;
         edgesWithZIndex.push(
-          edge.selected
+          edge.selected && config.elevateOnSelection
             ? {
                 ...edge,
                 zIndex: selectedZIndex,
               }
-            : assignEdgeZIndex(edge, zIndexMap, nodesMap)
+            : assignEdgeZIndex(edge, zIndexMap, nodesMap, config.edgesAboveConnectedNodes)
         );
       }
-    } else edgesWithZIndex = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap);
+    } else edgesWithZIndex = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap, config.edgesAboveConnectedNodes);
 
     for (const edge of edgesWithZIndex) {
       const currentEdge = edges.find((edgeData) => edgeData.id === edge.id);

@@ -22,8 +22,8 @@ are shown in a clear and logical way in the diagram. This assignment is handled 
    `subgroups`. These are rendered above their parent `group` and are processed recursively to preserve visual
    hierarchy.
 4. **Selected elements**: When an element is `selected`, it is visually elevated above all other elements by assigning
-   it a higher `zIndex`. By `default`, this value is defined by the constant `DEFAULT_SELECTED_Z_INDEX`. Optionally, it
-   can be overridden for each element using the `metadata.selectedZIndex`.
+   it a higher `zIndex`. By `default`, this value is 1000. This can be configured using the `config.zIndex.selectedZIndex`
+   setting.
 
 #### How does it work?
 
@@ -54,8 +54,8 @@ When `zOrder` is explicitly defined, the `middleware`:
 
 **Selection Behavior with Manual zOrder:**
 
-- If a node with a manual `zOrder` is `selected`: It's zIndex is temporarily overridden by `selectedZIndex` (or
-  falls back to `DEFAULT_SELECTED_Z_INDEX`) to visually bring it to the front.
+- If a node with a manual `zOrder` is `selected` and `elevateOnSelection` is enabled: Its zIndex is temporarily
+  overridden by `selectedZIndex` to visually bring it to the front.
 - Once the element is `unselected`, its `original zOrder` value is `restored`.
 - **This approach ensures that**:
   - Manual layering is always preserved.
@@ -67,33 +67,30 @@ When `zOrder` is explicitly defined, the `middleware`:
 Temporary edges (e.g., those shown while dragging to create a connection) are also included in the `zIndex` layering
 system.
 
-- Rendered above all other elements using `DEFAULT_SELECTED_Z_INDEX`, this value can be overridden via the
-  `temporaryEdgeZIndex` from `metadata`,
+- Rendered above all other elements using the same z-index as selected elements
 - Ensures visibility of `temporary edges` above `nodes`, `groups`, and other `edges`
 
-#### Middleware configuration
+#### Configuration
 
-```javascript
-this.model().setMetadata({
-  middlewaresConfig: {
-    'z-index': {
-      enabled: boolean,
-      selectedZIndex: number,
-    },
+The z-index behavior can be configured through the diagram config:
+
+```typescript
+const config: NgDiagramConfig = {
+  zIndex: {
+    enabled: true, // Enable/disable z-index middleware
+    selectedZIndex: 1000, // Z-index for selected elements
+    edgesAboveConnectedNodes: false, // Whether edges appear above their connected nodes
+    elevateOnSelection: true, // Whether selection elevates elements
   },
-});
+};
 ```
 
-```javascript
-this.model().setMetadata({
-  middlewaresConfig: {
-    'edges-routing': {
-      enabled: boolean,
-      temporaryEdgeZIndex: number,
-    },
-  },
-});
-```
+**Configuration Options:**
+
+- **`enabled`**: Controls whether the z-index middleware is active (default: `true`)
+- **`selectedZIndex`**: The z-index value assigned to selected elements (default: `1000`)
+- **`edgesAboveConnectedNodes`**: When `true`, edges will appear one level above their highest connected node (default: `false`)
+- **`elevateOnSelection`**: When `true`, selected elements are elevated to `selectedZIndex`. When `false`, selection doesn't change z-index (default: `true`)
 
 ## Consequences
 
