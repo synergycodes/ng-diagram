@@ -16,7 +16,6 @@
   --ngd-group-highlight-size: 1.25rem;
 
   --ngd-selected-node-box-shadow: 0 0 0 0.25rem var(--ngd-focus-ring-node-active);
-  --ngd-selected-node-outline: 0.0625rem solid var(--ngd-node-stroke-primary-hover);
 
   --ngd-rotate-handle-size: 2rem;
   --ngd-rotate-handle-distance: 2rem;

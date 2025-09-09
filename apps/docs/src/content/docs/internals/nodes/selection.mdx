@@ -1,0 +1,58 @@
+---
+title: Selection
+description: Understanding how selection works in NgDiagram
+---
+
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import { LinkCard } from '@astrojs/starlight/components';
+import Selection from '@components/angular/nodes/selection/selection.astro';
+
+The **selection** feature in NgDiagram allows users to select nodes on the diagram area.
+Selected nodes are visually highlighted, making it easier to identify and interact with them.
+
+Selection can be enabled per node using a directive and is reflected in the node's appearance.
+
+## How Selection Works
+
+- Nodes can be selected by clicking on them.
+- The selected state is managed by NgDiagram and can be accessed via the node's data.
+- Selection can be enabled per node using a directive.
+
+## Adding Selection to a Custom Node
+
+To make a custom node selectable, add the `NgDiagramNodeSelectedDirective` as a host directive in your node component:
+
+<CodeSnippet relativePath="nodes/selection/node.component.ts" mark={[{ range: '18-20' }]} collapse={['1-7', '21-38']} />
+
+## Enabling Selection for a Node
+
+Selection is enabled by default for nodes that use the `NgDiagramNodeSelectedDirective`.  
+You do not need to set any additional property in the node data.
+
+When a node is selected, it will be visually highlighted according to the styles defined in your application.
+
+## Customizing Selection Styles
+
+### Styling the Selection Shadow
+
+Here is the CSS variable you can use to style the selection highlight:
+
+```
+--ngd-selected-node-box-shadow    // Box shadow for selected node
+```
+
+You can override this variable in your styles to customize the appearance of selected nodes.
+
+## Example
+
+<Selection />
+
+## Further Reading
+
+<LinkCard icon="list-format" title="Nodes" href="/internals/nodes/nodes" description="Learn more about node features" />
+<LinkCard
+  icon="list-format"
+  title="Custom Nodes"
+  href="/internals/nodes/custom-nodes"
+  description="Create custom node"
+/>
