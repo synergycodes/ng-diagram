@@ -27,14 +27,14 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
     // Create custom points for the edge path
     const points = [
       { x: sourcePosition.x, y: sourcePosition.y },
-      { x: targetPosition.x, y: targetPosition.y }
+      { x: targetPosition.x, y: targetPosition.y },
     ];
 
     return {
       ...edge,
       points,
       routing: 'polyline',
-      routingMode: 'manual' as const
+      routingMode: 'manual' as const,
     };
   });
 }
