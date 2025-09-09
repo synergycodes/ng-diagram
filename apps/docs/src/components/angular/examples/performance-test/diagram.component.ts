@@ -2,13 +2,13 @@ import '@angular/compiler';
 
 import { Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
   type Edge,
   type Node,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -26,7 +26,7 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
   `,
 })
 export class NgDiagramPerformanceTestComponent {
-  model = createSignalModel<AppMiddlewares>(this.generateModelData());
+  model = initializeModel<AppMiddlewares>(this.generateModelData());
 
   generateModelData() {
     const nodes = this.generateNodes();

@@ -2,11 +2,11 @@ import '@angular/compiler';
 
 import { Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
 @Component({
@@ -30,7 +30,7 @@ import { CoordinatesPreview } from './coordinates-preview.component';
   `,
 })
 export class NgDiagramComponentContainer {
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: {
         x: 5,

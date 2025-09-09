@@ -3,14 +3,14 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
-import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component';
 import { LabelPanel } from './label-panel.component';
+import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component';
 
 @Component({
   selector: 'diagram',
@@ -40,7 +40,7 @@ export class Diagram {
     ['modifiable-label', ModifiableLabelEdgeComponent],
   ]);
 
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.7 },
     },

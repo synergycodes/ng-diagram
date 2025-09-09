@@ -4,6 +4,7 @@
     "module": "ESNext",
     "allowSyntheticDefaultImports": true,
     "target": "ESNext",
+    "lib": ["ES2023", "DOM"],
     "useDefineForClassFields": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

@@ -1,12 +1,12 @@
 import '@angular/compiler';
 import { Component, inject } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramModelService,
   type NgDiagramConfig,
   type NgDiagramNodeTemplateMap,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { NodeComponent } from './node/node.component';
 
 @Component({
@@ -50,7 +50,7 @@ export class CustomPortsExampleComponent {
     },
   } satisfies NgDiagramConfig;
 
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       {
         id: '1',

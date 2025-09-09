@@ -22,6 +22,7 @@ title: "@angularflow/angular-adapter"
 - [NgDiagramBaseEdgeComponent](/api/other/ngdiagrambaseedgecomponent/)
 - [Metadata](/api/other/metadata/)
 - [Middleware](/api/other/middleware/)
+- [initializeModel](/api/other/initializemodel/)
 
 ## Types
 

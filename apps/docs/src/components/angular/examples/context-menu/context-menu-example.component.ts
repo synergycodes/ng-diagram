@@ -1,12 +1,12 @@
 import '@angular/compiler';
 import { Component, inject } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramModelService,
   NgDiagramNodeTemplateMap,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { MenuComponent } from './menu/menu.component';
 import { ContextMenuService } from './menu/menu.service';
 import { NodeComponent } from './node/node.component';
@@ -55,7 +55,7 @@ export class ContextMenuExampleComponent {
     },
   } satisfies NgDiagramConfig;
 
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       {
         id: '1',

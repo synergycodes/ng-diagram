@@ -2,12 +2,12 @@ import '@angular/compiler';
 
 import { Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { SidebarContainer } from './sidebar.component';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent, SidebarContainer],
@@ -30,7 +30,7 @@ import { createSignalModel } from '@angularflow/angular-signals-model';
   `,
 })
 export class NgDiagramPropertiesSidebarContainer {
-  model = createSignalModel<AppMiddlewares>({
+  model = initializeModel<AppMiddlewares>({
     metadata: {
       viewport: { x: -45, y: 80, scale: 0.88 },
     },

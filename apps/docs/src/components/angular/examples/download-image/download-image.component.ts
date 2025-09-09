@@ -1,11 +1,11 @@
 import '@angular/compiler';
 import { Component, ElementRef, viewChild, type Signal } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramModelService,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 
 @Component({
@@ -46,7 +46,7 @@ export class DownloadImageComponent {
     },
   } satisfies NgDiagramConfig;
 
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       {
         id: 'MAIN ROOT',

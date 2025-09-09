@@ -1,12 +1,12 @@
 import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
+  initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
   type NgDiagramConfig,
   type NgDiagramNodeTemplateMap,
 } from '@angularflow/angular-adapter';
-import { createSignalModel } from '@angularflow/angular-signals-model';
 
 import { CustomNodeComponent } from './node.component';
 
@@ -52,7 +52,7 @@ export class CustomNodeWrapperComponent {
     },
   } satisfies NgDiagramConfig;
 
-  model = createSignalModel({
+  model = initializeModel({
     nodes: [
       {
         id: '1',

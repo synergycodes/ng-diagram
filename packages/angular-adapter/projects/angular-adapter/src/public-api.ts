@@ -24,6 +24,7 @@ export * from './lib/components/palette/item-preview/ng-diagram-palette-item-pre
 export * from './lib/components/palette/item/ng-diagram-palette-item.component';
 export * from './lib/components/port/ng-diagram-port.component';
 export * from './lib/directives';
+export { initializeModel } from './lib/model/initializeModel';
 export * from './lib/public-services/ng-diagram-model.service';
 export * from './lib/public-services/ng-diagram-viewport.service';
 export * from './lib/public-services/ng-diagram.service';
