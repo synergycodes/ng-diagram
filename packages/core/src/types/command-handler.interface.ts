@@ -29,6 +29,7 @@ import {
 } from '../command-handler/commands/linking';
 import { MoveNodesByCommand } from '../command-handler/commands/move';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
+import { RemoveFromGroupCommand } from '../command-handler/commands/remove-from-group';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { RotateNodeToCommand } from '../command-handler/commands/rotate-node';
 import { DeselectAllCommand, DeselectCommand, SelectCommand } from '../command-handler/commands/selection';
@@ -77,7 +78,8 @@ export type Command =
   | HighlightGroupCommand
   | HighlightGroupClearCommand
   | AddToGroupCommand
-  | ClearModelCommand;
+  | ClearModelCommand
+  | RemoveFromGroupCommand;
 
 /**
  * Type for command name

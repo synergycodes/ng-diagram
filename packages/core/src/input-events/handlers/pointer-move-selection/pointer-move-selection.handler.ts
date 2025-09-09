@@ -52,6 +52,10 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.panDiagramOnScreenEdge(event.currentDiagramEdge);
 
         this.lastInputPoint = event.lastInputPoint;
+
+        if (event.modifiers.shift) {
+          await this.handleRemoveFromGroup(pointer);
+        }
         break;
       }
       case 'end': {
@@ -95,7 +99,19 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       return;
     }
 
-    this.flow.commandHandler.emit('addToGroup', {
+    await this.flow.commandHandler.emit('addToGroup', {
+      groupId: topLevelGroupNode.id,
+      nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
+    });
+  }
+
+  private async handleRemoveFromGroup(point: Point) {
+    const topLevelGroupNode = this.getTopGroupAtPoint(point);
+    if (!topLevelGroupNode) {
+      return;
+    }
+
+    await this.flow.commandHandler.emit('removeFromGroup', {
       groupId: topLevelGroupNode.id,
       nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
     });
