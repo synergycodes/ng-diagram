@@ -5,6 +5,7 @@ import type {
   MiddlewareChain,
   MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
+  ModelChanges,
   Node,
 } from '@angularflow/core';
 
@@ -82,14 +83,12 @@ export class SignalModelAdapter<TMiddlewares extends MiddlewareChain = []>
     this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
-  onChange(
-    callback: (data: {
-      nodes: Node[];
-      edges: Edge[];
-      metadata: Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>;
-    }) => void
-  ): void {
+  onChange(callback: (data: ModelChanges) => void): void {
     this.callbacks.push(callback);
+  }
+
+  unregisterOnChange(callback: (data: ModelChanges) => void): void {
+    this.callbacks = this.callbacks.filter((cb) => cb !== callback);
   }
 
   undo(): void {

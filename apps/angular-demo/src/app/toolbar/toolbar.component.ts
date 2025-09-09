@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { AppMiddlewares, NgDiagramService } from '@angularflow/angular-adapter';
+import { AppMiddlewares, NgDiagramModelService, NgDiagramService } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-toolbar',
@@ -10,6 +10,7 @@ import { AppMiddlewares, NgDiagramService } from '@angularflow/angular-adapter';
 })
 export class ToolbarComponent {
   private readonly ngDiagramService: NgDiagramService<AppMiddlewares> = inject(NgDiagramService<AppMiddlewares>);
+  private readonly ngDiagramModelService = inject(NgDiagramModelService);
 
   toggleDebugModeClick = output<void>();
 
@@ -18,10 +19,12 @@ export class ToolbarComponent {
   }
 
   onToggleGroupChildrenClick(): void {
-    const metadata = this.ngDiagramService.getMetadata();
+    const metadata = this.ngDiagramModelService.metadata();
 
-    const moveExtentEnabled = metadata.middlewaresConfig['group-children-move-extent'].enabled;
-    const changeExtentEnabled = metadata.middlewaresConfig['group-children-change-extent'].enabled;
+    const middlewaresConfig = metadata.middlewaresConfig as Record<string, { enabled: boolean }>;
+
+    const moveExtentEnabled = middlewaresConfig['group-children-move-extent'].enabled;
+    const changeExtentEnabled = middlewaresConfig['group-children-change-extent'].enabled;
 
     // Toggle both middlewares
     this.ngDiagramService.updateMiddlewareConfig('group-children-move-extent', { enabled: !moveExtentEnabled });

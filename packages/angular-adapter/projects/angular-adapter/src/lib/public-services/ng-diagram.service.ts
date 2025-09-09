@@ -34,13 +34,6 @@ export class NgDiagramService<
   isInitialized = this.flowCoreProvider.isInitialized;
 
   /**
-   * Returns the current metadata
-   */
-  getMetadata(): Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> {
-    return this.flowCore.model.getMetadata();
-  }
-
-  /**
    * Returns diagram's command system for programmatic control.
    *
    * The command handler allows you to:

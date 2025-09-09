@@ -22,6 +22,7 @@ describe('FlowCoreProviderService', () => {
     setEdges: vi.fn(),
     setMetadata: vi.fn(),
     onChange: vi.fn(),
+    unregisterOnChange: vi.fn(),
     undo: vi.fn(),
     redo: vi.fn(),
     toJSON: vi.fn(),
