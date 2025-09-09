@@ -13,7 +13,7 @@ const ANIMATION_DURATION = 0.5;
   selector: 'multi-label-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
-    [stroke]="selected() ? 'rebeccapurple' : 'white'"
+    [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
   >
     @for (label of animatedLabels(); track label.id) {
       <ng-diagram-base-edge-label

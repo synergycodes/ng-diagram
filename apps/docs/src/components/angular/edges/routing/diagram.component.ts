@@ -32,30 +32,30 @@ export class Diagram {
 
   model = initializeModel<AppMiddlewares>({
     metadata: {
-      viewport: { x: 0, y: 0, scale: 0.7 },
+      viewport: { x: 0, y: 0, scale: 0.8 },
     },
     nodes: [
       {
         id: 'source-node',
-        position: { x: 200, y: 250 },
+        position: { x: 150, y: 240 },
         data: { label: 'Source' },
         rotatable: true,
       },
       {
         id: '2',
-        position: { x: 600, y: 50 },
+        position: { x: 600, y: 30 },
         data: { label: 'Target 1' },
         rotatable: true,
       },
       {
         id: '3',
-        position: { x: 600, y: 200 },
+        position: { x: 600, y: 180 },
         data: { label: 'Target 2' },
         rotatable: true,
       },
       {
         id: '4',
-        position: { x: 600, y: 350 },
+        position: { x: 600, y: 330 },
         data: { label: 'Target 3' },
         rotatable: true,
       },
