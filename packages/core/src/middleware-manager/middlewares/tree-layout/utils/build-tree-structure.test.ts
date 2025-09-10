@@ -12,23 +12,34 @@ import {
 type PartialNode = Pick<Node, 'id' | 'position' | 'size' | 'type' | 'groupId'>;
 type PartialEdge = Pick<Edge, 'source' | 'target'>;
 
+// Helper function to create mock TreeLayoutConfig
+function createMockConfig(overrides: Partial<TreeLayoutConfig> = {}): TreeLayoutConfig {
+  return {
+    getLayoutAngleForNode: (): LayoutAngleType | null => null,
+    getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
+    siblingGap: 20,
+    levelGap: 30,
+    autoLayout: false,
+    layoutAngle: 90,
+    layoutAlignment: 'parent',
+    ...overrides,
+  };
+}
+
 // Mock TreeLayoutConfig for testing with specific values for some tests
-const mockTreeLayoutConfigWithValues: TreeLayoutConfig = {
+const mockTreeLayoutConfigWithValues = createMockConfig({
   getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
     if (node.id === 'node1') return 90;
     return null;
   },
   getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
-    if (node.id === 'node1') return 'Parent';
+    if (node.id === 'node1') return 'parent';
     return null;
   },
-};
+});
 
 // Mock TreeLayoutConfig for testing
-const mockTreeLayoutConfig: TreeLayoutConfig = {
-  getLayoutAngleForNode: (): LayoutAngleType | null => null,
-  getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
-};
+const mockTreeLayoutConfig = createMockConfig();
 
 describe('buildTreeStructure', () => {
   it('should build a single root tree', () => {
@@ -115,15 +126,15 @@ describe('buildTreeStructure', () => {
     expect(roots[1].children.length).toBe(0);
   });
 
-  it('should apply layout configuration from TreeLayoutConfig', () => {
-    const configWithValues: TreeLayoutConfig = {
+  it('should apply layout configuration from ResolvedTreeLayoutConfig', () => {
+    const configWithValues = createMockConfig({
       getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
         return node.id === 'root' ? 270 : 90;
       },
       getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
-        return node.id === 'root' ? 'Subtree' : 'Start';
+        return node.id === 'root' ? 'subtree' : 'start';
       },
-    };
+    });
 
     const nodes: PartialNode[] = [
       { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
@@ -135,9 +146,9 @@ describe('buildTreeStructure', () => {
     const childNode = nodeMap.get('child')!;
 
     expect(rootNode.layoutAngle).toBe(270);
-    expect(rootNode.layoutAlignment).toBe('Subtree');
+    expect(rootNode.layoutAlignment).toBe('subtree');
     expect(childNode.layoutAngle).toBe(90);
-    expect(childNode.layoutAlignment).toBe('Start');
+    expect(childNode.layoutAlignment).toBe('start');
   });
 });
 
@@ -330,7 +341,7 @@ describe('getNodeMap', () => {
     expect(node1.size).toEqual({ width: 100, height: 50 });
     expect(node1.children).toEqual([]);
     expect(node1.layoutAngle).toBe(90);
-    expect(node1.layoutAlignment).toBe('Parent');
+    expect(node1.layoutAlignment).toBe('parent');
     expect(node1.type).toBe('Test');
     expect(node1.groupId).toBeUndefined();
 
@@ -397,15 +408,14 @@ describe('getNodeMap', () => {
   });
 });
 
-describe('TreeLayoutConfig integration', () => {
+describe('ResolvedTreeLayoutConfig integration', () => {
   it('should use getLayoutAngleForNode return value', () => {
-    const mockConfig: TreeLayoutConfig = {
+    const mockConfig = createMockConfig({
       getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
         if (node.id === 'special') return 180;
         return 90;
       },
-      getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
-    };
+    });
 
     const nodes: Node[] = [
       { id: 'normal', position: { x: 0, y: 0 }, type: 'Test', data: {} },
@@ -419,13 +429,12 @@ describe('TreeLayoutConfig integration', () => {
   });
 
   it('should use getLayoutAlignmentForNode return value', () => {
-    const mockConfig: TreeLayoutConfig = {
-      getLayoutAngleForNode: (): LayoutAngleType | null => null,
+    const mockConfig = createMockConfig({
       getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
-        if (node.id === 'center') return 'Subtree';
-        return 'Start';
+        if (node.id === 'center') return 'subtree';
+        return 'start';
       },
-    };
+    });
 
     const nodes: Node[] = [
       { id: 'left', position: { x: 0, y: 0 }, type: 'Test', data: {} },
@@ -434,15 +443,12 @@ describe('TreeLayoutConfig integration', () => {
 
     const nodeMap = getNodeMap(mockConfig, nodes);
 
-    expect(nodeMap.get('left')!.layoutAlignment).toBe('Start');
-    expect(nodeMap.get('center')!.layoutAlignment).toBe('Subtree');
+    expect(nodeMap.get('left')!.layoutAlignment).toBe('start');
+    expect(nodeMap.get('center')!.layoutAlignment).toBe('subtree');
   });
 
   it('should handle null return values from config methods', () => {
-    const mockConfig: TreeLayoutConfig = {
-      getLayoutAngleForNode: (): LayoutAngleType | null => null,
-      getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
-    };
+    const mockConfig = createMockConfig();
 
     const nodes: Node[] = [{ id: 'test', position: { x: 0, y: 0 }, type: 'Test', data: {} }];
 

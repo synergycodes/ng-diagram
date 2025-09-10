@@ -74,6 +74,11 @@ const defaultTreeLayoutConfig: TreeLayoutConfig = {
   getLayoutAlignmentForNode: (): LayoutAlignmentType | null => {
     return null;
   },
+  siblingGap: 20,
+  levelGap: 30,
+  autoLayout: false,
+  layoutAngle: 90,
+  layoutAlignment: 'parent',
 };
 
 const defaultNodeRotationConfig: NodeRotationConfig = {

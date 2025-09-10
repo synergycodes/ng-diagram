@@ -1,4 +1,5 @@
-import { Edge, Node, TreeLayoutConfig, TreeNode } from '../../../../types';
+import { Edge, Node, TreeNode } from '../../../../types';
+import { TreeLayoutConfig } from '../../../../types';
 
 /**
  * Makes a map that shows, for each node, the top group it belongs to.

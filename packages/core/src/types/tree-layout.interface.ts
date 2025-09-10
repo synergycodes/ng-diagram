@@ -8,18 +8,7 @@ export type LayoutAngleType = 0 | 90 | 180 | 270;
 /**
  * Type for layout alignment
  */
-export type LayoutAlignmentType = 'Parent' | 'Subtree' | 'Start';
-
-export interface GlobalTreeLayoutConfig {
-  // Configurable gap between sibling nodes in the same row/column
-  siblingGap: number;
-  // Configurable gap between parent and child nodes
-  levelGap: number;
-  autoLayout?: boolean;
-  layoutAngle: LayoutAngleType;
-  // Default 'Parent'
-  layoutAlignment?: LayoutAlignmentType;
-}
+export type LayoutAlignmentType = 'parent' | 'subtree' | 'start';
 
 export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'type' | 'groupId'> {
   children: TreeNode[];
@@ -29,7 +18,7 @@ export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'type'
    */
   layoutAngle?: LayoutAngleType;
   /**
-   * Node layout alignment: 'Parent' | 'Subtree' | 'Start'.
+   * Node layout alignment: 'parent' | 'subtree' | 'start'.
    */
   layoutAlignment?: LayoutAlignmentType;
 }

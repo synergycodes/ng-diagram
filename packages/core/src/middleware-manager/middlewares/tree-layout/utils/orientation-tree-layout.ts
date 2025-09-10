@@ -1,4 +1,4 @@
-import { Bounds, GlobalTreeLayoutConfig, LayoutAngleType, TreeNode } from '../../../../types';
+import { Bounds, LayoutAngleType, TreeNode, TreeLayoutConfig } from '../../../../types';
 import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils';
 import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
 
@@ -14,7 +14,7 @@ import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree
  */
 const layoutChildren = (
   parentNode: TreeNode,
-  config: GlobalTreeLayoutConfig,
+  config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
@@ -89,7 +89,7 @@ const layoutChildren = (
 
 const alignParent = (
   parent: TreeNode,
-  config: GlobalTreeLayoutConfig,
+  config: TreeLayoutConfig,
   childrenBounds: Bounds,
   offsetX: number,
   offsetY: number,
@@ -106,10 +106,10 @@ const alignParent = (
   let x: number;
   let y: number;
 
-  if (layoutAlignment === 'Start') {
+  if (layoutAlignment === 'start') {
     x = offsetX;
     y = offsetY;
-  } else if (layoutAlignment === 'Subtree') {
+  } else if (layoutAlignment === 'subtree') {
     x = !isHorizontal ? (childrenBounds.minX + childrenBounds.maxX - width) / 2 : offsetX;
     y = isHorizontal ? (childrenBounds.minY + childrenBounds.maxY - height) / 2 : offsetY;
   } else {
@@ -149,7 +149,7 @@ const alignParent = (
  */
 export const makeTreeLayout = (
   parentNode: TreeNode,
-  config: GlobalTreeLayoutConfig,
+  config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
