@@ -224,6 +224,46 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> im
     return this.flowCore.clientToFlowViewportPosition(clientPosition);
   }
 
+  /**
+   * Adds new nodes to the diagram.
+   * @param nodes Array of nodes to add.
+   */
+  addNodes(nodes: Node[]) {
+    this.flowCore.commandHandler.emit('addNodes', { nodes });
+  }
+
+  /**
+   * Adds new edges to the diagram.
+   * @param edges Array of edges to add.
+   */
+  addEdges(edges: Edge[]) {
+    this.flowCore.commandHandler.emit('addEdges', { edges });
+  }
+
+  /**
+   * Updates multiple nodes at once.
+   * @param nodes Array of node updates (must include id and any properties to update).
+   */
+  updateNodes(nodes: (Pick<Node, 'id'> & Partial<Node>)[]) {
+    this.flowCore.commandHandler.emit('updateNodes', { nodes });
+  }
+
+  /**
+   * Deletes nodes by their IDs.
+   * @param ids Array of node IDs to delete.
+   */
+  deleteNodes(ids: string[]) {
+    this.flowCore.commandHandler.emit('deleteNodes', { ids });
+  }
+
+  /**
+   * Deletes edges by their IDs.
+   * @param ids Array of edge IDs to delete.
+   */
+  deleteEdges(ids: string[]) {
+    this.flowCore.commandHandler.emit('deleteEdges', { ids });
+  }
+
   private modelListener = (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => {
     this._nodes.set(data.nodes);
     this._edges.set(data.edges);
