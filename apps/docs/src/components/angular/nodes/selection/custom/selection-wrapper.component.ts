@@ -12,6 +12,7 @@ import { CustomNodeComponent } from './node.component';
 
 @Component({
   selector: 'selection',
+  standalone: true,
   imports: [NgDiagramComponent, NgDiagramContextComponent],
   template: `
     <ng-diagram-context>
@@ -26,7 +27,7 @@ import { CustomNodeComponent } from './node.component';
   `,
   styleUrls: ['./selection-wrapper.component.scss'],
 })
-export class SelectionWrapperComponent {
+export class CustomSelectionWrapperComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
     ['myType', CustomNodeComponent],
   ]);
