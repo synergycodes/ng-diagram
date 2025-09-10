@@ -1,8 +1,8 @@
-import type { CommandHandler, Node } from '../../types';
+import type { CommandHandler, GroupNode, Node } from '../../types';
 
 export interface RemoveFromGroupCommand {
   name: 'removeFromGroup';
-  groupId: Node['id'];
+  groupId: GroupNode['id'];
   nodeIds: Node['id'][];
 }
 
