@@ -9,7 +9,7 @@ import {
   selector: 'custom-edge',
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
-    [stroke]="'var(--ngd-default-edge-stroke)'"
+    stroke="var(--ngd-default-edge-stroke)"
   />`,
   imports: [NgDiagramBaseEdgeComponent],
 })

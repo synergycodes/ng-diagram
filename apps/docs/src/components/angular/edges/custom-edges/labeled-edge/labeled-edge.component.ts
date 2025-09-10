@@ -16,7 +16,7 @@ import {
       <div class="custom-label">Label</div>
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
-  styleUrl: './labeled-edge.component.css',
+  styleUrl: './labeled-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {

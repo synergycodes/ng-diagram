@@ -12,13 +12,13 @@ import {
     [edge]="edge()"
     stroke="var(--ngd-default-edge-stroke)"
   >
-    <ng-diagram-base-edge-label [id]="'routing-label'" [positionOnEdge]="0.5">
+    <ng-diagram-base-edge-label id="routing-label" positionOnEdge="0.5">
       <div class="routing-label">
         {{ getRoutingName() }}
       </div>
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
-  styleUrl: './routing-edge.component.css',
+  styleUrl: './routing-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class RoutingEdgeComponent implements NgDiagramEdgeTemplate {

@@ -22,7 +22,7 @@ import {
       </ng-diagram-base-edge-label>
     }
   </ng-diagram-base-edge>`,
-  styleUrl: './modifiable-label-edge.component.css',
+  styleUrl: './modifiable-label-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate {

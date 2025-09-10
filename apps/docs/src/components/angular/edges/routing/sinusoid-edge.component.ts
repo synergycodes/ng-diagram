@@ -12,7 +12,7 @@ import {
     stroke="var(--ngd-default-edge-stroke)"
     [customMarkerEnd]="'ng-diagram-arrow'"
   ></ng-diagram-base-edge>`,
-  styleUrl: './sinusoid-edge.component.css',
+  styleUrl: './sinusoid-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent],
 })
 export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {

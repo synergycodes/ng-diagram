@@ -9,8 +9,8 @@ import {
   selector: 'sinusoid-edge',
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
-    [stroke]="'rebeccapurple'"
-    [customMarkerEnd]="'ng-diagram-arrow'"
+    stroke="rebeccapurple"
+    customMarkerEnd="ng-diagram-arrow"
   />`,
   imports: [NgDiagramBaseEdgeComponent],
 })
