@@ -1,0 +1,199 @@
+---
+editUrl: false
+next: false
+prev: false
+title: "ModelAdapter"
+---
+
+Interface for model adapters that handle the data management of a flow diagram
+
+## Type Parameters
+
+### TMetadata
+
+`TMetadata` *extends* [`Metadata`](/api/other/metadata/) = [`Metadata`](/api/other/metadata/)
+
+## Methods
+
+### destroy()
+
+> **destroy**(): `void`
+
+Destroy the model adapter and clean up resources
+This should be called when the model is no longer needed to prevent memory leaks
+
+#### Returns
+
+`void`
+
+***
+
+### getEdges()
+
+> **getEdges**(): [`Edge`](/api/types/edge/)\<`object`\>[]
+
+Get all edges in the model
+
+#### Returns
+
+[`Edge`](/api/types/edge/)\<`object`\>[]
+
+***
+
+### getMetadata()
+
+> **getMetadata**(): `TMetadata`
+
+Get metadata associated with the model
+
+#### Returns
+
+`TMetadata`
+
+***
+
+### getNodes()
+
+> **getNodes**(): [`Node`](/api/types/node/)[]
+
+Get all nodes in the model
+
+#### Returns
+
+[`Node`](/api/types/node/)[]
+
+***
+
+### onChange()
+
+> **onChange**(`callback`): `void`
+
+Register a callback to be called when the model changes
+
+#### Parameters
+
+##### callback
+
+(`__namedParameters`) => `void`
+
+Function to be called on changes
+
+#### Returns
+
+`void`
+
+***
+
+### redo()
+
+> **redo**(): `void`
+
+Redo the last undone change
+
+#### Returns
+
+`void`
+
+***
+
+### setEdges()
+
+> **setEdges**(`edges`): `void`
+
+Set edges in the model
+
+#### Parameters
+
+##### edges
+
+[`Edge`](/api/types/edge/)\<`object`\>[]
+
+Array of edges to set
+
+#### Returns
+
+`void`
+
+***
+
+### setMetadata()
+
+> **setMetadata**(`metadata`): `void`
+
+Set metadata for the model
+
+#### Parameters
+
+##### metadata
+
+`TMetadata`
+
+Metadata to set
+
+#### Returns
+
+`void`
+
+***
+
+### setNodes()
+
+> **setNodes**(`nodes`): `void`
+
+Set nodes in the model
+
+#### Parameters
+
+##### nodes
+
+[`Node`](/api/types/node/)[]
+
+Array of nodes to set
+
+#### Returns
+
+`void`
+
+***
+
+### toJSON()
+
+> **toJSON**(): `string`
+
+Convert the model to a JSON string
+
+#### Returns
+
+`string`
+
+***
+
+### undo()
+
+> **undo**(): `void`
+
+Undo the last change
+
+#### Returns
+
+`void`
+
+***
+
+### unregisterOnChange()
+
+> **unregisterOnChange**(`callback`): `void`
+
+Unregister a callback from being called when the model changes
+
+#### Parameters
+
+##### callback
+
+(`__namedParameters`) => `void`
+
+Function to unregister from changes
+
+#### Returns
+
+`void`
