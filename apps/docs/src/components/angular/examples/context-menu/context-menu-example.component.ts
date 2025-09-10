@@ -26,20 +26,7 @@ import { NodeComponent } from './node/node.component';
       <menu></menu>
     </div>
   `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-      .diagram {
-        flex: 1;
-        display: flex;
-        height: 20rem;
-        font-family: 'Poppins', sans-serif;
-      }
-    `,
-  ],
+  styleUrl: './context-menu-example.component.scss',
   providers: [ContextMenuService, NgDiagramModelService],
 })
 export class ContextMenuExampleComponent {
