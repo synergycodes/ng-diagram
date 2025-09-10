@@ -1,18 +1,18 @@
-import type { Point, PortSide, Size } from './utils';
+import type { DataObject, Point, PortSide, Size } from './utils';
 
 /**
  * Interface representing all possible node types in the diagram
  * @category Types
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Node<T = any> = SimpleNode<T> | GroupNode<T>;
+
+export type Node<T extends DataObject = DataObject> = SimpleNode<T> | GroupNode<T>;
 
 /**
  * Interface representing a group node in the diagram
  * @category Types
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface GroupNode<T = any> extends SimpleNode<T> {
+
+export interface GroupNode<T extends DataObject = DataObject> extends SimpleNode<T> {
   /**
    * Flag indicating the node is a group
    */
@@ -27,8 +27,8 @@ export interface GroupNode<T = any> extends SimpleNode<T> {
  * Interface representing the most basic node in the diagram
  * @category Types
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface SimpleNode<T = any> {
+
+export interface SimpleNode<T extends DataObject = DataObject> {
   /**
    * The unique identifier for the node.
    */

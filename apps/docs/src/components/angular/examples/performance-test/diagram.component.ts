@@ -41,7 +41,7 @@ export class NgDiagramPerformanceTestComponent {
     };
   }
 
-  private generateNodes(): Node[] {
+  private generateNodes(): Node<Data>[] {
     const spacingX = 250;
     const spacingY = 120;
     const rows = 20;
@@ -66,7 +66,7 @@ export class NgDiagramPerformanceTestComponent {
     }).sort((a, b) => Number(a.id) - Number(b.id));
   }
 
-  private generateEdges(nodes: Node[]): Edge[] {
+  private generateEdges(nodes: Node<Data>[]): Edge[] {
     return nodes.slice(0, -1).map((node, index) => {
       const next = nodes[index + 1];
       return {
@@ -80,3 +80,8 @@ export class NgDiagramPerformanceTestComponent {
     });
   }
 }
+
+type Data = {
+  label: string;
+  row: number;
+};

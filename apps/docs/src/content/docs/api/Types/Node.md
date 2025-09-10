@@ -13,4 +13,4 @@ Interface representing all possible node types in the diagram
 
 ### T
 
-`T` = `any`
+`T` *extends* `DataObject` = `DataObject`
