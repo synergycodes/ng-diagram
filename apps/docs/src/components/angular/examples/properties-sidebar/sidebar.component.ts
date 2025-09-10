@@ -14,7 +14,11 @@ export class SidebarContainer {
   private readonly selectedNode = computed(() => this.selection().nodes[0]);
 
   id = computed(() => this.selectedNode().id);
-  label = computed(() => this.selectedNode()?.data?.label ?? '');
+  label = computed(() => {
+    const data = this.selectedNode()?.data as Data;
+
+    return data.label;
+  });
   isRotatable = computed(() => this.selectedNode()?.rotatable);
   isResizable = computed(() => this.selectedNode()?.resizable);
   isEnabled = computed(() => !!this.selectedNode());
@@ -33,3 +37,7 @@ export class SidebarContainer {
     this.modelService.updateNode(this.id(), { rotatable: value });
   }
 }
+
+type Data = {
+  label: string;
+};

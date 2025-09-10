@@ -15,7 +15,7 @@ Interface representing a group node in the diagram
 
 ### T
 
-`T` = `any`
+`T` *extends* `DataObject` = `DataObject`
 
 ## Properties
 

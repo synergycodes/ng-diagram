@@ -8,11 +8,15 @@ import {
 
 @Component({
   selector: 'labeled-edge',
-  template: `<ng-diagram-base-edge [edge]="edge()" stroke="aliceblue">
+  template: `<ng-diagram-base-edge
+    [edge]="edge()"
+    stroke="var(--ngd-default-edge-stroke)"
+  >
     <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
-      <button (mousedown)="onButtonClick()">Test</button>
+      <div class="custom-label">Label</div>
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
+  styleUrl: './labeled-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
 export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {

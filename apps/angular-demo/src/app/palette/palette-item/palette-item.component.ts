@@ -9,5 +9,5 @@ import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
 })
 export class PaletteItemComponent {
   item = input.required<NgDiagramPaletteItem>();
-  nodeLabel = computed(() => this.item()?.data?.['label'] ?? 'Unknown');
+  nodeLabel = computed(() => this.item()?.data?.label ?? 'Unknown');
 }

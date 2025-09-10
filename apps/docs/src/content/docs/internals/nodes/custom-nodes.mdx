@@ -15,7 +15,7 @@ This allows you to build interactive and highly customized flow elements.
 
 You can create a custom node by extending `NgDiagramNodeTemplate` and implementing `CustomNodeComponent`.
 
-<CodeSnippet relativePath="nodes/custom-node/node.component.ts" range={[1, 45]} collapse={['1-6']} mark={[42]} />
+<CodeSnippet relativePath="nodes/custom-node/node.component.ts" range={[1, 44]} collapse={['1-6']} mark={[20]} />
 
 <CustomNode />
 
@@ -32,7 +32,7 @@ To register a custom node, you need to add it to the `nodeTemplateMap`.
 
 The map associates a string key, such as `myType`, with a value like `CustomNodeComponent`, which is a reference to an Angular component class.
 
-<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[44, 46]} />
+<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[30, 33]} />
 
 After registering, you need to pass the map to the `NgDiagram` component.
 
@@ -44,7 +44,7 @@ Assigning the `type` property as `myType` for the node allows you to precisely c
 
 This approach makes your diagram highly extensible and flexible, as you can easily introduce new node types and associate them with different components.
 
-<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[55, 62]} mark={[5]} />
+<CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[41, 48]} mark={[6]} />
 
 ## Custom Appearance
 
@@ -82,13 +82,25 @@ interface SimpleNode<T = any> {
   description="See detailed node properties reference"
 />
 
+## Handling Interactive Elements
+
+When adding interactive elements like inputs to your custom nodes, dragging on these elements might trigger unwanted diagram behaviors. You can control this using special data attributes:
+
+- **`data-no-pan="true"`** - Prevents the diagram canvas from panning when the user clicks and drags on the input
+- **`data-no-drag="true"`** - Prevents the node itself from being dragged when the user clicks and drags on the input
+
+```html
+<!-- Input that prevents both diagram panning and node dragging -->
+<input type="text" data-no-pan="true" data-no-drag="true" placeholder="Type here" />
+```
+
 ## Extending with NgDiagram Functionalities
 
 We also expose advanced behaviors like resizing, rotating, or customizing ports, enhancing the user experience with minimal effort.
 
-Integrating these functionalities is straightforward simply place the corresponding components in your node’s template.
+Integrating these functionalities is straightforward simply place the corresponding components in your node's template.
 
-As a result, your custom nodes are not only visually flexible, but also deeply integrated with the diagram’s data model, making them powerful and adaptable for complex scenarios.
+As a result, your custom nodes are not only visually flexible, but also deeply integrated with the diagram's data model, making them powerful and adaptable for complex scenarios.
 
 <LinkCard
   icon="list-format"

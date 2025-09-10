@@ -47,6 +47,8 @@ export type PortLocation = {
   side: PortSide;
 } & Point;
 
+export type DataObject = object;
+
 // More info: https://x.com/mattpocockuk/status/1671908303918473217
 export type LooseAutocomplete<T> = T | (string & {});
 

@@ -13,7 +13,7 @@ Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* `MiddlewareChain` = \[\]
+`TMiddlewares` *extends* [`MiddlewareChain`](/api/other/middlewarechain/) = \[\]
 
 ## Parameters
 

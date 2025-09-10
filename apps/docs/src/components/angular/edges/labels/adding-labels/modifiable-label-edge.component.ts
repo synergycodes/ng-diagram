@@ -10,7 +10,7 @@ import {
   selector: 'multi-label-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
-    [stroke]="selected() ? 'rebeccapurple' : 'white'"
+    [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
   >
     @if (label()) {
       <ng-diagram-base-edge-label
@@ -22,16 +22,12 @@ import {
       </ng-diagram-base-edge-label>
     }
   </ng-diagram-base-edge>`,
-  styles: `
-    .label {
-      background: #444;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-    }
-  `,
+  styleUrl: './modifiable-label-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
-export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate {
+export class ModifiableLabelEdgeComponent
+  implements NgDiagramEdgeTemplate<MultiLabelEdgeData>
+{
   edge = input.required<Edge<MultiLabelEdgeData>>();
 
   selected = computed(() => this.edge().selected);

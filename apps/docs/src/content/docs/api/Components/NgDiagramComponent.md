@@ -11,11 +11,11 @@ Diagram component
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* `MiddlewareChain` = \[\]
+`TMiddlewares` *extends* [`MiddlewareChain`](/api/other/middlewarechain/) = \[\]
 
 ### TAdapter
 
-`TAdapter` *extends* `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = `ModelAdapter`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
+`TAdapter` *extends* [`ModelAdapter`](/api/other/modeladapter/)\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = [`ModelAdapter`](/api/other/modeladapter/)\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
 
 ## Implements
 

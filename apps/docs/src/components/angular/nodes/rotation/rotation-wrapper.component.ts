@@ -24,19 +24,7 @@ import { CustomNodeComponent } from './node.component';
       </div>
     </ng-diagram-context>
   `,
-  styles: [
-    `
-      :host {
-        flex: 1;
-        display: flex;
-        .diagram {
-          flex: 1;
-          display: flex;
-          height: 20rem;
-        }
-      }
-    `,
-  ],
+  styleUrl: './rotation-wrapper.component.scss',
 })
 export class RotationWrapperComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([

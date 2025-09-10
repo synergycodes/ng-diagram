@@ -1,13 +1,39 @@
-import { computed, inject, Injectable } from '@angular/core';
-import { Edge, FlowCore, MiddlewareChain, Node, Point, Port } from '@angularflow/core';
+import { computed, effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { Edge, FlowCore, Metadata, MiddlewareChain, Node, Point, Port } from '@angularflow/core';
 import { FlowCoreProviderService } from '../services';
+import { NgDiagramService } from './ng-diagram.service';
 
 @Injectable()
-export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
+export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> implements OnDestroy {
+  private readonly diagramService = inject(NgDiagramService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
+
+  private _nodes = signal<Node[]>([]);
+  private _edges = signal<Edge[]>([]);
+  private _metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} });
+
+  nodes = this._nodes.asReadonly();
+  edges = this._edges.asReadonly();
+  metadata = this._metadata.asReadonly();
 
   private get flowCore(): FlowCore<TMiddlewares> {
     return this.flowCoreProvider.provide();
+  }
+
+  constructor() {
+    effect(() => {
+      if (this.diagramService.isInitialized()) {
+        this.flowCore.model.onChange(this.modelListener);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    try {
+      this.flowCore.model.unregisterOnChange(this.modelListener);
+    } catch (error) {
+      console.error('Error unregistering model listener:', error);
+    }
   }
 
   /**
@@ -197,4 +223,10 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> {
   clientToFlowViewportPosition(clientPosition: Point): Point {
     return this.flowCore.clientToFlowViewportPosition(clientPosition);
   }
+
+  private modelListener = (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => {
+    this._nodes.set(data.nodes);
+    this._edges.set(data.edges);
+    this._metadata.set(data.metadata);
+  };
 }

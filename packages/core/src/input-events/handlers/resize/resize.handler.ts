@@ -85,12 +85,22 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           }
         }
 
-        this.flow.commandHandler.emit('resizeNode', {
+        const resizeCommand: {
+          id: string;
+          disableAutoSize: boolean;
+          size: { width: number; height: number };
+          position?: { x: number; y: number };
+        } = {
           id: event.target.id,
           disableAutoSize: true,
-          position: { x: Math.round(newX), y: Math.round(newY) },
           size: { width: Math.round(newWidth), height: Math.round(newHeight) },
-        });
+        };
+
+        if (newX !== startNodePositionX || newY !== startNodePositionY) {
+          resizeCommand.position = { x: Math.round(newX), y: Math.round(newY) };
+        }
+
+        this.flow.commandHandler.emit('resizeNode', resizeCommand);
         break;
       }
       case 'end': {
