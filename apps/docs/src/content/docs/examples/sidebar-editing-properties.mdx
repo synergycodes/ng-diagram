@@ -7,7 +7,7 @@ Creating a sidebar for reading and updating node properties in NgDiagram is **si
 
 The sidebar is implemented using just a few key concepts:
 
-1. **Selection Tracking**: Uses `NgDiagramModelService.getSelection()` to track selected nodes
+1. **Selection Tracking**: Uses `NgDiagramSelectionService.selection()` to track selected nodes
 2. **Computed Properties**: Angular computed signals automatically update the UI when node properties change
 3. **Simple Update Methods**: Direct calls to `updateNodeData()` and `updateNode()` for property modifications
 

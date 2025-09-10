@@ -3,7 +3,7 @@ import '@angular/compiler';
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import {
-  NgDiagramModelService,
+  NgDiagramSelectionService,
   NgDiagramViewportService,
 } from '@angularflow/angular-adapter';
 
@@ -43,10 +43,11 @@ import {
 })
 export class CoordinatesPreview {
   private readonly viewportService = inject(NgDiagramViewportService);
-  private readonly modelService = inject(NgDiagramModelService);
-  private readonly selection = this.modelService.getSelection();
+  private readonly selectionService = inject(NgDiagramSelectionService);
 
   viewport = this.viewportService.viewport;
   scale = this.viewportService.scale;
-  selectionPosition = computed(() => this.selection()?.nodes[0]?.position);
+  selectionPosition = computed(
+    () => this.selectionService.selection().nodes[0]?.position
+  );
 }
