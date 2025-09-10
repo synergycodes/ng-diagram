@@ -18,12 +18,6 @@ The new size is reflected in the node's appearance and can be used to create fle
 - The node's size is updated in its data model.
 - Resizing can be enabled per node and configured globally via diagram config.
 
-## Adding Resize Adornment to a Custom Node
-
-To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-adornment>` in your node template and import the `NgDiagramNodeResizeAdornmentComponent`.
-
-<CodeSnippet relativePath="nodes/resizing/node.component.ts" mark={[11, { range: '13-20' }]} collapse={['22-52']} />
-
 ## Enabling Resizing for a Node
 
 Enable resizing by setting the `resizable` property to `true` in your node definition:
@@ -31,6 +25,14 @@ Enable resizing by setting the `resizable` property to `true` in your node defin
 <CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" mark={[53]} collapse={['1-44']} />
 
 When `resizable` is set, the resize handles and lines will appear, and the node can be resized by the user.
+
+## Adding Resize Adornment to a Custom Node
+
+To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-adornment>` in your node template and import the `NgDiagramNodeResizeAdornmentComponent`.
+
+You will also need to set the `resizable` property to `true` in your custom node definition.
+
+<CodeSnippet relativePath="nodes/resizing/node.component.ts" mark={[11, { range: '13-20' }]} collapse={['22-52']} />
 
 ## Customizing the Resize Handle and Line
 
