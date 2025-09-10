@@ -23,6 +23,8 @@ title: "@angularflow/angular-adapter"
 - [NodeSizeDirective](/api/other/nodesizedirective/)
 - [Metadata](/api/other/metadata/)
 - [Middleware](/api/other/middleware/)
+- [ModelAdapter](/api/other/modeladapter/)
+- [MiddlewareChain](/api/other/middlewarechain/)
 - [initializeModel](/api/other/initializemodel/)
 
 ## Types

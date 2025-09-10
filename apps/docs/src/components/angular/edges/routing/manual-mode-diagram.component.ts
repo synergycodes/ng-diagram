@@ -6,15 +6,13 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type AppMiddlewares,
-  NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
-import { SinusoidEdgeComponent } from './sinusoid-edge.component';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
   template: `
     <ng-diagram-context>
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+      <ng-diagram [model]="model" />
     </ng-diagram-context>
   `,
   styles: `
@@ -25,32 +23,42 @@ import { SinusoidEdgeComponent } from './sinusoid-edge.component';
     }
   `,
 })
-export class Diagram {
-  edgeTemplateMap = new NgDiagramEdgeTemplateMap([
-    ['sinusoid', SinusoidEdgeComponent],
-  ]);
-
+export class ManualModeDiagram {
   model = initializeModel<AppMiddlewares>({
     metadata: {
-      viewport: { x: 0, y: 0, scale: 0.88 },
+      viewport: { x: 0, y: 0, scale: 0.9 },
     },
     nodes: [
       {
-        id: '1',
-        position: { x: 150, y: 150 },
-        data: { label: 'Node 1' },
+        id: 'node1',
+        position: { x: 100, y: 150 },
+        data: { label: 'Move me!' },
         rotatable: true,
       },
-      { id: '2', position: { x: 500, y: 150 }, data: { label: 'Node 2' } },
+      {
+        id: 'node2',
+        position: { x: 500, y: 150 },
+        data: { label: 'Move me too!' },
+        rotatable: true,
+      },
     ],
     edges: [
       {
-        id: '1',
-        source: '1',
+        id: 'manual-edge',
+        source: 'node1',
         sourcePort: 'port-right',
+        target: 'node2',
         targetPort: 'port-left',
-        target: '2',
-        type: 'sinusoid',
+        routing: 'orthogonal',
+        routingMode: 'manual',
+        points: [
+          { x: 285, y: 172 },
+          { x: 345, y: 172 },
+          { x: 345, y: 100 },
+          { x: 445, y: 100 },
+          { x: 445, y: 172 },
+          { x: 500, y: 172 },
+        ],
         data: {},
       },
     ],

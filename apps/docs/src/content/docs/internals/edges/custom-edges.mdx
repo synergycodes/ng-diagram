@@ -5,13 +5,14 @@ sidebar:
   order: 1
 ---
 
+import { LinkCard } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 When NgDiagram's default edge customizations are not sufficient, you can create custom edges that provide more precise control over edge rendering, including routing.
 
 You can create a custom edge by extending `NgDiagramBaseEdgeComponent` and implementing `NgDiagramEdgeTemplate`
 
-<CodeSnippet relativePath="edges/custom-edges/custom-edge.component.ts" range={[8, 28]} />
+<CodeSnippet relativePath="edges/custom-edges/custom-edge.component.ts" range={[8, 40]} />
 
 ## Registering Custom Edge Types
 
@@ -26,17 +27,12 @@ Custom edge types need to be registered in the `edgeTemplateMap` and passed to t
 
 ## Custom Routing
 
-To use custom routing set the `pathAndPoints` property of `NgDiagramBaseEdgeComponent`. The `path` property defines the SVG path data for the edge, while `points` defines the control points for the edge's routing. The following example demonstrates how to create a sinusoidal edge between nodes:
+Custom routing is an extensible mechanism that allows you to create sophisticated edge paths tailored to your specific needs. You can implement custom routing algorithms, create dynamic paths based on node positions, or define manual waypoints for precise control.
 
-import SinusoidEdge from '@components/angular/edges/custom-edges/sinusoid-edge/sinusoid-edge.astro';
-
-<SinusoidEdge />
-
-<CodeSnippet
-  relativePath="edges/custom-edges/sinusoid-edge/sinusoid-edge.component.ts"
-  range={[8, 80]}
-  collapse={['20-67']}
-  mark={[5, { range: '14-17' }]}
+<LinkCard
+  title="Routing"
+  href="/internals/edges/routing"
+  description="Learn about routing algorithms and how to customize them in NgDiagram"
 />
 
 ## Adding Edge Labels
@@ -50,6 +46,12 @@ import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/lab
 <CodeSnippet
   relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts"
   range={[8, 35]}
-  collapse={['15-24']}
-  mark={{ range: '8-10' }}
+  collapse={['14-24']}
+  mark={{ range: '7-9' }}
+/>
+
+<LinkCard
+  title="Edge Labels"
+  href="/internals/edges/labels"
+  description="Learn more about adding and customizing labels on edges in NgDiagram"
 />
