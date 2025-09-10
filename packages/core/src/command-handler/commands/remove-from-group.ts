@@ -17,15 +17,7 @@ export const removeFromGroup = async (commandHandler: CommandHandler, { groupId,
   const updateData: { id: string; groupId?: string }[] = [];
 
   for (const node of nodes) {
-    if (commandHandler.flowCore.modelLookup.wouldCreateCircularDependency(node.id, groupId)) {
-      continue;
-    }
-
     if (node.groupId !== groupId) {
-      continue;
-    }
-
-    if (!commandHandler.flowCore.config.grouping.canGroup(node, group)) {
       continue;
     }
 
@@ -37,10 +29,5 @@ export const removeFromGroup = async (commandHandler: CommandHandler, { groupId,
 
   if (updateData.length > 0) {
     await commandHandler.flowCore.commandHandler.emit('updateNodes', { nodes: updateData });
-  }
-
-  // That means a group has been highlighted, so we need to clear it
-  if (updateData.some((node) => Boolean(node.groupId))) {
-    commandHandler.flowCore.commandHandler.emit('highlightGroupClear');
   }
 };
