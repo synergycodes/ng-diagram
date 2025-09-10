@@ -23,9 +23,11 @@ export class NgDiagramNodeService<TMiddlewares extends MiddlewareChain = []> {
    * Resizes a node to the specified dimensions.
    * @param id The ID of the node to resize.
    * @param size The new size of the node.
+   * @param position Optional new position of the node.
+   * @param disableAutoSize Optional flag to disable auto-sizing.
    */
-  resizeNode(id: string, size: { width: number; height: number }) {
-    this.flowCore.commandHandler.emit('resizeNode', { id, size });
+  resizeNode(id: string, size: { width: number; height: number }, position?: Point, disableAutoSize?: boolean) {
+    this.flowCore.commandHandler.emit('resizeNode', { id, size, position, disableAutoSize });
   }
 
   /**

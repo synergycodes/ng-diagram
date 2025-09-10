@@ -5,6 +5,7 @@ import {
   NgDiagramModelService,
   NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeSelectedDirective,
+  NgDiagramNodeService,
   NgDiagramNodeTemplate,
   NgDiagramPortComponent,
   NgDiagramService,
@@ -25,6 +26,7 @@ import {
 export class ResizableNodeComponent implements NgDiagramNodeTemplate<{ text: string }> {
   private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
+  private readonly nodeService = inject(NgDiagramNodeService);
 
   text = computed(() => this.node()?.data?.text || '');
   sizeText = model<string>('');
@@ -46,22 +48,12 @@ export class ResizableNodeComponent implements NgDiagramNodeTemplate<{ text: str
       return;
     }
 
-    this.diagramService.getCommandHandler()?.emit('resizeNode', {
-      id: this.node().id,
-      size: { width, height },
-      disableAutoSize: true,
-      position: this.node().position,
-    });
+    this.nodeService.resizeNode(this.node().id, { width, height }, this.node().position, true);
   }
 
   onSizeControlChange(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.diagramService.getCommandHandler()?.emit('updateNode', {
-      id: this.node().id,
-      nodeChanges: {
-        autoSize: checked,
-      },
-    });
+    this.modelService.updateNode(this.node().id, { autoSize: checked });
 
     if (!checked) {
       this.setSize();

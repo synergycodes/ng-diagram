@@ -34,21 +34,6 @@ export class NgDiagramService<
   isInitialized = this.flowCoreProvider.isInitialized;
 
   /**
-   * Returns diagram's command system for programmatic control.
-   *
-   * The command handler allows you to:
-   * - Emit system commands (select, move, copy, paste, etc.)
-   * - Listen for command events
-   * - Programmatically control diagram behavior
-   *
-   * Use this for implementing custom UI controls
-   * or integrating with external systems that need to control the diagram.
-   */
-  getCommandHandler() {
-    return this.flowCore.commandHandler;
-  }
-
-  /**
    * Sets the layout
    */
   layout(layout: 'Tree') {
