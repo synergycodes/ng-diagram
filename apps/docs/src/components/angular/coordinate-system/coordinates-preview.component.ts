@@ -46,7 +46,7 @@ export class CoordinatesPreview {
   private readonly modelService = inject(NgDiagramModelService);
   private readonly selection = this.modelService.getSelection();
 
-  viewport = this.viewportService.getViewport();
-  scale = this.viewportService.getScale();
+  viewport = this.viewportService.viewport;
+  scale = this.viewportService.scale;
   selectionPosition = computed(() => this.selection()?.nodes[0]?.position);
 }

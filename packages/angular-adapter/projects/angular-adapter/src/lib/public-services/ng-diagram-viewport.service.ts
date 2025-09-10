@@ -1,33 +1,19 @@
 import { computed, inject } from '@angular/core';
-import { FlowCore, MiddlewareChain } from '@angularflow/core';
+import { MiddlewareChain } from '@angularflow/core';
 import { FlowCoreProviderService } from '../services';
+import { NgDiagramModelService } from './ng-diagram-model.service';
 
 export class NgDiagramViewportService<TMiddlewares extends MiddlewareChain = []> {
   private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
-
-  private get flowCore(): FlowCore<TMiddlewares> | null {
-    try {
-      return this.flowCoreProvider.provide();
-    } catch {
-      return null;
-    }
-  }
+  private readonly modelService = inject(NgDiagramModelService);
 
   /**
    * Returns a computed signal for the viewport that safely handles uninitialized state
    */
-  getViewport() {
-    return computed(() => {
-      return this.flowCore?.model.getMetadata().viewport || { x: 0, y: 0, scale: 1 };
-    });
-  }
+  viewport = computed(() => this.modelService.metadata().viewport || { x: 0, y: 0, scale: 1 });
 
   /**
    * Returns a computed signal for the scale that safely handles uninitialized state
    */
-  getScale() {
-    return computed(() => {
-      return this.flowCore?.getScale() || 1;
-    });
-  }
+  scale = computed(() => this.modelService.metadata().viewport.scale || 1);
 }

@@ -1,12 +1,14 @@
 import { computed, ElementRef, inject, Signal } from '@angular/core';
+import { NgDiagramViewportService } from '../../public-services/ng-diagram-viewport.service';
 import { FlowCoreProviderService } from '../../services';
 
 export abstract class BackgroundPatternBase {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly viewportService = inject(NgDiagramViewportService);
 
   protected abstract readonly backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>;
 
-  private viewport = computed(() => this.flowCoreProvider.provide().getViewport());
+  private viewport = this.viewportService.viewport;
 
   size = computed(() => {
     const pattern = this.backgroundPattern();

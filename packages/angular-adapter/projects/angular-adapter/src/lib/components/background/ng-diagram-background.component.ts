@@ -1,5 +1,5 @@
 import { AfterContentInit, Component, computed, ElementRef, inject, viewChild } from '@angular/core';
-import { FlowCoreProviderService } from '../../services';
+import { NgDiagramViewportService } from '../../public-services/ng-diagram-viewport.service';
 import { DottedBackgroundComponent } from './default/dotted/dotted-background.component';
 import { LogoBackgroundComponent } from './default/logo/logo-background.component';
 
@@ -11,11 +11,9 @@ import { LogoBackgroundComponent } from './default/logo/logo-background.componen
 })
 export class NgDiagramBackgroundComponent implements AfterContentInit {
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
-  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly viewportService = inject(NgDiagramViewportService);
 
-  private scale = computed(() => this.flowCoreProvider.provide().getScale());
-
-  showLogo = computed(() => this.scale() === 2);
+  showLogo = computed(() => this.viewportService.scale() === 2);
   hasContent = false;
 
   ngAfterContentInit() {
