@@ -2,6 +2,12 @@ import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
+export interface ModelChanges {
+  nodes: Node[];
+  edges: Edge[];
+  metadata: Metadata;
+}
+
 /**
  * Interface for model adapters that handle the data management of a flow diagram
  */
@@ -55,7 +61,13 @@ export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
    * Register a callback to be called when the model changes
    * @param callback Function to be called on changes
    */
-  onChange(callback: ({ nodes, edges, metadata }: { nodes: Node[]; edges: Edge[]; metadata: TMetadata }) => void): void;
+  onChange(callback: ({ nodes, edges, metadata }: ModelChanges) => void): void;
+
+  /**
+   * Unregister a callback from being called when the model changes
+   * @param callback Function to unregister from changes
+   */
+  unregisterOnChange(callback: ({ nodes, edges, metadata }: ModelChanges) => void): void;
 
   /**
    * Undo the last change
