@@ -35,6 +35,8 @@ export { ZIndexDirective } from './lib/directives/z-index/z-index.directive';
 // Public directives
 export { NgDiagramGroupHighlightedDirective } from './lib/directives/group-highlighted/ng-diagram-group-highlighted.directive';
 export { NgDiagramNodeSelectedDirective } from './lib/directives/node-selected/ng-diagram-node-selected.directive';
+
+// Services
 export { NgDiagramModelService } from './lib/public-services/ng-diagram-model.service';
 export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewport.service';
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
