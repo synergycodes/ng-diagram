@@ -38,7 +38,7 @@ export class ResizingWrapperComponent {
     },
     resize: {
       getMinNodeSize: (_: Node) => {
-        return { width: 200, height: 100 };
+        return { width: 200, height: 80 };
       },
     },
   } satisfies NgDiagramConfig;

@@ -3,13 +3,16 @@
   height: 100%;
   display: flex;
   border: 1px solid #ccc;
+  overflow: hidden;
 
   .node-header {
     font-size: 20px;
-    padding: 3px 10px;
+    padding: 5px 10px;
+    height: 48px;
   }
   .node-content {
     font-size: 14px;
-    padding: 3px 10px;
+    padding: 0px 10px;
+    height: 30px;
   }
 }
