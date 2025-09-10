@@ -8,3 +8,5 @@ export * from './types';
 export * from './utils';
 
 export * from './middleware-manager/middlewares';
+
+export { DEFAULT_NODE_MIN_SIZE } from './flow-config/default-flow-config';

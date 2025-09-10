@@ -16,6 +16,8 @@ import type {
 } from '../types/flow-config.interface';
 import { Point, Size } from '../types/utils';
 
+export const DEFAULT_NODE_MIN_SIZE = { width: 20, height: 20 };
+
 const defaultComputeNodeId = (): string => {
   return crypto.randomUUID();
 };
@@ -25,10 +27,9 @@ const defaultComputeEdgeId = (): string => {
 };
 
 const defaultResizeConfig: ResizeConfig = {
-  getMinNodeSize: (): Size => ({
-    width: 100,
-    height: 100,
-  }),
+  getMinNodeSize: (): Size => {
+    return { ...DEFAULT_NODE_MIN_SIZE };
+  },
 };
 
 const defaultLinkingConfig: LinkingConfig = {
