@@ -1,15 +1,18 @@
 import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
 import { ContainerEdge, Point } from '../../../types/utils';
-import { isGroup } from '../../../utils';
+import { isGroup, sortNodesByZIndex } from '../../../utils';
 import { EventHandler } from '../event-hander';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
+
+export const MOVE_THRESHOLD = 5; // to find out if move was intended
 
 export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSelectionEvent> {
   private lastInputPoint: Point | undefined;
   private startPoint: Point | undefined;
   private initialNodePosition: Point | undefined;
   private isMoving = false;
+  private hasMoved = false;
 
   async handle(event: PointerMoveSelectionEvent) {
     switch (event.phase) {
@@ -19,16 +22,20 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.lastInputPoint = flowPosition;
         this.startPoint = flowPosition;
         this.isMoving = true;
+        this.flow.actionStateManager.dragging = {
+          modifiers: { ...event.modifiers },
+        };
 
         break;
       }
       case 'continue': {
-        const selectedNodes = this.flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
-        if (selectedNodes.length === 0 || !this.isMoving || !this.lastInputPoint || !this.startPoint) {
+        const selectedNodesWithChildren = this.flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
+        const selectedNodes = this.flow.modelLookup.getSelectedNodes();
+        if (selectedNodesWithChildren.length === 0 || !this.isMoving || !this.lastInputPoint || !this.startPoint) {
           return;
         }
 
-        const firstNode = selectedNodes[0];
+        const firstNode = selectedNodesWithChildren[0];
         if (!this.initialNodePosition) {
           this.initialNodePosition = { ...firstNode.position };
         }
@@ -38,82 +45,101 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const deltaX = x - this.startPoint.x;
         const deltaY = y - this.startPoint.y;
 
+        if (!this.hasMoved) {
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          if (distance >= MOVE_THRESHOLD) {
+            this.hasMoved = true;
+          }
+        }
+
         const dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
         const dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
 
-        this.flow.transaction('moveNodes', async (tx) => {
-          await tx.emit('moveNodesBy', {
-            delta: { x: dx, y: dy },
-            nodes: selectedNodes,
-          });
+        if (this.flow.actionStateManager.dragging) {
+          this.flow.actionStateManager.dragging.modifiers = { ...event.modifiers };
+        }
 
-          this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
-        });
-        this.panDiagramOnScreenEdge(event.currentDiagramEdge);
+        if (this.hasMoved) {
+          this.flow.transaction('moveNodes', async (tx) => {
+            await tx.emit('moveNodesBy', {
+              delta: { x: dx, y: dy },
+              nodes: selectedNodesWithChildren,
+            });
+
+            this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
+          });
+          this.panDiagramOnScreenEdge(event.currentDiagramEdge);
+        }
 
         this.lastInputPoint = event.lastInputPoint;
-
-        if (event.modifiers.shift) {
-          await this.handleRemoveFromGroup(pointer);
-        }
         break;
       }
       case 'end': {
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
-        await this.handleDropOnGroup(pointer);
+        if (this.hasMoved) {
+          await this.handleDrop(pointer);
+        }
 
+        this.flow.actionStateManager.clearDragging();
         this.lastInputPoint = undefined;
         this.startPoint = undefined;
         this.initialNodePosition = undefined;
         this.isMoving = false;
+        this.hasMoved = false;
       }
     }
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
+    const currentHighlightedGroup = this.flow.actionStateManager.highlightGroup?.highlightedGroupId;
+
     if (topLevelGroupNode) {
-      if (selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id)) {
-        tx.emit('highlightGroup', { groupId: topLevelGroupNode.id, nodes: selectedNodes });
+      const shouldHighlight = selectedNodes.some((node) => node.groupId !== topLevelGroupNode.id);
+
+      if (shouldHighlight) {
+        if (currentHighlightedGroup !== topLevelGroupNode.id) {
+          tx.emit('highlightGroup', { groupId: topLevelGroupNode.id, nodes: selectedNodes });
+        }
+      } else {
+        if (currentHighlightedGroup) {
+          tx.emit('highlightGroupClear');
+        }
       }
     } else {
-      tx.emit('highlightGroupClear');
+      if (currentHighlightedGroup) {
+        tx.emit('highlightGroupClear');
+      }
     }
   }
 
   private getTopGroupAtPoint(point: Point): Node | null {
-    // Get all nodes at this position
     const nodes = this.flow.getNodesInRange(point, 1);
-
-    // Get all groups at this position that are not selected
     const groups = nodes.filter((node) => isGroup(node) && !node.selected);
+    const sortedGroups = sortNodesByZIndex(groups, this.flow.getState().nodes);
 
-    // Get the top group
-    return groups.toSorted((a, b) => (b.zOrder ?? 0) - (a.zOrder ?? 0))[0];
+    return sortedGroups[0];
   }
 
-  private async handleDropOnGroup(point: Point) {
+  private async handleDrop(point: Point) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
+    const selectedNodes = this.flow.modelLookup.getSelectedNodes();
 
     if (!topLevelGroupNode) {
+      for (const node of selectedNodes) {
+        if (node.groupId != null) {
+          await this.flow.commandHandler.emit('removeFromGroup', {
+            groupId: node.groupId,
+            nodeIds: [node.id],
+          });
+        }
+      }
       return;
     }
 
     await this.flow.commandHandler.emit('addToGroup', {
       groupId: topLevelGroupNode.id,
-      nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
-    });
-  }
-
-  private async handleRemoveFromGroup(point: Point) {
-    const topLevelGroupNode = this.getTopGroupAtPoint(point);
-    if (!topLevelGroupNode) {
-      return;
-    }
-
-    await this.flow.commandHandler.emit('removeFromGroup', {
-      groupId: topLevelGroupNode.id,
-      nodeIds: this.flow.modelLookup.getSelectedNodes().map((node) => node.id),
+      nodeIds: selectedNodes.map((node) => node.id),
     });
   }
 

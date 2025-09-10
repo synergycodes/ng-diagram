@@ -1,5 +1,6 @@
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
+import type { InputModifiers } from '../input-events/input-events.interface';
 
 export interface ResizeActionState {
   startWidth: number;
@@ -31,10 +32,15 @@ export interface RotationActionState {
   nodeId: string;
 }
 
+export interface DraggingActionState {
+  modifiers: InputModifiers;
+}
+
 export interface ActionState {
   resize?: ResizeActionState;
   linking?: LinkingActionState;
   copyPaste?: CopyPasteActionState;
   highlightGroup?: HighlightGroupActionState;
   rotation?: RotationActionState;
+  dragging?: DraggingActionState;
 }

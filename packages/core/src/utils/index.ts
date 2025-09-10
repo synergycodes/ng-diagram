@@ -7,3 +7,4 @@ export * from './group-size';
 export * from './is-group';
 export * from './rects-points-sizes';
 export * from './semaphore';
+export * from './sort-nodes-by-z-index';

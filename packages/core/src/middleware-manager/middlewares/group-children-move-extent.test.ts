@@ -13,6 +13,16 @@ interface MockFlowCore {
     getParentChain: ReturnType<typeof vi.fn>;
     getNodeChildrenIds: ReturnType<typeof vi.fn>;
   };
+  actionStateManager: {
+    dragging?: {
+      modifiers: {
+        shift: boolean;
+        primary: boolean;
+        secondary: boolean;
+        meta: boolean;
+      };
+    };
+  };
 }
 
 describe('groupChildrenMoveExtent Middleware', () => {
@@ -40,6 +50,9 @@ describe('groupChildrenMoveExtent Middleware', () => {
       modelLookup: {
         getParentChain: vi.fn().mockReturnValue([]),
         getNodeChildrenIds: vi.fn().mockReturnValue([]),
+      },
+      actionStateManager: {
+        dragging: undefined,
       },
     };
     context = {
@@ -338,6 +351,167 @@ describe('groupChildrenMoveExtent Middleware', () => {
           autoSize: false,
         },
       ],
+    });
+  });
+
+  describe('shift modifier behavior', () => {
+    it('should skip extent updates when shift is held during dragging', () => {
+      helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+      helpers.getAffectedNodeIds.mockReturnValue(['node1']);
+      nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+      nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+
+      // Set shift modifier to true
+      flowCore.actionStateManager.dragging = {
+        modifiers: {
+          shift: true,
+          primary: false,
+          secondary: false,
+          meta: false,
+        },
+      };
+
+      flowCore.modelLookup.getParentChain.mockReturnValue([]);
+      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
+
+      groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+      // Should call next without updates when shift is held
+      expect(nextMock).toHaveBeenCalledWith();
+      expect(mockCalculateGroupRect).not.toHaveBeenCalled();
+    });
+
+    it('should apply extent updates when shift is not held', () => {
+      helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+      helpers.getAffectedNodeIds.mockReturnValue(['node1']);
+      nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+      nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+
+      // Set shift modifier to false
+      flowCore.actionStateManager.dragging = {
+        modifiers: {
+          shift: false,
+          primary: false,
+          secondary: false,
+          meta: false,
+        },
+      };
+
+      flowCore.modelLookup.getParentChain.mockReturnValue([]);
+      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
+
+      groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+      // Should apply updates when shift is not held
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [
+          {
+            id: 'group1',
+            position: { x: 10, y: 20 },
+            size: { width: 100, height: 200 },
+            autoSize: false,
+          },
+        ],
+      });
+    });
+
+    it('should apply extent updates when dragging state is undefined', () => {
+      helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+      helpers.getAffectedNodeIds.mockReturnValue(['node1']);
+      nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+      nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+
+      // No dragging state
+      flowCore.actionStateManager.dragging = undefined;
+
+      flowCore.modelLookup.getParentChain.mockReturnValue([]);
+      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
+
+      groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+      // Should apply updates when not dragging
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [
+          {
+            id: 'group1',
+            position: { x: 10, y: 20 },
+            size: { width: 100, height: 200 },
+            autoSize: false,
+          },
+        ],
+      });
+    });
+
+    it('should handle other modifiers without affecting extent behavior', () => {
+      helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+      helpers.getAffectedNodeIds.mockReturnValue(['node1']);
+      nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+      nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+
+      // Other modifiers set but not shift
+      flowCore.actionStateManager.dragging = {
+        modifiers: {
+          shift: false,
+          primary: true,
+          secondary: true,
+          meta: true,
+        },
+      };
+
+      flowCore.modelLookup.getParentChain.mockReturnValue([]);
+      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
+
+      groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+      // Should apply updates when shift is not held (other modifiers don't matter)
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [
+          {
+            id: 'group1',
+            position: { x: 10, y: 20 },
+            size: { width: 100, height: 200 },
+            autoSize: false,
+          },
+        ],
+      });
+    });
+
+    it('should skip extent updates for nested groups when shift is held', () => {
+      helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
+      helpers.getAffectedNodeIds.mockReturnValue(['node1']);
+
+      // Create nested structure
+      nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+      nodesMap.set('group1', { ...mockGroupNode, id: 'group1', groupId: 'group2' });
+      nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
+
+      // Set shift modifier to true
+      flowCore.actionStateManager.dragging = {
+        modifiers: {
+          shift: true,
+          primary: false,
+          secondary: false,
+          meta: false,
+        },
+      };
+
+      flowCore.modelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
+      flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
+        id === 'group1' ? ['node1'] : id === 'group2' ? ['group1'] : []
+      );
+      mockCalculateGroupRect
+        .mockReturnValueOnce({ x: 10, y: 20, width: 100, height: 200 })
+        .mockReturnValueOnce({ x: 5, y: 10, width: 200, height: 400 });
+
+      groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
+
+      // Should skip all updates when shift is held
+      expect(nextMock).toHaveBeenCalledWith();
+      expect(mockCalculateGroupRect).not.toHaveBeenCalled();
     });
   });
 

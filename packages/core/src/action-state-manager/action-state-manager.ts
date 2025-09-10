@@ -1,6 +1,7 @@
 import type {
   ActionState,
   CopyPasteActionState,
+  DraggingActionState,
   HighlightGroupActionState,
   LinkingActionState,
   ResizeActionState,
@@ -58,6 +59,14 @@ export class ActionStateManager {
     this.state.rotation = value;
   }
 
+  get dragging(): DraggingActionState | undefined {
+    return this.state.dragging;
+  }
+
+  set dragging(value: DraggingActionState | undefined) {
+    this.state.dragging = value;
+  }
+
   clearResize() {
     this.state.resize = undefined;
   }
@@ -78,6 +87,10 @@ export class ActionStateManager {
     this.state.rotation = undefined;
   }
 
+  clearDragging() {
+    this.state.dragging = undefined;
+  }
+
   isResizing(): boolean {
     return !!this.state.resize;
   }
@@ -88,5 +101,9 @@ export class ActionStateManager {
 
   isRotating(): boolean {
     return !!this.state.rotation;
+  }
+
+  isDragging(): boolean {
+    return !!this.state.dragging;
   }
 }
