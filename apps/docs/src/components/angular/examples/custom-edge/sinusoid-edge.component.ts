@@ -1,4 +1,4 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
   type Edge,
@@ -8,28 +8,37 @@ import {
 @Component({
   selector: 'sinusoid-edge',
   template: `<ng-diagram-base-edge
-    [edge]="edge()"
-    [pathAndPoints]="pathAndPoints()"
-    [stroke]="'rebeccapurple'"
-    [customMarkerEnd]="'ng-diagram-arrow'"
+    [edge]="customEdge()"
+    stroke="rebeccapurple"
+    customMarkerEnd="ng-diagram-arrow"
   />`,
   imports: [NgDiagramBaseEdgeComponent],
 })
 export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
 
-  pathAndPoints = computed(() => ({
-    path: this.generateCustomPath(),
-    points: [],
-  }));
-
-  private generateCustomPath(): string {
-    const { sourcePosition, targetPosition } = this.edge();
+  customEdge = computed(() => {
+    const edge = this.edge();
+    const { sourcePosition, targetPosition } = edge;
 
     if (!sourcePosition || !targetPosition) {
-      return '';
+      return edge;
     }
 
+    const points = this.generateSinusoidPoints(sourcePosition, targetPosition);
+
+    return {
+      ...edge,
+      points,
+      routing: 'polyline',
+      routingMode: 'manual' as const,
+    };
+  });
+
+  private generateSinusoidPoints(
+    sourcePosition: { x: number; y: number },
+    targetPosition: { x: number; y: number }
+  ) {
     const startX = sourcePosition.x;
     const startY = sourcePosition.y;
     const endX = targetPosition.x;
@@ -46,9 +55,9 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
     const frequency = Math.max(2, distance / 100);
     const segments = Math.max(20, Math.floor(distance / 5));
 
-    let path = `M ${startX},${startY}`;
+    const points = [{ x: startX, y: startY }];
 
-    // Generate sinusoidal curve points (stop before the final point)
+    // Generate sinusoidal curve points
     for (let i = 1; i < segments; i++) {
       const t = i / segments;
 
@@ -66,12 +75,12 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
       const x = baseX + Math.cos(perpAngle) * sineOffset;
       const y = baseY + Math.sin(perpAngle) * sineOffset;
 
-      path += ` L ${x},${y}`;
+      points.push({ x, y });
     }
 
     // Always end exactly at the target position
-    path += ` L ${endX},${endY}`;
+    points.push({ x: endX, y: endY });
 
-    return path;
+    return points;
   }
 }

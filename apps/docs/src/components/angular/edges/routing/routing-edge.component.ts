@@ -7,18 +7,25 @@ import {
 } from '@angularflow/angular-adapter';
 
 @Component({
-  selector: 'labeled-edge',
+  selector: 'routing-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
     stroke="var(--ngd-default-edge-stroke)"
   >
-    <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
-      <div class="custom-label">Label</div>
+    <ng-diagram-base-edge-label id="routing-label" positionOnEdge="0.5">
+      <div class="routing-label">
+        {{ getRoutingName() }}
+      </div>
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
-  styleUrl: './labeled-edge.component.scss',
+  styleUrl: './routing-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
-export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {
+export class RoutingEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
+
+  getRoutingName(): string {
+    const routing = this.edge().routing || 'polyline';
+    return routing.charAt(0).toUpperCase() + routing.slice(1);
+  }
 }

@@ -24,7 +24,7 @@ import { SinusoidEdgeComponent } from './sinusoid-edge.component';
       <circle-arrowhead />
     </ng-diagram-context>
   `,
-  styleUrls: ['diagram.css', 'edges.css'],
+  styleUrls: ['diagram.scss', 'edges.scss'],
 })
 export class Diagram {
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([

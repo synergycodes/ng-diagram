@@ -21,7 +21,7 @@ import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/lab
 <CodeSnippet
   relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts"
   range={[8, 33]}
-  mark={[{ range: '4-6' }]}
+  mark={[{ range: '7-9' }]}
 />
 
 ## Label Positioning
@@ -44,7 +44,7 @@ import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-
 <CodeSnippet
   relativePath="edges/labels/adding-labels/modifiable-label-edge.component.ts"
   range={[8, 50]}
-  mark={[{ range: '7-14' }, { range: '31-41' }]}
+  mark={[{ range: '7-15' }, { range: '25-36' }]}
   collapse={['17-24']}
 />
 
@@ -56,6 +56,18 @@ import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-
   mark={[{ range: '5-11' }, { range: '40-51' }]}
   collapse={['12-30', '35-39']}
 />
+
+## Handling Interactive Elements in Labels
+
+When adding interactive elements like inputs to edge labels, dragging on these elements might trigger unwanted diagram behaviors. You can control this using special data attributes:
+
+- **`data-no-pan="true"`** - Prevents the diagram canvas from panning when the user clicks and drags on the element
+- **`data-no-drag="true"`** - Prevents nodes from being dragged when the user clicks and drags on the element
+
+```html
+<!-- Input in edge label that won't trigger diagram interactions -->
+<input type="text" data-no-pan="true" data-no-drag="true" placeholder="Type here" />
+```
 
 ## Multiple Labels
 

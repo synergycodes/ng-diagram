@@ -1,0 +1,8 @@
+---
+import ContentWrapper from '@components/content-wrapper/content-wrapper.astro';
+import { SinusoidDiagram } from './sinusoid-diagram.component';
+---
+
+<ContentWrapper>
+  <SinusoidDiagram client:only="angular" />
+</ContentWrapper>

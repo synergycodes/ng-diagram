@@ -35,7 +35,7 @@ import {
       display: flex;
       height: 100%;
 
-      --ngd-default-edge-stroke: white;
+      --ngd-default-edge-stroke: #cccccc;
       --ngd-default-edge-stroke-hover: gray;
       --ngd-default-edge-stroke-selected: blue;
     }

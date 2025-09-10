@@ -30,13 +30,13 @@ This should be called when the model is no longer needed to prevent memory leaks
 
 ### getEdges()
 
-> **getEdges**(): [`Edge`](/api/types/edge/)\<`object`\>[]
+> **getEdges**(): [`Edge`](/api/types/edge/)\<`any`\>[]
 
 Get all edges in the model
 
 #### Returns
 
-[`Edge`](/api/types/edge/)\<`object`\>[]
+[`Edge`](/api/types/edge/)\<`any`\>[]
 
 ***
 
@@ -106,7 +106,7 @@ Set edges in the model
 
 ##### edges
 
-[`Edge`](/api/types/edge/)\<`object`\>[]
+[`Edge`](/api/types/edge/)\<`any`\>[]
 
 Array of edges to set
 
