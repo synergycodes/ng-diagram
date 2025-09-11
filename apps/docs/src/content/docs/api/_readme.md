@@ -7,29 +7,29 @@ title: "@angularflow/angular-adapter"
 
 ## Components
 
-- [NgDiagramComponent](/api/components/ngdiagramcomponent/)
+- [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
 
 ## Directives
 
-- [LinkingInputDirective](/api/directives/linkinginputdirective/)
+- [LinkingInputDirective](/docs/api/directives/linkinginputdirective/)
 
 ## Middlewares
 
-- [loggerMiddleware](/api/middlewares/loggermiddleware/)
+- [loggerMiddleware](/docs/api/middlewares/loggermiddleware/)
 
 ## Other
 
-- [NgDiagramBaseEdgeComponent](/api/other/ngdiagrambaseedgecomponent/)
-- [NodeSizeDirective](/api/other/nodesizedirective/)
-- [Metadata](/api/other/metadata/)
-- [Middleware](/api/other/middleware/)
-- [ModelAdapter](/api/other/modeladapter/)
-- [MiddlewareChain](/api/other/middlewarechain/)
-- [initializeModel](/api/other/initializemodel/)
+- [NgDiagramBaseEdgeComponent](/docs/api/other/ngdiagrambaseedgecomponent/)
+- [NodeSizeDirective](/docs/api/other/nodesizedirective/)
+- [Metadata](/docs/api/other/metadata/)
+- [Middleware](/docs/api/other/middleware/)
+- [ModelAdapter](/docs/api/other/modeladapter/)
+- [MiddlewareChain](/docs/api/other/middlewarechain/)
+- [initializeModel](/docs/api/other/initializemodel/)
 
 ## Types
 
-- [Edge](/api/types/edge/)
-- [GroupNode](/api/types/groupnode/)
-- [Point](/api/types/point/)
-- [Node](/api/types/node/)
+- [Edge](/docs/api/types/edge/)
+- [GroupNode](/docs/api/types/groupnode/)
+- [Point](/docs/api/types/point/)
+- [Node](/docs/api/types/node/)
