@@ -17,6 +17,7 @@ describe('TransactionManager', () => {
     mockFlowCore = {
       commandHandler: {
         emit: mockEmit,
+        emitInternal: vi.fn(),
       },
       applyUpdate: mockApplyUpdate,
       setState: vi.fn(),
@@ -31,6 +32,30 @@ describe('TransactionManager', () => {
     mockApplyUpdate.mockImplementation(async (update, actionType) => {
       transactionManager.queueUpdate(update, actionType);
     });
+
+    // Setup emitInternal to simulate actual command emission behavior
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (mockFlowCore.commandHandler as any).emitInternal.mockImplementation(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (command: string, _: boolean, ...args: any[]) => {
+        // When called with bypassTransaction=true from transaction context,
+        // it should queue the update through applyUpdate
+        const data = args[0] || {};
+
+        // Transform the data based on the command type for proper queueing
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let update: any = {};
+        if (command === 'addNodes' && data.nodes) {
+          update.nodesToAdd = data.nodes;
+        } else if (command === 'addEdges' && data.edges) {
+          update.edgesToAdd = data.edges;
+        } else {
+          update = data;
+        }
+
+        mockFlowCore.applyUpdate(update, command);
+      }
+    );
 
     mockEmit.mockImplementation(async (...args) => {
       mockFlowCore.applyUpdate(args[1], args[0]);
@@ -49,7 +74,9 @@ describe('TransactionManager', () => {
 
       const result = await transactionManager.transaction(callback);
 
-      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('addNodes', { nodes: [mockNode] });
+      expect(mockFlowCore.commandHandler.emitInternal).toHaveBeenCalledWith('addNodes', true, {
+        nodes: [mockNode],
+      });
       expect(result).toEqual({
         results: expect.any(Object),
         commandsCount: 1,
@@ -62,9 +89,15 @@ describe('TransactionManager', () => {
         await tx.emit('addEdges', { edges: [mockEdge] });
       });
 
-      await expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledTimes(2);
-      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ nodes: [mockNode] }), 'addNodes');
-      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ edges: [mockEdge] }), 'addEdges');
+      await expect(mockFlowCore.commandHandler.emitInternal).toHaveBeenCalledTimes(2);
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ nodesToAdd: [mockNode] }),
+        'addNodes'
+      );
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToAdd: [mockEdge] }),
+        'addEdges'
+      );
     });
   });
 
@@ -135,10 +168,16 @@ describe('TransactionManager', () => {
       });
 
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledTimes(3);
-      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ nodes: [mockNode] }), 'addNodes');
-      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(expect.objectContaining({ edges: [mockEdge] }), 'addEdges');
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({ nodes: [{ ...mockNode, id: 'node2' }] }),
+        expect.objectContaining({ nodesToAdd: [mockNode] }),
+        'addNodes'
+      );
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToAdd: [mockEdge] }),
+        'addEdges'
+      );
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ nodesToAdd: [{ ...mockNode, id: 'node2' }] }),
         'addNodes'
       );
     });
@@ -260,7 +299,7 @@ describe('TransactionManager', () => {
         await tx.emit('addEdges', { edges: [mockEdge] });
       });
 
-      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledTimes(4); // All emits still happen
+      expect(mockFlowCore.commandHandler.emitInternal).toHaveBeenCalledTimes(4); // All emits still happen
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledTimes(4);
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }),

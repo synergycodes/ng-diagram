@@ -39,6 +39,31 @@ export class CommandHandler implements CoreCommandHandler {
       ? [] | [WithoutName<CommandByName<K>>]
       : [WithoutName<CommandByName<K>>]
   ): Promise<void> {
+    return this.emitInternal(commandName, false, ...props);
+  }
+
+  /**
+   * Internal emit method that can bypass transaction checking
+   * @param commandName Command name
+   * @param bypassTransaction Whether to bypass transaction checking
+   * @param rest Command props
+   */
+  async emitInternal<K extends CommandName>(
+    commandName: K,
+    bypassTransaction: boolean,
+    ...props: IsEmpty<CommandByName<K>> extends true
+      ? [] | [WithoutName<CommandByName<K>>]
+      : [WithoutName<CommandByName<K>>]
+  ): Promise<void> {
+    // Check if we're inside a transaction and should use the transaction's emit
+    if (!bypassTransaction && this.flowCore.transactionManager.isActive()) {
+      const currentTransaction = this.flowCore.transactionManager.getCurrentTransaction();
+      if (currentTransaction && !currentTransaction.isAborted()) {
+        // Use the transaction context's emit which will handle queueing
+        return currentTransaction.context.emit(commandName, ...props);
+      }
+    }
+
     const callbacks = this.callbacks[commandName];
 
     if (callbacks) {
