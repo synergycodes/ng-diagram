@@ -3,8 +3,8 @@ import { Component, inject } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramModelService,
   NgDiagramNodeTemplateMap,
+  NgDiagramViewportService,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
 import { MenuComponent } from './menu/menu.component';
@@ -27,11 +27,12 @@ import { NodeComponent } from './node/node.component';
     </div>
   `,
   styleUrl: './context-menu-example.component.scss',
-  providers: [ContextMenuService, NgDiagramModelService],
+  providers: [ContextMenuService, NgDiagramViewportService],
 })
 export class ContextMenuExampleComponent {
   private contextMenuService = inject(ContextMenuService);
-  private readonly modelService = inject(NgDiagramModelService);
+  private readonly viewportService = inject(NgDiagramViewportService);
+
   nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['customNodeType', NodeComponent],
   ]);
@@ -61,7 +62,7 @@ export class ContextMenuExampleComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    const cursorPosition = this.modelService.clientToFlowViewportPosition({
+    const cursorPosition = this.viewportService.clientToFlowViewportPosition({
       x: event.clientX,
       y: event.clientY,
     });

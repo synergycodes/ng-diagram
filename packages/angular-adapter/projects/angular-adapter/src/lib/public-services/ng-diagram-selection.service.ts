@@ -45,4 +45,11 @@ export class NgDiagramSelectionService<TMiddlewares extends MiddlewareChain = []
   deselectAll() {
     this.flowCore.commandHandler.emit('deselectAll');
   }
+
+  /**
+   * Deletes the current selection
+   */
+  deleteSelection() {
+    this.flowCore.commandHandler.emit('deleteSelection');
+  }
 }

@@ -8,7 +8,6 @@ import {
   NgDiagramNodeService,
   NgDiagramNodeTemplate,
   NgDiagramPortComponent,
-  NgDiagramService,
   Node,
 } from '@angularflow/angular-adapter';
 
@@ -24,7 +23,6 @@ import {
   },
 })
 export class ResizableNodeComponent implements NgDiagramNodeTemplate<{ text: string }> {
-  private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
   private readonly nodeService = inject(NgDiagramNodeService);
 

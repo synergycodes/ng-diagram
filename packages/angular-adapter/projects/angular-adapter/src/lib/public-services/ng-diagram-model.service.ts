@@ -1,5 +1,5 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, FlowCore, Metadata, MiddlewareChain, Node, Point, Port } from '@angularflow/core';
+import { Edge, FlowCore, Metadata, MiddlewareChain, Node, Port } from '@angularflow/core';
 import { FlowCoreProviderService } from '../services';
 import { NgDiagramService } from './ng-diagram.service';
 
@@ -146,67 +146,6 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> im
 
   toJSON(): string {
     return this.flowCore.model.toJSON();
-  }
-
-  /**
-   * Sets the selection state
-   * @param nodeIds Nodes to select
-   * @param edgeIds Edges to select
-   */
-  setSelection(nodeIds: string[] = [], edgeIds: string[] = []) {
-    this.flowCore.commandHandler.emit('select', {
-      nodeIds,
-      edgeIds,
-    });
-  }
-
-  /**
-   * Copies the current selection to the clipboard
-   */
-  copySelection() {
-    this.flowCore.commandHandler.emit('copy');
-  }
-
-  /**
-   * Pastes the copied selection at a specific position
-   * @param position Position to paste the selection at
-   */
-  pasteSelection(position: Point) {
-    this.flowCore.commandHandler.emit('paste', { position });
-  }
-
-  /**
-   * Deletes the current selection
-   */
-  deleteSelection() {
-    this.flowCore.commandHandler.emit('deleteSelection');
-  }
-
-  /**
-   * Converts a client position to a flow position
-   * @param clientPosition Client position to convert
-   * @returns Flow position
-   */
-  clientToFlowPosition(clientPosition: Point): Point {
-    return this.flowCore.clientToFlowPosition(clientPosition);
-  }
-
-  /**
-   * Converts a flow position to a client position
-   * @param flowPosition Flow position to convert
-   * @returns Client position
-   */
-  flowToClientPosition(flowPosition: Point): Point {
-    return this.flowCore.flowToClientPosition(flowPosition);
-  }
-
-  /**
-   * Converts a client position to a position relative to the flow viewport
-   * @param clientPosition Client position
-   * @returns position on the flow viewport
-   */
-  clientToFlowViewportPosition(clientPosition: Point): Point {
-    return this.flowCore.clientToFlowViewportPosition(clientPosition);
   }
 
   /**

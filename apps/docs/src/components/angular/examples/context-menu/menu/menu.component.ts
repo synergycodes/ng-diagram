@@ -1,5 +1,10 @@
 import { Component, HostListener, inject } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import {
+  NgDiagramClipboardService,
+  NgDiagramModelService,
+  NgDiagramSelectionService,
+  NgDiagramViewportService,
+} from '@angularflow/angular-adapter';
 import { ContextMenuService } from './menu.service';
 
 @Component({
@@ -10,6 +15,9 @@ import { ContextMenuService } from './menu.service';
 export class MenuComponent {
   private contextMenuService = inject(ContextMenuService);
   private readonly modelService = inject(NgDiagramModelService);
+  private readonly clipboardService = inject(NgDiagramClipboardService);
+  private readonly selectionService = inject(NgDiagramSelectionService);
+  private readonly viewportService = inject(NgDiagramViewportService);
 
   showMenu = this.contextMenuService.visibility;
   menuPosition = this.contextMenuService.menuPosition;
@@ -21,19 +29,19 @@ export class MenuComponent {
   }
 
   onCopy() {
-    this.modelService.copySelection();
+    this.clipboardService.copy();
   }
 
   onPaste(event: MouseEvent) {
-    const position = this.modelService.clientToFlowPosition({
+    const position = this.viewportService.clientToFlowPosition({
       x: event.clientX,
       y: event.clientY,
     });
-    this.modelService.pasteSelection(position);
+    this.clipboardService.paste(position);
   }
 
   onDelete() {
-    this.modelService.deleteSelection();
+    this.selectionService.deleteSelection();
   }
 
   onSelectAll() {
@@ -41,6 +49,6 @@ export class MenuComponent {
       .getModel()
       .getNodes()
       .map((node) => node.id);
-    this.modelService.setSelection(allNodesIds);
+    this.selectionService.select(allNodesIds);
   }
 }

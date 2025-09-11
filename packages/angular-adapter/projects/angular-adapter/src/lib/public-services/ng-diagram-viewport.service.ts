@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { FlowCore, MiddlewareChain } from '@angularflow/core';
+import { FlowCore, MiddlewareChain, Point } from '@angularflow/core';
 import { FlowCoreProviderService } from '../services';
 import { NgDiagramModelService } from './ng-diagram-model.service';
 
@@ -48,5 +48,32 @@ export class NgDiagramViewportService<TMiddlewares extends MiddlewareChain = []>
     const x = center?.x || this.viewport().x;
     const y = center?.y || this.viewport().y;
     this.flowCore.commandHandler.emit('zoom', { scale: factor, x, y });
+  }
+
+  /**
+   * Converts a client position to a flow position
+   * @param clientPosition Client position to convert
+   * @returns Flow position
+   */
+  clientToFlowPosition(clientPosition: Point): Point {
+    return this.flowCore.clientToFlowPosition(clientPosition);
+  }
+
+  /**
+   * Converts a flow position to a client position
+   * @param flowPosition Flow position to convert
+   * @returns Client position
+   */
+  flowToClientPosition(flowPosition: Point): Point {
+    return this.flowCore.flowToClientPosition(flowPosition);
+  }
+
+  /**
+   * Converts a client position to a position relative to the flow viewport
+   * @param clientPosition Client position
+   * @returns position on the flow viewport
+   */
+  clientToFlowViewportPosition(clientPosition: Point): Point {
+    return this.flowCore.clientToFlowViewportPosition(clientPosition);
   }
 }
