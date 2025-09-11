@@ -1,8 +1,8 @@
-import { type Node, type Edge } from '@angularflow/angular-adapter';
+import { type Edge, type Node } from '@angularflow/angular-adapter';
 
 export const diagramModel: { nodes: Node[]; edges: Edge[] } = {
   nodes: [
-    { id: '1', position: { x: 183, y: 421 }, data: { label: 'Root' } },
+    { id: '1', position: { x: 0, y: 0 }, data: { label: 'Root' } },
     { id: '2', position: { x: 567, y: 122 }, data: { label: 'B' } },
     { id: '3', position: { x: 320, y: 301 }, data: { label: 'A' } },
     { id: '4', position: { x: 412, y: 254 }, data: { label: 'B 1' } },

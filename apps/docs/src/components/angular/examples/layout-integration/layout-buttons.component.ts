@@ -35,7 +35,6 @@ export class LayoutButtonsComponent {
   edges = computed(() => this.modelService.getModel().getEdges());
 
   onTreeLayout() {
-    //TODO: When tree config is fixed, apply 90 angle to the Tree
     this.diagramService.layout('tree');
   }
 

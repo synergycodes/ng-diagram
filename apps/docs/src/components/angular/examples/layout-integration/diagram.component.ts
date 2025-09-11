@@ -45,5 +45,8 @@ export class DiagramComponent {
     edges: diagramModel.edges,
   });
 
-  config: NgDiagramConfig = { edgeRouting: { defaultRouting: 'orthogonal' } };
+  config: NgDiagramConfig = {
+    edgeRouting: { defaultRouting: 'orthogonal' },
+    treeLayout: { layoutAngle: 0 },
+  };
 }

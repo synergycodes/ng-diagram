@@ -77,7 +77,6 @@ export const treeLayoutMiddleware: Middleware = {
         continue;
       }
 
-      // Apply position if node has no position or if position changed
       if (!node.position || !isSamePoint(node.position, currentNode.position)) {
         nodesToUpdate.push({ id: currentNode.id, position: currentNode.position });
       }
