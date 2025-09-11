@@ -1,15 +1,11 @@
-import { inject, Injectable } from '@angular/core';
-import { FlowCore, MiddlewareChain, Point } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services';
+import { Injectable } from '@angular/core';
+import { MiddlewareChain, Point } from '@angularflow/core';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramClipboardService<TMiddlewares extends MiddlewareChain = []> {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
-
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
-
+export class NgDiagramClipboardService<
+  TMiddlewares extends MiddlewareChain = [],
+> extends NgDiagramBaseService<TMiddlewares> {
   /**
    * Copies the current selection to the clipboard.
    */

@@ -1,10 +1,11 @@
 import { computed, inject } from '@angular/core';
-import { FlowCore, MiddlewareChain, Point } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services';
+import { MiddlewareChain, Point } from '@angularflow/core';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramModelService } from './ng-diagram-model.service';
 
-export class NgDiagramViewportService<TMiddlewares extends MiddlewareChain = []> {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
+export class NgDiagramViewportService<
+  TMiddlewares extends MiddlewareChain = [],
+> extends NgDiagramBaseService<TMiddlewares> {
   private readonly modelService = inject(NgDiagramModelService);
 
   /**
@@ -16,10 +17,6 @@ export class NgDiagramViewportService<TMiddlewares extends MiddlewareChain = []>
    * Returns a computed signal for the scale that safely handles uninitialized state
    */
   scale = computed(() => this.modelService.metadata().viewport.scale || 1);
-
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
 
   /**
    * Moves the viewport to the specified coordinates.

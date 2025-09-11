@@ -1,11 +1,12 @@
 import { computed, inject, Injectable } from '@angular/core';
-import { FlowCore, MiddlewareChain } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services';
+import { MiddlewareChain } from '@angularflow/core';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramModelService } from './ng-diagram-model.service';
 
 @Injectable()
-export class NgDiagramSelectionService<TMiddlewares extends MiddlewareChain = []> {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
+export class NgDiagramSelectionService<
+  TMiddlewares extends MiddlewareChain = [],
+> extends NgDiagramBaseService<TMiddlewares> {
   private readonly modelService = inject(NgDiagramModelService);
 
   /**
@@ -16,10 +17,6 @@ export class NgDiagramSelectionService<TMiddlewares extends MiddlewareChain = []
     const edges = this.modelService.edges().filter((edge) => edge.selected);
     return { nodes, edges };
   });
-
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
 
   /**
    * Selects nodes and edges by their IDs.

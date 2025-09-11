@@ -1,15 +1,11 @@
-import { inject, Injectable } from '@angular/core';
-import { FlowCore, MiddlewareChain, Node, Point } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services';
+import { Injectable } from '@angular/core';
+import { MiddlewareChain, Node, Point } from '@angularflow/core';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramNodeService<TMiddlewares extends MiddlewareChain = []> {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
-
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
-
+export class NgDiagramNodeService<
+  TMiddlewares extends MiddlewareChain = [],
+> extends NgDiagramBaseService<TMiddlewares> {
   /**
    * Moves nodes by the specified amounts.
    * @param nodes Array of nodes to move.

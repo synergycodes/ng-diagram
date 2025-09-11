@@ -1,12 +1,14 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, FlowCore, Metadata, MiddlewareChain, Node, Port } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services';
+import { Edge, Metadata, MiddlewareChain, Node, Port } from '@angularflow/core';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
 @Injectable()
-export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> implements OnDestroy {
+export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
+  extends NgDiagramBaseService<TMiddlewares>
+  implements OnDestroy
+{
   private readonly diagramService = inject(NgDiagramService);
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
 
   private _nodes = signal<Node[]>([]);
   private _edges = signal<Edge[]>([]);
@@ -16,11 +18,8 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> im
   edges = this._edges.asReadonly();
   metadata = this._metadata.asReadonly();
 
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
-
   constructor() {
+    super();
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.flowCore.model.onChange(this.modelListener);
