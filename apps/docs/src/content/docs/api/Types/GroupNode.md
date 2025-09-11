@@ -109,7 +109,7 @@ The ports of the node.
 
 ### position
 
-> **position**: [`Point`](/docs/api/types/point/)
+> **position**: [`Point`](/api/types/point/)
 
 The position of the node in the diagram.
 

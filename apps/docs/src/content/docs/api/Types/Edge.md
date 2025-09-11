@@ -41,7 +41,7 @@ The labels of the edge.
 
 ### points?
 
-> `optional` **points**: [`Point`](/docs/api/types/point/)[]
+> `optional` **points**: [`Point`](/api/types/point/)[]
 
 The points of the edge defining the path.
 
@@ -99,7 +99,7 @@ The port of the source node.
 
 ### sourcePosition?
 
-> `optional` **sourcePosition**: [`Point`](/docs/api/types/point/)
+> `optional` **sourcePosition**: [`Point`](/api/types/point/)
 
 The position of the edge start.
 
@@ -131,7 +131,7 @@ The port of the target node.
 
 ### targetPosition?
 
-> `optional` **targetPosition**: [`Point`](/docs/api/types/point/)
+> `optional` **targetPosition**: [`Point`](/api/types/point/)
 
 The position of the edge end.
 

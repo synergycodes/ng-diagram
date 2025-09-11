@@ -13,13 +13,13 @@ Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* [`MiddlewareChain`](/docs/api/other/middlewarechain/) = \[\]
+`TMiddlewares` *extends* [`MiddlewareChain`](/api/other/middlewarechain/) = \[\]
 
 ## Parameters
 
 ### model
 
-`Partial`\<`Model`\<[`Metadata`](/docs/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>\> = `{}`
+`Partial`\<`Model`\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>\> = `{}`
 
 ### injector?
 

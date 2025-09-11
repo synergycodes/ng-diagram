@@ -5,7 +5,7 @@
   "scripts": {
     "docs:dev": "pnpm dev",
     "dev": "astro dev",
-    "build": "astro build && mv ./dist ./tmp-dist && mkdir ./dist && mv ./tmp-dist ./dist/docs && touch ./dist/index.html",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint:check": "eslint .",
