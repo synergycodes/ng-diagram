@@ -8,6 +8,10 @@ export class NgDiagramViewportService<
 > extends NgDiagramBaseService<TMiddlewares> {
   private readonly modelService = inject(NgDiagramModelService);
 
+  // ===================
+  // VIEWPORT SIGNALS
+  // ===================
+
   /**
    * Returns a computed signal for the viewport that safely handles uninitialized state
    */
@@ -17,6 +21,41 @@ export class NgDiagramViewportService<
    * Returns a computed signal for the scale that safely handles uninitialized state
    */
   scale = computed(() => this.modelService.metadata().viewport.scale || 1);
+
+  // ===================
+  // POSITION CONVERSION METHODS
+  // ===================
+
+  /**
+   * Converts a client position to a flow position
+   * @param clientPosition Client position to convert
+   * @returns Flow position
+   */
+  clientToFlowPosition(clientPosition: Point): Point {
+    return this.flowCore.clientToFlowPosition(clientPosition);
+  }
+
+  /**
+   * Converts a client position to a position relative to the flow viewport
+   * @param clientPosition Client position
+   * @returns position on the flow viewport
+   */
+  clientToFlowViewportPosition(clientPosition: Point): Point {
+    return this.flowCore.clientToFlowViewportPosition(clientPosition);
+  }
+
+  /**
+   * Converts a flow position to a client position
+   * @param flowPosition Flow position to convert
+   * @returns Client position
+   */
+  flowToClientPosition(flowPosition: Point): Point {
+    return this.flowCore.flowToClientPosition(flowPosition);
+  }
+
+  // ===================
+  // VIEWPORT MOVEMENT METHODS
+  // ===================
 
   /**
    * Moves the viewport to the specified coordinates.
@@ -36,6 +75,10 @@ export class NgDiagramViewportService<
     this.flowCore.commandHandler.emit('moveViewportBy', { x: dx, y: dy });
   }
 
+  // ===================
+  // ZOOM METHODS
+  // ===================
+
   /**
    * Zooms the viewport by the specified factor.
    * @param factor The factor to zoom by.
@@ -45,32 +88,5 @@ export class NgDiagramViewportService<
     const x = center?.x || this.viewport().x;
     const y = center?.y || this.viewport().y;
     this.flowCore.commandHandler.emit('zoom', { scale: factor, x, y });
-  }
-
-  /**
-   * Converts a client position to a flow position
-   * @param clientPosition Client position to convert
-   * @returns Flow position
-   */
-  clientToFlowPosition(clientPosition: Point): Point {
-    return this.flowCore.clientToFlowPosition(clientPosition);
-  }
-
-  /**
-   * Converts a flow position to a client position
-   * @param flowPosition Flow position to convert
-   * @returns Client position
-   */
-  flowToClientPosition(flowPosition: Point): Point {
-    return this.flowCore.flowToClientPosition(flowPosition);
-  }
-
-  /**
-   * Converts a client position to a position relative to the flow viewport
-   * @param clientPosition Client position
-   * @returns position on the flow viewport
-   */
-  clientToFlowViewportPosition(clientPosition: Point): Point {
-    return this.flowCore.clientToFlowViewportPosition(clientPosition);
   }
 }
