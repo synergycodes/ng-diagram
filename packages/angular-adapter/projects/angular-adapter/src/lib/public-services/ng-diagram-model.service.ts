@@ -35,6 +35,10 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
     }
   }
 
+  // ===================
+  // GENERAL MODEL METHODS
+  // ===================
+
   /**
    * Returns the current model that NgDiagram instance is using
    * Returns null if flowCore is not initialized
@@ -43,49 +47,41 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
     return this.flowCore.model;
   }
 
+  toJSON(): string {
+    return this.flowCore.model.toJSON();
+  }
+
+  // ===================
+  // ADD METHODS
+  // ===================
+
   /**
-   * Gets a node by id
-   * @param nodeId Node id
-   * @returns Node
+   * Adds new edges to the diagram.
+   * @param edges Array of edges to add.
    */
-  getNodeById(nodeId: string): Node | null {
-    return this.flowCore.getNodeById(nodeId);
+  addEdges(edges: Edge[]) {
+    this.flowCore.commandHandler.emit('addEdges', { edges });
   }
 
   /**
-   * Updates the data of a node
-   * @param nodeId Node id
-   * @param data New data to set for the node (can be strongly typed)
+   * Adds new nodes to the diagram.
+   * @param nodes Array of nodes to add.
    */
-  updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T) {
-    this.flowCore.commandHandler.emit('updateNode', {
-      id: nodeId,
-      nodeChanges: {
-        data: data,
-      },
-    });
+  addNodes(nodes: Node[]) {
+    this.flowCore.commandHandler.emit('addNodes', { nodes });
   }
 
-  /**
-   * Updates the properties of a node
-   * @param nodeId Node id
-   * @param node New node properties
-   */
-  updateNode(nodeId: string, node: Partial<Node>) {
-    this.flowCore.commandHandler.emit('updateNode', {
-      id: nodeId,
-      nodeChanges: { ...node },
-    });
-  }
+  // ===================
+  // GET METHODS
+  // ===================
 
   /**
-   * Gets all nodes in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Array of nodes in range
+   * Gets an edge by id
+   * @param edgeId Edge id
+   * @returns Edge
    */
-  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
-    return this.flowCore.getNodesInRange(point, range);
+  getEdgeById(edgeId: string): Edge | null {
+    return this.flowCore.getEdgeById(edgeId) || null;
   }
 
   /**
@@ -109,12 +105,38 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
   }
 
   /**
-   * Gets an edge by id
-   * @param edgeId Edge id
-   * @returns Edge
+   * Gets a node by id
+   * @param nodeId Node id
+   * @returns Node
    */
-  getEdgeById(edgeId: string): Edge | null {
-    return this.flowCore.getEdgeById(edgeId) || null;
+  getNodeById(nodeId: string): Node | null {
+    return this.flowCore.getNodeById(nodeId);
+  }
+
+  /**
+   * Gets all nodes in a range from a point
+   * @param point Point to check from
+   * @param range Range to check in
+   * @returns Array of nodes in range
+   */
+  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
+    return this.flowCore.getNodesInRange(point, range);
+  }
+
+  // ===================
+  // UPDATE METHODS
+  // ===================
+
+  /**
+   * Updates the properties of an edge
+   * @param edgeId Edge id
+   * @param edge New edge properties
+   */
+  updateEdge(edgeId: string, edge: Partial<Edge>) {
+    this.flowCore.commandHandler.emit('updateEdge', {
+      id: edgeId,
+      edgeChanges: { ...edge },
+    });
   }
 
   /**
@@ -133,34 +155,28 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
 
   /**
    * Updates the properties of a node
-   * @param edgeId Edge id
-   * @param edge New edge properties
+   * @param nodeId Node id
+   * @param node New node properties
    */
-  updateEdge(edgeId: string, edge: Partial<Edge>) {
-    this.flowCore.commandHandler.emit('updateEdge', {
-      id: edgeId,
-      edgeChanges: { ...edge },
+  updateNode(nodeId: string, node: Partial<Node>) {
+    this.flowCore.commandHandler.emit('updateNode', {
+      id: nodeId,
+      nodeChanges: { ...node },
     });
   }
 
-  toJSON(): string {
-    return this.flowCore.model.toJSON();
-  }
-
   /**
-   * Adds new nodes to the diagram.
-   * @param nodes Array of nodes to add.
+   * Updates the data of a node
+   * @param nodeId Node id
+   * @param data New data to set for the node (can be strongly typed)
    */
-  addNodes(nodes: Node[]) {
-    this.flowCore.commandHandler.emit('addNodes', { nodes });
-  }
-
-  /**
-   * Adds new edges to the diagram.
-   * @param edges Array of edges to add.
-   */
-  addEdges(edges: Edge[]) {
-    this.flowCore.commandHandler.emit('addEdges', { edges });
+  updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T) {
+    this.flowCore.commandHandler.emit('updateNode', {
+      id: nodeId,
+      nodeChanges: {
+        data: data,
+      },
+    });
   }
 
   /**
@@ -171,13 +187,9 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
     this.flowCore.commandHandler.emit('updateNodes', { nodes });
   }
 
-  /**
-   * Deletes nodes by their IDs.
-   * @param ids Array of node IDs to delete.
-   */
-  deleteNodes(ids: string[]) {
-    this.flowCore.commandHandler.emit('deleteNodes', { ids });
-  }
+  // ===================
+  // DELETE METHODS
+  // ===================
 
   /**
    * Deletes edges by their IDs.
@@ -185,6 +197,14 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
    */
   deleteEdges(ids: string[]) {
     this.flowCore.commandHandler.emit('deleteEdges', { ids });
+  }
+
+  /**
+   * Deletes nodes by their IDs.
+   * @param ids Array of node IDs to delete.
+   */
+  deleteNodes(ids: string[]) {
+    this.flowCore.commandHandler.emit('deleteNodes', { ids });
   }
 
   private modelListener = (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => {
