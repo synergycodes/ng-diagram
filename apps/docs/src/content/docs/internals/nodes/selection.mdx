@@ -1,0 +1,66 @@
+---
+title: Selection
+description: Understanding how selection works in NgDiagram
+---
+
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import { LinkCard } from '@astrojs/starlight/components';
+import CustomSelection from '@components/angular/nodes/selection/selection-custom.astro';
+import DefaultSelection from '@components/angular/nodes/selection/selection-default.astro';
+
+The **selection** feature in NgDiagram allows users to select nodes on the diagram canvas.
+Selected nodes are visually highlighted, making it easier to identify and interact with them.
+
+## How Selection Works
+
+- Nodes can be selected by clicking on them.
+- When a node is selected, it will be visually highlighted according to the styles defined in your application.
+- The selected state is managed by NgDiagram and can be accessed via the node's `selected` property.
+- Default selection style can be enabled per node using a directive provided by NgDiagram.
+
+## Adding Selection Styles to a Custom Node
+
+Selection can be fully customized by using the `selected` property from the node to control its state.  
+You can assign any CSS class you prefer based on this property and define your own styles for selected nodes.  
+This allows you to tailor the selection appearance and behavior to fit your application's needs.
+
+<CustomSelection />
+
+<CodeSnippet
+  relativePath="nodes/selection/custom/node.component.ts"
+  mark={[{ range: '17-19' }, { range: '25-27' }]}
+  collapse={['1-6']}
+/>
+<CodeSnippet relativePath="nodes/selection/custom/node.component.scss" mark={[{ range: '7-9' }]} collapse={['11-18']} />
+
+## Using Default Selection for a Custom Node
+
+To make a custom node selectable with default functionality, add the `NgDiagramNodeSelectedDirective` as a host directive in your node component.
+
+There is no need to define anything else in your node or to provide custom selection styles.
+
+<DefaultSelection />
+
+<CodeSnippet relativePath="nodes/selection/default/node.component.ts" mark={[{ range: '18-20' }]} collapse={['1-6']} />
+
+## Customizing Default Selection Styles
+
+If you want to use the default selection functionality, you can still customize its styles.
+
+Here is a CSS variable you can use to style the selection highlight:
+
+```
+--ngd-selected-node-box-shadow    // Box shadow for selected node
+```
+
+You can override this variable in your styles to customize the appearance of selected nodes.
+
+## Further Reading
+
+<LinkCard icon="list-format" title="Nodes" href="/internals/nodes/nodes" description="Learn more about node features" />
+<LinkCard
+  icon="list-format"
+  title="Custom Nodes"
+  href="/internals/nodes/custom-nodes"
+  description="Create custom node templates"
+/>
