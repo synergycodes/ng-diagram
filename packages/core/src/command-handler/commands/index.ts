@@ -30,6 +30,7 @@ import {
 } from './linking/';
 import { moveNodesBy } from './move';
 import { moveViewport, moveViewportBy } from './move-viewport';
+import { removeFromGroup } from './remove-from-group';
 import { resizeNode } from './resize-node';
 import { rotateNodeTo } from './rotate-node';
 import { deselect, deselectAll, select } from './selection';
@@ -84,4 +85,5 @@ export const commands: CommandMap = {
   highlightGroup,
   highlightGroupClear,
   addToGroup,
+  removeFromGroup,
 };

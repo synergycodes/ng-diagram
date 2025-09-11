@@ -24,7 +24,7 @@ export const groupChildrenMoveExtent: Middleware<
   execute: ({ helpers, nodesMap, flowCore, middlewareMetadata }, next) => {
     const isEnabled = middlewareMetadata.enabled;
 
-    if (!isEnabled) {
+    if (!isEnabled || flowCore.actionStateManager.dragging?.modifiers.shift) {
       next();
       return;
     }

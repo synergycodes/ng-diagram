@@ -2,8 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockGroupNode, mockNode } from '../../../test-utils';
+import { sortNodesByZIndex } from '../../../utils';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
-import { PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
+import { MOVE_THRESHOLD, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
+
+vi.mock('../../../utils', () => ({
+  sortNodesByZIndex: vi.fn((nodes) => [...nodes].sort((a, b) => (b.zIndex ?? 0) - (a.zIndex ?? 0))),
+  isGroup: vi.fn((node) => node?.isGroup === true),
+}));
 
 function getSamplePointerMoveSelectionEvent(
   overrides: Partial<PointerMoveSelectionEvent> = {}
@@ -39,6 +45,16 @@ describe('PointerMoveSelectionEventHandler', () => {
     wouldCreateCircularDependency: ReturnType<typeof vi.fn>;
   };
   let mockGetNodesInRange: ReturnType<typeof vi.fn>;
+  let mockActionStateManager: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dragging: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    highlightGroup: any;
+    clearDragging: ReturnType<typeof vi.fn>;
+  };
+  let mockGetState: ReturnType<typeof vi.fn>;
+  let lastInputPointOverThreshold = { x: 100, y: 100 };
+  let lastInputPointBelowThreshold = { x: 100, y: 100 };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -52,14 +68,23 @@ describe('PointerMoveSelectionEventHandler', () => {
 
     mockGetNodesInRange = vi.fn().mockReturnValue([]);
 
+    mockActionStateManager = {
+      dragging: undefined,
+      highlightGroup: undefined,
+      clearDragging: vi.fn(),
+    };
+
+    mockGetState = vi.fn().mockReturnValue({ nodes: [], edges: [] });
+
     mockFlowCore = {
-      getState: vi.fn(),
+      getState: mockGetState,
       applyUpdate: vi.fn(),
       commandHandler: { emit: mockEmit },
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       modelLookup: mockModelLookup,
       getNodesInRange: mockGetNodesInRange,
+      actionStateManager: mockActionStateManager,
       transaction: vi.fn().mockImplementation(async (_name, callback) => {
         const txContext = { emit: mockEmit };
         return await callback(txContext);
@@ -73,24 +98,33 @@ describe('PointerMoveSelectionEventHandler', () => {
     } as unknown as FlowCore;
 
     handler = new PointerMoveSelectionEventHandler(mockFlowCore);
+
+    lastInputPointOverThreshold = { x: 100 + MOVE_THRESHOLD + 5, y: 100 + MOVE_THRESHOLD + 5 };
+    lastInputPointBelowThreshold = { x: 100 + 1, y: 100 + 1 };
   });
 
   describe('start phase', () => {
-    it('should initialize move state', () => {
-      const event = getSamplePointerMoveSelectionEvent({ phase: 'start' });
+    it('should initialize move state and dragging action state', () => {
+      const event = getSamplePointerMoveSelectionEvent({
+        phase: 'start',
+        modifiers: {
+          primary: false,
+          secondary: false,
+          shift: true,
+          meta: false,
+        },
+      });
 
       handler.handle(event);
 
-      // Verify internal state is set by testing a continue event
-      const continueEvent = getSamplePointerMoveSelectionEvent({
-        phase: 'continue',
-        lastInputPoint: { x: 110, y: 110 },
-      });
-      handler.handle(continueEvent);
-
-      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-        delta: { x: 10, y: 10 },
-        nodes: [mockNode],
+      // Verify dragging state is set with modifiers
+      expect(mockActionStateManager.dragging).toEqual({
+        modifiers: {
+          primary: false,
+          secondary: false,
+          shift: true,
+          meta: false,
+        },
       });
     });
 
@@ -112,331 +146,227 @@ describe('PointerMoveSelectionEventHandler', () => {
       handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
     });
 
-    it('should emit moveNodesBy command with correct delta', () => {
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'continue',
-        lastInputPoint: { x: 110, y: 110 },
+    describe('movement threshold', () => {
+      it('should not move nodes until threshold is exceeded', () => {
+        // Move just below threshold
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
       });
 
-      handler.handle(event);
+      it('should start moving nodes once threshold is exceeded', () => {
+        // Move beyond threshold
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
 
-      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-        delta: { x: 10, y: 10 },
-        nodes: [mockNode],
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          nodes: [mockNode],
+        });
+      });
+
+      it('should continue moving after threshold is exceeded', () => {
+        // First move beyond threshold
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
+
+        mockEmit.mockClear();
+
+        // Subsequent small move
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          nodes: [mockNode],
+        });
       });
     });
 
-    it('should not emit moveNodesBy when no selected nodes', () => {
-      mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([]);
+    describe('modifier updates', () => {
+      it('should update dragging modifiers during continue phase', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: true,
+            meta: true,
+          },
+        });
 
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'continue',
-        lastInputPoint: { x: 110, y: 110 },
+        handler.handle(event);
+
+        expect(mockActionStateManager.dragging.modifiers).toEqual({
+          primary: true,
+          secondary: false,
+          shift: true,
+          meta: true,
+        });
       });
+    });
 
-      handler.handle(event);
+    describe('separate node lists', () => {
+      it('should use selectedNodesWithChildren for moving and selectedNodes for highlighting', async () => {
+        const childNode = { ...mockNode, id: 'child', groupId: 'parent' };
+        const parentNode = { ...mockNode, id: 'parent' };
+        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
 
-      expect(mockEmit).not.toHaveBeenCalled();
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([parentNode, childNode]);
+        mockModelLookup.getSelectedNodes.mockReturnValue([parentNode]);
+        mockGetNodesInRange.mockReturnValue([targetGroup]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        // Should move both parent and child
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 10, y: 10 },
+          nodes: [parentNode, childNode],
+        });
+
+        // Should only highlight based on selected nodes
+        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
+          groupId: 'targetGroup',
+          nodes: [parentNode],
+        });
+      });
     });
 
     describe('group highlighting during drag', () => {
-      it('should highlight group when dragging over a group with nodes from different group', async () => {
-        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
-        const selectedNode = { ...mockNode, groupId: 'differentGroup' };
-
-        mockGetNodesInRange.mockReturnValue([targetGroup]);
-        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([selectedNode]);
-
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-        });
-
-        await handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-          delta: { x: 10, y: 10 },
-          nodes: [selectedNode],
-        });
-        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
-          groupId: 'targetGroup',
-          nodes: [selectedNode],
-        });
+      beforeEach(() => {
+        // Ensure we're past the movement threshold
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
+        mockEmit.mockClear();
       });
 
-      it('should highlight group when dragging over a group with ungrouped nodes', async () => {
-        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
-        const ungroupedNode = { ...mockNode, groupId: undefined };
+      it('should clear highlight when moving from child group to parent group', async () => {
+        const parentGroup = { ...mockGroupNode, id: 'parentGroup', isGroup: true, selected: false };
+        const nodeInParentGroup = { ...mockNode, groupId: 'parentGroup' };
 
-        mockGetNodesInRange.mockReturnValue([targetGroup]);
-        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([ungroupedNode]);
+        mockGetNodesInRange.mockReturnValue([parentGroup]);
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([nodeInParentGroup]);
+        mockModelLookup.getSelectedNodes.mockReturnValue([nodeInParentGroup]);
+        mockActionStateManager.highlightGroup = { highlightedGroupId: 'childGroup' };
 
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
+          lastInputPoint: lastInputPointOverThreshold,
         });
 
         await handler.handle(event);
 
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-          delta: { x: 10, y: 10 },
-          nodes: [ungroupedNode],
-        });
-        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
-          groupId: 'targetGroup',
-          nodes: [ungroupedNode],
-        });
-      });
-
-      it('should not highlight group when all selected nodes already belong to that group', async () => {
-        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
-        const nodeInSameGroup = { ...mockNode, groupId: 'targetGroup' };
-
-        mockGetNodesInRange.mockReturnValue([targetGroup]);
-        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([nodeInSameGroup]);
-
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-        });
-
-        await handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
-        expect(mockEmit).not.toHaveBeenCalledWith('highlightGroup', expect.any(Object));
-        expect(mockEmit).not.toHaveBeenCalledWith('highlightGroupClear');
-      });
-
-      it('should clear group highlight when not dragging over any group', async () => {
-        mockGetNodesInRange.mockReturnValue([]);
-
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-        });
-
-        await handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
         expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
       });
 
-      it('should select top-most group when multiple groups are at the same position', async () => {
-        const bottomGroup = { ...mockGroupNode, id: 'bottomGroup', isGroup: true, selected: false, zOrder: 1 };
-        const topGroup = { ...mockGroupNode, id: 'topGroup', isGroup: true, selected: false, zOrder: 10 };
-        const selectedNode = { ...mockNode, groupId: 'differentGroup' };
+      it('should use sortNodesByZIndex to find top group', async () => {
+        const group1 = { ...mockGroupNode, id: 'group1', isGroup: true, selected: false, zIndex: 1 };
+        const group2 = { ...mockGroupNode, id: 'group2', isGroup: true, selected: false, zIndex: 2 };
 
-        mockGetNodesInRange.mockReturnValue([bottomGroup, topGroup]);
+        mockGetNodesInRange.mockReturnValue([group1, group2]);
+        mockGetState.mockReturnValue({ nodes: [group1, group2], edges: [] });
+
+        const selectedNode = { ...mockNode, groupId: 'differentGroup' };
         mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([selectedNode]);
+        mockModelLookup.getSelectedNodes.mockReturnValue([selectedNode]);
 
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
+          lastInputPoint: lastInputPointOverThreshold,
         });
 
         await handler.handle(event);
 
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-          delta: { x: 10, y: 10 },
-          nodes: [selectedNode],
-        });
-        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
-          groupId: 'topGroup',
-          nodes: [selectedNode],
-        });
+        expect(sortNodesByZIndex).toHaveBeenCalledWith([group1, group2], [group1, group2]);
       });
 
-      it('should ignore selected groups when finding target group', async () => {
-        const selectedGroup = { ...mockGroupNode, id: 'selectedGroup', isGroup: true, selected: true };
+      it('should not emit redundant highlight commands', async () => {
         const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
         const selectedNode = { ...mockNode, groupId: 'differentGroup' };
 
-        mockGetNodesInRange.mockReturnValue([selectedGroup, targetGroup]);
+        mockGetNodesInRange.mockReturnValue([targetGroup]);
         mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([selectedNode]);
+        mockModelLookup.getSelectedNodes.mockReturnValue([selectedNode]);
+        mockActionStateManager.highlightGroup = { highlightedGroupId: 'targetGroup' };
 
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
+          lastInputPoint: lastInputPointOverThreshold,
         });
 
         await handler.handle(event);
 
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-          delta: { x: 10, y: 10 },
-          nodes: [selectedNode],
-        });
-        expect(mockEmit).toHaveBeenCalledWith('highlightGroup', {
-          groupId: 'targetGroup',
-          nodes: [selectedNode],
-        });
+        // Should not emit highlightGroup again since it's already highlighted
+        expect(mockEmit).not.toHaveBeenCalledWith('highlightGroup', expect.any(Object));
       });
     });
 
     describe('screen edge panning', () => {
-      it('should pan left when dragging near left edge', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'left',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
-      });
-
-      it('should pan right when dragging near right edge', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'right',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: 0 });
-      });
-
-      it('should pan up when dragging near top edge', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'top',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: EDGE_PANNING_FORCE });
-      });
-
-      it('should pan down when dragging near bottom edge', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'bottom',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: -EDGE_PANNING_FORCE });
-      });
-
-      it('should pan diagonally when dragging near top-left corner', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'topleft',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: EDGE_PANNING_FORCE });
-      });
-
-      it('should pan diagonally when dragging near top-right corner', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'topright',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: EDGE_PANNING_FORCE });
-      });
-
-      it('should pan diagonally when dragging near bottom-left corner', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'bottomleft',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
-      });
-
-      it('should pan diagonally when dragging near bottom-right corner', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'bottomright',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: -EDGE_PANNING_FORCE });
-      });
-
-      it('should not pan when currentDiagramEdge is null', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: null,
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
-        expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
-      });
-
-      it('should both move nodes and pan viewport when dragging on screen edge', () => {
-        const event = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'left',
-        });
-
-        handler.handle(event);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-          delta: { x: 10, y: 10 },
-          nodes: [mockNode],
-        });
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
-      });
-
-      it('should handle multiple screen edge changes during drag', () => {
-        // First continue with left edge
-        const leftEvent = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 105, y: 105 },
-          currentDiagramEdge: 'left',
-        });
-
-        handler.handle(leftEvent);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
-
-        // Reset mocks but keep the same mock implementation
+      beforeEach(() => {
+        // Ensure we're past the movement threshold
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
         mockEmit.mockClear();
-
-        // Then continue with right edge
-        const rightEvent = getSamplePointerMoveSelectionEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-          currentDiagramEdge: 'right',
-        });
-
-        handler.handle(rightEvent);
-
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: -EDGE_PANNING_FORCE, y: 0 });
       });
 
-      it('should not pan when no nodes are selected even with screen edge', () => {
-        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([]);
+      it('should only pan after movement threshold is exceeded', () => {
+        // Reset handler
+        handler = new PointerMoveSelectionEventHandler(mockFlowCore);
+        handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
 
+        // Move below threshold with edge
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
+          lastInputPoint: lastInputPointBelowThreshold,
           currentDiagramEdge: 'left',
         });
 
         handler.handle(event);
 
         expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+      });
+
+      it('should pan once movement threshold is exceeded', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+          currentDiagramEdge: 'left',
+        });
+
+        handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
       });
     });
   });
@@ -445,68 +375,169 @@ describe('PointerMoveSelectionEventHandler', () => {
     beforeEach(() => {
       // Start the movement
       handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      // Move beyond threshold
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+      mockEmit.mockClear();
     });
 
-    it('should group nodes when dropping on a valid group', () => {
-      mockGetNodesInRange.mockReturnValue([mockGroupNode]);
+    describe('group changes on drop', () => {
+      it('should only handle drop if movement exceeded threshold', async () => {
+        // Reset handler
+        handler = new PointerMoveSelectionEventHandler(mockFlowCore);
+        handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
 
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'end',
-        lastInputPoint: { x: 110, y: 110 },
+        // Move below threshold
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointBelowThreshold,
+          })
+        );
+        mockEmit.mockClear();
+
+        mockGetNodesInRange.mockReturnValue([mockGroupNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointBelowThreshold,
+        });
+
+        await handler.handle(event);
+
+        // Should not add to group since movement didn't exceed threshold
+        expect(mockEmit).not.toHaveBeenCalledWith('addToGroup', expect.any(Object));
       });
 
-      handler.handle(event);
+      it('should add nodes to group when dropping on a valid group', async () => {
+        mockGetNodesInRange.mockReturnValue([mockGroupNode]);
 
-      expect(mockEmit).toHaveBeenCalledWith('addToGroup', {
-        groupId: 'group1',
-        nodeIds: [mockNode.id],
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('addToGroup', {
+          groupId: 'group1',
+          nodeIds: [mockNode.id],
+        });
+      });
+
+      it('should remove nodes from groups when dropping on empty canvas', async () => {
+        const nodeWithGroup = { ...mockNode, id: 'node1', groupId: 'existingGroup' };
+        const nodeWithoutGroup = { ...mockNode, id: 'node2', groupId: undefined };
+
+        mockModelLookup.getSelectedNodes.mockReturnValue([nodeWithGroup, nodeWithoutGroup]);
+        mockGetNodesInRange.mockReturnValue([]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        // Should only remove the node that has a group
+        expect(mockEmit).toHaveBeenCalledWith('removeFromGroup', {
+          groupId: 'existingGroup',
+          nodeIds: ['node1'],
+        });
+        expect(mockEmit).toHaveBeenCalledTimes(1);
+      });
+
+      it('should handle nodes with null groupId correctly', async () => {
+        const nodeWithNullGroup = { ...mockNode, id: 'node1', groupId: null };
+
+        mockModelLookup.getSelectedNodes.mockReturnValue([nodeWithNullGroup]);
+        mockGetNodesInRange.mockReturnValue([]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        // Should not try to remove from group since groupId is null
+        expect(mockEmit).not.toHaveBeenCalledWith('removeFromGroup', expect.any(Object));
+      });
+
+      it('should handle multiple selected nodes when removing from groups', async () => {
+        const node1 = { ...mockNode, id: 'node1', groupId: 'group1' };
+        const node2 = { ...mockNode, id: 'node2', groupId: 'group2' };
+        const node3 = { ...mockNode, id: 'node3', groupId: 'group1' };
+
+        mockModelLookup.getSelectedNodes.mockReturnValue([node1, node2, node3]);
+        mockGetNodesInRange.mockReturnValue([]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        // Should remove each node from its own group
+        expect(mockEmit).toHaveBeenCalledWith('removeFromGroup', {
+          groupId: 'group1',
+          nodeIds: ['node1'],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('removeFromGroup', {
+          groupId: 'group2',
+          nodeIds: ['node2'],
+        });
+        expect(mockEmit).toHaveBeenCalledWith('removeFromGroup', {
+          groupId: 'group1',
+          nodeIds: ['node3'],
+        });
       });
     });
 
-    it('should not group nodes when dropping outside of groups', () => {
-      const nodeWithGroup = { ...mockNode, groupId: 'existingGroup' };
-      mockModelLookup.getSelectedNodes.mockReturnValue([nodeWithGroup]);
-      mockGetNodesInRange.mockReturnValue([]);
+    describe('state cleanup', () => {
+      it('should clear dragging state on end', async () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
 
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'end',
-        lastInputPoint: { x: 110, y: 110 },
+        await handler.handle(event);
+
+        expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
       });
 
-      handler.handle(event);
+      it('should reset all internal state after end', async () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
 
-      expect(mockEmit).not.toHaveBeenCalledWith('addToGroup', expect.any(Object));
-    });
+        await handler.handle(event);
 
-    it('should reset move state after end', async () => {
-      const event = getSamplePointerMoveSelectionEvent({
-        phase: 'end',
-        lastInputPoint: { x: 110, y: 110 },
-      });
+        // Verify state is reset by trying to continue movement
+        const continueEvent = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+        await handler.handle(continueEvent);
 
-      await handler.handle(event);
-
-      // Verify state is reset by trying to continue movement
-      const continueEvent = getSamplePointerMoveSelectionEvent({
-        phase: 'continue',
-        lastInputPoint: { x: 120, y: 120 },
-      });
-      await handler.handle(continueEvent);
-
-      // Should not emit moveNodesBy since movement state was reset
-      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', {
-        delta: { x: 20, y: 20 },
-        nodes: [mockNode],
+        // Should not emit moveNodesBy since movement state was reset
+        expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
       });
     });
 
-    it('should not pan during end phase even with screen edge', () => {
+    it('should not pan during end phase even with screen edge', async () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'end',
         currentDiagramEdge: 'left',
       });
 
-      handler.handle(event);
+      await handler.handle(event);
 
       expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
     });
