@@ -30,4 +30,13 @@ export class NgDiagramGroupsService<
   highlightGroupClear() {
     this.flowCore.commandHandler.emit('highlightGroupClear');
   }
+
+  /**
+   * Removes nodes from a group.
+   * @param groupId The ID of the group to remove nodes from.
+   * @param nodeIds Array of node IDs to remove from the group.
+   */
+  removeFromGroup(groupId: string, nodeIds: string[]) {
+    this.flowCore.commandHandler.emit('removeFromGroup', { groupId, nodeIds });
+  }
 }
