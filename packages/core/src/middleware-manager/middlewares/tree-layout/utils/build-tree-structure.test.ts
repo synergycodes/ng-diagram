@@ -127,7 +127,7 @@ describe('buildTreeStructure', () => {
     expect(roots[1].children.length).toBe(0);
   });
 
-  it('should apply layout configuration from ResolvedTreeLayoutConfig', () => {
+  it('should apply layout configuration from TreeLayoutConfig', () => {
     const configWithValues = createMockConfig({
       getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
         return node.id === 'root' ? 270 : 90;
@@ -445,7 +445,7 @@ describe('getNodeMap', () => {
   });
 });
 
-describe('ResolvedTreeLayoutConfig integration', () => {
+describe('TreeLayoutConfig integration', () => {
   it('should use getLayoutAngleForNode return value', () => {
     const mockConfig = createMockConfig({
       getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
