@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MiddlewareChain, Node, Point } from '@angularflow/core';
+import { MiddlewareChain, Node, Point, Port } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
@@ -51,5 +51,32 @@ export class NgDiagramNodeService<
    */
   sendToBack(nodeIds?: string[], edgeIds?: string[]) {
     this.flowCore.commandHandler.emit('sendToBack', { nodeIds, edgeIds });
+  }
+
+  /**
+   * Adds ports to a node.
+   * @param nodeId The ID of the node to add ports to.
+   * @param ports Array of ports to add to the node.
+   */
+  addPorts(nodeId: string, ports: Port[]) {
+    this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
+  }
+
+  /**
+   * Updates ports for a node.
+   * @param nodeId The ID of the node to update ports for.
+   * @param ports Array of port updates to apply to the node.
+   */
+  updatePorts(nodeId: string, ports: { portId: string; portChanges: Partial<Port> }[]) {
+    this.flowCore.commandHandler.emit('updatePorts', { nodeId, ports });
+  }
+
+  /**
+   * Deletes ports from a node.
+   * @param nodeId The ID of the node to delete ports from.
+   * @param portIds Array of port IDs to delete from the node.
+   */
+  deletePorts(nodeId: string, portIds: string[]) {
+    this.flowCore.commandHandler.emit('deletePorts', { nodeId, portIds });
   }
 }
