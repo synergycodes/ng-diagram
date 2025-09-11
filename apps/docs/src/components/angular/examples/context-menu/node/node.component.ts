@@ -5,9 +5,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {
-  NgDiagramModelService,
   NgDiagramNodeSelectedDirective,
   NgDiagramPortComponent,
+  NgDiagramSelectionService,
+  NgDiagramViewportService,
   type NgDiagramNodeTemplate,
   type Node,
 } from '@angularflow/angular-adapter';
@@ -31,7 +32,8 @@ import { ContextMenuService } from '../menu/menu.service';
 })
 export class NodeComponent implements NgDiagramNodeTemplate {
   private readonly contextMenuService = inject(ContextMenuService);
-  private readonly modelService = inject(NgDiagramModelService);
+  private readonly viewportService = inject(NgDiagramViewportService);
+  private readonly selectionService = inject(NgDiagramSelectionService);
 
   text = model<string>('');
   node = input.required<Node>();
@@ -42,9 +44,9 @@ export class NodeComponent implements NgDiagramNodeTemplate {
 
     if (this.node()) {
       // Additionally selects the node on right click
-      this.modelService.setSelection([this.node().id]);
+      this.selectionService.select([this.node().id]);
 
-      const cursorPosition = this.modelService.clientToFlowViewportPosition({
+      const cursorPosition = this.viewportService.clientToFlowViewportPosition({
         x: event.clientX,
         y: event.clientY,
       });

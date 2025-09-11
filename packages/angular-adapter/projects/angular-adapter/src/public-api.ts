@@ -37,7 +37,11 @@ export { NgDiagramGroupHighlightedDirective } from './lib/directives/group-highl
 export { NgDiagramNodeSelectedDirective } from './lib/directives/node-selected/ng-diagram-node-selected.directive';
 
 // Services
+export { NgDiagramClipboardService } from './lib/public-services/ng-diagram-clipboard.service';
+export { NgDiagramGroupsService } from './lib/public-services/ng-diagram-groups.service';
 export { NgDiagramModelService } from './lib/public-services/ng-diagram-model.service';
+export { NgDiagramNodeService } from './lib/public-services/ng-diagram-node.service';
+export { NgDiagramSelectionService } from './lib/public-services/ng-diagram-selection.service';
 export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewport.service';
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 

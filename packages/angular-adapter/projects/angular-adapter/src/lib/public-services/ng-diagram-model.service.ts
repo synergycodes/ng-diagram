@@ -1,12 +1,14 @@
-import { computed, effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, FlowCore, Metadata, MiddlewareChain, Node, Point, Port } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services';
+import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { Edge, Metadata, MiddlewareChain, Node, Port } from '@angularflow/core';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
 @Injectable()
-export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> implements OnDestroy {
+export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
+  extends NgDiagramBaseService<TMiddlewares>
+  implements OnDestroy
+{
   private readonly diagramService = inject(NgDiagramService);
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
 
   private _nodes = signal<Node[]>([]);
   private _edges = signal<Edge[]>([]);
@@ -16,11 +18,8 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> im
   edges = this._edges.asReadonly();
   metadata = this._metadata.asReadonly();
 
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
-
   constructor() {
+    super();
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.flowCore.model.onChange(this.modelListener);
@@ -144,84 +143,48 @@ export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []> im
     });
   }
 
-  /**
-   * Gets the current selection state as a reactive signal
-   * This signal automatically updates when selection changes or when selected nodes/edges are modified
-   * @returns Signal containing the current selection
-   */
-  getSelection() {
-    return computed(() => {
-      const { nodes, edges } = this.flowCore.getState();
-      return {
-        nodes: nodes.filter((node) => node.selected),
-        edges: edges.filter((edge) => edge.selected),
-      };
-    });
-  }
-
   toJSON(): string {
     return this.flowCore.model.toJSON();
   }
 
   /**
-   * Sets the selection state
-   * @param nodeIds Nodes to select
-   * @param edgeIds Edges to select
+   * Adds new nodes to the diagram.
+   * @param nodes Array of nodes to add.
    */
-  setSelection(nodeIds: string[] = [], edgeIds: string[] = []) {
-    this.flowCore.commandHandler.emit('select', {
-      nodeIds,
-      edgeIds,
-    });
+  addNodes(nodes: Node[]) {
+    this.flowCore.commandHandler.emit('addNodes', { nodes });
   }
 
   /**
-   * Copies the current selection to the clipboard
+   * Adds new edges to the diagram.
+   * @param edges Array of edges to add.
    */
-  copySelection() {
-    this.flowCore.commandHandler.emit('copy');
+  addEdges(edges: Edge[]) {
+    this.flowCore.commandHandler.emit('addEdges', { edges });
   }
 
   /**
-   * Pastes the copied selection at a specific position
-   * @param position Position to paste the selection at
+   * Updates multiple nodes at once.
+   * @param nodes Array of node updates (must include id and any properties to update).
    */
-  pasteSelection(position: Point) {
-    this.flowCore.commandHandler.emit('paste', { position });
+  updateNodes(nodes: (Pick<Node, 'id'> & Partial<Node>)[]) {
+    this.flowCore.commandHandler.emit('updateNodes', { nodes });
   }
 
   /**
-   * Deletes the current selection
+   * Deletes nodes by their IDs.
+   * @param ids Array of node IDs to delete.
    */
-  deleteSelection() {
-    this.flowCore.commandHandler.emit('deleteSelection');
+  deleteNodes(ids: string[]) {
+    this.flowCore.commandHandler.emit('deleteNodes', { ids });
   }
 
   /**
-   * Converts a client position to a flow position
-   * @param clientPosition Client position to convert
-   * @returns Flow position
+   * Deletes edges by their IDs.
+   * @param ids Array of edge IDs to delete.
    */
-  clientToFlowPosition(clientPosition: Point): Point {
-    return this.flowCore.clientToFlowPosition(clientPosition);
-  }
-
-  /**
-   * Converts a flow position to a client position
-   * @param flowPosition Flow position to convert
-   * @returns Client position
-   */
-  flowToClientPosition(flowPosition: Point): Point {
-    return this.flowCore.flowToClientPosition(flowPosition);
-  }
-
-  /**
-   * Converts a client position to a position relative to the flow viewport
-   * @param clientPosition Client position
-   * @returns position on the flow viewport
-   */
-  clientToFlowViewportPosition(clientPosition: Point): Point {
-    return this.flowCore.clientToFlowViewportPosition(clientPosition);
+  deleteEdges(ids: string[]) {
+    this.flowCore.commandHandler.emit('deleteEdges', { ids });
   }
 
   private modelListener = (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => {

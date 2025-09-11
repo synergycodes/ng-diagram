@@ -15,7 +15,7 @@ export class NgDiagramPaletteItemPreviewComponent {
 
   id = crypto.randomUUID();
 
-  scale = inject(NgDiagramViewportService).getScale();
+  scale = inject(NgDiagramViewportService).scale;
 
   isSafari = this.browser === 'Safari';
   isChrome = this.browser === 'Chrome';

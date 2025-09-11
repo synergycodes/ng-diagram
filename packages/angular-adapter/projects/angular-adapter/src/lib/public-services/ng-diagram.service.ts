@@ -1,9 +1,8 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   ActionState,
   EdgeRouting,
   EnvironmentInfo,
-  FlowCore,
   Metadata,
   Middleware,
   MiddlewareChain,
@@ -13,7 +12,7 @@ import {
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
-import { FlowCoreProviderService } from '../services/flow-core-provider/flow-core-provider.service';
+import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
 export class NgDiagramService<
@@ -21,32 +20,11 @@ export class NgDiagramService<
   TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> = Metadata<
     MiddlewaresConfigFromMiddlewares<TMiddlewares>
   >,
-> {
-  private readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
-
-  private get flowCore(): FlowCore<TMiddlewares> {
-    return this.flowCoreProvider.provide();
-  }
-
+> extends NgDiagramBaseService<TMiddlewares> {
   /**
    * Returns whether the diagram is initialized
    */
   isInitialized = this.flowCoreProvider.isInitialized;
-
-  /**
-   * Returns diagram's command system for programmatic control.
-   *
-   * The command handler allows you to:
-   * - Emit system commands (select, move, copy, paste, etc.)
-   * - Listen for command events
-   * - Programmatically control diagram behavior
-   *
-   * Use this for implementing custom UI controls
-   * or integrating with external systems that need to control the diagram.
-   */
-  getCommandHandler() {
-    return this.flowCore.commandHandler;
-  }
 
   /**
    * Sets the layout

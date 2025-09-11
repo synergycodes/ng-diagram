@@ -22,5 +22,5 @@ import { PaletteItemComponent } from './palette-item.component';
 export class Palette {
   model = input.required<NgDiagramPaletteItem[]>();
 
-  scale = inject(NgDiagramViewportService).getScale();
+  scale = inject(NgDiagramViewportService).scale;
 }

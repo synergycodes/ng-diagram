@@ -1,7 +1,10 @@
 import '@angular/compiler';
 
 import { Component, computed, inject } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import {
+  NgDiagramModelService,
+  NgDiagramSelectionService,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'sidebar-container',
@@ -10,8 +13,10 @@ import { NgDiagramModelService } from '@angularflow/angular-adapter';
 })
 export class SidebarContainer {
   private readonly modelService = inject(NgDiagramModelService);
-  private readonly selection = this.modelService.getSelection();
-  private readonly selectedNode = computed(() => this.selection().nodes[0]);
+  private readonly selectionService = inject(NgDiagramSelectionService);
+  private readonly selectedNode = computed(
+    () => this.selectionService.selection().nodes[0]
+  );
 
   id = computed(() => this.selectedNode().id);
   label = computed(() => {

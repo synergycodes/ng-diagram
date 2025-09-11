@@ -116,7 +116,7 @@ The viewport represents the visible area of the diagram:
 
 ### Coordinate Transformations
 
-The `NgDiagramService` offers methods for converting between different coordinate systems in `ngDiagram`:
+The `NgDiagramViewportService` offers methods for converting between different coordinate systems in `ngDiagram`:
 
 **Client to Flow Position:**
 
@@ -143,8 +143,8 @@ export class MyComponent {
   private viewportService = inject(NgDiagramViewportService);
 
   // Get reactive viewport data
-  viewport = this.viewportService.getViewport();
-  scale = this.viewportService.getScale();
+  viewport = this.viewportService.viewport;
+  scale = this.viewportService.scale;
 
   // Access current values
   currentViewport = this.viewport();
