@@ -41,6 +41,9 @@ export class ResizingWrapperComponent {
         return { width: 200, height: 80 };
       },
     },
+    snapping: {
+      shouldSnapResizeForNode: () => false,
+    },
   } satisfies NgDiagramConfig;
 
   model = initializeModel({
