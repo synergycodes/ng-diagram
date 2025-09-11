@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs",
     "docs:dev": "cross-env NODE_ENV=development turbo watch docs:dev",
+    "docs:build": "turbo run build --filter=docs",
     "lint:check": "turbo run lint:check",
     "lint:fix": "turbo run lint:fix",
     "format:check": "prettier . --check",
