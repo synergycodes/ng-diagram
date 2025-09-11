@@ -11,11 +11,11 @@ Diagram component
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* [`MiddlewareChain`](/api/other/middlewarechain/) = \[\]
+`TMiddlewares` *extends* [`MiddlewareChain`](/docs/api/other/middlewarechain/) = \[\]
 
 ### TAdapter
 
-`TAdapter` *extends* [`ModelAdapter`](/api/other/modeladapter/)\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = [`ModelAdapter`](/api/other/modeladapter/)\<[`Metadata`](/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
+`TAdapter` *extends* [`ModelAdapter`](/docs/api/other/modeladapter/)\<[`Metadata`](/docs/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = [`ModelAdapter`](/docs/api/other/modeladapter/)\<[`Metadata`](/docs/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
 
 ## Implements
 
@@ -120,7 +120,7 @@ const dbTemplate = this.getNodeTemplate('database'); // Returns DatabaseNodeComp
 
 #### See
 
- - [nodeTemplateMap](/api/components/ngdiagramcomponent/#nodetemplatemap) - The input property where templates are registered
+ - [nodeTemplateMap](/docs/api/components/ngdiagramcomponent/#nodetemplatemap) - The input property where templates are registered
  - NgDiagramNodeTemplateMap - Type definition for the template map
 
 #### Throws
