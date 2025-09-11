@@ -1,6 +1,5 @@
 import { FlowStateUpdate, Middleware, type MiddlewareContext, ModelActionType } from '../../../types';
 import { isAngleHorizontal, isSamePoint } from '../../../utils';
-import { TREE_LAYOUT_DEFAULT_CONFIG } from './constants.ts';
 import {
   buildGroupsHierarchy,
   buildTopGroupMap,
@@ -22,12 +21,13 @@ export const treeLayoutMiddleware: Middleware = {
   name: 'tree-layout',
   execute: (context, next) => {
     const {
-      state: { edges, nodes, metadata },
+      state: { edges, nodes },
       modelActionType,
+      flowCore,
     } = context;
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
     const shouldAutoLayout = checkIfShouldAutoTreeLayout(context);
-    const config = { ...TREE_LAYOUT_DEFAULT_CONFIG, ...(metadata.layoutConfiguration || {}) };
+    const config = flowCore.config.treeLayout;
 
     if (!config || (!shouldTreeLayout && (!config?.autoLayout || !shouldAutoLayout))) {
       next();
@@ -35,41 +35,48 @@ export const treeLayoutMiddleware: Middleware = {
     }
 
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
-    const nodeMap = getNodeMap(context.flowCore.config.treeLayout, nodes);
-    const topGroupMap = buildTopGroupMap(nodeMap);
+    const treeNodeMap = getNodeMap(config, nodes);
+    const topGroupMap = buildTopGroupMap(treeNodeMap);
     const remappedEdges = remapEdges(edges, topGroupMap);
 
-    buildGroupsHierarchy(nodeMap);
-    const { roots } = buildTreeStructure(nodeMap, remappedEdges);
-
-    const offset = { x: 100, y: 100 };
+    buildGroupsHierarchy(treeNodeMap);
+    const { roots } = buildTreeStructure(treeNodeMap, remappedEdges);
 
     const isHorizontal = isAngleHorizontal(config.layoutAngle);
+    let isFirstRoot = true;
+    let previousBounds: { minX: number; maxX: number; minY: number; maxY: number } | null = null;
+    const baseX = 100;
+    const baseY = 100;
+
     roots.forEach((root) => {
-      const subtreeBounds = makeTreeLayout(root, config, offset.x, offset.y, config.layoutAngle);
+      let offsetX = baseX;
+      let offsetY = baseY;
 
-      const subtreeSizeAlongCross = isHorizontal
-        ? subtreeBounds.maxY - subtreeBounds.minY
-        : subtreeBounds.maxX - subtreeBounds.minX;
-
-      if (isHorizontal) {
-        offset.y += subtreeSizeAlongCross + config.siblingGap;
-      } else {
-        offset.x += subtreeSizeAlongCross + config.siblingGap;
+      if (!isFirstRoot && previousBounds) {
+        if (isHorizontal) {
+          offsetX = baseX;
+          offsetY = previousBounds.maxY + config.treeGap;
+        } else {
+          offsetX = previousBounds.maxX + config.treeGap;
+          offsetY = baseY;
+        }
       }
+
+      const subtreeBounds = makeTreeLayout(root, config, offsetX, offsetY, config.layoutAngle);
+      previousBounds = subtreeBounds;
+      isFirstRoot = false;
     });
 
-    const nodeList = Array.from(nodeMap.values());
+    const nodeList = Array.from(treeNodeMap.values());
     for (const node of nodes) {
-      if (!node.position) {
+      const currentNode = nodeList.find((layoutNode) => layoutNode.id === node.id);
+      if (!currentNode) {
         continue;
       }
 
-      const currentNode = nodeList.find((layoutNode) => layoutNode.id === node.id);
-      if (!currentNode || isSamePoint(node.position, currentNode.position)) {
-        continue;
+      if (!node.position || !isSamePoint(node.position, currentNode.position)) {
+        nodesToUpdate.push({ id: currentNode.id, position: currentNode.position });
       }
-      nodesToUpdate.push({ id: currentNode.id, position: currentNode.position });
     }
 
     next({ ...(nodesToUpdate.length > 0 ? { nodesToUpdate } : {}) });

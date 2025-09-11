@@ -12,23 +12,35 @@ import {
 type PartialNode = Pick<Node, 'id' | 'position' | 'size' | 'type' | 'groupId'>;
 type PartialEdge = Pick<Edge, 'source' | 'target'>;
 
+// Helper function to create mock TreeLayoutConfig
+function createMockConfig(overrides: Partial<TreeLayoutConfig> = {}): TreeLayoutConfig {
+  return {
+    getLayoutAngleForNode: (): LayoutAngleType | null => null,
+    getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
+    siblingGap: 20,
+    levelGap: 30,
+    autoLayout: false,
+    layoutAngle: 90,
+    layoutAlignment: 'parent',
+    treeGap: 100,
+    ...overrides,
+  };
+}
+
 // Mock TreeLayoutConfig for testing with specific values for some tests
-const mockTreeLayoutConfigWithValues: TreeLayoutConfig = {
+const mockTreeLayoutConfigWithValues = createMockConfig({
   getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
     if (node.id === 'node1') return 90;
     return null;
   },
   getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
-    if (node.id === 'node1') return 'Parent';
+    if (node.id === 'node1') return 'parent';
     return null;
   },
-};
+});
 
 // Mock TreeLayoutConfig for testing
-const mockTreeLayoutConfig: TreeLayoutConfig = {
-  getLayoutAngleForNode: (): LayoutAngleType | null => null,
-  getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
-};
+const mockTreeLayoutConfig = createMockConfig();
 
 describe('buildTreeStructure', () => {
   it('should build a single root tree', () => {
@@ -116,14 +128,14 @@ describe('buildTreeStructure', () => {
   });
 
   it('should apply layout configuration from TreeLayoutConfig', () => {
-    const configWithValues: TreeLayoutConfig = {
+    const configWithValues = createMockConfig({
       getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
         return node.id === 'root' ? 270 : 90;
       },
       getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
-        return node.id === 'root' ? 'Subtree' : 'Start';
+        return node.id === 'root' ? 'subtree' : 'start';
       },
-    };
+    });
 
     const nodes: PartialNode[] = [
       { id: 'root', position: { x: 0, y: 0 }, type: 'Test' },
@@ -135,18 +147,21 @@ describe('buildTreeStructure', () => {
     const childNode = nodeMap.get('child')!;
 
     expect(rootNode.layoutAngle).toBe(270);
-    expect(rootNode.layoutAlignment).toBe('Subtree');
+    expect(rootNode.layoutAlignment).toBe('subtree');
     expect(childNode.layoutAngle).toBe(90);
-    expect(childNode.layoutAlignment).toBe('Start');
+    expect(childNode.layoutAlignment).toBe('start');
   });
 });
 
 describe('buildTopGroupMap', () => {
   it('should return a map with node IDs as keys and their top group IDs as values', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['node1', { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test' }],
-      ['group1', { id: 'group1', position: { x: 0, y: 0 }, children: [], type: 'group' }],
-      ['node2', { id: 'node2', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'group1' }],
+      ['node1', { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test', isGroup: false }],
+      ['group1', { id: 'group1', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
+      [
+        'node2',
+        { id: 'node2', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'group1', isGroup: false },
+      ],
     ]);
 
     const topGroupMap = buildTopGroupMap(nodeMap);
@@ -158,12 +173,29 @@ describe('buildTopGroupMap', () => {
 
   it('should handle nested groups correctly', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['topGroup', { id: 'topGroup', position: { x: 0, y: 0 }, children: [], type: 'group' }],
+      ['topGroup', { id: 'topGroup', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
       [
         'nestedGroup',
-        { id: 'nestedGroup', position: { x: 0, y: 0 }, children: [], type: 'group', groupId: 'topGroup' },
+        {
+          id: 'nestedGroup',
+          position: { x: 0, y: 0 },
+          children: [],
+          type: 'group',
+          groupId: 'topGroup',
+          isGroup: true,
+        },
       ],
-      ['deepNode', { id: 'deepNode', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'nestedGroup' }],
+      [
+        'deepNode',
+        {
+          id: 'deepNode',
+          position: { x: 0, y: 0 },
+          children: [],
+          type: 'Test',
+          groupId: 'nestedGroup',
+          isGroup: false,
+        },
+      ],
     ]);
 
     const topGroupMap = buildTopGroupMap(nodeMap);
@@ -175,7 +207,7 @@ describe('buildTopGroupMap', () => {
 
   it('should handle nodes with no group', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['standalone', { id: 'standalone', position: { x: 0, y: 0 }, children: [], type: 'Test' }],
+      ['standalone', { id: 'standalone', position: { x: 0, y: 0 }, children: [], type: 'Test', isGroup: false }],
     ]);
 
     const topGroupMap = buildTopGroupMap(nodeMap);
@@ -235,9 +267,15 @@ describe('remapEdges', () => {
 describe('buildGroupsHierarchy', () => {
   it('should build hierarchy with group children', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['topGroup', { id: 'topGroup', position: { x: 0, y: 0 }, children: [], type: 'group' }],
-      ['node1', { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'topGroup' }],
-      ['node2', { id: 'node2', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'topGroup' }],
+      ['topGroup', { id: 'topGroup', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
+      [
+        'node1',
+        { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'topGroup', isGroup: false },
+      ],
+      [
+        'node2',
+        { id: 'node2', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'topGroup', isGroup: false },
+      ],
     ]);
 
     const hierarchy = buildGroupsHierarchy(nodeMap);
@@ -251,12 +289,22 @@ describe('buildGroupsHierarchy', () => {
 
   it('should handle nested groups', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['topGroup', { id: 'topGroup', position: { x: 0, y: 0 }, children: [], type: 'group' }],
+      ['topGroup', { id: 'topGroup', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
       [
         'nestedGroup',
-        { id: 'nestedGroup', position: { x: 0, y: 0 }, children: [], type: 'group', groupId: 'topGroup' },
+        {
+          id: 'nestedGroup',
+          position: { x: 0, y: 0 },
+          children: [],
+          type: 'group',
+          groupId: 'topGroup',
+          isGroup: true,
+        },
       ],
-      ['node1', { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'nestedGroup' }],
+      [
+        'node1',
+        { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test', groupId: 'nestedGroup', isGroup: false },
+      ],
     ]);
 
     const hierarchy = buildGroupsHierarchy(nodeMap);
@@ -271,8 +319,8 @@ describe('buildGroupsHierarchy', () => {
 
   it('should return multiple top-level groups', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['group1', { id: 'group1', position: { x: 0, y: 0 }, children: [], type: 'group' }],
-      ['group2', { id: 'group2', position: { x: 0, y: 0 }, children: [], type: 'group' }],
+      ['group1', { id: 'group1', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
+      ['group2', { id: 'group2', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
     ]);
 
     const hierarchy = buildGroupsHierarchy(nodeMap);
@@ -291,8 +339,8 @@ describe('buildGroupsHierarchy', () => {
 
   it('should initialize groupChildren for all group nodes', () => {
     const nodeMap = new Map<string, TreeNode>([
-      ['group1', { id: 'group1', position: { x: 0, y: 0 }, children: [], type: 'group' }],
-      ['node1', { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test' }],
+      ['group1', { id: 'group1', position: { x: 0, y: 0 }, children: [], type: 'group', isGroup: true }],
+      ['node1', { id: 'node1', position: { x: 0, y: 0 }, children: [], type: 'Test', isGroup: false }],
     ]);
 
     buildGroupsHierarchy(nodeMap);
@@ -330,7 +378,7 @@ describe('getNodeMap', () => {
     expect(node1.size).toEqual({ width: 100, height: 50 });
     expect(node1.children).toEqual([]);
     expect(node1.layoutAngle).toBe(90);
-    expect(node1.layoutAlignment).toBe('Parent');
+    expect(node1.layoutAlignment).toBe('parent');
     expect(node1.type).toBe('Test');
     expect(node1.groupId).toBeUndefined();
 
@@ -399,13 +447,12 @@ describe('getNodeMap', () => {
 
 describe('TreeLayoutConfig integration', () => {
   it('should use getLayoutAngleForNode return value', () => {
-    const mockConfig: TreeLayoutConfig = {
+    const mockConfig = createMockConfig({
       getLayoutAngleForNode: (node: Node): LayoutAngleType | null => {
         if (node.id === 'special') return 180;
         return 90;
       },
-      getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
-    };
+    });
 
     const nodes: Node[] = [
       { id: 'normal', position: { x: 0, y: 0 }, type: 'Test', data: {} },
@@ -419,13 +466,12 @@ describe('TreeLayoutConfig integration', () => {
   });
 
   it('should use getLayoutAlignmentForNode return value', () => {
-    const mockConfig: TreeLayoutConfig = {
-      getLayoutAngleForNode: (): LayoutAngleType | null => null,
+    const mockConfig = createMockConfig({
       getLayoutAlignmentForNode: (node: Node): LayoutAlignmentType | null => {
-        if (node.id === 'center') return 'Subtree';
-        return 'Start';
+        if (node.id === 'center') return 'subtree';
+        return 'start';
       },
-    };
+    });
 
     const nodes: Node[] = [
       { id: 'left', position: { x: 0, y: 0 }, type: 'Test', data: {} },
@@ -434,15 +480,12 @@ describe('TreeLayoutConfig integration', () => {
 
     const nodeMap = getNodeMap(mockConfig, nodes);
 
-    expect(nodeMap.get('left')!.layoutAlignment).toBe('Start');
-    expect(nodeMap.get('center')!.layoutAlignment).toBe('Subtree');
+    expect(nodeMap.get('left')!.layoutAlignment).toBe('start');
+    expect(nodeMap.get('center')!.layoutAlignment).toBe('subtree');
   });
 
   it('should handle null return values from config methods', () => {
-    const mockConfig: TreeLayoutConfig = {
-      getLayoutAngleForNode: (): LayoutAngleType | null => null,
-      getLayoutAlignmentForNode: (): LayoutAlignmentType | null => null,
-    };
+    const mockConfig = createMockConfig();
 
     const nodes: Node[] = [{ id: 'test', position: { x: 0, y: 0 }, type: 'Test', data: {} }];
 

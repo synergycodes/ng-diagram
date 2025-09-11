@@ -10,6 +10,7 @@ describe('isLeafNode', () => {
       position: { x: 0, y: 0 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
 
     expect(isLeafNode(node)).toBe(true);
@@ -21,6 +22,7 @@ describe('isLeafNode', () => {
       position: { x: 0, y: 0 },
       children: undefined!,
       type: 'Test',
+      isGroup: false,
     };
 
     expect(isLeafNode(node)).toBe(true);
@@ -32,12 +34,14 @@ describe('isLeafNode', () => {
       position: { x: 0, y: 0 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const node: TreeNode = {
       id: 'test',
       position: { x: 0, y: 0 },
       children: [child],
       type: 'Test',
+      isGroup: false,
     };
 
     expect(isLeafNode(node)).toBe(false);
@@ -52,6 +56,7 @@ describe('getNodeSize', () => {
       size: { width: 100, height: 50 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
 
     expect(getNodeSize(node)).toEqual({ width: 100, height: 50 });
@@ -63,6 +68,7 @@ describe('getNodeSize', () => {
       position: { x: 0, y: 0 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
 
     expect(getNodeSize(node)).toEqual({ width: 0, height: 0 });
@@ -75,6 +81,7 @@ describe('getNodeSize', () => {
       size: null!,
       children: [],
       type: 'Test',
+      isGroup: false,
     };
 
     expect(getNodeSize(node)).toEqual({ width: 0, height: 0 });
@@ -88,12 +95,14 @@ describe('groupLayout', () => {
       position: { x: 10, y: 20 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const child2: TreeNode = {
       id: 'child2',
       position: { x: 30, y: 40 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const groupChildren = [child1, child2];
     const delta = { x: 5, y: 10 };
@@ -110,6 +119,7 @@ describe('groupLayout', () => {
       position: { x: 5, y: 15 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const parent: TreeNode = {
       id: 'parent',
@@ -117,6 +127,7 @@ describe('groupLayout', () => {
       children: [],
       groupChildren: [nestedChild],
       type: 'group',
+      isGroup: true,
     };
     const groupChildren = [parent];
     const delta = { x: 5, y: 10 };
@@ -140,6 +151,7 @@ describe('groupLayout', () => {
       position: { x: 10, y: 20 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const groupChildren = [child];
     const delta = { x: 0, y: 0 };
@@ -155,6 +167,7 @@ describe('groupLayout', () => {
       position: { x: 10, y: 20 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const groupChildren = [child];
     const delta = { x: -5, y: -10 };
@@ -172,18 +185,21 @@ describe('shiftSubtree', () => {
       position: { x: 0, y: 0 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const child: TreeNode = {
       id: 'child',
       position: { x: 10, y: 20 },
       children: [grandchild],
       type: 'Test',
+      isGroup: false,
     };
     const root: TreeNode = {
       id: 'root',
       position: { x: 5, y: 15 },
       children: [child],
       type: 'Test',
+      isGroup: false,
     };
 
     shiftSubtree(root, 10, 5);
@@ -199,6 +215,7 @@ describe('shiftSubtree', () => {
       position: { x: 10, y: 20 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
 
     shiftSubtree(node, 5, 10);
@@ -212,6 +229,7 @@ describe('shiftSubtree', () => {
       position: { x: 10, y: 20 },
       children: undefined!,
       type: 'Test',
+      isGroup: false,
     };
 
     expect(() => shiftSubtree(node, 5, 10)).not.toThrow();
@@ -224,12 +242,14 @@ describe('shiftSubtree', () => {
       position: { x: 10, y: 20 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const node: TreeNode = {
       id: 'node',
       position: { x: 5, y: 15 },
       children: [child],
       type: 'Test',
+      isGroup: false,
     };
 
     shiftSubtree(node, 0, 0);
@@ -244,12 +264,14 @@ describe('shiftSubtree', () => {
       position: { x: 10, y: 20 },
       children: [],
       type: 'Test',
+      isGroup: false,
     };
     const node: TreeNode = {
       id: 'node',
       position: { x: 5, y: 15 },
       children: [child],
       type: 'Test',
+      isGroup: false,
     };
 
     shiftSubtree(node, -2, -5);
@@ -270,15 +292,18 @@ describe('maybeShiftChildren', () => {
         position: { x: 10, y: 10 },
         children: [],
         type: 'Test',
+        isGroup: false,
       },
       {
         id: 'child2',
         position: { x: 20, y: 20 },
         children: [],
         type: 'Test',
+        isGroup: false,
       },
     ],
     type: 'Test',
+    isGroup: false,
   });
 
   const createMockBounds = (): Bounds => ({

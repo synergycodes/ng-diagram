@@ -1,4 +1,4 @@
-import { Bounds, GlobalTreeLayoutConfig, LayoutAngleType, TreeNode } from '../../../../types';
+import { Bounds, LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../../../types';
 import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils';
 import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
 
@@ -14,7 +14,7 @@ import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree
  */
 const layoutChildren = (
   parentNode: TreeNode,
-  config: GlobalTreeLayoutConfig,
+  config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
@@ -89,7 +89,7 @@ const layoutChildren = (
 
 const alignParent = (
   parent: TreeNode,
-  config: GlobalTreeLayoutConfig,
+  config: TreeLayoutConfig,
   childrenBounds: Bounds,
   offsetX: number,
   offsetY: number,
@@ -106,10 +106,10 @@ const alignParent = (
   let x: number;
   let y: number;
 
-  if (layoutAlignment === 'Start') {
+  if (layoutAlignment === 'start') {
     x = offsetX;
     y = offsetY;
-  } else if (layoutAlignment === 'Subtree') {
+  } else if (layoutAlignment === 'subtree') {
     x = !isHorizontal ? (childrenBounds.minX + childrenBounds.maxX - width) / 2 : offsetX;
     y = isHorizontal ? (childrenBounds.minY + childrenBounds.maxY - height) / 2 : offsetY;
   } else {
@@ -128,7 +128,7 @@ const alignParent = (
     }
   }
 
-  if (parent.type === 'group' && parent.groupChildren) {
+  if (parent.isGroup && parent.groupChildren) {
     const dx = x - parent.position.x;
     const dy = y - parent.position.y;
     groupLayout(parent.groupChildren, { x: dx, y: dy });
@@ -149,7 +149,7 @@ const alignParent = (
  */
 export const makeTreeLayout = (
   parentNode: TreeNode,
-  config: GlobalTreeLayoutConfig,
+  config: TreeLayoutConfig,
   offsetX: number,
   offsetY: number,
   grandparentAngle: LayoutAngleType
@@ -158,7 +158,7 @@ export const makeTreeLayout = (
   const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
 
   if (isLeafNode(parentNode)) {
-    if (parentNode.type === 'group' && parentNode.groupChildren) {
+    if (parentNode.isGroup && parentNode.groupChildren) {
       const delta = { x: offsetX - parentNode.position.x, y: offsetY - parentNode.position.y };
       groupLayout(parentNode.groupChildren, delta);
     }

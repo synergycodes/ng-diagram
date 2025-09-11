@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { GlobalTreeLayoutConfig, LayoutAngleType, TreeNode } from '../../../../types/tree-layout.interface.ts';
+import { LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../../../types';
 import { makeTreeLayout } from './orientation-tree-layout.ts';
 
 describe('makeTreeLayout', () => {
-  const createDefaultConfig = (): GlobalTreeLayoutConfig => ({
+  const createDefaultConfig = (): TreeLayoutConfig => ({
+    getLayoutAngleForNode: () => null,
+    getLayoutAlignmentForNode: () => null,
     siblingGap: 10,
     levelGap: 20,
     layoutAngle: 0,
-    layoutAlignment: 'Parent',
+    layoutAlignment: 'parent',
     autoLayout: true,
+    treeGap: 100,
   });
 
   const createLeafNode = (id: string, x = 0, y = 0, width = 50, height = 30): TreeNode => ({
@@ -17,6 +20,7 @@ describe('makeTreeLayout', () => {
     size: { width, height },
     children: [],
     type: 'Test',
+    isGroup: false,
   });
 
   const createParentNode = (id: string, children: TreeNode[], x = 0, y = 0, width = 60, height = 40): TreeNode => ({
@@ -25,6 +29,7 @@ describe('makeTreeLayout', () => {
     size: { width, height },
     children,
     type: 'Test',
+    isGroup: false,
   });
 
   describe('leaf node handling', () => {
@@ -51,6 +56,7 @@ describe('makeTreeLayout', () => {
         position: { x: 0, y: 0 },
         children: [],
         type: 'Test',
+        isGroup: false,
       };
       const config = createDefaultConfig();
 
@@ -73,6 +79,7 @@ describe('makeTreeLayout', () => {
         children: [],
         groupChildren: [groupChild],
         type: 'group',
+        isGroup: true,
       };
       const config = createDefaultConfig();
 
@@ -95,7 +102,7 @@ describe('makeTreeLayout', () => {
       const child1 = createLeafNode('child1', 0, 0, 40, 30);
       const child2 = createLeafNode('child2', 0, 0, 50, 25);
       const parent = createParentNode('parent', [child1, child2], 0, 0, 80, 40);
-      const config = createDefaultConfig(); // angle 0, alignment 'Parent'
+      const config = createDefaultConfig(); // angle 0, alignment 'parent'
 
       const bounds = makeTreeLayout(parent, config, 0, 0, 0);
 
@@ -110,7 +117,7 @@ describe('makeTreeLayout', () => {
     it('should handle Start alignment', () => {
       const child = createLeafNode('child', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child], 0, 0, 80, 40);
-      parent.layoutAlignment = 'Start';
+      parent.layoutAlignment = 'start';
       const config = createDefaultConfig();
 
       makeTreeLayout(parent, config, 10, 20, 0);
@@ -122,7 +129,7 @@ describe('makeTreeLayout', () => {
       const child1 = createLeafNode('child1', 0, 0, 40, 30);
       const child2 = createLeafNode('child2', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child1, child2], 0, 0, 50, 40);
-      parent.layoutAlignment = 'Subtree';
+      parent.layoutAlignment = 'subtree';
       const config = createDefaultConfig();
 
       const bounds = makeTreeLayout(parent, config, 0, 0, 0);
@@ -138,7 +145,7 @@ describe('makeTreeLayout', () => {
       const child1 = createLeafNode('child1', 0, 0, 40, 30);
       const child2 = createLeafNode('child2', 0, 0, 50, 25);
       const parent = createParentNode('parent', [child1, child2], 0, 0, 80, 40);
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         layoutAngle: 90,
       };
@@ -155,7 +162,7 @@ describe('makeTreeLayout', () => {
     it('should center children horizontally when parent is wider', () => {
       const child = createLeafNode('child', 0, 0, 30, 20);
       const parent = createParentNode('parent', [child], 0, 0, 100, 40);
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         layoutAngle: 90,
       };
@@ -171,7 +178,7 @@ describe('makeTreeLayout', () => {
     it('should handle angle 180 (horizontal reverse)', () => {
       const child = createLeafNode('child', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child], 0, 0, 80, 40);
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         layoutAngle: 180,
       };
@@ -186,7 +193,7 @@ describe('makeTreeLayout', () => {
     it('should handle angle 270 (vertical reverse)', () => {
       const child = createLeafNode('child', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child], 0, 0, 80, 40);
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         layoutAngle: 270,
       };
@@ -204,7 +211,7 @@ describe('makeTreeLayout', () => {
       const child = createLeafNode('child', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child], 0, 0, 80, 40);
       parent.layoutAngle = 90; // Override config angle
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         layoutAngle: 0, // Config says horizontal
       };
@@ -218,10 +225,10 @@ describe('makeTreeLayout', () => {
     it('should use node-specific layoutAlignment over config', () => {
       const child = createLeafNode('child', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child], 0, 0, 80, 40);
-      parent.layoutAlignment = 'Start'; // Override config alignment
-      const config: GlobalTreeLayoutConfig = {
+      parent.layoutAlignment = 'start'; // Override config alignment
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
-        layoutAlignment: 'Parent', // Config says Parent alignment
+        layoutAlignment: 'parent', // Config says parent alignment
       };
 
       makeTreeLayout(parent, config, 10, 20, 0);
@@ -280,6 +287,7 @@ describe('makeTreeLayout', () => {
         children: [treeChild],
         groupChildren: [groupChild],
         type: 'group',
+        isGroup: true,
       };
       const config = createDefaultConfig();
 
@@ -301,7 +309,7 @@ describe('makeTreeLayout', () => {
       const child1 = createLeafNode('child1', 0, 0, 40, 30);
       const child2 = createLeafNode('child2', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child1, child2], 0, 0, 60, 40);
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         siblingGap: 30, // Large gap between siblings
         layoutAngle: 90, // Vertical layout for easier testing
@@ -317,7 +325,7 @@ describe('makeTreeLayout', () => {
     it('should respect levelGap configuration', () => {
       const child = createLeafNode('child', 0, 0, 40, 30);
       const parent = createParentNode('parent', [child], 0, 0, 60, 40);
-      const config: GlobalTreeLayoutConfig = {
+      const config: TreeLayoutConfig = {
         ...createDefaultConfig(),
         levelGap: 50, // Large gap between levels
         layoutAngle: 0, // Horizontal layout
@@ -357,6 +365,7 @@ describe('makeTreeLayout', () => {
         size: { width: 60, height: 40 },
         children: [],
         type: 'Test',
+        isGroup: false,
       };
       const config = createDefaultConfig();
 
@@ -378,6 +387,7 @@ describe('makeTreeLayout', () => {
         size: { width: 60, height: 40 },
         children: undefined!,
         type: 'Test',
+        isGroup: false,
       };
       const config = createDefaultConfig();
 
