@@ -5,7 +5,7 @@ prev: false
 title: "MiddlewareChain"
 ---
 
-> **MiddlewareChain** = [`Middleware`](/docs/api/other/middleware/)[]
+> **MiddlewareChain** = [`Middleware`](/api/other/middleware/)[]
 
 Type for middleware chain
 

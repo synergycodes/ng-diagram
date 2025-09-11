@@ -1,13 +1,12 @@
 // @ts-check
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
-import starlightAutoSidebar from 'starlight-auto-sidebar';
 import starlightTypeDoc from 'starlight-typedoc';
+import starlightAutoSidebar from 'starlight-auto-sidebar';
 
 import angular from '@analogjs/astro-angular';
 
 export default defineConfig({
-  base: '/docs',
   integrations: [
     angular({
       vite: {

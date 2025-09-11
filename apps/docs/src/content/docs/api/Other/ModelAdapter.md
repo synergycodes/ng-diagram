@@ -11,7 +11,7 @@ Interface for model adapters that handle the data management of a flow diagram
 
 ### TMetadata
 
-`TMetadata` *extends* [`Metadata`](/docs/api/other/metadata/) = [`Metadata`](/docs/api/other/metadata/)
+`TMetadata` *extends* [`Metadata`](/api/other/metadata/) = [`Metadata`](/api/other/metadata/)
 
 ## Methods
 
@@ -30,13 +30,13 @@ This should be called when the model is no longer needed to prevent memory leaks
 
 ### getEdges()
 
-> **getEdges**(): [`Edge`](/docs/api/types/edge/)\<`object`\>[]
+> **getEdges**(): [`Edge`](/api/types/edge/)\<`object`\>[]
 
 Get all edges in the model
 
 #### Returns
 
-[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+[`Edge`](/api/types/edge/)\<`object`\>[]
 
 ***
 
@@ -54,13 +54,13 @@ Get metadata associated with the model
 
 ### getNodes()
 
-> **getNodes**(): [`Node`](/docs/api/types/node/)[]
+> **getNodes**(): [`Node`](/api/types/node/)[]
 
 Get all nodes in the model
 
 #### Returns
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/api/types/node/)[]
 
 ***
 
@@ -106,7 +106,7 @@ Set edges in the model
 
 ##### edges
 
-[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+[`Edge`](/api/types/edge/)\<`object`\>[]
 
 Array of edges to set
 
@@ -146,7 +146,7 @@ Set nodes in the model
 
 ##### nodes
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/api/types/node/)[]
 
 Array of nodes to set
 
