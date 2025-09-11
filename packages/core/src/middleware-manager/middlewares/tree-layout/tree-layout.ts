@@ -45,17 +45,14 @@ export const treeLayoutMiddleware: Middleware = {
     const isHorizontal = isAngleHorizontal(config.layoutAngle);
     let isFirstRoot = true;
     let previousBounds: { minX: number; maxX: number; minY: number; maxY: number } | null = null;
-    let baseX = 0;
-    let baseY = 0;
+    const baseX = 100;
+    const baseY = 100;
 
     roots.forEach((root) => {
-      let offsetX = root.position.x;
-      let offsetY = root.position.y;
+      let offsetX = baseX;
+      let offsetY = baseY;
 
-      if (isFirstRoot) {
-        baseX = root.position.x;
-        baseY = root.position.y;
-      } else if (previousBounds) {
+      if (!isFirstRoot && previousBounds) {
         if (isHorizontal) {
           offsetX = baseX;
           offsetY = previousBounds.maxY + config.treeGap;

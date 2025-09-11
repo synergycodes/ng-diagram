@@ -240,19 +240,19 @@ describe('treeLayoutMiddleware', () => {
 
       // Horizontal layout - varies Y
       vi.mocked(orientationModule.makeTreeLayout)
-        .mockReturnValueOnce({ minX: 10, maxX: 110, minY: 20, maxY: 70 })
-        .mockReturnValueOnce({ minX: 10, maxX: 110, minY: 170, maxY: 220 });
+        .mockReturnValueOnce({ minX: 100, maxX: 200, minY: 100, maxY: 150 })
+        .mockReturnValueOnce({ minX: 100, maxX: 200, minY: 250, maxY: 300 });
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
-      // First root uses its own position
-      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 10, 20, 0);
-      // Second root: same X as first, Y = previous maxY + treeGap
+      // First root always starts at (100, 100)
+      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 100, 100, 0);
+      // Second root: same X as base (100), Y = previous maxY + treeGap
       expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(
         mockRoots[1],
         expect.any(Object),
-        10, // Same X as first root
-        170, // 70 (previous maxY) + 100 (treeGap)
+        100, // Always uses base X of 100
+        250, // 150 (previous maxY) + 100 (treeGap)
         0
       );
     });
@@ -269,19 +269,19 @@ describe('treeLayoutMiddleware', () => {
 
       // Vertical layout - varies X
       vi.mocked(orientationModule.makeTreeLayout)
-        .mockReturnValueOnce({ minX: 15, maxX: 65, minY: 25, maxY: 125 })
-        .mockReturnValueOnce({ minX: 165, maxX: 215, minY: 25, maxY: 125 });
+        .mockReturnValueOnce({ minX: 100, maxX: 150, minY: 100, maxY: 200 })
+        .mockReturnValueOnce({ minX: 250, maxX: 300, minY: 100, maxY: 200 });
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
-      // First root uses its own position
-      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 15, 25, 90);
-      // Second root: same Y as first, X = previous maxX + treeGap
+      // First root always starts at (100, 100)
+      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 100, 100, 90);
+      // Second root: same Y as base (100), X = previous maxX + treeGap
       expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(
         mockRoots[1],
         expect.any(Object),
-        165, // 65 (previous maxX) + 100 (treeGap)
-        25, // Same Y as first root
+        250, // 150 (previous maxX) + 100 (treeGap)
+        100, // Always uses base Y of 100
         90
       );
     });
