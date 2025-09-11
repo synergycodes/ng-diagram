@@ -35,41 +35,52 @@ export const treeLayoutMiddleware: Middleware = {
     }
 
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
-    const nodeMap = getNodeMap(config, nodes);
-    const topGroupMap = buildTopGroupMap(nodeMap);
+    const treeNodeMap = getNodeMap(config, nodes);
+    const topGroupMap = buildTopGroupMap(treeNodeMap);
     const remappedEdges = remapEdges(edges, topGroupMap);
 
-    buildGroupsHierarchy(nodeMap);
-    const { roots } = buildTreeStructure(nodeMap, remappedEdges);
-
-    const offset = { x: 100, y: 100 };
+    buildGroupsHierarchy(treeNodeMap);
+    const { roots } = buildTreeStructure(treeNodeMap, remappedEdges);
 
     const isHorizontal = isAngleHorizontal(config.layoutAngle);
+    let isFirstRoot = true;
+    let previousBounds: { minX: number; maxX: number; minY: number; maxY: number } | null = null;
+    let baseX = 0;
+    let baseY = 0;
+
     roots.forEach((root) => {
-      const subtreeBounds = makeTreeLayout(root, config, offset.x, offset.y, config.layoutAngle);
+      let offsetX = root.position.x;
+      let offsetY = root.position.y;
 
-      const subtreeSizeAlongCross = isHorizontal
-        ? subtreeBounds.maxY - subtreeBounds.minY
-        : subtreeBounds.maxX - subtreeBounds.minX;
-
-      if (isHorizontal) {
-        offset.y += subtreeSizeAlongCross + config.siblingGap;
-      } else {
-        offset.x += subtreeSizeAlongCross + config.siblingGap;
+      if (isFirstRoot) {
+        baseX = root.position.x;
+        baseY = root.position.y;
+      } else if (previousBounds) {
+        if (isHorizontal) {
+          offsetX = baseX;
+          offsetY = previousBounds.maxY + config.treeGap;
+        } else {
+          offsetX = previousBounds.maxX + config.treeGap;
+          offsetY = baseY;
+        }
       }
+
+      const subtreeBounds = makeTreeLayout(root, config, offsetX, offsetY, config.layoutAngle);
+      previousBounds = subtreeBounds;
+      isFirstRoot = false;
     });
 
-    const nodeList = Array.from(nodeMap.values());
+    const nodeList = Array.from(treeNodeMap.values());
     for (const node of nodes) {
-      if (!node.position) {
+      const currentNode = nodeList.find((layoutNode) => layoutNode.id === node.id);
+      if (!currentNode) {
         continue;
       }
 
-      const currentNode = nodeList.find((layoutNode) => layoutNode.id === node.id);
-      if (!currentNode || isSamePoint(node.position, currentNode.position)) {
-        continue;
+      // Apply position if node has no position or if position changed
+      if (!node.position || !isSamePoint(node.position, currentNode.position)) {
+        nodesToUpdate.push({ id: currentNode.id, position: currentNode.position });
       }
-      nodesToUpdate.push({ id: currentNode.id, position: currentNode.position });
     }
 
     next({ ...(nodesToUpdate.length > 0 ? { nodesToUpdate } : {}) });

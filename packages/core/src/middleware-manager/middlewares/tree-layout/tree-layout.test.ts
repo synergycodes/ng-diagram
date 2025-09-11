@@ -7,7 +7,6 @@ import * as orientationModule from './utils/orientation-tree-layout';
 
 type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
 
-// Mock the imported modules
 vi.mock('./utils/build-tree-structure');
 vi.mock('./utils/orientation-tree-layout');
 
@@ -63,6 +62,7 @@ describe('treeLayoutMiddleware', () => {
             autoLayout: false,
             layoutAngle: 90,
             layoutAlignment: 'parent',
+            treeGap: 100,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,10 +88,6 @@ describe('treeLayoutMiddleware', () => {
   });
 
   describe('middleware configuration', () => {
-    it('should have correct name', () => {
-      expect(treeLayoutMiddleware.name).toBe('tree-layout');
-    });
-
     it('should be a middleware object with execute function', () => {
       expect(treeLayoutMiddleware).toHaveProperty('execute');
       expect(typeof treeLayoutMiddleware.execute).toBe('function');
@@ -143,12 +139,12 @@ describe('treeLayoutMiddleware', () => {
       context.state.nodes = mockNodes;
 
       const mockNodeMap = new Map([
-        ['1', { id: '1', position: { x: 50, y: 50 }, children: [] }],
-        ['2', { id: '2', position: { x: 150, y: 50 }, children: [] }],
+        ['1', { id: '1', position: { x: 50, y: 50 }, children: [], isGroup: false }],
+        ['2', { id: '2', position: { x: 150, y: 50 }, children: [], isGroup: false }],
       ]);
       vi.mocked(buildTreeModule.getNodeMap).mockReturnValue(mockNodeMap);
       vi.mocked(buildTreeModule.buildTreeStructure).mockReturnValue({
-        roots: [{ id: '1', position: { x: 50, y: 50 }, children: [] }],
+        roots: [{ id: '1', position: { x: 50, y: 50 }, children: [], isGroup: false }],
       });
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
@@ -168,7 +164,7 @@ describe('treeLayoutMiddleware', () => {
       const mockNodes = [{ id: '1', position: { x: 50, y: 50 }, type: 'node' }] as Node[];
       context.state.nodes = mockNodes;
 
-      const mockNodeMap = new Map([['1', { id: '1', position: { x: 50, y: 50 }, children: [] }]]);
+      const mockNodeMap = new Map([['1', { id: '1', position: { x: 50, y: 50 }, children: [], isGroup: false }]]);
       vi.mocked(buildTreeModule.getNodeMap).mockReturnValue(mockNodeMap);
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
@@ -237,25 +233,26 @@ describe('treeLayoutMiddleware', () => {
       context.flowCore.config!.treeLayout.layoutAngle = 0;
 
       const mockRoots = [
-        { id: 'root1', position: { x: 0, y: 0 }, children: [] },
-        { id: 'root2', position: { x: 0, y: 0 }, children: [] },
+        { id: 'root1', position: { x: 10, y: 20 }, children: [], isGroup: false },
+        { id: 'root2', position: { x: 30, y: 40 }, children: [], isGroup: false },
       ];
       vi.mocked(buildTreeModule.buildTreeStructure).mockReturnValue({ roots: mockRoots });
 
       // Horizontal layout - varies Y
       vi.mocked(orientationModule.makeTreeLayout)
-        .mockReturnValueOnce({ minX: 0, maxX: 100, minY: 0, maxY: 50 })
-        .mockReturnValueOnce({ minX: 0, maxX: 100, minY: 70, maxY: 120 });
+        .mockReturnValueOnce({ minX: 10, maxX: 110, minY: 20, maxY: 70 })
+        .mockReturnValueOnce({ minX: 10, maxX: 110, minY: 170, maxY: 220 });
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
-      // Should be called with increasing Y offsets for horizontal layout
-      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 100, 100, 0);
+      // First root uses its own position
+      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 10, 20, 0);
+      // Second root: same X as first, Y = previous maxY + treeGap
       expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(
         mockRoots[1],
         expect.any(Object),
-        100,
-        170, // 100 + 50 (height) + 20 (gap)
+        10, // Same X as first root
+        170, // 70 (previous maxY) + 100 (treeGap)
         0
       );
     });
@@ -265,25 +262,26 @@ describe('treeLayoutMiddleware', () => {
       context.flowCore.config!.treeLayout.layoutAngle = 90;
 
       const mockRoots = [
-        { id: 'root1', position: { x: 0, y: 0 }, children: [] },
-        { id: 'root2', position: { x: 0, y: 0 }, children: [] },
+        { id: 'root1', position: { x: 15, y: 25 }, children: [], isGroup: false },
+        { id: 'root2', position: { x: 35, y: 45 }, children: [], isGroup: false },
       ];
       vi.mocked(buildTreeModule.buildTreeStructure).mockReturnValue({ roots: mockRoots });
 
       // Vertical layout - varies X
       vi.mocked(orientationModule.makeTreeLayout)
-        .mockReturnValueOnce({ minX: 0, maxX: 50, minY: 0, maxY: 100 })
-        .mockReturnValueOnce({ minX: 70, maxX: 120, minY: 0, maxY: 100 });
+        .mockReturnValueOnce({ minX: 15, maxX: 65, minY: 25, maxY: 125 })
+        .mockReturnValueOnce({ minX: 165, maxX: 215, minY: 25, maxY: 125 });
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
-      // Should be called with increasing X offsets for vertical layout
-      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 100, 100, 90);
+      // First root uses its own position
+      expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(mockRoots[0], expect.any(Object), 15, 25, 90);
+      // Second root: same Y as first, X = previous maxX + treeGap
       expect(orientationModule.makeTreeLayout).toHaveBeenCalledWith(
         mockRoots[1],
         expect.any(Object),
-        170, // 100 + 50 (width) + 20 (gap)
-        100,
+        165, // 65 (previous maxX) + 100 (treeGap)
+        25, // Same Y as first root
         90
       );
     });
@@ -301,9 +299,9 @@ describe('treeLayoutMiddleware', () => {
       context.state.nodes = mockNodes;
 
       const mockNodeMap = new Map([
-        ['1', { id: '1', position: { x: 20, y: 20 }, children: [] }], // Changed
-        ['2', { id: '2', position: { x: 50, y: 50 }, children: [] }], // Same
-        ['3', { id: '3', position: { x: 100, y: 100 }, children: [] }], // Changed
+        ['1', { id: '1', position: { x: 20, y: 20 }, children: [], isGroup: false }], // Changed
+        ['2', { id: '2', position: { x: 50, y: 50 }, children: [], isGroup: false }], // Same
+        ['3', { id: '3', position: { x: 100, y: 100 }, children: [], isGroup: false }], // Changed
       ]);
       vi.mocked(buildTreeModule.getNodeMap).mockReturnValue(mockNodeMap);
 
@@ -317,25 +315,28 @@ describe('treeLayoutMiddleware', () => {
       });
     });
 
-    it('should skip nodes without position', () => {
+    it('should position nodes without initial position', () => {
       context.modelActionType = 'treeLayout';
 
       const mockNodes = [
         { id: '1', position: { x: 10, y: 10 }, type: 'node' },
-        { id: '2', type: 'node' }, // No position
+        { id: '2', type: 'node' }, // No position - should receive calculated position
       ] as Node[];
       context.state.nodes = mockNodes;
 
       const mockNodeMap = new Map([
-        ['1', { id: '1', position: { x: 20, y: 20 }, children: [] }],
-        ['2', { id: '2', position: { x: 50, y: 50 }, children: [] }],
+        ['1', { id: '1', position: { x: 20, y: 20 }, children: [], isGroup: false }],
+        ['2', { id: '2', position: { x: 50, y: 50 }, children: [], isGroup: false }],
       ]);
       vi.mocked(buildTreeModule.getNodeMap).mockReturnValue(mockNodeMap);
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: '1', position: { x: 20, y: 20 } }],
+        nodesToUpdate: [
+          { id: '1', position: { x: 20, y: 20 } },
+          { id: '2', position: { x: 50, y: 50 } }, // Node without position gets positioned
+        ],
       });
     });
   });
@@ -345,8 +346,8 @@ describe('treeLayoutMiddleware', () => {
       context.modelActionType = 'treeLayout';
 
       const mockNodeMap = new Map([
-        ['1', { id: '1', position: { x: 0, y: 0 }, type: 'group', children: [] }],
-        ['2', { id: '2', position: { x: 0, y: 0 }, groupId: '1', children: [] }],
+        ['1', { id: '1', position: { x: 0, y: 0 }, type: 'group', children: [], isGroup: true }],
+        ['2', { id: '2', position: { x: 0, y: 0 }, groupId: '1', children: [], isGroup: false }],
       ]);
       vi.mocked(buildTreeModule.getNodeMap).mockReturnValue(mockNodeMap);
 

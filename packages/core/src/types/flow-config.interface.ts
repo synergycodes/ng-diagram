@@ -179,29 +179,28 @@ export interface TreeLayoutConfig {
   getLayoutAlignmentForNode: (node: Node) => LayoutAlignmentType | null;
   /**
    * Gap between sibling nodes in the same row/column.
-   * @default 20
    */
   siblingGap: number;
   /**
    * Gap between parent and child nodes.
-   * @default 30
    */
   levelGap: number;
   /**
    * Whether to automatically apply tree layout on structural changes.
-   * @default false
    */
   autoLayout: boolean;
   /**
    * Default layout angle for nodes (0, 90, 180, 270).
-   * @default 90
    */
   layoutAngle: LayoutAngleType;
   /**
    * Default layout alignment ('parent', 'subtree', 'start').
-   * @default 'parent'
    */
   layoutAlignment: LayoutAlignmentType;
+  /**
+   * Gap between separate tree roots when multiple trees exist.
+   */
+  treeGap: number;
 }
 
 export interface SelectionMovingConfig {

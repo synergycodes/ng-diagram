@@ -11,6 +11,7 @@ describe('makeTreeLayout', () => {
     layoutAngle: 0,
     layoutAlignment: 'parent',
     autoLayout: true,
+    treeGap: 100,
   });
 
   const createLeafNode = (id: string, x = 0, y = 0, width = 50, height = 30): TreeNode => ({
@@ -19,6 +20,7 @@ describe('makeTreeLayout', () => {
     size: { width, height },
     children: [],
     type: 'Test',
+    isGroup: false,
   });
 
   const createParentNode = (id: string, children: TreeNode[], x = 0, y = 0, width = 60, height = 40): TreeNode => ({
@@ -27,6 +29,7 @@ describe('makeTreeLayout', () => {
     size: { width, height },
     children,
     type: 'Test',
+    isGroup: false,
   });
 
   describe('leaf node handling', () => {
@@ -53,6 +56,7 @@ describe('makeTreeLayout', () => {
         position: { x: 0, y: 0 },
         children: [],
         type: 'Test',
+        isGroup: false,
       };
       const config = createDefaultConfig();
 
@@ -75,6 +79,7 @@ describe('makeTreeLayout', () => {
         children: [],
         groupChildren: [groupChild],
         type: 'group',
+        isGroup: true,
       };
       const config = createDefaultConfig();
 
@@ -282,6 +287,7 @@ describe('makeTreeLayout', () => {
         children: [treeChild],
         groupChildren: [groupChild],
         type: 'group',
+        isGroup: true,
       };
       const config = createDefaultConfig();
 
@@ -359,6 +365,7 @@ describe('makeTreeLayout', () => {
         size: { width: 60, height: 40 },
         children: [],
         type: 'Test',
+        isGroup: false,
       };
       const config = createDefaultConfig();
 
@@ -380,6 +387,7 @@ describe('makeTreeLayout', () => {
         size: { width: 60, height: 40 },
         children: undefined!,
         type: 'Test',
+        isGroup: false,
       };
       const config = createDefaultConfig();
 

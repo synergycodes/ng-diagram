@@ -370,9 +370,9 @@ export class FlowCore<
   /**
    * Sets the layout
    */
-  layout(layout: 'Tree') {
+  layout(layout: 'tree') {
     switch (layout) {
-      case 'Tree':
+      case 'tree':
         this.applyUpdate({}, 'treeLayout');
         break;
       default:

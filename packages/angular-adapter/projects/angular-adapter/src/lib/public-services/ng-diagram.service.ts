@@ -51,7 +51,7 @@ export class NgDiagramService<
   /**
    * Sets the layout
    */
-  layout(layout: 'Tree') {
+  layout(layout: 'tree') {
     return this.flowCore.layout(layout);
   }
 

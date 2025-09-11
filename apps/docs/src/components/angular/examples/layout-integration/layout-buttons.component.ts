@@ -36,7 +36,7 @@ export class LayoutButtonsComponent {
 
   onTreeLayout() {
     //TODO: When tree config is fixed, apply 90 angle to the Tree
-    this.diagramService.layout('Tree');
+    this.diagramService.layout('tree');
   }
 
   async onCustomLayout() {

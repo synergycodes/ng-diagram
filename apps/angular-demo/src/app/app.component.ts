@@ -54,9 +54,6 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
-    treeLayout: {
-      levelGap: 100,
-    },
   };
 
   model = initializeModel({

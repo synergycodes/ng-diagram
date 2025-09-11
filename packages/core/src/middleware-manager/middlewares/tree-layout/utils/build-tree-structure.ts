@@ -1,5 +1,5 @@
-import { Edge, Node, TreeNode } from '../../../../types';
-import { TreeLayoutConfig } from '../../../../types';
+import { Edge, GroupNode, Node, TreeLayoutConfig, TreeNode } from '../../../../types';
+import { isGroup } from '../../../../utils';
 
 /**
  * Makes a map that shows, for each node, the top group it belongs to.
@@ -15,7 +15,7 @@ export const buildTopGroupMap = (nodeMap: Map<string, TreeNode>): Map<string, st
     let parent = nodeMap.get(node.groupId ?? '');
 
     // Go up the tree to find the top group
-    while (parent?.type === 'group') {
+    while (parent?.isGroup) {
       topId = parent.id;
       parent = nodeMap.get(parent.groupId ?? '');
     }
@@ -55,7 +55,7 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   const result: TreeNode[] = [];
 
   for (const node of nodeMap.values()) {
-    if (node.type === 'group') {
+    if (node.isGroup) {
       (node as TreeNode).groupChildren = [];
     }
   }
@@ -63,12 +63,12 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   for (const node of nodeMap.values()) {
     if (node.groupId) {
       const parent = nodeMap.get(node.groupId);
-      if (parent?.type === 'group') {
+      if (parent?.isGroup) {
         const groupNode = parent as TreeNode;
         groupNode.groupChildren!.push(node);
       }
     }
-    if (node.type === 'group' && !node.groupId) {
+    if (node.isGroup && node.groupId == null) {
       result.push(node as TreeNode);
     }
   }
@@ -76,7 +76,7 @@ export const buildGroupsHierarchy = (nodeMap: Map<string, TreeNode>): TreeNode[]
   return result;
 };
 
-export const getNodeMap = (config: TreeLayoutConfig, nodes: Node[]) => {
+export const getNodeMap = (config: TreeLayoutConfig, nodes: (Node | GroupNode)[]) => {
   const nodeMap = new Map<string, TreeNode>();
   //  Each node is deeply copied and extended with a `children` array.
   nodes.forEach((node) => {
@@ -89,6 +89,7 @@ export const getNodeMap = (config: TreeLayoutConfig, nodes: Node[]) => {
       layoutAlignment: config.getLayoutAlignmentForNode(node) ?? undefined,
       type: node.type,
       groupId: node.groupId,
+      isGroup: isGroup(node),
     });
   });
   return nodeMap;
@@ -115,12 +116,12 @@ export const buildTreeStructure = (
     const parent = nodeMap.get(edge.source);
     const child = nodeMap.get(edge.target);
     if (parent && child && !addedChildren.has(child.id)) {
-      parent.children!.push(child);
+      parent.children.push(child);
       addedChildren.add(child.id);
     }
   });
 
-  const roots = Array.from(nodeMap.values()).filter((n) => !n.groupId && !edges.some((e) => e.target === n.id));
+  const roots = Array.from(nodeMap.values()).filter((n) => n.groupId == null && !edges.some((e) => e.target === n.id));
 
   return { roots };
 };

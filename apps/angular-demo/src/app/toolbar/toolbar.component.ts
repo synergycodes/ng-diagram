@@ -15,7 +15,7 @@ export class ToolbarComponent {
   toggleDebugModeClick = output<void>();
 
   onTreeLayoutClick(): void {
-    this.ngDiagramService.layout('Tree');
+    this.ngDiagramService.layout('tree');
   }
 
   onToggleGroupChildrenClick(): void {

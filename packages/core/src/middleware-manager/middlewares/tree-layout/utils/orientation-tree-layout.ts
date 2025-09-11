@@ -1,4 +1,4 @@
-import { Bounds, LayoutAngleType, TreeNode, TreeLayoutConfig } from '../../../../types';
+import { Bounds, LayoutAngleType, TreeLayoutConfig, TreeNode } from '../../../../types';
 import { getSign, isAngleHorizontal, isAngleVertical } from '../../../../utils';
 import { getNodeSize, groupLayout, isLeafNode, maybeShiftChildren } from './tree-layout-utils.ts';
 
@@ -128,7 +128,7 @@ const alignParent = (
     }
   }
 
-  if (parent.type === 'group' && parent.groupChildren) {
+  if (parent.isGroup && parent.groupChildren) {
     const dx = x - parent.position.x;
     const dy = y - parent.position.y;
     groupLayout(parent.groupChildren, { x: dx, y: dy });
@@ -158,7 +158,7 @@ export const makeTreeLayout = (
   const parentAngle = parentNode.layoutAngle ?? config.layoutAngle;
 
   if (isLeafNode(parentNode)) {
-    if (parentNode.type === 'group' && parentNode.groupChildren) {
+    if (parentNode.isGroup && parentNode.groupChildren) {
       const delta = { x: offsetX - parentNode.position.x, y: offsetY - parentNode.position.y };
       groupLayout(parentNode.groupChildren, delta);
     }

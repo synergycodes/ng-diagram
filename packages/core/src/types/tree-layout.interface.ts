@@ -21,4 +21,5 @@ export interface TreeNode extends Pick<Node, 'id' | 'position' | 'size' | 'type'
    * Node layout alignment: 'parent' | 'subtree' | 'start'.
    */
   layoutAlignment?: LayoutAlignmentType;
+  isGroup: boolean;
 }
