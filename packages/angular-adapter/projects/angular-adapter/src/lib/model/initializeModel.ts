@@ -11,8 +11,8 @@ export function initializeModel<TMiddlewares extends MiddlewareChain = []>(
 ) {
   const create = () => {
     const adapter = new SignalModelAdapter<TMiddlewares>();
-    adapter.setNodes(model.nodes || []);
-    adapter.setEdges(model.edges || []);
+    adapter.updateNodes(model.nodes || []);
+    adapter.updateEdges(model.edges || []);
     adapter.setMetadata((prev) => ({ ...prev, ...model.metadata }));
 
     return adapter;
