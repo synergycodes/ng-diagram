@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { NgDiagramClipboardService } from '../../public-services/ng-diagram-clipboard.service';
+import { NgDiagramEdgeService } from '../../public-services/ng-diagram-edge.service';
+import { NgDiagramGroupsService } from '../../public-services/ng-diagram-groups.service';
 import { NgDiagramModelService } from '../../public-services/ng-diagram-model.service';
+import { NgDiagramNodeService } from '../../public-services/ng-diagram-node.service';
 import { NgDiagramSelectionService } from '../../public-services/ng-diagram-selection.service';
 import { NgDiagramViewportService } from '../../public-services/ng-diagram-viewport.service';
 import { NgDiagramService } from '../../public-services/ng-diagram.service';
@@ -33,6 +36,9 @@ import { UpdatePortsService } from '../../services/update-ports/update-ports.ser
     NgDiagramModelService,
     NgDiagramSelectionService,
     NgDiagramClipboardService,
+    NgDiagramNodeService,
+    NgDiagramEdgeService,
+    NgDiagramGroupsService,
   ],
 })
 export class NgDiagramContextComponent {}
