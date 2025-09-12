@@ -52,21 +52,18 @@ describe('treeLayoutMiddleware', () => {
       nodesMap,
       edgesMap,
       modelActionType: 'update',
-      flowCore: {
-        config: {
-          treeLayout: {
-            getLayoutAngleForNode: () => null,
-            getLayoutAlignmentForNode: () => null,
-            siblingGap: 20,
-            levelGap: 30,
-            autoLayout: false,
-            layoutAngle: 90,
-            layoutAlignment: 'parent',
-            treeGap: 100,
-          },
+      config: {
+        treeLayout: {
+          getLayoutAngleForNode: () => null,
+          getLayoutAlignmentForNode: () => null,
+          siblingGap: 20,
+          levelGap: 30,
+          autoLayout: false,
+          layoutAngle: 90,
+          layoutAlignment: 'parent',
+          treeGap: 100,
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
+      },
       helpers: helpers as Helpers,
       history: [],
       initialUpdate: {},
@@ -149,7 +146,7 @@ describe('treeLayoutMiddleware', () => {
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
-      expect(buildTreeModule.getNodeMap).toHaveBeenCalledWith(context.flowCore.config.treeLayout, context.state.nodes);
+      expect(buildTreeModule.getNodeMap).toHaveBeenCalledWith(context.config.treeLayout, context.state.nodes);
       expect(nextMock).toHaveBeenCalledWith({
         nodesToUpdate: [
           { id: '1', position: { x: 50, y: 50 } },
@@ -175,12 +172,12 @@ describe('treeLayoutMiddleware', () => {
 
   describe('auto layout triggers', () => {
     beforeEach(() => {
-      context.flowCore.config!.treeLayout.autoLayout = true;
+      context.config!.treeLayout.autoLayout = true;
     });
 
     it('should trigger on init when autoLayout is true', () => {
       context.modelActionType = 'init';
-      context.flowCore.config!.treeLayout.autoLayout = true;
+      context.config!.treeLayout.autoLayout = true;
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
@@ -189,7 +186,7 @@ describe('treeLayoutMiddleware', () => {
 
     it('should trigger when edges are added and autoLayout is true', () => {
       context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
-      context.flowCore.config!.treeLayout.autoLayout = true;
+      context.config!.treeLayout.autoLayout = true;
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
@@ -198,7 +195,7 @@ describe('treeLayoutMiddleware', () => {
 
     it('should trigger when edges are removed and autoLayout is true', () => {
       context.helpers.anyEdgesRemoved = vi.fn().mockReturnValue(true);
-      context.flowCore.config!.treeLayout.autoLayout = true;
+      context.config!.treeLayout.autoLayout = true;
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
@@ -207,7 +204,7 @@ describe('treeLayoutMiddleware', () => {
 
     it('should trigger when node position or size changes and autoLayout is true', () => {
       context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockReturnValue(true);
-      context.flowCore.config!.treeLayout.autoLayout = true;
+      context.config!.treeLayout.autoLayout = true;
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
@@ -218,7 +215,7 @@ describe('treeLayoutMiddleware', () => {
     it('should not trigger auto layout when autoLayout is false', () => {
       context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
       // autoLayout is false in raw config, so it should bail out early
-      context.flowCore.config!.treeLayout.autoLayout = false;
+      context.config!.treeLayout.autoLayout = false;
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
@@ -230,7 +227,7 @@ describe('treeLayoutMiddleware', () => {
   describe('tree layout calculation', () => {
     it('should handle horizontal layout (layoutAngle 0 or 180)', () => {
       context.modelActionType = 'treeLayout';
-      context.flowCore.config!.treeLayout.layoutAngle = 0;
+      context.config!.treeLayout.layoutAngle = 0;
 
       const mockRoots = [
         { id: 'root1', position: { x: 10, y: 20 }, children: [], isGroup: false },
@@ -259,7 +256,7 @@ describe('treeLayoutMiddleware', () => {
 
     it('should handle vertical layout (layoutAngle 90 or 270)', () => {
       context.modelActionType = 'treeLayout';
-      context.flowCore.config!.treeLayout.layoutAngle = 90;
+      context.config!.treeLayout.layoutAngle = 90;
 
       const mockRoots = [
         { id: 'root1', position: { x: 15, y: 25 }, children: [], isGroup: false },
@@ -400,7 +397,7 @@ describe('treeLayoutMiddleware', () => {
 
     it('should not perform layout for other action types when autoLayout is false', () => {
       context.modelActionType = 'updateNode';
-      context.flowCore.config!.treeLayout.autoLayout = false;
+      context.config!.treeLayout.autoLayout = false;
 
       treeLayoutMiddleware.execute(context, nextMock, cancelMock);
 
