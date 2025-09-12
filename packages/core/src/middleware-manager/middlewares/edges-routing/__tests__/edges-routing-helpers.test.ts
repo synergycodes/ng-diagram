@@ -595,7 +595,7 @@ describe('Edge Routing Helper Functions', () => {
       expect(result.data).toEqual({ custom: 'data' });
       expect(result.type).toBe('custom-edge');
       expect(result.routing).toBe('bezier');
-      expect(result.zIndex).toBe(500);
+      expect(result.computedZIndex).toBe(500);
     });
   });
 });

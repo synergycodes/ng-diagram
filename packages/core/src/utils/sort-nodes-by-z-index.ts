@@ -29,8 +29,8 @@ export function createNodeZIndexComparator(modelNodes: Node[]): (a: Node, b: Nod
   });
 
   return (a: Node, b: Node): number => {
-    const aZIndex = a.zIndex ?? 0;
-    const bZIndex = b.zIndex ?? 0;
+    const aZIndex = a.computedZIndex ?? 0;
+    const bZIndex = b.computedZIndex ?? 0;
 
     if (aZIndex !== bZIndex) {
       return bZIndex - aZIndex;

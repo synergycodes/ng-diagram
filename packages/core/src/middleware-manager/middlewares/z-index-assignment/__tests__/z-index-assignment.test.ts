@@ -651,7 +651,7 @@ describe('zIndexMiddleware', () => {
 
       expect(nodeIds.length).toBe(1);
       expect(nodeIds[0]).toBe('node1');
-      expect(updates[0].zIndex).toBe(DEFAULT_SELECTED_Z_INDEX); // selected takes precedence
+      expect(updates[0].computedZIndex).toBe(DEFAULT_SELECTED_Z_INDEX); // selected takes precedence
     });
 
     it('should allow zOrder to override previous processing (intentional behavior)', () => {
@@ -690,7 +690,7 @@ describe('zIndexMiddleware', () => {
       // 2. By shouldSnapZOrderNode: directly assigns the zOrder value
       expect(updates.length).toBe(2);
       expect(updates.every((u) => u.id === 'node1')).toBe(true);
-      expect(updates.every((u) => u.zIndex === 15)).toBe(true);
+      expect(updates.every((u) => u.computedZIndex === 15)).toBe(true);
     });
 
     it('should ensure zOrder changes always update zIndex even if node was already processed', () => {
@@ -717,7 +717,7 @@ describe('zIndexMiddleware', () => {
       const updates = stateUpdate.nodesToUpdate || [];
       expect(updates.length).toBe(1);
       expect(updates[0].id).toBe('node1');
-      expect(updates[0].zIndex).toBe(100); // New zOrder value overrides previous zIndex
+      expect(updates[0].computedZIndex).toBe(100); // New zOrder value overrides previous zIndex
     });
   });
 

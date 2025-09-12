@@ -81,7 +81,7 @@ export interface Edge<T extends DataObject = DataObject> {
   /**
    * The z-index of the node. This value is set automatically
    */
-  zIndex?: number;
+  computedZIndex?: number;
   /**
    * The labels of the edge.
    */

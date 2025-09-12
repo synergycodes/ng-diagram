@@ -62,13 +62,17 @@ export interface SimpleNode<T extends DataObject = DataObject> {
    */
   zOrder?: number;
   /**
+   * @readonly
+   * @remarks Z-index is computed by the system and should not be set manually.
    * The z-index of the node. This value is set automatically
    */
-  zIndex?: number;
+  readonly computedZIndex?: number;
   /**
+   * @readonly
+   * @remarks Ports are computed by the system and should not be set manually.
    * The ports of the node.
    */
-  measuredPorts?: Port[];
+  readonly measuredPorts?: Port[];
   /**
    * Whether the node is resizable.
    */

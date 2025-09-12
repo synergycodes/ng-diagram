@@ -15,6 +15,14 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 ## Properties
 
+### computedZIndex?
+
+> `optional` **computedZIndex**: `number`
+
+The z-index of the node. This value is set automatically
+
+***
+
 ### data
 
 > **data**: `T`
@@ -150,14 +158,6 @@ Whether the edge is temporary.
 > `optional` **type**: `string`
 
 The type of the edge declared in edgeTemplateMap.
-
-***
-
-### zIndex?
-
-> `optional` **zIndex**: `number`
-
-The z-index of the node. This value is set automatically
 
 ***
 

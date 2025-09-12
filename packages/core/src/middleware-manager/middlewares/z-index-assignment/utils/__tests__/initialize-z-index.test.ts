@@ -20,8 +20,8 @@ describe('initializeZIndex', () => {
     ]);
     const result = initializeZIndex(nodesMap);
     expect(result).toHaveLength(2);
-    expect(result.find((n) => n.id === '1')?.zIndex).toBe(0);
-    expect(result.find((n) => n.id === '2')?.zIndex).toBe(0);
+    expect(result.find((n) => n.id === '1')?.computedZIndex).toBe(0);
+    expect(result.find((n) => n.id === '2')?.computedZIndex).toBe(0);
   });
 
   it('assigns zIndex recursively to groups and children', () => {
@@ -35,16 +35,16 @@ describe('initializeZIndex', () => {
     ]);
     const result = initializeZIndex(nodesMap);
     expect(result.map((n) => n.id).sort()).toEqual(['g', 'c1', 'c2'].sort());
-    expect(result.find((n) => n.id === 'g')?.zIndex).toBe(0);
-    expect(result.find((n) => n.id === 'c1')?.zIndex).toBe(1);
-    expect(result.find((n) => n.id === 'c2')?.zIndex).toBe(1);
+    expect(result.find((n) => n.id === 'g')?.computedZIndex).toBe(0);
+    expect(result.find((n) => n.id === 'c1')?.computedZIndex).toBe(1);
+    expect(result.find((n) => n.id === 'c2')?.computedZIndex).toBe(1);
   });
 
   it('uses zOrder if present', () => {
     const node = baseNode('1', { zOrder: 42 });
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = initializeZIndex(nodesMap);
-    expect(result[0].zIndex).toBe(42);
+    expect(result[0].computedZIndex).toBe(42);
   });
 
   it('handles nested groups', () => {
@@ -58,8 +58,8 @@ describe('initializeZIndex', () => {
     ]);
     const result = initializeZIndex(nodesMap);
     expect(result.map((n) => n.id).sort()).toEqual(['g1', 'g2', 'c'].sort());
-    expect(result.find((n) => n.id === 'g1')?.zIndex).toBe(0);
-    expect(result.find((n) => n.id === 'g2')?.zIndex).toBe(1);
-    expect(result.find((n) => n.id === 'c')?.zIndex).toBe(2);
+    expect(result.find((n) => n.id === 'g1')?.computedZIndex).toBe(0);
+    expect(result.find((n) => n.id === 'g2')?.computedZIndex).toBe(1);
+    expect(result.find((n) => n.id === 'c')?.computedZIndex).toBe(2);
   });
 });

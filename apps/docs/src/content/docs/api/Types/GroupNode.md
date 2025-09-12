@@ -43,6 +43,18 @@ Whether the size of the node is automatically resized based on the content.
 
 ***
 
+### computedZIndex?
+
+> `optional` **computedZIndex**: `number`
+
+The z-index of the node. This value is set automatically
+
+#### Inherited from
+
+`SimpleNode.computedZIndex`
+
+***
+
 ### data
 
 > **data**: `T`
@@ -176,18 +188,6 @@ The type of the node declared in nodeTemplateMap.
 #### Inherited from
 
 `SimpleNode.type`
-
-***
-
-### zIndex?
-
-> `optional` **zIndex**: `number`
-
-The z-index of the node. This value is set automatically
-
-#### Inherited from
-
-`SimpleNode.zIndex`
 
 ***
 

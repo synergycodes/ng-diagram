@@ -21,7 +21,10 @@ export function assignNodeZIndex(
   const nodesWithZIndex: Node[] = [];
 
   function assignZIndex(currentNode: Node, zIndex: number, selected?: boolean): number {
-    const nodeWithZIndex: Node = { ...currentNode, zIndex: selected ? (currentNode?.zOrder ?? zIndex) : zIndex };
+    const nodeWithZIndex: Node = {
+      ...currentNode,
+      computedZIndex: selected ? (currentNode?.zOrder ?? zIndex) : zIndex,
+    };
     nodesWithZIndex.push(nodeWithZIndex);
 
     let currentZIndex = zIndex;

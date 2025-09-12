@@ -166,7 +166,7 @@ export const createUpdatedTemporaryEdge = (
     points,
     sourcePosition: sourcePoint,
     targetPosition: targetPoint,
-    zIndex,
+    computedZIndex: zIndex,
   };
 };
 

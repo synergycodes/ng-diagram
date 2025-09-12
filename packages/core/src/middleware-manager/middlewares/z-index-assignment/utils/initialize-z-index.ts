@@ -14,7 +14,7 @@ export function initializeZIndex(nodesMap: Map<string, Node>): Node[] {
 
 function assignZIndex(node: Node, nodesMap: Map<string, Node>, output: Node[], currentZIndex: number) {
   const zIndex = node?.zOrder ?? currentZIndex;
-  output.push({ ...node, zIndex: zIndex });
+  output.push({ ...node, computedZIndex: zIndex });
 
   if (!isGroup(node)) return;
 
