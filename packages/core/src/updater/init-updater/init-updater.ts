@@ -156,7 +156,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
 
       const updatedEdges = edges.map((edge) => ({
         ...edge,
-        labels: edge.measuredLabels?.map((label) => {
+        measuredLabels: edge.measuredLabels?.map((label) => {
           const size = edgeLabelSizeMap.get(this.getCompoundId(edge.id, label.id));
 
           if (!size) {
