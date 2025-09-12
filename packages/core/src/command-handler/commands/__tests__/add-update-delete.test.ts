@@ -137,12 +137,12 @@ describe('Add Update Delete Command', () => {
   });
 
   it('should delete ports from a node', () => {
-    getNodeByIdMock.mockReturnValue({ ...mockNode, ports: [mockPort] });
+    getNodeByIdMock.mockReturnValue({ ...mockNode, measuredPorts: [mockPort] });
 
     commandHandler.emit('deletePorts', { nodeId: mockNode.id, portIds: [mockPort.id] });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
-      { nodesToUpdate: [{ id: mockNode.id, ports: [] }] },
+      { nodesToUpdate: [{ id: mockNode.id, measuredPorts: [] }] },
       'updateNode'
     );
   });

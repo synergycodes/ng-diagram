@@ -86,7 +86,7 @@ describe('FlowResizeBatchProcessorService', () => {
 
     mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     mockFlowCore.getNodeById.mockReturnValue({
-      ports: [{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }],
+      measuredPorts: [{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }],
     });
 
     vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({

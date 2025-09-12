@@ -115,7 +115,7 @@ describe('finishLinking', () => {
   it('should clear temporary edge when target port is source type', async () => {
     const targetNodeWithSourcePort = {
       ...mockTargetNode,
-      ports: [
+      measuredPorts: [
         {
           id: 'target-port',
           type: 'source', // Invalid for target

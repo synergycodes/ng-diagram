@@ -211,13 +211,13 @@ describe('Copy-Paste Commands', () => {
         expect(pastedNode.id).not.toBe('node1');
         expect(pastedNode.id).toMatch(/^generated-node-/);
 
-        expect(pastedNode.ports).toHaveLength(2);
+        expect(pastedNode.measuredPorts).toHaveLength(2);
         // Port IDs should be preserved (not regenerated)
-        expect(pastedNode.ports[0].id).toBe('port1');
-        expect(pastedNode.ports[1].id).toBe('port2');
+        expect(pastedNode.measuredPorts[0].id).toBe('port1');
+        expect(pastedNode.measuredPorts[1].id).toBe('port2');
         // But nodeId should be updated to the new node ID
-        expect(pastedNode.ports[0].nodeId).toBe(pastedNode.id);
-        expect(pastedNode.ports[1].nodeId).toBe(pastedNode.id);
+        expect(pastedNode.measuredPorts[0].nodeId).toBe(pastedNode.id);
+        expect(pastedNode.measuredPorts[1].nodeId).toBe(pastedNode.id);
       });
 
       it('should preserve port IDs in edge references when pasting', async () => {
@@ -328,7 +328,7 @@ describe('Copy-Paste Commands', () => {
 
         expect(update.nodesToAdd).toHaveLength(1);
         const pastedNode = update.nodesToAdd[0];
-        expect(pastedNode.ports).toBeUndefined();
+        expect(pastedNode.measuredPorts).toBeUndefined();
       });
 
       it('should handle edges without labels', async () => {
