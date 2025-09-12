@@ -113,6 +113,9 @@ function updateGroupHierarchy(
 
     const groupRect = calculateGroupRect(childNodes, currentGroup);
 
+    // Skip if calculateGroupRect returns undefined (e.g., for empty groups)
+    if (!groupRect) continue;
+
     const update: NodeUpdate = {
       id: currentGroup.id,
       position: { x: groupRect.x, y: groupRect.y },
@@ -146,9 +149,16 @@ function updateGroupHierarchy(
  */
 function getParentChain(nodeId: string, nodesMap: Map<string, Node>): GroupNode[] {
   const parents: GroupNode[] = [];
+  const visitedIds = new Set<string>();
   let currentNode = nodesMap.get(nodeId);
 
   while (currentNode?.groupId) {
+    // Prevent circular references
+    if (visitedIds.has(currentNode.id)) {
+      break;
+    }
+    visitedIds.add(currentNode.id);
+
     const parent = nodesMap.get(currentNode.groupId);
     if (parent && isGroup(parent)) {
       parents.push(parent);
