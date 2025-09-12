@@ -1,7 +1,6 @@
 import type { ActionStateManager } from '../action-state-manager/action-state-manager';
 import type { EdgeRoutingManager } from '../edge-routing-manager';
 import type { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
-import type { ModelLookup } from '../model-lookup/model-lookup';
 import type { Edge } from './edge.interface';
 import type { FlowConfig } from './flow-config.interface';
 import type { Metadata } from './metadata.interface';
@@ -98,7 +97,6 @@ export interface MiddlewareContext<
   state: FlowState<TMetadata>;
   nodesMap: Map<string, Node>;
   edgesMap: Map<string, Edge>;
-  modelLookup: ModelLookup;
   modelActionType: ModelActionType;
   actionStateManager: ActionStateManager;
   edgeRoutingManager: EdgeRoutingManager;
