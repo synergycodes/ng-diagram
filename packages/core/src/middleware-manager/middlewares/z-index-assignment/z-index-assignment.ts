@@ -11,7 +11,8 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
   execute: (context, next) => {
     const {
       state: { edges, nodes },
-      modelLookup: { nodesMap, edgesMap },
+      nodesMap,
+      edgesMap,
       helpers,
       modelActionType,
       config,

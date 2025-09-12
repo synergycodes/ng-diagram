@@ -1,4 +1,3 @@
-import { ModelLookup } from '../../model-lookup/model-lookup';
 import type { GroupNode, Middleware, MiddlewareContext, Node } from '../../types';
 import { calculateGroupRect, isGroup } from '../../utils';
 
@@ -21,7 +20,7 @@ export const groupChildrenMoveExtent: Middleware<
   defaultMetadata: {
     enabled: true,
   },
-  execute: ({ helpers, modelLookup, actionStateManager, middlewareMetadata }, next) => {
+  execute: ({ helpers, nodesMap, actionStateManager, middlewareMetadata }, next) => {
     const isEnabled = middlewareMetadata.enabled;
 
     if (!isEnabled || actionStateManager.dragging?.modifiers.shift) {
@@ -35,13 +34,13 @@ export const groupChildrenMoveExtent: Middleware<
       return;
     }
 
-    const affectedGroups = findAffectedGroups(helpers, modelLookup.nodesMap);
+    const affectedGroups = findAffectedGroups(helpers, nodesMap);
     if (affectedGroups.size === 0) {
       next();
       return;
     }
 
-    const updates = calculateGroupUpdates(affectedGroups, modelLookup);
+    const updates = calculateGroupUpdates(affectedGroups, nodesMap);
 
     if (updates.length > 0) {
       next({ nodesToUpdate: updates });
@@ -75,16 +74,16 @@ function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map
 /**
  * Calculate all necessary updates for groups and their ancestors
  */
-function calculateGroupUpdates(affectedGroups: Set<GroupNode>, modelLookup: ModelLookup): NodeUpdate[] {
+function calculateGroupUpdates(affectedGroups: Set<GroupNode>, nodesMap: Map<string, Node>): NodeUpdate[] {
   const updates: NodeUpdate[] = [];
   const processedNodeIds = new Set<string>();
   const sortedGroups = [...affectedGroups].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0));
 
   // Create a working copy of the nodes map for incremental updates
-  const workingNodesMap = new Map(modelLookup.nodesMap);
+  const workingNodesMap = new Map(nodesMap);
 
   for (const group of sortedGroups) {
-    const groupUpdates = updateGroupHierarchy(group, workingNodesMap, modelLookup, processedNodeIds);
+    const groupUpdates = updateGroupHierarchy(group, workingNodesMap, processedNodeIds);
     updates.push(...groupUpdates);
   }
 
@@ -98,22 +97,24 @@ function calculateGroupUpdates(affectedGroups: Set<GroupNode>, modelLookup: Mode
 function updateGroupHierarchy(
   group: GroupNode,
   workingNodesMap: Map<string, Node>,
-  modelLookup: ModelLookup,
   processedNodeIds: Set<string>
 ): NodeUpdate[] {
   const updates: NodeUpdate[] = [];
 
   // Get the hierarchy from bottom to top (group -> ancestors)
-  const hierarchy = [group, ...modelLookup.getParentChain(group.id)];
+  const hierarchy = [group, ...getParentChain(group.id, workingNodesMap)];
 
   for (const currentGroup of hierarchy) {
-    const children = modelLookup.getNodeChildrenIds(currentGroup.id, { directOnly: true });
+    const children = getDirectChildren(currentGroup.id, workingNodesMap).map((child) => child.id);
 
     if (children.length === 0) continue;
 
     const childNodes = children.map((id: string) => workingNodesMap.get(id)!);
 
     const groupRect = calculateGroupRect(childNodes, currentGroup);
+
+    // Skip if calculateGroupRect returns undefined (e.g., for empty groups)
+    if (!groupRect) continue;
 
     const update: NodeUpdate = {
       id: currentGroup.id,
@@ -141,4 +142,46 @@ function updateGroupHierarchy(
   }
 
   return updates;
+}
+
+/**
+ * Get parent chain from the working nodes map
+ */
+function getParentChain(nodeId: string, nodesMap: Map<string, Node>): GroupNode[] {
+  const parents: GroupNode[] = [];
+  const visitedIds = new Set<string>();
+  let currentNode = nodesMap.get(nodeId);
+
+  while (currentNode?.groupId) {
+    // Prevent circular references
+    if (visitedIds.has(currentNode.id)) {
+      break;
+    }
+    visitedIds.add(currentNode.id);
+
+    const parent = nodesMap.get(currentNode.groupId);
+    if (parent && isGroup(parent)) {
+      parents.push(parent);
+      currentNode = parent;
+    } else {
+      break;
+    }
+  }
+
+  return parents;
+}
+
+/**
+ * Get direct children of a node from the working nodes map
+ */
+function getDirectChildren(nodeId: string, nodesMap: Map<string, Node>): Node[] {
+  const children: Node[] = [];
+
+  for (const node of nodesMap.values()) {
+    if (node.groupId === nodeId) {
+      children.push(node);
+    }
+  }
+
+  return children;
 }

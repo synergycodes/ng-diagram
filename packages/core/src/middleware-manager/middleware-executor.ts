@@ -94,7 +94,8 @@ export class MiddlewareExecutor<
     TMetadata['middlewaresConfig'][MiddlewareConfigKeys<TCustomMiddlewares>]
   > => ({
     state: this.getState(),
-    modelLookup: this.flowCore.modelLookup,
+    nodesMap: this.nodesMap,
+    edgesMap: this.edgesMap,
     initialState: this.initialState,
     modelActionType: this.modelActionType,
     actionStateManager: this.flowCore.actionStateManager,
