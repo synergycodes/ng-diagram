@@ -96,6 +96,8 @@ export interface MiddlewareContext<
 > {
   initialState: FlowState<TMetadata>;
   state: FlowState<TMetadata>;
+  nodesMap: Map<string, Node>;
+  edgesMap: Map<string, Edge>;
   modelLookup: ModelLookup;
   modelActionType: ModelActionType;
   actionStateManager: ActionStateManager;
