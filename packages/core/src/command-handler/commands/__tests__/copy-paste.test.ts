@@ -188,7 +188,7 @@ describe('Copy-Paste Commands', () => {
               ...mockNode,
               id: 'node1',
               selected: true,
-              ports: [
+              measuredPorts: [
                 { id: 'port1', type: 'source', nodeId: 'node1', side: 'top' },
                 { id: 'port2', type: 'target', nodeId: 'node1', side: 'bottom' },
               ],
@@ -227,13 +227,13 @@ describe('Copy-Paste Commands', () => {
               ...mockNode,
               id: 'node1',
               selected: true,
-              ports: [{ id: 'port1', type: 'source', nodeId: 'node1', side: 'right' }],
+              measuredPorts: [{ id: 'port1', type: 'source', nodeId: 'node1', side: 'right' }],
             },
             {
               ...mockNode,
               id: 'node2',
               selected: true,
-              ports: [{ id: 'port2', type: 'target', nodeId: 'node2', side: 'left' }],
+              measuredPorts: [{ id: 'port2', type: 'target', nodeId: 'node2', side: 'left' }],
             },
           ],
           edges: [
@@ -315,7 +315,7 @@ describe('Copy-Paste Commands', () => {
 
       it('should handle nodes without ports', async () => {
         commandHandler.flowCore.getState = () => ({
-          nodes: [{ ...mockNode, id: 'node1', selected: true, ports: undefined }],
+          nodes: [{ ...mockNode, id: 'node1', selected: true, measuredPorts: undefined }],
           edges: [],
           metadata: mockMetadata,
         });

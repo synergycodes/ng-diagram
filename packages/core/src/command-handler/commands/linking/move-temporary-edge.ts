@@ -71,7 +71,7 @@ export const createNewTemporaryEdge = (
     return createFloatingEdge();
   }
 
-  if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)) {
+  if (targetPortId && targetNode.measuredPorts?.find((port) => port.id === targetPortId)) {
     return createTemporaryEdge(commandHandler.flowCore.config, {
       source,
       sourcePort,

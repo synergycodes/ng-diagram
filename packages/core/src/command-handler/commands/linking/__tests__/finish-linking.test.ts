@@ -42,7 +42,7 @@ describe('finishLinking', () => {
     ...mockNode,
     id: 'target-node',
     position: { x: 100, y: 200 },
-    ports: [
+    measuredPorts: [
       {
         id: 'target-port',
         type: 'target',

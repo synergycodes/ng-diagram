@@ -95,15 +95,15 @@ Flag indicating the node is a group
 
 ***
 
-### ports?
+### measuredPorts?
 
-> `optional` **ports**: `Port`[]
+> `optional` **measuredPorts**: `Port`[]
 
 The ports of the node.
 
 #### Inherited from
 
-`SimpleNode.ports`
+`SimpleNode.measuredPorts`
 
 ***
 

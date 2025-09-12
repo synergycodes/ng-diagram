@@ -66,18 +66,18 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): { x: 
  * Update port nodeId references for a node
  */
 const updatePortNodeIds = (node: Node): Node => {
-  if (!node.ports || node.ports.length === 0) {
+  if (!node.measuredPorts || node.measuredPorts.length === 0) {
     return node;
   }
 
-  const updatedPorts = node.ports.map((port) => ({
+  const updatedPorts = node.measuredPorts.map((port) => ({
     ...port,
     nodeId: node.id, // Update nodeId reference only
   }));
 
   return {
     ...node,
-    ports: updatedPorts,
+    measuredPorts: updatedPorts,
   };
 };
 

@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { Port } from '@angularflow/core';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
 import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
@@ -105,7 +106,7 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
-      const port = node.ports?.find((port) => port.id === metadata.portId);
+      const port = node.measuredPorts?.find((port: Port) => port.id === metadata.portId);
       const currentSize = port?.size;
       const currentPosition = port?.position;
 

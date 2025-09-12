@@ -8,7 +8,7 @@ describe('computeFloatingEndSide', () => {
     ...mockNode,
     position: { x, y },
     size: { width: 100, height: 50 },
-    ports: [
+    measuredPorts: [
       {
         ...mockPort,
         id: 'test-port',
@@ -106,7 +106,7 @@ describe('computeFloatingEndSide', () => {
         ...mockNode,
         position: { x: 100, y: 100 },
         size: { width: 100, height: 50 },
-        ports: [
+        measuredPorts: [
           {
             ...mockPort,
             id: 'test-port',

@@ -12,7 +12,7 @@ describe('SpatialHash', () => {
       id: '1',
       position: { x: 0, y: 0 },
       size: { width: 20, height: 20 },
-      ports: [
+      measuredPorts: [
         {
           id: 'port-1',
           type: 'both',

@@ -5,7 +5,7 @@ import { getPoint, getSourceTargetPositions } from '../get-source-target-positio
 
 vi.mock('../../../../utils', () => ({
   getPortFlowPositionSide: vi.fn().mockImplementation((node: Node, portId: string) => {
-    const port = node.ports?.find((p) => p.id === portId);
+    const port = node.measuredPorts?.find((p) => p.id === portId);
     if (!port) return null;
 
     // Simulate rotation handling
@@ -102,7 +102,7 @@ describe('getSourceTargetPositions', () => {
           ...mockNode,
           id: 'node-1',
           position: { x: 0, y: 0 },
-          ports: [
+          measuredPorts: [
             {
               ...mockPort,
               id: 'port-1',
@@ -119,7 +119,7 @@ describe('getSourceTargetPositions', () => {
           ...mockNode,
           id: 'node-2',
           position: { x: 200, y: 0 },
-          ports: [
+          measuredPorts: [
             {
               ...mockPort,
               id: 'port-2',
@@ -156,7 +156,7 @@ describe('getSourceTargetPositions', () => {
           id: 'node-1',
           angle: 90,
           position: { x: 0, y: 0 },
-          ports: [
+          measuredPorts: [
             {
               ...mockPort,
               id: 'port-1',
@@ -173,7 +173,7 @@ describe('getSourceTargetPositions', () => {
           ...mockNode,
           id: 'node-2',
           position: { x: 200, y: 0 },
-          ports: [
+          measuredPorts: [
             {
               ...mockPort,
               id: 'port-2',
@@ -211,7 +211,7 @@ describe('getSourceTargetPositions', () => {
             ...mockNode,
             id: 'node-1',
             position: { x: 0, y: 0 },
-            ports: [
+            measuredPorts: [
               {
                 ...mockPort,
                 id: 'port-1',
@@ -249,7 +249,7 @@ describe('getSourceTargetPositions', () => {
             ...mockNode,
             id: 'node-2',
             position: { x: 200, y: 0 },
-            ports: [
+            measuredPorts: [
               {
                 ...mockPort,
                 id: 'port-2',
@@ -315,7 +315,7 @@ describe('getPoint', () => {
     const node: Node = {
       ...mockNode,
       position: { x: 100, y: 100 },
-      ports: [
+      measuredPorts: [
         {
           ...mockPort,
           id: 'port-1',
@@ -353,7 +353,7 @@ describe('getPoint', () => {
       ...mockNode,
       angle: 90,
       position: { x: 100, y: 100 },
-      ports: [
+      measuredPorts: [
         {
           ...mockPort,
           id: 'port-1',
@@ -374,7 +374,7 @@ describe('getPoint', () => {
     const node: Node = {
       ...mockNode,
       position: { x: 100, y: 100 },
-      ports: [],
+      measuredPorts: [],
     };
 
     const result = getPoint(node, 'bottom', 'non-existent-port', { x: 15, y: 15 });

@@ -13,7 +13,7 @@ describe('getFlowPortPosition', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -26,7 +26,7 @@ describe('getFlowPortPosition', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -39,7 +39,7 @@ describe('getFlowPortPosition', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -52,7 +52,7 @@ describe('getFlowPortPosition', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -67,7 +67,7 @@ describe('getFlowPortPosition', () => {
           ...mockNode,
           angle: 90,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -81,7 +81,7 @@ describe('getFlowPortPosition', () => {
           ...mockNode,
           angle: 180,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -95,7 +95,7 @@ describe('getFlowPortPosition', () => {
           ...mockNode,
           angle: 270,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -116,7 +116,7 @@ describe('getPortFlowPositionSide', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -128,7 +128,7 @@ describe('getPortFlowPositionSide', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'bottom', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -140,7 +140,7 @@ describe('getPortFlowPositionSide', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'left', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -152,7 +152,7 @@ describe('getPortFlowPositionSide', () => {
       {
         ...mockNode,
         position: { x: 100, y: 100 },
-        ports: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+        measuredPorts: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
       },
       mockPort.id
     );
@@ -166,7 +166,7 @@ describe('getPortFlowPositionSide', () => {
           ...mockNode,
           angle: 90,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -179,7 +179,7 @@ describe('getPortFlowPositionSide', () => {
           ...mockNode,
           angle: 180,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -192,7 +192,7 @@ describe('getPortFlowPositionSide', () => {
           ...mockNode,
           angle: 270,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -205,7 +205,7 @@ describe('getPortFlowPositionSide', () => {
           ...mockNode,
           angle: 90,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'right', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -218,7 +218,7 @@ describe('getPortFlowPositionSide', () => {
           ...mockNode,
           angle: 0,
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );
@@ -231,7 +231,7 @@ describe('getPortFlowPositionSide', () => {
           ...mockNode,
           angle: 450, // 450 % 360 = 90
           position: { x: 100, y: 100 },
-          ports: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
+          measuredPorts: [{ ...mockPort, side: 'top', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } }],
         },
         mockPort.id
       );

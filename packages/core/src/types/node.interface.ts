@@ -68,7 +68,7 @@ export interface SimpleNode<T extends DataObject = DataObject> {
   /**
    * The ports of the node.
    */
-  ports?: Port[];
+  measuredPorts?: Port[];
   /**
    * Whether the node is resizable.
    */

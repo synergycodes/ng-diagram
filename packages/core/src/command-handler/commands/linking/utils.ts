@@ -36,8 +36,12 @@ export const validateConnection = (
 ) => {
   const sourceNode = sourceNodeId ? core.getNodeById(sourceNodeId) : null;
   const targetNode = targetNodeId ? core.getNodeById(targetNodeId) : null;
-  const sourcePort = sourcePortId ? (sourceNode?.ports?.find((port) => port.id === sourcePortId) ?? null) : null;
-  const targetPort = targetPortId ? (targetNode?.ports?.find((port) => port.id === targetPortId) ?? null) : null;
+  const sourcePort = sourcePortId
+    ? (sourceNode?.measuredPorts?.find((port) => port.id === sourcePortId) ?? null)
+    : null;
+  const targetPort = targetPortId
+    ? (targetNode?.measuredPorts?.find((port) => port.id === targetPortId) ?? null)
+    : null;
 
   // Dragging temporary edge case without snapping to target port
   if (!isFinishLinking && sourcePort && !targetPort) {

@@ -118,10 +118,10 @@ export const addPorts = async (commandHandler: CommandHandler, command: AddPorts
   // instead of skipping them. This ensures the adapter stays synchronized with the core.
   // The front-end is considered the source of truth in this context.
   const newPortIds = new Set(ports.map((port) => port.id));
-  const existingPortsToKeep = (node.ports ?? []).filter((port) => !newPortIds.has(port.id));
+  const existingPortsToKeep = (node.measuredPorts ?? []).filter((port) => !newPortIds.has(port.id));
   const newPorts = [...existingPortsToKeep, ...ports];
 
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: newPorts }] }, 'updateNode');
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, measuredPorts: newPorts }] }, 'updateNode');
 };
 
 export interface UpdatePortsCommand {
@@ -136,7 +136,7 @@ export const updatePorts = async (commandHandler: CommandHandler, command: Updat
   if (!node) {
     return;
   }
-  const portsToUpdate = node.ports?.map((port) => {
+  const portsToUpdate = node.measuredPorts?.map((port) => {
     const portChanges = ports.find(({ portId }) => portId === port.id)?.portChanges;
     if (!portChanges) {
       return port;
@@ -149,7 +149,10 @@ export const updatePorts = async (commandHandler: CommandHandler, command: Updat
   if (!portsToUpdate) {
     return;
   }
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: portsToUpdate }] }, 'updateNode');
+  await commandHandler.flowCore.applyUpdate(
+    { nodesToUpdate: [{ id: nodeId, measuredPorts: portsToUpdate }] },
+    'updateNode'
+  );
 };
 
 export interface DeletePortsCommand {
@@ -164,8 +167,11 @@ export const deletePorts = async (commandHandler: CommandHandler, command: Delet
   if (!node) {
     return;
   }
-  const leftPorts = node.ports?.filter((port) => !portIds.includes(port.id));
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, ports: leftPorts }] }, 'updateNode');
+  const leftPorts = node.measuredPorts?.filter((port) => !portIds.includes(port.id));
+  await commandHandler.flowCore.applyUpdate(
+    { nodesToUpdate: [{ id: nodeId, measuredPorts: leftPorts }] },
+    'updateNode'
+  );
 };
 
 export interface AddEdgeLabelsCommand {
