@@ -207,21 +207,24 @@ describe('NgDiagramBaseEdgeComponent', () => {
   });
 
   it('should handle edge labels', () => {
-    mockEdge.labels = [
-      { id: 'label-1', positionOnEdge: 0.5 },
-      { id: 'label-2', positionOnEdge: 0.75 },
-    ];
+    const edgeWithLabels = {
+      ...mockEdge,
+      measuredLabels: [
+        { id: 'label-1', positionOnEdge: 0.5 },
+        { id: 'label-2', positionOnEdge: 0.75 },
+      ],
+    };
 
-    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.componentRef.setInput('edge', edgeWithLabels);
     fixture.detectChanges();
 
-    expect(component.labels()).toEqual(mockEdge.labels);
+    expect(component.labels()).toEqual(edgeWithLabels.measuredLabels);
   });
 
   it('should handle edge with no labels', () => {
-    mockEdge.labels = undefined;
+    const edgeWithoutLabels = { ...mockEdge, measuredLabels: undefined };
 
-    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.componentRef.setInput('edge', edgeWithoutLabels);
     fixture.detectChanges();
 
     expect(component.labels()).toEqual([]);

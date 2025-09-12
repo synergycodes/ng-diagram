@@ -18,7 +18,7 @@ class TestComponent {
     isGroup: true,
     highlighted: false,
     size: { width: 100, height: 100 },
-    ports: [],
+    measuredPorts: [],
     resizable: true,
     type: 'group',
   };

@@ -45,8 +45,11 @@ Whether the size of the node is automatically resized based on the content.
 
 ### computedZIndex?
 
-> `optional` **computedZIndex**: `number`
+> `readonly` `optional` **computedZIndex**: `number`
 
+#### Remarks
+
+Z-index is computed by the system and should not be set manually.
 The z-index of the node. This value is set automatically
 
 #### Inherited from
@@ -109,8 +112,11 @@ Flag indicating the node is a group
 
 ### measuredPorts?
 
-> `optional` **measuredPorts**: `Port`[]
+> `readonly` `optional` **measuredPorts**: `Port`[]
 
+#### Remarks
+
+Ports are computed by the system and should not be set manually.
 The ports of the node.
 
 #### Inherited from

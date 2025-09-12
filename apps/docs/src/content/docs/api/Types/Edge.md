@@ -17,8 +17,11 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 ### computedZIndex?
 
-> `optional` **computedZIndex**: `number`
+> `readonly` `optional` **computedZIndex**: `number`
 
+#### Remarks
+
+Z-index is computed by the system and should not be set manually.
 The z-index of the node. This value is set automatically
 
 ***
@@ -39,10 +42,13 @@ The unique identifier for the edge.
 
 ***
 
-### labels?
+### measuredLabels?
 
-> `optional` **labels**: `EdgeLabel`[]
+> `readonly` `optional` **measuredLabels**: `EdgeLabel`[]
 
+#### Remarks
+
+Edge Labels are computed by the system and should not be set manually.
 The labels of the edge.
 
 ***

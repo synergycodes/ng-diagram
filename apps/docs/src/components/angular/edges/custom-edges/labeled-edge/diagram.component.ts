@@ -5,8 +5,8 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
+  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 
@@ -51,7 +51,7 @@ export class Diagram {
         targetPort: 'port-left',
         target: '2',
         type: 'labeled',
-        labels: [{ id: 'label1', positionOnEdge: 0.5 }],
+        measuredLabels: [{ id: 'label1', positionOnEdge: 0.5 }],
         data: {},
       },
     ],
