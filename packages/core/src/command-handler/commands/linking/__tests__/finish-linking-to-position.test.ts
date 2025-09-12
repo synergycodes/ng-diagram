@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
-import type { CommandHandler, Edge } from '../../../../types';
+import type { CommandHandler, Edge, LinkingActionState } from '../../../../types';
 import { finishLinkingToPosition, FinishLinkingToPositionCommand } from '../finish-linking-to-position';
 
-// Mock the utility functions
 vi.mock('../utils', () => ({
   createFinalEdge: vi.fn(),
 }));
@@ -17,6 +16,10 @@ describe('finishLinkingToPosition', () => {
     getState: ReturnType<typeof vi.fn>;
     applyUpdate: ReturnType<typeof vi.fn>;
     config: object;
+    actionStateManager: {
+      linking: LinkingActionState | null;
+      clearLinking: ReturnType<typeof vi.fn>;
+    };
   };
 
   const mockTemporaryEdge: Edge = {
@@ -33,8 +36,12 @@ describe('finishLinkingToPosition', () => {
 
     mockFlowCore = {
       getState: vi.fn(),
-      applyUpdate: vi.fn(),
+      applyUpdate: vi.fn().mockResolvedValue(undefined),
       config: {},
+      actionStateManager: {
+        linking: null,
+        clearLinking: vi.fn(),
+      },
     };
 
     mockCommandHandler = {
@@ -45,7 +52,7 @@ describe('finishLinkingToPosition', () => {
   });
 
   it('should return early when no temporary edge exists', async () => {
-    mockFlowCore.getState.mockReturnValue({ metadata: {} });
+    mockFlowCore.actionStateManager.linking = null;
 
     const command: FinishLinkingToPositionCommand = {
       name: 'finishLinkingToPosition',
@@ -66,9 +73,11 @@ describe('finishLinkingToPosition', () => {
       data: {},
     };
 
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
     mockCreateFinalEdge.mockReturnValue(finalEdge);
 
     const command: FinishLinkingToPositionCommand = {
@@ -86,20 +95,22 @@ describe('finishLinkingToPosition', () => {
 
     expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        metadataUpdate: { temporaryEdge: null },
         edgesToAdd: [finalEdge],
       },
       'finishLinking'
     );
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
   it('should always create edge with empty target and targetPort', async () => {
     const position = { x: 300, y: 400 };
     const finalEdge = { id: 'final-edge', source: 'source-node', target: '', data: {} };
 
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
     mockCreateFinalEdge.mockReturnValue(finalEdge);
 
     const command: FinishLinkingToPositionCommand = {
@@ -120,9 +131,11 @@ describe('finishLinkingToPosition', () => {
     const position = { x: 500, y: 600 };
     const finalEdge = { id: 'final-edge', source: 'source-node', target: '', data: {} };
 
-    mockFlowCore.getState.mockReturnValue({
-      metadata: { temporaryEdge: mockTemporaryEdge },
-    });
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
     mockCreateFinalEdge.mockReturnValue(finalEdge);
 
     const command: FinishLinkingToPositionCommand = {
@@ -134,10 +147,10 @@ describe('finishLinkingToPosition', () => {
 
     expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        metadataUpdate: { temporaryEdge: null },
         edgesToAdd: [finalEdge],
       },
       'finishLinking'
     );
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 });

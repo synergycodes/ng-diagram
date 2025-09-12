@@ -13,6 +13,7 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         this.flow.actionStateManager.linking = {
           sourceNodeId,
           sourcePortId: event.portId,
+          temporaryEdge: null,
         };
 
         this.flow.commandHandler.emit('startLinking', {
@@ -36,12 +37,10 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
       case 'end': {
         if (!this.flow.actionStateManager.isLinking()) break;
 
-        this.flow.actionStateManager.linking = undefined;
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        this.flow.commandHandler.emit('finishLinking', {
-          position: flowPosition,
-        });
+        this.flow.commandHandler.emit('finishLinking', { position: flowPosition });
+        this.flow.actionStateManager.clearLinking();
 
         break;
       }

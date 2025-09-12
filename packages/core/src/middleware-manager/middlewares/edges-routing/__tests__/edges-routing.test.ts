@@ -37,6 +37,10 @@ describe('Edges Routing Middleware', () => {
   const checkIfMetadataPropsChangedMock = vi.fn();
   const checkIfEdgeChangedMock = vi.fn();
   const checkIfNodeChangedMock = vi.fn();
+  const mockActionStateManager = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    linking: null as any,
+  };
 
   const nodesMap = new Map();
   const edgesMap = new Map();
@@ -369,20 +373,27 @@ describe('Edges Routing Middleware', () => {
 
   describe('Temporary Edge Processing', () => {
     it('should process temporary edge', () => {
+      const temporaryEdge = {
+        ...mockEdge,
+        id: 'temp-edge',
+        source: 'node-1',
+        target: '',
+        targetPosition: { x: 200, y: 200 },
+        points: [],
+        temporary: true,
+      };
+
+      mockActionStateManager.linking = {
+        sourceNodeId: 'node-1',
+        sourcePortId: '',
+        temporaryEdge,
+      };
+
       const newState = {
         ...initialState,
         nodes: [{ ...mockNode, id: 'node-1', position: { x: 100, y: 100 } }],
-        metadata: {
-          ...mockMetadata,
-          temporaryEdge: {
-            ...mockEdge,
-            id: 'temp-edge',
-            source: 'node-1',
-            target: '',
-            targetPosition: { x: 200, y: 200 },
-            points: [],
-          },
-        },
+        edges: [],
+        metadata: mockMetadata,
       };
 
       nodesMap.clear();
@@ -390,61 +401,46 @@ describe('Edges Routing Middleware', () => {
       context.state = newState;
       context.modelActionType = 'init';
 
-      checkIfMetadataPropsChangedMock.mockReturnValue(true);
+      edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
-      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
-
-      expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: expect.arrayContaining([
-          expect.objectContaining({
-            id: 'edge1',
-          }),
-        ]),
-        metadataUpdate: {
-          temporaryEdge: expect.objectContaining({
-            id: 'temp-edge',
-            points: expect.any(Array),
-            computedZIndex: DEFAULT_SELECTED_Z_INDEX,
-          }),
-        },
-      });
+      expect(mockActionStateManager.linking.temporaryEdge).toEqual(
+        expect.objectContaining({
+          id: 'temp-edge',
+          points: expect.any(Array),
+          zIndex: DEFAULT_SELECTED_Z_INDEX,
+        })
+      );
+      expect(nextMock).toHaveBeenCalledWith({});
     });
 
     it('should use custom temporary edge z-index when provided', () => {
       const customZIndex = 9999;
       context.middlewareMetadata.temporaryEdgeZIndex = customZIndex;
 
-      const newState = {
-        ...initialState,
-        metadata: {
-          ...mockMetadata,
-          temporaryEdge: {
-            ...mockEdge,
-            id: 'temp-edge',
-            source: 'node-1',
-            targetPosition: { x: 200, y: 200 },
-          },
-        },
+      const temporaryEdge = {
+        ...mockEdge,
+        id: 'temp-edge',
+        source: 'node-1',
+        targetPosition: { x: 200, y: 200 },
+        temporary: true,
       };
 
-      context.state = newState;
-      context.modelActionType = 'init';
-      checkIfMetadataPropsChangedMock.mockReturnValue(true);
+      mockActionStateManager.linking = {
+        sourceNodeId: 'node-1',
+        sourcePortId: '',
+        temporaryEdge,
+      };
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
-      const callArgs = nextMock.mock.calls[0][0];
-      expect(callArgs?.metadataUpdate?.temporaryEdge?.computedZIndex).toBe(customZIndex);
+      expect(mockActionStateManager.linking.temporaryEdge.zIndex).toBe(customZIndex);
     });
 
-    it('should not process temporary edge if metadata has not changed', () => {
+    it('should not process if no temporary edge exists', () => {
+      mockActionStateManager.linking = null;
       const newState = {
-        nodes: initialState.nodes,
-        edges: [], // No edges to process
-        metadata: {
-          ...mockMetadata,
-          temporaryEdge: mockEdge,
-        },
+        ...initialState,
+        metadata: mockMetadata,
       };
 
       nodesMap.clear();

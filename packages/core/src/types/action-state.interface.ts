@@ -1,6 +1,6 @@
+import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
-import type { InputModifiers } from '../input-events/input-events.interface';
 
 export interface ResizeActionState {
   startWidth: number;
@@ -15,6 +15,7 @@ export interface ResizeActionState {
 export interface LinkingActionState {
   sourceNodeId: string;
   sourcePortId: string;
+  temporaryEdge: Edge | null;
 }
 
 export interface CopyPasteActionState {
