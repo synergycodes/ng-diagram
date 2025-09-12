@@ -21,7 +21,7 @@ export const groupChildrenMoveExtent: Middleware<
   defaultMetadata: {
     enabled: true,
   },
-  execute: ({ helpers, modelLookup, actionStateManager, middlewareMetadata }, next) => {
+  execute: ({ helpers, nodesMap, modelLookup, actionStateManager, middlewareMetadata }, next) => {
     const isEnabled = middlewareMetadata.enabled;
 
     if (!isEnabled || actionStateManager.dragging?.modifiers.shift) {
@@ -35,13 +35,13 @@ export const groupChildrenMoveExtent: Middleware<
       return;
     }
 
-    const affectedGroups = findAffectedGroups(helpers, modelLookup.nodesMap);
+    const affectedGroups = findAffectedGroups(helpers, nodesMap);
     if (affectedGroups.size === 0) {
       next();
       return;
     }
 
-    const updates = calculateGroupUpdates(affectedGroups, modelLookup);
+    const updates = calculateGroupUpdates(affectedGroups, nodesMap, modelLookup);
 
     if (updates.length > 0) {
       next({ nodesToUpdate: updates });
@@ -75,13 +75,17 @@ function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map
 /**
  * Calculate all necessary updates for groups and their ancestors
  */
-function calculateGroupUpdates(affectedGroups: Set<GroupNode>, modelLookup: ModelLookup): NodeUpdate[] {
+function calculateGroupUpdates(
+  affectedGroups: Set<GroupNode>,
+  nodesMap: Map<string, Node>,
+  modelLookup: ModelLookup
+): NodeUpdate[] {
   const updates: NodeUpdate[] = [];
   const processedNodeIds = new Set<string>();
   const sortedGroups = [...affectedGroups].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0));
 
   // Create a working copy of the nodes map for incremental updates
-  const workingNodesMap = new Map(modelLookup.nodesMap);
+  const workingNodesMap = new Map(nodesMap);
 
   for (const group of sortedGroups) {
     const groupUpdates = updateGroupHierarchy(group, workingNodesMap, modelLookup, processedNodeIds);

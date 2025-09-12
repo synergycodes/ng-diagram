@@ -179,7 +179,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
   execute: (context, next) => {
     const {
       state: { edges, metadata },
-      modelLookup: { nodesMap },
+      nodesMap,
       edgeRoutingManager,
       helpers,
       modelActionType,

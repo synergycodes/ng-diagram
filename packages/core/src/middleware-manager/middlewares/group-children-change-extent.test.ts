@@ -13,9 +13,7 @@ describe('groupChildrenChangeExtent Middleware', () => {
     checkIfAnyNodePropsChanged: ReturnType<typeof vi.fn>;
     getAffectedNodeIds: ReturnType<typeof vi.fn>;
   };
-  let mockModelLookup: {
-    nodesMap: Map<string, Node>;
-  };
+  let nodesMap: Map<string, Node>;
   let context: MiddlewareContext<
     [],
     Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
@@ -30,13 +28,11 @@ describe('groupChildrenChangeExtent Middleware', () => {
       getAffectedNodeIds: vi.fn(),
     };
 
-    mockModelLookup = {
-      nodesMap: new Map(),
-    };
+    nodesMap = new Map();
 
     context = {
       helpers: helpers as unknown as MiddlewareContext['helpers'],
-      modelLookup: mockModelLookup,
+      nodesMap,
       middlewareMetadata: {
         enabled: true,
       },
@@ -62,8 +58,8 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
     helpers.getAffectedNodeIds.mockReturnValue(['node1']);
 
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
-    mockModelLookup.nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
     mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
 
@@ -85,9 +81,9 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
     helpers.getAffectedNodeIds.mockReturnValue(['node1', 'node2']);
 
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
-    mockModelLookup.nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'group1' });
-    mockModelLookup.nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+    nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'group1' });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
     mockCalculateGroupRect.mockReturnValue({ x: 0, y: 0, width: 300, height: 400 });
 
@@ -109,10 +105,10 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
     helpers.getAffectedNodeIds.mockReturnValue(['node1', 'node2']);
 
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
-    mockModelLookup.nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'group2' });
-    mockModelLookup.nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
-    mockModelLookup.nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+    nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'group2' });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
 
     mockCalculateGroupRect
       .mockReturnValueOnce({ x: 10, y: 20, width: 100, height: 200 })
@@ -143,8 +139,8 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.getAffectedNodeIds.mockReturnValue(['node1']);
 
     // Node's groupId changed from 'group1' to undefined (removed from group)
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: undefined });
-    mockModelLookup.nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: undefined });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
     mockCalculateGroupRect.mockReturnValue({ x: 0, y: 0, width: 0, height: 0 });
 
@@ -159,9 +155,9 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.getAffectedNodeIds.mockReturnValue(['node1']);
 
     // Node's groupId changed from 'group1' to 'group2'
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group2' });
-    mockModelLookup.nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
-    mockModelLookup.nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group2' });
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
 
     mockCalculateGroupRect.mockReturnValue({ x: 15, y: 25, width: 120, height: 220 });
 
@@ -184,7 +180,7 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.getAffectedNodeIds.mockReturnValue(['node1']);
 
     // Node references a group that doesn't exist
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'nonexistent-group' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'nonexistent-group' });
 
     groupChildrenChangeExtent.execute(context, nextMock, cancelMock);
 
@@ -195,9 +191,9 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
     helpers.getAffectedNodeIds.mockReturnValue(['node1']);
 
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
     // Group node exists but is not a valid group node
-    mockModelLookup.nodesMap.set('group1', { ...mockNode, id: 'group1' }); // Not a group node
+    nodesMap.set('group1', { ...mockNode, id: 'group1' }); // Not a group node
 
     groupChildrenChangeExtent.execute(context, nextMock, cancelMock);
 
@@ -208,10 +204,10 @@ describe('groupChildrenChangeExtent Middleware', () => {
     helpers.checkIfAnyNodePropsChanged.mockReturnValue(true);
     helpers.getAffectedNodeIds.mockReturnValue(['node1', 'node2', 'node3']);
 
-    mockModelLookup.nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' }); // Valid group
-    mockModelLookup.nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'nonexistent' }); // Invalid group
-    mockModelLookup.nodesMap.set('node3', { ...mockNode, id: 'node3', groupId: 'group1' }); // Valid group
-    mockModelLookup.nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
+    nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' }); // Valid group
+    nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'nonexistent' }); // Invalid group
+    nodesMap.set('node3', { ...mockNode, id: 'node3', groupId: 'group1' }); // Valid group
+    nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
     mockCalculateGroupRect.mockReturnValue({ x: 5, y: 15, width: 250, height: 350 });
 

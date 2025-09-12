@@ -38,10 +38,8 @@ describe('Edges Routing Middleware', () => {
   const checkIfEdgeChangedMock = vi.fn();
   const checkIfNodeChangedMock = vi.fn();
 
-  const mockModelLookup = {
-    nodesMap: new Map(),
-    edgesMap: new Map(),
-  };
+  const nodesMap = new Map();
+  const edgesMap = new Map();
 
   const mockRoutingManager: Partial<EdgeRoutingManager> = {
     hasRouting: vi.fn().mockReturnValue(true),
@@ -65,13 +63,14 @@ describe('Edges Routing Middleware', () => {
       metadata: mockMetadata,
     };
 
-    mockModelLookup.nodesMap.clear();
-    mockModelLookup.edgesMap.clear();
+    nodesMap.clear();
+    edgesMap.clear();
 
     context = {
       state: initialState,
       initialState,
-      modelLookup: mockModelLookup,
+      nodesMap,
+      edgesMap,
       edgeRoutingManager: mockRoutingManager,
       modelActionType: 'addNodes',
       helpers: {
@@ -154,8 +153,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -196,8 +195,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -234,8 +233,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
 
       checkIfAnyNodePropsChangedMock.mockReturnValue(true);
       checkIfEdgeChangedMock.mockReturnValue(false);
@@ -275,8 +274,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -309,8 +308,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -352,8 +351,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -386,8 +385,8 @@ describe('Edges Routing Middleware', () => {
         },
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -448,8 +447,8 @@ describe('Edges Routing Middleware', () => {
         },
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -484,8 +483,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
@@ -529,8 +528,8 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      mockModelLookup.nodesMap.clear();
-      newState.nodes.forEach((node) => mockModelLookup.nodesMap.set(node.id, node));
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
       context.modelActionType = 'init';
 
