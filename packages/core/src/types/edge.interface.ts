@@ -79,6 +79,8 @@ export interface Edge<T extends DataObject = DataObject> {
    */
   zOrder?: number;
   /**
+   * @readonly
+   * @remarks Z-index is computed by the system and should not be set manually.
    * The z-index of the node. This value is set automatically
    */
   computedZIndex?: number;
