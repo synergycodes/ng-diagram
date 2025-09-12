@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { FlowCore } from '../../../../flow-core';
 import { mockEdge, mockNode } from '../../../../test-utils';
 import type {
   Edge,
@@ -30,8 +29,10 @@ describe('zIndexMiddleware', () => {
       getAffectedNodeIds: vi.fn(),
       getAffectedEdgeIds: vi.fn(),
     };
+
     nodesMap = new Map();
     edgesMap = new Map();
+
     nextMock = vi.fn();
     cancelMock = vi.fn();
     context = {
@@ -43,23 +44,21 @@ describe('zIndexMiddleware', () => {
       helpers: helpers as Helpers,
       nodesMap,
       edgesMap,
-      flowCore: {
-        config: {
-          zIndex: {
-            enabled: true,
-            selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
-            edgesAboveConnectedNodes: false,
-            elevateOnSelection: true,
-          },
+      config: {
+        zIndex: {
+          enabled: true,
+          selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
+          edgesAboveConnectedNodes: false,
+          elevateOnSelection: true,
         },
-      } as FlowCore,
+      },
       modelActionType: 'updateNode',
     } as unknown as MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   });
 
   describe('execution conditions', () => {
     it('should call next() without changes when middleware is disabled', () => {
-      context.flowCore.config.zIndex.enabled = false;
+      context.config.zIndex.enabled = false;
       context.modelActionType = 'init';
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
@@ -506,7 +505,7 @@ describe('zIndexMiddleware', () => {
 
     it('should handle custom selectedZIndex configuration', () => {
       const customSelectedZIndex = 2000;
-      context.flowCore.config.zIndex.selectedZIndex = customSelectedZIndex;
+      context.config.zIndex.selectedZIndex = customSelectedZIndex;
 
       const selectedNode = { ...mockNode, id: 'node1', selected: true, computedZIndex: 0 };
       nodesMap.set('node1', selectedNode);
@@ -526,7 +525,7 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should not elevate selected nodes when elevateOnSelection is false', () => {
-      context.flowCore.config.zIndex.elevateOnSelection = false;
+      context.config.zIndex.elevateOnSelection = false;
 
       const selectedNode = { ...mockNode, id: 'node1', selected: true, computedZIndex: 5 };
       nodesMap.set('node1', selectedNode);
@@ -547,7 +546,7 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should not elevate selected edges when elevateOnSelection is false', () => {
-      context.flowCore.config.zIndex.elevateOnSelection = false;
+      context.config.zIndex.elevateOnSelection = false;
 
       const node1 = { ...mockNode, id: 'node1', computedZIndex: 5 };
       const node2 = { ...mockNode, id: 'node2', computedZIndex: 3 };

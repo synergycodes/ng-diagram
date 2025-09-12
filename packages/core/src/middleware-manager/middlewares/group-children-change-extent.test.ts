@@ -27,7 +27,9 @@ describe('groupChildrenChangeExtent Middleware', () => {
       checkIfAnyNodePropsChanged: vi.fn(),
       getAffectedNodeIds: vi.fn(),
     };
+
     nodesMap = new Map();
+
     context = {
       helpers: helpers as unknown as MiddlewareContext['helpers'],
       nodesMap,

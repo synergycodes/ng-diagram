@@ -8,12 +8,17 @@ vi.mock('../../utils/group-size', () => ({
   calculateGroupRect: (...args: unknown[]) => mockCalculateGroupRect(...args),
 }));
 
-interface MockFlowCore {
-  modelLookup: {
+describe('groupChildrenMoveExtent Middleware', () => {
+  let helpers: {
+    checkIfAnyNodePropsChanged: ReturnType<typeof vi.fn>;
+    getAffectedNodeIds: ReturnType<typeof vi.fn>;
+  };
+  let nodesMap: Map<string, Node>;
+  let mockModelLookup: {
     getParentChain: ReturnType<typeof vi.fn>;
     getNodeChildrenIds: ReturnType<typeof vi.fn>;
   };
-  actionStateManager: {
+  let mockActionStateManager: {
     dragging?: {
       modifiers: {
         shift: boolean;
@@ -23,15 +28,6 @@ interface MockFlowCore {
       };
     };
   };
-}
-
-describe('groupChildrenMoveExtent Middleware', () => {
-  let helpers: {
-    checkIfAnyNodePropsChanged: ReturnType<typeof vi.fn>;
-    getAffectedNodeIds: ReturnType<typeof vi.fn>;
-  };
-  let nodesMap: Map<string, Node>;
-  let flowCore: MockFlowCore;
   let context: MiddlewareContext<
     [],
     Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
@@ -45,20 +41,22 @@ describe('groupChildrenMoveExtent Middleware', () => {
       checkIfAnyNodePropsChanged: vi.fn(),
       getAffectedNodeIds: vi.fn(),
     };
+
     nodesMap = new Map();
-    flowCore = {
-      modelLookup: {
-        getParentChain: vi.fn().mockReturnValue([]),
-        getNodeChildrenIds: vi.fn().mockReturnValue([]),
-      },
-      actionStateManager: {
-        dragging: undefined,
-      },
+    mockModelLookup = {
+      getParentChain: vi.fn().mockReturnValue([]),
+      getNodeChildrenIds: vi.fn().mockReturnValue([]),
     };
+
+    mockActionStateManager = {
+      dragging: undefined,
+    };
+
     context = {
       helpers: helpers as unknown as MiddlewareContext['helpers'],
       nodesMap,
-      flowCore,
+      modelLookup: mockModelLookup,
+      actionStateManager: mockActionStateManager,
       middlewareMetadata: {
         enabled: true,
       },
@@ -95,8 +93,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
     helpers.getAffectedNodeIds.mockReturnValue(['node1']);
     nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
-    flowCore.modelLookup.getParentChain.mockReturnValue([]);
-    flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+    mockModelLookup.getParentChain.mockReturnValue([]);
+    mockModelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
     mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
 
     groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
@@ -119,8 +117,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1', groupId: 'group2' });
     nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
-    flowCore.modelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
-    flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
+    mockModelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
+    mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
       id === 'group1' ? ['node1'] : id === 'group2' ? ['group1'] : []
     );
     mockCalculateGroupRect
@@ -153,8 +151,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('node1', { ...mockNode, id: 'node1', groupId: 'group1' });
     nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'group1' });
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
-    flowCore.modelLookup.getParentChain.mockReturnValue([]);
-    flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1', 'node2']);
+    mockModelLookup.getParentChain.mockReturnValue([]);
+    mockModelLookup.getNodeChildrenIds.mockReturnValue(['node1', 'node2']);
     mockCalculateGroupRect.mockReturnValue({ x: 0, y: 0, width: 300, height: 400 });
 
     groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
@@ -178,8 +176,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('node2', { ...mockNode, id: 'node2', groupId: 'group2' });
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
     nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
-    flowCore.modelLookup.getParentChain.mockReturnValue([]);
-    flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
+    mockModelLookup.getParentChain.mockReturnValue([]);
+    mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
       id === 'group1' ? ['node1'] : id === 'group2' ? ['node2'] : []
     );
     mockCalculateGroupRect
@@ -218,13 +216,13 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('group2', { ...mockGroupNode, id: 'group2', groupId: 'group3' });
     nodesMap.set('group3', { ...mockGroupNode, id: 'group3' });
 
-    flowCore.modelLookup.getParentChain.mockImplementation((id: string) => {
+    mockModelLookup.getParentChain.mockImplementation((id: string) => {
       if (id === 'group1') return [nodesMap.get('group2'), nodesMap.get('group3')];
       if (id === 'group2') return [nodesMap.get('group3')];
       return [];
     });
 
-    flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) => {
+    mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) => {
       switch (id) {
         case 'group1':
           return ['node1', 'node2'];
@@ -277,13 +275,13 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1', groupId: 'group2' });
     nodesMap.set('group2', { ...mockGroupNode, id: 'group2', groupId: 'group1' });
 
-    flowCore.modelLookup.getParentChain.mockImplementation((id: string) => {
+    mockModelLookup.getParentChain.mockImplementation((id: string) => {
       if (id === 'group1') return [nodesMap.get('group2')];
       if (id === 'group2') return [nodesMap.get('group1')];
       return [];
     });
 
-    flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) => {
+    mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) => {
       switch (id) {
         case 'group1':
           return ['node1'];
@@ -326,8 +324,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1', groupId: 'group2' });
     nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
 
-    flowCore.modelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
-    flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) => {
+    mockModelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
+    mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) => {
       switch (id) {
         case 'group1':
           return ['node1'];
@@ -362,7 +360,7 @@ describe('groupChildrenMoveExtent Middleware', () => {
       nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
       // Set shift modifier to true
-      flowCore.actionStateManager.dragging = {
+      mockActionStateManager.dragging = {
         modifiers: {
           shift: true,
           primary: false,
@@ -371,8 +369,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
         },
       };
 
-      flowCore.modelLookup.getParentChain.mockReturnValue([]);
-      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockModelLookup.getParentChain.mockReturnValue([]);
+      mockModelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
       mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
 
       groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
@@ -389,7 +387,7 @@ describe('groupChildrenMoveExtent Middleware', () => {
       nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
       // Set shift modifier to false
-      flowCore.actionStateManager.dragging = {
+      mockActionStateManager.dragging = {
         modifiers: {
           shift: false,
           primary: false,
@@ -398,8 +396,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
         },
       };
 
-      flowCore.modelLookup.getParentChain.mockReturnValue([]);
-      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockModelLookup.getParentChain.mockReturnValue([]);
+      mockModelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
       mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
 
       groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
@@ -424,10 +422,10 @@ describe('groupChildrenMoveExtent Middleware', () => {
       nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
       // No dragging state
-      flowCore.actionStateManager.dragging = undefined;
+      mockActionStateManager.dragging = undefined;
 
-      flowCore.modelLookup.getParentChain.mockReturnValue([]);
-      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockModelLookup.getParentChain.mockReturnValue([]);
+      mockModelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
       mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
 
       groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
@@ -452,7 +450,7 @@ describe('groupChildrenMoveExtent Middleware', () => {
       nodesMap.set('group1', { ...mockGroupNode, id: 'group1' });
 
       // Other modifiers set but not shift
-      flowCore.actionStateManager.dragging = {
+      mockActionStateManager.dragging = {
         modifiers: {
           shift: false,
           primary: true,
@@ -461,8 +459,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
         },
       };
 
-      flowCore.modelLookup.getParentChain.mockReturnValue([]);
-      flowCore.modelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
+      mockModelLookup.getParentChain.mockReturnValue([]);
+      mockModelLookup.getNodeChildrenIds.mockReturnValue(['node1']);
       mockCalculateGroupRect.mockReturnValue({ x: 10, y: 20, width: 100, height: 200 });
 
       groupChildrenMoveExtent.execute(context, nextMock, cancelMock);
@@ -490,7 +488,7 @@ describe('groupChildrenMoveExtent Middleware', () => {
       nodesMap.set('group2', { ...mockGroupNode, id: 'group2' });
 
       // Set shift modifier to true
-      flowCore.actionStateManager.dragging = {
+      mockActionStateManager.dragging = {
         modifiers: {
           shift: true,
           primary: false,
@@ -499,8 +497,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
         },
       };
 
-      flowCore.modelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
-      flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
+      mockModelLookup.getParentChain.mockReturnValue([nodesMap.get('group2')]);
+      mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
         id === 'group1' ? ['node1'] : id === 'group2' ? ['group1'] : []
       );
       mockCalculateGroupRect
@@ -525,8 +523,8 @@ describe('groupChildrenMoveExtent Middleware', () => {
     nodesMap.set('group1', { ...mockGroupNode, id: 'group1', zOrder: 2 });
     nodesMap.set('group2', { ...mockGroupNode, id: 'group2', zOrder: 1 });
 
-    flowCore.modelLookup.getParentChain.mockReturnValue([]);
-    flowCore.modelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
+    mockModelLookup.getParentChain.mockReturnValue([]);
+    mockModelLookup.getNodeChildrenIds.mockImplementation((id: string) =>
       id === 'group1' ? ['node1'] : id === 'group2' ? ['node2'] : []
     );
 

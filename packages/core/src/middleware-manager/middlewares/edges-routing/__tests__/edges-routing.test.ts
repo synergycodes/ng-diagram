@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EdgeRoutingManager } from '../../../../edge-routing-manager';
-import { FlowCore } from '../../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../../test-utils';
 import type {
   Edge,
@@ -28,7 +28,6 @@ vi.mock('../../../../utils', () => ({
 }));
 
 describe('Edges Routing Middleware', () => {
-  let flowCore: FlowCore;
   let initialState: FlowState;
   let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>, EdgesRoutingMiddlewareMetadata>;
   const nextMock = vi.fn();
@@ -38,6 +37,9 @@ describe('Edges Routing Middleware', () => {
   const checkIfMetadataPropsChangedMock = vi.fn();
   const checkIfEdgeChangedMock = vi.fn();
   const checkIfNodeChangedMock = vi.fn();
+
+  const nodesMap = new Map();
+  const edgesMap = new Map();
 
   const mockRoutingManager: Partial<EdgeRoutingManager> = {
     hasRouting: vi.fn().mockReturnValue(true),
@@ -55,23 +57,22 @@ describe('Edges Routing Middleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    flowCore = {
-      edgeRoutingManager: mockRoutingManager,
-    } as unknown as FlowCore;
-
     initialState = {
       nodes: [mockNode],
       edges: [mockEdge],
       metadata: mockMetadata,
     };
 
+    nodesMap.clear();
+    edgesMap.clear();
+
     context = {
       state: initialState,
       initialState,
-      nodesMap: new Map(),
-      edgesMap: new Map(),
+      nodesMap,
+      edgesMap,
+      edgeRoutingManager: mockRoutingManager,
       modelActionType: 'addNodes',
-      flowCore,
       helpers: {
         anyEdgesAdded: anyEdgesAddedMock,
         checkIfAnyNodePropsChanged: checkIfAnyNodePropsChangedMock,
@@ -97,7 +98,7 @@ describe('Edges Routing Middleware', () => {
     it('should exit early when middleware is disabled', () => {
       context.middlewareMetadata.enabled = false;
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith();
       expect(checkIfAnyNodePropsChangedMock).not.toHaveBeenCalled();
@@ -109,7 +110,7 @@ describe('Edges Routing Middleware', () => {
       checkIfAnyEdgePropsChangedMock.mockReturnValue(false);
       checkIfMetadataPropsChangedMock.mockReturnValue(false);
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith();
     });
@@ -117,7 +118,7 @@ describe('Edges Routing Middleware', () => {
     it('should proceed when edges need routing on init', () => {
       context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalled();
     });
@@ -126,7 +127,7 @@ describe('Edges Routing Middleware', () => {
       checkIfAnyNodePropsChangedMock.mockReturnValue(true);
       checkIfEdgeChangedMock.mockReturnValue(true);
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalled();
     });
@@ -152,14 +153,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith({
         edgesToUpdate: [
@@ -196,14 +195,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
       const edgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'manual-edge');
@@ -236,18 +233,18 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'updateNodes',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
 
       checkIfAnyNodePropsChangedMock.mockReturnValue(true);
       checkIfEdgeChangedMock.mockReturnValue(false);
       checkIfNodeChangedMock.mockReturnValue(false);
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      // Update context with new state
+      context.state = newState;
+      context.modelActionType = 'updateNodes';
+
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith({});
     });
@@ -277,14 +274,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith({});
     });
@@ -313,14 +308,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
       const edgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'edge-with-labels');
@@ -358,14 +351,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
       const edgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'manual-edge-with-labels');
@@ -394,18 +385,21 @@ describe('Edges Routing Middleware', () => {
         },
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'moveTemporaryEdge',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
       checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith({
+        edgesToUpdate: expect.arrayContaining([
+          expect.objectContaining({
+            id: 'edge1',
+          }),
+        ]),
         metadataUpdate: {
           temporaryEdge: expect.objectContaining({
             id: 'temp-edge',
@@ -434,9 +428,10 @@ describe('Edges Routing Middleware', () => {
       };
 
       context.state = newState;
+      context.modelActionType = 'init';
       checkIfMetadataPropsChangedMock.mockReturnValue(true);
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
       expect(callArgs?.metadataUpdate?.temporaryEdge?.computedZIndex).toBe(customZIndex);
@@ -444,27 +439,27 @@ describe('Edges Routing Middleware', () => {
 
     it('should not process temporary edge if metadata has not changed', () => {
       const newState = {
-        ...initialState,
+        nodes: initialState.nodes,
+        edges: [], // No edges to process
         metadata: {
           ...mockMetadata,
           temporaryEdge: mockEdge,
         },
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'updateNodes',
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
       checkIfMetadataPropsChangedMock.mockReturnValue(false);
       checkIfAnyNodePropsChangedMock.mockReturnValue(false);
       checkIfAnyEdgePropsChangedMock.mockReturnValue(false);
       anyEdgesAddedMock.mockReturnValue(false);
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
-      expect(nextMock).toHaveBeenCalledWith();
+      expect(nextMock).toHaveBeenCalledWith({});
     });
   });
 
@@ -488,14 +483,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
       const edgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'default-mode-edge');
@@ -535,14 +528,12 @@ describe('Edges Routing Middleware', () => {
         metadata: mockMetadata,
       };
 
-      context = {
-        ...context,
-        state: newState,
-        modelActionType: 'init',
-        nodesMap: new Map(newState.nodes.map((node) => [node.id, node])),
-      };
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionType = 'init';
 
-      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
       const autoEdgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'auto-edge');

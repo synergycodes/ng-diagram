@@ -1,6 +1,8 @@
-import type { FlowCore } from '../flow-core';
-import { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
+import type { ActionStateManager } from '../action-state-manager/action-state-manager';
+import type { EdgeRoutingManager } from '../edge-routing-manager';
+import type { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
 import type { Edge } from './edge.interface';
+import type { FlowConfig } from './flow-config.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
@@ -96,11 +98,13 @@ export interface MiddlewareContext<
   nodesMap: Map<string, Node>;
   edgesMap: Map<string, Edge>;
   modelActionType: ModelActionType;
-  flowCore: FlowCore;
+  actionStateManager: ActionStateManager;
+  edgeRoutingManager: EdgeRoutingManager;
   helpers: ReturnType<MiddlewareExecutor<TCustomMiddlewares, TMetadata>['helpers']>;
   history: MiddlewareHistoryUpdate<TCustomMiddlewares>[];
   initialUpdate: FlowStateUpdate;
   middlewareMetadata: TMiddlewareMetadata;
+  config: FlowConfig;
 }
 
 export type MiddlewareConfigKeys<TCustomMiddlewares extends MiddlewareChain> =
