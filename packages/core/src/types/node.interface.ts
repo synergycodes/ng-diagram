@@ -63,7 +63,7 @@ export interface SimpleNode<T extends DataObject = DataObject> {
   zOrder?: number;
   /**
    * @readonly
-   * @remarks Z-index is computed by the system and should not be set manually.
+   * @remarks ComputedZIndex is computed by the system and should not be set manually.
    * The z-index of the node. This value is set automatically
    */
   readonly computedZIndex?: number;

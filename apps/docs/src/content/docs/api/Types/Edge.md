@@ -21,7 +21,7 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 #### Remarks
 
-Z-index is computed by the system and should not be set manually.
+ComputedZIndex is computed by the system and should not be set manually.
 The z-index of the node. This value is set automatically
 
 ***
@@ -48,8 +48,8 @@ The unique identifier for the edge.
 
 #### Remarks
 
-Edge Labels are computed by the system and should not be set manually.
-The labels of the edge.
+MeasuredLabels are computed by the system and should not be set manually.
+The labels of the edge with computed position and size.
 
 ***
 

@@ -49,7 +49,7 @@ Whether the size of the node is automatically resized based on the content.
 
 #### Remarks
 
-Z-index is computed by the system and should not be set manually.
+ComputedZIndex is computed by the system and should not be set manually.
 The z-index of the node. This value is set automatically
 
 #### Inherited from

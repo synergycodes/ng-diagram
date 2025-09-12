@@ -80,14 +80,14 @@ export interface Edge<T extends DataObject = DataObject> {
   zOrder?: number;
   /**
    * @readonly
-   * @remarks Z-index is computed by the system and should not be set manually.
+   * @remarks ComputedZIndex is computed by the system and should not be set manually.
    * The z-index of the node. This value is set automatically
    */
   readonly computedZIndex?: number;
   /**
    * @readonly
-   * @remarks Edge Labels are computed by the system and should not be set manually.
-   * The labels of the edge.
+   * @remarks MeasuredLabels are computed by the system and should not be set manually.
+   * The labels of the edge with computed position and size.
    */
   readonly measuredLabels?: EdgeLabel[];
 }
