@@ -181,6 +181,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       state: { edges },
       nodesMap,
       edgeRoutingManager,
+      actionStateManager,
       helpers,
       modelActionType,
       middlewareMetadata,
@@ -194,7 +195,7 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
     const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
 
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
-    const temporaryEdge = flowCore.actionStateManager.linking?.temporaryEdge;
+    const temporaryEdge = actionStateManager.linking?.temporaryEdge;
 
     if (!shouldRouteEdges && !temporaryEdge) {
       next();
@@ -206,12 +207,12 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       : [];
 
     const newTemporaryEdge = temporaryEdge
-      ? createUpdatedTemporaryEdge(temporaryEdge, nodesMap, routingManager, temporaryEdgeZIndex)
+      ? createUpdatedTemporaryEdge(temporaryEdge, nodesMap, edgeRoutingManager, temporaryEdgeZIndex)
       : undefined;
 
-    if (newTemporaryEdge && flowCore.actionStateManager.linking) {
-      flowCore.actionStateManager.linking = {
-        ...flowCore.actionStateManager.linking,
+    if (newTemporaryEdge && actionStateManager.linking) {
+      actionStateManager.linking = {
+        ...actionStateManager.linking,
         temporaryEdge: newTemporaryEdge,
       };
     }

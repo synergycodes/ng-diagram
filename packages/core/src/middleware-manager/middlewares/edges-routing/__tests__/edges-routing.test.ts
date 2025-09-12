@@ -38,7 +38,6 @@ describe('Edges Routing Middleware', () => {
   const checkIfEdgeChangedMock = vi.fn();
   const checkIfNodeChangedMock = vi.fn();
   const mockActionStateManager = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     linking: null as any,
   };
 
@@ -76,6 +75,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap,
       edgesMap,
       edgeRoutingManager: mockRoutingManager,
+      actionStateManager: mockActionStateManager,
       modelActionType: 'addNodes',
       helpers: {
         anyEdgesAdded: anyEdgesAddedMock,
@@ -446,7 +446,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionType = 'updateNodes';
 
       checkIfMetadataPropsChangedMock.mockReturnValue(false);
       checkIfAnyNodePropsChangedMock.mockReturnValue(false);
@@ -455,7 +455,7 @@ describe('Edges Routing Middleware', () => {
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
-      expect(nextMock).toHaveBeenCalledWith({});
+      expect(nextMock).toHaveBeenCalledWith();
     });
   });
 
