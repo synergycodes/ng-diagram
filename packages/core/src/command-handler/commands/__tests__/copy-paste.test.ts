@@ -306,11 +306,11 @@ describe('Copy-Paste Commands', () => {
         expect(update.edgesToAdd).toHaveLength(1);
         const pastedEdge = update.edgesToAdd[0];
 
-        expect(pastedEdge.labels).toHaveLength(2);
-        expect(pastedEdge.labels[0].id).toBe('label1');
-        expect(pastedEdge.labels[1].id).toBe('label2');
-        expect(pastedEdge.labels[0].positionOnEdge).toBe(0.5);
-        expect(pastedEdge.labels[1].positionOnEdge).toBe(0.8);
+        expect(pastedEdge.measuredLabels).toHaveLength(2);
+        expect(pastedEdge.measuredLabels[0].id).toBe('label1');
+        expect(pastedEdge.measuredLabels[1].id).toBe('label2');
+        expect(pastedEdge.measuredLabels[0].positionOnEdge).toBe(0.5);
+        expect(pastedEdge.measuredLabels[1].positionOnEdge).toBe(0.8);
       });
 
       it('should handle nodes without ports', async () => {
@@ -358,7 +358,7 @@ describe('Copy-Paste Commands', () => {
 
         expect(update.edgesToAdd).toHaveLength(1);
         const pastedEdge = update.edgesToAdd[0];
-        expect(pastedEdge.labels).toBeUndefined();
+        expect(pastedEdge.measuredLabels).toBeUndefined();
       });
     });
 

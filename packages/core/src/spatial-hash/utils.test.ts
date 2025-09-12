@@ -99,7 +99,7 @@ describe('SpatialHash utils', () => {
         id: '1',
         position: { x: 0, y: 0 },
         size: { width: 5, height: 5 },
-        ports: [
+        measuredPorts: [
           { id: '1', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } },
           { id: '2', position: { x: 5, y: 5 }, size: { width: 2, height: 2 } },
         ],
@@ -109,14 +109,14 @@ describe('SpatialHash utils', () => {
         id: '2',
         position: { x: 10, y: 10 },
         size: { width: 5, height: 5 },
-        ports: [{ id: '2', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } }],
+        measuredPorts: [{ id: '2', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } }],
       };
       const node3 = {
         ...mockNode,
         id: '3',
         position: { x: 20, y: 20 },
         size: { width: 5, height: 5 },
-        ports: [{ id: '3', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } }],
+        measuredPorts: [{ id: '3', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } }],
       };
 
       mockGetState.mockReturnValue({
@@ -126,7 +126,7 @@ describe('SpatialHash utils', () => {
 
       const result = getNearestPortInRange(flowCore, { x: 6, y: 6 }, 2);
 
-      expect(result).toEqual(node1.ports[1]);
+      expect(result).toEqual(node1.measuredPorts[1]);
     });
   });
 });

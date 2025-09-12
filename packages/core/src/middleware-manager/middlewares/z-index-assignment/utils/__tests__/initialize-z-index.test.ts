@@ -11,7 +11,7 @@ const baseNode = (id: string, extra: Partial<Node> = {}): Node => ({
 });
 
 describe('initializeZIndex', () => {
-  it('assigns zIndex to root nodes', () => {
+  it('assigns computedZIndex to root nodes', () => {
     const node1 = baseNode('1');
     const node2 = baseNode('2');
     const nodesMap = new Map<string, Node>([
@@ -24,7 +24,7 @@ describe('initializeZIndex', () => {
     expect(result.find((n) => n.id === '2')?.computedZIndex).toBe(0);
   });
 
-  it('assigns zIndex recursively to groups and children', () => {
+  it('assigns computedZIndex recursively to groups and children', () => {
     const group = baseNode('g', { isGroup: true });
     const child1 = baseNode('c1', { groupId: 'g' });
     const child2 = baseNode('c2', { groupId: 'g' });

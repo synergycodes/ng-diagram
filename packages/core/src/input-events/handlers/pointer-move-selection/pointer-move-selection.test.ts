@@ -7,7 +7,7 @@ import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 import { MOVE_THRESHOLD, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
 
 vi.mock('../../../utils', () => ({
-  sortNodesByZIndex: vi.fn((nodes) => [...nodes].sort((a, b) => (b.zIndex ?? 0) - (a.zIndex ?? 0))),
+  sortNodesByZIndex: vi.fn((nodes) => [...nodes].sort((a, b) => (b.computedZIndex ?? 0) - (a.computedZIndex ?? 0))),
   isGroup: vi.fn((node) => node?.isGroup === true),
 }));
 
@@ -287,8 +287,8 @@ describe('PointerMoveSelectionEventHandler', () => {
       });
 
       it('should use sortNodesByZIndex to find top group', async () => {
-        const group1 = { ...mockGroupNode, id: 'group1', isGroup: true, selected: false, zIndex: 1 };
-        const group2 = { ...mockGroupNode, id: 'group2', isGroup: true, selected: false, zIndex: 2 };
+        const group1 = { ...mockGroupNode, id: 'group1', isGroup: true, selected: false, computedZIndex: 1 };
+        const group2 = { ...mockGroupNode, id: 'group2', isGroup: true, selected: false, computedZIndex: 2 };
 
         mockGetNodesInRange.mockReturnValue([group1, group2]);
         mockGetState.mockReturnValue({ nodes: [group1, group2], edges: [] });

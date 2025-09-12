@@ -116,8 +116,8 @@ Flag indicating the node is a group
 
 #### Remarks
 
-Ports are computed by the system and should not be set manually.
-The ports of the node.
+MeasuredPorts are computed by the system and should not be set manually.
+The ports of the node with computed position and size.
 
 #### Inherited from
 

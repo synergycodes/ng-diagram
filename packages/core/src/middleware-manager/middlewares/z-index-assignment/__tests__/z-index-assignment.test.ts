@@ -227,8 +227,8 @@ describe('zIndexMiddleware', () => {
     });
   });
 
-  describe('zOrder-based z-index assignment', () => {
-    it('should assign zOrder as zIndex when zOrder changes', () => {
+  describe('zOrder-based computedZIndex assignment', () => {
+    it('should assign zOrder as computedZIndex when zOrder changes', () => {
       const node1 = { ...mockNode, id: 'node1', zOrder: 15, computedZIndex: 0 };
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
@@ -246,7 +246,7 @@ describe('zIndexMiddleware', () => {
       });
     });
 
-    it('should not update nodes with same zOrder and zIndex', () => {
+    it('should not update nodes with same zOrder and computedZIndex', () => {
       const node1 = { ...mockNode, id: 'node1', zOrder: 15, computedZIndex: 15 };
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
@@ -620,7 +620,7 @@ describe('zIndexMiddleware', () => {
         id: 'child1',
         groupId: 'group1',
         selected: true,
-        zIndex: 0,
+        computedZIndex: 0,
       };
 
       nodesMap.set('group1', groupNode);
@@ -725,7 +725,7 @@ describe('zIndexMiddleware', () => {
       expect(updates.every((u) => u.computedZIndex === 15)).toBe(true);
     });
 
-    it('should ensure zOrder changes always update zIndex even if node was already processed', () => {
+    it('should ensure zOrder changes always update computedZIndex even if node was already processed', () => {
       // This test demonstrates why zOrder doesn't use processedNodeIds check
       // Scenario: A selected node gets a new zOrder via bringToFront command
       const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 100, computedZIndex: DEFAULT_SELECTED_Z_INDEX };
@@ -744,12 +744,12 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       // Even though the node might have been processed during init or selection,
-      // the zOrder change must still update the zIndex to reflect user's explicit intent
+      // the zOrder change must still update the computedZIndex to reflect user's explicit intent
       const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
       const updates = stateUpdate.nodesToUpdate || [];
       expect(updates.length).toBe(1);
       expect(updates[0].id).toBe('node1');
-      expect(updates[0].computedZIndex).toBe(100); // New zOrder value overrides previous zIndex
+      expect(updates[0].computedZIndex).toBe(100); // New zOrder value overrides previous computedZIndex
     });
   });
 
@@ -773,7 +773,13 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should handle missing group parent node', () => {
-      const orphanedChild = { ...mockNode, id: 'child1', groupId: 'missing-group', selected: false, zIndex: 100 };
+      const orphanedChild = {
+        ...mockNode,
+        id: 'child1',
+        groupId: 'missing-group',
+        selected: false,
+        computedZIndex: 100,
+      };
       nodesMap.set('child1', orphanedChild);
       context.state.nodes = [orphanedChild];
 

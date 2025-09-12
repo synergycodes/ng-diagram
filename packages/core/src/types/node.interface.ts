@@ -69,8 +69,8 @@ export interface SimpleNode<T extends DataObject = DataObject> {
   readonly computedZIndex?: number;
   /**
    * @readonly
-   * @remarks Ports are computed by the system and should not be set manually.
-   * The ports of the node.
+   * @remarks MeasuredPorts are computed by the system and should not be set manually.
+   * The ports of the node with computed position and size.
    */
   readonly measuredPorts?: Port[];
   /**

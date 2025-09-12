@@ -304,7 +304,7 @@ describe('Edges Routing Middleware', () => {
             source: 'node-1',
             target: 'node-2',
             points: [],
-            labels: [
+            measuredLabels: [
               { id: 'label-1', positionOnEdge: 0.5 },
               { id: 'label-2', positionOnEdge: 0.25 },
             ],
@@ -325,8 +325,8 @@ describe('Edges Routing Middleware', () => {
       const callArgs = nextMock.mock.calls[0][0];
       const edgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'edge-with-labels');
 
-      expect(edgeUpdate?.labels).toHaveLength(2);
-      expect(edgeUpdate?.labels?.[0]).toMatchObject({
+      expect(edgeUpdate?.measuredLabels).toHaveLength(2);
+      expect(edgeUpdate?.measuredLabels?.[0]).toMatchObject({
         id: 'label-1',
         positionOnEdge: 0.5,
         position: { x: 50, y: 50 },
@@ -352,7 +352,7 @@ describe('Edges Routing Middleware', () => {
             target: 'node-2',
             routingMode: 'manual' as const,
             points: manualPoints,
-            labels: [{ id: 'label-1', positionOnEdge: 0.5 }],
+            measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5 }],
           },
         ],
         metadata: mockMetadata,
@@ -371,8 +371,8 @@ describe('Edges Routing Middleware', () => {
       const edgeUpdate = callArgs?.edgesToUpdate?.find((e: Edge) => e.id === 'manual-edge-with-labels');
 
       expect(edgeUpdate?.points).toBeUndefined(); // Points not updated in manual mode
-      expect(edgeUpdate?.labels).toBeDefined();
-      expect(edgeUpdate?.labels?.[0]?.position).toBeDefined();
+      expect(edgeUpdate?.measuredLabels).toBeDefined();
+      expect(edgeUpdate?.measuredLabels?.[0]?.position).toBeDefined();
     });
   });
 
@@ -410,7 +410,7 @@ describe('Edges Routing Middleware', () => {
           temporaryEdge: expect.objectContaining({
             id: 'temp-edge',
             points: expect.any(Array),
-            zIndex: DEFAULT_SELECTED_Z_INDEX,
+            computedZIndex: DEFAULT_SELECTED_Z_INDEX,
           }),
         },
       });
@@ -439,7 +439,7 @@ describe('Edges Routing Middleware', () => {
       edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
       const callArgs = nextMock.mock.calls[0][0];
-      expect(callArgs?.metadataUpdate?.temporaryEdge?.zIndex).toBe(customZIndex);
+      expect(callArgs?.metadataUpdate?.temporaryEdge?.computedZIndex).toBe(customZIndex);
     });
 
     it('should not process temporary edge if metadata has not changed', () => {

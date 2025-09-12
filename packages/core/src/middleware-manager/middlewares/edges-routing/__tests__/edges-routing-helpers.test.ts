@@ -81,7 +81,12 @@ describe('Edge Routing Helper Functions', () => {
 
       const result = checkIfShouldRouteEdges(context);
       expect(result).toBe(true);
-      expect(mockHelpers.checkIfAnyNodePropsChanged).toHaveBeenCalledWith(['position', 'size', 'angle', 'ports']);
+      expect(mockHelpers.checkIfAnyNodePropsChanged).toHaveBeenCalledWith([
+        'position',
+        'size',
+        'angle',
+        'measuredPorts',
+      ]);
     });
 
     it('should return true when edge properties change', () => {
@@ -325,7 +330,7 @@ describe('Edge Routing Helper Functions', () => {
         id: 'edge-1',
         sourcePosition: sourcePoint,
         targetPosition: targetPoint,
-        labels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
       });
     });
 
@@ -350,7 +355,7 @@ describe('Edge Routing Helper Functions', () => {
         id: 'edge-1',
         sourcePosition: sourcePoint,
         targetPosition: targetPoint,
-        labels: undefined,
+        measuredLabels: undefined,
       });
     });
 
@@ -397,7 +402,7 @@ describe('Edge Routing Helper Functions', () => {
         points: newPoints,
         sourcePosition: sourcePoint,
         targetPosition: targetPoint,
-        labels: undefined,
+        measuredLabels: undefined,
       });
     });
 
@@ -450,7 +455,7 @@ describe('Edge Routing Helper Functions', () => {
         points: newPoints,
         sourcePosition: { x: 0, y: 0 },
         targetPosition: { x: 100, y: 100 },
-        labels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
       });
     });
   });
@@ -545,7 +550,7 @@ describe('Edge Routing Helper Functions', () => {
       });
     });
 
-    it('should create updated temporary edge with new points and z-index', () => {
+    it('should create updated temporary edge with new points and computedZIndex', () => {
       const temporaryEdge: Edge = {
         ...mockEdge,
         id: 'temp-edge',
@@ -571,7 +576,7 @@ describe('Edge Routing Helper Functions', () => {
         ],
         sourcePosition: { x: 10, y: 10 },
         targetPosition: { x: 90, y: 90 },
-        zIndex: 1000,
+        computedZIndex: 1000,
       });
     });
 
