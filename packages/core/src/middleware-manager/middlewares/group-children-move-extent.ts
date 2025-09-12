@@ -1,4 +1,4 @@
-import { FlowCore } from '../../flow-core';
+import { ModelLookup } from '../../model-lookup/model-lookup';
 import type { GroupNode, Middleware, MiddlewareContext, Node } from '../../types';
 import { calculateGroupRect, isGroup } from '../../utils';
 
@@ -21,10 +21,10 @@ export const groupChildrenMoveExtent: Middleware<
   defaultMetadata: {
     enabled: true,
   },
-  execute: ({ helpers, nodesMap, flowCore, middlewareMetadata }, next) => {
+  execute: ({ helpers, modelLookup, actionStateManager, middlewareMetadata }, next) => {
     const isEnabled = middlewareMetadata.enabled;
 
-    if (!isEnabled || flowCore.actionStateManager.dragging?.modifiers.shift) {
+    if (!isEnabled || actionStateManager.dragging?.modifiers.shift) {
       next();
       return;
     }
@@ -35,13 +35,13 @@ export const groupChildrenMoveExtent: Middleware<
       return;
     }
 
-    const affectedGroups = findAffectedGroups(helpers, nodesMap);
+    const affectedGroups = findAffectedGroups(helpers, modelLookup.nodesMap);
     if (affectedGroups.size === 0) {
       next();
       return;
     }
 
-    const updates = calculateGroupUpdates(affectedGroups, nodesMap, flowCore);
+    const updates = calculateGroupUpdates(affectedGroups, modelLookup);
 
     if (updates.length > 0) {
       next({ nodesToUpdate: updates });
@@ -75,20 +75,16 @@ function findAffectedGroups(helpers: MiddlewareContext['helpers'], nodesMap: Map
 /**
  * Calculate all necessary updates for groups and their ancestors
  */
-function calculateGroupUpdates(
-  affectedGroups: Set<GroupNode>,
-  nodesMap: Map<string, Node>,
-  flowCore: FlowCore
-): NodeUpdate[] {
+function calculateGroupUpdates(affectedGroups: Set<GroupNode>, modelLookup: ModelLookup): NodeUpdate[] {
   const updates: NodeUpdate[] = [];
   const processedNodeIds = new Set<string>();
   const sortedGroups = [...affectedGroups].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0));
 
   // Create a working copy of the nodes map for incremental updates
-  const workingNodesMap = new Map(nodesMap);
+  const workingNodesMap = new Map(modelLookup.nodesMap);
 
   for (const group of sortedGroups) {
-    const groupUpdates = updateGroupHierarchy(group, workingNodesMap, flowCore, processedNodeIds);
+    const groupUpdates = updateGroupHierarchy(group, workingNodesMap, modelLookup, processedNodeIds);
     updates.push(...groupUpdates);
   }
 
@@ -102,16 +98,16 @@ function calculateGroupUpdates(
 function updateGroupHierarchy(
   group: GroupNode,
   workingNodesMap: Map<string, Node>,
-  flowCore: FlowCore,
+  modelLookup: ModelLookup,
   processedNodeIds: Set<string>
 ): NodeUpdate[] {
   const updates: NodeUpdate[] = [];
 
   // Get the hierarchy from bottom to top (group -> ancestors)
-  const hierarchy = [group, ...flowCore.modelLookup.getParentChain(group.id)];
+  const hierarchy = [group, ...modelLookup.getParentChain(group.id)];
 
   for (const currentGroup of hierarchy) {
-    const children = flowCore.modelLookup.getNodeChildrenIds(currentGroup.id, { directOnly: true });
+    const children = modelLookup.getNodeChildrenIds(currentGroup.id, { directOnly: true });
 
     if (children.length === 0) continue;
 

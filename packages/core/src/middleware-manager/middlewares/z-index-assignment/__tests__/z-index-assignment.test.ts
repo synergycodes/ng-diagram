@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { FlowCore } from '../../../../flow-core';
 import { mockEdge, mockNode } from '../../../../test-utils';
 import type {
   Edge,
@@ -17,8 +16,10 @@ type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromM
 
 describe('zIndexMiddleware', () => {
   let helpers: Partial<Helpers>;
-  let nodesMap: Map<string, Node>;
-  let edgesMap: Map<string, Edge>;
+  let mockModelLookup: {
+    nodesMap: Map<string, Node>;
+    edgesMap: Map<string, Edge>;
+  };
   let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   let nextMock: ReturnType<typeof vi.fn>;
   let cancelMock: ReturnType<typeof vi.fn>;
@@ -30,8 +31,12 @@ describe('zIndexMiddleware', () => {
       getAffectedNodeIds: vi.fn(),
       getAffectedEdgeIds: vi.fn(),
     };
-    nodesMap = new Map();
-    edgesMap = new Map();
+
+    mockModelLookup = {
+      nodesMap: new Map(),
+      edgesMap: new Map(),
+    };
+
     nextMock = vi.fn();
     cancelMock = vi.fn();
     context = {
@@ -41,25 +46,22 @@ describe('zIndexMiddleware', () => {
         metadata: {} as Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
       },
       helpers: helpers as Helpers,
-      nodesMap,
-      edgesMap,
-      flowCore: {
-        config: {
-          zIndex: {
-            enabled: true,
-            selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
-            edgesAboveConnectedNodes: false,
-            elevateOnSelection: true,
-          },
+      modelLookup: mockModelLookup,
+      config: {
+        zIndex: {
+          enabled: true,
+          selectedZIndex: DEFAULT_SELECTED_Z_INDEX,
+          edgesAboveConnectedNodes: false,
+          elevateOnSelection: true,
         },
-      } as FlowCore,
+      },
       modelActionType: 'updateNode',
     } as unknown as MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
   });
 
   describe('execution conditions', () => {
     it('should call next() without changes when middleware is disabled', () => {
-      context.flowCore.config.zIndex.enabled = false;
+      context.config.zIndex.enabled = false;
       context.modelActionType = 'init';
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
@@ -100,7 +102,7 @@ describe('zIndexMiddleware', () => {
   describe('node selection z-index assignment', () => {
     it('should assign selectedZIndex to newly selected nodes', () => {
       const node1 = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
-      nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -118,7 +120,7 @@ describe('zIndexMiddleware', () => {
 
     it('should restore base z-index for deselected nodes without groupId', () => {
       const node1 = { ...mockNode, id: 'node1', selected: false, zIndex: DEFAULT_SELECTED_Z_INDEX };
-      nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -144,8 +146,8 @@ describe('zIndexMiddleware', () => {
         zIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
-      nodesMap.set('group1', groupNode);
-      nodesMap.set('child1', childNode);
+      mockModelLookup.nodesMap.set('group1', groupNode);
+      mockModelLookup.nodesMap.set('child1', childNode);
       context.state.nodes = [groupNode, childNode];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -163,7 +165,7 @@ describe('zIndexMiddleware', () => {
 
     it('should use selectedZIndex as base for selected nodes with zOrder', () => {
       const selectedNode = { ...mockNode, id: 'node1', selected: true, zOrder: 10, zIndex: 0 };
-      nodesMap.set('node1', selectedNode);
+      mockModelLookup.nodesMap.set('node1', selectedNode);
       context.state.nodes = [selectedNode];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -185,8 +187,8 @@ describe('zIndexMiddleware', () => {
       const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
       const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zIndex: 0 };
 
-      nodesMap.set('group1', groupNode);
-      nodesMap.set('child1', childNode);
+      mockModelLookup.nodesMap.set('group1', groupNode);
+      mockModelLookup.nodesMap.set('child1', childNode);
       context.state.nodes = [groupNode, childNode];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -211,8 +213,8 @@ describe('zIndexMiddleware', () => {
         zIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
-      nodesMap.set('group1', groupNode);
-      nodesMap.set('child1', selectedChildNode);
+      mockModelLookup.nodesMap.set('group1', groupNode);
+      mockModelLookup.nodesMap.set('child1', selectedChildNode);
       context.state.nodes = [groupNode, selectedChildNode];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -230,7 +232,7 @@ describe('zIndexMiddleware', () => {
   describe('zOrder-based z-index assignment', () => {
     it('should assign zOrder as zIndex when zOrder changes', () => {
       const node1 = { ...mockNode, id: 'node1', zOrder: 15, zIndex: 0 };
-      nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -248,7 +250,7 @@ describe('zIndexMiddleware', () => {
 
     it('should not update nodes with same zOrder and zIndex', () => {
       const node1 = { ...mockNode, id: 'node1', zOrder: 15, zIndex: 15 };
-      nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -269,9 +271,9 @@ describe('zIndexMiddleware', () => {
       const node2 = { ...mockNode, id: 'node2', zIndex: 3 };
       const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true, zIndex: 0 };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('node2', node2);
-      edgesMap.set('edge1', selectedEdge);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node2', node2);
+      mockModelLookup.edgesMap.set('edge1', selectedEdge);
       context.state.edges = [selectedEdge];
 
       (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
@@ -296,9 +298,9 @@ describe('zIndexMiddleware', () => {
         zIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('node2', node2);
-      edgesMap.set('edge1', deselectedEdge);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node2', node2);
+      mockModelLookup.edgesMap.set('edge1', deselectedEdge);
       context.state.edges = [deselectedEdge];
 
       (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
@@ -324,9 +326,9 @@ describe('zIndexMiddleware', () => {
         zIndex: 0,
       };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('node2', node2);
-      edgesMap.set('edge1', edgeWithZOrder);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node2', node2);
+      mockModelLookup.edgesMap.set('edge1', edgeWithZOrder);
       context.state.edges = [edgeWithZOrder];
 
       (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
@@ -344,9 +346,9 @@ describe('zIndexMiddleware', () => {
       const node2 = { ...mockNode, id: 'node2', zIndex: 7 };
       const newEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', zIndex: 0 };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('node2', node2);
-      edgesMap.set('edge1', newEdge);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node2', node2);
+      mockModelLookup.edgesMap.set('edge1', newEdge);
       context.state.edges = [newEdge];
       context.modelActionType = 'finishLinking';
 
@@ -360,7 +362,7 @@ describe('zIndexMiddleware', () => {
     it('should handle missing source/target nodes gracefully', () => {
       const edgeWithMissingNodes = { ...mockEdge, id: 'edge1', source: 'missing1', target: 'missing2', zIndex: 5 };
 
-      edgesMap.set('edge1', edgeWithMissingNodes);
+      mockModelLookup.edgesMap.set('edge1', edgeWithMissingNodes);
       context.state.edges = [edgeWithMissingNodes];
 
       (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
@@ -381,10 +383,10 @@ describe('zIndexMiddleware', () => {
       const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zIndex: 0 };
       const edge = { ...mockEdge, id: 'edge1', source: 'root1', target: 'child1', zIndex: 0 };
 
-      nodesMap.set('root1', rootNode);
-      nodesMap.set('group1', groupNode);
-      nodesMap.set('child1', childNode);
-      edgesMap.set('edge1', edge);
+      mockModelLookup.nodesMap.set('root1', rootNode);
+      mockModelLookup.nodesMap.set('group1', groupNode);
+      mockModelLookup.nodesMap.set('child1', childNode);
+      mockModelLookup.edgesMap.set('edge1', edge);
 
       context.state.nodes = [rootNode, groupNode, childNode];
       context.state.edges = [edge];
@@ -406,8 +408,8 @@ describe('zIndexMiddleware', () => {
       const nodeWithoutZOrder = { ...mockNode, id: 'node1', zIndex: 10 };
       const edge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node1', zIndex: 5 };
 
-      nodesMap.set('node1', nodeWithoutZOrder);
-      edgesMap.set('edge1', edge);
+      mockModelLookup.nodesMap.set('node1', nodeWithoutZOrder);
+      mockModelLookup.edgesMap.set('edge1', edge);
 
       context.state.nodes = [nodeWithoutZOrder];
       context.state.edges = [edge];
@@ -427,8 +429,8 @@ describe('zIndexMiddleware', () => {
       const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
       const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node1', selected: true, zIndex: 0 };
 
-      nodesMap.set('node1', selectedNode);
-      edgesMap.set('edge1', selectedEdge);
+      mockModelLookup.nodesMap.set('node1', selectedNode);
+      mockModelLookup.edgesMap.set('edge1', selectedEdge);
       context.state.nodes = [selectedNode];
       context.state.edges = [selectedEdge];
 
@@ -460,8 +462,8 @@ describe('zIndexMiddleware', () => {
         zIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
-      nodesMap.set('node1', nodeWithCorrectZIndex);
-      edgesMap.set('edge1', edgeWithCorrectZIndex);
+      mockModelLookup.nodesMap.set('node1', nodeWithCorrectZIndex);
+      mockModelLookup.edgesMap.set('edge1', edgeWithCorrectZIndex);
       context.state.nodes = [nodeWithCorrectZIndex];
       context.state.edges = [edgeWithCorrectZIndex];
 
@@ -481,10 +483,10 @@ describe('zIndexMiddleware', () => {
 
     it('should handle custom selectedZIndex configuration', () => {
       const customSelectedZIndex = 2000;
-      context.flowCore.config.zIndex.selectedZIndex = customSelectedZIndex;
+      context.config.zIndex.selectedZIndex = customSelectedZIndex;
 
       const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
-      nodesMap.set('node1', selectedNode);
+      mockModelLookup.nodesMap.set('node1', selectedNode);
       context.state.nodes = [selectedNode];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -501,10 +503,10 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should not elevate selected nodes when elevateOnSelection is false', () => {
-      context.flowCore.config.zIndex.elevateOnSelection = false;
+      context.config.zIndex.elevateOnSelection = false;
 
       const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 5 };
-      nodesMap.set('node1', selectedNode);
+      mockModelLookup.nodesMap.set('node1', selectedNode);
       context.state.nodes = [selectedNode];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
@@ -522,15 +524,15 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should not elevate selected edges when elevateOnSelection is false', () => {
-      context.flowCore.config.zIndex.elevateOnSelection = false;
+      context.config.zIndex.elevateOnSelection = false;
 
       const node1 = { ...mockNode, id: 'node1', zIndex: 5 };
       const node2 = { ...mockNode, id: 'node2', zIndex: 3 };
       const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true, zIndex: 0 };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('node2', node2);
-      edgesMap.set('edge1', selectedEdge);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node2', node2);
+      mockModelLookup.edgesMap.set('edge1', selectedEdge);
       context.state.edges = [selectedEdge];
 
       (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);
@@ -550,8 +552,8 @@ describe('zIndexMiddleware', () => {
       const node1 = { ...mockNode, id: 'node1', selected: false, zIndex: 0 };
       const node2 = { ...mockNode, id: 'node2', selected: false, zIndex: 0 };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('node2', node2);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node2', node2);
       context.state.nodes = [node1, node2];
 
       // First, init action processes all nodes
@@ -563,7 +565,7 @@ describe('zIndexMiddleware', () => {
 
       // Now node1 becomes selected
       const selectedNode1 = { ...node1, selected: true };
-      nodesMap.set('node1', selectedNode1);
+      mockModelLookup.nodesMap.set('node1', selectedNode1);
       context.state.nodes = [selectedNode1, node2];
       context.modelActionType = 'updateNode';
 
@@ -591,8 +593,8 @@ describe('zIndexMiddleware', () => {
         zIndex: 0,
       };
 
-      nodesMap.set('group1', groupNode);
-      nodesMap.set('child1', childNode);
+      mockModelLookup.nodesMap.set('group1', groupNode);
+      mockModelLookup.nodesMap.set('child1', childNode);
       context.state.nodes = [groupNode, childNode];
 
       // Both selected and groupId conditions are true
@@ -623,8 +625,8 @@ describe('zIndexMiddleware', () => {
       const node1 = { ...mockNode, id: 'node1', selected: true, groupId: 'group1', zIndex: 0 };
       const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
 
-      nodesMap.set('node1', node1);
-      nodesMap.set('group1', groupNode);
+      mockModelLookup.nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('group1', groupNode);
       context.state.nodes = [node1, groupNode];
 
       // Both selected and groupId conditions are true
@@ -659,7 +661,7 @@ describe('zIndexMiddleware', () => {
       // and should always override any previous z-index calculations
       const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 15, zIndex: 0 };
 
-      nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
       // Both selected and zOrder conditions are true
@@ -698,7 +700,7 @@ describe('zIndexMiddleware', () => {
       // Scenario: A selected node gets a new zOrder via bringToFront command
       const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 100, zIndex: DEFAULT_SELECTED_Z_INDEX };
 
-      nodesMap.set('node1', node1);
+      mockModelLookup.nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
       // Only zOrder changed (node was already selected)
@@ -742,7 +744,7 @@ describe('zIndexMiddleware', () => {
 
     it('should handle missing group parent node', () => {
       const orphanedChild = { ...mockNode, id: 'child1', groupId: 'missing-group', selected: false, zIndex: 100 };
-      nodesMap.set('child1', orphanedChild);
+      mockModelLookup.nodesMap.set('child1', orphanedChild);
       context.state.nodes = [orphanedChild];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
