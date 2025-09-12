@@ -234,7 +234,7 @@ describe('Edge Routing Helper Functions', () => {
       const edge: Edge = {
         ...mockEdge,
         routing: 'polyline',
-        labels: [
+        measuredLabels: [
           { id: 'label-1', positionOnEdge: 0.25 },
           { id: 'label-2', positionOnEdge: 0.75 },
         ],
@@ -271,7 +271,7 @@ describe('Edge Routing Helper Functions', () => {
     it('should return undefined when edge has no labels', () => {
       const edge: Edge = {
         ...mockEdge,
-        labels: undefined,
+        measuredLabels: undefined,
       };
       const points = [
         { x: 0, y: 0 },
@@ -287,7 +287,7 @@ describe('Edge Routing Helper Functions', () => {
     it('should handle empty labels array', () => {
       const edge: Edge = {
         ...mockEdge,
-        labels: [],
+        measuredLabels: [],
       };
       const points = [
         { x: 0, y: 0 },
@@ -305,7 +305,7 @@ describe('Edge Routing Helper Functions', () => {
       const edge: Edge = {
         ...mockEdge,
         id: 'edge-1',
-        labels: [{ id: 'label-1', positionOnEdge: 0.5 }],
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5 }],
       };
       const sourcePoint = { x: 0, y: 0 };
       const targetPoint = { x: 100, y: 100 };
@@ -428,7 +428,7 @@ describe('Edge Routing Helper Functions', () => {
         ...mockEdge,
         id: 'edge-1',
         points: undefined,
-        labels: [{ id: 'label-1', positionOnEdge: 0.5 }],
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5 }],
       };
       const newPoints = [
         { x: 0, y: 0 },

@@ -83,7 +83,7 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    */
   applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>) {
     const edge = this.flowCore.getEdgeById(edgeId);
-    const label = edge?.labels?.find((label) => label.id === labelId);
+    const label = edge?.measuredLabels?.find((label) => label.id === labelId);
 
     if (!label || isSameRect(getRect({ size: label.size }), getRect({ size }))) {
       return;

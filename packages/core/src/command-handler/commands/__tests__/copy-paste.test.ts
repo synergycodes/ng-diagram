@@ -288,7 +288,7 @@ describe('Copy-Paste Commands', () => {
               source: 'node1',
               target: 'node2',
               selected: true,
-              labels: [
+              measuredLabels: [
                 { id: 'label1', positionOnEdge: 0.5 },
                 { id: 'label2', positionOnEdge: 0.8 },
               ],
@@ -344,7 +344,7 @@ describe('Copy-Paste Commands', () => {
               source: 'node1',
               target: 'node2',
               selected: true,
-              labels: undefined,
+              measuredLabels: undefined,
             },
           ],
           metadata: mockMetadata,

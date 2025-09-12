@@ -143,7 +143,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       const updatedEdges = edges.map((edge) => {
         const labels = edgeLabelsMap.get(edge.id);
         if (labels) {
-          return { ...edge, labels: [...(edge.labels ?? []), ...labels] };
+          return { ...edge, measuredLabels: [...(edge.measuredLabels ?? []), ...labels] };
         }
         return edge;
       });
@@ -156,7 +156,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
 
       const updatedEdges = edges.map((edge) => ({
         ...edge,
-        labels: edge.labels?.map((label) => {
+        labels: edge.measuredLabels?.map((label) => {
           const size = edgeLabelSizeMap.get(this.getCompoundId(edge.id, label.id));
 
           if (!size) {

@@ -189,13 +189,16 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
   const points = edge.points || [];
   const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
   const newLabels = [
-    ...(edge.labels ?? []),
+    ...(edge.measuredLabels ?? []),
     ...labels.map((label) => ({
       ...label,
       position: edgeRoutingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
     })),
   ];
-  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
+  await commandHandler.flowCore.applyUpdate(
+    { edgesToUpdate: [{ id: edgeId, measuredLabels: newLabels }] },
+    'updateEdge'
+  );
 };
 
 export interface UpdateEdgeLabelCommand {
@@ -213,7 +216,7 @@ export const updateEdgeLabel = async (commandHandler: CommandHandler, command: U
   }
   const points = edge.points || [];
   const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
-  const newLabels = edge.labels?.map((label) => {
+  const newLabels = edge.measuredLabels?.map((label) => {
     const positionOnEdge = labelChanges?.positionOnEdge ?? label.positionOnEdge;
     const position = edgeRoutingManager.computePointOnPath(edge.routing, points, positionOnEdge);
     if (label.id !== labelId) {
@@ -224,7 +227,10 @@ export const updateEdgeLabel = async (commandHandler: CommandHandler, command: U
   if (!newLabels) {
     return;
   }
-  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: newLabels }] }, 'updateEdge');
+  await commandHandler.flowCore.applyUpdate(
+    { edgesToUpdate: [{ id: edgeId, measuredLabels: newLabels }] },
+    'updateEdge'
+  );
 };
 
 export interface DeleteEdgeLabelsCommand {
@@ -239,6 +245,9 @@ export const deleteEdgeLabels = async (commandHandler: CommandHandler, command: 
   if (!edge) {
     return;
   }
-  const leftLabels = edge.labels?.filter((label) => !labelIds.includes(label.id));
-  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id: edgeId, labels: leftLabels }] }, 'updateEdge');
+  const leftLabels = edge.measuredLabels?.filter((label) => !labelIds.includes(label.id));
+  await commandHandler.flowCore.applyUpdate(
+    { edgesToUpdate: [{ id: edgeId, measuredLabels: leftLabels }] },
+    'updateEdge'
+  );
 };

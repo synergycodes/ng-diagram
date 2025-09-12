@@ -182,7 +182,7 @@ export class FlowResizeBatchProcessorService {
       const edge = flowCore.getEdgeById(metadata.edgeId);
       if (!edge) continue;
 
-      const currentSize = edge.labels?.find((label) => label.id === metadata.labelId)?.size;
+      const currentSize = edge.measuredLabels?.find((label) => label.id === metadata.labelId)?.size;
       if (currentSize && !this.isSizeChanged(currentSize, size)) {
         continue;
       }

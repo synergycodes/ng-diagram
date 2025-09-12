@@ -57,7 +57,7 @@ export const havePointsChanged = (oldPoints: Point[] | undefined, newPoints: Poi
  * Updates label positions based on edge points.
  */
 export const updateLabelPositions = (edge: Edge, points: Point[], routingManager: EdgeRoutingManager) => {
-  return edge.labels?.map((label) => ({
+  return edge.measuredLabels?.map((label) => ({
     ...label,
     position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
   }));
@@ -80,7 +80,7 @@ export const processManualModeEdge = (
       id: edge.id,
       sourcePosition: sourcePoint,
       targetPosition: targetPoint,
-      labels: updatedLabels,
+      measuredLabels: updatedLabels,
     };
   }
   return null;
@@ -108,7 +108,7 @@ export const processAutoModeEdge = (
     points,
     sourcePosition: sourcePoint,
     targetPosition: targetPoint,
-    labels: updatedLabels,
+    measuredLabels: updatedLabels,
   };
 };
 
