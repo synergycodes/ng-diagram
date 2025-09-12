@@ -183,7 +183,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       const updatedNodes = nodes.map((node) => {
         return {
           ...node,
-          ports: nodePortsMap.get(node.id) ?? node.measuredPorts,
+          measuredPorts: nodePortsMap.get(node.id) ?? node.measuredPorts,
         };
       });
 
@@ -196,7 +196,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       const updatedNodes = nodes.map((node) => {
         return {
           ...node,
-          ports: node.measuredPorts?.map((port) => {
+          measuredPorts: node.measuredPorts?.map((port) => {
             const key = this.getCompoundId(node.id, port.id);
             const rect = portRectMap.get(key);
 

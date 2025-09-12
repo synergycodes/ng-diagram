@@ -15,7 +15,7 @@ export interface EdgesRoutingMiddlewareMetadata {
 export const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext): boolean =>
   modelActionType === 'init' ||
   helpers.anyEdgesAdded() ||
-  helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'ports']) ||
+  helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'measuredPorts']) ||
   helpers.checkIfAnyEdgePropsChanged([
     'targetPosition',
     'sourcePosition',
