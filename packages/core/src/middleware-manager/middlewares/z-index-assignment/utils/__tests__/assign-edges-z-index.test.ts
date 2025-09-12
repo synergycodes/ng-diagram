@@ -3,8 +3,8 @@ import { assignEdgesZIndex, assignEdgeZIndex } from '../assign-edges-z-index.ts'
 
 describe('assignEdgeZIndex', () => {
   const nodesMap = new Map([
-    ['1', { id: '1', zIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
-    ['2', { id: '2', zIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['1', { id: '1', computedZIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['2', { id: '2', computedZIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['3', { id: '3', type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['4', { id: '4', type: 'node', position: { x: 0, y: 0 }, data: {} }],
   ]);
@@ -41,10 +41,10 @@ describe('assignEdgeZIndex', () => {
 
 describe('assignEdgesZIndex', () => {
   const nodesWithZIndex = [
-    { id: '1', zIndex: 5, type: 'node', position: { x: 0, y: 0 }, data: {} },
+    { id: '1', computedZIndex: 5, type: 'node', position: { x: 0, y: 0 }, data: {} },
     {
       id: '2',
-      zIndex: 2,
+      computedZIndex: 2,
       type: 'node',
       position: { x: 0, y: 0 },
       data: {},
@@ -52,8 +52,8 @@ describe('assignEdgesZIndex', () => {
   ];
 
   const nodesMap = new Map([
-    ['1', { id: '1', zIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
-    ['2', { id: '2', zIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['1', { id: '1', computedZIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['2', { id: '2', computedZIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['3', { id: '3', type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['4', { id: '4', type: 'node', position: { x: 0, y: 0 }, data: {} }],
   ]);
