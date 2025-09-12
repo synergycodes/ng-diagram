@@ -13,7 +13,7 @@ export const groupChildrenChangeExtent: Middleware<
   defaultMetadata: {
     enabled: true,
   },
-  execute: async ({ helpers, nodesMap, middlewareMetadata }, next) => {
+  execute: async ({ helpers, modelLookup: { nodesMap }, middlewareMetadata }, next) => {
     const isEnabled = middlewareMetadata.enabled;
 
     if (!isEnabled) {

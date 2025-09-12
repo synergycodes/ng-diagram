@@ -23,26 +23,26 @@ export const treeLayoutMiddleware: Middleware = {
     const {
       state: { edges, nodes },
       modelActionType,
-      flowCore,
+      config,
     } = context;
     const shouldTreeLayout = checkIfShouldTreeLayout(modelActionType);
     const shouldAutoLayout = checkIfShouldAutoTreeLayout(context);
-    const config = flowCore.config.treeLayout;
+    const layoutConfig = config.treeLayout;
 
-    if (!config || (!shouldTreeLayout && (!config?.autoLayout || !shouldAutoLayout))) {
+    if (!config || (!shouldTreeLayout && (!layoutConfig?.autoLayout || !shouldAutoLayout))) {
       next();
       return;
     }
 
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
-    const treeNodeMap = getNodeMap(config, nodes);
+    const treeNodeMap = getNodeMap(layoutConfig, nodes);
     const topGroupMap = buildTopGroupMap(treeNodeMap);
     const remappedEdges = remapEdges(edges, topGroupMap);
 
     buildGroupsHierarchy(treeNodeMap);
     const { roots } = buildTreeStructure(treeNodeMap, remappedEdges);
 
-    const isHorizontal = isAngleHorizontal(config.layoutAngle);
+    const isHorizontal = isAngleHorizontal(layoutConfig.layoutAngle);
     let isFirstRoot = true;
     let previousBounds: { minX: number; maxX: number; minY: number; maxY: number } | null = null;
     const baseX = 100;
@@ -55,14 +55,14 @@ export const treeLayoutMiddleware: Middleware = {
       if (!isFirstRoot && previousBounds) {
         if (isHorizontal) {
           offsetX = baseX;
-          offsetY = previousBounds.maxY + config.treeGap;
+          offsetY = previousBounds.maxY + layoutConfig.treeGap;
         } else {
-          offsetX = previousBounds.maxX + config.treeGap;
+          offsetX = previousBounds.maxX + layoutConfig.treeGap;
           offsetY = baseY;
         }
       }
 
-      const subtreeBounds = makeTreeLayout(root, config, offsetX, offsetY, config.layoutAngle);
+      const subtreeBounds = makeTreeLayout(root, layoutConfig, offsetX, offsetY, layoutConfig.layoutAngle);
       previousBounds = subtreeBounds;
       isFirstRoot = false;
     });

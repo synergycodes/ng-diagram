@@ -94,15 +94,16 @@ export class MiddlewareExecutor<
     TMetadata['middlewaresConfig'][MiddlewareConfigKeys<TCustomMiddlewares>]
   > => ({
     state: this.getState(),
-    nodesMap: this.nodesMap,
-    edgesMap: this.edgesMap,
+    modelLookup: this.flowCore.modelLookup,
     initialState: this.initialState,
     modelActionType: this.modelActionType,
-    flowCore: this.flowCore as unknown as FlowCore<TCustomMiddlewares>,
+    actionStateManager: this.flowCore.actionStateManager,
+    edgeRoutingManager: this.flowCore.edgeRoutingManager,
     helpers: this.helpers(),
     history: this.history,
     initialUpdate: this.initialStateUpdate,
     middlewareMetadata: this.flowCore.middlewareManager.getMiddlewareConfig(middlewareName),
+    config: this.flowCore.config,
   });
 
   private resolveMiddlewares = (): Promise<FlowState<TMetadata> | undefined> => {

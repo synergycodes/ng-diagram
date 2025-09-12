@@ -28,7 +28,6 @@ vi.mock('../../../../utils', () => ({
 }));
 
 describe('Edges Routing Middleware', () => {
-  let flowCore: FlowCore;
   let initialState: FlowState;
   let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>, EdgesRoutingMiddlewareMetadata>;
   const nextMock = vi.fn();
@@ -71,7 +70,6 @@ describe('Edges Routing Middleware', () => {
       nodesMap: new Map(),
       edgesMap: new Map(),
       modelActionType: 'addNodes',
-      flowCore,
       helpers: {
         anyEdgesAdded: anyEdgesAddedMock,
         checkIfAnyNodePropsChanged: checkIfAnyNodePropsChangedMock,

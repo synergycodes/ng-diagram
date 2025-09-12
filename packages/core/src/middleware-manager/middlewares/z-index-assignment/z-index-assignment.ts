@@ -11,15 +11,14 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
   execute: (context, next) => {
     const {
       state: { edges, nodes },
-      nodesMap,
-      edgesMap,
+      modelLookup: { nodesMap, edgesMap },
       helpers,
       modelActionType,
-      flowCore,
+      config,
     } = context;
 
-    const config = flowCore.config.zIndex;
-    const isEnabled = config.enabled;
+    const zIndexConfig = config.zIndex;
+    const isEnabled = zIndexConfig.enabled;
     const isInit = checkIfIsInit(modelActionType);
     const shouldSnapSelectedNode = helpers.checkIfAnyNodePropsChanged(['selected']);
     const shouldSnapGroupIdNode = helpers.checkIfAnyNodePropsChanged(['groupId']);
@@ -49,7 +48,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
       nodesWithZIndex = initializeZIndex(nodesMap);
       nodesWithZIndex.forEach((node) => processedNodeIds.add(node.id));
     }
-    const selectedZIndex = config.selectedZIndex;
+    const selectedZIndex = zIndexConfig.selectedZIndex;
 
     // Partial for Node
     if (shouldSnapSelectedNode) {
@@ -61,14 +60,19 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         const node = nodesMap.get(nodeId);
         if (!node) continue;
         const baseZIndex =
-          node.selected && config.elevateOnSelection
+          node.selected && zIndexConfig.elevateOnSelection
             ? selectedZIndex
             : node.zOrder !== undefined
               ? node.zOrder
               : node.groupId
                 ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1
                 : 0;
-        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex, node.selected && config.elevateOnSelection);
+        const assignedNodes = assignNodeZIndex(
+          node,
+          nodesMap,
+          baseZIndex,
+          node.selected && zIndexConfig.elevateOnSelection
+        );
         nodesWithZIndex.push(...assignedNodes);
         assignedNodes.forEach((n) => processedNodeIds.add(n.id));
       }
@@ -107,7 +111,12 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     const addedEdge = edges.at(-1);
     // Partial for Edge
     if (isEdgeAdded && addedEdge) {
-      edgesWithZIndex = assignEdgesZIndex([addedEdge], nodesWithZIndex, nodesMap, config.edgesAboveConnectedNodes);
+      edgesWithZIndex = assignEdgesZIndex(
+        [addedEdge],
+        nodesWithZIndex,
+        nodesMap,
+        zIndexConfig.edgesAboveConnectedNodes
+      );
     }
 
     if (shouldSnapEdge) {
@@ -117,15 +126,15 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         const edge = edgesMap.get(edgeId);
         if (!edge) continue;
         edgesWithZIndex.push(
-          edge.selected && config.elevateOnSelection
+          edge.selected && zIndexConfig.elevateOnSelection
             ? {
                 ...edge,
                 zIndex: selectedZIndex,
               }
-            : assignEdgeZIndex(edge, zIndexMap, nodesMap, config.edgesAboveConnectedNodes)
+            : assignEdgeZIndex(edge, zIndexMap, nodesMap, zIndexConfig.edgesAboveConnectedNodes)
         );
       }
-    } else edgesWithZIndex = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap, config.edgesAboveConnectedNodes);
+    } else edgesWithZIndex = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap, zIndexConfig.edgesAboveConnectedNodes);
 
     for (const edge of edgesWithZIndex) {
       const currentEdge = edges.find((edgeData) => edgeData.id === edge.id);
