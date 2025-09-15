@@ -1,6 +1,7 @@
 import { ActionStateManager } from './action-state-manager/action-state-manager';
 import { CommandHandler } from './command-handler/command-handler';
 import { EdgeRoutingManager } from './edge-routing-manager';
+import { EventManager } from './event-manager';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -55,6 +56,7 @@ export class FlowCore<
   readonly portBatchProcessor: PortBatchProcessor;
   readonly actionStateManager: ActionStateManager;
   readonly edgeRoutingManager: EdgeRoutingManager;
+  readonly eventManager: EventManager;
 
   readonly config: FlowConfig;
 
@@ -85,6 +87,7 @@ export class FlowCore<
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
     );
+    this.eventManager = new EventManager();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
@@ -93,6 +96,7 @@ export class FlowCore<
   }
 
   destroy() {
+    this.eventManager.offAll();
     this.model.destroy();
   }
 

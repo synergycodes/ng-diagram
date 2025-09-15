@@ -62,7 +62,9 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
 export type {
+  DiagramInitEvent,
   Edge,
+  EdgeDrawnEvent,
   GroupNode,
   loggerMiddleware,
   Metadata,
@@ -73,4 +75,7 @@ export type {
   NgDiagramMath,
   Node,
   Point,
+  SelectionChangedEvent,
+  SelectionMovedEvent,
+  ViewportChangedEvent,
 } from '@angularflow/core';

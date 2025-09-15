@@ -41,6 +41,22 @@ When enabled, additional console logs are printed.
 
 ***
 
+### diagramInit
+
+> **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/other/diagraminitevent/)\>
+
+Event emitted when the diagram is initialized
+
+***
+
+### edgeDrawn
+
+> **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/other/edgedrawnevent/)\>
+
+Event emitted when the diagram is initialized
+
+***
+
 ### edgeTemplateMap
 
 > **edgeTemplateMap**: `InputSignal`\<`NgDiagramEdgeTemplateMap`\>
@@ -76,6 +92,30 @@ The model to use in the diagram.
 > **nodeTemplateMap**: `InputSignal`\<`NgDiagramNodeTemplateMap`\>
 
 The node template map to use for the diagram.
+
+***
+
+### selectionChanged
+
+> **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/other/selectionchangedevent/)\>
+
+Event emitted when selection changes
+
+***
+
+### selectionMoved
+
+> **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/other/selectionmovedevent/)\>
+
+Event emitted when selected objects are moved
+
+***
+
+### viewportChanged
+
+> **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/other/viewportchangedevent/)\>
+
+Event emitted when viewport changes (pan/zoom)
 
 ## Methods
 

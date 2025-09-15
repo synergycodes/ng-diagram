@@ -4,20 +4,27 @@ import {
   Component,
   effect,
   ElementRef,
+  EventEmitter,
   inject,
   input,
   OnDestroy,
   OnInit,
+  Output,
   signal,
 } from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
 import type {
+  DiagramInitEvent,
+  EdgeDrawnEvent,
   FlowCore,
   Metadata,
   MiddlewareChain,
   MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
+  SelectionChangedEvent,
+  SelectionMovedEvent,
+  ViewportChangedEvent,
 } from '@angularflow/core';
 
 import { DiagramSelectionDirective } from '../../directives';
@@ -126,6 +133,31 @@ export class NgDiagramComponent<
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
+  /**
+   * Event emitted when the diagram is initialized
+   */
+  @Output() diagramInit = new EventEmitter<DiagramInitEvent>();
+
+  /**
+   * Event emitted when the diagram is initialized
+   */
+  @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
+
+  /**
+   * Event emitted when selected objects are moved
+   */
+  @Output() selectionMoved = new EventEmitter<SelectionMovedEvent>();
+
+  /**
+   * Event emitted when selection changes
+   */
+  @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
+
+  /**
+   * Event emitted when viewport changes (pan/zoom)
+   */
+  @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
+
   constructor() {
     effect(() => {
       const model = this.model();
@@ -133,9 +165,12 @@ export class NgDiagramComponent<
         this.flowCoreProvider.destroy();
         this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
 
-        this.flowCore.set(this.flowCoreProvider.provide());
+        const flowCore = this.flowCoreProvider.provide();
+        this.flowCore.set(flowCore);
 
         this.initializedModel = model;
+
+        this.setupEventBridge(flowCore);
       }
     });
 
@@ -261,5 +296,15 @@ export class NgDiagramComponent<
         'updateViewportSize'
       );
     }
+  }
+
+  private setupEventBridge(flowCore: FlowCore): void {
+    const eventManager = flowCore.eventManager;
+
+    eventManager.on('diagramInit', (event) => this.diagramInit.emit(event));
+    eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
+    eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
+    eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
+    eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
   }
 }
