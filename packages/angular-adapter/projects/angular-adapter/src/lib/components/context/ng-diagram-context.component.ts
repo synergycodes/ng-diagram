@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NgDiagramClipboardService } from '../../public-services/ng-diagram-clipboard.service';
-import { NgDiagramEdgeService } from '../../public-services/ng-diagram-edge.service';
 import { NgDiagramGroupsService } from '../../public-services/ng-diagram-groups.service';
 import { NgDiagramModelService } from '../../public-services/ng-diagram-model.service';
 import { NgDiagramNodeService } from '../../public-services/ng-diagram-node.service';
@@ -12,6 +11,8 @@ import { CursorPositionTrackerService } from '../../services/cursor-position-tra
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
 import { FlowResizeBatchProcessorService } from '../../services/flow-resize-observer/flow-resize-processor.service';
 import { InputEventsRouterService } from '../../services/input-events/input-events-router.service';
+import { LinkingEventService } from '../../services/input-events/linking-event.service';
+import { ManualLinkingService } from '../../services/input-events/manual-linking.service';
 import { PaletteService } from '../../services/palette/palette.service';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
@@ -37,8 +38,9 @@ import { UpdatePortsService } from '../../services/update-ports/update-ports.ser
     NgDiagramSelectionService,
     NgDiagramClipboardService,
     NgDiagramNodeService,
-    NgDiagramEdgeService,
     NgDiagramGroupsService,
+    LinkingEventService,
+    ManualLinkingService,
   ],
 })
 export class NgDiagramContextComponent {}

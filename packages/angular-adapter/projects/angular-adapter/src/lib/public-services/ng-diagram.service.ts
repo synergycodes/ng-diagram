@@ -1,18 +1,22 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   ActionState,
+  EdgeLabel,
   EdgeRouting,
   EnvironmentInfo,
   Middleware,
   ModelActionType,
+  Node,
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
+import { ManualLinkingService } from '../services/input-events/manual-linking.service';
 import { NgDiagramConfig } from '../types';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
 export class NgDiagramService extends NgDiagramBaseService {
+  private readonly manualLinkingService = inject(ManualLinkingService);
   /**
    * Returns whether the diagram is initialized
    */
@@ -120,6 +124,43 @@ export class NgDiagramService extends NgDiagramBaseService {
    */
   getDefaultRouting(): string {
     return this.flowCore.edgeRoutingManager.getDefaultRouting();
+  }
+
+  /**
+   * Adds labels to an edge.
+   * @param edgeId The ID of the edge to add labels to.
+   * @param labels The labels to add to the edge.
+   */
+  addEdgeLabels(edgeId: string, labels: EdgeLabel[]) {
+    this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels });
+  }
+
+  /**
+   * Updates a label on an edge.
+   * @param edgeId The ID of the edge to update the label on.
+   * @param labelId The ID of the label to update.
+   * @param labelChanges The changes to apply to the label.
+   */
+  updateEdgeLabel(edgeId: string, labelId: string, labelChanges: Partial<EdgeLabel>) {
+    this.flowCore.commandHandler.emit('updateEdgeLabel', { edgeId, labelId, labelChanges });
+  }
+
+  /**
+   * Deletes labels from an edge.
+   * @param edgeId The ID of the edge to delete labels from.
+   * @param labelIds The IDs of the labels to delete.
+   */
+  deleteEdgeLabels(edgeId: string, labelIds: string[]) {
+    this.flowCore.commandHandler.emit('deleteEdgeLabels', { edgeId, labelIds });
+  }
+
+  /**
+   * Call this method to start linking from your custom logic
+   * @param node The node from which the linking starts
+   * @param portId The port ID from which the linking starts
+   */
+  startLinking(node: Node, portId: string) {
+    this.manualLinkingService.startLinking(node, portId);
   }
 
   /**

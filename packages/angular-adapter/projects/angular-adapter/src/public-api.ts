@@ -38,7 +38,6 @@ export { NgDiagramNodeSelectedDirective } from './lib/directives/node-selected/n
 
 // Services
 export { NgDiagramClipboardService } from './lib/public-services/ng-diagram-clipboard.service';
-export { NgDiagramEdgeService } from './lib/public-services/ng-diagram-edge.service';
 export { NgDiagramGroupsService } from './lib/public-services/ng-diagram-groups.service';
 export { NgDiagramModelService } from './lib/public-services/ng-diagram-model.service';
 export { NgDiagramNodeService } from './lib/public-services/ng-diagram-node.service';

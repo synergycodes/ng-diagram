@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { NgDiagramService } from '@angularflow/angular-adapter';
+import {
+  AppMiddlewares,
+  NgDiagramModelService,
+  NgDiagramSelectionService,
+  NgDiagramService,
+} from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-toolbar',
@@ -10,6 +15,7 @@ import { NgDiagramService } from '@angularflow/angular-adapter';
 })
 export class ToolbarComponent {
   private readonly ngDiagramService: NgDiagramService = inject(NgDiagramService);
+  private readonly ngDiagramSelectionService = inject(NgDiagramSelectionService);
 
   toggleDebugModeClick = output<void>();
 
@@ -28,5 +34,13 @@ export class ToolbarComponent {
     const { debugMode } = this.ngDiagramService.getConfig();
 
     this.ngDiagramService.updateConfig({ debugMode: !debugMode });
+  }
+
+  onLinkCreationClick() {
+    const node = this.ngDiagramSelectionService.selection().nodes[0];
+    if (node) {
+      const port = node.measuredPorts?.find((p) => p.type === 'source' || p.type === 'both')?.id || 'port-right';
+      this.ngDiagramService.startLinking(node, port);
+    }
   }
 }
