@@ -407,7 +407,7 @@ describe('Edges Routing Middleware', () => {
         expect.objectContaining({
           id: 'temp-edge',
           points: expect.any(Array),
-          zIndex: DEFAULT_SELECTED_Z_INDEX,
+          computedZIndex: DEFAULT_SELECTED_Z_INDEX,
         })
       );
       expect(nextMock).toHaveBeenCalledWith({});
@@ -433,7 +433,7 @@ describe('Edges Routing Middleware', () => {
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
-      expect(mockActionStateManager.linking.temporaryEdge.zIndex).toBe(customZIndex);
+      expect(mockActionStateManager.linking.temporaryEdge.computedZIndex).toBe(customZIndex);
     });
 
     it('should not process if no temporary edge exists', () => {
