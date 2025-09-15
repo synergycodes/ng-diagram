@@ -16,7 +16,7 @@ export const startLinking = async (commandHandler: CommandHandler, command: Star
     return;
   }
 
-  if (sourcePortId && sourceNode.ports?.find((port) => port.id === sourcePortId)?.type === 'target') {
+  if (sourcePortId && sourceNode.measuredPorts?.find((port) => port.id === sourcePortId)?.type === 'target') {
     return;
   }
 

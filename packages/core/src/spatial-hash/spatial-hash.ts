@@ -62,7 +62,7 @@ export class SpatialHash {
   }
 
   private nodeToRect(node: Node): RectWithId {
-    const ports = node.ports || [];
+    const ports = node.measuredPorts || [];
     const { x, y, width, height } = getRect(node);
     const angle = ((node.angle || 0) * Math.PI) / 180;
 

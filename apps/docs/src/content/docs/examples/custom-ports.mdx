@@ -18,7 +18,8 @@ This example demonstrates how to create custom ports in NgDiagram by customizing
   Ports are rendered using the `<ng-diagram-port>` component, which supports various attributes.
 
 - **Node Template Customization:**  
-  The node template `NodeComponent` defines how ports are arranged and styled within each node.
+  The `NodeComponent` template defines the arrangement and styling of ports within each node.  
+  Ports are stored in the `measuredPorts` property, which is read-only and cannot be modified in the node definition.
 
 - **Port Binding:**  
   Ports have a `type` property to set the connection type for each port. You can set it to `'both'`, `'target'`, or `'source'`.

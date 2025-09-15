@@ -7,7 +7,7 @@ describe('sortNodesByZIndex', () => {
     ({
       id,
       position: { x: 0, y: 0 },
-      zIndex,
+      computedZIndex: zIndex,
     }) as Node;
 
   describe('basic sorting', () => {
@@ -183,7 +183,7 @@ describe('createNodeZIndexComparator', () => {
     ({
       id,
       position: { x: 0, y: 0 },
-      zIndex,
+      computedZIndex: zIndex,
     }) as Node;
 
   it('should create a reusable comparator function', () => {

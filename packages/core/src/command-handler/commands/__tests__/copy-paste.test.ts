@@ -188,7 +188,7 @@ describe('Copy-Paste Commands', () => {
               ...mockNode,
               id: 'node1',
               selected: true,
-              ports: [
+              measuredPorts: [
                 { id: 'port1', type: 'source', nodeId: 'node1', side: 'top' },
                 { id: 'port2', type: 'target', nodeId: 'node1', side: 'bottom' },
               ],
@@ -211,13 +211,13 @@ describe('Copy-Paste Commands', () => {
         expect(pastedNode.id).not.toBe('node1');
         expect(pastedNode.id).toMatch(/^generated-node-/);
 
-        expect(pastedNode.ports).toHaveLength(2);
+        expect(pastedNode.measuredPorts).toHaveLength(2);
         // Port IDs should be preserved (not regenerated)
-        expect(pastedNode.ports[0].id).toBe('port1');
-        expect(pastedNode.ports[1].id).toBe('port2');
+        expect(pastedNode.measuredPorts[0].id).toBe('port1');
+        expect(pastedNode.measuredPorts[1].id).toBe('port2');
         // But nodeId should be updated to the new node ID
-        expect(pastedNode.ports[0].nodeId).toBe(pastedNode.id);
-        expect(pastedNode.ports[1].nodeId).toBe(pastedNode.id);
+        expect(pastedNode.measuredPorts[0].nodeId).toBe(pastedNode.id);
+        expect(pastedNode.measuredPorts[1].nodeId).toBe(pastedNode.id);
       });
 
       it('should preserve port IDs in edge references when pasting', async () => {
@@ -227,13 +227,13 @@ describe('Copy-Paste Commands', () => {
               ...mockNode,
               id: 'node1',
               selected: true,
-              ports: [{ id: 'port1', type: 'source', nodeId: 'node1', side: 'right' }],
+              measuredPorts: [{ id: 'port1', type: 'source', nodeId: 'node1', side: 'right' }],
             },
             {
               ...mockNode,
               id: 'node2',
               selected: true,
-              ports: [{ id: 'port2', type: 'target', nodeId: 'node2', side: 'left' }],
+              measuredPorts: [{ id: 'port2', type: 'target', nodeId: 'node2', side: 'left' }],
             },
           ],
           edges: [
@@ -288,7 +288,7 @@ describe('Copy-Paste Commands', () => {
               source: 'node1',
               target: 'node2',
               selected: true,
-              labels: [
+              measuredLabels: [
                 { id: 'label1', positionOnEdge: 0.5 },
                 { id: 'label2', positionOnEdge: 0.8 },
               ],
@@ -306,16 +306,16 @@ describe('Copy-Paste Commands', () => {
         expect(update.edgesToAdd).toHaveLength(1);
         const pastedEdge = update.edgesToAdd[0];
 
-        expect(pastedEdge.labels).toHaveLength(2);
-        expect(pastedEdge.labels[0].id).toBe('label1');
-        expect(pastedEdge.labels[1].id).toBe('label2');
-        expect(pastedEdge.labels[0].positionOnEdge).toBe(0.5);
-        expect(pastedEdge.labels[1].positionOnEdge).toBe(0.8);
+        expect(pastedEdge.measuredLabels).toHaveLength(2);
+        expect(pastedEdge.measuredLabels[0].id).toBe('label1');
+        expect(pastedEdge.measuredLabels[1].id).toBe('label2');
+        expect(pastedEdge.measuredLabels[0].positionOnEdge).toBe(0.5);
+        expect(pastedEdge.measuredLabels[1].positionOnEdge).toBe(0.8);
       });
 
       it('should handle nodes without ports', async () => {
         commandHandler.flowCore.getState = () => ({
-          nodes: [{ ...mockNode, id: 'node1', selected: true, ports: undefined }],
+          nodes: [{ ...mockNode, id: 'node1', selected: true, measuredPorts: undefined }],
           edges: [],
           metadata: mockMetadata,
         });
@@ -328,7 +328,7 @@ describe('Copy-Paste Commands', () => {
 
         expect(update.nodesToAdd).toHaveLength(1);
         const pastedNode = update.nodesToAdd[0];
-        expect(pastedNode.ports).toBeUndefined();
+        expect(pastedNode.measuredPorts).toBeUndefined();
       });
 
       it('should handle edges without labels', async () => {
@@ -344,7 +344,7 @@ describe('Copy-Paste Commands', () => {
               source: 'node1',
               target: 'node2',
               selected: true,
-              labels: undefined,
+              measuredLabels: undefined,
             },
           ],
           metadata: mockMetadata,
@@ -358,7 +358,7 @@ describe('Copy-Paste Commands', () => {
 
         expect(update.edgesToAdd).toHaveLength(1);
         const pastedEdge = update.edgesToAdd[0];
-        expect(pastedEdge.labels).toBeUndefined();
+        expect(pastedEdge.measuredLabels).toBeUndefined();
       });
     });
 

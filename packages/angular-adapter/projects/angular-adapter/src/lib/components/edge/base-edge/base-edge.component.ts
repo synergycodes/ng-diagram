@@ -78,7 +78,7 @@ export class NgDiagramBaseEdgeComponent {
   selected = computed(() => this.edge().selected);
   temporary = computed(() => this.edge().temporary);
 
-  labels = computed(() => this.edge().labels ?? []);
+  labels = computed(() => this.edge().measuredLabels ?? []);
 
   private prevRouting: string | undefined;
   private prevRoutingMode: RoutingMode | undefined;

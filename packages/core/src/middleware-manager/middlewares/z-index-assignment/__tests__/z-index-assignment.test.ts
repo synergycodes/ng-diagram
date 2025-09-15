@@ -98,7 +98,7 @@ describe('zIndexMiddleware', () => {
 
   describe('node selection z-index assignment', () => {
     it('should assign selectedZIndex to newly selected nodes', () => {
-      const node1 = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
+      const node1 = { ...mockNode, id: 'node1', selected: true, computedZIndex: 0 };
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
@@ -111,12 +111,12 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
       });
     });
 
     it('should restore base z-index for deselected nodes without groupId', () => {
-      const node1 = { ...mockNode, id: 'node1', selected: false, zIndex: DEFAULT_SELECTED_Z_INDEX };
+      const node1 = { ...mockNode, id: 'node1', selected: false, computedZIndex: DEFAULT_SELECTED_Z_INDEX };
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
@@ -129,18 +129,18 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: 0 }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: 0 }],
       });
     });
 
     it('should assign group-based z-index for deselected nodes with groupId', () => {
-      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
       const childNode = {
         ...mockNode,
         id: 'child1',
         selected: false,
         groupId: 'group1',
-        zIndex: DEFAULT_SELECTED_Z_INDEX,
+        computedZIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
       nodesMap.set('group1', groupNode);
@@ -156,12 +156,12 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'child1', zIndex: 6 }],
+        nodesToUpdate: [{ id: 'child1', computedZIndex: 6 }],
       });
     });
 
     it('should use selectedZIndex as base for selected nodes with zOrder', () => {
-      const selectedNode = { ...mockNode, id: 'node1', selected: true, zOrder: 10, zIndex: 0 };
+      const selectedNode = { ...mockNode, id: 'node1', selected: true, zOrder: 10, computedZIndex: 0 };
       nodesMap.set('node1', selectedNode);
       context.state.nodes = [selectedNode];
 
@@ -174,15 +174,15 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: 10 }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: 10 }],
       });
     });
   });
 
   describe('group hierarchy z-index assignment', () => {
     it('should assign correct z-index when groupId changes', () => {
-      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
-      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zIndex: 0 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
+      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', computedZIndex: 0 };
 
       nodesMap.set('group1', groupNode);
       nodesMap.set('child1', childNode);
@@ -196,18 +196,18 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'child1', zIndex: 6 }],
+        nodesToUpdate: [{ id: 'child1', computedZIndex: 6 }],
       });
     });
 
     it('should not update selected nodes when groupId changes', () => {
-      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
       const selectedChildNode = {
         ...mockNode,
         id: 'child1',
         groupId: 'group1',
         selected: true,
-        zIndex: DEFAULT_SELECTED_Z_INDEX,
+        computedZIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
       nodesMap.set('group1', groupNode);
@@ -226,9 +226,9 @@ describe('zIndexMiddleware', () => {
     });
   });
 
-  describe('zOrder-based z-index assignment', () => {
-    it('should assign zOrder as zIndex when zOrder changes', () => {
-      const node1 = { ...mockNode, id: 'node1', zOrder: 15, zIndex: 0 };
+  describe('zOrder-based computedZIndex assignment', () => {
+    it('should assign zOrder as computedZIndex when zOrder changes', () => {
+      const node1 = { ...mockNode, id: 'node1', zOrder: 15, computedZIndex: 0 };
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
@@ -241,12 +241,12 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: 15 }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: 15 }],
       });
     });
 
-    it('should not update nodes with same zOrder and zIndex', () => {
-      const node1 = { ...mockNode, id: 'node1', zOrder: 15, zIndex: 15 };
+    it('should not update nodes with same zOrder and computedZIndex', () => {
+      const node1 = { ...mockNode, id: 'node1', zOrder: 15, computedZIndex: 15 };
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
 
@@ -264,9 +264,16 @@ describe('zIndexMiddleware', () => {
 
   describe('edge z-index assignment', () => {
     it('should assign selectedZIndex to selected edges', () => {
-      const node1 = { ...mockNode, id: 'node1', zIndex: 5 };
-      const node2 = { ...mockNode, id: 'node2', zIndex: 3 };
-      const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true, zIndex: 0 };
+      const node1 = { ...mockNode, id: 'node1', computedZIndex: 5 };
+      const node2 = { ...mockNode, id: 'node2', computedZIndex: 3 };
+      const selectedEdge = {
+        ...mockEdge,
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        selected: true,
+        computedZIndex: 0,
+      };
 
       nodesMap.set('node1', node1);
       nodesMap.set('node2', node2);
@@ -279,20 +286,20 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: [{ id: 'edge1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
       });
     });
 
     it('should assign max source/target z-index to deselected edges', () => {
-      const node1 = { ...mockNode, id: 'node1', zIndex: 5 };
-      const node2 = { ...mockNode, id: 'node2', zIndex: 8 };
+      const node1 = { ...mockNode, id: 'node1', computedZIndex: 5 };
+      const node2 = { ...mockNode, id: 'node2', computedZIndex: 8 };
       const deselectedEdge = {
         ...mockEdge,
         id: 'edge1',
         source: 'node1',
         target: 'node2',
         selected: false,
-        zIndex: DEFAULT_SELECTED_Z_INDEX,
+        computedZIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
       nodesMap.set('node1', node1);
@@ -306,13 +313,13 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: [{ id: 'edge1', zIndex: 8 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 8 }],
       });
     });
 
     it('should use edge zOrder if specified', () => {
-      const node1 = { ...mockNode, id: 'node1', zIndex: 5 };
-      const node2 = { ...mockNode, id: 'node2', zIndex: 8 };
+      const node1 = { ...mockNode, id: 'node1', computedZIndex: 5 };
+      const node2 = { ...mockNode, id: 'node2', computedZIndex: 8 };
       const edgeWithZOrder = {
         ...mockEdge,
         id: 'edge1',
@@ -320,7 +327,7 @@ describe('zIndexMiddleware', () => {
         target: 'node2',
         zOrder: 12,
         selected: false,
-        zIndex: 0,
+        computedZIndex: 0,
       };
 
       nodesMap.set('node1', node1);
@@ -334,14 +341,14 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: [{ id: 'edge1', zIndex: 12 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 12 }],
       });
     });
 
     it('should process newly added edges on finishLinking', () => {
-      const node1 = { ...mockNode, id: 'node1', zIndex: 3 };
-      const node2 = { ...mockNode, id: 'node2', zIndex: 7 };
-      const newEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', zIndex: 0 };
+      const node1 = { ...mockNode, id: 'node1', computedZIndex: 3 };
+      const node2 = { ...mockNode, id: 'node2', computedZIndex: 7 };
+      const newEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', computedZIndex: 0 };
 
       nodesMap.set('node1', node1);
       nodesMap.set('node2', node2);
@@ -352,12 +359,18 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: [{ id: 'edge1', zIndex: 7 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 7 }],
       });
     });
 
     it('should handle missing source/target nodes gracefully', () => {
-      const edgeWithMissingNodes = { ...mockEdge, id: 'edge1', source: 'missing1', target: 'missing2', zIndex: 5 };
+      const edgeWithMissingNodes = {
+        ...mockEdge,
+        id: 'edge1',
+        source: 'missing1',
+        target: 'missing2',
+        computedZIndex: 5,
+      };
 
       edgesMap.set('edge1', edgeWithMissingNodes);
       context.state.edges = [edgeWithMissingNodes];
@@ -368,17 +381,17 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: [{ id: 'edge1', zIndex: 0 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 0 }],
       });
     });
   });
 
   describe('initialization (init action)', () => {
     it('should initialize z-index for all nodes on init', () => {
-      const rootNode = { ...mockNode, id: 'root1', zOrder: 5, zIndex: 0 };
-      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zOrder: 3, zIndex: 0 };
-      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zIndex: 0 };
-      const edge = { ...mockEdge, id: 'edge1', source: 'root1', target: 'child1', zIndex: 0 };
+      const rootNode = { ...mockNode, id: 'root1', zOrder: 5, computedZIndex: 0 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zOrder: 3, computedZIndex: 0 };
+      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', computedZIndex: 0 };
+      const edge = { ...mockEdge, id: 'edge1', source: 'root1', target: 'child1', computedZIndex: 0 };
 
       nodesMap.set('root1', rootNode);
       nodesMap.set('group1', groupNode);
@@ -393,17 +406,17 @@ describe('zIndexMiddleware', () => {
 
       expect(nextMock).toHaveBeenCalledWith({
         nodesToUpdate: [
-          { id: 'root1', zIndex: 5 },
-          { id: 'group1', zIndex: 3 },
-          { id: 'child1', zIndex: 1 },
+          { id: 'root1', computedZIndex: 5 },
+          { id: 'group1', computedZIndex: 3 },
+          { id: 'child1', computedZIndex: 1 },
         ],
-        edgesToUpdate: [{ id: 'edge1', zIndex: 5 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 5 }],
       });
     });
 
     it('should handle nodes without zOrder on init', () => {
-      const nodeWithoutZOrder = { ...mockNode, id: 'node1', zIndex: 10 };
-      const edge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node1', zIndex: 5 };
+      const nodeWithoutZOrder = { ...mockNode, id: 'node1', computedZIndex: 10 };
+      const edge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node1', computedZIndex: 5 };
 
       nodesMap.set('node1', nodeWithoutZOrder);
       edgesMap.set('edge1', edge);
@@ -415,16 +428,23 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: 0 }],
-        edgesToUpdate: [{ id: 'edge1', zIndex: 0 }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: 0 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 0 }],
       });
     });
   });
 
   describe('complex scenarios', () => {
     it('should handle mixed node and edge updates', () => {
-      const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
-      const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node1', selected: true, zIndex: 0 };
+      const selectedNode = { ...mockNode, id: 'node1', selected: true, computedZIndex: 0 };
+      const selectedEdge = {
+        ...mockEdge,
+        id: 'edge1',
+        source: 'node1',
+        target: 'node1',
+        selected: true,
+        computedZIndex: 0,
+      };
 
       nodesMap.set('node1', selectedNode);
       edgesMap.set('edge1', selectedEdge);
@@ -443,20 +463,25 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
-        edgesToUpdate: [{ id: 'edge1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
       });
     });
 
     it('should not update nodes/edges that already have correct z-index', () => {
-      const nodeWithCorrectZIndex = { ...mockNode, id: 'node1', selected: true, zIndex: DEFAULT_SELECTED_Z_INDEX };
+      const nodeWithCorrectZIndex = {
+        ...mockNode,
+        id: 'node1',
+        selected: true,
+        computedZIndex: DEFAULT_SELECTED_Z_INDEX,
+      };
       const edgeWithCorrectZIndex = {
         ...mockEdge,
         id: 'edge1',
         source: 'node1',
         target: 'node1',
         selected: true,
-        zIndex: DEFAULT_SELECTED_Z_INDEX,
+        computedZIndex: DEFAULT_SELECTED_Z_INDEX,
       };
 
       nodesMap.set('node1', nodeWithCorrectZIndex);
@@ -482,7 +507,7 @@ describe('zIndexMiddleware', () => {
       const customSelectedZIndex = 2000;
       context.config.zIndex.selectedZIndex = customSelectedZIndex;
 
-      const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 0 };
+      const selectedNode = { ...mockNode, id: 'node1', selected: true, computedZIndex: 0 };
       nodesMap.set('node1', selectedNode);
       context.state.nodes = [selectedNode];
 
@@ -495,14 +520,14 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: customSelectedZIndex }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: customSelectedZIndex }],
       });
     });
 
     it('should not elevate selected nodes when elevateOnSelection is false', () => {
       context.config.zIndex.elevateOnSelection = false;
 
-      const selectedNode = { ...mockNode, id: 'node1', selected: true, zIndex: 5 };
+      const selectedNode = { ...mockNode, id: 'node1', selected: true, computedZIndex: 5 };
       nodesMap.set('node1', selectedNode);
       context.state.nodes = [selectedNode];
 
@@ -516,16 +541,23 @@ describe('zIndexMiddleware', () => {
 
       // Should use base z-index (0) instead of selectedZIndex
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: 0 }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: 0 }],
       });
     });
 
     it('should not elevate selected edges when elevateOnSelection is false', () => {
       context.config.zIndex.elevateOnSelection = false;
 
-      const node1 = { ...mockNode, id: 'node1', zIndex: 5 };
-      const node2 = { ...mockNode, id: 'node2', zIndex: 3 };
-      const selectedEdge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2', selected: true, zIndex: 0 };
+      const node1 = { ...mockNode, id: 'node1', computedZIndex: 5 };
+      const node2 = { ...mockNode, id: 'node2', computedZIndex: 3 };
+      const selectedEdge = {
+        ...mockEdge,
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        selected: true,
+        computedZIndex: 0,
+      };
 
       nodesMap.set('node1', node1);
       nodesMap.set('node2', node2);
@@ -539,15 +571,15 @@ describe('zIndexMiddleware', () => {
 
       // Should use max of source/target z-index (5) instead of selectedZIndex
       expect(nextMock).toHaveBeenCalledWith({
-        edgesToUpdate: [{ id: 'edge1', zIndex: 5 }],
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 5 }],
       });
     });
   });
 
   describe('duplicate processing prevention', () => {
     it('should not reprocess nodes that were already processed during init when selection changes', () => {
-      const node1 = { ...mockNode, id: 'node1', selected: false, zIndex: 0 };
-      const node2 = { ...mockNode, id: 'node2', selected: false, zIndex: 0 };
+      const node1 = { ...mockNode, id: 'node1', selected: false, computedZIndex: 0 };
+      const node2 = { ...mockNode, id: 'node2', selected: false, computedZIndex: 0 };
 
       nodesMap.set('node1', node1);
       nodesMap.set('node2', node2);
@@ -576,18 +608,18 @@ describe('zIndexMiddleware', () => {
 
       // Should only update node1 (selected), not node2 (already processed in init)
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'node1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+        nodesToUpdate: [{ id: 'node1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
       });
     });
 
     it('should process node only once when multiple conditions are true', () => {
-      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
       const childNode = {
         ...mockNode,
         id: 'child1',
         groupId: 'group1',
         selected: true,
-        zIndex: 0,
+        computedZIndex: 0,
       };
 
       nodesMap.set('group1', groupNode);
@@ -605,7 +637,7 @@ describe('zIndexMiddleware', () => {
 
       // Should process node only once with selected z-index (selected takes precedence)
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'child1', zIndex: DEFAULT_SELECTED_Z_INDEX }],
+        nodesToUpdate: [{ id: 'child1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
       });
 
       // Verify no duplicate updates
@@ -619,8 +651,8 @@ describe('zIndexMiddleware', () => {
     it('should not create duplicate entries in nodesWithZIndex array', () => {
       // Test scenario where a node might be affected by multiple conditions
       // Node1: affected by both selected and groupId changes
-      const node1 = { ...mockNode, id: 'node1', selected: true, groupId: 'group1', zIndex: 0 };
-      const groupNode = { ...mockNode, id: 'group1', isGroup: true, zIndex: 5 };
+      const node1 = { ...mockNode, id: 'node1', selected: true, groupId: 'group1', computedZIndex: 0 };
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
 
       nodesMap.set('node1', node1);
       nodesMap.set('group1', groupNode);
@@ -650,13 +682,13 @@ describe('zIndexMiddleware', () => {
 
       expect(nodeIds.length).toBe(1);
       expect(nodeIds[0]).toBe('node1');
-      expect(updates[0].zIndex).toBe(DEFAULT_SELECTED_Z_INDEX); // selected takes precedence
+      expect(updates[0].computedZIndex).toBe(DEFAULT_SELECTED_Z_INDEX); // selected takes precedence
     });
 
     it('should allow zOrder to override previous processing (intentional behavior)', () => {
       // This is by design: zOrder represents explicit user intent (e.g., bringToFront/sendToBack)
       // and should always override any previous z-index calculations
-      const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 15, zIndex: 0 };
+      const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 15, computedZIndex: 0 };
 
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
@@ -689,13 +721,13 @@ describe('zIndexMiddleware', () => {
       // 2. By shouldSnapZOrderNode: directly assigns the zOrder value
       expect(updates.length).toBe(2);
       expect(updates.every((u) => u.id === 'node1')).toBe(true);
-      expect(updates.every((u) => u.zIndex === 15)).toBe(true);
+      expect(updates.every((u) => u.computedZIndex === 15)).toBe(true);
     });
 
-    it('should ensure zOrder changes always update zIndex even if node was already processed', () => {
+    it('should ensure zOrder changes always update computedZIndex even if node was already processed', () => {
       // This test demonstrates why zOrder doesn't use processedNodeIds check
       // Scenario: A selected node gets a new zOrder via bringToFront command
-      const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 100, zIndex: DEFAULT_SELECTED_Z_INDEX };
+      const node1 = { ...mockNode, id: 'node1', selected: true, zOrder: 100, computedZIndex: DEFAULT_SELECTED_Z_INDEX };
 
       nodesMap.set('node1', node1);
       context.state.nodes = [node1];
@@ -711,12 +743,12 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       // Even though the node might have been processed during init or selection,
-      // the zOrder change must still update the zIndex to reflect user's explicit intent
+      // the zOrder change must still update the computedZIndex to reflect user's explicit intent
       const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
       const updates = stateUpdate.nodesToUpdate || [];
       expect(updates.length).toBe(1);
       expect(updates[0].id).toBe('node1');
-      expect(updates[0].zIndex).toBe(100); // New zOrder value overrides previous zIndex
+      expect(updates[0].computedZIndex).toBe(100); // New zOrder value overrides previous computedZIndex
     });
   });
 
@@ -740,7 +772,13 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should handle missing group parent node', () => {
-      const orphanedChild = { ...mockNode, id: 'child1', groupId: 'missing-group', selected: false, zIndex: 100 };
+      const orphanedChild = {
+        ...mockNode,
+        id: 'child1',
+        groupId: 'missing-group',
+        selected: false,
+        computedZIndex: 100,
+      };
       nodesMap.set('child1', orphanedChild);
       context.state.nodes = [orphanedChild];
 
@@ -753,7 +791,7 @@ describe('zIndexMiddleware', () => {
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'child1', zIndex: 0 }],
+        nodesToUpdate: [{ id: 'child1', computedZIndex: 0 }],
       });
     });
   });

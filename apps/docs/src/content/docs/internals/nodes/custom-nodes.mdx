@@ -66,8 +66,8 @@ interface SimpleNode<T = any> {
   size?: Size; // The size of the node.
   autoSize?: boolean; // Whether the size of the node is automatically resized based on the content.
   zOrder?: number; // The z-order of the node.
-  zIndex?: number; // The z-index of the node. This value is set automatically.
-  ports?: Port[]; // The ports of the node.
+  readonly computedZIndex?: number; // The z-index of the node. This value is set automatically.
+  readonly measuredPorts?: Port[]; // The ports of the node. This value is set automatically.
   resizable?: boolean; // Whether the node is resizable.
   rotatable?: boolean; // Whether the node is rotatable.
   angle?: number; // The angle of the node from 0 to 360.

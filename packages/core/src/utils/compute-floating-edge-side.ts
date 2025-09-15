@@ -21,8 +21,8 @@ export const computeFloatingEndSide = (
 
   let startCenter: Point;
 
-  if (startPort && startNode.ports) {
-    const port = startNode.ports.find((p) => p.id === startPort);
+  if (startPort && startNode.measuredPorts) {
+    const port = startNode.measuredPorts.find((p) => p.id === startPort);
     if (port?.position) {
       startCenter = {
         x: startNode.position.x + port.position.x + (port.size?.width ?? 0) / 2,

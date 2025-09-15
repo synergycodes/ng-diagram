@@ -86,7 +86,7 @@ describe('FlowResizeBatchProcessorService', () => {
 
     mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     mockFlowCore.getNodeById.mockReturnValue({
-      ports: [{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }],
+      measuredPorts: [{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }],
     });
 
     vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
@@ -126,7 +126,7 @@ describe('FlowResizeBatchProcessorService', () => {
     };
 
     mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
-    mockFlowCore.getEdgeById.mockReturnValue({ labels: [{ id: 'l1', size: { width: 1, height: 2 } }] });
+    mockFlowCore.getEdgeById.mockReturnValue({ measuredLabels: [{ id: 'l1', size: { width: 1, height: 2 } }] });
     vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
       width: 10,
       height: 20,

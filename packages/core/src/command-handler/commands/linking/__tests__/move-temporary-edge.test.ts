@@ -44,7 +44,7 @@ describe('moveTemporaryEdge', () => {
   const mockTargetNode: Node = {
     ...mockNode,
     id: 'target-node',
-    ports: [mockTargetPort],
+    measuredPorts: [mockTargetPort],
   };
 
   beforeEach(() => {

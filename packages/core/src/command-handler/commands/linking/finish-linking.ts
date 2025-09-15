@@ -21,7 +21,7 @@ const validateTarget = (
     return { isValid: false, targetNode: null, targetPosition: null };
   }
 
-  if (targetPortId && targetNode.ports?.find((port) => port.id === targetPortId)?.type === 'source') {
+  if (targetPortId && targetNode.measuredPorts?.find((port) => port.id === targetPortId)?.type === 'source') {
     return { isValid: false, targetNode, targetPosition: null };
   }
 

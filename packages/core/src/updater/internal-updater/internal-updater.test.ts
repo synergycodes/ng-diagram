@@ -107,7 +107,7 @@ describe('InternalUpdater', () => {
     it('should emit updatePorts with empty array if none of the ports are changed', () => {
       const node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           { ...mockPort, id: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
           { ...mockPort, id: 'port-2', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
           { ...mockPort, id: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
@@ -129,7 +129,7 @@ describe('InternalUpdater', () => {
     it('should emit updatePorts for changed ports', () => {
       const node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           { ...mockPort, id: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
           { ...mockPort, id: 'port-2', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
           { ...mockPort, id: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
@@ -176,7 +176,7 @@ describe('InternalUpdater', () => {
     it('should not call anything if size is not changed', () => {
       const edge = {
         ...mockEdge,
-        labels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
+        measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
       };
       getEdgeByIdMock.mockReturnValue(edge);
 
@@ -188,7 +188,7 @@ describe('InternalUpdater', () => {
     it('should emit updateEdgeLabel when size changes', () => {
       const edge = {
         ...mockEdge,
-        labels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
+        measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
       };
       getEdgeByIdMock.mockReturnValue(edge);
 
@@ -212,7 +212,7 @@ describe('InternalUpdater', () => {
     it('should not call anything if label does not exist', () => {
       const edge = {
         ...mockEdge,
-        labels: [],
+        measuredLabels: [],
       };
       getEdgeByIdMock.mockReturnValue(edge);
 

@@ -71,7 +71,7 @@ describe('startLinking', () => {
       ...mockNode,
       id: 'source-node',
       position: { x: 100, y: 200 },
-      ports: [
+      measuredPorts: [
         {
           ...mockPort,
           id: 'source-port',
@@ -219,7 +219,7 @@ describe('startLinking', () => {
       it('should handle source port with type "both"', async () => {
         const nodeWithBothPort: Node = {
           ...sourceNode,
-          ports: [
+          measuredPorts: [
             {
               ...mockPort,
               id: 'both-port',

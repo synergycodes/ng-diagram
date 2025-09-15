@@ -11,16 +11,16 @@ describe('assignNodeZIndex', () => {
     ...extra,
   });
 
-  it('assigns zIndex to a single node', () => {
+  it('assigns computedZIndex to a single node', () => {
     const node = baseNode('1');
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = assignNodeZIndex(node, nodesMap, 5);
     expect(result).toHaveLength(1);
-    expect(result[0].zIndex).toBe(5);
+    expect(result[0].computedZIndex).toBe(5);
     expect(result[0].id).toBe('1');
   });
 
-  it('assigns zIndex recursively to group and its children', () => {
+  it('assigns computedZIndex recursively to group and its children', () => {
     const group = baseNode('g', { isGroup: true });
     const child1 = baseNode('c1', { groupId: 'g' });
     const child2 = baseNode('c2', { groupId: 'g' });
@@ -32,23 +32,23 @@ describe('assignNodeZIndex', () => {
     const result = assignNodeZIndex(group, nodesMap, 1);
     // group, c1, c2
     expect(result.map((n) => n.id).sort()).toEqual(['g', 'c1', 'c2'].sort());
-    expect(result[0].zIndex).toBe(1);
-    expect(result[1].zIndex ?? 0).toBeGreaterThanOrEqual(2);
-    expect(result[2].zIndex ?? 0).toBeGreaterThanOrEqual(2);
+    expect(result[0].computedZIndex).toBe(1);
+    expect(result[1].computedZIndex ?? 0).toBeGreaterThanOrEqual(2);
+    expect(result[2].computedZIndex ?? 0).toBeGreaterThanOrEqual(2);
   });
 
   it('uses zOrder if selected is true and node has zOrder', () => {
     const node = baseNode('1', { zOrder: 42 });
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = assignNodeZIndex(node, nodesMap, 5, true);
-    expect(result[0].zIndex).toBe(42);
+    expect(result[0].computedZIndex).toBe(42);
   });
 
-  it('falls back to zIndex if selected is true but no zOrder', () => {
+  it('falls back to computedZIndex if selected is true but no zOrder', () => {
     const node = baseNode('1');
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = assignNodeZIndex(node, nodesMap, 7, true);
-    expect(result[0].zIndex).toBe(7);
+    expect(result[0].computedZIndex).toBe(7);
   });
 
   it('handles nested groups', () => {
@@ -62,9 +62,9 @@ describe('assignNodeZIndex', () => {
     ]);
     const result = assignNodeZIndex(group1, nodesMap, 0);
     expect(result.map((n) => n.id).sort()).toEqual(['g1', 'g2', 'c'].sort());
-    // zIndex should increase for each node
-    expect(result[0].zIndex).toBe(0);
-    expect(result[1].zIndex ?? 0).toBeGreaterThan(result[0].zIndex ?? 0);
-    expect(result[2].zIndex ?? 0).toBeGreaterThan(result[1].zIndex ?? 0);
+    // computedZIndex should increase for each node
+    expect(result[0].computedZIndex).toBe(0);
+    expect(result[1].computedZIndex ?? 0).toBeGreaterThan(result[0].computedZIndex ?? 0);
+    expect(result[2].computedZIndex ?? 0).toBeGreaterThan(result[1].computedZIndex ?? 0);
   });
 });

@@ -47,7 +47,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
       const sourceNode: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -69,7 +69,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
       const sourceNode: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -93,7 +93,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
       const sourceNode: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -106,7 +106,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
       const targetNode: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           {
             id: 'port-2',
             type: 'target',
@@ -130,7 +130,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
       const sourceNode: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -143,7 +143,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
       const targetNode: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           {
             id: 'port-2',
             type: 'target',
@@ -289,7 +289,7 @@ describe('Get Edge Points Helper Functions', () => {
     it('should find port by ID', () => {
       const node: Node = {
         ...mockNode,
-        ports: [
+        measuredPorts: [
           { id: 'port-1', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 10, y: 10 } },
           { id: 'port-2', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 20, y: 20 } },
           { id: 'port-3', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 30, y: 30 } },
@@ -309,7 +309,9 @@ describe('Get Edge Points Helper Functions', () => {
     it('should return undefined when port is not found', () => {
       const node: Node = {
         ...mockNode,
-        ports: [{ id: 'port-1', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 10, y: 10 } }],
+        measuredPorts: [
+          { id: 'port-1', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 10, y: 10 } },
+        ],
       };
 
       const result = findNodePort(node, 'non-existent-port');
@@ -324,7 +326,9 @@ describe('Get Edge Points Helper Functions', () => {
     it('should return undefined when portId is undefined', () => {
       const node: Node = {
         ...mockNode,
-        ports: [{ id: 'port-1', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 10, y: 10 } }],
+        measuredPorts: [
+          { id: 'port-1', type: 'source', nodeId: 'test-node', side: 'right', position: { x: 10, y: 10 } },
+        ],
       };
 
       const result = findNodePort(node, undefined);
@@ -334,7 +338,7 @@ describe('Get Edge Points Helper Functions', () => {
     it('should return undefined when node has no ports', () => {
       const node: Node = {
         ...mockNode,
-        ports: undefined,
+        measuredPorts: undefined,
       };
 
       const result = findNodePort(node, 'port-1');
@@ -344,7 +348,7 @@ describe('Get Edge Points Helper Functions', () => {
     it('should return undefined when node has empty ports array', () => {
       const node: Node = {
         ...mockNode,
-        ports: [],
+        measuredPorts: [],
       };
 
       const result = findNodePort(node, 'port-1');
@@ -452,12 +456,16 @@ describe('Get Edge Points Helper Functions', () => {
 
       const sourceNodeWithPorts: Node = {
         ...sourceNode,
-        ports: [{ id: 'port-1', type: 'source', nodeId: 'source-node', side: 'right', position: { x: 5, y: 5 } }],
+        measuredPorts: [
+          { id: 'port-1', type: 'source', nodeId: 'source-node', side: 'right', position: { x: 5, y: 5 } },
+        ],
       };
 
       const targetNodeWithPorts: Node = {
         ...targetNode,
-        ports: [{ id: 'port-2', type: 'target', nodeId: 'target-node', side: 'left', position: { x: 95, y: 95 } }],
+        measuredPorts: [
+          { id: 'port-2', type: 'target', nodeId: 'target-node', side: 'left', position: { x: 95, y: 95 } },
+        ],
       };
 
       computeAutoModePoints(
@@ -472,8 +480,8 @@ describe('Get Edge Points Helper Functions', () => {
       expect(mockRoutingManager.computePoints).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          sourcePort: sourceNodeWithPorts.ports![0],
-          targetPort: targetNodeWithPorts.ports![0],
+          sourcePort: sourceNodeWithPorts.measuredPorts![0],
+          targetPort: targetNodeWithPorts.measuredPorts![0],
         })
       );
     });

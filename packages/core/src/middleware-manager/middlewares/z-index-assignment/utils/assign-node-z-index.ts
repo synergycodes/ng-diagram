@@ -2,13 +2,13 @@ import { Node } from '../../../../types';
 import { isGroup } from '../../../../utils';
 
 /**
- * Recursively assigns zIndex to the given node and its children, returning a flat array of nodes with assigned zIndex.
+ * Recursively assigns computedZIndex to the given node and its children, returning a flat array of nodes with assigned computedZIndex.
  *
  * @param {Node} node - The starting node.
  * @param {Map<string, Node>} nodesMap - Map of all nodes by id.
  * @param {number} currentZIndex - The starting zIndex value.
  * @param selected
- * @returns {Node[]} Flat array of nodes with assigned zIndex.
+ * @returns {Node[]} Flat array of nodes with assigned computedZIndex.
  */
 export function assignNodeZIndex(
   node: Node,
@@ -21,7 +21,10 @@ export function assignNodeZIndex(
   const nodesWithZIndex: Node[] = [];
 
   function assignZIndex(currentNode: Node, zIndex: number, selected?: boolean): number {
-    const nodeWithZIndex: Node = { ...currentNode, zIndex: selected ? (currentNode?.zOrder ?? zIndex) : zIndex };
+    const nodeWithZIndex: Node = {
+      ...currentNode,
+      computedZIndex: selected ? (currentNode?.zOrder ?? zIndex) : zIndex,
+    };
     nodesWithZIndex.push(nodeWithZIndex);
 
     let currentZIndex = zIndex;

@@ -39,7 +39,7 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
   edgeId = computed(() => this.edgeData()?.id);
   position = computed(() => {
     const edgeData = this.edgeData();
-    const labelData = edgeData?.labels?.find((label) => label.id === this.id());
+    const labelData = edgeData?.measuredLabels?.find((label) => label.id === this.id());
 
     return labelData?.position || { x: 0, y: 0 };
   });
@@ -50,7 +50,7 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
     const edgeData = this.edgeData();
     if (!edgeData) return false;
 
-    const labelData = edgeData.labels?.find((label) => label.id === this.id());
+    const labelData = edgeData.measuredLabels?.find((label) => label.id === this.id());
 
     const hasCalculatedPosition = !!(
       labelData?.position &&

@@ -3,8 +3,8 @@ import { assignEdgesZIndex, assignEdgeZIndex } from '../assign-edges-z-index.ts'
 
 describe('assignEdgeZIndex', () => {
   const nodesMap = new Map([
-    ['1', { id: '1', zIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
-    ['2', { id: '2', zIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['1', { id: '1', computedZIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['2', { id: '2', computedZIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['3', { id: '3', type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['4', { id: '4', type: 'node', position: { x: 0, y: 0 }, data: {} }],
   ]);
@@ -17,34 +17,34 @@ describe('assignEdgeZIndex', () => {
   it('should use zOrder if present', () => {
     const edge = { id: '1', data: {}, source: '1', target: '2', zOrder: 99 };
     const result = assignEdgeZIndex(edge, zIndexMap, nodesMap);
-    expect(result.zIndex).toBe(99);
+    expect(result.computedZIndex).toBe(99);
   });
 
   it('should use max zIndex from zIndexMap for source and target', () => {
     const edge = { id: '1', data: {}, source: '1', target: '2' };
     const result = assignEdgeZIndex(edge, zIndexMap, nodesMap);
-    expect(result.zIndex).toBe(7);
+    expect(result.computedZIndex).toBe(7);
   });
 
   it('should add 1 to max zIndex when edgesAboveConnectedNodes is true', () => {
     const edge = { id: '1', data: {}, source: '1', target: '2' };
     const result = assignEdgeZIndex(edge, zIndexMap, nodesMap, true);
-    expect(result.zIndex).toBe(8);
+    expect(result.computedZIndex).toBe(8);
   });
 
   it('should still respect zOrder when edgesAboveConnectedNodes is true', () => {
     const edge = { id: '1', data: {}, source: '1', target: '2', zOrder: 99 };
     const result = assignEdgeZIndex(edge, zIndexMap, nodesMap, true);
-    expect(result.zIndex).toBe(99);
+    expect(result.computedZIndex).toBe(99);
   });
 });
 
 describe('assignEdgesZIndex', () => {
   const nodesWithZIndex = [
-    { id: '1', zIndex: 5, type: 'node', position: { x: 0, y: 0 }, data: {} },
+    { id: '1', computedZIndex: 5, type: 'node', position: { x: 0, y: 0 }, data: {} },
     {
       id: '2',
-      zIndex: 2,
+      computedZIndex: 2,
       type: 'node',
       position: { x: 0, y: 0 },
       data: {},
@@ -52,8 +52,8 @@ describe('assignEdgesZIndex', () => {
   ];
 
   const nodesMap = new Map([
-    ['1', { id: '1', zIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
-    ['2', { id: '2', zIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['1', { id: '1', computedZIndex: 3, type: 'node', position: { x: 0, y: 0 }, data: {} }],
+    ['2', { id: '2', computedZIndex: 7, type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['3', { id: '3', type: 'node', position: { x: 0, y: 0 }, data: {} }],
     ['4', { id: '4', type: 'node', position: { x: 0, y: 0 }, data: {} }],
   ]);
@@ -67,10 +67,10 @@ describe('assignEdgesZIndex', () => {
     ];
     const result = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap);
 
-    expect(result[0].zIndex).toBe(5);
-    expect(result[1].zIndex).toBe(5);
-    expect(result[2].zIndex).toBe(2);
-    expect(result[3].zIndex).toBe(42);
+    expect(result[0].computedZIndex).toBe(5);
+    expect(result[1].computedZIndex).toBe(5);
+    expect(result[2].computedZIndex).toBe(2);
+    expect(result[3].computedZIndex).toBe(42);
   });
 
   it('should add 1 to zIndex when edgesAboveConnectedNodes is true', () => {
@@ -82,9 +82,9 @@ describe('assignEdgesZIndex', () => {
     ];
     const result = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap, true);
 
-    expect(result[0].zIndex).toBe(6); // 5 + 1
-    expect(result[1].zIndex).toBe(6); // 5 + 1
-    expect(result[2].zIndex).toBe(3); // 2 + 1
-    expect(result[3].zIndex).toBe(42); // zOrder is respected
+    expect(result[0].computedZIndex).toBe(6); // 5 + 1
+    expect(result[1].computedZIndex).toBe(6); // 5 + 1
+    expect(result[2].computedZIndex).toBe(3); // 2 + 1
+    expect(result[3].computedZIndex).toBe(42); // zOrder is respected
   });
 });

@@ -66,7 +66,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
             : node.zOrder !== undefined
               ? node.zOrder
               : node.groupId
-                ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1
+                ? (nodesMap.get(node.groupId)?.computedZIndex ?? -1) + 1
                 : 0;
         const assignedNodes = assignNodeZIndex(
           node,
@@ -85,7 +85,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         }
         const node = nodesMap.get(nodeId);
         if (!node || node?.selected) continue;
-        const baseZIndex = node.groupId ? (nodesMap.get(node.groupId)?.zIndex ?? -1) + 1 : 0;
+        const baseZIndex = node.groupId ? (nodesMap.get(node.groupId)?.computedZIndex ?? -1) + 1 : 0;
         const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex);
         nodesWithZIndex.push(...assignedNodes);
         assignedNodes.forEach((n) => processedNodeIds.add(n.id));
@@ -96,17 +96,17 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
       for (const nodeId of helpers.getAffectedNodeIds(['zOrder'])) {
         const node = nodesMap.get(nodeId);
         if (!node) continue;
-        nodesWithZIndex.push({ ...node, zIndex: node.zOrder });
+        nodesWithZIndex.push({ ...node, computedZIndex: node.zOrder });
         processedNodeIds.add(node.id);
       }
     }
 
     for (const node of nodesWithZIndex) {
       const currentNode = nodes.find((nodeData) => nodeData.id === node.id);
-      if (!currentNode || node.zIndex === currentNode.zIndex) {
+      if (!currentNode || node.computedZIndex === currentNode.computedZIndex) {
         continue;
       }
-      nodesToUpdate.push({ id: node.id, zIndex: node.zIndex });
+      nodesToUpdate.push({ id: node.id, computedZIndex: node.computedZIndex });
     }
 
     const addedEdge = edges.at(-1);
@@ -121,7 +121,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     }
 
     if (shouldSnapEdge) {
-      const zIndexMap = new Map(nodesWithZIndex.map((n) => [n.id, n.zIndex ?? 0]));
+      const zIndexMap = new Map(nodesWithZIndex.map((n) => [n.id, n.computedZIndex ?? 0]));
 
       for (const edgeId of helpers.getAffectedEdgeIds(['selected'])) {
         const edge = edgesMap.get(edgeId);
@@ -130,7 +130,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
           edge.selected && zIndexConfig.elevateOnSelection
             ? {
                 ...edge,
-                zIndex: selectedZIndex,
+                computedZIndex: selectedZIndex,
               }
             : assignEdgeZIndex(edge, zIndexMap, nodesMap, zIndexConfig.edgesAboveConnectedNodes)
         );
@@ -139,10 +139,10 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
 
     for (const edge of edgesWithZIndex) {
       const currentEdge = edges.find((edgeData) => edgeData.id === edge.id);
-      if (!currentEdge || edge.zIndex === currentEdge.zIndex) {
+      if (!currentEdge || edge.computedZIndex === currentEdge.computedZIndex) {
         continue;
       }
-      edgesToUpdate.push({ id: edge.id, zIndex: edge.zIndex });
+      edgesToUpdate.push({ id: edge.id, computedZIndex: edge.computedZIndex });
     }
 
     next({

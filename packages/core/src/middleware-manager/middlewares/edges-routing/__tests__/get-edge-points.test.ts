@@ -58,7 +58,7 @@ describe('getEdgePoints', () => {
       const sourceNode: Node = {
         ...mockNode,
         id: 'node-1',
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -72,7 +72,7 @@ describe('getEdgePoints', () => {
       const targetNode: Node = {
         ...mockNode,
         id: 'node-2',
-        ports: [
+        measuredPorts: [
           {
             id: 'port-2',
             type: 'target',
@@ -117,7 +117,7 @@ describe('getEdgePoints', () => {
       const sourceNode: Node = {
         ...mockNode,
         id: 'node-1',
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -151,7 +151,7 @@ describe('getEdgePoints', () => {
         ...mockNode,
         id: 'node-1',
         position: { x: 0, y: 0 },
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -167,7 +167,7 @@ describe('getEdgePoints', () => {
         ...mockNode,
         id: 'node-2',
         position: { x: 100, y: 100 },
-        ports: [
+        measuredPorts: [
           {
             id: 'port-2',
             type: 'target',
@@ -386,7 +386,7 @@ describe('getEdgePoints', () => {
       const sourceNode: Node = {
         ...mockNode,
         id: 'node-1',
-        ports: [
+        measuredPorts: [
           {
             id: 'port-1',
             type: 'source',
@@ -409,7 +409,7 @@ describe('getEdgePoints', () => {
       const targetNode: Node = {
         ...mockNode,
         id: 'node-2',
-        ports: [
+        measuredPorts: [
           {
             id: 'port-2',
             type: 'target',
@@ -429,8 +429,8 @@ describe('getEdgePoints', () => {
       expect(mockRoutingManager.computePoints).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          sourcePort: sourceNode.ports![0],
-          targetPort: targetNode.ports![0],
+          sourcePort: sourceNode.measuredPorts![0],
+          targetPort: targetNode.measuredPorts![0],
           sourceNode,
           targetNode,
         })

@@ -6,7 +6,7 @@ export function assignEdgesZIndex(
   nodesMap: Map<string, Node>,
   edgesAboveConnectedNodes = false
 ): Edge[] {
-  const zIndexMap = new Map(nodesWithZIndex.map((n) => [n.id, n.zIndex ?? 0]));
+  const zIndexMap = new Map(nodesWithZIndex.map((n) => [n.id, n.computedZIndex ?? 0]));
 
   return edges.map((edge) => assignEdgeZIndex(edge, zIndexMap, nodesMap, edgesAboveConnectedNodes));
 }
@@ -17,13 +17,13 @@ export function assignEdgeZIndex(
   nodesMap: Map<string, Node>,
   edgesAboveConnectedNodes = false
 ): Edge {
-  const sourceZ = zIndexMap.get(edge.source) ?? nodesMap.get(edge.source)?.zIndex ?? 0;
-  const targetZ = zIndexMap.get(edge.target) ?? nodesMap.get(edge.target)?.zIndex ?? 0;
+  const sourceZ = zIndexMap.get(edge.source) ?? nodesMap.get(edge.source)?.computedZIndex ?? 0;
+  const targetZ = zIndexMap.get(edge.target) ?? nodesMap.get(edge.target)?.computedZIndex ?? 0;
   const baseZIndex = Math.max(sourceZ, targetZ);
   const zIndex = edge?.zOrder ?? (edgesAboveConnectedNodes ? baseZIndex + 1 : baseZIndex);
 
   return {
     ...edge,
-    zIndex,
+    computedZIndex: zIndex,
   };
 }

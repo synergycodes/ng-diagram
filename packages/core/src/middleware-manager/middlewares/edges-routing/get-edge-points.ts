@@ -7,15 +7,15 @@ import { getSourceTargetPositions } from './get-source-target-positions';
  * Returns true only if all required ports have their geometry data.
  */
 export const areEdgePortsInitialized = (edge: Edge, sourceNode?: Node, targetNode?: Node): boolean => {
-  if (edge.sourcePort && sourceNode?.ports) {
-    const sourcePort = sourceNode.ports.find((p) => p.id === edge.sourcePort);
+  if (edge.sourcePort && sourceNode?.measuredPorts) {
+    const sourcePort = sourceNode.measuredPorts.find((p) => p.id === edge.sourcePort);
     if (sourcePort && (!sourcePort.position || !sourcePort.size)) {
       return false;
     }
   }
 
-  if (edge.targetPort && targetNode?.ports) {
-    const targetPort = targetNode.ports.find((p) => p.id === edge.targetPort);
+  if (edge.targetPort && targetNode?.measuredPorts) {
+    const targetPort = targetNode.measuredPorts.find((p) => p.id === edge.targetPort);
     if (targetPort && (!targetPort.position || !targetPort.size)) {
       return false;
     }
@@ -43,7 +43,7 @@ export const portLocationToPoint = (location: PortLocation | undefined): Point |
  * Finds a port by ID in a node's ports array.
  */
 export const findNodePort = (node: Node | undefined, portId: string | undefined) => {
-  return node && portId ? node.ports?.find((p) => p.id === portId) : undefined;
+  return node && portId ? node.measuredPorts?.find((p) => p.id === portId) : undefined;
 };
 
 /**

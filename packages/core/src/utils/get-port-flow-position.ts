@@ -55,7 +55,7 @@ export const getPortPosition = (port: Port, node: Node) => {
 };
 
 export const getPortFlowPosition = (node: Node, portId: string) => {
-  const port = node.ports?.find((port) => port.id === portId);
+  const port = node.measuredPorts?.find((port) => port.id === portId);
   if (!port) {
     return null;
   }
@@ -64,7 +64,7 @@ export const getPortFlowPosition = (node: Node, portId: string) => {
 };
 
 export const getPortFlowPositionSide = (node: Node, portId: string) => {
-  const port = node.ports?.find((port) => port.id === portId);
+  const port = node.measuredPorts?.find((port) => port.id === portId);
   if (!port) {
     return null;
   }

@@ -43,6 +43,21 @@ Whether the size of the node is automatically resized based on the content.
 
 ***
 
+### computedZIndex?
+
+> `readonly` `optional` **computedZIndex**: `number`
+
+#### Remarks
+
+ComputedZIndex is computed by the system and should not be set manually.
+The z-index of the node. This value is set automatically
+
+#### Inherited from
+
+`SimpleNode.computedZIndex`
+
+***
+
 ### data
 
 > **data**: `T`
@@ -95,15 +110,18 @@ Flag indicating the node is a group
 
 ***
 
-### ports?
+### measuredPorts?
 
-> `optional` **ports**: `Port`[]
+> `readonly` `optional` **measuredPorts**: `Port`[]
 
-The ports of the node.
+#### Remarks
+
+MeasuredPorts are computed by the system and should not be set manually.
+The ports of the node with computed position and size.
 
 #### Inherited from
 
-`SimpleNode.ports`
+`SimpleNode.measuredPorts`
 
 ***
 
@@ -176,18 +194,6 @@ The type of the node declared in nodeTemplateMap.
 #### Inherited from
 
 `SimpleNode.type`
-
-***
-
-### zIndex?
-
-> `optional` **zIndex**: `number`
-
-The z-index of the node. This value is set automatically
-
-#### Inherited from
-
-`SimpleNode.zIndex`
 
 ***
 

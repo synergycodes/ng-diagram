@@ -15,6 +15,17 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 ## Properties
 
+### computedZIndex?
+
+> `readonly` `optional` **computedZIndex**: `number`
+
+#### Remarks
+
+ComputedZIndex is computed by the system and should not be set manually.
+The z-index of the node. This value is set automatically
+
+***
+
 ### data
 
 > **data**: `T`
@@ -31,11 +42,14 @@ The unique identifier for the edge.
 
 ***
 
-### labels?
+### measuredLabels?
 
-> `optional` **labels**: `EdgeLabel`[]
+> `readonly` `optional` **measuredLabels**: `EdgeLabel`[]
 
-The labels of the edge.
+#### Remarks
+
+MeasuredLabels are computed by the system and should not be set manually.
+The labels of the edge with computed position and size.
 
 ***
 
@@ -150,14 +164,6 @@ Whether the edge is temporary.
 > `optional` **type**: `string`
 
 The type of the edge declared in edgeTemplateMap.
-
-***
-
-### zIndex?
-
-> `optional` **zIndex**: `number`
-
-The z-index of the node. This value is set automatically
 
 ***
 

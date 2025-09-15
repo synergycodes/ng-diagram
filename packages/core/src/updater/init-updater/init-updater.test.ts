@@ -82,7 +82,7 @@ describe('InitUpdater', () => {
     it('should schedule port rect initialization for changed ports', () => {
       const node = {
         ...mockNode,
-        ports: [{ ...mockPort, id: 'port-1', size: { width: 50, height: 50 }, position: { x: 0, y: 0 } }],
+        measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 50, height: 50 }, position: { x: 0, y: 0 } }],
       };
       vi.mocked(flowCore.getNodeById).mockReturnValue(node);
 
@@ -101,7 +101,7 @@ describe('InitUpdater', () => {
     it('should not schedule anything for ports without size or position', () => {
       const node = {
         ...mockNode,
-        ports: [{ ...mockPort, id: 'port-1', size: { width: 50, height: 50 }, position: { x: 0, y: 0 } }],
+        measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 50, height: 50 }, position: { x: 0, y: 0 } }],
       };
       vi.mocked(flowCore.getNodeById).mockReturnValue(node);
 
