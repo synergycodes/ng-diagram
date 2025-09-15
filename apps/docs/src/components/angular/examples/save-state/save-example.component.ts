@@ -52,7 +52,7 @@ export class SaveStateExampleComponent {
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 
-  //TODO - change any type to the correct one
+  // TODO - change any type to the correct one
   loadModel(model: any): void {
     this.model = initializeModel(model, this.injector);
   }

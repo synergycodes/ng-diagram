@@ -12,15 +12,17 @@ Get up and running with ngDiagram in minutes. This guide will help you create yo
 ## Installation
 
 ```bash
-npm install @angularflow/angular-adapter
+npm install ng-diagram
 ```
+
+**Note**: You can use `yarn` or `pnpm` too
 
 ## Import Styles
 
 **Important:** You must import the required styles for the diagram to display correctly.
 
 ```css
-@import '@angularflow/angular-adapter/styles.css';
+@import 'ng-diagram/styles.css';
 ```
 
 Without these styles, the diagram components will not render properly.
@@ -29,7 +31,7 @@ Without these styles, the diagram components will not render properly.
 
 ```typescript
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from '@angularflow/angular-adapter';
+import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from 'ng-diagram';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -46,7 +48,7 @@ import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from '
     }
   `,
 })
-export class NgDiagramComponentContainer {
+export class AppComponent {
   model = initializeModel({
     nodes: [
       { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
