@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { SidebarContainer } from './sidebar.component';
 
@@ -30,7 +29,7 @@ import { SidebarContainer } from './sidebar.component';
   `,
 })
 export class NgDiagramPropertiesSidebarContainer {
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: -45, y: 80, scale: 0.88 },
     },

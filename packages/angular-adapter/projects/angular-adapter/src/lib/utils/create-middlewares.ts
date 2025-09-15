@@ -2,6 +2,7 @@ import {
   edgesRoutingMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
+  loggerMiddleware,
   MiddlewareChain,
   treeLayoutMiddleware,
   zIndexMiddleware,
@@ -13,6 +14,7 @@ export const BUILTIN_MIDDLEWARES = [
   groupChildrenMoveExtent,
   treeLayoutMiddleware,
   edgesRoutingMiddleware,
+  loggerMiddleware,
 ] as const satisfies MiddlewareChain;
 
 export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;

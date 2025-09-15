@@ -1,18 +1,15 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, Metadata, MiddlewareChain, Node, Port } from '@angularflow/core';
+import { Edge, Metadata, Node, Port } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
 @Injectable()
-export class NgDiagramModelService<TMiddlewares extends MiddlewareChain = []>
-  extends NgDiagramBaseService<TMiddlewares>
-  implements OnDestroy
-{
+export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
   private readonly diagramService = inject(NgDiagramService);
 
   private _nodes = signal<Node[]>([]);
   private _edges = signal<Edge[]>([]);
-  private _metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} });
+  private _metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 } });
 
   nodes = this._nodes.asReadonly();
   edges = this._edges.asReadonly();

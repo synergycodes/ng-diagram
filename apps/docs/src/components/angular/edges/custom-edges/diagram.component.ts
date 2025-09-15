@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { CustomEdgeComponent } from './custom-edge.component';
@@ -30,7 +29,7 @@ export class Diagram {
     ['custom', CustomEdgeComponent],
   ]);
 
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.88 },
     },

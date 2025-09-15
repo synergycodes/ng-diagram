@@ -12,17 +12,20 @@ interface NodeUpdate {
   autoSize: boolean;
 }
 
-export const groupChildrenMoveExtent: Middleware<
-  'group-children-move-extent',
-  GroupChildrenMoveExtentMiddlewareMetadata
-> = {
+export const groupChildrenMoveExtent: Middleware = {
   name: 'group-children-move-extent',
-  defaultMetadata: {
-    enabled: true,
-  },
-  execute: ({ helpers, nodesMap, actionStateManager, middlewareMetadata }, next) => {
-    const isEnabled = middlewareMetadata.enabled;
-
+  execute: (
+    {
+      helpers,
+      nodesMap,
+      actionStateManager,
+      config: {
+        grouping: { allowGroupAutoResize },
+      },
+    },
+    next
+  ) => {
+    const isEnabled = allowGroupAutoResize === true || allowGroupAutoResize === undefined;
     if (!isEnabled || actionStateManager.dragging?.modifiers.shift) {
       next();
       return;

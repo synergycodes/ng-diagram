@@ -1,3 +1,5 @@
+import { DataObject } from './utils';
+
 /**
  * Interface representing the viewport of the diagram.
  */
@@ -12,8 +14,7 @@ export interface Viewport {
 /**
  * Interface representing the metadata of the diagram.
  */
-export interface Metadata<TMiddlewaresMetadata = unknown> {
+export interface Metadata<T extends DataObject = DataObject> {
   viewport: Viewport;
-  middlewaresConfig: TMiddlewaresMetadata;
-  [key: string]: unknown;
+  data?: T;
 }

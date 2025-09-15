@@ -6,7 +6,6 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
-  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
@@ -32,7 +31,7 @@ export class Diagram {
     ['sinusoid', SinusoidEdgeComponent],
   ]);
 
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: -30, y: -30, scale: 0.7 },
     },

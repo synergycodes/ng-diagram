@@ -5,21 +5,15 @@ prev: false
 title: "initializeModel"
 ---
 
-> **initializeModel**\<`TMiddlewares`\>(`model`, `injector?`): `SignalModelAdapter`\<`TMiddlewares`\>
+> **initializeModel**(`model`, `injector?`): `SignalModelAdapter`
 
 Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
-
-## Type Parameters
-
-### TMiddlewares
-
-`TMiddlewares` *extends* [`MiddlewareChain`](/docs/api/other/middlewarechain/) = \[\]
 
 ## Parameters
 
 ### model
 
-`Partial`\<`Model`\<[`Metadata`](/docs/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>\> = `{}`
+`Partial`\<`Model`\> = `{}`
 
 ### injector?
 
@@ -27,4 +21,4 @@ Helper to create a SignalModelAdapter with initial nodes, edges, and metadata.
 
 ## Returns
 
-`SignalModelAdapter`\<`TMiddlewares`\>
+`SignalModelAdapter`

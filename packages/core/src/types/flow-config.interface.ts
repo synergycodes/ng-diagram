@@ -66,6 +66,12 @@ export interface GroupingConfig {
    * @returns True if the node can be grouped, false otherwise.
    */
   canGroup: (node: Node, group: Node) => boolean;
+
+  /**
+   * If true, the group will automatically resize its boundaries
+   * when a new node is added or when child nodes are moved inside.
+   */
+  allowGroupAutoResize: boolean;
 }
 
 /**
@@ -228,6 +234,10 @@ export interface ZIndexConfig {
    */
   selectedZIndex: number;
   /**
+   * The z-index value for temporary edge.
+   */
+  temporaryEdgeZIndex: number;
+  /**
    * Whether edges should appear above their connected nodes.
    */
   edgesAboveConnectedNodes: boolean;
@@ -315,4 +325,10 @@ export interface FlowConfig {
    * Configuration for z-index layering behavior.
    */
   zIndex: ZIndexConfig;
+
+  /**
+   * Enables or disables debug mode for the diagram.
+   * When enabled, additional console logs are printed.
+   */
+  debugMode: boolean;
 }

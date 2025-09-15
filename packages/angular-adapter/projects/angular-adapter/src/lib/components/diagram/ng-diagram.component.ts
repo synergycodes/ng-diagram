@@ -8,17 +8,10 @@ import {
   input,
   OnDestroy,
   OnInit,
-  signal,
 } from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
-import type {
-  FlowCore,
-  Metadata,
-  MiddlewareChain,
-  MiddlewaresConfigFromMiddlewares,
-  ModelAdapter,
-} from '@angularflow/core';
+import type { MiddlewareChain, ModelAdapter } from '@angularflow/core';
 
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
@@ -67,22 +60,13 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
     DiagramSelectionDirective,
   ],
 })
-export class NgDiagramComponent<
-    TMiddlewares extends MiddlewareChain = [],
-    TAdapter extends ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>> = ModelAdapter<
-      Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>
-    >,
-  >
-  implements OnInit, OnDestroy
-{
+export class NgDiagramComponent implements OnInit, OnDestroy {
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
 
-  private flowCore = signal<FlowCore | undefined>(undefined);
-
-  private initializedModel: TAdapter | null = null;
+  private initializedModel: ModelAdapter | null = null;
   private resizeObserver: ResizeObserver | null = null;
 
   /**
@@ -93,7 +77,7 @@ export class NgDiagramComponent<
   /**
    * The model to use in the diagram.
    */
-  model = input.required<TAdapter>();
+  model = input.required<ModelAdapter>();
 
   /**
    * Optional — the initial middlewares to use.
@@ -103,7 +87,7 @@ export class NgDiagramComponent<
    * ⚠️ Use with caution — incorrectly implemented custom middlewares
    * can degrade performance or completely break the data flow.
    */
-  middlewares = input<TMiddlewares>(BUILTIN_MIDDLEWARES as unknown as TMiddlewares);
+  middlewares = input<MiddlewareChain>(BUILTIN_MIDDLEWARES);
 
   /**
    * The node template map to use for the diagram.
@@ -116,12 +100,6 @@ export class NgDiagramComponent<
    */
   edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new NgDiagramEdgeTemplateMap());
 
-  /**
-   * Enables or disables debug mode for the diagram.
-   * When enabled, additional console logs are printed.
-   */
-  debugMode = input<boolean>(false);
-
   nodes = this.renderer.nodes;
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
@@ -133,19 +111,8 @@ export class NgDiagramComponent<
         this.flowCoreProvider.destroy();
         this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
 
-        this.flowCore.set(this.flowCoreProvider.provide());
-
         this.initializedModel = model;
       }
-    });
-
-    effect(() => {
-      const flowCore = this.flowCore();
-      if (!flowCore) {
-        return;
-      }
-
-      flowCore.setDebugMode(this.debugMode());
     });
   }
 
@@ -239,11 +206,11 @@ export class NgDiagramComponent<
   }
 
   private updateViewportSize(width: number, height: number): void {
-    const flowCore = this.flowCore();
-    if (!flowCore) {
+    if (!this.flowCoreProvider.isInitialized()) {
       return;
     }
 
+    const flowCore = this.flowCoreProvider.provide();
     const currentMetadata = flowCore.getState().metadata;
     const currentViewport = currentMetadata.viewport;
 

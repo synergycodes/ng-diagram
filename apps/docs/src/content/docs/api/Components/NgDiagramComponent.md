@@ -7,16 +7,6 @@ title: "NgDiagramComponent"
 
 Diagram component
 
-## Type Parameters
-
-### TMiddlewares
-
-`TMiddlewares` *extends* [`MiddlewareChain`](/docs/api/other/middlewarechain/) = \[\]
-
-### TAdapter
-
-`TAdapter` *extends* [`ModelAdapter`](/docs/api/other/modeladapter/)\<[`Metadata`](/docs/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\> = [`ModelAdapter`](/docs/api/other/modeladapter/)\<[`Metadata`](/docs/api/other/metadata/)\<`MiddlewaresConfigFromMiddlewares`\<`TMiddlewares`\>\>\>
-
 ## Implements
 
 - `OnInit`
@@ -32,15 +22,6 @@ Global configuration options for the diagram.
 
 ***
 
-### debugMode
-
-> **debugMode**: `InputSignal`\<`boolean`\>
-
-Enables or disables debug mode for the diagram.
-When enabled, additional console logs are printed.
-
-***
-
 ### edgeTemplateMap
 
 > **edgeTemplateMap**: `InputSignal`\<`NgDiagramEdgeTemplateMap`\>
@@ -52,7 +33,7 @@ Optional - if not provided, default edge rendering will be used.
 
 ### middlewares
 
-> **middlewares**: `InputSignal`\<`TMiddlewares`\>
+> **middlewares**: `InputSignal`\<[`MiddlewareChain`](/docs/api/other/middlewarechain/)\>
 
 Optional — the initial middlewares to use.
 When provided, the middleware list can be modified to add new items,
@@ -65,7 +46,7 @@ can degrade performance or completely break the data flow.
 
 ### model
 
-> **model**: `InputSignal`\<`TAdapter`\>
+> **model**: `InputSignal`\<[`ModelAdapter`](/docs/api/other/modeladapter/)\>
 
 The model to use in the diagram.
 

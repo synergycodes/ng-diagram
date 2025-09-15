@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramBackgroundComponent,
@@ -38,8 +38,6 @@ export class AppComponent {
     ['custom-polyline-edge', CustomPolylineEdgeComponent],
     ['labelled-edge', LabelledEdgeComponent],
   ]);
-
-  debugMode = signal(true);
 
   config: NgDiagramConfig = {
     zoom: {

@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
@@ -30,7 +29,7 @@ import { CoordinatesPreview } from './coordinates-preview.component';
   `,
 })
 export class NgDiagramComponentContainer {
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: {
         x: 5,
