@@ -72,6 +72,7 @@ describe('LinkingEventHandler', () => {
         expect(spy).toHaveBeenCalledWith({
           sourceNodeId: 'node-1',
           sourcePortId: 'port-1',
+          temporaryEdge: null,
         });
       });
 
@@ -97,7 +98,7 @@ describe('LinkingEventHandler', () => {
         instance.handle(startEvent);
         vi.clearAllMocks();
 
-        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1' };
+        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1', temporaryEdge: null };
         mockActionStateManager.isLinking.mockReturnValue(true);
       });
 
@@ -145,11 +146,11 @@ describe('LinkingEventHandler', () => {
         instance.handle(startEvent);
         vi.clearAllMocks();
 
-        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1' };
+        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1', temporaryEdge: null };
         mockActionStateManager.isLinking.mockReturnValue(true);
       });
 
-      it('should emit finishLinking command with converted position and set isLinking to false', () => {
+      it('should emit finishLinking command with converted position and call clearLinking', () => {
         const clientPosition = { x: 200, y: 200 };
         const flowPosition = { x: 250, y: 250 };
         mockClientToFlowPosition.mockReturnValue(flowPosition);
@@ -165,7 +166,7 @@ describe('LinkingEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', {
           position: flowPosition,
         });
-        expect(mockActionStateManager.linking).toBe(undefined);
+        expect(mockActionStateManager.clearLinking).toHaveBeenCalled();
       });
 
       it('should not emit when not linking', () => {

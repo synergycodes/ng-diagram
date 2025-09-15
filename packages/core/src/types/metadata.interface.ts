@@ -1,5 +1,3 @@
-import type { Edge } from './edge.interface';
-
 /**
  * Interface representing the viewport of the diagram.
  */
@@ -16,7 +14,6 @@ export interface Viewport {
  */
 export interface Metadata<TMiddlewaresMetadata = unknown> {
   viewport: Viewport;
-  temporaryEdge?: Edge | null;
   middlewaresConfig: TMiddlewaresMetadata;
   [key: string]: unknown;
 }

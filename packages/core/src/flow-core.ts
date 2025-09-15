@@ -180,8 +180,8 @@ export class FlowCore<
    * @param state State to set
    */
   setState(state: FlowState<TMetadata>): void {
-    this.model.setNodes(state.nodes);
-    this.model.setEdges(state.edges);
+    this.model.updateNodes(state.nodes);
+    this.model.updateEdges(state.edges);
     this.model.setMetadata(state.metadata);
     // We desynchronize the model lookup to force a re-sync of the model lookup maps on the fly
     this.modelLookup.desynchronize();
@@ -315,7 +315,8 @@ export class FlowCore<
    */
   private render(): void {
     const { nodes, edges, metadata } = this.getState();
-    const finalEdges = metadata.temporaryEdge ? [...edges, metadata.temporaryEdge] : edges;
+    const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
+    const finalEdges = temporaryEdge && temporaryEdge.temporary ? [...edges, temporaryEdge] : edges;
     this.renderer.draw(nodes, finalEdges, metadata.viewport);
   }
 

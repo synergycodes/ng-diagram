@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockNode, mockPort } from '../../../../test-utils';
-import type { CommandHandler, Node } from '../../../../types';
+import type { CommandHandler, LinkingActionState, Node } from '../../../../types';
 import { startLinking, StartLinkingCommand } from '../start-linking';
 
-// Mock the utility functions
 vi.mock('../../../../utils', () => ({
   getPortFlowPosition: vi.fn(),
 }));
@@ -28,6 +27,9 @@ describe('startLinking', () => {
         temporaryEdgeDataBuilder: ReturnType<typeof vi.fn>;
       };
     };
+    actionStateManager: {
+      linking: LinkingActionState | null;
+    };
   };
 
   beforeEach(() => {
@@ -35,11 +37,14 @@ describe('startLinking', () => {
 
     mockFlowCore = {
       getNodeById: vi.fn(),
-      applyUpdate: vi.fn(),
+      applyUpdate: vi.fn().mockResolvedValue(undefined),
       config: {
         linking: {
           temporaryEdgeDataBuilder: vi.fn(),
         },
+      },
+      actionStateManager: {
+        linking: null,
       },
     };
 
@@ -170,14 +175,12 @@ describe('startLinking', () => {
           target: '',
           targetPosition: portPosition,
         });
-        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-          {
-            metadataUpdate: {
-              temporaryEdge: mockTemporaryEdge,
-            },
-          },
-          'startLinking'
-        );
+        expect(mockFlowCore.actionStateManager.linking).toEqual({
+          temporaryEdge: mockTemporaryEdge,
+          sourceNodeId: 'source-node',
+          sourcePortId: 'source-port',
+        });
+        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
 
       it('should successfully start linking without source port', async () => {
@@ -206,14 +209,12 @@ describe('startLinking', () => {
           target: '',
           targetPosition: sourceNode.position,
         });
-        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-          {
-            metadataUpdate: {
-              temporaryEdge: mockTemporaryEdge,
-            },
-          },
-          'startLinking'
-        );
+        expect(mockFlowCore.actionStateManager.linking).toEqual({
+          temporaryEdge: mockTemporaryEdge,
+          sourceNodeId: 'source-node',
+          sourcePortId: '',
+        });
+        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
 
       it('should handle source port with type "both"', async () => {
@@ -252,14 +253,12 @@ describe('startLinking', () => {
           target: '',
           targetPosition: portPosition,
         });
-        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-          {
-            metadataUpdate: {
-              temporaryEdge: mockTemporaryEdge,
-            },
-          },
-          'startLinking'
-        );
+        expect(mockFlowCore.actionStateManager.linking).toEqual({
+          temporaryEdge: mockTemporaryEdge,
+          sourceNodeId: 'source-node',
+          sourcePortId: 'both-port',
+        });
+        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
 
       it('should handle source port with type "source"', async () => {
@@ -284,14 +283,12 @@ describe('startLinking', () => {
           target: '',
           targetPosition: portPosition,
         });
-        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-          {
-            metadataUpdate: {
-              temporaryEdge: mockTemporaryEdge,
-            },
-          },
-          'startLinking'
-        );
+        expect(mockFlowCore.actionStateManager.linking).toEqual({
+          temporaryEdge: mockTemporaryEdge,
+          sourceNodeId: 'source-node',
+          sourcePortId: 'source-port',
+        });
+        expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
     });
   });

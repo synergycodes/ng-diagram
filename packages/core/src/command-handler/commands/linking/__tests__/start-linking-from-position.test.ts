@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
-import type { CommandHandler } from '../../../../types';
+import type { CommandHandler, LinkingActionState } from '../../../../types';
 import { startLinkingFromPosition, StartLinkingFromPositionCommand } from '../start-linking-from-position';
 
-// Mock the utility functions
 vi.mock('../utils', () => ({
   createTemporaryEdge: vi.fn(),
 }));
@@ -20,17 +19,23 @@ describe('startLinkingFromPosition', () => {
         temporaryEdgeDataBuilder: ReturnType<typeof vi.fn>;
       };
     };
+    actionStateManager: {
+      linking: LinkingActionState | null;
+    };
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     mockFlowCore = {
-      applyUpdate: vi.fn(),
+      applyUpdate: vi.fn().mockResolvedValue(undefined),
       config: {
         linking: {
           temporaryEdgeDataBuilder: vi.fn(),
         },
+      },
+      actionStateManager: {
+        linking: null,
       },
     };
 
@@ -69,14 +74,13 @@ describe('startLinkingFromPosition', () => {
         targetPosition: position,
       });
 
-      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
-        {
-          metadataUpdate: {
-            temporaryEdge: mockTemporaryEdge,
-          },
-        },
-        'startLinking'
-      );
+      expect(mockFlowCore.actionStateManager.linking).toEqual({
+        sourceNodeId: '',
+        sourcePortId: '',
+        temporaryEdge: mockTemporaryEdge,
+      });
+
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinkingFromPosition');
     });
   });
 
@@ -107,6 +111,12 @@ describe('startLinkingFromPosition', () => {
       };
 
       expect(mockCreateTemporaryEdge).toHaveBeenCalledWith(mockFlowCore.config, expectedEdgeData);
+
+      expect(mockFlowCore.actionStateManager.linking).toEqual({
+        sourceNodeId: '',
+        sourcePortId: '',
+        temporaryEdge: mockTemporaryEdge,
+      });
     });
 
     it('should use same position for both source and target positions', async () => {
@@ -132,6 +142,12 @@ describe('startLinkingFromPosition', () => {
         sourcePosition: position,
         target: '',
         targetPosition: position,
+      });
+
+      expect(mockFlowCore.actionStateManager.linking).toEqual({
+        sourceNodeId: '',
+        sourcePortId: '',
+        temporaryEdge: mockTemporaryEdge,
       });
     });
   });

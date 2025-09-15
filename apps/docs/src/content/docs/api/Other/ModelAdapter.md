@@ -96,26 +96,6 @@ Redo the last undone change
 
 ***
 
-### setEdges()
-
-> **setEdges**(`edges`): `void`
-
-Set edges in the model
-
-#### Parameters
-
-##### edges
-
-[`Edge`](/docs/api/types/edge/)\<`object`\>[]
-
-Array of edges to set
-
-#### Returns
-
-`void`
-
-***
-
 ### setMetadata()
 
 > **setMetadata**(`metadata`): `void`
@@ -129,26 +109,6 @@ Set metadata for the model
 `TMetadata`
 
 Metadata to set
-
-#### Returns
-
-`void`
-
-***
-
-### setNodes()
-
-> **setNodes**(`nodes`): `void`
-
-Set nodes in the model
-
-#### Parameters
-
-##### nodes
-
-[`Node`](/docs/api/types/node/)[]
-
-Array of nodes to set
 
 #### Returns
 
@@ -193,6 +153,46 @@ Unregister a callback from being called when the model changes
 (`__namedParameters`) => `void`
 
 Function to unregister from changes
+
+#### Returns
+
+`void`
+
+***
+
+### updateEdges()
+
+> **updateEdges**(`edges`): `void`
+
+Update edges in the model
+
+#### Parameters
+
+##### edges
+
+[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Array of edges to set
+
+#### Returns
+
+`void`
+
+***
+
+### updateNodes()
+
+> **updateNodes**(`nodes`): `void`
+
+Update nodes in the model
+
+#### Parameters
+
+##### nodes
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of nodes to set
 
 #### Returns
 

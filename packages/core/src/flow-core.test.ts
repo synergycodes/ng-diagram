@@ -92,8 +92,8 @@ describe('FlowCore', () => {
       getNodes: mockGetNodes,
       getEdges: mockGetEdges,
       getMetadata: mockGetMetadata,
-      setNodes: vi.fn(),
-      setEdges: vi.fn(),
+      updateNodes: vi.fn(),
+      updateEdges: vi.fn(),
       setMetadata: vi.fn(),
       onChange: vi.fn(),
       unregisterOnChange: vi.fn(),
@@ -263,8 +263,8 @@ describe('FlowCore', () => {
       await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
       expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
-      expect(mockModelAdapter.setNodes).toHaveBeenCalledWith([mockNode]);
-      expect(mockModelAdapter.setEdges).toHaveBeenCalledWith([mockEdge]);
+      expect(mockModelAdapter.updateNodes).toHaveBeenCalledWith([mockNode]);
+      expect(mockModelAdapter.updateEdges).toHaveBeenCalledWith([mockEdge]);
     });
 
     it('should call the middleware with the correct parameters', async () => {
@@ -287,8 +287,8 @@ describe('FlowCore', () => {
       await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
       expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
-      expect(mockModelAdapter.setNodes).not.toHaveBeenCalled();
-      expect(mockModelAdapter.setEdges).not.toHaveBeenCalled();
+      expect(mockModelAdapter.updateNodes).not.toHaveBeenCalled();
+      expect(mockModelAdapter.updateEdges).not.toHaveBeenCalled();
     });
   });
 

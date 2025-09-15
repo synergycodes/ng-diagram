@@ -12,17 +12,18 @@ export const startLinkingFromPosition = async (
 ) => {
   const { position } = command;
 
-  await commandHandler.flowCore.applyUpdate(
-    {
-      metadataUpdate: {
-        temporaryEdge: createTemporaryEdge(commandHandler.flowCore.config, {
-          source: '',
-          sourcePosition: position,
-          target: '',
-          targetPosition: position,
-        }),
-      },
-    },
-    'startLinking'
-  );
+  const temporaryEdge = createTemporaryEdge(commandHandler.flowCore.config, {
+    source: '',
+    sourcePosition: position,
+    target: '',
+    targetPosition: position,
+  });
+
+  commandHandler.flowCore.actionStateManager.linking = {
+    sourceNodeId: '',
+    sourcePortId: '',
+    temporaryEdge,
+  };
+
+  await commandHandler.flowCore.applyUpdate({}, 'startLinkingFromPosition');
 };

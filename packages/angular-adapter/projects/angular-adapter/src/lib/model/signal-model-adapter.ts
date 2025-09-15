@@ -61,11 +61,11 @@ export class SignalModelAdapter<TMiddlewares extends MiddlewareChain = []>
     return this.edges();
   }
 
-  setNodes(next: Node[] | ((prev: Node[]) => Node[])): void {
+  updateNodes(next: Node[] | ((prev: Node[]) => Node[])): void {
     this.nodes.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 
-  setEdges(next: Edge[] | ((prev: Edge[]) => Edge[])): void {
+  updateEdges(next: Edge[] | ((prev: Edge[]) => Edge[])): void {
     this.edges.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 

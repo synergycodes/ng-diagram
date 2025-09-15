@@ -1,10 +1,9 @@
 import '@angular/compiler';
 
-import { Component, inject, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import {
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
-  NgDiagramViewportService,
   type NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
 import { PaletteItemComponent } from './palette-item.component';
@@ -21,6 +20,4 @@ import { PaletteItemComponent } from './palette-item.component';
 })
 export class Palette {
   model = input.required<NgDiagramPaletteItem[]>();
-
-  scale = inject(NgDiagramViewportService).scale;
 }
