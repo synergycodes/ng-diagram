@@ -1,6 +1,6 @@
 ---
 title: Custom Nodes
-description: How to create and implement custom nodes in NgDiagram
+description: How to create and implement custom nodes in ngDiagram
 sidebar:
   order: 1
 ---
@@ -9,7 +9,7 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 
-When NgDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
+When ngDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
 
 This allows you to build interactive and highly customized flow elements.
 
@@ -34,7 +34,7 @@ The map associates a string key, such as `myType`, with a value like `CustomNode
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[30, 33]} />
 
-After registering, you need to pass the map to the `NgDiagram` component.
+After registering, you need to pass the map to the `ngDiagram` component.
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[20, 24]} mark={[4]} />
 

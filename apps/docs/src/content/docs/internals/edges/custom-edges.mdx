@@ -1,6 +1,6 @@
 ---
 title: Custom Edges
-description: How to create and implement custom edges in NgDiagram
+description: How to create and implement custom edges in ngDiagram
 sidebar:
   order: 1
 ---
@@ -8,7 +8,7 @@ sidebar:
 import { LinkCard } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
-When NgDiagram's default edge customizations are not sufficient, you can create custom edges that provide more precise control over edge rendering, including routing.
+When ngDiagram's default edge customizations are not sufficient, you can create custom edges that provide more precise control over edge rendering, including routing.
 
 You can create a custom edge by extending `NgDiagramBaseEdgeComponent` and implementing `NgDiagramEdgeTemplate`
 
@@ -16,7 +16,7 @@ You can create a custom edge by extending `NgDiagramBaseEdgeComponent` and imple
 
 ## Registering Custom Edge Types
 
-Custom edge types need to be registered in the `edgeTemplateMap` and passed to the `NgDiagram` component.
+Custom edge types need to be registered in the `edgeTemplateMap` and passed to the `ngDiagram` component.
 
 <CodeSnippet
   relativePath="edges/custom-edges/diagram.component.ts"
@@ -32,7 +32,7 @@ Custom routing is an extensible mechanism that allows you to create sophisticate
 <LinkCard
   title="Routing"
   href="/docs/internals/edges/routing"
-  description="Learn about routing algorithms and how to customize them in NgDiagram"
+  description="Learn about routing algorithms and how to customize them in ngDiagram"
 />
 
 ## Adding Edge Labels
@@ -53,5 +53,5 @@ import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/lab
 <LinkCard
   title="Edge Labels"
   href="/docs/internals/edges/labels"
-  description="Learn more about adding and customizing labels on edges in NgDiagram"
+  description="Learn more about adding and customizing labels on edges in ngDiagram"
 />
