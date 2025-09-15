@@ -4,11 +4,6 @@ import { isSamePoint } from '../../../utils';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getEdgePoints } from './get-edge-points';
 
-export interface EdgesRoutingMiddlewareMetadata {
-  enabled: boolean;
-  temporaryEdgeZIndex: number;
-}
-
 /**
  * Determines if edges should be re-routed based on changes in the flow state.
  */

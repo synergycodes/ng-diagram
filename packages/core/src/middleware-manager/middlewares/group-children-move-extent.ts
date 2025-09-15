@@ -1,10 +1,6 @@
 import type { GroupNode, Middleware, MiddlewareContext, Node } from '../../types';
 import { calculateGroupRect, isGroup } from '../../utils';
 
-export interface GroupChildrenMoveExtentMiddlewareMetadata {
-  enabled: boolean;
-}
-
 interface NodeUpdate {
   id: string;
   position: Node['position'];

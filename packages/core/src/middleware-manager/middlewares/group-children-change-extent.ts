@@ -1,10 +1,6 @@
 import type { Middleware, Node } from '../../types';
 import { calculateGroupRect, isGroup } from '../../utils';
 
-export interface GroupChildrenChangeExtentMiddlewareMetadata {
-  enabled: boolean;
-}
-
 export const groupChildrenChangeExtent: Middleware = {
   name: 'group-children-change-extent',
   execute: async (

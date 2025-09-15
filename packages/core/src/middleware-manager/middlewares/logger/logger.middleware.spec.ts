@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, MockInstance, vi } from 'vitest';
-import { FlowState, Metadata, MiddlewareContext } from '../../../types';
-import { loggerMiddleware, LoggerMiddlewareMetadata } from './logger';
+import { FlowState, MiddlewareContext } from '../../../types';
+import { loggerMiddleware } from './logger';
 
 describe('LoggerMiddleware', () => {
   let consoleLogSpy: MockInstance;
   let initialState: FlowState;
-  let context: MiddlewareContext<[], Metadata<Record<string, unknown>>, LoggerMiddlewareMetadata>;
+  let context: MiddlewareContext;
   const nextMock = vi.fn();
 
   beforeEach(() => {
     initialState = {
       nodes: [],
       edges: [],
-      metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} },
+      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
     context = {
       initialState,
@@ -22,8 +22,8 @@ describe('LoggerMiddleware', () => {
       metadata: initialState.metadata,
       history: [],
       initialUpdate: { nodesToAdd: [] },
-      middlewareMetadata: { enabled: true },
-    } as unknown as MiddlewareContext<[], Metadata<Record<string, unknown>>, LoggerMiddlewareMetadata>;
+      config: { debugMode: true },
+    } as unknown as MiddlewareContext;
 
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {
       // do nothing
@@ -41,18 +41,18 @@ describe('LoggerMiddleware', () => {
         { id: 'node2', type: 'output', position: { x: 0, y: 0 }, data: {} },
       ],
       edges: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
-      metadata: { viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} },
+      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
     const newContext = {
       ...context,
       modelActionType: 'changeSelection',
       state,
-    } as unknown as MiddlewareContext<[], Metadata<Record<string, unknown>>, LoggerMiddlewareMetadata>;
+    } as unknown as MiddlewareContext;
 
     loggerMiddleware.execute(newContext, nextMock, () => null);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      '[AngularFlow] changeSelection',
+      '[ngDiagram] changeSelection',
       expect.objectContaining({
         initialState,
         finalState: state,

@@ -1,14 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../flow-core';
 import { mockMetadata, mockNode } from '../test-utils';
-import type {
-  FlowState,
-  FlowStateUpdate,
-  Metadata,
-  Middleware,
-  MiddlewaresConfigFromMiddlewares,
-  ModelAdapter,
-} from '../types';
+import type { FlowState, FlowStateUpdate, Middleware, ModelAdapter } from '../types';
 import { MiddlewareManager } from './middleware-manager';
 
 // Define all mocks at the top level
@@ -29,19 +22,17 @@ vi.mock('./middleware-executor', () => ({
 type TestMiddlewares = [
   Middleware<'mockMiddleware1'>,
   Middleware<'mockMiddleware2'>,
-  Middleware<'mockMiddlewareWithMetadata', { enabled: boolean; threshold: number }>,
+  Middleware<'mockMiddlewareWithMetadata'>,
 ];
-type TestMetadata = Metadata<MiddlewaresConfigFromMiddlewares<TestMiddlewares>>;
-
 describe('MiddlewareManager', () => {
-  let flowCore: FlowCore<TestMiddlewares, TestMetadata>;
+  let flowCore: FlowCore;
   let mockMiddleware1: Middleware<'mockMiddleware1'>;
   let mockMiddleware2: Middleware<'mockMiddleware2'>;
-  let middlewareManager: MiddlewareManager<TestMiddlewares, TestMetadata>;
-  let initialState: FlowState<TestMetadata>;
+  let middlewareManager: MiddlewareManager;
+  let initialState: FlowState;
   let stateUpdate: FlowStateUpdate;
   let MiddlewareExecutor: unknown;
-  let mockModel: ModelAdapter<TestMetadata>;
+  let mockModel: ModelAdapter;
 
   beforeEach(async () => {
     const module = await import('./middleware-executor');
@@ -54,7 +45,6 @@ describe('MiddlewareManager', () => {
 
     mockModel = {
       getMetadata: getMetadataMock,
-      updateMiddlewareMetadata: vi.fn(),
       setMetadata: vi.fn(),
       getNodes: vi.fn(),
       getEdges: vi.fn(),
@@ -64,7 +54,7 @@ describe('MiddlewareManager', () => {
       undo: vi.fn(),
       redo: vi.fn(),
       toJSON: vi.fn(),
-    } as unknown as ModelAdapter<TestMetadata>;
+    } as unknown as ModelAdapter;
 
     flowCore = {
       getState: vi.fn().mockReturnValue({
@@ -79,11 +69,8 @@ describe('MiddlewareManager', () => {
       setMetadata: vi.fn(),
       applyUpdate: vi.fn(),
       model: mockModel,
-    } as unknown as FlowCore<TestMiddlewares, TestMetadata>;
+    } as unknown as FlowCore;
     middlewareManager = new MiddlewareManager(flowCore);
-
-    // Spy on the methods that are called during registration
-    vi.spyOn(middlewareManager, 'applyMiddlewareConfig');
 
     mockMiddleware1 = {
       name: 'mockMiddleware1',
@@ -109,7 +96,7 @@ describe('MiddlewareManager', () => {
       nodes: [],
       edges: [],
       metadata: mockMetadata,
-    } as unknown as FlowState<TestMetadata>;
+    } as unknown as FlowState;
     stateUpdate = {
       nodesToAdd: [mockNode],
     };
@@ -138,27 +125,6 @@ describe('MiddlewareManager', () => {
       expect(() => middlewareManager.register(mockMiddleware1)).toThrow();
     });
 
-    it('should not call updateMiddlewareMetadata when registering middleware without defaultMetadata', () => {
-      middlewareManager.register(mockMiddleware1);
-
-      expect(middlewareManager.applyMiddlewareConfig).not.toHaveBeenCalled();
-    });
-
-    it('should call applyMiddlewareConfig when registering middleware with defaultMetadata', () => {
-      const middlewareWithMetadata = {
-        name: 'mockMiddlewareWithMetadata',
-        defaultMetadata: { enabled: true, threshold: 10 },
-        execute: vi.fn(),
-      };
-
-      middlewareManager.register(middlewareWithMetadata);
-
-      expect(middlewareManager.applyMiddlewareConfig).toHaveBeenCalledWith('mockMiddlewareWithMetadata', {
-        enabled: true,
-        threshold: 10,
-      });
-    });
-
     it('should return a function that unregisters the middleware when called', () => {
       const unregister = middlewareManager.register(mockMiddleware1);
 
@@ -184,13 +150,6 @@ describe('MiddlewareManager', () => {
 
     it('should handle unregistering a non-existent middleware gracefully', () => {
       expect(() => middlewareManager.unregister(mockMiddleware1.name)).not.toThrow();
-    });
-
-    it('should call applyMiddlewareConfig with undefined when unregistering middleware', () => {
-      middlewareManager.register(mockMiddleware1);
-      middlewareManager.unregister(mockMiddleware1.name);
-
-      expect(middlewareManager.applyMiddlewareConfig).toHaveBeenCalledWith(mockMiddleware1.name, undefined);
     });
 
     it('should remove middleware from the chain when unregistered', () => {
@@ -224,122 +183,8 @@ describe('MiddlewareManager', () => {
     });
   });
 
-  describe('applyMiddlewareConfig', () => {
-    it('should update middleware configuration in the flow state', () => {
-      const config = { enabled: true, threshold: 5 };
-
-      middlewareManager.applyMiddlewareConfig('mockMiddlewareWithMetadata', config);
-
-      expect(flowCore.setState).toHaveBeenCalled();
-      const callArgs = (flowCore.setState as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(callArgs.metadata.middlewaresConfig.mockMiddlewareWithMetadata).toEqual(config);
-    });
-
-    it('should remove middleware configuration when config is undefined', () => {
-      // First set a config
-      const initialConfig = { enabled: true, threshold: 5 };
-      middlewareManager.applyMiddlewareConfig('mockMiddlewareWithMetadata', initialConfig);
-
-      // Reset the mock to clear previous calls
-      (flowCore.setState as ReturnType<typeof vi.fn>).mockClear();
-
-      // Now remove the config
-      middlewareManager.applyMiddlewareConfig('mockMiddlewareWithMetadata', undefined);
-
-      expect(flowCore.setState).toHaveBeenCalled();
-      const callArgs = (flowCore.setState as ReturnType<typeof vi.fn>).mock.calls[0][0];
-      expect(callArgs.metadata.middlewaresConfig.mockMiddlewareWithMetadata).toBeUndefined();
-    });
-
-    it('should preserve other middleware configurations when updating one', () => {
-      const config1 = { enabled: true, threshold: 5 };
-      const config2 = { enabled: false, threshold: 10 };
-
-      middlewareManager.applyMiddlewareConfig('mockMiddleware1', config1);
-      middlewareManager.applyMiddlewareConfig('mockMiddleware2', config2);
-
-      const finalCallArgs = (flowCore.setState as ReturnType<typeof vi.fn>).mock.calls[1][0];
-      expect(finalCallArgs.metadata.middlewaresConfig.mockMiddleware1).toEqual(config1);
-      expect(finalCallArgs.metadata.middlewaresConfig.mockMiddleware2).toEqual(config2);
-    });
-  });
-
-  describe('getMiddlewareConfig', () => {
-    let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-
-    beforeEach(() => {
-      consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {
-        // Suppress console warnings during tests
-      });
-    });
-
-    afterEach(() => {
-      consoleWarnSpy.mockRestore();
-    });
-
-    it('should return middleware configuration merged with default metadata', () => {
-      const middlewareWithMetadata = {
-        name: 'mockMiddlewareWithMetadata',
-        defaultMetadata: { enabled: true, threshold: 10 },
-        execute: vi.fn(),
-      };
-
-      middlewareManager.register(middlewareWithMetadata);
-      middlewareManager.applyMiddlewareConfig('mockMiddlewareWithMetadata', { enabled: true, threshold: 20 });
-
-      const config = middlewareManager.getMiddlewareConfig('mockMiddlewareWithMetadata');
-
-      expect(config).toEqual({ enabled: true, threshold: 20 });
-    });
-
-    it('should return default metadata when no custom config is set', () => {
-      const middlewareWithMetadata = {
-        name: 'mockMiddlewareWithMetadata',
-        defaultMetadata: { enabled: true, threshold: 10 },
-        execute: vi.fn(),
-      };
-
-      middlewareManager.register(middlewareWithMetadata);
-
-      const config = middlewareManager.getMiddlewareConfig('mockMiddlewareWithMetadata');
-
-      expect(config).toEqual({ enabled: true, threshold: 10 });
-    });
-
-    it('should return empty object when middleware has no default metadata and no config', () => {
-      middlewareManager.register(mockMiddleware1);
-
-      const config = middlewareManager.getMiddlewareConfig('mockMiddleware1');
-
-      expect(config).toEqual({});
-    });
-
-    it('should warn when accessing config for non-registered middleware', () => {
-      const config = middlewareManager.getMiddlewareConfig(
-        'nonExistentMiddleware' as keyof MiddlewaresConfigFromMiddlewares<TestMiddlewares>
-      );
-
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        '[AngularFlow] Accessing middleware config for "nonExistentMiddleware" not found'
-      );
-      expect(config).toEqual({});
-    });
-
-    it('should return configuration from state even if middleware is not registered', () => {
-      // Set config directly in state without registering middleware
-      middlewareManager.applyMiddlewareConfig('mockMiddleware1', { someConfig: 'value' });
-
-      const config = middlewareManager.getMiddlewareConfig('mockMiddleware1');
-
-      expect(config).toEqual({ someConfig: 'value' });
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        '[AngularFlow] Accessing middleware config for "mockMiddleware1" not found'
-      );
-    });
-  });
-
   describe('integration tests', () => {
-    it('should handle complete middleware lifecycle with configuration', () => {
+    it('should handle complete middleware lifecycle', () => {
       const middlewareWithMetadata = {
         name: 'mockMiddlewareWithMetadata',
         defaultMetadata: { enabled: true, threshold: 10 },
@@ -349,23 +194,11 @@ describe('MiddlewareManager', () => {
       // Register middleware
       const unregister = middlewareManager.register(middlewareWithMetadata);
 
-      // Verify default config is applied
-      let config = middlewareManager.getMiddlewareConfig('mockMiddlewareWithMetadata');
-      expect(config).toEqual({ enabled: true, threshold: 10 });
-
-      // Update config
-      middlewareManager.applyMiddlewareConfig('mockMiddlewareWithMetadata', { enabled: false, threshold: 20 });
-      config = middlewareManager.getMiddlewareConfig('mockMiddlewareWithMetadata');
-      expect(config).toEqual({ enabled: false, threshold: 20 });
-
       // Unregister middleware
       unregister();
 
       // Verify middleware is removed from chain
       expect(middlewareManager['middlewareChain']).not.toContain(middlewareWithMetadata);
-
-      // Verify config is cleaned up
-      expect(middlewareManager.applyMiddlewareConfig).toHaveBeenCalledWith('mockMiddlewareWithMetadata', undefined);
     });
 
     it('should maintain correct middleware order after registration and unregistration', () => {
