@@ -1,59 +1,224 @@
-# AngularAdapter
+# ng-diagram
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
+[![npm version](https://badge.fury.io/js/%40angularflow%2Fangular-adapter.svg)](https://badge.fury.io/js/%40angularflow%2Fangular-adapter)
+[![License: MIT](https://img.shields.io/badge/license-Apache%202-blue)](https://opensource.org/license/apache-2-0)
 
-## Development server
+A robust Angular library for building interactive diagrams, node-based editors, and visual programming interfaces. Designed with Angular and TypeScript, it offers a complete toolkit to create sophisticated, customizable, and high-performance diagramming applications.
 
-To start a local development server, run:
+Unlike generic diagramming libraries, **ng-diagram** is Angular-first — built on Angular signals and templates for seamless integration and performance.
 
-```bash
-ng serve
-```
+## ⚠️ Beta Notice
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+This project is currently in beta. While features and APIs may still evolve, the foundation is stable, and your feedback will directly shape its future.
 
-## Code scaffolding
+## ✨ Features
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **🎯 Interactive Elements**: Draggable, resizable, and rotatable nodes
+- **🔗 Customizable Connections**: Flexible edges with various routing options (polyline, curved, orthogonal)
+- **🎨 Consistent Styling**: Built-in design system with CSS variables and themes
+- **🧩 Custom Templates**: Define own Angular templates for nodes and edges to create tailored visuals and behaviors
+- **📦 Groups**: Container nodes that can be moved together with automatic sizing
+- **🔌 Extensible Architecture**: Plugin-based system for custom behaviors and business logic
+- **⚡ Reactive State Management**: Built on Angular signals for optimal performance
+- **🎨 Embedded Palette**: Built-in drag-and-drop palette system for adding nodes to diagrams
+- **🎛️ Rich Interactions**: Selection, rotation, resizing, panning, zooming, and more
 
-```bash
-ng generate component component-name
-```
+## 📚 What You Can Build
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+With ng-diagram, you can create:
 
-```bash
-ng generate --help
-```
+- **Flow Diagrams**: Process flows, decision trees, and workflow visualizations
+- **Node-Based Editors**: Visual programming interfaces and data flow editors
+- **Network Diagrams**: System architectures and network topologies
+- **Mind Maps**: Hierarchical information structures and brainstorming tools
+- **Circuit Diagrams**: Electronic schematics and technical drawings
+- **Custom Visualizations**: Any diagram type with custom node and edge templates
 
-## Building
+## 🚀 Quick Start
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev) test runner, use the following command:
+### Installation
 
 ```bash
-ng test
+npm install ng-diagram
 ```
 
-## Running end-to-end tests
+### Import Styles
 
-For end-to-end (e2e) testing, run:
+**Important:** You must import the required styles for the diagram to display correctly.
 
-```bash
-ng e2e
+```css
+@import 'ng-diagram/styles.css';
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Create Your First Diagram
 
-## Additional Resources
+```typescript
+import { Component } from '@angular/core';
+import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from 'ng-diagram';
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+@Component({
+  imports: [NgDiagramContextComponent, NgDiagramComponent],
+  template: `
+    <ng-diagram-context>
+      <ng-diagram [model]="model" />
+    </ng-diagram-context>
+  `,
+  styles: `
+    :host {
+      flex: 1;
+      display: flex;
+      height: 100%;
+    }
+  `,
+})
+export class MyDiagramComponent {
+  model = initializeModel({
+    nodes: [
+      { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
+      { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },
+    ],
+    edges: [
+      {
+        id: '1',
+        source: '1',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        target: '2',
+        data: {},
+      },
+    ],
+  });
+}
+```
+
+That's it! You now have a working diagram with default node and edge templates.
+
+## 🎨 Customization
+
+### Custom Nodes
+
+Create custom node components with any Angular template:
+
+```typescript
+@Component({
+  selector: 'app-custom-node',
+  template: `
+    <div class="custom-node">
+      <h3>{{ node.data.title }}</h3>
+      <p>{{ node.data.description }}</p>
+      <ng-diagram-port id="input" position="left" type="target"> </ng-diagram-port>
+      <ng-diagram-port id="output" position="right" type="source"> </ng-diagram-port>
+    </div>
+  `,
+  styles: [
+    `
+      .custom-node {
+        background: #fff;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 16px;
+        min-width: 200px;
+      }
+    `,
+  ],
+})
+export class CustomNodeComponent implements NgDiagramNodeTemplate {
+  node = input.required<Node>();
+}
+```
+
+### Custom Edges
+
+Create custom edge components with unique visual styles:
+
+```typescript
+@Component({
+  selector: 'app-custom-edge',
+  template: `
+    <ng-diagram-base-edge [path]="path" [markerEnd]="markerEnd" [style]="edgeStyle"> </ng-diagram-base-edge>
+  `,
+})
+export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
+  edge = input.required<Edge>();
+
+  get path() {
+    // Custom path calculation
+    return this.calculateCustomPath();
+  }
+}
+```
+
+## 🛠️ Core Components
+
+### Main Components
+
+- **`NgDiagramComponent`**: The main diagram component
+- **`NgDiagramContextComponent`**: Provides diagram context and services
+- **`NgDiagramPortComponent`**: Connection points on nodes
+- **`NgDiagramBaseEdgeComponent`**: Base edge component for custom edges
+- **`NgDiagramPaletteItemComponent`**: Drag-and-drop palette items
+- **`NgDiagramPaletteItemPreviewComponent`**: Live preview during drag operations
+
+### Services
+
+- **`NgDiagramService`**: Main service providing access to all diagram functionality
+- **`NgDiagramModelService`**: Model management and state
+- **`NgDiagramNodeService`**: Node operations and manipulation
+- **`NgDiagramEdgeService`**: Edge operations and connections
+- **`NgDiagramGroupsService`**: Group node operations and management
+- **`NgDiagramSelectionService`**: Selection state management
+- **`NgDiagramViewportService`**: Panning and zooming controls
+- **`NgDiagramClipboardService`**: Copy, paste, and clipboard operations
+
+### Directives
+
+- **`NgDiagramNodeSelectedDirective`**: Node selection styling
+- **`NgDiagramGroupHighlightedDirective`**: Group highlighting styling
+
+## 👩‍💻 About the Creators
+
+ng-diagram is built and maintained by [**Synergy Codes**](https://www.synergycodes.com) — a team of developers who’ve spent **over a decade designing and delivering diagramming solutions** for clients worldwide.
+
+We are continuously distilling everything we know about building interactive diagrams, editors, and visual tools into this library. Our goal is simple: to empower Angular developers to create diagramming applications faster, easier, and with confidence.
+
+When you use this library, you can be sure you’re in **good hands** — backed by a team that knows diagrams inside out.
+
+## 📖 Documentation
+
+For comprehensive documentation, examples, and API reference, visit:
+
+**📚 [Full Documentation](https://angularflow.dev/docs)**
+
+The documentation includes:
+
+- Detailed API reference
+- Interactive examples
+- Customization guides
+- Best practices
+- Advanced use cases
+
+## 🔧 Requirements
+
+- **Angular**: 18.0.0 or higher
+- **TypeScript**: 5.0.0 or higher
+- **Node.js**: 18.0.0 or higher
+
+## 📄 License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/synergycodes/angularflow/blob/main/LICENSE) file for details.
+
+## 🔗 Links
+
+- **Documentation**: [https://angularflow.dev/docs](https://angularflow.dev/docs)
+- **GitHub**: [https://github.com/synergycodes/angularflow](https://github.com/synergycodes/angularflow)
+- **NPM**: [https://www.npmjs.com/package/ng-diagram](https://www.npmjs.com/package/ng-diagram)
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/synergycodes/angularflow/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/synergycodes/angularflow/discussions)
+- **Documentation**: [https://angularflow.dev/docs](https://angularflow.dev/docs)
+
+---
+
+Built with ❤️ by the Synergycodes team
