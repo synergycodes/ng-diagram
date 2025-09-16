@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   type NgDiagramConfig,
 } from '@angularflow/angular-adapter';
 import { diagramModel } from './data';
@@ -37,7 +36,7 @@ import { LayoutButtonsComponent } from './layout-buttons.component';
   `,
 })
 export class DiagramComponent {
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: 100, y: 80, scale: 0.5 },
     },

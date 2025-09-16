@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   type Edge,
   type Node,
 } from '@angularflow/angular-adapter';
@@ -26,7 +25,7 @@ import {
   `,
 })
 export class NgDiagramPerformanceTestComponent {
-  model = initializeModel<AppMiddlewares>(this.generateModelData());
+  model = initializeModel(this.generateModelData());
 
   generateModelData() {
     const nodes = this.generateNodes();

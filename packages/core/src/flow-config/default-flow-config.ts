@@ -55,6 +55,7 @@ const defaultGroupingConfig: GroupingConfig = {
     // Allow grouping by default
     return true;
   },
+  allowGroupAutoResize: true,
 };
 
 const defaultZoomConfig: ZoomConfig = {
@@ -130,6 +131,7 @@ const defaultZIndexConfig: ZIndexConfig = {
   selectedZIndex: 1000,
   edgesAboveConnectedNodes: false,
   elevateOnSelection: true,
+  temporaryEdgeZIndex: 1000,
 };
 
 /**
@@ -149,4 +151,5 @@ export const defaultFlowConfig: FlowConfig = {
   selectionMoving: defaultSelectionMovingConfig,
   edgeRouting: defaultEdgeRoutingConfig,
   zIndex: defaultZIndexConfig,
+  debugMode: false,
 };

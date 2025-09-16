@@ -1,11 +1,11 @@
 ---
 title: Coordinate System
-description: Understanding the coordinate system used in NgDiagram
+description: Understanding the coordinate system used in ngDiagram
 ---
 
 import NgDiagramComponentContainer from '../../../components/angular/coordinate-system/coordinate-system.astro';
 
-ngDiagram uses a coordinate system that enables precise positioning of all diagram elements. Understanding this system is crucial for creating accurate diagrams and implementing custom behaviors.
+NgDiagram uses a coordinate system that enables precise positioning of all diagram elements. Understanding this system is crucial for creating accurate diagrams and implementing custom behaviors.
 
 ## Diagram Origin
 
@@ -17,6 +17,7 @@ The diagram has a **global coordinate system** with its origin at the top-left c
 - **Positive X**: Moving the viewport to the right increases values
 - **Positive Y**: Moving the viewport down increases values
 - **Units**: All coordinates are in pixels
+- Negative values are supported
 
 > In other words, as you drag the diagram right or down, the coordinates of elements increase along the X and Y axes.
 
@@ -140,7 +141,7 @@ Use the `NgDiagramViewportService` to access viewport information reactively:
 import { NgDiagramViewportService } from '@angularflow/angular-adapter';
 
 export class MyComponent {
-  private viewportService = inject(NgDiagramViewportService);
+  private readonly viewportService = inject(NgDiagramViewportService);
 
   // Get reactive viewport data
   viewport = this.viewportService.viewport;

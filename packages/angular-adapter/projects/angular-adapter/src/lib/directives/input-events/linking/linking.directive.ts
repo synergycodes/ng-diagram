@@ -1,6 +1,7 @@
 import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
 import { Node } from '@angularflow/core';
-import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { FlowCoreProviderService } from '../../../services';
+import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';
 
 /**
@@ -11,16 +12,18 @@ import { PointerInputEvent } from '../../../types';
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },
+  providers: [LinkingEventService],
 })
 export class LinkingInputDirective implements OnDestroy {
-  private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly linkingEventService = inject(LinkingEventService);
+  private readonly flowCoreProviderService = inject(FlowCoreProviderService);
 
-  target = signal<Node | undefined>(undefined);
+  private target = signal<Node | undefined>(undefined);
+
   portId = input.required<string>();
 
   ngOnDestroy(): void {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
+    this.cleanup();
   }
 
   setTargetNode(node: Node) {
@@ -28,49 +31,29 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
+    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
+      this.target.set(undefined);
+      return;
+    }
     $event.linkingHandled = true;
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
 
-    const baseEvent = this.inputEventsRouter.getBaseEvent($event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'linking',
-      phase: 'start',
-      target: this.target(),
-      targetType: 'node',
-      portId: this.portId(),
-      lastInputPoint: { x: $event.clientX, y: $event.clientY },
-    });
+    this.linkingEventService.emitStart($event, this.target(), this.portId());
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
-    const baseEvent = this.inputEventsRouter.getBaseEvent($event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'linking',
-      phase: 'continue',
-      target: this.target(),
-      targetType: 'node',
-      portId: this.portId(),
-      lastInputPoint: { x: $event.clientX, y: $event.clientY },
-    });
+    this.linkingEventService.emitContinue($event, this.target(), this.portId());
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
-    const baseEvent = this.inputEventsRouter.getBaseEvent($event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'linking',
-      phase: 'end',
-      target: this.target(),
-      targetType: 'node',
-      portId: this.portId(),
-      lastInputPoint: { x: $event.clientX, y: $event.clientY },
-    });
+    this.linkingEventService.emitEnd($event, this.target(), this.portId());
+    this.cleanup();
+  };
 
+  private cleanup() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
-  };
+  }
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { AppMiddlewares, NgDiagramModelService, NgDiagramService } from '@angularflow/angular-adapter';
+import { NgDiagramSelectionService, NgDiagramService } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-toolbar',
@@ -9,8 +9,8 @@ import { AppMiddlewares, NgDiagramModelService, NgDiagramService } from '@angula
   styleUrl: './toolbar.component.scss',
 })
 export class ToolbarComponent {
-  private readonly ngDiagramService: NgDiagramService<AppMiddlewares> = inject(NgDiagramService<AppMiddlewares>);
-  private readonly ngDiagramModelService = inject(NgDiagramModelService);
+  private readonly ngDiagramService: NgDiagramService = inject(NgDiagramService);
+  private readonly ngDiagramSelectionService = inject(NgDiagramSelectionService);
 
   toggleDebugModeClick = output<void>();
 
@@ -19,15 +19,23 @@ export class ToolbarComponent {
   }
 
   onToggleGroupChildrenClick(): void {
-    const metadata = this.ngDiagramModelService.metadata();
+    const allowGroupAutoResize = this.ngDiagramService.getConfig().grouping?.allowGroupAutoResize;
+    const isEnabled = allowGroupAutoResize === undefined || allowGroupAutoResize === true;
 
-    const middlewaresConfig = metadata.middlewaresConfig as Record<string, { enabled: boolean }>;
+    this.ngDiagramService.updateConfig({ grouping: { allowGroupAutoResize: !isEnabled } });
+  }
 
-    const moveExtentEnabled = middlewaresConfig['group-children-move-extent'].enabled;
-    const changeExtentEnabled = middlewaresConfig['group-children-change-extent'].enabled;
+  onToggleDebugModeClick(): void {
+    const { debugMode } = this.ngDiagramService.getConfig();
 
-    // Toggle both middlewares
-    this.ngDiagramService.updateMiddlewareConfig('group-children-move-extent', { enabled: !moveExtentEnabled });
-    this.ngDiagramService.updateMiddlewareConfig('group-children-change-extent', { enabled: !changeExtentEnabled });
+    this.ngDiagramService.updateConfig({ debugMode: !debugMode });
+  }
+
+  onLinkCreationClick() {
+    const node = this.ngDiagramSelectionService.selection().nodes[0];
+    if (node) {
+      const port = node.measuredPorts?.find((p) => p.type === 'source' || p.type === 'both')?.id || 'port-right';
+      this.ngDiagramService.startLinking(node, port);
+    }
   }
 }

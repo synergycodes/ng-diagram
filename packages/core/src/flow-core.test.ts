@@ -4,12 +4,11 @@ import { FlowCore } from './flow-core';
 import { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockMetadata, mockNode } from './test-utils';
-import { MiddlewaresConfigFromMiddlewares } from './types';
 import { Edge } from './types/edge.interface';
 import type { EnvironmentInfo } from './types/environment.interface';
 import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
-import type { Middleware, MiddlewareChain } from './types/middleware.interface';
+import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
@@ -70,13 +69,13 @@ vi.mock('./model-lookup/model-lookup', () => ({
 }));
 
 describe('FlowCore', () => {
-  let flowCore: FlowCore<MiddlewareChain>;
-  let mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+  let flowCore: FlowCore;
+  let mockModelAdapter: ModelAdapter;
   let mockRenderer: Renderer;
   let mockDestroy: Mock;
   let mockGetNodes: Mock<() => Node[]>;
   let mockGetEdges: Mock<() => Edge[]>;
-  let mockGetMetadata: Mock<() => Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+  let mockGetMetadata: Mock<() => Metadata>;
   let mockEventRouter: InputEventsRouter;
   const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 

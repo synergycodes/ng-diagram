@@ -1,11 +1,11 @@
 import { inject } from '@angular/core';
-import { FlowCore, MiddlewareChain } from '@angularflow/core';
+import { FlowCore } from '@angularflow/core';
 import { FlowCoreProviderService } from '../services';
 
-export abstract class NgDiagramBaseService<TMiddlewares extends MiddlewareChain = []> {
-  protected readonly flowCoreProvider = inject(FlowCoreProviderService<TMiddlewares>);
+export abstract class NgDiagramBaseService {
+  protected readonly flowCoreProvider = inject(FlowCoreProviderService);
 
-  protected get flowCore(): FlowCore<TMiddlewares> {
+  protected get flowCore(): FlowCore {
     return this.flowCoreProvider.provide();
   }
 }

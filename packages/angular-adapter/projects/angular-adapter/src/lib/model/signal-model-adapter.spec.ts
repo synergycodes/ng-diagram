@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import type { Edge, Metadata, Node, Viewport } from '@angularflow/core';
+import type { Edge, Node, Viewport } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SignalModelAdapter } from './signal-model-adapter';
 
@@ -13,7 +13,6 @@ describe('SignalModelAdapter', () => {
 
   const mockEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2', type: 'default', data: {} }];
   const viewport: Viewport = { x: 0, y: 0, scale: 1 };
-  const middlewaresConfig: Metadata['middlewaresConfig'] = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -25,7 +24,7 @@ describe('SignalModelAdapter', () => {
   it('should initialize with empty state', () => {
     expect(service.getNodes()).toEqual([]);
     expect(service.getEdges()).toEqual([]);
-    expect(service.getMetadata()).toEqual({ viewport, middlewaresConfig });
+    expect(service.getMetadata()).toEqual({ viewport });
   });
 
   it('should set and get nodes', () => {

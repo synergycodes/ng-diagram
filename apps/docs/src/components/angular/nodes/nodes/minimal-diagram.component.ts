@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -17,7 +16,7 @@ import {
   `,
 })
 export class Diagram {
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     nodes: [
       {
         id: '1',

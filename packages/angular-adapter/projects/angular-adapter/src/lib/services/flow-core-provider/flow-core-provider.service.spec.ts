@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { FlowCore, Metadata, Middleware, MiddlewaresConfigFromMiddlewares, ModelAdapter } from '@angularflow/core';
+import { FlowCore, Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { detectEnvironment } from '../../utils/detect-environment';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
@@ -11,9 +11,9 @@ vi.mock('../../utils/detect-environment');
 describe('FlowCoreProviderService', () => {
   const mockMiddlewares: [Middleware<'test'>] = [{ name: 'test', execute: vi.fn() }] as unknown as [Middleware<'test'>];
   const mockOffset = () => ({ x: 0, y: 0 });
-  let service: FlowCoreProviderService<typeof mockMiddlewares>;
+  let service: FlowCoreProviderService;
 
-  const mockModelAdapter: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<typeof mockMiddlewares>>> = {
+  const mockModelAdapter: ModelAdapter = {
     destroy: vi.fn(),
     getNodes: vi.fn().mockReturnValue([]),
     getEdges: vi.fn().mockReturnValue([]),
@@ -41,13 +41,13 @@ describe('FlowCoreProviderService', () => {
 
   describe('init', () => {
     it('should create new FlowCore instance', () => {
-      service.init(mockModelAdapter, undefined, mockOffset);
+      service.init(mockModelAdapter, [], mockOffset);
 
       expect(service.provide()).toBeInstanceOf(FlowCore);
     });
 
     it('should call detectEnvironment method', () => {
-      service.init(mockModelAdapter, undefined, mockOffset);
+      service.init(mockModelAdapter, [], mockOffset);
 
       expect(detectEnvironment).toHaveBeenCalled();
     });
@@ -67,7 +67,7 @@ describe('FlowCoreProviderService', () => {
     });
 
     it('should return FlowCore instance when initialized', () => {
-      service.init(mockModelAdapter, undefined, mockOffset);
+      service.init(mockModelAdapter, [], mockOffset);
 
       const flowCore = service.provide();
 

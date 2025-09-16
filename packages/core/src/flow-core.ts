@@ -20,11 +20,8 @@ import type {
   FlowState,
   FlowStateUpdate,
   LooseAutocomplete,
-  Metadata,
   Middleware,
   MiddlewareChain,
-  MiddlewareConfigKeys,
-  MiddlewaresConfigFromMiddlewares,
   ModelActionType,
   ModelAdapter,
   Node,
@@ -37,19 +34,16 @@ import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
 import { deepMerge, Semaphore } from './utils';
 
-export class FlowCore<
-  TMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> = Metadata<
-    MiddlewaresConfigFromMiddlewares<TMiddlewares>
-  >,
-> {
-  private _model: ModelAdapter<TMetadata>;
+export class FlowCore {
+  private _model: ModelAdapter;
+  private _config: FlowConfig;
+
   private readonly initUpdater: InitUpdater;
   private readonly internalUpdater: InternalUpdater;
   private readonly updateSemaphore = new Semaphore(1);
 
   readonly commandHandler: CommandHandler;
-  readonly middlewareManager: MiddlewareManager<TMiddlewares, TMetadata>;
+  readonly middlewareManager: MiddlewareManager;
   readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
   readonly modelLookup: ModelLookup;
@@ -60,28 +54,26 @@ export class FlowCore<
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
 
-  readonly config: FlowConfig;
-
   readonly getFlowOffset: () => { x: number; y: number };
 
   constructor(
-    modelAdapter: ModelAdapter<TMetadata>,
+    modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
     public readonly inputEventsRouter: InputEventsRouter,
     environment: EnvironmentInfo,
-    middlewares?: TMiddlewares,
+    middlewares?: MiddlewareChain,
     getFlowOffset?: () => { x: number; y: number },
     config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
-    this.config = deepMerge(defaultFlowConfig, config);
+    this._config = deepMerge(defaultFlowConfig, config);
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.spatialHash = new SpatialHash();
     this.initUpdater = new InitUpdater(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
-    this.middlewareManager = new MiddlewareManager<TMiddlewares, TMetadata>(this, middlewares);
+    this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
@@ -123,7 +115,7 @@ export class FlowCore<
    * Sets the new model and runs the init process
    * @param model Model
    */
-  private set model(model: ModelAdapter<TMetadata>) {
+  private set model(model: ModelAdapter) {
     this._model = model;
     this.init();
   }
@@ -131,7 +123,7 @@ export class FlowCore<
   /**
    * Gets the current model that flow core is using
    */
-  get model(): ModelAdapter<TMetadata> {
+  get model(): ModelAdapter {
     return this._model;
   }
 
@@ -140,6 +132,14 @@ export class FlowCore<
    */
   getEnvironment(): EnvironmentInfo {
     return this.environment;
+  }
+
+  get config(): FlowConfig {
+    return this._config;
+  }
+
+  updateConfig(updatedConfig: DeepPartial<FlowConfig>) {
+    this._config = deepMerge(this._config, updatedConfig);
   }
 
   /**
@@ -155,26 +155,14 @@ export class FlowCore<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(name: MiddlewareConfigKeys<TMiddlewares>): void {
+  unregisterMiddleware(name: string): void {
     this.middlewareManager.unregister(name);
-  }
-
-  /**
-   * Updates the configuration of a middleware
-   * @param name Name of the middleware to update
-   * @param config Config of the middleware to update
-   */
-  updateMiddlewareConfig<TName extends MiddlewareConfigKeys<TMiddlewares>>(
-    name: TName,
-    config: TMetadata['middlewaresConfig'][TName]
-  ): void {
-    this.middlewareManager.applyMiddlewareConfig(name, config);
   }
 
   /**
    * Gets the current state of the flow
    */
-  getState(): FlowState<TMetadata> {
+  getState(): FlowState {
     return {
       nodes: this.model.getNodes(),
       edges: this.model.getEdges(),
@@ -186,7 +174,7 @@ export class FlowCore<
    * Sets the current state of the flow
    * @param state State to set
    */
-  setState(state: FlowState<TMetadata>): void {
+  setState(state: FlowState): void {
     this.model.updateNodes(state.nodes);
     this.model.updateEdges(state.edges);
     this.model.setMetadata(state.metadata);
@@ -415,13 +403,13 @@ export class FlowCore<
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).flowCore = this;
 
-      if (!this.middlewareManager.isRegistered(loggerMiddleware.name as MiddlewareConfigKeys<TMiddlewares>)) {
+      if (!this.middlewareManager.isRegistered(loggerMiddleware.name)) {
         this.registerMiddleware(loggerMiddleware);
       }
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).flowCore;
-      this.unregisterMiddleware(loggerMiddleware.name as MiddlewareConfigKeys<TMiddlewares>);
+      this.unregisterMiddleware(loggerMiddleware.name);
     }
   }
 }
