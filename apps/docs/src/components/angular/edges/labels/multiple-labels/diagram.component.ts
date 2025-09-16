@@ -6,7 +6,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
@@ -32,7 +31,7 @@ export class Diagram {
     ['multiple-labels', MultipleLabelsEdgeComponent],
   ]);
 
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.7 },
     },

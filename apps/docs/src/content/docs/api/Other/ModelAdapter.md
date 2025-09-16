@@ -7,12 +7,6 @@ title: "ModelAdapter"
 
 Interface for model adapters that handle the data management of a flow diagram
 
-## Type Parameters
-
-### TMetadata
-
-`TMetadata` *extends* [`Metadata`](/docs/api/other/metadata/) = [`Metadata`](/docs/api/other/metadata/)
-
 ## Methods
 
 ### destroy()
@@ -42,13 +36,13 @@ Get all edges in the model
 
 ### getMetadata()
 
-> **getMetadata**(): `TMetadata`
+> **getMetadata**(): [`Metadata`](/docs/api/other/metadata/)
 
 Get metadata associated with the model
 
 #### Returns
 
-`TMetadata`
+[`Metadata`](/docs/api/other/metadata/)
 
 ***
 
@@ -106,7 +100,7 @@ Set metadata for the model
 
 ##### metadata
 
-`TMetadata`
+[`Metadata`](/docs/api/other/metadata/)
 
 Metadata to set
 

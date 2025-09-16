@@ -1,30 +1,22 @@
 import { inject, Injectable, signal } from '@angular/core';
-import {
-  DeepPartial,
-  FlowConfig,
-  FlowCore,
-  Metadata,
-  MiddlewareChain,
-  MiddlewaresConfigFromMiddlewares,
-  ModelAdapter,
-} from '@angularflow/core';
+import { DeepPartial, FlowConfig, FlowCore, MiddlewareChain, ModelAdapter } from '@angularflow/core';
 
 import { detectEnvironment } from '../../utils/detect-environment';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
 import { RendererService } from '../renderer/renderer.service';
 
 @Injectable()
-export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> {
+export class FlowCoreProviderService {
   private readonly renderer = inject(RendererService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private flowCore: FlowCore<TMiddlewares> | null = null;
+  private flowCore: FlowCore | null = null;
   private _isInitialized = signal(false);
 
   readonly isInitialized = this._isInitialized.asReadonly();
 
   init(
-    model: ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>>>,
-    middlewares: TMiddlewares = [] as unknown as TMiddlewares,
+    model: ModelAdapter,
+    middlewares: MiddlewareChain,
     getFlowOffset: () => { x: number; y: number },
     config?: DeepPartial<FlowConfig>
   ): void {
@@ -48,7 +40,7 @@ export class FlowCoreProviderService<TMiddlewares extends MiddlewareChain = []> 
     }
   }
 
-  provide(): FlowCore<TMiddlewares> {
+  provide(): FlowCore {
     if (!this.flowCore) {
       throw new Error('FlowCore not initialized');
     }

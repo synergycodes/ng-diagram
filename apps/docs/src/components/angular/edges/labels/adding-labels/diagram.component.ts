@@ -6,7 +6,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   NgDiagramEdgeTemplateMap,
 } from '@angularflow/angular-adapter';
 import { LabelPanel } from './label-panel.component';
@@ -40,7 +39,7 @@ export class Diagram {
     ['modifiable-label', ModifiableLabelEdgeComponent],
   ]);
 
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.7 },
     },

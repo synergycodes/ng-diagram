@@ -1,11 +1,9 @@
 import { computed, inject } from '@angular/core';
-import { MiddlewareChain, Point } from '@angularflow/core';
+import { Point } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramModelService } from './ng-diagram-model.service';
 
-export class NgDiagramViewportService<
-  TMiddlewares extends MiddlewareChain = [],
-> extends NgDiagramBaseService<TMiddlewares> {
+export class NgDiagramViewportService extends NgDiagramBaseService {
   private readonly modelService = inject(NgDiagramModelService);
 
   // ===================

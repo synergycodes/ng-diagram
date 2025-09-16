@@ -5,11 +5,10 @@
       [edgeTemplateMap]="edgeTemplateMap"
       [model]="model"
       [config]="config"
-      [debugMode]="debugMode()"
     >
       <ng-diagram-background></ng-diagram-background>
     </ng-diagram>
-    <app-toolbar (toggleDebugModeClick)="debugMode.set(!debugMode())" />
+    <app-toolbar />
     <app-palette [model]="paletteModel" />
   </div>
 </ng-diagram-context>

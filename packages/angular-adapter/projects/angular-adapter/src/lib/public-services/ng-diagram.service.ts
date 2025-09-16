@@ -3,24 +3,16 @@ import {
   ActionState,
   EdgeRouting,
   EnvironmentInfo,
-  Metadata,
   Middleware,
-  MiddlewareChain,
-  MiddlewareConfigKeys,
-  MiddlewaresConfigFromMiddlewares,
   ModelActionType,
   TransactionCallback,
   TransactionResult,
 } from '@angularflow/core';
+import { NgDiagramConfig } from '../types';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramService<
-  TMiddlewares extends MiddlewareChain = [],
-  TMetadata extends Metadata<MiddlewaresConfigFromMiddlewares<TMiddlewares>> = Metadata<
-    MiddlewaresConfigFromMiddlewares<TMiddlewares>
-  >,
-> extends NgDiagramBaseService<TMiddlewares> {
+export class NgDiagramService extends NgDiagramBaseService {
   /**
    * Returns whether the diagram is initialized
    */
@@ -49,6 +41,24 @@ export class NgDiagramService<
   }
 
   /**
+   * Returns the current configuration (readonly).
+   * The returned object cannot be modified directly —
+   * use {@link updateConfig} to make changes.
+   */
+  getConfig(): Readonly<NgDiagramConfig> {
+    return this.flowCore.config;
+  }
+
+  /**
+   * Updates the current configuration.
+   *
+   * @param config Partial configuration object containing properties to update.
+   */
+  updateConfig(config: Partial<NgDiagramConfig>) {
+    this.flowCore.updateConfig(config);
+  }
+
+  /**
    * Registers a new middleware in the chain
    * @param middleware Middleware to register
    * @returns Function to unregister the middleware
@@ -61,20 +71,8 @@ export class NgDiagramService<
    * Unregister a middleware from the chain
    * @param name Name of the middleware to unregister
    */
-  unregisterMiddleware(name: MiddlewareConfigKeys<TMiddlewares>): void {
+  unregisterMiddleware(name: string): void {
     return this.flowCore.unregisterMiddleware(name);
-  }
-
-  /**
-   * Updates the configuration of a middleware
-   * @param name Name of the middleware to update
-   * @param config Config of the middleware to update
-   */
-  updateMiddlewareConfig<TName extends MiddlewareConfigKeys<TMiddlewares>>(
-    name: TName,
-    config: TMetadata['middlewaresConfig'][TName]
-  ) {
-    this.flowCore.updateMiddlewareConfig(name, config);
   }
 
   /**

@@ -2,16 +2,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EdgeRoutingManager } from '../../../../edge-routing-manager';
 import { mockEdge, mockMetadata, mockNode } from '../../../../test-utils';
-import type {
-  Edge,
-  FlowState,
-  Metadata,
-  MiddlewareContext,
-  MiddlewaresConfigFromMiddlewares,
-  Point,
-} from '../../../../types';
+import type { Edge, FlowState, MiddlewareContext, Point } from '../../../../types';
 import { DEFAULT_SELECTED_Z_INDEX } from '../../z-index-assignment/constants';
-import { edgesRoutingMiddleware, EdgesRoutingMiddlewareMetadata } from '../edges-routing';
+import { edgesRoutingMiddleware } from '../edges-routing';
 
 vi.mock('../get-edge-points', () => ({
   getEdgePoints: vi.fn().mockImplementation((edge) => {
@@ -29,7 +22,7 @@ vi.mock('../../../../utils', () => ({
 
 describe('Edges Routing Middleware', () => {
   let initialState: FlowState;
-  let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>, EdgesRoutingMiddlewareMetadata>;
+  let context: MiddlewareContext;
   const nextMock = vi.fn();
   const anyEdgesAddedMock = vi.fn();
   const checkIfAnyNodePropsChangedMock = vi.fn();
@@ -87,27 +80,15 @@ describe('Edges Routing Middleware', () => {
       },
       history: [],
       initialUpdate: {},
-      middlewareMetadata: {
-        enabled: true,
-        temporaryEdgeZIndex: DEFAULT_SELECTED_Z_INDEX,
+      config: {
+        zIndex: {
+          temporaryEdgeZIndex: DEFAULT_SELECTED_Z_INDEX,
+        },
       },
-    } as unknown as MiddlewareContext<
-      [],
-      Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
-      EdgesRoutingMiddlewareMetadata
-    >;
+    } as unknown as MiddlewareContext;
   });
 
   describe('Middleware Execution Control', () => {
-    it('should exit early when middleware is disabled', () => {
-      context.middlewareMetadata.enabled = false;
-
-      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
-
-      expect(nextMock).toHaveBeenCalledWith();
-      expect(checkIfAnyNodePropsChangedMock).not.toHaveBeenCalled();
-    });
-
     it('should exit when no routing is needed', () => {
       anyEdgesAddedMock.mockReturnValue(false);
       checkIfAnyNodePropsChangedMock.mockReturnValue(false);
@@ -415,7 +396,7 @@ describe('Edges Routing Middleware', () => {
 
     it('should use custom temporary edge z-index when provided', () => {
       const customZIndex = 9999;
-      context.middlewareMetadata.temporaryEdgeZIndex = customZIndex;
+      context.config.zIndex.temporaryEdgeZIndex = customZIndex;
 
       const temporaryEdge = {
         ...mockEdge,

@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { MiddlewareChain, Node, Point, Port } from '@angularflow/core';
+import { Node, Point, Port } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramNodeService<
-  TMiddlewares extends MiddlewareChain = [],
-> extends NgDiagramBaseService<TMiddlewares> {
+export class NgDiagramNodeService extends NgDiagramBaseService {
   // ===================
   // ADD METHODS
   // ===================

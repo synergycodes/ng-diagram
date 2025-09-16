@@ -1,11 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  Metadata,
-  Middleware,
-  MiddlewareChain,
-  MiddlewaresConfigFromMiddlewares,
-  ModelAdapter,
-} from '@angularflow/core';
+import { Middleware, ModelAdapter } from '@angularflow/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -19,10 +13,8 @@ import { InputEventsRouterService } from '../../services/input-events/input-even
 import { NgDiagramComponent } from './ng-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
-  let component: NgDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>;
-  let fixture: ComponentFixture<
-    NgDiagramComponent<MiddlewareChain, ModelAdapter<Metadata<MiddlewaresConfigFromMiddlewares<[]>>>>
-  >;
+  let component: NgDiagramComponent;
+  let fixture: ComponentFixture<NgDiagramComponent>;
   const mockModel: ModelAdapter = {
     destroy: vi.fn(),
     getNodes: vi.fn(),
@@ -63,7 +55,15 @@ describe('AngularAdapterDiagramComponent', () => {
           useValue: {
             init: vi.fn(),
             destroy: vi.fn(),
-            provide: vi.fn(),
+            provide: vi.fn().mockReturnValue({
+              getState: vi.fn().mockReturnValue({
+                metadata: {
+                  viewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+                },
+              }),
+              applyUpdate: vi.fn(),
+            }),
+            isInitialized: vi.fn().mockReturnValue(true),
           },
         },
         {

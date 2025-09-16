@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
   type NgDiagramPaletteItem,
 } from '@angularflow/angular-adapter';
 import { Palette } from './palette.component';
@@ -33,7 +32,7 @@ export class NgDiagramComponentContainer {
     { data: { label: 'Default Group' }, resizable: true, isGroup: true },
   ];
 
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: {
         x: 272,

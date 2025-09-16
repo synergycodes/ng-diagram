@@ -4,11 +4,6 @@ import { isSamePoint } from '../../../utils';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getEdgePoints } from './get-edge-points';
 
-export interface EdgesRoutingMiddlewareMetadata {
-  enabled: boolean;
-  temporaryEdgeZIndex: number;
-}
-
 /**
  * Determines if edges should be re-routed based on changes in the flow state.
  */
@@ -170,12 +165,8 @@ export const createUpdatedTemporaryEdge = (
   };
 };
 
-export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMiddlewareMetadata> = {
+export const edgesRoutingMiddleware: Middleware = {
   name: 'edges-routing',
-  defaultMetadata: {
-    enabled: true,
-    temporaryEdgeZIndex: DEFAULT_SELECTED_Z_INDEX,
-  },
   execute: (context, next) => {
     const {
       state: { edges },
@@ -184,15 +175,10 @@ export const edgesRoutingMiddleware: Middleware<'edges-routing', EdgesRoutingMid
       actionStateManager,
       helpers,
       modelActionType,
-      middlewareMetadata,
+      config: { zIndex },
     } = context;
 
-    if (!middlewareMetadata.enabled) {
-      next();
-      return;
-    }
-
-    const temporaryEdgeZIndex = middlewareMetadata.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
+    const temporaryEdgeZIndex = zIndex.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
 
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
     const temporaryEdge = actionStateManager.linking?.temporaryEdge;
