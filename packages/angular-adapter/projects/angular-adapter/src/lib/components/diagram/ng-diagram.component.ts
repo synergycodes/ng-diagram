@@ -115,17 +115,17 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   viewport = this.renderer.viewport;
 
   /**
-   * Event emitted when the diagram is initialized
+   * Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
    */
   @Output() diagramInit = new EventEmitter<DiagramInitEvent>();
 
   /**
-   * Event emitted when the diagram is initialized
+   * Event emitted when a user manually draws an edge between two nodes
    */
   @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
 
   /**
-   * Event emitted when selected objects are moved
+   * Event emitted when selected nodes are moved
    */
   @Output() selectionMoved = new EventEmitter<SelectionMovedEvent>();
 

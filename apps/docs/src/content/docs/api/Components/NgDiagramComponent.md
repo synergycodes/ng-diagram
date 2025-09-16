@@ -24,17 +24,17 @@ Global configuration options for the diagram.
 
 ### diagramInit
 
-> **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/other/diagraminitevent/)\>
+> **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/types/diagraminitevent/)\>
 
-Event emitted when the diagram is initialized
+Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
 
 ***
 
 ### edgeDrawn
 
-> **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/other/edgedrawnevent/)\>
+> **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/types/edgedrawnevent/)\>
 
-Event emitted when the diagram is initialized
+Event emitted when a user manually draws an edge between two nodes
 
 ***
 
@@ -78,7 +78,7 @@ The node template map to use for the diagram.
 
 ### selectionChanged
 
-> **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/other/selectionchangedevent/)\>
+> **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/types/selectionchangedevent/)\>
 
 Event emitted when selection changes
 
@@ -86,15 +86,15 @@ Event emitted when selection changes
 
 ### selectionMoved
 
-> **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/other/selectionmovedevent/)\>
+> **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)\>
 
-Event emitted when selected objects are moved
+Event emitted when selected nodes are moved
 
 ***
 
 ### viewportChanged
 
-> **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/other/viewportchangedevent/)\>
+> **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/viewportchangedevent/)\>
 
 Event emitted when viewport changes (pan/zoom)
 
