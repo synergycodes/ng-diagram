@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import {
-  AppMiddlewares,
-  NgDiagramModelService,
-  NgDiagramSelectionService,
-  NgDiagramService,
-} from '@angularflow/angular-adapter';
+import { NgDiagramSelectionService, NgDiagramService } from '@angularflow/angular-adapter';
 
 @Component({
   selector: 'app-toolbar',
