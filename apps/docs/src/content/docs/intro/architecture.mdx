@@ -20,9 +20,13 @@ The user-facing components that render the diagram and handle user interactions:
 
 Specialized services provide different levels of control and functionality:
 
-- **NgDiagramService**: Provides advanced control and middleware management. It gives you access to the command system for programmatic control, middleware registration and configuration, transaction handling for atomic operations, and access to action state
-- **NgDiagramModelService**: Handles model-specific operations and spatial queries. It provides methods for updating node and edge data, finding elements by ID, performing spatial queries to find nearby nodes and ports, and accessing the underlying model adapter
-- **NgDiagramViewportService**: Manages viewport and scale operations. It provides reactive signals for the current viewport position and zoom scale, enabling components to reactively respond to viewport changes
+- **NgDiagramService**: Core service providing middleware management, routing management, and transaction handling
+- **NgDiagramModelService**: Handles model operations including node/edge updates, spatial queries, and data access
+- **NgDiagramViewportService**: Manages viewport state with reactive signals for position, scale, and coordinate transformations
+- **NgDiagramSelectionService**: Manages selection state with methods for selecting/deselecting nodes and edges
+- **NgDiagramNodeService**: Provides node-specific operations
+- **NgDiagramEdgeService**: Handles edge-specific operations
+- **NgDiagramClipboardService**: Manages copy/paste operations for diagram elements
 
 All services are scoped within `ng-diagram-context`, enabling multiple diagrams on the same page with isolated state and behavior.
 

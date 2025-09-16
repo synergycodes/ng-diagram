@@ -1,0 +1,385 @@
+---
+title: Services
+description: Comprehensive guide to ngDiagram services and their usage
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+ngDiagram provides a rich set of injectable services that give you programmatic control over different aspects of your diagram. These services are designed with specific responsibilities and can be combined to build powerful diagram interactions.
+
+<Aside type="tip">
+  All ngDiagram services are scoped within `ng-diagram-context`, which means you can have multiple diagrams on the same
+  page with completely isolated state and behavior.
+</Aside>
+
+## Core Services
+
+### NgDiagramService
+
+The main orchestration service that provides access to the action state and middleware management. This is your gateway to advanced diagram control.
+
+**Key Capabilities:**
+
+- Manage middleware registration and configuration
+- Access action state and environment information
+- Manage edges routing
+
+**Usage Example:**
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { NgDiagramService } from '@angularflow/angular-adapter';
+
+@Component({
+  selector: 'app-toolbar',
+  template: `
+    <button (click)="applyTreeLayout()">Tree Layout</button>
+    <button (click)="toggleMiddleware()">Toggle Feature</button>
+  `,
+})
+export class ToolbarComponent {
+  private diagramService = inject(NgDiagramService);
+
+  applyTreeLayout() {
+    // Execute layout command
+    this.diagramService.layout('tree');
+  }
+
+  toggleMiddleware() {
+    // Update configuration
+    this.diagramService.updateConfig({ zIndex: { enabled: true } });
+  }
+}
+```
+
+### NgDiagramModelService
+
+Handles all model-related operations including node and edge updates, spatial queries, and direct access to the underlying data model.
+
+**Key Capabilities:**
+
+- Update node and edge data
+- Perform spatial queries to find nearby elements
+- Access nodes, edges, and metadata as reactive signals
+- Find elements by ID
+
+**Usage Example:**
+
+```typescript
+import { Component, inject, computed } from '@angular/core';
+import { NgDiagramModelService } from '@angularflow/angular-adapter';
+
+@Component({
+  selector: 'app-properties-panel',
+  template: `
+    <div *ngIf="hasNodes()">
+      <p>Total nodes: {{ nodeCount() }}</p>
+      <p>Total edges: {{ edgeCount() }}</p>
+
+      <button (click)="updateSelectedNode()">Update Node</button>
+      <button (click)="findNearbyNodes()">Find Nearby</button>
+    </div>
+  `,
+})
+export class PropertiesPanelComponent {
+  private modelService = inject(NgDiagramModelService);
+
+  // Reactive access to model data
+  nodes = this.modelService.nodes;
+  edges = this.modelService.edges;
+  metadata = this.modelService.metadata;
+
+  // Computed signals
+  nodeCount = computed(() => this.nodes().length);
+  edgeCount = computed(() => this.edges().length);
+  hasNodes = computed(() => this.nodeCount() > 0);
+
+  updateSelectedNode() {
+    // Update node data
+    this.modelService.updateNodeData('node-1', {
+      label: 'Updated Label',
+      color: '#ff0000',
+    });
+
+    // Update node properties
+    this.modelService.updateNode('node-1', {
+      x: 150,
+      y: 200,
+      width: 120,
+      height: 80,
+    });
+  }
+
+  findNearbyNodes() {
+    // Spatial query to find nodes near a point
+    const nearbyNodes = this.modelService.getNodesInRange(
+      { x: 100, y: 100 },
+      150 // range in pixels
+    );
+
+    console.log('Found nearby nodes:', nearbyNodes);
+  }
+}
+```
+
+### NgDiagramViewportService
+
+Manages viewport operations, coordinate transformations, and provides reactive access to zoom and pan state.
+
+**Key Capabilities:**
+
+- Reactive viewport position and scale signals
+- Convert between client and flow coordinates
+- Programmatic zoom and pan operations
+
+**Usage Example:**
+
+```typescript
+import { Component, inject, computed } from '@angular/core';
+import { NgDiagramViewportService } from '@angularflow/angular-adapter';
+
+@Component({
+  selector: 'app-viewport-controls',
+  template: `
+    <div class="viewport-info">
+      <p>Zoom: {{ zoomPercentage() }}%</p>
+      <p>Position: {{ position() }}</p>
+    </div>
+
+    <div class="controls">
+      <button (click)="zoomIn()">Zoom In</button>
+      <button (click)="zoomOut()">Zoom Out</button>
+      <button (click)="centerView()">Center</button>
+      <button (click)="resetZoom()">Reset Zoom</button>
+    </div>
+  `,
+})
+export class ViewportControlsComponent {
+  private viewportService = inject(NgDiagramViewportService);
+
+  // Reactive viewport data
+  viewport = this.viewportService.viewport;
+  scale = this.viewportService.scale;
+
+  // Computed values for display
+  zoomPercentage = computed(() => Math.round(this.scale() * 100));
+  position = computed(() => {
+    const vp = this.viewport();
+    return `(${Math.round(vp.x)}, ${Math.round(vp.y)})`;
+  });
+
+  zoomIn() {
+    const currentScale = this.scale();
+    this.viewportService.zoom(currentScale * 1.2);
+  }
+
+  zoomOut() {
+    const currentScale = this.scale();
+    this.viewportService.zoom(currentScale * 0.8);
+  }
+
+  centerView() {
+    this.viewportService.moveViewport(0, 0);
+  }
+
+  resetZoom() {
+    this.viewportService.zoom(1);
+  }
+
+  // Coordinate conversion examples
+  onMouseClick(event: MouseEvent) {
+    // Convert click position to diagram coordinates
+    const flowPosition = this.viewportService.clientToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    console.log('Clicked at diagram position:', flowPosition);
+  }
+}
+```
+
+## Selection and Interaction Services
+
+### NgDiagramSelectionService
+
+Manages the selection state of nodes and edges, providing both reactive access to current selection and methods to modify it.
+
+**Key Capabilities:**
+
+- Reactive selection state with nodes and edges
+- Select/deselect individual or multiple elements
+- Clear all selections
+
+**Usage Example:**
+
+```typescript
+import { Component, inject, computed } from '@angular/core';
+import { NgDiagramSelectionService } from '@angularflow/angular-adapter';
+
+@Component({
+  selector: 'app-selection-toolbar',
+  template: `
+    <div class="selection-info">
+      <p>Selected: {{ selectionSummary() }}</p>
+    </div>
+
+    <div class="actions" *ngIf="hasSelection()">
+      <button (click)="selectAll()">Select All</button>
+      <button (click)="clearSelection()">Clear Selection</button>
+      <button (click)="deleteSelected()">Delete Selected</button>
+    </div>
+  `,
+})
+export class SelectionToolbarComponent {
+  private selectionService = inject(NgDiagramSelectionService);
+  private modelService = inject(NgDiagramModelService);
+
+  // Reactive selection data
+  selection = this.selectionService.selection;
+
+  // Computed selection info
+  hasSelection = computed(() => {
+    const sel = this.selection();
+    return sel.nodes.length > 0 || sel.edges.length > 0;
+  });
+
+  selectionSummary = computed(() => {
+    const sel = this.selection();
+    return `${sel.nodes.length} nodes, ${sel.edges.length} edges`;
+  });
+
+  selectAll() {
+    // Select specific nodes and edges
+    this.selectionService.select(['node-1', 'node-2'], ['edge-1']);
+  }
+
+  clearSelection() {
+    this.selectionService.deselectAll();
+  }
+
+  deleteSelected() {
+    // Delete all currently selected elements
+    this.selectionService.deleteSelection();
+  }
+
+  // Programmatic selection based on criteria
+  selectByType(nodeType: string) {
+    const nodes = this.modelService.nodes();
+    const matchingIds = nodes.filter((node) => node.data?.type === nodeType).map((node) => node.id);
+
+    this.selectionService.select(matchingIds);
+  }
+}
+```
+
+### NgDiagramClipboardService
+
+Handles copy, cut, and paste operations for diagram elements with support for position-aware pasting.
+
+**Key Capabilities:**
+
+- Copy selected elements to clipboard
+- Cut elements (copy + delete)
+- Paste elements at specific positions
+
+**Usage Example:**
+
+```typescript
+import { Component, inject, input } from '@angular/core';
+import { NgDiagramClipboardService, NgDiagramViewportService } from '@angularflow/angular-adapter';
+
+@Component({
+  selector: 'app-context-menu',
+  template: `
+    <div class="context-menu" [style.left]="menuPosition.x + 'px'" [style.top]="menuPosition.y + 'px'">
+      <button (click)="copy()">Copy</button>
+      <button (click)="cut()">Cut</button>
+      <button (click)="paste($event)">Paste</button>
+    </div>
+  `,
+})
+export class ContextMenuComponent {
+  private clipboardService = inject(NgDiagramClipboardService);
+  private viewportService = inject(NgDiagramViewportService);
+
+  menuPosition = input.required<{ x: number; y: number }>();
+
+  copy() {
+    this.clipboardService.copy();
+    this.closeMenu();
+  }
+
+  cut() {
+    this.clipboardService.cut();
+    this.closeMenu();
+  }
+
+  paste(event: MouseEvent) {
+    // Convert mouse position to diagram coordinates
+    const position = this.viewportService.clientToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    // Paste at the clicked position
+    this.clipboardService.paste(position);
+    this.closeMenu();
+  }
+
+  private closeMenu() {
+    // Close menu logic
+  }
+}
+```
+
+## Specialized Services
+
+### NgDiagramNodeService
+
+Provides node-specific operations with focus on transformations.
+
+**Key Capabilities:**
+
+- Node-specific transformations
+
+**Usage Example:**
+
+```typescript
+import { Component, inject, input } from '@angular/core';
+import { NgDiagramNodeService } from '@angularflow/angular-adapter';
+
+@Component({
+  selector: 'app-custom-node',
+  template: `
+    <div class="node-content" (click)="handleClick()" (dblclick)="handleDoubleClick()">
+      <h3>{{ node().data?.title }}</h3>
+      <div class="ports">
+        <div *ngFor="let port of node().ports" [id]="port.id" class="port"></div>
+      </div>
+    </div>
+  `,
+})
+export class CustomNodeComponent {
+  private nodeService = inject(NgDiagramNodeService);
+
+  node = input.required<Node>();
+
+  handleClick() {
+    // Bring node to front when clicked
+    this.nodeService.bringToFront([this.node().id]);
+  }
+
+  handleDoubleClick() {
+    // Rotate node on double click
+    this.nodeService.rotateNodeTo(this.node().id, 45);
+  }
+
+  onResize(newSize: { width: number; height: number }) {
+    // Handle node resizing
+    this.nodeService.resizeNode(this.node().id, newSize);
+  }
+}
+```
