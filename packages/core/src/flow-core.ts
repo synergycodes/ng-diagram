@@ -4,6 +4,7 @@ import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
+import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -54,6 +55,7 @@ export class FlowCore<
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
+  readonly labelBatchProcessor: LabelBatchProcessor;
   readonly actionStateManager: ActionStateManager;
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
@@ -83,6 +85,7 @@ export class FlowCore<
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
+    this.labelBatchProcessor = new LabelBatchProcessor();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
