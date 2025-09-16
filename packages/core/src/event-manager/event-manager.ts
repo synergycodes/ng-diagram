@@ -5,12 +5,18 @@ interface ListenerEntry {
   once: boolean;
 }
 
+interface DeferredEmit {
+  event: keyof DiagramEventMap;
+  payload: DiagramEventMap[keyof DiagramEventMap];
+}
+
 /**
  * Manages event subscriptions and emissions for the diagram
  */
 export class EventManager {
   private listeners = new Map<keyof DiagramEventMap, Set<ListenerEntry>>();
   private enabled = true;
+  private deferredEmits: DeferredEmit[] = [];
 
   /**
    * Subscribe to an event
@@ -89,6 +95,22 @@ export class EventManager {
   }
 
   /**
+   * Queue an event to be emitted later
+   * @param event The event name
+   * @param payload The event payload
+   */
+  deferredEmit<K extends keyof DiagramEventMap>(event: K, payload: DiagramEventMap[K]): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.deferredEmits.push({
+      event,
+      payload: payload as DiagramEventMap[keyof DiagramEventMap],
+    });
+  }
+
+  /**
    * Remove all listeners for an event, or a specific listener
    * @param event The event name
    * @param callback Optional specific callback to remove
@@ -138,6 +160,25 @@ export class EventManager {
    */
   hasListeners(event: keyof DiagramEventMap): boolean {
     return this.listeners.has(event) && this.listeners.get(event)!.size > 0;
+  }
+
+  /**
+   * Flush all deferred emits
+   */
+  flushDeferredEmits(): void {
+    const emitsToFlush = [...this.deferredEmits];
+    this.deferredEmits = [];
+
+    for (const { event, payload } of emitsToFlush) {
+      this.emit(event, payload);
+    }
+  }
+
+  /**
+   * Clear all deferred emits without executing them
+   */
+  clearDeferredEmits(): void {
+    this.deferredEmits = [];
   }
 
   private removeListener<K extends keyof DiagramEventMap>(event: K, entry: ListenerEntry): void {

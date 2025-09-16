@@ -30,7 +30,7 @@ export class SelectionMovedEmitter implements EventEmitter {
     const event: SelectionMovedEvent = {
       nodes: movedNodes,
     };
-    eventManager.emit('selectionMoved', event);
+    eventManager.deferredEmit('selectionMoved', event);
   }
 
   private collectUpdatedNodeIds(

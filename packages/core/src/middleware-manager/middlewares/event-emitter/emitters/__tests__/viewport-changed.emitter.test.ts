@@ -32,7 +32,7 @@ describe('ViewportChangedEmitter', () => {
     emitter = new ViewportChangedEmitter();
     emitSpy = vi.fn();
     eventManager = {
-      emit: emitSpy,
+      deferredEmit: emitSpy,
     } as unknown as EventManager;
 
     const initialViewport = createViewport(0, 0, 1);

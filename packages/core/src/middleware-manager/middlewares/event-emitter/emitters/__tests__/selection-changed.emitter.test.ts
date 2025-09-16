@@ -15,7 +15,7 @@ describe('SelectionChangedEmitter', () => {
     emitter = new SelectionChangedEmitter();
     emitSpy = vi.fn();
     eventManager = {
-      emit: emitSpy,
+      deferredEmit: emitSpy,
     } as unknown as EventManager;
 
     context = {

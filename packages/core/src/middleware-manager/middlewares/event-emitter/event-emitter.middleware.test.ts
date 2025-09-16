@@ -15,6 +15,9 @@ describe('EventEmitterMiddleware', () => {
     eventManager = {
       isEnabled: vi.fn().mockReturnValue(true),
       emit: vi.fn(),
+      deferredEmit: vi.fn(),
+      flushDeferredEmits: vi.fn(),
+      clearDeferredEmits: vi.fn(),
       on: vi.fn(),
       once: vi.fn(),
       off: vi.fn(),
@@ -66,8 +69,8 @@ describe('EventEmitterMiddleware', () => {
       callOrder.push('next');
     });
 
-    (eventManager.emit as ReturnType<typeof vi.fn>).mockImplementation(() => {
-      callOrder.push('emit');
+    (eventManager.deferredEmit as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      callOrder.push('deferredEmit');
     });
 
     middleware.execute(context, nextMock, vi.fn());
@@ -83,7 +86,7 @@ describe('EventEmitterMiddleware', () => {
     middleware.execute(context, nextMock, vi.fn());
 
     expect(nextMock).toHaveBeenCalled();
-    expect(eventManager.emit).not.toHaveBeenCalled();
+    expect(eventManager.deferredEmit).not.toHaveBeenCalled();
   });
 
   it('should process all emitters when event manager is enabled', () => {
@@ -96,7 +99,7 @@ describe('EventEmitterMiddleware', () => {
 
     expect(nextMock).toHaveBeenCalled();
     // DiagramInitEmitter should emit for empty diagram
-    expect(eventManager.emit).toHaveBeenCalled();
+    expect(eventManager.deferredEmit).toHaveBeenCalled();
   });
 
   it('should handle viewport change events', () => {
@@ -108,7 +111,7 @@ describe('EventEmitterMiddleware', () => {
 
     middleware.execute(context, nextMock, vi.fn());
 
-    expect(eventManager.emit).toHaveBeenCalledWith('viewportChanged', {
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('viewportChanged', {
       viewport: context.state.metadata.viewport,
       previousViewport: context.initialState.metadata.viewport,
     });
@@ -128,7 +131,7 @@ describe('EventEmitterMiddleware', () => {
 
     middleware.execute(context, nextMock, vi.fn());
 
-    expect(eventManager.emit).toHaveBeenCalledWith('selectionChanged', {
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('selectionChanged', {
       selectedNodes: [node2],
       selectedEdges: [],
       previousNodes: [],
@@ -152,7 +155,7 @@ describe('EventEmitterMiddleware', () => {
 
     middleware.execute(context, nextMock, vi.fn());
 
-    expect(eventManager.emit).toHaveBeenCalledWith('selectionMoved', {
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('selectionMoved', {
       nodes: [movedNode],
     });
   });
@@ -173,7 +176,7 @@ describe('EventEmitterMiddleware', () => {
 
     middleware.execute(context, nextMock, vi.fn());
 
-    expect(eventManager.emit).toHaveBeenCalledWith('edgeDrawn', {
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('edgeDrawn', {
       edge,
       source: sourceNode,
       target: targetNode,
@@ -216,7 +219,7 @@ describe('EventEmitterMiddleware', () => {
     middleware.execute(context, nextMock, vi.fn());
 
     // Should still emit viewport change even if selection change emitter fails
-    expect(eventManager.emit).toHaveBeenCalledWith('viewportChanged', expect.any(Object));
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('viewportChanged', expect.any(Object));
     expect(consoleErrorSpy).toHaveBeenCalled();
   });
 
@@ -232,18 +235,18 @@ describe('EventEmitterMiddleware', () => {
 
     expect(nextMock).toHaveBeenCalled();
     // No events should be emitted for unchanged viewport
-    expect(eventManager.emit).not.toHaveBeenCalledWith('viewportChanged', expect.any(Object));
+    expect(eventManager.deferredEmit).not.toHaveBeenCalledWith('viewportChanged', expect.any(Object));
   });
 
   it('should create independent middleware instances', () => {
     const eventManager1 = {
       ...eventManager,
-      emit: vi.fn(),
+      deferredEmit: vi.fn(),
     } as unknown as EventManager;
 
     const eventManager2 = {
       ...eventManager,
-      emit: vi.fn(),
+      deferredEmit: vi.fn(),
     } as unknown as EventManager;
 
     const middleware1 = createEventEmitterMiddleware(eventManager1);
@@ -254,9 +257,9 @@ describe('EventEmitterMiddleware', () => {
     middleware1.execute(context, nextMock, vi.fn());
     middleware2.execute(context, nextMock, vi.fn());
 
-    expect(eventManager1.emit).toHaveBeenCalled();
-    expect(eventManager2.emit).toHaveBeenCalled();
-    expect(eventManager1.emit).not.toBe(eventManager2.emit);
+    expect(eventManager1.deferredEmit).toHaveBeenCalled();
+    expect(eventManager2.deferredEmit).toHaveBeenCalled();
+    expect(eventManager1.deferredEmit).not.toBe(eventManager2.deferredEmit);
   });
 
   it('should handle complex state transitions', () => {
@@ -284,7 +287,7 @@ describe('EventEmitterMiddleware', () => {
     middleware.execute(context, nextMock, vi.fn());
 
     // Should emit both selection change and viewport change
-    expect(eventManager.emit).toHaveBeenCalledWith('selectionChanged', expect.any(Object));
-    expect(eventManager.emit).toHaveBeenCalledWith('viewportChanged', expect.any(Object));
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('selectionChanged', expect.any(Object));
+    expect(eventManager.deferredEmit).toHaveBeenCalledWith('viewportChanged', expect.any(Object));
   });
 });

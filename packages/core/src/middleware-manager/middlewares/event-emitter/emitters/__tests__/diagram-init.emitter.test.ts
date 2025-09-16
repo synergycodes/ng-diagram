@@ -15,7 +15,7 @@ describe('DiagramInitEmitter', () => {
     emitter = new DiagramInitEmitter();
     emitSpy = vi.fn();
     eventManager = {
-      emit: emitSpy,
+      deferredEmit: emitSpy,
     } as unknown as EventManager;
 
     context = {

@@ -257,6 +257,9 @@ export class FlowCore {
 
       if (finalState) {
         this.setState(finalState);
+        this.eventManager.flushDeferredEmits();
+      } else {
+        this.eventManager.clearDeferredEmits();
       }
     } finally {
       // Always release the semaphore, even if an error occurs

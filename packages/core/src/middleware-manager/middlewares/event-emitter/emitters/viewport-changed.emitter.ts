@@ -22,7 +22,7 @@ export class ViewportChangedEmitter implements EventEmitter {
         viewport: currViewport,
         previousViewport: prevViewport,
       };
-      eventManager.emit('viewportChanged', event);
+      eventManager.deferredEmit('viewportChanged', event);
     }
   }
 }

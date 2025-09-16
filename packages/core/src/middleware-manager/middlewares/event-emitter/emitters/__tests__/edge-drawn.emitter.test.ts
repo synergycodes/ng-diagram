@@ -18,7 +18,7 @@ describe('EdgeDrawnEmitter', () => {
     emitter = new EdgeDrawnEmitter();
     emitSpy = vi.fn();
     eventManager = {
-      emit: emitSpy,
+      deferredEmit: emitSpy,
     } as unknown as EventManager;
 
     helpers = {

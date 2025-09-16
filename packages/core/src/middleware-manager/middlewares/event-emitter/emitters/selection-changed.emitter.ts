@@ -35,7 +35,7 @@ export class SelectionChangedEmitter implements EventEmitter {
         previousNodes: prevSelectedNodes,
         previousEdges: prevSelectedEdges,
       };
-      eventManager.emit('selectionChanged', event);
+      eventManager.deferredEmit('selectionChanged', event);
     }
   }
 

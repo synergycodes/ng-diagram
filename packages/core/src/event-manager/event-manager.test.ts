@@ -329,6 +329,150 @@ describe('EventManager', () => {
     });
   });
 
+  describe('deferredEmit() / flushDeferredEmits() / clearDeferredEmits()', () => {
+    it('should queue events and flush them later', () => {
+      const callback = vi.fn();
+      eventManager.on('selectionMoved', callback);
+
+      const event1: SelectionMovedEvent = {
+        nodes: [{ id: 'n1', position: { x: 10, y: 10 }, data: {} }],
+      };
+      const event2: SelectionMovedEvent = {
+        nodes: [{ id: 'n2', position: { x: 20, y: 20 }, data: {} }],
+      };
+
+      eventManager.deferredEmit('selectionMoved', event1);
+      eventManager.deferredEmit('selectionMoved', event2);
+
+      expect(callback).not.toHaveBeenCalled();
+
+      eventManager.flushDeferredEmits();
+
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenNthCalledWith(1, event1);
+      expect(callback).toHaveBeenNthCalledWith(2, event2);
+    });
+
+    it('should queue different event types', () => {
+      const moveCallback = vi.fn();
+      const initCallback = vi.fn();
+
+      eventManager.on('selectionMoved', moveCallback);
+      eventManager.on('diagramInit', initCallback);
+
+      const moveEvent: SelectionMovedEvent = {
+        nodes: [],
+      };
+      const initEvent: DiagramInitEvent = {
+        nodes: [],
+        edges: [],
+        viewport: { x: 0, y: 0, scale: 1 },
+      };
+
+      eventManager.deferredEmit('selectionMoved', moveEvent);
+      eventManager.deferredEmit('diagramInit', initEvent);
+
+      expect(moveCallback).not.toHaveBeenCalled();
+      expect(initCallback).not.toHaveBeenCalled();
+
+      eventManager.flushDeferredEmits();
+
+      expect(moveCallback).toHaveBeenCalledWith(moveEvent);
+      expect(initCallback).toHaveBeenCalledWith(initEvent);
+    });
+
+    it('should clear deferred emits after flushing', () => {
+      const callback = vi.fn();
+      eventManager.on('selectionMoved', callback);
+
+      const event: SelectionMovedEvent = {
+        nodes: [],
+      };
+
+      eventManager.deferredEmit('selectionMoved', event);
+      eventManager.flushDeferredEmits();
+
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      eventManager.flushDeferredEmits();
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should clear deferred emits without executing them', () => {
+      const callback = vi.fn();
+      eventManager.on('selectionMoved', callback);
+
+      const event: SelectionMovedEvent = {
+        nodes: [],
+      };
+
+      eventManager.deferredEmit('selectionMoved', event);
+      eventManager.clearDeferredEmits();
+
+      expect(callback).not.toHaveBeenCalled();
+
+      eventManager.flushDeferredEmits();
+      expect(callback).not.toHaveBeenCalled();
+    });
+
+    it('should not queue events when disabled', () => {
+      const callback = vi.fn();
+      eventManager.on('selectionMoved', callback);
+
+      eventManager.setEnabled(false);
+
+      const event: SelectionMovedEvent = {
+        nodes: [],
+      };
+
+      eventManager.deferredEmit('selectionMoved', event);
+      eventManager.setEnabled(true);
+      eventManager.flushDeferredEmits();
+
+      expect(callback).not.toHaveBeenCalled();
+    });
+
+    it('should maintain order of deferred emits', () => {
+      const callback = vi.fn();
+      eventManager.on('selectionMoved', callback);
+
+      const events = Array.from({ length: 5 }, (_, i) => ({
+        nodes: [{ id: `n${i}`, position: { x: i, y: i }, data: {} }],
+      }));
+
+      events.forEach((event) => eventManager.deferredEmit('selectionMoved', event));
+
+      eventManager.flushDeferredEmits();
+
+      expect(callback).toHaveBeenCalledTimes(5);
+      events.forEach((event, i) => {
+        expect(callback).toHaveBeenNthCalledWith(i + 1, event);
+      });
+    });
+
+    it('should handle mix of regular emit and deferred emit', () => {
+      const callback = vi.fn();
+      eventManager.on('selectionMoved', callback);
+
+      const event1: SelectionMovedEvent = { nodes: [] };
+      const event2: SelectionMovedEvent = { nodes: [{ id: 'n1', position: { x: 0, y: 0 }, data: {} }] };
+      const event3: SelectionMovedEvent = { nodes: [{ id: 'n2', position: { x: 1, y: 1 }, data: {} }] };
+
+      eventManager.emit('selectionMoved', event1);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith(event1);
+
+      eventManager.deferredEmit('selectionMoved', event2);
+      eventManager.deferredEmit('selectionMoved', event3);
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      eventManager.flushDeferredEmits();
+      expect(callback).toHaveBeenCalledTimes(3);
+      expect(callback).toHaveBeenNthCalledWith(2, event2);
+      expect(callback).toHaveBeenNthCalledWith(3, event3);
+    });
+  });
+
   describe('complex scenarios', () => {
     it('should handle multiple subscriptions and unsubscriptions', () => {
       const callbacks = [vi.fn(), vi.fn(), vi.fn()];

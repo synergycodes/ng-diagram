@@ -39,7 +39,7 @@ export class EdgeDrawnEmitter implements EventEmitter {
             sourcePort: edge.sourcePort,
             targetPort: edge.targetPort,
           };
-          eventManager.emit('edgeDrawn', event);
+          eventManager.deferredEmit('edgeDrawn', event);
         }
       }
     }

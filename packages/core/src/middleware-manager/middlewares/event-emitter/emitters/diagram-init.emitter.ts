@@ -156,7 +156,7 @@ export class DiagramInitEmitter implements EventEmitter {
       viewport: context.state.metadata.viewport,
     };
 
-    eventManager.emit('diagramInit', event);
+    eventManager.deferredEmit('diagramInit', event);
     this.initEventEmitted = true;
   }
 }
