@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 
 @Component({
@@ -36,7 +35,7 @@ import {
   `,
 })
 export class Diagram {
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: 222, y: 130, scale: 1.6 },
     },

@@ -1,25 +1,18 @@
 import { Middleware } from '../../../types';
 
-export interface LoggerMiddlewareMetadata {
-  enabled: boolean;
-}
-
 /**
  * Middleware used for logging NgDiagram internal events and state changes
  * @category Middlewares
  */
-export const loggerMiddleware: Middleware<'logger', LoggerMiddlewareMetadata> = {
+export const loggerMiddleware: Middleware = {
   name: 'logger',
-  defaultMetadata: {
-    enabled: true,
-  },
   execute: (context, next) => {
-    if (!context.middlewareMetadata.enabled) {
+    if (!context.config.debugMode) {
       next();
       return;
     }
 
-    console.log(`[AngularFlow] ${context.modelActionType}`, {
+    console.log(`[ngDiagram] ${context.modelActionType}`, {
       initialState: context.initialState,
       finalState: context.state,
       history: context.history,

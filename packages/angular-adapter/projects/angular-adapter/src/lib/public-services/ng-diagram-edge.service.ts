@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { EdgeLabel, MiddlewareChain } from '@angularflow/core';
+import { EdgeLabel } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramEdgeService<
-  TMiddlewares extends MiddlewareChain = [],
-> extends NgDiagramBaseService<TMiddlewares> {
+export class NgDiagramEdgeService extends NgDiagramBaseService {
   /**
    * Adds labels to an edge.
    * @param edgeId The ID of the edge to add labels to.

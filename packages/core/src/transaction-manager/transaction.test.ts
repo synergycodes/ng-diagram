@@ -222,22 +222,6 @@ describe('Transaction', () => {
       });
       expect(result.commandsCount).toBe(3);
     });
-
-    it('should merge metadata updates with last-write-wins', () => {
-      transaction.queueUpdate(
-        { metadataUpdate: { viewport: { x: 100, y: 200, scale: 1 }, selection: { nodes: ['1'] } } },
-        'update1'
-      );
-      transaction.queueUpdate({ metadataUpdate: { viewport: { x: 200, y: 200, scale: 1 }, theme: 'dark' } }, 'update2');
-
-      const result = transaction.getMergedUpdates();
-
-      expect(result.mergedUpdate.metadataUpdate).toEqual({
-        viewport: { x: 200, y: 200, scale: 1 },
-        selection: { nodes: ['1'] },
-        theme: 'dark',
-      });
-    });
   });
 
   describe('getState', () => {

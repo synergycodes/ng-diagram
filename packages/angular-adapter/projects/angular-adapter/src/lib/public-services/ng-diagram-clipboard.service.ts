@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { MiddlewareChain, Point } from '@angularflow/core';
+import { Point } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramClipboardService<
-  TMiddlewares extends MiddlewareChain = [],
-> extends NgDiagramBaseService<TMiddlewares> {
+export class NgDiagramClipboardService extends NgDiagramBaseService {
   /**
    * Copies the current selection to the clipboard.
    */

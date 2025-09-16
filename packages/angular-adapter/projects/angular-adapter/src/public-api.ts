@@ -68,7 +68,6 @@ export type {
   Metadata,
   Middleware,
   MiddlewareChain,
-  MiddlewaresConfigFromMiddlewares,
   ModelAdapter,
   NgDiagramMath,
   Node,

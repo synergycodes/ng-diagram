@@ -1,24 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockEdge, mockNode } from '../../../../test-utils';
-import type {
-  Edge,
-  FlowStateUpdate,
-  Metadata,
-  MiddlewareContext,
-  MiddlewaresConfigFromMiddlewares,
-  Node,
-} from '../../../../types';
+import type { Edge, FlowStateUpdate, Metadata, MiddlewareContext, Node } from '../../../../types';
 import type { MiddlewareExecutor } from '../../../middleware-executor';
 import { DEFAULT_SELECTED_Z_INDEX } from '../constants';
 import { zIndexMiddleware } from '../z-index-assignment';
 
-type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
+type Helpers = ReturnType<MiddlewareExecutor['helpers']>;
 
 describe('zIndexMiddleware', () => {
   let helpers: Partial<Helpers>;
   let nodesMap: Map<string, Node>;
   let edgesMap: Map<string, Edge>;
-  let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+  let context: MiddlewareContext;
   let nextMock: ReturnType<typeof vi.fn>;
   let cancelMock: ReturnType<typeof vi.fn>;
 
@@ -39,7 +32,7 @@ describe('zIndexMiddleware', () => {
       state: {
         nodes: [],
         edges: [],
-        metadata: {} as Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+        metadata: {} as Metadata,
       },
       helpers: helpers as Helpers,
       nodesMap,
@@ -53,7 +46,7 @@ describe('zIndexMiddleware', () => {
         },
       },
       modelActionType: 'updateNode',
-    } as unknown as MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+    } as unknown as MiddlewareContext;
   });
 
   describe('execution conditions', () => {

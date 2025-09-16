@@ -9,6 +9,6 @@ Interface representing the metadata of the diagram.
 
 ## Type Parameters
 
-### TMiddlewaresMetadata
+### T
 
-`TMiddlewaresMetadata` = `unknown`
+`T` *extends* `DataObject` = `DataObject`

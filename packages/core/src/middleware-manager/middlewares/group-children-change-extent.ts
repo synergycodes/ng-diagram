@@ -1,32 +1,30 @@
 import type { Middleware, Node } from '../../types';
 import { calculateGroupRect, isGroup } from '../../utils';
 
-export interface GroupChildrenChangeExtentMiddlewareMetadata {
-  enabled: boolean;
-}
-
-export const groupChildrenChangeExtent: Middleware<
-  'group-children-change-extent',
-  GroupChildrenChangeExtentMiddlewareMetadata
-> = {
+export const groupChildrenChangeExtent: Middleware = {
   name: 'group-children-change-extent',
-  defaultMetadata: {
-    enabled: true,
-  },
-  execute: async ({ helpers, nodesMap, middlewareMetadata }, next) => {
-    const isEnabled = middlewareMetadata.enabled;
-
+  execute: async (
+    {
+      helpers,
+      nodesMap,
+      config: {
+        grouping: { allowGroupAutoResize },
+      },
+    },
+    next
+  ) => {
+    const isEnabled = allowGroupAutoResize === true || allowGroupAutoResize === undefined;
     if (!isEnabled) {
       next();
       return;
     }
 
     const hasGroupChanges = helpers.checkIfAnyNodePropsChanged(['groupId']);
-
     if (!hasGroupChanges) {
       next();
       return;
     }
+
     const affectedGroupIds = new Set<string>();
     const affectedNodes = helpers.getAffectedNodeIds(['groupId']);
 

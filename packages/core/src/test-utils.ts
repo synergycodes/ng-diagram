@@ -1,13 +1,4 @@
-import type {
-  Edge,
-  EdgeLabel,
-  EnvironmentInfo,
-  GroupNode,
-  Metadata,
-  MiddlewaresConfigFromMiddlewares,
-  Node,
-  Port,
-} from './types';
+import type { Edge, EdgeLabel, EnvironmentInfo, GroupNode, Metadata, Node, Port } from './types';
 
 export const mockNode: Node = {
   id: 'node1',
@@ -41,15 +32,8 @@ export const mockEdge: Edge = {
   ],
 };
 
-export const mockMetadata: Metadata<MiddlewaresConfigFromMiddlewares<[]>> = {
+export const mockMetadata: Metadata = {
   viewport: { x: 0, y: 0, scale: 1 },
-  middlewaresConfig: {
-    'node-position-snap': { snap: { x: 10, y: 10 } },
-    'node-rotation-snap': { enabled: true, snap: 10 },
-    'group-children-change-extent': { enabled: true },
-    'group-children-move-extent': { enabled: true },
-    'edges-routing': { enabled: true },
-  },
 };
 
 export const mockEnvironment: EnvironmentInfo = {

@@ -11,7 +11,7 @@ export interface ModelChanges {
 /**
  * Interface for model adapters that handle the data management of a flow diagram
  */
-export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
+export interface ModelAdapter {
   /**
    * Destroy the model adapter and clean up resources
    * This should be called when the model is no longer needed to prevent memory leaks
@@ -47,15 +47,15 @@ export interface ModelAdapter<TMetadata extends Metadata = Metadata> {
   /**
    * Get metadata associated with the model
    */
-  getMetadata(): TMetadata;
+  getMetadata(): Metadata;
 
   /**
    * Set metadata for the model
    * @param metadata Metadata to set
    * @param metadataFn Function that takes current metadata and returns new metadata
    */
-  setMetadata(metadata: TMetadata): void;
-  setMetadata(metadataFn: (metadata: TMetadata) => TMetadata): void;
+  setMetadata(metadata: Metadata): void;
+  setMetadata(metadataFn: (metadata: Metadata) => Metadata): void;
 
   /**
    * Register a callback to be called when the model changes

@@ -18,7 +18,3 @@ Type of the metadata of the middleware
 `TName` *extends* `string` = `string`
 
 Type of the name of the middleware (should be a string literal)
-
-### TMiddlewareMetadata
-
-`TMiddlewareMetadata` = `any`

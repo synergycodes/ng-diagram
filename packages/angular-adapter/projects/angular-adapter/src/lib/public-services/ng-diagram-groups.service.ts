@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { MiddlewareChain, Node } from '@angularflow/core';
+import { Node } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
-export class NgDiagramGroupsService<
-  TMiddlewares extends MiddlewareChain = [],
-> extends NgDiagramBaseService<TMiddlewares> {
+export class NgDiagramGroupsService extends NgDiagramBaseService {
   /**
    * Adds nodes to a group.
    * @param groupId The ID of the group to add nodes to.

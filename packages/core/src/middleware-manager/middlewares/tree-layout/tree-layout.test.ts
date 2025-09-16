@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Edge, Metadata, MiddlewareContext, MiddlewaresConfigFromMiddlewares, Node } from '../../../types';
+import type { Edge, Metadata, MiddlewareContext, Node } from '../../../types';
 import type { MiddlewareExecutor } from '../../middleware-executor';
 import { treeLayoutMiddleware } from './tree-layout';
 import * as buildTreeModule from './utils/build-tree-structure';
 import * as orientationModule from './utils/orientation-tree-layout';
 
-type Helpers = ReturnType<MiddlewareExecutor<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>['helpers']>;
+type Helpers = ReturnType<MiddlewareExecutor['helpers']>;
 
 vi.mock('./utils/build-tree-structure');
 vi.mock('./utils/orientation-tree-layout');
@@ -14,7 +14,7 @@ describe('treeLayoutMiddleware', () => {
   let helpers: Partial<Helpers>;
   let nodesMap: Map<string, Node>;
   let edgesMap: Map<string, Edge>;
-  let context: MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+  let context: MiddlewareContext;
   let nextMock: ReturnType<typeof vi.fn>;
   let cancelMock: ReturnType<typeof vi.fn>;
 
@@ -39,7 +39,7 @@ describe('treeLayoutMiddleware', () => {
         metadata: {
           viewport: { x: 0, y: 0, scale: 1 },
           middlewaresConfig: {},
-        } as Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+        } as Metadata,
       },
       state: {
         nodes: [],
@@ -47,7 +47,7 @@ describe('treeLayoutMiddleware', () => {
         metadata: {
           viewport: { x: 0, y: 0, scale: 1 },
           middlewaresConfig: {},
-        } as Metadata<MiddlewaresConfigFromMiddlewares<[]>>,
+        } as Metadata,
       },
       nodesMap,
       edgesMap,
@@ -67,8 +67,7 @@ describe('treeLayoutMiddleware', () => {
       helpers: helpers as Helpers,
       history: [],
       initialUpdate: {},
-      middlewareMetadata: undefined,
-    } as unknown as MiddlewareContext<[], Metadata<MiddlewaresConfigFromMiddlewares<[]>>>;
+    } as unknown as MiddlewareContext;
 
     // Setup default mock implementations
     vi.mocked(buildTreeModule.getNodeMap).mockReturnValue(new Map());
