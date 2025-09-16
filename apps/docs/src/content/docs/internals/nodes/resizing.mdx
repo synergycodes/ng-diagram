@@ -1,13 +1,13 @@
 ---
 title: Resizing
-description: Understanding how resizing works in NgDiagram
+description: Understanding how resizing works in ngDiagram
 ---
 
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import Resizing from '@components/angular/nodes/resizing/resizing.astro';
 
-The **resizing** feature in NgDiagram allows users to interactively change the size of nodes on the diagram canvas.
+The **resizing** feature in ngDiagram allows users to interactively change the size of nodes on the diagram canvas.
 Resizable nodes display resize handles and lines that users can drag to adjust the node's width and height.
 
 The new size is reflected in the node's appearance and can be used to create flexible, dynamic diagrams.
@@ -92,10 +92,15 @@ Pass this configuration to the `ng-diagram` component:
 
 ## Further Reading
 
-<LinkCard icon="list-format" title="Nodes" href="/internals/nodes/nodes" description="Learn more about node features" />
+<LinkCard
+  icon="list-format"
+  title="Nodes"
+  href="/docs/internals/nodes/nodes"
+  description="Learn more about node features"
+/>
 <LinkCard
   icon="list-format"
   title="Custom Nodes"
-  href="/internals/nodes/custom-nodes"
+  href="/docs/internals/nodes/custom-nodes"
   description="Create custom node templates with advanced features"
 />

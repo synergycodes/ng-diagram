@@ -1,6 +1,6 @@
 ---
 title: Custom Nodes
-description: How to create and implement custom nodes in NgDiagram
+description: How to create and implement custom nodes in ngDiagram
 sidebar:
   order: 1
 ---
@@ -9,7 +9,7 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 
-When NgDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
+When ngDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
 
 This allows you to build interactive and highly customized flow elements.
 
@@ -22,7 +22,7 @@ You can create a custom node by extending `NgDiagramNodeTemplate` and implementi
 <LinkCard
   icon="list-format"
   title="Custom Node Example"
-  href="/examples/custom-node"
+  href="/docs/examples/custom-node"
   description="For more comprehensive example please check here."
 />
 
@@ -34,7 +34,7 @@ The map associates a string key, such as `myType`, with a value like `CustomNode
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[30, 33]} />
 
-After registering, you need to pass the map to the `NgDiagram` component.
+After registering, you need to pass the map to the `ngDiagram` component.
 
 <CodeSnippet relativePath="nodes/custom-node/custom-node-wrapper.component.ts" range={[20, 24]} mark={[4]} />
 
@@ -78,7 +78,7 @@ interface SimpleNode<T = any> {
 <LinkCard
   icon="list-format"
   title="Node API"
-  href="/api/types/node"
+  href="/docs/api/types/node"
   description="See detailed node properties reference"
 />
 
@@ -105,20 +105,20 @@ As a result, your custom nodes are not only visually flexible, but also deeply i
 <LinkCard
   icon="list-format"
   title="Resizing"
-  href="/internals/nodes/resizing"
+  href="/docs/internals/nodes/resizing"
   description="Resizing functionality for your Custom Node"
 />
 
 <LinkCard
   icon="list-format"
   title="Rotating"
-  href="/internals/nodes/rotation"
+  href="/docs/internals/nodes/rotation"
   description="Rotation functionality for your Custom Node"
 />
 
 <LinkCard
   icon="list-format"
   title="Custom Ports"
-  href="/internals/nodes/ports"
+  href="/docs/internals/nodes/ports"
   description="Custom ports in your Custom Node"
 />

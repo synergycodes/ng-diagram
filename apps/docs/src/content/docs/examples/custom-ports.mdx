@@ -1,31 +1,31 @@
 ---
 title: Custom Ports
-description: Example of how to create custom ports in NgDiagram
+description: Example of how to create custom ports in ngDiagram
 ---
 
 import CustomPorts from '@examples/custom-ports/custom-ports.astro';
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
-This example demonstrates how to create custom ports in NgDiagram by customizing their appearance and behavior.
+This example demonstrates how to create custom ports in ngDiagram by customizing their appearance and behavior.
 
 ## Key Concepts
 
-- **Custom Port Styling:**  
+- **Custom Port Styling:**
   Ports can be styled individually using CSS classes, inline styles, or by overriding CSS variables used in port styling.
 
-- **Dynamic Port Rendering:**  
+- **Dynamic Port Rendering:**
   Ports are rendered using the `<ng-diagram-port>` component, which supports various attributes.
 
-- **Node Template Customization:**  
-  The `NodeComponent` template defines the arrangement and styling of ports within each node.  
+- **Node Template Customization:**
+  The `NodeComponent` template defines the arrangement and styling of ports within each node.
   Ports are stored in the `measuredPorts` property, which is read-only and cannot be modified in the node definition.
 
-- **Port Binding:**  
+- **Port Binding:**
   Ports have a `type` property to set the connection type for each port. You can set it to `'both'`, `'target'`, or `'source'`.
 
-- **Port Positioning:**  
-  Ports have a `side` property to set their placement.  
+- **Port Positioning:**
+  Ports have a `side` property to set their placement.
   To further customize port placement, you can use CSS styling.
 
 ## Example Overview
