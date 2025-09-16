@@ -62,6 +62,16 @@ describe('AngularAdapterDiagramComponent', () => {
                 },
               }),
               applyUpdate: vi.fn(),
+              eventManager: {
+                on: vi.fn(),
+                once: vi.fn(),
+                off: vi.fn(),
+                offAll: vi.fn(),
+                emit: vi.fn(),
+                isEnabled: vi.fn().mockReturnValue(true),
+                setEnabled: vi.fn(),
+                hasListeners: vi.fn(),
+              },
             }),
             isInitialized: vi.fn().mockReturnValue(true),
           },
@@ -192,6 +202,116 @@ describe('AngularAdapterDiagramComponent', () => {
       component.getBoundingClientRect();
 
       expect(getBoundingClientRectSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Event Bridge', () => {
+    it('should setup event bridge on initialization', () => {
+      const flowCore = TestBed.inject(FlowCoreProviderService).provide();
+      const eventManager = flowCore.eventManager;
+
+      expect(eventManager.on).toHaveBeenCalledWith('diagramInit', expect.any(Function));
+      expect(eventManager.on).toHaveBeenCalledWith('edgeDrawn', expect.any(Function));
+      expect(eventManager.on).toHaveBeenCalledWith('selectionMoved', expect.any(Function));
+      expect(eventManager.on).toHaveBeenCalledWith('selectionChanged', expect.any(Function));
+      expect(eventManager.on).toHaveBeenCalledWith('viewportChanged', expect.any(Function));
+    });
+
+    it('should emit diagramInit output when eventManager emits diagramInit', () => {
+      const flowCore = TestBed.inject(FlowCoreProviderService).provide();
+      const eventManager = flowCore.eventManager;
+      const diagramInitSpy = vi.fn();
+      component.diagramInit.subscribe(diagramInitSpy);
+
+      // Get the callback that was registered for diagramInit
+      const diagramInitCallback = (eventManager.on as ReturnType<typeof vi.fn>).mock.calls.find(
+        (call) => call[0] === 'diagramInit'
+      )?.[1];
+
+      const event = { nodes: [], edges: [], viewport: { x: 0, y: 0, scale: 1 } };
+      diagramInitCallback?.(event);
+
+      expect(diagramInitSpy).toHaveBeenCalledWith(event);
+    });
+
+    it('should emit edgeDrawn output when eventManager emits edgeDrawn', () => {
+      const flowCore = TestBed.inject(FlowCoreProviderService).provide();
+      const eventManager = flowCore.eventManager;
+      const edgeDrawnSpy = vi.fn();
+      component.edgeDrawn.subscribe(edgeDrawnSpy);
+
+      const edgeDrawnCallback = (eventManager.on as ReturnType<typeof vi.fn>).mock.calls.find(
+        (call) => call[0] === 'edgeDrawn'
+      )?.[1];
+
+      const event = {
+        edge: { id: 'edge1', source: 'node1', target: 'node2', data: {} },
+        source: { id: 'node1', position: { x: 0, y: 0 }, data: {} },
+        target: { id: 'node2', position: { x: 100, y: 100 }, data: {} },
+        sourcePort: undefined,
+        targetPort: undefined,
+      };
+      edgeDrawnCallback?.(event);
+
+      expect(edgeDrawnSpy).toHaveBeenCalledWith(event);
+    });
+
+    it('should emit selectionMoved output when eventManager emits selectionMoved', () => {
+      const flowCore = TestBed.inject(FlowCoreProviderService).provide();
+      const eventManager = flowCore.eventManager;
+      const selectionMovedSpy = vi.fn();
+      component.selectionMoved.subscribe(selectionMovedSpy);
+
+      const selectionMovedCallback = (eventManager.on as ReturnType<typeof vi.fn>).mock.calls.find(
+        (call) => call[0] === 'selectionMoved'
+      )?.[1];
+
+      const event = {
+        nodes: [{ id: 'node1', position: { x: 100, y: 100 }, data: {} }],
+      };
+      selectionMovedCallback?.(event);
+
+      expect(selectionMovedSpy).toHaveBeenCalledWith(event);
+    });
+
+    it('should emit selectionChanged output when eventManager emits selectionChanged', () => {
+      const flowCore = TestBed.inject(FlowCoreProviderService).provide();
+      const eventManager = flowCore.eventManager;
+      const selectionChangedSpy = vi.fn();
+      component.selectionChanged.subscribe(selectionChangedSpy);
+
+      const selectionChangedCallback = (eventManager.on as ReturnType<typeof vi.fn>).mock.calls.find(
+        (call) => call[0] === 'selectionChanged'
+      )?.[1];
+
+      const event = {
+        selectedNodes: [{ id: 'node1', selected: true, position: { x: 0, y: 0 }, data: {} }],
+        selectedEdges: [],
+        previousNodes: [],
+        previousEdges: [],
+      };
+      selectionChangedCallback?.(event);
+
+      expect(selectionChangedSpy).toHaveBeenCalledWith(event);
+    });
+
+    it('should emit viewportChanged output when eventManager emits viewportChanged', () => {
+      const flowCore = TestBed.inject(FlowCoreProviderService).provide();
+      const eventManager = flowCore.eventManager;
+      const viewportChangedSpy = vi.fn();
+      component.viewportChanged.subscribe(viewportChangedSpy);
+
+      const viewportChangedCallback = (eventManager.on as ReturnType<typeof vi.fn>).mock.calls.find(
+        (call) => call[0] === 'viewportChanged'
+      )?.[1];
+
+      const event = {
+        viewport: { x: 100, y: 100, scale: 2, width: 800, height: 600 },
+        previousViewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+      };
+      viewportChangedCallback?.(event);
+
+      expect(viewportChangedSpy).toHaveBeenCalledWith(event);
     });
   });
 });

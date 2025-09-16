@@ -6,13 +6,7 @@ import type { EventEmitter } from './event-emitter.interface';
 export class SelectionMovedEmitter implements EventEmitter {
   name = 'SelectionMovedEmitter';
 
-  private readonly moveActions = [
-    'moveSelection',
-    'keyboardMoveSelection',
-    'pointerMoveSelection',
-    'moveNodes',
-    'moveNodesBy',
-  ];
+  private readonly moveActions = ['moveNodes', 'moveNodesBy'];
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
     if (!this.moveActions.includes(context.modelActionType)) {

@@ -13,7 +13,9 @@ export class ViewportChangedEmitter implements EventEmitter {
     const hasChanged =
       prevViewport.x !== currViewport.x ||
       prevViewport.y !== currViewport.y ||
-      prevViewport.scale !== currViewport.scale;
+      prevViewport.scale !== currViewport.scale ||
+      prevViewport.width !== currViewport.width ||
+      prevViewport.height !== currViewport.height;
 
     if (hasChanged) {
       const event: ViewportChangedEvent = {

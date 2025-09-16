@@ -3,6 +3,9 @@ import type { DiagramInitEvent } from '../../../../event-manager/event-types';
 import type { Edge, MiddlewareContext, Node } from '../../../../types';
 import type { EventEmitter } from './event-emitter.interface';
 
+/**
+ * Tracks unmeasured items and emits the diagramInit event when all measurements are complete.
+ */
 export class DiagramInitEmitter implements EventEmitter {
   name = 'DiagramInitEmitter';
 
@@ -13,157 +16,126 @@ export class DiagramInitEmitter implements EventEmitter {
   private initEventEmitted = false;
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    const { modelActionType, nodesMap, edgesMap } = context;
+    const { modelActionType } = context;
 
-    if (modelActionType === 'init') {
-      this.handleInit(nodesMap, edgesMap);
-      this.initialized = true;
-      return;
+    switch (modelActionType) {
+      case 'init':
+        this.handleInit(context, eventManager);
+        break;
+      case 'updateNode':
+      case 'updateEdge':
+        this.handleUpdate(context, eventManager);
+        break;
     }
+  }
 
+  private handleInit(context: MiddlewareContext, eventManager: EventManager): void {
+    const { nodesMap, edgesMap } = context;
+
+    this.collectUnmeasuredItems(nodesMap, edgesMap);
+    this.initialized = true;
+
+    if (this.areAllMeasured()) {
+      this.emitInitEvent(context, eventManager);
+    }
+  }
+
+  private handleUpdate(context: MiddlewareContext, eventManager: EventManager): void {
     if (!this.initialized || this.initEventEmitted) {
       return;
     }
 
+    const { modelActionType, initialUpdate, nodesMap, edgesMap } = context;
+
     if (modelActionType === 'updateNode') {
-      this.handleUpdateNode(context);
+      this.processNodeUpdates(initialUpdate, nodesMap);
     } else if (modelActionType === 'updateEdge') {
-      this.handleUpdateEdge(context);
+      this.processEdgeUpdates(initialUpdate, edgesMap);
     }
 
-    if (this.areAllMeasured() && !this.initEventEmitted) {
-      const nodes = Array.from(nodesMap.values());
-      const edges = Array.from(edgesMap.values());
-      const viewport = context.state.metadata.viewport;
-
-      const event: DiagramInitEvent = {
-        nodes,
-        edges,
-        viewport,
-      };
-
-      eventManager.emit('diagramInit', event);
-      this.initEventEmitted = true;
+    if (this.areAllMeasured()) {
+      this.emitInitEvent(context, eventManager);
     }
   }
 
-  private handleInit(nodesMap: Map<string, Node>, edgesMap: Map<string, Edge>): void {
+  private collectUnmeasuredItems(nodesMap: Map<string, Node>, edgesMap: Map<string, Edge>): void {
     this.unmeasuredNodes.clear();
     this.unmeasuredNodePorts.clear();
     this.unmeasuredEdgeLabels.clear();
 
     for (const [nodeId, node] of nodesMap) {
-      if (!node.size || node.size.width === undefined || node.size.height === undefined) {
+      if (!node.size?.width || !node.size?.height) {
         this.unmeasuredNodes.add(nodeId);
       }
 
-      if (node.measuredPorts) {
-        for (const port of node.measuredPorts) {
-          if (
-            !port.position ||
-            port.position.x === undefined ||
-            port.position.y === undefined ||
-            !port.size ||
-            port.size.width === undefined ||
-            port.size.height === undefined
-          ) {
-            this.unmeasuredNodePorts.add(`${nodeId}:${port.id}`);
-          }
+      for (const port of node.measuredPorts ?? []) {
+        if (!port.position?.x || !port.position?.y || !port.size?.width || !port.size?.height) {
+          this.unmeasuredNodePorts.add(`${nodeId}:${port.id}`);
         }
       }
     }
 
     for (const [edgeId, edge] of edgesMap) {
-      if (edge.measuredLabels) {
-        for (const label of edge.measuredLabels) {
-          if (
-            !label.position ||
-            label.position.x === undefined ||
-            label.position.y === undefined ||
-            !label.size ||
-            label.size.width === undefined ||
-            label.size.height === undefined
-          ) {
-            this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
-          }
+      for (const label of edge.measuredLabels ?? []) {
+        if (!label.position?.x || !label.position?.y || !label.size?.width || !label.size?.height) {
+          this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
         }
       }
     }
   }
 
-  private handleUpdateNode(context: MiddlewareContext): void {
-    const { initialUpdate, nodesMap } = context;
-
-    if (!initialUpdate || !initialUpdate.nodesToUpdate || initialUpdate.nodesToUpdate.length === 0) {
+  private processNodeUpdates(initialUpdate: MiddlewareContext['initialUpdate'], nodesMap: Map<string, Node>): void {
+    if (!initialUpdate?.nodesToUpdate?.length) {
       return;
     }
 
     for (const nodeUpdate of initialUpdate.nodesToUpdate) {
-      const nodeId = nodeUpdate.id;
-      const currentNode = nodesMap.get(nodeId);
-
-      if (!currentNode) {
+      if (!nodesMap.has(nodeUpdate.id)) {
         continue;
       }
 
-      if (
-        nodeUpdate.size &&
-        nodeUpdate.size.width !== undefined &&
-        nodeUpdate.size.height !== undefined &&
-        this.unmeasuredNodes.has(nodeId)
-      ) {
-        this.unmeasuredNodes.delete(nodeId);
+      if (this.unmeasuredNodes.has(nodeUpdate.id) && nodeUpdate.size?.width && nodeUpdate.size?.height) {
+        this.unmeasuredNodes.delete(nodeUpdate.id);
       }
 
       if (nodeUpdate.measuredPorts) {
-        for (const portUpdate of nodeUpdate.measuredPorts) {
-          const portKey = `${nodeId}:${portUpdate.id}`;
-          if (this.unmeasuredNodePorts.has(portKey)) {
-            if (
-              portUpdate.position &&
-              portUpdate.position.x !== undefined &&
-              portUpdate.position.y !== undefined &&
-              portUpdate.size &&
-              portUpdate.size.width !== undefined &&
-              portUpdate.size.height !== undefined
-            ) {
-              this.unmeasuredNodePorts.delete(portKey);
-            }
+        for (const port of nodeUpdate.measuredPorts) {
+          const portKey = `${nodeUpdate.id}:${port.id}`;
+          if (
+            this.unmeasuredNodePorts.has(portKey) &&
+            port.position?.x !== undefined &&
+            port.position?.y !== undefined &&
+            port.size?.width !== undefined &&
+            port.size?.height !== undefined
+          ) {
+            this.unmeasuredNodePorts.delete(portKey);
           }
         }
       }
     }
   }
 
-  private handleUpdateEdge(context: MiddlewareContext): void {
-    const { initialUpdate, edgesMap } = context;
-
-    if (!initialUpdate || !initialUpdate.edgesToUpdate || initialUpdate.edgesToUpdate.length === 0) {
+  private processEdgeUpdates(initialUpdate: MiddlewareContext['initialUpdate'], edgesMap: Map<string, Edge>): void {
+    if (!initialUpdate?.edgesToUpdate?.length) {
       return;
     }
 
     for (const edgeUpdate of initialUpdate.edgesToUpdate) {
-      const edgeId = edgeUpdate.id;
-      const currentEdge = edgesMap.get(edgeId);
-
-      if (!currentEdge) {
+      if (!edgesMap.has(edgeUpdate.id)) {
         continue;
       }
 
       if (edgeUpdate.measuredLabels) {
-        for (const labelUpdate of edgeUpdate.measuredLabels) {
-          const labelKey = `${edgeId}:${labelUpdate.id}`;
-          if (this.unmeasuredEdgeLabels.has(labelKey)) {
-            if (
-              labelUpdate.position &&
-              labelUpdate.position.x !== undefined &&
-              labelUpdate.position.y !== undefined &&
-              labelUpdate.size &&
-              labelUpdate.size.width !== undefined &&
-              labelUpdate.size.height !== undefined
-            ) {
-              this.unmeasuredEdgeLabels.delete(labelKey);
-            }
+        for (const label of edgeUpdate.measuredLabels) {
+          const labelKey = `${edgeUpdate.id}:${label.id}`;
+          if (
+            this.unmeasuredEdgeLabels.has(labelKey) &&
+            label.position?.x !== undefined &&
+            label.position?.y !== undefined &&
+            label.size?.width !== undefined &&
+            label.size?.height !== undefined
+          ) {
+            this.unmeasuredEdgeLabels.delete(labelKey);
           }
         }
       }
@@ -174,5 +146,17 @@ export class DiagramInitEmitter implements EventEmitter {
     return (
       this.unmeasuredNodes.size === 0 && this.unmeasuredNodePorts.size === 0 && this.unmeasuredEdgeLabels.size === 0
     );
+  }
+
+  private emitInitEvent(context: MiddlewareContext, eventManager: EventManager): void {
+    const { nodesMap, edgesMap } = context;
+    const event: DiagramInitEvent = {
+      nodes: Array.from(nodesMap.values()),
+      edges: Array.from(edgesMap.values()),
+      viewport: context.state.metadata.viewport,
+    };
+
+    eventManager.emit('diagramInit', event);
+    this.initEventEmitted = true;
   }
 }
