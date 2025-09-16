@@ -18,7 +18,7 @@ ngDiagram provides a rich set of injectable services that give you programmatic 
 
 ### NgDiagramService
 
-The main orchestration service that provides access to the command system and middleware management. This is your gateway to advanced diagram control.
+The main orchestration service that provides access to the action state and middleware management. This is your gateway to advanced diagram control.
 
 **Key Capabilities:**
 
@@ -48,8 +48,8 @@ export class ToolbarComponent {
   }
 
   toggleMiddleware() {
-    // Update middleware configuration
-    this.diagramService.updateMiddlewareConfig('z-index', { enabled: true });
+    // Update configuration
+    this.diagramService.updateConfig({ zIndex: { enabled: true } });
   }
 }
 ```
@@ -339,12 +339,11 @@ export class ContextMenuComponent {
 
 ### NgDiagramNodeService
 
-Provides node-specific operations with focus on transformations and port management.
+Provides node-specific operations with focus on transformations.
 
 **Key Capabilities:**
 
 - Node-specific transformations
-- Port management
 
 **Usage Example:**
 
@@ -382,196 +381,5 @@ export class CustomNodeComponent {
     // Handle node resizing
     this.nodeService.resizeNode(this.node().id, newSize);
   }
-
-  onAddPort() {
-    // Add a new port to the node
-    const newPort = {
-      id: crypto.randomUUID(),
-      x: 0,
-      y: 0,
-      width: 10,
-      height: 10,
-    };
-    this.nodeService.addPorts(this.node().id, [newPort]);
-  }
 }
 ```
-
-### NgDiagramEdgeService
-
-Handles edge label management operations.
-
-**Key Capabilities:**
-
-- Edge label management
-
-**Usage Example:**
-
-```typescript
-import { Component, inject } from '@angular/core';
-import { NgDiagramEdgeService } from '@angularflow/angular-adapter';
-
-@Component({
-  selector: 'app-edge-manager',
-  template: `
-    <div class="edge-controls">
-      <button (click)="addLabel()">Add Label</button>
-      <button (click)="updateLabel()">Update Label</button>
-      <button (click)="deleteLabels()">Delete Labels</button>
-    </div>
-  `,
-})
-export class EdgeManagerComponent {
-  private edgeService = inject(NgDiagramEdgeService);
-
-  addLabel() {
-    // Add a label to an edge
-    const labels = [
-      {
-        id: 'label-1',
-        text: 'Flow Data',
-        x: 0.5, // Position along the edge (0-1)
-        y: -10, // Offset from edge
-      },
-    ];
-    this.edgeService.addEdgeLabels('edge-1', labels);
-  }
-
-  updateLabel() {
-    // Update an existing edge label
-    this.edgeService.updateEdgeLabel('edge-1', 'label-1', {
-      text: 'Updated Label',
-      x: 0.3,
-    });
-  }
-
-  deleteLabels() {
-    // Delete specific labels from an edge
-    this.edgeService.deleteEdgeLabels('edge-1', ['label-1']);
-  }
-}
-```
-
-## Service Integration Patterns
-
-### Combining Services for Complex Operations
-
-Services are designed to work together seamlessly. Here are common patterns:
-
-```typescript
-import { Component, inject } from '@angular/core';
-import {
-  NgDiagramService,
-  NgDiagramModelService,
-  NgDiagramSelectionService,
-  NgDiagramViewportService,
-} from '@angularflow/angular-adapter';
-
-@Component({
-  selector: 'app-advanced-operations',
-})
-export class AdvancedOperationsComponent {
-  private diagramService = inject(NgDiagramService);
-  private modelService = inject(NgDiagramModelService);
-  private selectionService = inject(NgDiagramSelectionService);
-  private viewportService = inject(NgDiagramViewportService);
-
-  // Pattern 1: Coordinated service operations
-  reorganizeSelectedNodes() {
-    const selectedNodes = this.selectionService.selection().nodes;
-
-    selectedNodes.forEach((node, index) => {
-      this.modelService.updateNode(node.id, {
-        x: index * 150,
-        y: 100,
-      });
-    });
-
-    // Center viewport to show reorganized nodes
-    this.viewportService.moveViewport(0, 0);
-  }
-
-  // Pattern 2: Spatial operations with selection
-  selectNodesInViewport() {
-    const viewport = this.viewportService.viewport();
-    // Get center point of viewport
-    const centerPoint = {
-      x: viewport.x + window.innerWidth / viewport.scale / 2,
-      y: viewport.y + window.innerHeight / viewport.scale / 2,
-    };
-
-    // Find nodes near viewport center
-    const visibleNodes = this.modelService.getNodesInRange(
-      centerPoint,
-      Math.max(window.innerWidth, window.innerHeight) / viewport.scale
-    );
-
-    const nodeIds = visibleNodes.map((node) => node.id);
-    this.selectionService.select(nodeIds);
-  }
-
-  // Pattern 3: Context-aware operations
-  onCanvasRightClick(event: MouseEvent) {
-    event.preventDefault();
-
-    // Convert to diagram coordinates
-    const position = this.viewportService.clientToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    // Find nodes at position (using range-based search)
-    const nodesAtPosition = this.modelService.getNodesInRange(position, 5);
-
-    if (nodesAtPosition.length > 0) {
-      // Select node if found
-      this.selectionService.select([nodesAtPosition[0].id]);
-    } else {
-      // Create new node at position
-      this.modelService.addNodes([
-        {
-          id: crypto.randomUUID(),
-          x: position.x,
-          y: position.y,
-          width: 100,
-          height: 60,
-        },
-      ]);
-    }
-  }
-}
-```
-
-## Service Scoping and Multiple Diagrams
-
-When working with multiple diagrams, each diagram context provides its own service instances:
-
-```typescript
-@Component({
-  selector: 'app-multi-diagram',
-  template: `
-    <div class="diagram-container">
-      <ng-diagram-context>
-        <ng-diagram [model]="model1" />
-        <app-toolbar diagramId="diagram1" />
-      </ng-diagram-context>
-    </div>
-
-    <div class="diagram-container">
-      <ng-diagram-context>
-        <ng-diagram [model]="model2" />
-        <app-toolbar diagramId="diagram2" />
-      </ng-diagram-context>
-    </div>
-  `,
-})
-export class MultiDiagramComponent {
-  // Each diagram (and each toolbar) will get its own service instances
-  // scoped to its respective diagram context
-}
-```
-
-<Aside type="note">
-  Service instances are automatically created and destroyed with their diagram context, ensuring proper cleanup and
-  memory management.
-</Aside>
