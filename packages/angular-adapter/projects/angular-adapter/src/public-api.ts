@@ -46,7 +46,7 @@ export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewp
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
-export { initializeModel } from './lib/model/initializeModel';
+export { initializeModel } from './lib/model/initialize-model';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
 export { NgDiagramNodeTemplateMap } from './lib/types/node-template-map';
 export { createMiddlewares } from './lib/utils/create-middlewares';
