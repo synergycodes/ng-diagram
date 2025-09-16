@@ -184,6 +184,14 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     this.flowCore.commandHandler.emit('updateNodes', { nodes });
   }
 
+  /**
+   * Updates multiple edges at once.
+   * @param edges Array of edge updates (must include id and any properties to update).
+   */
+  updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]) {
+    this.flowCore.commandHandler.emit('updateEdges', { edges });
+  }
+
   // ===================
   // DELETE METHODS
   // ===================

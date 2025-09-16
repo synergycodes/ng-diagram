@@ -91,6 +91,16 @@ export const updateEdge = async (commandHandler: CommandHandler, command: Update
   await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id, ...edgeChanges }] }, 'updateEdge');
 };
 
+export interface UpdateEdgesCommand {
+  name: 'updateEdges';
+  edges: (Pick<Edge, 'id'> & Partial<Edge>)[];
+}
+
+export const updateEdges = async (commandHandler: CommandHandler, command: UpdateEdgesCommand) => {
+  const { edges } = command;
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: edges }, 'updateEdges');
+};
+
 export interface DeleteEdgesCommand {
   name: 'deleteEdges';
   ids: string[];
