@@ -1,4 +1,53 @@
 ---
 title: Arrowheads
-description: Understanding how arrowheads work in ngDiagram
+description: Understanding how arrowheads work in NgDiagram
+sidebar:
+  order: 3
 ---
+
+import { LinkCard } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import DefaultArrowhead from '@components/angular/edges/arrowheads/default-arrowhead/default-arrowhead.astro';
+import CustomArrowhead from '@components/angular/edges/arrowheads/custom-arrowhead/custom-arrowhead.astro';
+
+Arrowheads in NgDiagram are visual markers that indicate the start or end of the edge. They are implemented using SVG markers and can be applied to either the source end (`sourceArrowhead`) or target end (`targetArrowhead`) of an edge.
+
+## Default Arrowhead
+
+NgDiagram provides a built-in arrowhead called `ng-diagram-arrow` that can be used out of the box. This default arrowhead is a simple triangular arrow that adapts to the edge's stroke color.
+
+<DefaultArrowhead />
+
+To use the default arrowhead, specify it in your edge configuration:
+
+<CodeSnippet
+  relativePath="edges/arrowheads/default-arrowhead/diagram.component.ts"
+  range={[53, 75]}
+  collapse={['4-10', '15-21']}
+  mark={[3, { range: '13-14' }]}
+/>
+
+## Custom Arrowhead
+
+You can create custom arrowheads by defining SVG markers with unique IDs. Custom arrowheads allow you to create distinctive visual styles that match your application's design requirements.
+
+<CustomArrowhead />
+
+Custom arrowheads need to be defined as SVG `<marker>` elements within a `<defs>` section. Each marker needs a unique ID that you'll reference in your edge configuration:
+
+<CodeSnippet
+  relativePath="edges/arrowheads/custom-arrowhead/custom-arrowheads.component.ts"
+  range={[3, 71]}
+  mark={[{ range: '6-23' }, { range: '25-42' }, { range: '44-54' }]}
+/>
+
+When marker is defined in the SVG `<defs>` section, it can be referenced in your edge configuration to apply the custom arrowhead to the edge.
+
+<CodeSnippet
+  relativePath="edges/arrowheads/custom-arrowhead/diagram.component.ts"
+  range={[32, 98]}
+  collapse={['3-37', '41-46', '50-55', '59-64']}
+  mark={[40, 49, 58]}
+/>
+
+See [`<marker>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/marker) documentation on MDN for more details.

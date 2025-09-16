@@ -28,8 +28,8 @@ export class NgDiagramBaseEdgeComponent {
   edge = input.required<Edge>();
   routing = input<string>();
   stroke = input<string>();
-  customMarkerStart = input<string>();
-  customMarkerEnd = input<string>();
+  sourceArrowhead = input<string>();
+  targetArrowhead = input<string>();
   strokeOpacity = input<number>(1);
   strokeWidth = input<number>(2);
 
@@ -59,26 +59,44 @@ export class NgDiagramBaseEdgeComponent {
     return `M ${points[0].x},${points[0].y}`;
   });
 
-  markerStart = computed(() =>
-    this.customMarkerStart()
-      ? `url(#${this.customMarkerStart()})`
-      : this.edge()?.targetArrowhead
-        ? `url(#${this.edge().targetArrowhead})`
-        : null
-  );
+  markerStart = computed(() => {
+    const markerId = this.sourceArrowhead() ?? this.edge()?.sourceArrowhead;
 
-  markerEnd = computed(() =>
-    this.customMarkerEnd()
-      ? `url(#${this.customMarkerEnd()})`
-      : this.edge()?.sourceArrowhead
-        ? `url(#${this.edge().sourceArrowhead})`
-        : null
-  );
+    if (!markerId) {
+      return null;
+    }
+
+    return `url(#${markerId})`;
+  });
+
+  markerEnd = computed(() => {
+    const markerId = this.targetArrowhead() ?? this.edge()?.targetArrowhead;
+
+    if (!markerId) {
+      return null;
+    }
+
+    return `url(#${markerId})`;
+  });
 
   selected = computed(() => this.edge().selected);
   temporary = computed(() => this.edge().temporary);
 
   labels = computed(() => this.edge().measuredLabels ?? []);
+
+  class = computed(() => {
+    const classArray = ['ng-diagram-edge__path'];
+
+    if (this.selected()) {
+      classArray.push('selected');
+    }
+
+    if (this.temporary()) {
+      classArray.push('temporary');
+    }
+
+    return classArray.join(' ');
+  });
 
   private prevRouting: string | undefined;
   private prevRoutingMode: RoutingMode | undefined;

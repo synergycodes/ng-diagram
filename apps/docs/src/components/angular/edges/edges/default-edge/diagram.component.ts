@@ -62,7 +62,7 @@ export class Diagram {
         target: '2',
         targetPort: 'port-left',
         data: {},
-        sourceArrowhead: 'custom-arrowhead',
+        targetArrowhead: 'custom-arrowhead',
         routing: 'bezier',
       },
     ],

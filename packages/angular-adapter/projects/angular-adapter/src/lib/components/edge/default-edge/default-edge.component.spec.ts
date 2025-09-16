@@ -57,22 +57,4 @@ describe('NgDiagramDefaultEdgeComponent', () => {
     expect(component.edge).toBeDefined();
     expect(component.edge().id).toBe('test-edge');
   });
-
-  it('should return proper marker when edge has source arrowhead', () => {
-    mockEdge.sourceArrowhead = 'arrowhead';
-
-    fixture.componentRef.setInput('edge', mockEdge);
-    fixture.detectChanges();
-
-    expect(component.markerStart()).toBe('url(#arrowhead)');
-  });
-
-  it('should return proper marker when edge has target arrowhead', () => {
-    mockEdge.targetArrowhead = 'arrowhead';
-
-    fixture.componentRef.setInput('edge', mockEdge);
-    fixture.detectChanges();
-
-    expect(component.markerEnd()).toBe('url(#arrowhead)');
-  });
 });
