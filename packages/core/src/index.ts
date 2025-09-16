@@ -11,4 +11,3 @@ export * from './utils';
 export * from './middleware-manager/middlewares';
 
 export { DEFAULT_NODE_MIN_SIZE } from './flow-config/default-flow-config';
-export { type LabelUpdate } from './label-batch-processor/label-batch-processor';

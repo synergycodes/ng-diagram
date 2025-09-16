@@ -201,12 +201,13 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
   );
 };
 
-import type { LabelUpdate } from '../../label-batch-processor/label-batch-processor';
-
 export interface UpdateEdgeLabelsCommand {
   name: 'updateEdgeLabels';
   edgeId: string;
-  labelUpdates: LabelUpdate[];
+  labelUpdates: {
+    labelId: string;
+    labelChanges: Partial<EdgeLabel>;
+  }[];
 }
 
 export const updateEdgeLabels = async (commandHandler: CommandHandler, command: UpdateEdgeLabelsCommand) => {
