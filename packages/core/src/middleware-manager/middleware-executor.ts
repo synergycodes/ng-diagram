@@ -28,6 +28,8 @@ export class MiddlewareExecutor<
   private metadata!: TMetadata;
   private edgesMap = new Map<string, Edge>();
   private nodesMap = new Map<string, Node>();
+  private initialNodesMap = new Map<string, Node>();
+  private initialEdgesMap = new Map<string, Edge>();
   private addedNodesIds = new Set<string>();
   private removedNodesIds = new Set<string>();
   private addedEdgesIds = new Set<string>();
@@ -54,6 +56,8 @@ export class MiddlewareExecutor<
     this.metadata = initialState.metadata;
     this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
     this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+    this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
+    this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
     return this.resolveMiddlewares();
@@ -96,6 +100,8 @@ export class MiddlewareExecutor<
     state: this.getState(),
     nodesMap: this.nodesMap,
     edgesMap: this.edgesMap,
+    initialNodesMap: this.initialNodesMap,
+    initialEdgesMap: this.initialEdgesMap,
     initialState: this.initialState,
     modelActionType: this.modelActionType,
     actionStateManager: this.flowCore.actionStateManager,

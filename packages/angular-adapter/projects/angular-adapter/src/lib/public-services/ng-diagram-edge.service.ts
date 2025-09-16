@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EdgeLabel, MiddlewareChain } from '@angularflow/core';
+import { EdgeLabel, LabelUpdate, MiddlewareChain } from '@angularflow/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()
@@ -17,12 +17,11 @@ export class NgDiagramEdgeService<
 
   /**
    * Updates a label on an edge.
-   * @param edgeId The ID of the edge to update the label on.
-   * @param labelId The ID of the label to update.
-   * @param labelChanges The changes to apply to the label.
+   * @param edgeId The ID of the edge to update the labels on.
+   * @param labelUpdates The changes to apply to the labels.
    */
-  updateEdgeLabel(edgeId: string, labelId: string, labelChanges: Partial<EdgeLabel>) {
-    this.flowCore.commandHandler.emit('updateEdgeLabel', { edgeId, labelId, labelChanges });
+  updateEdgeLabels(edgeId: string, labelUpdates: LabelUpdate[]) {
+    this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates });
   }
 
   /**

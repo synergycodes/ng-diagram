@@ -15,9 +15,7 @@ describe('EventManager', () => {
       eventManager.on('selectionMoved', callback);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 10, y: 20 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -48,9 +46,7 @@ describe('EventManager', () => {
       const unsubscribe = eventManager.on('selectionMoved', callback);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 5, y: 5 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -69,9 +65,7 @@ describe('EventManager', () => {
       eventManager.on('diagramInit', initCallback);
 
       const moveEvent: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', moveEvent);
@@ -122,9 +116,7 @@ describe('EventManager', () => {
       eventManager.on('selectionMoved', regularCallback);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 10, y: 10 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -162,9 +154,7 @@ describe('EventManager', () => {
       eventManager.setEnabled(false);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -184,9 +174,7 @@ describe('EventManager', () => {
       eventManager.on('selectionMoved', normalCallback);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -200,9 +188,7 @@ describe('EventManager', () => {
 
     it('should do nothing when no listeners are registered', () => {
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       expect(() => eventManager.emit('selectionMoved', event)).not.toThrow();
@@ -220,9 +206,7 @@ describe('EventManager', () => {
       eventManager.off('selectionMoved');
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -240,9 +224,7 @@ describe('EventManager', () => {
       eventManager.off('selectionMoved', callback1);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -273,9 +255,7 @@ describe('EventManager', () => {
       eventManager.offAll();
 
       eventManager.emit('selectionMoved', {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       });
       eventManager.emit('diagramInit', {
         nodes: [],
@@ -311,17 +291,13 @@ describe('EventManager', () => {
 
       eventManager.setEnabled(false);
       eventManager.emit('selectionMoved', {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       });
       expect(callback).not.toHaveBeenCalled();
 
       eventManager.setEnabled(true);
       eventManager.emit('selectionMoved', {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       });
       expect(callback).toHaveBeenCalled();
     });
@@ -359,9 +335,7 @@ describe('EventManager', () => {
       const unsubscribes = callbacks.map((cb) => eventManager.on('selectionMoved', cb));
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);
@@ -384,9 +358,7 @@ describe('EventManager', () => {
       unsubscribe = eventManager.on('selectionMoved', selfUnsubscribingCallback);
 
       const event: SelectionMovedEvent = {
-        selectedNodes: [],
-        selectedEdges: [],
-        delta: { x: 1, y: 1 },
+        nodes: [],
       };
 
       eventManager.emit('selectionMoved', event);

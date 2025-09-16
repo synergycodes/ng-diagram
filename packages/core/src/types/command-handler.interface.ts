@@ -10,7 +10,7 @@ import {
   DeleteNodesCommand,
   DeletePortsCommand,
   UpdateEdgeCommand,
-  UpdateEdgeLabelCommand,
+  UpdateEdgeLabelsCommand,
   UpdateNodeCommand,
   UpdateNodesCommand,
   UpdatePortsCommand,
@@ -72,7 +72,7 @@ export type Command =
   | BringToFrontCommand
   | SendToBackCommand
   | AddEdgeLabelsCommand
-  | UpdateEdgeLabelCommand
+  | UpdateEdgeLabelsCommand
   | DeleteEdgeLabelsCommand
   | RotateNodeToCommand
   | HighlightGroupCommand

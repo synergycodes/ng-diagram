@@ -170,10 +170,9 @@ describe('Add Update Delete Command', () => {
     const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
 
-    commandHandler.emit('updateEdgeLabel', {
+    commandHandler.emit('updateEdgeLabels', {
       edgeId: mockEdge.id,
-      labelId: mockEdgeLabel1.id,
-      labelChanges: { positionOnEdge: 0 },
+      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: 0 } }],
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(

@@ -6,6 +6,11 @@
       [model]="model"
       [config]="config"
       [debugMode]="debugMode()"
+      (diagramInit)="onDiagramInit($event)"
+      (selectionChanged)="onSelectionChanged($event)"
+      (selectionMoved)="onSelectionMoved($event)"
+      (viewportChanged)="onViewportChanged($event)"
+      (edgeDrawn)="onEdgeDrawn($event)"
     >
       <ng-diagram-background></ng-diagram-background>
     </ng-diagram>

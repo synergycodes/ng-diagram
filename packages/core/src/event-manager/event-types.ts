@@ -1,4 +1,4 @@
-import type { Edge, Node, Point, Viewport } from '../types';
+import type { Edge, Node, Viewport } from '../types';
 
 /**
  * Map of all available diagram events and their payload types
@@ -24,9 +24,7 @@ export interface DiagramInitEvent {
  * Event emitted when selected objects are moved
  */
 export interface SelectionMovedEvent {
-  selectedNodes: Node[];
-  selectedEdges: Edge[];
-  delta: Point;
+  nodes: Node[];
 }
 
 /**
