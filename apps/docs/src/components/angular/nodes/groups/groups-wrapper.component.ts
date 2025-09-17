@@ -1,10 +1,11 @@
 import '@angular/compiler';
+
 import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
