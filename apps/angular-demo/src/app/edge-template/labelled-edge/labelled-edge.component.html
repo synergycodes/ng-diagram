@@ -1,4 +1,4 @@
-<ng-diagram-base-edge class="labelled-edge" [edge]="edge()" stroke="black" [customMarkerEnd]="'ng-diagram-arrow'">
+<ng-diagram-base-edge class="labelled-edge" [edge]="edge()" stroke="black" [targetArrowhead]="'ng-diagram-arrow'">
   <ng-diagram-base-edge-label [id]="'edge-label'" [positionOnEdge]="edge().data.labelPosition ?? 0.5">
     <div class="edge-label">
       <span>{{ edge().data['labelPosition'] || 'Label' }}</span>

@@ -49,25 +49,25 @@ interaction, etc.).
   [data]="data()"
   [routing]="'bezier'"
   [customStroke]="'red'"
-  [customMarkerEnd]="'angularflow-arrow'"
+  [targetArrowhead]="'angularflow-arrow'"
   [displayLabel]="true"
 />
 ```
 
-| Input               | Type                                                 | Required | Description                                                                |
-| ------------------- | ---------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
-| `data`              | `Edge`                                               | Yes      | Edge data object (source, target, metadata, etc.).                         |
-| `routing`           | `string`                                             | No       | Path type: `'polyline'`, `'bezier'`, `'orthogonal'`. Default: `'polyline'` |
-| `customStroke`      | `string`                                             | No       | Custom stroke color.                                                       |
-| `customMarkerStart` | `string`                                             | No       | Custom marker start                                                        |
-| `customMarkerEnd`   | `string`                                             | No       | Custom marker end                                                          |
-| `displayLabel`      | `boolean`                                            | No       | Whether to display the default edge label component.                       |
-| `pathAndPoints`     | `{ path: string; points: {x: number, y: number}[] }` | No       | Overrides routing with a custom path and list of points.                   |
+| Input             | Type                                                 | Required | Description                                                                |
+| ----------------- | ---------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `data`            | `Edge`                                               | Yes      | Edge data object (source, target, metadata, etc.).                         |
+| `routing`         | `string`                                             | No       | Path type: `'polyline'`, `'bezier'`, `'orthogonal'`. Default: `'polyline'` |
+| `customStroke`    | `string`                                             | No       | Custom stroke color.                                                       |
+| `sourceArrowhead` | `string`                                             | No       | Custom marker start                                                        |
+| `targetArrowhead` | `string`                                             | No       | Custom marker end                                                          |
+| `displayLabel`    | `boolean`                                            | No       | Whether to display the default edge label component.                       |
+| `pathAndPoints`   | `{ path: string; points: {x: number, y: number}[] }` | No       | Overrides routing with a custom path and list of points.                   |
 
 #### How to Use a Custom Path
 
 ```html
-<angular-adapter-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [customMarkerEnd]="'angularflow-arrow'" />
+<angular-adapter-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [targetArrowhead]="'angularflow-arrow'" />
 ```
 
 #### angular-adapter-edge-label

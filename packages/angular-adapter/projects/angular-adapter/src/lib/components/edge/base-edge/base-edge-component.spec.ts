@@ -144,7 +144,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
 
   it('should return proper marker when edge has source arrowhead', () => {
     fixture.componentRef.setInput('edge', mockEdge);
-    fixture.componentRef.setInput('customMarkerStart', 'arrowhead');
+    fixture.componentRef.setInput('sourceArrowhead', 'arrowhead');
     fixture.detectChanges();
 
     expect(component.markerStart()).toBe('url(#arrowhead)');
@@ -152,7 +152,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
 
   it('should return proper marker when edge has target arrowhead', () => {
     fixture.componentRef.setInput('edge', mockEdge);
-    fixture.componentRef.setInput('customMarkerEnd', 'arrowhead');
+    fixture.componentRef.setInput('targetArrowhead', 'arrowhead');
     fixture.detectChanges();
 
     expect(component.markerEnd()).toBe('url(#arrowhead)');
