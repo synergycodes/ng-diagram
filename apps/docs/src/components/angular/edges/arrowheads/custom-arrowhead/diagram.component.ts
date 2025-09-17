@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type AppMiddlewares,
 } from '@angularflow/angular-adapter';
 import { CustomArrowheadsComponent } from './custom-arrowheads.component';
 
@@ -30,7 +29,7 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
   `,
 })
 export class CustomArrowheadDiagram {
-  model = initializeModel<AppMiddlewares>({
+  model = initializeModel({
     metadata: {
       viewport: { x: 100, y: 0, scale: 0.8 },
     },
