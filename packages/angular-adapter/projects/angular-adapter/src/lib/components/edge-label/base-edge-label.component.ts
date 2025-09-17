@@ -71,10 +71,9 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
       const lastPositionOnEdge = this.lastPositionOnEdge();
       if (newPositionOnEdge !== lastPositionOnEdge) {
         this.lastPositionOnEdge.set(newPositionOnEdge);
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabel', {
+        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
           edgeId: this.edgeId(),
-          labelId: this.id(),
-          labelChanges: { positionOnEdge: newPositionOnEdge },
+          labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
         });
       }
     });

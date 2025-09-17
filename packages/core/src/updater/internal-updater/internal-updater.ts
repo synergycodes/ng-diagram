@@ -37,7 +37,7 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    * @param portId Port id
    */
   addPort(nodeId: string, port: Port) {
-    this.flowCore.portBatchProcessor.process(nodeId, port, (nodeId, ports) => {
+    this.flowCore.portBatchProcessor.processAdd(nodeId, port, (nodeId, ports) => {
       this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
     });
   }
@@ -57,9 +57,14 @@ export class InternalUpdater extends BaseUpdater implements Updater {
 
     const portsToUpdate = this.getPortsToUpdate(node, ports);
 
-    this.flowCore.commandHandler.emit('updatePorts', {
-      nodeId,
-      ports: portsToUpdate.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } })),
+    portsToUpdate.forEach(({ id, size, position }) => {
+      this.flowCore.portBatchProcessor.processUpdate(
+        nodeId,
+        { portId: id, portChanges: { size, position } },
+        (nodeId, portUpdates) => {
+          this.flowCore.commandHandler.emit('updatePorts', { nodeId, ports: portUpdates });
+        }
+      );
     });
   }
 
@@ -70,16 +75,17 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    * @param label Label
    */
   addEdgeLabel(edgeId: string, label: EdgeLabel) {
-    this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels: [label] });
+    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, (edgeId, labels) => {
+      this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels });
+    });
   }
 
   /**
    * @internal
-   * Internal method to apply a edge label size and position
+   * Internal method to apply an edge label size
    * @param edgeId Edge id
    * @param labelId Label id
    * @param size Size
-   * @param position Position
    */
   applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>) {
     const edge = this.flowCore.getEdgeById(edgeId);
@@ -89,6 +95,12 @@ export class InternalUpdater extends BaseUpdater implements Updater {
       return;
     }
 
-    this.flowCore.commandHandler.emit('updateEdgeLabel', { edgeId, labelId, labelChanges: { size } });
+    this.flowCore.labelBatchProcessor.processUpdate(
+      edgeId,
+      { labelId, labelChanges: { size } },
+      (edgeId, labelUpdates) => {
+        this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates });
+      }
+    );
   }
 }

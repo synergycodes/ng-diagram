@@ -1,14 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import {
   ActionState,
-  EdgeLabel,
+  DiagramEventMap,
   EdgeRouting,
   EnvironmentInfo,
+  EventListener,
   Middleware,
   ModelActionType,
   Node,
   TransactionCallback,
   TransactionResult,
+  UnsubscribeFn,
 } from '@angularflow/core';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
 import { NgDiagramConfig } from '../types';
@@ -127,40 +129,105 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Adds labels to an edge.
-   * @param edgeId The ID of the edge to add labels to.
-   * @param labels The labels to add to the edge.
-   */
-  addEdgeLabels(edgeId: string, labels: EdgeLabel[]) {
-    this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels });
-  }
-
-  /**
-   * Updates a label on an edge.
-   * @param edgeId The ID of the edge to update the label on.
-   * @param labelId The ID of the label to update.
-   * @param labelChanges The changes to apply to the label.
-   */
-  updateEdgeLabel(edgeId: string, labelId: string, labelChanges: Partial<EdgeLabel>) {
-    this.flowCore.commandHandler.emit('updateEdgeLabel', { edgeId, labelId, labelChanges });
-  }
-
-  /**
-   * Deletes labels from an edge.
-   * @param edgeId The ID of the edge to delete labels from.
-   * @param labelIds The IDs of the labels to delete.
-   */
-  deleteEdgeLabels(edgeId: string, labelIds: string[]) {
-    this.flowCore.commandHandler.emit('deleteEdgeLabels', { edgeId, labelIds });
-  }
-
-  /**
    * Call this method to start linking from your custom logic
    * @param node The node from which the linking starts
    * @param portId The port ID from which the linking starts
    */
   startLinking(node: Node, portId: string) {
     this.manualLinkingService.startLinking(node, portId);
+  }
+
+  /**
+   * Add an event listener for a diagram event
+   * @param event The event name
+   * @param callback The callback to invoke when the event is emitted
+   * @returns A function to unsubscribe
+   * @example
+   * const unsubscribe = ngDiagramService.addEventListener('selectionChanged', (event) => {
+   *   console.log('Selection changed', event.selectedNodes);
+   * });
+   */
+  addEventListener<K extends keyof DiagramEventMap>(
+    event: K,
+    callback: EventListener<DiagramEventMap[K]>
+  ): UnsubscribeFn {
+    return this.flowCore.eventManager.on(event, callback);
+  }
+
+  /**
+   * Add an event listener that will only fire once
+   * @param event The event name
+   * @param callback The callback to invoke when the event is emitted
+   * @returns A function to unsubscribe
+   * @example
+   * ngDiagramService.addEventListenerOnce('diagramInit', (event) => {
+   *   console.log('Diagram initialized', event);
+   * });
+   */
+  addEventListenerOnce<K extends keyof DiagramEventMap>(
+    event: K,
+    callback: EventListener<DiagramEventMap[K]>
+  ): UnsubscribeFn {
+    return this.flowCore.eventManager.once(event, callback);
+  }
+
+  /**
+   * Remove an event listener
+   * @param event The event name
+   * @param callback Optional specific callback to remove
+   * @example
+   * // Remove all listeners for an event
+   * ngDiagramService.removeEventListener('selectionChanged');
+   *
+   * // Remove a specific listener
+   * ngDiagramService.removeEventListener('selectionChanged', myCallback);
+   */
+  removeEventListener<K extends keyof DiagramEventMap>(event: K, callback?: EventListener<DiagramEventMap[K]>): void {
+    this.flowCore.eventManager.off(event, callback);
+  }
+
+  /**
+   * Remove all event listeners
+   * @example
+   * ngDiagramService.removeAllEventListeners();
+   */
+  removeAllEventListeners(): void {
+    this.flowCore.eventManager.offAll();
+  }
+
+  /**
+   * Enable or disable event emissions
+   * @param enabled Whether events should be emitted
+   * @example
+   * // Disable all events
+   * ngDiagramService.setEventsEnabled(false);
+   *
+   * // Re-enable events
+   * ngDiagramService.setEventsEnabled(true);
+   */
+  setEventsEnabled(enabled: boolean): void {
+    this.flowCore.eventManager.setEnabled(enabled);
+  }
+
+  /**
+   * Check if event emissions are enabled
+   * @returns True if events are enabled
+   */
+  areEventsEnabled(): boolean {
+    return this.flowCore.eventManager.isEnabled();
+  }
+
+  /**
+   * Check if there are any listeners for an event
+   * @param event The event name
+   * @returns True if there are listeners
+   * @example
+   * if (ngDiagramService.hasEventListeners('selectionChanged')) {
+   *   // There are listeners for selection changes
+   * }
+   */
+  hasEventListeners(event: keyof DiagramEventMap): boolean {
+    return this.flowCore.eventManager.hasListeners(event);
   }
 
   /**

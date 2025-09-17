@@ -266,6 +266,21 @@ describe('FlowCore', () => {
       expect(mockModelAdapter.updateEdges).toHaveBeenCalledWith([mockEdge]);
     });
 
+    it('should flush deferred emits when state is applied', async () => {
+      const finalState = {
+        nodes: [mockNode],
+        edges: [mockEdge],
+        metadata: { test: 'abc' },
+      };
+
+      mockMiddlewareManager.execute.mockResolvedValue(finalState);
+      const flushSpy = vi.spyOn(flowCore.eventManager, 'flushDeferredEmits');
+
+      await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
+
+      expect(flushSpy).toHaveBeenCalled();
+    });
+
     it('should call the middleware with the correct parameters', async () => {
       mockGetMetadata.mockReturnValue(mockMetadata);
       mockGetNodes.mockReturnValue([mockNode]);
@@ -288,6 +303,15 @@ describe('FlowCore', () => {
       expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
       expect(mockModelAdapter.updateNodes).not.toHaveBeenCalled();
       expect(mockModelAdapter.updateEdges).not.toHaveBeenCalled();
+    });
+
+    it('should clear deferred emits when state is not applied', async () => {
+      mockMiddlewareManager.execute.mockResolvedValue(undefined);
+      const clearSpy = vi.spyOn(flowCore.eventManager, 'clearDeferredEmits');
+
+      await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
+
+      expect(clearSpy).toHaveBeenCalled();
     });
   });
 

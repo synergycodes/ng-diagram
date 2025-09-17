@@ -29,7 +29,12 @@ title: "@angularflow/angular-adapter"
 
 ## Types
 
+- [DiagramInitEvent](/docs/api/types/diagraminitevent/)
 - [Edge](/docs/api/types/edge/)
+- [EdgeDrawnEvent](/docs/api/types/edgedrawnevent/)
 - [GroupNode](/docs/api/types/groupnode/)
 - [Point](/docs/api/types/point/)
+- [SelectionChangedEvent](/docs/api/types/selectionchangedevent/)
+- [SelectionMovedEvent](/docs/api/types/selectionmovedevent/)
+- [ViewportChangedEvent](/docs/api/types/viewportchangedevent/)
 - [Node](/docs/api/types/node/)

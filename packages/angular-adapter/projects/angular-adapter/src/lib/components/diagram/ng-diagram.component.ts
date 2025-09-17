@@ -4,14 +4,24 @@ import {
   Component,
   effect,
   ElementRef,
+  EventEmitter,
   inject,
   input,
   OnDestroy,
   OnInit,
+  Output,
 } from '@angular/core';
 import { Edge, Node } from '@angularflow/core';
 
-import type { MiddlewareChain, ModelAdapter } from '@angularflow/core';
+import type {
+  DiagramInitEvent,
+  EdgeDrawnEvent,
+  MiddlewareChain,
+  ModelAdapter,
+  SelectionChangedEvent,
+  SelectionMovedEvent,
+  ViewportChangedEvent,
+} from '@angularflow/core';
 
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
@@ -104,6 +114,31 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   edges = this.renderer.edges;
   viewport = this.renderer.viewport;
 
+  /**
+   * Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
+   */
+  @Output() diagramInit = new EventEmitter<DiagramInitEvent>();
+
+  /**
+   * Event emitted when a user manually draws an edge between two nodes
+   */
+  @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
+
+  /**
+   * Event emitted when selected nodes are moved
+   */
+  @Output() selectionMoved = new EventEmitter<SelectionMovedEvent>();
+
+  /**
+   * Event emitted when selection changes
+   */
+  @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
+
+  /**
+   * Event emitted when viewport changes (pan/zoom)
+   */
+  @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
+
   constructor() {
     effect(() => {
       const model = this.model();
@@ -112,6 +147,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
         this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
 
         this.initializedModel = model;
+
+        this.setupEventBridge();
       }
     });
   }
@@ -228,5 +265,16 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
         'updateViewportSize'
       );
     }
+  }
+
+  private setupEventBridge(): void {
+    const flowCore = this.flowCoreProvider.provide();
+    const eventManager = flowCore.eventManager;
+
+    eventManager.on('diagramInit', (event) => this.diagramInit.emit(event));
+    eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
+    eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
+    eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
+    eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
   }
 }

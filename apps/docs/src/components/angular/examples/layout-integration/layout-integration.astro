@@ -1,8 +1,8 @@
 ---
-import { DiagramComponent } from './diagram.component';
+import { LayoutIntegrationWrapperComponent } from './layout-integration-wrapper.component';
 import ContentWrapper from '@components/content-wrapper/content-wrapper.astro';
 ---
 
 <ContentWrapper>
-  <DiagramComponent client:only="angular" />
+  <LayoutIntegrationWrapperComponent client:only="angular" />
 </ContentWrapper>
