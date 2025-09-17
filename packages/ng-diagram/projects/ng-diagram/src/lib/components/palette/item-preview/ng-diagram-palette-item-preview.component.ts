@@ -3,6 +3,19 @@ import { NgDiagramViewportService } from '../../../public-services/ng-diagram-vi
 import { PaletteService } from '../../../services';
 import { detectEnvironment } from '../../../utils/detect-environment';
 
+/**
+ * The `NgDiagramPaletteItemPreviewComponent` is responsible for rendering a live preview of a palette item
+ * when it is being dragged or hovered in the palette.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-palette-item-preview>
+ *   <!-- Palette item content here -->
+ * </ng-diagram-palette-item-preview>
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-palette-item-preview',
   templateUrl: './ng-diagram-palette-item-preview.component.html',
@@ -13,14 +26,12 @@ export class NgDiagramPaletteItemPreviewComponent {
   private paletteService = inject(PaletteService);
   private browser = detectEnvironment().browser;
 
-  id = crypto.randomUUID();
+  readonly id = crypto.randomUUID();
+  readonly preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
 
-  scale = inject(NgDiagramViewportService).scale;
+  protected readonly scale = inject(NgDiagramViewportService).scale;
+  protected readonly isSafari = this.browser === 'Safari';
+  protected readonly isChrome = this.browser === 'Chrome';
 
-  isSafari = this.browser === 'Safari';
-  isChrome = this.browser === 'Chrome';
-
-  preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
-
-  isVisible = computed(() => this.paletteService.previewId() === this.id);
+  protected readonly isVisible = computed(() => this.paletteService.previewId() === this.id);
 }

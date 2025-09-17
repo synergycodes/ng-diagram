@@ -9,7 +9,7 @@ Interface representing a group node in the diagram
 
 ## Extends
 
-- `SimpleNode`\<`T`\>
+- [`SimpleNode`](/docs/api/types/simplenode/)\<`T`\>
 
 ## Type Parameters
 
@@ -27,7 +27,7 @@ The angle of the node from 0 to 360.
 
 #### Inherited from
 
-`SimpleNode.angle`
+[`SimpleNode`](/docs/api/types/simplenode/).[`angle`](/docs/api/types/simplenode/#angle)
 
 ***
 
@@ -39,7 +39,7 @@ Whether the size of the node is automatically resized based on the content.
 
 #### Inherited from
 
-`SimpleNode.autoSize`
+[`SimpleNode`](/docs/api/types/simplenode/).[`autoSize`](/docs/api/types/simplenode/#autosize)
 
 ***
 
@@ -54,7 +54,7 @@ The z-index of the node. This value is set automatically
 
 #### Inherited from
 
-`SimpleNode.computedZIndex`
+[`SimpleNode`](/docs/api/types/simplenode/).[`computedZIndex`](/docs/api/types/simplenode/#computedzindex)
 
 ***
 
@@ -66,7 +66,7 @@ The data associated with the node.
 
 #### Inherited from
 
-`SimpleNode.data`
+[`SimpleNode`](/docs/api/types/simplenode/).[`data`](/docs/api/types/simplenode/#data)
 
 ***
 
@@ -78,7 +78,7 @@ The id of the parent node.
 
 #### Inherited from
 
-`SimpleNode.groupId`
+[`SimpleNode`](/docs/api/types/simplenode/).[`groupId`](/docs/api/types/simplenode/#groupid)
 
 ***
 
@@ -98,7 +98,7 @@ The unique identifier for the node.
 
 #### Inherited from
 
-`SimpleNode.id`
+[`SimpleNode`](/docs/api/types/simplenode/).[`id`](/docs/api/types/simplenode/#id)
 
 ***
 
@@ -112,7 +112,7 @@ Flag indicating the node is a group
 
 ### measuredPorts?
 
-> `readonly` `optional` **measuredPorts**: `Port`[]
+> `readonly` `optional` **measuredPorts**: [`Port`](/docs/api/types/port/)[]
 
 #### Remarks
 
@@ -121,7 +121,7 @@ The ports of the node with computed position and size.
 
 #### Inherited from
 
-`SimpleNode.measuredPorts`
+[`SimpleNode`](/docs/api/types/simplenode/).[`measuredPorts`](/docs/api/types/simplenode/#measuredports)
 
 ***
 
@@ -133,7 +133,7 @@ The position of the node in the diagram.
 
 #### Inherited from
 
-`SimpleNode.position`
+[`SimpleNode`](/docs/api/types/simplenode/).[`position`](/docs/api/types/simplenode/#position)
 
 ***
 
@@ -145,7 +145,7 @@ Whether the node is resizable.
 
 #### Inherited from
 
-`SimpleNode.resizable`
+[`SimpleNode`](/docs/api/types/simplenode/).[`resizable`](/docs/api/types/simplenode/#resizable)
 
 ***
 
@@ -157,7 +157,7 @@ Whether the node is rotatable.
 
 #### Inherited from
 
-`SimpleNode.rotatable`
+[`SimpleNode`](/docs/api/types/simplenode/).[`rotatable`](/docs/api/types/simplenode/#rotatable)
 
 ***
 
@@ -169,19 +169,19 @@ Whether the node is selected.
 
 #### Inherited from
 
-`SimpleNode.selected`
+[`SimpleNode`](/docs/api/types/simplenode/).[`selected`](/docs/api/types/simplenode/#selected)
 
 ***
 
 ### size?
 
-> `optional` **size**: `Size`
+> `optional` **size**: [`Size`](/docs/api/types/size/)
 
 The size of the node.
 
 #### Inherited from
 
-`SimpleNode.size`
+[`SimpleNode`](/docs/api/types/simplenode/).[`size`](/docs/api/types/simplenode/#size)
 
 ***
 
@@ -193,7 +193,7 @@ The type of the node declared in nodeTemplateMap.
 
 #### Inherited from
 
-`SimpleNode.type`
+[`SimpleNode`](/docs/api/types/simplenode/).[`type`](/docs/api/types/simplenode/#type)
 
 ***
 
@@ -205,4 +205,4 @@ The z-order of the node.
 
 #### Inherited from
 
-`SimpleNode.zOrder`
+[`SimpleNode`](/docs/api/types/simplenode/).[`zOrder`](/docs/api/types/simplenode/#zorder)

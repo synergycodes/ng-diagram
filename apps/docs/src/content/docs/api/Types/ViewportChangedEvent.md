@@ -13,7 +13,7 @@ pinch zoom, and programmatic viewport changes.
 
 ### previousViewport
 
-> **previousViewport**: `Viewport`
+> **previousViewport**: [`Viewport`](/docs/api/types/viewport/)
 
 Previous viewport state before the change
 
@@ -21,6 +21,6 @@ Previous viewport state before the change
 
 ### viewport
 
-> **viewport**: `Viewport`
+> **viewport**: [`Viewport`](/docs/api/types/viewport/)
 
 Current viewport state after the change

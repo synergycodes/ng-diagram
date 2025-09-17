@@ -1,4 +1,4 @@
-import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node } from '../../types';
+import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node, Point } from '../../types';
 
 const OFFSET = 20;
 
@@ -8,13 +8,13 @@ export interface CopyCommand {
 
 export interface PasteCommand {
   name: 'paste';
-  position?: { x: number; y: number };
+  position?: Point;
 }
 
 /**
  * Calculate the center point of a collection of nodes
  */
-const calculateNodeCenter = (nodes: Node[]): { x: number; y: number } => {
+const calculateNodeCenter = (nodes: Node[]): Point => {
   if (nodes.length === 0) {
     return { x: 0, y: 0 };
   }
@@ -28,7 +28,7 @@ const calculateNodeCenter = (nodes: Node[]): { x: number; y: number } => {
 /**
  * Calculate the paste position and offset based on command parameters
  */
-const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): { x: number; y: number } => {
+const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point => {
   const center = calculateNodeCenter(copiedNodes);
 
   if (!command.position) {
@@ -87,7 +87,7 @@ const updatePortNodeIds = (node: Node): Node => {
 const createPastedNodes = (
   config: FlowConfig,
   copiedNodes: Node[],
-  offset: { x: number; y: number },
+  offset: Point,
   nodeIdMap: Map<string, string>
 ): Node[] => {
   return copiedNodes.map((node) => {

@@ -1,5 +1,5 @@
 import { NgDiagramMath } from '../../math';
-import type { Bounds, CommandHandler, FlowConfig, GroupNode, Node } from '../../types';
+import type { Bounds, CommandHandler, FlowConfig, GroupNode, Node, Point, Size } from '../../types';
 import { calculateGroupBounds, isGroup, isSameSize } from '../../utils';
 
 export interface ResizeNodeCommand {
@@ -230,8 +230,8 @@ const calculateSnappedDimensions = (
   nextPosition: Node['position'] | undefined,
   nextSize: Node['size'],
   snappedPosition: Node['position'] | undefined,
-  snapping: { x: number; y: number }
-): { width: number; height: number } => {
+  snapping: Point
+): Size => {
   const prevWidth = node.size?.width ?? 0;
   const prevHeight = node.size?.height ?? 0;
   const nodeWidth = nextSize?.width ?? prevWidth;

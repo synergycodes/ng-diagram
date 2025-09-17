@@ -5,6 +5,8 @@ import { Point, Size } from './utils';
 
 /**
  * Configuration for node resizing behavior.
+ *
+ * @category Types
  */
 export interface ResizeConfig {
   /**
@@ -16,6 +18,8 @@ export interface ResizeConfig {
 
 /**
  * Configuration for linking (edge creation) behavior.
+ *
+ * @category Types
  */
 export interface LinkingConfig {
   /**
@@ -56,6 +60,8 @@ export interface LinkingConfig {
 
 /**
  * Configuration for node grouping behavior.
+ *
+ * @category Types
  */
 export interface GroupingConfig {
   /**
@@ -69,6 +75,8 @@ export interface GroupingConfig {
 
 /**
  * Configuration for zooming behavior.
+ *
+ * @category Types
  */
 export interface ZoomConfig {
   /**
@@ -85,6 +93,11 @@ export interface ZoomConfig {
   step: number;
 }
 
+/**
+ * Configuration for the diagram background.
+ *
+ * @category Types
+ */
 export interface BackgroundConfig {
   /**
    * The size of the dots in the background.
@@ -94,6 +107,8 @@ export interface BackgroundConfig {
 
 /**
  * Configuration for node rotation behavior.
+ *
+ * @category Types
  */
 export interface NodeRotationConfig {
   /**
@@ -117,6 +132,8 @@ export interface NodeRotationConfig {
 
 /**
  * Configuration for node dragging behavior.
+ *
+ * @category Types
  */
 export interface SnappingConfig {
   /**
@@ -160,6 +177,13 @@ export interface SnappingConfig {
   defaultResizeSnap: Point;
 }
 
+ *
+ * @category Types
+/**
+ * Configuration for selection moving behavior.
+ *
+ * @category Types
+ */
 export interface SelectionMovingConfig {
   /**
    * Distance in pixels to move the screen while dragging nodes near the edge of the viewport.
@@ -174,6 +198,8 @@ export interface SelectionMovingConfig {
 
 /**
  * Configuration for z-index layering behavior.
+ *
+ * @category Types
  */
 export interface ZIndexConfig {
   /**
@@ -201,18 +227,25 @@ export interface ZIndexConfig {
 /**
  * Interface representing configurable properties of the edge routing.
  *
- * Built-in edge routing configurations:
- * - `bezier`: Configuration for bezier curve routing
- * - `orthogonal`: Configuration for orthogonal routing
+ * @category Types
  */
 export interface EdgeRoutingConfig {
+  /**
+   * The default edge routing algorithm to use for edges.
+   * Can be one of the built-in routing names or a custom string for user-defined routing.
+   * @see EdgeRoutingName
+   */
   defaultRouting: EdgeRoutingName;
-
+  /** configuration options for bezier routing */
   bezier?: {
+    /** bezier control point offset */
     bezierControlOffset?: number;
   };
+  /** configuration options for orthogonal routing */
   orthogonal?: {
+    /** first/last segment length */
     firstLastSegmentLength?: number;
+    /** maximum corner radius */
     maxCornerRadius?: number;
   };
 
@@ -224,6 +257,8 @@ export interface EdgeRoutingConfig {
 
 /**
  * The main configuration interface for the flow system.
+ *
+ * @category Types
  */
 export interface FlowConfig {
   /**
@@ -263,7 +298,18 @@ export interface FlowConfig {
    */
   background: BackgroundConfig;
 
+  /**
+   * Tree layout configuration.
+   */
+
+  /**
+   * Configuration for node rotation behavior.
+   */
   nodeRotation: NodeRotationConfig;
+
+  /**
+   * Configuration for snapping behavior.
+   */
   snapping: SnappingConfig;
 
   /**

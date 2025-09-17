@@ -28,6 +28,6 @@ All nodes present in the diagram after initialization
 
 ### viewport
 
-> **viewport**: `Viewport`
+> **viewport**: [`Viewport`](/docs/api/types/viewport/)
 
 Current viewport configuration including position and scale

@@ -25,6 +25,7 @@ import type {
   ModelActionType,
   ModelAdapter,
   Node,
+  Point,
   Port,
   Renderer,
 } from './types';
@@ -54,7 +55,7 @@ export class FlowCore {
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
 
-  readonly getFlowOffset: () => { x: number; y: number };
+  readonly getFlowOffset: () => Point;
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -62,7 +63,7 @@ export class FlowCore {
     public readonly inputEventsRouter: InputEventsRouter,
     environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
-    getFlowOffset?: () => { x: number; y: number },
+    getFlowOffset?: () => Point,
     config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
@@ -272,7 +273,7 @@ export class FlowCore {
    * @param clientPosition Client position
    * @returns { x: number, y: number } Flow position
    */
-  clientToFlowPosition(clientPosition: { x: number; y: number }): { x: number; y: number } {
+  clientToFlowPosition(clientPosition: Point): Point {
     const { x: viewportX, y: viewportY, scale } = this.model.getMetadata().viewport;
     const { x: flowOffsetX, y: flowOffsetY } = this.getFlowOffset();
     return {
@@ -286,7 +287,7 @@ export class FlowCore {
    * @param flowPosition Flow position
    * @returns { x: number, y: number } Client position
    */
-  flowToClientPosition(flowPosition: { x: number; y: number }): { x: number; y: number } {
+  flowToClientPosition(flowPosition: Point): Point {
     const { x: viewportX, y: viewportY, scale } = this.model.getMetadata().viewport;
     const { x: flowOffsetX, y: flowOffsetY } = this.getFlowOffset();
     return {
@@ -300,7 +301,7 @@ export class FlowCore {
    * @param clientPosition Client position
    * @returns position on the flow viewport
    */
-  clientToFlowViewportPosition(clientPosition: { x: number; y: number }): { x: number; y: number } {
+  clientToFlowViewportPosition(clientPosition: Point): Point {
     const { x: flowOffsetX, y: flowOffsetY } = this.getFlowOffset();
     return {
       x: clientPosition.x - flowOffsetX,
@@ -342,7 +343,7 @@ export class FlowCore {
    * @param range Range to check in
    * @returns Array of nodes in range
    */
-  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
+  getNodesInRange(point: Point, range: number): Node[] {
     return getNodesInRange(this, point, range);
   }
 
@@ -352,7 +353,7 @@ export class FlowCore {
    * @param range Range to check in
    * @returns Nearest node in range or null
    */
-  getNearestNodeInRange(point: { x: number; y: number }, range: number): Node | null {
+  getNearestNodeInRange(point: Point, range: number): Node | null {
     return getNearestNodeInRange(this, point, range);
   }
 
@@ -362,7 +363,7 @@ export class FlowCore {
    * @param range Range to check in
    * @returns Nearest port in range or null
    */
-  getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
+  getNearestPortInRange(point: Point, range: number): Port | null {
     return getNearestPortInRange(this, point, range);
   }
 

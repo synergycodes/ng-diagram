@@ -16,6 +16,16 @@ import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
 
+/**
+ * The `NgDiagramPortComponent` represents a single port on a node within the diagram.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-port [id]="port.id" [type]="port.type" [side]="port.side" />
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-port',
   template: '',
@@ -33,15 +43,25 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
   private readonly linkingInputDirective = inject(LinkingInputDirective);
+  protected readonly isInitialized = signal(false);
+  protected readonly lastSide = signal<Port['side'] | undefined>(undefined);
+  protected readonly lastType = signal<Port['type'] | undefined>(undefined);
+  protected readonly nodeData = computed(() => this.nodeComponent?.node());
 
+  /**
+   * The unique identifier for the port. test
+   */
   id = input.required<Port['id']>();
-  type = input.required<Port['type']>();
-  side = input.required<Port['side']>();
-  nodeData = computed(() => this.nodeComponent?.node());
 
-  lastSide = signal<Port['side'] | undefined>(undefined);
-  lastType = signal<Port['type'] | undefined>(undefined);
-  private isInitialized = signal(false);
+  /**
+   * The type of the port (e.g., source, target, both).
+   */
+  type = input.required<Port['type']>();
+
+  /**
+   * The side of the node where the port is rendered (e.g., top, right, bottom, left).
+   */
+  side = input.required<Port['side']>();
 
   constructor() {
     super();
@@ -75,6 +95,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     });
   }
 
+  /** @internal */
   ngOnInit(): void {
     this.lastSide.set(this.side());
     this.lastType.set(this.type());
@@ -98,6 +119,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     this.isInitialized.set(true);
   }
 
+  /** @internal */
   ngOnDestroy(): void {
     const nodeData = this.nodeData();
     if (!nodeData) {

@@ -2,12 +2,19 @@ import type { Edge, Node, Viewport } from '../types';
 
 /**
  * Map of all available diagram events and their payload types
+ *
+ * @category Types
  */
 export interface DiagramEventMap {
+  /** Event emitted when the diagram is initialized */
   diagramInit: DiagramInitEvent;
+  /** Event emitted when the selection is moved */
   selectionMoved: SelectionMovedEvent;
+  /** Event emitted when the selection changes */
   selectionChanged: SelectionChangedEvent;
+  /** Event emitted when the viewport changes */
   viewportChanged: ViewportChangedEvent;
+  /** Event emitted when an edge is drawn */
   edgeDrawn: EdgeDrawnEvent;
 }
 

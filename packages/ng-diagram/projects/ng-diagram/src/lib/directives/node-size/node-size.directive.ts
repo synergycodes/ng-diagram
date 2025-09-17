@@ -17,6 +17,7 @@ export const DEFAULT_GROUP_SIZE = { width: '9.0625rem', height: '9.0625rem' };
  * 1. Explicit size from node data (when autoSize=false)
  * 2. Built-in defaults for default node types (no type specified)
  * 3. User's CSS (for custom node types)
+ * @internal
  */
 @Directive({
   selector: '[ngDiagramNodeSize]',

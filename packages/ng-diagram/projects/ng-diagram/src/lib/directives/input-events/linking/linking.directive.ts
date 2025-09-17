@@ -4,9 +4,6 @@ import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';
 
-/**
- * @category Directives
- */
 @Directive({
   selector: '[ngDiagramLinkingInput]',
   host: {

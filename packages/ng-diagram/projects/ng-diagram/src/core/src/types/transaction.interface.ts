@@ -58,7 +58,18 @@ export interface TransactionContext {
 
 export type TransactionCallback = (context: TransactionContext) => void | Promise<void>;
 
+/**
+ * Result of a transaction execution.
+ *
+ * @category Types
+ */
 export interface TransactionResult {
+  /**
+   * Results of the transaction as a state update
+   */
   results: FlowStateUpdate;
+  /**
+   * Number of commands emitted during the transaction
+   */
   commandsCount: number;
 }

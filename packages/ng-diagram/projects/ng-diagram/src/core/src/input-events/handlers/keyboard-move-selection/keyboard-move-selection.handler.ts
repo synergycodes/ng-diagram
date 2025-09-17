@@ -1,4 +1,4 @@
-import { Point } from '../../../types';
+import { Point, Size } from '../../../types';
 import { EventHandler } from '../event-hander';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
@@ -32,10 +32,7 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
     }
   }
 
-  private handleEdgePanning(
-    event: KeyboardMoveSelectionEvent,
-    nodes: { position: Point; size?: { width: number; height: number } }[]
-  ): void {
+  private handleEdgePanning(event: KeyboardMoveSelectionEvent, nodes: { position: Point; size?: Size }[]): void {
     const needsPanning = this.checkIfNodesNearEdge(nodes, event.direction);
 
     if (needsPanning) {
@@ -44,7 +41,7 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
   }
 
   private checkIfNodesNearEdge(
-    nodes: { position: Point; size?: { width: number; height: number } }[],
+    nodes: { position: Point; size?: Size }[],
     direction: KeyboardMoveSelectionEvent['direction']
   ): boolean {
     const threshold = this.flow.config.selectionMoving.edgePanningThreshold;

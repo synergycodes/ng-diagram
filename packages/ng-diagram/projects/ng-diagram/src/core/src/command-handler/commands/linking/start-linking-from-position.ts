@@ -1,9 +1,9 @@
-import type { CommandHandler } from '../../../types';
+import type { CommandHandler, Point } from '../../../types';
 import { createTemporaryEdge } from './utils';
 
 export interface StartLinkingFromPositionCommand {
   name: 'startLinkingFromPosition';
-  position: { x: number; y: number };
+  position: Point;
 }
 
 export const startLinkingFromPosition = async (

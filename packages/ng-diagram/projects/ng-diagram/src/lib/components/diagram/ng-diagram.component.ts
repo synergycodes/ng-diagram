@@ -110,9 +110,9 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    */
   edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new NgDiagramEdgeTemplateMap());
 
-  nodes = this.renderer.nodes;
-  edges = this.renderer.edges;
-  viewport = this.renderer.viewport;
+  readonly nodes = this.renderer.nodes;
+  readonly edges = this.renderer.edges;
+  readonly viewport = this.renderer.viewport;
 
   /**
    * Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
@@ -153,11 +153,13 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** @ignore */
   ngOnInit(): void {
     this.flowResizeBatchProcessor.initialize();
     this.setupViewportSizeTracking();
   }
 
+  /** @ignore */
   ngOnDestroy(): void {
     this.flowCoreProvider.destroy();
     this.cleanupViewportSizeTracking();

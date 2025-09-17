@@ -1,7 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Node, Point } from '../../core/src';
+import { Node, Point, Size } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
+/**
+ * The `NgDiagramNodeService` provides methods for manipulating nodes in the diagram.
+ *
+ * ## Example usage
+ * ```typescript
+ * private nodeService = inject(NgDiagramNodeService);
+ *
+ * // Move nodes by a delta
+ * this.nodeService.moveNodesBy([node1, node2], { x: 10, y: 20 });
+ * ```
+ *
+ * @category Services
+ */
 @Injectable()
 export class NgDiagramNodeService extends NgDiagramBaseService {
   /**
@@ -20,7 +33,7 @@ export class NgDiagramNodeService extends NgDiagramBaseService {
    * @param position Optional new position of the node.
    * @param disableAutoSize Optional flag to disable auto-sizing.
    */
-  resizeNode(id: string, size: { width: number; height: number }, position?: Point, disableAutoSize?: boolean) {
+  resizeNode(id: string, size: Size, position?: Point, disableAutoSize?: boolean) {
     this.flowCore.commandHandler.emit('resizeNode', { id, size, position, disableAutoSize });
   }
 
@@ -34,7 +47,7 @@ export class NgDiagramNodeService extends NgDiagramBaseService {
   }
 
   /**
-   * Brings the specified nodes to the front (highest z-index).
+   * Brings the specified nodes and edges to the front (highest z-index).
    * @param nodeIds Array of node IDs to bring to front.
    * @param edgeIds Array of edge IDs to bring to front.
    */
@@ -43,7 +56,7 @@ export class NgDiagramNodeService extends NgDiagramBaseService {
   }
 
   /**
-   * Sends the specified nodes to the back (lowest z-index).
+   * Sends the specified nodes and edges to the back (lowest z-index).
    * @param nodeIds Array of node IDs to send to back.
    * @param edgeIds Array of edge IDs to send to back.
    */

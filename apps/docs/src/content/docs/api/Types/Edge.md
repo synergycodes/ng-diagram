@@ -44,7 +44,7 @@ The unique identifier for the edge.
 
 ### measuredLabels?
 
-> `readonly` `optional` **measuredLabels**: `EdgeLabel`[]
+> `readonly` `optional` **measuredLabels**: [`EdgeLabel`](/docs/api/types/edgelabel/)[]
 
 #### Remarks
 
@@ -63,7 +63,7 @@ The points of the edge defining the path.
 
 ### routing?
 
-> `optional` **routing**: `EdgeRoutingName`
+> `optional` **routing**: [`EdgeRoutingName`](/docs/api/types/edgeroutingname/)
 
 The routing of the edge.
 
@@ -71,7 +71,7 @@ The routing of the edge.
 
 ### routingMode?
 
-> `optional` **routingMode**: `RoutingMode`
+> `optional` **routingMode**: [`RoutingMode`](/docs/api/types/routingmode/)
 
 The routing mode of the edge.
 'auto' (default): Points are computed automatically based on routing algorithm

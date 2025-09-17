@@ -1,9 +1,9 @@
-import type { CommandHandler, Edge } from '../../../types';
+import type { CommandHandler, Edge, Point } from '../../../types';
 import { createTemporaryEdge, isProperTargetPort, validateConnection } from './utils';
 
 export interface MoveTemporaryEdgeCommand {
   name: 'moveTemporaryEdge';
-  position: { x: number; y: number };
+  position: Point;
 }
 
 interface TargetPortInfo {
@@ -14,7 +14,7 @@ interface TargetPortInfo {
 
 export const getTargetPortInfo = (
   commandHandler: CommandHandler,
-  position: { x: number; y: number },
+  position: Point,
   temporaryEdge: Edge
 ): TargetPortInfo => {
   const targetPort = commandHandler.flowCore.getNearestPortInRange(
@@ -34,7 +34,7 @@ export const createNewTemporaryEdge = (
   commandHandler: CommandHandler,
   temporaryEdge: Edge,
   targetPortInfo: TargetPortInfo,
-  position: { x: number; y: number }
+  position: Point
 ): Edge => {
   const { targetNodeId, targetPortId } = targetPortInfo;
 

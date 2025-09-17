@@ -298,7 +298,7 @@ export class ContextMenuComponent {
   private clipboardService = inject(NgDiagramClipboardService);
   private viewportService = inject(NgDiagramViewportService);
 
-  menuPosition = input.required<{ x: number; y: number }>();
+  menuPosition = input.required<Point>();
 
   copy() {
     this.clipboardService.copy();
@@ -370,7 +370,7 @@ export class CustomNodeComponent {
     this.nodeService.rotateNodeTo(this.node().id, 45);
   }
 
-  onResize(newSize: { width: number; height: number }) {
+  onResize(newSize: Size) {
     // Handle node resizing
     this.nodeService.resizeNode(this.node().id, newSize);
   }

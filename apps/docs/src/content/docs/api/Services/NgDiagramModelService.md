@@ -1,0 +1,439 @@
+---
+editUrl: false
+next: false
+prev: false
+title: "NgDiagramModelService"
+---
+
+The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+
+## Example usage
+```typescript
+private modelService = inject(NgDiagramModelService);
+
+// Add nodes
+this.modelService.addNodes([node1, node2]);
+```
+
+## Extends
+
+- `NgDiagramBaseService`
+
+## Implements
+
+- `OnDestroy`
+
+## Properties
+
+### edges
+
+> `readonly` **edges**: `Signal`\<[`Edge`](/docs/api/types/edge/)\<`object`\>[]\>
+
+Readonly signal of current edges in the diagram.
+
+***
+
+### metadata
+
+> `readonly` **metadata**: `Signal`\<[`Metadata`](/docs/api/types/metadata/)\<`object`\>\>
+
+Readonly signal of current diagram metadata.
+
+***
+
+### nodes
+
+> `readonly` **nodes**: `Signal`\<[`Node`](/docs/api/types/node/)[]\>
+
+Readonly signal of current nodes in the diagram.
+
+## Methods
+
+### addEdges()
+
+> **addEdges**(`edges`): `void`
+
+Adds new edges to the diagram.
+
+#### Parameters
+
+##### edges
+
+[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Array of edges to add.
+
+#### Returns
+
+`void`
+
+***
+
+### addNodes()
+
+> **addNodes**(`nodes`): `void`
+
+Adds new nodes to the diagram.
+
+#### Parameters
+
+##### nodes
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of nodes to add.
+
+#### Returns
+
+`void`
+
+***
+
+### deleteEdges()
+
+> **deleteEdges**(`ids`): `void`
+
+Deletes edges by their IDs.
+
+#### Parameters
+
+##### ids
+
+`string`[]
+
+Array of edge IDs to delete.
+
+#### Returns
+
+`void`
+
+***
+
+### deleteNodes()
+
+> **deleteNodes**(`ids`): `void`
+
+Deletes nodes by their IDs.
+
+#### Parameters
+
+##### ids
+
+`string`[]
+
+Array of node IDs to delete.
+
+#### Returns
+
+`void`
+
+***
+
+### getEdgeById()
+
+> **getEdgeById**(`edgeId`): `null` \| [`Edge`](/docs/api/types/edge/)\<`object`\>
+
+Gets an edge by id.
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+Edge id.
+
+#### Returns
+
+`null` \| [`Edge`](/docs/api/types/edge/)\<`object`\>
+
+Edge or null if not found.
+
+***
+
+### getModel()
+
+> **getModel**(): [`ModelAdapter`](/docs/api/types/modeladapter/)
+
+Returns the current model that NgDiagram instance is using.
+Returns null if flowCore is not initialized.
+
+#### Returns
+
+[`ModelAdapter`](/docs/api/types/modeladapter/)
+
+***
+
+### getNearestNodeInRange()
+
+> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/docs/api/types/node/)
+
+Gets the nearest node in a range from a point.
+
+#### Parameters
+
+##### point
+
+[`Point`](/docs/api/types/point/)
+
+Point to check from.
+
+##### range
+
+`number`
+
+Range to check in.
+
+#### Returns
+
+`null` \| [`Node`](/docs/api/types/node/)
+
+Nearest node in range or null.
+
+***
+
+### getNearestPortInRange()
+
+> **getNearestPortInRange**(`point`, `range`): `null` \| [`Port`](/docs/api/types/port/)
+
+Gets the nearest port in a range from a point.
+
+#### Parameters
+
+##### point
+
+[`Point`](/docs/api/types/point/)
+
+Point to check from.
+
+##### range
+
+`number`
+
+Range to check in.
+
+#### Returns
+
+`null` \| [`Port`](/docs/api/types/port/)
+
+Nearest port in range or null.
+
+***
+
+### getNodeById()
+
+> **getNodeById**(`nodeId`): `null` \| [`Node`](/docs/api/types/node/)
+
+Gets a node by id.
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id.
+
+#### Returns
+
+`null` \| [`Node`](/docs/api/types/node/)
+
+Node or null if not found.
+
+***
+
+### getNodesInRange()
+
+> **getNodesInRange**(`point`, `range`): [`Node`](/docs/api/types/node/)[]
+
+Gets all nodes in a range from a point.
+
+#### Parameters
+
+##### point
+
+[`Point`](/docs/api/types/point/)
+
+Point to check from.
+
+##### range
+
+`number`
+
+Range to check in.
+
+#### Returns
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of nodes in range.
+
+***
+
+### toJSON()
+
+> **toJSON**(): `string`
+
+Serializes the current model to a JSON string.
+
+#### Returns
+
+`string`
+
+The model as a JSON string.
+
+***
+
+### updateEdge()
+
+> **updateEdge**(`edgeId`, `edge`): `void`
+
+Updates the properties of an edge.
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+Edge id.
+
+##### edge
+
+`Partial`\<[`Edge`](/docs/api/types/edge/)\>
+
+New edge properties.
+
+#### Returns
+
+`void`
+
+***
+
+### updateEdgeData()
+
+> **updateEdgeData**\<`T`\>(`edgeId`, `data`): `void`
+
+Updates the data of an edge.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `undefined` \| `Record`\<`string`, `unknown`\>
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+Edge id.
+
+##### data
+
+`T`
+
+New data to set for the edge (can be strongly typed).
+
+#### Returns
+
+`void`
+
+***
+
+### updateEdges()
+
+> **updateEdges**(`edges`): `void`
+
+Updates multiple edges at once.
+
+#### Parameters
+
+##### edges
+
+`Pick`\<[`Edge`](/docs/api/types/edge/)\<`object`\>, `"id"`\> & `Partial`\<[`Edge`](/docs/api/types/edge/)\<`object`\>\>[]
+
+Array of edge updates (must include id and any properties to update).
+
+#### Returns
+
+`void`
+
+***
+
+### updateNode()
+
+> **updateNode**(`nodeId`, `node`): `void`
+
+Updates the properties of a node.
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id.
+
+##### node
+
+`Partial`\<[`Node`](/docs/api/types/node/)\>
+
+New node properties.
+
+#### Returns
+
+`void`
+
+***
+
+### updateNodeData()
+
+> **updateNodeData**\<`T`\>(`nodeId`, `data`): `void`
+
+Updates the data of a node.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `undefined` \| `Record`\<`string`, `unknown`\>
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id.
+
+##### data
+
+`T`
+
+New data to set for the node (can be strongly typed).
+
+#### Returns
+
+`void`
+
+***
+
+### updateNodes()
+
+> **updateNodes**(`nodes`): `void`
+
+Updates multiple nodes at once.
+
+#### Parameters
+
+##### nodes
+
+`Pick`\<[`Node`](/docs/api/types/node/), `"id"`\> & `Partial`\<[`Node`](/docs/api/types/node/)\>[]
+
+Array of node updates (must include id and any properties to update).
+
+#### Returns
+
+`void`

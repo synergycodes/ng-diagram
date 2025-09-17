@@ -1,8 +1,8 @@
 import { FlowCore } from '../flow-core';
-import { Node, Port } from '../types';
+import { Node, Point, Port } from '../types';
 import { getDistanceBetweenRects, getPointRangeRect, getRect } from '../utils';
 
-export const getNodesInRange = (flowCore: FlowCore, point: { x: number; y: number }, range: number): Node[] => {
+export const getNodesInRange = (flowCore: FlowCore, point: Point, range: number): Node[] => {
   const foundNodesIds = new Set(flowCore.spatialHash.queryIds(getPointRangeRect(point, range)));
   const foundNodes: Node[] = [];
   flowCore.getState().nodes.forEach((node) => {
@@ -13,11 +13,7 @@ export const getNodesInRange = (flowCore: FlowCore, point: { x: number; y: numbe
   return foundNodes;
 };
 
-export const getNearestNodeInRange = (
-  flowCore: FlowCore,
-  point: { x: number; y: number },
-  range: number
-): Node | null => {
+export const getNearestNodeInRange = (flowCore: FlowCore, point: Point, range: number): Node | null => {
   return (
     getNodesInRange(flowCore, point, range).sort((a, b) => {
       const aDistance = getDistanceBetweenRects(getRect(a), getPointRangeRect(point, 1));
@@ -27,11 +23,7 @@ export const getNearestNodeInRange = (
   );
 };
 
-export const getNearestPortInRange = (
-  flowCore: FlowCore,
-  point: { x: number; y: number },
-  range: number
-): Port | null => {
+export const getNearestPortInRange = (flowCore: FlowCore, point: Point, range: number): Port | null => {
   const nodeToPortsMap = new Map<Node, Port[]>();
   getNodesInRange(flowCore, point, range).forEach((node) => {
     nodeToPortsMap.set(node, node.measuredPorts || []);

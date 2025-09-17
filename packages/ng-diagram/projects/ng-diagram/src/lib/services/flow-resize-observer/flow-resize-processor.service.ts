@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Port } from '../../../core/src';
+import { Point, Port, Size } from '../../../core/src';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
 import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
@@ -90,8 +90,8 @@ export class FlowResizeBatchProcessorService {
       string,
       {
         id: string;
-        size: { width: number; height: number };
-        position: { x: number; y: number };
+        size: Size;
+        position: Point;
       }[]
     >();
 
@@ -169,7 +169,7 @@ export class FlowResizeBatchProcessorService {
       string,
       {
         labelId: string;
-        size: { width: number; height: number };
+        size: Size;
       }[]
     >();
 
@@ -209,7 +209,7 @@ export class FlowResizeBatchProcessorService {
    * @param entry Resize observer entry
    * @returns Border box size or null if not available
    */
-  private getBorderBoxSize(entry: ResizeObserverEntry): { width: number; height: number } | null {
+  private getBorderBoxSize(entry: ResizeObserverEntry): Size | null {
     const [borderBox] = entry.borderBoxSize;
 
     if (!borderBox) return null;
@@ -224,7 +224,7 @@ export class FlowResizeBatchProcessorService {
    * @param newSize New size
    * @returns True if the size has changed by more than 1px, false otherwise
    */
-  private isSizeChanged(currentSize: { width: number; height: number }, newSize: { width: number; height: number }) {
+  private isSizeChanged(currentSize: Size, newSize: Size) {
     return Math.abs(currentSize.width - newSize.width) > 1 || Math.abs(currentSize.height - newSize.height) > 1;
   }
 
@@ -234,7 +234,7 @@ export class FlowResizeBatchProcessorService {
    * @param newPosition New position
    * @returns True if the position has changed by more than 1px, false otherwise
    */
-  private isPositionChanged(currentPosition: { x: number; y: number }, newPosition: { x: number; y: number }) {
+  private isPositionChanged(currentPosition: Point, newPosition: Point) {
     return Math.abs(currentPosition.x - newPosition.x) > 1 || Math.abs(currentPosition.y - newPosition.y) > 1;
   }
 }

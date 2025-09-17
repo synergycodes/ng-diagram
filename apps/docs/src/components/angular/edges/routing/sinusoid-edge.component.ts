@@ -3,6 +3,7 @@ import {
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
+  type Point,
 } from 'ng-diagram';
 
 @Component({
@@ -36,10 +37,7 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
     };
   });
 
-  private generateSinusoidPoints(
-    sourcePosition: { x: number; y: number },
-    targetPosition: { x: number; y: number }
-  ) {
+  private generateSinusoidPoints(sourcePosition: Point, targetPosition: Point) {
     const startX = sourcePosition.x;
     const startY = sourcePosition.y;
     const endX = targetPosition.x;
