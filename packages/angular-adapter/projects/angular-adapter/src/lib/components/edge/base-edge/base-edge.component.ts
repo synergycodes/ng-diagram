@@ -10,8 +10,8 @@ import { FlowCoreProviderService } from '../../../services';
  * - Auto mode (default): Path is computed from source/target positions using routing algorithm
  * - Manual mode: Path is computed from user-provided points using routing algorithm
  * The routing algorithm determines how the path is rendered (orthogonal, bezier, polyline, etc.)
+ * @category Components
  */
-
 @Component({
   selector: 'ng-diagram-base-edge',
   templateUrl: './base-edge.component.html',
@@ -28,7 +28,13 @@ export class NgDiagramBaseEdgeComponent {
   edge = input.required<Edge>();
   routing = input<string>();
   stroke = input<string>();
+  /**
+   * ID of a source <marker> element in the SVG document. Edge model data has precedence over this property.
+   */
   sourceArrowhead = input<string>();
+  /**
+   * ID of a target <marker> element in the SVG document. Edge model data has precedence over this property.
+   */
   targetArrowhead = input<string>();
   strokeOpacity = input<number>(1);
   strokeWidth = input<number>(2);
@@ -60,7 +66,7 @@ export class NgDiagramBaseEdgeComponent {
   });
 
   markerStart = computed(() => {
-    const markerId = this.sourceArrowhead() ?? this.edge()?.sourceArrowhead;
+    const markerId = this.edge()?.sourceArrowhead ?? this.sourceArrowhead();
 
     if (!markerId) {
       return null;
@@ -70,7 +76,7 @@ export class NgDiagramBaseEdgeComponent {
   });
 
   markerEnd = computed(() => {
-    const markerId = this.targetArrowhead() ?? this.edge()?.targetArrowhead;
+    const markerId = this.edge()?.targetArrowhead ?? this.targetArrowhead();
 
     if (!markerId) {
       return null;

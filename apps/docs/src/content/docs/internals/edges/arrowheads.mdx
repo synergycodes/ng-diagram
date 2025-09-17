@@ -45,9 +45,19 @@ When marker is defined in the SVG `<defs>` section, it can be referenced in your
 
 <CodeSnippet
   relativePath="edges/arrowheads/custom-arrowhead/diagram.component.ts"
-  range={[31, 98]}
-  collapse={['3-37', '41-46', '50-55', '59-64']}
-  mark={[40, 49, 58]}
+  range={[10, 98]}
+  collapse={['13-19', '23-58', '61-66', '70-75', '79-84']}
+  mark={[10, 60, 69, 78]}
 />
 
 See [`<marker>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/marker) documentation on MDN for more details.
+
+## Overriding arrowheads in Custom Edges
+
+When implementing custom edges, you can override the default arrowhead with a custom one by specifying the `sourceArrowhead` and `targetArrowhead` inputs of `NgDiagramBaseEdgeComponent`. Thanks to it you don't have to specify the arrowhead in the data of each edge.
+
+<LinkCard
+  title="Custom Edges"
+  href="/docs/internals/edges/custom-edges"
+  description="See how to implement custom edges"
+/>
