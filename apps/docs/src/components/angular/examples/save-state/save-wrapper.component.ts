@@ -1,9 +1,6 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import {
-  NgDiagramContextComponent,
-  NgDiagramModelService,
-} from '@angularflow/angular-adapter';
+import { NgDiagramContextComponent, NgDiagramModelService } from 'ng-diagram';
 import { SaveStateExampleComponent } from './save-example.component';
 import { SaveStateService } from './save.service';
 

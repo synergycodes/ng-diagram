@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "@angularflow/angular-adapter"
+title: "ng-diagram"
 ---
 
 ## Components

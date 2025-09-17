@@ -6,7 +6,7 @@ import {
   NgDiagramModelService,
   type NgDiagramConfig,
   type NgDiagramNodeTemplateMap,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { NodeComponent } from './node/node.component';
 
 @Component({

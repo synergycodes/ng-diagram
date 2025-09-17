@@ -5,7 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { CustomArrowheadsComponent } from './custom-arrowheads.component';
 
 @Component({

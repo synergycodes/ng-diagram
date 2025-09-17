@@ -7,7 +7,7 @@ import {
   NgDiagramModelService,
   type NgDiagramConfig,
   type SelectionMovedEvent,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { diagramModel } from './data';
 import { LayoutButtonsComponent } from './layout-buttons.component';
 

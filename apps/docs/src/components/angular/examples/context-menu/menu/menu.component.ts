@@ -4,7 +4,7 @@ import {
   NgDiagramModelService,
   NgDiagramSelectionService,
   NgDiagramViewportService,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { ContextMenuService } from './menu.service';
 
 @Component({

@@ -3,23 +3,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-adapter": {
+    "ng-diagram": {
       "projectType": "library",
-      "root": "projects/angular-adapter",
-      "sourceRoot": "projects/angular-adapter/src",
+      "root": "projects/ng-diagram",
+      "sourceRoot": "projects/ng-diagram/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/angular-adapter/ng-package.json"
+            "project": "projects/ng-diagram/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/angular-adapter/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ng-diagram/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/angular-adapter/tsconfig.lib.json"
+              "tsConfig": "projects/ng-diagram/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -30,8 +30,8 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["projects/angular-adapter/src/**/*.ts", "projects/angular-adapter/src/**/*.html"],
-            "eslintConfig": "projects/angular-adapter/eslint.config.js"
+            "lintFilePatterns": ["projects/ng-diagram/src/**/*.ts", "projects/ng-diagram/src/**/*.html"],
+            "eslintConfig": "projects/ng-diagram/eslint.config.js"
           }
         }
       }

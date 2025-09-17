@@ -5,7 +5,7 @@ import { Component, computed, inject } from '@angular/core';
 import {
   NgDiagramSelectionService,
   NgDiagramViewportService,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'coordinates-preview',

@@ -6,7 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 import { SinusoidEdgeComponent } from './sinusoid-edge.component';

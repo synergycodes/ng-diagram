@@ -1,5 +1,5 @@
 import { Component, ElementRef, inject, input } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import { NgDiagramModelService } from 'ng-diagram';
 import { downloadImage } from '../generate-image.helper';
 import { GenerateImageService } from '../generate-image.service';
 

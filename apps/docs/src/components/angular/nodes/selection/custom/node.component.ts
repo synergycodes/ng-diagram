@@ -1,8 +1,5 @@
 import { Component, input } from '@angular/core';
-import {
-  type NgDiagramNodeTemplate,
-  type Node,
-} from '@angularflow/angular-adapter';
+import { type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
 
 @Component({
   selector: 'node',
