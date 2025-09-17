@@ -21,33 +21,7 @@ import { readOnlyMiddleware } from './read-only-middleware';
   imports: [NgDiagramComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './readonly-middleware-inner.component.scss',
-  template: `
-    <div class="controls">
-      <button
-        [class.active]="isReadOnly()"
-        (click)="toggleReadOnly()"
-        class="readonly-toggle"
-      >
-        {{ isReadOnly() ? '🔒 Read-Only Mode' : '✏️ Edit Mode' }}
-      </button>
-      <div class="status">
-        <span [class.readonly]="isReadOnly()">
-          {{
-            isReadOnly()
-              ? 'Diagram is locked - try moving nodes!'
-              : 'Diagram is editable - drag nodes around'
-          }}
-        </span>
-      </div>
-    </div>
-    <div class="diagram">
-      <ng-diagram
-        [model]="model"
-        [config]="config"
-        [middlewares]="middlewares"
-      />
-    </div>
-  `,
+  templateUrl: './readonly-middleware-inner.component.html',
 })
 export class ReadonlyMiddlewareInnerComponent {
   private readonly ngDiagram = inject(NgDiagramService);
@@ -74,21 +48,18 @@ export class ReadonlyMiddlewareInnerComponent {
       {
         id: '1',
         position: { x: 100, y: 80 },
-        size: { width: 120, height: 80 },
         data: { label: 'Node 1' },
         resizable: true,
       },
       {
         id: '2',
         position: { x: 300, y: 80 },
-        size: { width: 120, height: 80 },
         data: { label: 'Node 2' },
         resizable: true,
       },
       {
         id: '3',
         position: { x: 200, y: 220 },
-        size: { width: 120, height: 80 },
         data: { label: 'Node 3' },
         resizable: true,
       },

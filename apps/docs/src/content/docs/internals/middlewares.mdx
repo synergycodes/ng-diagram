@@ -72,7 +72,7 @@ Use **`next()`** to continue to the next middleware, optionally passing state up
 The primary way to configure middlewares is using the `createMiddlewares` helper and passing them to the `<ng-diagram>` component:
 
 ```typescript
-import { createMiddlewares } from '@angularflow/angular-adapter';
+import { createMiddlewares } from 'ng-diagram';
 
 // Use all default middlewares
 const middlewares = createMiddlewares((defaults) => defaults);
@@ -102,7 +102,7 @@ You can also register and unregister middlewares dynamically using the `NgDiagra
 
 ```typescript
 import { inject } from '@angular/core';
-import { NgDiagramService } from '@angularflow/angular-adapter';
+import { NgDiagramService } from 'ng-diagram';
 
 @Component({...})
 export class MyComponent {
@@ -141,7 +141,7 @@ export class MyComponent {
 Here's the basic structure for a custom middleware:
 
 ```typescript
-import { Middleware } from '@angularflow/angular-adapter';
+import { Middleware } from 'ng-diagram';
 
 const myMiddleware: Middleware<'my-middleware'> = {
   name: 'my-middleware',
@@ -162,98 +162,9 @@ const myMiddleware: Middleware<'my-middleware'> = {
 };
 ```
 
-### Example: Read-Only Mode Middleware
+### Example: Custom Middleware
 
-Let's create a practical example - a middleware that can make the diagram read-only by preventing certain operations:
-
-```typescript
-import { Middleware, FlowStateUpdate } from '@angularflow/angular-adapter';
-
-interface ReadOnlyConfig {
-  enabled: boolean;
-  allowedActions?: string[];
-}
-
-const readOnlyMiddleware: Middleware<'read-only'> = {
-  name: 'read-only',
-  execute: (context, next, cancel) => {
-    const { modelActionType, config } = context;
-
-    // Get read-only configuration from metadata or config
-    const readOnlyConfig = config.readOnly as ReadOnlyConfig | undefined;
-
-    if (!readOnlyConfig?.enabled) {
-      return next(); // Not in read-only mode, allow everything
-    }
-
-    // Define actions that should be blocked in read-only mode
-    const blockedActions = [
-      'addNode',
-      'addEdge',
-      'updateNode',
-      'updateEdge',
-      'removeNode',
-      'removeEdge',
-      'moveNodes',
-      'finishLinking',
-      'paletteDropNode',
-    ];
-
-    // Allow specific actions if configured
-    const allowedActions = readOnlyConfig.allowedActions || [];
-    const isActionBlocked = blockedActions.includes(modelActionType) && !allowedActions.includes(modelActionType);
-
-    if (isActionBlocked) {
-      console.warn(`Action "${modelActionType}" blocked by read-only mode`);
-      cancel(); // Cancel the operation
-      return;
-    }
-
-    // Allow the action to proceed
-    next();
-  },
-};
-```
-
-### Interactive Demo
-
-Try this interactive example that demonstrates the read-only middleware in action:
-
-import ReadonlyMiddleware from '@examples/readonly-middleware/readonly-middleware.astro';
-
-<ReadonlyMiddleware />
-
-**How to use:**
-
-1. **Edit Mode** (default): Drag the nodes around, resize them, and interact normally
-2. **Read-Only Mode**: Click the toggle button to enable read-only mode, then try to move or resize nodes - they will be locked!
-
-The middleware intercepts movement and resize operations, preventing them when read-only mode is enabled while still allowing selection changes.
-
-### Using the Read-Only Middleware
-
-```typescript
-// Add to your middleware configuration
-const middlewares = createMiddlewares((defaults) => [
-  readOnlyMiddleware, // Add early in the chain to block quickly
-  ...defaults,
-]);
-
-// Pass to your ng-diagram component
-@Component({
-  template: ` <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" /> `,
-})
-export class MyDiagramComponent {
-  middlewares = createMiddlewares((defaults) => [readOnlyMiddleware, ...defaults]);
-
-  config = {
-    readOnly: {
-      enabled: true,
-      allowedActions: ['changeSelection'], // Still allow selection changes
-    },
-  };
-}
-```
+For a complete example of creating custom middleware, see the [Custom Middleware example](/examples/custom-middleware/) which demonstrates how to implement a read-only mode middleware that prevents certain operations while allowing others.
 
 ### Advanced Middleware Features
 

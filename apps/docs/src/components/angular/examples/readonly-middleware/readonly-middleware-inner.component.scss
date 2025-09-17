@@ -24,35 +24,35 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
-}
 
-.readonly-toggle:hover {
-  background: var(--sl-color-accent-high);
-}
+  &:hover {
+    background: var(--sl-color-accent-high);
+  }
 
-.readonly-toggle.active {
-  background: var(--sl-color-red);
-}
+  &.active {
+    background: var(--sl-color-red);
 
-.readonly-toggle.active:hover {
-  background: var(--sl-color-red-high);
+    &:hover {
+      background: var(--sl-color-red-high);
+    }
+  }
 }
 
 .status {
   font-size: 0.875rem;
   color: var(--sl-color-text-accent);
-}
 
-.status .readonly {
-  color: var(--sl-color-red);
-  font-weight: 500;
+  .readonly {
+    color: var(--sl-color-red);
+    font-weight: 500;
+  }
 }
 
 .diagram {
   flex-grow: 1;
-}
 
-.diagram ng-diagram {
-  height: 100%;
-  width: 100%;
+  ng-diagram {
+    height: 100%;
+    width: 100%;
+  }
 }
