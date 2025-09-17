@@ -1,0 +1,58 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+.controls {
+  padding: 1rem;
+  background: var(--sl-color-bg-nav);
+  border-bottom: 1px solid var(--sl-color-hairline);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.readonly-toggle {
+  background: var(--sl-color-accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.readonly-toggle:hover {
+  background: var(--sl-color-accent-high);
+}
+
+.readonly-toggle.active {
+  background: var(--sl-color-red);
+}
+
+.readonly-toggle.active:hover {
+  background: var(--sl-color-red-high);
+}
+
+.status {
+  font-size: 0.875rem;
+  color: var(--sl-color-text-accent);
+}
+
+.status .readonly {
+  color: var(--sl-color-red);
+  font-weight: 500;
+}
+
+.diagram {
+  flex-grow: 1;
+}
+
+.diagram ng-diagram {
+  height: 100%;
+  width: 100%;
+}

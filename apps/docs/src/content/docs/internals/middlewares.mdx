@@ -1,6 +1,340 @@
 ---
 title: Middlewares
 description: Understanding how middlewares work in ngDiagram
+sidebar:
+  order: 4
 ---
 
-# Middlewares
+Middlewares provide a powerful plugin architecture for extending ngDiagram behavior. They intercept state changes before they reach the model, allowing you to transform data, add custom logic, and implement features without modifying core code.
+
+## How Middlewares Work
+
+When any change occurs in the diagram (adding nodes, moving elements, changing selections), the change goes through a middleware pipeline before reaching the model. Each middleware can:
+
+- **Inspect** the current state and what's being changed
+- **Transform** the data being applied
+- **Add** additional changes to the state
+- **Cancel** the operation entirely
+- **Perform** asynchronous operations
+
+Middlewares execute in sequence, with each middleware receiving the output of the previous one. This creates a powerful composition system where multiple behaviors can be combined.
+
+## Built-in Middlewares
+
+ngDiagram comes with several built-in middlewares that handle common functionality:
+
+- **`zIndexMiddleware`** - Manages element layering and z-index assignment
+- **`groupChildrenChangeExtent`** - Handles group node resizing when children change
+- **`groupChildrenMoveExtent`** - Handles group node positioning when children move
+- **`treeLayoutMiddleware`** - Provides automatic tree layout functionality
+- **`edgesRoutingMiddleware`** - Handles edge routing and pathfinding
+- **`loggerMiddleware`** - Logs state changes for debugging (only in debug mode)
+
+## Middleware API
+
+### Middleware Interface
+
+Each middleware implements the `Middleware` interface:
+
+```typescript
+interface Middleware<TName extends string = string> {
+  name: TName;
+  execute: (
+    context: MiddlewareContext,
+    next: (stateUpdate?: FlowStateUpdate) => Promise<FlowState>,
+    cancel: () => void
+  ) => Promise<void> | void;
+}
+```
+
+### Context and Helpers
+
+The **context** provides access to the current state, configuration, and metadata about what triggered the change. Key properties include:
+
+- `state` - Current diagram state with nodes, edges, and metadata.
+- `modelActionType` - What action triggered this middleware (e.g., 'addNode', 'moveNodes').
+- `nodesMap`/`edgesMap` - Maps of nodes and edges by ID for quick lookup. Lookup is updated after each middleware.
+- `config` - Current diagram configuration.
+- `helpers` - Utility functions for checking what changed.
+
+There are also more specialized properties depending on the action type, such as access to ActionStateManager, which provides temporary state for actions like resizing or linking.
+
+The **helpers** object provides convenient methods to inspect changes:
+
+- `helpers.anyNodesAdded()` - Check if any nodes were added
+- `helpers.checkIfNodeChanged(id)` - Check if specific node was modified
+- `helpers.checkIfAnyNodePropsChanged(['position', 'size'])` - Check if any node had specific properties changed
+
+Use **`next()`** to continue to the next middleware, optionally passing state updates. Use **`cancel()`** to abort the operation entirely.
+
+## Managing Middlewares
+
+### Registering Middlewares at the Start
+
+The primary way to configure middlewares is using the `createMiddlewares` helper and passing them to the `<ng-diagram>` component:
+
+```typescript
+import { createMiddlewares } from '@angularflow/angular-adapter';
+
+// Use all default middlewares
+const middlewares = createMiddlewares((defaults) => defaults);
+
+// Add custom middleware to the chain
+const middlewares = createMiddlewares((defaults) => [...defaults, myCustomMiddleware]);
+
+// Remove specific middleware
+const middlewares = createMiddlewares((defaults) => defaults.filter((m) => m.name !== 'logger'));
+```
+
+Then pass them to your diagram component:
+
+```typescript
+@Component({
+  template: ` <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" /> `,
+})
+export class MyDiagramComponent {
+  middlewares = createMiddlewares((defaults) => [...defaults, myCustomMiddleware]);
+  // ...
+}
+```
+
+### Registering Middlewares at Runtime
+
+You can also register and unregister middlewares dynamically using the `NgDiagramService`. **Note**: This can only be done when the diagram is initialized, which you can check using `isInitialized` signal:
+
+```typescript
+import { inject } from '@angular/core';
+import { NgDiagramService } from '@angularflow/angular-adapter';
+
+@Component({...})
+export class MyComponent {
+  private ngDiagram = inject(NgDiagramService);
+
+  addMiddleware() {
+    // Check if diagram is initialized first
+    if (!this.ngDiagram.isInitialized()) {
+      console.warn('Cannot register middleware: diagram not initialized');
+      return;
+    }
+
+    // Register returns an unregister function
+    const unregister = this.ngDiagram.registerMiddleware(myMiddleware);
+
+    // Later you can unregister the middleware by invoking the returned function
+    // unregister();
+  }
+
+  removeMiddleware() {
+    if (!this.ngDiagram.isInitialized()) {
+      console.warn('Cannot unregister middleware: diagram not initialized');
+      return;
+    }
+
+    // You can also unregister the middleware by name
+    this.ngDiagram.unregisterMiddleware('my-middleware-name');
+  }
+}
+```
+
+## Creating Custom Middlewares
+
+### Basic Middleware Structure
+
+Here's the basic structure for a custom middleware:
+
+```typescript
+import { Middleware } from '@angularflow/angular-adapter';
+
+const myMiddleware: Middleware<'my-middleware'> = {
+  name: 'my-middleware',
+  execute: async (context, next, cancel) => {
+    const { state, modelActionType, helpers } = context;
+
+    // Check if this middleware should run
+    if (modelActionType !== 'updateNode') {
+      return next(); // Pass through without changes
+    }
+
+    // Your custom logic here
+    console.log('Nodes being updated:', state.nodes);
+
+    // Continue to next middleware
+    await next();
+  },
+};
+```
+
+### Example: Read-Only Mode Middleware
+
+Let's create a practical example - a middleware that can make the diagram read-only by preventing certain operations:
+
+```typescript
+import { Middleware, FlowStateUpdate } from '@angularflow/angular-adapter';
+
+interface ReadOnlyConfig {
+  enabled: boolean;
+  allowedActions?: string[];
+}
+
+const readOnlyMiddleware: Middleware<'read-only'> = {
+  name: 'read-only',
+  execute: (context, next, cancel) => {
+    const { modelActionType, config } = context;
+
+    // Get read-only configuration from metadata or config
+    const readOnlyConfig = config.readOnly as ReadOnlyConfig | undefined;
+
+    if (!readOnlyConfig?.enabled) {
+      return next(); // Not in read-only mode, allow everything
+    }
+
+    // Define actions that should be blocked in read-only mode
+    const blockedActions = [
+      'addNode',
+      'addEdge',
+      'updateNode',
+      'updateEdge',
+      'removeNode',
+      'removeEdge',
+      'moveNodes',
+      'finishLinking',
+      'paletteDropNode',
+    ];
+
+    // Allow specific actions if configured
+    const allowedActions = readOnlyConfig.allowedActions || [];
+    const isActionBlocked = blockedActions.includes(modelActionType) && !allowedActions.includes(modelActionType);
+
+    if (isActionBlocked) {
+      console.warn(`Action "${modelActionType}" blocked by read-only mode`);
+      cancel(); // Cancel the operation
+      return;
+    }
+
+    // Allow the action to proceed
+    next();
+  },
+};
+```
+
+### Interactive Demo
+
+Try this interactive example that demonstrates the read-only middleware in action:
+
+import ReadonlyMiddleware from '@examples/readonly-middleware/readonly-middleware.astro';
+
+<ReadonlyMiddleware />
+
+**How to use:**
+
+1. **Edit Mode** (default): Drag the nodes around, resize them, and interact normally
+2. **Read-Only Mode**: Click the toggle button to enable read-only mode, then try to move or resize nodes - they will be locked!
+
+The middleware intercepts movement and resize operations, preventing them when read-only mode is enabled while still allowing selection changes.
+
+### Using the Read-Only Middleware
+
+```typescript
+// Add to your middleware configuration
+const middlewares = createMiddlewares((defaults) => [
+  readOnlyMiddleware, // Add early in the chain to block quickly
+  ...defaults,
+]);
+
+// Pass to your ng-diagram component
+@Component({
+  template: ` <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" /> `,
+})
+export class MyDiagramComponent {
+  middlewares = createMiddlewares((defaults) => [readOnlyMiddleware, ...defaults]);
+
+  config = {
+    readOnly: {
+      enabled: true,
+      allowedActions: ['changeSelection'], // Still allow selection changes
+    },
+  };
+}
+```
+
+### Advanced Middleware Features
+
+#### Modifying State
+
+Middlewares can modify the state by passing updates to `next()`:
+
+```typescript
+const scaleNodesMiddleware: Middleware<'scale-nodes'> = {
+  name: 'scale-nodes',
+  execute: (context, next) => {
+    const { helpers } = context;
+
+    if (!helpers.anyNodesAdded()) {
+      return next(); // No new nodes, nothing to do
+    }
+
+    // Scale all new nodes by 1.5x
+    const stateUpdate: FlowStateUpdate = {
+      nodesToUpdate: context.state.nodes
+        .filter((node) => helpers.checkIfNodeAdded(node.id))
+        .map((node) => ({
+          ...node,
+          size: {
+            width: node.size.width * 1.5,
+            height: node.size.height * 1.5,
+          },
+        })),
+    };
+
+    next(stateUpdate);
+  },
+};
+```
+
+#### Asynchronous Operations
+
+Middlewares can perform async operations:
+
+```typescript
+const validationMiddleware: Middleware<'validation'> = {
+  name: 'validation',
+  execute: async (context, next, cancel) => {
+    const { helpers } = context;
+
+    if (!helpers.anyNodesAdded()) {
+      return next();
+    }
+
+    try {
+      // Simulate API validation
+      await validateNodesWithAPI(context.state.nodes);
+      next(); // Validation passed
+    } catch (error) {
+      console.error('Validation failed:', error);
+      cancel(); // Cancel the operation
+    }
+  },
+};
+```
+
+However, you should avoid long-running async operations in middlewares as they can block the UI.
+
+## Best Practices
+
+### Performance
+
+- **Check conditions early**: Return `next()` immediately if your middleware doesn't need to run
+- **Use helpers efficiently**: The helper functions are optimized for checking what changed
+- **Avoid heavy computations**: Keep middleware logic lightweight, especially for frequently-triggered actions
+
+### Middleware Ordering
+
+- **Validation middlewares** should run early to fail fast
+- **Data transformation middlewares** should run before built-in middlewares that depend on the data
+- **Logging middlewares** typically run last to capture the final state
+
+### Configuration
+
+- **Make middlewares configurable** through the config object
+- **Provide sensible defaults** for middleware behavior
+- **Allow disabling** through configuration flags

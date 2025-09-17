@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+readonly-middleware-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
