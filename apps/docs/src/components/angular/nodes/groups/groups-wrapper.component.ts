@@ -1,5 +1,4 @@
 import '@angular/compiler';
-
 import { Component } from '@angular/core';
 import {
   initializeModel,
