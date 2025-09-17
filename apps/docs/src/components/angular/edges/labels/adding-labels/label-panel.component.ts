@@ -4,7 +4,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   NgDiagramModelService,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'label-panel',

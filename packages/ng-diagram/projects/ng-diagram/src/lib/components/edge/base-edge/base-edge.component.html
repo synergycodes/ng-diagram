@@ -1,6 +1,6 @@
 <svg>
   <path
-    [class]="`ng-diagram-edge__path ${selected() ? 'selected' : null} ${temporary() ? 'temporary' : null}`"
+    [class]="class()"
     [attr.d]="path()"
     [attr.stroke]="stroke()"
     [attr.fill]="'none'"
@@ -9,7 +9,6 @@
     [attr.marker-end]="markerEnd()"
     [attr.stroke-opacity]="strokeOpacity()"
   />
-  <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
 </svg>
 
 <ng-content />

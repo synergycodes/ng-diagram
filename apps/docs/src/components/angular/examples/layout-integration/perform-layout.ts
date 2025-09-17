@@ -1,5 +1,5 @@
-import { type Edge, type Node } from '@angularflow/angular-adapter';
 import ELK, { type ElkExtendedEdge, type ElkNode } from 'elkjs';
+import { type Edge, type Node } from 'ng-diagram';
 
 const elk = new ELK();
 const layoutOptions = {

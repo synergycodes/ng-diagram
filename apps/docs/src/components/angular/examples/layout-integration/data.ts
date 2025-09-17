@@ -1,4 +1,4 @@
-import { type Edge, type Node } from '@angularflow/angular-adapter';
+import { type Edge, type Node } from 'ng-diagram';
 
 export const diagramModel: { nodes: Node[]; edges: Edge[] } = {
   nodes: [

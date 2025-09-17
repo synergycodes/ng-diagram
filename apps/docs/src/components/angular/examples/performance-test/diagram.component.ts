@@ -7,7 +7,7 @@ import {
   NgDiagramContextComponent,
   type Edge,
   type Node,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],

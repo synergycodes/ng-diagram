@@ -10,8 +10,8 @@ import { FlowCoreProviderService } from '../../../services';
  * - Auto mode (default): Path is computed from source/target positions using routing algorithm
  * - Manual mode: Path is computed from user-provided points using routing algorithm
  * The routing algorithm determines how the path is rendered (orthogonal, bezier, polyline, etc.)
+ * @category Components
  */
-
 @Component({
   selector: 'ng-diagram-base-edge',
   templateUrl: './base-edge.component.html',
@@ -28,8 +28,14 @@ export class NgDiagramBaseEdgeComponent {
   edge = input.required<Edge>();
   routing = input<string>();
   stroke = input<string>();
-  customMarkerStart = input<string>();
-  customMarkerEnd = input<string>();
+  /**
+   * ID of a source <marker> element in the SVG document. Edge model data has precedence over this property.
+   */
+  sourceArrowhead = input<string>();
+  /**
+   * ID of a target <marker> element in the SVG document. Edge model data has precedence over this property.
+   */
+  targetArrowhead = input<string>();
   strokeOpacity = input<number>(1);
   strokeWidth = input<number>(2);
 
@@ -59,26 +65,44 @@ export class NgDiagramBaseEdgeComponent {
     return `M ${points[0].x},${points[0].y}`;
   });
 
-  markerStart = computed(() =>
-    this.customMarkerStart()
-      ? `url(#${this.customMarkerStart()})`
-      : this.edge()?.targetArrowhead
-        ? `url(#${this.edge().targetArrowhead})`
-        : null
-  );
+  markerStart = computed(() => {
+    const markerId = this.edge()?.sourceArrowhead ?? this.sourceArrowhead();
 
-  markerEnd = computed(() =>
-    this.customMarkerEnd()
-      ? `url(#${this.customMarkerEnd()})`
-      : this.edge()?.sourceArrowhead
-        ? `url(#${this.edge().sourceArrowhead})`
-        : null
-  );
+    if (!markerId) {
+      return null;
+    }
+
+    return `url(#${markerId})`;
+  });
+
+  markerEnd = computed(() => {
+    const markerId = this.edge()?.targetArrowhead ?? this.targetArrowhead();
+
+    if (!markerId) {
+      return null;
+    }
+
+    return `url(#${markerId})`;
+  });
 
   selected = computed(() => this.edge().selected);
   temporary = computed(() => this.edge().temporary);
 
   labels = computed(() => this.edge().measuredLabels ?? []);
+
+  class = computed(() => {
+    const classArray = ['ng-diagram-edge__path'];
+
+    if (this.selected()) {
+      classArray.push('selected');
+    }
+
+    if (this.temporary()) {
+      classArray.push('temporary');
+    }
+
+    return classArray.join(' ');
+  });
 
   private prevRouting: string | undefined;
   private prevRoutingMode: RoutingMode | undefined;

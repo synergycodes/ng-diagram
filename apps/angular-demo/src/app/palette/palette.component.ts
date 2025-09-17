@@ -4,7 +4,7 @@ import {
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
   NgDiagramViewportService,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { PaletteItemPreviewComponent } from './palette-item-preview/palette-item-preview.component';
 import { PaletteItemComponent } from './palette-item/palette-item.component';
 

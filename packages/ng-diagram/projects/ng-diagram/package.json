@@ -1,8 +1,8 @@
 {
-  "name": "@angularflow/angular-adapter",
+  "name": "ng-diagram",
   "version": "0.0.10",
   "type": "module",
-  "main": "./fesm2022/angularflow-angular-adapter.mjs",
+  "main": "./fesm2022/ng-diagram.mjs",
   "types": "./index.d.ts",
   "peerDependencies": {
     "@angular/common": ">=18.0.0",

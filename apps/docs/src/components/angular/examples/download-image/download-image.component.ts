@@ -5,7 +5,7 @@ import {
   NgDiagramComponent,
   NgDiagramModelService,
   type NgDiagramConfig,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 
 @Component({

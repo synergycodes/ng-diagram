@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import type { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
+import type { NgDiagramPaletteItem } from 'ng-diagram';
 
 @Component({
   selector: 'palette-item',

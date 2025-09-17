@@ -1,9 +1,5 @@
 import { effect, Injectable, signal } from '@angular/core';
-import {
-  type Edge,
-  type Metadata,
-  type Node,
-} from '@angularflow/angular-adapter';
+import { type Edge, type Metadata, type Node } from 'ng-diagram';
 
 @Injectable()
 export class SaveStateService {

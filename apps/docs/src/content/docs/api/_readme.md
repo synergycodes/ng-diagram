@@ -2,11 +2,12 @@
 editUrl: false
 next: false
 prev: false
-title: "@angularflow/angular-adapter"
+title: "ng-diagram"
 ---
 
 ## Components
 
+- [NgDiagramBaseEdgeComponent](/docs/api/components/ngdiagrambaseedgecomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
 
 ## Directives
@@ -19,7 +20,6 @@ title: "@angularflow/angular-adapter"
 
 ## Other
 
-- [NgDiagramBaseEdgeComponent](/docs/api/other/ngdiagrambaseedgecomponent/)
 - [NodeSizeDirective](/docs/api/other/nodesizedirective/)
 - [Metadata](/docs/api/other/metadata/)
 - [Middleware](/docs/api/other/middleware/)
