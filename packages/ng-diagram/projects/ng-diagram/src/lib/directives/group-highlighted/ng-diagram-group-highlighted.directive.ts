@@ -1,5 +1,5 @@
 import { computed, Directive, input } from '@angular/core';
-import { GroupNode } from '@angularflow/core';
+import { GroupNode } from '@ng-diagram/core';
 
 @Directive({
   selector: '[ngDiagramGroupHighlighted]',

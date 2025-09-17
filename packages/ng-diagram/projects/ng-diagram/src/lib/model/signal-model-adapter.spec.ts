@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import type { Edge, Node, Viewport } from '@angularflow/core';
+import type { Edge, Node, Viewport } from '@ng-diagram/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SignalModelAdapter } from './signal-model-adapter';
 

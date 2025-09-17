@@ -1,4 +1,4 @@
-import { ResizeDirection } from '@angularflow/core';
+import { ResizeDirection } from '@ng-diagram/core';
 
 export type LinePosition = Extract<ResizeDirection, 'top' | 'right' | 'bottom' | 'left'>;
 

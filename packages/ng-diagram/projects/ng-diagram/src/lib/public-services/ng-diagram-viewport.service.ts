@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { Point } from '@angularflow/core';
+import { Point } from '@ng-diagram/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramModelService } from './ng-diagram-model.service';
 

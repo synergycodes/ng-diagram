@@ -1,5 +1,5 @@
 import { Injector, runInInjectionContext } from '@angular/core';
-import type { Model } from '@angularflow/core';
+import type { Model } from '@ng-diagram/core';
 import { SignalModelAdapter } from './signal-model-adapter';
 
 /**

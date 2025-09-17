@@ -1,5 +1,5 @@
 import { computed, Directive, input } from '@angular/core';
-import { Edge, Node } from '@angularflow/core';
+import { Edge, Node } from '@ng-diagram/core';
 
 @Directive({
   selector: '[ngDiagramZIndex]',

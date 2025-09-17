@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Point } from '@angularflow/core';
+import { Point } from '@ng-diagram/core';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()

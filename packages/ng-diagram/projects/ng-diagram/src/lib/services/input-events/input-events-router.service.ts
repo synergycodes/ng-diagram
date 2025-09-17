@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { InputEventsRouter } from '@angularflow/core';
+import { InputEventsRouter } from '@ng-diagram/core';
 import { BrowserInputsHelpers } from './browser-inputs-helpers';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent | TouchEvent;

@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { FlowCore } from '@angularflow/core';
+import { FlowCore } from '@ng-diagram/core';
 import { FlowCoreProviderService } from '../services';
 
 export abstract class NgDiagramBaseService {

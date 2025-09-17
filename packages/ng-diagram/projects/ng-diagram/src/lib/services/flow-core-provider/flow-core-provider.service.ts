@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { DeepPartial, FlowConfig, FlowCore, MiddlewareChain, ModelAdapter } from '@angularflow/core';
+import { DeepPartial, FlowConfig, FlowCore, MiddlewareChain, ModelAdapter } from '@ng-diagram/core';
 
 import { detectEnvironment } from '../../utils/detect-environment';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';

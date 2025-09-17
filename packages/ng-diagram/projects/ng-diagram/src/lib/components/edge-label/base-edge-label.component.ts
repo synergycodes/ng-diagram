@@ -10,7 +10,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { EdgeLabel } from '@angularflow/core';
+import { EdgeLabel } from '@ng-diagram/core';
 import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
 import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 

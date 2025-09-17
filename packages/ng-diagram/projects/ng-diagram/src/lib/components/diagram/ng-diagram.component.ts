@@ -11,7 +11,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { Edge, Node } from '@angularflow/core';
+import { Edge, Node } from '@ng-diagram/core';
 
 import type {
   DiagramInitEvent,
@@ -21,7 +21,7 @@ import type {
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
-} from '@angularflow/core';
+} from '@ng-diagram/core';
 
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';

@@ -1,5 +1,5 @@
 import { Directive, input } from '@angular/core';
-import { Viewport } from '@angularflow/core';
+import { Viewport } from '@ng-diagram/core';
 
 @Directive({
   selector: '[ngDiagramViewport]',

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Port } from '@angularflow/core';
+import { Port } from '@ng-diagram/core';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
 import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';

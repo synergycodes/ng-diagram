@@ -1,5 +1,5 @@
 import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { Node } from '@ng-diagram/core';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';

@@ -1,5 +1,5 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { DEFAULT_NODE_MIN_SIZE, isGroup, type Node } from '@angularflow/core';
+import { DEFAULT_NODE_MIN_SIZE, isGroup, type Node } from '@ng-diagram/core';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 

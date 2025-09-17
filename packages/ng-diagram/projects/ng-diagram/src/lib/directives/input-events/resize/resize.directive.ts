@@ -1,5 +1,5 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { Node, ResizeDirection } from '@angularflow/core';
+import { Node, ResizeDirection } from '@ng-diagram/core';
 
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
