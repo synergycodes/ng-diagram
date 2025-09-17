@@ -10,7 +10,7 @@ import {
   NgDiagramComponent,
   NgDiagramService,
   type NgDiagramConfig,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { readOnlyMiddleware } from './read-only-middleware';
 
 /**

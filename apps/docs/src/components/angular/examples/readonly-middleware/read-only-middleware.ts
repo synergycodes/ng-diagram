@@ -1,4 +1,4 @@
-import type { Middleware } from '@angularflow/angular-adapter';
+import type { Middleware } from 'ng-diagram';
 
 /**
  * Read-only middleware implementation that blocks specific actions when enabled

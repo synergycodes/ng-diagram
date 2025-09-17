@@ -1,6 +1,6 @@
 import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgDiagramContextComponent } from '@angularflow/angular-adapter';
+import { NgDiagramContextComponent } from 'ng-diagram';
 import { ReadonlyMiddlewareInnerComponent } from './readonly-middleware-inner.component';
 
 /**
