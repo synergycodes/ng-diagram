@@ -1,8 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import {
-  NgDiagramModelService,
-  NgDiagramService,
-} from '@angularflow/angular-adapter';
+import { NgDiagramModelService, NgDiagramService } from 'ng-diagram';
 import { performLayout } from './perform-layout';
 
 @Component({

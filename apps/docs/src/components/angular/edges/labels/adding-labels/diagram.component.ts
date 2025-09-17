@@ -7,7 +7,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { LabelPanel } from './label-panel.component';
 import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component';
 

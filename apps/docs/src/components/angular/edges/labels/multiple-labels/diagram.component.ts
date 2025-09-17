@@ -7,7 +7,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
 
 @Component({

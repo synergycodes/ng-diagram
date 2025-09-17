@@ -3,7 +3,7 @@ import {
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'sinusoid-edge',

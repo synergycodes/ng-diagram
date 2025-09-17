@@ -1,4 +1,4 @@
-import { type Node } from '@angularflow/angular-adapter';
+import { type Node } from 'ng-diagram';
 
 export const downloadImage = (data: string | Blob, fileName: string) => {
   try {

@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "angular-adapter": ["./dist/angular-adapter"]
+      "ng-diagram": ["./dist/ng-diagram"]
     },
     "outDir": "./dist/out-tsc",
     "strict": true,

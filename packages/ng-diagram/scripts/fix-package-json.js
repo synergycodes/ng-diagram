@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const packageJsonPath = path.join(__dirname, '../dist/angular-adapter/package.json');
+const packageJsonPath = path.join(__dirname, '../dist/ng-diagram/package.json');
 const corePackageJsonPath = path.join(__dirname, '../../core/package.json');
 
 try {
@@ -37,7 +37,7 @@ try {
     },
     '.': {
       types: './index.d.ts',
-      default: './fesm2022/angularflow-angular-adapter.mjs',
+      default: './fesm2022/ng-diagram.mjs',
     },
     './styles.css': './styles.css',
     './primitives.css': './primitives.css',

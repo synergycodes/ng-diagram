@@ -9,7 +9,7 @@ import {
   NgDiagramNodeTemplate,
   NgDiagramPortComponent,
   Node,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'app-resizable-node',

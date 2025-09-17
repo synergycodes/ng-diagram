@@ -51,8 +51,8 @@ export default defineConfig({
       plugins: [
         starlightAutoSidebar(),
         starlightTypeDoc({
-          entryPoints: ['../../packages/angular-adapter/projects/angular-adapter/src/public-api.ts'],
-          tsconfig: '../../packages/angular-adapter/projects/angular-adapter/tsconfig.lib.json',
+          entryPoints: ['../../packages/ng-diagram/projects/ng-diagram/src/public-api.ts'],
+          tsconfig: '../../packages/ng-diagram/projects/ng-diagram/tsconfig.lib.json',
           typeDoc: {
             router: 'category',
             disableSources: true,

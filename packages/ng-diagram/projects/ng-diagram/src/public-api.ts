@@ -1,5 +1,5 @@
 /*
- * Public API Surface of angular-adapter
+ * Public API Surface of ng-diagram
  */
 
 // Components

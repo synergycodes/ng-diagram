@@ -5,7 +5,7 @@ import {
   NgDiagramGroupNodeTemplate,
   NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeSelectedDirective,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'app-group-node',

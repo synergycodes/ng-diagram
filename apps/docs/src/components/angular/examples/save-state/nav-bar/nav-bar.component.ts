@@ -1,5 +1,5 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import { NgDiagramModelService } from 'ng-diagram';
 import { SaveStateService } from '../save.service';
 
 @Component({

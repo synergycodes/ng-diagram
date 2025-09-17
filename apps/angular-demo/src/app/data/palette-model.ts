@@ -1,4 +1,4 @@
-import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
+import { NgDiagramPaletteItem } from 'ng-diagram';
 import { NodeTemplateType } from './node-template';
 
 export const paletteModel: NgDiagramPaletteItem<Data>[] = [

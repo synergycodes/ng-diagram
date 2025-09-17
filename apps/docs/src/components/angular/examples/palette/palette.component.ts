@@ -5,7 +5,7 @@ import {
   NgDiagramPaletteItemComponent,
   NgDiagramPaletteItemPreviewComponent,
   type NgDiagramPaletteItem,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { PaletteItemComponent } from './palette-item.component';
 
 @Component({

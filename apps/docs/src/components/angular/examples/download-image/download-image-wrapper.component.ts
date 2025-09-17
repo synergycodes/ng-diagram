@@ -1,6 +1,6 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import { NgDiagramContextComponent } from '@angularflow/angular-adapter';
+import { NgDiagramContextComponent } from 'ng-diagram';
 import { DownloadImageComponent } from './download-image.component';
 import { GenerateImageService } from './generate-image.service';
 

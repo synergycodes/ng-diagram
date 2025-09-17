@@ -1,10 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
-import {
-  BaseEdgeLabelComponent,
-  Edge,
-  NgDiagramBaseEdgeComponent,
-  NgDiagramEdgeTemplate,
-} from '@angularflow/angular-adapter';
+import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate } from 'ng-diagram';
 
 /**
  * Simple edge with a single label at the center.

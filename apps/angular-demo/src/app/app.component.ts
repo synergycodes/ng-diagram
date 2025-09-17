@@ -13,7 +13,7 @@ import {
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';

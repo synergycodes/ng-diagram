@@ -1,10 +1,7 @@
 import '@angular/compiler';
 
 import { Component, computed, inject } from '@angular/core';
-import {
-  NgDiagramModelService,
-  NgDiagramSelectionService,
-} from '@angularflow/angular-adapter';
+import { NgDiagramModelService, NgDiagramSelectionService } from 'ng-diagram';
 
 @Component({
   selector: 'sidebar-container',
