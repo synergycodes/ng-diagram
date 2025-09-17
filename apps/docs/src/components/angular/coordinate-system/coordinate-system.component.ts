@@ -5,7 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
 @Component({

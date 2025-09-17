@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
+import { NgDiagramPaletteItem } from 'ng-diagram';
 
 @Component({
   selector: 'app-palette-item',

@@ -1,4 +1,4 @@
-import { NgDiagramNodeTemplateMap } from '@angularflow/angular-adapter';
+import { NgDiagramNodeTemplateMap } from 'ng-diagram';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from '../node-template/input-field-node/input-field-node.component';

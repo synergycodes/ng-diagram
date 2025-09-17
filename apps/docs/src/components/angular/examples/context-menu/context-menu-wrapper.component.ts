@@ -1,9 +1,6 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import {
-  NgDiagramContextComponent,
-  NgDiagramModelService,
-} from '@angularflow/angular-adapter';
+import { NgDiagramContextComponent, NgDiagramModelService } from 'ng-diagram';
 import { ContextMenuExampleComponent } from './context-menu-example.component';
 import { ContextMenuService } from './menu/menu.service';
 

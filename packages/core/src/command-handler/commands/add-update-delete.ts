@@ -91,6 +91,16 @@ export const updateEdge = async (commandHandler: CommandHandler, command: Update
   await commandHandler.flowCore.applyUpdate({ edgesToUpdate: [{ id, ...edgeChanges }] }, 'updateEdge');
 };
 
+export interface UpdateEdgesCommand {
+  name: 'updateEdges';
+  edges: (Pick<Edge, 'id'> & Partial<Edge>)[];
+}
+
+export const updateEdges = async (commandHandler: CommandHandler, command: UpdateEdgesCommand) => {
+  const { edges } = command;
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate: edges }, 'updateEdges');
+};
+
 export interface DeleteEdgesCommand {
   name: 'deleteEdges';
   ids: string[];
@@ -201,32 +211,46 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
   );
 };
 
-export interface UpdateEdgeLabelCommand {
-  name: 'updateEdgeLabel';
+export interface UpdateEdgeLabelsCommand {
+  name: 'updateEdgeLabels';
   edgeId: string;
-  labelId: string;
-  labelChanges: Partial<EdgeLabel>;
+  labelUpdates: {
+    labelId: string;
+    labelChanges: Partial<EdgeLabel>;
+  }[];
 }
 
-export const updateEdgeLabel = async (commandHandler: CommandHandler, command: UpdateEdgeLabelCommand) => {
-  const { edgeId, labelId, labelChanges } = command;
+export const updateEdgeLabels = async (commandHandler: CommandHandler, command: UpdateEdgeLabelsCommand) => {
+  const { edgeId, labelUpdates } = command;
   const edge = commandHandler.flowCore.getEdgeById(edgeId);
   if (!edge) {
     return;
   }
+
   const points = edge.points || [];
   const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
+
+  const updatesMap = new Map<string, Partial<EdgeLabel>>();
+  labelUpdates.forEach(({ labelId, labelChanges }) => {
+    updatesMap.set(labelId, labelChanges);
+  });
+
   const newLabels = edge.measuredLabels?.map((label) => {
-    const positionOnEdge = labelChanges?.positionOnEdge ?? label.positionOnEdge;
-    const position = edgeRoutingManager.computePointOnPath(edge.routing, points, positionOnEdge);
-    if (label.id !== labelId) {
+    const updates = updatesMap.get(label.id);
+    if (!updates) {
+      const position = edgeRoutingManager.computePointOnPath(edge.routing, points, label.positionOnEdge);
       return { ...label, position };
     }
-    return { ...label, ...(labelChanges || {}), position };
+
+    const positionOnEdge = updates.positionOnEdge ?? label.positionOnEdge;
+    const position = edgeRoutingManager.computePointOnPath(edge.routing, points, positionOnEdge);
+    return { ...label, ...updates, position };
   });
+
   if (!newLabels) {
     return;
   }
+
   await commandHandler.flowCore.applyUpdate(
     { edgesToUpdate: [{ id: edgeId, measuredLabels: newLabels }] },
     'updateEdge'

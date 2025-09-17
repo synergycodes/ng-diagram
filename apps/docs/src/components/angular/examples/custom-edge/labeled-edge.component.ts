@@ -4,7 +4,7 @@ import {
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 const STROKE_WIDTH_DEFAULT = 2;
 const STROKE_WIDTH_SELECTED = 4;

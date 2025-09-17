@@ -3,14 +3,14 @@ import {
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'sinusoid-edge',
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
     stroke="rebeccapurple"
-    customMarkerEnd="ng-diagram-arrow"
+    targetArrowhead="ng-diagram-arrow"
   />`,
   imports: [NgDiagramBaseEdgeComponent],
 })

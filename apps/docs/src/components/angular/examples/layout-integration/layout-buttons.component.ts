@@ -1,8 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import {
-  NgDiagramModelService,
-  NgDiagramService,
-} from '@angularflow/angular-adapter';
+import { NgDiagramModelService, NgDiagramService } from 'ng-diagram';
 import { performLayout } from './perform-layout';
 
 @Component({
@@ -35,6 +32,19 @@ export class LayoutButtonsComponent {
   edges = computed(() => this.modelService.getModel().getEdges());
 
   onTreeLayout() {
+    // Reset all edges to auto routing mode before applying built-in tree layout
+    const edges = this.edges();
+    const edgesToReset = edges
+      .filter((edge) => edge.routingMode === 'manual')
+      .map((edge) => ({
+        id: edge.id,
+        routingMode: 'auto' as const,
+      }));
+
+    if (edgesToReset.length > 0) {
+      this.modelService.updateEdges(edgesToReset);
+    }
+
     this.diagramService.layout('tree');
   }
 
@@ -44,12 +54,12 @@ export class LayoutButtonsComponent {
       this.edges()
     );
 
-    for (const node of finalNodes) {
-      this.modelService.updateNode(node.id, node);
+    if (finalNodes.length > 0) {
+      this.modelService.updateNodes(finalNodes);
     }
 
-    for (const edge of finalEdges) {
-      this.modelService.updateEdge(edge.id, edge);
+    if (finalEdges.length > 0) {
+      this.modelService.updateEdges(finalEdges);
     }
   }
 }

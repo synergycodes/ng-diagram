@@ -11,7 +11,7 @@ import {
   NgDiagramPortComponent,
   type NgDiagramNodeTemplate,
   type Node,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   selector: 'node',

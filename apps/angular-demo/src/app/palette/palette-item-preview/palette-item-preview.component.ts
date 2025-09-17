@@ -1,6 +1,6 @@
 import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { NgDiagramPaletteItem } from '@angularflow/angular-adapter';
+import { NgDiagramPaletteItem } from 'ng-diagram';
 import { nodeTemplateMap } from '../../data/node-template';
 import { PaletteItemComponent } from '../palette-item/palette-item.component';
 

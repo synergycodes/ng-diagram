@@ -13,7 +13,7 @@ When diagrams are created, requirements often extend beyond simple `edges` conne
 
 ## Decision
 
-A dedicated component - `angular-adapter-custom-edge` - is provided to make defining custom edges easy and consistent
+A dedicated component - `ng-diagram-custom-edge` - is provided to make defining custom edges easy and consistent
 within Angular applications.
 
 ### This component allows you to:
@@ -21,17 +21,17 @@ within Angular applications.
 - Use one of the built-in path generators (e.g., `polyline`, `bezier`, `orthogonal`),
 - Or define your own `custom path` using any `logic` you like,
 - Add custom elements (e.g., `icons`, `buttons`, `badges`) directly inside the edge,
-- Optionally use the built-in 'label' renderer via `angular-adapter-edge-label`
+- Optionally use the built-in 'label' renderer via `ng-diagram-edge-label`
 
 ### Implementation Details
 
 #### Related tools
 
-1. `angular-adapter-custom-edge`- base component for creating fully custom edges.
-2. `angular-adapter-edge-label` - `default label` renderer (can be reused or replaced).
+1. `ng-diagram-custom-edge`- base component for creating fully custom edges.
+2. `ng-diagram-edge-label` - `default label` renderer (can be reused or replaced).
 3. `Built-in path utilities` - a set of pre-defined path functions for quick start.
 
-#### angular-adapter-custom-edge
+#### ng-diagram-custom-edge
 
 - A configurable edge component designed for integration within `diagram systems`.
 - It allows full control over appearance and behavior, including:
@@ -45,32 +45,32 @@ interaction, etc.).
 #### How to Use a Basic Label
 
 ```html
-<angular-adapter-custom-edge
+<ng-diagram-custom-edge
   [data]="data()"
   [routing]="'bezier'"
   [customStroke]="'red'"
-  [customMarkerEnd]="'angularflow-arrow'"
+  [targetArrowhead]="'angularflow-arrow'"
   [displayLabel]="true"
 />
 ```
 
-| Input               | Type                                                 | Required | Description                                                                |
-| ------------------- | ---------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
-| `data`              | `Edge`                                               | Yes      | Edge data object (source, target, metadata, etc.).                         |
-| `routing`           | `string`                                             | No       | Path type: `'polyline'`, `'bezier'`, `'orthogonal'`. Default: `'polyline'` |
-| `customStroke`      | `string`                                             | No       | Custom stroke color.                                                       |
-| `customMarkerStart` | `string`                                             | No       | Custom marker start                                                        |
-| `customMarkerEnd`   | `string`                                             | No       | Custom marker end                                                          |
-| `displayLabel`      | `boolean`                                            | No       | Whether to display the default edge label component.                       |
-| `pathAndPoints`     | `{ path: string; points: {x: number, y: number}[] }` | No       | Overrides routing with a custom path and list of points.                   |
+| Input             | Type                                                 | Required | Description                                                                |
+| ----------------- | ---------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `data`            | `Edge`                                               | Yes      | Edge data object (source, target, metadata, etc.).                         |
+| `routing`         | `string`                                             | No       | Path type: `'polyline'`, `'bezier'`, `'orthogonal'`. Default: `'polyline'` |
+| `customStroke`    | `string`                                             | No       | Custom stroke color.                                                       |
+| `sourceArrowhead` | `string`                                             | No       | Custom marker start                                                        |
+| `targetArrowhead` | `string`                                             | No       | Custom marker end                                                          |
+| `displayLabel`    | `boolean`                                            | No       | Whether to display the default edge label component.                       |
+| `pathAndPoints`   | `{ path: string; points: {x: number, y: number}[] }` | No       | Overrides routing with a custom path and list of points.                   |
 
 #### How to Use a Custom Path
 
 ```html
-<angular-adapter-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [customMarkerEnd]="'angularflow-arrow'" />
+<ng-diagram-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [targetArrowhead]="'angularflow-arrow'" />
 ```
 
-#### angular-adapter-edge-label
+#### ng-diagram-edge-label
 
 A flexible `label component` that allows attaching interactive content directly to an edge.
 
@@ -83,9 +83,9 @@ A flexible `label component` that allows attaching interactive content directly 
 `[positionOnEdge]` - Defines the position of the `label` along the edge path.
 
 ```html
-<angular-adapter-custom-edge [data]="data()" [displayLabel]="false">
-  <angular-adapter-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
+<ng-diagram-custom-edge [data]="data()" [displayLabel]="false">
+  <ng-diagram-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
     <button (mousedown)="onButtonClick()">Button</button>
-  </angular-adapter-edge-label>
-</angular-adapter-custom-edge>
+  </ng-diagram-edge-label>
+</ng-diagram-custom-edge>
 ```

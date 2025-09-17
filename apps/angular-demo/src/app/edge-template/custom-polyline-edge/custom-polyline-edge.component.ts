@@ -1,10 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import {
-  BaseEdgeLabelComponent,
-  Edge,
-  NgDiagramBaseEdgeComponent,
-  NgDiagramEdgeTemplate,
-} from '@angularflow/angular-adapter';
+import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate } from 'ng-diagram';
 
 /**
  * The example below demonstrates how to create a custom edge with:

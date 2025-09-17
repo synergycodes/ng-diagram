@@ -3,13 +3,18 @@ title: Layout Integration
 description: Example of how to integrate layout algorithms in ngDiagram
 ---
 
-NgDiagram provides built-in layout functionality exposed through the `NgDiagramService` class. Currently only tree layout is supported.
+NgDiagram provides built-in layout functionality exposed through the `NgDiagramService` class. Currently only tree layout (preview) is supported.
 For finer control over layouts you may integrate with external layout libraries to automatically position and arrange diagram elements.
 
 The implementation below shows:
 
 - How to use built-in layout using `NgDiagramService`
 - How to use external layout libraries like ELK.js
+- How to use the `selectionMoved` event to detect when nodes are moved by the user
+- How to manage edge routing modes (`manual` vs `auto`):
+  - Setting edges to `manual` mode to preserve custom layout points from ELK
+  - Resetting edges to `auto` mode when connected nodes are moved manually
+- How to use batch update methods (`updateNodes` and `updateEdges`) for better performance
 
 ## Implementation Example
 

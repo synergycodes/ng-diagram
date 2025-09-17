@@ -2,11 +2,12 @@
 editUrl: false
 next: false
 prev: false
-title: "@angularflow/angular-adapter"
+title: "ng-diagram"
 ---
 
 ## Components
 
+- [NgDiagramBaseEdgeComponent](/docs/api/components/ngdiagrambaseedgecomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
 
 ## Directives
@@ -19,7 +20,6 @@ title: "@angularflow/angular-adapter"
 
 ## Other
 
-- [NgDiagramBaseEdgeComponent](/docs/api/other/ngdiagrambaseedgecomponent/)
 - [NodeSizeDirective](/docs/api/other/nodesizedirective/)
 - [Metadata](/docs/api/other/metadata/)
 - [Middleware](/docs/api/other/middleware/)
@@ -29,7 +29,12 @@ title: "@angularflow/angular-adapter"
 
 ## Types
 
+- [DiagramInitEvent](/docs/api/types/diagraminitevent/)
 - [Edge](/docs/api/types/edge/)
+- [EdgeDrawnEvent](/docs/api/types/edgedrawnevent/)
 - [GroupNode](/docs/api/types/groupnode/)
 - [Point](/docs/api/types/point/)
+- [SelectionChangedEvent](/docs/api/types/selectionchangedevent/)
+- [SelectionMovedEvent](/docs/api/types/selectionmovedevent/)
+- [ViewportChangedEvent](/docs/api/types/viewportchangedevent/)
 - [Node](/docs/api/types/node/)

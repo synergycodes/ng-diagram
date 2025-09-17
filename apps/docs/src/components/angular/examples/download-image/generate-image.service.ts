@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { type Node } from '@angularflow/angular-adapter';
 import { toPng } from 'html-to-image';
 import type { Options } from 'html-to-image/lib/types';
+import { type Node } from 'ng-diagram';
 import { calculateBoundingBox } from './generate-image.helper';
 
 @Injectable()

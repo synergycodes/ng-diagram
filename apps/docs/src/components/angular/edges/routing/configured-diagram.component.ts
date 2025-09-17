@@ -6,7 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type NgDiagramConfig,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],

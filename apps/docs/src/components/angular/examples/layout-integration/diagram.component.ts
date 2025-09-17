@@ -1,26 +1,26 @@
 import '@angular/compiler';
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  NgDiagramModelService,
   type NgDiagramConfig,
-} from '@angularflow/angular-adapter';
+  type SelectionMovedEvent,
+} from 'ng-diagram';
 import { diagramModel } from './data';
 import { LayoutButtonsComponent } from './layout-buttons.component';
 
 @Component({
-  imports: [
-    NgDiagramContextComponent,
-    NgDiagramComponent,
-    LayoutButtonsComponent,
-  ],
+  selector: 'diagram-component',
+  imports: [NgDiagramComponent, LayoutButtonsComponent],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" [config]="config" />
-      <layout-buttons />
-    </ng-diagram-context>
+    <ng-diagram
+      [model]="model"
+      [config]="config"
+      (selectionMoved)="onSelectionMoved($event)"
+    />
+    <layout-buttons />
   `,
   styles: `
     :host {
@@ -36,6 +36,8 @@ import { LayoutButtonsComponent } from './layout-buttons.component';
   `,
 })
 export class DiagramComponent {
+  private modelService = inject(NgDiagramModelService);
+
   model = initializeModel({
     metadata: {
       viewport: { x: 100, y: 80, scale: 0.5 },
@@ -48,4 +50,26 @@ export class DiagramComponent {
     edgeRouting: { defaultRouting: 'orthogonal' },
     treeLayout: { layoutAngle: 0 },
   };
+
+  // When user manually moves nodes, edges in manual routing mode should be
+  // reset to auto so they follow the node movement and re-route appropriately
+  onSelectionMoved(event: SelectionMovedEvent): void {
+    const movedNodeIds = new Set(event.nodes.map((n) => n.id));
+    const edges = this.modelService.edges();
+
+    const edgesToUpdate = edges
+      .filter(
+        (edge) =>
+          (movedNodeIds.has(edge.source) || movedNodeIds.has(edge.target)) &&
+          edge.routingMode === 'manual'
+      )
+      .map((edge) => ({
+        id: edge.id,
+        routingMode: 'auto' as const,
+      }));
+
+    if (edgesToUpdate.length > 0) {
+      this.modelService.updateEdges(edgesToUpdate);
+    }
+  }
 }
