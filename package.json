@@ -1,5 +1,5 @@
 {
-  "name": "angularflow",
+  "name": "ng-diagram-package",
   "private": true,
   "scripts": {
     "build": "turbo run build",
