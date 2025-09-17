@@ -1,9 +1,4 @@
-import type {
-  Edge,
-  Metadata,
-  ModelAdapter,
-  Node,
-} from '@angularflow/angular-adapter';
+import type { Edge, Metadata, ModelAdapter, Node } from 'ng-diagram';
 
 export class LocalStorageModelAdapter implements ModelAdapter {
   private callbacks: Array<

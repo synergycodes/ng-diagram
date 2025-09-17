@@ -12,7 +12,7 @@ The model is the core data structure that holds all your diagram information inc
 ### Basic Model Creation
 
 ```typescript
-import { initializeModel } from '@angularflow/angular-adapter';
+import { initializeModel } from 'ng-diagram';
 
 const model = initializeModel({
   nodes: [
@@ -102,7 +102,7 @@ The `NgDiagramModelService` provides a reactive interface to interact with your 
 
 ```typescript
 import { Component, inject } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import { NgDiagramModelService } from 'ng-diagram';
 
 @Component({
   // ...

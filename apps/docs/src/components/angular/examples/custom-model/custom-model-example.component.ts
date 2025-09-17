@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
 import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import type { Node } from '@angularflow/angular-adapter';
-import {
-  NgDiagramComponent,
-  NgDiagramContextComponent,
-} from '@angularflow/angular-adapter';
+import type { Node } from 'ng-diagram';
+import { NgDiagramComponent, NgDiagramContextComponent } from 'ng-diagram';
 import { LocalStorageModelAdapter } from './local-storage-model-adapter';
 
 @Component({
