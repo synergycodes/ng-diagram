@@ -39,7 +39,7 @@ For more details on group autoresize, see the [Group Resizing via diagram config
 To create a group, add a node with `isGroup: true` to your diagram model.
 Child nodes reference their parent group via the `groupId` property.
 
-```typescript
+```typescript {3,11}
 {
   id: 'group1',
   isGroup: true,
@@ -100,7 +100,7 @@ The `grouping` configuration in `NgDiagramConfig` lets you control advanced grou
    Use the `canGroup` function to control which nodes can be grouped together.  
    This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
 
-```typescript
+```typescript {3,6,7}
 config = {
   resize: {
     getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),

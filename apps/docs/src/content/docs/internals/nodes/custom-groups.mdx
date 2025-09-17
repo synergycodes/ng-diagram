@@ -11,7 +11,7 @@ import { Aside } from '@astrojs/starlight/components';
 You can create custom group templates, similar to custom nodes.
 All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
 
-```typescript
+```typescript {13}
 @Component({
   selector: 'app-custom-group',
   template: `
