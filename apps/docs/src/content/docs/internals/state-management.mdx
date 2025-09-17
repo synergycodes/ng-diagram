@@ -277,6 +277,9 @@ Always use the model service methods rather than directly modifying the model:
 // ❌ Don't modify directly
 this.model.nodes[0].position = { x: 100, y: 100 };
 
+// ❌ Also don't use model methods directly
+this.model.updateNode('node-id', { position: { x: 100, y: 100 } });
+
 // ✅ Use model service methods
 this.modelService.updateNode('node-id', {
   position: { x: 100, y: 100 },

@@ -4,14 +4,10 @@ export class LocalStorageModelAdapter implements ModelAdapter {
   private callbacks: Array<
     (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void
   > = [];
-  public readonly storageKey: string;
-
   constructor(
-    storageKey: string = 'ng-diagram-data',
+    private readonly storageKey: string = 'ng-diagram-data',
     initialData?: { nodes?: Node[]; edges?: Edge[]; metadata?: Metadata }
   ) {
-    this.storageKey = storageKey;
-
     // Initialize storage if it doesn't exist
     if (!localStorage.getItem(this.storageKey)) {
       const defaultData = {
@@ -142,11 +138,7 @@ export class LocalStorageModelAdapter implements ModelAdapter {
   }
 
   private notifyCallbacks(): void {
-    const data = {
-      nodes: this.getNodes(),
-      edges: this.getEdges(),
-      metadata: this.getMetadata(),
-    };
+    const data = this.getStorageData();
 
     for (const callback of this.callbacks) {
       callback(data);
