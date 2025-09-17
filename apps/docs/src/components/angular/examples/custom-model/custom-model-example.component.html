@@ -1,0 +1,15 @@
+<div class="example-container">
+  <div class="controls">
+    <h3>Custom Model Controls</h3>
+    <div class="control-group">
+      <button class="btn primary" (click)="addNode()">Add Node</button>
+      <button class="btn secondary" (click)="clearAll()">Clear All</button>
+    </div>
+  </div>
+
+  <ng-diagram-context>
+    <div class="diagram-container">
+      <ng-diagram [model]="modelAdapter" class="diagram"> </ng-diagram>
+    </div>
+  </ng-diagram-context>
+</div>
