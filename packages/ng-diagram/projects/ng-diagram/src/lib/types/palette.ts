@@ -1,4 +1,4 @@
-import { GroupNode, SimpleNode } from '@ng-diagram/core';
+import { GroupNode, SimpleNode } from '../../core/src';
 
 export type NgDiagramPaletteItem<Data extends object = BasePaletteItemData> =
   | SimpleNodeData<Data>

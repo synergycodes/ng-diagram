@@ -2,12 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@ng-diagram/core": [
-        "./projects/ng-diagram/src/core/src/index.ts"
-      ],
-      "ng-diagram": [
-        "./dist/ng-diagram"
-      ]
+      "ng-diagram": ["./dist/ng-diagram"]
     },
     "outDir": "./dist/out-tsc",
     "strict": true,

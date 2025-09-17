@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
-import { Edge } from '@ng-diagram/core';
+import { Edge } from '../../../../core/src';
 import { NgDiagramEdgeTemplate } from '../../../types';
 import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
 import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';

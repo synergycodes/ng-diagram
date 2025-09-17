@@ -1,5 +1,5 @@
 import { computed, Directive, input } from '@angular/core';
-import { Node } from '@ng-diagram/core';
+import { Node } from '../../../core/src';
 
 @Directive({
   selector: '[ngDiagramNodeSelected]',

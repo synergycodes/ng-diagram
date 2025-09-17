@@ -1,3 +1,3 @@
-import { DeepPartial, FlowConfig } from '@ng-diagram/core';
+import { DeepPartial, FlowConfig } from '../../core/src';
 
 export type NgDiagramConfig = DeepPartial<FlowConfig>;

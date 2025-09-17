@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { FlowCore, Middleware, ModelAdapter } from '@ng-diagram/core';
+import { FlowCore, Middleware, ModelAdapter } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { detectEnvironment } from '../../utils/detect-environment';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';

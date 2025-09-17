@@ -1,5 +1,5 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { ContainerEdge, FPS_60, NgDiagramMath, Node } from '@ng-diagram/core';
+import { ContainerEdge, FPS_60, NgDiagramMath, Node } from '../../../../core/src';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
 import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';

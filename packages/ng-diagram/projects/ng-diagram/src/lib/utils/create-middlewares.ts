@@ -6,7 +6,7 @@ import {
   MiddlewareChain,
   treeLayoutMiddleware,
   zIndexMiddleware,
-} from '@ng-diagram/core';
+} from '../../core/src';
 
 export const BUILTIN_MIDDLEWARES = [
   zIndexMiddleware,

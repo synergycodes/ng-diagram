@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Node } from '@ng-diagram/core';
+import { Node } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
 import { LinkingEventService } from './linking-event.service';

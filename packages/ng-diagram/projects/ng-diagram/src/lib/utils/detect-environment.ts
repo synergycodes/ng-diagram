@@ -1,4 +1,4 @@
-import { EnvironmentInfo } from '@ng-diagram/core';
+import { EnvironmentInfo } from '../../core/src';
 
 export function getOS(): EnvironmentInfo['os'] {
   const userAgent = window.navigator.userAgent;

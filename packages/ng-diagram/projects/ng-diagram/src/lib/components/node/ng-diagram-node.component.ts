@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Node } from '@ng-diagram/core';
+import { Node } from '../../../core/src';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
 import { NodeSelectionDirective } from '../../directives/input-events/object-selection/object-selection.directive';

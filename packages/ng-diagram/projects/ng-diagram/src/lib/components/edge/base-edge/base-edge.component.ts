@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, Point, RoutingMode } from '@ng-diagram/core';
+import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 

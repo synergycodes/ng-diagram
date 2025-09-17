@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Node } from '@ng-diagram/core';
+import { Node } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { InputEventsRouterService } from './input-events-router.service';
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Node } from '@ng-diagram/core';
+import { Node } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 @Injectable()

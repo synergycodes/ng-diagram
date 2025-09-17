@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { GroupNode } from '@ng-diagram/core';
+import { GroupNode } from '../../../../core/src';
 import { NgDiagramGroupHighlightedDirective, NgDiagramNodeSelectedDirective } from '../../../directives';
 import { NgDiagramGroupNodeTemplate } from '../../../types';
 import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node-resize-adornment.component';

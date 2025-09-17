@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Direction } from '@ng-diagram/core';
+import { Direction } from '../../../../../core/src';
 import { FlowCoreProviderService } from '../../../../services/flow-core-provider/flow-core-provider.service';
 import { BrowserInputsHelpers } from '../../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../../services/input-events/input-events-router.service';

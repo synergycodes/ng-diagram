@@ -1,4 +1,4 @@
-import { ResizeDirection } from '@ng-diagram/core';
+import { ResizeDirection } from '../../../../core/src';
 
 export type LinePosition = Extract<ResizeDirection, 'top' | 'right' | 'bottom' | 'left'>;
 

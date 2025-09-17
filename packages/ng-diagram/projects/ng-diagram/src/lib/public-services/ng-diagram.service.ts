@@ -11,7 +11,7 @@ import {
   TransactionCallback,
   TransactionResult,
   UnsubscribeFn,
-} from '@ng-diagram/core';
+} from '../../core/src';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
 import { NgDiagramConfig } from '../types';
 import { NgDiagramBaseService } from './ng-diagram-base.service';

@@ -76,4 +76,4 @@ export type {
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
-} from '@ng-diagram/core';
+} from './core/src';

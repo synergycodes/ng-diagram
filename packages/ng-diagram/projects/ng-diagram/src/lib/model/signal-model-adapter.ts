@@ -1,5 +1,5 @@
 import { EffectRef, Injectable, effect, signal } from '@angular/core';
-import type { Edge, Metadata, ModelAdapter, ModelChanges, Node } from '@ng-diagram/core';
+import type { Edge, Metadata, ModelAdapter, ModelChanges, Node } from '../../core/src';
 
 @Injectable()
 export class SignalModelAdapter implements ModelAdapter {

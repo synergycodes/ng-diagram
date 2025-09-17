@@ -1,5 +1,5 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { Node } from '@ng-diagram/core';
+import { Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
 
