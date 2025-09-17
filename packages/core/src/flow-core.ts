@@ -1,8 +1,10 @@
 import { ActionStateManager } from './action-state-manager/action-state-manager';
 import { CommandHandler } from './command-handler/command-handler';
 import { EdgeRoutingManager } from './edge-routing-manager';
+import { EventManager } from './event-manager';
 import { defaultFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
+import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -47,8 +49,10 @@ export class FlowCore {
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
   readonly portBatchProcessor: PortBatchProcessor;
+  readonly labelBatchProcessor: LabelBatchProcessor;
   readonly actionStateManager: ActionStateManager;
   readonly edgeRoutingManager: EdgeRoutingManager;
+  readonly eventManager: EventManager;
 
   readonly getFlowOffset: () => { x: number; y: number };
 
@@ -73,10 +77,12 @@ export class FlowCore {
     this.transactionManager = new TransactionManager(this);
     this.actionStateManager = new ActionStateManager();
     this.portBatchProcessor = new PortBatchProcessor();
+    this.labelBatchProcessor = new LabelBatchProcessor();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
     );
+    this.eventManager = new EventManager();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
@@ -85,6 +91,7 @@ export class FlowCore {
   }
 
   destroy() {
+    this.eventManager.offAll();
     this.model.destroy();
   }
 
@@ -250,6 +257,9 @@ export class FlowCore {
 
       if (finalState) {
         this.setState(finalState);
+        this.eventManager.flushDeferredEmits();
+      } else {
+        this.eventManager.clearDeferredEmits();
       }
     } finally {
       // Always release the semaphore, even if an error occurs

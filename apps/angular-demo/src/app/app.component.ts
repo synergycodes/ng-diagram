@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
+  DiagramInitEvent,
+  EdgeDrawnEvent,
   initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
@@ -8,6 +10,9 @@ import {
   NgDiagramEdgeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  SelectionChangedEvent,
+  SelectionMovedEvent,
+  ViewportChangedEvent,
 } from '@angularflow/angular-adapter';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
@@ -53,6 +58,58 @@ export class AppComponent {
       defaultRouting: 'orthogonal',
     },
   };
+
+  onDiagramInit(event: DiagramInitEvent): void {
+    console.log('INIT');
+    event.nodes.forEach((node) => {
+      console.log(`${node.size?.width} ${node.size?.height}`);
+      if (node.measuredPorts) {
+        node.measuredPorts.forEach((port) =>
+          console.log(`${port.size?.width} ${port.size?.height} ${port.position?.x} ${port.position?.y}`)
+        );
+      }
+    });
+
+    event.edges.forEach((edge) => {
+      if (edge.measuredLabels) {
+        edge.measuredLabels.forEach((label) => {
+          console.log(`${label.size?.width} ${label.size?.height} ${label.position?.x} ${label.position?.y}`);
+        });
+      }
+    });
+  }
+
+  onSelectionChanged(event: SelectionChangedEvent): void {
+    console.log('Selection Changed:', {
+      nodes: event.selectedNodes.map((n) => n.id),
+      edges: event.selectedEdges.map((e) => e.id),
+      previousNodes: event.previousNodes.map((n) => n.id),
+      previousEdges: event.previousEdges.map((e) => e.id),
+    });
+  }
+
+  onSelectionMoved(event: SelectionMovedEvent): void {
+    console.log('Selection Moved:', {
+      nodes: event.nodes.map((n) => n.id),
+    });
+  }
+
+  onViewportChanged(event: ViewportChangedEvent): void {
+    console.log('Viewport Changed:', {
+      current: event.viewport,
+      previous: event.previousViewport,
+    });
+  }
+
+  onEdgeDrawn(event: EdgeDrawnEvent): void {
+    console.log('Edge Drawn:', {
+      edge: event.edge.id,
+      source: event.source.id,
+      target: event.target.id,
+      sourcePort: event.sourcePort,
+      targetPort: event.targetPort,
+    });
+  }
 
   model = initializeModel({
     nodes: [

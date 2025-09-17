@@ -42,6 +42,17 @@ describe('Add Update Delete Command', () => {
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToUpdate: [{ id: '1', selected: true }] }, 'updateNode');
   });
 
+  it('should update multiple nodes', () => {
+    const updates = [
+      { id: '1', selected: true },
+      { id: '2', selected: false, position: { x: 100, y: 200 } },
+    ];
+
+    commandHandler.emit('updateNodes', { nodes: updates });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToUpdate: updates }, 'updateNodes');
+  });
+
   it('should delete nodes from the flow with edges connected to them', () => {
     const node1 = { ...mockNode, id: '1', selected: true };
     const node2 = { ...mockNode, id: '2', selected: false };
@@ -70,6 +81,17 @@ describe('Add Update Delete Command', () => {
     commandHandler.emit('updateEdge', { id: '1', edgeChanges: { selected: true } });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edgesToUpdate: [{ id: '1', selected: true }] }, 'updateEdge');
+  });
+
+  it('should update multiple edges', () => {
+    const updates = [
+      { id: '1', selected: true },
+      { id: '2', selected: false, data: { label: 'Updated' } },
+    ];
+
+    commandHandler.emit('updateEdges', { edges: updates });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ edgesToUpdate: updates }, 'updateEdges');
   });
 
   it('should delete edges from the flow', () => {
@@ -170,10 +192,9 @@ describe('Add Update Delete Command', () => {
     const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
 
-    commandHandler.emit('updateEdgeLabel', {
+    commandHandler.emit('updateEdgeLabels', {
       edgeId: mockEdge.id,
-      labelId: mockEdgeLabel1.id,
-      labelChanges: { positionOnEdge: 0 },
+      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: 0 } }],
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
