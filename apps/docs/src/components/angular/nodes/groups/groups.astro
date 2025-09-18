@@ -1,0 +1,17 @@
+---
+import ContentWrapper from '@components/content-wrapper/content-wrapper.astro';
+import { GroupsDiagram } from './groups-wrapper.component';
+---
+
+<ContentWrapper class="diagram-container">
+  <GroupsDiagram client:only="angular" />
+</ContentWrapper>
+
+<style>
+  .diagram-container {
+    width: 100%;
+    height: 20rem;
+    border: 5px solid var(--ngd-ui-border-default);
+    background-color: var(--ngd-ui-bg-tertiary-default) ;
+  }
+</style>

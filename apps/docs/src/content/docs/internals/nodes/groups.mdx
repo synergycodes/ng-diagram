@@ -1,6 +1,190 @@
 ---
 title: Groups
 description: Understanding how groups work in ngDiagram
+sidebar:
+  order: 1
 ---
 
-# Groups
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import { LinkCard } from '@astrojs/starlight/components';
+import Groups from '@components/angular/nodes/groups/groups.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+Groups in **ngDiagram** are containers for other nodes, allowing you to organize, move, and manage multiple nodes as a single unit.
+They are essential for structuring complex diagrams, enabling collective operations and visual grouping.
+
+## What is a Group?
+
+A group is a node that can contain other nodes (children), serving as both a visual and logical container.
+Groups support most node features but have unique behaviors for layout and interaction.
+
+**Key Concepts:**
+
+- **Container Node:** Groups encapsulate other nodes, but child nodes retain their global coordinates.
+- **Visual Organization:** Useful for representing subsystems, clusters, or logical groupings.
+- **Interactive:** Groups can be moved, resized, selected, and highlighted.
+
+To add a node to a group, simply select the node and drag and drop it into the group.
+To remove a node from a group, the method depends on the `allowGroupAutoResize` setting:
+
+- **When `allowGroupAutoResize` is disabled:**  
+   Simply drag the node out of the group. The node will be removed from the group automatically.
+- **When `allowGroupAutoResize` is enabled (default):**  
+   Hold the `SHIFT` key while dragging the node out of the group. This ensures the node is removed from the group, as dragging alone will trigger group autoresize instead.
+
+For more details on group autoresize, see the [Group Resizing via diagram config](/docs/internals/nodes/groups/#resizing-configuration).
+
+## Creating a Group
+
+To create a group, add a node with `isGroup: true` to your diagram model.
+Child nodes reference their parent group via the `groupId` property.
+
+```typescript {3,11}
+{
+  id: 'group1',
+  isGroup: true,
+  position: { x: 300, y: 400 },
+  data: { title: 'My Group' },
+  // Optional: size, autoSize, resizable
+},
+{
+  id: 'node1',
+  position: { x: 350, y: 450 },
+  groupId: 'group1',
+  data: { label: 'Child Node' }
+}
+```
+
+## Default Group
+
+ngDiagram provides a default group template with built-in styling and resizing.
+If you do not specify a custom type, the default group template is used.
+
+**Features:**
+
+- Styled container with content area
+- Supports resizing and selection
+- Highlighted when nodes are dragged over
+
+<Groups />
+
+## Resizing Groups
+
+Groups can be resized interactively if `resizable: true` is set.
+The resize adornment appears, allowing users to adjust the group's dimensions.
+
+- **Manual Resize:** Set `resizable: true` and optionally provide a `size` property.
+- **Autoresize:** With `allowGroupAutoResize: true` (default) set in a diagram configuration, the group automatically fits its children.
+  For more details, see the [Group Resizing via diagram config](/docs/internals/nodes/groups/#resizing-configuration).
+
+{/* TODO: change that linkcard to configuration via diagram documentation when this page will be created */}
+
+<LinkCard
+  icon="list-format"
+  title="Diagram configuration"
+  href="/docs/internals/nodes/resizing/#configuring-resizing-via-diagram-config"
+  description="Read more about configuring via diagram config"
+/>
+
+### Resizing Configuration
+
+You can control resizing behavior globally via the `resize` config in `NgDiagramConfig`, such as setting minimum group size.
+
+The `grouping` configuration in `NgDiagramConfig` lets you control advanced grouping behavior:
+
+- **allowGroupAutoResize:**  
+   When `true` (default), groups automatically resize to fit their children.  
+   When `false`, groups do not resize automatically, and you must manually adjust their size.
+
+- **canGroup callback:**  
+   Use the `canGroup` function to control which nodes can be grouped together.  
+   This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
+
+```typescript {3,6,7}
+config = {
+  resize: {
+    getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
+  },
+  grouping: {
+    allowGroupAutoResize: true,
+    canGroup: (node: Node, group: Node) => true;
+  },
+};
+```
+
+{/* TODO: change that linkcard to configuration via diagram documentation when this page will be created */}
+
+<LinkCard
+  icon="list-format"
+  title="Diagram configuration"
+  href="/docs/internals/nodes/resizing/#configuring-resizing-via-diagram-config"
+  description="Read more about configuring resizing via diagram config"
+/>
+
+## Highlighting Groups
+
+Groups can be visually highlighted when nodes are dragged over them or programmatically via the `highlighted` property.
+
+## Selecting Groups
+
+Groups can be visually selected with built-in functionality.
+
+<LinkCard
+  icon="list-format"
+  title="Selection"
+  href="/docs/internals/nodes/selection"
+  description="Read more about Selection"
+/>
+
+## Rotation
+
+Groups can be rotated if `rotatable: true` is set.
+However, **rotation only affects the group container**—child nodes are **not rotated** with the group.
+Children retain their global orientation and position.
+
+<Aside type="caution">
+**Limitations:** Groups do not yet fully support rotated child nodes. 
+  
+Please use it with caution in your Custom Groups.
+
+Currently, for the default group, this feature is disabled due to these limitations. Autoresize that takes child
+rotation into account is also in progress.
+
+We will come back soon with an update to fix that!
+
+</Aside>
+
+## Coordinate System
+
+All group and child node positions are defined in the **global coordinate system**.
+Adding a node to a group does **not** change its coordinates.
+When a group moves, all its children move by the same delta, preserving their relative positions.
+
+---
+
+## Custom Groups
+
+See [Custom Groups](/docs/internals/nodes/custom-groups) for information on creating your own group templates, registering them, and handling advanced behaviors.
+
+---
+
+## Further Reading
+
+<LinkCard
+  icon="list-format"
+  title="Nodes"
+  href="/docs/internals/nodes/nodes"
+  description="Learn more about node features"
+/>
+<LinkCard
+  icon="list-format"
+  title="Custom Nodes"
+  href="/docs/internals/nodes/custom-nodes"
+  description="Create custom node templates"
+/>
+<LinkCard
+  icon="list-format"
+  title="Resizing"
+  href="/docs/internals/nodes/resizing"
+  description="Learn about resizing nodes and groups"
+/>
