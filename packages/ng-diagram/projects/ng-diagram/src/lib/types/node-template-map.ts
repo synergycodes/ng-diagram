@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { InputSignal, Type } from '@angular/core';
-import { DataObject, GroupNode, Node, SimpleNode } from '@angularflow/core';
+import { DataObject, GroupNode, Node, SimpleNode } from '../../core/src';
 
 export interface NgDiagramNodeTemplate<
   Data extends DataObject = DataObject,

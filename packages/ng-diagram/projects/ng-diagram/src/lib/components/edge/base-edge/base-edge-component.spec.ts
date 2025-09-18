@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Edge, Point } from '@angularflow/core';
+import { Edge, Point } from '../../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService, RendererService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';

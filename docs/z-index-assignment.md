@@ -1,4 +1,4 @@
-# Z-index in AngularFlow
+# Z-index in ng-diagram
 
 ## Context
 
