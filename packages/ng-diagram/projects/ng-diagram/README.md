@@ -1,7 +1,7 @@
 # ng-diagram
 
-[![npm version](https://badge.fury.io/js/%40angularflow%2Fangular-adapter.svg)](https://badge.fury.io/js/%40angularflow%2Fangular-adapter)
-[![License: MIT](https://img.shields.io/badge/license-Apache%202-blue)](https://opensource.org/license/apache-2-0)
+[![npm version](https://badge.fury.io/js/ng-diagram.svg)](https://badge.fury.io/js/ng-diagram)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202-blue)](https://opensource.org/license/apache-2-0)
 
 A robust Angular library for building interactive diagrams, node-based editors, and visual programming interfaces. Designed with Angular and TypeScript, it offers a complete toolkit to create sophisticated, customizable, and high-performance diagramming applications.
 
@@ -164,7 +164,6 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
 - **`NgDiagramService`**: Main service providing access to all diagram functionality
 - **`NgDiagramModelService`**: Model management and state
 - **`NgDiagramNodeService`**: Node operations and manipulation
-- **`NgDiagramEdgeService`**: Edge operations and connections
 - **`NgDiagramGroupsService`**: Group node operations and management
 - **`NgDiagramSelectionService`**: Selection state management
 - **`NgDiagramViewportService`**: Panning and zooming controls
@@ -187,7 +186,7 @@ When you use this library, you can be sure you’re in **good hands** — backed
 
 For comprehensive documentation, examples, and API reference, visit:
 
-**📚 [Full Documentation](https://angularflow.dev/docs)**
+**📚 [Full Documentation](https://www.ngdiagram.dev/docs)**
 
 The documentation includes:
 
@@ -199,26 +198,26 @@ The documentation includes:
 
 ## 🔧 Requirements
 
-- **Angular**: 18.0.0 or higher
-- **TypeScript**: 5.0.0 or higher
-- **Node.js**: 18.0.0 or higher
+- **Angular**: 19.0.0 or higher
+- **TypeScript**: 5.6.0 or higher
+- **Node.js**: 18.19.1 or higher
 
 ## 📄 License
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/synergycodes/angularflow/blob/main/LICENSE) file for details.
+This project is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/synergycodes/ng-diagram/blob/main/LICENSE) file for details.
 
 ## 🔗 Links
 
-- **Documentation**: [https://angularflow.dev/docs](https://angularflow.dev/docs)
-- **GitHub**: [https://github.com/synergycodes/angularflow](https://github.com/synergycodes/angularflow)
+- **Documentation**: [https://www.ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
+- **GitHub**: [https://github.com/synergycodes/ng-diagram](https://github.com/synergycodes/ng-diagram)
 - **NPM**: [https://www.npmjs.com/package/ng-diagram](https://www.npmjs.com/package/ng-diagram)
 
 ## 🆘 Support
 
-- **Issues**: [GitHub Issues](https://github.com/synergycodes/angularflow/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/synergycodes/angularflow/discussions)
-- **Documentation**: [https://angularflow.dev/docs](https://angularflow.dev/docs)
+- **Issues**: [GitHub Issues](https://github.com/synergycodes/ng-diagram/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/synergycodes/ng-diagram/discussions)
+- **Documentation**: [https://www.ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
 
 ---
 
-Built with ❤️ by the Synergycodes team
+Built with ❤️ by the Synergy Codes team
