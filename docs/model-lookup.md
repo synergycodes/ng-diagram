@@ -1,4 +1,4 @@
-# Model Lookup in AngularFlow
+# Model Lookup in ng-diagram
 
 ## Overview
 

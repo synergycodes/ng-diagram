@@ -1,4 +1,4 @@
-# Custom Edge in AngularFlow
+# Custom Edge in ng-diagram
 
 ## Context
 
@@ -49,7 +49,7 @@ interaction, etc.).
   [data]="data()"
   [routing]="'bezier'"
   [customStroke]="'red'"
-  [targetArrowhead]="'angularflow-arrow'"
+  [targetArrowhead]="'ng-diagram-arrow'"
   [displayLabel]="true"
 />
 ```
@@ -67,7 +67,7 @@ interaction, etc.).
 #### How to Use a Custom Path
 
 ```html
-<ng-diagram-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [targetArrowhead]="'angularflow-arrow'" />
+<ng-diagram-custom-edge [pathAndPoints]="pathAndPoints" [data]="data()" [targetArrowhead]="'ng-diagram-arrow'" />
 ```
 
 #### ng-diagram-edge-label

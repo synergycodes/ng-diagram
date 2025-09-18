@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { type Node } from '@angularflow/core';
+import { type Node } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';

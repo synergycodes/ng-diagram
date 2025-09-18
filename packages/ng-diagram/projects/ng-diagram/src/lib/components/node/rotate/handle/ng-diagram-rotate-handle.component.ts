@@ -9,7 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { Node } from '../../../../../core/src';
 import { RotateHandleDirective } from '../../../../directives/input-events/rotate/rotate.directive';
 
 @Component({

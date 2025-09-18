@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Edge, Node, Renderer, Viewport } from '@angularflow/core';
+import { Edge, Node, Renderer, Viewport } from '../../../core/src';
 
 @Injectable()
 export class RendererService implements Renderer {

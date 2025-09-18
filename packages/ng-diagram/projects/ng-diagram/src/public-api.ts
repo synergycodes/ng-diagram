@@ -76,4 +76,4 @@ export type {
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
-} from '@angularflow/core';
+} from './core/src';

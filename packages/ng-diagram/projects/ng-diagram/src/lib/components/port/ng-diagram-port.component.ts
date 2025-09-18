@@ -10,7 +10,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Port } from '@angularflow/core';
+import { Port } from '../../../core/src';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
 import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';

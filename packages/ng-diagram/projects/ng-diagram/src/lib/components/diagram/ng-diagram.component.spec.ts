@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Middleware, ModelAdapter } from '@angularflow/core';
+import { Middleware, ModelAdapter } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {

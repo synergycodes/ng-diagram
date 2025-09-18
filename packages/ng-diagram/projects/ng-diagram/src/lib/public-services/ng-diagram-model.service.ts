@@ -1,5 +1,5 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, Metadata, Node, Port } from '@angularflow/core';
+import { Edge, Metadata, Node, Port } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 

@@ -6,7 +6,7 @@ import {
   MiddlewareChain,
   treeLayoutMiddleware,
   zIndexMiddleware,
-} from '@angularflow/core';
+} from '../../core/src';
 
 export const BUILTIN_MIDDLEWARES = [
   zIndexMiddleware,
