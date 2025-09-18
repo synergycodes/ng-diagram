@@ -5,6 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 
 @Component({
@@ -13,12 +14,17 @@ import {
   template: `
     <ng-diagram-context>
       <div class="not-content diagram">
-        <ng-diagram [model]="model" />
+        <ng-diagram [model]="model" [config]="config" />
       </div>
     </ng-diagram-context>
   `,
 })
 export class GroupsDiagram {
+  config: NgDiagramConfig = {
+    snapping: {
+      shouldSnapResizeForNode: () => false,
+    },
+  };
   model = initializeModel({
     nodes: [
       {

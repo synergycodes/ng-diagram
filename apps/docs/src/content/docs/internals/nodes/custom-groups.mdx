@@ -10,6 +10,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 You can create custom group templates, similar to custom nodes.
 All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
+Remember that in your diagram model, the group node must have `isGroup: true` set to function as a group.
 
 ```typescript {13}
 @Component({
@@ -49,7 +50,7 @@ Register your custom group in the `nodeTemplateMap` and assign its `type` to the
 
 ### Autoresize and CSS
 
-When using autoresize, ensure your group template's root element does **not** set fixed width/height.
+When using [autoresize](/docs/internals/nodes/groups/#resizing-configuration), ensure your group template's root element does **not** set fixed width/height.
 Use `width: 100%` and `height: 100%` to allow the group to grow/shrink with its contents.
 
 ```scss
