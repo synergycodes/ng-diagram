@@ -1,0 +1,44 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ng-diagram": {
+      "projectType": "library",
+      "root": "projects/ng-diagram",
+      "sourceRoot": "projects/ng-diagram/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ng-diagram/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ng-diagram/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ng-diagram/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@analogjs/vitest-angular:test"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/ng-diagram/src/**/*.ts", "projects/ng-diagram/src/**/*.html"],
+            "eslintConfig": "projects/ng-diagram/eslint.config.js"
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "schematicCollections": ["angular-eslint"],
+    "analytics": false
+  }
+}

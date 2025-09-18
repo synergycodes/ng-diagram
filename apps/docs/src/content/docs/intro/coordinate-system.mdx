@@ -1,6 +1,8 @@
 ---
 title: Coordinate System
 description: Understanding the coordinate system used in ngDiagram
+sidebar:
+  order: 4
 ---
 
 import NgDiagramComponentContainer from '../../../components/angular/coordinate-system/coordinate-system.astro';
@@ -138,7 +140,7 @@ const clientPosition = service.flowToClientPosition({ x: 100, y: 150 });
 Use the `NgDiagramViewportService` to access viewport information reactively:
 
 ```typescript
-import { NgDiagramViewportService } from '@angularflow/angular-adapter';
+import { NgDiagramViewportService } from 'ng-diagram';
 
 export class MyComponent {
   private readonly viewportService = inject(NgDiagramViewportService);

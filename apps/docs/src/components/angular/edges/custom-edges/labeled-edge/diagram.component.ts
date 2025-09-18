@@ -6,7 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 
 @Component({

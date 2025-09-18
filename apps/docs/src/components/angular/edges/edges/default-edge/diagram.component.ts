@@ -5,7 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 @Component({
   imports: [NgDiagramContextComponent, NgDiagramComponent],
@@ -62,7 +62,7 @@ export class Diagram {
         target: '2',
         targetPort: 'port-left',
         data: {},
-        sourceArrowhead: 'custom-arrowhead',
+        targetArrowhead: 'custom-arrowhead',
         routing: 'bezier',
       },
     ],

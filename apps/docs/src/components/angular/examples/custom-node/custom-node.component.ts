@@ -4,9 +4,9 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramContextComponent,
-  type NgDiagramConfig,
   NgDiagramNodeTemplateMap,
-} from '@angularflow/angular-adapter';
+  type NgDiagramConfig,
+} from 'ng-diagram';
 
 import { NodeComponent } from './node/node.component';
 

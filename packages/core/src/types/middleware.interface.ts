@@ -78,6 +78,8 @@ export interface MiddlewareContext {
   state: FlowState;
   nodesMap: Map<string, Node>;
   edgesMap: Map<string, Edge>;
+  initialNodesMap: Map<string, Node>;
+  initialEdgesMap: Map<string, Edge>;
   modelActionType: ModelActionType;
   helpers: ReturnType<MiddlewareExecutor['helpers']>;
   history: MiddlewareHistoryUpdate[];

@@ -1,5 +1,5 @@
-import { type Edge, type Node } from '@angularflow/angular-adapter';
 import ELK, { type ElkExtendedEdge, type ElkNode } from 'elkjs';
+import { type Edge, type Node } from 'ng-diagram';
 
 const elk = new ELK();
 const layoutOptions = {
@@ -80,9 +80,10 @@ export async function performLayout(nodes: Node[], edges: Edge[]) {
 
     const points = getLayoutPoints(elkEdge);
 
-    //TODO: When events are implemented change routingMode to auto when node is moved
     return {
       ...edge,
+      // Set routing mode to manual to disable automatic routing from ngDiagram
+      // and use the exact points calculated by ELK layout engine
       routingMode: 'manual',
       points,
     };

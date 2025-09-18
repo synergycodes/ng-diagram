@@ -8,9 +8,11 @@ import type {
   ModelActionType,
 } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
+import { createEventEmitterMiddleware } from './middlewares/event-emitter';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
+  private eventEmitterMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -64,7 +66,15 @@ export class MiddlewareManager {
     stateUpdate: FlowStateUpdate,
     modelActionType: LooseAutocomplete<ModelActionType>
   ): Promise<FlowState | undefined> {
-    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, this.middlewareChain);
+    if (!this.eventEmitterMiddleware && this.flowCore.eventManager) {
+      this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
+    }
+
+    const chainWithEventEmitter = this.eventEmitterMiddleware
+      ? [...this.middlewareChain, this.eventEmitterMiddleware]
+      : this.middlewareChain;
+
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, chainWithEventEmitter);
     return await middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
   }
 }

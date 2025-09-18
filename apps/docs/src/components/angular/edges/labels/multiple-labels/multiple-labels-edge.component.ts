@@ -4,7 +4,7 @@ import {
   NgDiagramBaseEdgeComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 
 const LABEL_COUNT = 10;
 const ANIMATION_DURATION = 0.5;

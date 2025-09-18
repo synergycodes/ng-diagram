@@ -25,12 +25,13 @@ The main orchestration service that provides access to the action state and midd
 - Manage middleware registration and configuration
 - Access action state and environment information
 - Manage edges routing
+- Manage event listeners
 
 **Usage Example:**
 
 ```typescript
 import { Component, inject } from '@angular/core';
-import { NgDiagramService } from '@angularflow/angular-adapter';
+import { NgDiagramService } from 'ng-diagram';
 
 @Component({
   selector: 'app-toolbar',
@@ -69,7 +70,7 @@ Handles all model-related operations including node and edge updates, spatial qu
 
 ```typescript
 import { Component, inject, computed } from '@angular/core';
-import { NgDiagramModelService } from '@angularflow/angular-adapter';
+import { NgDiagramModelService } from 'ng-diagram';
 
 @Component({
   selector: 'app-properties-panel',
@@ -138,7 +139,7 @@ Manages viewport operations, coordinate transformations, and provides reactive a
 
 ```typescript
 import { Component, inject, computed } from '@angular/core';
-import { NgDiagramViewportService } from '@angularflow/angular-adapter';
+import { NgDiagramViewportService } from 'ng-diagram';
 
 @Component({
   selector: 'app-viewport-controls',
@@ -217,7 +218,7 @@ Manages the selection state of nodes and edges, providing both reactive access t
 
 ```typescript
 import { Component, inject, computed } from '@angular/core';
-import { NgDiagramSelectionService } from '@angularflow/angular-adapter';
+import { NgDiagramSelectionService } from 'ng-diagram';
 
 @Component({
   selector: 'app-selection-toolbar',
@@ -289,7 +290,7 @@ Handles copy, cut, and paste operations for diagram elements with support for po
 
 ```typescript
 import { Component, inject, input } from '@angular/core';
-import { NgDiagramClipboardService, NgDiagramViewportService } from '@angularflow/angular-adapter';
+import { NgDiagramClipboardService, NgDiagramViewportService } from 'ng-diagram';
 
 @Component({
   selector: 'app-context-menu',
@@ -349,7 +350,7 @@ Provides node-specific operations with focus on transformations.
 
 ```typescript
 import { Component, inject, input } from '@angular/core';
-import { NgDiagramNodeService } from '@angularflow/angular-adapter';
+import { NgDiagramNodeService } from 'ng-diagram';
 
 @Component({
   selector: 'app-custom-node',

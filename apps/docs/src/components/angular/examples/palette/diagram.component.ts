@@ -6,7 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramContextComponent,
   type NgDiagramPaletteItem,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { Palette } from './palette.component';
 
 @Component({

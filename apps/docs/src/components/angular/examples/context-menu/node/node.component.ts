@@ -11,7 +11,7 @@ import {
   NgDiagramViewportService,
   type NgDiagramNodeTemplate,
   type Node,
-} from '@angularflow/angular-adapter';
+} from 'ng-diagram';
 import { ContextMenuService } from '../menu/menu.service';
 
 @Component({

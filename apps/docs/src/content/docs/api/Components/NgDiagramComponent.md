@@ -22,6 +22,22 @@ Global configuration options for the diagram.
 
 ***
 
+### diagramInit
+
+> **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/types/diagraminitevent/)\>
+
+Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
+
+***
+
+### edgeDrawn
+
+> **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/types/edgedrawnevent/)\>
+
+Event emitted when a user manually draws an edge between two nodes
+
+***
+
 ### edgeTemplateMap
 
 > **edgeTemplateMap**: `InputSignal`\<`NgDiagramEdgeTemplateMap`\>
@@ -57,6 +73,30 @@ The model to use in the diagram.
 > **nodeTemplateMap**: `InputSignal`\<`NgDiagramNodeTemplateMap`\>
 
 The node template map to use for the diagram.
+
+***
+
+### selectionChanged
+
+> **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/types/selectionchangedevent/)\>
+
+Event emitted when selection changes
+
+***
+
+### selectionMoved
+
+> **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)\>
+
+Event emitted when selected nodes are moved
+
+***
+
+### viewportChanged
+
+> **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/viewportchangedevent/)\>
+
+Event emitted when viewport changes (pan/zoom)
 
 ## Methods
 
