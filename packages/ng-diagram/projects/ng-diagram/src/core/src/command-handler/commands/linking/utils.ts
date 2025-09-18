@@ -59,6 +59,6 @@ export const createTemporaryEdge = (config: FlowConfig, partialEdge: Partial<Edg
     ...partialEdge,
     source: partialEdge.source || '',
     target: partialEdge.target || '',
-    sourceArrowhead: partialEdge.sourceArrowhead || 'ng-diagram-arrow',
+    targetArrowhead: partialEdge.targetArrowhead || 'ng-diagram-arrow',
   });
 };
