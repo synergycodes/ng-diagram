@@ -14,7 +14,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node scripts/fix-package-json.js",
     "publish:local": "cd dist/ng-diagram && npm publish --registry http://localhost:4873/",
     "prepublish": "pnpm build",
     "watch": "ng build --watch --configuration development",
