@@ -68,6 +68,40 @@ export class AppComponent {
 }
 ```
 
+**Important:** The `<ng-diagram>` component must be wrapped with the `<ng-diagram-context>` component, which serves as a dependency injection container for diagram-specific services and state management.
+
 That's it! You now have a working diagram with default node and edge templates.
 
 <NgDiagramComponentContainer />
+
+## What's Next?
+
+Now that you have a basic diagram working, you can customize it to fit your specific needs. Here are the main areas you can explore:
+
+### Customize Your Nodes
+
+Create custom node templates with your own styling, content, and interactive elements:
+
+[Learn about Custom Nodes →](/docs/internals/nodes/custom-nodes) | [See Example →](/docs/examples/custom-node)
+
+### Create Custom Edges
+
+Design custom edge types with unique visual styles and routing:
+
+[Learn about Custom Edges →](/docs/internals/edges/custom-edges) | [See Example →](/docs/examples/custom-edge)
+
+### Add a Palette
+
+Create a drag-and-drop interface for users to add nodes to your diagram:
+
+[Learn about Palette →](/docs/internals/palette) | [See Example →](/docs/examples/palette)
+
+### Persistence & State Management
+
+Save and restore your diagram state:
+
+[Learn about State Management →](/docs/internals/state-management) | [See Example →](/docs/examples/save-state)
+
+---
+
+**Ready to dive deeper?** Start with [Custom Nodes](/docs/internals/nodes/custom-nodes) or explore our [Examples](/docs/examples) to see ngDiagram in action!
