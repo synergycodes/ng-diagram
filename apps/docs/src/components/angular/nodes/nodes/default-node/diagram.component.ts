@@ -4,16 +4,13 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
-  template: `
-    <ng-diagram-context>
-      <ng-diagram class="customized-diagram" [model]="model" />
-    </ng-diagram-context>
-  `,
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
+  template: ` <ng-diagram class="customized-diagram" [model]="model" /> `,
   styles: `
     :host .customized-diagram {
       flex: 1;

@@ -5,17 +5,16 @@ import { FormsModule } from '@angular/forms';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, FormsModule],
+  imports: [NgDiagramComponent, FormsModule],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
   `,
   styles: `
     :host {

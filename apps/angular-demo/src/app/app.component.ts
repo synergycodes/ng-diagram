@@ -6,10 +6,10 @@ import {
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
-  NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  provideNgDiagram,
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
@@ -26,13 +26,8 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [
-    ToolbarComponent,
-    PaletteComponent,
-    NgDiagramComponent,
-    NgDiagramContextComponent,
-    NgDiagramBackgroundComponent,
-  ],
+  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramBackgroundComponent],
+  providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {

@@ -11,7 +11,6 @@ title: "ng-diagram"
 - [NgDiagramBackgroundComponent](/docs/api/components/ngdiagrambackgroundcomponent/)
 - [NgDiagramBaseEdgeComponent](/docs/api/components/ngdiagrambaseedgecomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
-- [NgDiagramContextComponent](/docs/api/components/ngdiagramcontextcomponent/)
 - [NgDiagramNodeResizeAdornmentComponent](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/)
 - [NgDiagramNodeRotateAdornmentComponent](/docs/api/components/ngdiagramnoderotateadornmentcomponent/)
 - [NgDiagramPaletteItemComponent](/docs/api/components/ngdiagrampaletteitemcomponent/)
@@ -27,6 +26,7 @@ title: "ng-diagram"
 
 - [createMiddlewares](/docs/api/other/createmiddlewares/)
 - [initializeModel](/docs/api/other/initializemodel/)
+- [provideNgDiagram](/docs/api/other/providengdiagram/)
 
 ## Services
 

@@ -4,24 +4,19 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 import { SinusoidEdgeComponent } from './sinusoid-edge.component';
 
 @Component({
-  imports: [
-    NgDiagramContextComponent,
-    NgDiagramComponent,
-    CircleArrowheadComponent,
-  ],
+  imports: [NgDiagramComponent, CircleArrowheadComponent],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-      <circle-arrowhead />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    <circle-arrowhead />
   `,
   styleUrls: ['diagram.scss', 'edges.scss'],
 })

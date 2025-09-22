@@ -5,25 +5,19 @@ import { FormsModule } from '@angular/forms';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { LabelPanel } from './label-panel.component';
 import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component';
 
 @Component({
   selector: 'diagram',
-  imports: [
-    NgDiagramContextComponent,
-    NgDiagramComponent,
-    FormsModule,
-    LabelPanel,
-  ],
+  imports: [NgDiagramComponent, FormsModule, LabelPanel],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-      <label-panel />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    <label-panel />
   `,
   styles: `
     :host {

@@ -4,17 +4,16 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, CoordinatesPreview],
+  imports: [NgDiagramComponent, CoordinatesPreview],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-      <coordinates-preview />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" />
+    <coordinates-preview />
   `,
   styles: `
     :host {

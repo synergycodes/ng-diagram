@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
   type NgDiagramConfig,
   type NgDiagramNodeTemplateMap,
 } from 'ng-diagram';
@@ -12,17 +12,16 @@ import { CustomNodeComponent } from './node.component';
 
 @Component({
   selector: 'rotation',
-  imports: [NgDiagramComponent, NgDiagramContextComponent],
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <div class="not-content diagram">
-        <ng-diagram
-          [model]="model"
-          [config]="config"
-          [nodeTemplateMap]="nodeTemplateMap"
-        />
-      </div>
-    </ng-diagram-context>
+    <div class="not-content diagram">
+      <ng-diagram
+        [model]="model"
+        [config]="config"
+        [nodeTemplateMap]="nodeTemplateMap"
+      />
+    </div>
   `,
   styleUrl: './rotation-wrapper.component.scss',
 })

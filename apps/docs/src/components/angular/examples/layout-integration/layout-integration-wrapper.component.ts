@@ -1,16 +1,13 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import { NgDiagramContextComponent } from 'ng-diagram';
+import { provideNgDiagram } from 'ng-diagram';
 import { DiagramComponent } from './diagram.component';
 
 @Component({
   selector: 'layout-integration-wrapper',
-  imports: [NgDiagramContextComponent, DiagramComponent],
-  template: `
-    <ng-diagram-context>
-      <diagram-component />
-    </ng-diagram-context>
-  `,
+  imports: [DiagramComponent],
+  providers: [provideNgDiagram()],
+  template: ` <diagram-component /> `,
   styles: [
     `
       :host {

@@ -4,17 +4,16 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { SidebarContainer } from './sidebar.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, SidebarContainer],
+  imports: [NgDiagramComponent, SidebarContainer],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-      <sidebar-container />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" />
+    <sidebar-container />
   `,
   styles: `
     :host {
