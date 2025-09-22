@@ -9,7 +9,9 @@ import { LinkCard } from '@astrojs/starlight/components';
 
 ## What is ngDiagram?
 
-ngDiagram is a powerful diagramming library for Angular applications that enables you to create interactive diagrams, node-based editors, and visual programming interfaces.
+ngDiagram is a powerful Angular diagramming library for building interactive diagram interfaces.
+It features customizable nodes, edges, and ports, group containers, a palette system, service and middleware architecture, a command system, and full theming support.
+ngDiagram provides a complete toolkit for creating, customizing, and managing diagrams with advanced features and high performance.
 
 ### What You Can Build
 
@@ -24,15 +26,21 @@ With ngDiagram, you can create:
 
 ### Key Features
 
-ngDiagram provides a complete toolkit for creating interactive diagrams with:
+ngDiagram provides a comprehensive set of features for building interactive diagrams:
 
 - **Interactive Elements**: Draggable, resizable, and rotatable nodes with smooth animations
-- **Customizable Connections**: Customizable edges with various routing options (polyline, curved, orthogonal)
-- **Consistent Styling**: Built-in design system with CSS variables and themes for consistent styling across your diagrams. More details can be found in the [Styling](../styling) section
-- **Groups**: Containers for other nodes that can be moved together, with automatic sizing based on their contents
-- **Extensible Architecture**: Plugin-based system for custom behaviors and business logic
+- **Customizable Connections**: Flexible edges with various routing options (polyline, curved, orthogonal)
+- **Ports**: Structured, stylable connection points on nodes, with validation and custom positioning
+- **Groups**: Container nodes for organizing and managing multiple nodes, with auto/manual sizing, highlighting, and selection
+- **Palette System**: Drag-and-drop palette for adding nodes to diagrams
+- **Consistent Styling**: Built-in design system with CSS variables and themes for consistent styling and easy customization ([see Styling](../styling))
+- **Service Layer**: Injectable Angular services for model, selection, viewport, groups, clipboard, and more
+- **Command System**: Atomic operations with undo/redo support for robust editing workflows
+- **Middleware & Plugins**: Extensible architecture for custom behaviors and business logic
+- **Multiple Diagrams**: Scoped context for rendering and managing multiple diagrams on a single page
 - **Reactive State Management**: Built on Angular signals for optimal performance and real-time updates
 - **Type Safety**: Full TypeScript support with generic templates for compile-time error checking
+- **Clipboard Support**: Copy, paste, and clipboard operations for diagram elements
 
 ## Understanding Diagram Elements
 
@@ -48,7 +56,7 @@ Nodes are the primary visual elements in your diagram. They represent entities, 
 - **Data Container**: Nodes can store custom data for your application logic
 - **Interactive Behavior**: Nodes can be draggable, resizable, rotatable, and selectable
 - **Grouping**: Nodes can be organized into groups for better visual organization
-- **Templates**: Custom visual representations for different node types - Angular component are used as node templates, enabling rich, dynamic content and interaction
+- **Templates**: Custom visual representations for different node types - Angular components are used as node templates, enabling rich, dynamic content and interaction
 
 <LinkCard title="Nodes" href="/docs/internals/nodes/nodes" description="Read more about nodes" />
 
@@ -59,7 +67,7 @@ Ports are connection points on nodes where edges can start or end. They provide 
 **Key Concepts:**
 
 - **Connection Points**: Ports define where edges can connect on a node
-- **Positioning**: Ports can be placed on any side of a node (left, right, top, bottom), by default in the middle of the edge. They can also be precisely positioned using CSS properties like top, left, bottom or right.
+- **Positioning**: Ports can be placed on any side of a node (left, right, top, bottom), by default in the middle of the edge. They can also be precisely positioned using CSS properties like top, left, bottom, or right.
 
 <LinkCard title="Ports" href="/docs/internals/nodes/ports" description="Read more about ports" />
 
