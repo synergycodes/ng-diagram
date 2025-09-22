@@ -93,7 +93,7 @@ describe('FlowCore', () => {
       getMetadata: mockGetMetadata,
       updateNodes: vi.fn(),
       updateEdges: vi.fn(),
-      setMetadata: vi.fn(),
+      updateMetadata: vi.fn(),
       onChange: vi.fn(),
       unregisterOnChange: vi.fn(),
       undo: vi.fn(),
@@ -260,7 +260,7 @@ describe('FlowCore', () => {
 
       await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
-      expect(mockModelAdapter.setMetadata).toHaveBeenCalledWith({ test: 'abc' });
+      expect(mockModelAdapter.updateMetadata).toHaveBeenCalledWith({ test: 'abc' });
       expect(mockModelAdapter.updateNodes).toHaveBeenCalledWith([mockNode]);
       expect(mockModelAdapter.updateEdges).toHaveBeenCalledWith([mockEdge]);
     });
@@ -299,7 +299,7 @@ describe('FlowCore', () => {
 
       await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
-      expect(mockModelAdapter.setMetadata).not.toHaveBeenCalled();
+      expect(mockModelAdapter.updateMetadata).not.toHaveBeenCalled();
       expect(mockModelAdapter.updateNodes).not.toHaveBeenCalled();
       expect(mockModelAdapter.updateEdges).not.toHaveBeenCalled();
     });

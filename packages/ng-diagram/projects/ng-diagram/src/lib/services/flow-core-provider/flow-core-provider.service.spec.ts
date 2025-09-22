@@ -20,7 +20,7 @@ describe('FlowCoreProviderService', () => {
     getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} }),
     updateNodes: vi.fn(),
     updateEdges: vi.fn(),
-    setMetadata: vi.fn(),
+    updateMetadata: vi.fn(),
     onChange: vi.fn(),
     unregisterOnChange: vi.fn(),
     undo: vi.fn(),

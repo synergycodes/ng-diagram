@@ -45,7 +45,7 @@ describe('MiddlewareManager', () => {
 
     mockModel = {
       getMetadata: getMetadataMock,
-      setMetadata: vi.fn(),
+      updateMetadata: vi.fn(),
       getNodes: vi.fn(),
       getEdges: vi.fn(),
       updateNodes: vi.fn(),
@@ -66,7 +66,7 @@ describe('MiddlewareManager', () => {
         },
       }),
       setState: vi.fn(),
-      setMetadata: vi.fn(),
+      updateMetadata: vi.fn(),
       applyUpdate: vi.fn(),
       model: mockModel,
     } as unknown as FlowCore;

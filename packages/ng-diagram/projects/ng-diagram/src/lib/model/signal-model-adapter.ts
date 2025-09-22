@@ -60,7 +60,7 @@ export class SignalModelAdapter implements ModelAdapter {
     return this.metadata();
   }
 
-  setMetadata(next: Metadata | ((prev: Metadata) => Metadata)): void {
+  updateMetadata(next: Metadata | ((prev: Metadata) => Metadata)): void {
     this.metadata.update((prev) => (typeof next === 'function' ? next(prev) : next));
   }
 

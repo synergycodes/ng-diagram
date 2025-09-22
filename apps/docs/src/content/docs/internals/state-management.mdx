@@ -339,7 +339,7 @@ The `NgDiagramComponent` accepts any object that implements the `ModelAdapter` i
 
 ### Understanding the ModelAdapter Interface
 
-The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/other/modeladapter/). The key methods include data access (`getNodes`, `getEdges`, `getMetadata`), data modification (`updateNodes`, `updateEdges`, `setMetadata`), change notification system (`onChange`, `unregisterOnChange`), and lifecycle management (`destroy`, `undo`, `redo`, `toJSON`).
+The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/other/modeladapter/). The key methods include data access (`getNodes`, `getEdges`, `getMetadata`), data modification (`updateNodes`, `updateEdges`, `updateMetadata`), change notification system (`onChange`, `unregisterOnChange`), and lifecycle management (`destroy`, `undo`, `redo`, `toJSON`).
 
 For a complete example of implementing a custom model adapter, see the [Custom Model example](/docs/examples/custom-model/).
 

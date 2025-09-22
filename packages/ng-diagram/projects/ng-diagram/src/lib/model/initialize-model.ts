@@ -19,7 +19,7 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
     const adapter = new SignalModelAdapter();
     adapter.updateNodes(model.nodes || []);
     adapter.updateEdges(model.edges || []);
-    adapter.setMetadata((prev) => ({ ...prev, ...model.metadata }));
+    adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
 
     return adapter;
   };
