@@ -4,7 +4,6 @@ import {
   groupChildrenMoveExtent,
   loggerMiddleware,
   MiddlewareChain,
-  treeLayoutMiddleware,
   zIndexMiddleware,
 } from '../../core/src';
 
@@ -12,7 +11,6 @@ export const BUILTIN_MIDDLEWARES = [
   zIndexMiddleware,
   groupChildrenChangeExtent,
   groupChildrenMoveExtent,
-  treeLayoutMiddleware,
   edgesRoutingMiddleware,
   loggerMiddleware,
 ] as const satisfies MiddlewareChain;

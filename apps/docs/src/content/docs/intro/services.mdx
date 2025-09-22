@@ -36,17 +36,11 @@ import { NgDiagramService } from 'ng-diagram';
 @Component({
   selector: 'app-toolbar',
   template: `
-    <button (click)="applyTreeLayout()">Tree Layout</button>
     <button (click)="toggleMiddleware()">Toggle Feature</button>
   `,
 })
 export class ToolbarComponent {
   private diagramService = inject(NgDiagramService);
-
-  applyTreeLayout() {
-    // Execute layout command
-    this.diagramService.layout('tree');
-  }
 
   toggleMiddleware() {
     // Update configuration

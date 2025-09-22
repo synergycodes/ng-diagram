@@ -367,19 +367,6 @@ export class FlowCore {
   }
 
   /**
-   * Sets the layout
-   */
-  layout(layout: 'tree') {
-    switch (layout) {
-      case 'tree':
-        this.applyUpdate({}, 'treeLayout');
-        break;
-      default:
-        throw new Error(`The "${layout}" layout does not exist.`);
-    }
-  }
-
-  /**
    * Returns the current zoom scale
    */
   getScale() {

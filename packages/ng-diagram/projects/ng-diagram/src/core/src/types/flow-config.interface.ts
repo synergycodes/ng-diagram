@@ -1,7 +1,6 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
-import { LayoutAlignmentType, LayoutAngleType } from './tree-layout.interface';
 import { Point, Size } from './utils';
 
 /**
@@ -167,48 +166,6 @@ export interface SnappingConfig {
   defaultResizeSnap: Point;
 }
 
-/**
- * Configuration for tree layout behavior.
- */
-export interface TreeLayoutConfig {
-  /**
-   * Gets the layout angle for positioning a node in a tree structure.
-   * @param node The node to get the layout angle for.
-   * @returns The angle in degrees for the node's position in the tree, or null for default positioning.
-   */
-  getLayoutAngleForNode: (node: Node) => LayoutAngleType | null;
-  /**
-   * Gets the layout alignment for a node in a tree structure.
-   * @param node The node to get the alignment for.
-   * @returns The alignment type for the node, or null for default alignment.
-   */
-  getLayoutAlignmentForNode: (node: Node) => LayoutAlignmentType | null;
-  /**
-   * Gap between sibling nodes in the same row/column.
-   */
-  siblingGap: number;
-  /**
-   * Gap between parent and child nodes.
-   */
-  levelGap: number;
-  /**
-   * Whether to automatically apply tree layout on structural changes.
-   */
-  autoLayout: boolean;
-  /**
-   * Default layout angle for nodes (0, 90, 180, 270).
-   */
-  layoutAngle: LayoutAngleType;
-  /**
-   * Default layout alignment ('parent', 'subtree', 'start').
-   */
-  layoutAlignment: LayoutAlignmentType;
-  /**
-   * Gap between separate tree roots when multiple trees exist.
-   */
-  treeGap: number;
-}
-
 export interface SelectionMovingConfig {
   /**
    * Distance in pixels to move the screen while dragging nodes near the edge of the viewport.
@@ -312,7 +269,6 @@ export interface FlowConfig {
    */
   background: BackgroundConfig;
 
-  treeLayout: TreeLayoutConfig;
   nodeRotation: NodeRotationConfig;
   snapping: SnappingConfig;
 

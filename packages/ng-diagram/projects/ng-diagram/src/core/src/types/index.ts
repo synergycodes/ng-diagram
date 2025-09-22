@@ -21,9 +21,6 @@ export * from './environment.interface';
 // Utils types
 export * from './utils';
 
-// TreeLayout types
-export * from './tree-layout.interface';
-
 // Transaction types
 export * from './transaction.interface';
 
