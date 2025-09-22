@@ -1,0 +1,114 @@
+---
+title: Overview
+description: Understanding the what is ngDiagram
+---
+
+---
+
+## OBSOLETE - This doc provides a less technical, high-level overview of ngDiagram and its main concepts
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+## What is ngDiagram?
+
+ngDiagram is a powerful Angular diagramming library for building interactive diagram interfaces.
+It features customizable nodes, edges, and ports, group containers, a palette system, service and middleware architecture, a command system, and full theming support.
+ngDiagram provides a complete toolkit for creating, customizing, and managing diagrams with advanced features and high performance.
+
+### What You Can Build
+
+With ngDiagram, you can create:
+
+- **Flow Diagrams**: Process flows, decision trees, and workflow visualizations
+- **Node-Based Editors**: Visual programming interfaces and data flow editors
+- **Network Diagrams**: System architectures and network topologies
+- **Mind Maps**: Hierarchical information structures and brainstorming tools
+- **Circuit Diagrams**: Electronic schematics and technical drawings
+- **Custom Visualizations**: Any diagram type with custom node and edge templates
+
+### Key Features
+
+ngDiagram provides a comprehensive set of features for building interactive diagrams:
+
+- **Interactive Elements**: Draggable, resizable, and rotatable nodes with smooth animations
+- **Customizable Connections**: Flexible edges with various routing options (polyline, curved, orthogonal)
+- **Ports**: Structured, stylable connection points on nodes, with validation and custom positioning
+- **Groups**: Container nodes for organizing and managing multiple nodes, with auto/manual sizing, highlighting, and selection
+- **Palette System**: Drag-and-drop palette for adding nodes to diagrams
+- **Consistent Styling**: Built-in design system with CSS variables and themes for consistent styling and easy customization ([see Styling](../styling))
+- **Service Layer**: Injectable Angular services for model, selection, viewport, groups, clipboard, and more
+- **Command System**: Atomic operations with undo/redo support for robust editing workflows
+- **Middleware & Plugins**: Extensible architecture for custom behaviors and business logic
+- **Multiple Diagrams**: Scoped context for rendering and managing multiple diagrams on a single page
+- **Reactive State Management**: Built on Angular signals for optimal performance and real-time updates
+- **Type Safety**: Full TypeScript support with generic templates for compile-time error checking
+- **Clipboard Support**: Copy, paste, and clipboard operations for diagram elements
+
+## Understanding Diagram Elements
+
+Before diving into the technical architecture, let's understand the fundamental elements that make up any diagram:
+
+### Nodes
+
+Nodes are the primary visual elements in your diagram. They represent entities, processes, or data points in your system.
+
+**Key Concepts:**
+
+- **Visual Representation**: Each node has a position, size, and visual appearance
+- **Data Container**: Nodes can store custom data for your application logic
+- **Interactive Behavior**: Nodes can be draggable, resizable, rotatable, and selectable
+- **Grouping**: Nodes can be organized into groups for better visual organization
+- **Templates**: Custom visual representations for different node types - Angular components are used as node templates, enabling rich, dynamic content and interaction
+
+<LinkCard title="Nodes" href="/docs/internals/nodes/nodes" description="Read more about nodes" />
+
+### Ports
+
+Ports are connection points on nodes where edges can start or end. They provide structured connection points and enable validation.
+
+**Key Concepts:**
+
+- **Connection Points**: Ports define where edges can connect on a node
+- **Positioning**: Ports can be placed on any side of a node (left, right, top, bottom), by default in the middle of the edge. They can also be precisely positioned using CSS properties like top, left, bottom, or right.
+
+<LinkCard title="Ports" href="/docs/internals/nodes/ports" description="Read more about ports" />
+
+### Edges
+
+Edges connect nodes and represent relationships, data flow, or dependencies between elements.
+
+**Key Concepts:**
+
+- **Connection Points**: Edges connect from one node to another
+- **Routing**: Edges can follow different paths (polyline, curved, orthogonal)
+- **Ports**: Edges can connect to specific connection points on nodes
+- **Styling**: Custom visual appearance with colors, line styles, and arrows
+- **Validation**: Connection rules can be enforced during edge creation
+
+<LinkCard title="Edges" href="/docs/internals/edges/edges" description="Read more about edges" />
+
+### Groups
+
+Groups are container nodes that organize and manage multiple nodes as a single unit, enabling collective operations and visual organization.
+
+**Key Concepts:**
+
+- **Container Node**: Groups encapsulate other nodes while maintaining global coordinates for child nodes
+- **Visual Organization**: Essential for representing subsystems, clusters, or logical groupings in complex diagrams
+- **Collective Operations**: Move, select, and manage multiple nodes together as a single unit
+- **Automatic Sizing**: Groups can automatically resize to fit their contents or be manually resized
+- **Interactive Behavior**: Groups support highlighting when nodes are dragged over them and can be selected
+
+<LinkCard title="Groups" href="/docs/internals/nodes/groups" description="Read more about groups" />
+
+### Viewport
+
+The viewport is the working space where all diagram interactions happen. It represents the visible area of the diagram and can be manipulated by the user.
+
+**Key Concepts:**
+
+- **Working Area**: The viewport is where all nodes, edges, and interactions take place
+- **Zoom Control**: Users can zoom in to see details or zoom out for an overview
+- **Panning**: The viewport can be moved around to navigate different areas of the diagram
+- **Coordinate System**: All elements are positioned relative to the viewport's coordinate system
+- **Responsive**: The viewport adapts to different screen sizes and orientations
