@@ -86,7 +86,7 @@ The `grouping` configuration in `NgDiagramConfig` lets you control advanced grou
   Use the `canGroup` function to control which nodes can be grouped together.
   This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
 
-```typescript {3,6,7}
+```typescript {3,6}
 config = {
   resize: {
     getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
