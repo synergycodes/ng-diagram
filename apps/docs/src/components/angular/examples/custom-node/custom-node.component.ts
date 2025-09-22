@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
   NgDiagramNodeTemplateMap,
+  provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
 
@@ -16,18 +16,17 @@ enum NodeTemplateType {
 
 @Component({
   selector: 'customnode',
-  imports: [NgDiagramComponent, NgDiagramContextComponent],
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <ng-diagram-context>
-      <div class="not-content diagram">
-        <ng-diagram
-          [model]="model"
-          [config]="config"
-          [nodeTemplateMap]="nodeTemplateMap"
-        />
-      </div>
-    </ng-diagram-context>
+    <div class="not-content diagram">
+      <ng-diagram
+        [model]="model"
+        [config]="config"
+        [nodeTemplateMap]="nodeTemplateMap"
+      />
+    </div>
   `,
   styleUrl: './custom-node.component.scss',
 })

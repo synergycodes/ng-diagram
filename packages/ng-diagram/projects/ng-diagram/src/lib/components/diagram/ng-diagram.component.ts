@@ -30,6 +30,7 @@ import { PaletteDropDirective } from '../../directives/input-events/palette-drop
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
+import { NgDiagramServicesAvailabilityCheckerDirective } from '../../directives/services-availability-checker/ng-diagram-services-availability-checker.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
@@ -61,6 +62,7 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
   styleUrl: './ng-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
+    NgDiagramServicesAvailabilityCheckerDirective,
     CursorPositionTrackerDirective,
     ZoomingPointerDirective,
     ZoomingWheelDirective,

@@ -52,7 +52,7 @@ export class LocalStorageModelAdapter implements ModelAdapter {
     this.notifyCallbacks();
   }
 
-  setMetadata(next: Metadata | ((prev: Metadata) => Metadata)): void {
+  updateMetadata(next: Metadata | ((prev: Metadata) => Metadata)): void {
     const currentMetadata = this.getMetadata();
     const newMetadata =
       typeof next === 'function' ? next(currentMetadata) : next;

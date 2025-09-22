@@ -4,19 +4,18 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
   styleUrls: ['./groups-wrapper.component.scss'],
   template: `
-    <ng-diagram-context>
-      <div class="not-content diagram">
-        <ng-diagram [model]="model" [config]="config" />
-      </div>
-    </ng-diagram-context>
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" [config]="config" />
+    </div>
   `,
 })
 export class GroupsDiagram {

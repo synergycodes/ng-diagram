@@ -12,7 +12,6 @@ ngDiagram follows a layered architecture that separates concerns and enables ext
 The user-facing components that render the diagram and handle user interactions:
 
 - **ng-diagram**: Main component that renders the entire diagram, handles user interactions, and orchestrates all functionality
-- **ng-diagram-context**: Container component that provides diagram context and scopes services for multiple diagrams on the same page
 - **ng-diagram-background**: Background component that renders the diagram's background grid
 - **ng-diagram-resize-adornment** and **ng-diagram-rotate-adornment**: Utility components that can be embedded in custom node templates to provide resize and rotation functionality
 - **ng-diagram-palette-item**: Drag and drop component that can be placed anywhere in your application to create palette functionality
@@ -33,7 +32,7 @@ Specialized services provide different levels of control and functionality:
 - **NgDiagramGroupsService**: Manages group node operations such as member management
 - **NgDiagramClipboardService**: Manages copy/paste operations for diagram elements
 
-All services are scoped within `ng-diagram-context`, enabling multiple diagrams on the same page with isolated state and behavior.
+All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior.
 
 ### 3. Command System
 

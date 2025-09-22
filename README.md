@@ -56,15 +56,12 @@ Because the library uses **CSS variables**, import the stylesheet in your **glob
 
 ```typescript
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from 'ng-diagram';
+import { NgDiagramComponent, initializeModel, provideNgDiagram } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
-  template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-    </ng-diagram-context>
-  `,
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
+  template: ` <ng-diagram [model]="model" /> `,
   styles: `
     :host {
       flex: 1;
@@ -155,7 +152,6 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
 ### Main Components
 
 - **`NgDiagramComponent`**: The main diagram component
-- **`NgDiagramContextComponent`**: Provides diagram context and services
 - **`NgDiagramPortComponent`**: Connection points on nodes
 - **`NgDiagramBaseEdgeComponent`**: Base edge component for custom edges
 - **`NgDiagramPaletteItemComponent`**: Drag-and-drop palette items

@@ -36,15 +36,12 @@ Without these styles, the diagram components will not render properly.
 
 ```typescript
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from 'ng-diagram';
+import { NgDiagramComponent, initializeModel, provideNgDiagram } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
-  template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-    </ng-diagram-context>
-  `,
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
+  template: ` <ng-diagram [model]="model" /> `,
   styles: `
     :host {
       flex: 1;
@@ -73,7 +70,10 @@ export class AppComponent {
 }
 ```
 
-**Important:** The `<ng-diagram>` component must be wrapped with the `<ng-diagram-context>` component, which serves as a dependency injection container for diagram-specific services and state management.
+<Aside type="caution" title="Important">
+The `<ng-diagram>` component must be used within a component or module that registers `provideNgDiagram()`, 
+which provides the diagram-specific services and state management.
+</Aside>
 
 That's it! You now have a working diagram with default node and edge templates.
 
