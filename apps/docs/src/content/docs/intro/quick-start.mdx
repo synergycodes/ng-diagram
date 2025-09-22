@@ -5,6 +5,7 @@ sidebar:
   order: 0
 ---
 
+import { Aside } from '@astrojs/starlight/components';
 import NgDiagramComponentContainer from '../../../components/angular/quick-start/quick-start.astro';
 
 Get up and running with ngDiagram in minutes. This guide will help you create your first interactive diagram.
@@ -19,7 +20,10 @@ npm install ng-diagram
 
 ## Import Styles
 
-**Important:** You must import the required styles for the diagram to display correctly.
+<Aside type="caution" title="Important">
+  You must import the required styles for the diagram to display correctly. Because the library uses **CSS variables**,
+  import the stylesheet in your **global file**, not inside a component.
+</Aside>
 
 ```css
 @import 'ng-diagram/styles.css';
