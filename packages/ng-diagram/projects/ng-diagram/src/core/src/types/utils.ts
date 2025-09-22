@@ -1,5 +1,3 @@
-export type LayoutAngleType = 0 | 90 | 180 | 270;
-
 export interface Rect {
   x: number;
   y: number;

@@ -6,7 +6,6 @@ sidebar:
 ---
 
 import { LinkCard } from '@astrojs/starlight/components';
-import { Aside } from '@astrojs/starlight/components';
 
 You can create custom group templates, similar to custom nodes.
 All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
@@ -73,17 +72,6 @@ Use `NgDiagramNodeSelectedDirective` for selection styles.
 Groups can be rotated if `rotatable: true` is set.
 However, **rotation only affects the group container**—child nodes are **not rotated** with the group.
 Children retain their global orientation and position.
-
-<Aside type="caution">
-**Limitations:** Groups do not yet fully support rotated child nodes.
-
-Please use it with caution in your Custom Groups.
-
-Currently, for the default group, this feature is disabled due to these limitations.
-
-We will come back soon with an update to fix that!
-
-</Aside>
 
 ## See Also
 

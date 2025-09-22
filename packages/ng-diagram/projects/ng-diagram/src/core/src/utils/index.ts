@@ -1,7 +1,6 @@
 export * from './compute-floating-edge-side';
 export * from './constants';
 export * from './deep-merge';
-export * from './get-direction';
 export * from './get-port-flow-position';
 export * from './group-size';
 export * from './is-group';
