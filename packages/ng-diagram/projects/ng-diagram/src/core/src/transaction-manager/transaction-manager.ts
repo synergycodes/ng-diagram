@@ -76,7 +76,7 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
     return current ? current.getState().name : null;
   }
 
-  private getCurrentTransaction(): Transaction | null {
+  getCurrentTransaction(): Transaction | null {
     return this.transactionStack[this.transactionStack.length - 1] || null;
   }
 

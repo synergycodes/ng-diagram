@@ -23,6 +23,7 @@ describe('createTransactionContext', () => {
     mockFlowCore = {
       commandHandler: {
         emit: vi.fn(),
+        emitInternal: vi.fn(),
       },
       transactionManager: {
         transaction: vi.fn(),
@@ -33,10 +34,10 @@ describe('createTransactionContext', () => {
   });
 
   describe('emit', () => {
-    it('should call flowCore.commandHandler.emit when transaction is not rolled back', async () => {
+    it('should call flowCore.commandHandler.emitInternal when transaction is not rolled back', async () => {
       await context.emit('addNodes', { nodes: [mockNode] });
 
-      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('addNodes', { nodes: [mockNode] });
+      expect(mockFlowCore.commandHandler.emitInternal).toHaveBeenCalledWith('addNodes', true, { nodes: [mockNode] });
     });
 
     it('should throw error when transaction is rolled back', async () => {
@@ -46,13 +47,13 @@ describe('createTransactionContext', () => {
         'Cannot emit on rolled back transaction'
       );
 
-      expect(mockFlowCore.commandHandler.emit).not.toHaveBeenCalled();
+      expect(mockFlowCore.commandHandler.emitInternal).not.toHaveBeenCalled();
     });
 
     it('should handle emit without additional parameters', async () => {
       await context.emit('addNodes', { nodes: [mockNode] });
 
-      expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('addNodes', { nodes: [mockNode] });
+      expect(mockFlowCore.commandHandler.emitInternal).toHaveBeenCalledWith('addNodes', true, { nodes: [mockNode] });
     });
   });
 

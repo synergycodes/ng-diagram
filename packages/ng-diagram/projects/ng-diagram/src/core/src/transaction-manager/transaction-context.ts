@@ -17,8 +17,8 @@ export function createTransactionContext<TFlowCore extends FlowCore>(
         throw new Error('Cannot emit on rolled back transaction');
       }
 
-      // The actual emission happens through FlowCore's existing mechanism
-      await flowCore.commandHandler.emit(command, ...data);
+      // Call the internal emit method with bypassTransaction=true to avoid recursion
+      await flowCore.commandHandler.emitInternal(command, true, ...data);
     },
 
     abort: () => {
