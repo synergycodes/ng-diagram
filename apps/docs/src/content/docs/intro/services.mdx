@@ -35,9 +35,7 @@ import { NgDiagramService } from 'ng-diagram';
 
 @Component({
   selector: 'app-toolbar',
-  template: `
-    <button (click)="toggleMiddleware()">Toggle Feature</button>
-  `,
+  template: ` <button (click)="toggleMiddleware()">Toggle Feature</button> `,
 })
 export class ToolbarComponent {
   private diagramService = inject(NgDiagramService);

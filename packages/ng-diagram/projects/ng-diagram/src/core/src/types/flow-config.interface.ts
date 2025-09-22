@@ -65,12 +65,6 @@ export interface GroupingConfig {
    * @returns True if the node can be grouped, false otherwise.
    */
   canGroup: (node: Node, group: Node) => boolean;
-
-  /**
-   * If true, the group will automatically resize its boundaries
-   * when a new node is added or when child nodes are moved inside.
-   */
-  allowGroupAutoResize: boolean;
 }
 
 /**

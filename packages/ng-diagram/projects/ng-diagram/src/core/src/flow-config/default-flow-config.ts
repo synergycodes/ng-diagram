@@ -53,7 +53,6 @@ const defaultGroupingConfig: GroupingConfig = {
     // Allow grouping by default
     return true;
   },
-  allowGroupAutoResize: true,
 };
 
 const defaultZoomConfig: ZoomConfig = {
