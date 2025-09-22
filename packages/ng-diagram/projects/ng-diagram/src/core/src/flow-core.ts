@@ -178,7 +178,7 @@ export class FlowCore {
   setState(state: FlowState): void {
     this.model.updateNodes(state.nodes);
     this.model.updateEdges(state.edges);
-    this.model.setMetadata(state.metadata);
+    this.model.updateMetadata(state.metadata);
     // We desynchronize the model lookup to force a re-sync of the model lookup maps on the fly
     this.modelLookup.desynchronize();
   }

@@ -90,26 +90,6 @@ Redo the last undone change
 
 ***
 
-### setMetadata()
-
-> **setMetadata**(`metadata`): `void`
-
-Set metadata for the model
-
-#### Parameters
-
-##### metadata
-
-[`Metadata`](/docs/api/types/metadata/)
-
-Metadata to set
-
-#### Returns
-
-`void`
-
-***
-
 ### toJSON()
 
 > **toJSON**(): `string`
@@ -167,6 +147,26 @@ Update edges in the model
 [`Edge`](/docs/api/types/edge/)\<`object`\>[]
 
 Array of edges to set
+
+#### Returns
+
+`void`
+
+***
+
+### updateMetadata()
+
+> **updateMetadata**(`metadata`): `void`
+
+Set metadata for the model
+
+#### Parameters
+
+##### metadata
+
+[`Metadata`](/docs/api/types/metadata/)
+
+Metadata to set
 
 #### Returns
 

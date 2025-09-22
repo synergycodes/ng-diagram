@@ -56,8 +56,8 @@ export interface ModelAdapter {
    * @param metadata Metadata to set
    * @param metadataFn Function that takes current metadata and returns new metadata
    */
-  setMetadata(metadata: Metadata): void;
-  setMetadata(metadataFn: (metadata: Metadata) => Metadata): void;
+  updateMetadata(metadata: Metadata): void;
+  updateMetadata(metadataFn: (metadata: Metadata) => Metadata): void;
 
   /**
    * Register a callback to be called when the model changes
