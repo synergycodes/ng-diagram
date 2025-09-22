@@ -44,9 +44,11 @@ npm install ng-diagram
 
 ### Import Styles
 
-**Important:** You must import the required styles for the diagram to display correctly.
+**⚠️ Important:** You must import the required styles for the diagram to display correctly.
+Because the library uses **CSS variables**, import the stylesheet in your **global file** (e.g. `src/styles.scss`), not inside a component.
 
 ```css
+/* src/styles.scss */
 @import 'ng-diagram/styles.css';
 ```
 
