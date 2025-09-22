@@ -174,7 +174,6 @@ describe('FlowCore', () => {
       expect(flowCore.config.linking).toBeDefined();
       expect(flowCore.config.grouping).toBeDefined();
       expect(flowCore.config.zoom).toBeDefined();
-      expect(flowCore.config.treeLayout).toBeDefined();
       expect(flowCore.config.nodeRotation).toBeDefined();
     });
 

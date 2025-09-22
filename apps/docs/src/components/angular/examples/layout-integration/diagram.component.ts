@@ -48,7 +48,6 @@ export class DiagramComponent {
 
   config: NgDiagramConfig = {
     edgeRouting: { defaultRouting: 'orthogonal' },
-    treeLayout: { layoutAngle: 0 },
   };
 
   // When user manually moves nodes, edges in manual routing mode should be

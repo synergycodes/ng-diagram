@@ -8,7 +8,6 @@ sidebar:
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import Groups from '@components/angular/nodes/groups/groups.astro';
-import { Aside } from '@astrojs/starlight/components';
 
 Groups in **ngDiagram** are containers for other nodes, allowing you to organize, move, and manage multiple nodes as a single unit.
 They are essential for structuring complex diagrams, enabling collective operations and visual grouping.
@@ -25,14 +24,7 @@ Groups support most node features but have unique behaviors for layout and inter
 - **Interactive:** Groups can be moved, resized, selected, and highlighted.
 
 To add a node to a group, simply select the node and drag and drop it into the group.
-To remove a node from a group, the method depends on the `allowGroupAutoResize` setting:
-
-- **When `allowGroupAutoResize` is disabled:**  
-   Simply drag the node out of the group. The node will be removed from the group automatically.
-- **When `allowGroupAutoResize` is enabled (default):**  
-   Hold the `SHIFT` key while dragging the node out of the group. This ensures the node is removed from the group, as dragging alone will trigger group autoresize instead.
-
-For more details on group autoresize, see the [Group Resizing via diagram config](/docs/internals/nodes/groups/#resizing-configuration).
+To remove a node from a group, drag the node out of the group.
 
 ## Creating a Group
 
@@ -73,9 +65,7 @@ If you do not specify a custom type, the default group template is used.
 Groups can be resized interactively if `resizable: true` is set.
 The resize adornment appears, allowing users to adjust the group's dimensions.
 
-- **Manual Resize:** Set `resizable: true` and optionally provide a `size` property.
-- **Autoresize:** With `allowGroupAutoResize: true` (default) set in a diagram configuration, the group automatically fits its children.
-  For more details, see the [Group Resizing via diagram config](/docs/internals/nodes/groups/#resizing-configuration).
+For more details, see the [Group Resizing via diagram config](/docs/internals/nodes/groups/#resizing-configuration).
 
 {/* TODO: change that linkcard to configuration via diagram documentation when this page will be created */}
 
@@ -92,13 +82,9 @@ You can control resizing behavior globally via the `resize` config in `NgDiagram
 
 The `grouping` configuration in `NgDiagramConfig` lets you control advanced grouping behavior:
 
-- **allowGroupAutoResize:**  
-   When `true` (default), groups automatically resize to fit their children.  
-   When `false`, groups do not resize automatically, and you must manually adjust their size.
-
-- **canGroup callback:**  
-   Use the `canGroup` function to control which nodes can be grouped together.  
-   This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
+- **canGroup callback:**
+  Use the `canGroup` function to control which nodes can be grouped together.
+  This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
 
 ```typescript {3,6,7}
 config = {
@@ -106,7 +92,6 @@ config = {
     getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
   },
   grouping: {
-    allowGroupAutoResize: true,
     canGroup: (node: Node, group: Node) => true;
   },
 };
@@ -141,18 +126,6 @@ Groups can be visually selected with built-in functionality.
 Groups can be rotated if `rotatable: true` is set.
 However, **rotation only affects the group container**—child nodes are **not rotated** with the group.
 Children retain their global orientation and position.
-
-<Aside type="caution">
-**Limitations:** Groups do not yet fully support rotated child nodes. 
-  
-Please use it with caution in your Custom Groups.
-
-Currently, for the default group, this feature is disabled due to these limitations. Autoresize that takes child
-rotation into account is also in progress.
-
-We will come back soon with an update to fix that!
-
-</Aside>
 
 ## Coordinate System
 

@@ -6,7 +6,6 @@ import { performLayout } from './perform-layout';
   imports: [],
   selector: 'layout-buttons',
   template: `
-    <button (click)="onTreeLayout()">Perform built-in tree layout</button>
     <button (click)="onCustomLayout()">Perform custom layout</button>
   `,
   styles: `
@@ -30,23 +29,6 @@ export class LayoutButtonsComponent {
 
   nodes = computed(() => this.modelService.getModel().getNodes());
   edges = computed(() => this.modelService.getModel().getEdges());
-
-  onTreeLayout() {
-    // Reset all edges to auto routing mode before applying built-in tree layout
-    const edges = this.edges();
-    const edgesToReset = edges
-      .filter((edge) => edge.routingMode === 'manual')
-      .map((edge) => ({
-        id: edge.id,
-        routingMode: 'auto' as const,
-      }));
-
-    if (edgesToReset.length > 0) {
-      this.modelService.updateEdges(edgesToReset);
-    }
-
-    this.diagramService.layout('tree');
-  }
 
   async onCustomLayout() {
     const { nodes: finalNodes, edges: finalEdges } = await performLayout(

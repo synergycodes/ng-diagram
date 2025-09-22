@@ -1,18 +1,7 @@
-import {
-  edgesRoutingMiddleware,
-  groupChildrenChangeExtent,
-  groupChildrenMoveExtent,
-  loggerMiddleware,
-  MiddlewareChain,
-  treeLayoutMiddleware,
-  zIndexMiddleware,
-} from '../../core/src';
+import { edgesRoutingMiddleware, loggerMiddleware, MiddlewareChain, zIndexMiddleware } from '../../core/src';
 
 export const BUILTIN_MIDDLEWARES = [
   zIndexMiddleware,
-  groupChildrenChangeExtent,
-  groupChildrenMoveExtent,
-  treeLayoutMiddleware,
   edgesRoutingMiddleware,
   loggerMiddleware,
 ] as const satisfies MiddlewareChain;

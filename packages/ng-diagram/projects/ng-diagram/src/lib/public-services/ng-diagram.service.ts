@@ -23,13 +23,6 @@ export class NgDiagramService extends NgDiagramBaseService {
   isInitialized = this.flowCoreProvider.isInitialized;
 
   /**
-   * Sets the layout
-   */
-  layout(layout: 'tree') {
-    return this.flowCore.layout(layout);
-  }
-
-  /**
    * Gets the current environment information
    */
   getEnvironment(): EnvironmentInfo {

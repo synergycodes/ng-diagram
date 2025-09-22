@@ -1,4 +1,3 @@
-import { LayoutAlignmentType, LayoutAngleType } from '../types';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
@@ -10,7 +9,6 @@ import type {
   ResizeConfig,
   SelectionMovingConfig,
   SnappingConfig,
-  TreeLayoutConfig,
   ZIndexConfig,
   ZoomConfig,
 } from '../types/flow-config.interface';
@@ -55,7 +53,6 @@ const defaultGroupingConfig: GroupingConfig = {
     // Allow grouping by default
     return true;
   },
-  allowGroupAutoResize: true,
 };
 
 const defaultZoomConfig: ZoomConfig = {
@@ -66,21 +63,6 @@ const defaultZoomConfig: ZoomConfig = {
 
 const defaultBackgroundConfig: BackgroundConfig = {
   dotSize: 60,
-};
-
-const defaultTreeLayoutConfig: TreeLayoutConfig = {
-  getLayoutAngleForNode: (): LayoutAngleType | null => {
-    return null;
-  },
-  getLayoutAlignmentForNode: (): LayoutAlignmentType | null => {
-    return null;
-  },
-  siblingGap: 50,
-  levelGap: 200,
-  autoLayout: false,
-  layoutAngle: 0,
-  layoutAlignment: 'parent',
-  treeGap: 100,
 };
 
 const defaultNodeRotationConfig: NodeRotationConfig = {
@@ -145,7 +127,6 @@ export const defaultFlowConfig: FlowConfig = {
   grouping: defaultGroupingConfig,
   zoom: defaultZoomConfig,
   background: defaultBackgroundConfig,
-  treeLayout: defaultTreeLayoutConfig,
   nodeRotation: defaultNodeRotationConfig,
   snapping: defaultNodeDraggingConfig,
   selectionMoving: defaultSelectionMovingConfig,

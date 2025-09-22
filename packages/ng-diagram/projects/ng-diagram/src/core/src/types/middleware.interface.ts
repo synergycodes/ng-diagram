@@ -34,7 +34,6 @@ export type ModelActionType =
   | 'rotateNodeTo'
   | 'highlightGroup'
   | 'highlightGroupClear'
-  | 'treeLayout'
   | 'moveNodes'
   | 'moveNodesStop';
 

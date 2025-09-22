@@ -14,17 +14,6 @@ export class ToolbarComponent {
 
   toggleDebugModeClick = output<void>();
 
-  onTreeLayoutClick(): void {
-    this.ngDiagramService.layout('tree');
-  }
-
-  onToggleGroupChildrenClick(): void {
-    const allowGroupAutoResize = this.ngDiagramService.getConfig().grouping?.allowGroupAutoResize;
-    const isEnabled = allowGroupAutoResize === undefined || allowGroupAutoResize === true;
-
-    this.ngDiagramService.updateConfig({ grouping: { allowGroupAutoResize: !isEnabled } });
-  }
-
   onToggleDebugModeClick(): void {
     const { debugMode } = this.ngDiagramService.getConfig();
 
