@@ -177,8 +177,6 @@ export interface SnappingConfig {
   defaultResizeSnap: Point;
 }
 
- *
- * @category Types
 /**
  * Configuration for selection moving behavior.
  *
@@ -266,23 +264,28 @@ export interface FlowConfig {
    * @returns The node's unique ID.
    */
   computeNodeId: () => string;
+
   /**
    * Computes a unique ID for an edge.
    * @returns The edge's unique ID.
    */
   computeEdgeId: () => string;
+
   /**
    * Configuration for node resizing.
    */
   resize: ResizeConfig;
+
   /**
    * Configuration for linking (edge creation).
    */
   linking: LinkingConfig;
+
   /**
    * Configuration for node grouping.
    */
   grouping: GroupingConfig;
+
   /**
    * Configuration for zooming.
    */
@@ -297,10 +300,6 @@ export interface FlowConfig {
    * Configuration for background behavior.
    */
   background: BackgroundConfig;
-
-  /**
-   * Tree layout configuration.
-   */
 
   /**
    * Configuration for node rotation behavior.

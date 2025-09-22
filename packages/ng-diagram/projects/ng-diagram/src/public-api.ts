@@ -98,7 +98,6 @@ export type {
   Size,
   SnappingConfig,
   TransactionResult,
-  TreeLayoutConfig,
   Viewport,
   ViewportChangedEvent,
   ZIndexConfig,

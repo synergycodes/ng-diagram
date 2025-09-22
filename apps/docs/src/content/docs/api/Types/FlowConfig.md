@@ -110,14 +110,6 @@ Configuration for snapping behavior.
 
 ***
 
-### treeLayout
-
-> **treeLayout**: [`TreeLayoutConfig`](/docs/api/types/treelayoutconfig/)
-
-Tree layout configuration.
-
-***
-
 ### zIndex
 
 > **zIndex**: [`ZIndexConfig`](/docs/api/types/zindexconfig/)

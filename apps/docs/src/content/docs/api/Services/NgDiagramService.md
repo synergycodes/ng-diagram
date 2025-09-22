@@ -234,26 +234,6 @@ if (ngDiagramService.hasEventListeners('selectionChanged')) {
 
 ***
 
-### layout()
-
-> **layout**(`layout`): `void`
-
-Sets the layout.
-
-#### Parameters
-
-##### layout
-
-`"tree"`
-
-The layout type (e.g., 'tree').
-
-#### Returns
-
-`void`
-
-***
-
 ### registerMiddleware()
 
 > **registerMiddleware**(`middleware`): () => `void`
@@ -449,99 +429,43 @@ The port ID from which the linking starts.
 
 ### transaction()
 
-#### Call Signature
-
-> **transaction**(`callback`): `Promise`\<[`TransactionResult`](/docs/api/types/transactionresult/)\>
+> **transaction**(`callback`): `void`
 
 Executes a function within a transaction context.
 All state updates within the callback are batched and applied atomically.
 
-##### Parameters
+#### Parameters
 
-###### callback
+##### callback
 
-`TransactionCallback`
+() => `void`
 
-##### Returns
+#### Returns
 
-`Promise`\<[`TransactionResult`](/docs/api/types/transactionresult/)\>
+`void`
 
-##### Example
-
-```ts
-// Simple transaction
-await ngDiagramService.transaction(async (tx) => {
-  await tx.emit('addNode', { node });
-  await tx.emit('selectNode', { nodeId: node.id });
-});
-
-// Named transaction
-await ngDiagramService.transaction('batchUpdate', async (tx) => {
-  await tx.emit('updateNodes', { nodes });
-  if (error) {
-    tx.rollback(); // Discard all changes
-  }
-});
-
-// With savepoints
-await ngDiagramService.transaction(async (tx) => {
-  await tx.emit('step1', {});
-  tx.savepoint('afterStep1');
-
-  await tx.emit('step2', {});
-  if (step2Failed) {
-    tx.rollbackTo('afterStep1');
-  }
-});
-```
-
-#### Call Signature
-
-> **transaction**(`name`, `callback`): `Promise`\<[`TransactionResult`](/docs/api/types/transactionresult/)\>
-
-Executes a function within a transaction context.
-All state updates within the callback are batched and applied atomically.
-
-##### Parameters
-
-###### name
-
-`ModelActionType`
-
-###### callback
-
-`TransactionCallback`
-
-##### Returns
-
-`Promise`\<[`TransactionResult`](/docs/api/types/transactionresult/)\>
-
-##### Example
+#### Example
 
 ```ts
-// Simple transaction
-await ngDiagramService.transaction(async (tx) => {
-  await tx.emit('addNode', { node });
-  await tx.emit('selectNode', { nodeId: node.id });
-});
-
-// Named transaction
-await ngDiagramService.transaction('batchUpdate', async (tx) => {
-  await tx.emit('updateNodes', { nodes });
-  if (error) {
-    tx.rollback(); // Discard all changes
-  }
-});
-
-// With savepoints
-await ngDiagramService.transaction(async (tx) => {
-  await tx.emit('step1', {});
-  tx.savepoint('afterStep1');
-
-  await tx.emit('step2', {});
-  if (step2Failed) {
-    tx.rollbackTo('afterStep1');
-  }
+this.ngDiagramService.transaction(() => {
+ this.ngDiagramModelService.addNodes([
+   {
+     id: '1',
+     position: { x: 100, y: 100 },
+     data: {
+       label: 'Transaction node',
+     },
+   },
+ ]);
+ this.ngDiagramModelService.addNodes([
+   {
+     id: '2',
+     position: { x: 100, y: 200 },
+     data: {
+       label: 'Transaction node 2',
+     },
+   },
+ ]);
 });
 ```
 

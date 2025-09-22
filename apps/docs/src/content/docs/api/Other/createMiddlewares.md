@@ -14,7 +14,7 @@ Allows modifying the default middleware chain by removing, replacing, or adding 
 
 ### TMiddlewares
 
-`TMiddlewares` *extends* [`MiddlewareChain`](/docs/api/types/middlewarechain/) = \[[`Middleware`](/docs/api/types/middleware/)\<`"z-index"`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>\]
+`TMiddlewares` *extends* [`MiddlewareChain`](/docs/api/types/middlewarechain/) = \[[`Middleware`](/docs/api/types/middleware/)\<`"z-index"`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>, [`Middleware`](/docs/api/types/middleware/)\<`string`\>\]
 
 The type of the resulting middleware chain
 

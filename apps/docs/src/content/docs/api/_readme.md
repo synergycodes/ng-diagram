@@ -75,7 +75,6 @@ title: "ng-diagram"
 - [Size](/docs/api/types/size/)
 - [SnappingConfig](/docs/api/types/snappingconfig/)
 - [TransactionResult](/docs/api/types/transactionresult/)
-- [TreeLayoutConfig](/docs/api/types/treelayoutconfig/)
 - [Viewport](/docs/api/types/viewport/)
 - [ViewportChangedEvent](/docs/api/types/viewportchangedevent/)
 - [ZIndexConfig](/docs/api/types/zindexconfig/)
