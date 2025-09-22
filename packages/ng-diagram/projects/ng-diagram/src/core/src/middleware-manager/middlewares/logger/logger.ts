@@ -12,7 +12,7 @@ export const loggerMiddleware: Middleware = {
       return;
     }
 
-    console.log(`[ngDiagram] ${context.modelActionType}`, {
+    console.trace(`[ngDiagram] ${context.modelActionType}`, {
       initialState: context.initialState,
       finalState: context.state,
       history: context.history,

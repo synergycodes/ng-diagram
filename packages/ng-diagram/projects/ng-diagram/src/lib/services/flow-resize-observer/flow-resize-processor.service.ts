@@ -152,6 +152,8 @@ export class FlowResizeBatchProcessorService {
         continue;
       }
 
+      console.log('Flow resize processor -> apply node size');
+      console.log(size);
       flowCore.updater.applyNodeSize(metadata.nodeId, size);
 
       const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);

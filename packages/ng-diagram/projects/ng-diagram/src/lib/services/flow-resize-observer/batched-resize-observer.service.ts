@@ -32,6 +32,11 @@ export class BatchResizeObserverService implements OnDestroy {
     // Create observer outside Angular zone for performance
     this.ngZone.runOutsideAngular(() => {
       this.observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          console.log(entry.contentRect);
+          console.log(entry.borderBoxSize);
+        }
+
         // Collect all entries
         this.pendingEntries.push(...entries);
 

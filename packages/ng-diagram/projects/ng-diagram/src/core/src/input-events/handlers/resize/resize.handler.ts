@@ -100,6 +100,8 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           resizeCommand.position = { x: Math.round(newX), y: Math.round(newY) };
         }
 
+        console.log('Resize Handler', resizeCommand.size);
+
         this.flow.commandHandler.emit('resizeNode', resizeCommand);
         break;
       }
