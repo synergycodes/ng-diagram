@@ -5,6 +5,18 @@ import { NgDiagramResizeHandleComponent } from './handle/ng-diagram-resize-handl
 import { NgDiagramResizeLineComponent } from './line/ng-diagram-resize-line.component';
 import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment.types';
 
+/**
+ * The `NgDiagramNodeResizeAdornmentComponent` displays resize handles and lines around a selected, resizable node.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-node-resize-adornment>
+ *   <!-- Node content here -->
+ * </ng-diagram-node-resize-adornment>
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-node-resize-adornment',
   templateUrl: './ng-diagram-node-resize-adornment.component.html',
@@ -13,11 +25,10 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
   imports: [NgDiagramResizeLineComponent, NgDiagramResizeHandleComponent],
 })
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
-  nodeData = computed(() => this.nodeComponent?.node());
-  showAdornment = computed(
+  readonly nodeData = computed(() => this.nodeComponent?.node());
+  readonly showAdornment = computed(
     () => !!this.nodeData()?.resizable && this.nodeData()?.selected && this.isRenderedOnCanvas()
   );
-
-  linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
-  handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  readonly linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
+  readonly handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 }

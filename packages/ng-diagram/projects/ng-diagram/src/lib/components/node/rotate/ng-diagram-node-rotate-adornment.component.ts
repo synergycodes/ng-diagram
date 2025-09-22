@@ -2,6 +2,17 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handle.component';
 
+/**
+ * The `NgDiagramNodeRotateAdornmentComponent` displays a rotation handle for a selected, rotatable node.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-node-rotate-adornment />
+ * <!-- Add your node content here -->
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-node-rotate-adornment',
   templateUrl: './ng-diagram-node-rotate-adornment.component.html',
@@ -13,8 +24,8 @@ import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handl
   },
 })
 export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase {
-  readonly nodeData = computed(() => this.nodeComponent?.node());
   readonly isRotating = signal(false);
+  readonly nodeData = computed(() => this.nodeComponent?.node());
   readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.nodeData() }));
   readonly showAdornment = computed(
     () => !!this.nodeData()?.selected && this.nodeData()?.rotatable && this.isRenderedOnCanvas()

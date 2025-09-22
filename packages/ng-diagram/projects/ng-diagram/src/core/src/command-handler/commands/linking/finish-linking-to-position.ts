@@ -1,9 +1,9 @@
-import type { CommandHandler } from '../../../types';
+import type { CommandHandler, Point } from '../../../types';
 import { createFinalEdge } from './utils';
 
 export interface FinishLinkingToPositionCommand {
   name: 'finishLinkingToPosition';
-  position: { x: number; y: number };
+  position: Point;
 }
 
 export const finishLinkingToPosition = async (

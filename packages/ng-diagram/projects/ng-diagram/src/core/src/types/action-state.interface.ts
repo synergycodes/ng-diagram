@@ -37,11 +37,34 @@ export interface DraggingActionState {
   modifiers: InputModifiers;
 }
 
+/**
+ * Interface representing the current state of various user actions in the flow diagram
+ *
+ * @category Types
+ */
 export interface ActionState {
+  /**
+   * State related to node resizing action
+   */
   resize?: ResizeActionState;
+  /**
+   * State related to linking nodes
+   */
   linking?: LinkingActionState;
+  /**
+   * State related to copy-paste actions
+   */
   copyPaste?: CopyPasteActionState;
+  /**
+   * State related to highlighting groups
+   */
   highlightGroup?: HighlightGroupActionState;
+  /**
+   * State related to node rotation
+   */
   rotation?: RotationActionState;
+  /**
+   * State related to dragging elements
+   */
   dragging?: DraggingActionState;
 }

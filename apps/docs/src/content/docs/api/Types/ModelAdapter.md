@@ -36,13 +36,13 @@ Get all edges in the model
 
 ### getMetadata()
 
-> **getMetadata**(): [`Metadata`](/docs/api/other/metadata/)
+> **getMetadata**(): [`Metadata`](/docs/api/types/metadata/)
 
 Get metadata associated with the model
 
 #### Returns
 
-[`Metadata`](/docs/api/other/metadata/)
+[`Metadata`](/docs/api/types/metadata/)
 
 ***
 
@@ -100,7 +100,7 @@ Set metadata for the model
 
 ##### metadata
 
-[`Metadata`](/docs/api/other/metadata/)
+[`Metadata`](/docs/api/types/metadata/)
 
 Metadata to set
 

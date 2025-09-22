@@ -3,16 +3,22 @@ import { BUILT_IN_EDGE_ROUTINGS } from './edge-routing-manager';
 
 /**
  * Type representing built-in edge routing names
+ * @internal
  */
 export type BuiltInEdgeRoutingName = (typeof BUILT_IN_EDGE_ROUTINGS)[number];
 
 /**
- * Type representing edge routing name - can be built-in or custom string
+ * Type representing edge routing name - can be built-in or custom
+ *
+ * **Allowed values:** `'orthogonal' | 'bezier' | 'polyline'`
+ * @category Types
  */
 export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 
 /**
  * Context object containing all information needed for routing computation
+ *
+ * @category Types
  */
 export interface EdgeRoutingContext {
   /**

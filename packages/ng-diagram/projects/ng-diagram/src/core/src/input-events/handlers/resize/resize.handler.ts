@@ -1,3 +1,4 @@
+import { Point, Size } from '../../..';
 import { EventHandler } from '../event-hander';
 import { ResizeEvent } from './resize.event';
 
@@ -88,8 +89,8 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
         const resizeCommand: {
           id: string;
           disableAutoSize: boolean;
-          size: { width: number; height: number };
-          position?: { x: number; y: number };
+          size: Size;
+          position?: Point;
         } = {
           id: event.target.id,
           disableAutoSize: true,

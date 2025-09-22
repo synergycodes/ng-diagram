@@ -16,7 +16,7 @@ Diagram component
 
 ### config
 
-> **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<`FlowConfig`\>\>
+> **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>\>
 
 Global configuration options for the diagram.
 
@@ -40,7 +40,7 @@ Event emitted when a user manually draws an edge between two nodes
 
 ### edgeTemplateMap
 
-> **edgeTemplateMap**: `InputSignal`\<`NgDiagramEdgeTemplateMap`\>
+> **edgeTemplateMap**: `InputSignal`\<[`NgDiagramEdgeTemplateMap`](/docs/api/types/ngdiagramedgetemplatemap/)\>
 
 The edge template map to use for the diagram.
 Optional - if not provided, default edge rendering will be used.
@@ -49,7 +49,7 @@ Optional - if not provided, default edge rendering will be used.
 
 ### middlewares
 
-> **middlewares**: `InputSignal`\<[`MiddlewareChain`](/docs/api/other/middlewarechain/)\>
+> **middlewares**: `InputSignal`\<[`MiddlewareChain`](/docs/api/types/middlewarechain/)\>
 
 Optional — the initial middlewares to use.
 When provided, the middleware list can be modified to add new items,
@@ -62,7 +62,7 @@ can degrade performance or completely break the data flow.
 
 ### model
 
-> **model**: `InputSignal`\<[`ModelAdapter`](/docs/api/other/modeladapter/)\>
+> **model**: `InputSignal`\<[`ModelAdapter`](/docs/api/types/modeladapter/)\>
 
 The model to use in the diagram.
 
@@ -70,7 +70,7 @@ The model to use in the diagram.
 
 ### nodeTemplateMap
 
-> **nodeTemplateMap**: `InputSignal`\<`NgDiagramNodeTemplateMap`\>
+> **nodeTemplateMap**: `InputSignal`\<[`NgDiagramNodeTemplateMap`](/docs/api/types/ngdiagramnodetemplatemap/)\>
 
 The node template map to use for the diagram.
 
@@ -102,7 +102,7 @@ Event emitted when viewport changes (pan/zoom)
 
 ### getNodeTemplate()
 
-> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<`NgDiagramNodeTemplate`\<`any`, `SimpleNode`\<`any`\>\>\> \| `Type$1`\<`NgDiagramGroupNodeTemplate`\<`any`\>\>
+> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/ngdiagramgroupnodetemplate/)\<`any`\>\>
 
 Retrieves the custom Angular component template for rendering a specific node type.
 
@@ -120,7 +120,7 @@ The type identifier of the node to get a template for.
 
 #### Returns
 
-`null` \| `Type$1`\<`NgDiagramNodeTemplate`\<`any`, `SimpleNode`\<`any`\>\>\> \| `Type$1`\<`NgDiagramGroupNodeTemplate`\<`any`\>\>
+`null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/ngdiagramgroupnodetemplate/)\<`any`\>\>
 
 The Angular component class registered for the node type, or
 null if no custom template is registered for this type
@@ -142,45 +142,8 @@ const dbTemplate = this.getNodeTemplate('database'); // Returns DatabaseNodeComp
 #### See
 
  - [nodeTemplateMap](/docs/api/components/ngdiagramcomponent/#nodetemplatemap) - The input property where templates are registered
- - NgDiagramNodeTemplateMap - Type definition for the template map
+ - [NgDiagramNodeTemplateMap](/docs/api/types/ngdiagramnodetemplatemap/) - Type definition for the template map
 
 #### Throws
 
 This method does not throw exceptions - it handles all edge cases gracefully
-
-***
-
-### ngOnDestroy()
-
-> **ngOnDestroy**(): `void`
-
-A callback method that performs custom clean-up, invoked immediately
-before a directive, pipe, or service instance is destroyed.
-
-#### Returns
-
-`void`
-
-#### Implementation of
-
-`OnDestroy.ngOnDestroy`
-
-***
-
-### ngOnInit()
-
-> **ngOnInit**(): `void`
-
-A callback method that is invoked immediately after the
-default change detector has checked the directive's
-data-bound properties for the first time,
-and before any of the view or content children have been checked.
-It is invoked only once when the directive is instantiated.
-
-#### Returns
-
-`void`
-
-#### Implementation of
-
-`OnInit.ngOnInit`

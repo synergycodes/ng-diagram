@@ -1,6 +1,20 @@
 import { computed, Directive, input } from '@angular/core';
 import { GroupNode } from '../../../core/src';
 
+/**
+ * The `NgDiagramGroupHighlightedDirective` conditionally applies a highlight class to a group node in the diagram when it is highlighted.
+ *
+ * ## Example usage
+ * ```html
+ * <div ngDiagramGroupHighlighted [node]="node">
+ *   <!-- Group node content here -->
+ * </div>
+ * ```
+ *
+ * When the group's `highlighted` property is `true`, the `ng-diagram-group-highlight` CSS class is applied.
+ *
+ * @category Directives
+ */
 @Directive({
   selector: '[ngDiagramGroupHighlighted]',
   host: {
@@ -9,8 +23,12 @@ import { GroupNode } from '../../../core/src';
   },
 })
 export class NgDiagramGroupHighlightedDirective {
+  /**
+   * The group node instance to monitor for highlight state.
+   */
   node = input.required<GroupNode>();
-  highlighted = computed(() => {
+
+  protected readonly highlighted = computed(() => {
     return this.node().highlighted ?? false;
   });
 }

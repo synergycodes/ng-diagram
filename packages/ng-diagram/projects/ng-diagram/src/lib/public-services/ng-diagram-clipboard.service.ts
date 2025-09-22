@@ -2,6 +2,19 @@ import { Injectable } from '@angular/core';
 import { Point } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
+/**
+ * The `NgDiagramClipboardService` provides clipboard operations for diagram.
+ *
+ * ## Example usage
+ * ```typescript
+ * private clipboardService = inject(NgDiagramClipboardService);
+ *
+ * // Copy selected elements
+ * this.clipboardService.copy();
+ * ```
+ *
+ * @category Services
+ */
 @Injectable()
 export class NgDiagramClipboardService extends NgDiagramBaseService {
   /**

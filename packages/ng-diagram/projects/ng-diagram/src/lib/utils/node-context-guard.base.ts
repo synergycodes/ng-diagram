@@ -12,5 +12,5 @@ export abstract class NodeContextGuardBase {
    * Computed signal that indicates whether the component is rendered within the node component context.
    * Returns true when the node component is available.
    */
-  readonly isRenderedOnCanvas = computed(() => !!this.nodeComponent);
+  protected readonly isRenderedOnCanvas = computed(() => !!this.nodeComponent);
 }

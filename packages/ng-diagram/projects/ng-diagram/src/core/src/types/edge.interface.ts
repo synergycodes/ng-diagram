@@ -1,6 +1,11 @@
 import { EdgeRoutingName } from '../edge-routing-manager/types';
 import { DataObject, Point, Size } from './utils';
 
+/**
+ * Type representing edge routing mode
+ *
+ * @category Types
+ */
 export type RoutingMode = 'manual' | 'auto';
 
 /**
@@ -94,6 +99,8 @@ export interface Edge<T extends DataObject = DataObject> {
 
 /**
  * Interface representing a label of an edge.
+ *
+ * @category Types
  */
 export interface EdgeLabel {
   /**

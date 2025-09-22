@@ -14,24 +14,44 @@ import { ManualLinkingService } from '../services/input-events/manual-linking.se
 import { NgDiagramConfig } from '../types';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
+/**
+ * The `NgDiagramService` provides advanced access to the diagram's core API,
+ * including configuration, layout, event management, routing, transactions, and more.
+ *
+ * ## Example usage
+ * ```typescript
+ * private ngDiagramService = inject(NgDiagramService);
+ *
+ * // Check if diagram is initialized
+ * const ready = this.ngDiagramService.isInitialized();
+ *
+ * // Update configuration
+ * this.ngDiagramService.updateConfig({ gridSize: 20 });
+ * ```
+ *
+ * @category Services
+ */
 @Injectable()
 export class NgDiagramService extends NgDiagramBaseService {
   private readonly manualLinkingService = inject(ManualLinkingService);
+
   /**
-   * Returns whether the diagram is initialized
+   * Returns whether the diagram is initialized.
    */
   isInitialized = this.flowCoreProvider.isInitialized;
 
   /**
-   * Gets the current environment information
+   * Gets the current environment information.
+   * @returns The environment info object.
    */
   getEnvironment(): EnvironmentInfo {
     return this.flowCore.getEnvironment();
   }
 
   /**
-   * Returns the current action state (readonly)
-   * This includes information about ongoing actions like resizing and linking
+   * Returns the current action state (readonly).
+   * This includes information about ongoing actions like resizing and linking.
+   * @returns The current action state.
    */
   getActionState(): Readonly<ActionState> {
     return this.flowCore.actionStateManager.getState();
@@ -41,6 +61,7 @@ export class NgDiagramService extends NgDiagramBaseService {
    * Returns the current configuration (readonly).
    * The returned object cannot be modified directly —
    * use {@link updateConfig} to make changes.
+   * @returns The current configuration.
    */
   getConfig(): Readonly<NgDiagramConfig> {
     return this.flowCore.config;
@@ -48,7 +69,6 @@ export class NgDiagramService extends NgDiagramBaseService {
 
   /**
    * Updates the current configuration.
-   *
    * @param config Partial configuration object containing properties to update.
    */
   updateConfig(config: Partial<NgDiagramConfig>) {
@@ -56,25 +76,25 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Registers a new middleware in the chain
-   * @param middleware Middleware to register
-   * @returns Function to unregister the middleware
+   * Registers a new middleware in the chain.
+   * @param middleware Middleware to register.
+   * @returns Function to unregister the middleware.
    */
   registerMiddleware(middleware: Middleware): () => void {
     return this.flowCore.registerMiddleware(middleware);
   }
 
   /**
-   * Unregister a middleware from the chain
-   * @param name Name of the middleware to unregister
+   * Unregister a middleware from the chain.
+   * @param name Name of the middleware to unregister.
    */
   unregisterMiddleware(name: string): void {
-    return this.flowCore.unregisterMiddleware(name);
+    this.flowCore.unregisterMiddleware(name);
   }
 
   /**
-   * Registers a custom routing implementation
-   * @param routing Routing implementation to register
+   * Registers a custom routing implementation.
+   * @param routing Routing implementation to register.
    * @example
    * const customRouting: Routing = {
    *   name: 'custom',
@@ -88,51 +108,51 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Unregisters a routing implementation
-   * @param name Name of the routing to unregister
+   * Unregisters a routing implementation.
+   * @param name Name of the routing to unregister.
    */
   unregisterRouting(name: string): void {
     this.flowCore.edgeRoutingManager.unregisterRouting(name);
   }
 
   /**
-   * Gets all registered routing names
-   * @returns Array of registered routing names
+   * Gets all registered routing names.
+   * @returns Array of registered routing names.
    */
   getRegisteredRoutings(): string[] {
     return this.flowCore.edgeRoutingManager.getRegisteredRoutings();
   }
 
   /**
-   * Sets the default routing to use when not specified on edges
-   * @param name Name of the routing to set as default
+   * Sets the default routing to use when not specified on edges.
+   * @param name Name of the routing to set as default.
    */
   setDefaultRouting(name: string): void {
     this.flowCore.edgeRoutingManager.setDefaultRouting(name);
   }
 
   /**
-   * Gets the current default routing name
-   * @returns Name of the default routing
+   * Gets the current default routing name.
+   * @returns Name of the default routing.
    */
   getDefaultRouting(): string {
     return this.flowCore.edgeRoutingManager.getDefaultRouting();
   }
 
   /**
-   * Call this method to start linking from your custom logic
-   * @param node The node from which the linking starts
-   * @param portId The port ID from which the linking starts
+   * Call this method to start linking from your custom logic.
+   * @param node The node from which the linking starts.
+   * @param portId The port ID from which the linking starts.
    */
   startLinking(node: Node, portId: string) {
     this.manualLinkingService.startLinking(node, portId);
   }
 
   /**
-   * Add an event listener for a diagram event
-   * @param event The event name
-   * @param callback The callback to invoke when the event is emitted
-   * @returns A function to unsubscribe
+   * Add an event listener for a diagram event.
+   * @param event The event name.
+   * @param callback The callback to invoke when the event is emitted.
+   * @returns A function to unsubscribe.
    * @example
    * const unsubscribe = ngDiagramService.addEventListener('selectionChanged', (event) => {
    *   console.log('Selection changed', event.selectedNodes);
@@ -146,10 +166,10 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Add an event listener that will only fire once
-   * @param event The event name
-   * @param callback The callback to invoke when the event is emitted
-   * @returns A function to unsubscribe
+   * Add an event listener that will only fire once.
+   * @param event The event name.
+   * @param callback The callback to invoke when the event is emitted.
+   * @returns A function to unsubscribe.
    * @example
    * ngDiagramService.addEventListenerOnce('diagramInit', (event) => {
    *   console.log('Diagram initialized', event);
@@ -163,9 +183,9 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Remove an event listener
-   * @param event The event name
-   * @param callback Optional specific callback to remove
+   * Remove an event listener.
+   * @param event The event name.
+   * @param callback Optional specific callback to remove.
    * @example
    * // Remove all listeners for an event
    * ngDiagramService.removeEventListener('selectionChanged');
@@ -178,7 +198,7 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Remove all event listeners
+   * Remove all event listeners.
    * @example
    * ngDiagramService.removeAllEventListeners();
    */
@@ -187,8 +207,8 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Enable or disable event emissions
-   * @param enabled Whether events should be emitted
+   * Enable or disable event emissions.
+   * @param enabled Whether events should be emitted.
    * @example
    * // Disable all events
    * ngDiagramService.setEventsEnabled(false);
@@ -201,17 +221,17 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Check if event emissions are enabled
-   * @returns True if events are enabled
+   * Check if event emissions are enabled.
+   * @returns True if events are enabled.
    */
   areEventsEnabled(): boolean {
     return this.flowCore.eventManager.isEnabled();
   }
 
   /**
-   * Check if there are any listeners for an event
-   * @param event The event name
-   * @returns True if there are listeners
+   * Check if there are any listeners for an event.
+   * @param event The event name.
+   * @returns True if there are listeners.
    * @example
    * if (ngDiagramService.hasEventListeners('selectionChanged')) {
    *   // There are listeners for selection changes

@@ -1,6 +1,6 @@
 import { Bounds, Point, Rect, Size } from '../types';
 
-export const getPointRangeRect = (point: { x: number; y: number }, range: number): Rect => {
+export const getPointRangeRect = (point: Point, range: number): Rect => {
   return {
     x: point.x - range,
     y: point.y - range,
@@ -19,8 +19,8 @@ export const getRect = ({
   position = { x: 0, y: 0 },
   size = { width: 1, height: 1 },
 }: {
-  position?: { x: number; y: number };
-  size?: { width: number; height: number };
+  position?: Point;
+  size?: Size;
 }): Rect => {
   return {
     x: position?.x || 0,

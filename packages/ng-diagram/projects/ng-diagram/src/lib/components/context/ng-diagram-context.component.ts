@@ -17,6 +17,19 @@ import { PaletteService } from '../../services/palette/palette.service';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { UpdatePortsService } from '../../services/update-ports/update-ports.service';
 
+/**
+ * The `NgDiagramContextComponent` sets up the dependency injection context for all ngDiagram services.
+ * It should wrap any usage of {@link NgDiagramComponent}.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-context>
+ *   <ng-diagram ... />
+ * </ng-diagram-context>
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-context',
   template: `<ng-content />`,

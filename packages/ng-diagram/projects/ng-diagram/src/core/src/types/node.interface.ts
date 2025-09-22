@@ -25,6 +25,7 @@ export interface GroupNode<T extends DataObject = DataObject> extends SimpleNode
 
 /**
  * Interface representing the most basic node in the diagram
+ *
  * @category Types
  */
 
@@ -93,6 +94,8 @@ export interface SimpleNode<T extends DataObject = DataObject> {
 
 /**
  * Interface representing a port in the node.
+ *
+ * @category Types
  */
 export interface Port {
   /**

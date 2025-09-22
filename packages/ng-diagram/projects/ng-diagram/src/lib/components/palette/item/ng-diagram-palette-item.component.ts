@@ -3,6 +3,21 @@ import { PaletteService } from '../../../services';
 import { NgDiagramPaletteItem } from '../../../types';
 import { NgDiagramPaletteItemPreviewComponent } from '../item-preview/ng-diagram-palette-item-preview.component';
 
+/**
+ * The `NgDiagramPaletteItemComponent` represents a single item in the diagram palette.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-palette-item [item]="item">
+ *   <!-- Palette item content here -->
+ *   <ng-diagram-palette-item-preview>
+ *     <!-- Optional: custom preview content -->
+ *   </ng-diagram-palette-item-preview>
+ * </ng-diagram-palette-item>
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-palette-item',
   templateUrl: './ng-diagram-palette-item.component.html',
@@ -16,8 +31,12 @@ export class NgDiagramPaletteItemComponent {
   private paletteService = inject(PaletteService);
   private paletteItemPreviewComponent = contentChild(NgDiagramPaletteItemPreviewComponent);
 
+  /**
+   * The palette item data to be rendered and managed.
+   */
   item = input.required<NgDiagramPaletteItem>();
 
+  /** @internal */
   onDragStart(event: DragEvent) {
     const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();
     if (previewHtmlElement && previewHtmlElement.nativeElement) {
@@ -26,6 +45,7 @@ export class NgDiagramPaletteItemComponent {
     this.paletteService.onDragStartFromPalette(event, this.item());
   }
 
+  /** @internal */
   onMouseDown() {
     this.paletteService.onMouseDown(this.item(), this.paletteItemPreviewComponent()?.id || '');
   }

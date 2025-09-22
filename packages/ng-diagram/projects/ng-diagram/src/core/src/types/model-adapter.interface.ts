@@ -10,6 +10,8 @@ export interface ModelChanges {
 
 /**
  * Interface for model adapters that handle the data management of a flow diagram
+ *
+ * @category Types
  */
 export interface ModelAdapter {
   /**

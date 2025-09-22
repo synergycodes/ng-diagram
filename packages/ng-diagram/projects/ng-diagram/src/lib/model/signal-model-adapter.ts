@@ -1,6 +1,11 @@
 import { EffectRef, Injectable, effect, signal } from '@angular/core';
 import type { Edge, Metadata, ModelAdapter, ModelChanges, Node } from '../../core/src';
 
+/**
+ * An implementation of ModelAdapter using Angular signals to manage the state of nodes, edges, and metadata.
+ *
+ * @internal
+ */
 @Injectable()
 export class SignalModelAdapter implements ModelAdapter {
   private effectRef: EffectRef | null = null;
