@@ -20,7 +20,7 @@ npm install ng-diagram
 
 ## Import Styles
 
-<Aside type="caution" title="Important">
+<Aside type="caution" title="Caution">
   You must import the required styles for the diagram to display correctly. Because the library uses **CSS variables**,
   import the stylesheet in your **global file** (e.g. `src/styles.scss`), not inside a component.
 </Aside>
@@ -45,8 +45,6 @@ import { NgDiagramComponent, initializeModel, provideNgDiagram } from 'ng-diagra
   styles: `
     :host {
       display: flex;
-      flex: 1;
-      width: 100%;
       height: 300px;
     }
   `,
@@ -71,12 +69,13 @@ export class AppComponent {
 }
 ```
 
-The <ng-diagram> component must be placed inside a container element with an explicitly defined size.
+<Aside type="note" title="Note">
+The `<ng-diagram>` component must be placed inside a container element with an **explicitly defined size** (e.g. 300px, 100vh, etc.).
 The diagram will automatically scale to fit the dimensions of its parent container.
-You can set the container size using standard CSS properties such as width and height, or by leveraging layout systems like Flexbox.
 This approach ensures that the diagram renders correctly and responds to layout changes as expected.
+</Aside>
 
-<Aside type="caution" title="Important">
+<Aside type="caution" title="Caution">
 The `<ng-diagram>` component must be used within a component or module that registers `provideNgDiagram()`, 
 which provides the diagram-specific services and state management.
 </Aside>
