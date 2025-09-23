@@ -120,13 +120,59 @@ import Routing from '@components/angular/edges/routing/routing.astro';
   description="Learn about routing algorithms and how to customize them in ngDiagram"
 />
 
+## Creating Edges Through User Interaction
+
+When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created. This is done through the `linking` configuration in your diagram's config.
+
+### Customizing Edge Creation
+
+The `linking` configuration provides two builder functions:
+
+- **`temporaryEdgeDataBuilder`** - Customizes the edge shown while dragging
+- **`finalEdgeDataBuilder`** - Customizes the final edge when connection is completed
+
+```typescript
+@Component({
+  selector: 'my-diagram',
+  template: ` <ng-diagram [model]="model" [config]="config" /> `,
+  providers: [provideNgDiagram()],
+})
+export class MyDiagramComponent {
+  model = initializeModel({
+    /* ... */
+  });
+
+  config: NgDiagramConfig = {
+    linking: {
+      temporaryEdgeDataBuilder: (defaultEdge) => ({
+        ...defaultEdge,
+        routing: 'bezier', // Use bezier routing for temporary edge
+        type: 'preview', // Use a custom edge template
+      }),
+      finalEdgeDataBuilder: (defaultEdge) => ({
+        ...defaultEdge,
+        data: {
+          ...defaultEdge.data,
+          createdAt: new Date(),
+          status: 'active',
+        },
+        type: 'custom',
+        routing: 'orthogonal',
+      }),
+    },
+  };
+}
+```
+
+This allows you to:
+
+- Set different edge types for preview vs final edges
+- Add custom data to newly created edges
+- Apply specific routing algorithms
+- Control the visual appearance and behavior
+
 ## Further reading
 
-<LinkCard
-  title="Layout"
-  href="/docs/internals/layout"
-  description="Learn about layout algorithms and how to customize them in ngDiagram"
-/>
 <LinkCard
   title="Labels"
   href="/docs/internals/edges/labels"

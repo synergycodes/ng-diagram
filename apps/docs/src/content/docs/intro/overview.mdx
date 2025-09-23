@@ -61,6 +61,12 @@ ngDiagram provides default nodes that work out of the box with built-in features
 - Optional resize handles (when `resizable` is set on the node)
 - Optional rotation handle (when `rotatable` is set on the node)
 - Automatic port hover indicators
+- Automatic sizing by default (`autoSize: true`) - nodes resize to fit their content
+
+<Aside type="note">
+  To set a manual size for nodes, you must explicitly set `autoSize: false` along with the `size` property. Without
+  this, the size property will be overridden by the automatic sizing behavior.
+</Aside>
 
 For specific requirements, you can create custom nodes with any Angular template, form controls, or visual elements you need.
 

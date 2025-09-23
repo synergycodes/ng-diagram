@@ -137,4 +137,8 @@ To precisely control the size of a node, use the `size` property:
 }
 ```
 
+:::note
 By default, nodes use **automatic sizing** (`autoSize: true`). In this mode, the provided `size` property is ignored, and the node resizes itself to fit its content. The `size` property is then updated with the **measured values**.
+
+To set a manual size for a node, you must explicitly set `autoSize: false`. Without this, the `size` property will be overridden by the automatic sizing behavior.
+:::
