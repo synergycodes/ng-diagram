@@ -30,7 +30,7 @@ export class GroupsDiagram {
         id: '1',
         position: {
           x: 240,
-          y: 115,
+          y: 130,
         },
         data: { label: 'Node 1' },
         groupId: '3',
@@ -38,14 +38,14 @@ export class GroupsDiagram {
       {
         id: '3',
         position: {
-          x: 230,
-          y: 85,
+          x: 200,
+          y: 90,
         },
         data: {},
-        size: { width: 200, height: 100 },
+        size: { width: 260, height: 126 },
+        autoSize: false,
         isGroup: true,
         resizable: true,
-        rotatable: true,
       },
     ],
   });

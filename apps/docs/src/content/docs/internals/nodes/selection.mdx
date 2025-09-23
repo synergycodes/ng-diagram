@@ -39,6 +39,10 @@ To make a custom node selectable with default functionality, add the `NgDiagramN
 
 There is no need to define anything else in your node or to provide custom selection styles.
 
+:::note
+The host element must have `display: block` or `display: flex` set in its styles for the selection box-shadow to render properly. Without this, the selection effect may be invisible or barely visible.
+:::
+
 <DefaultSelection />
 
 <CodeSnippet relativePath="nodes/selection/default/node.component.ts" mark={[{ range: '18-20' }]} collapse={['1-6']} />
