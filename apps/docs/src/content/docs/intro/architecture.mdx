@@ -12,9 +12,13 @@ ngDiagram follows a layered architecture that separates concerns and enables ext
 The user-facing components that render the diagram and handle user interactions:
 
 - **ng-diagram**: Main component that renders the entire diagram, handles user interactions, and orchestrates all functionality
+- **ng-diagram-background**: Background component that renders the diagram's background grid
 - **ng-diagram-resize-adornment** and **ng-diagram-rotate-adornment**: Utility components that can be embedded in custom node templates to provide resize and rotation functionality
 - **ng-diagram-palette-item**: Drag and drop component that can be placed anywhere in your application to create palette functionality
+- **ng-diagram-palette-item-preview**: Preview component that shows a visual representation of palette items during drag operations
 - **ng-diagram-base-edge**: Foundation component for building custom edge templates with advanced styling and behavior
+- **base-edge-label**: Base component for creating custom edge labels with consistent styling and positioning
+- **ng-diagram-port**: Port component that defines connection points on nodes for edge connections
 
 ### 2. Service Layer
 
@@ -25,10 +29,10 @@ Specialized services provide different levels of control and functionality:
 - **NgDiagramViewportService**: Manages viewport state with reactive signals for position, scale, and coordinate transformations
 - **NgDiagramSelectionService**: Manages selection state with methods for selecting/deselecting nodes and edges
 - **NgDiagramNodeService**: Provides node-specific operations
-- **NgDiagramEdgeService**: Handles edge-specific operations
+- **NgDiagramGroupsService**: Manages group node operations such as member management
 - **NgDiagramClipboardService**: Manages copy/paste operations for diagram elements
 
-All services are scoped within `ng-diagram-context`, enabling multiple diagrams on the same page with isolated state and behavior.
+All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior.
 
 ### 3. Command System
 

@@ -4,18 +4,17 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
   type NgDiagramPaletteItem,
 } from 'ng-diagram';
 import { Palette } from './palette.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, Palette],
+  imports: [NgDiagramComponent, Palette],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-      <palette-container [model]="paletteModel" />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" />
+    <palette-container [model]="paletteModel" />
   `,
   styles: `
     :host {

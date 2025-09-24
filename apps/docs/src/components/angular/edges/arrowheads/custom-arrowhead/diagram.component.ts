@@ -4,21 +4,16 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { CustomArrowheadsComponent } from './custom-arrowheads.component';
 
 @Component({
-  imports: [
-    NgDiagramContextComponent,
-    NgDiagramComponent,
-    CustomArrowheadsComponent,
-  ],
+  imports: [NgDiagramComponent, CustomArrowheadsComponent],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-      <custom-arrowheads />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" />
+    <custom-arrowheads />
   `,
   styles: `
     :host {

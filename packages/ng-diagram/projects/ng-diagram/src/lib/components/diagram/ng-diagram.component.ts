@@ -11,7 +11,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { Edge, Node } from '@angularflow/core';
+import { Edge, Node } from '../../../core/src';
 
 import type {
   DiagramInitEvent,
@@ -21,7 +21,7 @@ import type {
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
-} from '@angularflow/core';
+} from '../../../core/src';
 
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
@@ -30,6 +30,7 @@ import { PaletteDropDirective } from '../../directives/input-events/palette-drop
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
+import { NgDiagramServicesAvailabilityCheckerDirective } from '../../directives/services-availability-checker/ng-diagram-services-availability-checker.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
@@ -61,6 +62,7 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
   styleUrl: './ng-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
+    NgDiagramServicesAvailabilityCheckerDirective,
     CursorPositionTrackerDirective,
     ZoomingPointerDirective,
     ZoomingWheelDirective,
@@ -110,9 +112,9 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    */
   edgeTemplateMap = input<NgDiagramEdgeTemplateMap>(new NgDiagramEdgeTemplateMap());
 
-  nodes = this.renderer.nodes;
-  edges = this.renderer.edges;
-  viewport = this.renderer.viewport;
+  readonly nodes = this.renderer.nodes;
+  readonly edges = this.renderer.edges;
+  readonly viewport = this.renderer.viewport;
 
   /**
    * Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
@@ -153,11 +155,13 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** @ignore */
   ngOnInit(): void {
     this.flowResizeBatchProcessor.initialize();
     this.setupViewportSizeTracking();
   }
 
+  /** @ignore */
   ngOnDestroy(): void {
     this.flowCoreProvider.destroy();
     this.cleanupViewportSizeTracking();

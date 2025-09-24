@@ -4,15 +4,14 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" />
     <svg height="0" width="0">
       <defs>
         <marker

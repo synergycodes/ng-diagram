@@ -5,6 +5,7 @@ sidebar:
   order: 0
 ---
 
+import { Aside } from '@astrojs/starlight/components';
 import NgDiagramComponentContainer from '../../../components/angular/quick-start/quick-start.astro';
 
 Get up and running with ngDiagram in minutes. This guide will help you create your first interactive diagram.
@@ -19,9 +20,13 @@ npm install ng-diagram
 
 ## Import Styles
 
-**Important:** You must import the required styles for the diagram to display correctly.
+<Aside type="caution" title="Caution">
+  You must import the required styles for the diagram to display correctly. Because the library uses **CSS variables**,
+  import the stylesheet in your **global file** (e.g. `src/styles.scss`), not inside a component.
+</Aside>
 
 ```css
+/* src/styles.scss */
 @import 'ng-diagram/styles.css';
 ```
 
@@ -31,20 +36,16 @@ Without these styles, the diagram components will not render properly.
 
 ```typescript
 import { Component } from '@angular/core';
-import { NgDiagramComponent, NgDiagramContextComponent, initializeModel } from 'ng-diagram';
+import { NgDiagramComponent, initializeModel, provideNgDiagram } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
-  template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-    </ng-diagram-context>
-  `,
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
+  template: ` <ng-diagram [model]="model" /> `,
   styles: `
     :host {
-      flex: 1;
       display: flex;
-      height: 100%;
+      height: 300px;
     }
   `,
 })
@@ -68,6 +69,49 @@ export class AppComponent {
 }
 ```
 
+<Aside type="note" title="Note">
+The `<ng-diagram>` component must be placed inside a container element with an **explicitly defined size** (e.g. 300px, 100vh, etc.).
+The diagram will automatically scale to fit the dimensions of its parent container.
+This approach ensures that the diagram renders correctly and responds to layout changes as expected.
+</Aside>
+
+<Aside type="caution" title="Caution">
+The `<ng-diagram>` component must be used within a component or module that registers `provideNgDiagram()`, 
+which provides the diagram-specific services and state management.
+</Aside>
+
 That's it! You now have a working diagram with default node and edge templates.
 
 <NgDiagramComponentContainer />
+
+## What's Next?
+
+Now that you have a basic diagram working, you can customize it to fit your specific needs. Here are the main areas you can explore:
+
+### Customize Your Nodes
+
+Create custom node templates with your own styling, content, and interactive elements:
+
+[Learn about Custom Nodes →](/docs/internals/nodes/custom-nodes) | [See Example →](/docs/examples/custom-node)
+
+### Create Custom Edges
+
+Design custom edge types with unique visual styles and routing:
+
+[Learn about Custom Edges →](/docs/internals/edges/custom-edges) | [See Example →](/docs/examples/custom-edge)
+
+### Add a Palette
+
+Create a drag-and-drop interface for users to add nodes to your diagram:
+
+[Learn about Palette →](/docs/internals/palette) | [See Example →](/docs/examples/palette)
+
+### Persistence & State Management
+
+Save and restore your diagram state:
+
+[Learn about State Management →](/docs/internals/state-management) | [See Example →](/docs/examples/save-state)
+
+---
+
+**Ready to dive deeper?** Start with [Custom Nodes](/docs/internals/nodes/custom-nodes) or explore our [Examples](/docs/examples) to see ngDiagram in action!

@@ -4,7 +4,6 @@
 
 // Components
 export { NgDiagramBackgroundComponent } from './lib/components/background/ng-diagram-background.component';
-export { NgDiagramContextComponent } from './lib/components/context/ng-diagram-context.component';
 export { NgDiagramComponent } from './lib/components/diagram/ng-diagram.component';
 export { BaseEdgeLabelComponent } from './lib/components/edge-label/base-edge-label.component';
 export { NgDiagramBaseEdgeComponent } from './lib/components/edge/base-edge/base-edge.component';
@@ -29,6 +28,7 @@ export { ZoomingPointerDirective } from './lib/directives/input-events/zooming/z
 export { ZoomingWheelDirective } from './lib/directives/input-events/zooming/zooming-wheel.directive';
 export { NodePositionDirective } from './lib/directives/node-position/node-position.directive';
 export { NodeSizeDirective } from './lib/directives/node-size/node-size.directive';
+export { NgDiagramServicesAvailabilityCheckerDirective } from './lib/directives/services-availability-checker/ng-diagram-services-availability-checker.directive';
 export { ViewportDirective } from './lib/directives/viewport/viewport.directive';
 export { ZIndexDirective } from './lib/directives/z-index/z-index.directive';
 
@@ -46,7 +46,8 @@ export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewp
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
-export { initializeModel } from './lib/model/initializeModel';
+export { initializeModel } from './lib/model/initialize-model';
+export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
 export { NgDiagramNodeTemplateMap } from './lib/types/node-template-map';
 export { createMiddlewares } from './lib/utils/create-middlewares';
@@ -61,19 +62,45 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
 export type {
+  ActionState,
+  BackgroundConfig,
+  DiagramEventMap,
   DiagramInitEvent,
   Edge,
   EdgeDrawnEvent,
+  EdgeLabel,
+  EdgeRoutingConfig,
+  EdgeRoutingContext,
+  EdgeRoutingName,
+  EnvironmentInfo,
+  FlowConfig,
+  GroupingConfig,
   GroupNode,
+  LinkingConfig,
   loggerMiddleware,
   Metadata,
   Middleware,
   MiddlewareChain,
+  Model,
   ModelAdapter,
   NgDiagramMath,
   Node,
+  NodeRotationConfig,
   Point,
+  Port,
+  PortLocation,
+  PortSide,
+  ResizeConfig,
+  RoutingMode,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  SelectionMovingConfig,
+  SimpleNode,
+  Size,
+  SnappingConfig,
+  TransactionResult,
+  Viewport,
   ViewportChangedEvent,
-} from '@angularflow/core';
+  ZIndexConfig,
+  ZoomConfig,
+} from './core/src';

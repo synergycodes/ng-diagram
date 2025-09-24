@@ -1,5 +1,5 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { DEFAULT_NODE_MIN_SIZE, isGroup, type Node } from '@angularflow/core';
+import { DEFAULT_NODE_MIN_SIZE, isGroup, type Node } from '../../../core/src';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 
@@ -17,6 +17,7 @@ export const DEFAULT_GROUP_SIZE = { width: '9.0625rem', height: '9.0625rem' };
  * 1. Explicit size from node data (when autoSize=false)
  * 2. Built-in defaults for default node types (no type specified)
  * 3. User's CSS (for custom node types)
+ * @internal
  */
 @Directive({
   selector: '[ngDiagramNodeSize]',

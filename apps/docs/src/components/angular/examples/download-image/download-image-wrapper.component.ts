@@ -1,17 +1,13 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import { NgDiagramContextComponent } from 'ng-diagram';
+import { provideNgDiagram } from 'ng-diagram';
 import { DownloadImageComponent } from './download-image.component';
 import { GenerateImageService } from './generate-image.service';
 
 @Component({
   selector: 'download-image-wrapper',
-  imports: [NgDiagramContextComponent, DownloadImageComponent],
-  template: `
-    <ng-diagram-context>
-      <download-image></download-image>
-    </ng-diagram-context>
-  `,
+  imports: [DownloadImageComponent],
+  template: ` <download-image></download-image> `,
   styles: [
     `
       :host {
@@ -22,6 +18,6 @@ import { GenerateImageService } from './generate-image.service';
       }
     `,
   ],
-  providers: [GenerateImageService],
+  providers: [GenerateImageService, provideNgDiagram()],
 })
 export class DownloadImageWrapperComponent {}

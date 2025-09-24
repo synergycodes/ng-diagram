@@ -28,7 +28,7 @@ This allows you to tailor the selection appearance and behavior to fit your appl
 
 <CodeSnippet
   relativePath="nodes/selection/custom/node.component.ts"
-  mark={[{ range: '17-19' }, { range: '25-27' }]}
+  mark={[{ range: '14-16' }, { range: '22-24' }]}
   collapse={['1-6']}
 />
 <CodeSnippet relativePath="nodes/selection/custom/node.component.scss" mark={[{ range: '7-9' }]} collapse={['11-18']} />
@@ -38,6 +38,10 @@ This allows you to tailor the selection appearance and behavior to fit your appl
 To make a custom node selectable with default functionality, add the `NgDiagramNodeSelectedDirective` as a host directive in your node component.
 
 There is no need to define anything else in your node or to provide custom selection styles.
+
+:::note
+The host element must have `display: block` or `display: flex` set in its styles for the selection box-shadow to render properly. Without this, the selection effect may be invisible or barely visible.
+:::
 
 <DefaultSelection />
 

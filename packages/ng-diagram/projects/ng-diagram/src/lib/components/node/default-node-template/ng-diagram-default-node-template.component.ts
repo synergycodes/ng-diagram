@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { Node } from '../../../../core/src';
 import { NgDiagramNodeSelectedDirective } from '../../../directives';
 import { NgDiagramNodeTemplate } from '../../../types';
 import { NgDiagramPortComponent } from '../../port/ng-diagram-port.component';

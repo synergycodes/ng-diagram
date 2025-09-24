@@ -4,17 +4,16 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
   NgDiagramEdgeTemplateMap,
+  provideNgDiagram,
 } from 'ng-diagram';
 import { LabeledEdgeComponent } from './labeled-edge.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent],
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
   `,
   styles: `
     :host {

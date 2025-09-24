@@ -1,17 +1,13 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import { NgDiagramContextComponent, NgDiagramModelService } from 'ng-diagram';
+import { NgDiagramModelService, provideNgDiagram } from 'ng-diagram';
 import { SaveStateExampleComponent } from './save-example.component';
 import { SaveStateService } from './save.service';
 
 @Component({
   selector: 'save-state-wrapper',
-  imports: [NgDiagramContextComponent, SaveStateExampleComponent],
-  template: `
-    <ng-diagram-context>
-      <save-state-example></save-state-example>
-    </ng-diagram-context>
-  `,
+  imports: [SaveStateExampleComponent],
+  template: ` <save-state-example></save-state-example> `,
   styles: [
     `
       :host {
@@ -22,6 +18,6 @@ import { SaveStateService } from './save.service';
       }
     `,
   ],
-  providers: [NgDiagramModelService, SaveStateService],
+  providers: [NgDiagramModelService, SaveStateService, provideNgDiagram()],
 })
 export class SaveStateWrapperComponent {}

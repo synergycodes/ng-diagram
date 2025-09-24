@@ -2,7 +2,7 @@
 title: Download Image
 description: Example of how to download the flow as an image in ngDiagram
 sidebar:
-  order: 1
+  order: 7
 ---
 
 import { Image } from 'astro:assets';
@@ -58,26 +58,6 @@ Also it passes the flow element reference to the service.
   range={[1, 38]}
   collapse={['1-5']}
   mark={[{ range: '21-29' }]}
-/>
-
-### Download Image Component
-
-This component renders the flow and navigation bar, wiring up the download functionality:
-
-<CodeSnippet
-  relativePath="examples/download-image/download-image.component.ts"
-  range={[1, 174]}
-  collapse={['1-10', '36-170']}
-/>
-
-### Wrapper Component
-
-The wrapper provides context and service providers for the example:
-
-<CodeSnippet
-  relativePath="examples/download-image/download-image-wrapper.component.ts"
-  range={[1, 24]}
-  collapse={['1-6', '15-24']}
 />
 
 ## Actions

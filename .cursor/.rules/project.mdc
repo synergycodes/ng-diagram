@@ -1,11 +1,11 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
-# AI Rules for AngularFlow
+# AI Rules for ng-diagram
 
-AngularFlow is a library for creating interactive diagrams in Angular
+ng-diagram is a library for creating interactive diagrams in Angular
 
 - Diagrams are DOM-based.
 - Library complies with latest Angular standards.

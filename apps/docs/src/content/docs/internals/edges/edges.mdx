@@ -41,9 +41,9 @@ To add edges to your diagram, include them in the `edges` array of your model:
 
 <CodeSnippet
   relativePath="edges/edges/minimal-diagram.component.ts"
-  range={[19, 70]}
-  collapse={['3-20']}
-  mark={[{ range: '21-30' }]}
+  range={[16, 70]}
+  collapse={['3-18']}
+  mark={[{ range: '21-28' }]}
 />
 
 ## Default Edge
@@ -69,8 +69,8 @@ import DefaultEdge from '@components/angular/edges/edges/default-edge/default-ed
 <CodeSnippet
   relativePath="edges/edges/default-edge/diagram.component.ts"
   range={[10, 70]}
-  collapse={['24-27', '36-47', '50-55']}
-  mark={[{ range: '9-18' }, { range: '28-30' }, { range: '56-57' }]}
+  collapse={['23-26', '35-46', '49-54']}
+  mark={[{ range: '8-17' }, { range: '27-29' }, { range: '55-56' }]}
 />
 
 Use Custom Edges for even more control over edge look and functionality
@@ -91,9 +91,9 @@ These IDs (along with their parent node IDs) are used to specify the exact posit
 
 <CodeSnippet
   relativePath="edges/edges/minimal-diagram.component.ts"
-  range={[19, 70]}
+  range={[16, 70]}
   collapse={['3-21']}
-  mark={[25, 27]}
+  mark={[24, 26]}
 />
 
 <LinkCard
@@ -120,13 +120,59 @@ import Routing from '@components/angular/edges/routing/routing.astro';
   description="Learn about routing algorithms and how to customize them in ngDiagram"
 />
 
+## Creating Edges Through User Interaction
+
+When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created. This is done through the `linking` configuration in your diagram's config.
+
+### Customizing Edge Creation
+
+The `linking` configuration provides two builder functions:
+
+- **`temporaryEdgeDataBuilder`** - Customizes the edge shown while dragging
+- **`finalEdgeDataBuilder`** - Customizes the final edge when connection is completed
+
+```typescript
+@Component({
+  selector: 'my-diagram',
+  template: ` <ng-diagram [model]="model" [config]="config" /> `,
+  providers: [provideNgDiagram()],
+})
+export class MyDiagramComponent {
+  model = initializeModel({
+    /* ... */
+  });
+
+  config: NgDiagramConfig = {
+    linking: {
+      temporaryEdgeDataBuilder: (defaultEdge) => ({
+        ...defaultEdge,
+        routing: 'bezier', // Use bezier routing for temporary edge
+        type: 'preview', // Use a custom edge template
+      }),
+      finalEdgeDataBuilder: (defaultEdge) => ({
+        ...defaultEdge,
+        data: {
+          ...defaultEdge.data,
+          createdAt: new Date(),
+          status: 'active',
+        },
+        type: 'custom',
+        routing: 'orthogonal',
+      }),
+    },
+  };
+}
+```
+
+This allows you to:
+
+- Set different edge types for preview vs final edges
+- Add custom data to newly created edges
+- Apply specific routing algorithms
+- Control the visual appearance and behavior
+
 ## Further reading
 
-<LinkCard
-  title="Layout"
-  href="/docs/internals/layout"
-  description="Learn about layout algorithms and how to customize them in ngDiagram"
-/>
 <LinkCard
   title="Labels"
   href="/docs/internals/edges/labels"

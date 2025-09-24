@@ -1,17 +1,13 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
-import { NgDiagramContextComponent, NgDiagramModelService } from 'ng-diagram';
+import { NgDiagramModelService, provideNgDiagram } from 'ng-diagram';
 import { ContextMenuExampleComponent } from './context-menu-example.component';
 import { ContextMenuService } from './menu/menu.service';
 
 @Component({
   selector: 'context-menu-wrapper',
-  imports: [NgDiagramContextComponent, ContextMenuExampleComponent],
-  template: `
-    <ng-diagram-context>
-      <context-menu-example></context-menu-example>
-    </ng-diagram-context>
-  `,
+  imports: [ContextMenuExampleComponent],
+  template: `<context-menu-example></context-menu-example> `,
   styles: [
     `
       :host {
@@ -21,6 +17,6 @@ import { ContextMenuService } from './menu/menu.service';
       }
     `,
   ],
-  providers: [ContextMenuService, NgDiagramModelService],
+  providers: [ContextMenuService, NgDiagramModelService, provideNgDiagram()],
 })
 export class ContextMenuWrapperComponent {}

@@ -1,13 +1,29 @@
 {
   "name": "ng-diagram",
-  "version": "0.0.10",
+  "version": "0.4.0-beta.3",
+  "description": "A robust Angular library for building interactive diagrams, node-based editors, and visual programming interfaces",
+  "keywords": [
+    "angular",
+    "node-based UI",
+    "graph",
+    "diagram",
+    "workflow",
+    "flow",
+    "flowchart",
+    "ngdiagram"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/synergycodes/ng-diagram.git"
+  },
+  "homepage": "https://www.ngdiagram.dev/docs",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./fesm2022/ng-diagram.mjs",
   "types": "./index.d.ts",
   "peerDependencies": {
-    "@angular/common": ">=18.0.0",
-    "@angular/core": ">=18.0.0",
-    "@angularflow/core": "workspace:*"
+    "@angular/common": ">=19.0.0",
+    "@angular/core": ">=19.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

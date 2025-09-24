@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Point } from '@angularflow/core';
+import { Point } from '../../../core/src';
 
 export interface CursorPosition extends Point {
   timestamp: number;

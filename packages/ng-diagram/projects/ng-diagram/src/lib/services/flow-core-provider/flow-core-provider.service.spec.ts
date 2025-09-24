@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { FlowCore, Middleware, ModelAdapter } from '@angularflow/core';
+import { FlowCore, Middleware, ModelAdapter } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { detectEnvironment } from '../../utils/detect-environment';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
@@ -20,7 +20,7 @@ describe('FlowCoreProviderService', () => {
     getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} }),
     updateNodes: vi.fn(),
     updateEdges: vi.fn(),
-    setMetadata: vi.fn(),
+    updateMetadata: vi.fn(),
     onChange: vi.fn(),
     unregisterOnChange: vi.fn(),
     undo: vi.fn(),

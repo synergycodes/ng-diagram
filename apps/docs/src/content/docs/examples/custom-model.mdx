@@ -1,0 +1,41 @@
+---
+title: Custom Model
+description: Example of how to create a custom model implementation in ngDiagram
+sidebar:
+  order: 3
+---
+
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import CustomModel from '../../../components/angular/examples/custom-model/custom-model.astro';
+
+This example demonstrates how to create a custom model implementation that persists data directly to localStorage, providing automatic persistence without keeping local copies in memory.
+
+## Custom Model Overview
+
+The `NgDiagramComponent` accepts any object that implements the `ModelAdapter` interface, which means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by `initializeModel`. This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
+
+### Key Features
+
+- **Direct localStorage Persistence**: All data is read from and written directly to localStorage
+- **Single Source of Truth**: No local copies of data are maintained in memory
+- **Automatic Synchronization**: Changes are immediately persisted
+- **Error Handling**: Robust error handling for storage operations
+
+## Implementation Details
+
+### Understanding the ModelAdapter Interface
+
+The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/other/modeladapter/). The key methods include:
+
+- **Data access**: `getNodes`, `getEdges`, `getMetadata`
+- **Data modification**: `updateNodes`, `updateEdges`, `updateMetadata`
+- **Change notification**: `onChange`, `unregisterOnChange`
+- **Lifecycle management**: `destroy`, `undo`, `redo`, `toJSON`
+
+### LocalStorageModelAdapter Implementation
+
+This example demonstrates a custom model adapter that persists diagram data to localStorage. The data will survive page refreshes and browser sessions. You can try it by adding nodes and edges, then refreshing the page to see that your changes are retained.
+
+<CustomModel />
+
+<ExampleViewer dirName="custom-model" />

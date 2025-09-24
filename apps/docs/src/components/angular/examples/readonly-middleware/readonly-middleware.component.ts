@@ -1,6 +1,6 @@
 import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgDiagramContextComponent } from 'ng-diagram';
+import { provideNgDiagram } from 'ng-diagram';
 import { ReadonlyMiddlewareInnerComponent } from './readonly-middleware-inner.component';
 
 /**
@@ -8,13 +8,10 @@ import { ReadonlyMiddlewareInnerComponent } from './readonly-middleware-inner.co
  */
 @Component({
   selector: 'readonly-middleware',
-  imports: [NgDiagramContextComponent, ReadonlyMiddlewareInnerComponent],
+  imports: [ReadonlyMiddlewareInnerComponent],
+  providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <ng-diagram-context>
-      <readonly-middleware-inner />
-    </ng-diagram-context>
-  `,
+  template: ` <readonly-middleware-inner /> `,
   styleUrl: './readonly-middleware.component.scss',
 })
 export class ReadonlyMiddlewareComponent {}

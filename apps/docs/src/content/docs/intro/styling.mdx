@@ -7,7 +7,17 @@ sidebar:
 
 import { Aside } from '@astrojs/starlight/components';
 
-ngDiagram provides a well-structured design system with a clear separation of concerns. Its styling is based on a minimal yet sufficient set of primitives, tokens, and component-level variables that support consistent theming and easy customization across all library components.
+<Aside type="note">
+  If you want to get started quickly, you can skip the detailed customization sections below. The default styling works
+  out of the box and provides a professional appearance without any additional configuration.
+</Aside>
+
+<Aside type="caution" title="Important">
+  This library relies on **global CSS variables**. Make sure the stylesheet is imported in your **global** styles file
+  (e.g. `src/styles.scss`) as shown in the [Quick Start](/docs/intro/quick-start).
+</Aside>
+
+ngDiagram provides a **default** well-structured design system with a clear separation of concerns. Its styling is based on a minimal yet sufficient set of primitives, tokens, and component-level variables that support consistent theming and easy customization across all library components.
 
 In addition to the design system, the library includes components, directives, and CSS classes to help you build consistent and interactive diagram interfaces.
 
@@ -76,7 +86,7 @@ Component-specific CSS variables that use tokens for consistent styling:
 
 ### Default Themes
 
-ngDiagram supports both light and dark themes out of the box:
+ngDiagram supports both light and dark themes **out of the box by default**:
 
 - **Light theme** - Applied by default (no HTML attribute needed)
 - **Dark theme** - Applied when `data-theme="dark"` is set on the `html` element
@@ -89,6 +99,8 @@ ngDiagram supports both light and dark themes out of the box:
 ```
 
 ### Customization
+
+> **Note:** The following customization options are **optional**.
 
 #### Global Color Override
 

@@ -1,90 +1,278 @@
 ---
 title: Overview
-description: Understanding the what is ngDiagram
+description: Essential concepts of ngDiagram - understand the library without diving deep into documentation
 sidebar:
-  order: 1
+  order: 2
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-## What is ngDiagram?
+A comprehensive overview of ngDiagram's core concepts, helping you understand the library's capabilities without reading the entire documentation.
 
-ngDiagram is a powerful diagramming library for Angular applications that enables you to create interactive diagrams, node-based editors, and visual programming interfaces.
+## Creating Your First Diagram
 
-### What You Can Build
+The simplest way to start is by installing the library, importing the required styles, and creating a component with the `NgDiagramComponent` and `provideNgDiagram()` in its providers. The diagram component needs a model with nodes and edges to display.
 
-With ngDiagram, you can create:
+➡️ [Quick Start Guide](/docs/intro/quick-start) for step-by-step setup
 
-- **Flow Diagrams**: Process flows, decision trees, and workflow visualizations
-- **Node-Based Editors**: Visual programming interfaces and data flow editors
-- **Network Diagrams**: System architectures and network topologies
-- **Mind Maps**: Hierarchical information structures and brainstorming tools
-- **Circuit Diagrams**: Electronic schematics and technical drawings
-- **Custom Visualizations**: Any diagram type with custom node and edge templates
+## Model and Data Management
 
-### Key Features
+ngDiagram uses a reactive model to manage diagram state. You initialize the model with nodes and edges, each having required properties like ID and position. The model is the single source of truth for your diagram's data.
 
-ngDiagram provides a complete toolkit for creating interactive diagrams with:
+**Key concepts:**
 
-- **Interactive Elements**: Draggable, resizable, and rotatable nodes with smooth animations
-- **Customizable Connections**: Customizable edges with various routing options (polyline, curved, orthogonal)
-- **Consistent Styling**: Built-in design system with CSS variables and themes for consistent styling across your diagrams. More details can be found in the [Styling](../styling) section
-- **Groups**: Containers for other nodes that can be moved together, with automatic sizing based on their contents
-- **Extensible Architecture**: Plugin-based system for custom behaviors and business logic
-- **Reactive State Management**: Built on Angular signals for optimal performance and real-time updates
-- **Type Safety**: Full TypeScript support with generic templates for compile-time error checking
+- Initialize model with `initializeModel()`
+- Nodes require: `id`, `position`, `data`
+- Edges require: `id`, `source`, `target`, `sourcePort`, `targetPort`, `data`
+- Custom properties can be stored in the `data` field of nodes and edges
+- Use `metadata` for diagram-level custom information
 
-## Understanding Diagram Elements
+You can also implement custom model adapters to connect to external data sources like databases or real-time services.
 
-Before diving into the technical architecture, let's understand the fundamental elements that make up any diagram:
+➡️ [State Management](/docs/internals/state-management) | [Custom Model Example](/docs/examples/custom-model)
 
-### Nodes
+<Aside type="caution">
+  Never modify nodes or edges directly. Always use services to update the model to maintain reactivity.
+</Aside>
 
-Nodes are the primary visual elements in your diagram. They represent entities, processes, or data points in your system.
+## Service Isolation and Multiple Instances
 
-**Key Concepts:**
+Every diagram requires `provideNgDiagram()` in its component's providers array, which supplies all necessary services with proper scope isolation. This architecture allows you to have multiple independent diagrams on the same page, each with its own state and services.
 
-- **Visual Representation**: Each node has a position, size, and visual appearance
-- **Data Container**: Nodes can store custom data for your application logic
-- **Interactive Behavior**: Nodes can be draggable, resizable, rotatable, and selectable
-- **Grouping**: Nodes can be organized into groups for better visual organization
-- **Templates**: Custom visual representations for different node types - Angular component are used as node templates, enabling rich, dynamic content and interaction
+**Benefits:**
 
-<LinkCard title="Nodes" href="/docs/internals/nodes/nodes" description="Read more about nodes" />
+- Isolated service instances per diagram
+- Independent state management
+- Multiple diagrams on one page
+- No conflicts between instances
 
-### Ports
+➡️ [Architecture Documentation](/docs/intro/architecture)
 
-Ports are connection points on nodes where edges can start or end. They provide structured connection points and enable validation.
+## Nodes - Building Blocks
 
-**Key Concepts:**
+ngDiagram provides default nodes that work out of the box with built-in features like selection, dragging, and ports. Default nodes display a label and have standard connection points.
 
-- **Connection Points**: Ports define where edges can connect on a node
-- **Positioning**: Ports can be placed on any side of a node (left, right, top, bottom), by default in the middle of the edge. They can also be precisely positioned using CSS properties like top, left, bottom or right.
+**Default node features:**
 
-<LinkCard title="Ports" href="/docs/internals/nodes/ports" description="Read more about ports" />
+- Automatic rendering with label (shows node data label or falls back to node ID)
+- Built-in selection and hover states
+- Drag to reposition
+- Two bidirectional connection ports (left and right)
+- Optional resize handles (when `resizable` is set on the node)
+- Optional rotation handle (when `rotatable` is set on the node)
+- Automatic port hover indicators
+- Automatic sizing by default (`autoSize: true`) - nodes resize to fit their content
 
-### Edges
+<Aside type="note">
+  To set a manual size for nodes, you must explicitly set `autoSize: false` along with the `size` property. Without
+  this, the size property will be overridden by the automatic sizing behavior.
+</Aside>
 
-Edges connect nodes and represent relationships, data flow, or dependencies between elements.
+For specific requirements, you can create custom nodes with any Angular template, form controls, or visual elements you need.
 
-**Key Concepts:**
+➡️ [Nodes Documentation](/docs/internals/nodes/nodes) | [Custom Nodes](/docs/internals/nodes/custom-nodes)
 
-- **Connection Points**: Edges connect from one node to another
-- **Routing**: Edges can follow different paths (polyline, curved, orthogonal)
-- **Ports**: Edges can connect to specific connection points on nodes
-- **Styling**: Custom visual appearance with colors, line styles, and arrows
-- **Validation**: Connection rules can be enforced during edge creation
+## Groups - Organizing Nodes
 
-<LinkCard title="Edges" href="/docs/internals/edges/edges" description="Read more about edges" />
+Groups are special nodes that can contain other nodes, helping organize complex diagrams into logical sections. They support nesting and group-aware interactions.
 
-### Viewport
+**Group capabilities:**
 
-The viewport is the working space where all diagram interactions happen. It represents the visible area of the diagram and can be manipulated by the user.
+- Container for other nodes
+- Nested groups support
+- Visual hierarchy
+- Group-aware dragging
 
-**Key Concepts:**
+➡️ [Groups Documentation](/docs/internals/nodes/groups)
 
-- **Working Area**: The viewport is where all nodes, edges, and interactions take place
-- **Zoom Control**: Users can zoom in to see details or zoom out for an overview
-- **Panning**: The viewport can be moved around to navigate different areas of the diagram
-- **Coordinate System**: All elements are positioned relative to the viewport's coordinate system
-- **Responsive**: The viewport adapts to different screen sizes and orientations
+## Edges - Connections
+
+Edges connect nodes through ports. Default edges automatically calculate paths between nodes and support different routing algorithms. Like nodes, you can create custom edge templates for specialized visualizations.
+
+**Edge features:**
+
+- Automatic path calculation
+- Three routing modes (orthogonal, straight, bezier)
+- Custom edge templates
+- Selection and hover states
+
+➡️ [Edges Documentation](/docs/internals/edges/edges) | [Custom Edges](/docs/internals/edges/custom-edges)
+
+## Ports - Connection Points
+
+Ports define where edges can connect to nodes. Default nodes have two ports (left and right), but you can define custom ports with specific positions and connection rules in custom node templates.
+
+**Port system:**
+
+- Default ports: `port-left`, `port-right` (bidirectional)
+- Four possible sides: `top`, `right`, `bottom`, `left`
+- Three connection types: `source` (outgoing only), `target` (incoming only), `both` (bidirectional)
+- Custom port positions and IDs in custom node templates
+- Visual hover indicators when dragging connections
+
+➡️ [Ports Documentation](/docs/internals/nodes/ports)
+
+## Viewport - Working Area
+
+The viewport is the interactive space where all diagram elements are rendered and manipulated. It determines what part of the diagram is visible and supports navigation and scaling.
+
+**Viewport features:**
+
+- Zoom in/out for detail or overview
+- Pan to navigate large diagrams
+- All elements are positioned relative to the viewport's coordinate system
+
+➡️ [Viewport Features](/docs/intro/coordinate-system/#viewport-and-scaling)
+
+## Labels and Arrowheads
+
+Custom edges can display labels for showing information along connections. You can add multiple labels with different positions in your custom edge templates. Arrowheads are customizable using SVG markers.
+
+**Visual enhancements:**
+
+- Edge labels in custom edges
+- Multiple labels per edge
+- Custom arrowhead designs
+- SVG-based customization for arrowheads
+
+➡️ [Labels Documentation](/docs/internals/edges/labels) | [Arrowheads](/docs/internals/edges/arrowheads)
+
+## Interactions - Resize, Rotate, Selection
+
+Nodes can be configured for different interaction modes. Enable resizing to allow users to change node dimensions, rotation for angular adjustments. Selection state is tracked automatically, but custom components need to implement visual feedback.
+
+**Interaction options:**
+
+- **Resizable**: Enable resize handles on nodes by setting `resizable: true`
+- **Rotatable**: Enable rotation handle on nodes by setting `rotatable: true`
+- **Selection**: Click to select nodes and edges
+  - Custom nodes: Use `NgDiagramNodeSelectedDirective` as hostDirective for selection styles
+  - Custom edges: Use `NgDiagramBaseEdgeComponent` or implement selection styles manually
+  - Default templates have selection styles built-in
+
+➡️ [Selection](/docs/internals/nodes/selection) | [Resizing](/docs/internals/nodes/resizing) | [Rotation](/docs/internals/nodes/rotation)
+
+## Configuration
+
+Most diagram behavior is configurable through the config object passed to the diagram component.
+
+**Configurable aspects:**
+
+- `background` - Background dot grid size
+- `computeEdgeId` - Function to generate unique edge IDs
+- `computeNodeId` - Function to generate unique node IDs
+- `debugMode` - Enable additional console logging
+- `edgeRouting` - Default routing algorithm (orthogonal, bezier, polyline) and routing-specific settings
+- `grouping` - Rules for which nodes can be grouped together
+- `linking` - Edge creation validation, snap distance, and custom edge builders
+- `nodeRotation` - Rotation snapping angles
+- `resize` - Minimum node size constraints
+- `selectionMoving` - Edge panning behavior when dragging near viewport edges
+- `snapping` - Grid snapping for dragging and resizing with customizable snap points
+- `zIndex` - Layer management for selected elements and edge-node relationships
+- `zoom` - Min/max zoom levels and zoom step
+
+## Services - Programmatic Control
+
+ngDiagram provides injectable services for all diagram operations. Services are the only way to safely update the model and control diagram behavior programmatically.
+
+**Core services:**
+
+- **NgDiagramService** - diagram API access (config, events, transactions, middleware, routing)
+- **NgDiagramModelService** - CRUD operations for nodes, edges, and metadata
+- **NgDiagramViewportService** - Control zoom, pan, and viewport positioning
+- **NgDiagramSelectionService** - Manage selection state for nodes and edges
+- **NgDiagramNodeService** - Node-specific operations (move, resize, rotate)
+- **NgDiagramGroupsService** - Group/ungroup nodes and manage group hierarchies
+- **NgDiagramClipboardService** - Copy/paste/cut operations for diagram elements
+
+Services use Angular signals for reactive state management, making it easy to build reactive UI components.
+
+➡️ [Services Documentation](/docs/intro/services)
+
+## Events
+
+The diagram emits events for user interactions and state changes. Subscribe to these events to react to user actions or synchronize with external systems.
+
+**Available events:**
+
+- `diagramInit` - Fired when diagram is fully initialized with all nodes and edges measured
+- `selectionChanged` - Fired when nodes/edges are selected or deselected
+- `selectionMoved` - Fired when selected nodes are moved (dragged)
+- `viewportChanged` - Fired when viewport is panned or zoomed
+- `edgeDrawn` - Fired when user manually creates an edge by dragging between nodes
+
+Events can be subscribed to via `@Output` bindings on the `ng-diagram` component or programmatically through `NgDiagramService.addEventListener()`.
+
+## Edge Routing
+
+Edges support multiple routing algorithms for different visual styles. You can control how edges are drawn between nodes using both automatic and manual approaches.
+
+**Built-in routing algorithms:**
+
+- **Orthogonal** - Right-angle paths between nodes
+- **Polyline** - Straight line segments between points
+- **Bezier** - Smooth curved connections with control points
+
+**Routing modes:**
+
+- **Auto mode** (`routingMode: 'auto'`) - Algorithm automatically calculates the path between nodes
+- **Manual mode** (`routingMode: 'manual'`) - You provide custom waypoints in the `points` array, algorithm renders the path through your points
+
+Set routing per edge with the `routing` property, or globally through configuration with `edgeRouting.defaultRouting`. For complete custom routing algorithms, use `NgDiagramService.registerRouting()`.
+
+➡️ [Routing Documentation](/docs/internals/edges/routing)
+
+## Palette - Drag to Create
+
+The palette system enables drag-and-drop node creation. Build your own palette container using the provided components to let users drag items onto the diagram.
+
+**Palette components:**
+
+- `NgDiagramPaletteItemComponent` - Wrapper for draggable palette items
+- `NgDiagramPaletteItemPreviewComponent` - Live preview shown while dragging
+
+**Palette features:**
+
+- Drag-and-drop to create nodes at drop location
+- Custom item templates and preview templates
+- Support for creating both regular nodes and group nodes
+- Visual feedback with live preview during drag
+
+➡️ [Palette Documentation](/docs/internals/palette) | [Palette Example](/docs/examples/custom-node)
+
+## Custom Middlewares
+
+ngDiagram uses a middleware system that allows you to intercept and modify any state changes. Register custom middleware via `NgDiagramService.registerMiddleware()` to override any aspect of the application and create low-level features.
+
+**Middleware capabilities:**
+
+- Intercept all state updates before they're applied
+- Modify or cancel operations
+- Add custom side effects
+- Implement complex business logic
+- Create custom behaviors and constraints
+
+<Aside type="caution">
+  Use middlewares carefully - poorly implemented middleware can break core functionality and severely impact
+  performance. Always test thoroughly and ensure your middleware properly passes through unhandled operations.
+</Aside>
+
+➡️ [Middleware Documentation](/docs/internals/middlewares)
+
+## Styling System
+
+ngDiagram provides a comprehensive CSS variable system for theming and customization. You can override colors, borders, and other visual properties to match your application's design.
+
+➡️ [Styling Guide](/docs/intro/styling)
+
+## Next Steps
+
+Now that you understand the core concepts:
+
+1. [Follow the Quick Start](/docs/intro/quick-start) to build your first diagram
+2. [Explore Examples](/docs/examples/custom-node) to see implementations
+3. [Read Architecture](/docs/intro/architecture) for deeper understanding
+4. [Master Services](/docs/intro/services) for programmatic control
+
+Each section of this overview links to detailed documentation where you can find code examples and comprehensive guides.

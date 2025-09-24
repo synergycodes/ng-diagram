@@ -1,4 +1,4 @@
-# Z-Order in AngularFlow
+# Z-Order in ng-diagram
 
 ## Context
 
@@ -8,7 +8,7 @@ Some nodes or edges need to appear above or below other nodes and edges based on
 ## Decision
 
 `zOrder` property has been added to `Node` and `Edge` interfaces which is an integer that can hold positive or negative values.
-Two primary commands to handle z-ordering in AngularFlow have been implemented:
+Two primary commands to handle z-ordering in ng-diagram have been implemented:
 
 1. `bringToFront`: Moves provided or selected nodes and edges to the front of the visual stack
 2. `sendToBack`: Moves provided or selected nodes and edges to the back of the visual stack

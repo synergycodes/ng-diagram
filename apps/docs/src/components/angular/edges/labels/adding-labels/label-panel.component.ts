@@ -1,14 +1,10 @@
 import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  NgDiagramComponent,
-  NgDiagramContextComponent,
-  NgDiagramModelService,
-} from 'ng-diagram';
+import { NgDiagramModelService } from 'ng-diagram';
 
 @Component({
   selector: 'label-panel',
-  imports: [NgDiagramContextComponent, NgDiagramComponent, FormsModule],
+  imports: [FormsModule],
   template: `
     @if (isEdgeSelected()) {
       <input [(ngModel)]="label" />

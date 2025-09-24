@@ -1,8 +1,21 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, Metadata, Node, Port } from '@angularflow/core';
+import { Edge, Metadata, Node, Point, Port } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
+/**
+ * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+ *
+ * ## Example usage
+ * ```typescript
+ * private modelService = inject(NgDiagramModelService);
+ *
+ * // Add nodes
+ * this.modelService.addNodes([node1, node2]);
+ * ```
+ *
+ * @category Services
+ */
 @Injectable()
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
   private readonly diagramService = inject(NgDiagramService);
@@ -11,9 +24,20 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   private _edges = signal<Edge[]>([]);
   private _metadata = signal<Metadata>({ viewport: { x: 0, y: 0, scale: 1 } });
 
-  nodes = this._nodes.asReadonly();
-  edges = this._edges.asReadonly();
-  metadata = this._metadata.asReadonly();
+  /**
+   * Readonly signal of current nodes in the diagram.
+   */
+  readonly nodes = this._nodes.asReadonly();
+
+  /**
+   * Readonly signal of current edges in the diagram.
+   */
+  readonly edges = this._edges.asReadonly();
+
+  /**
+   * Readonly signal of current diagram metadata.
+   */
+  readonly metadata = this._metadata.asReadonly();
 
   constructor() {
     super();
@@ -24,6 +48,7 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     });
   }
 
+  /** @internal */
   ngOnDestroy(): void {
     try {
       this.flowCore.model.unregisterOnChange(this.modelListener);
@@ -37,13 +62,17 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   // ===================
 
   /**
-   * Returns the current model that NgDiagram instance is using
-   * Returns null if flowCore is not initialized
+   * Returns the current model that NgDiagram instance is using.
+   * Returns null if flowCore is not initialized.
    */
   getModel() {
     return this.flowCore.model;
   }
 
+  /**
+   * Serializes the current model to a JSON string.
+   * @returns The model as a JSON string.
+   */
   toJSON(): string {
     return this.flowCore.model.toJSON();
   }
@@ -73,50 +102,50 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   // ===================
 
   /**
-   * Gets an edge by id
-   * @param edgeId Edge id
-   * @returns Edge
+   * Gets an edge by id.
+   * @param edgeId Edge id.
+   * @returns Edge or null if not found.
    */
   getEdgeById(edgeId: string): Edge | null {
     return this.flowCore.getEdgeById(edgeId) || null;
   }
 
   /**
-   * Gets the nearest node in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Nearest node in range or null
+   * Gets the nearest node in a range from a point.
+   * @param point Point to check from.
+   * @param range Range to check in.
+   * @returns Nearest node in range or null.
    */
-  getNearestNodeInRange(point: { x: number; y: number }, range: number): Node | null {
+  getNearestNodeInRange(point: Point, range: number): Node | null {
     return this.flowCore.getNearestNodeInRange(point, range) || null;
   }
 
   /**
-   * Gets the nearest port in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Nearest port in range or null
+   * Gets the nearest port in a range from a point.
+   * @param point Point to check from.
+   * @param range Range to check in.
+   * @returns Nearest port in range or null.
    */
-  getNearestPortInRange(point: { x: number; y: number }, range: number): Port | null {
+  getNearestPortInRange(point: Point, range: number): Port | null {
     return this.flowCore.getNearestPortInRange(point, range) || null;
   }
 
   /**
-   * Gets a node by id
-   * @param nodeId Node id
-   * @returns Node
+   * Gets a node by id.
+   * @param nodeId Node id.
+   * @returns Node or null if not found.
    */
   getNodeById(nodeId: string): Node | null {
     return this.flowCore.getNodeById(nodeId);
   }
 
   /**
-   * Gets all nodes in a range from a point
-   * @param point Point to check from
-   * @param range Range to check in
-   * @returns Array of nodes in range
+   * Gets all nodes in a range from a point.
+   * @param point Point to check from.
+   * @param range Range to check in.
+   * @returns Array of nodes in range.
    */
-  getNodesInRange(point: { x: number; y: number }, range: number): Node[] {
+  getNodesInRange(point: Point, range: number): Node[] {
     return this.flowCore.getNodesInRange(point, range);
   }
 
@@ -125,9 +154,9 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   // ===================
 
   /**
-   * Updates the properties of an edge
-   * @param edgeId Edge id
-   * @param edge New edge properties
+   * Updates the properties of an edge.
+   * @param edgeId Edge id.
+   * @param edge New edge properties.
    */
   updateEdge(edgeId: string, edge: Partial<Edge>) {
     this.flowCore.commandHandler.emit('updateEdge', {
@@ -137,9 +166,9 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Updates the data of an edge
-   * @param edgeId Edge id
-   * @param data New data to set for the edge (can be strongly typed)
+   * Updates the data of an edge.
+   * @param edgeId Edge id.
+   * @param data New data to set for the edge (can be strongly typed).
    */
   updateEdgeData<T extends Record<string, unknown> | undefined>(edgeId: string, data: T) {
     this.flowCore.commandHandler.emit('updateEdge', {
@@ -151,9 +180,9 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Updates the properties of a node
-   * @param nodeId Node id
-   * @param node New node properties
+   * Updates the properties of a node.
+   * @param nodeId Node id.
+   * @param node New node properties.
    */
   updateNode(nodeId: string, node: Partial<Node>) {
     this.flowCore.commandHandler.emit('updateNode', {
@@ -163,9 +192,9 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Updates the data of a node
-   * @param nodeId Node id
-   * @param data New data to set for the node (can be strongly typed)
+   * Updates the data of a node.
+   * @param nodeId Node id.
+   * @param data New data to set for the node (can be strongly typed).
    */
   updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T) {
     this.flowCore.commandHandler.emit('updateNode', {

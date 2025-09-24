@@ -4,17 +4,17 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 import { CoordinatesPreview } from './coordinates-preview.component';
 
 @Component({
-  imports: [NgDiagramContextComponent, NgDiagramComponent, CoordinatesPreview],
+  imports: [NgDiagramComponent, CoordinatesPreview],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <ng-diagram [model]="model" />
-      <coordinates-preview />
-    </ng-diagram-context>
+    <ng-diagram [model]="model" [config]="config" />
+    <coordinates-preview />
   `,
   styles: `
     :host {
@@ -29,6 +29,11 @@ import { CoordinatesPreview } from './coordinates-preview.component';
   `,
 })
 export class NgDiagramComponentContainer {
+  config: NgDiagramConfig = {
+    snapping: {
+      shouldSnapResizeForNode: () => false,
+    },
+  };
   model = initializeModel({
     metadata: {
       viewport: {
@@ -48,9 +53,11 @@ export class NgDiagramComponentContainer {
       {
         id: '3',
         isGroup: true,
-        position: { x: 390, y: 100 },
-        size: { width: 220, height: 140 },
+        position: { x: 370, y: 80 },
+        size: { width: 260, height: 186 },
+        autoSize: false,
         data: {},
+        resizable: true,
       },
     ],
     edges: [],

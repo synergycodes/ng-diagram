@@ -40,7 +40,7 @@ import Routing from '@components/angular/edges/routing/routing.astro';
 
 To specify a routing algorithm for an edge, set the `routing` property in the edge data:
 
-<CodeSnippet relativePath="edges/routing/diagram.component.ts" collapse={['1-62']} mark={[70, 80, 90]} />
+<CodeSnippet relativePath="edges/routing/diagram.component.ts" collapse={['1-60']} mark={[68, 78, 88]} />
 
 When no routing is specified, the default routing algorithm (polyline) is used. The default can be changed through configuration.
 
@@ -85,9 +85,9 @@ import ManualMode from '@components/angular/edges/routing/manual-mode.astro';
 
 <CodeSnippet
   relativePath="edges/routing/manual-mode-diagram.component.ts"
-  range={[26, 66]}
-  collapse={['3-19']}
-  mark={[28, { range: '29-36' }]}
+  range={[23, 63]}
+  collapse={['2-18']}
+  mark={[{ range: '26-35' }]}
 />
 
 This is useful for creating custom edge behaviors, fixed connection paths, or implementing your own edge update logic.
@@ -98,8 +98,8 @@ You can configure routing behavior globally through the diagram's configuration:
 
 <CodeSnippet
   relativePath="edges/routing/configured-diagram.component.ts"
-  collapse={['1-27', '40-83']}
-  mark={[{ range: '29-38' }]}
+  collapse={['1-22', '36-79']}
+  mark={[{ range: '25-34' }]}
 />
 
 ## Custom Routing Algorithms
@@ -117,7 +117,7 @@ import Sinusoid from '@components/angular/edges/routing/sinusoid.astro';
 <CodeSnippet
   relativePath="edges/routing/sinusoid-edge.component.ts"
   collapse={['1-8', '39-88']}
-  mark={[11, 29, { range: '32-37' }]}
+  mark={[11, 30, { range: '32-37' }]}
 />
 
 This approach is ideal when you want the path to update automatically based on node positions and when you just need to compute points - the SVG path can be computed by a built-in routing algorithm (in this case, polyline was sufficient).
@@ -127,7 +127,7 @@ This approach is ideal when you want the path to update automatically based on n
 For more control and reusability across different edge types, you can create a custom routing algorithm by implementing the `EdgeRouting` interface:
 
 ```typescript
-import { EdgeRouting, EdgeRoutingContext, Point } from '@angularflow/core';
+import { EdgeRouting, EdgeRoutingContext, Point } from 'ng-diagram';
 
 export class CustomRouting implements EdgeRouting {
   name = 'custom';

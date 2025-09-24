@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Port } from '@angularflow/core';
+import { Port } from '../../../core/src';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 

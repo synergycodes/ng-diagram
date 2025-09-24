@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
-  NgDiagramContextComponent,
+  provideNgDiagram,
   type NgDiagramConfig,
   type NgDiagramNodeTemplateMap,
   type Node,
@@ -13,17 +13,16 @@ import { CustomNodeComponent } from './node.component';
 
 @Component({
   selector: 'resizing',
-  imports: [NgDiagramComponent, NgDiagramContextComponent],
+  imports: [NgDiagramComponent],
+  providers: [provideNgDiagram()],
   template: `
-    <ng-diagram-context>
-      <div class="not-content diagram">
-        <ng-diagram
-          [model]="model"
-          [config]="config"
-          [nodeTemplateMap]="nodeTemplateMap"
-        />
-      </div>
-    </ng-diagram-context>
+    <div class="not-content diagram">
+      <ng-diagram
+        [model]="model"
+        [config]="config"
+        [nodeTemplateMap]="nodeTemplateMap"
+      />
+    </div>
   `,
   styleUrls: ['./resizing-wrapper.component.scss'],
 })

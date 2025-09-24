@@ -10,10 +10,25 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { EdgeLabel } from '@angularflow/core';
+import { EdgeLabel } from '../../../core/src';
 import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
 import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 
+/**
+ * The `BaseEdgeLabelComponent` is responsible for displaying a label at a specific position along an edge.
+ *
+ * ## Example usage
+ * ```html
+ * <ng-diagram-base-edge-label
+ *   [id]="labelId"
+ *   [positionOnEdge]="0.5"
+ * >
+ *   <!-- Any label content here (text, icon, button) -->
+ * </ng-diagram-base-edge-label>
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-base-edge-label',
   templateUrl: './base-edge-label.component.html',
@@ -30,23 +45,28 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly edgeComponent = inject(NgDiagramBaseEdgeComponent);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
 
+  /**
+   * The unique identifier for the edge label.
+   */
   id = input.required<EdgeLabel['id']>();
+
+  /**
+   * The relative position of the label along the edge (from 0 to 1).
+   */
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
 
-  edgeData = computed(() => this.edgeComponent.edge());
-
-  points = computed(() => this.edgeData()?.points);
-  edgeId = computed(() => this.edgeData()?.id);
-  position = computed(() => {
+  readonly edgeData = computed(() => this.edgeComponent.edge());
+  readonly points = computed(() => this.edgeData()?.points);
+  readonly edgeId = computed(() => this.edgeData()?.id);
+  readonly position = computed(() => {
     const edgeData = this.edgeData();
     const labelData = edgeData?.measuredLabels?.find((label) => label.id === this.id());
-
     return labelData?.position || { x: 0, y: 0 };
   });
 
   // Hide label when it doesn't have a valid position or edge has no points
   // (prevents initial "blinking")
-  isVisible = computed(() => {
+  readonly isVisible = computed(() => {
     const edgeData = this.edgeData();
     if (!edgeData) return false;
 
@@ -79,6 +99,7 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** @internal */
   ngOnInit() {
     this.lastPositionOnEdge.set(this.positionOnEdge());
     this.flowCoreProvider.provide().updater.addEdgeLabel(this.edgeId(), {
@@ -93,6 +114,7 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** @internal */
   ngOnDestroy(): void {
     this.flowCoreProvider.provide().commandHandler.emit('deleteEdgeLabels', {
       edgeId: this.edgeId(),

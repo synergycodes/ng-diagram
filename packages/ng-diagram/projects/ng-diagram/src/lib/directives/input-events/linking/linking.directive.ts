@@ -1,12 +1,9 @@
 import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { Node } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';
 
-/**
- * @category Directives
- */
 @Directive({
   selector: '[ngDiagramLinkingInput]',
   host: {

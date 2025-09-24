@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Middleware, ModelAdapter } from '@angularflow/core';
+import { Middleware, ModelAdapter } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -22,7 +22,7 @@ describe('AngularAdapterDiagramComponent', () => {
     getMetadata: vi.fn(() => ({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} })),
     updateNodes: vi.fn(),
     updateEdges: vi.fn(),
-    setMetadata: vi.fn(),
+    updateMetadata: vi.fn(),
     onChange: vi.fn(),
     unregisterOnChange: vi.fn(),
     undo: vi.fn(),

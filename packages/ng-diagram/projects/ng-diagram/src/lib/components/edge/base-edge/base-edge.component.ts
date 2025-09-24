@@ -1,15 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, Point, RoutingMode } from '@angularflow/core';
+import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
 
 /**
  * Base edge component that handles edge rendering.
- *
- * Path is determined based on edge routing mode:
- * - Auto mode (default): Path is computed from source/target positions using routing algorithm
- * - Manual mode: Path is computed from user-provided points using routing algorithm
- * The routing algorithm determines how the path is rendered (orthogonal, bezier, polyline, etc.)
+ * It can be extended or used directly to render edges in the diagram.
  * @category Components
  */
 @Component({
@@ -25,23 +21,44 @@ import { FlowCoreProviderService } from '../../../services';
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
+  /**
+   * Edge data model
+   */
   edge = input.required<Edge>();
+
+  /**
+   * Edge routing mode
+   */
   routing = input<string>();
+
+  /**
+   * Stroke color of the edge. Edge model data has precedence over this property.
+   */
   stroke = input<string>();
+
   /**
    * ID of a source <marker> element in the SVG document. Edge model data has precedence over this property.
    */
   sourceArrowhead = input<string>();
+
   /**
    * ID of a target <marker> element in the SVG document. Edge model data has precedence over this property.
    */
   targetArrowhead = input<string>();
+
+  /**
+   * Stroke opacity of the edge
+   */
   strokeOpacity = input<number>(1);
+
+  /**
+   * Stroke width of the edge
+   */
   strokeWidth = input<number>(2);
 
-  points = computed(() => this.edge().points ?? []);
+  readonly points = computed(() => this.edge().points ?? []);
 
-  path = computed(() => {
+  readonly path = computed(() => {
     const edge = this.edge();
     const routingName = this.routing() ?? edge.routing;
     const flowCore = this.flowCoreProvider.provide();
@@ -65,7 +82,7 @@ export class NgDiagramBaseEdgeComponent {
     return `M ${points[0].x},${points[0].y}`;
   });
 
-  markerStart = computed(() => {
+  readonly markerStart = computed(() => {
     const markerId = this.edge()?.sourceArrowhead ?? this.sourceArrowhead();
 
     if (!markerId) {
@@ -75,7 +92,7 @@ export class NgDiagramBaseEdgeComponent {
     return `url(#${markerId})`;
   });
 
-  markerEnd = computed(() => {
+  readonly markerEnd = computed(() => {
     const markerId = this.edge()?.targetArrowhead ?? this.targetArrowhead();
 
     if (!markerId) {
@@ -85,12 +102,12 @@ export class NgDiagramBaseEdgeComponent {
     return `url(#${markerId})`;
   });
 
-  selected = computed(() => this.edge().selected);
-  temporary = computed(() => this.edge().temporary);
+  readonly selected = computed(() => this.edge().selected);
+  readonly temporary = computed(() => this.edge().temporary);
 
-  labels = computed(() => this.edge().measuredLabels ?? []);
+  readonly labels = computed(() => this.edge().measuredLabels ?? []);
 
-  class = computed(() => {
+  readonly class = computed(() => {
     const classArray = ['ng-diagram-edge__path'];
 
     if (this.selected()) {

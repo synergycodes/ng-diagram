@@ -1,7 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Node } from '@angularflow/core';
+import { Node } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
+/**
+ * The `NgDiagramGroupsService` provides methods for managing node groups in the diagram.
+ *
+ * ## Example usage
+ * ```typescript
+ * private groupsService = inject(NgDiagramGroupsService);
+ *
+ * // Add nodes to a group
+ * this.groupsService.addToGroup('groupId', ['nodeId1', 'nodeId2']);
+ * ```
+ *
+ * @category Services
+ */
 @Injectable()
 export class NgDiagramGroupsService extends NgDiagramBaseService {
   /**

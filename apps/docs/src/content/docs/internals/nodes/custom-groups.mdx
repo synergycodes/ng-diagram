@@ -1,0 +1,89 @@
+---
+title: Custom Groups
+description: Creating and configuring custom group templates in ngDiagram
+sidebar:
+  order: 4
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+You can create custom group templates, similar to custom nodes.
+All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
+Remember that in your diagram model, the group node must have `isGroup: true` set to function as a group.
+
+```typescript {13}
+@Component({
+  selector: 'app-custom-group',
+  template: `
+    <ng-diagram-node-resize-adornment>
+      <div class="custom-group" ngDiagramNodeSelected [node]="node()">
+        <div class="header">{{ node().data.title }}</div>
+        <div>...</div>
+      </div>
+    </ng-diagram-node-resize-adornment>
+  `,
+  // ...styles and imports
+})
+export class CustomGroupComponent implements NgDiagramGroupNodeTemplate {
+  node = input.required<GroupNode>();
+}
+```
+
+Register your custom group in the `nodeTemplateMap` and assign its `type` to the group node.
+
+<LinkCard
+  icon="list-format"
+  title="Registering Custom Types"
+  href="/docs/internals/nodes/custom-nodes/#registering-custom-node-types"
+  description="Check how to register Custom Group"
+/>
+
+## Resizing Custom Group
+
+<LinkCard
+  icon="list-format"
+  title="Resizing"
+  href="/docs/internals/nodes/resizing"
+  description="Resizing Custom Group"
+/>
+
+## Highlighting Custom Group
+
+Use `NgDiagramGroupHighlightedDirective` for highlight styles.
+
+```html
+<div ngDiagramGroupHighlighted [node]="node">
+  <!-- Your Custom Group content -->
+</div>
+```
+
+## Selecting Custom Group
+
+Use `NgDiagramNodeSelectedDirective` for selection styles.
+
+```html
+<div ngDiagramNodeSelected [node]="node">
+  <!-- Your Custom Group content -->
+</div>
+```
+
+## Rotation
+
+Groups can be rotated if `rotatable: true` is set.
+However, **rotation only affects the group container**—child nodes are **not rotated** with the group.
+Children retain their global orientation and position.
+
+## See Also
+
+<LinkCard
+  icon="list-format"
+  title="Groups"
+  href="/docs/internals/nodes/groups"
+  description="Learn about default group functionality"
+/>
+<LinkCard
+  icon="list-format"
+  title="Custom Nodes"
+  href="/docs/internals/nodes/custom-nodes"
+  description="Create custom node templates"
+/>
