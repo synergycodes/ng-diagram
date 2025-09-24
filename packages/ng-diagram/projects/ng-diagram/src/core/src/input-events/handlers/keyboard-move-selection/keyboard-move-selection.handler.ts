@@ -44,7 +44,7 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
     nodes: { position: Point; size?: Size }[],
     direction: KeyboardMoveSelectionEvent['direction']
   ): boolean {
-    const threshold = this.flow.config.selectionMoving.edgePanningThreshold;
+    const threshold = this.flow.config.selectionMoving.keyboardEdgePanningThreshold;
     const metadata = this.flow.model.getMetadata();
     const { viewport } = metadata;
 
@@ -79,7 +79,7 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
   }
 
   private performEdgePan(direction: KeyboardMoveSelectionEvent['direction']): void {
-    const force = this.flow.config.selectionMoving.edgePanningForce;
+    const force = this.flow.config.selectionMoving.keyboardEdgePanningForce;
     let x = 0;
     let y = 0;
 

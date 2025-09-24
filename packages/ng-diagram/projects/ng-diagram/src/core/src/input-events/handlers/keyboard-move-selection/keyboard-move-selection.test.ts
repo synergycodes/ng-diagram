@@ -46,8 +46,8 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           defaultDragSnap: { x: 10, y: 10 },
         },
         selectionMoving: {
-          edgePanningThreshold: 10,
-          edgePanningForce: 15,
+          keyboardEdgePanningThreshold: 10,
+          keyboardEdgePanningForce: 15,
         },
       },
     } as unknown as FlowCore;
