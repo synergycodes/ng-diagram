@@ -3,4 +3,74 @@ title: Transactions
 description: Understanding how transactions work in ngDiagram
 ---
 
-TBD
+import { Aside } from '@astrojs/starlight/components';
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+
+Transactions in ngDiagram provide a mechanism for batching multiple state changes into atomic operations.
+This is particularly useful for complex operations that involve multiple nodes and edges, ensuring better performance.
+
+## Usage
+
+The transaction API is straightforward - simply wrap your operations in a callback.
+
+<Aside type="note">
+  When testing the demo example below, you can see detailed transaction logs in the browser console. This is enabled by setting `debugMode: true` in the diagram configuration:
+  ```typescript
+  config: NgDiagramConfig = {
+    debugMode: true,
+  };
+  ```
+  This is particularly useful for understanding the difference between transaction and non-transaction behavior in the interactive demo.
+</Aside>
+
+import Transactions from '@examples/transactions/transactions.astro';
+
+<Transactions />
+<ExampleViewer dirName="transactions" />
+
+<Aside type="caution">
+  **Initialization Timing**: When creating a new diagram from scratch, you must wait for the `isInitialized` flag from
+  `ngDiagramService` to become `true` before applying any changes to the model. Changes made during initialization will
+  not be applied or rendered. **This may be improved in future versions for better developer experience.**
+</Aside>
+
+## Benefits
+
+### Performance
+
+Transactions batch multiple operations together, reducing the number of state updates and re-renders. Instead of triggering change detection for each individual operation, all changes are applied at once.
+
+### Consistency
+
+All operations within a transaction succeed together, preventing partial state updates that could leave your diagram in an inconsistent state.
+
+## When to Use Transactions
+
+Use transactions for:
+
+- **Complex multi-step operations** - Creating multiple related nodes and edges
+- **Bulk operations** - Adding or updating many elements at once
+- **Performance optimization** - Reducing the number of state updates
+
+## Best Practices
+
+### Keep Transactions Focused
+
+Group related operations together, but avoid making transactions too large or complex:
+
+```typescript
+// ✅ Good - related operations grouped together
+this.ngDiagramService.transaction(() => {
+  this.modelService.addNodes([node1, node2, node3]);
+  this.modelService.addEdges([edge1, edge2]);
+});
+
+// ❌ Avoid - unrelated operations in same transaction
+this.ngDiagramService.transaction(() => {
+  this.modelService.addNodes([...]);
+  this.updateUserPreferences(); // Unrelated operation
+  this.updateDiagramName(); // Another unrelated operation
+});
+```
+
+Whether you're building simple diagrams or complex applications, transactions help ensure data consistency and optimal performance.
