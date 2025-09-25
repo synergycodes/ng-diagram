@@ -1,0 +1,226 @@
+---
+title: Roadmap to v1.0
+description: Track our progress towards the stable v1.0 release of ng-diagram
+sidebar:
+  order: 10
+---
+
+import { Card, CardGrid, Badge } from '@astrojs/starlight/components';
+
+This page tracks our progress towards ng-diagram v1.0. We're committed to delivering a stable, feature-complete library for building interactive diagrams in Angular applications.
+
+## Implementation Status
+
+<table class="roadmap-table">
+  <thead>
+    <tr>
+      <th>📋 To Do</th>
+      <th>🚧 In Progress</th>
+      <th>✅ Done</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Angular 18 Support</h4>
+          <p>Backwards compatibility for Angular 18 projects</p>
+          <Badge text="compatibility" variant="note" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>Library Stabilization</h4>
+          <p>From beta version to 1.0</p>
+          <Badge text="stability" variant="caution" size="small" />
+        </div>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Additional Events</h4>
+          <p>New hooks: model loaded, object removed, etc.</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Lookup Helpers</h4>
+          <p>Utilities like getConnectedEdges</p>
+          <Badge text="enhancement" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Default Edge Labels</h4>
+          <p>Label support for built-in edge types</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Box Selection</h4>
+          <p>Rectangular multi-select tool</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Shortcut Manager</h4>
+          <p>Centralized keyboard shortcut system</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Minimap</h4>
+          <p>Overview navigation widget</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Virtualization</h4>
+          <p>Render only visible elements</p>
+          <Badge text="performance" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Direct Node Connections</h4>
+          <p>Connect nodes without explicit ports</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Grid Background</h4>
+          <p>Configurable grid pattern background</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Context Panel</h4>
+          <p>Floating panel following nodes with custom content</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Port Labels</h4>
+          <p>Additional content for port components</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+## Stay Updated
+
+- Watch our [GitHub repository](https://github.com/synergycodes/ng-diagram) for releases
+- Join our community discussions for feature requests and feedback
+
+<style>{`
+  .roadmap-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0.5rem;
+    margin: 2rem 0;
+  }
+
+  .roadmap-table th {
+    background: var(--sl-color-gray-5);
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    border-radius: 0.5rem;
+    vertical-align: top;
+    width: 33.33%;
+  }
+
+  .roadmap-table td {
+    background: var(--sl-color-gray-6);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    vertical-align: top;
+  }
+
+  .task-card {
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .task-card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sl-color-text);
+  }
+
+  .task-card p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    color: var(--sl-color-text-accent);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 768px) {
+    .roadmap-table {
+      display: block;
+      overflow-x: auto;
+    }
+
+    .roadmap-table th {
+      min-width: 200px;
+    }
+  }
+`}</style>
