@@ -1,7 +1,6 @@
 import '@angular/compiler';
 
-import { Component, inject, Injector } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
@@ -10,7 +9,6 @@ import {
   provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
-import { filter, skip, take } from 'rxjs';
 
 @Component({
   imports: [NgDiagramComponent],
@@ -47,18 +45,13 @@ import { filter, skip, take } from 'rxjs';
 export class NgDiagramComponentContainer {
   private ngDiagramService = inject(NgDiagramService);
   private modelService = inject(NgDiagramModelService);
-  private injector = inject(Injector);
-
-  private initialModel = {
-    metadata: { viewport: { x: 130, y: 25, scale: 1 } },
-  };
 
   config: NgDiagramConfig = {
     debugMode: true,
   };
 
   model = initializeModel({
-    ...this.initialModel,
+    metadata: { viewport: { x: 130, y: 25, scale: 1 } },
     nodes: [
       {
         id: '1',
@@ -69,97 +62,52 @@ export class NgDiagramComponentContainer {
   });
 
   onTestTransactionClick() {
-    this.initializeAndCreateDiagram(true);
+    this.cleanDiagram();
+    this.ngDiagramService.transaction(() => {
+      this.createDiagram('Transaction Node');
+    });
   }
 
   onTestWithoutTransactionClick() {
-    this.initializeAndCreateDiagram(false);
+    this.cleanDiagram();
+    this.createDiagram('Non-transaction Node');
   }
 
-  private initializeAndCreateDiagram(useTransaction: boolean) {
-    this.model = initializeModel(this.initialModel, this.injector);
-
-    // Wait for initialization and then create diagram
-    toObservable(this.ngDiagramService.isInitialized, {
-      injector: this.injector,
-    })
-      .pipe(
-        filter((initialized) => initialized),
-        skip(1), // Skip the initial value (might already be true)
-        take(1) // Take only the next emission when it becomes true
-      )
-      .subscribe(() => {
-        if (useTransaction) {
-          this.ngDiagramService.transaction(() => {
-            this.createTransactionDiagram();
-          });
-        } else {
-          this.createNonTransactionDiagram();
-        }
-      });
-  }
-
-  private createTransactionDiagram() {
+  private createDiagram(nodeName: string) {
     // Transaction example: All operations are batched together
     this.modelService.addNodes([
       {
         id: '1',
         position: { x: 100, y: 100 },
-        data: { label: 'Transaction Node 1' },
+        data: { label: nodeName },
       },
       {
         id: '2',
         position: { x: 100, y: 200 },
-        data: { label: 'Transaction Node 2' },
+        data: { label: nodeName },
       },
       {
         id: '3',
         position: { x: 100, y: 300 },
-        data: { label: 'Transaction Node 3' },
+        data: { label: nodeName },
       },
     ]);
 
     // Update node data within the same transaction
     this.modelService.updateNodeData('1', {
-      label: 'Updated Transaction Node 1',
+      label: `Updated ${nodeName} 1`,
     });
     this.modelService.updateNodeData('2', {
-      label: 'Updated Transaction Node 2',
+      label: `Updated ${nodeName} 2`,
     });
     this.modelService.updateNodeData('3', {
-      label: 'Updated Transaction Node 3',
+      label: `Updated ${nodeName} 3`,
     });
   }
 
-  private createNonTransactionDiagram() {
-    // Non-transaction example: Operations are applied individually
-    this.modelService.addNodes([
-      {
-        id: '1',
-        position: { x: 100, y: 100 },
-        data: { label: 'Non-Transaction Node 1' },
-      },
-      {
-        id: '2',
-        position: { x: 100, y: 200 },
-        data: { label: 'Non-Transaction Node 2' },
-      },
-      {
-        id: '3',
-        position: { x: 100, y: 300 },
-        data: { label: 'Non-Transaction Node 3' },
-      },
-    ]);
-
-    // Update node data individually (not batched)
-    this.modelService.updateNodeData('1', {
-      label: 'Updated Non-Transaction Node 1',
-    });
-    this.modelService.updateNodeData('2', {
-      label: 'Updated Non-Transaction Node 2',
-    });
-    this.modelService.updateNodeData('3', {
-      label: 'Updated Non-Transaction Node 3',
-    });
+  private cleanDiagram() {
+    this.modelService.deleteNodes(
+      this.modelService.nodes().map((node) => node.id)
+    );
   }
 }
