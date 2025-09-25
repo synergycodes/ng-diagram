@@ -248,24 +248,8 @@ export class NgDiagramService extends NgDiagramBaseService {
    * @example
    *
    * this.ngDiagramService.transaction(() => {
-   *  this.ngDiagramModelService.addNodes([
-   *    {
-   *      id: '1',
-   *      position: { x: 100, y: 100 },
-   *      data: {
-   *        label: 'Transaction node',
-   *      },
-   *    },
-   *  ]);
-   *  this.ngDiagramModelService.addNodes([
-   *    {
-   *      id: '2',
-   *      position: { x: 100, y: 200 },
-   *      data: {
-   *        label: 'Transaction node 2',
-   *      },
-   *    },
-   *  ]);
+   *  this.ngDiagramModelService.addNodes([node1, node2]);
+   *  this.ngDiagramModelService.addEdges([edge1]);
    * });
    **/
   transaction(callback: () => void): void {
