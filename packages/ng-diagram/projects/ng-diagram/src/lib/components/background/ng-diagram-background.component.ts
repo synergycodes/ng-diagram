@@ -1,7 +1,5 @@
-import { AfterContentInit, Component, computed, ElementRef, inject, viewChild } from '@angular/core';
-import { NgDiagramViewportService } from '../../public-services/ng-diagram-viewport.service';
+import { AfterContentInit, Component, ElementRef, viewChild } from '@angular/core';
 import { DottedBackgroundComponent } from './default/dotted/dotted-background.component';
-import { LogoBackgroundComponent } from './default/logo/logo-background.component';
 
 /**
  * The `NgDiagramBackgroundComponent` is responsible for rendering the background of the diagram.
@@ -20,13 +18,11 @@ import { LogoBackgroundComponent } from './default/logo/logo-background.componen
   selector: 'ng-diagram-background',
   templateUrl: './ng-diagram-background.component.html',
   styleUrls: ['./ng-diagram-background.component.scss'],
-  imports: [LogoBackgroundComponent, DottedBackgroundComponent],
+  imports: [DottedBackgroundComponent],
 })
 export class NgDiagramBackgroundComponent implements AfterContentInit {
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
-  private readonly viewportService = inject(NgDiagramViewportService);
 
-  readonly showLogo = computed(() => this.viewportService.scale() === 2);
   protected hasContent = false;
 
   /** @internal */

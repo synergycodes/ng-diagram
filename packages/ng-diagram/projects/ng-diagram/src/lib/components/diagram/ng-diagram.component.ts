@@ -41,6 +41,7 @@ import { NgDiagramEdgeComponent } from '../edge/ng-diagram-edge.component';
 import { NgDiagramDefaultGroupTemplateComponent } from '../node/default-group-template/ng-diagram-default-group-template.component';
 import { NgDiagramDefaultNodeTemplateComponent } from '../node/default-node-template/ng-diagram-default-node-template.component';
 import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
+import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
 
 /**
  * Diagram component
@@ -57,6 +58,7 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
     NgDiagramDefaultNodeTemplateComponent,
     NgDiagramDefaultGroupTemplateComponent,
     NgDiagramEdgeComponent,
+    NgDiagramWatermarkComponent,
   ],
   templateUrl: './ng-diagram.component.html',
   styleUrl: './ng-diagram.component.scss',
