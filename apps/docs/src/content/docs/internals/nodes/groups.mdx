@@ -5,9 +5,9 @@ sidebar:
   order: 1
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import Groups from '@components/angular/nodes/groups/groups.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Groups in **ngDiagram** are containers for other nodes, allowing you to organize, move, and manage multiple nodes as a single unit.
 They are essential for structuring complex diagrams, enabling collective operations and visual grouping.
@@ -86,13 +86,19 @@ The `grouping` configuration in `NgDiagramConfig` lets you control advanced grou
   Use the `canGroup` function to control which nodes can be grouped together.
   This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
 
-```typescript {3,6}
+- **enforceGroupMinSizeToChildren:**
+  By default, groups can be resized to any size, even smaller than their children.  
+  If you want to prevent resizing a group smaller than its children (so all children always remain fully contained), set `enforceGroupMinSizeToChildren: true` in your config.  
+  When enabled, the group will always be at least as large as the bounding box of its children.
+
+```typescript {3,7}
 config = {
   resize: {
     getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
   },
   grouping: {
-    canGroup: (node: Node, group: Node) => true;
+    canGroup: (node: Node, group: Node) => true,
+    enforceGroupMinSizeToChildren: true, // Prevent group from being resized smaller than its children
   },
 };
 ```
