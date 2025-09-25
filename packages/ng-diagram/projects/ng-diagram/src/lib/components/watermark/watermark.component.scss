@@ -1,0 +1,23 @@
+:host {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: var(--watermark-size);
+
+  svg {
+    opacity: 0.7;
+    height: 100%;
+    width: 100%;
+
+    path {
+      fill: var(--watermark-fill);
+    }
+  }
+
+  :hover svg {
+    opacity: 1;
+  }
+
+  --watermark-size: min(4rem, 10%);
+  --watermark-fill: #b3b3b3;
+}
