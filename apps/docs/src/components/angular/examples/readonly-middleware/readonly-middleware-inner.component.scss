@@ -5,6 +5,15 @@
   flex: 1;
 }
 
+.diagram-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 25rem;
+  border: 5px solid var(--ngd-ui-border-default);
+  background-color: var(--ngd-ui-bg-tertiary-default);
+}
+
 .controls {
   padding: 1rem;
   background: var(--sl-color-bg-nav);
