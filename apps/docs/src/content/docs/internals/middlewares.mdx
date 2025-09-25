@@ -17,17 +17,6 @@ When any change occurs in the diagram (adding nodes, moving elements, changing s
 
 Middlewares execute in sequence, with each middleware receiving the output of the previous one. This creates a powerful composition system where multiple behaviors can be combined.
 
-## Built-in Middlewares
-
-ngDiagram comes with several built-in middlewares that handle common functionality:
-
-- **`zIndexMiddleware`** - Manages element layering and z-index assignment
-- **`groupChildrenChangeExtent`** - Handles group node resizing when children change
-- **`groupChildrenMoveExtent`** - Handles group node positioning when children move
-- **`treeLayoutMiddleware`** - Provides automatic tree layout functionality
-- **`edgesRoutingMiddleware`** - Handles edge routing and pathfinding
-- **`loggerMiddleware`** - Logs state changes for debugging (only in debug mode)
-
 ## Middleware API
 
 ### Middleware Interface
@@ -91,7 +80,7 @@ Then pass them to your diagram component:
   template: ` <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" /> `,
 })
 export class MyDiagramComponent {
-  middlewares = createMiddlewares((defaults) => [...defaults, myCustomMiddleware]);
+  middlewares = createMiddlewares((defaults) => [...defaults, myMiddleware]);
   // ...
 }
 ```
@@ -143,21 +132,22 @@ Here's the basic structure for a custom middleware:
 ```typescript
 import { Middleware } from 'ng-diagram';
 
-const myMiddleware: Middleware<'my-middleware'> = {
+export const myMiddleware: Middleware = {
   name: 'my-middleware',
-  execute: async (context, next, cancel) => {
-    const { state, modelActionType, helpers } = context;
+  execute: async (context, next) => {
+    const { state, modelActionType } = context;
 
     // Check if this middleware should run
     if (modelActionType !== 'updateNode') {
-      return next(); // Pass through without changes
+      next(); // Pass through without changes
+      return;
     }
 
     // Your custom logic here
     console.log('Nodes being updated:', state.nodes);
 
     // Continue to next middleware
-    await next();
+    next();
   },
 };
 ```
@@ -173,28 +163,29 @@ For a complete example of creating custom middleware, see the [Custom Middleware
 Middlewares can modify the state by passing updates to `next()`:
 
 ```typescript
-const scaleNodesMiddleware: Middleware<'scale-nodes'> = {
-  name: 'scale-nodes',
-  execute: (context, next) => {
+export const myCustomMiddleware: Middleware = {
+  name: 'rotate-middleware',
+  execute: async (context, next) => {
     const { helpers } = context;
 
+    // Check if this middleware should run
     if (!helpers.anyNodesAdded()) {
-      return next(); // No new nodes, nothing to do
+      next(); // Pass through without changes
+      return;
     }
 
-    // Scale all new nodes by 1.5x
-    const stateUpdate: FlowStateUpdate = {
+    // Rotate all new nodes and change label
+    const stateUpdate = {
       nodesToUpdate: context.state.nodes
         .filter((node) => helpers.checkIfNodeAdded(node.id))
         .map((node) => ({
           ...node,
-          size: {
-            width: node.size.width * 1.5,
-            height: node.size.height * 1.5,
-          },
+          angle: 45,
+          data: { ...node.data, label: `rotated via middleware` },
         })),
     };
 
+    // Continue to next middleware
     next(stateUpdate);
   },
 };
@@ -205,21 +196,35 @@ const scaleNodesMiddleware: Middleware<'scale-nodes'> = {
 Middlewares can perform async operations:
 
 ```typescript
-const validationMiddleware: Middleware<'validation'> = {
+export const myCustomMiddleware: Middleware = {
   name: 'validation',
   execute: async (context, next, cancel) => {
     const { helpers } = context;
 
     if (!helpers.anyNodesAdded()) {
-      return next();
+      next();
+      return;
     }
 
+    // Simulated API validation function
+    const validateNodesWithAPI = () => {
+      return new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          const isValid = Math.random() > 0.5; // 50% chance of success
+          if (isValid) {
+            resolve();
+          } else {
+            reject(new Error('Random validation failure'));
+          }
+        }, 1000); // 1 second delay — after this time the node will be added if valid, or an alert/error will be displayed if invalid
+      });
+    };
+
     try {
-      // Simulate API validation
-      await validateNodesWithAPI(context.state.nodes);
+      await validateNodesWithAPI();
       next(); // Validation passed
     } catch (error) {
-      console.error('Validation failed:', error);
+      alert(`Validation failed: ${error}`);
       cancel(); // Cancel the operation
     }
   },
