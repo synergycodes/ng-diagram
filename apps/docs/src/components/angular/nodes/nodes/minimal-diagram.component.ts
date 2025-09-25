@@ -15,6 +15,7 @@ import {
 export class Diagram {
   model = initializeModel({
     nodes: [
+      // @mark-start
       {
         id: '1',
         position: {
@@ -23,6 +24,7 @@ export class Diagram {
         },
         data: { label: 'Node 1' },
       },
+      // @mark-end
     ],
   });
 }

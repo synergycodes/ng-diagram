@@ -1,0 +1,13 @@
+---
+import { Code } from "@astrojs/starlight/components";
+import type { ComponentProps } from 'astro/types';
+import { extractCodeHighlights } from './extract-code-highlights';
+
+type Props = ComponentProps<typeof Code>;
+
+const { code, ...rest } = Astro.props;
+
+const { finalCode, highlightProps } = extractCodeHighlights(code);
+---
+
+<Code code={finalCode} {...highlightProps} {...rest} />

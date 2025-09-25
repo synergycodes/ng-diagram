@@ -17,6 +17,7 @@ import {
       display: flex;
       height: 100%;
 
+      // @mark-start
       --ngd-node-border-color: #d04a02;
       --ngd-node-border-color-hover: #9b0018;
       --ngd-node-border-radius: 1.75rem;
@@ -28,10 +29,12 @@ import {
       --ngd-port-background-color-hover: #9b0018;
 
       --ngd-selected-node-box-shadow: 0 0 0 0.25rem #9b001852;
+      // @mark-end
     }
   `,
 })
 export class Diagram {
+  // @collapse-start
   model = initializeModel({
     metadata: {
       viewport: { x: 222, y: 130, scale: 1.6 },
@@ -44,4 +47,5 @@ export class Diagram {
       },
     ],
   });
+  // @collapse-end
 }
