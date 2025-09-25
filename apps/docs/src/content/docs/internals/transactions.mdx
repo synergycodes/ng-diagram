@@ -20,6 +20,11 @@ this.ngDiagramService.transaction(() => {
 });
 ```
 
+<Aside type="caution">
+  **Order Guarantee**: Currently, we cannot guarantee the execution order of operations within a transaction callback.
+  This limitation is being addressed and will be resolved in the stable version of the library.
+</Aside>
+
 ## Benefits
 
 ### Performance

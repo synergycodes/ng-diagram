@@ -14,14 +14,16 @@ import {
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" [config]="config" />
-    <div class="toolbar">
-      <button (click)="onTestTransactionClick()">
-        Create diagram (Transaction)
-      </button>
-      <button (click)="onTestWithoutTransactionClick()">
-        Create diagram (Without Transaction)
-      </button>
+    <div class="diagram-container">
+      <ng-diagram [model]="model" [config]="config" />
+      <div class="toolbar">
+        <button (click)="onTestTransactionClick()">
+          Create diagram (Transaction)
+        </button>
+        <button (click)="onTestWithoutTransactionClick()">
+          Create diagram (Without Transaction)
+        </button>
+      </div>
     </div>
   `,
   styles: `
@@ -30,6 +32,14 @@ import {
       display: flex;
       height: 100%;
       position: relative;
+    }
+
+    .diagram-container {
+      display: flex;
+      width: 100%;
+      height: 30rem;
+      border: 5px solid var(--ngd-ui-border-default);
+      background-color: var(--ngd-ui-bg-tertiary-default);
     }
 
     .toolbar {
