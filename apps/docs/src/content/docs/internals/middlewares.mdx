@@ -246,9 +246,3 @@ However, you should avoid long-running async operations in middlewares as they c
 - **Validation middlewares** should run early to fail fast
 - **Data transformation middlewares** should run before built-in middlewares that depend on the data
 - **Logging middlewares** typically run last to capture the final state
-
-### Configuration
-
-- **Make middlewares configurable** through the config object
-- **Provide sensible defaults** for middleware behavior
-- **Allow disabling** through configuration flags
