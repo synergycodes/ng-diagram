@@ -71,6 +71,12 @@ export interface GroupingConfig {
    * @returns True if the node can be grouped, false otherwise.
    */
   canGroup: (node: Node, group: Node) => boolean;
+
+  /**
+   * If true, prevents resizing a group smaller than its children.
+   * Default: false (group can be resized below children size).
+   */
+  enforceGroupMinSizeToChildren?: boolean;
 }
 
 /**

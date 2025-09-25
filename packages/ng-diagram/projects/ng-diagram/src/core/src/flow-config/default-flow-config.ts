@@ -53,6 +53,7 @@ const defaultGroupingConfig: GroupingConfig = {
     // Allow grouping by default
     return true;
   },
+  enforceGroupMinSizeToChildren: false,
 };
 
 const defaultZoomConfig: ZoomConfig = {
