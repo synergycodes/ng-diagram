@@ -7,6 +7,7 @@ import {
   provideNgDiagram,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
@@ -28,3 +29,4 @@ export class Diagram {
     ],
   });
 }
+// @section-end

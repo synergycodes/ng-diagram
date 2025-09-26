@@ -1,10 +1,18 @@
 import { Code } from '@astrojs/starlight/components';
 import type { ComponentProps } from 'astro/types';
+import {
+  isRangeHighlight,
+  isSingleLineHighlight,
+  parseRangeHighlight,
+  parseSingleLineHighlight,
+  type Highlight,
+  type RangeHighlight,
+} from './highlights';
 
 type CodeProps = ComponentProps<typeof Code>;
 
-export function extractCodeHighlights(code: string) {
-  const lines = code.split('\n');
+export function extractCodeHighlights(code: string, sectionId?: string) {
+  const lines = getCodeLines(code, sectionId);
   const finalLines = [];
   const highlights: Highlight[] = [];
 
@@ -12,18 +20,16 @@ export function extractCodeHighlights(code: string) {
 
   let lineOffset = 0;
   for (const [index, line] of lines.entries()) {
-    const isSingleLineHighlight = singleLineHighlightRegex.test(line);
-    if (isSingleLineHighlight) {
-      const [_, highlight, substring] = line.match(singleLineHighlightRegex)!;
+    if (isSingleLineHighlight(line)) {
+      const { highlight, substring } = parseSingleLineHighlight(line);
       highlights.push({ type: highlight, line: index + lineOffset, substring });
 
       lineOffset--;
       continue;
     }
 
-    const isRangeHighlight = rangeHighlightRegex.test(line);
-    if (isRangeHighlight) {
-      const [_, highlight, location] = line.match(rangeHighlightRegex)!;
+    if (isRangeHighlight(line)) {
+      const { highlight, location } = parseRangeHighlight(line);
 
       const indexWithOffset = index + lineOffset;
 
@@ -52,23 +58,22 @@ export function extractCodeHighlights(code: string) {
 }
 
 function highlightsToCodeProps(highlights: Highlight[]) {
-  function isRangeHighlight(highlight: Highlight): highlight is RangeHighlight {
-    return highlight.type === keys.mark || highlight.type === keys.collapse;
-  }
-
   const mark: CodeProps['mark'] = [];
   const collapse: CodeProps['collapse'] = [];
 
   for (const highlight of highlights) {
-    if (isRangeHighlight(highlight)) {
+    if ('start' in highlight) {
       const range = `${highlight.start}-${highlight.end}`;
 
-      if (highlight.type === 'mark') {
-        mark.push({
-          range,
-        });
-      } else if (highlight.type === 'collapse') {
-        collapse.push(range);
+      switch (highlight.type) {
+        case 'mark':
+          mark.push({
+            range,
+          });
+          break;
+        case 'collapse':
+          collapse.push(range);
+          break;
       }
 
       continue;
@@ -82,28 +87,24 @@ function highlightsToCodeProps(highlights: Highlight[]) {
   return { mark, collapse };
 }
 
-const keys = {
-  mark: 'mark',
-  collapse: 'collapse',
-  'mark-substring': 'mark-substring',
-};
+function getCodeLines(code: string, sectionId?: string) {
+  const lines = code.split('\n');
 
-type Highlight = RangeHighlight | SingleLineHighlight;
+  const hasSingleSection = lines.filter((line) => line.includes('@section-start')).length === 1;
 
-type SingleLineHighlight = {
-  line: number;
-  substring: string | RegExp;
-  type: SingleLineHighlightType;
-};
+  if (!sectionId && !hasSingleSection) {
+    return lines;
+  }
 
-type SingleLineHighlightType = (typeof keys)['mark-substring'];
+  const startSubstring = hasSingleSection ? `@section-start` : `@section-start ${sectionId}`;
+  const endSubstring = hasSingleSection ? `@section-end` : `@section-end ${sectionId}`;
 
-const rangeHighlightRegex = new RegExp(`//\\s*@(${keys.mark}|${keys.collapse})-(start|end)`);
-const singleLineHighlightRegex = new RegExp('//\\s*@mark-substring\\s+(.+)');
+  const start = lines.findIndex((line) => line.includes(startSubstring));
+  const end = lines.findIndex((line) => line.includes(endSubstring));
 
-type RangeHighlightType = typeof keys.mark | typeof keys.collapse;
-type RangeHighlight = {
-  start: number;
-  end: number;
-  type: RangeHighlightType;
-};
+  if (start === -1 || end === -1 || start > end) {
+    throw new Error(`Invalid section ID: ${sectionId}`);
+  }
+
+  return lines.slice(start + 1, end);
+}
