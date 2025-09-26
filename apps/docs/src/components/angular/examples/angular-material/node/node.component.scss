@@ -25,15 +25,10 @@
       align-items: center;
       justify-items: center;
 
-      .chip {
-        display: inline-block;
+      .mat-mdc-chip {
         font-size: 11px;
         height: 20px;
-        padding: 0 8px;
-        border-radius: 10px;
-        background: #e0e0e0;
         margin-bottom: 10px;
-        line-height: 20px;
       }
     }
 
@@ -45,12 +40,8 @@
         height: 50px;
         margin-top: 8px;
 
-        select {
+        .mat-mdc-form-field {
           min-width: 120px;
-          padding: 4px 8px;
-          border-radius: 4px;
-          border: 1px solid #ccc;
-          font-size: 12px;
         }
       }
     }
