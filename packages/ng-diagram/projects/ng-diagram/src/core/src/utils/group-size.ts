@@ -3,15 +3,20 @@ import { getBoundsFromRect, getRect, getRectFromBounds } from './rects-points-si
 
 interface CalculateGroupRectOptions {
   useGroupRect?: boolean;
+  allowResizeBelowChildrenBounds?: boolean;
 }
 
 export const calculateGroupBounds = (
   childNodes: Node[],
   group: GroupNode,
-  { useGroupRect = true }: CalculateGroupRectOptions = {}
+  { useGroupRect = true, allowResizeBelowChildrenBounds = true }: CalculateGroupRectOptions = {}
 ): Bounds => {
   if (!group.size?.width || !group.size?.height) {
     throw new Error('Group must have both width and height defined');
+  }
+
+  if (allowResizeBelowChildrenBounds) {
+    return { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
   }
 
   const groupBounds: Bounds = getBoundsFromRect(getRect(group));

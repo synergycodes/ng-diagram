@@ -28,6 +28,7 @@ const defaultResizeConfig: ResizeConfig = {
   getMinNodeSize: (): Size => {
     return { ...DEFAULT_NODE_MIN_SIZE };
   },
+  allowResizeBelowChildrenBounds: true,
 };
 
 const defaultLinkingConfig: LinkingConfig = {

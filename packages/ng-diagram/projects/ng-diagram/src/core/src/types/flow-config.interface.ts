@@ -14,6 +14,13 @@ export interface ResizeConfig {
    * @param node The node to compute the minimum size for.
    */
   getMinNodeSize: (node: Node) => Size;
+
+  /**
+   * Allows resizing a group node smaller than its children bounds.
+   * When set to false, a group node cannot be resized smaller than the bounding box of its children.
+   * Default: true (group can be resized below children size).
+   */
+  allowResizeBelowChildrenBounds: boolean;
 }
 
 /**
