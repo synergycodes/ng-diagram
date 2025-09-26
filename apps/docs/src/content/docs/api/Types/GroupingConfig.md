@@ -34,12 +34,3 @@ The group node.
 `boolean`
 
 True if the node can be grouped, false otherwise.
-
-***
-
-### enforceGroupMinSizeToChildren?
-
-> `optional` **enforceGroupMinSizeToChildren**: `boolean`
-
-Prevents resizing a group smaller than its children, ensuring all children remain contained within the group.
-Default: false (group can be resized below children size).

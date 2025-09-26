@@ -3,19 +3,19 @@ import { getBoundsFromRect, getRect, getRectFromBounds } from './rects-points-si
 
 interface CalculateGroupRectOptions {
   useGroupRect?: boolean;
-  enforceMinSize?: boolean;
+  allowResizeBelowChildrenBounds?: boolean;
 }
 
 export const calculateGroupBounds = (
   childNodes: Node[],
   group: GroupNode,
-  { useGroupRect = true, enforceMinSize = false }: CalculateGroupRectOptions = {}
+  { useGroupRect = true, allowResizeBelowChildrenBounds = true }: CalculateGroupRectOptions = {}
 ): Bounds => {
   if (!group.size?.width || !group.size?.height) {
     throw new Error('Group must have both width and height defined');
   }
 
-  if (!enforceMinSize) {
+  if (allowResizeBelowChildrenBounds) {
     return { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
   }
 
