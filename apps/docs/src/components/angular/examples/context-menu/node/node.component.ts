@@ -1,9 +1,4 @@
 import { Component, inject, input, model } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import {
   NgDiagramNodeSelectedDirective,
   NgDiagramPortComponent,
@@ -16,14 +11,7 @@ import { ContextMenuService } from '../menu/menu.service';
 
 @Component({
   selector: 'node',
-  imports: [
-    NgDiagramPortComponent,
-    MatSelectModule,
-    MatFormFieldModule,
-    FormsModule,
-    MatInputModule,
-    MatChipsModule,
-  ],
+  imports: [NgDiagramPortComponent],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   hostDirectives: [
