@@ -1,0 +1,261 @@
+---
+title: Model Initialization
+description: Learn how to properly initialize and reinitialize models, and when to run your logic during the initialization process
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Model initialization and reinitialization are crucial concepts in ngDiagram that determine when and how your
+diagram data is set up and when it's safe to perform operations on the model.
+Understanding these mechanisms is essential for building robust applications that
+handle dynamic data loading and model switching.
+
+## Understanding Model Initialization
+
+The `initializeModel` function is the primary way to create a model for use in ngDiagram.
+It creates a model instance that wraps your diagram data and provides reactive state management.
+
+### Basic Model Creation
+
+```typescript
+import { initializeModel } from 'ng-diagram';
+
+// Create a model with default values (empty nodes, edges, and default metadata)
+const model = initializeModel();
+
+// Create a model with initial data
+const model = initializeModel({
+  nodes: [
+    {
+      id: '1',
+      position: { x: 100, y: 150 },
+      data: { label: 'Node 1' },
+    },
+    {
+      id: '2',
+      position: { x: 400, y: 150 },
+      data: { label: 'Node 2' },
+    },
+  ],
+  edges: [
+    {
+      id: 'edge-1',
+      source: '1',
+      target: '2',
+      sourcePort: 'port-left',
+      targetPort: 'port-right',
+      data: {},
+    },
+  ],
+  metadata: {
+    viewport: { x: 0, y: 0, scale: 1 },
+  },
+});
+```
+
+## Model Reinitialization
+
+Sometimes you need to replace the entire model with new data. This commonly happens when:
+
+- **Loading data asynchronously** - Fetching diagram data from an API
+- **Switching between different diagrams** - User selects a different model from a list
+- **Resetting the diagram** - Clearing all data and starting fresh
+
+### Reinitializing with New Data
+
+```typescript
+export class MyComponent {
+  private readonly injector = inject(Injector);
+
+  model = initializeModel();
+
+  async loadDiagramFromAPI(diagramId: string) {
+    // Fetch data asynchronously
+    const diagramData = await this.diagramService.getDiagram(diagramId);
+
+    // Reinitialize model with new data
+    this.model = initializeModel(diagramData, this.injector);
+  }
+
+  switchToDiagram(diagramData: Partial<Model>) {
+    // Switch to a different diagram
+    this.model = initializeModel(diagramData, this.injector);
+  }
+
+  resetDiagram() {
+    // Reset to empty diagram
+    this.model = initializeModel({}, this.injector);
+  }
+}
+```
+
+<Aside type="caution">
+  **Important**: When you reinitialize a model, all previous model references become invalid.
+</Aside>
+
+## Initialization Timing and Event Handling
+
+When a model is reinitialized, the diagram goes through a complete initialization process. All nodes and edges need to be measured and positioned before the diagram is fully ready.
+You need to wait for this process to complete before performing operations on the model.
+
+### Understanding the Initialization Process
+
+The initialization process involves several steps:
+
+1. **Model Assignment** – A new model is assigned to the diagram component.
+2. **Logic Recreation** – The internal core logic is destroyed and recreated. Because the logic is recreated, the `isInitialized` signal has its default value (`false`).
+3. **Element Measurement** – All nodes, edges, and their internal parts are measured.
+4. **Layout Calculation** – Positions and sizes are calculated.
+5. **Event Emission & Signal Update** – The `diagramInit` event is emitted when everything is ready, and the `isInitialized` signal is set to `true`.
+
+### Waiting for Initialization
+
+There are three main ways to detect when the diagram is fully initialized:
+
+#### 1. Using the diagramInit Event
+
+The most convenient way is to listen for the `diagramInit` event from the `ng-diagram` component:
+
+```typescript
+export class MyComponent {
+  model = initializeModel();
+  private injector = inject(Injector);
+
+  onDiagramInit(event: DiagramInitEvent): void {
+    console.log('Diagram is fully initialized');
+    console.log('Nodes:', event.nodes);
+    console.log('Edges:', event.edges);
+    console.log('Viewport:', event.viewport);
+
+    // Now it's safe to perform operations
+    this.performPostInitializationLogic();
+  }
+
+  private performPostInitializationLogic() {
+    // Your logic here - diagram is fully ready
+    this.modelService.addNodes([...]);
+    this.modelService.updateNodeData('node-1', { ... });
+  }
+}
+```
+
+```html
+<ng-diagram [model]="model" (diagramInit)="onDiagramInit($event)"> </ng-diagram>
+```
+
+#### 2. Using the isInitialized Signal
+
+You can also check the `isInitialized` signal from `NgDiagramService`:
+
+```typescript
+export class MyComponent {
+  private ngDiagramService = inject(NgDiagramService);
+  private modelService = inject(NgDiagramModelService);
+
+  constructor() {
+    effect(() => {
+      if (this.ngDiagramService.isInitialized()) {
+        this.performPostInitializationLogic();
+      }
+    });
+  }
+}
+```
+
+#### 3. Using Event Listener Registration
+
+For more advanced scenarios, you can register event listeners programmatically:
+
+```typescript
+export class MyComponent {
+  private ngDiagramService = inject(NgDiagramService);
+  private modelService = inject(NgDiagramModelService);
+
+  ngOnInit() {
+    // Register a one-time listener for diagram initialization.
+    // Alternatively, you can use addEventListener, but make sure to
+    // unregister it when no longer needed to avoid memory leaks.
+    this.ngDiagramService.addEventListenerOnce('diagramInit', (event) => {
+      console.log('Diagram initialized via event listener');
+      this.performPostInitializationLogic(event);
+    });
+  }
+
+  private performPostInitializationLogic(event: DiagramInitEvent) {
+    // Your logic here — at this stage you can safely read the measured
+    // nodes, edges and their internal parts (positions, sizes, points, etc.).
+  }
+}
+```
+
+## Best Practices
+
+### Always Wait for Initialization
+
+<Aside type="tip">
+  **Rule of Thumb**: Never perform model operations immediately after reinitializing. Always wait for the `diagramInit`
+  event or check `isInitialized()` signal.
+</Aside>
+
+```typescript
+// ❌ Don't do this - operations may fail or be ignored
+this.model = initializeModel(newData, this.injector);
+this.modelService.addNodes([...]); // This might not work!
+
+// ✅ Do this instead
+this.model = initializeModel(newData, this.injector);
+// Wait for onDiagramInit() to be called, then perform operations
+```
+
+### Use Transactions for Post-Initialization Operations
+
+When performing multiple operations after initialization, wrap them in a transaction:
+
+```typescript
+onDiagramInit(event: DiagramInitEvent): void {
+  this.ngDiagramService.transaction(() => {
+    this.modelService.addNodes([...]);
+    this.modelService.addEdges([...]);
+    this.modelService.updateMetadata({ ... });
+  });
+}
+```
+
+### Memory Management
+
+When switching between models frequently, be aware of memory usage:
+
+```typescript
+export class MemoryConsciousComponent {
+  model = initializeModel();
+  private injector = inject(Injector);
+  private currentDiagramId: string | null = null;
+
+  async switchToDiagram(diagramId: string) {
+    // Avoid unnecessary reinitializations
+    if (this.currentDiagramId === diagramId) {
+      return;
+    }
+
+    this.currentDiagramId = diagramId;
+    const diagramData = await this.diagramAPI.getDiagram(diagramId);
+    this.model = initializeModel(diagramData, this.injector);
+  }
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Operations not working after model reinitialization:**
+
+- Ensure you're waiting for the `diagramInit` event
+- Check that you're using the model service, not the model directly
+
+**Initialization events not firing:**
+
+- Verify that the diagram component is properly rendered
+- Check that the model is actually changing (not the same reference)
+
+Understanding model initialization and reinitialization is key to building robust ngDiagram applications that can handle dynamic data loading and model switching while maintaining proper timing and state management.
