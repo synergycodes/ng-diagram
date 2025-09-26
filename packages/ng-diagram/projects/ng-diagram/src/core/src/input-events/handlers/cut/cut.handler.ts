@@ -1,4 +1,4 @@
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { CutInputEvent } from './cut.event';
 
 export class CutEventHandler extends EventHandler<CutInputEvent> {

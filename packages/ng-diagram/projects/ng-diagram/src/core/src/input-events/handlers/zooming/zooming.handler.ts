@@ -1,5 +1,5 @@
 import { NgDiagramMath } from '../../../math';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { ZoomingEvent } from './zooming.event';
 
 export class ZoomingEventHandler extends EventHandler<ZoomingEvent> {

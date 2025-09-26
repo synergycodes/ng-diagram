@@ -1,4 +1,4 @@
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { PasteEvent } from './paste.event';
 
 export class PasteEventHandler extends EventHandler<PasteEvent> {

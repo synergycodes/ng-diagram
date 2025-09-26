@@ -1,5 +1,5 @@
 import { Point, Size } from '../../../types';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
 export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMoveSelectionEvent> {
