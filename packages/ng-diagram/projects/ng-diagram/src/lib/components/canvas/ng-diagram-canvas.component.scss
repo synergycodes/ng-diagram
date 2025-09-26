@@ -5,6 +5,7 @@
   display: flex;
   overflow: visible;
   transform-origin: 0 0;
+  will-change: transform;
 }
 
 .nodes-container,
