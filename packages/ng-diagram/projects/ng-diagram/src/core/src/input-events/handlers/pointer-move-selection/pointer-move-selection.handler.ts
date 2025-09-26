@@ -2,7 +2,7 @@ import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
 import { ContainerEdge, Point } from '../../../types/utils';
 import { isGroup, sortNodesByZIndex } from '../../../utils';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
 export const MOVE_THRESHOLD = 5; // to find out if move was intended

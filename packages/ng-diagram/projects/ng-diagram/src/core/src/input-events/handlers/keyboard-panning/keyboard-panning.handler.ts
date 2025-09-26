@@ -1,4 +1,4 @@
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { KeyboardPanningEvent } from './keyboard-panning.event';
 
 export class KeyboardPanningEventHandler extends EventHandler<KeyboardPanningEvent> {
