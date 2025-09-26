@@ -1,5 +1,7 @@
+// @collapse-start
 import { Component, input } from '@angular/core';
 import { type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   selector: 'node',
@@ -11,15 +13,19 @@ import { type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
       </div>
     </div>
   `,
+  // @mark-start
   host: {
     '[class.custom-selected]': 'isSelected',
   },
+  // @mark-end
   styleUrls: ['./node.component.scss'],
 })
 export class CustomNodeComponent implements NgDiagramNodeTemplate {
   node = input.required<Node>();
 
+  // @mark-start
   get isSelected(): boolean {
     return this.node().selected ?? false;
   }
+  // @mark-end
 }

@@ -1,16 +1,21 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
+// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
+  // @mark-start
   template: ` <ng-diagram [model]="model" /> `,
+  // @mark-end
+  // @collapse-start
   styles: `
     :host {
       flex: 1;
@@ -18,6 +23,7 @@ import {
       height: 100%;
     }
   `,
+  // @collapse-end
 })
 export class DefaultArrowheadDiagram {
   model = initializeModel({
@@ -48,7 +54,9 @@ export class DefaultArrowheadDiagram {
     ],
     edges: [
       {
+        // @mark-start
         targetArrowhead: 'ng-diagram-arrow',
+        // @mark-end
         id: '1',
         source: '1',
         sourcePort: 'port-right',

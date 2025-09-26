@@ -1,9 +1,10 @@
 export function parseSingleLineHighlight(line: string) {
-  const [_, highlight, substring] = line.match(singleLineHighlightRegex)!;
+  const [_, __, highlight, substring, sectionId] = line.match(singleLineHighlightRegex)!;
 
   return {
     highlight: highlight as SingleLineHighlightType,
     substring,
+    sectionId,
   };
 }
 
@@ -12,11 +13,13 @@ export function isRangeHighlight(line: string) {
 }
 
 export function parseRangeHighlight(line: string) {
-  const [_, highlight, location] = line.match(rangeHighlightRegex)!;
+  const [_, __, highlight, location, sectionId] = line.match(rangeHighlightRegex)!;
+  console.log(line.match(rangeHighlightRegex));
 
   return {
     highlight: highlight as RangeHighlightType,
     location,
+    sectionId,
   };
 }
 
@@ -30,7 +33,23 @@ const highlightKeys = {
   'mark-substring': 'mark-substring',
 } as const;
 
+const commentStartPattern = '(//|<!--)';
+const rangeHighlightRegex = new RegExp(
+  `\\s*${commentStartPattern}\\s*@(${highlightKeys.mark}|${highlightKeys.collapse})-(start|end)\\s+(.+)`
+);
+const singleLineHighlightRegex = new RegExp(
+  `${commentStartPattern}\\s*(${highlightKeys['mark-substring']})\\s+(.+)\\s+(.+)`
+);
+
 export type Highlight = RangeHighlight | SingleLineHighlight;
+
+export type RangeHighlight = {
+  start: number;
+  end: number;
+  type: RangeHighlightType;
+};
+
+type RangeHighlightType = typeof highlightKeys.mark | typeof highlightKeys.collapse;
 
 type SingleLineHighlight = {
   line: number;
@@ -39,13 +58,3 @@ type SingleLineHighlight = {
 };
 
 type SingleLineHighlightType = (typeof highlightKeys)['mark-substring'];
-
-export const rangeHighlightRegex = new RegExp(`//\\s*@(${highlightKeys.mark}|${highlightKeys.collapse})-(start|end)`);
-export const singleLineHighlightRegex = new RegExp(`//\\s*(${highlightKeys['mark-substring']})\\s+(.+)`);
-
-type RangeHighlightType = typeof highlightKeys.mark | typeof highlightKeys.collapse;
-export type RangeHighlight = {
-  start: number;
-  end: number;
-  type: RangeHighlightType;
-};

@@ -1,3 +1,4 @@
+// @collapse-start
 import { Component, computed, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
@@ -5,14 +6,17 @@ import {
   type NgDiagramEdgeTemplate,
   type Point,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   selector: 'sinusoid-edge',
+  // @mark-start
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
     stroke="var(--ngd-default-edge-stroke)"
     [targetArrowhead]="'ng-diagram-arrow'"
   ></ng-diagram-base-edge>`,
+  // @mark-end
   styleUrl: './sinusoid-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent],
 })
@@ -28,15 +32,18 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
     }
 
     const points = this.generateSinusoidPoints(sourcePosition, targetPosition);
-
+    // @mark-start
     return {
       ...edge,
       points,
+      // @mark-start
       routing: 'polyline',
       routingMode: 'manual' as const,
+      // @mark-end
     };
   });
 
+  // @collapse-start
   private generateSinusoidPoints(sourcePosition: Point, targetPosition: Point) {
     const startX = sourcePosition.x;
     const startY = sourcePosition.y;
@@ -82,4 +89,5 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
 
     return points;
   }
+  // @collapse-end
 }

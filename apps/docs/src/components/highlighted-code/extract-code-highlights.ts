@@ -20,8 +20,18 @@ export function extractCodeHighlights(code: string, sectionId?: string) {
 
   let lineOffset = 0;
   for (const [index, line] of lines.entries()) {
+    if (line.match(/@section/)) {
+      lineOffset--;
+      continue;
+    }
+
     if (isSingleLineHighlight(line)) {
-      const { highlight, substring } = parseSingleLineHighlight(line);
+      const { highlight, substring, sectionId: id } = parseSingleLineHighlight(line);
+      if (id && id !== sectionId) {
+        lineOffset--;
+        continue;
+      }
+
       highlights.push({ type: highlight, line: index + lineOffset, substring });
 
       lineOffset--;
@@ -29,7 +39,11 @@ export function extractCodeHighlights(code: string, sectionId?: string) {
     }
 
     if (isRangeHighlight(line)) {
-      const { highlight, location } = parseRangeHighlight(line);
+      const { highlight, location, sectionId: id } = parseRangeHighlight(line);
+      if (id && id !== sectionId) {
+        lineOffset--;
+        continue;
+      }
 
       const indexWithOffset = index + lineOffset;
 
@@ -40,6 +54,7 @@ export function extractCodeHighlights(code: string, sectionId?: string) {
       } else if (!openRangeHighlight && location === 'start') {
         openRangeHighlight = { start: indexWithOffset + 1, end: indexWithOffset + 1, type: highlight };
       } else {
+        console.log(highlight, location, sectionId);
         throw new Error('Invalid range highlight. Nested range highlights are not allowed.');
       }
 

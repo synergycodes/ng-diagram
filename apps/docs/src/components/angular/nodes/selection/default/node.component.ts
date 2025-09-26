@@ -1,9 +1,11 @@
+// @collapse-start
 import { Component, input } from '@angular/core';
 import {
   NgDiagramNodeSelectedDirective,
   type NgDiagramNodeTemplate,
   type Node,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   selector: 'node',
@@ -15,9 +17,11 @@ import {
       </div>
     </div>
   `,
+  // @mark-start
   hostDirectives: [
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
+  // @mark-end
   styleUrls: ['./node.component.scss'],
 })
 export class DefaultNodeComponent implements NgDiagramNodeTemplate {

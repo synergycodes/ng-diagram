@@ -7,9 +7,9 @@ type Props = ComponentProps<typeof Code> & {
   sectionId?: string;
 };
 
-const { code, ...rest } = Astro.props;
+const { code, sectionId, ...rest } = Astro.props;
 
-const { finalCode, highlightProps } = extractCodeHighlights(code);
+const { finalCode, highlightProps } = extractCodeHighlights(code, sectionId);
 ---
 
 <Code code={finalCode} {...highlightProps} {...rest} />

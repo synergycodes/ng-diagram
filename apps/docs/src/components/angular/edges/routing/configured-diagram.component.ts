@@ -1,12 +1,14 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
+// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
@@ -21,6 +23,7 @@ import {
   `,
 })
 export class ConfiguredDiagram {
+  // @mark-start
   config: NgDiagramConfig = {
     edgeRouting: {
       defaultRouting: 'orthogonal', // Set default routing
@@ -33,8 +36,10 @@ export class ConfiguredDiagram {
       },
     },
   };
+  // @mark-end
 
   model = initializeModel({
+    // @collapse-start
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.8 },
     },
@@ -55,6 +60,7 @@ export class ConfiguredDiagram {
         data: { label: 'Target 2' },
       },
     ],
+    // @collapse-end
     edges: [
       {
         id: 'edge1',

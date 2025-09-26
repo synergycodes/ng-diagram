@@ -1,6 +1,7 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
+// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
@@ -8,6 +9,7 @@ import {
   provideNgDiagram,
 } from 'ng-diagram';
 import { RoutingEdgeComponent } from './routing-edge.component';
+// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
@@ -29,6 +31,7 @@ export class Diagram {
   ]);
 
   model = initializeModel({
+    // @collapse-start
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.8 },
     },
@@ -58,6 +61,7 @@ export class Diagram {
         rotatable: true,
       },
     ],
+    // @collapse-end
     edges: [
       {
         id: '1',
@@ -65,7 +69,7 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
-        routing: 'polyline',
+        routing: 'polyline', // @mark 'polyline'
         type: 'routing-edge',
         data: {},
       },
@@ -75,7 +79,7 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '3',
-        routing: 'orthogonal',
+        routing: 'orthogonal', // @mark 'orthogonal'
         type: 'routing-edge',
         data: {},
       },
@@ -85,7 +89,7 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '4',
-        routing: 'bezier',
+        routing: 'bezier', // @mark 'bezier'
         type: 'routing-edge',
         data: {},
       },

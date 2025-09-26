@@ -5,6 +5,7 @@ import {
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   selector: 'custom-edge',
   template: `<ng-diagram-base-edge
@@ -38,3 +39,4 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
     };
   });
 }
+// @section-end

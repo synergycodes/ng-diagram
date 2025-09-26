@@ -8,6 +8,7 @@ import {
 
 @Component({
   selector: 'labeled-edge',
+  // @mark-start
   template: `<ng-diagram-base-edge
     [edge]="edge()"
     stroke="var(--ngd-default-edge-stroke)"
@@ -16,6 +17,7 @@ import {
       <div class="custom-label">Label</div>
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
+  // @mark-end
   styleUrl: './labeled-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })

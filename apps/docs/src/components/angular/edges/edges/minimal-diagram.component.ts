@@ -1,11 +1,13 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
+// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
@@ -14,6 +16,7 @@ import {
 })
 export class Diagram {
   model = initializeModel({
+    // @collapse-start
     nodes: [
       {
         id: '1',
@@ -21,8 +24,11 @@ export class Diagram {
           x: 0,
           y: 0,
         },
+        // @mark-start
         data: { label: 'Node 1' },
+        // @mark-end
       },
+      // @mark-start
       {
         id: '2',
         position: {
@@ -31,7 +37,10 @@ export class Diagram {
         },
         data: { label: 'Node 2' },
       },
+      // @mark-end
     ],
+    // @collapse-end
+    // @mark-start
     edges: [
       {
         id: '1',
@@ -42,5 +51,6 @@ export class Diagram {
         data: {},
       },
     ],
+    // @mark-end
   });
 }

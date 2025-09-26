@@ -1,3 +1,4 @@
+// @collapse-start
 import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
@@ -10,7 +11,9 @@ import {
 } from 'ng-diagram';
 
 import { CustomNodeComponent } from './node.component';
+// @collapse-end
 
+// @section-start
 @Component({
   selector: 'resizing',
   imports: [NgDiagramComponent],
@@ -19,7 +22,9 @@ import { CustomNodeComponent } from './node.component';
     <div class="not-content diagram">
       <ng-diagram
         [model]="model"
+        <!-- @mark-start -->
         [config]="config"
+        <!-- @mark-end -->
         [nodeTemplateMap]="nodeTemplateMap"
       />
     </div>
@@ -35,16 +40,19 @@ export class ResizingWrapperComponent {
     zoom: {
       max: 3,
     },
+    // @mark-start
     resize: {
       getMinNodeSize: (_: Node) => {
         return { width: 200, height: 80 };
       },
     },
+    // @mark-end
     snapping: {
       shouldSnapResizeForNode: () => false,
     },
   } satisfies NgDiagramConfig;
 
+  // @collapse-start
   model = initializeModel({
     nodes: [
       {
@@ -52,10 +60,14 @@ export class ResizingWrapperComponent {
         position: { x: 100, y: 100 },
         type: 'myType',
         data: {},
+        // @mark-start
         resizable: true,
+        // @mark-end
       },
     ],
     edges: [],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
+  // @collapse-end
 }
+// @section-end

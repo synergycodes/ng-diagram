@@ -22,7 +22,7 @@ The new size is reflected in the node's appearance and can be used to create fle
 
 Enable resizing by setting the `resizable` property to `true` in your node definition:
 
-<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" mark={[55]} collapse={['1-46']} />
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" />
 
 When `resizable` is set, the resize handles and lines will appear, and the node can be resized by the user.
 
@@ -32,7 +32,7 @@ To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-ad
 
 You will also need to set the `resizable` property to `true` in your custom node definition.
 
-<CodeSnippet relativePath="nodes/resizing/node.component.ts" mark={[11, { range: '13-20' }]} collapse={['22-52']} />
+<CodeSnippet relativePath="nodes/resizing/node.component.ts" />
 
 ## Customizing the Resize Handle and Line
 
@@ -72,19 +72,11 @@ This configuration allows you to control minimum node size and other resizing op
 
 You can set these options in your diagram configuration:
 
-<CodeSnippet
-  relativePath="nodes/resizing/resizing-wrapper.component.ts"
-  mark={[{ range: '38-42' }]}
-  collapse={['1-13', 46 - 58]}
-/>
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" />
 
 Pass this configuration to the `ng-diagram` component:
 
-<CodeSnippet
-  relativePath="nodes/resizing/resizing-wrapper.component.ts"
-  mark={[{ range: '22' }]}
-  collapse={['26-72', '1-15']}
-/>
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" />
 
 ## Example
 
