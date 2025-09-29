@@ -1,12 +1,13 @@
 :host {
   position: absolute;
-  width: 100%;
-  justify-content: center;
-  display: flex;
+  left: 50%;
   bottom: 8px;
+  transform: translateX(-50%);
   margin: 0 -2px;
 
   & > div {
+    display: flex;
+    gap: 8px;
     padding: 8px;
     background: #ffffff;
     border-radius: 4px;
