@@ -9,6 +9,16 @@ Configuration for node resizing behavior.
 
 ## Properties
 
+### allowResizeBelowChildrenBounds
+
+> **allowResizeBelowChildrenBounds**: `boolean`
+
+Allows resizing a group node smaller than its children bounds.
+When set to false, a group node cannot be resized smaller than the bounding box of its children.
+Default: true (group can be resized below children size).
+
+***
+
 ### getMinNodeSize()
 
 > **getMinNodeSize**: (`node`) => [`Size`](/docs/api/types/size/)
