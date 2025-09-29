@@ -28,5 +28,10 @@ export class NodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');
   node = input.required<Node>();
 
-  selectedState: string = 'Active';
+  selectedState: string = 'Inactive';
+
+  onStateChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedState = selectElement.value;
+  }
 }

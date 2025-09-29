@@ -13,7 +13,12 @@
       {{ node().data.description }}
       <form>
         <label for="state-select">State:</label>
-        <select id="state-select" [(ngModel)]="selectedState" name="state">
+        <select
+          id="state-select"
+          [value]="selectedState"
+          name="state"
+          (change)="onStateChange($event)"
+        >
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
           <option value="Error">Error</option>
