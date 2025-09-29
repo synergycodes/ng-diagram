@@ -46,40 +46,30 @@ export class AngularMaterialExampleComponent {
       {
         id: '1',
         position: { x: 80, y: 100 },
+        size: { width: 200, height: 150 },
         type: 'customNodeType',
         data: {
           name: 'Node 1',
-          description: 'This is Node 1',
+          description:
+            'This is Node 1. This node is a custom node with a custom template.',
           tooltip: 'Node 1 is a custom node',
+          status: 'orange',
         },
-        rotatable: true,
-        resizable: true,
       },
       {
         id: '2',
-        position: { x: 450, y: 100 },
+        position: { x: 400, y: 100 },
         type: 'customNodeType',
         data: {
           name: 'Node 2',
-          description: 'This is Node 2',
+          description:
+            'This is Node 2. Initial status is red. This node is a custom node with a custom template.',
           tooltip: 'Node 2 is a custom node',
+          status: 'red',
         },
-        rotatable: true,
-        resizable: true,
-        angle: 30,
       },
     ],
-    edges: [
-      {
-        id: '1',
-        source: '1',
-        target: '2',
-        data: {},
-        sourcePort: 'port-right',
-        targetPort: 'port-left',
-        sourceArrowhead: 'ng-diagram-arrow',
-      },
-    ],
+    edges: [],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 }

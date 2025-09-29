@@ -1,42 +1,52 @@
-import { Component, input, model } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {
-  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramModelService,
   NgDiagramNodeRotateAdornmentComponent,
   NgDiagramNodeSelectedDirective,
-  NgDiagramPortComponent,
   type NgDiagramNodeTemplate,
   type Node,
 } from 'ng-diagram';
+
+export type NodeData = {
+  name: string;
+  status: string;
+  description: string;
+  tooltip: string;
+};
 
 @Component({
   selector: 'node',
   imports: [
     NgDiagramNodeRotateAdornmentComponent,
-    NgDiagramPortComponent,
-    NgDiagramNodeResizeAdornmentComponent,
     MatSelectModule,
     MatFormFieldModule,
     FormsModule,
     MatInputModule,
     MatChipsModule,
+    MatExpansionModule,
   ],
-  templateUrl: './node.component.html',
-  styleUrls: ['./node.component.scss'],
   hostDirectives: [
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
-  host: {
-    '[class.ng-diagram-port-hoverable-over-node]': 'true',
-  },
+  templateUrl: './node.component.html',
+  styleUrls: ['./node.component.scss'],
 })
-export class NodeComponent implements NgDiagramNodeTemplate {
-  text = model<string>('');
-  node = input.required<Node>();
+export class NodeComponent implements NgDiagramNodeTemplate<NodeData> {
+  private readonly modelService = inject(NgDiagramModelService);
+  readonly panelOpenState = signal(false);
+  node = input.required<Node<NodeData>>();
+  nodeStatus = computed(() => this.node().data.status);
 
-  selectedState: string = 'Active';
+  onColorChange({ value }: any) {
+    this.modelService.updateNodeData(this.node().id, {
+      ...this.node().data,
+      status: value,
+    });
+  }
 }

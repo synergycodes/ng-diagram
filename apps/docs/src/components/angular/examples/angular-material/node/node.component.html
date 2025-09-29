@@ -1,29 +1,38 @@
-<ng-diagram-node-rotate-adornment />
-<ng-diagram-node-resize-adornment>
-  <div class="node">
-    <div class="node-header">
-      <div>
-        {{ node().data.name }}
-      </div>
-      <div>
-        <mat-chip>{{ selectedState }}</mat-chip>
-      </div>
+<div class="node">
+  <div class="node-header">
+    <div>
+      {{ node().data.name }}
     </div>
-    <div class="node-body" title="{{ node().data.tooltip }}">
-      {{ node().data.description }}
-      <form>
-        <mat-form-field>
-          <mat-select [(ngModel)]="selectedState" name="state">
-            <mat-option value="Active">Active</mat-option>
-            <mat-option value="Inactive">Inactive</mat-option>
-            <mat-option value="Error">Error</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </form>
+    <div>
+      <mat-chip [style.backgroundColor]="nodeStatus()" />
     </div>
   </div>
-  <ng-diagram-port id="port-left" type="both" side="left" />
-  <ng-diagram-port id="port-top" type="both" side="top" />
-  <ng-diagram-port id="port-right" type="both" side="right" />
-  <ng-diagram-port id="port-bottom" type="both" side="bottom" />
-</ng-diagram-node-resize-adornment>
+  <div class="node-body" title="{{ node().data.tooltip }}">
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Description</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{ node().data.description }}</p>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Options</mat-panel-title>
+        </mat-expansion-panel-header>
+        <form>
+          <mat-form-field>
+            <mat-select
+              (selectionChange)="onColorChange($event)"
+              [value]="nodeStatus()"
+              name="color"
+            >
+              <mat-option value="red">Red</mat-option>
+              <mat-option value="orange">Orange</mat-option>
+              <mat-option value="green">Green</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>
