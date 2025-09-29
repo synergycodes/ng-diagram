@@ -9,6 +9,7 @@ import { PasteAction } from './keyboard-actions/paste.action';
 
 @Directive({
   selector: '[ngDiagramKeyboardInputs]',
+  standalone: true,
   host: {
     '(document:keydown)': 'onKeyDown($event)',
   },

@@ -6,6 +6,7 @@ import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node
 
 @Component({
   selector: 'ng-diagram-default-group-template',
+  standalone: true,
   templateUrl: './ng-diagram-default-group-template.component.html',
   styleUrls: ['./ng-diagram-default-group-template.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

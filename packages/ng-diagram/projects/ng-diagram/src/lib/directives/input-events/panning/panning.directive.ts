@@ -7,6 +7,7 @@ import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
 @Directive({
   selector: '[ngDiagramPanning]',
+  standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

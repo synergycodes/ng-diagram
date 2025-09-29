@@ -8,6 +8,7 @@ import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node
 
 @Component({
   selector: 'ng-diagram-default-node-template',
+  standalone: true,
   templateUrl: './ng-diagram-default-node-template.component.html',
   styleUrls: ['./ng-diagram-default-node-template.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

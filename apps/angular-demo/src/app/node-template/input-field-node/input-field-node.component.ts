@@ -11,6 +11,7 @@ import {
 
 @Component({
   selector: 'app-input-field-node',
+  standalone: true,
   imports: [
     FormsModule,
     NgDiagramPortComponent,

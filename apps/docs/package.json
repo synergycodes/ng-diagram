@@ -16,18 +16,19 @@
   },
   "dependencies": {
     "@analogjs/astro-angular": "^1.19.4",
-    "@angular-devkit/build-angular": "^19.2.7",
-    "@angular/animations": "^19.2.7",
-    "@angular/common": "^19.2.7",
-    "@angular/compiler": "^19.2.7",
-    "@angular/compiler-cli": "^19.2.7",
-    "@angular/core": "^19.2.7",
-    "@angular/forms": "19.2.14",
-    "@angular/language-service": "^19.2.7",
-    "@angular/material": "19.2.19",
-    "@angular/platform-browser": "^19.2.7",
-    "@angular/platform-browser-dynamic": "^19.2.10",
-    "@angular/platform-server": "^19.2.7",
+    "@angular-devkit/build-angular": "^18.1.0",
+    "@angular/animations": "^18.1.0",
+    "@angular/common": "^18.1.0",
+    "@angular/compiler": "^18.1.0",
+    "@angular/compiler-cli": "^18.1.0",
+    "@angular/core": "^18.1.0",
+    "@angular/forms": "^18.1.0",
+    "@angular/language-service": "^18.1.0",
+    "@angular/cdk": "^18.1.0",
+    "@angular/material": "^18.1.0",
+    "@angular/platform-browser": "^18.1.0",
+    "@angular/platform-browser-dynamic": "^18.1.0",
+    "@angular/platform-server": "^18.1.0",
     "ng-diagram": "workspace:*",
     "@astrojs/starlight": "^0.35.2",
     "@expressive-code/plugin-collapsible-sections": "^0.41.3",
@@ -35,7 +36,7 @@
     "astro": "^5.6.1",
     "html-to-image": "1.11.11",
     "elkjs": "^0.10.0",
-    "rxjs": "~7.8.2",
+    "rxjs": "~7.8.0",
     "sharp": "^0.34.2",
     "starlight-auto-sidebar": "^0.1.2",
     "starlight-typedoc": "^0.21.3",
@@ -43,7 +44,7 @@
     "typedoc": "^0.28.9",
     "typedoc-plugin-markdown": "^4.8.0",
     "web-worker": "^1.5.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.14.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
@@ -60,7 +61,7 @@
     "globals": "^16.3.0",
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^5.8.3",
+    "typescript": "^5.4.0",
     "typescript-eslint": "^8.31.0"
   }
 }

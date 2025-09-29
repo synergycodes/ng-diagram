@@ -40,13 +40,13 @@ the number of elements in the Map.
 
 ### \[iterator\]()
 
-> **\[iterator\]**(): `MapIterator`\<\[`string`, `Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
+> **\[iterator\]**(): `MapIterator`\<\[`string`, `Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
 
 Returns an iterable of entries in the map.
 
 #### Returns
 
-`MapIterator`\<\[`string`, `Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
+`MapIterator`\<\[`string`, `Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
 
 #### Inherited from
 
@@ -78,13 +78,13 @@ true if an element in the Map existed and has been removed, or false if the elem
 
 ### entries()
 
-> **entries**(): `MapIterator`\<\[`string`, `Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
+> **entries**(): `MapIterator`\<\[`string`, `Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
 
 Returns an iterable of key, value pairs for every entry in the map.
 
 #### Returns
 
-`MapIterator`\<\[`string`, `Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
+`MapIterator`\<\[`string`, `Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\]\>
 
 #### Inherited from
 
@@ -120,7 +120,7 @@ Executes a provided function once per each key/value pair in the Map, in inserti
 
 ### get()
 
-> **get**(`key`): `undefined` \| `Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>
+> **get**(`key`): `undefined` \| `Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>
 
 Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
 
@@ -132,7 +132,7 @@ Returns a specified element from the Map object. If the value that is associated
 
 #### Returns
 
-`undefined` \| `Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>
+`undefined` \| `Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>
 
 Returns the element associated with the specified key. If no element is associated with the specified key, undefined is returned.
 
@@ -194,7 +194,7 @@ Adds a new element with a specified key and value to the Map. If an element with
 
 ##### value
 
-`Type$1`
+`Type`
 
 #### Returns
 
@@ -208,13 +208,13 @@ Adds a new element with a specified key and value to the Map. If an element with
 
 ### values()
 
-> **values**(): `MapIterator`\<`Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\>
+> **values**(): `MapIterator`\<`Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\>
 
 Returns an iterable of values in the map
 
 #### Returns
 
-`MapIterator`\<`Type$1`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\>
+`MapIterator`\<`Type`\<[`NgDiagramEdgeTemplate`](/docs/api/types/ngdiagramedgetemplate/)\<`any`\>\>\>
 
 #### Inherited from
 

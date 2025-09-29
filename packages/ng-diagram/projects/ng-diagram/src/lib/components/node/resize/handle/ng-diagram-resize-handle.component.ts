@@ -5,6 +5,7 @@ import { HandlePosition } from '../ng-diagram-node-resize-adornment.types';
 
 @Component({
   selector: 'ng-diagram-resize-handle',
+  standalone: true,
   template: '',
   styleUrl: './ng-diagram-resize-handle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

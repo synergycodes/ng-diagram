@@ -31,11 +31,12 @@ import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.componen
  */
 @Component({
   selector: 'ng-diagram-base-edge-label',
+  standalone: true,
   templateUrl: './base-edge-label.component.html',
   styleUrl: './base-edge-label.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '[style.transform]': '`translate(${position().x}px, ${position().y}px) translate(-50%, -50%)`',
+    '[style.transform]': 'transform',
     '[style.display]': 'isVisible() ? null : "none"',
   },
 })
@@ -85,18 +86,26 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
 
   private lastPositionOnEdge = signal<EdgeLabel['positionOnEdge'] | undefined>(undefined);
 
+  get transform(): string {
+    const pos = this.position();
+    return `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`;
+  }
+
   constructor() {
-    effect(() => {
-      const newPositionOnEdge = this.positionOnEdge();
-      const lastPositionOnEdge = this.lastPositionOnEdge();
-      if (newPositionOnEdge !== lastPositionOnEdge) {
-        this.lastPositionOnEdge.set(newPositionOnEdge);
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
-          edgeId: this.edgeId(),
-          labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
-        });
-      }
-    });
+    effect(
+      () => {
+        const newPositionOnEdge = this.positionOnEdge();
+        const lastPositionOnEdge = this.lastPositionOnEdge();
+        if (newPositionOnEdge !== lastPositionOnEdge) {
+          this.lastPositionOnEdge.set(newPositionOnEdge);
+          this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
+            edgeId: this.edgeId(),
+            labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
+          });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   /** @internal */

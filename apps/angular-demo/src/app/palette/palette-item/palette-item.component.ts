@@ -3,6 +3,7 @@ import { NgDiagramPaletteItem } from 'ng-diagram';
 
 @Component({
   selector: 'app-palette-item',
+  standalone: true,
   templateUrl: './palette-item.component.html',
   styleUrls: ['./palette-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

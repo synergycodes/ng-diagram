@@ -3,6 +3,7 @@ import { Edge, Node } from '../../../core/src';
 
 @Directive({
   selector: '[ngDiagramZIndex]',
+  standalone: true,
   host: {
     '[style.z-index]': 'zIndex()',
   },

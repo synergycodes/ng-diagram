@@ -4,6 +4,7 @@ import { BackgroundPatternBase } from '../../background-pattern.base';
 
 @Component({
   selector: 'ng-diagram-dotted-background',
+  standalone: true,
   templateUrl: './dotted-background.component.html',
   styleUrl: './dotted-background.component.scss',
 })

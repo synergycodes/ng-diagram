@@ -11,6 +11,7 @@ import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdge
 
 @Component({
   selector: 'app-button-edge',
+  standalone: true,
   templateUrl: './button-edge.component.html',
   styleUrls: ['./button-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

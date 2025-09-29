@@ -28,12 +28,13 @@ import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
  */
 @Component({
   selector: 'ng-diagram-port',
+  standalone: true,
   template: '',
   styleUrl: './ng-diagram-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-port-id]': 'id()',
-    '[class]': '`ng-diagram-port ${side()}`',
+    '[class]': 'portClass',
     '[style.display]': 'isRenderedOnCanvas() ? "block" : "none"',
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['portId: id'] }],
@@ -63,6 +64,10 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
    */
   side = input.required<Port['side']>();
 
+  get portClass(): string {
+    return `ng-diagram-port ${this.side()}`;
+  }
+
   constructor() {
     super();
     effect(() => {
@@ -76,23 +81,29 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       }
     });
 
-    effect(() => {
-      const nodeData = this.nodeData();
-      if (this.isInitialized() && nodeData) {
-        this.linkingInputDirective.setTargetNode(nodeData);
-      }
-    });
+    effect(
+      () => {
+        const nodeData = this.nodeData();
+        if (this.isInitialized() && nodeData) {
+          this.linkingInputDirective.setTargetNode(nodeData);
+        }
+      },
+      { allowSignalWrites: true }
+    );
 
-    effect(() => {
-      const nodeData = this.nodeData();
-      if (this.isInitialized() && this.lastType() !== this.type() && nodeData) {
-        this.lastType.set(this.type());
-        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-          nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
-        });
-      }
-    });
+    effect(
+      () => {
+        const nodeData = this.nodeData();
+        if (this.isInitialized() && this.lastType() !== this.type() && nodeData) {
+          this.lastType.set(this.type());
+          this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
+            nodeId: nodeData.id,
+            ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
+          });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   /** @internal */

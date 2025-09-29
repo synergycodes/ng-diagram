@@ -16,6 +16,7 @@ import { Edge, Node } from '../../../core/src';
 import type {
   DiagramInitEvent,
   EdgeDrawnEvent,
+  GroupNode,
   MiddlewareChain,
   ModelAdapter,
   SelectionChangedEvent,
@@ -49,6 +50,7 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
  */
 @Component({
   selector: 'ng-diagram',
+  standalone: true,
   imports: [
     CommonModule,
     NgDiagramCanvasComponent,
@@ -144,17 +146,20 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
 
   constructor() {
-    effect(() => {
-      const model = this.model();
-      if (this.initializedModel != model) {
-        this.flowCoreProvider.destroy();
-        this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+    effect(
+      () => {
+        const model = this.model();
+        if (this.initializedModel != model) {
+          this.flowCoreProvider.destroy();
+          this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
 
-        this.initializedModel = model;
+          this.initializedModel = model;
 
-        this.setupEventBridge();
-      }
-    });
+          this.setupEventBridge();
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   /** @ignore */
@@ -211,6 +216,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
   isGroup(node: Node) {
     return 'isGroup' in node;
+  }
+
+  castToGroupNode(node: Node) {
+    return node as GroupNode;
   }
 
   getBoundingClientRect() {

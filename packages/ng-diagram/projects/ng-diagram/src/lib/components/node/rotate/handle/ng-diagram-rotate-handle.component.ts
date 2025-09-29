@@ -14,6 +14,7 @@ import { RotateHandleDirective } from '../../../../directives/input-events/rotat
 
 @Component({
   selector: 'ng-diagram-rotate-handle',
+  standalone: true,
   templateUrl: './ng-diagram-rotate-handle.component.html',
   styleUrls: ['./ng-diagram-rotate-handle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

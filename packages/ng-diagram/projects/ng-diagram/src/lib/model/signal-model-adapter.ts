@@ -18,15 +18,18 @@ export class SignalModelAdapter implements ModelAdapter {
   private callbacks: ((data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void)[] = [];
 
   constructor() {
-    this.effectRef = effect(() => {
-      const nodes = this.nodes();
-      const edges = this.edges();
-      const metadata = this.metadata();
+    this.effectRef = effect(
+      () => {
+        const nodes = this.nodes();
+        const edges = this.edges();
+        const metadata = this.metadata();
 
-      for (const callback of this.callbacks) {
-        callback({ nodes, edges, metadata });
-      }
-    });
+        for (const callback of this.callbacks) {
+          callback({ nodes, edges, metadata });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   destroy(): void {

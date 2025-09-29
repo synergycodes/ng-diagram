@@ -19,6 +19,7 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
  */
 @Component({
   selector: 'ng-diagram-node-resize-adornment',
+  standalone: true,
   templateUrl: './ng-diagram-node-resize-adornment.component.html',
   styleUrl: './ng-diagram-node-resize-adornment.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

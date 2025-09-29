@@ -10,6 +10,7 @@ import { PaletteItemComponent } from './palette-item/palette-item.component';
 
 @Component({
   selector: 'app-palette',
+  standalone: true,
   templateUrl: './palette.component.html',
   styleUrls: ['./palette.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

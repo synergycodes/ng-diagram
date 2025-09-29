@@ -5,6 +5,7 @@ import { PointerInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramRotateHandle]',
+  standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

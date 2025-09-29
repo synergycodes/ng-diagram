@@ -7,21 +7,23 @@ import { getSourceTargetPositions } from './get-source-target-positions';
  * Returns true only if all required ports have their geometry data.
  */
 export const areEdgePortsInitialized = (edge: Edge, sourceNode?: Node, targetNode?: Node): boolean => {
-  if (edge.sourcePort && sourceNode?.measuredPorts) {
-    const sourcePort = sourceNode.measuredPorts.find((p) => p.id === edge.sourcePort);
-    if (sourcePort && (!sourcePort.position || !sourcePort.size)) {
-      return false;
-    }
+  // Check source port
+  if (edge.sourcePort) {
+    const sourcePorts = sourceNode?.measuredPorts;
+    if (!sourcePorts) return false; // measuredPorts missing
+    const sourcePort = sourcePorts.find((p) => p.id === edge.sourcePort);
+    if (!sourcePort || !sourcePort.position || !sourcePort.size) return false;
   }
 
-  if (edge.targetPort && targetNode?.measuredPorts) {
-    const targetPort = targetNode.measuredPorts.find((p) => p.id === edge.targetPort);
-    if (targetPort && (!targetPort.position || !targetPort.size)) {
-      return false;
-    }
+  // Check target port
+  if (edge.targetPort) {
+    const targetPorts = targetNode?.measuredPorts;
+    if (!targetPorts) return false; // measuredPorts missing
+    const targetPort = targetPorts.find((p) => p.id === edge.targetPort);
+    if (!targetPort || !targetPort.position || !targetPort.size) return false;
   }
 
-  return true;
+  return true; // All checks passed
 };
 
 /**
@@ -66,6 +68,8 @@ export const computeAutoModePoints = (
     sourcePort: findNodePort(sourceNode, edge.sourcePort),
     targetPort: findNodePort(targetNode, edge.targetPort),
   };
+
+  console.log('computeAutoModePoints:context', context);
 
   if (edge.routing && routingManager.hasRouting(edge.routing)) {
     return routingManager.computePoints(edge.routing, context);

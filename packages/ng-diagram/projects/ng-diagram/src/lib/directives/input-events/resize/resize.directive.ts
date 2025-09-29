@@ -5,6 +5,7 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 
 @Directive({
   selector: '[ngDiagramResize]',
+  standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

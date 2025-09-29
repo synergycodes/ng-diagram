@@ -4,6 +4,7 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 
 @Directive({
   selector: '[ngDiagramZoomingPointer]',
+  standalone: true,
   host: {
     '(touchstart)': 'onTouchStart($event)',
     '(touchend)': 'onTouchEnd($event)',

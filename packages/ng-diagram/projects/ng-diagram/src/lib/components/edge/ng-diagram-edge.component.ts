@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'ng-diagram-edge',
+  standalone: true,
   template: '<ng-content />',
   styles: [
     `

@@ -4,6 +4,7 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
 
 @Directive({
   selector: '[ngDiagramZooming]',
+  standalone: true,
   host: {
     '(wheel)': 'onWheel($event)',
   },

@@ -9,6 +9,7 @@ import {
 
 @Component({
   selector: 'app-image-node',
+  standalone: true,
   templateUrl: './image-node.component.html',
   styleUrls: ['./image-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

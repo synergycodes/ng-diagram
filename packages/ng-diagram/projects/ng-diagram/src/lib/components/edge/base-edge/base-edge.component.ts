@@ -10,6 +10,7 @@ import { FlowCoreProviderService } from '../../../services';
  */
 @Component({
   selector: 'ng-diagram-base-edge',
+  standalone: true,
   templateUrl: './base-edge.component.html',
   styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,7 +57,9 @@ export class NgDiagramBaseEdgeComponent {
    */
   strokeWidth = input<number>(2);
 
-  readonly points = computed(() => this.edge().points ?? []);
+  readonly points = computed(() => {
+    return this.edge().points ?? [];
+  });
 
   readonly path = computed(() => {
     const edge = this.edge();
