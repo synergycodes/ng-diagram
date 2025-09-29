@@ -6,13 +6,14 @@ import {
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   selector: 'multi-label-edge',
-  // @mark-start
   template: `<ng-diagram-base-edge
     [edge]="edge()"
     [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
   >
+    <!-- @mark-start -->
     @if (label()) {
       <ng-diagram-base-edge-label
         [id]="label().id"
@@ -22,8 +23,8 @@ import {
         {{ label().content }}
       </ng-diagram-base-edge-label>
     }
+    <!-- @mark-end -->
   </ng-diagram-base-edge>`,
-  // @mark-end
   styleUrl: './modifiable-label-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
@@ -50,7 +51,10 @@ export class ModifiableLabelEdgeComponent
   });
   // @mark-end
 }
+// @collapse-start
 
 type MultiLabelEdgeData = {
   label: string;
 };
+// @collapse-end
+// @section-end

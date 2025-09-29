@@ -1,21 +1,20 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
 } from 'ng-diagram';
-// @collapse-end
-// @mark-start
-import { CustomEdgeComponent } from './custom-edge.component';
-// @mark-end
 
+import { CustomEdgeComponent } from './custom-edge.component';
+
+// @section-start
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
+  // @mark-substring:[edgeTemplateMap]="edgeTemplateMap"
   // @mark-start
   template: `
     <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
@@ -29,6 +28,7 @@ import { CustomEdgeComponent } from './custom-edge.component';
       height: 100%;
     }
   `,
+  // @collapse-end
 })
 export class Diagram {
   // @mark-start
@@ -36,6 +36,7 @@ export class Diagram {
     ['custom', CustomEdgeComponent],
   ]);
   // @mark-end
+  // @collapse-start
 
   model = initializeModel({
     metadata: {
@@ -51,7 +52,6 @@ export class Diagram {
       { id: '2', position: { x: 500, y: 150 }, data: { label: 'Node 2' } },
     ],
     edges: [
-      // @collapse-end
       {
         id: '1',
         source: '1',
@@ -63,4 +63,6 @@ export class Diagram {
       },
     ],
   });
+  // @collapse-end
 }
+// @section-end

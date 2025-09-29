@@ -1,5 +1,11 @@
 export function parseSingleLineHighlight(line: string) {
-  const [_, __, highlight, substring, sectionId] = line.match(singleLineHighlightRegex)!;
+  const { groups } = line.match(singleLineHighlightRegex) ?? {};
+
+  if (!groups) {
+    throw new Error('Invalid single line highlight');
+  }
+
+  const { highlight, substring, sectionId } = groups;
 
   return {
     highlight: highlight as SingleLineHighlightType,
@@ -13,8 +19,13 @@ export function isRangeHighlight(line: string) {
 }
 
 export function parseRangeHighlight(line: string) {
-  const [_, __, highlight, location, sectionId] = line.match(rangeHighlightRegex)!;
-  console.log(line.match(rangeHighlightRegex));
+  const { groups } = line.match(rangeHighlightRegex) ?? {};
+
+  if (!groups) {
+    throw new Error('Invalid range highlight');
+  }
+
+  const { highlight, location, sectionId } = groups;
 
   return {
     highlight: highlight as RangeHighlightType,
@@ -33,12 +44,19 @@ const highlightKeys = {
   'mark-substring': 'mark-substring',
 } as const;
 
-const commentStartPattern = '(//|<!--)';
+const commentStartPattern = '\\s*(//|<!--|/*)\\s*';
+const sectionIdGroup = '(?<sectionId>[\\w-]*)';
+
+const rangeHighlightGroup = `@(?<highlight>${highlightKeys.mark}|${highlightKeys.collapse})`;
+const rangeLocationGroup = `(?<location>start|end)`;
 const rangeHighlightRegex = new RegExp(
-  `\\s*${commentStartPattern}\\s*@(${highlightKeys.mark}|${highlightKeys.collapse})-(start|end)\\s+(.+)`
+  `${commentStartPattern}${rangeHighlightGroup}-${rangeLocationGroup}\\:?${sectionIdGroup}`
 );
+
+const singleHighlightGroup = `@(?<highlight>${highlightKeys['mark-substring']})`;
+const substringGroup = '(?<substring>[^:]+)';
 const singleLineHighlightRegex = new RegExp(
-  `${commentStartPattern}\\s*(${highlightKeys['mark-substring']})\\s+(.+)\\s+(.+)`
+  `${commentStartPattern}${singleHighlightGroup}:${substringGroup}\\:?${sectionIdGroup}`
 );
 
 export type Highlight = RangeHighlight | SingleLineHighlight;

@@ -1,8 +1,7 @@
-// @collapse-start
 import { Component, input } from '@angular/core';
 import { type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
-// @collapse-end
 
+// @section-start
 @Component({
   selector: 'node',
   template: `
@@ -29,3 +28,4 @@ export class CustomNodeComponent implements NgDiagramNodeTemplate {
   }
   // @mark-end
 }
+// @section-end

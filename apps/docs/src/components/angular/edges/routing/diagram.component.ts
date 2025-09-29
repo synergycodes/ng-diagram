@@ -1,7 +1,6 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
@@ -9,7 +8,6 @@ import {
   provideNgDiagram,
 } from 'ng-diagram';
 import { RoutingEdgeComponent } from './routing-edge.component';
-// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
@@ -30,6 +28,7 @@ export class Diagram {
     ['routing-edge', RoutingEdgeComponent],
   ]);
 
+  // @section-start
   model = initializeModel({
     // @collapse-start
     metadata: {
@@ -69,9 +68,11 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
-        routing: 'polyline', // @mark 'polyline'
-        type: 'routing-edge',
         data: {},
+        // @mark-start
+        routing: 'polyline',
+        // @mark-end
+        type: 'routing-edge',
       },
       {
         id: '2',
@@ -79,9 +80,11 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '3',
-        routing: 'orthogonal', // @mark 'orthogonal'
-        type: 'routing-edge',
         data: {},
+        // @mark-start
+        routing: 'orthogonal',
+        // @mark-end
+        type: 'routing-edge',
       },
       {
         id: '3',
@@ -89,10 +92,13 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '4',
-        routing: 'bezier', // @mark 'bezier'
-        type: 'routing-edge',
         data: {},
+        // @mark-start
+        routing: 'bezier',
+        // @mark-end
+        type: 'routing-edge',
       },
     ],
   });
 }
+// @section-end

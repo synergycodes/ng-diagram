@@ -1,4 +1,3 @@
-// @collapse-start
 import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
@@ -11,9 +10,10 @@ import {
 } from 'ng-diagram';
 
 import { CustomNodeComponent } from './node.component';
-// @collapse-end
 
-// @section-start
+// @section-start:config
+// @section-start:usage
+// @mark-substring:config:config
 @Component({
   selector: 'resizing',
   imports: [NgDiagramComponent],
@@ -22,9 +22,7 @@ import { CustomNodeComponent } from './node.component';
     <div class="not-content diagram">
       <ng-diagram
         [model]="model"
-        <!-- @mark-start -->
         [config]="config"
-        <!-- @mark-end -->
         [nodeTemplateMap]="nodeTemplateMap"
       />
     </div>
@@ -32,27 +30,30 @@ import { CustomNodeComponent } from './node.component';
   styleUrls: ['./resizing-wrapper.component.scss'],
 })
 export class ResizingWrapperComponent {
+  // @collapse-start:config
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
     ['myType', CustomNodeComponent],
   ]);
 
+  // @collapse-end:config
   config = {
     zoom: {
       max: 3,
     },
-    // @mark-start
+    // @mark-start:config
     resize: {
       getMinNodeSize: (_: Node) => {
         return { width: 200, height: 80 };
       },
     },
-    // @mark-end
+    // @mark-end:config
     snapping: {
       shouldSnapResizeForNode: () => false,
     },
   } satisfies NgDiagramConfig;
+  // @collapse-start:config
 
-  // @collapse-start
+  // @section-start:enabling
   model = initializeModel({
     nodes: [
       {
@@ -60,14 +61,18 @@ export class ResizingWrapperComponent {
         position: { x: 100, y: 100 },
         type: 'myType',
         data: {},
-        // @mark-start
+        // @mark-start:enabling
         resizable: true,
-        // @mark-end
+        // @mark-end:enabling
       },
     ],
+    // @collapse-start:enabling
     edges: [],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+    // @collapse-end:enabling
   });
-  // @collapse-end
+  // @section-end:enabling
+  // @collapse-end:config
 }
-// @section-end
+// @section-end:config
+// @section-end:usage

@@ -40,6 +40,7 @@ export function extractCodeHighlights(code: string, sectionId?: string) {
 
     if (isRangeHighlight(line)) {
       const { highlight, location, sectionId: id } = parseRangeHighlight(line);
+
       if (id && id !== sectionId) {
         lineOffset--;
         continue;
@@ -54,8 +55,7 @@ export function extractCodeHighlights(code: string, sectionId?: string) {
       } else if (!openRangeHighlight && location === 'start') {
         openRangeHighlight = { start: indexWithOffset + 1, end: indexWithOffset + 1, type: highlight };
       } else {
-        console.log(highlight, location, sectionId);
-        throw new Error('Invalid range highlight. Nested range highlights are not allowed.');
+        throw new Error(`Invalid range highlight on line: ${line}`);
       }
 
       lineOffset--;
@@ -111,8 +111,8 @@ function getCodeLines(code: string, sectionId?: string) {
     return lines;
   }
 
-  const startSubstring = hasSingleSection ? `@section-start` : `@section-start ${sectionId}`;
-  const endSubstring = hasSingleSection ? `@section-end` : `@section-end ${sectionId}`;
+  const startSubstring = hasSingleSection ? `@section-start` : `@section-start:${sectionId}`;
+  const endSubstring = hasSingleSection ? `@section-end` : `@section-end:${sectionId}`;
 
   const start = lines.findIndex((line) => line.includes(startSubstring));
   const end = lines.findIndex((line) => line.includes(endSubstring));

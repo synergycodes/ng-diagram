@@ -9,6 +9,12 @@ type Props = ComponentProps<typeof Code> & {
 
 const { code, sectionId, ...rest } = Astro.props;
 
+const forbiddenProps = ['mark', 'collapse', 'range'];
+
+if (Object.keys(rest).some(prop => forbiddenProps.includes(prop))) {
+  throw new Error('Use code comments for code highlighting in favour of manual props.');
+}
+
 const { finalCode, highlightProps } = extractCodeHighlights(code, sectionId);
 ---
 

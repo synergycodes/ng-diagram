@@ -1,16 +1,16 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
-// @collapse-end
 
+// @section-start
 @Component({
+  // @collapse-start
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
   template: `<ng-diagram [model]="model" [config]="config" />`,
@@ -21,10 +21,11 @@ import {
       height: 100%;
     }
   `,
+  // @collapse-end
 })
 export class ConfiguredDiagram {
-  // @mark-start
   config: NgDiagramConfig = {
+    // @mark-start
     edgeRouting: {
       defaultRouting: 'orthogonal', // Set default routing
       orthogonal: {
@@ -35,11 +36,11 @@ export class ConfiguredDiagram {
         bezierControlOffset: 150, // Distance of control points from nodes
       },
     },
+    // @mark-end
   };
-  // @mark-end
+  // @collapse-start
 
   model = initializeModel({
-    // @collapse-start
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.8 },
     },
@@ -60,7 +61,6 @@ export class ConfiguredDiagram {
         data: { label: 'Target 2' },
       },
     ],
-    // @collapse-end
     edges: [
       {
         id: 'edge1',
@@ -82,4 +82,6 @@ export class ConfiguredDiagram {
       },
     ],
   });
+  // @collapse-end
 }
+// @section-end

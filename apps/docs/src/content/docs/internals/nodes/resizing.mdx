@@ -22,7 +22,7 @@ The new size is reflected in the node's appearance and can be used to create fle
 
 Enable resizing by setting the `resizable` property to `true` in your node definition:
 
-<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" />
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" sectionId="enabling" />
 
 When `resizable` is set, the resize handles and lines will appear, and the node can be resized by the user.
 
@@ -70,13 +70,9 @@ This configuration allows you to control minimum node size and other resizing op
 
 - **getMinNodeSize** – Returns the minimum size for a node during resizing.
 
-You can set these options in your diagram configuration:
+You can set these options in your diagram configuration and pass them to the `ng-diagram` component:
 
-<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" />
-
-Pass this configuration to the `ng-diagram` component:
-
-<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" />
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" sectionId="config" />
 
 ## Example
 

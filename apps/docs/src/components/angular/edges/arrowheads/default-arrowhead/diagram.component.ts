@@ -1,21 +1,16 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
 } from 'ng-diagram';
-// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
-  // @mark-start
   template: ` <ng-diagram [model]="model" /> `,
-  // @mark-end
-  // @collapse-start
   styles: `
     :host {
       flex: 1;
@@ -23,10 +18,11 @@ import {
       height: 100%;
     }
   `,
-  // @collapse-end
 })
 export class DefaultArrowheadDiagram {
+  // @section-start
   model = initializeModel({
+    // @collapse-start
     metadata: {
       viewport: { x: 0, y: -50, scale: 1 },
     },
@@ -52,11 +48,13 @@ export class DefaultArrowheadDiagram {
         data: { label: 'Connection' },
       },
     ],
+    // @collapse-end
     edges: [
       {
         // @mark-start
         targetArrowhead: 'ng-diagram-arrow',
         // @mark-end
+        // @collapse-start
         id: '1',
         source: '1',
         sourcePort: 'port-right',
@@ -64,10 +62,14 @@ export class DefaultArrowheadDiagram {
         targetPort: 'port-left',
         data: {},
         routing: 'straight',
+        // @collapse-end
       },
       {
+        // @mark-start
         sourceArrowhead: 'ng-diagram-arrow',
         targetArrowhead: 'ng-diagram-arrow',
+        // @mark-end
+        // @collapse-start
         id: '2',
         source: '3',
         sourcePort: 'port-right',
@@ -75,7 +77,9 @@ export class DefaultArrowheadDiagram {
         targetPort: 'port-left',
         data: {},
         routing: 'straight',
+        // @collapse-end
       },
     ],
   });
 }
+// @section-end

@@ -1,12 +1,11 @@
-// @collapse-start
 import { Component, input } from '@angular/core';
 import {
   NgDiagramNodeSelectedDirective,
   type NgDiagramNodeTemplate,
   type Node,
 } from 'ng-diagram';
-// @collapse-end
 
+// @section-start
 @Component({
   selector: 'node',
   template: `
@@ -27,3 +26,4 @@ import {
 export class DefaultNodeComponent implements NgDiagramNodeTemplate {
   node = input.required<Node>();
 }
+// @section-end

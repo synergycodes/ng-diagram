@@ -1,13 +1,11 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
-// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
 } from 'ng-diagram';
-// @collapse-end
 
 @Component({
   imports: [NgDiagramComponent],
@@ -22,12 +20,12 @@ import {
   `,
 })
 export class ManualModeDiagram {
+  // @section-start
   model = initializeModel({
     // @collapse-start
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.9 },
     },
-    // @collapse-end
     nodes: [
       {
         id: 'node1',
@@ -42,7 +40,7 @@ export class ManualModeDiagram {
         rotatable: true,
       },
     ],
-    // @mark-start
+    // @collapse-end
     edges: [
       {
         id: 'manual-edge',
@@ -50,6 +48,7 @@ export class ManualModeDiagram {
         sourcePort: 'port-right',
         target: 'node2',
         targetPort: 'port-left',
+        // @mark-start
         routing: 'orthogonal',
         routingMode: 'manual',
         points: [
@@ -60,9 +59,10 @@ export class ManualModeDiagram {
           { x: 445, y: 172 },
           { x: 500, y: 172 },
         ],
+        // @mark-end
         data: {},
       },
     ],
-    // @mark-end
   });
 }
+// @section-end

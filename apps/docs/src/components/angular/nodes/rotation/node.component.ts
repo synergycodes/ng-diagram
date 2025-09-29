@@ -1,14 +1,17 @@
 import { Component, input } from '@angular/core';
 import {
-  NgDiagramNodeRotateAdornmentComponent, // @mark NgDiagramNodeRotateAdornmentComponent
+  NgDiagramNodeRotateAdornmentComponent,
   NgDiagramNodeSelectedDirective,
   type NgDiagramNodeTemplate,
   type Node,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   selector: 'node',
-  imports: [NgDiagramNodeRotateAdornmentComponent], // @mark [NgDiagramNodeRotateAdornmentComponent]
+  // @mark-start
+  imports: [NgDiagramNodeRotateAdornmentComponent],
+  // @mark-end
   template: `
     <!-- @mark-start -->
     <ng-diagram-node-rotate-adornment />
@@ -25,8 +28,9 @@ import {
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
   styleUrl: './node.component.scss',
+  // @collapse-end
 })
 export class CustomNodeComponent implements NgDiagramNodeTemplate {
   node = input.required<Node>();
 }
-// @collapse-end
+// @section-end

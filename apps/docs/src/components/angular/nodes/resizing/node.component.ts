@@ -1,16 +1,18 @@
 import { Component, input } from '@angular/core';
 import {
-  NgDiagramNodeResizeAdornmentComponent, // @mark NgDiagramNodeResizeAdornmentComponent
+  NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeSelectedDirective,
   type NgDiagramNodeTemplate,
   type Node,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   selector: 'node',
-  imports: [NgDiagramNodeResizeAdornmentComponent], // @mark [NgDiagramNodeResizeAdornmentComponent]
-  // @mark-start
+  // @mark-substring:NgDiagramNodeResizeAdornmentComponent
+  imports: [NgDiagramNodeResizeAdornmentComponent],
   template: `
+    <!-- @mark-start -->
     <ng-diagram-node-resize-adornment>
       <div class="node">
         <div class="node-header">Header</div>
@@ -19,15 +21,16 @@ import {
         </div>
       </div>
     </ng-diagram-node-resize-adornment>
+    <!-- @mark-end -->
   `,
-  // @mark-end
   // @collapse-start
   hostDirectives: [
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
   styleUrls: ['./node.component.scss'],
+  // @collapse-end
 })
 export class CustomNodeComponent implements NgDiagramNodeTemplate {
   node = input.required<Node>();
 }
-// @collapse-end
+// @section-end

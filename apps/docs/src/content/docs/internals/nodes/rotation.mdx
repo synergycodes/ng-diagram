@@ -28,7 +28,7 @@ To make a custom node rotatable, include `<ng-diagram-node-rotate-adornment />` 
 
 Enable rotation by setting the `rotatable` property to `true` in your node definition:
 
-<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" />
+<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" sectionId="enabling" />
 
 When `rotatable` is set, the rotation handle will appear, and the node can be rotated by the user.
 
@@ -74,13 +74,9 @@ This configuration allows you to control snapping and snap angles for node rotat
 - **defaultSnapAngle** - The default snap angle in degrees, used if `computeSnapAngleForNode` returns null.
 - **shouldSnapForNode** - Determines whether rotation snapping should be enabled for a node.
 
-You can set these options in your diagram configuration:
+You can set these options in your diagram by passing the configuration to the `ng-diagram` component:
 
-<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" />
-
-Pass this configuration to the `ng-diagram` component:
-
-<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" />
+<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" sectionId="config" />
 
 ## Example
 

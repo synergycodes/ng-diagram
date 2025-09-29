@@ -2,19 +2,20 @@ import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgDiagramModelService } from 'ng-diagram';
 
+// @section-start
 @Component({
-  // @mark-start
   selector: 'label-panel',
   imports: [FormsModule],
   template: `
+    <!-- @mark-start -->
     @if (isEdgeSelected()) {
       <input [(ngModel)]="label" />
     } @else {
       Select an edge
     }
     <button (click)="onSetLabel()">Set Label</button>
+    <!-- @mark-end -->
   `,
-  // @mark-end
   // @collapse-start
   styles: `
     :host {
@@ -38,15 +39,15 @@ import { NgDiagramModelService } from 'ng-diagram';
   // @collapse-end
 })
 export class LabelPanel {
-  // @collapse-start
   private modelService: NgDiagramModelService = inject(NgDiagramModelService);
   edges = computed(() => this.modelService.getModel().getEdges());
+  // @collapse-start
 
   selectedEdge = computed(() => this.edges().find((edge) => edge.selected));
   isEdgeSelected = computed(() => !!this.selectedEdge());
   label = '';
-  // @collapse-end
 
+  // @collapse-end
   // @mark-start
   onSetLabel() {
     const edgeToUpdate = this.edges().find((edge) => edge.selected);
@@ -61,3 +62,4 @@ export class LabelPanel {
   }
   // @mark-end
 }
+// @section-end

@@ -11,6 +11,7 @@ import {
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
+  // @mark-substring [model]="model"
   template: ` <ng-diagram [model]="model" /> `,
 })
 export class Diagram {
