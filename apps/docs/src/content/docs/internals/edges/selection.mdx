@@ -1,0 +1,103 @@
+---
+title: Selection
+description: Understanding how edge selection works in ngDiagram
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+import CustomEdgeSelection from '@components/angular/edges/edge-selection/custom-edge/custom-edge.astro';
+import CustomSelection from '@components/angular/edges/edge-selection/custom/custom.astro';
+import DefaultEdgeSelection from '@components/angular/edges/edge-selection/default/default.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+The **edge selection** feature in ngDiagram allows users to select edges on the diagram canvas.
+Selected edges are visually highlighted, making it easier to identify and interact with connections between nodes.
+
+## How Edge Selection Works
+
+- Edges can be selected by clicking on them.
+- The selected state is managed by ngDiagram and can be accessed via the edge's `selected` property.
+- Selection styles can be applied automatically or customized.
+
+## Default Selection
+
+Default edge selection uses built-in styles and logic provided by ngDiagram.
+The default edge template automatically highlights selected edges.
+
+<DefaultEdgeSelection />
+
+## Customizing Default Selection Styles
+
+You can customize edge selection styles.
+
+Here are a CSS variables you can use to style the selection highlight:
+
+```
+--ngd-default-edge-stroke   // Stroke color for default edge
+--ngd-default-edge-stroke-hover // Stroke color for default edge on hover
+--ngd-default-edge-stroke-selected   // Stroke color for selected default edge
+```
+
+You can override this variable in your styles to customize the appearance of selected nodes.
+
+<CustomSelection />
+
+<CodeSnippet relativePath="edges/edge-selection/custom/diagram.component.scss" sectionId="styles" />
+
+## Custom Edge Selection
+
+Custom edges can easily apply selection styles using CSS variables. The base edge component exposes selection state through CSS classes, allowing you to style edges without breaking encapsulation.
+
+### How It Works
+
+When an edge is selected, the `NgDiagramBaseEdgeComponent` automatically adds the `.selected` class to its host element. You can use this class to change CSS variables that control the edge appearance.
+
+### Example: Custom Edge with Selection Styling
+
+<CustomEdgeSelection />
+
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.ts" />
+
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.scss" />
+
+### Available CSS Variables
+
+You can customize these CSS variables to control edge appearance:
+
+- `--edge-stroke` - Stroke color
+- `--edge-stroke-width` - Stroke width
+- `--edge-stroke-opacity` - Stroke opacity
+- `--edge-stroke-dasharray` - Stroke dash pattern (e.g., `5 5` for dashed line)
+- `--edge-stroke-transition` - Transition for stroke changes (e.g., `stroke 0.1s ease-in-out`)
+
+### Available Host Classes
+
+The base edge component exposes these classes for styling:
+
+- `.selected` - Applied when the edge is selected
+- `.temporary` - Applied when the edge is being drawn (preview state)
+
+### Alternative: Dynamic Styling with Computed Properties
+
+For complex or programmatic styling, you can use computed properties with the base edge inputs:
+
+<CodeSnippet relativePath="edges/edge-selection/dynamic-edge/dynamic-edge.component.ts" />
+
+## Further Reading
+
+<LinkCard
+  title="Edges Overview"
+  href="/docs/internals/edges/edges"
+  description="General overview of edges in ngDiagram"
+/>
+
+<LinkCard
+  title="Custom Edges"
+  href="/docs/internals/edges/custom-edges"
+  description="Create edges with custom rendering and behavior"
+/>
+
+<LinkCard
+  title="Edge Labels"
+  href="/docs/internals/edges/labels"
+  description="Add labels and interactive elements to edges"
+/>
