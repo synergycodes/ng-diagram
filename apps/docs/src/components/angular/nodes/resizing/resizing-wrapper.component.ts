@@ -11,6 +11,9 @@ import {
 
 import { CustomNodeComponent } from './node.component';
 
+// @section-start:config
+// @section-start:usage
+// @mark-substring:config:config
 @Component({
   selector: 'resizing',
   imports: [NgDiagramComponent],
@@ -27,24 +30,30 @@ import { CustomNodeComponent } from './node.component';
   styleUrls: ['./resizing-wrapper.component.scss'],
 })
 export class ResizingWrapperComponent {
+  // @collapse-start:config
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
     ['myType', CustomNodeComponent],
   ]);
 
+  // @collapse-end:config
   config = {
     zoom: {
       max: 3,
     },
+    // @mark-start:config
     resize: {
       getMinNodeSize: (_: Node) => {
         return { width: 200, height: 80 };
       },
     },
+    // @mark-end:config
     snapping: {
       shouldSnapResizeForNode: () => false,
     },
   } satisfies NgDiagramConfig;
+  // @collapse-start:config
 
+  // @section-start:enabling
   model = initializeModel({
     nodes: [
       {
@@ -52,10 +61,18 @@ export class ResizingWrapperComponent {
         position: { x: 100, y: 100 },
         type: 'myType',
         data: {},
+        // @mark-start:enabling
         resizable: true,
+        // @mark-end:enabling
       },
     ],
+    // @collapse-start:enabling
     edges: [],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+    // @collapse-end:enabling
   });
+  // @section-end:enabling
+  // @collapse-end:config
 }
+// @section-end:config
+// @section-end:usage

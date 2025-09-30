@@ -1,3 +1,4 @@
+/* @collapse-start */
 :host {
   display: flex;
   width: 100%;
@@ -18,7 +19,9 @@
       font-size: 12px;
     }
   }
+  /* @collapse-end */
 
+  /* @mark-start */
   .some-custom-class {
     // Override default styles using port CSS custom properties
     --ngd-port-border-size: 0px;
@@ -29,4 +32,5 @@
     background: url('data:image/svg+xml;utf8,<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg"><polygon points="7.5,0 9,6 15,6 10.5,9 12,15 7.5,12 3,15 4.5,9 0,6 6,6" fill="%239140ff"/></svg>');
     background-repeat: no-repeat;
   }
+  /* @mark-end */
 }

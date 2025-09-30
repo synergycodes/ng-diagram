@@ -1,9 +1,12 @@
+// @collapse-start
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { NgDiagramModelService } from 'ng-diagram';
 import { SaveStateService } from '../save.service';
+// @collapse-end
 
 @Component({
   selector: 'nav-bar',
+  // @mark-start
   template: `
     <div class="nav-bar">
       <div class="status">{{ statusMessage() }}</div>
@@ -14,9 +17,11 @@ import { SaveStateService } from '../save.service';
       </button>
     </div>
   `,
+  // @mark-end
   styleUrls: ['./nav-bar.component.scss'],
 })
 export class NavBarComponent {
+  // @collapse-start
   //TODO - change any type to the correct one
   loadModel = output<any>();
 
@@ -62,4 +67,5 @@ export class NavBarComponent {
       this.statusTimeout = null;
     }, 6000);
   }
+  // @collapse-end
 }

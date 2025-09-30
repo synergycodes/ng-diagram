@@ -10,10 +10,14 @@ import {
 
 import { CustomNodeComponent } from './node.component';
 
+// @section-start:config
+// @mark-substring:config:config
 @Component({
+  // @collapse-start:config
   selector: 'rotation',
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
+  // @collapse-end:config
   template: `
     <div class="not-content diagram">
       <ng-diagram
@@ -26,21 +30,26 @@ import { CustomNodeComponent } from './node.component';
   styleUrl: './rotation-wrapper.component.scss',
 })
 export class RotationWrapperComponent {
+  // @collapse-start:config
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
     ['myType', CustomNodeComponent],
   ]);
 
+  // @collapse-end:config
   config = {
     zoom: {
       max: 3,
     },
+    // @mark-start:config
     nodeRotation: {
       computeSnapAngleForNode: () => 45,
       defaultSnapAngle: 25,
       shouldSnapForNode: () => true,
     },
+    // @mark-end:config
   } satisfies NgDiagramConfig;
-
+  // @collapse-start:config
+  // @section-start:enabling
   model = initializeModel({
     nodes: [
       {
@@ -48,10 +57,17 @@ export class RotationWrapperComponent {
         position: { x: 100, y: 100 },
         type: 'myType',
         data: {},
+        // @mark-start:enabling
         rotatable: true,
+        // @mark-end:enabling
       },
     ],
+    // @collapse-start:enabling
     edges: [],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+    // @collapse-end:enabling
   });
+  // @section-end:enabling
+  // @collapse-end:config
 }
+// @section-end:config

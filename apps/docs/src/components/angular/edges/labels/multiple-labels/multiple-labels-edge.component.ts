@@ -6,6 +6,7 @@ import {
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
 
+// @section-start
 const LABEL_COUNT = 10;
 const ANIMATION_DURATION = 0.5;
 
@@ -15,6 +16,7 @@ const ANIMATION_DURATION = 0.5;
     [edge]="edge()"
     [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
   >
+    <!-- @mark-start -->
     @for (label of animatedLabels(); track label.id) {
       <ng-diagram-base-edge-label
         class="label"
@@ -24,8 +26,10 @@ const ANIMATION_DURATION = 0.5;
       >
       </ng-diagram-base-edge-label>
     }
+    <!-- @mark-end -->
   </ng-diagram-base-edge>`,
   styles: `
+    /* @mark-start */
     @keyframes label-animation {
       0% {
         background: aliceblue;
@@ -43,6 +47,7 @@ const ANIMATION_DURATION = 0.5;
       background: aliceblue;
       animation: label-animation ${ANIMATION_DURATION}s ease-in-out infinite;
     }
+    /* @mark-end */
   `,
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
 })
@@ -52,6 +57,7 @@ export class MultipleLabelsEdgeComponent
   edge = input.required<Edge<MultiLabelEdgeData>>();
   selected = computed(() => this.edge().selected);
 
+  // @mark-start
   animatedLabels = computed(() => {
     return Array.from({ length: LABEL_COUNT }, (_, i) => ({
       id: `label-${i}`,
@@ -61,8 +67,10 @@ export class MultipleLabelsEdgeComponent
       },
     }));
   });
+  // @mark-end
 }
 
 type MultiLabelEdgeData = {
   label: string;
 };
+// @section-end

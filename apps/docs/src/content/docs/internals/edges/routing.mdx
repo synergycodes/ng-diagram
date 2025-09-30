@@ -40,7 +40,7 @@ import Routing from '@components/angular/edges/routing/routing.astro';
 
 To specify a routing algorithm for an edge, set the `routing` property in the edge data:
 
-<CodeSnippet relativePath="edges/routing/diagram.component.ts" collapse={['1-60']} mark={[68, 78, 88]} />
+<CodeSnippet relativePath="edges/routing/diagram.component.ts" />
 
 When no routing is specified, the default routing algorithm (polyline) is used. The default can be changed through configuration.
 
@@ -83,12 +83,7 @@ import ManualMode from '@components/angular/edges/routing/manual-mode.astro';
 
 <ManualMode />
 
-<CodeSnippet
-  relativePath="edges/routing/manual-mode-diagram.component.ts"
-  range={[23, 63]}
-  collapse={['2-18']}
-  mark={[{ range: '26-35' }]}
-/>
+<CodeSnippet relativePath="edges/routing/manual-mode-diagram.component.ts" />
 
 This is useful for creating custom edge behaviors, fixed connection paths, or implementing your own edge update logic.
 
@@ -96,11 +91,7 @@ This is useful for creating custom edge behaviors, fixed connection paths, or im
 
 You can configure routing behavior globally through the diagram's configuration:
 
-<CodeSnippet
-  relativePath="edges/routing/configured-diagram.component.ts"
-  collapse={['1-22', '36-79']}
-  mark={[{ range: '25-34' }]}
-/>
+<CodeSnippet relativePath="edges/routing/configured-diagram.component.ts" />
 
 ## Custom Routing Algorithms
 
@@ -114,11 +105,7 @@ import Sinusoid from '@components/angular/edges/routing/sinusoid.astro';
 
 <Sinusoid />
 
-<CodeSnippet
-  relativePath="edges/routing/sinusoid-edge.component.ts"
-  collapse={['1-8', '39-88']}
-  mark={[11, 30, { range: '32-37' }]}
-/>
+<CodeSnippet relativePath="edges/routing/sinusoid-edge.component.ts" />
 
 This approach is ideal when you want the path to update automatically based on node positions and when you just need to compute points - the SVG path can be computed by a built-in routing algorithm (in this case, polyline was sufficient).
 

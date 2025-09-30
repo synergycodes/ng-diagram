@@ -1,20 +1,27 @@
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
+// @collapse-start
 import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
 } from 'ng-diagram';
+// @collapse-end
+// @mark-start
 import { CustomArrowheadsComponent } from './custom-arrowheads.component';
+// @mark-end
 
 @Component({
   imports: [NgDiagramComponent, CustomArrowheadsComponent],
   providers: [provideNgDiagram()],
   template: `
     <ng-diagram [model]="model" />
+    <!-- @mark-start -->
     <custom-arrowheads />
+    <!-- @mark-end -->
   `,
+  // @collapse-start
   styles: `
     :host {
       flex: 1;
@@ -22,13 +29,17 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
       height: 100%;
     }
   `,
+  // @collapse-end
 })
 export class CustomArrowheadDiagram {
   model = initializeModel({
+    // @collapse-start
     metadata: {
       viewport: { x: 100, y: 0, scale: 0.8 },
     },
+    // @collapse-end
     nodes: [
+      // @collapse-start
       {
         id: 'square',
         position: { x: 50, y: 50 },
@@ -59,34 +70,47 @@ export class CustomArrowheadDiagram {
         position: { x: 400, y: 250 },
         data: { label: 'Target' },
       },
+      // @collapse-end
     ],
     edges: [
       {
+        // @mark-start
         targetArrowhead: 'square-arrowhead',
+        // @mark-end
+        // @collapse-start
         id: '1',
         source: 'square',
         target: 'square-target',
         sourcePort: 'port-right',
         targetPort: 'port-left',
         data: {},
+        // @collapse-end
       },
       {
+        // @mark-start
         targetArrowhead: 'open-arrow',
+        // @mark-end
+        // @collapse-start
         id: '2',
         source: 'open-arrow',
         target: 'open-arrow-target',
         sourcePort: 'port-right',
         targetPort: 'port-left',
         data: {},
+        // @collapse-end
       },
       {
+        // @mark-start
         targetArrowhead: 'circle-arrowhead',
+        // @mark-end
+        // @collapse-start
         id: '3',
         source: 'circle',
         target: 'circle-target',
         sourcePort: 'port-right',
         targetPort: 'port-left',
         data: {},
+        // @collapse-end
       },
     ],
   });
