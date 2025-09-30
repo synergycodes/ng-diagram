@@ -1,0 +1,14 @@
+:host {
+  flex: 1;
+  display: flex;
+
+  .custom-diagram {
+    flex: 1;
+    display: flex;
+    height: 20rem;
+
+    --ngd-default-edge-stroke: red;
+    --ngd-default-edge-stroke-hover: green;
+    --ngd-default-edge-stroke-selected: blue;
+  }
+}

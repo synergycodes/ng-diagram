@@ -1,0 +1,63 @@
+---
+title: Selection
+description: Understanding how edge selection works in ngDiagram
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+import CustomEdgeSelection from '@components/angular/edges/edge-selection/edge-selection-custom.astro';
+import DefaultEdgeSelection from '@components/angular/edges/edge-selection/edge-selection-default.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+The **edge selection** feature in ngDiagram allows users to select edges on the diagram canvas.
+Selected edges are visually highlighted, making it easier to identify and interact with connections between nodes.
+
+## How Edge Selection Works
+
+- Edges can be selected by clicking on them.
+- The selected state is managed by ngDiagram and can be accessed via the edge's `selected` property.
+- Selection styles can be applied automatically or customized.
+
+## Default Selection
+
+Default edge selection uses built-in styles and logic provided by ngDiagram.
+The default edge template automatically highlights selected edges.
+
+<DefaultEdgeSelection />
+
+## Customizing Default Selection Styles
+
+You can customize edge selection styles.
+
+Here are a CSS variables you can use to style the selection highlight:
+
+```
+--ngd-default-edge-stroke   // Stroke color for default edge
+--ngd-default-edge-stroke-hover // Stroke color for default edge on hover
+--ngd-default-edge-stroke-selected   // Stroke color for selected default edge
+```
+
+You can override this variable in your styles to customize the appearance of selected nodes.
+
+<CustomEdgeSelection />
+
+<CodeSnippet relativePath="edges/edge-selection/custom/diagram.component.scss" mark={[{ range: '10-12' }]} />
+
+## Further Reading
+
+<LinkCard
+  title="Edges Overview"
+  href="/docs/internals/edges/edges"
+  description="General overview of edges in ngDiagram"
+/>
+
+<LinkCard
+  title="Custom Edges"
+  href="/docs/internals/edges/custom-edges"
+  description="Create edges with custom rendering and behavior"
+/>
+
+<LinkCard
+  title="Edge Labels"
+  href="/docs/internals/edges/labels"
+  description="Add labels and interactive elements to edges"
+/>
