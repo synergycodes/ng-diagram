@@ -1,8 +1,4 @@
 :host {
-  --mdc-chip-label-text-size: 10px;
-  --mat-form-field-container-vertical-padding: 8px;
-  --mat-form-field-container-height: 30px;
-
   display: flex;
   width: 100%;
   height: 100%;
@@ -18,7 +14,7 @@
 
     &-header {
       font-weight: bold;
-      margin-bottom: 4px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       vertical-align: middle;
@@ -26,9 +22,7 @@
       justify-items: center;
 
       .mat-mdc-chip {
-        font-size: 11px;
-        height: 20px;
-        margin-bottom: 10px;
+        --mdc-chip-label-text-color: white !important;
       }
     }
 
@@ -40,6 +34,14 @@
         width: 180px;
       }
 
+      .mat-expansion-panel {
+        --mat-expansion-container-background-color: var(
+          --ngd-node-stroke-primary-default
+        );
+        --mat-expansion-header-text-color: var(--ngd-txt-primary-default);
+        --mat-expansion-container-text-color: var(--ngd-txt-primary-default);
+      }
+
       form {
         height: 50px;
         margin-top: 8px;
@@ -47,19 +49,6 @@
         .mat-mdc-form-field {
           min-width: 120px;
         }
-      }
-    }
-
-    &-button {
-      margin-top: 8px;
-      padding: 4px 8px;
-      font-size: 12px;
-      border: 1px solid var(--ngd-node-stroke-primary-default);
-      border-radius: 4px;
-      cursor: pointer;
-
-      &:hover {
-        border-color: var(--ngd-node-stroke-primary-hover);
       }
     }
   }

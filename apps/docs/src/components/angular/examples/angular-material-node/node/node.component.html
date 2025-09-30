@@ -4,7 +4,9 @@
       {{ node().data.name }}
     </div>
     <div>
-      <mat-chip [style.backgroundColor]="nodeStatus()" />
+      <mat-chip [style.backgroundColor]="nodeStatus()">
+        {{ this.node().data.status }}
+      </mat-chip>
     </div>
   </div>
   <div class="node-body" title="{{ node().data.tooltip }}">
@@ -23,12 +25,12 @@
           <mat-form-field>
             <mat-select
               (selectionChange)="onColorChange($event)"
-              [value]="nodeStatus()"
-              name="color"
+              [value]="this.node().data.status"
+              name="status"
             >
-              <mat-option value="red">Red</mat-option>
-              <mat-option value="orange">Orange</mat-option>
-              <mat-option value="green">Green</mat-option>
+              <mat-option value="Active">Active</mat-option>
+              <mat-option value="Inactive">Inactive</mat-option>
+              <mat-option value="Error">Error</mat-option>
             </mat-select>
           </mat-form-field>
         </form>

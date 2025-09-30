@@ -6,7 +6,17 @@
         {{ node().data.name }}
       </div>
       <div>
-        <span class="chip">{{ selectedState }}</span>
+        <span
+          class="chip"
+          [style.backgroundColor]="
+            selectedState === 'Active'
+              ? 'green'
+              : selectedState === 'Error'
+                ? 'red'
+                : 'gray'
+          "
+          >{{ selectedState }}</span
+        >
       </div>
     </div>
     <div class="node-body" title="{{ node().data.tooltip }}">

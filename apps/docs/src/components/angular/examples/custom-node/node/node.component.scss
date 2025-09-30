@@ -31,7 +31,7 @@
         height: 20px;
         padding: 0 8px;
         border-radius: 10px;
-        background: #e0e0e0;
+        color: white;
         margin-bottom: 10px;
         line-height: 20px;
       }
@@ -52,19 +52,6 @@
           border: 1px solid #ccc;
           font-size: 12px;
         }
-      }
-    }
-
-    &-button {
-      margin-top: 8px;
-      padding: 4px 8px;
-      font-size: 12px;
-      border: 1px solid var(--ngd-node-stroke-primary-default);
-      border-radius: 4px;
-      cursor: pointer;
-
-      &:hover {
-        border-color: var(--ngd-node-stroke-primary-hover);
       }
     }
   }

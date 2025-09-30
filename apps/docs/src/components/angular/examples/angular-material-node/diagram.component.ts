@@ -50,7 +50,7 @@ export class DiagramComponent {
           description:
             'This is Node 1. This node is a custom node with a custom template.',
           tooltip: 'Node 1 is a custom node',
-          status: 'orange',
+          status: 'Active',
         },
       },
       {
@@ -62,7 +62,7 @@ export class DiagramComponent {
           description:
             'This is Node 2. Initial status is red. This node is a custom node with a custom template.',
           tooltip: 'Node 2 is a custom node',
-          status: 'red',
+          status: 'Error',
         },
       },
     ],
