@@ -31,18 +31,30 @@ export class InitUpdater extends BaseUpdater implements Updater {
     this.portRectInitializer = portRectInitializer;
   }
 
-  async start() {
-    if (this.flowCore.getState()?.nodes?.length > 0) {
-      await this.checkIfInitialized();
+  start(onComplete?: () => void) {
+    // Start all initializers' stability timers
+    // They will wait for data or resolve immediately based on their configuration
+    Promise.all(this.getInitializers().map((initializer) => initializer.waitForFinish()))
+      .then(() => {
+        // All initializers have stabilized and finished
+        this.isInitialized = true;
+        console.log('initialized - all initializers stable');
 
-      // Call init to make sure all scheduled data is processed
-      for (const initializer of this.getInitializers()) {
-        initializer.init();
-      }
-    }
+        // Execute completion callback if provided
+        if (onComplete) {
+          onComplete();
+        }
+      })
+      .catch((err) => {
+        console.error('Initialization failed:', err);
+        // Set initialized anyway to prevent hanging
+        this.isInitialized = true;
 
-    this.isInitialized = true;
-    return;
+        // Still call completion callback even on error
+        if (onComplete) {
+          onComplete();
+        }
+      });
   }
 
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
@@ -109,12 +121,11 @@ export class InitUpdater extends BaseUpdater implements Updater {
     ];
   }
 
-  private async checkIfInitialized() {
-    return Promise.all(this.getInitializers().map((initializer) => initializer.waitForFinish()));
-  }
-
   private createInitializers() {
     const { flowCore } = this;
+    const state = flowCore.getState();
+    const hasNodes = state.nodes.length > 0;
+    const hasEdges = state.edges.length > 0;
 
     const nodeSizeInitializer = new BatchInitializer<Size>((nodeSizeMap) => {
       const { nodes, ...state } = flowCore.getState();
@@ -128,7 +139,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       });
 
       flowCore.setState({ ...state, nodes: updatedNodes });
-    });
+    }, hasNodes); // Only wait for node sizes if there are nodes
 
     const edgeLabelInitializer = new BatchInitializer<EdgeLabel>((edgeLabelMap) => {
       const { edges, ...state } = flowCore.getState();
@@ -149,7 +160,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       });
 
       flowCore.setState({ ...state, edges: updatedEdges });
-    });
+    }, hasEdges); // Only wait for edge labels if there are edges
 
     const edgeLabelSizeInitializer = new BatchInitializer<Size>((edgeLabelSizeMap) => {
       const { edges, ...state } = flowCore.getState();
@@ -168,7 +179,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       }));
 
       flowCore.setState({ ...state, edges: updatedEdges });
-    });
+    }, hasEdges); // Only wait for edge label sizes if there are edges
 
     const portInitializer = new BatchInitializer<Port>((portMap) => {
       const { nodes, ...state } = flowCore.getState();
@@ -188,7 +199,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       });
 
       flowCore.setState({ ...state, nodes: updatedNodes });
-    });
+    }, hasNodes); // Only wait for ports if there are nodes
 
     const portRectInitializer = new BatchInitializer<Rect>((portRectMap) => {
       const { nodes, ...state } = flowCore.getState();
@@ -212,7 +223,7 @@ export class InitUpdater extends BaseUpdater implements Updater {
       });
 
       flowCore.setState({ ...state, nodes: updatedNodes });
-    });
+    }, hasNodes); // Only wait for port rectangles if there are nodes
 
     return {
       nodeSizeInitializer,

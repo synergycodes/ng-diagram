@@ -99,17 +99,21 @@ export class FlowCore {
   /**
    * Starts listening to model changes and emits init command
    */
-  private async init() {
+  private init() {
     this.render();
 
-    await this.initUpdater.start();
-
+    // Set up model change listener immediately
     this.model.onChange((state) => {
       this.spatialHash.process(state.nodes);
       this.render();
     });
 
-    this.commandHandler.emit('init');
+    // Start the initialization process (non-blocking)
+    // InitUpdater will emit 'init' when all components stabilize
+    this.initUpdater.start(() => {
+      // Callback executed when initialization is complete
+      this.commandHandler.emit('init');
+    });
   }
 
   /**

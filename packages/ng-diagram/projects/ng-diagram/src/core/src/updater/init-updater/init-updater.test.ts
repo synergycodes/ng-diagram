@@ -6,9 +6,8 @@ import { InitUpdater } from './init-updater';
 
 // Mock BatchInitializer
 vi.mock(import('./batch-initializer'), () => ({ BatchInitializer: vi.fn() }));
-BatchInitializer.prototype.waitForFinish = vi.fn();
-BatchInitializer.prototype.init = vi.fn(() => Promise.resolve());
-BatchInitializer.prototype.scheduleInit = vi.fn();
+BatchInitializer.prototype.waitForFinish = vi.fn(() => Promise.resolve());
+BatchInitializer.prototype.init = vi.fn();
 BatchInitializer.prototype.batchChange = vi.fn();
 
 describe('InitUpdater', () => {
@@ -42,10 +41,60 @@ describe('InitUpdater', () => {
   });
 
   describe('start', () => {
-    it('should wait for all initializers to finish and set isInitialized to true', async () => {
-      await initUpdater.start();
+    it('should call waitForFinish on all initializers and eventually set isInitialized', async () => {
+      const onCompleteMock = vi.fn();
 
-      expect(BatchInitializer).toHaveBeenCalledTimes(5);
+      initUpdater.start(onCompleteMock);
+
+      // waitForFinish should be called for each initializer
+      expect(BatchInitializer.prototype.waitForFinish).toHaveBeenCalledTimes(5);
+
+      // Initially, isInitialized should still be false (async)
+      expect(initUpdater.isInitialized).toBe(false);
+
+      // Wait for promises to resolve
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // After promises resolve, isInitialized should be true and callback called
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(onCompleteMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle initialization failure and still call onComplete', async () => {
+      const onCompleteMock = vi.fn();
+      const error = new Error('Initialization failed');
+
+      // Make one initializer fail
+      BatchInitializer.prototype.waitForFinish = vi
+        .fn()
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue(undefined);
+
+      // Spy on console.error
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      initUpdater.start(onCompleteMock);
+
+      // Wait for promises to resolve/reject
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // Should still set isInitialized and call callback even on error
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(onCompleteMock).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Initialization failed:', error);
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should work without onComplete callback', async () => {
+      initUpdater.start(); // No callback
+
+      // Wait for promises to resolve
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // Should still set isInitialized
       expect(initUpdater.isInitialized).toBe(true);
     });
   });
