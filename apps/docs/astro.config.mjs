@@ -25,6 +25,7 @@ export default defineConfig({
         light: './src/assets/ng-diagram-logo-black.svg',
         dark: './src/assets/ng-diagram-logo-white.svg',
       },
+      favicon: '/docs/favicon.svg', // should inclue baseUrl
       customCss: ['./src/styles/custom.css'],
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/synergycodes/ng-diagram' }],
       sidebar: [
