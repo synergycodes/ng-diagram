@@ -1,5 +1,5 @@
 import '@angular/compiler';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   initializeModel,
   NgDiagramComponent,
@@ -15,10 +15,8 @@ enum NodeTemplateType {
 }
 
 @Component({
-  selector: 'customnode',
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="not-content diagram">
       <ng-diagram
@@ -28,9 +26,9 @@ enum NodeTemplateType {
       />
     </div>
   `,
-  styleUrl: './angular-material.component.scss',
+  styleUrl: './diagram.component.scss',
 })
-export class AngularMaterialExampleComponent {
+export class DiagramComponent {
   nodeTemplateMap = new NgDiagramNodeTemplateMap([
     [NodeTemplateType.CustomNodeType, NodeComponent],
   ]);
@@ -45,8 +43,7 @@ export class AngularMaterialExampleComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 80, y: 100 },
-        size: { width: 200, height: 150 },
+        position: { x: 50, y: 20 },
         type: 'customNodeType',
         data: {
           name: 'Node 1',
@@ -58,7 +55,7 @@ export class AngularMaterialExampleComponent {
       },
       {
         id: '2',
-        position: { x: 400, y: 100 },
+        position: { x: 400, y: 20 },
         type: 'customNodeType',
         data: {
           name: 'Node 2',
