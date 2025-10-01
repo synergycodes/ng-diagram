@@ -60,6 +60,11 @@ export class NgDiagramBaseEdgeComponent {
    */
   strokeWidth = input<number>(2);
 
+  /**
+   * Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-dot pattern).
+   */
+  strokeDasharray = input<string>();
+
   readonly points = computed(() => this.edge().points ?? []);
 
   readonly path = computed(() => {

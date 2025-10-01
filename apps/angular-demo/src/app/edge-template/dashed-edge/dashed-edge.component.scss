@@ -1,0 +1,14 @@
+:host {
+  --edge-stroke: #666;
+  --edge-stroke-dasharray: 5 5;
+}
+
+ng-diagram-base-edge.dashed-edge.selected {
+  --edge-stroke: blue;
+  --edge-stroke-width: 3;
+  --edge-stroke-dasharray: 8 4;
+}
+
+ng-diagram-base-edge.dashed-edge:hover:not(.selected) {
+  --edge-stroke: #999;
+}

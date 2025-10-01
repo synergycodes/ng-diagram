@@ -5,6 +5,7 @@
     [attr.stroke]="stroke() || 'var(--edge-stroke, var(--ngd-default-edge-stroke))'"
     [attr.fill]="'none'"
     [attr.stroke-width]="strokeWidth() || 'var(--edge-stroke-width, 2)'"
+    [attr.stroke-dasharray]="strokeDasharray() || 'var(--edge-stroke-dasharray, none)'"
     [attr.marker-start]="markerStart()"
     [attr.marker-end]="markerEnd()"
     [attr.stroke-opacity]="strokeOpacity() || 'var(--edge-stroke-opacity, 1)'"

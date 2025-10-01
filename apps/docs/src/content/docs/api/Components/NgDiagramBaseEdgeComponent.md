@@ -42,6 +42,14 @@ Stroke color of the edge. Edge model data has precedence over this property.
 
 ***
 
+### strokeDasharray
+
+> **strokeDasharray**: `InputSignal`\<`undefined` \| `string`\>
+
+Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-dot pattern).
+
+***
+
 ### strokeOpacity
 
 > **strokeOpacity**: `InputSignal`\<`number`\>
