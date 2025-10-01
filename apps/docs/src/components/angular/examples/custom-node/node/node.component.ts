@@ -1,9 +1,4 @@
 import { Component, input, model } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import {
   NgDiagramNodeResizeAdornmentComponent,
   NgDiagramNodeRotateAdornmentComponent,
@@ -19,11 +14,6 @@ import {
     NgDiagramNodeRotateAdornmentComponent,
     NgDiagramPortComponent,
     NgDiagramNodeResizeAdornmentComponent,
-    MatSelectModule,
-    MatFormFieldModule,
-    FormsModule,
-    MatInputModule,
-    MatChipsModule,
   ],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
@@ -38,5 +28,10 @@ export class NodeComponent implements NgDiagramNodeTemplate {
   text = model<string>('');
   node = input.required<Node>();
 
-  selectedState: string = 'Active';
+  selectedState: string = 'Inactive';
+
+  onStateChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedState = selectElement.value;
+  }
 }
