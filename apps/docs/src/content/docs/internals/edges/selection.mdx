@@ -4,8 +4,9 @@ description: Understanding how edge selection works in ngDiagram
 ---
 
 import { LinkCard } from '@astrojs/starlight/components';
-import CustomEdgeSelection from '@components/angular/edges/edge-selection/edge-selection-custom.astro';
-import DefaultEdgeSelection from '@components/angular/edges/edge-selection/edge-selection-default.astro';
+import CustomEdgeSelection from '@components/angular/edges/edge-selection/selection-custom-edge.astro';
+import CustomSelection from '@components/angular/edges/edge-selection/selection-custom.astro';
+import DefaultEdgeSelection from '@components/angular/edges/edge-selection/selection-default.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 The **edge selection** feature in ngDiagram allows users to select edges on the diagram canvas.
@@ -38,9 +39,30 @@ Here are a CSS variables you can use to style the selection highlight:
 
 You can override this variable in your styles to customize the appearance of selected nodes.
 
+<CustomSelection />
+
+<CodeSnippet relativePath="edges/edge-selection/custom/diagram.component.scss" sectionId="styles" />
+
+## Custom Edge Selection
+
+To use selection highlighting in a custom edge implementation, define your own edge template and apply styles in its stylesheet.
+This allows you to control how selected custom edges are rendered.
+
+:::note
+Make sure to set `ViewEncapsulation.None` in your custom edge component.
+Angular’s default style encapsulation restricts styles to the component’s template only.
+By setting `ViewEncapsulation.None`, your styles (such as `.ng-diagram-edge__path.selected`) will be applied globally, ensuring that selection highlighting works correctly for custom edges.
+:::
+
+For example, you can set a custom stroke color for selected edges:
+
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.scss" />
+
+This approach ensures that selection feedback is consistent with your custom edge design.
+
 <CustomEdgeSelection />
 
-<CodeSnippet relativePath="edges/edge-selection/custom/diagram.component.scss" />
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.ts" />
 
 ## Further Reading
 
