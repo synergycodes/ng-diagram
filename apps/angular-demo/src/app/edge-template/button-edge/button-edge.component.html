@@ -1,9 +1,4 @@
-<ng-diagram-base-edge
-  class="custom-edge"
-  [edge]="edge()"
-  [routing]="'bezier'"
-  [targetArrowhead]="'ng-diagram-arrow'"
->
+<ng-diagram-base-edge class="custom-edge" [edge]="edge()" [routing]="'bezier'" [targetArrowhead]="'ng-diagram-arrow'">
   <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.4">
     <button (mousedown)="onButtonClick()">Button</button>
   </ng-diagram-base-edge-label>
