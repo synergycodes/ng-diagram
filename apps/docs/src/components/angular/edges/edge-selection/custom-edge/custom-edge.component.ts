@@ -1,4 +1,4 @@
-import { Component, input, ViewEncapsulation } from '@angular/core';
+import { Component, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
   type Edge,
@@ -6,12 +6,8 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  template: `<ng-diagram-base-edge
-    [edge]="edge()"
-    stroke="var(--ngd-default-edge-stroke)"
-  />`,
+  template: `<ng-diagram-base-edge [edge]="edge()" />`,
   imports: [NgDiagramBaseEdgeComponent],
-  encapsulation: ViewEncapsulation.None, //remember to set ViewEncapsulation to None to apply styles
   styleUrls: ['./custom-edge.component.scss'],
 })
 export class CustomEdgeComponent implements NgDiagramEdgeTemplate {

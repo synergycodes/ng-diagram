@@ -17,6 +17,10 @@ import { FlowCoreProviderService } from '../../../services';
     { directive: ZIndexDirective, inputs: ['data: edge'] },
     { directive: EdgeSelectionDirective, inputs: ['targetData: edge'] },
   ],
+  host: {
+    '[class.selected]': 'selected()',
+    '[class.temporary]': 'temporary()',
+  },
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);

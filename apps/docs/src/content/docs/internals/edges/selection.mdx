@@ -45,24 +45,41 @@ You can override this variable in your styles to customize the appearance of sel
 
 ## Custom Edge Selection
 
-To use selection highlighting in a custom edge implementation, define your own edge template and apply styles in its stylesheet.
-This allows you to control how selected custom edges are rendered.
+Custom edges can easily apply selection styles using CSS variables. The base edge component exposes selection state through CSS classes, allowing you to style edges without breaking encapsulation.
 
-:::note
-Make sure to set `ViewEncapsulation.None` in your custom edge component.
-Angular’s default style encapsulation restricts styles to the component’s template only.
-By setting `ViewEncapsulation.None`, your styles (such as `.ng-diagram-edge__path.selected`) will be applied globally, ensuring that selection highlighting works correctly for custom edges.
-:::
+### How It Works
 
-For example, you can set a custom stroke color for selected edges:
+When an edge is selected, the `NgDiagramBaseEdgeComponent` automatically adds the `.selected` class to its host element. You can use this class to change CSS variables that control the edge appearance.
 
-<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.scss" />
-
-This approach ensures that selection feedback is consistent with your custom edge design.
+### Example: Custom Edge with Selection Styling
 
 <CustomEdgeSelection />
 
 <CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.ts" />
+
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.scss" />
+
+### Available CSS Variables
+
+You can customize these CSS variables to control edge appearance:
+
+- `--edge-stroke` - Stroke color
+- `--edge-stroke-width` - Stroke width
+- `--edge-stroke-opacity` - Stroke opacity
+- `--edge-stroke-transition` - Transition for stroke changes (e.g., `stroke 0.1s ease-in-out`)
+
+### Available Host Classes
+
+The base edge component exposes these classes for styling:
+
+- `.selected` - Applied when the edge is selected
+- `.temporary` - Applied when the edge is being drawn (preview state)
+
+### Alternative: Dynamic Styling with Computed Properties
+
+For complex or programmatic styling, you can use computed properties with the base edge inputs:
+
+<CodeSnippet relativePath="edges/edge-selection/dynamic-edge/dynamic-edge.component.ts" />
 
 ## Further Reading
 
