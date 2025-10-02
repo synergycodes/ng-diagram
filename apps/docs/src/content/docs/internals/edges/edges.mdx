@@ -39,12 +39,7 @@ interface Edge<T = any> {
 
 To add edges to your diagram, include them in the `edges` array of your model:
 
-<CodeSnippet
-  relativePath="edges/edges/minimal-diagram.component.ts"
-  range={[16, 70]}
-  collapse={['3-18']}
-  mark={[{ range: '21-28' }]}
-/>
+<CodeSnippet relativePath="edges/edges/minimal-diagram.component.ts" sectionId="adding-edges" />
 
 ## Default Edge
 
@@ -66,12 +61,7 @@ import DefaultEdge from '@components/angular/edges/edges/default-edge/default-ed
 
 <DefaultEdge />
 
-<CodeSnippet
-  relativePath="edges/edges/default-edge/diagram.component.ts"
-  range={[10, 70]}
-  collapse={['23-26', '35-46', '49-54']}
-  mark={[{ range: '8-17' }, { range: '27-29' }, { range: '55-56' }]}
-/>
+<CodeSnippet relativePath="edges/edges/default-edge/diagram.component.ts" />
 
 Use Custom Edges for even more control over edge look and functionality
 
@@ -89,12 +79,7 @@ Ports are connection points on nodes where edges can start or end.
 Each port has an ID unique within its node.
 These IDs (along with their parent node IDs) are used to specify the exact position where edges should be attached.
 
-<CodeSnippet
-  relativePath="edges/edges/minimal-diagram.component.ts"
-  range={[16, 70]}
-  collapse={['3-21']}
-  mark={[24, 26]}
-/>
+<CodeSnippet relativePath="edges/edges/minimal-diagram.component.ts" sectionId="ports" />
 
 <LinkCard
   title="Ports"

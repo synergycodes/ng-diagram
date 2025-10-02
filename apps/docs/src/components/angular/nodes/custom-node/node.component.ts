@@ -6,6 +6,7 @@ import {
   type Node,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   selector: 'node',
   imports: [NgDiagramPortComponent],
@@ -30,6 +31,9 @@ import {
   `,
   styleUrl: './node.component.scss',
 })
+// @mark-start
 export class CustomNodeComponent implements NgDiagramNodeTemplate {
   node = input.required<Node>();
 }
+// @mark-end
+// @section-end

@@ -1,19 +1,28 @@
 ---
-import { Code, Tabs, TabItem } from '@astrojs/starlight/components';
+import HighlightedCode from "../highlighted-code/highlighted-code.astro";
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { loadExamples } from './load-examples';
 
 interface Props {
+  /**
+  * files from this directory are gonna be used as examples
+  */
   dirName: string;
+
+  /**
+  * id of the section to be used as a source
+  */
+  sectionId?: string;
 }
 
-const { dirName } = Astro.props;
+const { dirName, sectionId } = Astro.props;
 const examples = await loadExamples(dirName);
 ---
 
 <Tabs>
   {examples.map(
     ({ fileName, content, extension }) => <TabItem label={fileName}>
-      <Code class="code-container" code={content} lang={extension} />
+      <HighlightedCode class="code-container" code={content} lang={extension} sectionId={sectionId} />
     </TabItem>
   )}
 </Tabs>

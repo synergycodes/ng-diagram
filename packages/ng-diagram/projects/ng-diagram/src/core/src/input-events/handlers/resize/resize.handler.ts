@@ -1,5 +1,5 @@
 import { Point, Size } from '../../..';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { ResizeEvent } from './resize.event';
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {

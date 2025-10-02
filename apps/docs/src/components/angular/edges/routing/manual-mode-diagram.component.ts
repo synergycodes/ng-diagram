@@ -20,7 +20,9 @@ import {
   `,
 })
 export class ManualModeDiagram {
+  // @section-start
   model = initializeModel({
+    // @collapse-start
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.9 },
     },
@@ -38,6 +40,7 @@ export class ManualModeDiagram {
         rotatable: true,
       },
     ],
+    // @collapse-end
     edges: [
       {
         id: 'manual-edge',
@@ -45,6 +48,7 @@ export class ManualModeDiagram {
         sourcePort: 'port-right',
         target: 'node2',
         targetPort: 'port-left',
+        // @mark-start
         routing: 'orthogonal',
         routingMode: 'manual',
         points: [
@@ -55,8 +59,10 @@ export class ManualModeDiagram {
           { x: 445, y: 172 },
           { x: 500, y: 172 },
         ],
+        // @mark-end
         data: {},
       },
     ],
   });
 }
+// @section-end

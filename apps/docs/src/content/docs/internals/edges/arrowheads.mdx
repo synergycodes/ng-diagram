@@ -20,12 +20,7 @@ NgDiagram provides a built-in arrowhead called `ng-diagram-arrow` that can be us
 
 To use the default arrowhead, specify it in your edge configuration:
 
-<CodeSnippet
-  relativePath="edges/arrowheads/default-arrowhead/diagram.component.ts"
-  range={[49, 72]}
-  collapse={['4-10', '15-21']}
-  mark={[3, { range: '13-14' }]}
-/>
+<CodeSnippet relativePath="edges/arrowheads/default-arrowhead/diagram.component.ts" />
 
 ## Custom Arrowhead
 
@@ -35,20 +30,11 @@ You can create custom arrowheads by defining SVG markers with unique IDs. Custom
 
 Custom arrowheads need to be defined as SVG `<marker>` elements within a `<defs>` section. Each marker needs a unique ID that you'll reference in your edge configuration:
 
-<CodeSnippet
-  relativePath="edges/arrowheads/custom-arrowhead/custom-arrowheads.component.ts"
-  range={[3, 71]}
-  mark={[{ range: '6-23' }, { range: '25-42' }, { range: '44-54' }]}
-/>
+<CodeSnippet relativePath="edges/arrowheads/custom-arrowhead/custom-arrowheads.component.ts" />
 
 When marker is defined in the SVG `<defs>` section, it can be referenced in your edge configuration to apply the custom arrowhead to the edge.
 
-<CodeSnippet
-  relativePath="edges/arrowheads/custom-arrowhead/diagram.component.ts"
-  range={[10, 101]}
-  collapse={['8-14', '18-52', '56-61', '65-70', '74-79']}
-  mark={[6, 55, 64, 73]}
-/>
+<CodeSnippet relativePath="edges/arrowheads/custom-arrowhead/diagram.component.ts" />
 
 See [`<marker>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/marker) documentation on MDN for more details.
 

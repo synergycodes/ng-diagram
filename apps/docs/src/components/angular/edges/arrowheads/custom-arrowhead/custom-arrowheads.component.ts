@@ -5,6 +5,7 @@ import { Component } from '@angular/core';
   template: `
     <svg height="0" width="0">
       <defs>
+        <!-- @mark-start -->
         <!-- Square Arrowhead -->
         <marker
           id="square-arrowhead"
@@ -23,7 +24,9 @@ import { Component } from '@angular/core';
             stroke="context-stroke"
           />
         </marker>
+        <!-- @mark-end -->
 
+        <!-- @mark-start -->
         <!-- Open Arrow Arrowhead -->
         <marker
           id="open-arrow"
@@ -42,7 +45,9 @@ import { Component } from '@angular/core';
             stroke-linejoin="round"
           />
         </marker>
+        <!-- @mark-end -->
 
+        <!-- @mark-start -->
         <!-- Circle Arrowhead -->
         <marker
           id="circle-arrowhead"
@@ -54,6 +59,7 @@ import { Component } from '@angular/core';
         >
           <circle cx="4" cy="4" r="3" fill="context-stroke" />
         </marker>
+        <!-- @mark-end -->
       </defs>
     </svg>
   `,

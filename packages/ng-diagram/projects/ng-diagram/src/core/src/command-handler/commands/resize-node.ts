@@ -133,7 +133,10 @@ const handleGroupNodeResize = async (
     return;
   }
 
-  const childrenBounds = calculateGroupBounds(children, node, { useGroupRect: false });
+  const childrenBounds = calculateGroupBounds(children, node, {
+    useGroupRect: false,
+    allowResizeBelowChildrenBounds: commandHandler.flowCore.config.resize.allowResizeBelowChildrenBounds,
+  });
 
   const { size: constrainedSize, position: constrainedPosition } = applyMinimumSizeConstraints(
     commandHandler.flowCore.config,

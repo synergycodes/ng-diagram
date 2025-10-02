@@ -12,9 +12,11 @@ import {
     [edge]="edge()"
     stroke="var(--ngd-default-edge-stroke)"
   >
+    <!-- @mark-start -->
     <ng-diagram-base-edge-label [id]="'test-label'" [positionOnEdge]="0.5">
       <div class="custom-label">Label</div>
     </ng-diagram-base-edge-label>
+    <!-- @mark-end -->
   </ng-diagram-base-edge>`,
   styleUrl: './labeled-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],

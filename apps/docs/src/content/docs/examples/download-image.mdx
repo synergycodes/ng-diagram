@@ -1,8 +1,9 @@
 ---
-title: Download Image
+title: Download Image Example
 description: Example of how to download the flow as an image in ngDiagram
 sidebar:
   order: 7
+  label: Download Image
 ---
 
 import { Image } from 'astro:assets';
@@ -28,23 +29,13 @@ The download functionality allows users to export the flow as a image, capturing
 
 The `GenerateImageService` handles the logic for exporting the flow as an image. It uses the `html-to-image` library and calculates the bounding box to ensure all nodes are included:
 
-<CodeSnippet
-  relativePath="examples/download-image/generate-image.service.ts"
-  range={[1, 34]}
-  collapse={['1-7']}
-  mark={[{ range: '11-33' }]}
-/>
+<CodeSnippet relativePath="examples/download-image/generate-image.service.ts" />
 
 ### Helper Functions
 
 Helper functions manage the download process and calculate the bounding box for the flow:
 
-<CodeSnippet
-  relativePath="examples/download-image/generate-image.helper.ts"
-  range={[1, 61]}
-  collapse={['1-29']}
-  mark={[{ range: '44-59' }]}
-/>
+<CodeSnippet relativePath="examples/download-image/generate-image.helper.ts" />
 
 ### NavBar Component
 
@@ -53,12 +44,7 @@ The navigation bar provides a button to trigger the download action.
 To accurately calculate the bounding box for the entire flow, all nodes are pulled and passed to the calculation.
 Also it passes the flow element reference to the service.
 
-<CodeSnippet
-  relativePath="examples/download-image/nav-bar/nav-bar.component.ts"
-  range={[1, 38]}
-  collapse={['1-5']}
-  mark={[{ range: '21-29' }]}
-/>
+<CodeSnippet relativePath="examples/download-image/nav-bar/nav-bar.component.ts" />
 
 ## Actions
 
