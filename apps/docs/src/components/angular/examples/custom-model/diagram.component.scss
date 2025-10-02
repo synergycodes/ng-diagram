@@ -1,0 +1,39 @@
+.diagram {
+  width: 100%;
+  height: 100%;
+  margin-top: 0;
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  overflow: hidden;
+
+  .button-controls {
+    display: flex;
+    height: 66px;
+    gap: 0.5rem;
+    align-items: flex-end;
+    justify-content: end;
+    padding: 1rem;
+    background-color: var(--ngd-ui-bg-tertiary-default);
+
+    .btn {
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0;
+      border: 0;
+
+      &.secondary {
+        background-color: #8b0000;
+        color: white;
+      }
+
+      &:hover {
+        color: black;
+        background-color: var(--ngd-node-stroke-primary-default);
+      }
+    }
+  }
+}

@@ -59,6 +59,6 @@ export const calculateBoundingBox = (nodes: Node[], margin: number) => {
     height: maxY - minY + margin * 2,
     left: minX - margin,
     top: minY - margin,
-    // @mark-end
   };
+  // @mark-end
 };

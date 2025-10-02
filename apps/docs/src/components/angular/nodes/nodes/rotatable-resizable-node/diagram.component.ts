@@ -12,17 +12,20 @@ import {
   // @collapse-start
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
-  template: ` <ng-diagram [model]="model" /> `,
+  template: `
+    <div class="not-content rotatable-resizable-diagram">
+      <ng-diagram [model]="model" />
+    </div>
+  `,
   styles: `
-    :host {
-      flex: 1;
+    .rotatable-resizable-diagram {
       display: flex;
-      height: 100%;
+      height: 20rem;
     }
   `,
   // @collapse-end
 })
-export class Diagram {
+export class DiagramComponent {
   model = initializeModel({
     // @collapse-start
     metadata: {

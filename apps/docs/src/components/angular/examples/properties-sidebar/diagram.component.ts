@@ -6,40 +6,32 @@ import {
   NgDiagramComponent,
   provideNgDiagram,
 } from 'ng-diagram';
-import { SidebarContainer } from './sidebar.component';
+import { SidebarContainer } from './sidebar/sidebar.component';
 
 @Component({
   imports: [NgDiagramComponent, SidebarContainer],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" />
+    </div>
     <sidebar-container />
   `,
-  styles: `
-    :host {
-      flex: 1;
-      display: flex;
-      height: 100%;
-
-      .coordinates {
-        display: flex;
-      }
-    }
-  `,
+  styleUrls: ['./diagram.component.scss'],
 })
-export class NgDiagramPropertiesSidebarContainer {
+export class DiagramComponent {
   model = initializeModel({
     metadata: {
-      viewport: { x: -45, y: 80, scale: 0.88 },
+      viewport: { x: 0, y: 0, scale: 0.88 },
     },
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 150 },
+        position: { x: 50, y: 120 },
         data: { label: 'Node 1' },
         rotatable: true,
       },
-      { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },
+      { id: '2', position: { x: 300, y: 120 }, data: { label: 'Node 2' } },
     ],
     edges: [
       {

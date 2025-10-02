@@ -5,9 +5,9 @@ sidebar:
   order: 0
 ---
 
-import { Image } from 'astro:assets';
 import { LinkCard } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import { Image } from 'astro:assets';
 
 Edges are the connections between nodes in ngDiagram. They represent relationships, data flow, or dependencies between different components in your diagram.
 
@@ -39,7 +39,7 @@ interface Edge<T = any> {
 
 To add edges to your diagram, include them in the `edges` array of your model:
 
-<CodeSnippet relativePath="edges/edges/minimal-diagram.component.ts" sectionId="adding-edges" />
+<CodeSnippet relativePath="edges/edges/diagram.component.ts" sectionId="adding-edges" />
 
 ## Default Edge
 
@@ -79,7 +79,7 @@ Ports are connection points on nodes where edges can start or end.
 Each port has an ID unique within its node.
 These IDs (along with their parent node IDs) are used to specify the exact position where edges should be attached.
 
-<CodeSnippet relativePath="edges/edges/minimal-diagram.component.ts" sectionId="ports" />
+<CodeSnippet relativePath="edges/edges/diagram.component.ts" sectionId="ports" />
 
 <LinkCard
   title="Ports"
@@ -95,7 +95,7 @@ Edges can be routed using three [built-in routing algorithms](/docs/internals/ed
 - `orthogonal`: Draws a series of horizontal and vertical lines
 - `bezier`: Draws a bezier curve
 
-import Routing from '@components/angular/edges/routing/routing.astro';
+import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 <Routing />
 

@@ -1,8 +1,5 @@
 ---
-import ContentWrapper from '@components/content-wrapper/content-wrapper.astro';
-import { Diagram } from './diagram.component';
+import { DiagramComponent } from './diagram.component';
 ---
 
-<ContentWrapper>
-  <Diagram client:only="angular" />
-</ContentWrapper>
+<DiagramComponent client:only="angular" />

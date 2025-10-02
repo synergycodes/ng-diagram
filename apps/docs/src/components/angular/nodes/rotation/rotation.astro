@@ -1,16 +1,5 @@
 ---
-import { RotationWrapperComponent } from './rotation-wrapper.component';
+import { DiagramComponent } from './diagram.component';
 ---
 
-<div class="diagram-container">
-  <RotationWrapperComponent client:only="angular" />
-</div>
-
-<style>
-  .diagram-container {
-    width: 100%;
-    height: 20rem;
-    border: 5px solid var(--ngd-ui-border-default);
-    background-color: var(--ngd-ui-bg-tertiary-default) ;
-  }
-</style>
+<DiagramComponent client:only="angular" />

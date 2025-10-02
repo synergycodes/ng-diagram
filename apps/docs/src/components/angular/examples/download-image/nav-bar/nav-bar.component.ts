@@ -9,7 +9,7 @@ import { GenerateImageService } from '../generate-image.service';
   selector: 'nav-bar',
   template: `
     <div class="nav-bar">
-      <button (click)="download()">Download</button>
+      <button class="btn" (click)="download()">Download</button>
     </div>
   `,
   styleUrls: ['./nav-bar-component.scss'],
