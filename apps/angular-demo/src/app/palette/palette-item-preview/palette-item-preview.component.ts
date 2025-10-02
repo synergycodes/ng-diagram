@@ -6,7 +6,6 @@ import { PaletteItemComponent } from '../palette-item/palette-item.component';
 
 @Component({
   selector: 'app-palette-item-preview',
-  standalone: true,
   templateUrl: './palette-item-preview.component.html',
   imports: [NgComponentOutlet, PaletteItemComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,

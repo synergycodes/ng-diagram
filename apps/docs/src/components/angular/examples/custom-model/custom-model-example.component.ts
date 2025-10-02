@@ -6,7 +6,6 @@ import { LocalStorageModelAdapter } from './local-storage-model-adapter';
 
 @Component({
   selector: 'app-custom-model-example',
-  standalone: true,
   imports: [CommonModule, NgDiagramComponent],
   templateUrl: './custom-model-example.component.html',
   styleUrl: './custom-model-example.component.scss',

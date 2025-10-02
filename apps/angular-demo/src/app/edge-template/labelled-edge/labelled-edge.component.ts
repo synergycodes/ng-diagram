@@ -8,7 +8,6 @@ import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdge
 
 @Component({
   selector: 'app-labelled-edge',
-  standalone: true,
   templateUrl: './labelled-edge.component.html',
   styleUrls: ['./labelled-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

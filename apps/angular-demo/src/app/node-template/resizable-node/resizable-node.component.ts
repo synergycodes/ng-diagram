@@ -13,7 +13,6 @@ import {
 
 @Component({
   selector: 'app-resizable-node',
-  standalone: true,
   imports: [FormsModule, DecimalPipe, NgDiagramPortComponent, NgDiagramNodeResizeAdornmentComponent],
   templateUrl: './resizable-node.component.html',
   styleUrls: ['./resizable-node.component.scss'],

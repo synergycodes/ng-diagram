@@ -9,6 +9,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import { EdgeLabel } from '../../../core/src';
 import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
@@ -92,20 +93,20 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    effect(
-      () => {
-        const newPositionOnEdge = this.positionOnEdge();
-        const lastPositionOnEdge = this.lastPositionOnEdge();
-        if (newPositionOnEdge !== lastPositionOnEdge) {
+    effect(() => {
+      const newPositionOnEdge = this.positionOnEdge();
+      const lastPositionOnEdge = this.lastPositionOnEdge();
+      if (newPositionOnEdge !== lastPositionOnEdge) {
+        // Angular 18 backward compatibility
+        untracked(() => {
           this.lastPositionOnEdge.set(newPositionOnEdge);
-          this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
-            edgeId: this.edgeId(),
-            labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
-          });
-        }
-      },
-      { allowSignalWrites: true }
-    );
+        });
+        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
+          edgeId: this.edgeId(),
+          labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
+        });
+      }
+    });
   }
 
   /** @internal */

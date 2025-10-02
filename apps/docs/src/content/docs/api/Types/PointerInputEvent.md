@@ -35,8 +35,6 @@ onPointerDown(event: PointerInputEvent) {
 
 > `readonly` **altitudeAngle**: `number`
 
-The **`altitudeAngle`** read-only property of the PointerEvent interface represents the angle between a transducer (a pointer or stylus) axis and the X-Y plane of a device screen.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/altitudeAngle)
 
 #### Inherited from
@@ -48,8 +46,6 @@ The **`altitudeAngle`** read-only property of the PointerEvent interface represe
 ### altKey
 
 > `readonly` **altKey**: `boolean`
-
-The **`MouseEvent.altKey`** read-only property is a boolean value that indicates whether the <kbd>alt</kbd> key was pressed or not when a given mouse event occurs.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/altKey)
 
@@ -63,8 +59,6 @@ The **`MouseEvent.altKey`** read-only property is a boolean value that indicates
 
 > `readonly` **azimuthAngle**: `number`
 
-The **`azimuthAngle`** read-only property of the PointerEvent interface represents the angle between the Y-Z plane and the plane containing both the transducer (pointer or stylus) axis and the Y axis.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/azimuthAngle)
 
 #### Inherited from
@@ -77,7 +71,7 @@ The **`azimuthAngle`** read-only property of the PointerEvent interface represen
 
 > `readonly` **bubbles**: `boolean`
 
-The **`bubbles`** read-only property of the Event interface indicates whether the event bubbles up through the DOM tree or not.
+Returns true or false depending on how event was initialized. True if event goes through its target's ancestors in reverse tree order, and false otherwise.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/bubbles)
 
@@ -91,8 +85,6 @@ The **`bubbles`** read-only property of the Event interface indicates whether th
 
 > `readonly` **button**: `number`
 
-The **`MouseEvent.button`** read-only property indicates which button was pressed or released on the mouse to trigger the event.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/button)
 
 #### Inherited from
@@ -104,8 +96,6 @@ The **`MouseEvent.button`** read-only property indicates which button was presse
 ### buttons
 
 > `readonly` **buttons**: `number`
-
-The **`MouseEvent.buttons`** read-only property indicates which buttons are pressed on the mouse (or other input device) when a mouse event is triggered.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/buttons)
 
@@ -119,7 +109,7 @@ The **`MouseEvent.buttons`** read-only property indicates which buttons are pres
 
 > `readonly` **cancelable**: `boolean`
 
-The **`cancelable`** read-only property of the Event interface indicates whether the event can be canceled, and therefore prevented as if the event never happened.
+Returns true or false depending on how event was initialized. Its return value does not always carry meaning, but true can indicate that part of the operation during which event was dispatched, can be canceled by invoking the preventDefault() method.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelable)
 
@@ -132,8 +122,6 @@ The **`cancelable`** read-only property of the Event interface indicates whether
 ### ~~cancelBubble~~
 
 > **cancelBubble**: `boolean`
-
-The **`cancelBubble`** property of the Event interface is deprecated.
 
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelBubble)
@@ -149,8 +137,6 @@ The **`cancelBubble`** property of the Event interface is deprecated.
 
 > `readonly` **clientX**: `number`
 
-The **`clientX`** read-only property of the MouseEvent interface provides the horizontal coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the page).
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/clientX)
 
 #### Inherited from
@@ -162,8 +148,6 @@ The **`clientX`** read-only property of the MouseEvent interface provides the ho
 ### clientY
 
 > `readonly` **clientY**: `number`
-
-The **`clientY`** read-only property of the MouseEvent interface provides the vertical coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the page).
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/clientY)
 
@@ -177,7 +161,7 @@ The **`clientY`** read-only property of the MouseEvent interface provides the ve
 
 > `readonly` **composed**: `boolean`
 
-The read-only **`composed`** property of the or not the event will propagate across the shadow DOM boundary into the standard DOM.
+Returns true or false depending on how event was initialized. True if event invokes listeners past a ShadowRoot node that is the root of its target, and false otherwise.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composed)
 
@@ -191,8 +175,6 @@ The read-only **`composed`** property of the or not the event will propagate acr
 
 > `readonly` **ctrlKey**: `boolean`
 
-The **`MouseEvent.ctrlKey`** read-only property is a boolean value that indicates whether the <kbd>ctrl</kbd> key was pressed or not when a given mouse event occurs.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/ctrlKey)
 
 #### Inherited from
@@ -205,7 +187,7 @@ The **`MouseEvent.ctrlKey`** read-only property is a boolean value that indicate
 
 > `readonly` **currentTarget**: `null` \| `EventTarget`
 
-The **`currentTarget`** read-only property of the Event interface identifies the element to which the event handler has been attached.
+Returns the object whose event listener's callback is currently being invoked.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/currentTarget)
 
@@ -219,7 +201,7 @@ The **`currentTarget`** read-only property of the Event interface identifies the
 
 > `readonly` **defaultPrevented**: `boolean`
 
-The **`defaultPrevented`** read-only property of the Event interface returns a boolean value indicating whether or not the call to Event.preventDefault() canceled the event.
+Returns true if preventDefault() was invoked successfully to indicate cancelation, and false otherwise.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/defaultPrevented)
 
@@ -233,8 +215,6 @@ The **`defaultPrevented`** read-only property of the Event interface returns a b
 
 > `readonly` **detail**: `number`
 
-The **`UIEvent.detail`** read-only property, when non-zero, provides the current (or next, depending on the event) click count.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/UIEvent/detail)
 
 #### Inherited from
@@ -247,7 +227,7 @@ The **`UIEvent.detail`** read-only property, when non-zero, provides the current
 
 > `readonly` **eventPhase**: `number`
 
-The **`eventPhase`** read-only property of the being evaluated.
+Returns the event's phase, which is one of NONE, CAPTURING_PHASE, AT_TARGET, and BUBBLING_PHASE.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/eventPhase)
 
@@ -261,8 +241,6 @@ The **`eventPhase`** read-only property of the being evaluated.
 
 > `readonly` **height**: `number`
 
-The **`height`** read-only property of the geometry, along the y-axis (in CSS pixels).
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/height)
 
 #### Inherited from
@@ -274,8 +252,6 @@ The **`height`** read-only property of the geometry, along the y-axis (in CSS pi
 ### isPrimary
 
 > `readonly` **isPrimary**: `boolean`
-
-The **`isPrimary`** read-only property of the created the event is the _primary_ pointer.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/isPrimary)
 
@@ -289,7 +265,7 @@ The **`isPrimary`** read-only property of the created the event is the _primary_
 
 > `readonly` **isTrusted**: `boolean`
 
-The **`isTrusted`** read-only property of the when the event was generated by the user agent (including via user actions and programmatic methods such as HTMLElement.focus()), and `false` when the event was dispatched via The only exception is the `click` event, which initializes the `isTrusted` property to `false` in user agents.
+Returns true if event was dispatched by the user agent, and false otherwise.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/isTrusted)
 
@@ -303,8 +279,6 @@ The **`isTrusted`** read-only property of the when the event was generated by th
 
 > `readonly` **layerX**: `number`
 
-The **`MouseEvent.layerX`** read-only property returns the horizontal coordinate of the event relative to the current layer.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/layerX)
 
 #### Inherited from
@@ -316,8 +290,6 @@ The **`MouseEvent.layerX`** read-only property returns the horizontal coordinate
 ### layerY
 
 > `readonly` **layerY**: `number`
-
-The **`MouseEvent.layerY`** read-only property returns the vertical coordinate of the event relative to the current layer.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/layerY)
 
@@ -331,8 +303,6 @@ The **`MouseEvent.layerY`** read-only property returns the vertical coordinate o
 
 > `readonly` **metaKey**: `boolean`
 
-The **`MouseEvent.metaKey`** read-only property is a boolean value that indicates whether the <kbd>meta</kbd> key was pressed or not when a given mouse event occurs.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/metaKey)
 
 #### Inherited from
@@ -344,8 +314,6 @@ The **`MouseEvent.metaKey`** read-only property is a boolean value that indicate
 ### movementX
 
 > `readonly` **movementX**: `number`
-
-The **`movementX`** read-only property of the MouseEvent interface provides the difference in the X coordinate of the mouse pointer between the given event and the previous Element/mousemove_event event.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/movementX)
 
@@ -359,8 +327,6 @@ The **`movementX`** read-only property of the MouseEvent interface provides the 
 
 > `readonly` **movementY**: `number`
 
-The **`movementY`** read-only property of the MouseEvent interface provides the difference in the Y coordinate of the mouse pointer between the given event and the previous Element/mousemove_event event.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/movementY)
 
 #### Inherited from
@@ -372,8 +338,6 @@ The **`movementY`** read-only property of the MouseEvent interface provides the 
 ### offsetX
 
 > `readonly` **offsetX**: `number`
-
-The **`offsetX`** read-only property of the MouseEvent interface provides the offset in the X coordinate of the mouse pointer between that event and the padding edge of the target node.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/offsetX)
 
@@ -387,8 +351,6 @@ The **`offsetX`** read-only property of the MouseEvent interface provides the of
 
 > `readonly` **offsetY**: `number`
 
-The **`offsetY`** read-only property of the MouseEvent interface provides the offset in the Y coordinate of the mouse pointer between that event and the padding edge of the target node.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/offsetY)
 
 #### Inherited from
@@ -400,8 +362,6 @@ The **`offsetY`** read-only property of the MouseEvent interface provides the of
 ### pageX
 
 > `readonly` **pageX**: `number`
-
-The **`pageX`** read-only property of the MouseEvent interface returns the X (horizontal) coordinate (in pixels) at which the mouse was clicked, relative to the left edge of the entire document.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/pageX)
 
@@ -415,8 +375,6 @@ The **`pageX`** read-only property of the MouseEvent interface returns the X (ho
 
 > `readonly` **pageY**: `number`
 
-The **`pageY`** read-only property of the MouseEvent interface returns the Y (vertical) coordinate (in pixels) at which the mouse was clicked, relative to the top edge of the entire document.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/pageY)
 
 #### Inherited from
@@ -428,8 +386,6 @@ The **`pageY`** read-only property of the MouseEvent interface returns the Y (ve
 ### pointerId
 
 > `readonly` **pointerId**: `number`
-
-The **`pointerId`** read-only property of the event.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/pointerId)
 
@@ -443,8 +399,6 @@ The **`pointerId`** read-only property of the event.
 
 > `readonly` **pointerType**: `string`
 
-The **`pointerType`** read-only property of the that caused a given pointer event.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/pointerType)
 
 #### Inherited from
@@ -456,8 +410,6 @@ The **`pointerType`** read-only property of the that caused a given pointer even
 ### pressure
 
 > `readonly` **pressure**: `number`
-
-The **`pressure`** read-only property of the input.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/pressure)
 
@@ -471,8 +423,6 @@ The **`pressure`** read-only property of the input.
 
 > `readonly` **relatedTarget**: `null` \| `EventTarget`
 
-The **`MouseEvent.relatedTarget`** read-only property is the secondary target for the mouse event, if there is one.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/relatedTarget)
 
 #### Inherited from
@@ -484,8 +434,6 @@ The **`MouseEvent.relatedTarget`** read-only property is the secondary target fo
 ### ~~returnValue~~
 
 > **returnValue**: `boolean`
-
-The Event property **`returnValue`** indicates whether the default action for this event has been prevented or not.
 
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/returnValue)
@@ -501,8 +449,6 @@ The Event property **`returnValue`** indicates whether the default action for th
 
 > `readonly` **screenX**: `number`
 
-The **`screenX`** read-only property of the MouseEvent interface provides the horizontal coordinate (offset) of the mouse pointer in screen coordinates.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/screenX)
 
 #### Inherited from
@@ -514,8 +460,6 @@ The **`screenX`** read-only property of the MouseEvent interface provides the ho
 ### screenY
 
 > `readonly` **screenY**: `number`
-
-The **`screenY`** read-only property of the MouseEvent interface provides the vertical coordinate (offset) of the mouse pointer in screen coordinates.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/screenY)
 
@@ -529,8 +473,6 @@ The **`screenY`** read-only property of the MouseEvent interface provides the ve
 
 > `readonly` **shiftKey**: `boolean`
 
-The **`MouseEvent.shiftKey`** read-only property is a boolean value that indicates whether the <kbd>shift</kbd> key was pressed or not when a given mouse event occurs.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/shiftKey)
 
 #### Inherited from
@@ -542,8 +484,6 @@ The **`MouseEvent.shiftKey`** read-only property is a boolean value that indicat
 ### ~~srcElement~~
 
 > `readonly` **srcElement**: `null` \| `EventTarget`
-
-The deprecated **`Event.srcElement`** is an alias for the Event.target property.
 
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/srcElement)
@@ -559,8 +499,6 @@ The deprecated **`Event.srcElement`** is an alias for the Event.target property.
 
 > `readonly` **tangentialPressure**: `number`
 
-The **`tangentialPressure`** read-only property of the the pointer input (also known as barrel pressure or cylinder stress).
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/tangentialPressure)
 
 #### Inherited from
@@ -573,7 +511,7 @@ The **`tangentialPressure`** read-only property of the the pointer input (also k
 
 > `readonly` **target**: `null` \| `EventTarget`
 
-The read-only **`target`** property of the dispatched.
+Returns the object to which event is dispatched (its target).
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/target)
 
@@ -587,8 +525,6 @@ The read-only **`target`** property of the dispatched.
 
 > `readonly` **tiltX**: `number`
 
-The **`tiltX`** read-only property of the PointerEvent interface is the angle (in degrees) between the _Y-Z plane_ of the pointer and the screen.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/tiltX)
 
 #### Inherited from
@@ -600,8 +536,6 @@ The **`tiltX`** read-only property of the PointerEvent interface is the angle (i
 ### tiltY
 
 > `readonly` **tiltY**: `number`
-
-The **`tiltY`** read-only property of the PointerEvent interface is the angle (in degrees) between the _X-Z plane_ of the pointer and the screen.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/tiltY)
 
@@ -615,7 +549,7 @@ The **`tiltY`** read-only property of the PointerEvent interface is the angle (i
 
 > `readonly` **timeStamp**: `number`
 
-The **`timeStamp`** read-only property of the Event interface returns the time (in milliseconds) at which the event was created.
+Returns the event's timestamp as the number of milliseconds measured relative to the time origin.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/timeStamp)
 
@@ -629,8 +563,6 @@ The **`timeStamp`** read-only property of the Event interface returns the time (
 
 > `readonly` **twist**: `number`
 
-The **`twist`** read-only property of the (e.g., pen stylus) around its major axis, in degrees.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/twist)
 
 #### Inherited from
@@ -643,7 +575,7 @@ The **`twist`** read-only property of the (e.g., pen stylus) around its major ax
 
 > `readonly` **type**: `string`
 
-The **`type`** read-only property of the Event interface returns a string containing the event's type.
+Returns the type of event, e.g. "click", "hashchange", or "submit".
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/type)
 
@@ -657,8 +589,6 @@ The **`type`** read-only property of the Event interface returns a string contai
 
 > `readonly` **view**: `null` \| `Window`
 
-The **`UIEvent.view`** read-only property returns the is the Window object the event happened in.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/UIEvent/view)
 
 #### Inherited from
@@ -670,8 +600,6 @@ The **`UIEvent.view`** read-only property returns the is the Window object the e
 ### ~~which~~
 
 > `readonly` **which**: `number`
-
-The **`UIEvent.which`** read-only property of the UIEvent interface returns a number that indicates which button was pressed on the mouse, or the numeric `keyCode` or the character code (`charCode`) of the key pressed on the keyboard.
 
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/UIEvent/which)
@@ -687,8 +615,6 @@ The **`UIEvent.which`** read-only property of the UIEvent interface returns a nu
 
 > `readonly` **width**: `number`
 
-The **`width`** read-only property of the geometry along the x-axis, measured in CSS pixels.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/width)
 
 #### Inherited from
@@ -700,8 +626,6 @@ The **`width`** read-only property of the geometry along the x-axis, measured in
 ### x
 
 > `readonly` **x**: `number`
-
-The **`MouseEvent.x`** property is an alias for the MouseEvent.clientX property.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/x)
 
@@ -715,8 +639,6 @@ The **`MouseEvent.x`** property is an alias for the MouseEvent.clientX property.
 
 > `readonly` **y**: `number`
 
-The **`MouseEvent.y`** property is an alias for the MouseEvent.clientY property.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/y)
 
 #### Inherited from
@@ -729,7 +651,7 @@ The **`MouseEvent.y`** property is an alias for the MouseEvent.clientY property.
 
 > **composedPath**(): `EventTarget`[]
 
-The **`composedPath()`** method of the Event interface returns the event's path which is an array of the objects on which listeners will be invoked.
+Returns the invocation target objects of event's path (objects on which listeners will be invoked), except for any nodes in shadow trees of which the shadow root's mode is "closed" that are not reachable from event's currentTarget.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composedPath)
 
@@ -747,7 +669,6 @@ The **`composedPath()`** method of the Event interface returns the event's path 
 
 > **getCoalescedEvents**(): `PointerEvent`[]
 
-The **`getCoalescedEvents()`** method of the PointerEvent interface returns a sequence of `PointerEvent` instances that were coalesced (merged) into a single Element/pointermove_event or Element/pointerrawupdate_event event.
 Available only in secure contexts.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/getCoalescedEvents)
@@ -765,8 +686,6 @@ Available only in secure contexts.
 ### getModifierState()
 
 > **getModifierState**(`keyArg`): `boolean`
-
-The **`MouseEvent.getModifierState()`** method returns the current state of the specified modifier key: `true` if the modifier is active (i.e., the modifier key is pressed or locked), otherwise, `false`.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/getModifierState)
 
@@ -790,8 +709,6 @@ The **`MouseEvent.getModifierState()`** method returns the current state of the 
 
 > **getPredictedEvents**(): `PointerEvent`[]
 
-The **`getPredictedEvents()`** method of the PointerEvent interface returns a sequence of `PointerEvent` instances that are estimated future pointer positions.
-
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/PointerEvent/getPredictedEvents)
 
 #### Returns
@@ -807,8 +724,6 @@ The **`getPredictedEvents()`** method of the PointerEvent interface returns a se
 ### ~~initEvent()~~
 
 > **initEvent**(`type`, `bubbles?`, `cancelable?`): `void`
-
-The **`Event.initEvent()`** method is used to initialize the value of an event created using Document.createEvent().
 
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/initEvent)
@@ -841,8 +756,6 @@ The **`Event.initEvent()`** method is used to initialize the value of an event c
 ### ~~initMouseEvent()~~
 
 > **initMouseEvent**(`typeArg`, `canBubbleArg`, `cancelableArg`, `viewArg`, `detailArg`, `screenXArg`, `screenYArg`, `clientXArg`, `clientYArg`, `ctrlKeyArg`, `altKeyArg`, `shiftKeyArg`, `metaKeyArg`, `buttonArg`, `relatedTargetArg`): `void`
-
-The **`MouseEvent.initMouseEvent()`** method initializes the value of a mouse event once it's been created (normally using the Document.createEvent() method).
 
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/initMouseEvent)
@@ -924,8 +837,6 @@ The **`MouseEvent.initMouseEvent()`** method initializes the value of a mouse ev
 
 > **initUIEvent**(`typeArg`, `bubblesArg?`, `cancelableArg?`, `viewArg?`, `detailArg?`): `void`
 
-The **`UIEvent.initUIEvent()`** method initializes a UI event once it's been created.
-
 :::caution[Deprecated]
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/UIEvent/initUIEvent)
 :::
@@ -966,7 +877,7 @@ The **`UIEvent.initUIEvent()`** method initializes a UI event once it's been cre
 
 > **preventDefault**(): `void`
 
-The **`preventDefault()`** method of the Event interface tells the user agent that if the event does not get explicitly handled, its default action should not be taken as it normally would be.
+If invoked when the cancelable attribute value is true, and while executing a listener for the event with passive set to false, signals to the operation that caused event to be dispatched that it needs to be canceled.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/preventDefault)
 
@@ -984,7 +895,7 @@ The **`preventDefault()`** method of the Event interface tells the user agent th
 
 > **stopImmediatePropagation**(): `void`
 
-The **`stopImmediatePropagation()`** method of the If several listeners are attached to the same element for the same event type, they are called in the order in which they were added.
+Invoking this method prevents event from reaching any registered event listeners after the current one finishes running and, when dispatched in a tree, also prevents event from reaching any other objects.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopImmediatePropagation)
 
@@ -1002,7 +913,7 @@ The **`stopImmediatePropagation()`** method of the If several listeners are atta
 
 > **stopPropagation**(): `void`
 
-The **`stopPropagation()`** method of the Event interface prevents further propagation of the current event in the capturing and bubbling phases.
+When dispatched in a tree, invoking this method prevents event from reaching any objects other than the current object.
 
 [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopPropagation)
 
