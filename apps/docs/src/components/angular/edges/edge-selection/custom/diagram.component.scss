@@ -1,0 +1,17 @@
+:host {
+  flex: 1;
+  display: flex;
+  // @section-start
+  .custom-diagram {
+    flex: 1;
+    display: flex;
+    height: 20rem;
+
+    // @mark-start:styles
+    --ngd-default-edge-stroke: black;
+    --ngd-default-edge-stroke-hover: darkgoldenrod;
+    --ngd-default-edge-stroke-selected: gold;
+    // @mark-end:styles
+  }
+  // @section-end
+}
