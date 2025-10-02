@@ -104,28 +104,14 @@ export class NgDiagramComponentContainer {
     ]);
 
     // Update node data within the same transaction
-    // this.modelService.updateNodeData('1', {
-    //   label: `Updated ${nodeName} 1`,
-    // });
-    // this.modelService.updateNodeData('2', {
-    //   label: `Updated ${nodeName} 2`,
-    // });
-    // this.modelService.updateNodeData('3', {
-    //   label: `Updated ${nodeName} 3`,
-    // });
-
-    requestAnimationFrame(() => {
-      this.modelService.addEdges([
-        {
-          id: 'edge-1',
-          source: '1',
-          target: '2',
-          sourcePort: 'port-right',
-          targetPort: 'port-left',
-          data: {},
-          routing: 'orthogonal',
-        },
-      ]);
+    this.modelService.updateNodeData('1', {
+      label: `Updated ${nodeName} 1`,
+    });
+    this.modelService.updateNodeData('2', {
+      label: `Updated ${nodeName} 2`,
+    });
+    this.modelService.updateNodeData('3', {
+      label: `Updated ${nodeName} 3`,
     });
   }
 
