@@ -40,12 +40,17 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 100 },
+        position: { x: 10, y: 100 },
         data: {},
       },
       {
         id: '2',
-        position: { x: 400, y: 100 },
+        position: { x: 270, y: 100 },
+        data: {},
+      },
+      {
+        id: '3',
+        position: { x: 530, y: 100 },
         data: {},
       },
     ],
@@ -59,6 +64,15 @@ export class DiagramComponent {
         targetPort: 'port-left',
         targetArrowhead: 'ng-diagram-arrow',
         type: 'custom',
+      },
+      {
+        id: '2',
+        source: '2',
+        target: '3',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        targetArrowhead: 'ng-diagram-arrow',
       },
     ],
     metadata: { viewport: { x: 0, y: 0, scale: 1 } },

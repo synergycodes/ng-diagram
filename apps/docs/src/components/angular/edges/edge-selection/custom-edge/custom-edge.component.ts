@@ -7,6 +7,7 @@ import {
 
 @Component({
   template: `<ng-diagram-base-edge
+    class="my-custom-edge"
     [edge]="edge()"
     stroke="var(--ngd-default-edge-stroke)"
   />`,

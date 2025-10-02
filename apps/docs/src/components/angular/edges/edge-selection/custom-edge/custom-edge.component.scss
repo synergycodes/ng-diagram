@@ -1,3 +1,10 @@
-.ng-diagram-edge__path.selected {
-  stroke: blue;
+.my-custom-edge {
+  .ng-diagram-edge__path.selected {
+    stroke: lightgreen;
+
+    stroke-width: 4;
+    stroke-dasharray: 8, 4;
+    stroke-opacity: 0.7;
+    stroke-linecap: round;
+  }
 }
