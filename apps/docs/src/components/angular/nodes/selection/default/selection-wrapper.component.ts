@@ -12,7 +12,6 @@ import { DefaultNodeComponent } from './node.component';
 
 @Component({
   selector: 'selection',
-  standalone: true,
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
   template: `

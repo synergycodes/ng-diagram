@@ -10,12 +10,14 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  untracked,
 } from '@angular/core';
 import { Edge, Node } from '../../../core/src';
 
 import type {
   DiagramInitEvent,
   EdgeDrawnEvent,
+  GroupNode,
   MiddlewareChain,
   ModelAdapter,
   SelectionChangedEvent,
@@ -49,6 +51,7 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
  */
 @Component({
   selector: 'ng-diagram',
+  standalone: true,
   imports: [
     CommonModule,
     NgDiagramCanvasComponent,
@@ -148,7 +151,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
       const model = this.model();
       if (this.initializedModel != model) {
         this.flowCoreProvider.destroy();
-        this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+        // Angular 18 backward compatibility
+        untracked(() => {
+          this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+        });
 
         this.initializedModel = model;
 
@@ -211,6 +217,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
   isGroup(node: Node) {
     return 'isGroup' in node;
+  }
+
+  castToGroupNode(node: Node) {
+    return node as GroupNode;
   }
 
   getBoundingClientRect() {

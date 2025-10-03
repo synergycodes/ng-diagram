@@ -5,6 +5,7 @@ import { LinePosition } from '../ng-diagram-node-resize-adornment.types';
 
 @Component({
   selector: 'ng-diagram-resize-line',
+  standalone: true,
   template: '',
   styleUrl: './ng-diagram-resize-line.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

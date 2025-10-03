@@ -17,6 +17,7 @@ import { GroupNode } from '../../../core/src';
  */
 @Directive({
   selector: '[ngDiagramGroupHighlighted]',
+  standalone: true,
   host: {
     '[class.ng-diagram-group-highlight]': 'highlighted()',
     '[class.ng-diagram-node-wrapper]': 'true',

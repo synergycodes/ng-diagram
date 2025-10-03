@@ -16,6 +16,7 @@ import { DottedBackgroundComponent } from './default/dotted/dotted-background.co
  */
 @Component({
   selector: 'ng-diagram-background',
+  standalone: true,
   templateUrl: './ng-diagram-background.component.html',
   styleUrls: ['./ng-diagram-background.component.scss'],
   imports: [DottedBackgroundComponent],

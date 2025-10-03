@@ -9,6 +9,7 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
   selector: '[ngDiagramPointerMoveSelection]',
+  standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

@@ -15,6 +15,7 @@ import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handl
  */
 @Component({
   selector: 'ng-diagram-node-rotate-adornment',
+  standalone: true,
   templateUrl: './ng-diagram-node-rotate-adornment.component.html',
   styleUrl: './ng-diagram-node-rotate-adornment.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -3,6 +3,7 @@ import { CursorPositionTrackerService } from '../../services/cursor-position-tra
 
 @Directive({
   selector: '[ngDiagramCursorPositionTracker]',
+  standalone: true,
   host: {
     '(document:mousemove)': 'onMouseMove($event)',
   },

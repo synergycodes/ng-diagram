@@ -21,6 +21,7 @@ export const DEFAULT_GROUP_SIZE = { width: '9.0625rem', height: '9.0625rem' };
  */
 @Directive({
   selector: '[ngDiagramNodeSize]',
+  standalone: true,
 })
 export class NodeSizeDirective implements OnDestroy, OnInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);

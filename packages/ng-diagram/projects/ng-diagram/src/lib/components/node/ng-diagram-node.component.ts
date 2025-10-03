@@ -8,6 +8,7 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 
 @Component({
   selector: 'ng-diagram-node',
+  standalone: true,
   templateUrl: './ng-diagram-node.component.html',
   styleUrl: './ng-diagram-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

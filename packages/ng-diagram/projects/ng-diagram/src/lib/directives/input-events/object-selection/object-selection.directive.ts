@@ -38,19 +38,19 @@ abstract class ObjectSelectionDirective {
   }
 }
 
-@Directive()
+@Directive({ standalone: true })
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'diagram';
   override readonly targetData = input<Node | Edge | undefined>();
 }
 
-@Directive()
+@Directive({ standalone: true })
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'edge';
   override readonly targetData = input.required<Node | Edge | undefined>();
 }
 
-@Directive()
+@Directive({ standalone: true })
 export class NodeSelectionDirective extends ObjectSelectionDirective {
   targetType: BasePointerInputEvent['targetType'] = 'node';
   override readonly targetData = input.required<Node | Edge | undefined>();

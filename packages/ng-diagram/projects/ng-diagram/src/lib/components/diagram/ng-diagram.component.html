@@ -17,7 +17,7 @@
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { node }" />
       } @else if (isGroup(node)) {
-        <ng-diagram-default-group-template [node]="node" />
+        <ng-diagram-default-group-template [node]="castToGroupNode(node)" />
       } @else {
         <ng-diagram-default-node-template [node]="node" />
       }

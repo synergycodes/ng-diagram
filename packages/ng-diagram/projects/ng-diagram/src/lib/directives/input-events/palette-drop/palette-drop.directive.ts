@@ -4,6 +4,7 @@ import { PaletteService } from '../../../services/palette/palette.service';
 
 @Directive({
   selector: '[ngDiagramPaletteDrop]',
+  standalone: true,
   host: {
     '(drop)': 'onDrop($event)',
     '(dragover)': 'onDragOver($event)',

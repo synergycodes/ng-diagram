@@ -4,6 +4,7 @@ import { ViewportDirective } from '../../directives';
 
 @Component({
   selector: 'ng-diagram-canvas',
+  standalone: true,
   templateUrl: './ng-diagram-canvas.component.html',
   styleUrl: './ng-diagram-canvas.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

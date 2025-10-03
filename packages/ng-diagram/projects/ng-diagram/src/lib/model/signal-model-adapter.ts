@@ -1,4 +1,4 @@
-import { EffectRef, Injectable, effect, signal } from '@angular/core';
+import { EffectRef, Injectable, effect, signal, untracked } from '@angular/core';
 import type { Edge, Metadata, ModelAdapter, ModelChanges, Node } from '../../core/src';
 
 /**
@@ -22,10 +22,12 @@ export class SignalModelAdapter implements ModelAdapter {
       const nodes = this.nodes();
       const edges = this.edges();
       const metadata = this.metadata();
-
-      for (const callback of this.callbacks) {
-        callback({ nodes, edges, metadata });
-      }
+      // Angular 18 backward compatibility
+      untracked(() => {
+        for (const callback of this.callbacks) {
+          callback({ nodes, edges, metadata });
+        }
+      });
     });
   }
 

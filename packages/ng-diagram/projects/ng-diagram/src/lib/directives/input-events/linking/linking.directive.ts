@@ -6,6 +6,7 @@ import { PointerInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramLinkingInput]',
+  standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },

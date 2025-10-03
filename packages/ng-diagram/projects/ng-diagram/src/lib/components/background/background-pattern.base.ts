@@ -24,8 +24,11 @@ export abstract class BackgroundPatternBase {
   });
 
   patternTransform = computed(() => {
-    const dx = this.viewport().x % this.size();
-    const dy = this.viewport().y % this.size();
+    const size = this.size();
+    const viewport = this.viewport();
+
+    const dx = size ? viewport.x % size : 0;
+    const dy = size ? viewport.y % size : 0;
 
     return `translate(${dx},${dy})`;
   });

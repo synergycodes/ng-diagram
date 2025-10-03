@@ -3,6 +3,7 @@ import { FlowCoreProviderService } from '../../services';
 
 @Directive({
   selector: '[ngDiagramServicesAvailabilityChecker]',
+  standalone: true,
 })
 export class NgDiagramServicesAvailabilityCheckerDirective {
   private readonly service = inject(FlowCoreProviderService, { optional: true, skipSelf: true });

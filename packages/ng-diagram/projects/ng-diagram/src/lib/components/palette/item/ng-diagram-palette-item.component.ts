@@ -20,6 +20,7 @@ import { NgDiagramPaletteItemPreviewComponent } from '../item-preview/ng-diagram
  */
 @Component({
   selector: 'ng-diagram-palette-item',
+  standalone: true,
   templateUrl: './ng-diagram-palette-item.component.html',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,

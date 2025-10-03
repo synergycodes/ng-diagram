@@ -95,10 +95,6 @@ export class CommandHandler implements CoreCommandHandler {
   }
 
   private getCommandCallbacks<K extends CommandName>(commandName: K): CommandCallback<K>[] {
-    if (!this.callbacks[commandName]) {
-      this.callbacks[commandName] = [];
-    }
-
-    return this.callbacks[commandName];
+    return (this.callbacks[commandName] ||= []);
   }
 }

@@ -18,6 +18,7 @@ import { detectEnvironment } from '../../../utils/detect-environment';
  */
 @Component({
   selector: 'ng-diagram-palette-item-preview',
+  standalone: true,
   templateUrl: './ng-diagram-palette-item-preview.component.html',
   styleUrl: './ng-diagram-palette-item-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,4 +35,8 @@ export class NgDiagramPaletteItemPreviewComponent {
   protected readonly isChrome = this.browser === 'Chrome';
 
   protected readonly isVisible = computed(() => this.paletteService.previewId() === this.id);
+
+  get scaleTransform(): string {
+    return `scale(${this.scale()})`;
+  }
 }
