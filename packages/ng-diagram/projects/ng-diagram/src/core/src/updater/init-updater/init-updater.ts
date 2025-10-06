@@ -31,29 +31,27 @@ export class InitUpdater extends BaseUpdater implements Updater {
     this.portRectInitializer = portRectInitializer;
   }
 
-  start(onComplete?: () => void) {
+  start(onComplete?: () => void | Promise<void>) {
     // Start all initializers' stability timers
     // They will wait for data or resolve immediately based on their configuration
     Promise.all(this.getInitializers().map((initializer) => initializer.waitForFinish()))
-      .then(() => {
+      .then(async () => {
+        // Execute completion callback if provided
+        if (onComplete) {
+          await onComplete();
+        }
         // All initializers have stabilized and finished
         this.isInitialized = true;
         console.log('initialized - all initializers stable');
-
-        // Execute completion callback if provided
-        if (onComplete) {
-          onComplete();
-        }
       })
-      .catch((err) => {
+      .catch(async (err) => {
         console.error('Initialization failed:', err);
-        // Set initialized anyway to prevent hanging
-        this.isInitialized = true;
-
         // Still call completion callback even on error
         if (onComplete) {
-          onComplete();
+          await onComplete();
         }
+        // Set initialized anyway to prevent hanging
+        this.isInitialized = true;
       });
   }
 
