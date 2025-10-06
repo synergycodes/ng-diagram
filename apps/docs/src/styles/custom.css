@@ -13,3 +13,12 @@
 .site-title span {
   display: none;
 }
+
+/* Collapse sections in code snippets */
+details.ec-section.github {
+  opacity: 0.5;
+
+  &[open] {
+    opacity: 1;
+  }
+}

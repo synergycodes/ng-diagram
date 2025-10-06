@@ -5,6 +5,7 @@ import {
   type Node,
 } from 'ng-diagram';
 
+// @section-start
 @Component({
   selector: 'node',
   template: `
@@ -15,11 +16,14 @@ import {
       </div>
     </div>
   `,
+  // @mark-start
   hostDirectives: [
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
+  // @mark-end
   styleUrls: ['./node.component.scss'],
 })
 export class DefaultNodeComponent implements NgDiagramNodeTemplate {
   node = input.required<Node>();
 }
+// @section-end

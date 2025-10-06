@@ -9,6 +9,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import { Port } from '../../../core/src';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
@@ -81,29 +82,29 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       }
     });
 
-    effect(
-      () => {
-        const nodeData = this.nodeData();
-        if (this.isInitialized() && nodeData) {
+    effect(() => {
+      const nodeData = this.nodeData();
+      if (this.isInitialized() && nodeData) {
+        // Angular 18 backward compatibility
+        untracked(() => {
           this.linkingInputDirective.setTargetNode(nodeData);
-        }
-      },
-      { allowSignalWrites: true }
-    );
+        });
+      }
+    });
 
-    effect(
-      () => {
-        const nodeData = this.nodeData();
-        if (this.isInitialized() && this.lastType() !== this.type() && nodeData) {
+    effect(() => {
+      const nodeData = this.nodeData();
+      if (this.isInitialized() && this.lastType() !== this.type() && nodeData) {
+        // Angular 18 backward compatibility
+        untracked(() => {
           this.lastType.set(this.type());
-          this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-            nodeId: nodeData.id,
-            ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
-          });
-        }
-      },
-      { allowSignalWrites: true }
-    );
+        });
+        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
+          nodeId: nodeData.id,
+          ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
+        });
+      }
+    });
   }
 
   /** @internal */

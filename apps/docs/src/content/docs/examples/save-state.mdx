@@ -1,8 +1,9 @@
 ---
-title: Save Persistence
+title: Save Persistence Example
 description: Example of how to save and restore state in ngDiagram
 sidebar:
   order: 8
+  label: Save Persistence
 ---
 
 import { Image } from 'astro:assets';
@@ -29,18 +30,13 @@ The save functionality allows users to persist the current diagram (nodes and ed
 
 The `SaveStateService` manages saving, loading, and clearing the diagram state using Angular signals and effects:
 
-<CodeSnippet relativePath="examples/save-state/save.service.ts" range={[1, 34]} collapse={['1-8']} />
+<CodeSnippet relativePath="examples/save-state/save.service.ts" />
 
 ### NavBar Component
 
 The navigation bar provides buttons for saving, loading, and clearing the diagram state. Button states are reactive:
 
-<CodeSnippet
-  relativePath="examples/save-state/nav-bar/nav-bar.component.ts"
-  range={[1, 63]}
-  collapse={['1-4', '20-61']}
-  mark={[{ range: '8-15' }]}
-/>
+<CodeSnippet relativePath="examples/save-state/nav-bar/nav-bar.component.ts" />
 
 ### Component Structure
 

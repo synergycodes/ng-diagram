@@ -1,4 +1,4 @@
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { SelectEvent } from './select.event';
 
 export class SelectEventHandler extends EventHandler<SelectEvent> {

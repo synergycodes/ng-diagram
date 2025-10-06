@@ -1,5 +1,6 @@
 ---
 import { Code } from "@astrojs/starlight/components";
+import HighlightedCode from "../highlighted-code/highlighted-code.astro";
 import type { ComponentProps } from 'astro/types';
 import { getAngularFileSource } from "./get-angular-file-source";
 
@@ -10,18 +11,14 @@ interface Props extends ComponentProps<typeof Code> {
   relativePath: string;
 
   /**
-  * range of lines to be used as a source
+  * id of the section to be used as a source
   */
-  range?: [number, number];
+  sectionId?: string;
 }
 
-const { relativePath, range, ...rest } = Astro.props;
+const { relativePath, sectionId, ...rest } = Astro.props;
 
 const { content, extension } = await getAngularFileSource(relativePath);
-
-const clippedContent = range
-  ? content.split('\n').slice(range[0] - 1, range[1]).join('\n')
-  : content;
 ---
 
-<Code lang={extension} {...rest} code={clippedContent} />
+<HighlightedCode lang={extension} sectionId={sectionId} {...rest} code={content} />

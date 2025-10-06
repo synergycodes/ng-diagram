@@ -28,7 +28,9 @@ export class Diagram {
     ['routing-edge', RoutingEdgeComponent],
   ]);
 
+  // @section-start
   model = initializeModel({
+    // @collapse-start
     metadata: {
       viewport: { x: 0, y: 0, scale: 0.8 },
     },
@@ -58,6 +60,7 @@ export class Diagram {
         rotatable: true,
       },
     ],
+    // @collapse-end
     edges: [
       {
         id: '1',
@@ -65,9 +68,11 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '2',
-        routing: 'polyline',
-        type: 'routing-edge',
         data: {},
+        // @mark-start
+        routing: 'polyline',
+        // @mark-end
+        type: 'routing-edge',
       },
       {
         id: '2',
@@ -75,9 +80,11 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '3',
-        routing: 'orthogonal',
-        type: 'routing-edge',
         data: {},
+        // @mark-start
+        routing: 'orthogonal',
+        // @mark-end
+        type: 'routing-edge',
       },
       {
         id: '3',
@@ -85,10 +92,13 @@ export class Diagram {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         target: '4',
-        routing: 'bezier',
-        type: 'routing-edge',
         data: {},
+        // @mark-start
+        routing: 'bezier',
+        // @mark-end
+        type: 'routing-edge',
       },
     ],
   });
 }
+// @section-end

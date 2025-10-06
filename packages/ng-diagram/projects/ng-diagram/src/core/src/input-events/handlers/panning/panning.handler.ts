@@ -1,5 +1,5 @@
 import { Point } from '../../../types';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { PanningEvent } from './panning.event';
 
 export class PanningEventHandler extends EventHandler<PanningEvent> {

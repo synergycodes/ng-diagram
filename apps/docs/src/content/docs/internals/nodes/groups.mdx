@@ -5,9 +5,9 @@ sidebar:
   order: 1
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import Groups from '@components/angular/nodes/groups/groups.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Groups in **ngDiagram** are containers for other nodes, allowing you to organize, move, and manage multiple nodes as a single unit.
 They are essential for structuring complex diagrams, enabling collective operations and visual grouping.
@@ -92,7 +92,7 @@ config = {
     getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
   },
   grouping: {
-    canGroup: (node: Node, group: Node) => true;
+    canGroup: (node: Node, group: Node) => true,
   },
 };
 ```

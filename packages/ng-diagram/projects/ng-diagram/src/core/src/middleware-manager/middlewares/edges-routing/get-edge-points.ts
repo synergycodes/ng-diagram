@@ -7,20 +7,26 @@ import { getSourceTargetPositions } from './get-source-target-positions';
  * Returns true only if all required ports have their geometry data.
  */
 export const areEdgePortsInitialized = (edge: Edge, sourceNode?: Node, targetNode?: Node): boolean => {
-  // Check source port
   if (edge.sourcePort) {
     const sourcePorts = sourceNode?.measuredPorts;
-    if (!sourcePorts) return false; // measuredPorts missing
+    if (!sourcePorts) {
+      return false;
+    }
     const sourcePort = sourcePorts.find((p) => p.id === edge.sourcePort);
-    if (!sourcePort || !sourcePort.position || !sourcePort.size) return false;
+    if (!sourcePort || !sourcePort.position || !sourcePort.size) {
+      return false;
+    }
   }
 
-  // Check target port
   if (edge.targetPort) {
     const targetPorts = targetNode?.measuredPorts;
-    if (!targetPorts) return false; // measuredPorts missing
+    if (!targetPorts) {
+      return false;
+    }
     const targetPort = targetPorts.find((p) => p.id === edge.targetPort);
-    if (!targetPort || !targetPort.position || !targetPort.size) return false;
+    if (!targetPort || !targetPort.position || !targetPort.size) {
+      return false;
+    }
   }
 
   return true; // All checks passed

@@ -1,3 +1,4 @@
+// @collapse-start
 import { type Node } from 'ng-diagram';
 
 export const downloadImage = (data: string | Blob, fileName: string) => {
@@ -26,6 +27,7 @@ export const downloadImage = (data: string | Blob, fileName: string) => {
     console.error(e);
   }
 };
+// @collapse-end
 
 export const calculateBoundingBox = (nodes: Node[], margin: number) => {
   if (nodes.length === 0) {
@@ -41,6 +43,7 @@ export const calculateBoundingBox = (nodes: Node[], margin: number) => {
     maxX = -Infinity,
     maxY = -Infinity;
 
+  // @mark-start
   for (const node of nodes) {
     const nodeWidth = node.size?.width || 0;
     const nodeHeight = node.size?.height || 0;
@@ -56,5 +59,6 @@ export const calculateBoundingBox = (nodes: Node[], margin: number) => {
     height: maxY - minY + margin * 2,
     left: minX - margin,
     top: minY - margin,
+    // @mark-end
   };
 };

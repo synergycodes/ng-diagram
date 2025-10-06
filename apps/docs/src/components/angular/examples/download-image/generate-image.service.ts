@@ -1,3 +1,4 @@
+// @collapse-start
 import { Injectable } from '@angular/core';
 import { toPng } from 'html-to-image';
 import type { Options } from 'html-to-image/lib/types';
@@ -5,9 +6,11 @@ import { type Node } from 'ng-diagram';
 import { calculateBoundingBox } from './generate-image.helper';
 
 @Injectable()
+// @collapse-end
 export class GenerateImageService {
   private IMAGE_MARGIN: number = 50;
 
+  // @mark-start
   async generateImageFile(nodes: Node[], element: HTMLElement) {
     const size = calculateBoundingBox(nodes, this.IMAGE_MARGIN);
     const backgroundColor = getComputedStyle(element).backgroundColor || '#fff';
@@ -31,4 +34,5 @@ export class GenerateImageService {
 
     return await toPng(diagramCanvasElement, options);
   }
+  // @mark-end
 }

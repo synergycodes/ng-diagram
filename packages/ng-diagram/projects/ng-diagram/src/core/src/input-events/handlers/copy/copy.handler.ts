@@ -1,4 +1,4 @@
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { CopyInputEvent } from './copy.event';
 
 export class CopyEventHandler extends EventHandler<CopyInputEvent> {

@@ -10,6 +10,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  untracked,
 } from '@angular/core';
 import { Edge, Node } from '../../../core/src';
 
@@ -151,7 +152,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
         const model = this.model();
         if (this.initializedModel != model) {
           this.flowCoreProvider.destroy();
-          this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+          // Angular 18 backward compatibility
+          untracked(() => {
+            this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+          });
 
           this.initializedModel = model;
 

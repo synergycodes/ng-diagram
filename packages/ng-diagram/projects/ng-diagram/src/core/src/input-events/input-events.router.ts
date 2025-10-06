@@ -2,7 +2,7 @@ import { FlowCore } from '../flow-core';
 import { CopyEventHandler } from './handlers/copy/copy.handler';
 import { CutEventHandler } from './handlers/cut/cut.handler';
 import { DeleteSelectionEventHandler } from './handlers/delete-selection/delete-selection.handler';
-import { EventHandler } from './handlers/event-hander';
+import { EventHandler } from './handlers/event-handler';
 import { KeyboardMoveSelectionEventHandler } from './handlers/keyboard-move-selection/keyboard-move-selection.handler';
 import { KeyboardPanningEventHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
 import { LinkingEventHandler } from './handlers/linking/linking.handler';

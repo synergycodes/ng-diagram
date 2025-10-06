@@ -8,6 +8,7 @@
     opacity: 0.7;
     height: 100%;
     width: 100%;
+    display: block;
 
     path {
       fill: var(--watermark-fill);
@@ -20,4 +21,14 @@
 
   --watermark-size: min(4rem, 10%);
   --watermark-fill: #b3b3b3;
+
+  .sr-only {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
 }

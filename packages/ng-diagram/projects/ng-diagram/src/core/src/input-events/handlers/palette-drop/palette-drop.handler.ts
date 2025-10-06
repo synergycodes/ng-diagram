@@ -1,5 +1,5 @@
 import { Node } from '../../../types/node.interface';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { PaletteDropInputEvent } from './palette-drop.event';
 
 export class PaletteDropEventHandler extends EventHandler<PaletteDropInputEvent> {

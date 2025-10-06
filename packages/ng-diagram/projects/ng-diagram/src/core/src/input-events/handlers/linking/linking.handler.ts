@@ -1,4 +1,4 @@
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { LinkingInputEvent } from './linking.event';
 
 export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {

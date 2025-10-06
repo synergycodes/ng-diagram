@@ -1,3 +1,4 @@
+// @collapse-start
 import { effect, Injectable, signal } from '@angular/core';
 import { type Edge, type Metadata, type Node } from 'ng-diagram';
 
@@ -6,6 +7,7 @@ export class SaveStateService {
   private KEY = 'ngDiagramSaveStateKey';
 
   state = signal<string | null>(localStorage.getItem(this.KEY));
+  // @collapse-end
   stateSync = effect(() => {
     if (this.state() === null) {
       localStorage.removeItem(this.KEY);

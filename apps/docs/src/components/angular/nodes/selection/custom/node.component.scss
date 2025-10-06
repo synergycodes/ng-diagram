@@ -1,12 +1,17 @@
 :host {
+  /* @collapse-start */
   width: 100%;
   height: 100%;
   display: flex;
   border: 1px solid #ccc;
 
+  /* @collapse-end */
+  /* @mark-start */
   &.custom-selected {
     box-shadow: 0px 0px 5px 3px orangered;
   }
+  /* @mark-end */
+  /* @collapse-start */
 
   .node-header {
     font-size: 20px;
@@ -16,4 +21,5 @@
     font-size: 14px;
     padding: 3px 10px;
   }
+  /* @collapse-end */
 }

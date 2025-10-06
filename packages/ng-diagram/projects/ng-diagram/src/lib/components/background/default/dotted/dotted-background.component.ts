@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
 import { FlowCoreProviderService } from '../../../../services';
 import { BackgroundPatternBase } from '../../background-pattern.base';
 
@@ -9,9 +9,11 @@ import { BackgroundPatternBase } from '../../background-pattern.base';
   styleUrl: './dotted-background.component.scss',
 })
 export class DottedBackgroundComponent extends BackgroundPatternBase {
-  private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly flowCoreService = inject(FlowCoreProviderService);
 
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
-  dotSize = this.flowCore.provide().config.background.dotSize;
+  dotSize = computed(() => {
+    return this.flowCoreService.isInitialized() ? this.flowCoreService.provide().config.background.dotSize : 0;
+  });
 }

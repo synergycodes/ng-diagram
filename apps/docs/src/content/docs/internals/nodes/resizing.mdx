@@ -3,9 +3,9 @@ title: Resizing
 description: Understanding how resizing works in ngDiagram
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import Resizing from '@components/angular/nodes/resizing/resizing.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 The **resizing** feature in ngDiagram allows users to interactively change the size of nodes on the diagram canvas.
 Resizable nodes display resize handles and lines that users can drag to adjust the node's width and height.
@@ -22,7 +22,7 @@ The new size is reflected in the node's appearance and can be used to create fle
 
 Enable resizing by setting the `resizable` property to `true` in your node definition:
 
-<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" mark={[55]} collapse={['1-46']} />
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" sectionId="enabling" />
 
 When `resizable` is set, the resize handles and lines will appear, and the node can be resized by the user.
 
@@ -32,7 +32,7 @@ To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-ad
 
 You will also need to set the `resizable` property to `true` in your custom node definition.
 
-<CodeSnippet relativePath="nodes/resizing/node.component.ts" mark={[11, { range: '13-20' }]} collapse={['22-52']} />
+<CodeSnippet relativePath="nodes/resizing/node.component.ts" />
 
 ## Customizing the Resize Handle and Line
 
@@ -69,22 +69,11 @@ You can further customize resizing behavior using the `resize` configuration in 
 This configuration allows you to control minimum node size and other resizing options:
 
 - **getMinNodeSize** – Returns the minimum size for a node during resizing.
+- **allowResizeBelowChildrenBounds** – By default, groups can be resized to any size, even smaller than their children. If you want to prevent resizing a group smaller than its children (so all children always remain fully contained), set this option to `false`.
 
-You can set these options in your diagram configuration:
+You can set these options in your diagram configuration and pass them to the `ng-diagram` component:
 
-<CodeSnippet
-  relativePath="nodes/resizing/resizing-wrapper.component.ts"
-  mark={[{ range: '38-42' }]}
-  collapse={['1-13', 46 - 58]}
-/>
-
-Pass this configuration to the `ng-diagram` component:
-
-<CodeSnippet
-  relativePath="nodes/resizing/resizing-wrapper.component.ts"
-  mark={[{ range: '22' }]}
-  collapse={['26-72', '1-15']}
-/>
+<CodeSnippet relativePath="nodes/resizing/resizing-wrapper.component.ts" sectionId="config" />
 
 ## Example
 

@@ -1,5 +1,5 @@
 import { NgDiagramMath } from '../../../math';
-import { EventHandler } from '../event-hander';
+import { EventHandler } from '../event-handler';
 import { RotateInputEvent } from './rotate.event';
 
 const MIN_DISTANCE_TO_CENTER = 30;
