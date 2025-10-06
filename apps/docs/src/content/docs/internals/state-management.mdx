@@ -3,11 +3,14 @@ title: State Management
 description: Learn how to create models, access the model service, and perform operations on your diagram data
 ---
 
-ngDiagram uses a reactive state management system that allows you to create, access, and modify diagram data efficiently. Understanding this system is essential for building dynamic, interactive diagrams.
+ngDiagram uses a reactive state management system that allows you to create, access, and modify diagram data efficiently.
+Understanding this system is essential for building dynamic, interactive diagrams.
 
 ## Creating a Model
 
-The model is the core data structure that holds all your diagram information including nodes, edges, and metadata. Use the `initializeModel` function to create a new model with initial data.
+The model is the core data structure that holds all your diagram information including nodes, edges, and metadata.
+Use the `initializeModel` function to create a new model with initial data.
+For more information about model initialization scenarios and best practices, see [Model Initialization](/docs/internals/model-initialization/).
 
 ### Basic Model Creation
 
@@ -125,11 +128,13 @@ export class MyComponent {
   edges = this.modelService.edges;
   metadata = this.modelService.metadata;
 
-  ngOnInit() {
+  constructor() {
     // Access current values
-    console.log('Current nodes:', this.nodes());
-    console.log('Current edges:', this.edges());
-    console.log('Current viewport:', this.metadata().viewport);
+    effect(() => {
+      console.log('Current nodes:', this.nodes());
+      console.log('Current edges:', this.edges());
+      console.log('Current viewport:', this.metadata().viewport);
+    });
   }
 }
 ```
