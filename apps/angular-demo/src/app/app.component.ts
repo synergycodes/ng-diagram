@@ -53,6 +53,7 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
+    debugMode: true,
   };
 
   onDiagramInit(event: DiagramInitEvent): void {
