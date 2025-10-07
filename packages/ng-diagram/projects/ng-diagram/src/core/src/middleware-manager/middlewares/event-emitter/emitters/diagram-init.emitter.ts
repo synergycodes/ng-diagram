@@ -35,6 +35,15 @@ export class DiagramInitEmitter implements EventEmitter {
     this.collectUnmeasuredItems(nodesMap, edgesMap);
     this.initialized = true;
 
+    console.log('[DiagramInitEmitter] handleInit, unmeasured:', {
+      nodes: this.unmeasuredNodes.size,
+      ports: this.unmeasuredNodePorts.size,
+      labels: this.unmeasuredEdgeLabels.size,
+      unmeasuredNodeIds: Array.from(this.unmeasuredNodes),
+      unmeasuredPortIds: Array.from(this.unmeasuredNodePorts),
+      unmeasuredLabelIds: Array.from(this.unmeasuredEdgeLabels),
+    });
+
     if (this.areAllMeasured()) {
       this.emitInitEvent(context, eventManager);
     }
@@ -47,13 +56,26 @@ export class DiagramInitEmitter implements EventEmitter {
 
     const { modelActionType, initialUpdate, nodesMap, edgesMap } = context;
 
+    console.log('[DiagramInitEmitter] handleUpdate, action:', modelActionType, 'unmeasured before:', {
+      nodes: this.unmeasuredNodes.size,
+      ports: this.unmeasuredNodePorts.size,
+      labels: this.unmeasuredEdgeLabels.size,
+    });
+
     if (modelActionType === 'updateNode') {
       this.processNodeUpdates(initialUpdate, nodesMap);
     } else if (modelActionType === 'updateEdge') {
       this.processEdgeUpdates(initialUpdate, edgesMap);
     }
 
+    console.log('[DiagramInitEmitter] handleUpdate, unmeasured after:', {
+      nodes: this.unmeasuredNodes.size,
+      ports: this.unmeasuredNodePorts.size,
+      labels: this.unmeasuredEdgeLabels.size,
+    });
+
     if (this.areAllMeasured()) {
+      console.log('[DiagramInitEmitter] All measured! Emitting diagramInit');
       this.emitInitEvent(context, eventManager);
     }
   }

@@ -31,6 +31,17 @@ export class InitUpdater extends BaseUpdater implements Updater {
     this.portRectInitializer = portRectInitializer;
   }
 
+  /**
+   * Override getPortsToUpdate to accept all ports during initialization.
+   * Unlike InternalUpdater which filters by existing ports, InitUpdater needs to accept
+   * all incoming port positions since ports are still being batched and won't exist
+   * in node.measuredPorts yet.
+   */
+  override getPortsToUpdate(node: Node, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
+    // During initialization, accept all ports regardless of whether they exist in the node yet
+    return ports;
+  }
+
   start(onComplete?: () => void | Promise<void>) {
     // Start all initializers' stability timers
     // They will wait for data or resolve immediately based on their configuration
