@@ -113,9 +113,9 @@ export class FlowCore {
 
     // Start the initialization process (non-blocking)
     // InitUpdater will emit 'init' when all components stabilize
-    this.initUpdater.start(() => {
+    this.initUpdater.start(async () => {
       // Callback executed when initialization is complete
-      this.commandHandler.emit('init');
+      await this.commandHandler.emit('init');
     });
   }
 
