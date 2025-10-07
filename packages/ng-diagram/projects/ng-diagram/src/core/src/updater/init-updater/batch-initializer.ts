@@ -10,7 +10,7 @@ export class BatchInitializer<T> {
   dataToInitialize = new Map<string, T>();
   private onInit: (dataMap: Map<string, T>) => void;
 
-  constructor(onInit: (dataMap: Map<string, T>) => void, shouldWaitForData = true, stabilityDelay = 0) {
+  constructor(onInit: (dataMap: Map<string, T>) => void, shouldWaitForData = true, stabilityDelay = 50) {
     this.onInit = onInit;
     this.shouldWaitForData = shouldWaitForData;
     this.stabilityDelay = stabilityDelay;
@@ -27,12 +27,18 @@ export class BatchInitializer<T> {
     return this._isFinished;
   }
 
-  batchChange(key: string, value: T): void {
+  batchChange(key: string, value: T): boolean {
+    // Don't accept new data if initialization is already finished
+    if (this._isFinished) {
+      return false;
+    }
+
     this.dataToInitialize.set(key, value);
     this.hasReceivedData = true;
 
     // Reset stability timer on each new change
     this.resetStabilityTimer();
+    return true;
   }
 
   waitForFinish(): Promise<void> {

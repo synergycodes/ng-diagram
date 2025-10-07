@@ -55,25 +55,30 @@ export class InitUpdater extends BaseUpdater implements Updater {
       });
   }
 
-  applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
-    this.nodeSizeInitializer.batchChange(nodeId, size);
+  applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): boolean {
+    return this.nodeSizeInitializer.batchChange(nodeId, size);
   }
 
-  addPort(nodeId: string, port: Port) {
+  addPort(nodeId: string, port: Port): boolean {
     const key = this.getCompoundId(nodeId, port.id);
 
-    this.portInitializer.batchChange(key, port);
+    return this.portInitializer.batchChange(key, port);
   }
 
-  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
+  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): boolean {
     const node = this.flowCore.getNodeById(nodeId);
 
     if (!node) {
-      return;
+      return false;
     }
 
     const portsToUpdate = this.getPortsToUpdate(node, ports);
 
+    if (portsToUpdate.length === 0) {
+      return true; // No ports to update, but not a failure
+    }
+
+    let allAccepted = true;
     for (const { id, size, position } of portsToUpdate) {
       if (!size || !position) {
         continue;
@@ -81,19 +86,24 @@ export class InitUpdater extends BaseUpdater implements Updater {
 
       const key = this.getCompoundId(nodeId, id);
 
-      this.portRectInitializer.batchChange(key, { ...size, ...position });
+      const accepted = this.portRectInitializer.batchChange(key, { ...size, ...position });
+      if (!accepted) {
+        allAccepted = false;
+      }
     }
+
+    return allAccepted;
   }
 
-  addEdgeLabel(edgeId: string, label: EdgeLabel) {
+  addEdgeLabel(edgeId: string, label: EdgeLabel): boolean {
     const key = this.getCompoundId(edgeId, label.id);
-    this.edgeLabelInitializer.batchChange(key, label);
+    return this.edgeLabelInitializer.batchChange(key, label);
   }
 
-  applyEdgeLabelSize(edgeId: string, labelId: string, size: Size) {
+  applyEdgeLabelSize(edgeId: string, labelId: string, size: Size): boolean {
     const key = this.getCompoundId(edgeId, labelId);
 
-    this.edgeLabelSizeInitializer.batchChange(key, size);
+    return this.edgeLabelSizeInitializer.batchChange(key, size);
   }
 
   isNodeSizeInitializerFinished(): boolean {
