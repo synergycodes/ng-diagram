@@ -30,6 +30,7 @@ import type {
   Renderer,
 } from './types';
 import { TransactionCallback, TransactionResult } from './types/transaction.interface';
+import { CompositeUpdater } from './updater/composite-updater/composite-updater';
 import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
@@ -41,6 +42,7 @@ export class FlowCore {
 
   private readonly initUpdater: InitUpdater;
   private readonly internalUpdater: InternalUpdater;
+  private readonly compositeUpdater: CompositeUpdater;
   private readonly updateSemaphore = new Semaphore(1);
 
   readonly commandHandler: CommandHandler;
@@ -73,6 +75,7 @@ export class FlowCore {
     this.spatialHash = new SpatialHash();
     this.initUpdater = new InitUpdater(this);
     this.internalUpdater = new InternalUpdater(this);
+    this.compositeUpdater = new CompositeUpdater(this.initUpdater, this.internalUpdater);
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
@@ -386,11 +389,7 @@ export class FlowCore {
   }
 
   get updater(): Updater {
-    if (!this.initUpdater.isInitialized) {
-      return this.initUpdater;
-    }
-
-    return this.internalUpdater;
+    return this.compositeUpdater;
   }
 
   setDebugMode(debugMode: boolean): void {

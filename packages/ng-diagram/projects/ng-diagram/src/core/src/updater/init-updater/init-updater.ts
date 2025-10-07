@@ -98,6 +98,26 @@ export class InitUpdater extends BaseUpdater implements Updater {
     this.edgeLabelSizeInitializer.batchChange(key, size);
   }
 
+  isNodeSizeInitializerFinished(): boolean {
+    return this.nodeSizeInitializer.isFinished;
+  }
+
+  isPortInitializerFinished(): boolean {
+    return this.portInitializer.isFinished;
+  }
+
+  isPortRectInitializerFinished(): boolean {
+    return this.portRectInitializer.isFinished;
+  }
+
+  isEdgeLabelInitializerFinished(): boolean {
+    return this.edgeLabelInitializer.isFinished;
+  }
+
+  isEdgeLabelSizeInitializerFinished(): boolean {
+    return this.edgeLabelSizeInitializer.isFinished;
+  }
+
   private splitCompoundId(id: string) {
     const [entityId, itemId] = id.split(ID_SEPARATOR);
 
