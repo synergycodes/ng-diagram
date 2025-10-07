@@ -58,6 +58,7 @@ export class NgDiagramComponentContainer {
 
   config: NgDiagramConfig = {
     debugMode: true,
+    edgeRouting: { defaultRouting: 'orthogonal' },
   };
 
   model = initializeModel({
@@ -84,7 +85,6 @@ export class NgDiagramComponentContainer {
   }
 
   private createDiagram(nodeName: string) {
-    // Transaction example: All operations are batched together
     this.modelService.addNodes([
       {
         id: '1',
@@ -103,7 +103,6 @@ export class NgDiagramComponentContainer {
       },
     ]);
 
-    // Update node data within the same transaction
     this.modelService.updateNodeData('1', {
       label: `Updated ${nodeName} 1`,
     });
@@ -113,6 +112,25 @@ export class NgDiagramComponentContainer {
     this.modelService.updateNodeData('3', {
       label: `Updated ${nodeName} 3`,
     });
+
+    this.modelService.addEdges([
+      {
+        id: 'edge-1',
+        source: '1',
+        target: '2',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        data: {},
+      },
+      {
+        id: 'edge-2',
+        source: '2',
+        target: '3',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        data: {},
+      },
+    ]);
   }
 
   private cleanDiagram() {
