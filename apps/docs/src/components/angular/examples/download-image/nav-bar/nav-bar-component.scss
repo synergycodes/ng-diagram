@@ -1,21 +1,19 @@
 .nav-bar {
   display: flex;
-  gap: 8px;
+  gap: 0.5px;
   align-items: flex-end;
   justify-content: end;
-  padding: 2px 16px;
-  background-color: var(--ngd-node-stroke-primary-defaultx);
+  padding: 1rem;
+  background-color: var(--ngd-ui-bg-tertiary-default);
 
-  & > button {
+  .btn {
     cursor: pointer;
-    border: none;
+    transition: all 0.2s;
+    margin-top: 0;
+    border: 0;
 
-    &:disabled {
-      cursor: not-allowed;
-
-      &.clear {
-        background: none;
-      }
+    &:hover {
+      background-color: var(--ngd-node-stroke-primary-default);
     }
   }
 }

@@ -32,7 +32,7 @@ Creates paths using only horizontal and vertical segments, ideal for technical d
 
 Produces smooth curved connections using cubic Bézier curves.
 
-import Routing from '@components/angular/edges/routing/routing.astro';
+import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 <Routing />
 
@@ -40,7 +40,7 @@ import Routing from '@components/angular/edges/routing/routing.astro';
 
 To specify a routing algorithm for an edge, set the `routing` property in the edge data:
 
-<CodeSnippet relativePath="edges/routing/diagram.component.ts" />
+<CodeSnippet relativePath="edges/routing/routing/diagram.component.ts" />
 
 When no routing is specified, the default routing algorithm (polyline) is used. The default can be changed through configuration.
 
@@ -79,11 +79,11 @@ Manual mode gives you full control over the edge path by allowing you to provide
 
 Try moving the nodes in the example below - notice how the edge path remains fixed:
 
-import ManualMode from '@components/angular/edges/routing/manual-mode.astro';
+import ManualMode from '@components/angular/edges/routing/manual/manual-mode.astro';
 
 <ManualMode />
 
-<CodeSnippet relativePath="edges/routing/manual-mode-diagram.component.ts" />
+<CodeSnippet relativePath="edges/routing/manual/diagram.component.ts" />
 
 This is useful for creating custom edge behaviors, fixed connection paths, or implementing your own edge update logic.
 
@@ -91,7 +91,7 @@ This is useful for creating custom edge behaviors, fixed connection paths, or im
 
 You can configure routing behavior globally through the diagram's configuration:
 
-<CodeSnippet relativePath="edges/routing/configured-diagram.component.ts" />
+<CodeSnippet relativePath="edges/routing/configured/diagram.component.ts" />
 
 ## Custom Routing Algorithms
 
@@ -101,11 +101,11 @@ NgDiagram's routing system is extensible. You can create custom routing algorith
 
 You can create dynamic custom paths by computing points in your edge component and using manual routing mode. Here's an example of a sinusoid edge that updates its path dynamically as nodes move:
 
-import Sinusoid from '@components/angular/edges/routing/sinusoid.astro';
+import Sinusoid from '@components/angular/edges/routing/sinusoid/sinusoid.astro';
 
 <Sinusoid />
 
-<CodeSnippet relativePath="edges/routing/sinusoid-edge.component.ts" />
+<CodeSnippet relativePath="edges/routing/sinusoid/sinusoid-edge.component.ts" />
 
 This approach is ideal when you want the path to update automatically based on node positions and when you just need to compute points - the SVG path can be computed by a built-in routing algorithm (in this case, polyline was sufficient).
 

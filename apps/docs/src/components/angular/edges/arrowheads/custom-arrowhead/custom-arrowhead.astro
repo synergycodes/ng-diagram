@@ -1,8 +1,5 @@
 ---
-import { CustomArrowheadDiagram } from './diagram.component';
-import ContentWrapper from '@components/content-wrapper/content-wrapper.astro';
+import { DiagramComponent } from './diagram.component';
 ---
 
-<ContentWrapper>
-  <CustomArrowheadDiagram client:only="angular" />
-</ContentWrapper>
+<DiagramComponent client:only="angular" />

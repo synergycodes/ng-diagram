@@ -3,10 +3,9 @@ title: Ports
 description: Understanding how ports work in ngDiagram
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
-import { LinkCard } from '@astrojs/starlight/components';
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, LinkCard } from '@astrojs/starlight/components';
 import Ports from '@components/angular/nodes/ports/ports.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Ports are connection points on Nodes that allow Edges to link different entities in your diagram.
 
@@ -64,13 +63,13 @@ For example, to create a custom style, you can define a CSS class and assign it 
 
 You can enable default hover styles on ports by adding following code into your component:
 
-<CodeSnippet relativePath="nodes/ports/node.component.ts" sectionId="hover-style" />
+<CodeSnippet relativePath="nodes/ports/node/node.component.ts" sectionId="hover-style" />
 
 ## Example Usage
 
 To add ports to a node, render them in your node template:
 
-<CodeSnippet relativePath="nodes/ports/node.component.ts" sectionId="usage" />
+<CodeSnippet relativePath="nodes/ports/node/node.component.ts" sectionId="usage" />
 
 ## Live example
 

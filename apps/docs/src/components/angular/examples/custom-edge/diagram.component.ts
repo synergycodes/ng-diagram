@@ -15,12 +15,14 @@ import { SinusoidEdgeComponent } from './sinusoid-edge.component';
   imports: [NgDiagramComponent, CircleArrowheadComponent],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-    <circle-arrowhead />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+      <circle-arrowhead />
+    </div>
   `,
-  styleUrls: ['diagram.scss', 'edges.scss'],
+  styleUrls: ['./diagram.component.scss'],
 })
-export class Diagram {
+export class DiagramComponent {
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['labeled', LabeledEdgeComponent],
     ['sinusoid', SinusoidEdgeComponent],

@@ -7,25 +7,20 @@ import {
   provideNgDiagram,
   type NgDiagramPaletteItem,
 } from 'ng-diagram';
-import { Palette } from './palette.component';
+import { Palette } from './palette/palette.component';
 
 @Component({
   imports: [NgDiagramComponent, Palette],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" />
+    </div>
     <palette-container [model]="paletteModel" />
   `,
-  styles: `
-    :host {
-      flex: 1;
-      display: flex;
-      height: 100%;
-      position: relative;
-    }
-  `,
+  styleUrls: ['./diagram.component.scss'],
 })
-export class NgDiagramComponentContainer {
+export class DiagramComponent {
   paletteModel: NgDiagramPaletteItem[] = [
     { data: { label: 'Default Node' }, resizable: true, rotatable: true },
     { data: { label: 'Default Group' }, resizable: true, isGroup: true },

@@ -3,10 +3,10 @@ title: Selection
 description: Understanding how selection works in ngDiagram
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
-import CustomSelection from '@components/angular/nodes/selection/selection-custom.astro';
-import DefaultSelection from '@components/angular/nodes/selection/selection-default.astro';
+import CustomSelection from '@components/angular/nodes/selection/custom/selection.astro';
+import DefaultSelection from '@components/angular/nodes/selection/default/selection.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 The **selection** feature in ngDiagram allows users to select nodes on the diagram canvas.
 Selected nodes are visually highlighted, making it easier to identify and interact with them.
@@ -26,9 +26,9 @@ This allows you to tailor the selection appearance and behavior to fit your appl
 
 <CustomSelection />
 
-<CodeSnippet relativePath="nodes/selection/custom/node.component.ts" />
+<CodeSnippet relativePath="nodes/selection/custom/node/node.component.ts" />
 
-<CodeSnippet relativePath="nodes/selection/custom/node.component.scss" />
+<CodeSnippet relativePath="nodes/selection/custom/node/node.component.scss" />
 
 ## Using Default Selection for a Custom Node
 
@@ -42,7 +42,7 @@ The host element must have `display: block` or `display: flex` set in its styles
 
 <DefaultSelection />
 
-<CodeSnippet relativePath="nodes/selection/default/node.component.ts" />
+<CodeSnippet relativePath="nodes/selection/default/node/node.component.ts" />
 
 ## Customizing Default Selection Styles
 

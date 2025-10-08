@@ -17,20 +17,21 @@ import { CustomEdgeComponent } from './custom-edge.component';
   // @mark-substring:[edgeTemplateMap]="edgeTemplateMap"
   // @mark-start
   template: `
-    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    </div>
   `,
   // @mark-end
   // @collapse-start
   styles: `
-    :host {
-      flex: 1;
+    .diagram {
       display: flex;
-      height: 100%;
+      height: 20rem;
     }
   `,
   // @collapse-end
 })
-export class Diagram {
+export class DiagramComponent {
   // @mark-start
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['custom', CustomEdgeComponent],

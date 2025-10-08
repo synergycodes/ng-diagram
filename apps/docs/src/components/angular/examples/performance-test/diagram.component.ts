@@ -12,16 +12,19 @@ import {
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
-  template: ` <ng-diagram [model]="model" /> `,
+  template: `
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" />
+    </div>
+  `,
   styles: `
-    :host {
-      flex: 1;
+    .diagram {
       display: flex;
-      height: 100%;
+      height: 30rem;
     }
   `,
 })
-export class NgDiagramPerformanceTestComponent {
+export class DiagramComponent {
   model = initializeModel(this.generateModelData());
 
   generateModelData() {
@@ -30,7 +33,7 @@ export class NgDiagramPerformanceTestComponent {
 
     return {
       metadata: {
-        viewport: { x: 50, y: 130, scale: 0.1 },
+        viewport: { x: 50, y: 100, scale: 0.1 },
       },
       nodes,
       edges,

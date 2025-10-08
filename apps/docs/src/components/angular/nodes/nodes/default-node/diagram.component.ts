@@ -11,12 +11,15 @@ import {
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
-  template: ` <ng-diagram class="customized-diagram" [model]="model" /> `,
+  template: `
+    <div class="not-content default-diagram">
+      <ng-diagram [model]="model" />
+    </div>
+  `,
   styles: `
-    :host .customized-diagram {
-      flex: 1;
+    .default-diagram {
       display: flex;
-      height: 100%;
+      height: 20rem;
 
       // @mark-start
       --ngd-node-border-color: #d04a02;
@@ -34,7 +37,7 @@ import {
     }
   `,
 })
-export class Diagram {
+export class DiagramComponent {
   // @collapse-start
   model = initializeModel({
     metadata: {

@@ -14,45 +14,21 @@ import {
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
   template: `
-    <div class="diagram-container">
+    <div class="toolbar">
+      <button (click)="onTestTransactionClick()">
+        Create diagram (Transaction)
+      </button>
+      <button (click)="onTestWithoutTransactionClick()">
+        Create diagram (Without Transaction)
+      </button>
+    </div>
+    <div class="not-content diagram">
       <ng-diagram [model]="model" [config]="config" />
-      <div class="toolbar">
-        <button (click)="onTestTransactionClick()">
-          Create diagram (Transaction)
-        </button>
-        <button (click)="onTestWithoutTransactionClick()">
-          Create diagram (Without Transaction)
-        </button>
-      </div>
     </div>
   `,
-  styles: `
-    :host {
-      flex: 1;
-      display: flex;
-      height: 100%;
-      position: relative;
-    }
-
-    .diagram-container {
-      display: flex;
-      width: 100%;
-      height: 30rem;
-      border: 5px solid var(--ngd-ui-border-default);
-      background-color: var(--ngd-ui-bg-tertiary-default);
-    }
-
-    .toolbar {
-      position: absolute;
-      display: flex;
-      gap: 0.5rem;
-      padding: 0.5rem;
-      justify-content: center;
-      width: 100%;
-    }
-  `,
+  styleUrls: ['./diagram.component.scss'],
 })
-export class NgDiagramComponentContainer {
+export class DiagramComponent {
   private ngDiagramService = inject(NgDiagramService);
   private modelService = inject(NgDiagramModelService);
 
