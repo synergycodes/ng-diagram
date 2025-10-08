@@ -26,6 +26,26 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/core/src/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../../lib/**', '../lib/**', './lib/**', '@lib/**'],
+              message: 'Core cannot import from lib folder.',
+            },
+            {
+              group: ['@angular/**'],
+              message: 'Core cannot import Angular.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.html'],
     rules: {},
   }
