@@ -1,6 +1,13 @@
-import { edgesRoutingMiddleware, loggerMiddleware, MiddlewareChain, zIndexMiddleware } from '../../core/src';
+import {
+  edgesRoutingMiddleware,
+  internalIdMiddleware,
+  loggerMiddleware,
+  MiddlewareChain,
+  zIndexMiddleware,
+} from '../../core/src';
 
 export const BUILTIN_MIDDLEWARES = [
+  internalIdMiddleware,
   zIndexMiddleware,
   edgesRoutingMiddleware,
   loggerMiddleware,

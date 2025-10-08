@@ -12,7 +12,7 @@
     </ng-diagram-edge>
   }
   <ng-diagram-marker-arrow />
-  @for (node of nodes(); track node.id) {
+  @for (node of nodes(); track trackNode($index, node)) {
     <ng-diagram-node class="ng-diagram-node" [attr.data-node-id]="node.id" [node]="node">
       @if (getNodeTemplate(node.type)) {
         <ng-container *ngComponentOutlet="getNodeTemplate(node.type); inputs: { node }" />

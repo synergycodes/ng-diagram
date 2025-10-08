@@ -215,6 +215,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     return this.edgeTemplateMap().get(edgeType) ?? null;
   }
 
+  // Used by template @for track function to force view recreation after delete/re-add
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  trackNode = (_index: number, node: Node) => (node as any)._internalId || node.id;
+
   isGroup(node: Node) {
     return 'isGroup' in node;
   }
