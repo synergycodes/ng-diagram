@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Middleware, ModelAdapter } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Middleware, ModelAdapter } from '../../../core/src';
 
 import {
   FlowCoreProviderService,
@@ -10,6 +10,7 @@ import {
 } from '../../services';
 import { CursorPositionTrackerService } from '../../services/cursor-position-tracker/cursor-position-tracker.service';
 import { InputEventsRouterService } from '../../services/input-events/input-events-router.service';
+import { TemplateProviderService } from '../../services/template-provider/template-provider.service';
 import { NgDiagramComponent } from './ng-diagram.component';
 
 describe('AngularAdapterDiagramComponent', () => {
@@ -72,6 +73,9 @@ describe('AngularAdapterDiagramComponent', () => {
                 setEnabled: vi.fn(),
                 hasListeners: vi.fn(),
               },
+              config: {
+                debugMode: false,
+              },
             }),
             isInitialized: vi.fn().mockReturnValue(true),
           },
@@ -83,6 +87,7 @@ describe('AngularAdapterDiagramComponent', () => {
             onDragStartFromPalette: vi.fn(),
           },
         },
+        TemplateProviderService,
         CursorPositionTrackerService,
         InputEventsRouterService,
       ],
@@ -148,6 +153,7 @@ describe('AngularAdapterDiagramComponent', () => {
       const templateMap = new Map([['test-type', mockTemplate]]);
 
       fixture.componentRef.setInput('nodeTemplateMap', templateMap);
+      fixture.detectChanges();
 
       expect(component.getNodeTemplate('test-type')).toBe(mockTemplate);
     });
@@ -167,6 +173,7 @@ describe('AngularAdapterDiagramComponent', () => {
       const templateMap = new Map([['test-type', mockTemplate]]);
 
       fixture.componentRef.setInput('edgeTemplateMap', templateMap);
+      fixture.detectChanges();
 
       expect(component.getEdgeTemplate('test-type')).toBe(mockTemplate);
     });
