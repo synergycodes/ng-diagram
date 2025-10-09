@@ -39,7 +39,7 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 100 },
+        position: { x: 50, y: 100 },
         type: 'myType',
         data: { label: 'Node 1' },
       },
