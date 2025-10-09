@@ -9,7 +9,7 @@ title: "PortLocation"
 
 Interface representing the location of a port on a node
 
-## Type Declaration
+## Type declaration
 
 ### side
 

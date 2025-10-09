@@ -15,10 +15,11 @@ import {
     <!-- @mark-start -->
     <ng-diagram-node-rotate-adornment />
     <!-- @mark-end -->
-    <div class="node">
-      <div class="node-header">Header</div>
-      <div class="node-content">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    <div class="custom-node">
+      <div class="custom-node__header">Node title</div>
+      <div class="custom-node__content">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua.
       </div>
     </div>
   `,

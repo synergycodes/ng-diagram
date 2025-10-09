@@ -22,3 +22,8 @@ details.ec-section.github {
     opacity: 1;
   }
 }
+
+/* Custom font only for the diagram canvas elements */
+ng-diagram-canvas {
+  font-family: 'Poppins', sans-serif;
+}
