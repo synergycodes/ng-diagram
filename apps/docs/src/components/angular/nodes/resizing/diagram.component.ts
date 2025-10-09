@@ -58,6 +58,8 @@ export class DiagramComponent {
       {
         id: '1',
         position: { x: 100, y: 100 },
+        size: { width: 200, height: 150 },
+        autoSize: false,
         type: 'myType',
         data: {},
         // @mark-start:enabling
