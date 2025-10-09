@@ -23,6 +23,10 @@ describe('Add Update Delete Command', () => {
           return { x: 50, y: 50 };
         }),
       },
+      transactionManager: {
+        isActive: vi.fn().mockReturnValue(false),
+        getCurrentTransaction: vi.fn(),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });

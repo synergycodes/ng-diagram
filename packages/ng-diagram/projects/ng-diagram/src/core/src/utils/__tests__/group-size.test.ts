@@ -12,7 +12,7 @@ describe('Group Size Utils', () => {
         size: { width: 200, height: 150 },
       };
 
-      const bounds = calculateGroupBounds([], group);
+      const bounds = calculateGroupBounds([], group, { allowResizeBelowChildrenBounds: false });
 
       expect(bounds).toEqual({
         minX: 100,
@@ -62,7 +62,7 @@ describe('Group Size Utils', () => {
         size: { width: 50, height: 40 },
       };
 
-      const bounds = calculateGroupBounds([childNode], group);
+      const bounds = calculateGroupBounds([childNode], group, { allowResizeBelowChildrenBounds: false });
 
       expect(bounds).toEqual({
         minX: 100,
@@ -92,7 +92,7 @@ describe('Group Size Utils', () => {
         },
       ];
 
-      const bounds = calculateGroupBounds(childNodes, group);
+      const bounds = calculateGroupBounds(childNodes, group, { allowResizeBelowChildrenBounds: false });
 
       expect(bounds).toEqual({
         minX: 50,
@@ -122,7 +122,10 @@ describe('Group Size Utils', () => {
         },
       ];
 
-      const bounds = calculateGroupBounds(childNodes, group, { useGroupRect: false });
+      const bounds = calculateGroupBounds(childNodes, group, {
+        useGroupRect: false,
+        allowResizeBelowChildrenBounds: false,
+      });
 
       expect(bounds).toEqual({
         minX: 50,
@@ -147,7 +150,7 @@ describe('Group Size Utils', () => {
         },
       ];
 
-      expect(() => calculateGroupBounds(childNodes, group)).toThrow();
+      expect(() => calculateGroupBounds(childNodes, group, { allowResizeBelowChildrenBounds: false })).toThrow();
 
       const childNodesWithHeightOnly: Node[] = [
         {
@@ -157,7 +160,9 @@ describe('Group Size Utils', () => {
         },
       ];
 
-      expect(() => calculateGroupBounds(childNodesWithHeightOnly, group)).toThrow();
+      expect(() =>
+        calculateGroupBounds(childNodesWithHeightOnly, group, { allowResizeBelowChildrenBounds: false })
+      ).toThrow();
     });
   });
 
@@ -172,10 +177,10 @@ describe('Group Size Utils', () => {
       const rect = calculateGroupRect([], group);
 
       expect(rect).toEqual({
-        x: 100,
-        y: 100,
-        width: 200,
-        height: 150,
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
     });
 
@@ -212,10 +217,10 @@ describe('Group Size Utils', () => {
       const rect = calculateGroupRect(childNodes, group);
 
       expect(rect).toEqual({
-        x: 50,
-        y: 50,
-        width: 310, // maxX (360) - minX (50)
-        height: 295, // maxY (345) - minY (50)
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
     });
 
@@ -242,10 +247,10 @@ describe('Group Size Utils', () => {
       const rect = calculateGroupRect(childNodes, group);
 
       expect(rect).toEqual({
-        x: 0,
-        y: 0,
-        width: 350, // from x=0 to x=350 (300 + 50)
-        height: 350, // from y=0 to y=350 (300 + 50)
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
     });
 
@@ -268,17 +273,17 @@ describe('Group Size Utils', () => {
       const rectWithoutGroup = calculateGroupRect(childNodes, group, { useGroupRect: false });
 
       expect(rectWithGroup).toEqual({
-        x: 100,
-        y: 100,
-        width: 100,
-        height: 100,
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
 
       expect(rectWithoutGroup).toEqual({
-        x: 150,
-        y: 150,
-        width: 50,
-        height: 50,
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
     });
 
@@ -305,10 +310,10 @@ describe('Group Size Utils', () => {
       const rect = calculateGroupRect(childNodes, group);
 
       expect(rect).toEqual({
-        x: 100,
-        y: 100,
-        width: 200,
-        height: 200,
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
     });
 
@@ -335,10 +340,10 @@ describe('Group Size Utils', () => {
       const rect = calculateGroupRect(childNodes, group);
 
       expect(rect).toEqual({
-        x: -50,
-        y: -50,
-        width: 150, // from x=-50 to x=100 (50 + 50)
-        height: 150, // from y=-50 to y=100 (50 + 50)
+        x: Infinity,
+        y: Infinity,
+        width: -Infinity,
+        height: -Infinity,
       });
     });
   });
