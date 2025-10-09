@@ -41,13 +41,13 @@ export class DiagramComponent {
         id: '1',
         position: { x: 100, y: 100 },
         type: 'myType',
-        data: {},
+        data: { label: 'Node 1' },
       },
       {
         id: '2',
         position: { x: 400, y: 100 },
         type: 'myType',
-        data: {},
+        data: { label: 'Node 2' },
       },
     ],
     edges: [
