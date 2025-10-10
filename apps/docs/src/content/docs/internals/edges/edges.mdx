@@ -192,6 +192,13 @@ export class MyDiagramComponent {
 }
 ```
 
+This allows you to:
+
+- Set different edge types for preview vs final edges
+- Add custom data to newly created edges
+- Apply specific routing algorithms
+- Control the visual appearance and behavior
+
 ### Available Host Classes
 
 The base edge component exposes these classes for styling:
@@ -199,12 +206,7 @@ The base edge component exposes these classes for styling:
 - `.selected` - Applied when the edge is selected
 - `.temporary` - Applied when the edge is being drawn (preview state)
 
-This allows you to:
-
-- Set different edge types for preview vs final edges
-- Add custom data to newly created edges
-- Apply specific routing algorithms
-- Control the visual appearance and behavior
+See [Edge Selection](/docs/internals/edges/selection) for more details on customizing selection styles.
 
 ## Further reading
 
