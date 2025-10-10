@@ -59,28 +59,13 @@ When an edge is selected, the `NgDiagramBaseEdgeComponent` automatically adds th
 
 <CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.scss" />
 
-### Available CSS Variables
-
-You can customize these CSS variables to control edge appearance:
-
-- `--edge-stroke` - Stroke color
-- `--edge-stroke-width` - Stroke width
-- `--edge-stroke-opacity` - Stroke opacity
-- `--edge-stroke-dasharray` - Stroke dash pattern (e.g., `5 5` for dashed line)
-- `--edge-stroke-transition` - Transition for stroke changes (e.g., `stroke 0.1s ease-in-out`)
-
-### Available Host Classes
-
-The base edge component exposes these classes for styling:
-
-- `.selected` - Applied when the edge is selected
-- `.temporary` - Applied when the edge is being drawn (preview state)
-
 ### Alternative: Dynamic Styling with Computed Properties
 
-For complex or programmatic styling, you can use computed properties with the base edge inputs:
-
-<CodeSnippet relativePath="edges/edge-selection/dynamic-edge/dynamic-edge.component.ts" />
+<LinkCard
+  title="Dynamic Edge Styling"
+  href="/docs/internals/edges/edges/#dynamic-styling-with-computed-properties"
+  description="Dynamic Styling with Computed Properties"
+/>
 
 ## Further Reading
 
