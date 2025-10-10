@@ -20,6 +20,59 @@ Custom edge types need to be registered in the `edgeTemplateMap` and passed to t
 
 <CodeSnippet relativePath="edges/custom-edges/diagram.component.ts" />
 
+## Styling Custom Edges
+
+Custom edges can be styled using CSS variables that the `NgDiagramBaseEdgeComponent` exposes. This approach provides a clean way to customize edge appearance without breaking encapsulation.
+
+### Available CSS Variables
+
+- `--edge-stroke` - Stroke color
+- `--edge-stroke-width` - Stroke width
+- `--edge-stroke-opacity` - Stroke opacity
+- `--edge-stroke-dasharray` - Stroke dash pattern (e.g., `5 5` for dashed line)
+- `--edge-stroke-transition` - Transition for stroke changes (e.g., `stroke 0.1s ease-in-out`)
+
+### Example: Styled Custom Edge
+
+```scss
+ng-diagram-base-edge {
+  --edge-stroke: #334155;
+  --edge-stroke-width: 2;
+  --edge-stroke-dasharray: 5 5; // Dashed line
+}
+
+ng-diagram-base-edge.selected {
+  --edge-stroke: #3b82f6;
+  --edge-stroke-width: 3;
+  --edge-stroke-dasharray: 8 4; // Different dash pattern when selected
+}
+
+ng-diagram-base-edge:hover:not(.selected) {
+  --edge-stroke: #64748b;
+}
+```
+
+### Alternative: Component Inputs
+
+You can also pass styling properties directly to the `NgDiagramBaseEdgeComponent`:
+
+```typescript
+@Component({
+  selector: 'custom-edge',
+  template: `<ng-diagram-base-edge
+    [edge]="edge()"
+    stroke="#334155"
+    [strokeWidth]="3"
+    strokeDasharray="5 5"
+    [strokeOpacity]="0.8"
+  />`,
+  imports: [NgDiagramBaseEdgeComponent],
+})
+export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
+  edge = input.required<Edge>();
+}
+```
+
 ## Custom Routing
 
 Custom routing is an extensible mechanism that allows you to create sophisticated edge paths tailored to your specific needs. You can implement custom routing algorithms, create dynamic paths based on node positions, or define manual waypoints for precise control.

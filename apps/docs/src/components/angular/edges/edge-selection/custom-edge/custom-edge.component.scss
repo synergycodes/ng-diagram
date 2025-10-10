@@ -1,0 +1,16 @@
+// Base state
+ng-diagram-base-edge {
+  --edge-stroke: black;
+  --edge-stroke-width: 2;
+}
+
+// Selected state
+ng-diagram-base-edge.selected {
+  --edge-stroke: blue;
+  --edge-stroke-width: 3;
+}
+
+// Hover state
+ng-diagram-base-edge:hover:not(.selected) {
+  --edge-stroke: lightblue;
+}

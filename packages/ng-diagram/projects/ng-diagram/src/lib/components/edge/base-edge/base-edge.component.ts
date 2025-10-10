@@ -18,6 +18,10 @@ import { FlowCoreProviderService } from '../../../services';
     { directive: ZIndexDirective, inputs: ['data: edge'] },
     { directive: EdgeSelectionDirective, inputs: ['targetData: edge'] },
   ],
+  host: {
+    '[class.selected]': 'selected()',
+    '[class.temporary]': 'temporary()',
+  },
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
@@ -50,16 +54,19 @@ export class NgDiagramBaseEdgeComponent {
   /**
    * Stroke opacity of the edge
    */
-  strokeOpacity = input<number>(1);
+  strokeOpacity = input<number>();
 
   /**
    * Stroke width of the edge
    */
-  strokeWidth = input<number>(2);
+  strokeWidth = input<number>();
 
-  readonly points = computed(() => {
-    return this.edge().points ?? [];
-  });
+  /**
+   * Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-dot pattern).
+   */
+  strokeDasharray = input<string>();
+
+  readonly points = computed(() => this.edge().points ?? []);
 
   readonly path = computed(() => {
     const edge = this.edge();
