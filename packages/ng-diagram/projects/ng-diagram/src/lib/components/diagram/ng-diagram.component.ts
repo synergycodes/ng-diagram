@@ -34,6 +34,7 @@ import { ZoomingPointerDirective } from '../../directives/input-events/zooming/z
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { NgDiagramServicesAvailabilityCheckerDirective } from '../../directives/services-availability-checker/ng-diagram-services-availability-checker.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
+import { TemplateProviderService } from '../../services/template-provider/template-provider.service';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
 import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
@@ -82,6 +83,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
+  private readonly templateProviderService = inject(TemplateProviderService);
 
   private initializedModel: ModelAdapter | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -161,6 +163,16 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
         this.setupEventBridge();
       }
     });
+
+    effect(() => {
+      const nodeTemplateMap = this.nodeTemplateMap();
+      this.templateProviderService.setNodeTemplateMap(nodeTemplateMap);
+    });
+
+    effect(() => {
+      const edgeTemplateMap = this.edgeTemplateMap();
+      this.templateProviderService.setEdgeTemplateMap(edgeTemplateMap);
+    });
   }
 
   /** @ignore */
@@ -205,14 +217,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * @throws This method does not throw exceptions - it handles all edge cases gracefully
    */
   getNodeTemplate(nodeType: Node['type']) {
-    return this.nodeTemplateMap().get(nodeType || '') ?? null;
+    return this.templateProviderService.getNodeTemplate(nodeType);
   }
 
   getEdgeTemplate(edgeType: Edge['type']) {
-    if (!edgeType) {
-      return null;
-    }
-    return this.edgeTemplateMap().get(edgeType) ?? null;
+    return this.templateProviderService.getEdgeTemplate(edgeType);
   }
 
   // Used by template @for track function to force view recreation after delete/re-add

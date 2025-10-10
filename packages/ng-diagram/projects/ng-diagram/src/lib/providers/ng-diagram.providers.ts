@@ -15,6 +15,7 @@ import { LinkingEventService } from '../services/input-events/linking-event.serv
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
 import { PaletteService } from '../services/palette/palette.service';
 import { RendererService } from '../services/renderer/renderer.service';
+import { TemplateProviderService } from '../services/template-provider/template-provider.service';
 import { UpdatePortsService } from '../services/update-ports/update-ports.service';
 
 /**
@@ -61,5 +62,6 @@ export function provideNgDiagram(): Provider[] {
     NgDiagramGroupsService,
     LinkingEventService,
     ManualLinkingService,
+    TemplateProviderService,
   ];
 }
