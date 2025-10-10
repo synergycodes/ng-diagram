@@ -8,7 +8,6 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  selector: 'selection',
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
   template: `
