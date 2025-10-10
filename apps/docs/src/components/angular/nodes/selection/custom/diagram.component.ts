@@ -40,6 +40,8 @@ export class DiagramComponent {
       {
         id: '1',
         position: { x: 100, y: 100 },
+        size: { width: 250, height: 170 },
+        autoSize: false,
         type: 'myType',
         data: {},
       },
