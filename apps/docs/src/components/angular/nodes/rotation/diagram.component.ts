@@ -53,7 +53,9 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 100 },
+        position: { x: 200, y: 70 },
+        size: { width: 250, height: 170 },
+        autoSize: false,
         type: 'myType',
         data: {},
         // @mark-start:enabling

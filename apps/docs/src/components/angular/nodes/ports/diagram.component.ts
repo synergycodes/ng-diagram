@@ -40,12 +40,16 @@ export class DiagramComponent {
       {
         id: '1',
         position: { x: 50, y: 100 },
+        size: { width: 250, height: 170 },
+        autoSize: false,
         type: 'myType',
         data: { label: 'Node 1' },
       },
       {
         id: '2',
         position: { x: 400, y: 100 },
+        size: { width: 250, height: 170 },
+        autoSize: false,
         type: 'myType',
         data: { label: 'Node 2' },
       },

@@ -1,0 +1,28 @@
+@mixin custom-node__host {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  background-color: var(--ngd-node-bg-primary-default);
+  border: 1px solid var(--ngd-node-stroke-primary-default);
+  border-radius: 8px;
+
+  &:not(.ng-diagram-node-selected):hover {
+    border-color: var(--ngd-node-stroke-primary-hover);
+  }
+}
+
+@mixin custom-node__header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  background-color: var(--ngd-node-bg-primary-secondary);
+  border-bottom: 1px solid var(--ngd-node-stroke-primary-default);
+  color: var(--ngd-txt-primary-default);
+  padding: 0.75rem 1.5rem 0.5rem 1.5rem;
+}
+
+@mixin custom-node__content {
+  font-size: 0.75rem;
+  font-weight: 400;
+  padding: 1rem 1.5rem;
+}

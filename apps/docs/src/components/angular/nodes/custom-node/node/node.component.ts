@@ -15,18 +15,17 @@ import {
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
   template: `
-    <div class="node">
-      <div class="node-header">Header</div>
-      <div class="node-content">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    <div class="custom-node">
+      <div class="custom-node__header">Node title</div>
+      <div class="custom-node__content">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua.
       </div>
-
-      <!-- Left port for connections -->
-      <ng-diagram-port [side]="'left'" [type]="'both'" [id]="'port-left'" />
-
-      <!-- Right port for connections -->
-      <ng-diagram-port [side]="'right'" [type]="'both'" [id]="'port-right'" />
     </div>
+    <!-- Left port for connections -->
+    <ng-diagram-port [side]="'left'" [type]="'both'" [id]="'port-left'" />
+    <!-- Right port for connections -->
+    <ng-diagram-port [side]="'right'" [type]="'both'" [id]="'port-right'" />
   `,
   styleUrl: './node.component.scss',
 })
