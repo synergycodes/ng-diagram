@@ -46,7 +46,9 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 100 },
+        position: { x: 200, y: 50 },
+        size: { width: 250, height: 170 },
+        autoSize: false,
         // @mark-start
         type: 'myType',
         // @mark-end
@@ -55,7 +57,7 @@ export class DiagramComponent {
     ],
     // @collapse-start
     edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1.25 } },
+    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     // @collapse-end
   });
   // @section-end:model

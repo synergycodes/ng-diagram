@@ -3,12 +3,12 @@ import { type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
 
 // @section-start
 @Component({
-  selector: 'node',
   template: `
-    <div class="node">
-      <div class="node-header">Header {{ node().data.label }}</div>
-      <div class="node-content">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    <div class="custom-node">
+      <div class="custom-node__header">Node title</div>
+      <div class="custom-node__content">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua.
       </div>
     </div>
   `,
