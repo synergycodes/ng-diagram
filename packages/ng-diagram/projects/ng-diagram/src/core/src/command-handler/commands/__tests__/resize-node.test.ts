@@ -12,7 +12,7 @@ vi.mock('../../../utils', () => ({
 }));
 
 // Import the mocked functions after the mock is declared
-import { calculateGroupBounds, isSameSize, isGroup } from '../../../utils';
+import { calculateGroupBounds, isGroup, isSameSize } from '../../../utils';
 const mockCalculateGroupBounds = vi.mocked(calculateGroupBounds);
 const mockIsSameSize = vi.mocked(isSameSize);
 const mockIsGroup = vi.mocked(isGroup);

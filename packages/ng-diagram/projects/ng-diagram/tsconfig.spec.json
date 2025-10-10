@@ -5,6 +5,6 @@
     "types": ["vitest/globals"],
     "target": "es2016"
   },
-  "include": ["**/*.spec.ts", "**/*.d.ts"],
+  "include": ["**/*.spec.ts", "**/*.test.ts", "**/*.d.ts"],
   "files": ["src/test-setup.ts"]
 }

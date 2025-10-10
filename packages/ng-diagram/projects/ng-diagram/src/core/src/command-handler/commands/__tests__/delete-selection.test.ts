@@ -15,6 +15,10 @@ describe('Delete Selection Command', () => {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       modelLookup: mockModelLookup,
+      transactionManager: {
+        isActive: vi.fn().mockReturnValue(false),
+        getCurrentTransaction: vi.fn(),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });

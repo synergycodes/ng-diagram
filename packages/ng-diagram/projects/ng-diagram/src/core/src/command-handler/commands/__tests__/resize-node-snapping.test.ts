@@ -41,6 +41,10 @@ describe('Resize Node Command with Snapping', () => {
           defaultResizeSnap: SNAP_GRID,
         },
       },
+      transactionManager: {
+        isActive: vi.fn().mockReturnValue(false),
+        getCurrentTransaction: vi.fn(),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
 
