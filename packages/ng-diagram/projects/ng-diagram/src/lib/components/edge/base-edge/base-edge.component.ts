@@ -54,12 +54,12 @@ export class NgDiagramBaseEdgeComponent {
   /**
    * Stroke opacity of the edge
    */
-  strokeOpacity = input<number>(1);
+  strokeOpacity = input<number>();
 
   /**
    * Stroke width of the edge
    */
-  strokeWidth = input<number>(2);
+  strokeWidth = input<number>();
 
   /**
    * Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-dot pattern).
