@@ -52,7 +52,7 @@ Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-
 
 ### strokeOpacity
 
-> **strokeOpacity**: `InputSignal`\<`number`\>
+> **strokeOpacity**: `InputSignal`\<`undefined` \| `number`\>
 
 Stroke opacity of the edge
 
@@ -60,7 +60,7 @@ Stroke opacity of the edge
 
 ### strokeWidth
 
-> **strokeWidth**: `InputSignal`\<`number`\>
+> **strokeWidth**: `InputSignal`\<`undefined` \| `number`\>
 
 Stroke width of the edge
 
