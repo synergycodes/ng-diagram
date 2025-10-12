@@ -1,35 +1,79 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { FlowCore } from '../../flow-core';
-import { mockEdgeLabel, mockNode, mockPort } from '../../test-utils';
-import { BatchInitializer } from './batch-initializer';
+import type { Edge, EdgeLabel, Node, Port, Size } from '../../types';
 import { InitUpdater } from './init-updater';
 
-// Create shared mocks for BatchInitializer instances
-const waitForStabilityMock = vi.fn(() => Promise.resolve());
-const addMock = vi.fn();
-const dataMock = new Map();
-
-// Mock BatchInitializer
-vi.mock('./batch-initializer', () => ({
-  BatchInitializer: vi.fn().mockImplementation(() => ({
-    waitForStability: waitForStabilityMock,
-    add: addMock,
-    data: dataMock,
-  })),
-}));
-
 describe('InitUpdater', () => {
-  const stateMock = { nodes: [], edges: [], metadata: {} };
-  const getStateMock = vi.fn();
-  const setStateMock = vi.fn();
-  let flowCore: FlowCore;
   let initUpdater: InitUpdater;
+  let mockFlowCore: {
+    getState: Mock;
+    setState: Mock;
+    internalUpdater: {
+      addPort: Mock;
+      addEdgeLabel: Mock;
+      applyNodeSize: Mock;
+      applyPortsSizesAndPositions: Mock;
+      applyEdgeLabelSize: Mock;
+    };
+  };
+
+  const createMockNode = (id: string, withPorts = false): Node => ({
+    id,
+    position: { x: 0, y: 0 },
+    size: { width: 100, height: 100 },
+    type: 'default',
+    data: {},
+    measuredPorts: withPorts
+      ? [
+          {
+            id: 'port1',
+            type: 'source',
+            nodeId: id,
+            side: 'top',
+            size: { width: 10, height: 10 },
+            position: { x: 5, y: 0 },
+          },
+        ]
+      : undefined,
+  });
+
+  const createMockEdge = (id: string, withLabels = false): Edge => ({
+    id,
+    source: 'node1',
+    target: 'node2',
+    type: 'default',
+    data: {},
+    measuredLabels: withLabels
+      ? [
+          {
+            id: 'label1',
+            positionOnEdge: 0.5,
+            size: { width: 50, height: 20 },
+          },
+        ]
+      : undefined,
+  });
+
+  const createMockPort = (id: string): Port => ({
+    id,
+    type: 'source',
+    nodeId: 'node1',
+    side: 'top',
+    size: { width: 10, height: 10 },
+    position: { x: 0, y: 0 },
+  });
+
+  const createMockEdgeLabel = (id: string): EdgeLabel => ({
+    id,
+    positionOnEdge: 0.5,
+  });
 
   beforeEach(() => {
-    flowCore = {
-      getState: getStateMock,
-      setState: setStateMock,
-      getNodeById: vi.fn(),
+    vi.useFakeTimers();
+
+    mockFlowCore = {
+      getState: vi.fn(),
+      setState: vi.fn(),
       internalUpdater: {
         addPort: vi.fn(),
         addEdgeLabel: vi.fn(),
@@ -37,329 +81,570 @@ describe('InitUpdater', () => {
         applyPortsSizesAndPositions: vi.fn(),
         applyEdgeLabelSize: vi.fn(),
       },
-    } as unknown as FlowCore;
+    };
+  });
 
-    getStateMock.mockReturnValue(stateMock);
-    vi.clearAllMocks();
-    waitForStabilityMock.mockClear();
-    addMock.mockClear();
-    dataMock.clear();
-
-    initUpdater = new InitUpdater(flowCore);
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('constructor', () => {
-    it('should initialize with isInitialized as false', () => {
+    it('should initialize with isInitialized=false when no nodes or edges', () => {
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
       expect(initUpdater.isInitialized).toBe(false);
     });
 
-    it('should create 2 batch initializers (ports and labels)', () => {
-      expect(BatchInitializer).toHaveBeenCalledTimes(2);
+    it('should initialize with isInitialized=false when nodes exist', () => {
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [createMockNode('node1')],
+        edges: [],
+      });
+
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      expect(initUpdater.isInitialized).toBe(false);
+    });
+
+    it('should initialize with isInitialized=false when edges exist', () => {
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [createMockEdge('edge1')],
+      });
+
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      expect(initUpdater.isInitialized).toBe(false);
     });
   });
 
   describe('start', () => {
-    it('should call waitForStability on both initializers and emit init command', async () => {
-      const onCompleteMock = vi.fn().mockResolvedValue(undefined);
+    it('should mark as initialized immediately with no entities', async () => {
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      // Set up state with a measured node so finish condition is met
-      const stateWithMeasuredNode = {
-        nodes: [{ id: 'node-1', size: { width: 100, height: 100 } }],
-        edges: [],
-        metadata: {},
-      };
-      getStateMock.mockReturnValue(stateWithMeasuredNode);
+      initUpdater.start();
 
-      const newInitUpdater = new InitUpdater(flowCore);
-      newInitUpdater.start(onCompleteMock);
+      // Should resolve immediately without waiting for stability delay
+      await vi.runAllTimersAsync();
 
-      // waitForStability should be called for port and label initializers
-      expect(waitForStabilityMock).toHaveBeenCalled();
-
-      // Initially, isInitialized should still be false (async)
-      expect(newInitUpdater.isInitialized).toBe(false);
-
-      // Wait for promises to resolve
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      // After promises resolve, isInitialized should be true and callback called
-      expect(newInitUpdater.isInitialized).toBe(true);
-      expect(onCompleteMock).toHaveBeenCalledTimes(1);
+      expect(initUpdater.isInitialized).toBe(true);
     });
 
-    it('should handle initialization failure and force finish', async () => {
-      const onCompleteMock = vi.fn();
-      const error = new Error('Initialization failed');
+    it('should call onComplete callback after initialization', async () => {
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      // Set up state with a measured node
-      const stateWithMeasuredNode = {
-        nodes: [{ id: 'node-1', size: { width: 100, height: 100 } }],
-        edges: [],
-        metadata: {},
-      };
-      getStateMock.mockReturnValue(stateWithMeasuredNode);
+      const onComplete = vi.fn();
+      initUpdater.start(onComplete);
 
-      // Make one initializer fail
-      waitForStabilityMock.mockResolvedValueOnce(undefined).mockRejectedValueOnce(error);
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
 
-      // Spy on console.error
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      const newInitUpdater = new InitUpdater(flowCore);
-      newInitUpdater.start(onCompleteMock);
-
-      // Wait for promises to resolve/reject
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      // Should still set isInitialized and call callback even on error
-      expect(newInitUpdater.isInitialized).toBe(true);
-      expect(onCompleteMock).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith('[InitUpdater] Entity stabilization failed:', error);
-
-      consoleErrorSpy.mockRestore();
+      expect(onComplete).toHaveBeenCalledTimes(1);
     });
 
-    it('should work without onComplete callback', async () => {
-      // Set up state with a measured node
-      const stateWithMeasuredNode = {
-        nodes: [{ id: 'node-1', size: { width: 100, height: 100 } }],
-        edges: [],
-        metadata: {},
-      };
-      getStateMock.mockReturnValue(stateWithMeasuredNode);
+    it('should wait for node measurements before finishing', async () => {
+      const node = { ...createMockNode('node1'), size: undefined };
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      const newInitUpdater = new InitUpdater(flowCore);
-      newInitUpdater.start(); // No callback
+      initUpdater.start();
 
-      // Wait for promises to resolve
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
 
-      // Should still set isInitialized
-      expect(newInitUpdater.isInitialized).toBe(true);
+      expect(initUpdater.isInitialized).toBe(false);
+
+      initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
+
+      expect(initUpdater.isInitialized).toBe(true);
     });
 
-    it('should collect already measured items from initial state', () => {
-      const stateWithMeasuredItems = {
-        nodes: [
+    it('should wait for port measurements before finishing', async () => {
+      const node = {
+        ...createMockNode('node1'),
+        size: { width: 100, height: 100 },
+        measuredPorts: [
           {
-            id: 'node-1',
-            size: { width: 100, height: 100 },
-            measuredPorts: [
-              {
-                id: 'port-1',
-                size: { width: 50, height: 50 },
-                position: { x: 10, y: 10 },
-              },
-            ],
+            id: 'port1',
+            type: 'source' as const,
+            nodeId: 'node1',
+            side: 'top' as const,
+            size: undefined,
+            position: undefined,
           },
         ],
-        edges: [
+      };
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start();
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(false);
+
+      initUpdater.applyPortsSizesAndPositions('node1', [
+        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      ]);
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should wait for edge label measurements before finishing', async () => {
+      const edge = {
+        ...createMockEdge('edge1'),
+        measuredLabels: [
           {
-            id: 'edge-1',
-            measuredLabels: [{ id: 'label-1', size: { width: 80, height: 20 } }],
+            id: 'label1',
+            positionOnEdge: 0.5,
+            size: undefined,
           },
         ],
-        metadata: {},
       };
-      getStateMock.mockReturnValue(stateWithMeasuredItems);
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      const newInitUpdater = new InitUpdater(flowCore);
-      newInitUpdater.start();
+      initUpdater.start();
 
-      // Pre-measured items should be tracked (we can't directly test private fields,
-      // but we can verify the behavior by ensuring finish happens immediately if all are measured)
-      expect(newInitUpdater.isInitialized).toBe(false); // Still waiting for stabilization
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(false);
+
+      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should handle async onComplete callback', async () => {
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      const onComplete = vi.fn().mockResolvedValue(undefined);
+      initUpdater.start(onComplete);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(initUpdater.isInitialized).toBe(true);
     });
   });
 
   describe('applyNodeSize', () => {
-    it('should store node size with valid dimensions', () => {
-      const size = { width: 100, height: 100 };
+    it('should record node size measurement and apply on finish', async () => {
+      const node = { ...createMockNode('node1'), size: undefined };
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.applyNodeSize('node-1', size);
+      initUpdater.start();
 
-      // Can't directly test private Map, but we can verify it doesn't throw
-      expect(() => initUpdater.applyNodeSize('node-1', size)).not.toThrow();
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      const size = { width: 150, height: 150 };
+      initUpdater.applyNodeSize('node1', size);
+
+      await vi.runAllTimersAsync();
+
+      expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
+      const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
+      expect(stateUpdate.nodes[0].size).toEqual(size);
     });
 
-    it('should not track node as measured if size is 0', () => {
-      const size = { width: 0, height: 0 };
+    it('should queue measurement if finishing', async () => {
+      const node = { ...createMockNode('node1'), size: undefined };
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.applyNodeSize('node-1', size);
+      const onComplete = vi.fn(() => {
+        // Apply node size while finish() is executing
+        initUpdater.applyNodeSize('node2', { width: 200, height: 200 });
+      });
 
-      // Size is stored but not tracked as measured (can't verify directly, but shouldn't throw)
-      expect(() => initUpdater.applyNodeSize('node-1', size)).not.toThrow();
-    });
+      initUpdater.start(onComplete);
 
-    it('should store node sizes during initialization', () => {
-      const size = { width: 100, height: 100 };
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
 
-      initUpdater.applyNodeSize('node-1', size);
+      // Trigger finish by applying node1 size
+      initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
 
-      // Should accept without throwing during initialization
-      expect(() => initUpdater.applyNodeSize('node-1', size)).not.toThrow();
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.applyNodeSize).toHaveBeenCalledWith('node2', {
+        width: 200,
+        height: 200,
+      });
     });
   });
 
   describe('addPort', () => {
-    it('should add port to BatchInitializer', () => {
-      initUpdater.addPort('node-1', mockPort);
-
-      expect(addMock).toHaveBeenCalledWith(`node-1->${mockPort.id}`, mockPort);
+    beforeEach(() => {
+      const node = createMockNode('node1');
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
     });
 
-    it('should track added ports during initialization', () => {
-      initUpdater.addPort('node-1', mockPort);
+    it('should add port and delay stabilization', async () => {
+      initUpdater.start();
 
-      // Should add to BatchInitializer and track in expectedPorts
-      expect(addMock).toHaveBeenCalledWith(`node-1->${mockPort.id}`, mockPort);
+      const port = createMockPort('port1');
+      initUpdater.addPort('node1', port);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      // Should not finish yet - waiting for port measurement
+      expect(initUpdater.isInitialized).toBe(false);
+    });
+
+    it('should reset stability timer on multiple port additions', async () => {
+      initUpdater.start();
+
+      initUpdater.addPort('node1', createMockPort('port1'));
+
+      vi.advanceTimersByTime(30);
+
+      initUpdater.addPort('node1', createMockPort('port2'));
+
+      vi.advanceTimersByTime(30);
+
+      // Should not be stabilized yet (only 30ms since last addition)
+      expect(initUpdater.isInitialized).toBe(false);
+
+      vi.advanceTimersByTime(20);
+      await vi.runAllTimersAsync();
+
+      // Should still not finish - waiting for measurements
+      expect(initUpdater.isInitialized).toBe(false);
     });
   });
 
   describe('applyPortsSizesAndPositions', () => {
-    it('should not process anything if node does not exist', () => {
-      vi.mocked(flowCore.getNodeById).mockReturnValue(null);
-
-      initUpdater.applyPortsSizesAndPositions('node-1', [
-        {
-          id: 'port-1',
-          size: { width: 100, height: 100 },
-          position: { x: 0, y: 0 },
-        },
-      ]);
-
-      // Should return early without throwing
-      expect(() =>
-        initUpdater.applyPortsSizesAndPositions('node-1', [
+    it('should record port measurements', async () => {
+      const node = {
+        ...createMockNode('node1'),
+        size: { width: 100, height: 100 },
+        measuredPorts: [
           {
-            id: 'port-1',
-            size: { width: 100, height: 100 },
-            position: { x: 0, y: 0 },
+            id: 'port1',
+            type: 'source' as const,
+            nodeId: 'node1',
+            side: 'top' as const,
+            size: undefined,
+            position: undefined,
           },
-        ])
-      ).not.toThrow();
-    });
-
-    it('should store port measurements', () => {
-      const node = {
-        ...mockNode,
-        measuredPorts: [{ ...mockPort, id: 'port-1' }],
+        ],
       };
-      vi.mocked(flowCore.getNodeById).mockReturnValue(node);
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.applyPortsSizesAndPositions('node-1', [
-        {
-          id: 'port-1',
-          size: { width: 100, height: 100 },
-          position: { x: 10, y: 10 },
-        },
+      initUpdater.start();
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      initUpdater.applyPortsSizesAndPositions('node1', [
+        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
       ]);
 
-      expect(() =>
-        initUpdater.applyPortsSizesAndPositions('node-1', [
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should skip ports without size or position', async () => {
+      const node = {
+        ...createMockNode('node1'),
+        size: { width: 100, height: 100 },
+        measuredPorts: [
           {
-            id: 'port-1',
-            size: { width: 100, height: 100 },
-            position: { x: 10, y: 10 },
+            id: 'port1',
+            type: 'source' as const,
+            nodeId: 'node1',
+            side: 'top' as const,
+            size: undefined,
+            position: undefined,
           },
-        ])
-      ).not.toThrow();
-    });
-
-    it('should skip ports without size or position', () => {
-      const node = {
-        ...mockNode,
-        measuredPorts: [{ ...mockPort, id: 'port-1' }],
+        ],
       };
-      vi.mocked(flowCore.getNodeById).mockReturnValue(node);
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.applyPortsSizesAndPositions('node-1', [
-        { id: 'port-1', size: undefined, position: { x: 10, y: 10 } },
+      initUpdater.start();
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      initUpdater.applyPortsSizesAndPositions('node1', [
+        { id: 'port1', size: undefined as unknown as Size, position: { x: 5, y: 0 } },
       ]);
 
-      // Should skip without throwing
-      expect(() =>
-        initUpdater.applyPortsSizesAndPositions('node-1', [
-          { id: 'port-1', size: undefined, position: { x: 10, y: 10 } },
-        ])
-      ).not.toThrow();
-    });
-
-    it('should track port measurements during initialization', () => {
-      const node = {
-        ...mockNode,
-        measuredPorts: [{ ...mockPort, id: 'port-1' }],
-      };
-      vi.mocked(flowCore.getNodeById).mockReturnValue(node);
-
-      const ports = [
-        {
-          id: 'port-1',
-          size: { width: 100, height: 100 },
-          position: { x: 10, y: 10 },
-        },
-      ];
-      initUpdater.applyPortsSizesAndPositions('node-1', ports);
-
-      // Should store without throwing
-      expect(() => initUpdater.applyPortsSizesAndPositions('node-1', ports)).not.toThrow();
+      // Should not finish - port wasn't measured
+      expect(initUpdater.isInitialized).toBe(false);
     });
   });
 
   describe('addEdgeLabel', () => {
-    it('should add edge label to BatchInitializer', () => {
-      initUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
-
-      expect(addMock).toHaveBeenCalledWith(`edge-1->${mockEdgeLabel.id}`, mockEdgeLabel);
+    beforeEach(() => {
+      const edge = createMockEdge('edge1');
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
     });
 
-    it('should handle multiple labels for the same edge', () => {
-      const label1 = { ...mockEdgeLabel, id: 'label-1' };
-      const label2 = { ...mockEdgeLabel, id: 'label-2' };
-      const label3 = { ...mockEdgeLabel, id: 'label-3' };
+    it('should add label and delay stabilization', async () => {
+      initUpdater.start();
 
-      initUpdater.addEdgeLabel('edge-1', label1);
-      initUpdater.addEdgeLabel('edge-1', label2);
-      initUpdater.addEdgeLabel('edge-1', label3);
+      const label = createMockEdgeLabel('label1');
+      initUpdater.addEdgeLabel('edge1', label);
 
-      expect(addMock).toHaveBeenCalledWith(`edge-1->label-1`, label1);
-      expect(addMock).toHaveBeenCalledWith(`edge-1->label-2`, label2);
-      expect(addMock).toHaveBeenCalledWith(`edge-1->label-3`, label3);
-      expect(addMock).toHaveBeenCalledTimes(3);
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      // Should not finish yet - waiting for label measurement
+      expect(initUpdater.isInitialized).toBe(false);
     });
 
-    it('should track added labels during initialization', () => {
-      initUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
+    it('should reset stability timer on multiple label additions', async () => {
+      initUpdater.start();
 
-      // Should add to BatchInitializer and track in expectedLabels
-      expect(addMock).toHaveBeenCalledWith(`edge-1->${mockEdgeLabel.id}`, mockEdgeLabel);
+      initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
+
+      vi.advanceTimersByTime(30);
+
+      initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label2'));
+
+      vi.advanceTimersByTime(30);
+
+      // Should not be stabilized yet (only 30ms since last addition)
+      expect(initUpdater.isInitialized).toBe(false);
+
+      vi.advanceTimersByTime(20);
+      await vi.runAllTimersAsync();
+
+      // Should still not finish - waiting for measurements
+      expect(initUpdater.isInitialized).toBe(false);
     });
   });
 
   describe('applyEdgeLabelSize', () => {
-    it('should store edge label size', () => {
-      const size = { width: 100, height: 100 };
-
-      initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size);
-
-      expect(() => initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size)).not.toThrow();
+    beforeEach(() => {
+      const edge = createMockEdge('edge1', true);
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
     });
 
-    it('should not track label as measured if size is 0', () => {
-      const size = { width: 0, height: 0 };
+    it('should record label size measurement', async () => {
+      initUpdater.start();
 
-      initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size);
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
 
-      expect(() => initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size)).not.toThrow();
+      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+  });
+
+  describe('late arrival queueing', () => {
+    it('should queue port additions that arrive during finish', async () => {
+      const node = { ...createMockNode('node1'), size: undefined };
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      let finishCallbackExecuted = false;
+      const onComplete = vi.fn(() => {
+        // Add port while finish() is executing
+        initUpdater.addPort('node1', createMockPort('port1'));
+        finishCallbackExecuted = true;
+      });
+
+      initUpdater.start(onComplete);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      // Apply node size to trigger finish
+      initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
+
+      await vi.runAllTimersAsync();
+
+      expect(finishCallbackExecuted).toBe(true);
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.addPort).toHaveBeenCalledWith('node1', expect.any(Object));
     });
 
-    it('should track label sizes during initialization', () => {
-      const size = { width: 100, height: 100 };
-      initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size);
+    it('should queue measurements that arrive during finish', async () => {
+      const node = { ...createMockNode('node1'), size: undefined };
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      // Should store without throwing
-      expect(() => initUpdater.applyEdgeLabelSize('edge-1', 'label-1', size)).not.toThrow();
+      let finishCallbackExecuted = false;
+      const onComplete = vi.fn(() => {
+        // Add measurement while finish() is executing
+        initUpdater.applyNodeSize('node2', { width: 200, height: 200 });
+        finishCallbackExecuted = true;
+      });
+
+      initUpdater.start(onComplete);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      // Apply node size to trigger finish
+      initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
+
+      await vi.runAllTimersAsync();
+
+      expect(finishCallbackExecuted).toBe(true);
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.applyNodeSize).toHaveBeenCalledWith('node2', {
+        width: 200,
+        height: 200,
+      });
+    });
+
+    it('should queue edge label additions that arrive during finish', async () => {
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      let finishCallbackExecuted = false;
+      const onComplete = vi.fn(() => {
+        // Add label while finish() is executing
+        initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
+        finishCallbackExecuted = true;
+      });
+
+      initUpdater.start(onComplete);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      expect(finishCallbackExecuted).toBe(true);
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.addEdgeLabel).toHaveBeenCalledWith('edge1', expect.any(Object));
+    });
+  });
+
+  describe('state application', () => {
+    it('should apply all collected data on finish', async () => {
+      const node = createMockNode('node1');
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start();
+      initUpdater.applyNodeSize('node1', { width: 150, height: 150 });
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
+      const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
+      expect(stateUpdate.nodes[0].size).toEqual({ width: 150, height: 150 });
+    });
+
+    it('should merge new ports with existing ports', async () => {
+      const node = createMockNode('node1', true);
+      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start();
+
+      const newPort = createMockPort('port2');
+      initUpdater.addPort('node1', newPort);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
+      initUpdater.applyPortsSizesAndPositions('node1', [
+        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+        { id: 'port2', size: { width: 15, height: 15 }, position: { x: 10, y: 0 } },
+      ]);
+
+      expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
+      const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
+      expect(stateUpdate.nodes[0].measuredPorts).toHaveLength(2);
+    });
+
+    it('should merge new labels with existing labels', async () => {
+      const edge = createMockEdge('edge1', true);
+      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start();
+
+      const newLabel = createMockEdgeLabel('label2');
+      initUpdater.addEdgeLabel('edge1', newLabel);
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+      initUpdater.applyEdgeLabelSize('edge1', 'label2', { width: 60, height: 25 });
+
+      expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
+      const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
+      expect(stateUpdate.edges[0].measuredLabels).toHaveLength(2);
+    });
+  });
+
+  describe('integration', () => {
+    it('should handle complex initialization scenario', async () => {
+      const node1 = { ...createMockNode('node1'), size: undefined };
+      const node2 = {
+        ...createMockNode('node2'),
+        size: undefined,
+        measuredPorts: [
+          {
+            id: 'port1',
+            type: 'source' as const,
+            nodeId: 'node2',
+            side: 'top' as const,
+            size: undefined,
+            position: undefined,
+          },
+        ],
+      };
+      const edge1 = createMockEdge('edge1');
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node1, node2],
+        edges: [edge1],
+      });
+
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      const onComplete = vi.fn();
+      initUpdater.start(onComplete);
+
+      // Add new entities
+      initUpdater.addPort('node1', createMockPort('port1'));
+      initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
+
+      vi.advanceTimersByTime(50);
+      await vi.runAllTimersAsync();
+
+      // Apply measurements
+      initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
+      initUpdater.applyNodeSize('node2', { width: 150, height: 150 });
+      initUpdater.applyPortsSizesAndPositions('node1', [
+        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      ]);
+      initUpdater.applyPortsSizesAndPositions('node2', [
+        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      ]);
+      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
     });
   });
 });
