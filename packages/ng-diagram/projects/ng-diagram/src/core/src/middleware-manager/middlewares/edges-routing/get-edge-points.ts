@@ -29,7 +29,7 @@ export const areEdgePortsInitialized = (edge: Edge, sourceNode?: Node, targetNod
     }
   }
 
-  return true; // All checks passed
+  return true;
 };
 
 /**
@@ -74,8 +74,6 @@ export const computeAutoModePoints = (
     sourcePort: findNodePort(sourceNode, edge.sourcePort),
     targetPort: findNodePort(targetNode, edge.targetPort),
   };
-
-  console.log('computeAutoModePoints:context', context);
 
   if (edge.routing && routingManager.hasRouting(edge.routing)) {
     return routingManager.computePoints(edge.routing, context);

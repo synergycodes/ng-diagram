@@ -30,11 +30,9 @@ export class BatchInitializer<T> {
   batchChange(key: string, value: T): boolean {
     // Don't accept new data if initialization is already finished
     if (this._isFinished) {
-      console.log(`[BatchInitializer] REJECTED batchChange for key ${key} - already finished`);
       return false;
     }
 
-    console.log(`[BatchInitializer] ACCEPTED batchChange for key ${key}, isFinished: ${this._isFinished}`);
     this.dataToInitialize.set(key, value);
     this.hasReceivedData = true;
 
@@ -68,10 +66,8 @@ export class BatchInitializer<T> {
       this.stabilityTimeout = null;
       // Process any pending data and mark as finished
       if (this.dataToInitialize.size > 0) {
-        console.log(`[BatchInitializer] Timer fired, processing ${this.dataToInitialize.size} items`);
         this.init();
       } else {
-        console.log('[BatchInitializer] Timer fired, no data to process, finishing');
         this.finish();
       }
     }, this.stabilityDelay);
