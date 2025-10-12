@@ -2,34 +2,29 @@ import { FlowCore } from '../../flow-core';
 import type { Node, Port } from '../../types';
 import { EdgeLabel } from '../../types';
 import { getRect, isSameRect } from '../../utils';
-import { BaseUpdater } from '../base-updater';
 import { Updater } from '../updater.interface';
 
-export class InternalUpdater extends BaseUpdater implements Updater {
-  constructor(private readonly flowCore: FlowCore) {
-    super();
-  }
+export class InternalUpdater implements Updater {
+  constructor(private readonly flowCore: FlowCore) {}
 
   /**
    * @internal
    * Internal method to initialize a node size
    * @param nodeId Node id
    * @param size Size
-   * @returns true if processed, false if skipped
    */
-  applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): boolean {
+  applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
     const node = this.flowCore.getNodeById(nodeId);
 
     // If the node size is the same the ports should be the same too
     if (!node || isSameRect(getRect(node), getRect({ size })) || this.flowCore.actionStateManager.isResizing()) {
-      return true; // Skipped but not an error
+      return;
     }
 
     this.flowCore.commandHandler.emit('resizeNode', {
       id: nodeId,
       size,
     });
-    return true;
   }
 
   /**
@@ -37,13 +32,11 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    * Internal method to add a new port to the flow
    * @param nodeId Node id
    * @param port Port
-   * @returns true (always processes)
    */
-  addPort(nodeId: string, port: Port): boolean {
+  addPort(nodeId: string, port: Port): void {
     this.flowCore.portBatchProcessor.processAdd(nodeId, port, (nodeId, ports) => {
       this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
     });
-    return true;
   }
 
   /**
@@ -51,13 +44,12 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    * Internal method to apply a port size and position
    * @param nodeId Node id
    * @param ports Ports with size and position
-   * @returns true if processed, false if node doesn't exist
    */
-  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): boolean {
+  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void {
     const node = this.flowCore.getNodeById(nodeId);
 
     if (!node) {
-      return true; // Node doesn't exist, not a failure
+      return;
     }
 
     const portsToUpdate = this.getPortsToUpdate(node, ports);
@@ -71,7 +63,6 @@ export class InternalUpdater extends BaseUpdater implements Updater {
         }
       );
     });
-    return true;
   }
 
   /**
@@ -79,13 +70,11 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    * Internal method to add a new edge label to the flow
    * @param edgeId Edge id
    * @param label Label
-   * @returns true (always processes)
    */
-  addEdgeLabel(edgeId: string, label: EdgeLabel): boolean {
+  addEdgeLabel(edgeId: string, label: EdgeLabel): void {
     this.flowCore.labelBatchProcessor.processAdd(edgeId, label, (edgeId, labels) => {
       this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels });
     });
-    return true;
   }
 
   /**
@@ -94,14 +83,13 @@ export class InternalUpdater extends BaseUpdater implements Updater {
    * @param edgeId Edge id
    * @param labelId Label id
    * @param size Size
-   * @returns true if processed, false if skipped
    */
-  applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>): boolean {
+  applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>): void {
     const edge = this.flowCore.getEdgeById(edgeId);
     const label = edge?.measuredLabels?.find((label) => label.id === labelId);
 
     if (!label || isSameRect(getRect({ size: label.size }), getRect({ size }))) {
-      return true; // Skipped but not a failure
+      return;
     }
 
     this.flowCore.labelBatchProcessor.processUpdate(
@@ -111,6 +99,16 @@ export class InternalUpdater extends BaseUpdater implements Updater {
         this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates });
       }
     );
-    return true;
+  }
+
+  private getPortsToUpdate(node: Node, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
+    const allPortsMap = new Map<string, { size: Port['size']; position: Port['position'] }>();
+    node?.measuredPorts?.forEach(({ id, size, position }) => allPortsMap.set(id, { size, position }));
+
+    return ports.filter(({ id, size, position }) => {
+      const port = allPortsMap.get(id);
+
+      return port && !isSameRect(getRect(port), getRect({ size, position }));
+    });
   }
 }

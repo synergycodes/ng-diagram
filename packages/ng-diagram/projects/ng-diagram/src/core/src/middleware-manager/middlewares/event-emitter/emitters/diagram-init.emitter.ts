@@ -5,6 +5,11 @@ import type { EventEmitter } from './event-emitter.interface';
 
 /**
  * Tracks unmeasured items and emits the diagramInit event when all measurements are complete.
+ *
+ * With the new InitUpdater approach:
+ * - When 'init' fires, most items should already be measured
+ * - But late arrivals (race condition during finish) may still be processing
+ * - So we still need to track and wait for any remaining unmeasured items
  */
 export class DiagramInitEmitter implements EventEmitter {
   name = 'DiagramInitEmitter';
@@ -35,6 +40,12 @@ export class DiagramInitEmitter implements EventEmitter {
     this.collectUnmeasuredItems(nodesMap, edgesMap);
     this.initialized = true;
 
+    console.log('[DiagramInitEmitter] Init handled, unmeasured:', {
+      nodes: this.unmeasuredNodes.size,
+      ports: this.unmeasuredNodePorts.size,
+      labels: this.unmeasuredEdgeLabels.size,
+    });
+
     if (this.areAllMeasured()) {
       this.emitInitEvent(context, eventManager);
     }
@@ -54,6 +65,7 @@ export class DiagramInitEmitter implements EventEmitter {
     }
 
     if (this.areAllMeasured()) {
+      console.log('[DiagramInitEmitter] All measured after update, emitting diagramInit');
       this.emitInitEvent(context, eventManager);
     }
   }
@@ -64,12 +76,19 @@ export class DiagramInitEmitter implements EventEmitter {
     this.unmeasuredEdgeLabels.clear();
 
     for (const [nodeId, node] of nodesMap) {
-      if (!node.size?.width || !node.size?.height) {
+      // Node size must be > 0
+      if ((node.size?.width ?? 0) <= 0 || (node.size?.height ?? 0) <= 0) {
         this.unmeasuredNodes.add(nodeId);
       }
 
       for (const port of node.measuredPorts ?? []) {
-        if (!port.position?.x || !port.position?.y || !port.size?.width || !port.size?.height) {
+        // Port size must be > 0, position can be 0 (just check != null)
+        if (
+          (port.size?.width ?? 0) <= 0 ||
+          (port.size?.height ?? 0) <= 0 ||
+          port.position?.x == null ||
+          port.position?.y == null
+        ) {
           this.unmeasuredNodePorts.add(`${nodeId}:${port.id}`);
         }
       }
@@ -77,7 +96,13 @@ export class DiagramInitEmitter implements EventEmitter {
 
     for (const [edgeId, edge] of edgesMap) {
       for (const label of edge.measuredLabels ?? []) {
-        if (!label.position?.x || !label.position?.y || !label.size?.width || !label.size?.height) {
+        // Label size must be > 0, position can be 0 (just check != null)
+        if (
+          (label.size?.width ?? 0) <= 0 ||
+          (label.size?.height ?? 0) <= 0 ||
+          label.position?.x == null ||
+          label.position?.y == null
+        ) {
           this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
         }
       }
@@ -94,19 +119,25 @@ export class DiagramInitEmitter implements EventEmitter {
         continue;
       }
 
-      if (this.unmeasuredNodes.has(nodeUpdate.id) && nodeUpdate.size?.width && nodeUpdate.size?.height) {
+      // Node size must be > 0
+      if (
+        this.unmeasuredNodes.has(nodeUpdate.id) &&
+        (nodeUpdate.size?.width ?? 0) > 0 &&
+        (nodeUpdate.size?.height ?? 0) > 0
+      ) {
         this.unmeasuredNodes.delete(nodeUpdate.id);
       }
 
       if (nodeUpdate.measuredPorts) {
         for (const port of nodeUpdate.measuredPorts) {
           const portKey = `${nodeUpdate.id}:${port.id}`;
+          // Port size must be > 0, position can be 0 (just check != null)
           if (
             this.unmeasuredNodePorts.has(portKey) &&
-            port.position?.x !== undefined &&
-            port.position?.y !== undefined &&
-            port.size?.width !== undefined &&
-            port.size?.height !== undefined
+            (port.size?.width ?? 0) > 0 &&
+            (port.size?.height ?? 0) > 0 &&
+            port.position?.x != null &&
+            port.position?.y != null
           ) {
             this.unmeasuredNodePorts.delete(portKey);
           }
@@ -128,12 +159,13 @@ export class DiagramInitEmitter implements EventEmitter {
       if (edgeUpdate.measuredLabels) {
         for (const label of edgeUpdate.measuredLabels) {
           const labelKey = `${edgeUpdate.id}:${label.id}`;
+          // Label size must be > 0, position can be 0 (just check != null)
           if (
             this.unmeasuredEdgeLabels.has(labelKey) &&
-            label.position?.x !== undefined &&
-            label.position?.y !== undefined &&
-            label.size?.width !== undefined &&
-            label.size?.height !== undefined
+            (label.size?.width ?? 0) > 0 &&
+            (label.size?.height ?? 0) > 0 &&
+            label.position?.x != null &&
+            label.position?.y != null
           ) {
             this.unmeasuredEdgeLabels.delete(labelKey);
           }
@@ -156,6 +188,7 @@ export class DiagramInitEmitter implements EventEmitter {
       viewport: context.state.metadata.viewport,
     };
 
+    console.log('[DiagramInitEmitter] Emitting diagramInit event');
     eventManager.deferredEmit('diagramInit', event);
     this.initEventEmitted = true;
   }
