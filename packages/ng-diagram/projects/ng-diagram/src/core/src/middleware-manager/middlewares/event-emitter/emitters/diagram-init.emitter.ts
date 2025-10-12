@@ -7,8 +7,7 @@ import type { EventEmitter } from './event-emitter.interface';
 /**
  * Tracks unmeasured items and emits the diagramInit event when all measurements are complete.
  *
- * With the new InitUpdater approach:
- * - When 'init' fires, most items should already be measured
+ * - When 'init' fires, most items should already be measured thanks to the InitUpdater
  * - But late arrivals (race condition during finish) may still be processing
  * - So we still need to track and wait for any remaining unmeasured items
  */

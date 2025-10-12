@@ -102,16 +102,12 @@ export class FlowCore {
   private init() {
     this.render();
 
-    // Set up model change listener immediately
     this.model.onChange((state) => {
       this.spatialHash.process(state.nodes);
       this.render();
     });
 
-    // Start the initialization process (non-blocking)
-    // InitUpdater will emit 'init' when all components stabilize
     this.initUpdater.start(async () => {
-      // Callback executed when initialization is complete
       await this.commandHandler.emit('init');
     });
   }
@@ -386,7 +382,6 @@ export class FlowCore {
   }
 
   get updater(): Updater {
-    // Simple flag-based routing: if initialized, use InternalUpdater, otherwise InitUpdater
     return this.initUpdater.isInitialized ? this.internalUpdater : this.initUpdater;
   }
 
