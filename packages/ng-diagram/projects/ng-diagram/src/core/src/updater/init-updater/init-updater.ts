@@ -8,6 +8,9 @@ import { StabilityDetector } from './stability-detector';
 /** Milliseconds to wait after last entity addition before considering entities stabilized */
 const STABILITY_DELAY = 50;
 
+/** Milliseconds to wait for measurements after entities stabilize before forcing finish */
+const MEASUREMENT_TIMEOUT = 2000;
+
 /**
  * InitUpdater batches all initialization data and applies it in a single state update.
  *
@@ -17,6 +20,7 @@ const STABILITY_DELAY = 50;
  * 3. Finish when: entities stabilized AND all entities have measurements
  * 4. Apply everything in one setState
  * 5. Queue late arrivals to prevent data loss during finish transition
+ * 6. Safety timeout: If measurements don't arrive within MEASUREMENT_TIMEOUT, force finish
  */
 export class InitUpdater implements Updater {
   /** Flag indicating whether initialization has completed */
@@ -39,6 +43,9 @@ export class InitUpdater implements Updater {
 
   /** Callback to execute when initialization completes */
   private onCompleteCallback?: () => void | Promise<void>;
+
+  /** Safety timeout to prevent indefinite waiting for measurements */
+  private measurementTimeout: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * Creates a new InitUpdater.
@@ -73,6 +80,7 @@ export class InitUpdater implements Updater {
     Promise.all([this.portStabilityDetector.waitForStability(), this.labelStabilityDetector.waitForStability()])
       .then(() => {
         this.entitiesStabilized = true;
+        this.startMeasurementTimeout();
         this.tryFinish();
       })
       .catch((err) => {
@@ -195,6 +203,7 @@ export class InitUpdater implements Updater {
    * Marks as finishing, applies state, executes callback, marks as initialized, processes late arrivals.
    */
   private async finish() {
+    this.clearMeasurementTimeout();
     this.lateArrivalQueue.startFinishing();
 
     this.initState.applyToDiagramState(this.flowCore);
@@ -214,5 +223,45 @@ export class InitUpdater implements Updater {
    */
   private forceFinish() {
     this.finish();
+  }
+
+  /**
+   * Starts a safety timeout to prevent indefinite waiting for measurements.
+   * If measurements don't arrive within MEASUREMENT_TIMEOUT, initialization is forced to complete.
+   * This handles cases where entities may not be measurable (e.g., display: none).
+   */
+  private startMeasurementTimeout(): void {
+    this.measurementTimeout = setTimeout(() => {
+      if (!this.isInitialized) {
+        const state = this.flowCore.getState();
+        const nodeCount = state.nodes.length;
+        const expectedPorts = this.initState.portsToMeasure.size;
+        const measuredPorts = this.initState.measuredPorts.size;
+        const expectedLabels = this.initState.labelsToMeasure.size;
+        const measuredLabels = this.initState.measuredLabels.size;
+        const measuredNodes = this.initState.measuredNodes.size;
+
+        console.warn(
+          '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).',
+          {
+            nodes: { expected: nodeCount, measured: measuredNodes },
+            ports: { expected: expectedPorts, measured: measuredPorts },
+            labels: { expected: expectedLabels, measured: measuredLabels },
+          }
+        );
+
+        this.forceFinish();
+      }
+    }, MEASUREMENT_TIMEOUT);
+  }
+
+  /**
+   * Clears the measurement timeout if it's active.
+   */
+  private clearMeasurementTimeout(): void {
+    if (this.measurementTimeout !== null) {
+      clearTimeout(this.measurementTimeout);
+      this.measurementTimeout = null;
+    }
   }
 }
