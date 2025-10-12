@@ -1,0 +1,23 @@
+<div class="diagram-container">
+  <div class="controls">
+    <div class="status">
+      <span [class.readonly]="isReadOnly()">
+        {{
+          isReadOnly()
+            ? 'Diagram is locked - try moving nodes!'
+            : 'Diagram is editable - drag nodes around'
+        }}
+      </span>
+    </div>
+    <button
+      [class.active]="isReadOnly()"
+      (click)="toggleReadOnly()"
+      class="readonly-toggle"
+    >
+      {{ isReadOnly() ? '🔒 Read-Only Mode' : '✏️ Edit Mode' }}
+    </button>
+  </div>
+  <div class="not-content diagram">
+    <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" />
+  </div>
+</div>

@@ -3,9 +3,9 @@ title: Rotation
 description: Understanding how rotation works in ngDiagram
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { LinkCard } from '@astrojs/starlight/components';
 import Rotation from '@components/angular/nodes/rotation/rotation.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 The **rotation** feature in ngDiagram allows users to interactively rotate nodes on the diagram canvas.
 Rotatable nodes display a rotation handle that users can drag to change the node's angle.
@@ -22,13 +22,13 @@ The rotation is reflected in the node's appearance and can be used to create var
 
 To make a custom node rotatable, include `<ng-diagram-node-rotate-adornment />` in your node template and import the `NgDiagramNodeRotateAdornmentComponent` reference.
 
-<CodeSnippet relativePath="nodes/rotation/node.component.ts" />
+<CodeSnippet relativePath="nodes/rotation/node/node.component.ts" />
 
 ## Enabling Rotation for a Node
 
 Enable rotation by setting the `rotatable` property to `true` in your node definition:
 
-<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" sectionId="enabling" />
+<CodeSnippet relativePath="nodes/rotation/diagram.component.ts" sectionId="enabling" />
 
 When `rotatable` is set, the rotation handle will appear, and the node can be rotated by the user.
 
@@ -76,7 +76,7 @@ This configuration allows you to control snapping and snap angles for node rotat
 
 You can set these options in your diagram by passing the configuration to the `ng-diagram` component:
 
-<CodeSnippet relativePath="nodes/rotation/rotation-wrapper.component.ts" sectionId="config" />
+<CodeSnippet relativePath="nodes/rotation/diagram.component.ts" sectionId="config" />
 
 ## Example
 

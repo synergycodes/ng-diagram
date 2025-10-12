@@ -5,35 +5,27 @@ import {
   initializeModel,
   NgDiagramComponent,
   NgDiagramModelService,
+  provideNgDiagram,
   type NgDiagramConfig,
   type SelectionMovedEvent,
 } from 'ng-diagram';
 import { diagramModel } from './data';
-import { LayoutButtonsComponent } from './layout-buttons.component';
+import { LayoutButtonsComponent } from './layout-buttons/layout-buttons.component';
 
 @Component({
-  selector: 'diagram-component',
   imports: [NgDiagramComponent, LayoutButtonsComponent],
   template: `
-    <ng-diagram
-      [model]="model"
-      [config]="config"
-      (selectionMoved)="onSelectionMoved($event)"
-    />
     <layout-buttons />
+    <div class="not-content diagram">
+      <ng-diagram
+        [model]="model"
+        [config]="config"
+        (selectionMoved)="onSelectionMoved($event)"
+      />
+    </div>
   `,
-  styles: `
-    :host {
-      flex: 1;
-      position: relative;
-      display: flex;
-      height: 100%;
-
-      .coordinates {
-        display: flex;
-      }
-    }
-  `,
+  styleUrls: ['./diagram.component.scss'],
+  providers: [provideNgDiagram()],
 })
 export class DiagramComponent {
   private modelService = inject(NgDiagramModelService);

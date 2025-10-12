@@ -21,7 +21,14 @@ describe('CoreCommandHandler', () => {
 
   beforeEach(() => {
     mockGetState = vi.fn();
-    handler = new CommandHandler({ applyUpdate: vi.fn(), getState: mockGetState } as unknown as FlowCore);
+    handler = new CommandHandler({
+      applyUpdate: vi.fn(),
+      getState: mockGetState,
+      transactionManager: {
+        isActive: vi.fn().mockReturnValue(false),
+        getCurrentTransaction: vi.fn(),
+      },
+    } as unknown as FlowCore);
     vi.clearAllMocks();
   });
 

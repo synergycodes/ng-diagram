@@ -14,18 +14,19 @@ import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
   imports: [NgDiagramComponent, FormsModule],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    </div>
   `,
   styles: `
-    :host {
+    .diagram {
       position: relative;
-      flex: 1;
       display: flex;
-      height: 100%;
+      height: 20rem;
     }
   `,
 })
-export class Diagram {
+export class DiagramComponent {
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['multiple-labels', MultipleLabelsEdgeComponent],
   ]);

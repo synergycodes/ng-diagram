@@ -16,19 +16,20 @@ import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component'
   imports: [NgDiagramComponent, FormsModule, LabelPanel],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
-    <label-panel />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+      <label-panel />
+    </div>
   `,
   styles: `
-    :host {
+    .diagram {
       position: relative;
-      flex: 1;
       display: flex;
-      height: 100%;
+      height: 20rem;
     }
   `,
 })
-export class Diagram {
+export class DiagramComponent {
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['modifiable-label', ModifiableLabelEdgeComponent],
   ]);

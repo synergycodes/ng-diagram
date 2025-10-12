@@ -1,0 +1,26 @@
+@use '../../../../../../styles/shared.scss' as *;
+
+:host {
+  /* @collapse-start */
+  @include custom-node__host;
+  /* @collapse-end */
+
+  &:not(.custom-selected):hover {
+    border-color: orangered;
+  }
+  &.custom-selected {
+    box-shadow: 0px 0px 5px 3px orangered;
+  }
+
+  /* @collapse-start */
+  .custom-node {
+    &__header {
+      @include custom-node__header;
+    }
+
+    &__content {
+      @include custom-node__content;
+    }
+  }
+  /* @collapse-end */
+}

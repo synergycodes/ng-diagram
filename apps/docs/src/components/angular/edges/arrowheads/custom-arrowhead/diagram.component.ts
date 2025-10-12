@@ -16,22 +16,23 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
   imports: [NgDiagramComponent, CustomArrowheadsComponent],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" />
-    <!-- @mark-start -->
-    <custom-arrowheads />
-    <!-- @mark-end -->
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" />
+      <!-- @mark-start -->
+      <custom-arrowheads />
+      <!-- @mark-end -->
+    </div>
   `,
   // @collapse-start
   styles: `
-    :host {
-      flex: 1;
+    .diagram {
       display: flex;
-      height: 100%;
+      height: 20rem;
     }
   `,
   // @collapse-end
 })
-export class CustomArrowheadDiagram {
+export class DiagramComponent {
   model = initializeModel({
     // @collapse-start
     metadata: {

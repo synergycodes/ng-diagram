@@ -6,6 +6,8 @@
   overflow: hidden;
   background-color: var(--ngd-ui-bg-tertiary-default);
   touch-action: none;
+  transform: translateZ(0px);
+  -webkit-font-smoothing: antialiased;
 
   .diagram-background-container {
     width: 100%;

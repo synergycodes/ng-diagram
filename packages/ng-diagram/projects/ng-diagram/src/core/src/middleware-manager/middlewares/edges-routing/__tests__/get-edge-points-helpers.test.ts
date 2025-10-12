@@ -167,7 +167,7 @@ describe('Get Edge Points Helper Functions', () => {
       };
 
       const result = areEdgePortsInitialized(edge, undefined, undefined);
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
   });
 

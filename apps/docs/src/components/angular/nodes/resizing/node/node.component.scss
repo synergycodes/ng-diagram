@@ -1,0 +1,17 @@
+@use '../../../../../styles/shared.scss' as *;
+
+:host {
+  @include custom-node__host;
+
+  .custom-node {
+    overflow: hidden;
+
+    &__header {
+      @include custom-node__header;
+    }
+
+    &__content {
+      @include custom-node__content;
+    }
+  }
+}

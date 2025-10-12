@@ -13,17 +13,18 @@ import { LabeledEdgeComponent } from './labeled-edge.component';
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
   template: `
-    <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+    </div>
   `,
   styles: `
-    :host {
-      flex: 1;
+    .diagram {
       display: flex;
-      height: 100%;
+      height: 20rem;
     }
   `,
 })
-export class Diagram {
+export class DiagramComponent {
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([
     ['labeled', LabeledEdgeComponent],
   ]);
