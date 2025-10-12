@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { FlowCore } from '../../flow-core';
 import type { Edge, EdgeLabel, Node, Port, Size } from '../../types';
-import { InitUpdater } from './init-updater';
+import { InitUpdater, MEASUREMENT_TIMEOUT, STABILITY_DELAY } from './init-updater';
 
 describe('InitUpdater', () => {
   let initUpdater: InitUpdater;
@@ -140,7 +140,7 @@ describe('InitUpdater', () => {
       const onComplete = vi.fn();
       initUpdater.start(onComplete);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       expect(onComplete).toHaveBeenCalledTimes(1);
@@ -154,7 +154,7 @@ describe('InitUpdater', () => {
       initUpdater.start();
 
       // Advance only stability delay, not the measurement timeout
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       expect(initUpdater.isInitialized).toBe(false);
@@ -187,7 +187,7 @@ describe('InitUpdater', () => {
       initUpdater.start();
 
       // Advance only stability delay, not the measurement timeout
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       expect(initUpdater.isInitialized).toBe(false);
@@ -218,7 +218,7 @@ describe('InitUpdater', () => {
       initUpdater.start();
 
       // Advance only stability delay, not the measurement timeout
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       expect(initUpdater.isInitialized).toBe(false);
@@ -237,7 +237,7 @@ describe('InitUpdater', () => {
       const onComplete = vi.fn().mockResolvedValue(undefined);
       initUpdater.start(onComplete);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       expect(onComplete).toHaveBeenCalledTimes(1);
@@ -253,7 +253,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start();
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       const size = { width: 150, height: 150 };
@@ -278,7 +278,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start(onComplete);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       // Trigger finish by applying node1 size
@@ -307,7 +307,7 @@ describe('InitUpdater', () => {
       const port = createMockPort('port1');
       initUpdater.addPort('node1', port);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       // Should not finish yet - waiting for port measurement
@@ -357,7 +357,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start();
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       initUpdater.applyPortsSizesAndPositions('node1', [
@@ -389,7 +389,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start();
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       initUpdater.applyPortsSizesAndPositions('node1', [
@@ -416,7 +416,7 @@ describe('InitUpdater', () => {
       const label = createMockEdgeLabel('label1');
       initUpdater.addEdgeLabel('edge1', label);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       // Should not finish yet - waiting for label measurement
@@ -455,7 +455,7 @@ describe('InitUpdater', () => {
     it('should record label size measurement', async () => {
       initUpdater.start();
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
@@ -481,7 +481,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start(onComplete);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       // Apply node size to trigger finish
@@ -508,7 +508,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start(onComplete);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       // Apply node size to trigger finish
@@ -537,7 +537,7 @@ describe('InitUpdater', () => {
 
       initUpdater.start(onComplete);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       expect(finishCallbackExecuted).toBe(true);
@@ -555,7 +555,7 @@ describe('InitUpdater', () => {
       initUpdater.start();
       initUpdater.applyNodeSize('node1', { width: 150, height: 150 });
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
@@ -573,7 +573,7 @@ describe('InitUpdater', () => {
       const newPort = createMockPort('port2');
       initUpdater.addPort('node1', newPort);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
@@ -597,7 +597,7 @@ describe('InitUpdater', () => {
       const newLabel = createMockEdgeLabel('label2');
       initUpdater.addEdgeLabel('edge1', newLabel);
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
@@ -618,13 +618,13 @@ describe('InitUpdater', () => {
       initUpdater.start();
 
       // Advance stability delay
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
       expect(initUpdater.isInitialized).toBe(false);
 
-      // Advance to measurement timeout (2000ms)
-      vi.advanceTimersByTime(2000);
+      // Advance to measurement timeout
+      vi.advanceTimersByTime(MEASUREMENT_TIMEOUT);
       await vi.runAllTimersAsync();
 
       // Should force finish even without measurements
@@ -665,7 +665,7 @@ describe('InitUpdater', () => {
       initUpdater.addPort('node1', createMockPort('port1'));
       initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
 
-      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
       // Apply measurements

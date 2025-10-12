@@ -6,10 +6,10 @@ import { LateArrivalQueue } from './late-arrival-queue';
 import { StabilityDetector } from './stability-detector';
 
 /** Milliseconds to wait after last entity addition before considering entities stabilized */
-const STABILITY_DELAY = 50;
+export const STABILITY_DELAY = 50;
 
 /** Milliseconds to wait for measurements after entities stabilize before forcing finish */
-const MEASUREMENT_TIMEOUT = 2000;
+export const MEASUREMENT_TIMEOUT = 2000;
 
 /**
  * InitUpdater batches all initialization data and applies it in a single state update.
