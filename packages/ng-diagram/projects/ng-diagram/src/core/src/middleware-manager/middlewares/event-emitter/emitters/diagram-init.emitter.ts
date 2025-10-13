@@ -1,10 +1,15 @@
 import type { EventManager } from '../../../../event-manager/event-manager';
 import type { DiagramInitEvent } from '../../../../event-manager/event-types';
 import type { Edge, MiddlewareContext, Node } from '../../../../types';
+import { isValidPosition, isValidSize } from '../../../../utils/measurement-validation';
 import type { EventEmitter } from './event-emitter.interface';
 
 /**
  * Tracks unmeasured items and emits the diagramInit event when all measurements are complete.
+ *
+ * - When 'init' fires, most items should already be measured thanks to the InitUpdater
+ * - But late arrivals (race condition during finish) may still be processing
+ * - So we still need to track and wait for any remaining unmeasured items
  */
 export class DiagramInitEmitter implements EventEmitter {
   name = 'DiagramInitEmitter';
@@ -64,12 +69,12 @@ export class DiagramInitEmitter implements EventEmitter {
     this.unmeasuredEdgeLabels.clear();
 
     for (const [nodeId, node] of nodesMap) {
-      if (!node.size?.width || !node.size?.height) {
+      if (!isValidSize(node.size)) {
         this.unmeasuredNodes.add(nodeId);
       }
 
       for (const port of node.measuredPorts ?? []) {
-        if (!port.position?.x || !port.position?.y || !port.size?.width || !port.size?.height) {
+        if (!isValidSize(port.size) || !isValidPosition(port.position)) {
           this.unmeasuredNodePorts.add(`${nodeId}:${port.id}`);
         }
       }
@@ -77,7 +82,7 @@ export class DiagramInitEmitter implements EventEmitter {
 
     for (const [edgeId, edge] of edgesMap) {
       for (const label of edge.measuredLabels ?? []) {
-        if (!label.position?.x || !label.position?.y || !label.size?.width || !label.size?.height) {
+        if (!isValidSize(label.size) || !isValidPosition(label.position)) {
           this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
         }
       }
@@ -94,20 +99,14 @@ export class DiagramInitEmitter implements EventEmitter {
         continue;
       }
 
-      if (this.unmeasuredNodes.has(nodeUpdate.id) && nodeUpdate.size?.width && nodeUpdate.size?.height) {
+      if (this.unmeasuredNodes.has(nodeUpdate.id) && isValidSize(nodeUpdate.size)) {
         this.unmeasuredNodes.delete(nodeUpdate.id);
       }
 
       if (nodeUpdate.measuredPorts) {
         for (const port of nodeUpdate.measuredPorts) {
           const portKey = `${nodeUpdate.id}:${port.id}`;
-          if (
-            this.unmeasuredNodePorts.has(portKey) &&
-            port.position?.x !== undefined &&
-            port.position?.y !== undefined &&
-            port.size?.width !== undefined &&
-            port.size?.height !== undefined
-          ) {
+          if (this.unmeasuredNodePorts.has(portKey) && isValidSize(port.size) && isValidPosition(port.position)) {
             this.unmeasuredNodePorts.delete(portKey);
           }
         }
@@ -128,13 +127,7 @@ export class DiagramInitEmitter implements EventEmitter {
       if (edgeUpdate.measuredLabels) {
         for (const label of edgeUpdate.measuredLabels) {
           const labelKey = `${edgeUpdate.id}:${label.id}`;
-          if (
-            this.unmeasuredEdgeLabels.has(labelKey) &&
-            label.position?.x !== undefined &&
-            label.position?.y !== undefined &&
-            label.size?.width !== undefined &&
-            label.size?.height !== undefined
-          ) {
+          if (this.unmeasuredEdgeLabels.has(labelKey) && isValidSize(label.size) && isValidPosition(label.position)) {
             this.unmeasuredEdgeLabels.delete(labelKey);
           }
         }

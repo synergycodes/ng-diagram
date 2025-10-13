@@ -40,7 +40,7 @@ export class FlowCore {
   private _config: FlowConfig;
 
   private readonly initUpdater: InitUpdater;
-  private readonly internalUpdater: InternalUpdater;
+  readonly internalUpdater: InternalUpdater;
   private readonly updateSemaphore = new Semaphore(1);
 
   readonly commandHandler: CommandHandler;
@@ -99,17 +99,17 @@ export class FlowCore {
   /**
    * Starts listening to model changes and emits init command
    */
-  private async init() {
+  private init() {
     this.render();
-
-    await this.initUpdater.start();
 
     this.model.onChange((state) => {
       this.spatialHash.process(state.nodes);
       this.render();
     });
 
-    this.commandHandler.emit('init');
+    this.initUpdater.start(async () => {
+      await this.commandHandler.emit('init');
+    });
   }
 
   /**
@@ -382,11 +382,7 @@ export class FlowCore {
   }
 
   get updater(): Updater {
-    if (!this.initUpdater.isInitialized) {
-      return this.initUpdater;
-    }
-
-    return this.internalUpdater;
+    return this.initUpdater.isInitialized ? this.internalUpdater : this.initUpdater;
   }
 
   setDebugMode(debugMode: boolean): void {

@@ -15,7 +15,13 @@ import type { Renderer } from './types/renderer.interface';
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
-    start: vi.fn(() => Promise.resolve()),
+    start: vi.fn((callback) => {
+      // Simulate async initialization
+      if (callback) {
+        setTimeout(callback, 0);
+      }
+    }),
+    isInitialized: false,
   })),
 }));
 
@@ -141,7 +147,14 @@ describe('FlowCore', () => {
       expect(mockModelAdapter.onChange).toHaveBeenCalled();
     });
 
-    it('should emit init command', () => {
+    it('should emit init command after initialization completes', async () => {
+      // Initially, init command should not be called yet
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('init');
+
+      // Wait for the initialization callback to be executed
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // Now init command should have been emitted
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('init');
     });
 
