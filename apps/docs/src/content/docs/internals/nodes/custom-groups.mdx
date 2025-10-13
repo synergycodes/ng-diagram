@@ -11,18 +11,27 @@ You can create custom group templates, similar to custom nodes.
 All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
 Remember that in your diagram model, the group node must have `isGroup: true` set to function as a group.
 
-```typescript {13}
+```typescript {22}
+import { Component, input } from '@angular/core';
+import {
+  GroupNode,
+  NgDiagramGroupHighlightedDirective,
+  NgDiagramGroupNodeTemplate,
+  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeSelectedDirective,
+} from 'ng-diagram';
+
 @Component({
-  selector: 'app-custom-group',
+  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramGroupHighlightedDirective, NgDiagramNodeSelectedDirective],
   template: `
     <ng-diagram-node-resize-adornment>
-      <div class="custom-group" ngDiagramNodeSelected [node]="node()">
-        <div class="header">{{ node().data.title }}</div>
+      <div class="custom-group" ngDiagramGroupHighlighted ngDiagramNodeSelected [node]="node()">
+        <div class="header">Group header</div>
         <div>...</div>
       </div>
     </ng-diagram-node-resize-adornment>
   `,
-  // ...styles and imports
+  // styles: { ... }
 })
 export class CustomGroupComponent implements NgDiagramGroupNodeTemplate {
   node = input.required<GroupNode>();
@@ -52,7 +61,7 @@ Register your custom group in the `nodeTemplateMap` and assign its `type` to the
 Use `NgDiagramGroupHighlightedDirective` for highlight styles.
 
 ```html
-<div ngDiagramGroupHighlighted [node]="node">
+<div ngDiagramGroupHighlighted [node]="node()">
   <!-- Your Custom Group content -->
 </div>
 ```
@@ -62,7 +71,7 @@ Use `NgDiagramGroupHighlightedDirective` for highlight styles.
 Use `NgDiagramNodeSelectedDirective` for selection styles.
 
 ```html
-<div ngDiagramNodeSelected [node]="node">
+<div ngDiagramNodeSelected [node]="node()">
   <!-- Your Custom Group content -->
 </div>
 ```
