@@ -38,7 +38,7 @@ jobs:
         run: pnpm run test
 
       - name: Build package for production
-        run: cd packages/ng-diagram && pnpm run build:prod
+        run: cd packages/ng-diagram && pnpm build:prod
 
       - name: Publish to npm
         run: |
