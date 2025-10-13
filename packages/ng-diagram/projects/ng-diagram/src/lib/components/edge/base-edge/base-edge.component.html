@@ -2,12 +2,13 @@
   <path
     [class]="class()"
     [attr.d]="path()"
-    [attr.stroke]="stroke()"
+    [attr.stroke]="stroke() || 'var(--edge-stroke, var(--ngd-default-edge-stroke))'"
     [attr.fill]="'none'"
-    [attr.stroke-width]="strokeWidth()"
+    [attr.stroke-width]="strokeWidth() || 'var(--edge-stroke-width, 2)'"
+    [attr.stroke-dasharray]="strokeDasharray() || 'var(--edge-stroke-dasharray, none)'"
     [attr.marker-start]="markerStart()"
     [attr.marker-end]="markerEnd()"
-    [attr.stroke-opacity]="strokeOpacity()"
+    [attr.stroke-opacity]="strokeOpacity() || 'var(--edge-stroke-opacity, 1)'"
   />
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
 </svg>

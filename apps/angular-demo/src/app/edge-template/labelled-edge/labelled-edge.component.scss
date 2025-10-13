@@ -1,24 +1,19 @@
-.labelled-edge {
-  .edge-label {
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-color);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    white-space: nowrap;
+ng-diagram-base-edge.labelled-edge {
+  --edge-stroke: black;
+}
 
-    span {
-      display: block;
-    }
-  }
+.edge-label {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 
-  &.selected {
-    .edge-label {
-      border-color: var(--primary-color);
-      background-color: var(--primary-light);
-    }
+  span {
+    display: block;
   }
 }
