@@ -63,6 +63,58 @@ import DefaultEdge from '@components/angular/edges/edges/default-edge/default-ed
 
 <CodeSnippet relativePath="edges/edges/default-edge/diagram.component.ts" />
 
+#### Styling Default Edges with CSS Variables
+
+Default edges can be styled using CSS variables. You can customize these in your global styles:
+
+```scss
+// Override default edge styling
+ng-diagram-base-edge.default-edge {
+  --edge-stroke: #334155;
+  --edge-stroke-width: 3;
+  --edge-stroke-dasharray: 5 5; // Dashed line
+  --edge-stroke-transition: stroke 0.2s ease;
+}
+
+ng-diagram-base-edge.default-edge:hover:not(.selected) {
+  --edge-stroke: #64748b;
+}
+
+ng-diagram-base-edge.default-edge.selected {
+  --edge-stroke: #3b82f6;
+  --edge-stroke-width: 4;
+}
+```
+
+**Available CSS variables:**
+
+- `--edge-stroke` - Stroke color
+- `--edge-stroke-width` - Stroke width
+- `--edge-stroke-opacity` - Stroke opacity
+- `--edge-stroke-dasharray` - Stroke dash pattern (e.g., `5 5` for dashed line)
+- `--edge-stroke-transition` - Transition for stroke changes
+
+The default edge also uses these semantic variables that map to the design system:
+
+- `--ngd-default-edge-stroke` - Base stroke color (default state)
+- `--ngd-default-edge-stroke-hover` - Stroke color on hover
+- `--ngd-default-edge-stroke-selected` - Stroke color when selected
+
+### Available Host Classes
+
+The base edge component exposes these classes for styling:
+
+- `.selected` - Applied when the edge is selected
+- `.temporary` - Applied when the edge is being drawn (preview state)
+
+See [Edge Selection](/docs/internals/edges/selection) for more details on customizing selection styles.
+
+### Dynamic Styling with Computed Properties
+
+For complex or programmatic styling, you can use computed properties with the base edge inputs:
+
+<CodeSnippet relativePath="edges/edge-selection/dynamic-edge/dynamic-edge.component.ts" />
+
 Use Custom Edges for even more control over edge look and functionality
 
 <LinkCard
