@@ -10,7 +10,6 @@ import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdge
 
 @Component({
   selector: 'app-custom-polyline-edge',
-  standalone: true,
   templateUrl: './custom-polyline-edge.component.html',
   styleUrls: ['./custom-polyline-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

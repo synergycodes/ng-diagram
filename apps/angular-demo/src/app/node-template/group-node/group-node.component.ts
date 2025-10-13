@@ -9,7 +9,6 @@ import {
 
 @Component({
   selector: 'app-group-node',
-  standalone: true,
   imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, NgDiagramGroupHighlightedDirective],
   templateUrl: './group-node.component.html',
   styleUrls: ['./group-node.component.scss'],

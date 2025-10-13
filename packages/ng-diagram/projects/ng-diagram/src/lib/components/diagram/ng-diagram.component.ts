@@ -147,23 +147,20 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
 
   constructor() {
-    effect(
-      () => {
-        const model = this.model();
-        if (this.initializedModel != model) {
-          this.flowCoreProvider.destroy();
-          // Angular 18 backward compatibility
-          untracked(() => {
-            this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
-          });
+    effect(() => {
+      const model = this.model();
+      if (this.initializedModel != model) {
+        this.flowCoreProvider.destroy();
+        // Angular 18 backward compatibility
+        untracked(() => {
+          this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+        });
 
-          this.initializedModel = model;
+        this.initializedModel = model;
 
-          this.setupEventBridge();
-        }
-      },
-      { allowSignalWrites: true }
-    );
+        this.setupEventBridge();
+      }
+    });
   }
 
   /** @ignore */
