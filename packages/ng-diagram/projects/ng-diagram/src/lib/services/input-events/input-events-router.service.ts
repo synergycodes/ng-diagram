@@ -1,25 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { InputEventsRouter } from '../../../core/src';
-import { BrowserInputsHelpers } from './browser-inputs-helpers';
+import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent | TouchEvent;
 
 @Injectable()
 export class InputEventsRouterService extends InputEventsRouter {
-  getBaseEvent(event: DomEvent) {
-    return {
-      modifiers: BrowserInputsHelpers.getModifiers(event),
-      id: this.generateEventId(),
-      timestamp: performance.now(),
-    };
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+
+  protected get environment() {
+    return this.flowCoreProvider.provide().getEnvironment();
   }
 
-  private generateEventId(): string {
-    if (!crypto.randomUUID) {
-      console.warn('crypto.randomUUID is not supported, using fallback ID generation');
-      return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-    }
-    // NOTE: Works only in https
-    return crypto.randomUUID();
+  get eventHelpers() {
+    return this.environment.eventHelpers;
+  }
+
+  getBaseEvent(event: DomEvent) {
+    return {
+      modifiers: this.eventHelpers.getModifiers(event),
+      id: this.environment.generateId(),
+      timestamp: this.environment.now(),
+    };
   }
 }

@@ -1,9 +1,7 @@
-import { inject, Injectable } from '@angular/core';
-import { Direction } from '../../../../../core/src';
-import { BrowserInputsHelpers } from '../../../../services/input-events/browser-inputs-helpers';
+import { Injectable, inject } from '@angular/core';
+import type { Direction } from '../../../../../core/src';
+import { FlowCoreProviderService } from '../../../../services';
 import { InputEventsRouterService } from '../../../../services/input-events/input-events-router.service';
-
-import { FlowCoreProviderService } from '../../../../services/flow-core-provider/flow-core-provider.service';
 import { KeyboardAction } from './keyboard-action';
 
 @Injectable()
@@ -16,7 +14,7 @@ export class PanWithArrowsAction extends KeyboardAction {
       return false;
     }
 
-    return BrowserInputsHelpers.isArrowKeyPressed(event);
+    return this.inputEventsRouter.eventHelpers.isArrowKeyPressed(event);
   }
 
   handle(event: KeyboardEvent): void {
