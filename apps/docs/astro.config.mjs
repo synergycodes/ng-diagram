@@ -3,12 +3,20 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import starlightAutoSidebar from 'starlight-auto-sidebar';
 import starlightTypeDoc from 'starlight-typedoc';
+import { loadEnv } from 'vite';
 
 import angular from '@analogjs/astro-angular';
+import umami from '@yeskunall/astro-umami';
+
+const env = loadEnv(process.env.NODE_ENV || 'production', process.cwd(), '');
+const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || env.UMAMI_WEBSITE_ID || '';
 
 export default defineConfig({
   base: '/docs',
   integrations: [
+    umami({
+      id: UMAMI_WEBSITE_ID || '',
+    }),
     angular({
       vite: {
         transformFilter: (_code, id) => {

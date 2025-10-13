@@ -42,3 +42,4 @@ jobs:
           CUSTOM_BUILD_COMMAND: npm i -g corepack@latest && corepack prepare && pnpm install --frozen-lockfile && pnpm run docs:build
           ENABLE_NODE_MONOREPO_BUILD: true
           NODE_VERSION: 22
+          UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
