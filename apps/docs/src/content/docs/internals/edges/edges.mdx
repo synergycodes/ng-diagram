@@ -100,6 +100,15 @@ The default edge also uses these semantic variables that map to the design syste
 - `--ngd-default-edge-stroke-hover` - Stroke color on hover
 - `--ngd-default-edge-stroke-selected` - Stroke color when selected
 
+### Available Host Classes
+
+The base edge component exposes these classes for styling:
+
+- `.selected` - Applied when the edge is selected
+- `.temporary` - Applied when the edge is being drawn (preview state)
+
+See [Edge Selection](/docs/internals/edges/selection) for more details on customizing selection styles.
+
 ### Dynamic Styling with Computed Properties
 
 For complex or programmatic styling, you can use computed properties with the base edge inputs:
@@ -198,15 +207,6 @@ This allows you to:
 - Add custom data to newly created edges
 - Apply specific routing algorithms
 - Control the visual appearance and behavior
-
-### Available Host Classes
-
-The base edge component exposes these classes for styling:
-
-- `.selected` - Applied when the edge is selected
-- `.temporary` - Applied when the edge is being drawn (preview state)
-
-See [Edge Selection](/docs/internals/edges/selection) for more details on customizing selection styles.
 
 ## Further reading
 
