@@ -1,11 +1,10 @@
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
-import { InputEventsRouter } from './input-events';
+import type { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
-import { mockEdge, mockMetadata, mockNode } from './test-utils';
-import { Edge } from './types/edge.interface';
-import type { EnvironmentInfo } from './types/environment.interface';
+import { mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
+import type { Edge } from './types/edge.interface';
 import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
 import type { Middleware } from './types/middleware.interface';
@@ -77,7 +76,6 @@ describe('FlowCore', () => {
   let mockGetEdges: Mock<() => Edge[]>;
   let mockGetMetadata: Mock<() => Metadata>;
   let mockEventRouter: InputEventsRouter;
-  const mockEnvironment: EnvironmentInfo = { os: 'MacOS', browser: 'Chrome' };
 
   beforeEach(() => {
     mockGetNodes = vi.fn().mockReturnValue([]);
@@ -260,7 +258,9 @@ describe('FlowCore', () => {
 
       await flowCore.applyUpdate({ nodesToUpdate: [mockNode] }, 'changeSelection');
 
-      expect(mockModelAdapter.updateMetadata).toHaveBeenCalledWith({ test: 'abc' });
+      expect(mockModelAdapter.updateMetadata).toHaveBeenCalledWith({
+        test: 'abc',
+      });
       expect(mockModelAdapter.updateNodes).toHaveBeenCalledWith([mockNode]);
       expect(mockModelAdapter.updateEdges).toHaveBeenCalledWith([mockEdge]);
     });
@@ -316,7 +316,10 @@ describe('FlowCore', () => {
 
   describe('clientToFlowPosition', () => {
     it('should convert client position to flow position', () => {
-      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
+      mockGetMetadata.mockReturnValue({
+        ...mockMetadata,
+        viewport: { x: 200, y: 200, scale: 2 },
+      });
       const clientPosition = { x: 30, y: 30 };
       const flowPosition = flowCore.clientToFlowPosition(clientPosition);
 
@@ -334,7 +337,10 @@ describe('FlowCore', () => {
         customGetFlowOffset
       );
 
-      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
+      mockGetMetadata.mockReturnValue({
+        ...mockMetadata,
+        viewport: { x: 200, y: 200, scale: 2 },
+      });
       const clientPosition = { x: 30, y: 30 };
       const flowPosition = flowCore.clientToFlowPosition(clientPosition);
 
@@ -345,7 +351,10 @@ describe('FlowCore', () => {
 
   describe('flowToClientPosition', () => {
     it('should convert flow position to client position', () => {
-      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
+      mockGetMetadata.mockReturnValue({
+        ...mockMetadata,
+        viewport: { x: 200, y: 200, scale: 2 },
+      });
       const flowPosition = { x: -85, y: -85 };
       const clientPosition = flowCore.flowToClientPosition(flowPosition);
 
@@ -363,7 +372,10 @@ describe('FlowCore', () => {
         customGetFlowOffset
       );
 
-      mockGetMetadata.mockReturnValue({ ...mockMetadata, viewport: { x: 200, y: 200, scale: 2 } });
+      mockGetMetadata.mockReturnValue({
+        ...mockMetadata,
+        viewport: { x: 200, y: 200, scale: 2 },
+      });
       const flowPosition = { x: -110, y: -135 };
       const clientPosition = flowCore.flowToClientPosition(flowPosition);
 
