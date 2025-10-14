@@ -1,0 +1,48 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Run lint
+        run: pnpm run lint:check
+
+      - name: Run format check
+        run: pnpm run format:check
+
+      - name: Check types
+        run: pnpm run check-types
+
+      - name: Run tests
+        run: pnpm run test
+
+      - name: Build package for production
+        run: cd packages/ng-diagram && pnpm build:prod
+
+      - name: Publish to npm
+        run: |
+          cd packages/ng-diagram/dist/ng-diagram
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

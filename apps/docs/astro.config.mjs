@@ -5,10 +5,16 @@ import starlightAutoSidebar from 'starlight-auto-sidebar';
 import starlightTypeDoc from 'starlight-typedoc';
 
 import angular from '@analogjs/astro-angular';
+import umami from '@yeskunall/astro-umami';
+
+const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 
 export default defineConfig({
   base: '/docs',
   integrations: [
+    umami({
+      id: UMAMI_WEBSITE_ID,
+    }),
     angular({
       vite: {
         transformFilter: (_code, id) => {
