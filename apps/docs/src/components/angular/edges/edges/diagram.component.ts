@@ -1,3 +1,4 @@
+// @section-start:adding-edges
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
@@ -7,11 +8,22 @@ import {
   provideNgDiagram,
 } from 'ng-diagram';
 
-// @section-start:adding-edges
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
-  template: `<ng-diagram [model]="model" />`,
+  template: `
+    <div class="not-content diagram">
+      <ng-diagram [model]="model" />
+    </div>
+  `,
+  styles: [
+    `
+      .diagram {
+        display: flex;
+        height: 20rem;
+      }
+    `,
+  ],
 })
 export class DiagramComponent {
   // @section-start:ports
@@ -22,8 +34,8 @@ export class DiagramComponent {
       {
         id: '1',
         position: {
-          x: 0,
-          y: 0,
+          x: 100,
+          y: 100,
         },
         // @mark-start:else
         data: { label: 'Node 1' },
@@ -33,7 +45,7 @@ export class DiagramComponent {
       {
         id: '2',
         position: {
-          x: 100,
+          x: 500,
           y: 100,
         },
         data: { label: 'Node 2' },
