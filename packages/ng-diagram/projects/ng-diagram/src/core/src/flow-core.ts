@@ -45,7 +45,6 @@ export class FlowCore {
 
   readonly commandHandler: CommandHandler;
   readonly middlewareManager: MiddlewareManager;
-  readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
@@ -61,7 +60,7 @@ export class FlowCore {
     modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
     public readonly inputEventsRouter: InputEventsRouter,
-    environment: EnvironmentInfo,
+    public readonly environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
     getFlowOffset?: () => Point,
     config: DeepPartial<FlowConfig> = {}

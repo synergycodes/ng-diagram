@@ -7,7 +7,7 @@ import {
   type ModelAdapter,
   type Point,
 } from '../../../core/src';
-import { BrowserEnvironment } from '../../../core/src/environment/browser-environment';
+import { EnvironmentProviderService } from '../environment-provider/environment-provider.service';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
 import { RendererService } from '../renderer/renderer.service';
 
@@ -15,6 +15,7 @@ import { RendererService } from '../renderer/renderer.service';
 export class FlowCoreProviderService {
   private readonly renderer = inject(RendererService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly environment = inject(EnvironmentProviderService);
   private flowCore: FlowCore | null = null;
   private _isInitialized = signal(false);
 
@@ -30,7 +31,7 @@ export class FlowCoreProviderService {
       model,
       this.renderer,
       this.inputEventsRouter,
-      new BrowserEnvironment(),
+      this.environment,
       middlewares,
       getFlowOffset,
       config
