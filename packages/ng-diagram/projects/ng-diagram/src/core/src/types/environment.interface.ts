@@ -11,9 +11,9 @@ export interface EnvironmentInfo {
   /** User Browser name (when applicable) */
   browser: LooseAutocomplete<'Chrome' | 'Firefox' | 'Safari' | 'Edge' | 'Opera' | 'IE' | 'Other'> | null;
   /** Platform identity for high-level adapter routing */
-  runtime?: LooseAutocomplete<'web' | 'node' | 'other'>;
-  /** Primary modifier key semantics for shortcuts (meta on Mac, ctrl elsewhere) */
-
+  runtime: LooseAutocomplete<'web' | 'node' | 'other'> | null;
+  /** Current timestamp in ms */
   now: () => number;
+  /** Generates a unique ID */
   generateId: () => string;
 }
