@@ -27,3 +27,14 @@ details.ec-section.github {
 ng-diagram-canvas {
   font-family: 'Poppins', sans-serif;
 }
+
+/* Hide the code block header with three dots while preserving syntax highlighting */
+.expressive-code {
+  .header {
+    display: none;
+  }
+
+  code {
+    border-top: var(--ec-brdWd) solid var(--ec-brdCol);
+  }
+}
