@@ -9,7 +9,6 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  selector: 'node',
   imports: [
     NgDiagramNodeRotateAdornmentComponent,
     NgDiagramPortComponent,
@@ -24,9 +23,19 @@ import {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class NodeComponent implements NgDiagramNodeTemplate {
+export class NodeComponent
+  implements
+    NgDiagramNodeTemplate<{
+      name: string;
+      description: string;
+      tooltip: string;
+    }>
+{
   text = model<string>('');
-  node = input.required<Node>();
+  node =
+    input.required<
+      Node<{ name: string; description: string; tooltip: string }>
+    >();
 
   selectedState: string = 'Inactive';
 

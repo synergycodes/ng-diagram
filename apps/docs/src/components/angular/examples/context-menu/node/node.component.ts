@@ -10,7 +10,6 @@ import {
 import { ContextMenuService } from '../menu/menu.service';
 
 @Component({
-  selector: 'node',
   imports: [NgDiagramPortComponent],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],

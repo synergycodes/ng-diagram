@@ -10,7 +10,6 @@ const STROKE_WIDTH_DEFAULT = 2;
 const STROKE_WIDTH_SELECTED = 4;
 
 @Component({
-  selector: 'labeled-edge',
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
     stroke="orange"

@@ -8,7 +8,6 @@ import {
 import { ContextMenuService } from './menu.service';
 
 @Component({
-  selector: 'menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
 })
