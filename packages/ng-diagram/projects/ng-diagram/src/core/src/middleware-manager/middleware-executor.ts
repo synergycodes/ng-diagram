@@ -93,6 +93,7 @@ export class MiddlewareExecutor {
     history: this.history,
     initialUpdate: this.initialStateUpdate,
     config: this.flowCore.config,
+    environment: this.flowCore.environment,
   });
 
   private resolveMiddlewares = (): Promise<FlowState | undefined> => {

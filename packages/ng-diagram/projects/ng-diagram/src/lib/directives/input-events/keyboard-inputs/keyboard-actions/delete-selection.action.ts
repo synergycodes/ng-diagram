@@ -1,5 +1,4 @@
-import { inject, Injectable } from '@angular/core';
-import { BrowserInputsHelpers } from '../../../../services/input-events/browser-inputs-helpers';
+import { Injectable, inject } from '@angular/core';
 import { InputEventsRouterService } from '../../../../services/input-events/input-events-router.service';
 import { KeyboardAction } from './keyboard-action';
 
@@ -8,7 +7,7 @@ export class DeleteSelectionAction extends KeyboardAction {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   override matches(event: KeyboardEvent): boolean {
-    return BrowserInputsHelpers.isDeleteKeyPressed(event);
+    return this.inputEventsRouter.eventGuards.isDeleteKeyPressed(event);
   }
 
   override handle(event: KeyboardEvent): void {

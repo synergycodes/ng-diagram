@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { FlowCore, Middleware, ModelAdapter } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { detectEnvironment } from '../../utils/detect-environment';
+import { FlowCore, type Middleware, type ModelAdapter } from '../../../core/src';
+import { EnvironmentProviderService } from '../environment-provider/environment-provider.service';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
 import { RendererService } from '../renderer/renderer.service';
 import { FlowCoreProviderService } from './flow-core-provider.service';
@@ -17,7 +17,10 @@ describe('FlowCoreProviderService', () => {
     destroy: vi.fn(),
     getNodes: vi.fn().mockReturnValue([]),
     getEdges: vi.fn().mockReturnValue([]),
-    getMetadata: vi.fn().mockReturnValue({ viewport: { x: 0, y: 0, scale: 1 }, middlewaresConfig: {} }),
+    getMetadata: vi.fn().mockReturnValue({
+      viewport: { x: 0, y: 0, scale: 1 },
+      middlewaresConfig: {},
+    }),
     updateNodes: vi.fn(),
     updateEdges: vi.fn(),
     updateMetadata: vi.fn(),
@@ -30,7 +33,7 @@ describe('FlowCoreProviderService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowCoreProviderService, RendererService, InputEventsRouterService],
+      providers: [FlowCoreProviderService, RendererService, InputEventsRouterService, EnvironmentProviderService],
     });
     service = TestBed.inject(FlowCoreProviderService);
   });
@@ -44,12 +47,6 @@ describe('FlowCoreProviderService', () => {
       service.init(mockModelAdapter, [], mockOffset);
 
       expect(service.provide()).toBeInstanceOf(FlowCore);
-    });
-
-    it('should call detectEnvironment method', () => {
-      service.init(mockModelAdapter, [], mockOffset);
-
-      expect(detectEnvironment).toHaveBeenCalled();
     });
 
     it('should initialize FlowCore with provided middlewares', () => {

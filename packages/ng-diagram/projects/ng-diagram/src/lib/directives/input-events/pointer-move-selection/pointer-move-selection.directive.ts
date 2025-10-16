@@ -1,10 +1,9 @@
-import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { ContainerEdge, FPS_60, NgDiagramMath, Node } from '../../../../core/src';
+import { Directive, inject, input, type OnDestroy } from '@angular/core';
+import { type ContainerEdge, FPS_60, NgDiagramMath, type Node } from '../../../../core/src';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
-import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types/event';
+import type { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
@@ -35,7 +34,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
-    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 
@@ -65,7 +64,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   onPointerUp = (event: PointerEvent): void => {
-    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 

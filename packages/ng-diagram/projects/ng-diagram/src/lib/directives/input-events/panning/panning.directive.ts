@@ -1,7 +1,6 @@
-import { Directive, inject, OnDestroy } from '@angular/core';
-import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
+import { Directive, inject, type OnDestroy } from '@angular/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types/event';
+import type { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
@@ -21,7 +20,7 @@ export class PanningDirective implements OnDestroy {
   }
 
   onPointerDown(event: PointerInputEvent): void {
-    if (!BrowserInputsHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
 
@@ -46,7 +45,7 @@ export class PanningDirective implements OnDestroy {
   }
 
   onPointerUp = (event: PointerEvent): void => {
-    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 

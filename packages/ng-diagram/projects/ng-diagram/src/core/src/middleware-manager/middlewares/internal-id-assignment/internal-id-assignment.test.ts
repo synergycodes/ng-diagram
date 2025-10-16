@@ -1,24 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mockEnvironment } from '../../../test-utils';
 import type { MiddlewareContext } from '../../../types';
 import { internalIdMiddleware } from './internal-id-assignment';
-
-let originalCrypto: Crypto | undefined;
 
 describe('InternalIdMiddleware', () => {
   let context: MiddlewareContext;
   let nextMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    // Ensure crypto.randomUUID exists in test environment
-    originalCrypto = globalThis.crypto as Crypto | undefined;
-    if (!originalCrypto || typeof originalCrypto.randomUUID !== 'function') {
-      // @ts-expect-error Partial stub for tests
-      globalThis.crypto = {
-        // Return a valid RFC4122 v4 UUID string
-        randomUUID: vi.fn().mockReturnValue('550e8400-e29b-41d4-a716-446655440000'),
-      } as Crypto;
-    }
-
     nextMock = vi.fn();
 
     context = {
@@ -47,15 +36,15 @@ describe('InternalIdMiddleware', () => {
         getAffectedNodeIds: vi.fn().mockReturnValue([]),
         getAffectedEdgeIds: vi.fn().mockReturnValue([]),
       },
+      environment: {
+        ...mockEnvironment,
+        generateId: vi.fn().mockReturnValue('550e8400-e29b-41d4-a716-446655440000'),
+      },
     } as unknown as MiddlewareContext;
   });
 
   afterEach(() => {
-    // Restore original crypto if we replaced it
-    if (originalCrypto) {
-      globalThis.crypto = originalCrypto;
-      originalCrypto = undefined;
-    }
+    vi.restoreAllMocks();
   });
 
   it('should not modify state when no nodes are added', async () => {
@@ -131,7 +120,7 @@ describe('InternalIdMiddleware', () => {
 
     // Mock different UUIDs for sequential calls
     const randomUUIDMock = vi
-      .spyOn(globalThis.crypto!, 'randomUUID')
+      .spyOn(context.environment, 'generateId')
       .mockReturnValueOnce('550e8400-e29b-41d4-a716-446655440000')
       .mockReturnValueOnce('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
@@ -199,7 +188,7 @@ describe('InternalIdMiddleware', () => {
 
     // Use a predictable UUID so the regex is deterministic
     const randomUUIDMock = vi
-      .spyOn(globalThis.crypto!, 'randomUUID')
+      .spyOn(context.environment, 'generateId')
       .mockReturnValue('550e8400-e29b-41d4-a716-446655440000');
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
@@ -275,7 +264,7 @@ describe('InternalIdMiddleware', () => {
 
     // Mock different UUIDs
     const randomUUIDMock = vi
-      .spyOn(globalThis.crypto!, 'randomUUID')
+      .spyOn(context.environment, 'generateId')
       .mockReturnValueOnce('550e8400-e29b-41d4-a716-446655440000')
       .mockReturnValueOnce('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 

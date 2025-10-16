@@ -1,8 +1,7 @@
 import { Directive, HostListener, inject, input } from '@angular/core';
-import { BasePointerInputEvent, Edge, Node } from '../../../../core/src';
-import { BrowserInputsHelpers } from '../../../services/input-events/browser-inputs-helpers';
+import type { BasePointerInputEvent, Edge, Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types';
+import type { PointerInputEvent } from '../../../types';
 
 @Directive()
 abstract class ObjectSelectionDirective {
@@ -13,7 +12,7 @@ abstract class ObjectSelectionDirective {
 
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
-    if (!BrowserInputsHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 

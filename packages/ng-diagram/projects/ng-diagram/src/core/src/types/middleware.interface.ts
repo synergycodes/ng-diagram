@@ -2,6 +2,7 @@ import type { ActionStateManager } from '../action-state-manager/action-state-ma
 import type { EdgeRoutingManager } from '../edge-routing-manager';
 import type { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
 import type { Edge } from './edge.interface';
+import { EnvironmentInfo } from './environment.interface';
 import { FlowConfig } from './flow-config.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
@@ -101,6 +102,8 @@ export interface MiddlewareContext {
   initialUpdate: FlowStateUpdate;
   /** The configuration for the flow diagram */
   config: FlowConfig;
+  /** The environment information */
+  environment: EnvironmentInfo;
 }
 
 /**

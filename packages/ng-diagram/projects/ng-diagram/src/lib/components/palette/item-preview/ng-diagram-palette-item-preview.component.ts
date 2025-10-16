@@ -1,7 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, Signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  type ElementRef,
+  inject,
+  type Signal,
+  viewChild,
+} from '@angular/core';
 import { NgDiagramViewportService } from '../../../public-services/ng-diagram-viewport.service';
 import { PaletteService } from '../../../services';
-import { detectEnvironment } from '../../../utils/detect-environment';
+import { EnvironmentProviderService } from '../../../services/environment-provider/environment-provider.service';
 
 /**
  * The `NgDiagramPaletteItemPreviewComponent` is responsible for rendering a live preview of a palette item
@@ -15,8 +23,7 @@ import { detectEnvironment } from '../../../utils/detect-environment';
  * ```
  *
  * @category Components
- */
-@Component({
+ */ @Component({
   selector: 'ng-diagram-palette-item-preview',
   standalone: true,
   templateUrl: './ng-diagram-palette-item-preview.component.html',
@@ -25,9 +32,10 @@ import { detectEnvironment } from '../../../utils/detect-environment';
 })
 export class NgDiagramPaletteItemPreviewComponent {
   private paletteService = inject(PaletteService);
-  private browser = detectEnvironment().browser;
+  private environment = inject(EnvironmentProviderService);
+  private browser = this.environment.browser;
 
-  readonly id = crypto.randomUUID();
+  readonly id = this.environment.generateId();
   readonly preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
 
   protected readonly scale = inject(NgDiagramViewportService).scale;

@@ -1,3 +1,4 @@
+import { FlowCore } from '../flow-core';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
@@ -12,17 +13,10 @@ import type {
   ZIndexConfig,
   ZoomConfig,
 } from '../types/flow-config.interface';
-import { Point, Size } from '../types/utils';
+import { DeepPartial, Point, Size } from '../types/utils';
+import { deepMerge } from '../utils';
 
 export const DEFAULT_NODE_MIN_SIZE = { width: 20, height: 20 };
-
-const defaultComputeNodeId = (): string => {
-  return crypto.randomUUID();
-};
-
-const defaultComputeEdgeId = (): string => {
-  return crypto.randomUUID();
-};
 
 const defaultResizeConfig: ResizeConfig = {
   getMinNodeSize: (): Size => {
@@ -120,18 +114,22 @@ const defaultZIndexConfig: ZIndexConfig = {
 /**
  * Default configuration for the flow system.
  */
-export const defaultFlowConfig: FlowConfig = {
-  computeNodeId: defaultComputeNodeId,
-  computeEdgeId: defaultComputeEdgeId,
-  resize: defaultResizeConfig,
-  linking: defaultLinkingConfig,
-  grouping: defaultGroupingConfig,
-  zoom: defaultZoomConfig,
-  background: defaultBackgroundConfig,
-  nodeRotation: defaultNodeRotationConfig,
-  snapping: defaultNodeDraggingConfig,
-  selectionMoving: defaultSelectionMovingConfig,
-  edgeRouting: defaultEdgeRoutingConfig,
-  zIndex: defaultZIndexConfig,
-  debugMode: false,
-};
+export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: FlowCore): FlowConfig =>
+  deepMerge(
+    {
+      computeNodeId: () => flowCore.environment.generateId(),
+      computeEdgeId: () => flowCore.environment.generateId(),
+      resize: defaultResizeConfig,
+      linking: defaultLinkingConfig,
+      grouping: defaultGroupingConfig,
+      zoom: defaultZoomConfig,
+      background: defaultBackgroundConfig,
+      nodeRotation: defaultNodeRotationConfig,
+      snapping: defaultNodeDraggingConfig,
+      selectionMoving: defaultSelectionMovingConfig,
+      edgeRouting: defaultEdgeRoutingConfig,
+      zIndex: defaultZIndexConfig,
+      debugMode: false,
+    },
+    config
+  );
