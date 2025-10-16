@@ -12,6 +12,7 @@ import { ContextMenuService } from './menu/menu.service';
 import { NodeComponent } from './node/node.component';
 
 @Component({
+  selector: 'context-menu-example',
   imports: [NgDiagramComponent, MenuComponent],
   template: `
     <div (contextmenu)="onDiagramRightClick($event)">

@@ -17,13 +17,13 @@ import { ContextMenuService } from '../menu/menu.service';
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
 })
-export class NodeComponent implements NgDiagramNodeTemplate {
+export class NodeComponent implements NgDiagramNodeTemplate<{ name: string }> {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
 
   text = model<string>('');
-  node = input.required<Node>();
+  node = input.required<Node<{ name: string }>>();
 
   onRightClick(event: MouseEvent) {
     event.preventDefault();
