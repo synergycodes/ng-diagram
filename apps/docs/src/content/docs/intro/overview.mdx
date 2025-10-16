@@ -13,7 +13,7 @@ A comprehensive overview of ngDiagram's core concepts, helping you understand th
 
 The simplest way to start is by installing the library, importing the required styles, and creating a component with the `NgDiagramComponent` and `provideNgDiagram()` in its providers. The diagram component needs a model with nodes and edges to display.
 
-➡️ [Quick Start Guide](/docs/intro/quick-start) for step-by-step setup
+[Quick Start Guide](/docs/intro/quick-start) for step-by-step setup
 
 ## Model and Data Management
 
@@ -29,7 +29,7 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 
 You can also implement custom model adapters to connect to external data sources like databases or real-time services.
 
-➡️ [State Management](/docs/internals/state-management) | [Custom Model Example](/docs/examples/custom-model)
+[State Management →](/docs/internals/state-management) | [Custom Model Example →](/docs/examples/custom-model)
 
 <Aside type="caution">
   Never modify nodes or edges directly. Always use services to update the model to maintain reactivity.
@@ -46,7 +46,7 @@ Every diagram requires `provideNgDiagram()` in its component's providers array, 
 - Multiple diagrams on one page
 - No conflicts between instances
 
-➡️ [Architecture Documentation](/docs/intro/architecture)
+[Architecture Documentation →](/docs/intro/architecture)
 
 ## Nodes - Building Blocks
 
@@ -70,7 +70,7 @@ ngDiagram provides default nodes that work out of the box with built-in features
 
 For specific requirements, you can create custom nodes with any Angular template, form controls, or visual elements you need.
 
-➡️ [Nodes Documentation](/docs/internals/nodes/nodes) | [Custom Nodes](/docs/internals/nodes/custom-nodes)
+[Nodes Documentation →](/docs/internals/nodes/nodes) | [Custom Nodes →](/docs/internals/nodes/custom-nodes)
 
 ## Groups - Organizing Nodes
 
@@ -83,7 +83,7 @@ Groups are special nodes that can contain other nodes, helping organize complex 
 - Visual hierarchy
 - Group-aware dragging
 
-➡️ [Groups Documentation](/docs/internals/nodes/groups)
+[Groups Documentation →](/docs/internals/nodes/groups)
 
 ## Edges - Connections
 
@@ -96,7 +96,7 @@ Edges connect nodes through ports. Default edges automatically calculate paths b
 - Custom edge templates
 - Selection and hover states
 
-➡️ [Edges Documentation](/docs/internals/edges/edges) | [Custom Edges](/docs/internals/edges/custom-edges)
+[Edges Documentation →](/docs/internals/edges/edges) | [Custom Edges →](/docs/internals/edges/custom-edges)
 
 ## Ports - Connection Points
 
@@ -110,7 +110,7 @@ Ports define where edges can connect to nodes. Default nodes have two ports (lef
 - Custom port positions and IDs in custom node templates
 - Visual hover indicators when dragging connections
 
-➡️ [Ports Documentation](/docs/internals/nodes/ports)
+[Ports Documentation →](/docs/internals/nodes/ports)
 
 ## Viewport - Working Area
 
@@ -122,7 +122,7 @@ The viewport is the interactive space where all diagram elements are rendered an
 - Pan to navigate large diagrams
 - All elements are positioned relative to the viewport's coordinate system
 
-➡️ [Viewport Features](/docs/intro/coordinate-system/#viewport-and-scaling)
+[Viewport Features →](/docs/intro/coordinate-system/#viewport-and-scaling)
 
 ## Labels and Arrowheads
 
@@ -135,7 +135,7 @@ Custom edges can display labels for showing information along connections. You c
 - Custom arrowhead designs
 - SVG-based customization for arrowheads
 
-➡️ [Labels Documentation](/docs/internals/edges/labels) | [Arrowheads](/docs/internals/edges/arrowheads)
+[Labels Documentation →](/docs/internals/edges/labels) | [Arrowheads →](/docs/internals/edges/arrowheads)
 
 ## Interactions - Resize, Rotate, Selection
 
@@ -150,7 +150,7 @@ Nodes can be configured for different interaction modes. Enable resizing to allo
   - Custom edges: Use `NgDiagramBaseEdgeComponent` or implement selection styles manually
   - Default templates have selection styles built-in
 
-➡️ [Selection](/docs/internals/nodes/selection) | [Resizing](/docs/internals/nodes/resizing) | [Rotation](/docs/internals/nodes/rotation)
+[Selection →](/docs/internals/nodes/selection) | [Resizing →](/docs/internals/nodes/resizing) | [Rotation →](/docs/internals/nodes/rotation)
 
 ## Configuration
 
@@ -188,7 +188,7 @@ ngDiagram provides injectable services for all diagram operations. Services are 
 
 Services use Angular signals for reactive state management, making it easy to build reactive UI components.
 
-➡️ [Services Documentation](/docs/intro/services)
+[Services Documentation →](/docs/intro/services)
 
 ## Events
 
@@ -221,7 +221,7 @@ Edges support multiple routing algorithms for different visual styles. You can c
 
 Set routing per edge with the `routing` property, or globally through configuration with `edgeRouting.defaultRouting`. For complete custom routing algorithms, use `NgDiagramService.registerRouting()`.
 
-➡️ [Routing Documentation](/docs/internals/edges/routing)
+[Routing Documentation →](/docs/internals/edges/routing)
 
 ## Palette - Drag to Create
 
@@ -239,7 +239,7 @@ The palette system enables drag-and-drop node creation. Build your own palette c
 - Support for creating both regular nodes and group nodes
 - Visual feedback with live preview during drag
 
-➡️ [Palette Documentation](/docs/internals/palette) | [Palette Example](/docs/examples/custom-node)
+[Palette Documentation →](/docs/internals/palette) | [Palette Example →](/docs/examples/custom-node)
 
 ## Custom Middlewares
 
@@ -258,13 +258,13 @@ ngDiagram uses a middleware system that allows you to intercept and modify any s
   performance. Always test thoroughly and ensure your middleware properly passes through unhandled operations.
 </Aside>
 
-➡️ [Middleware Documentation](/docs/internals/middlewares)
+[Middleware Documentation →](/docs/internals/middlewares)
 
 ## Styling System
 
 ngDiagram provides a comprehensive CSS variable system for theming and customization. You can override colors, borders, and other visual properties to match your application's design.
 
-➡️ [Styling Guide](/docs/intro/styling)
+[Styling Guide →](/docs/intro/styling)
 
 ## Next Steps
 

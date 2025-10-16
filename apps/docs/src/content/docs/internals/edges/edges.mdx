@@ -5,7 +5,6 @@ sidebar:
   order: 0
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { Image } from 'astro:assets';
 
@@ -28,12 +27,7 @@ interface Edge<T = any> {
 }
 ```
 
-<LinkCard
-  icon="list-format"
-  title="Edge API"
-  href="/docs/api/types/edge"
-  description="See detailed edge properties reference"
-/>
+[Edge API Reference →](/docs/api/types/edge)
 
 ## Adding Edges to a Diagram
 
@@ -117,13 +111,7 @@ For complex or programmatic styling, you can use computed properties with the ba
 
 Use Custom Edges for even more control over edge look and functionality
 
-<LinkCard
-  title="Custom Edges"
-  href="/docs/internals/edges/custom-edges"
-  description="Provide your edges with unique styles and behaviors"
-/>
-
-<LinkCard title="Arrowheads" href="/docs/internals/edges/arrowheads" description="Create custom arrowheads" />
+[Custom Edges →](/docs/internals/edges/custom-edges) | [Arrowheads →](/docs/internals/edges/arrowheads)
 
 ## Ports
 
@@ -133,11 +121,7 @@ These IDs (along with their parent node IDs) are used to specify the exact posit
 
 <CodeSnippet relativePath="edges/edges/diagram.component.ts" sectionId="ports" />
 
-<LinkCard
-  title="Ports"
-  href="/docs/internals/nodes/ports"
-  description="Read more about ports and how they work in ngDiagram"
-/>
+[Ports →](/docs/internals/nodes/ports)
 
 ## Routing
 
@@ -151,11 +135,7 @@ import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 <Routing />
 
-<LinkCard
-  title="Routing"
-  href="/docs/internals/edges/routing"
-  description="Learn about routing algorithms and how to customize them in ngDiagram"
-/>
+[Routing →](/docs/internals/edges/routing)
 
 ## Creating Edges Through User Interaction
 
@@ -210,8 +190,4 @@ This allows you to:
 
 ## Further reading
 
-<LinkCard
-  title="Labels"
-  href="/docs/internals/edges/labels"
-  description="See how to add labels to edges in ngDiagram"
-/>
+[Labels →](/docs/internals/edges/labels)

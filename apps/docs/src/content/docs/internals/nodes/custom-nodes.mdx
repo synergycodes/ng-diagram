@@ -5,7 +5,6 @@ sidebar:
   order: 3
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -19,12 +18,7 @@ You can create a custom node by extending `NgDiagramNodeTemplate` and implementi
 
 <CustomNode />
 
-<LinkCard
-  icon="list-format"
-  title="Custom Node Example"
-  href="/docs/examples/custom-node"
-  description="For more comprehensive example please check here."
-/>
+[Custom Node Example →](/docs/examples/custom-node)
 
 ## Registering Custom Node Types
 
@@ -75,12 +69,7 @@ interface SimpleNode<T = any> {
 }
 ```
 
-<LinkCard
-  icon="list-format"
-  title="Node API"
-  href="/docs/api/types/node"
-  description="See detailed node properties reference"
-/>
+[Node API →](/docs/api/types/node)
 
 ## Handling Interactive Elements
 
@@ -102,23 +91,4 @@ Integrating these functionalities is straightforward simply place the correspond
 
 As a result, your custom nodes are not only visually flexible, but also deeply integrated with the diagram's data model, making them powerful and adaptable for complex scenarios.
 
-<LinkCard
-  icon="list-format"
-  title="Resizing"
-  href="/docs/internals/nodes/resizing"
-  description="Resizing functionality for your Custom Node"
-/>
-
-<LinkCard
-  icon="list-format"
-  title="Rotating"
-  href="/docs/internals/nodes/rotation"
-  description="Rotation functionality for your Custom Node"
-/>
-
-<LinkCard
-  icon="list-format"
-  title="Custom Ports"
-  href="/docs/internals/nodes/ports"
-  description="Custom ports in your Custom Node"
-/>
+[Resizing →](/docs/internals/nodes/resizing) | [Rotating →](/docs/internals/nodes/rotation) | [Custom Ports →](/docs/internals/nodes/ports)

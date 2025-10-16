@@ -5,7 +5,6 @@ sidebar:
   order: 3
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import DefaultArrowhead from '@components/angular/edges/arrowheads/default-arrowhead/default-arrowhead.astro';
 import CustomArrowhead from '@components/angular/edges/arrowheads/custom-arrowhead/custom-arrowhead.astro';
@@ -42,8 +41,4 @@ See [`<marker>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Elem
 
 When implementing custom edges, you can override the default arrowhead with a custom one by specifying the `sourceArrowhead` and `targetArrowhead` inputs of `NgDiagramBaseEdgeComponent`. Thanks to it you don't have to specify the arrowhead in the data of each edge.
 
-<LinkCard
-  title="Custom Edges"
-  href="/docs/internals/edges/custom-edges"
-  description="See how to implement custom edges"
-/>
+[Custom Edges →](/docs/internals/edges/custom-edges)

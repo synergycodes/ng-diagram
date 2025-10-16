@@ -7,55 +7,86 @@ sidebar:
 
 ngDiagram follows a layered architecture that separates concerns and enables extensibility. This design makes it easy to understand, customize, and extend for your specific needs.
 
+## Architecture Flow
+
+When a user interacts with the diagram, here's what happens:
+
+1. **User Interaction**: User clicks, drags, or presses keys on diagram components
+2. **Event Capture & Processing**: User interactions are captured and processed to determine the appropriate action
+3. **Command Emission**: Based on the event, one or more commands are emitted to represent the intended operation
+4. **Middleware Pipeline**: Commands flow through middleware chain for validation, transformation, or side effects
+5. **Model Update**: Final state changes are applied to the model
+6. **UI Reactivity**: Angular signals automatically update the UI to reflect new state
+
+This unidirectional flow ensures predictable behavior and makes debugging straightforward.
+
+## Architecture Layers
+
 ### 1. Components Layer
 
 The user-facing components that render the diagram and handle user interactions:
 
-- **ng-diagram**: Main component that renders the entire diagram, handles user interactions, and orchestrates all functionality
-- **ng-diagram-background**: Background component that renders the diagram's background grid
-- **ng-diagram-resize-adornment** and **ng-diagram-rotate-adornment**: Utility components that can be embedded in custom node templates to provide resize and rotation functionality
-- **ng-diagram-palette-item**: Drag and drop component that can be placed anywhere in your application to create palette functionality
-- **ng-diagram-palette-item-preview**: Preview component that shows a visual representation of palette items during drag operations
-- **ng-diagram-base-edge**: Foundation component for building custom edge templates with advanced styling and behavior
-- **base-edge-label**: Base component for creating custom edge labels with consistent styling and positioning
-- **ng-diagram-port**: Port component that defines connection points on nodes for edge connections
+- [**ng-diagram**](/docs/api/components/ngdiagramcomponent): Main component that renders the entire diagram, handles user interactions, and orchestrates all functionality
+- [**ng-diagram-background**](/docs/api/components/ngdiagrambackgroundcomponent): Background component that renders the diagram's background grid
+- [**ng-diagram-resize-adornment**](/docs/api/components/ngdiagramnoderesizeadornmentcomponent) and [**ng-diagram-rotate-adornment**](/docs/api/components/ngdiagramnoderotateadornmentcomponent): Utility components that can be embedded in custom node templates to provide resize and rotation functionality
+- [**ng-diagram-palette-item**](/docs/api/components/ngdiagrampaletteitemcomponent): Drag and drop component that can be placed anywhere in your application to create palette functionality
+- [**ng-diagram-palette-item-preview**](/docs/api/components/ngdiagrampaletteitempreviewcomponent): Preview component that shows a visual representation of palette items during drag operations
+- [**ng-diagram-base-edge**](/docs/api/components/ngdiagrambaseedgecomponent): Foundation component for building custom edge templates with advanced styling and behavior
+- [**base-edge-label**](/docs/api/components/baseedgelabelcomponent): Base component for creating custom edge labels with consistent styling and positioning
+- [**ng-diagram-port**](/docs/api/components/ngdiagramportcomponent): Port component that defines connection points on nodes for edge connections
 
 ### 2. Service Layer
 
 Specialized services provide different levels of control and functionality:
 
-- **NgDiagramService**: Core service providing middleware management, routing management, and transaction handling
-- **NgDiagramModelService**: Handles model operations including node/edge updates, spatial queries, and data access
-- **NgDiagramViewportService**: Manages viewport state with reactive signals for position, scale, and coordinate transformations
-- **NgDiagramSelectionService**: Manages selection state with methods for selecting/deselecting nodes and edges
-- **NgDiagramNodeService**: Provides node-specific operations
-- **NgDiagramGroupsService**: Manages group node operations such as member management
-- **NgDiagramClipboardService**: Manages copy/paste operations for diagram elements
+- [**NgDiagramService**](/docs/api/services/ngdiagramservice): Core service providing middleware management, routing management, and transaction handling
+- [**NgDiagramModelService**](/docs/api/services/ngdiagrammodelservice): Handles model operations including node/edge updates, spatial queries, and data access
+- [**NgDiagramViewportService**](/docs/api/services/ngdiagramviewportservice): Manages viewport state with reactive signals for position, scale, and coordinate transformations
+- [**NgDiagramSelectionService**](/docs/api/services/ngdiagramselectionservice): Manages selection state with methods for selecting/deselecting nodes and edges
+- [**NgDiagramNodeService**](/docs/api/services/ngdiagramnodeservice): Provides node-specific operations
+- [**NgDiagramGroupsService**](/docs/api/services/ngdiagramgroupsservice): Manages group node operations such as member management
+- [**NgDiagramClipboardService**](/docs/api/services/ngdiagramclipboardservice): Manages copy/paste operations for diagram elements
 
-All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior.
+All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior. Learn more in the [Services documentation](/docs/intro/services).
 
-### 3. Command System
+### 3. Event Layer
 
-Commands provide precise instructions for what needs to be done in the diagram. This system ensures data consistency and enables powerful features:
+The event layer captures user interactions and translates them into commands that modify the diagram state:
 
-- **Atomic Operations**: Each command represents a single, well-defined action that can be executed, undone, or redone
-- **Transaction Support**: Commands can be grouped into transactions for atomic execution, ensuring data consistency
-- **Extensible**: Custom commands can be added for specific use cases, enabling domain-specific operations
+- **Event Capture**: User interactions (clicks, drags, keyboard input) are captured by the diagram components
+- **Event Processing**: Each interaction type is processed to understand the user's intent and context (what was clicked, modifier keys, coordinates)
+- **Command Emission**: Based on the processed event, appropriate commands are emitted to perform the desired operation
 
-### 4. Middleware System
+Supported interactions include: selection, panning, zooming, node movement, resizing, rotation, edge creation (linking), clipboard operations (copy/paste/cut), and palette item drops.
 
-Middleware intercepts between the engine and state, enabling behavior extension without modifying core code:
+### 4. Command System
+
+Commands provide precise, structured instructions for state changes in the diagram. After events are processed, handlers emit commands that represent the intended operation:
+
+- **Atomic Operations**: Each command represents a single, well-defined action (select, moveNode, addEdge, etc.)
+- **Command Emission**: Event handlers analyze user interactions and emit appropriate commands through the CommandHandler
+- **Transaction Support**: Commands can be grouped into [transactions](/docs/internals/transactions) for atomic execution, ensuring data consistency
+- **Extensible**: The system supports 40+ built-in commands and can be extended with custom commands
+
+The command system acts as the bridge between user interactions (events) and state changes (model updates), ensuring all modifications go through a controlled, predictable pipeline.
+
+### 5. Middleware System
+
+Middleware intercepts commands before they reach the model, enabling behavior extension without modifying core code:
 
 - **Plugin Architecture**: Add, remove, or modify behaviors without changing core code, making the system highly extensible
-- **Processing Pipeline**: Middleware processes data transformations in sequence, allowing for complex business logic
+- **Processing Pipeline**: Middleware processes commands and state updates in sequence, allowing for validation, transformation, and side effects
 - **Configurable**: Each middleware can be enabled/disabled and configured at runtime, providing flexibility
+- **Async Support**: Middlewares can perform asynchronous operations like API calls or validations
 
-### 5. Data Model
+Learn more in the [Middlewares documentation](/docs/internals/middlewares).
+
+### 6. Data Model
 
 The foundation that stores diagram state and provides the data layer:
 
-- **Nodes**: Visual elements with position, data, and behavior that represent entities in your diagram
-- **Edges**: Connections between nodes with routing and styling that represent relationships
+- **Nodes**: Visual elements with position, data, and behavior that represent entities in your diagram. See [Nodes documentation](/docs/internals/nodes/nodes) for details.
+- **Edges**: Connections between nodes with routing and styling that represent relationships. See [Edges documentation](/docs/internals/edges/edges) for details.
 - **Metadata**: Viewport state, middleware configurations, and other settings that control diagram behavior
 
-The default Signal Model uses Angular signals for reactive state management, providing excellent performance and real-time updates. For advanced use cases, custom model adapters can integrate with external data sources like databases or APIs.
+The default Signal Model uses Angular signals for reactive state management, providing excellent performance and real-time updates. For advanced use cases, custom model adapters can integrate with external data sources like databases or APIs. Learn more in the [State Management documentation](/docs/internals/state-management).
