@@ -196,7 +196,7 @@ The documentation includes:
 
 ## 🔧 Requirements
 
-- **Angular**: 19.0.0 or higher
+- **Angular**: 18.0.0 or higher
 - **TypeScript**: 5.6.0 or higher
 - **Node.js**: 18.19.1 or higher
 
