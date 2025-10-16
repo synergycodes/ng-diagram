@@ -32,7 +32,13 @@ export default defineConfig({
         dark: './src/assets/ng-diagram-logo-white.svg',
       },
       customCss: ['./src/styles/custom.css'],
-      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/synergycodes/ng-diagram' }],
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/synergycodes/ng-diagram',
+        },
+      ],
       sidebar: [
         {
           label: 'Intro',
@@ -72,6 +78,9 @@ export default defineConfig({
           watch: true,
         }),
       ],
+      components: {
+        SocialIcons: './src/components/social-icons/social-icons.astro',
+      },
     }),
   ],
 });
