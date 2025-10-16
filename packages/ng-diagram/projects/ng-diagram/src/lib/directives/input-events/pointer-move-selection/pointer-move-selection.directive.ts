@@ -34,7 +34,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
-    if (!this.inputEventsRouter.eventHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 
@@ -64,7 +64,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   onPointerUp = (event: PointerEvent): void => {
-    if (!this.inputEventsRouter.eventHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 

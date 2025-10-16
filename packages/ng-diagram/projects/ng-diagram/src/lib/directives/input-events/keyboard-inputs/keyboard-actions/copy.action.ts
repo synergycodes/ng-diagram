@@ -7,7 +7,7 @@ export class CopyAction extends KeyboardAction {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   override matches(event: KeyboardEvent): boolean {
-    return this.inputEventsRouter.eventHelpers.isKeyComboPressed('c', 'primary')(event);
+    return this.inputEventsRouter.eventGuards.isKeyComboPressed('c', 'primary')(event);
   }
 
   override handle(event: KeyboardEvent): void {

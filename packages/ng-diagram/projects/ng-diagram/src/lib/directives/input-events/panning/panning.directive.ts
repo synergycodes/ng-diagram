@@ -20,7 +20,7 @@ export class PanningDirective implements OnDestroy {
   }
 
   onPointerDown(event: PointerInputEvent): void {
-    if (!this.inputEventsRouter.eventHelpers.withPrimaryButton(event) || !this.shouldHandle(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
 
@@ -45,7 +45,7 @@ export class PanningDirective implements OnDestroy {
   }
 
   onPointerUp = (event: PointerEvent): void => {
-    if (!this.inputEventsRouter.eventHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 

@@ -7,7 +7,7 @@ export class CutAction extends KeyboardAction {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   override matches(event: KeyboardEvent): boolean {
-    return this.inputEventsRouter.eventHelpers.isKeyComboPressed('x', 'primary')(event);
+    return this.inputEventsRouter.eventGuards.isKeyComboPressed('x', 'primary')(event);
   }
 
   override handle(event: KeyboardEvent): void {

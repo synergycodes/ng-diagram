@@ -14,7 +14,7 @@ export class MoveSelectionAction extends KeyboardAction {
       return false;
     }
 
-    return this.inputEventsRouter.eventHelpers.isArrowKeyPressed(event);
+    return this.inputEventsRouter.eventGuards.isArrowKeyPressed(event);
   }
 
   handle(event: KeyboardEvent): void {

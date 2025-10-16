@@ -9,7 +9,7 @@ export class PasteAction extends KeyboardAction {
   private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
 
   override matches(event: KeyboardEvent): boolean {
-    return this.inputEventsRouter.eventHelpers.isKeyComboPressed('v', 'primary')(event);
+    return this.inputEventsRouter.eventGuards.isKeyComboPressed('v', 'primary')(event);
   }
 
   override handle(event: KeyboardEvent): void {

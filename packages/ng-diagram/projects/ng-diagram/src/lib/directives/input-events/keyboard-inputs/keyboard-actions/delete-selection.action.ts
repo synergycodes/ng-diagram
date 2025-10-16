@@ -7,7 +7,7 @@ export class DeleteSelectionAction extends KeyboardAction {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   override matches(event: KeyboardEvent): boolean {
-    return this.inputEventsRouter.eventHelpers.isDeleteKeyPressed(event);
+    return this.inputEventsRouter.eventGuards.isDeleteKeyPressed(event);
   }
 
   override handle(event: KeyboardEvent): void {

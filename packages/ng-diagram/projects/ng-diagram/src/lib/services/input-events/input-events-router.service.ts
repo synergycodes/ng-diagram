@@ -1,14 +1,30 @@
 import { Injectable, inject } from '@angular/core';
-import { InputEventsRouter, type InputModifiers } from '../../../core/src';
+import { BaseInputEvent, InputEventsRouter, type InputModifiers } from '../../../core/src';
 import { EnvironmentProviderService } from '../environment-provider/environment-provider.service';
 
+/**
+ * Union of browser events that this router understands and can normalize.
+ */
 type DomEvent = KeyboardEvent | WheelEvent | PointerEvent | DragEvent | TouchEvent;
 
+/**
+ * Bridges Angular DOM events to the agnostic ng-diagram core.
+ *
+ * It listens to events, normalizes them and adds common details (id, timestamp,
+ * modifier keys), and forwards them to the core input handlers.
+ * This is why it touches both DOM specifics and core event data.
+ */
 @Injectable()
 export class InputEventsRouterService extends InputEventsRouter {
   private readonly environment = inject(EnvironmentProviderService);
 
-  getBaseEvent(event: DomEvent) {
+  /**
+   * Creates a minimal core event payload from a DOM event.
+   *
+   * - Adds a stable `id` and `timestamp` from the environment provider
+   * - Normalizes modifier keys across OSes/browsers
+   */
+  getBaseEvent(event: DomEvent): Omit<BaseInputEvent, 'name'> {
     return {
       modifiers: this.getModifiers(event),
       id: this.environment.generateId(),
@@ -16,13 +32,14 @@ export class InputEventsRouterService extends InputEventsRouter {
     };
   }
 
-  readonly eventHelpers = {
-    getPrimaryModifierKey: this.getPrimaryModifierKey.bind(this),
+  /**
+   * Guards for common event properties like modifiers, buttons, keys, etc.
+   */
+  readonly eventGuards = {
     isPointerEvent: this.isPointerEvent.bind(this),
     isKeyboardEvent: this.isKeyboardEvent.bind(this),
     isWheelEvent: this.isWheelEvent.bind(this),
     isDomEvent: this.isDomEvent.bind(this),
-    getModifiers: this.getModifiers.bind(this),
     withPrimaryModifier: this.withPrimaryModifier.bind(this),
     withSecondaryModifier: this.withSecondaryModifier.bind(this),
     withShiftModifier: this.withShiftModifier.bind(this),

@@ -12,7 +12,7 @@ abstract class ObjectSelectionDirective {
 
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
-    if (!this.inputEventsRouter.eventHelpers.withPrimaryButton(event)) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
 

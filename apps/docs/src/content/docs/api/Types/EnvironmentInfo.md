@@ -17,11 +17,23 @@ User Browser name (when applicable)
 
 ***
 
+### generateId()
+
+> **generateId**: () => `string`
+
+Generates a unique ID
+
+#### Returns
+
+`string`
+
+***
+
 ### now()
 
 > **now**: () => `number`
 
-Primary modifier key semantics for shortcuts (meta on Mac, ctrl elsewhere)
+Current timestamp in ms
 
 #### Returns
 
@@ -37,8 +49,8 @@ User Operating system name
 
 ***
 
-### runtime?
+### runtime
 
-> `optional` **runtime**: `LooseAutocomplete`\<`"node"` \| `"web"` \| `"other"`\>
+> **runtime**: `null` \| `LooseAutocomplete`\<`"node"` \| `"web"` \| `"other"`\>
 
 Platform identity for high-level adapter routing
