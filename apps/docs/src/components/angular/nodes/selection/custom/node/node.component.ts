@@ -1,7 +1,7 @@
+// @section-start
 import { Component, input } from '@angular/core';
 import { type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
 
-// @section-start
 @Component({
   template: `
     <div class="custom-node">

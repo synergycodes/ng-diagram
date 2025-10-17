@@ -1,8 +1,8 @@
+// @section-start
 import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgDiagramModelService } from 'ng-diagram';
 
-// @section-start
 @Component({
   selector: 'label-panel',
   imports: [FormsModule],

@@ -31,8 +31,8 @@ export class NavBarComponent {
     return this.saveStateService.state() !== null;
   });
 
-  private statusMessage = signal('');
   private statusTimeout: ReturnType<typeof setTimeout> | null = null;
+  protected statusMessage = signal('');
 
   save(): void {
     const model = this.modelService.toJSON();

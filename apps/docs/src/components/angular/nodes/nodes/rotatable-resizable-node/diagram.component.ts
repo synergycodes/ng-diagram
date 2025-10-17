@@ -1,3 +1,4 @@
+// @section-start
 import '@angular/compiler';
 
 import { Component } from '@angular/core';
@@ -7,7 +8,6 @@ import {
   provideNgDiagram,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
   // @collapse-start
   imports: [NgDiagramComponent],

@@ -1,3 +1,4 @@
+// @section-start
 import { Component, computed, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
@@ -6,9 +7,7 @@ import {
   type Point,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
-  selector: 'sinusoid-edge',
   // @mark-substring:[edge]="customEdge()"
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"

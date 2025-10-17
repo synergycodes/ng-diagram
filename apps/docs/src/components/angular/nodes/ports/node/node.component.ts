@@ -1,3 +1,5 @@
+// @section-start:hover-style
+// @section-start:usage
 import { Component, input } from '@angular/core';
 import {
   NgDiagramPortComponent,
@@ -5,8 +7,6 @@ import {
   type Node,
 } from 'ng-diagram';
 
-// @section-start:hover-style
-// @section-start:usage
 @Component({
   // @collapse-start:usage
   imports: [NgDiagramPortComponent],
@@ -35,8 +35,10 @@ import {
   styleUrl: './node.component.scss',
   // @collapse-end:hover-style
 })
-export class CustomNodeComponent implements NgDiagramNodeTemplate {
-  node = input.required<Node>();
+export class CustomNodeComponent
+  implements NgDiagramNodeTemplate<{ label: string }>
+{
+  node = input.required<Node<{ label: string }>>();
 }
 // @section-end:hover-style
 // @section-end:usage

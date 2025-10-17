@@ -6,7 +6,6 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  selector: 'node',
   imports: [NgDiagramPortComponent],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],

@@ -10,7 +10,6 @@ import {
 import { ContextMenuService } from '../menu/menu.service';
 
 @Component({
-  selector: 'node',
   imports: [NgDiagramPortComponent],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
@@ -18,13 +17,13 @@ import { ContextMenuService } from '../menu/menu.service';
     { directive: NgDiagramNodeSelectedDirective, inputs: ['node'] },
   ],
 })
-export class NodeComponent implements NgDiagramNodeTemplate {
+export class NodeComponent implements NgDiagramNodeTemplate<{ name: string }> {
   private readonly contextMenuService = inject(ContextMenuService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
 
   text = model<string>('');
-  node = input.required<Node>();
+  node = input.required<Node<{ name: string }>>();
 
   onRightClick(event: MouseEvent) {
     event.preventDefault();
@@ -32,7 +31,10 @@ export class NodeComponent implements NgDiagramNodeTemplate {
 
     if (this.node()) {
       // Additionally selects the node on right click
-      this.selectionService.select([this.node().id]);
+      const selectedNodes = this.selectionService.selection().nodes;
+      if (!selectedNodes.some((n) => n.id === this.node().id)) {
+        this.selectionService.select([this.node().id]);
+      }
 
       const cursorPosition = this.viewportService.clientToFlowViewportPosition({
         x: event.clientX,

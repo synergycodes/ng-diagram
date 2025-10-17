@@ -7,7 +7,6 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  selector: 'sinusoid-edge',
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
     stroke="rebeccapurple"

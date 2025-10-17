@@ -1,3 +1,4 @@
+// @section-start:config
 import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
@@ -10,7 +11,6 @@ import {
 
 import { CustomNodeComponent } from './node/node.component';
 
-// @section-start:config
 // @mark-substring:config:config
 @Component({
   // @collapse-start:config

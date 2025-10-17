@@ -1,3 +1,5 @@
+// @section-start:config
+// @section-start:usage
 import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
@@ -11,8 +13,6 @@ import {
 
 import { CustomNodeComponent } from './node/node.component';
 
-// @section-start:config
-// @section-start:usage
 // @mark-substring:config:config
 @Component({
   imports: [NgDiagramComponent],

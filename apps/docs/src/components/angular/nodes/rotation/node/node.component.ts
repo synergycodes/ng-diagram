@@ -1,3 +1,4 @@
+// @section-start
 import { Component, input } from '@angular/core';
 import {
   NgDiagramNodeRotateAdornmentComponent,
@@ -6,7 +7,6 @@ import {
   type Node,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
   // @mark-start
   imports: [NgDiagramNodeRotateAdornmentComponent],

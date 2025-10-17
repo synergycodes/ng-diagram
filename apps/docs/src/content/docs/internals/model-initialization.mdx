@@ -45,8 +45,8 @@ const model = initializeModel({
       id: 'edge-1',
       source: '1',
       target: '2',
-      sourcePort: 'port-left',
-      targetPort: 'port-right',
+      sourcePort: 'port-right',
+      targetPort: 'port-left',
       data: {},
     },
   ],
@@ -74,7 +74,7 @@ export class MyComponent {
 
   async loadDiagramFromAPI(diagramId: string) {
     // Fetch data asynchronously
-    const diagramData = await this.diagramService.getDiagram(diagramId);
+    const diagramData = await this.dataService.getDiagramData(diagramId);
 
     // Reinitialize model with new data
     this.model = initializeModel(diagramData, this.injector);

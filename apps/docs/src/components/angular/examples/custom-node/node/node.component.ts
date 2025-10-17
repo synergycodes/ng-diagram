@@ -8,8 +8,13 @@ import {
   type Node,
 } from 'ng-diagram';
 
+type CustomDataType = {
+  name: string;
+  description: string;
+  tooltip: string;
+};
+
 @Component({
-  selector: 'node',
   imports: [
     NgDiagramNodeRotateAdornmentComponent,
     NgDiagramPortComponent,
@@ -24,9 +29,9 @@ import {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class NodeComponent implements NgDiagramNodeTemplate {
+export class NodeComponent implements NgDiagramNodeTemplate<CustomDataType> {
   text = model<string>('');
-  node = input.required<Node>();
+  node = input.required<Node<CustomDataType>>();
 
   selectedState: string = 'Inactive';
 

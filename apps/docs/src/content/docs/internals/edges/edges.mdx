@@ -169,11 +169,6 @@ The `linking` configuration provides two builder functions:
 - **`finalEdgeDataBuilder`** - Customizes the final edge when connection is completed
 
 ```typescript
-@Component({
-  selector: 'my-diagram',
-  template: ` <ng-diagram [model]="model" [config]="config" /> `,
-  providers: [provideNgDiagram()],
-})
 export class MyDiagramComponent {
   model = initializeModel({
     /* ... */

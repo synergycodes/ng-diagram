@@ -15,30 +15,33 @@ export class SidebarContainer {
   private readonly modelService = inject(NgDiagramModelService);
   private readonly selectionService = inject(NgDiagramSelectionService);
   private readonly selectedNode = computed(
-    () => this.selectionService.selection().nodes[0]
+    () => this.selectionService.selection().nodes[0] ?? null
   );
 
-  id = computed(() => this.selectedNode().id);
+  id = computed(() => this.selectedNode()?.id ?? null);
   label = computed(() => {
-    const data = this.selectedNode()?.data as Data;
-
-    return data.label;
+    const data = this.selectedNode()?.data as Data | undefined;
+    return data?.label ?? '';
   });
-  isRotatable = computed(() => this.selectedNode()?.rotatable);
-  isResizable = computed(() => this.selectedNode()?.resizable);
+  isRotatable = computed(() => this.selectedNode()?.rotatable ?? false);
+  isResizable = computed(() => this.selectedNode()?.resizable ?? false);
   isEnabled = computed(() => !!this.selectedNode());
 
-  onInput(value: string) {
-    this.modelService.updateNodeData<{ label: string }>(this.id(), {
+  onInput(event: Event) {
+    if (!this.selectedNode()) return;
+    const value = (event.target as HTMLInputElement).value;
+    this.modelService.updateNodeData<{ label: string }>(this.id()!, {
       label: value,
     });
   }
 
   onIsResizableChange(value: boolean) {
-    this.modelService.updateNode(this.id(), { resizable: value });
+    if (!this.selectedNode()) return;
+    this.modelService.updateNode(this.id()!, { resizable: value });
   }
 
   onIsRotatableChange(value: boolean) {
-    this.modelService.updateNode(this.id(), { rotatable: value });
+    if (!this.selectedNode()) return;
+    this.modelService.updateNode(this.id()!, { rotatable: value });
   }
 }

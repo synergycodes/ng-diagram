@@ -1,3 +1,4 @@
+// @section-start
 import { Component, computed, input } from '@angular/core';
 import {
   BaseEdgeLabelComponent,
@@ -6,7 +7,6 @@ import {
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
 
-// @section-start
 const LABEL_COUNT = 10;
 const ANIMATION_DURATION = 0.5;
 

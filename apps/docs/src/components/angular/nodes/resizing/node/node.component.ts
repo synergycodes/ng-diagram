@@ -1,3 +1,4 @@
+// @section-start
 import { Component, input } from '@angular/core';
 import {
   NgDiagramNodeResizeAdornmentComponent,
@@ -6,7 +7,6 @@ import {
   type Node,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
   // @mark-substring:NgDiagramNodeResizeAdornmentComponent
   imports: [NgDiagramNodeResizeAdornmentComponent],

@@ -32,8 +32,10 @@ const model = initializeModel({
   ],
   edges: [
     {
-      id: 'edge-1',
+      id: '1',
       source: '1',
+      sourcePort: 'port-right',
+      targetPort: 'port-left',
       target: '2',
       data: {},
     },
@@ -87,8 +89,10 @@ const model = initializeModel({
   ],
   edges: [
     {
-      id: 'edge-1',
+      id: '1',
       source: '1',
+      sourcePort: 'port-right',
+      targetPort: 'port-left',
       target: '2',
       data: { label: 'Connection', style: 'solid' } as CustomEdgeData,
     },
@@ -256,19 +260,25 @@ const nodesInRange = this.modelService.getNodesInRange({ x: 150, y: 150 }, 100);
 Save and restore your diagram state:
 
 ```typescript
-// Export model to JSON
-const jsonString = this.modelService.toJSON();
+// Angular injector placed in component to initialize model from saved state
+private injector = inject(Injector);
 
-// Store in localStorage
-localStorage.setItem('diagram-state', jsonString);
+saveModel() {
+  // Export model to JSON
+  const jsonString = this.modelService.toJSON();
 
-// Load from localStorage
-const savedState = localStorage.getItem('diagram-state');
-if (savedState) {
-  const parsedModel = JSON.parse(savedState);
+  // Store in localStorage
+  localStorage.setItem('diagram-state', jsonString);
+}
 
-  // Create new model from saved state
-  this.model = initializeModel(parsedModel);
+openModel() {
+  // Load from localStorage
+  const savedState = localStorage.getItem('diagram-state');
+  if (savedState) {
+    const parsedModel = JSON.parse(savedState);
+    // Create new model from saved state
+    this.model = initializeModel(parsedModel, this.injector);
+  }
 }
 ```
 

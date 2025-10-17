@@ -17,4 +17,4 @@ import { ContextMenuService } from './menu/menu.service';
   ],
   providers: [ContextMenuService, NgDiagramModelService, provideNgDiagram()],
 })
-export class ContextMenuWrapperComponent {}
+export class DiagramWrapperComponent {}
