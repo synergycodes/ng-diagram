@@ -32,8 +32,10 @@ const model = initializeModel({
   ],
   edges: [
     {
-      id: 'edge-1',
+      id: '1',
       source: '1',
+      sourcePort: 'port-right',
+      targetPort: 'port-left',
       target: '2',
       data: {},
     },
@@ -87,8 +89,10 @@ const model = initializeModel({
   ],
   edges: [
     {
-      id: 'edge-1',
+      id: '1',
       source: '1',
+      sourcePort: 'port-right',
+      targetPort: 'port-left',
       target: '2',
       data: { label: 'Connection', style: 'solid' } as CustomEdgeData,
     },
