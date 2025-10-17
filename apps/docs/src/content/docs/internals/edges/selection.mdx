@@ -3,7 +3,6 @@ title: Selection
 description: Understanding how edge selection works in ngDiagram
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
 import CustomEdgeSelection from '@components/angular/edges/edge-selection/custom-edge/custom-edge.astro';
 import CustomSelection from '@components/angular/edges/edge-selection/custom/custom.astro';
 import DefaultEdgeSelection from '@components/angular/edges/edge-selection/default/default.astro';
@@ -12,7 +11,7 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 The **edge selection** feature in ngDiagram allows users to select edges on the diagram canvas.
 Selected edges are visually highlighted, making it easier to identify and interact with connections between nodes.
 
-## How Edge Selection Works
+## How It Works
 
 - Edges can be selected by clicking on them.
 - The selected state is managed by ngDiagram and can be accessed via the edge's `selected` property.
@@ -25,7 +24,7 @@ The default edge template automatically highlights selected edges.
 
 <DefaultEdgeSelection />
 
-## Customizing Default Selection Styles
+## Customizing Defaults
 
 You can customize edge selection styles.
 
@@ -61,30 +60,10 @@ When an edge is selected, the `NgDiagramBaseEdgeComponent` automatically adds th
 
 More informaction about CSS variables and styling can be found in the [Edges Customization](/docs/internals/edges/edges/#styling-default-edges-with-css-variables) section.
 
-### Alternative: Dynamic Styling with Computed Properties
+### Alternative: Dynamic Styling
 
-<LinkCard
-  title="Dynamic Edge Styling"
-  href="/docs/internals/edges/edges/#dynamic-styling-with-computed-properties"
-  description="Dynamic Styling with Computed Properties"
-/>
+[Dynamic Edge Styling →](/docs/internals/edges/edges/#dynamic-styling)
 
 ## Further Reading
 
-<LinkCard
-  title="Edges Overview"
-  href="/docs/internals/edges/edges"
-  description="General overview of edges in ngDiagram"
-/>
-
-<LinkCard
-  title="Custom Edges"
-  href="/docs/internals/edges/custom-edges"
-  description="Create edges with custom rendering and behavior"
-/>
-
-<LinkCard
-  title="Edge Labels"
-  href="/docs/internals/edges/labels"
-  description="Add labels and interactive elements to edges"
-/>
+[Edges Overview →](/docs/internals/edges/edges) | [Custom Edges →](/docs/internals/edges/custom-edges) | [Edge Labels →](/docs/internals/edges/labels)

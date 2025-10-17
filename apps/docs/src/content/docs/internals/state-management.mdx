@@ -97,7 +97,7 @@ const model = initializeModel({
 });
 ```
 
-## Accessing the Model Service
+## Model Service
 
 The `NgDiagramModelService` provides a reactive interface to interact with your diagram's state. It becomes available once you register `provideNgDiagram()` and can then be injected into your components.
 
@@ -115,7 +115,7 @@ export class MyComponent {
 }
 ```
 
-### Accessing Reactive Data
+### Reactive Data
 
 The model service provides reactive signals for nodes, edges, and metadata:
 
@@ -338,11 +338,11 @@ this.modelService.updateNode('3', { position: { x: 300, y: 300 } });
 
 The state management system provides a robust foundation for building dynamic diagrams that can respond to user interactions and external data changes while maintaining excellent performance and type safety.
 
-## Creating Custom Model Implementations
+## Custom Models
 
 The `NgDiagramComponent` accepts any object that implements the `ModelAdapter` interface, which means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by `initializeModel`. This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
 
-### Understanding the ModelAdapter Interface
+### ModelAdapter Interface
 
 The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/other/modeladapter/). The key methods include data access (`getNodes`, `getEdges`, `getMetadata`), data modification (`updateNodes`, `updateEdges`, `updateMetadata`), change notification system (`onChange`, `unregisterOnChange`), and lifecycle management (`destroy`, `undo`, `redo`, `toJSON`).
 
@@ -352,11 +352,11 @@ For a complete example of implementing a custom model adapter, see the [Custom M
 
 Custom model implementations enable several advanced scenarios:
 
-#### **Real-time Collaboration**
+#### Real-time Collaboration
 
 Multi-user collaboration requires synchronizing diagram changes across different clients in real-time. A collaborative model adapter would typically integrate with WebSocket connections, services like Socket.IO or libraries like Yjs to broadcast changes and apply remote updates while handling conflict resolution.
 
-#### **State Management Integration**
+#### State Management Integration
 
 When working with complex Angular applications that use state management libraries like NgRx or Akita, you can create model adapters that integrate seamlessly with your existing store architecture. These adapters would dispatch actions for diagram changes and subscribe to state selections, ensuring that diagram data follows your application's established data flow patterns and benefits from features like time-travel debugging and state persistence.
 

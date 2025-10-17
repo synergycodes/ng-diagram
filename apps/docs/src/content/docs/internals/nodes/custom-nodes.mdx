@@ -5,7 +5,6 @@ sidebar:
   order: 3
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -19,14 +18,9 @@ You can create a custom node by extending `NgDiagramNodeTemplate` and implementi
 
 <CustomNode />
 
-<LinkCard
-  icon="list-format"
-  title="Custom Node Example"
-  href="/docs/examples/custom-node"
-  description="For more comprehensive example please check here."
-/>
+[Custom Node Example →](/docs/examples/custom-node)
 
-## Registering Custom Node Types
+## Registration
 
 To register a custom node, you need to add it to the `nodeTemplateMap`.
 
@@ -38,7 +32,7 @@ After registering, you need to pass the map to the `ngDiagram` component.
 
 <CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="usage" />
 
-## Setting the Proper Type for the Node
+## Setting Node Type
 
 Assigning the `type` property as `myType` for the node allows you to precisely control which template is used to render each node.
 
@@ -51,7 +45,7 @@ This approach makes your diagram highly extensible and flexible, as you can easi
 Above component receives the node data as input and provides its own template and styles for rendering.
 In the example, the node displays a header and some content, but you can fully customize its appearance and behavior.
 
-## Using Node Definition Properties
+## Node Properties
 
 By using this approach—creating custom node components that implement NgDiagramNodeTemplate and receive the node data as input—you gain full access to the Node definition and all its properties.
 This means your custom node can leverage any property defined in the Node interface, such as:
@@ -75,12 +69,7 @@ interface SimpleNode<T = any> {
 }
 ```
 
-<LinkCard
-  icon="list-format"
-  title="Node API"
-  href="/docs/api/types/node"
-  description="See detailed node properties reference"
-/>
+[Node API →](/docs/api/types/node)
 
 ## Handling Interactive Elements
 
@@ -94,7 +83,7 @@ When adding interactive elements like inputs to your custom nodes, dragging on t
 <input type="text" data-no-pan="true" data-no-drag="true" placeholder="Type here" />
 ```
 
-## Extending with NgDiagram Functionalities
+## Adding Features
 
 We also expose advanced behaviors like resizing, rotating, or customizing ports, enhancing the user experience with minimal effort.
 
@@ -102,23 +91,4 @@ Integrating these functionalities is straightforward simply place the correspond
 
 As a result, your custom nodes are not only visually flexible, but also deeply integrated with the diagram's data model, making them powerful and adaptable for complex scenarios.
 
-<LinkCard
-  icon="list-format"
-  title="Resizing"
-  href="/docs/internals/nodes/resizing"
-  description="Resizing functionality for your Custom Node"
-/>
-
-<LinkCard
-  icon="list-format"
-  title="Rotating"
-  href="/docs/internals/nodes/rotation"
-  description="Rotation functionality for your Custom Node"
-/>
-
-<LinkCard
-  icon="list-format"
-  title="Custom Ports"
-  href="/docs/internals/nodes/ports"
-  description="Custom ports in your Custom Node"
-/>
+[Resizing →](/docs/internals/nodes/resizing) | [Rotating →](/docs/internals/nodes/rotation) | [Custom Ports →](/docs/internals/nodes/ports)
