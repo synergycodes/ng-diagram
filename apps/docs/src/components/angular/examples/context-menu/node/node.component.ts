@@ -31,7 +31,10 @@ export class NodeComponent implements NgDiagramNodeTemplate<{ name: string }> {
 
     if (this.node()) {
       // Additionally selects the node on right click
-      this.selectionService.select([this.node().id]);
+      const selectedNodes = this.selectionService.selection().nodes;
+      if (!selectedNodes.some((n) => n.id === this.node().id)) {
+        this.selectionService.select([this.node().id]);
+      }
 
       const cursorPosition = this.viewportService.clientToFlowViewportPosition({
         x: event.clientX,
