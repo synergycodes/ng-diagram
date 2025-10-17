@@ -9,13 +9,13 @@ import { Aside } from '@astrojs/starlight/components';
 
 A comprehensive overview of ngDiagram's core concepts, helping you understand the library's capabilities without reading the entire documentation.
 
-## Creating Your First Diagram
+## Getting Started
 
 The simplest way to start is by installing the library, importing the required styles, and creating a component with the [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) and [`provideNgDiagram()`](/docs/api/functions/providengdiagram) in its providers. The diagram component needs a model with nodes and edges to display.
 
 [Quick Start Guide](/docs/intro/quick-start) for step-by-step setup
 
-## Model and Data Management
+## Model & Data
 
 ngDiagram uses a reactive model to manage diagram state. You initialize the model with nodes and edges, each having required properties like ID and position. The model is the single source of truth for your diagram's data.
 
@@ -35,7 +35,7 @@ You can also implement custom model adapters to connect to external data sources
   Never modify nodes or edges directly. Always use services to update the model to maintain reactivity.
 </Aside>
 
-## Service Isolation and Multiple Instances
+## Service Isolation
 
 Every diagram requires [`provideNgDiagram()`](/docs/api/other/providengdiagram) in its component's providers array, which supplies all necessary services with proper scope isolation. This architecture allows you to have multiple independent diagrams on the same page, each with its own state and services.
 
@@ -48,7 +48,7 @@ Every diagram requires [`provideNgDiagram()`](/docs/api/other/providengdiagram) 
 
 [Architecture Documentation →](/docs/intro/architecture)
 
-## Nodes - Building Blocks
+## Nodes
 
 ngDiagram provides default nodes that work out of the box with built-in features like selection, dragging, and ports. Default nodes display a label and have standard connection points.
 
@@ -72,7 +72,7 @@ For specific requirements, you can create custom nodes with any Angular template
 
 [Nodes Documentation →](/docs/internals/nodes/nodes) | [Custom Nodes →](/docs/internals/nodes/custom-nodes)
 
-## Groups - Organizing Nodes
+## Groups
 
 Groups are special nodes that can contain other nodes, helping organize complex diagrams into logical sections. They support nesting and group-aware interactions.
 
@@ -85,7 +85,7 @@ Groups are special nodes that can contain other nodes, helping organize complex 
 
 [Groups Documentation →](/docs/internals/nodes/groups)
 
-## Edges - Connections
+## Edges
 
 Edges connect nodes through ports. Default edges automatically calculate paths between nodes and support different routing algorithms. Like nodes, you can create custom edge templates for specialized visualizations.
 
@@ -98,7 +98,7 @@ Edges connect nodes through ports. Default edges automatically calculate paths b
 
 [Edges Documentation →](/docs/internals/edges/edges) | [Custom Edges →](/docs/internals/edges/custom-edges)
 
-## Ports - Connection Points
+## Ports
 
 Ports define where edges can connect to nodes. Default nodes have two ports (left and right), but you can define custom ports with specific positions and connection rules in custom node templates.
 
@@ -112,7 +112,7 @@ Ports define where edges can connect to nodes. Default nodes have two ports (lef
 
 [Ports Documentation →](/docs/internals/nodes/ports)
 
-## Viewport - Working Area
+## Viewport
 
 The viewport is the interactive space where all diagram elements are rendered and manipulated. It determines what part of the diagram is visible and supports navigation and scaling.
 
@@ -137,7 +137,7 @@ Custom edges can display labels for showing information along connections. You c
 
 [Labels Documentation →](/docs/internals/edges/labels) | [Arrowheads →](/docs/internals/edges/arrowheads)
 
-## Interactions - Resize, Rotate, Selection
+## Interactions
 
 Nodes can be configured for different interaction modes. Enable resizing to allow users to change node dimensions, rotation for angular adjustments. Selection state is tracked automatically, but custom components need to implement visual feedback.
 
@@ -172,7 +172,7 @@ Most diagram behavior is configurable through the config object passed to the di
 - `zIndex` - Layer management for selected elements and edge-node relationships
 - `zoom` - Min/max zoom levels and zoom step
 
-## Services - Programmatic Control
+## Services
 
 ngDiagram provides injectable services for all diagram operations. Services are the only way to safely update the model and control diagram behavior programmatically.
 
@@ -223,7 +223,7 @@ Set routing per edge with the `routing` property, or globally through configurat
 
 [Routing Documentation →](/docs/internals/edges/routing)
 
-## Palette - Drag to Create
+## Palette
 
 The palette system enables drag-and-drop node creation. Build your own palette container using the provided components to let users drag items onto the diagram.
 

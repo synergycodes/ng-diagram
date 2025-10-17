@@ -15,7 +15,7 @@ Edge routing determines how connections between nodes are drawn in your diagram.
 
 Routing algorithms automatically calculate optimal paths, with an option to provide predefined waypoints for static edge paths.
 
-## Built-in Routing Algorithms
+## Built-in Algorithms
 
 NgDiagram includes three routing algorithms:
 
@@ -35,7 +35,7 @@ import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 <Routing />
 
-## How to Use Routing
+## Using Routing
 
 To specify a routing algorithm for an edge, set the `routing` property in the edge data:
 
@@ -86,7 +86,7 @@ import ManualMode from '@components/angular/edges/routing/manual/manual-mode.ast
 
 This is useful for creating custom edge behaviors, fixed connection paths, or implementing your own edge update logic.
 
-## Routing Configuration
+## Configuration
 
 You can configure routing behavior globally through the diagram's configuration:
 
@@ -96,7 +96,7 @@ You can configure routing behavior globally through the diagram's configuration:
 
 NgDiagram's routing system is extensible. You can create custom routing algorithms by implementing the `EdgeRouting` interface, or by creating custom edge components that generate their own paths using manual mode.
 
-### Using Manual Mode for Custom Routing
+### Manual Mode Approach
 
 You can create dynamic custom paths by computing points in your edge component and using manual routing mode. Here's an example of a sinusoid edge that updates its path dynamically as nodes move:
 
@@ -108,7 +108,7 @@ import Sinusoid from '@components/angular/edges/routing/sinusoid/sinusoid.astro'
 
 This approach is ideal when you want the path to update automatically based on node positions and when you just need to compute points - the SVG path can be computed by a built-in routing algorithm (in this case, polyline was sufficient).
 
-### Implementing the EdgeRouting Interface
+### EdgeRouting Interface
 
 For more control and reusability across different edge types, you can create a custom routing algorithm by implementing the `EdgeRouting` interface:
 

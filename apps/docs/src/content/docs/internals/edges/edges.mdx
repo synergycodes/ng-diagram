@@ -57,7 +57,7 @@ import DefaultEdge from '@components/angular/edges/edges/default-edge/default-ed
 
 <CodeSnippet relativePath="edges/edges/default-edge/diagram.component.ts" />
 
-#### Styling Default Edges with CSS Variables
+#### CSS Variables
 
 Default edges can be styled using CSS variables. You can customize these in your global styles:
 
@@ -103,7 +103,7 @@ The base edge component exposes these classes for styling:
 
 See [Edge Selection](/docs/internals/edges/selection) for more details on customizing selection styles.
 
-### Dynamic Styling with Computed Properties
+### Dynamic Styling
 
 For complex or programmatic styling, you can use computed properties with the base edge inputs:
 
@@ -137,11 +137,11 @@ import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 [Routing →](/docs/internals/edges/routing)
 
-## Creating Edges Through User Interaction
+## User-Created Edges
 
 When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created. This is done through the `linking` configuration in your diagram's config.
 
-### Customizing Edge Creation
+### Customization
 
 The `linking` configuration provides two builder functions:
 

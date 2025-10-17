@@ -11,19 +11,19 @@ Rotatable nodes display a rotation handle that users can drag to change the node
 
 The rotation is reflected in the node's appearance and can be used to create various diagrams.
 
-## How Rotation Works
+## How It Works
 
 - Nodes can be rotated by dragging the rotation handle.
 - The rotation angle is stored in the node's `angle` property.
 - Rotation can be enabled per node and configured globally via diagram config.
 
-## Adding Rotation Adornment to a Custom Node
+## Custom Node Setup
 
 To make a custom node rotatable, include `<ng-diagram-node-rotate-adornment />` in your node template and import the `NgDiagramNodeRotateAdornmentComponent` reference.
 
 <CodeSnippet relativePath="nodes/rotation/node/node.component.ts" />
 
-## Enabling Rotation for a Node
+## Enabling Rotation
 
 Enable rotation by setting the `rotatable` property to `true` in your node definition:
 
@@ -31,9 +31,9 @@ Enable rotation by setting the `rotatable` property to `true` in your node defin
 
 When `rotatable` is set, the rotation handle will appear, and the node can be rotated by the user.
 
-## Customizing the Rotate Handle
+## Customization
 
-### Styling the Rotate Handle
+### Rotate Handle
 
 Here are the CSS variables you can use to style the rotation handle:
 
@@ -64,7 +64,7 @@ The content you provide will be rendered inside the handle.
 
 If you do not provide any content inside `<ng-diagram-node-rotate-adornment>`, the component will automatically display its built-in default rotation icon.
 
-## Configuring Rotation via Diagram Config
+## Configuration
 
 You can further customize rotation behavior using the `nodeRotation` configuration in `NgDiagramConfig`.
 This configuration allows you to control snapping and snap angles for node rotation:

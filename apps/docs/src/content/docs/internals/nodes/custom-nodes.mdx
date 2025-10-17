@@ -20,7 +20,7 @@ You can create a custom node by extending `NgDiagramNodeTemplate` and implementi
 
 [Custom Node Example →](/docs/examples/custom-node)
 
-## Registering Custom Node Types
+## Registration
 
 To register a custom node, you need to add it to the `nodeTemplateMap`.
 
@@ -32,7 +32,7 @@ After registering, you need to pass the map to the `ngDiagram` component.
 
 <CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="usage" />
 
-## Setting the Proper Type for the Node
+## Setting Node Type
 
 Assigning the `type` property as `myType` for the node allows you to precisely control which template is used to render each node.
 
@@ -45,7 +45,7 @@ This approach makes your diagram highly extensible and flexible, as you can easi
 Above component receives the node data as input and provides its own template and styles for rendering.
 In the example, the node displays a header and some content, but you can fully customize its appearance and behavior.
 
-## Using Node Definition Properties
+## Node Properties
 
 By using this approach—creating custom node components that implement NgDiagramNodeTemplate and receive the node data as input—you gain full access to the Node definition and all its properties.
 This means your custom node can leverage any property defined in the Node interface, such as:
@@ -83,7 +83,7 @@ When adding interactive elements like inputs to your custom nodes, dragging on t
 <input type="text" data-no-pan="true" data-no-drag="true" placeholder="Type here" />
 ```
 
-## Extending with NgDiagram Functionalities
+## Adding Features
 
 We also expose advanced behaviors like resizing, rotating, or customizing ports, enhancing the user experience with minimal effort.
 

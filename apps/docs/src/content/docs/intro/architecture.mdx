@@ -22,7 +22,7 @@ This unidirectional flow ensures predictable behavior and makes debugging straig
 
 ## Architecture Layers
 
-### 1. Components Layer
+### Components Layer
 
 The user-facing components that render the diagram and handle user interactions:
 
@@ -35,7 +35,7 @@ The user-facing components that render the diagram and handle user interactions:
 - [**base-edge-label**](/docs/api/components/baseedgelabelcomponent): Base component for creating custom edge labels with consistent styling and positioning
 - [**ng-diagram-port**](/docs/api/components/ngdiagramportcomponent): Port component that defines connection points on nodes for edge connections
 
-### 2. Service Layer
+### Service Layer
 
 Specialized services provide different levels of control and functionality:
 
@@ -49,7 +49,7 @@ Specialized services provide different levels of control and functionality:
 
 All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior. Learn more in the [Services documentation](/docs/intro/services).
 
-### 3. Event Layer
+### Event Layer
 
 The event layer captures user interactions and translates them into commands that modify the diagram state:
 
@@ -59,7 +59,7 @@ The event layer captures user interactions and translates them into commands tha
 
 Supported interactions include: selection, panning, zooming, node movement, resizing, rotation, edge creation (linking), clipboard operations (copy/paste/cut), and palette item drops.
 
-### 4. Command System
+### Command System
 
 Commands provide precise, structured instructions for state changes in the diagram. After events are processed, handlers emit commands that represent the intended operation:
 
@@ -70,7 +70,7 @@ Commands provide precise, structured instructions for state changes in the diagr
 
 The command system acts as the bridge between user interactions (events) and state changes (model updates), ensuring all modifications go through a controlled, predictable pipeline.
 
-### 5. Middleware System
+### Middleware System
 
 Middleware intercepts commands before they reach the model, enabling behavior extension without modifying core code:
 
@@ -81,7 +81,7 @@ Middleware intercepts commands before they reach the model, enabling behavior ex
 
 Learn more in the [Middlewares documentation](/docs/internals/middlewares).
 
-### 6. Data Model
+### Data Model
 
 The foundation that stores diagram state and provides the data layer:
 

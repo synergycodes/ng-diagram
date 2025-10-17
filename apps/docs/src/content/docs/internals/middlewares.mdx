@@ -56,7 +56,7 @@ Use **`next()`** to continue to the next middleware, optionally passing state up
 
 ## Managing Middlewares
 
-### Registering Middlewares at the Start
+### Initial Registration
 
 The primary way to configure middlewares is using the `createMiddlewares` helper and passing them to the `<ng-diagram>` component:
 
@@ -85,7 +85,7 @@ export class MyDiagramComponent {
 }
 ```
 
-### Registering Middlewares at Runtime
+### Runtime Registration
 
 You can also register and unregister middlewares dynamically using the `NgDiagramService`. **Note**: This can only be done when the diagram is initialized, which you can check using `isInitialized` signal:
 
@@ -152,7 +152,7 @@ export const myMiddleware: Middleware = {
 };
 ```
 
-### Example: Custom Middleware
+### Example
 
 For a complete example of creating custom middleware, see the [Custom Middleware example](/examples/custom-middleware/) which demonstrates how to implement a read-only mode middleware that prevents certain operations while allowing others.
 
