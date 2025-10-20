@@ -152,9 +152,9 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     effect(() => {
       const model = this.model();
       if (this.initializedModel != model) {
-        this.flowCoreProvider.destroy();
         // Angular 18 backward compatibility
         untracked(() => {
+          this.flowCoreProvider.destroy();
           this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
         });
 
