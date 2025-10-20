@@ -81,7 +81,7 @@ The `grouping` configuration in `NgDiagramConfig` lets you control advanced grou
 ```typescript {3,6}
 config = {
   resize: {
-    getMinNodeSize: (node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
+    getMinNodeSize: (node: Node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
   },
   grouping: {
     canGroup: (node: Node, group: Node) => true,

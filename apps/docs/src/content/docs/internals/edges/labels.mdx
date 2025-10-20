@@ -34,13 +34,47 @@ import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-
 
 <AddingLabels />
 
-**Edge component**
+The edge component implementation looks like this:
 
-<CodeSnippet relativePath="edges/labels/adding-labels/modifiable-label-edge.component.ts" />
+```typescript
+import { Component, computed, input } from '@angular/core';
+import { BaseEdgeLabelComponent, NgDiagramBaseEdgeComponent, type Edge, type NgDiagramEdgeTemplate } from 'ng-diagram';
 
-**Label Panel**
+@Component({
+  selector: 'multi-label-edge',
+  template: `<ng-diagram-base-edge
+    [edge]="edge()"
+    [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
+  >
+    <ng-diagram-base-edge-label id="1" [positionOnEdge]="0.5" class="custom-label">
+      {{ edge().data.label }}
+    </ng-diagram-base-edge-label>
+  </ng-diagram-base-edge>`,
+  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+})
+export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate<{ label: string }> {
+  edge = input.required<Edge<{ label: string }>>();
 
-<CodeSnippet relativePath="edges/labels/adding-labels/label-panel.component.ts" />
+  selected = computed(() => this.edge().selected);
+}
+```
+
+In the diagram model, the edge can be defined like this:
+
+```typescript
+...
+edges: [
+        {
+          id: '1',
+          source: '1',
+          sourcePort: 'port-right',
+          target: '2',
+          targetPort: 'port-left',
+          data: { label: 'Label text...' },
+        }
+]
+...
+```
 
 ## Handling Interactive Elements in Labels
 

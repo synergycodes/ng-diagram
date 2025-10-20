@@ -6,8 +6,8 @@ sidebar:
   label: Context Menu
 ---
 
-import ContextMenu from '../../../components/angular/examples/context-menu/context-menu.astro';
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import ContextMenu from '../../../components/angular/examples/context-menu/context-menu.astro';
 
 This example demonstrates how to implement a context menu that adapts its options based on the context—showing node-specific actions when a node is right-clicked, and diagram-wide actions otherwise.
 
@@ -76,17 +76,19 @@ Nodes handle right-click events to show the context menu and select the node. Th
 
 ```typescript
 onRightClick(event: MouseEvent) {
-  event.preventDefault();
-  event.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-  if (this.node()) {
-    // Additionally selects the node on right click
-    this.selectionService.select([this.node().id]);
+    if (this.node()) {
+      this.selectionService.select([this.node().id]);
 
-    const cursorPosition = this.viewportService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
-    this.contextMenuService.showMenu(cursorPosition);
+      const cursorPosition = this.viewportService.clientToFlowViewportPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      this.contextMenuService.showMenu(cursorPosition);
+    }
   }
-}
 ```
 
 ### Diagram Right-Click Handling
@@ -95,12 +97,15 @@ Right-clicking the diagram background shows the diagram-wide menu, also using vi
 
 ```typescript
 onDiagramRightClick(event: MouseEvent) {
-  event.preventDefault();
-  event.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-  const cursorPosition = this.viewportService.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
-  this.contextMenuService.showDiagramMenu(cursorPosition);
-}
+    const cursorPosition = this.viewportService.clientToFlowViewportPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+    this.contextMenuService.showDiagramMenu(cursorPosition);
+  }
 ```
 
 ## Actions

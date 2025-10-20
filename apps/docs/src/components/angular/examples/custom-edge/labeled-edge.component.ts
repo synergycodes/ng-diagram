@@ -10,13 +10,12 @@ const STROKE_WIDTH_DEFAULT = 2;
 const STROKE_WIDTH_SELECTED = 4;
 
 @Component({
-  selector: 'labeled-edge',
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
     stroke="orange"
     [strokeWidth]="strokeWidth()"
   >
-    <ng-diagram-base-edge-label id="test-label" positionOnEdge="0.5">
+    <ng-diagram-base-edge-label id="test-label" [positionOnEdge]="0.5">
       <button
         style="white-space: nowrap; padding: 4px 8px;"
         (click)="onButtonClick()"

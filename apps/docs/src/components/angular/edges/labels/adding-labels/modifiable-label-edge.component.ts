@@ -1,3 +1,4 @@
+// @section-start
 import { Component, computed, input } from '@angular/core';
 import {
   BaseEdgeLabelComponent,
@@ -6,7 +7,6 @@ import {
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
   selector: 'multi-label-edge',
   template: `<ng-diagram-base-edge
