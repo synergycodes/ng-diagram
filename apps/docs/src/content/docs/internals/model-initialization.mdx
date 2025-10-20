@@ -13,7 +13,7 @@ handle dynamic data loading and model switching.
 There are various scenarios when and how to initialize a model, depending on your application's requirements and data flow.
 For comprehensive information about state management patterns and model operations, see [State Management](/docs/internals/state-management/).
 
-## Understanding Model Initialization
+## Model Initialization
 
 The `initializeModel` function is the primary way to create a model for use in ngDiagram.
 It creates a model instance that wraps your diagram data and provides reactive state management.
@@ -96,12 +96,12 @@ export class MyComponent {
   **Important**: When you reinitialize a model, all previous model references become invalid.
 </Aside>
 
-## Initialization Timing and Event Handling
+## Timing and Events
 
 When a model is reinitialized, the diagram goes through a complete initialization process. All nodes and edges need to be measured and positioned before the diagram is fully ready.
 You need to wait for this process to complete before performing operations on the model.
 
-### Understanding the Initialization Process
+### Initialization Process
 
 The initialization process involves several steps:
 
@@ -115,7 +115,7 @@ The initialization process involves several steps:
 
 There are three main ways to detect when the diagram is fully initialized:
 
-#### 1. Using the diagramInit Event
+#### Using the diagramInit Event
 
 The most convenient way is to listen for the `diagramInit` event from the `ng-diagram` component:
 
@@ -146,7 +146,7 @@ export class MyComponent {
 <ng-diagram [model]="model" (diagramInit)="onDiagramInit($event)"> </ng-diagram>
 ```
 
-#### 2. Using the isInitialized Signal
+#### Using the isInitialized Signal
 
 You can also check the `isInitialized` signal from `NgDiagramService`:
 
@@ -165,7 +165,7 @@ export class MyComponent {
 }
 ```
 
-#### 3. Using Event Listener Registration
+#### Using Event Listener Registration
 
 For more advanced scenarios, you can register event listeners programmatically:
 
@@ -210,7 +210,7 @@ this.model = initializeModel(newData, this.injector);
 // Wait for onDiagramInit() to be called, then perform operations
 ```
 
-### Use Transactions for Post-Initialization Operations
+### Use Transactions
 
 When performing multiple operations after initialization, wrap them in a transaction:
 

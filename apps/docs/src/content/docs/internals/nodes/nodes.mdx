@@ -5,7 +5,6 @@ sidebar:
   order: 0
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Nodes are the fundamental building blocks of a diagram in ngDiagram.
@@ -20,12 +19,7 @@ interface Node<T = any> {
 }
 ```
 
-<LinkCard
-  icon="list-format"
-  title="Node API"
-  href="/docs/api/types/node"
-  description="See detailed node properties reference"
-/>
+[Node API Reference →](/docs/api/types/node)
 
 ## Adding Nodes to a Diagram
 
@@ -59,19 +53,13 @@ import RotatableResizableNode from '@components/angular/nodes/nodes/rotatable-re
 
 <CodeSnippet relativePath="nodes/nodes/rotatable-resizable-node/diagram.component.ts" />
 
-<LinkCard icon="list-format" title="Resizing" href="/docs/nodes/resizing" description="Learn about node resizing" />
-
-<LinkCard icon="list-format" title="Rotation" href="/docs/nodes/rotation" description="Learn about node rotation" />
+[Resizing →](/docs/internals/nodes/resizing) | [Rotation →](/docs/internals/nodes/rotation)
 
 ### Ports
 
 Every node can expose one or more **ports**, which define the connection points for edges. By convention, the default node includes a single input and a single output port, but you can customize the number, placement, and appearance of ports in your own node templates.
 
-<LinkCard
-  title="Ports"
-  href="/docs/internals/nodes/ports"
-  description="Read more about ports and how they work in ngDiagram"
-/>
+[Ports →](/docs/internals/nodes/ports)
 
 ### Customization
 
@@ -83,13 +71,9 @@ import DefaultNode from '@components/angular/nodes/nodes/default-node/default-no
 
 <CodeSnippet relativePath="nodes/nodes/default-node/diagram.component.ts" />
 
-For deeper customization, you can also define your own node templates, giving you full control over the node’s structure and behavior.
+For deeper customization, you can also define your own node templates, giving you full control over the node's structure and behavior.
 
-<LinkCard
-  title="Custom Nodes"
-  href="/docs/internals/nodes/custom-nodes"
-  description="Provide your nodes with unique styles and behaviors"
-/>
+[Custom Nodes →](/docs/internals/nodes/custom-nodes)
 
 ## Position
 

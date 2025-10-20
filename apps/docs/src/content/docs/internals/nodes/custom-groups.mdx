@@ -5,8 +5,6 @@ sidebar:
   order: 4
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
-
 You can create custom group templates, similar to custom nodes.
 All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
 Remember that in your diagram model, the group node must have `isGroup: true` set to function as a group.
@@ -31,21 +29,11 @@ export class CustomGroupComponent implements NgDiagramGroupNodeTemplate {
 
 Register your custom group in the `nodeTemplateMap` and assign its `type` to the group node.
 
-<LinkCard
-  icon="list-format"
-  title="Registering Custom Types"
-  href="/docs/internals/nodes/custom-nodes/#registering-custom-node-types"
-  description="Check how to register Custom Group"
-/>
+[Registering Custom Types →](/docs/internals/nodes/custom-nodes/#registering-custom-node-types)
 
 ## Resizing Custom Group
 
-<LinkCard
-  icon="list-format"
-  title="Resizing"
-  href="/docs/internals/nodes/resizing"
-  description="Resizing Custom Group"
-/>
+[Resizing →](/docs/internals/nodes/resizing)
 
 ## Highlighting Custom Group
 
@@ -75,15 +63,4 @@ Children retain their global orientation and position.
 
 ## See Also
 
-<LinkCard
-  icon="list-format"
-  title="Groups"
-  href="/docs/internals/nodes/groups"
-  description="Learn about default group functionality"
-/>
-<LinkCard
-  icon="list-format"
-  title="Custom Nodes"
-  href="/docs/internals/nodes/custom-nodes"
-  description="Create custom node templates"
-/>
+[Groups →](/docs/internals/nodes/groups) | [Custom Nodes →](/docs/internals/nodes/custom-nodes)
