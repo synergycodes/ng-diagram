@@ -45,8 +45,8 @@ export default defineConfig({
           autogenerate: { directory: 'intro' },
         },
         {
-          label: 'Internals',
-          autogenerate: { directory: 'internals' },
+          label: 'Guides',
+          autogenerate: { directory: 'guides' },
           collapsed: true,
         },
         {

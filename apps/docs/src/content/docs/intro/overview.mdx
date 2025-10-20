@@ -11,7 +11,7 @@ A comprehensive overview of ngDiagram's core concepts, helping you understand th
 
 ## Getting Started
 
-The simplest way to start is by installing the library, importing the required styles, and creating a component with the [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) and [`provideNgDiagram()`](/docs/api/functions/providengdiagram) in its providers. The diagram component needs a model with nodes and edges to display.
+The simplest way to start is by installing the library, importing the required styles, and creating a component with the [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) and [`provideNgDiagram()`](/docs/api/other/providengdiagram) in its providers. The diagram component needs a model with nodes and edges to display.
 
 [Quick Start Guide](/docs/intro/quick-start) for step-by-step setup
 
@@ -29,7 +29,7 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 
 You can also implement custom model adapters to connect to external data sources like databases or real-time services.
 
-[State Management →](/docs/internals/state-management) | [Custom Model Example →](/docs/examples/custom-model) | [Model initialization →](/docs/internals/model-initialization/)
+[State Management →](/docs/guides/state-management) | [Custom Model Example →](/docs/examples/custom-model) | [Model initialization →](/docs/guides/model-initialization/)
 
 <Aside type="caution">
   Never modify nodes or edges directly. Always use services to update the model to maintain reactivity.
@@ -70,7 +70,7 @@ ngDiagram provides default nodes that work out of the box with built-in features
 
 For specific requirements, you can create custom nodes with any Angular template, form controls, or visual elements you need.
 
-[Nodes Documentation →](/docs/internals/nodes/nodes) | [Custom Nodes →](/docs/internals/nodes/custom-nodes)
+[Nodes Documentation →](/docs/guides/nodes/nodes) | [Custom Nodes →](/docs/guides/nodes/custom-nodes)
 
 ## Groups
 
@@ -83,7 +83,7 @@ Groups are special nodes that can contain other nodes, helping organize complex 
 - Visual hierarchy
 - Group-aware dragging
 
-[Groups Documentation →](/docs/internals/nodes/groups)
+[Groups Documentation →](/docs/guides/nodes/groups)
 
 ## Edges
 
@@ -96,7 +96,7 @@ Edges connect nodes through ports. Default edges automatically calculate paths b
 - Custom edge templates
 - Selection and hover states
 
-[Edges Documentation →](/docs/internals/edges/edges) | [Custom Edges →](/docs/internals/edges/custom-edges)
+[Edges Documentation →](/docs/guides/edges/edges) | [Custom Edges →](/docs/guides/edges/custom-edges)
 
 ## Ports
 
@@ -110,7 +110,7 @@ Ports define where edges can connect to nodes. Default nodes have two ports (lef
 - Custom port positions and IDs in custom node templates
 - Visual hover indicators when dragging connections
 
-[Ports Documentation →](/docs/internals/nodes/ports)
+[Ports Documentation →](/docs/guides/nodes/ports)
 
 ## Viewport
 
@@ -135,7 +135,7 @@ Custom edges can display labels for showing information along connections. You c
 - Custom arrowhead designs
 - SVG-based customization for arrowheads
 
-[Labels Documentation →](/docs/internals/edges/labels) | [Arrowheads →](/docs/internals/edges/arrowheads)
+[Labels Documentation →](/docs/guides/edges/labels) | [Arrowheads →](/docs/guides/edges/arrowheads)
 
 ## Interactions
 
@@ -150,7 +150,7 @@ Nodes can be configured for different interaction modes. Enable resizing to allo
   - Custom edges: Use [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) or implement selection styles manually
   - Default templates have selection styles built-in
 
-[Selection →](/docs/internals/nodes/selection) | [Resizing →](/docs/internals/nodes/resizing) | [Rotation →](/docs/internals/nodes/rotation)
+[Selection →](/docs/guides/nodes/selection) | [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation)
 
 ## Configuration
 
@@ -221,7 +221,7 @@ Edges support multiple routing algorithms for different visual styles. You can c
 
 Set routing per edge with the `routing` property, or globally through configuration with `edgeRouting.defaultRouting`. For complete custom routing algorithms, use [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice#registerrouting).
 
-[Routing Documentation →](/docs/internals/edges/routing)
+[Routing Documentation →](/docs/guides/edges/routing)
 
 ## Palette
 
@@ -239,7 +239,7 @@ The palette system enables drag-and-drop node creation. Build your own palette c
 - Support for creating both regular nodes and group nodes
 - Visual feedback with live preview during drag
 
-[Palette Documentation →](/docs/internals/palette) | [Palette Example →](/docs/examples/custom-node)
+[Palette Documentation →](/docs/guides/palette) | [Palette Example →](/docs/examples/custom-node)
 
 ## Custom Middlewares
 
@@ -258,7 +258,7 @@ ngDiagram uses a middleware system that allows you to intercept and modify any s
   performance. Always test thoroughly and ensure your middleware properly passes through unhandled operations.
 </Aside>
 
-[Middleware Documentation →](/docs/internals/middlewares)
+[Middleware Documentation →](/docs/guides/middlewares)
 
 ## Styling System
 
