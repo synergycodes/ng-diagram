@@ -10,7 +10,7 @@ Understanding this system is essential for building dynamic, interactive diagram
 
 The model is the core data structure that holds all your diagram information including nodes, edges, and metadata.
 Use the `initializeModel` function to create a new model with initial data.
-For more information about model initialization scenarios and best practices, see [Model Initialization](/docs/internals/model-initialization/).
+For more information about model initialization scenarios and best practices, see [Model Initialization](/docs/guides/model-initialization/).
 
 ### Basic Model Creation
 
@@ -354,7 +354,7 @@ The `NgDiagramComponent` accepts any object that implements the `ModelAdapter` i
 
 ### ModelAdapter Interface
 
-The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/other/modeladapter/). The key methods include data access (`getNodes`, `getEdges`, `getMetadata`), data modification (`updateNodes`, `updateEdges`, `updateMetadata`), change notification system (`onChange`, `unregisterOnChange`), and lifecycle management (`destroy`, `undo`, `redo`, `toJSON`).
+The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/types/modeladapter/). The key methods include data access (`getNodes`, `getEdges`, `getMetadata`), data modification (`updateNodes`, `updateEdges`, `updateMetadata`), change notification system (`onChange`, `unregisterOnChange`), and lifecycle management (`destroy`, `undo`, `redo`, `toJSON`).
 
 For a complete example of implementing a custom model adapter, see the [Custom Model example](/docs/examples/custom-model/).
 

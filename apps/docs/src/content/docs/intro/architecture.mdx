@@ -65,7 +65,7 @@ Commands provide precise, structured instructions for state changes in the diagr
 
 - **Atomic Operations**: Each command represents a single, well-defined action (select, moveNode, addEdge, etc.)
 - **Command Emission**: Event handlers analyze user interactions and emit appropriate commands through the CommandHandler
-- **Transaction Support**: Commands can be grouped into [transactions](/docs/internals/transactions) for atomic execution, ensuring data consistency
+- **Transaction Support**: Commands can be grouped into [transactions](/docs/guides/transactions) for atomic execution, ensuring data consistency
 - **Extensible**: The system supports 40+ built-in commands and can be extended with custom commands
 
 The command system acts as the bridge between user interactions (events) and state changes (model updates), ensuring all modifications go through a controlled, predictable pipeline.
@@ -79,14 +79,14 @@ Middleware intercepts commands before they reach the model, enabling behavior ex
 - **Configurable**: Each middleware can be enabled/disabled and configured at runtime, providing flexibility
 - **Async Support**: Middlewares can perform asynchronous operations like API calls or validations
 
-Learn more in the [Middlewares documentation](/docs/internals/middlewares).
+Learn more in the [Middlewares documentation](/docs/guides/middlewares).
 
 ### Data Model
 
 The foundation that stores diagram state and provides the data layer:
 
-- **Nodes**: Visual elements with position, data, and behavior that represent entities in your diagram. See [Nodes documentation](/docs/internals/nodes/nodes) for details.
-- **Edges**: Connections between nodes with routing and styling that represent relationships. See [Edges documentation](/docs/internals/edges/edges) for details.
+- **Nodes**: Visual elements with position, data, and behavior that represent entities in your diagram. See [Nodes documentation](/docs/guides/nodes/nodes) for details.
+- **Edges**: Connections between nodes with routing and styling that represent relationships. See [Edges documentation](/docs/guides/edges/edges) for details.
 - **Metadata**: Viewport state, middleware configurations, and other settings that control diagram behavior
 
-The default Signal Model uses Angular signals for reactive state management, providing excellent performance and real-time updates. For advanced use cases, custom model adapters can integrate with external data sources like databases or APIs. Learn more in the [State Management documentation](/docs/internals/state-management).
+The default Signal Model uses Angular signals for reactive state management, providing excellent performance and real-time updates. For advanced use cases, custom model adapters can integrate with external data sources like databases or APIs. Learn more in the [State Management documentation](/docs/guides/state-management).
