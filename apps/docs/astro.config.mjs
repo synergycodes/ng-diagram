@@ -54,6 +54,11 @@ export default defineConfig({
           autogenerate: { directory: 'examples' },
           collapsed: true,
         },
+        // TODO: Enable this section after deploying yjs demo app
+        // {
+        //   label: 'Demos',
+        //   link: '/demos/',
+        // },
         {
           label: 'API',
           autogenerate: { directory: 'api', collapsed: true },
