@@ -1,6 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CursorPositionTrackerService } from '../../../../services/cursor-position-tracker/cursor-position-tracker.service';
-import { BrowserInputsHelpers } from '../../../../services/input-events/browser-inputs-helpers';
 import { InputEventsRouterService } from '../../../../services/input-events/input-events-router.service';
 import { KeyboardAction } from './keyboard-action';
 
@@ -10,7 +9,7 @@ export class PasteAction extends KeyboardAction {
   private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
 
   override matches(event: KeyboardEvent): boolean {
-    return BrowserInputsHelpers.isKeyComboPressed('v', 'primary')(event);
+    return this.inputEventsRouter.eventGuards.isKeyComboPressed('v', 'primary')(event);
   }
 
   override handle(event: KeyboardEvent): void {
