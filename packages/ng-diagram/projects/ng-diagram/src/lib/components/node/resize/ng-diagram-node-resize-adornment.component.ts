@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Node } from '../../../../core/src';
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramResizeHandleComponent } from './handle/ng-diagram-resize-handle.component';
 import { NgDiagramResizeLineComponent } from './line/ng-diagram-resize-line.component';
@@ -26,10 +28,22 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
   imports: [NgDiagramResizeLineComponent, NgDiagramResizeHandleComponent],
 })
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
+  /**
+   * Whether the node is resizable.
+   * Takes precedence over {@link Node.resizable}.
+   *
+   * @default true
+   */
+  resizable = input<boolean>(true);
   readonly nodeData = computed(() => this.nodeComponent?.node());
+
+  readonly isResizable = computed(() => {
+    const dataResizable = this.nodeData()?.resizable;
+    return this.resizable() ?? dataResizable ?? true;
+  });
+
   readonly showAdornment = computed(
-    () =>
-      !!this.nodeData()?.resizable && this.nodeData()?.selected && this.isRenderedOnCanvas() && !this.nodeData()?.angle
+    () => !!this.isResizable() && this.nodeData()?.selected && this.isRenderedOnCanvas() && !this.nodeData()?.angle
   );
   readonly linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
   readonly handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];

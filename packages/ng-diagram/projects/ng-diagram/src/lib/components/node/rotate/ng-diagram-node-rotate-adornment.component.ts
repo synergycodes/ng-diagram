@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Node } from '../../../../core/src';
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handle.component';
 
@@ -25,10 +27,21 @@ import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handl
   },
 })
 export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase {
+  /**
+   * Whether the node is rotatable.
+   * Takes precedence over {@link Node.rotatable}.
+   *
+   * @default true
+   */
+  rotatable = input<boolean>(true);
   readonly isRotating = signal(false);
   readonly nodeData = computed(() => this.nodeComponent?.node());
+
+  readonly isRotatable = computed(() => {
+    const dataRotatable = this.nodeData()?.rotatable;
+    return this.rotatable() ?? dataRotatable ?? true;
+  });
+
   readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.nodeData() }));
-  readonly showAdornment = computed(
-    () => !!this.nodeData()?.selected && this.nodeData()?.rotatable && this.isRenderedOnCanvas()
-  );
+  readonly showAdornment = computed(() => !!this.nodeData()?.selected && this.isRenderedOnCanvas());
 }
