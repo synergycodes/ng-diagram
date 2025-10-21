@@ -1,10 +1,14 @@
 <div class="example-container">
   <div class="button-controls">
     <button class="btn" (click)="addNode()">Add Node</button>
-    <button class="btn secondary" (click)="clearAll()">Clear All</button>
+    <button class="btn secondary" (click)="reset()">Reset to Default</button>
   </div>
 
   <div class="not-content diagram">
-    <ng-diagram [model]="modelAdapter" class="diagram"></ng-diagram>
+    <ng-diagram
+      [model]="modelAdapter"
+      [config]="config"
+      class="diagram"
+    ></ng-diagram>
   </div>
 </div>

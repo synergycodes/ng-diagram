@@ -6,22 +6,21 @@ sidebar:
   label: Layout Integration
 ---
 
-To perform layouts on in ngDiagram, integrate with external layout libraries to automatically position and arrange diagram elements.
-
-The implementation below shows:
-
-- How to use built-in layout using `NgDiagramService`
-- How to use external layout libraries like ELK.js
-- How to use the `selectionMoved` event to detect when nodes are moved by the user
-- How to manage edge routing modes (`manual` vs `auto`):
-  - Setting edges to `manual` mode to preserve custom layout points from ELK
-  - Resetting edges to `auto` mode when connected nodes are moved manually
-- How to use batch update methods (`updateNodes` and `updateEdges`) for better performance
-
-## Implementation Example
-
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 import LayoutIntegration from '@examples/layout-integration/layout-integration.astro';
 
+This example demonstrates how to integrate external layout libraries and use built-in layout features in ngDiagram.
+
 <LayoutIntegration />
 <ExampleViewer dirName="layout-integration" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **External Layout Libraries:** Integrate solutions like ELK.js for advanced layouts. ELK.js assigns positions to nodes and generates edge paths automatically.
+- **User Interaction Detection:** Use the `selectionMoved` event to detect manual node movement.
+- **Edge Routing Modes:**
+  - Set edges to `manual` mode to preserve custom layout points from ELK.
+  - Reset edges to `auto` mode when connected nodes are moved manually.
+- **Batch Updates:** Use `updateNodes` and `updateEdges` for efficient diagram updates.
