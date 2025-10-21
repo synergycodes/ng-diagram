@@ -11,109 +11,35 @@ import ContextMenu from '../../../components/angular/examples/context-menu/conte
 
 This example demonstrates how to implement a context menu that adapts its options based on the context—showing node-specific actions when a node is right-clicked, and diagram-wide actions otherwise.
 
-## Context Menu Overview
-
-The context menu appears at the cursor position when the user right-clicks on a node or the diagram. The example provides relevant actions such as copy, paste, delete, and select all.
-
-### Key Features
-
-- **Context Awareness**: Menu options change depending on whether a node or the diagram background is right-clicked.
-- **Positioning**: The menu appears at the exact cursor location using viewport coordinates.
-- **Integration**: Uses Angular signals and services for reactive state management.
-
-## Implementation Details
-
-### Context Menu Service
-
-The `ContextMenuService` manages the menu’s visibility, position, and context (node or diagram):
-
-```typescript
-@Injectable()
-export class ContextMenuService {
-  readonly visibility = signal(false);
-  readonly menuPosition = signal({ x: 0, y: 0 });
-  readonly nodeContext = signal(false);
-
-  showMenu({ x, y }: Point): void {
-    this.nodeContext.set(true);
-    this.menuPosition.set({ x, y });
-    this.visibility.set(true);
-  }
-
-  showDiagramMenu({ x, y }: Point): void {
-    this.nodeContext.set(false);
-    this.menuPosition.set({ x, y });
-    this.visibility.set(true);
-  }
-
-  hideMenu(): void {
-    this.visibility.set(false);
-  }
-}
-```
-
-### Menu Component
-
-The menu component displays options based on the context and stores information about menu positioning:
-
-```html
-<div #menu class="menu" [style.top.px]="menuPosition().y" [style.left.px]="menuPosition().x" [class.show]="showMenu()">
-  <ul>
-    @if (nodeContext()) {
-    <li (click)="onCopy()">Copy</li>
-    <li (click)="onDelete()">Delete</li>
-    } @else {
-    <li (click)="onSelectAll()">Select All</li>
-    <li (click)="onPaste($event)">Paste</li>
-    }
-  </ul>
-</div>
-```
-
-### Node Right-Click Handling
-
-Nodes handle right-click events to show the context menu and select the node. The menu position is calculated using viewport coordinates:
-
-```typescript
-onRightClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (this.node()) {
-      this.selectionService.select([this.node().id]);
-
-      const cursorPosition = this.viewportService.clientToFlowViewportPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
-      this.contextMenuService.showMenu(cursorPosition);
-    }
-  }
-```
-
-### Diagram Right-Click Handling
-
-Right-clicking the diagram background shows the diagram-wide menu, also using viewport coordinates:
-
-```typescript
-onDiagramRightClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const cursorPosition = this.viewportService.clientToFlowViewportPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
-    this.contextMenuService.showDiagramMenu(cursorPosition);
-  }
-```
-
-## Actions
-
-- **Copy**: Copies the selected node(s) to the clipboard.
-- **Paste**: Pastes copied nodes at the cursor position.
-- **Delete**: Removes the selected node(s).
-- **Select All**: Selects all nodes in the diagram.
-
 <ContextMenu />
 <ExampleViewer dirName="context-menu" />
+
+## Additional Explanation
+
+- **Context Awareness:** Menu options change depending on whether a node or the diagram background is right-clicked.
+- **Positioning:** The menu appears at the exact cursor location using viewport coordinates.
+- **Integration:** Uses Angular signals and services for reactive state management.
+
+### Key Concepts
+
+- **Node Right-Click Handling:**  
+  Nodes handle right-click events to show the context menu and select the node.
+
+- **Diagram Right-Click Handling:**  
+  Right-clicking the diagram background shows the diagram-wide menu.
+
+- **Menu Positioning:**  
+  The menu position is calculated using viewport coordinates.
+
+- **Context Menu Service:**  
+  The service manages the menu’s visibility, position, and context (node or diagram).
+
+- **Menu Component:**  
+  The menu component displays options based on the context and stores information about menu positioning.
+
+### Actions
+
+- **Copy:** Copies the selected node(s) to the clipboard.
+- **Paste:** Pastes copied nodes at the cursor position.
+- **Delete:** Removes the selected node(s).
+- **Select All:** Selects all nodes in the diagram.
