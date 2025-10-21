@@ -26,6 +26,12 @@ You can create a custom node by extending `NgDiagramNodeTemplate` and implementi
   description="For more comprehensive example please check here."
 />
 
+## Using the Default Node as a Base
+
+If you don't want to start from scratch, you can use the `NgDiagramBaseNodeTemplateComponent` component as a way to add custom content into the default node if you want more than just a label.
+
+Simply wrap your custom content inside the `<ng-diagram-base-node-template>` component.
+
 ## Registering Custom Node Types
 
 To register a custom node, you need to add it to the `nodeTemplateMap`.

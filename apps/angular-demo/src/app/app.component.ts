@@ -188,6 +188,14 @@ export class AppComponent {
         resizable: true,
         rotatable: true,
       },
+      {
+        id: '12',
+        position: { x: 700, y: 750 },
+        data: {},
+        type: 'customized-default',
+        resizable: true,
+        rotatable: true,
+      },
     ],
     edges: [
       {
