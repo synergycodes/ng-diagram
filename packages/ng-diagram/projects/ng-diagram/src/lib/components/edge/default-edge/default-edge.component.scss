@@ -3,16 +3,28 @@
     .ng-diagram-edge__path {
       transition: stroke 0.1s ease-in-out;
     }
+
+    .ng-diagram-default-edge-label {
+      transition: border-color 0.1s ease-in-out;
+    }
   }
 
   &:hover {
     .ng-diagram-edge__path:not(.selected):not(.temporary) {
       stroke: var(--ngd-default-edge-stroke-hover);
     }
+
+    .ng-diagram-default-edge-label:not(.selected) {
+      border-color: var(--ngd-default-edge-stroke-hover);
+    }
   }
 
   .ng-diagram-edge__path.selected {
     stroke: var(--ngd-default-edge-stroke-selected);
+  }
+
+  .ng-diagram-default-edge-label.selected {
+    border-color: var(--ngd-default-edge-stroke-selected);
   }
 
   .ng-diagram-edge__path.temporary {

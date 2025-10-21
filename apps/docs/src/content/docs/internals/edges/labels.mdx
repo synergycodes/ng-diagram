@@ -10,9 +10,19 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
 
-## Using Labels in Edge Components
+## Using Labels in Default Edges
 
-To display a label on an edge, use the `BaseEdgeLabelComponent` in the implementation of your edge component:
+To display a label on an edge, you can add a `label` property to the edge's data.
+
+import DefaultLabel from '@components/angular/edges/labels/default-label/default-label.astro';
+
+<DefaultLabel />
+
+<CodeSnippet relativePath="edges/labels/default-label/diagram.component.ts" />
+
+## Custom Labels
+
+To display a custom label on an edge, use the `BaseEdgeLabelComponent` in an implementation of a custom edge component:
 
 import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
 

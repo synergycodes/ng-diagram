@@ -11,9 +11,9 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { EdgeLabel } from '../../../core/src';
-import { BatchResizeObserverService, FlowCoreProviderService } from '../../services';
-import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
+import { EdgeLabel } from '../../../../core/src';
+import { BatchResizeObserverService, FlowCoreProviderService } from '../../../services';
+import { NgDiagramBaseEdgeComponent } from '../../edge/base-edge/base-edge.component';
 
 /**
  * The `BaseEdgeLabelComponent` is responsible for displaying a label at a specific position along an edge.

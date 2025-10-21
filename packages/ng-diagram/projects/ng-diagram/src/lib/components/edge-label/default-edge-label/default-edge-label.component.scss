@@ -1,0 +1,9 @@
+.ng-diagram-default-edge-label {
+  display: flex;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--ngd-node-bg-primary-default);
+  color: var(--ngd-txt-primary-default);
+  border: 2px solid var(--ngd-default-edge-stroke);
+}
