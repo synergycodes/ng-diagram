@@ -158,9 +158,9 @@ export class InputEventsRouterService extends InputEventsRouter {
     const target = event.target as HTMLElement | null;
 
     const isEditableTarget = (el: HTMLElement | null) =>
-      !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+      el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
 
-    if (!isEditableTarget(target)) return false;
+    if (isEditableTarget(target)) return false;
 
     return event.key === this.keysMap.keys.delete || event.key === this.keysMap.keys.backspace;
   }
