@@ -5,7 +5,7 @@
 // Components
 export { NgDiagramBackgroundComponent } from './lib/components/background/ng-diagram-background.component';
 export { NgDiagramComponent } from './lib/components/diagram/ng-diagram.component';
-export { BaseEdgeLabelComponent } from './lib/components/edge-label/base-edge-label.component';
+export { NgDiagramBaseEdgeLabelComponent } from './lib/components/edge-label/base-edge-label.component';
 export { NgDiagramBaseEdgeComponent } from './lib/components/edge/base-edge/base-edge.component';
 export { NgDiagramNodeResizeAdornmentComponent } from './lib/components/node/resize/ng-diagram-node-resize-adornment.component';
 export { NgDiagramNodeRotateAdornmentComponent } from './lib/components/node/rotate/ng-diagram-node-rotate-adornment.component';

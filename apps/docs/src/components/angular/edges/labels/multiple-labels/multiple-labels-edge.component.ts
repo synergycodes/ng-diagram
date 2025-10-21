@@ -1,8 +1,8 @@
 // @section-start
 import { Component, computed, input } from '@angular/core';
 import {
-  BaseEdgeLabelComponent,
   NgDiagramBaseEdgeComponent,
+  NgDiagramBaseEdgeLabelComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
@@ -49,7 +49,7 @@ const ANIMATION_DURATION = 0.5;
     }
     /* @mark-end */
   `,
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
 export class MultipleLabelsEdgeComponent
   implements NgDiagramEdgeTemplate<MultiLabelEdgeData>

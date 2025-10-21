@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdgeTemplate } from 'ng-diagram';
+import { Edge, NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent, NgDiagramEdgeTemplate } from 'ng-diagram';
 
 /**
  * The example below demonstrates how to create a custom edge with:
@@ -13,7 +13,7 @@ import { BaseEdgeLabelComponent, Edge, NgDiagramBaseEdgeComponent, NgDiagramEdge
   templateUrl: './custom-polyline-edge.component.html',
   styleUrls: ['./custom-polyline-edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
 export class CustomPolylineEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();

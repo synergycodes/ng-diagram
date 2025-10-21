@@ -11,7 +11,7 @@ Labels are visual elements attached to edges that can display text, buttons, or 
 
 ## Using Labels in Edge Components
 
-To display a label on an edge, use the `BaseEdgeLabelComponent` in the implementation of your edge component:
+To display a label on an edge, use the `NgDiagramBaseEdgeLabelComponent` in the implementation of your edge component:
 
 import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
 
@@ -38,7 +38,12 @@ The edge component implementation looks like this:
 
 ```typescript
 import { Component, computed, input } from '@angular/core';
-import { BaseEdgeLabelComponent, NgDiagramBaseEdgeComponent, type Edge, type NgDiagramEdgeTemplate } from 'ng-diagram';
+import {
+  NgDiagramBaseEdgeLabelComponent,
+  NgDiagramBaseEdgeComponent,
+  type Edge,
+  type NgDiagramEdgeTemplate,
+} from 'ng-diagram';
 
 @Component({
   selector: 'multi-label-edge',
@@ -50,7 +55,7 @@ import { BaseEdgeLabelComponent, NgDiagramBaseEdgeComponent, type Edge, type NgD
       {{ edge().data.label }}
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
 export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate<{ label: string }> {
   edge = input.required<Edge<{ label: string }>>();
