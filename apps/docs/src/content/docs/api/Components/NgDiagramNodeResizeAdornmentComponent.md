@@ -20,9 +20,9 @@ The `NgDiagramNodeResizeAdornmentComponent` displays resize handles and lines ar
 
 ## Properties
 
-### resizable
+### value
 
-> **resizable**: `InputSignal`\<`boolean`\>
+> **value**: `InputSignal`\<`undefined` \| `boolean`\>
 
 Whether the node is resizable.
 Takes precedence over Node.resizable.
@@ -30,5 +30,5 @@ Takes precedence over Node.resizable.
 #### Default
 
 ```ts
-true
+undefined
 ```

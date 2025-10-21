@@ -31,15 +31,15 @@ export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase 
    * Whether the node is rotatable.
    * Takes precedence over {@link Node.rotatable}.
    *
-   * @default true
+   * @default undefined
    */
-  rotatable = input<boolean>(true);
+  value = input<boolean | undefined>(undefined);
   readonly isRotating = signal(false);
   readonly nodeData = computed(() => this.nodeComponent?.node());
 
   readonly isRotatable = computed(() => {
     const dataRotatable = this.nodeData()?.rotatable;
-    return this.rotatable() ?? dataRotatable ?? true;
+    return this.value() ?? dataRotatable ?? true;
   });
 
   readonly eventTarget = computed(() => ({ type: 'rotate-handle' as const, element: this.nodeData() }));

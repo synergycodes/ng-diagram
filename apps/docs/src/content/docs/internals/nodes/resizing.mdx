@@ -30,7 +30,11 @@ When `resizable` is set, the resize handles and lines will appear, and the node 
 
 To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-adornment>` in your node template and import the `NgDiagramNodeResizeAdornmentComponent`.
 
-You will also need to set the `resizable` property to `true` in your custom node definition.
+The adornment is shown by default.
+
+You can control whether the adornment is enabled either by setting the `value` input property on the adornment component or by setting the `resizable` property on the node data.
+
+Setting the `value` to a boolean takes precedence over the node data property.
 
 <CodeSnippet relativePath="nodes/resizing/node/node.component.ts" />
 

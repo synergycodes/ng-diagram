@@ -32,14 +32,14 @@ export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase 
    * Whether the node is resizable.
    * Takes precedence over {@link Node.resizable}.
    *
-   * @default true
+   * @default undefined
    */
-  resizable = input<boolean>(true);
+  value = input<boolean | undefined>(undefined);
   readonly nodeData = computed(() => this.nodeComponent?.node());
 
   readonly isResizable = computed(() => {
     const dataResizable = this.nodeData()?.resizable;
-    return this.resizable() ?? dataResizable ?? true;
+    return this.value() ?? dataResizable ?? true;
   });
 
   readonly showAdornment = computed(

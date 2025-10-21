@@ -26,11 +26,11 @@ To make a custom node rotatable, include `<ng-diagram-node-rotate-adornment />` 
 
 ## Enabling Rotation for a Node
 
-Enable rotation by setting the `rotatable` property to `true` in your node definition:
+The adornment is shown by default.
 
-<CodeSnippet relativePath="nodes/rotation/diagram.component.ts" sectionId="enabling" />
+You can control whether the adornment is enabled either by setting the `value` input property on the adornment component or by setting the `rotatable` property on the node data.
 
-When `rotatable` is set, the rotation handle will appear, and the node can be rotated by the user.
+Setting the `value` to a boolean takes precedence over the node data property.
 
 ## Customizing the Rotate Handle
 
