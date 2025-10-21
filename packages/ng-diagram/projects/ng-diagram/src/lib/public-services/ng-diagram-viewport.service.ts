@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { Point } from '../../core/src';
+import { Node, Point } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramModelService } from './ng-diagram-model.service';
 
@@ -102,5 +102,28 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
     const x = center?.x || this.viewport().x;
     const y = center?.y || this.viewport().y;
     this.flowCore.commandHandler.emit('zoom', { scale: factor, x, y });
+  }
+
+  // ===================
+  // CENTERING METHODS
+  // ===================
+
+  /**
+   * Centers the Node within the current viewport bounds.
+   * @param node The ID of the node or the node object to center on
+   */
+  centerOnNode(node: string | Node) {
+    this.flowCore.commandHandler.emit('centerOnNode', { node });
+  }
+
+  /**
+   * Centers the rectangle within the current viewport bounds.
+   * @param x The x-coordinate of the rectangle.
+   * @param y The y-coordinate of the rectangle.
+   * @param width The width of the rectangle.
+   * @param height The height of the rectangle.
+   */
+  centerOnRect(x: number, y: number, width: number, height: number) {
+    this.flowCore.commandHandler.emit('centerOnRect', { x, y, width, height });
   }
 }
