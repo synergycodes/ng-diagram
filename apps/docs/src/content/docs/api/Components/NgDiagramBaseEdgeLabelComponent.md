@@ -2,10 +2,10 @@
 editUrl: false
 next: false
 prev: false
-title: "BaseEdgeLabelComponent"
+title: "NgDiagramBaseEdgeLabelComponent"
 ---
 
-The `BaseEdgeLabelComponent` is responsible for displaying a label at a specific position along an edge.
+The `NgDiagramBaseEdgeLabelComponent` is responsible for displaying a label at a specific position along an edge.
 
 ## Example usage
 ```html

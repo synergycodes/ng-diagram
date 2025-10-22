@@ -1,8 +1,8 @@
 // @section-start
 import { Component, computed, input } from '@angular/core';
 import {
-  BaseEdgeLabelComponent,
   NgDiagramBaseEdgeComponent,
+  NgDiagramBaseEdgeLabelComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
@@ -26,7 +26,7 @@ import {
     <!-- @mark-end -->
   </ng-diagram-base-edge>`,
   styleUrl: './modifiable-label-edge.component.scss',
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
 export class ModifiableLabelEdgeComponent
   implements NgDiagramEdgeTemplate<MultiLabelEdgeData>

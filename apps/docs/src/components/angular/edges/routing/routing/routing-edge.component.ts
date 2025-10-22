@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import {
-  BaseEdgeLabelComponent,
   NgDiagramBaseEdgeComponent,
+  NgDiagramBaseEdgeLabelComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
@@ -19,7 +19,7 @@ import {
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge>`,
   styleUrl: './routing-edge.component.scss',
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
 export class RoutingEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
