@@ -23,9 +23,6 @@ import { CoordinatesComponent } from './preview/coordinates.component';
       display: flex;
       height: 30rem;
     }
-    .coordinates {
-      display: flex;
-    }
   `,
 })
 export class DiagramComponent {
