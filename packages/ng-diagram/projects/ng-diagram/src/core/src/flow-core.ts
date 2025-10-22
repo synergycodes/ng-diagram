@@ -103,6 +103,7 @@ export class FlowCore {
 
     this.model.onChange((state) => {
       this.spatialHash.process(state.nodes);
+      this.modelLookup.desynchronize();
       this.render();
     });
 
