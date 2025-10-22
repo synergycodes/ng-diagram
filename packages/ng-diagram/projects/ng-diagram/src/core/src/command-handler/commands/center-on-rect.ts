@@ -10,14 +10,25 @@ export interface CenterOnRectCommand {
 }
 
 export const centerOnRect = async (commandHandler: CommandHandler, { x, y, width, height }: CenterOnRectCommand) => {
-  const { metadata } = commandHandler.flowCore.getState();
+  const { viewport } = commandHandler.flowCore.getState().metadata;
 
-  const rectCenterPoint: { x: number; y: number } = {
-    x: x + width / 2,
-    y: y + height / 2,
-  };
+  if (!width || !height || width < 0 || height < 0 || !viewport.width || !viewport.height) {
+    return;
+  }
 
-  if (isSamePoint(metadata.viewport, { x: rectCenterPoint.x, y: rectCenterPoint.y })) {
+  const rectCenterX = x + width / 2;
+  const rectCenterY = y + height / 2;
+
+  const rectCenterXScaled = rectCenterX * viewport.scale;
+  const rectCenterYScaled = rectCenterY * viewport.scale;
+
+  const viewportCenterX = viewport.width / 2;
+  const viewportCenterY = viewport.height / 2;
+
+  const newX = viewportCenterX - rectCenterXScaled;
+  const newY = viewportCenterY - rectCenterYScaled;
+
+  if (isSamePoint(viewport, { x: newX, y: newY })) {
     return;
   }
 
@@ -25,9 +36,9 @@ export const centerOnRect = async (commandHandler: CommandHandler, { x, y, width
     {
       metadataUpdate: {
         viewport: {
-          ...metadata.viewport,
-          x: rectCenterPoint.x,
-          y: rectCenterPoint.y,
+          ...viewport,
+          x: newX,
+          y: newY,
         },
       },
     },

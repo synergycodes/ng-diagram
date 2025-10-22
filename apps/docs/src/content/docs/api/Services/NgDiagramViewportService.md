@@ -40,6 +40,64 @@ Returns a computed signal for the viewport that safely handles uninitialized sta
 
 ## Methods
 
+### centerOnNode()
+
+> **centerOnNode**(`node`): `void`
+
+Centers the Node within the current viewport bounds.
+
+#### Parameters
+
+##### node
+
+The ID of the node or the node object to center on
+
+`string` | [`Node`](/docs/api/types/node/)
+
+#### Returns
+
+`void`
+
+***
+
+### centerOnRect()
+
+> **centerOnRect**(`x`, `y`, `width`, `height`): `void`
+
+Centers the rectangle within the current viewport bounds.
+
+#### Parameters
+
+##### x
+
+`number`
+
+The x-coordinate of the rectangle.
+
+##### y
+
+`number`
+
+The y-coordinate of the rectangle.
+
+##### width
+
+`number`
+
+The width of the rectangle.
+
+##### height
+
+`number`
+
+The height of the rectangle.
+
+#### Returns
+
+`void`
+
+***
+
 ### clientToFlowPosition()
 
 > **clientToFlowPosition**(`clientPosition`): [`Point`](/docs/api/types/point/)

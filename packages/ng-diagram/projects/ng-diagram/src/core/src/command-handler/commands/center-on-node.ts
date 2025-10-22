@@ -8,22 +8,29 @@ export interface CenterOnNodeCommand {
 
 export const centerOnNode = async (commandHandler: CommandHandler, { node }: CenterOnNodeCommand) => {
   const nodeObj = typeof node === 'string' ? commandHandler.flowCore.getNodeById(node) : node;
-  const { metadata } = commandHandler.flowCore.getState();
+  const { viewport } = commandHandler.flowCore.getState().metadata;
 
-  if (!nodeObj) {
-    throw new Error(`Node with id ${node} not found.`);
+  if (!nodeObj || !nodeObj.size?.width || !nodeObj.size?.height) {
+    return;
   }
 
-  if (!nodeObj.size || nodeObj.size?.width === undefined || nodeObj.size?.height === undefined) {
-    throw new Error(`Size properties are not provided for the node with id ${node}`);
+  if (!viewport.width || !viewport.height) {
+    return;
   }
 
-  const nodeCenterPoint: { x: number; y: number } = {
-    x: nodeObj.position.x + nodeObj.size?.width / 2,
-    y: nodeObj.position.y + nodeObj.size?.height / 2,
-  };
+  const nodeCenterX = nodeObj.position.x + nodeObj.size.width / 2;
+  const nodeCenterY = nodeObj.position.y + nodeObj.size.height / 2;
 
-  if (isSamePoint(metadata.viewport, { x: nodeCenterPoint.x, y: nodeCenterPoint.y })) {
+  const nodeCenterXScaled = nodeCenterX * viewport.scale;
+  const nodeCenterYScaled = nodeCenterY * viewport.scale;
+
+  const viewportCenterX = viewport.width / 2;
+  const viewportCenterY = viewport.height / 2;
+
+  const newX = viewportCenterX - nodeCenterXScaled;
+  const newY = viewportCenterY - nodeCenterYScaled;
+
+  if (isSamePoint(viewport, { x: newX, y: newY })) {
     return;
   }
 
@@ -31,9 +38,9 @@ export const centerOnNode = async (commandHandler: CommandHandler, { node }: Cen
     {
       metadataUpdate: {
         viewport: {
-          ...metadata.viewport,
-          x: nodeCenterPoint.x,
-          y: nodeCenterPoint.y,
+          ...viewport,
+          x: newX,
+          y: newY,
         },
       },
     },
