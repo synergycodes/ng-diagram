@@ -87,6 +87,15 @@ describe('zIndexMiddleware', () => {
 
       expect(nextMock).toHaveBeenCalled();
     });
+
+    it('should process changes when addEdges action is triggered', () => {
+      context.modelActionType = 'addEdges';
+      context.state.edges = [{ ...mockEdge, id: 'edge1' }];
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      expect(nextMock).toHaveBeenCalled();
+    });
   });
 
   describe('node selection z-index assignment', () => {

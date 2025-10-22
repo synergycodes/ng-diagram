@@ -38,6 +38,7 @@ describe('Edge Routing Helper Functions', () => {
       checkIfMetadataPropsChanged: vi.fn(),
       checkIfEdgeChanged: vi.fn(),
       checkIfNodeChanged: vi.fn(),
+      checkIfEdgeAdded: vi.fn(),
     };
 
     mockRoutingManager = {
@@ -179,6 +180,16 @@ describe('Edge Routing Helper Functions', () => {
       const result = shouldRouteEdge(edge, mockHelpers, 'updateNodes');
 
       expect(result).toBe(false);
+    });
+
+    it('should return true when edge is added programmatically', () => {
+      const edge: Edge = { ...mockEdge, id: 'edge-4' };
+      mockHelpers.checkIfEdgeAdded = vi.fn().mockReturnValue(true);
+
+      const result = shouldRouteEdge(edge, mockHelpers, 'addEdges');
+
+      expect(result).toBe(true);
+      expect(mockHelpers.checkIfEdgeAdded).toHaveBeenCalledWith('edge-4');
     });
   });
 
