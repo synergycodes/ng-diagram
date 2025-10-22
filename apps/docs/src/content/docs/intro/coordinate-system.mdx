@@ -5,6 +5,7 @@ sidebar:
   order: 2
 ---
 
+import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 import NgDiagramComponentContainer from '../../../components/angular/coordinate-system/coordinate-system.astro';
 
 NgDiagram uses a coordinate system that enables precise positioning of all diagram elements. Understanding this system is crucial for creating accurate diagrams and implementing custom behaviors.
@@ -162,3 +163,4 @@ export class MyComponent {
 - `width`, `height`: Viewport dimensions
 
 <NgDiagramComponentContainer />
+<ExampleViewer dirName="coordinate-system" />

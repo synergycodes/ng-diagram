@@ -25,7 +25,7 @@ Make sure you know the tech you'll be working with:
 
 #### ExampleViewer
 
-To display comprehensive code examples with many files create a directory in `./src/components/angular/examples/$DIR_NAME` and place your code files there. Then use `<ExampleViewer dirName={$DIR_NAME} />`. It will automatically display the code examples except for the `.astro` files.
+To display comprehensive code examples with many files create a directory in `./src/components/angular/$DIR_NAME` and place your code files there. Then use `<ExampleViewer dirName={$DIR_NAME} />`. It will automatically display the code examples except for the `.astro` files.
 
 You still need to create the `.astro` component to display the angular components and import it manually into and `.mdx` documentation.
 
@@ -39,7 +39,7 @@ import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 
 <CustomNode />
 
-<ExampleViewer dirName="custom-node" />
+<ExampleViewer dirName="examples/custom-node" />
 ```
 
 #### CodeSnippet
