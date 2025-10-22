@@ -7,15 +7,15 @@ import {
   provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
-import { CoordinatesPreview } from './coordinates-preview.component';
+import { CoordinatesComponent } from './preview/coordinates.component';
 
 @Component({
-  imports: [NgDiagramComponent, CoordinatesPreview],
+  imports: [NgDiagramComponent, CoordinatesComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
       <ng-diagram [model]="model" [config]="config" />
-      <coordinates-preview />
+      <coordinates />
     </div>
   `,
   styles: `
@@ -43,7 +43,11 @@ export class DiagramComponent {
       },
     },
     nodes: [
-      { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
+      {
+        id: '1',
+        position: { x: 100, y: 150 },
+        data: { label: 'Node 1' },
+      },
       {
         id: '2',
         position: { x: 410, y: 150 },

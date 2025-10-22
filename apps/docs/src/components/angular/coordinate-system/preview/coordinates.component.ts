@@ -1,3 +1,4 @@
+// @collapse-start
 import '@angular/compiler';
 
 import { DecimalPipe } from '@angular/common';
@@ -6,31 +7,12 @@ import {
   NgDiagramSelectionService,
   NgDiagramViewportService,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
-  selector: 'coordinates-preview',
+  selector: 'coordinates',
   imports: [DecimalPipe],
-  template: `
-    <span>x: {{ viewport().x | number: '1.0-2' }}</span>
-    <span>y: {{ viewport().y | number: '1.0-2' }}</span>
-    <span>scale: {{ scale() | number: '1.0-2' }}</span>
-    <span
-      >selection x:
-      {{
-        selectionPosition() != null
-          ? (selectionPosition().x | number: '1.0-2')
-          : '-'
-      }}</span
-    >
-    <span
-      >selection y:
-      {{
-        selectionPosition() != null
-          ? (selectionPosition().y | number: '1.0-2')
-          : '-'
-      }}</span
-    >
-  `,
+  templateUrl: './coordinates.component.html',
   styles: `
     :host {
       display: flex;
@@ -41,7 +23,7 @@ import {
     }
   `,
 })
-export class CoordinatesPreview {
+export class CoordinatesComponent {
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
 
