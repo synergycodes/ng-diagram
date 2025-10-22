@@ -1,3 +1,4 @@
+// @section-start
 import { Component, input } from '@angular/core';
 import {
   NgDiagramNodeSelectedDirective,
@@ -5,7 +6,6 @@ import {
   type Node,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
   template: `
     <div class="custom-node">

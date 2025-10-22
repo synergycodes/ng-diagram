@@ -6,49 +6,33 @@ sidebar:
   label: Download Image
 ---
 
-import { Image } from 'astro:assets';
-import { LinkCard } from '@astrojs/starlight/components';
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
-import DownloadImage from '../../../components/angular/examples/download-image/download-image.astro';
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import DownloadImage from '../../../components/angular/examples/download-image/download-image.astro';
 
 This example demonstrates how to export the current flow as an image using Angular features and the `html-to-image` library.
 
-## Download Image Overview
-
-The download functionality allows users to export the flow as a image, capturing the current state and layout.
-
-### Key Features
-
-- **Export**: Downloads the flow as a PNG image.
-- **Bounding Box Calculation**: Ensures the exported image includes all nodes with proper margins.
-
-## Implementation Details
-
-### Generate Image Service
-
-The `GenerateImageService` handles the logic for exporting the flow as an image. It uses the `html-to-image` library and calculates the bounding box to ensure all nodes are included:
-
-<CodeSnippet relativePath="examples/download-image/generate-image.service.ts" />
-
-### Helper Functions
-
-Helper functions manage the download process and calculate the bounding box for the flow:
-
-<CodeSnippet relativePath="examples/download-image/generate-image.helper.ts" />
-
-### NavBar Component
-
-The navigation bar provides a button to trigger the download action.
-
-To accurately calculate the bounding box for the entire flow, all nodes are pulled and passed to the calculation.
-Also it passes the flow element reference to the service.
-
-<CodeSnippet relativePath="examples/download-image/nav-bar/nav-bar.component.ts" />
-
-## Actions
-
-- **Download**: Exports the current flow as a PNG image using the bounding box and margin settings.
-
 <DownloadImage />
 <ExampleViewer dirName="download-image" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Export:** Downloads the flow as a PNG image.
+- **Bounding Box Calculation:** Ensures the exported image includes all nodes with proper margins.
+
+### Implementation Details
+
+- **Generate Image Service:**  
+  Handles the logic for exporting the flow as an image, using the `html-to-image` library and bounding box calculation.
+
+- **Helper Functions:**  
+  Manage the download process and calculate the bounding box for the flow.
+
+- **NavBar Component:**  
+  Provides a button to trigger the download action.  
+  Calculates the bounding box for the entire flow and passes the flow element reference to the service.
+
+### Actions
+
+- **Download:** Exports the current flow as a PNG image using the bounding box and margin settings.

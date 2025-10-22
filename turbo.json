@@ -1,5 +1,5 @@
 {
-  "globalEnv": ["NODE_ENV"],
+  "globalEnv": ["NODE_ENV", "UMAMI_WEBSITE_ID"],
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {

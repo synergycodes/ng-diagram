@@ -19,13 +19,12 @@ import { CoordinatesPreview } from './coordinates-preview.component';
     </div>
   `,
   styles: `
-      .diagram {
-        display: flex;
-        height: 30rem;
-      }
-      .coordinates {
-        display: flex;
-      }
+    .diagram {
+      display: flex;
+      height: 30rem;
+    }
+    .coordinates {
+      display: flex;
     }
   `,
 })

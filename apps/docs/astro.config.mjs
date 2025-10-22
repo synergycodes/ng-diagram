@@ -5,10 +5,16 @@ import starlightAutoSidebar from 'starlight-auto-sidebar';
 import starlightTypeDoc from 'starlight-typedoc';
 
 import angular from '@analogjs/astro-angular';
+import umami from '@yeskunall/astro-umami';
+
+const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 
 export default defineConfig({
   base: '/docs',
   integrations: [
+    umami({
+      id: UMAMI_WEBSITE_ID,
+    }),
     angular({
       vite: {
         transformFilter: (_code, id) => {
@@ -26,15 +32,21 @@ export default defineConfig({
         dark: './src/assets/ng-diagram-logo-white.svg',
       },
       customCss: ['./src/styles/custom.css'],
-      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/synergycodes/ng-diagram' }],
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/synergycodes/ng-diagram',
+        },
+      ],
       sidebar: [
         {
           label: 'Intro',
           autogenerate: { directory: 'intro' },
         },
         {
-          label: 'Internals',
-          autogenerate: { directory: 'internals' },
+          label: 'Guides',
+          autogenerate: { directory: 'guides' },
           collapsed: true,
         },
         {
@@ -42,6 +54,11 @@ export default defineConfig({
           autogenerate: { directory: 'examples' },
           collapsed: true,
         },
+        // TODO: Enable this section after deploying yjs demo app
+        // {
+        //   label: 'Demos',
+        //   link: '/demos/',
+        // },
         {
           label: 'API',
           autogenerate: { directory: 'api', collapsed: true },
@@ -66,6 +83,9 @@ export default defineConfig({
           watch: true,
         }),
       ],
+      components: {
+        SocialIcons: './src/components/social-icons/social-icons.astro',
+      },
     }),
   ],
 });

@@ -43,7 +43,8 @@
     "typedoc": "^0.28.9",
     "typedoc-plugin-markdown": "^4.8.0",
     "web-worker": "^1.5.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@yeskunall/astro-umami": "~0.0.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

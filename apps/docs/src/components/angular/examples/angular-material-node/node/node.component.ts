@@ -21,7 +21,6 @@ export type NodeData = {
 };
 
 @Component({
-  selector: 'node',
   imports: [
     NgDiagramNodeRotateAdornmentComponent,
     MatSelectModule,

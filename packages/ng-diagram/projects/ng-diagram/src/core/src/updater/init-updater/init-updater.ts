@@ -1,227 +1,267 @@
 import { FlowCore } from '../../flow-core';
-import { EdgeLabel, Node, Port, Rect, Size } from '../../types';
-import { BaseUpdater } from '../base-updater';
+import { EdgeLabel, Node, Port, Size } from '../../types';
 import { Updater } from '../updater.interface';
-import { BatchInitializer } from './batch-initializer';
+import { InitState } from './init-state';
+import { LateArrivalQueue } from './late-arrival-queue';
+import { StabilityDetector } from './stability-detector';
 
-export class InitUpdater extends BaseUpdater implements Updater {
+/** Milliseconds to wait after last entity addition before considering entities stabilized */
+export const STABILITY_DELAY = 50;
+
+/** Milliseconds to wait for measurements after entities stabilize before forcing finish */
+export const MEASUREMENT_TIMEOUT = 2000;
+
+/**
+ * InitUpdater batches all initialization data and applies it in a single state update.
+ *
+ * Strategy:
+ * 1. Wait for entity creation to stabilize (addPort, addEdgeLabel) using StabilityDetectors
+ * 2. Immediately collect measurements (applyNodeSize, applyPortsSizesAndPositions, applyEdgeLabelSize)
+ * 3. Finish when: entities stabilized AND all entities have measurements
+ * 4. Apply everything in one setState
+ * 5. Queue late arrivals to prevent data loss during finish transition
+ * 6. Safety timeout: If measurements don't arrive within MEASUREMENT_TIMEOUT, force finish
+ */
+export class InitUpdater implements Updater {
+  /** Flag indicating whether initialization has completed */
   public isInitialized = false;
 
-  private nodeSizeInitializer: BatchInitializer<Size>;
-  private edgeLabelSizeInitializer: BatchInitializer<Size>;
-  private edgeLabelInitializer: BatchInitializer<EdgeLabel>;
-  private portInitializer: BatchInitializer<Port>;
-  private portRectInitializer: BatchInitializer<Rect>;
+  /** Flag indicating whether entity additions (ports/labels) have stabilized */
+  private entitiesStabilized = false;
 
+  /** Detects when port additions have stabilized */
+  private portStabilityDetector: StabilityDetector;
+
+  /** Detects when label additions have stabilized */
+  private labelStabilityDetector: StabilityDetector;
+
+  /** Collects all initialization data and applies it to diagram state */
+  private initState: InitState;
+
+  /** Queues updates that arrive during finish to prevent data loss */
+  private lateArrivalQueue: LateArrivalQueue;
+
+  /** Callback to execute when initialization completes */
+  private onCompleteCallback?: () => void | Promise<void>;
+
+  /** Safety timeout to prevent indefinite waiting for measurements */
+  private measurementTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Creates a new InitUpdater.
+   * Initializes stability detectors based on whether nodes/edges exist.
+   *
+   * @param flowCore - The FlowCore instance to update
+   */
   constructor(private flowCore: FlowCore) {
-    super();
+    const state = flowCore.getState();
+    const hasNodes = state.nodes.length > 0;
+    const hasEdges = state.edges.length > 0;
 
-    const {
-      nodeSizeInitializer,
-      edgeLabelSizeInitializer,
-      edgeLabelInitializer,
-      portInitializer,
-      portRectInitializer,
-    } = this.createInitializers();
+    this.portStabilityDetector = new StabilityDetector(hasNodes, STABILITY_DELAY);
+    this.labelStabilityDetector = new StabilityDetector(hasEdges, STABILITY_DELAY);
 
-    this.nodeSizeInitializer = nodeSizeInitializer;
-    this.edgeLabelSizeInitializer = edgeLabelSizeInitializer;
-    this.edgeLabelInitializer = edgeLabelInitializer;
-    this.portInitializer = portInitializer;
-    this.portRectInitializer = portRectInitializer;
+    this.initState = new InitState();
+    this.lateArrivalQueue = new LateArrivalQueue();
   }
 
-  async start() {
-    if (this.flowCore.getState()?.nodes?.length > 0) {
-      await this.checkIfInitialized();
+  /**
+   * Starts the initialization process.
+   * Collects pre-existing measurements and waits for entity additions to stabilize.
+   *
+   * @param onComplete - Optional callback to execute after initialization completes
+   */
+  start(onComplete?: () => void | Promise<void>) {
+    this.onCompleteCallback = onComplete;
 
-      // Call init to make sure all scheduled data is processed
-      for (const initializer of this.getInitializers()) {
-        initializer.init();
-      }
-    }
+    const state = this.flowCore.getState();
+    this.initState.collectAlreadyMeasuredItems(state.nodes, state.edges);
 
-    this.isInitialized = true;
-    return;
+    Promise.all([this.portStabilityDetector.waitForStability(), this.labelStabilityDetector.waitForStability()])
+      .then(() => {
+        this.entitiesStabilized = true;
+        this.startMeasurementTimeout();
+        this.tryFinish();
+      })
+      .catch((err) => {
+        console.error('[InitUpdater] Entity stabilization failed:', err);
+        this.forceFinish();
+      });
   }
 
+  /**
+   * Records a node size measurement.
+   * Queues the update if finishing is in progress, otherwise records and attempts to finish.
+   *
+   * @param nodeId - The node ID
+   * @param size - The measured size
+   */
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
-    this.nodeSizeInitializer.batchChange(nodeId, size);
-  }
-
-  addPort(nodeId: string, port: Port) {
-    const key = this.getCompoundId(nodeId, port.id);
-
-    this.portInitializer.batchChange(key, port);
-  }
-
-  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]) {
-    const node = this.flowCore.getNodeById(nodeId);
-
-    if (!node) {
+    if (this.lateArrivalQueue.isFinishing) {
+      this.lateArrivalQueue.enqueue({ method: 'applyNodeSize', args: [nodeId, size] });
       return;
     }
 
-    const portsToUpdate = this.getPortsToUpdate(node, ports);
+    this.initState.trackNodeMeasurement(nodeId, size);
+    this.tryFinish();
+  }
 
-    for (const { id, size, position } of portsToUpdate) {
-      if (!size || !position) {
-        continue;
-      }
+  /**
+   * Adds a new port created during initialization.
+   * Queues if finishing, otherwise adds to init state and notifies stability detector.
+   *
+   * @param nodeId - The node ID the port belongs to
+   * @param port - The port to add
+   */
+  addPort(nodeId: string, port: Port): void {
+    if (this.lateArrivalQueue.isFinishing) {
+      this.lateArrivalQueue.enqueue({ method: 'addPort', args: [nodeId, port] });
+      return;
+    }
 
-      const key = this.getCompoundId(nodeId, id);
+    this.initState.addPort(nodeId, port);
+    this.portStabilityDetector.notify();
+  }
 
-      this.portRectInitializer.batchChange(key, { ...size, ...position });
+  /**
+   * Records port measurements (sizes and positions).
+   * Queues if finishing, otherwise records all measurements and attempts to finish.
+   *
+   * @param nodeId - The node ID the ports belong to
+   * @param ports - Array of port measurements
+   */
+  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void {
+    if (this.lateArrivalQueue.isFinishing) {
+      this.lateArrivalQueue.enqueue({ method: 'applyPortsSizesAndPositions', args: [nodeId, ports] });
+      return;
+    }
+
+    for (const { id, size, position } of ports) {
+      if (!size || !position) continue;
+      this.initState.trackPortMeasurement(nodeId, id, size, position);
+    }
+
+    this.tryFinish();
+  }
+
+  /**
+   * Adds a new edge label created during initialization.
+   * Queues if finishing, otherwise adds to init state and notifies stability detector.
+   *
+   * @param edgeId - The edge ID the label belongs to
+   * @param label - The label to add
+   */
+  addEdgeLabel(edgeId: string, label: EdgeLabel): void {
+    if (this.lateArrivalQueue.isFinishing) {
+      this.lateArrivalQueue.enqueue({ method: 'addEdgeLabel', args: [edgeId, label] });
+      return;
+    }
+
+    this.initState.addLabel(edgeId, label);
+    this.labelStabilityDetector.notify();
+  }
+
+  /**
+   * Records an edge label size measurement.
+   * Queues if finishing, otherwise records measurement and attempts to finish.
+   *
+   * @param edgeId - The edge ID the label belongs to
+   * @param labelId - The label ID
+   * @param size - The measured size
+   */
+  applyEdgeLabelSize(edgeId: string, labelId: string, size: Size): void {
+    if (this.lateArrivalQueue.isFinishing) {
+      this.lateArrivalQueue.enqueue({ method: 'applyEdgeLabelSize', args: [edgeId, labelId, size] });
+      return;
+    }
+
+    this.initState.trackLabelMeasurement(edgeId, labelId, size);
+    this.tryFinish();
+  }
+
+  /**
+   * Attempts to finish initialization if conditions are met.
+   * Conditions: not already finishing, not initialized, entities stabilized, all entities measured.
+   */
+  private tryFinish() {
+    if (this.lateArrivalQueue.isFinishing || this.isInitialized) {
+      return;
+    }
+
+    if (!this.entitiesStabilized) {
+      return;
+    }
+
+    const state = this.flowCore.getState();
+    if (this.initState.allEntitiesHaveMeasurements(state.nodes.length)) {
+      this.finish();
     }
   }
 
-  addEdgeLabel(edgeId: string, label: EdgeLabel) {
-    const key = this.getCompoundId(edgeId, label.id);
-    this.edgeLabelInitializer.batchChange(key, label);
+  /**
+   * Completes initialization by applying all collected data.
+   * Marks as finishing, applies state, executes callback, marks as initialized, processes late arrivals.
+   */
+  private async finish() {
+    this.clearMeasurementTimeout();
+    this.lateArrivalQueue.startFinishing();
+
+    this.initState.applyToDiagramState(this.flowCore);
+
+    if (this.onCompleteCallback) {
+      await this.onCompleteCallback();
+    }
+
+    this.isInitialized = true;
+
+    this.lateArrivalQueue.processAll(this.flowCore.internalUpdater);
   }
 
-  applyEdgeLabelSize(edgeId: string, labelId: string, size: Size) {
-    const key = this.getCompoundId(edgeId, labelId);
-
-    this.edgeLabelSizeInitializer.batchChange(key, size);
+  /**
+   * Forces initialization to finish even if conditions aren't fully met.
+   * Used as a fallback when entity stabilization fails.
+   */
+  private forceFinish() {
+    this.finish();
   }
 
-  private splitCompoundId(id: string) {
-    const [entityId, itemId] = id.split(ID_SEPARATOR);
+  /**
+   * Starts a safety timeout to prevent indefinite waiting for measurements.
+   * If measurements don't arrive within MEASUREMENT_TIMEOUT, initialization is forced to complete.
+   * This handles cases where entities may not be measurable (e.g., display: none).
+   */
+  private startMeasurementTimeout(): void {
+    this.measurementTimeout = setTimeout(() => {
+      if (!this.isInitialized) {
+        const state = this.flowCore.getState();
+        const nodeCount = state.nodes.length;
+        const expectedPorts = this.initState.portsToMeasure.size;
+        const measuredPorts = this.initState.measuredPorts.size;
+        const expectedLabels = this.initState.labelsToMeasure.size;
+        const measuredLabels = this.initState.measuredLabels.size;
+        const measuredNodes = this.initState.measuredNodes.size;
 
-    return {
-      entityId,
-      itemId,
-    };
-  }
-
-  private getCompoundId(edgeId: string, labelId: string) {
-    return `${edgeId}${ID_SEPARATOR}${labelId}`;
-  }
-
-  private getInitializers() {
-    return [
-      this.nodeSizeInitializer,
-      this.edgeLabelInitializer,
-      this.edgeLabelSizeInitializer,
-      this.portInitializer,
-      this.portRectInitializer,
-    ];
-  }
-
-  private async checkIfInitialized() {
-    return Promise.all(this.getInitializers().map((initializer) => initializer.waitForFinish()));
-  }
-
-  private createInitializers() {
-    const { flowCore } = this;
-
-    const nodeSizeInitializer = new BatchInitializer<Size>((nodeSizeMap) => {
-      const { nodes, ...state } = flowCore.getState();
-
-      const updatedNodes = nodes.map((node) => {
-        const size = nodeSizeMap.get(node.id);
-        if (size) {
-          return { ...node, size };
-        }
-        return node;
-      });
-
-      flowCore.setState({ ...state, nodes: updatedNodes });
-    });
-
-    const edgeLabelInitializer = new BatchInitializer<EdgeLabel>((edgeLabelMap) => {
-      const { edges, ...state } = flowCore.getState();
-
-      const edgeLabelsMap = new Map<string, EdgeLabel[]>();
-
-      for (const [key, label] of edgeLabelMap.entries()) {
-        const { entityId: edgeId } = this.splitCompoundId(key);
-        edgeLabelsMap.set(edgeId, [...(edgeLabelsMap.get(edgeId) || []), label]);
-      }
-
-      const updatedEdges = edges.map((edge) => {
-        const labels = edgeLabelsMap.get(edge.id);
-        if (labels) {
-          return { ...edge, measuredLabels: [...(edge.measuredLabels ?? []), ...labels] };
-        }
-        return edge;
-      });
-
-      flowCore.setState({ ...state, edges: updatedEdges });
-    });
-
-    const edgeLabelSizeInitializer = new BatchInitializer<Size>((edgeLabelSizeMap) => {
-      const { edges, ...state } = flowCore.getState();
-
-      const updatedEdges = edges.map((edge) => ({
-        ...edge,
-        measuredLabels: edge.measuredLabels?.map((label) => {
-          const size = edgeLabelSizeMap.get(this.getCompoundId(edge.id, label.id));
-
-          if (!size) {
-            return label;
+        console.warn(
+          '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).',
+          {
+            nodes: { expected: nodeCount, measured: measuredNodes },
+            ports: { expected: expectedPorts, measured: measuredPorts },
+            labels: { expected: expectedLabels, measured: measuredLabels },
           }
+        );
 
-          return { ...label, size };
-        }),
-      }));
-
-      flowCore.setState({ ...state, edges: updatedEdges });
-    });
-
-    const portInitializer = new BatchInitializer<Port>((portMap) => {
-      const { nodes, ...state } = flowCore.getState();
-
-      const nodePortsMap = new Map<string, Port[]>();
-
-      for (const [key, port] of portMap.entries()) {
-        const { entityId: nodeId } = this.splitCompoundId(key);
-        nodePortsMap.set(nodeId, [...(nodePortsMap.get(nodeId) || []), port]);
+        this.forceFinish();
       }
+    }, MEASUREMENT_TIMEOUT);
+  }
 
-      const updatedNodes = nodes.map((node) => {
-        return {
-          ...node,
-          measuredPorts: nodePortsMap.get(node.id) ?? node.measuredPorts,
-        };
-      });
-
-      flowCore.setState({ ...state, nodes: updatedNodes });
-    });
-
-    const portRectInitializer = new BatchInitializer<Rect>((portRectMap) => {
-      const { nodes, ...state } = flowCore.getState();
-
-      const updatedNodes = nodes.map((node) => {
-        return {
-          ...node,
-          measuredPorts: node.measuredPorts?.map((port) => {
-            const key = this.getCompoundId(node.id, port.id);
-            const rect = portRectMap.get(key);
-
-            if (!rect) {
-              return port;
-            }
-
-            const { width, height, x, y } = rect;
-
-            return { ...port, size: { width, height }, position: { x, y } };
-          }),
-        };
-      });
-
-      flowCore.setState({ ...state, nodes: updatedNodes });
-    });
-
-    return {
-      nodeSizeInitializer,
-      edgeLabelInitializer,
-      edgeLabelSizeInitializer,
-      portInitializer,
-      portRectInitializer,
-    };
+  /**
+   * Clears the measurement timeout if it's active.
+   */
+  private clearMeasurementTimeout(): void {
+    if (this.measurementTimeout !== null) {
+      clearTimeout(this.measurementTimeout);
+      this.measurementTimeout = null;
+    }
   }
 }
-
-const ID_SEPARATOR = '->';

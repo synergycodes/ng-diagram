@@ -1,0 +1,166 @@
+---
+title: Routing
+description: Understanding how edge routing works in ngDiagram
+sidebar:
+  order: 2
+---
+
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+Edge routing determines how connections between nodes are drawn in your diagram. NgDiagram provides flexible routing where each routing algorithm:
+
+- Calculates the points that define the edge path
+- Draws the SVG path from those points
+- Computes positions along the path for labels and decorations
+
+Routing algorithms automatically calculate optimal paths, with an option to provide predefined waypoints for static edge paths.
+
+## Built-in Algorithms
+
+NgDiagram includes three routing algorithms:
+
+### Polyline
+
+The simplest routing that connects points with straight line segments. In auto mode, it creates a direct line between source and target. In manual mode, it can create multi-segment paths by connecting user-provided waypoints with straight lines.
+
+### Orthogonal
+
+Creates paths using only horizontal and vertical segments, ideal for technical diagrams and flowcharts. Supports configurable segment lengths and optional rounded corners.
+
+### Bezier
+
+Produces smooth curved connections using cubic Bézier curves.
+
+import Routing from '@components/angular/edges/routing/routing/routing.astro';
+
+<Routing />
+
+## Using Routing
+
+To specify a routing algorithm for an edge, set the `routing` property in the edge data:
+
+<CodeSnippet relativePath="edges/routing/routing/diagram.component.ts" />
+
+When no routing is specified, the default routing algorithm (polyline) is used. The default can be changed through configuration.
+
+For custom edge components, you can provide routing directly in the template:
+
+```typescript
+<ng-diagram-base-edge
+  [edge]="edge"
+  [routing]="'orthogonal'"
+  stroke="var(--ngd-default-edge-stroke)"
+/>
+```
+
+## Routing Modes
+
+Each edge can operate in one of two routing modes:
+
+### Auto Mode (Default)
+
+In auto mode, the routing algorithm automatically calculates the path between nodes. The list of points is calculated by the routing algorithm and should be treated as read-only. The path updates automatically when nodes move or resize.
+
+```typescript
+const edge = {
+  id: 'edge1',
+  source: 'node1',
+  target: 'node2',
+  routing: 'orthogonal',
+  routingMode: 'auto', // or omit for default
+  data: {},
+};
+```
+
+### Manual Mode
+
+Manual mode gives you full control over the edge path by allowing you to provide your own list of points. The routing algorithm is still used to draw the SVG path from these points and calculate label positions. When nodes move, you control what happens - the path can remain unchanged, or you can programmatically update the points as needed.
+
+Try moving the nodes in the example below - notice how the edge path remains fixed:
+
+import ManualMode from '@components/angular/edges/routing/manual/manual-mode.astro';
+
+<ManualMode />
+
+<CodeSnippet relativePath="edges/routing/manual/diagram.component.ts" />
+
+This is useful for creating custom edge behaviors, fixed connection paths, or implementing your own edge update logic.
+
+## Configuration
+
+You can configure routing behavior globally through the diagram's configuration:
+
+<CodeSnippet relativePath="edges/routing/configured/diagram.component.ts" />
+
+## Custom Routing Algorithms
+
+NgDiagram's routing system is extensible. You can create custom routing algorithms by implementing the `EdgeRouting` interface, or by creating custom edge components that generate their own paths using manual mode.
+
+### Manual Mode Approach
+
+You can create dynamic custom paths by computing points in your edge component and using manual routing mode. Here's an example of a sinusoid edge that updates its path dynamically as nodes move:
+
+import Sinusoid from '@components/angular/edges/routing/sinusoid/sinusoid.astro';
+
+<Sinusoid />
+
+<CodeSnippet relativePath="edges/routing/sinusoid/sinusoid-edge.component.ts" />
+
+This approach is ideal when you want the path to update automatically based on node positions and when you just need to compute points - the SVG path can be computed by a built-in routing algorithm (in this case, polyline was sufficient).
+
+### EdgeRouting Interface
+
+For more control and reusability across different edge types, you can create a custom routing algorithm by implementing the `EdgeRouting` interface:
+
+```typescript
+import { EdgeRouting, EdgeRoutingContext, Point } from 'ng-diagram';
+
+export class CustomRouting implements EdgeRouting {
+  name = 'custom';
+
+  computePoints(context: EdgeRoutingContext): Point[] {
+    const { sourcePoint, targetPoint, edge, sourceNode, targetNode } = context;
+
+    // Your custom routing logic here
+    // Return array of points defining the path
+    return [sourcePoint /* ...waypoints */, , targetPoint];
+  }
+
+  computeSvgPath(points: Point[]): string {
+    // Convert points to SVG path string
+    return `M ${points[0].x},${points[0].y} ...`;
+  }
+
+  computePointOnPath(points: Point[], percentage: number): Point {
+    // Calculate point at given percentage along path
+    // Used for label positioning
+    return { x: 0, y: 0 };
+  }
+}
+```
+
+Register your custom routing:
+
+```typescript
+import { NgDiagramService } from 'ng-diagram';
+
+constructor(private diagramService: NgDiagramService) {
+  this.diagramService.registerRouting(new CustomRouting());
+}
+```
+
+Then use it in your edges:
+
+```typescript
+const edge = {
+  id: 'edge1',
+  source: 'node1',
+  target: 'node2',
+  routing: 'custom', // Your custom routing name
+  data: {},
+};
+```
+
+## Related Topics
+
+[Edges Overview →](/docs/guides/edges/edges) | [Custom Edges →](/docs/guides/edges/custom-edges) | [Edge Labels →](/docs/guides/edges/labels)

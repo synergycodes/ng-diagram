@@ -38,7 +38,7 @@ import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.componen
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.transform]': 'transform',
-    '[style.display]': 'isVisible() ? null : "none"',
+    '[style.visibility]': 'isVisible() ? null : "hidden"',
   },
 })
 export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
