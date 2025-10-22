@@ -67,6 +67,10 @@ export default defineConfig({
           autogenerate: { directory: 'api', collapsed: true },
           collapsed: false,
         },
+        {
+          label: 'Changelog',
+          link: '/changelog/',
+        },
       ],
       plugins: [
         starlightAutoSidebar(),
@@ -88,6 +92,7 @@ export default defineConfig({
       ],
       components: {
         SocialIcons: './src/components/social-icons/social-icons.astro',
+        PageTitle: './src/components/page-title/page-title.astro',
       },
     }),
   ],
