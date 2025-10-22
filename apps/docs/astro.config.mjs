@@ -11,6 +11,9 @@ const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 
 export default defineConfig({
   base: '/docs',
+  redirects: {
+    '/': '/docs/intro/quick-start/',
+  },
   integrations: [
     umami({
       id: UMAMI_WEBSITE_ID,
