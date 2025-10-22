@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import {
-  BaseEdgeLabelComponent,
   NgDiagramBaseEdgeComponent,
+  NgDiagramBaseEdgeLabelComponent,
   type Edge,
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
@@ -24,7 +24,7 @@ const STROKE_WIDTH_SELECTED = 4;
       </button>
     </ng-diagram-base-edge-label>
   </ng-diagram-base-edge> `,
-  imports: [NgDiagramBaseEdgeComponent, BaseEdgeLabelComponent],
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
 export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();

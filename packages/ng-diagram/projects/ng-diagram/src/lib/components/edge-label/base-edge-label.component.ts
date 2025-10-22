@@ -16,7 +16,7 @@ import { BatchResizeObserverService, FlowCoreProviderService } from '../../servi
 import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.component';
 
 /**
- * The `BaseEdgeLabelComponent` is responsible for displaying a label at a specific position along an edge.
+ * The `NgDiagramBaseEdgeLabelComponent` is responsible for displaying a label at a specific position along an edge.
  *
  * ## Example usage
  * ```html
@@ -41,7 +41,7 @@ import { NgDiagramBaseEdgeComponent } from '../edge/base-edge/base-edge.componen
     '[style.visibility]': 'isVisible() ? null : "hidden"',
   },
 })
-export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
+export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly edgeComponent = inject(NgDiagramBaseEdgeComponent);
@@ -133,3 +133,8 @@ export class BaseEdgeLabelComponent implements OnInit, OnDestroy {
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }
+
+/**
+ * @deprecated Use {@link NgDiagramBaseEdgeLabelComponent} instead. This alias will be removed in a future version.
+ */
+export const BaseEdgeLabelComponent = NgDiagramBaseEdgeLabelComponent;
