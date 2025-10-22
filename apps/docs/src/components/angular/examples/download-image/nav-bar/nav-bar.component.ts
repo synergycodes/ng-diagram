@@ -18,14 +18,15 @@ export class NavBarComponent {
   private readonly generateImageService = inject(GenerateImageService);
   private readonly modelService = inject(NgDiagramModelService);
 
-  elementRef = input<ElementRef>();
+  diagramRef = input<ElementRef<HTMLElement> | undefined>();
 
   // @mark-start
   async download(): Promise<void> {
-    if (this.elementRef()) {
+    const diagramRef = this.diagramRef();
+    if (diagramRef) {
       const file = await this.generateImageService.generateImageFile(
         this.modelService.getModel().getNodes(),
-        this.elementRef()?.nativeElement
+        diagramRef.nativeElement
       );
 
       downloadImage(file, `flow-diagram-${Date.now()}.png`);
