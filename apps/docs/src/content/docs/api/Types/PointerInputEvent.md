@@ -193,7 +193,7 @@ Returns the object whose event listener's callback is currently being invoked.
 
 #### Inherited from
 
-[`PointerInputEvent`](/docs/api/types/pointerinputevent/).[`currentTarget`](/docs/api/types/pointerinputevent/#currenttarget)
+`PointerEvent.currentTarget`
 
 ***
 
@@ -491,7 +491,7 @@ Returns true if event was dispatched by the user agent, and false otherwise.
 
 #### Inherited from
 
-[`PointerInputEvent`](/docs/api/types/pointerinputevent/).[`srcElement`](/docs/api/types/pointerinputevent/#srcelement)
+`PointerEvent.srcElement`
 
 ***
 
@@ -517,7 +517,7 @@ Returns the object to which event is dispatched (its target).
 
 #### Inherited from
 
-[`PointerInputEvent`](/docs/api/types/pointerinputevent/).[`target`](/docs/api/types/pointerinputevent/#target)
+`PointerEvent.target`
 
 ***
 

@@ -18,6 +18,7 @@ import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
+import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
@@ -37,6 +38,7 @@ export class AppComponent {
     ['button-edge', ButtonEdgeComponent],
     ['custom-polyline-edge', CustomPolylineEdgeComponent],
     ['labelled-edge', LabelledEdgeComponent],
+    ['dashed-edge', DashedEdgeComponent],
   ]);
 
   config: NgDiagramConfig = {
@@ -229,6 +231,16 @@ export class AppComponent {
         targetPort: 'port-left',
         type: 'labelled-edge',
         routing: 'bezier',
+      },
+      {
+        id: '6',
+        source: '11',
+        target: '12',
+        data: {},
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        type: 'dashed-edge',
+        routing: 'orthogonal',
       },
     ],
     metadata: {

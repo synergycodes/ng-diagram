@@ -1,0 +1,12 @@
+// @section-start
+.custom-diagram {
+  display: flex;
+  height: 20rem;
+
+  // @mark-start:styles
+  --ngd-default-edge-stroke: black;
+  --ngd-default-edge-stroke-hover: darkgoldenrod;
+  --ngd-default-edge-stroke-selected: gold;
+  // @mark-end:styles
+}
+// @section-end

@@ -270,7 +270,7 @@ Registers a custom routing implementation.
 
 ##### routing
 
-`EdgeRouting`
+[`EdgeRouting`](/docs/api/other/edgerouting/)
 
 Routing implementation to register.
 

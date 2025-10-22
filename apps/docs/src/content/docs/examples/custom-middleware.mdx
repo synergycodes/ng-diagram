@@ -8,17 +8,17 @@ sidebar:
 import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 import ReadonlyMiddleware from '@examples/readonly-middleware/readonly-middleware.astro';
 
-This example demonstrates how to create a custom middleware that implements read-only functionality for ngDiagram. Middlewares provide a powerful plugin architecture for extending diagram behavior by intercepting state changes before they reach the model.
-
-The read-only middleware demonstrates how to:
-
-- **Block specific actions** based on configuration
-- **Allow selective operations** through an allowlist
-- **Cancel operations** to prevent state changes
-- **Log warnings** for blocked actions
-
-The middleware prevents users from modifying the diagram while still allowing actions like selection changes.
+This example demonstrates how to create a custom middleware that implements read-only functionality for ngDiagram.
+Middlewares provide a powerful plugin architecture for extending diagram behavior by intercepting state changes before they reach the model.
 
 <ReadonlyMiddleware />
-
 <ExampleViewer dirName="readonly-middleware" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Action Blocking:** Block specific actions based on configuration.
+- **Allowlist:** Permit selective operations through an allowlist.
+- **Operation Cancellation:** Cancel operations to prevent unwanted state changes.
+- **Logging:** Log warnings for blocked actions.

@@ -1,7 +1,13 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { DeepPartial, FlowConfig, FlowCore, MiddlewareChain, ModelAdapter, Point } from '../../../core/src';
-
-import { detectEnvironment } from '../../utils/detect-environment';
+import { Injectable, inject, signal } from '@angular/core';
+import {
+  type DeepPartial,
+  type FlowConfig,
+  FlowCore,
+  type MiddlewareChain,
+  type ModelAdapter,
+  type Point,
+} from '../../../core/src';
+import { EnvironmentProviderService } from '../environment-provider/environment-provider.service';
 import { InputEventsRouterService } from '../input-events/input-events-router.service';
 import { RendererService } from '../renderer/renderer.service';
 
@@ -9,6 +15,7 @@ import { RendererService } from '../renderer/renderer.service';
 export class FlowCoreProviderService {
   private readonly renderer = inject(RendererService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly environment = inject(EnvironmentProviderService);
   private flowCore: FlowCore | null = null;
   private _isInitialized = signal(false);
 
@@ -24,7 +31,7 @@ export class FlowCoreProviderService {
       model,
       this.renderer,
       this.inputEventsRouter,
-      detectEnvironment(),
+      this.environment,
       middlewares,
       getFlowOffset,
       config
