@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Edge, Point } from '../../../../core/src';
 import { FlowCoreProviderService, RendererService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { BaseEdgeLabelComponent } from '../../edge-label/base-edge-label/base-edge-label.component';
+import { NgDiagramBaseEdgeLabelComponent } from '../../edge-label/base-edge-label/base-edge-label.component';
 import { NgDiagramBaseEdgeComponent } from './base-edge.component';
 
 @Component({
@@ -59,7 +59,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
     })
       .overrideComponent(NgDiagramBaseEdgeComponent, {
         remove: {
-          imports: [BaseEdgeLabelComponent],
+          imports: [NgDiagramBaseEdgeLabelComponent],
         },
         add: {
           imports: [MockNgDiagramEdgeLabelComponent],
@@ -246,11 +246,35 @@ describe('NgDiagramBaseEdgeComponent', () => {
     expect(component.strokeWidth()).toBe(4);
   });
 
-  it('should use default values for stroke opacity and width', () => {
+  it('should use default value for stroke opacity', () => {
     fixture.componentRef.setInput('edge', mockEdge);
     fixture.detectChanges();
 
-    expect(component.strokeOpacity()).toBe(1);
-    expect(component.strokeWidth()).toBe(2);
+    const pathElement = fixture.nativeElement.querySelector('path');
+    expect(pathElement.getAttribute('stroke-opacity')).toBe('var(--edge-stroke-opacity, 1)');
+  });
+
+  it('should use default value for stroke width', () => {
+    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.detectChanges();
+
+    const pathElement = fixture.nativeElement.querySelector('path');
+    expect(pathElement.getAttribute('stroke-width')).toBe('var(--edge-stroke-width, 2)');
+  });
+
+  it('should use default value for stroke color', () => {
+    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.detectChanges();
+
+    const pathElement = fixture.nativeElement.querySelector('path');
+    expect(pathElement.getAttribute('stroke')).toBe('var(--edge-stroke, var(--ngd-default-edge-stroke))');
+  });
+
+  it('should use default value for stroke dasharray', () => {
+    fixture.componentRef.setInput('edge', mockEdge);
+    fixture.detectChanges();
+
+    const pathElement = fixture.nativeElement.querySelector('path');
+    expect(pathElement.getAttribute('stroke-dasharray')).toBe('var(--edge-stroke-dasharray, none)');
   });
 });

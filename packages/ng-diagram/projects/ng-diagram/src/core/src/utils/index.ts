@@ -4,6 +4,7 @@ export * from './deep-merge';
 export * from './get-port-flow-position';
 export * from './group-size';
 export * from './is-group';
+export * from './measurement-validation';
 export * from './rects-points-sizes';
 export * from './semaphore';
 export * from './sort-nodes-by-z-index';

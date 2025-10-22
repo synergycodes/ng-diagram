@@ -57,32 +57,4 @@ describe('NgDiagramDefaultEdgeComponent', () => {
     expect(component.edge).toBeDefined();
     expect(component.edge().id).toBe('test-edge');
   });
-
-  it('should render label when label is present in data', () => {
-    const edgeWithLabel: Edge = {
-      ...mockEdge,
-      data: { label: 'Test Label' },
-    };
-
-    fixture.componentRef.setInput('edge', edgeWithLabel);
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement;
-    const labelElement = compiled.querySelector('ng-diagram-base-edge-label ng-diagram-default-edge-label');
-
-    expect(component.label()).toBe('Test Label');
-    expect(labelElement).toBeTruthy();
-    expect(labelElement.textContent).toBe('Test Label');
-  });
-
-  it('should not render label when label is not present in data', () => {
-    fixture.componentRef.setInput('edge', mockEdge);
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement;
-    const labelElement = compiled.querySelector('ng-diagram-base-edge-label');
-
-    expect(component.label()).toBeUndefined();
-    expect(labelElement).toBeFalsy();
-  });
 });

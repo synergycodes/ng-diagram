@@ -44,9 +44,5 @@ export default tseslint.config(
         },
       ],
     },
-  },
-  {
-    files: ['**/*.html'],
-    rules: {},
   }
 );

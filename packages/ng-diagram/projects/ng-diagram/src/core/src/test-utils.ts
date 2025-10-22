@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import type { Edge, EdgeLabel, EnvironmentInfo, GroupNode, Metadata, Node, Port } from './types';
 
 export const mockNode: Node = {
@@ -39,6 +40,9 @@ export const mockMetadata: Metadata = {
 export const mockEnvironment: EnvironmentInfo = {
   os: 'MacOS',
   browser: 'Chrome',
+  runtime: 'web',
+  now: vi.fn(),
+  generateId: vi.fn(),
 };
 
 export const mockPort: Port = {

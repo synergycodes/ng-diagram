@@ -2,7 +2,7 @@ import { ActionStateManager } from './action-state-manager/action-state-manager'
 import { CommandHandler } from './command-handler/command-handler';
 import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
-import { defaultFlowConfig } from './flow-config/default-flow-config';
+import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -40,12 +40,11 @@ export class FlowCore {
   private _config: FlowConfig;
 
   private readonly initUpdater: InitUpdater;
-  private readonly internalUpdater: InternalUpdater;
+  readonly internalUpdater: InternalUpdater;
   private readonly updateSemaphore = new Semaphore(1);
 
   readonly commandHandler: CommandHandler;
   readonly middlewareManager: MiddlewareManager;
-  readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
@@ -61,13 +60,13 @@ export class FlowCore {
     modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
     public readonly inputEventsRouter: InputEventsRouter,
-    environment: EnvironmentInfo,
+    public readonly environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
     getFlowOffset?: () => Point,
     config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
-    this._config = deepMerge(defaultFlowConfig, config);
+    this._config = createFlowConfig(config, this);
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.spatialHash = new SpatialHash();
@@ -99,17 +98,17 @@ export class FlowCore {
   /**
    * Starts listening to model changes and emits init command
    */
-  private async init() {
+  private init() {
     this.render();
-
-    await this.initUpdater.start();
 
     this.model.onChange((state) => {
       this.spatialHash.process(state.nodes);
       this.render();
     });
 
-    this.commandHandler.emit('init');
+    this.initUpdater.start(async () => {
+      await this.commandHandler.emit('init');
+    });
   }
 
   /**
@@ -382,11 +381,7 @@ export class FlowCore {
   }
 
   get updater(): Updater {
-    if (!this.initUpdater.isInitialized) {
-      return this.initUpdater;
-    }
-
-    return this.internalUpdater;
+    return this.initUpdater.isInitialized ? this.internalUpdater : this.initUpdater;
   }
 
   setDebugMode(debugMode: boolean): void {

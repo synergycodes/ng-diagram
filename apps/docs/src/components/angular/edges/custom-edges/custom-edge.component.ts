@@ -1,3 +1,4 @@
+// @section-start
 import { Component, computed, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
@@ -5,7 +6,6 @@ import {
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
 
-// @section-start
 @Component({
   selector: 'custom-edge',
   template: `<ng-diagram-base-edge

@@ -12,7 +12,7 @@ import { GenerateImageService } from '../generate-image.service';
       <button class="btn" (click)="download()">Download</button>
     </div>
   `,
-  styleUrls: ['./nav-bar-component.scss'],
+  styleUrls: ['./nav-bar.component.scss'],
 })
 export class NavBarComponent {
   private readonly generateImageService = inject(GenerateImageService);

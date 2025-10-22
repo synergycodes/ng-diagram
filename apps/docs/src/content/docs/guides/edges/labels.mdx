@@ -1,0 +1,143 @@
+---
+title: Labels
+description: Understanding how labels on edges work in ngDiagram
+sidebar:
+  order: 5
+---
+
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
+
+## Using Labels in Default Edges
+
+To display a label on an edge, you can add a `label` property to the edge's data.
+
+import DefaultLabel from '@components/angular/edges/labels/default-label/default-label.astro';
+
+<DefaultLabel />
+
+<CodeSnippet relativePath="edges/labels/default-label/diagram.component.ts" />
+
+### CSS Variables
+
+Default labels can be styled using CSS variables. You can customize these in your global styles:
+
+```scss
+ng-diagram-default-edge-label {
+  --edge-label-padding: 10px;
+  --edge-label-border-radius: 8px;
+  --edge-label-font-size: 14px;
+  --edge-label-background-color: #f3f4f6;
+  --edge-label-text-color: #1e293b;
+  --edge-label-border-width: 2px;
+  --edge-label-border-color: #334155;
+}
+```
+
+The default edge also applies different styles to labels based on the edge state (normal, hover, selected). You can customize these styles by modifying the following CSS:
+
+```scss
+ng-diagram-base-edge.default-edge:hover:not(.selected) {
+  --edge-label-border-color: #2563eb;
+}
+
+ng-diagram-base-edge.default-edge.selected {
+  --edge-label-border-color: #3b82f6;
+}
+```
+
+## Custom Labels
+
+To display a custom label on an edge, use the `NgDiagramBaseEdgeLabelComponent` in an implementation of your custom edge component:
+
+import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
+
+<LabeledEdge />
+
+<CodeSnippet relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts" />
+
+## Label Positioning
+
+The `positionOnEdge` property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/docs/guides/edges/routing).
+
+## Adding labels
+
+Labels can be added and modified dynamically. One way to achieve this is by using diagram's model. The `ModifiableLabelEdgeComponent` shows how to map such data into an actual label implementation.
+
+Click on an edge to select it in the example below. Then fill the label's name and click "Set Label".
+It'll modify selected edge's data to include a new element in a `measuredLabels` property.
+
+import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-labels.astro';
+
+<AddingLabels />
+
+The edge component implementation looks like this:
+
+```typescript
+import { Component, computed, input } from '@angular/core';
+import {
+  NgDiagramBaseEdgeLabelComponent,
+  NgDiagramBaseEdgeComponent,
+  type Edge,
+  type NgDiagramEdgeTemplate,
+} from 'ng-diagram';
+
+@Component({
+  selector: 'multi-label-edge',
+  template: `<ng-diagram-base-edge
+    [edge]="edge()"
+    [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
+  >
+    <ng-diagram-base-edge-label id="1" [positionOnEdge]="0.5" class="custom-label">
+      {{ edge().data.label }}
+    </ng-diagram-base-edge-label>
+  </ng-diagram-base-edge>`,
+  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
+})
+export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate<{ label: string }> {
+  edge = input.required<Edge<{ label: string }>>();
+
+  selected = computed(() => this.edge().selected);
+}
+```
+
+In the diagram model, the edge can be defined like this:
+
+```typescript
+...
+edges: [
+        {
+          id: '1',
+          source: '1',
+          sourcePort: 'port-right',
+          target: '2',
+          targetPort: 'port-left',
+          data: { label: 'Label text...' },
+        }
+]
+...
+```
+
+## Handling Interactive Elements in Labels
+
+When adding interactive elements like inputs to edge labels, dragging on these elements might trigger unwanted diagram behaviors. You can control this using special data attributes:
+
+- **`data-no-pan="true"`** - Prevents the diagram canvas from panning when the user clicks and drags on the element
+- **`data-no-drag="true"`** - Prevents nodes from being dragged when the user clicks and drags on the element
+
+```html
+<!-- Input in edge label that won't trigger diagram interactions -->
+<input type="text" data-no-pan="true" data-no-drag="true" placeholder="Type here" />
+```
+
+## Multiple Labels
+
+NgDiagram supports multiple labels and they can be used to display images, shapes, or any other content.
+The example below demonstrates how to add multiple labels to an edge to create a flow animation.
+
+import MultipleLabels from '@components/angular/edges/labels/multiple-labels/multiple-labels.astro';
+
+<MultipleLabels />
+
+<CodeSnippet relativePath="edges/labels/multiple-labels/multiple-labels-edge.component.ts" />

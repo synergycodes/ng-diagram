@@ -204,6 +204,147 @@ describe('DiagramInitEmitter', () => {
     });
   });
 
+  describe('zero size validation', () => {
+    it('should treat node with 0 width or height as unmeasured', () => {
+      const nodeWithZeroWidth: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 0, height: 50 },
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', nodeWithZeroWidth);
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit - width is 0
+      expect(emitSpy).not.toHaveBeenCalled();
+
+      // Update with valid width
+      context.modelActionType = 'updateNode';
+      context.initialUpdate = {
+        nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
+      };
+
+      emitter.emit(context, eventManager);
+
+      // Should emit now
+      expect(emitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should treat port with 0 size as unmeasured', () => {
+      const portWithZeroSize: Port = {
+        id: 'port1',
+        type: 'both',
+        side: 'left',
+        position: { x: 10, y: 25 },
+        size: { width: 0, height: 10 },
+        nodeId: 'node1',
+      };
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+        measuredPorts: [portWithZeroSize],
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit - port width is 0
+      expect(emitSpy).not.toHaveBeenCalled();
+    });
+
+    it('should accept port position with 0 coordinates as valid', () => {
+      const portAtOrigin: Port = {
+        id: 'port1',
+        type: 'both',
+        side: 'left',
+        position: { x: 0, y: 0 },
+        size: { width: 10, height: 10 },
+        nodeId: 'node1',
+      };
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+        measuredPorts: [portAtOrigin],
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // Should emit - position (0, 0) is valid
+      expect(emitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should treat label with 0 size as unmeasured', () => {
+      const labelWithZeroSize: EdgeLabel = {
+        id: 'label1',
+        position: { x: 50, y: 50 },
+        size: { width: 0, height: 20 },
+        positionOnEdge: 0.5,
+      };
+
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge1',
+        measuredLabels: [labelWithZeroSize],
+      };
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+      context.edgesMap.set('edge1', edge);
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit - label width is 0
+      expect(emitSpy).not.toHaveBeenCalled();
+    });
+
+    it('should accept label position with 0 coordinates as valid', () => {
+      const labelAtOrigin: EdgeLabel = {
+        id: 'label1',
+        position: { x: 0, y: 0 },
+        size: { width: 40, height: 20 },
+        positionOnEdge: 0.5,
+      };
+
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge1',
+        measuredLabels: [labelAtOrigin],
+      };
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+      context.edgesMap.set('edge1', edge);
+
+      emitter.emit(context, eventManager);
+
+      // Should emit - position (0, 0) is valid
+      expect(emitSpy).toHaveBeenCalledOnce();
+    });
+  });
+
   describe('measurement updates', () => {
     it('should emit event after all nodes are measured', () => {
       const node1: Node = {
