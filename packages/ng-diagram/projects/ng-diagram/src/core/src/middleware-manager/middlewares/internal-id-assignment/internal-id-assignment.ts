@@ -11,7 +11,7 @@ import { FlowStateUpdate, Middleware } from '../../../types';
 export const internalIdMiddleware: Middleware = {
   name: 'internal-id-assignment',
   execute: async (context, next) => {
-    const { helpers, initialUpdate } = context;
+    const { helpers, initialUpdate, environment } = context;
 
     if (!helpers.anyNodesAdded()) {
       next();
@@ -22,7 +22,7 @@ export const internalIdMiddleware: Middleware = {
       ...node,
       _internalId:
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (node as any)._internalId || `${node.id}-${crypto.randomUUID()}`,
+        (node as any)._internalId || `${node.id}-${environment.generateId()}`,
     }));
 
     const stateUpdate: FlowStateUpdate = {

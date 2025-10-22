@@ -2,7 +2,7 @@ import { ActionStateManager } from './action-state-manager/action-state-manager'
 import { CommandHandler } from './command-handler/command-handler';
 import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
-import { defaultFlowConfig } from './flow-config/default-flow-config';
+import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -45,7 +45,6 @@ export class FlowCore {
 
   readonly commandHandler: CommandHandler;
   readonly middlewareManager: MiddlewareManager;
-  readonly environment: EnvironmentInfo;
   readonly spatialHash: SpatialHash;
   readonly modelLookup: ModelLookup;
   readonly transactionManager: TransactionManager;
@@ -61,13 +60,13 @@ export class FlowCore {
     modelAdapter: ModelAdapter,
     private readonly renderer: Renderer,
     public readonly inputEventsRouter: InputEventsRouter,
-    environment: EnvironmentInfo,
+    public readonly environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
     getFlowOffset?: () => Point,
     config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
-    this._config = deepMerge(defaultFlowConfig, config);
+    this._config = createFlowConfig(config, this);
     this.environment = environment;
     this.commandHandler = new CommandHandler(this);
     this.spatialHash = new SpatialHash();
@@ -104,6 +103,7 @@ export class FlowCore {
 
     this.model.onChange((state) => {
       this.spatialHash.process(state.nodes);
+      this.modelLookup.desynchronize();
       this.render();
     });
 

@@ -2,7 +2,7 @@
 title: Services
 description: Comprehensive guide to ngDiagram services and their usage
 sidebar:
-  order: 4
+  order: 3
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -19,6 +19,8 @@ ngDiagram provides a rich set of injectable services that give you programmatic 
 ### NgDiagramService
 
 The main orchestration service that provides access to the action state and middleware management. This is your gateway to advanced diagram control.
+
+[API Documentation →](/docs/api/services/ngdiagramservice)
 
 **Key Capabilities:**
 
@@ -50,6 +52,8 @@ export class ToolbarComponent {
 ### NgDiagramModelService
 
 Handles all model-related operations including node and edge updates, spatial queries, and direct access to the underlying data model.
+
+[API Documentation →](/docs/api/services/ngdiagrammodelservice)
 
 **Key Capabilities:**
 
@@ -120,6 +124,8 @@ export class PropertiesPanelComponent {
 ### NgDiagramViewportService
 
 Manages viewport operations, coordinate transformations, and provides reactive access to zoom and pan state.
+
+[API Documentation →](/docs/api/services/ngdiagramviewportservice)
 
 **Key Capabilities:**
 
@@ -200,6 +206,8 @@ export class ViewportControlsComponent {
 
 Manages the selection state of nodes and edges, providing both reactive access to current selection and methods to modify it.
 
+[API Documentation →](/docs/api/services/ngdiagramselectionservice)
+
 **Key Capabilities:**
 
 - Reactive selection state with nodes and edges
@@ -272,6 +280,8 @@ export class SelectionToolbarComponent {
 
 Handles copy, cut, and paste operations for diagram elements with support for position-aware pasting.
 
+[API Documentation →](/docs/api/services/ngdiagramclipboardservice)
+
 **Key Capabilities:**
 
 - Copy selected elements to clipboard
@@ -333,6 +343,8 @@ export class ContextMenuComponent {
 ### NgDiagramNodeService
 
 Provides node-specific operations with focus on transformations.
+
+[View API Documentation →](/docs/api/services/ngdiagramnodeservice)
 
 **Key Capabilities:**
 

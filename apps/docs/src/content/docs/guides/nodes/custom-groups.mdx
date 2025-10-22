@@ -1,0 +1,73 @@
+---
+title: Custom Groups
+description: Creating and configuring custom group templates in ngDiagram
+sidebar:
+  order: 4
+---
+
+You can create custom group templates, similar to custom nodes.
+All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
+Remember that in your diagram model, the group node must have `isGroup: true` set to function as a group.
+
+```typescript {22}
+import { Component, input } from '@angular/core';
+import {
+  GroupNode,
+  NgDiagramGroupHighlightedDirective,
+  NgDiagramGroupNodeTemplate,
+  NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeSelectedDirective,
+} from 'ng-diagram';
+
+@Component({
+  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramGroupHighlightedDirective, NgDiagramNodeSelectedDirective],
+  template: `
+    <ng-diagram-node-resize-adornment>
+      <div class="custom-group" ngDiagramGroupHighlighted ngDiagramNodeSelected [node]="node()">
+        <div class="header">Group header</div>
+        <div>...</div>
+      </div>
+    </ng-diagram-node-resize-adornment>
+  `,
+  // styles: { ... }
+})
+export class CustomGroupComponent implements NgDiagramGroupNodeTemplate {
+  node = input.required<GroupNode>();
+}
+```
+
+Register your custom group in the `nodeTemplateMap` and assign its `type` to the group node.
+
+[Registering Custom Types →](/docs/guides/nodes/custom-nodes/#registration)
+
+## Resizing Custom Group
+
+For more information on resizing, see [Resizing →](/docs/guides/nodes/resizing)
+
+## Highlighting Custom Group
+
+Use `NgDiagramGroupHighlightedDirective` for highlight styles.
+
+```html
+<div ngDiagramGroupHighlighted [node]="node()">
+  <!-- Your Custom Group content -->
+</div>
+```
+
+## Selecting Custom Group
+
+Use `NgDiagramNodeSelectedDirective` for selection styles.
+
+```html
+<div ngDiagramNodeSelected [node]="node()">
+  <!-- Your Custom Group content -->
+</div>
+```
+
+## Rotation
+
+For more information on rotation, see [Rotation →](/docs/guides/nodes/rotation).
+
+## See Also
+
+[Groups →](/docs/guides/nodes/groups) | [Custom Nodes →](/docs/guides/nodes/custom-nodes)

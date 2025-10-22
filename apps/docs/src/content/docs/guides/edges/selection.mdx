@@ -1,0 +1,69 @@
+---
+title: Selection
+description: Understanding how edge selection works in ngDiagram
+---
+
+import CustomEdgeSelection from '@components/angular/edges/edge-selection/custom-edge/custom-edge.astro';
+import CustomSelection from '@components/angular/edges/edge-selection/custom/custom.astro';
+import DefaultEdgeSelection from '@components/angular/edges/edge-selection/default/default.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+The **edge selection** feature in ngDiagram allows users to select edges on the diagram canvas.
+Selected edges are visually highlighted, making it easier to identify and interact with connections between nodes.
+
+## How It Works
+
+- Edges can be selected by clicking on them.
+- The selected state is managed by ngDiagram and can be accessed via the edge's `selected` property.
+- Selection styles can be applied automatically or customized.
+
+## Default Selection
+
+Default edge selection uses built-in styles and logic provided by ngDiagram.
+The default edge template automatically highlights selected edges.
+
+<DefaultEdgeSelection />
+
+## Customizing Defaults
+
+You can customize edge selection styles.
+
+Here are a CSS variables you can use to style the selection highlight:
+
+```
+--ngd-default-edge-stroke   // Stroke color for default edge
+--ngd-default-edge-stroke-hover // Stroke color for default edge on hover
+--ngd-default-edge-stroke-selected   // Stroke color for selected default edge
+```
+
+You can override this variable in your styles to customize the appearance of selected nodes.
+
+<CustomSelection />
+
+<CodeSnippet relativePath="edges/edge-selection/custom/diagram.component.scss" sectionId="styles" />
+
+## Custom Edge Selection
+
+Custom edges can easily apply selection styles using CSS variables. The base edge component exposes selection state through CSS classes, allowing you to style edges without breaking encapsulation.
+
+### How It Works
+
+When an edge is selected, the `NgDiagramBaseEdgeComponent` automatically adds the `.selected` class to its host element. You can use this class to change CSS variables that control the edge appearance.
+
+### Example: Custom Edge with Selection Styling
+
+<CustomEdgeSelection />
+
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.ts" />
+
+<CodeSnippet relativePath="edges/edge-selection/custom-edge/custom-edge.component.scss" />
+
+More informaction about CSS variables and styling can be found in the [Edges Customization](/docs/guides/edges/edges/#styling-default-edges-with-css-variables) section.
+
+### Alternative: Dynamic Styling
+
+[Dynamic Edge Styling →](/docs/guides/edges/edges/#dynamic-styling)
+
+## Further Reading
+
+[Edges Overview →](/docs/guides/edges/edges) | [Custom Edges →](/docs/guides/edges/custom-edges) | [Edge Labels →](/docs/guides/edges/labels)

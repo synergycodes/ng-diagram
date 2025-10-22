@@ -1,0 +1,248 @@
+---
+title: Middlewares
+description: Understanding how middlewares work in ngDiagram
+---
+
+Middlewares provide a powerful plugin architecture for extending ngDiagram behavior. They intercept state changes before they reach the model, allowing you to transform data, add custom logic, and implement features without modifying core code.
+
+## How Middlewares Work
+
+When any change occurs in the diagram (adding nodes, moving elements, changing selections), the change goes through a middleware pipeline before reaching the model. Each middleware can:
+
+- **Inspect** the current state and what's being changed
+- **Transform** the data being applied
+- **Add** additional changes to the state
+- **Cancel** the operation entirely
+- **Perform** asynchronous operations
+
+Middlewares execute in sequence, with each middleware receiving the output of the previous one. This creates a powerful composition system where multiple behaviors can be combined.
+
+## Middleware API
+
+### Middleware Interface
+
+Each middleware implements the `Middleware` interface:
+
+```typescript
+interface Middleware<TName extends string = string> {
+  name: TName;
+  execute: (
+    context: MiddlewareContext,
+    next: (stateUpdate?: FlowStateUpdate) => Promise<FlowState>,
+    cancel: () => void
+  ) => Promise<void> | void;
+}
+```
+
+### Context and Helpers
+
+The **context** provides access to the current state, configuration, and metadata about what triggered the change. Key properties include:
+
+- `state` - Current diagram state with nodes, edges, and metadata.
+- `modelActionType` - What action triggered this middleware (e.g., 'addNode', 'moveNodes').
+- `nodesMap`/`edgesMap` - Maps of nodes and edges by ID for quick lookup. Lookup is updated after each middleware.
+- `config` - Current diagram configuration.
+- `helpers` - Utility functions for checking what changed.
+
+There are also more specialized properties depending on the action type, such as access to ActionStateManager, which provides temporary state for actions like resizing or linking.
+
+The **helpers** object provides convenient methods to inspect changes:
+
+- `helpers.anyNodesAdded()` - Check if any nodes were added
+- `helpers.checkIfNodeChanged(id)` - Check if specific node was modified
+- `helpers.checkIfAnyNodePropsChanged(['position', 'size'])` - Check if any node had specific properties changed
+
+Use **`next()`** to continue to the next middleware, optionally passing state updates. Use **`cancel()`** to abort the operation entirely.
+
+## Managing Middlewares
+
+### Initial Registration
+
+The primary way to configure middlewares is using the `createMiddlewares` helper and passing them to the `<ng-diagram>` component:
+
+```typescript
+import { createMiddlewares } from 'ng-diagram';
+
+// Use all default middlewares
+const middlewares = createMiddlewares((defaults) => defaults);
+
+// Add custom middleware to the chain
+const middlewares = createMiddlewares((defaults) => [...defaults, myCustomMiddleware]);
+
+// Remove specific middleware
+const middlewares = createMiddlewares((defaults) => defaults.filter((m) => m.name !== 'logger'));
+```
+
+Then pass them to your diagram component:
+
+```typescript
+@Component({
+  template: ` <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" /> `,
+})
+export class MyDiagramComponent {
+  middlewares = createMiddlewares((defaults) => [...defaults, myMiddleware]);
+  // ...
+}
+```
+
+### Runtime Registration
+
+You can also register and unregister middlewares dynamically using the `NgDiagramService`. **Note**: This can only be done when the diagram is initialized, which you can check using `isInitialized` signal:
+
+```typescript
+import { inject } from '@angular/core';
+import { NgDiagramService } from 'ng-diagram';
+
+@Component({...})
+export class MyComponent {
+  private ngDiagram = inject(NgDiagramService);
+
+  addMiddleware() {
+    // Check if diagram is initialized first
+    if (!this.ngDiagram.isInitialized()) {
+      console.warn('Cannot register middleware: diagram not initialized');
+      return;
+    }
+
+    // Register returns an unregister function
+    const unregister = this.ngDiagram.registerMiddleware(myMiddleware);
+
+    // Later you can unregister the middleware by invoking the returned function
+    // unregister();
+  }
+
+  removeMiddleware() {
+    if (!this.ngDiagram.isInitialized()) {
+      console.warn('Cannot unregister middleware: diagram not initialized');
+      return;
+    }
+
+    // You can also unregister the middleware by name
+    this.ngDiagram.unregisterMiddleware('my-middleware-name');
+  }
+}
+```
+
+## Creating Custom Middlewares
+
+### Basic Middleware Structure
+
+Here's the basic structure for a custom middleware:
+
+```typescript
+import { Middleware } from 'ng-diagram';
+
+export const myMiddleware: Middleware = {
+  name: 'my-middleware',
+  execute: async (context, next) => {
+    const { state, modelActionType } = context;
+
+    // Check if this middleware should run
+    if (modelActionType !== 'updateNode') {
+      next(); // Pass through without changes
+      return;
+    }
+
+    // Your custom logic here
+    console.log('Nodes being updated:', state.nodes);
+
+    // Continue to next middleware
+    next();
+  },
+};
+```
+
+### Example
+
+For a complete example of creating custom middleware, see the [Custom Middleware example](/docs/examples/custom-middleware/) which demonstrates how to implement a read-only mode middleware that prevents certain operations while allowing others.
+
+### Advanced Middleware Features
+
+#### Modifying State
+
+Middlewares can modify the state by passing updates to `next()`:
+
+```typescript
+export const myCustomMiddleware: Middleware = {
+  name: 'rotate-middleware',
+  execute: async (context, next) => {
+    const { helpers } = context;
+
+    // Check if this middleware should run
+    if (!helpers.anyNodesAdded()) {
+      next(); // Pass through without changes
+      return;
+    }
+
+    // Rotate all new nodes and change label
+    const stateUpdate = {
+      nodesToUpdate: context.state.nodes
+        .filter((node) => helpers.checkIfNodeAdded(node.id))
+        .map((node) => ({
+          ...node,
+          angle: 45,
+          data: { ...node.data, label: `rotated via middleware` },
+        })),
+    };
+
+    // Continue to next middleware
+    next(stateUpdate);
+  },
+};
+```
+
+#### Asynchronous Operations
+
+Middlewares can perform async operations:
+
+```typescript
+export const myCustomMiddleware: Middleware = {
+  name: 'validation',
+  execute: async (context, next, cancel) => {
+    const { helpers } = context;
+
+    if (!helpers.anyNodesAdded()) {
+      next();
+      return;
+    }
+
+    // Simulated API validation function
+    const validateNodesWithAPI = () => {
+      return new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          const isValid = Math.random() > 0.5; // 50% chance of success
+          if (isValid) {
+            resolve();
+          } else {
+            reject(new Error('Random validation failure'));
+          }
+        }, 1000); // 1 second delay — after this time the node will be added if valid, or an alert/error will be displayed if invalid
+      });
+    };
+
+    try {
+      await validateNodesWithAPI();
+      next(); // Validation passed
+    } catch (error) {
+      alert(`Validation failed: ${error}`);
+      cancel(); // Cancel the operation
+    }
+  },
+};
+```
+
+However, you should avoid long-running async operations in middlewares as they can block the UI.
+
+## Best Practices
+
+### Performance
+
+- **Check conditions early**: Return `next()` immediately if your middleware doesn't need to run
+- **Use helpers efficiently**: The helper functions are optimized for checking what changed
+- **Avoid heavy computations**: Keep middleware logic lightweight, especially for frequently-triggered actions
+
+### Middleware Ordering
+
+- **Validation middlewares** should run early to fail fast
+- **Data transformation middlewares** should run before built-in middlewares that depend on the data
+- **Logging middlewares** typically run last to capture the final state

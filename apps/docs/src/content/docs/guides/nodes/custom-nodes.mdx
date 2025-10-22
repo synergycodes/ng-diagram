@@ -1,0 +1,94 @@
+---
+title: Custom Nodes
+description: How to create and implement custom nodes in ngDiagram
+sidebar:
+  order: 3
+---
+
+import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+When ngDiagram's default node is not sufficient, you can create custom nodes that provide the flexibility to render any kind of content, such as shapes, icons, Angular components, images, buttons, or even more advanced structures.
+
+This allows you to build interactive and highly customized flow elements.
+
+You can create a custom node by extending `NgDiagramNodeTemplate` and implementing `CustomNodeComponent`.
+
+<CodeSnippet relativePath="nodes/custom-node/node/node.component.ts" />
+
+<CustomNode />
+
+[Custom Node Example →](/docs/examples/custom-node)
+
+## Registration
+
+To register a custom node, you need to add it to the `nodeTemplateMap`.
+
+The map associates a string key, such as `myType`, with a value like `CustomNodeComponent`, which is a reference to an Angular component class.
+
+<CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="registering" />
+
+After registering, you need to pass the map to the `ngDiagram` component.
+
+<CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="usage" />
+
+## Setting Node Type
+
+Assigning the `type` property as `myType` for the node allows you to precisely control which template is used to render each node.
+
+This approach makes your diagram highly extensible and flexible, as you can easily introduce new node types and associate them with different components.
+
+<CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="model" />
+
+## Custom Appearance
+
+Above component receives the node data as input and provides its own template and styles for rendering.
+In the example, the node displays a header and some content, but you can fully customize its appearance and behavior.
+
+## Node Properties
+
+By using this approach—creating custom node components that implement NgDiagramNodeTemplate and receive the node data as input—you gain full access to the Node definition and all its properties.
+This means your custom node can leverage any property defined in the Node interface, such as:
+
+```typescript
+interface SimpleNode<T = any> {
+  id: string; // The unique identifier for the node.
+  position: Point; // The position of the node in the diagram.
+  data: T; // The data associated with the node.
+  type?: string; // The type of the node declared in nodeTemplateMap.
+  selected?: boolean; // Whether the node is selected.
+  size?: Size; // The size of the node.
+  autoSize?: boolean; // Whether the size of the node is automatically resized based on the content.
+  zOrder?: number; // The z-order of the node.
+  readonly computedZIndex?: number; // The z-index of the node. This value is set automatically.
+  readonly measuredPorts?: Port[]; // The ports of the node. This value is set automatically.
+  resizable?: boolean; // Whether the node is resizable.
+  rotatable?: boolean; // Whether the node is rotatable.
+  angle?: number; // The angle of the node from 0 to 360.
+  groupId?: Node<T>['id']; // The id of the parent node.
+}
+```
+
+[Node API →](/docs/api/types/node)
+
+## Handling Interactive Elements
+
+When adding interactive elements like inputs to your custom nodes, dragging on these elements might trigger unwanted diagram behaviors. You can control this using special data attributes:
+
+- **`data-no-pan="true"`** - Prevents the diagram canvas from panning when the user clicks and drags on the input
+- **`data-no-drag="true"`** - Prevents the node itself from being dragged when the user clicks and drags on the input
+
+```html
+<!-- Input that prevents both diagram panning and node dragging -->
+<input type="text" data-no-pan="true" data-no-drag="true" placeholder="Type here" />
+```
+
+## Adding Features
+
+We also expose advanced behaviors like resizing, rotating, or customizing ports, enhancing the user experience with minimal effort.
+
+Integrating these functionalities is straightforward simply place the corresponding components in your node's template.
+
+As a result, your custom nodes are not only visually flexible, but also deeply integrated with the diagram's data model, making them powerful and adaptable for complex scenarios.
+
+[Resizing →](/docs/guides/nodes/resizing) | [Rotating →](/docs/guides/nodes/rotation) | [Custom Ports →](/docs/guides/nodes/ports)

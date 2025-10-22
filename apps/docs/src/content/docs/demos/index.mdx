@@ -1,0 +1,34 @@
+---
+title: Demos
+description: Explore real-world applications built with ngDiagram library
+---
+
+import DemoTile from '../../../components/demo-tile/demo-tile.astro';
+import { demos } from './demos.ts';
+
+Discover applications and projects built by the community using ngDiagram. These demos showcase the library's capabilities in real-world scenarios.
+
+<div class="demo-grid">
+  {demos.map((demo) => (
+    <DemoTile
+      title={demo.title}
+      description={demo.description}
+      href={demo.href}
+      image={demo.image}
+      imageAlt={demo.imageAlt}
+    />
+  ))}
+</div>
+
+## Submit Your Demo
+
+Have you built something amazing with ngDiagram? We'd love to feature your project here! Share your demo by:
+
+1. Creating an issue on our [GitHub repository](https://github.com/synergycodes/ng-diagram/issues)
+2. Including:
+   - Project name and description
+   - Live demo URL
+   - Screenshot (16:9 aspect ratio, minimum 800x450px)
+   - Brief explanation of what makes your demo unique
+
+Your contribution helps showcase the possibilities of ngDiagram and inspires other developers in the community.

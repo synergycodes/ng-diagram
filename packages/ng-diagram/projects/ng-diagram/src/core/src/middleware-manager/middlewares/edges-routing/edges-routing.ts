@@ -32,6 +32,7 @@ export const shouldRouteEdge = (
   modelActionType: MiddlewareContext['modelActionType']
 ): boolean => {
   const isEdgeOrNodesChanged =
+    helpers.checkIfEdgeAdded(edge.id) ||
     helpers.checkIfEdgeChanged(edge.id) ||
     helpers.checkIfNodeChanged(edge.source) ||
     helpers.checkIfNodeChanged(edge.target);

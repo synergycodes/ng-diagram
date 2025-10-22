@@ -29,6 +29,7 @@ describe('Edges Routing Middleware', () => {
   const checkIfAnyEdgePropsChangedMock = vi.fn();
   const checkIfMetadataPropsChangedMock = vi.fn();
   const checkIfEdgeChangedMock = vi.fn();
+  const checkIfEdgeAddedMock = vi.fn();
   const checkIfNodeChangedMock = vi.fn();
   const mockActionStateManager = {
     linking: null as any,
@@ -77,6 +78,7 @@ describe('Edges Routing Middleware', () => {
         checkIfMetadataPropsChanged: checkIfMetadataPropsChangedMock,
         checkIfEdgeChanged: checkIfEdgeChangedMock,
         checkIfNodeChanged: checkIfNodeChangedMock,
+        checkIfEdgeAdded: checkIfEdgeAddedMock,
       },
       history: [],
       initialUpdate: {},
@@ -111,6 +113,18 @@ describe('Edges Routing Middleware', () => {
     it('should proceed when node properties change', () => {
       checkIfAnyNodePropsChangedMock.mockReturnValue(true);
       checkIfEdgeChangedMock.mockReturnValue(true);
+
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
+
+      expect(nextMock).toHaveBeenCalled();
+    });
+
+    it('should proceed when edge added programatically', () => {
+      checkIfAnyNodePropsChangedMock.mockReturnValue(false);
+      checkIfEdgeChangedMock.mockReturnValue(false);
+      checkIfEdgeAddedMock.mockReturnValue(true);
+
+      context.modelActionType = 'addEdges';
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -224,6 +238,7 @@ describe('Edges Routing Middleware', () => {
       checkIfAnyNodePropsChangedMock.mockReturnValue(true);
       checkIfEdgeChangedMock.mockReturnValue(false);
       checkIfNodeChangedMock.mockReturnValue(false);
+      checkIfEdgeAddedMock.mockReturnValue(false);
 
       // Update context with new state
       context.state = newState;

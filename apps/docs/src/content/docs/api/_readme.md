@@ -7,9 +7,9 @@ title: "ng-diagram"
 
 ## Components
 
-- [BaseEdgeLabelComponent](/docs/api/components/baseedgelabelcomponent/)
 - [NgDiagramBackgroundComponent](/docs/api/components/ngdiagrambackgroundcomponent/)
 - [NgDiagramBaseEdgeComponent](/docs/api/components/ngdiagrambaseedgecomponent/)
+- [NgDiagramBaseEdgeLabelComponent](/docs/api/components/ngdiagrambaseedgelabelcomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
 - [NgDiagramNodeResizeAdornmentComponent](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/)
 - [NgDiagramNodeRotateAdornmentComponent](/docs/api/components/ngdiagramnoderotateadornmentcomponent/)
@@ -24,6 +24,8 @@ title: "ng-diagram"
 
 ## Other
 
+- [EdgeRouting](/docs/api/other/edgerouting/)
+- [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
 - [createMiddlewares](/docs/api/other/createmiddlewares/)
 - [initializeModel](/docs/api/other/initializemodel/)
 - [provideNgDiagram](/docs/api/other/providengdiagram/)
