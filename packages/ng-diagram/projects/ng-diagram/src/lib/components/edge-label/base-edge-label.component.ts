@@ -133,3 +133,8 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }
+
+/**
+ * @deprecated Use {@link NgDiagramBaseEdgeLabelComponent} instead. This alias will be removed in a future version.
+ */
+export const BaseEdgeLabelComponent = NgDiagramBaseEdgeLabelComponent;

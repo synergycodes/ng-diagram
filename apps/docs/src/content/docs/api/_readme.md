@@ -25,6 +25,7 @@ title: "ng-diagram"
 ## Other
 
 - [EdgeRouting](/docs/api/other/edgerouting/)
+- [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
 - [createMiddlewares](/docs/api/other/createmiddlewares/)
 - [initializeModel](/docs/api/other/initializemodel/)
 - [provideNgDiagram](/docs/api/other/providengdiagram/)
