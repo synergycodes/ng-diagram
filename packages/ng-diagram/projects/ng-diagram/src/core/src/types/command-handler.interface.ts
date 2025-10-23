@@ -10,14 +10,13 @@ import {
   DeleteNodesCommand,
   DeletePortsCommand,
   UpdateEdgeCommand,
-  UpdateEdgesCommand,
   UpdateEdgeLabelsCommand,
+  UpdateEdgesCommand,
   UpdateNodeCommand,
   UpdateNodesCommand,
   UpdatePortsCommand,
 } from '../command-handler/commands/add-update-delete';
-import { CenterOnNodeCommand } from '../command-handler/commands/center-on-node';
-import { CenterOnRectCommand } from '../command-handler/commands/center-on-rect';
+import { CenterOnNodeCommand, CenterOnRectCommand } from '../command-handler/commands/centering';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { CutCommand } from '../command-handler/commands/cut';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';

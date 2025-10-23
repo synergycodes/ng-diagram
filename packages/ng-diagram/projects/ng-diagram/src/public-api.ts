@@ -92,6 +92,7 @@ export type {
   Port,
   PortLocation,
   PortSide,
+  Rect,
   ResizeConfig,
   RoutingMode,
   SelectionChangedEvent,
