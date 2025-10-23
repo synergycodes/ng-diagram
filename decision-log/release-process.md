@@ -26,7 +26,12 @@ We use a single `release` branch with automated GitHub Actions to deploy documen
    - Move `[Unreleased]` changes to new version section
    - Update comparison links
 
-2. **Update package.json version**
+2. **Update documentation badges and versions** ([see guide](maintaining-documentation.md))
+   - Remove old NEW badges from previous release
+   - Add NEW badges to features introduced after last release
+   - Add version tags to new features
+
+3. **Update package.json version**
    - File: `packages/ng-diagram/projects/ng-diagram/package.json`
    - Example: `"version": "0.5.0"`
 
@@ -130,3 +135,4 @@ git push origin --delete v0.5.0
 ## Related Documentation
 
 - [Maintaining the Changelog](maintaining-changelog.md) - Update CHANGELOG.md before releases
+- [Maintaining Documentation](maintaining-documentation.md) - Update badges and version tags before releases
