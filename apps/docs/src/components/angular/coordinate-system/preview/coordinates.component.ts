@@ -1,3 +1,4 @@
+// @section-start
 // @collapse-start
 import '@angular/compiler';
 
@@ -23,13 +24,20 @@ import {
     }
   `,
 })
+// @section-start:coordinates-component
 export class CoordinatesComponent {
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly selectionService = inject(NgDiagramSelectionService);
 
+  // Get reactive viewport data
   viewport = this.viewportService.viewport;
   scale = this.viewportService.scale;
+
+  // @collapse-start
   selectionPosition = computed(
     () => this.selectionService.selection().nodes[0]?.position
   );
+  // @collapse-end
 }
+// @section-end:coordinates-component
+// @section-end
