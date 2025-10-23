@@ -42,15 +42,15 @@ Returns a computed signal for the viewport that safely handles uninitialized sta
 
 ### centerOnNode()
 
-> **centerOnNode**(`node`): `void`
+> **centerOnNode**(`nodeOrId`): `void`
 
 Centers the Node within the current viewport bounds.
 
 #### Parameters
 
-##### node
+##### nodeOrId
 
-The ID of the node or the node object to center on
+The ID of the node or the node object to center on.
 
 `string` | [`Node`](/docs/api/types/node/)
 
@@ -62,35 +62,17 @@ The ID of the node or the node object to center on
 
 ### centerOnRect()
 
-> **centerOnRect**(`x`, `y`, `width`, `height`): `void`
+> **centerOnRect**(`rect`): `void`
 
 Centers the rectangle within the current viewport bounds.
 
 #### Parameters
 
-##### x
+##### rect
 
-`number`
+[`Rect`](/docs/api/types/rect/)
 
-The x-coordinate of the rectangle.
-
-##### y
-
-`number`
-
-The y-coordinate of the rectangle.
-
-##### width
-
-`number`
-
-The width of the rectangle.
-
-##### height
-
-`number`
-
-The height of the rectangle.
+The rectangle to center on.
 
 #### Returns
 

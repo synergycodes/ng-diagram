@@ -68,6 +68,7 @@ title: "ng-diagram"
 - [Point](/docs/api/types/point/)
 - [PointerInputEvent](/docs/api/types/pointerinputevent/)
 - [Port](/docs/api/types/port/)
+- [Rect](/docs/api/types/rect/)
 - [ResizeConfig](/docs/api/types/resizeconfig/)
 - [SelectionChangedEvent](/docs/api/types/selectionchangedevent/)
 - [SelectionMovedEvent](/docs/api/types/selectionmovedevent/)
