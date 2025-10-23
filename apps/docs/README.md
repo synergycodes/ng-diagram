@@ -23,9 +23,9 @@ Make sure you know the tech you'll be working with:
 
 ### Components for presenting code
 
-#### ExampleViewer
+#### CodeViewer
 
-To display comprehensive code examples with many files create a directory in `./src/components/angular/$DIR_NAME` and place your code files there. Then use `<ExampleViewer dirName={$DIR_NAME} />`. It will automatically display the code examples except for the `.astro` files.
+To display comprehensive code examples with many files create a directory in `./src/components/angular/$DIR_NAME` and place your code files there. Then use `<CodeViewer dirName={$DIR_NAME} />`. It will automatically display the code examples except for the `.astro` files.
 
 You still need to create the `.astro` component to display the angular components and import it manually into and `.mdx` documentation.
 
@@ -35,11 +35,11 @@ _Example_
 // custom-node.mdx
 
 import CustomNode from '@examples/custom-node/custom-node.astro';
-import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 
 <CustomNode />
 
-<ExampleViewer dirName="examples/custom-node" />
+<CodeViewer dirName="examples/custom-node" />
 ```
 
 #### CodeSnippet
@@ -48,7 +48,7 @@ import ExampleViewer from '@components/example-viewer/example-viewer.astro';
 
 #### Code Highlighting
 
-Both `<ExampleViewer />` and `<CodeSnippet />` support highlighting the code snippets for easier comprehension and readability. This feature is using `<Code />` component provided by Starlight and is using Expressive Code library. Check `ec.config.js` too see how it's configured.
+Both `<CodeViewer />` and `<CodeSnippet />` support highlighting the code snippets for easier comprehension and readability. This feature is using `<Code />` component provided by Starlight and is using Expressive Code library. Check `ec.config.js` too see how it's configured.
 
 `<Code />` enables code highlighting by passing props such as `mark`, `collapse` etc. Tracking the changes of highlighted lines is really tricky with this approach. To avoid this issue `<HighlightedCode />` was created to extract the highlights directly from the code snippet source using special comments.
 
@@ -66,7 +66,7 @@ Adding `sectionId` to the comment will highlight the code snippet in the specifi
 Syntax: `// @section-(start|end):sectionId`
 
 If there's only one section in a file, the `sectionId` is optional. It also applies for other special comments like `@mark`
-Passing `sectionId` to `<ExampleViewer />` or `<CodeSnippet />` will highlight the code snippet in the specified section. Otherwise, the entire snippet or the only section will be highlighted.
+Passing `sectionId` to `<CodeViewer />` or `<CodeSnippet />` will highlight the code snippet in the specified section. Otherwise, the entire snippet or the only section will be highlighted.
 
 ##### Mark Substring
 
@@ -77,14 +77,14 @@ Syntax: `@mark:keyword:sectionId`
 ##### Mark (Range)
 
 Highlights all lines in a given range.
-Passing `sectionId` will highlight the code only when appropriate `sectionId` was provided to `<ExampleViewer />` or `<CodeSnippet />`.
+Passing `sectionId` will highlight the code only when appropriate `sectionId` was provided to `<CodeViewer />` or `<CodeSnippet />`.
 
 Syntax: `@mark-(start|end):sectionId`
 
 ##### Collapse (Range)
 
 Collapses all lines in a given range.
-Passing `sectionId` will collapse the code only when appropriate `sectionId` was provided to `<ExampleViewer />` or `<CodeSnippet />`.
+Passing `sectionId` will collapse the code only when appropriate `sectionId` was provided to `<CodeViewer />` or `<CodeSnippet />`.
 
 Syntax: `@collapse-(start|end):sectionId`
 
