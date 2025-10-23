@@ -10,12 +10,13 @@ import {
   DeleteNodesCommand,
   DeletePortsCommand,
   UpdateEdgeCommand,
-  UpdateEdgesCommand,
   UpdateEdgeLabelsCommand,
+  UpdateEdgesCommand,
   UpdateNodeCommand,
   UpdateNodesCommand,
   UpdatePortsCommand,
 } from '../command-handler/commands/add-update-delete';
+import { CenterOnNodeCommand, CenterOnRectCommand } from '../command-handler/commands/centering';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { CutCommand } from '../command-handler/commands/cut';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
@@ -81,7 +82,9 @@ export type Command =
   | HighlightGroupClearCommand
   | AddToGroupCommand
   | ClearModelCommand
-  | RemoveFromGroupCommand;
+  | RemoveFromGroupCommand
+  | CenterOnNodeCommand
+  | CenterOnRectCommand;
 
 /**
  * Type for command name

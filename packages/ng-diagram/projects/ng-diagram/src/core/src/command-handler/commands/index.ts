@@ -11,12 +11,13 @@ import {
   deleteNodes,
   deletePorts,
   updateEdge,
-  updateEdges,
   updateEdgeLabels,
+  updateEdges,
   updateNode,
   updateNodes,
   updatePorts,
 } from './add-update-delete';
+import { centerOnNode, centerOnRect } from './centering';
 import { copy, paste } from './copy-paste';
 import { cut } from './cut';
 import { deleteSelection } from './delete-selection';
@@ -88,4 +89,6 @@ export const commands: CommandMap = {
   highlightGroupClear,
   addToGroup,
   removeFromGroup,
+  centerOnNode,
+  centerOnRect,
 };
