@@ -34,6 +34,7 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+  margin-top: 0;
 }
 
 .content-tile-description {
@@ -50,7 +51,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--sl-color-text-accent);
-  margin-top: 0.5rem;
+  margin-top: auto;
 }
 
 .content-tile-grid {
