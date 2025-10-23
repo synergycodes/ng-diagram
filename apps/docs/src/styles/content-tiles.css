@@ -1,5 +1,5 @@
-/* Demo Tile */
-.demo-tile {
+/* Content Tile */
+.content-tile {
   display: flex;
   flex-direction: column;
   border-radius: 0.5rem;
@@ -10,11 +10,11 @@
   height: 100%;
 }
 
-.demo-tile:hover {
+.content-tile:hover {
   border-color: var(--sl-color-gray-2);
 }
 
-.demo-tile-image {
+.content-tile-image {
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -22,13 +22,13 @@
   position: relative;
 }
 
-.demo-tile-image img {
+.content-tile-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.demo-tile-content {
+.content-tile-content {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -36,14 +36,14 @@
   flex: 1;
 }
 
-.demo-tile-description {
+.content-tile-description {
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--sl-color-gray-2);
   margin: 0;
 }
 
-.demo-tile-link {
+.content-tile-link {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -53,8 +53,7 @@
   margin-top: 0.5rem;
 }
 
-/* Demos Grid */
-.demo-grid {
+.content-tile-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
