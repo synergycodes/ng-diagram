@@ -81,6 +81,29 @@ export interface GroupingConfig {
 }
 
 /**
+ * Configuration for zoom-to-fit behavior.
+ *
+ * @category Types
+ */
+export interface ZoomToFitConfig {
+  /**
+   * The default padding (in pixels) to use for zoom-to-fit operations.
+   * Supports CSS-like padding syntax:
+   * - Single number: applies to all sides
+   * - [v, h]: vertical, horizontal
+   * - [t, h, b]: top, horizontal, bottom
+   * - [t, r, b, l]: top, right, bottom, left
+   * Can be overridden per command invocation.
+   */
+  padding: number | [number, number] | [number, number, number] | [number, number, number, number];
+  /**
+   * Whether to automatically zoom to fit all content when the diagram is initialized.
+   * @default false
+   */
+  onInit: boolean;
+}
+
+/**
  * Configuration for zooming behavior.
  *
  * @category Types
@@ -297,6 +320,11 @@ export interface FlowConfig {
    * Configuration for zooming.
    */
   zoom: ZoomConfig;
+
+  /**
+   * Configuration for zoom-to-fit operations.
+   */
+  zoomToFit: ZoomToFitConfig;
 
   /**
    * Configuration for edge routing.

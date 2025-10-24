@@ -12,6 +12,7 @@ import type {
   SnappingConfig,
   ZIndexConfig,
   ZoomConfig,
+  ZoomToFitConfig,
 } from '../types/flow-config.interface';
 import { DeepPartial, Point, Size } from '../types/utils';
 import { deepMerge } from '../utils';
@@ -48,6 +49,11 @@ const defaultGroupingConfig: GroupingConfig = {
     // Allow grouping by default
     return true;
   },
+};
+
+const defaultZoomToFitConfig: ZoomToFitConfig = {
+  padding: 50,
+  onInit: false,
 };
 
 const defaultZoomConfig: ZoomConfig = {
@@ -123,6 +129,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       linking: defaultLinkingConfig,
       grouping: defaultGroupingConfig,
       zoom: defaultZoomConfig,
+      zoomToFit: defaultZoomToFitConfig,
       background: defaultBackgroundConfig,
       nodeRotation: defaultNodeRotationConfig,
       snapping: defaultNodeDraggingConfig,

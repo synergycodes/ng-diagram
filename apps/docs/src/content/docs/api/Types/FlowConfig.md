@@ -123,3 +123,11 @@ Configuration for z-index layering behavior.
 > **zoom**: [`ZoomConfig`](/docs/api/types/zoomconfig/)
 
 Configuration for zooming.
+
+***
+
+### zoomToFit
+
+> **zoomToFit**: `ZoomToFitConfig`
+
+Configuration for zoom-to-fit operations.
