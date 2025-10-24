@@ -102,6 +102,58 @@ const calculateBounds = (nodes: Node[], edges: Edge[]): Bounds | null => {
   return { minX, minY, maxX, maxY };
 };
 
+const filterTargetElements = (
+  nodes: Node[],
+  edges: Edge[],
+  nodeIds?: string[],
+  edgeIds?: string[]
+): { targetNodes: Node[]; targetEdges: Edge[] } => {
+  const targetNodes = nodeIds?.length ? nodes.filter((node) => nodeIds.includes(node.id)) : nodes;
+
+  const targetEdges = edgeIds?.length ? edges.filter((edge) => edgeIds.includes(edge.id)) : edges;
+
+  return { targetNodes, targetEdges };
+};
+
+const calculateOptimalScale = (
+  contentWidth: number,
+  contentHeight: number,
+  availableWidth: number,
+  availableHeight: number,
+  minScale: number,
+  maxScale: number
+): number => {
+  const scaleX = availableWidth / contentWidth;
+  const scaleY = availableHeight / contentHeight;
+  const scale = Math.min(scaleX, scaleY);
+
+  return Math.max(minScale, Math.min(maxScale, scale));
+};
+
+const calculateViewportPosition = (
+  bounds: Bounds,
+  viewport: { width: number; height: number },
+  padding: Padding,
+  scale: number
+): { x: number; y: number } => {
+  const contentWidth = bounds.maxX - bounds.minX;
+  const contentHeight = bounds.maxY - bounds.minY;
+  const contentCenterX = bounds.minX + contentWidth / 2;
+  const contentCenterY = bounds.minY + contentHeight / 2;
+
+  const centerOffsetX = (padding.left - padding.right) / 2;
+  const centerOffsetY = (padding.top - padding.bottom) / 2;
+
+  return {
+    x: viewport.width / 2 - contentCenterX * scale + centerOffsetX,
+    y: viewport.height / 2 - contentCenterY * scale + centerOffsetY,
+  };
+};
+
+const isValidViewport = (viewport: { width?: number; height?: number }): boolean => {
+  return !!viewport.width && !!viewport.height && viewport.width > 0 && viewport.height > 0;
+};
+
 /**
  * Zoom to fit command handler
  * Calculates optimal viewport position and scale to fit specified content
@@ -110,87 +162,53 @@ export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeI
   const { nodes, edges, metadata } = commandHandler.flowCore.getState();
   const { viewport } = metadata;
 
-  // Get default padding from config
-  const defaultPadding = commandHandler.flowCore.config.zoom.zoomToFit.padding;
-  const effectivePadding = padding ?? defaultPadding;
-
-  // Validate viewport dimensions
-  if (!viewport.width || !viewport.height || viewport.width <= 0 || viewport.height <= 0) {
+  if (!isValidViewport(viewport)) {
     return;
   }
 
-  // Filter nodes and edges based on provided IDs (only if IDs are specified)
-  let targetNodes = nodes;
-  let targetEdges = edges;
+  const viewportWidth = viewport.width!;
+  const viewportHeight = viewport.height!;
 
-  if (nodeIds && nodeIds.length > 0) {
-    const nodeIdSet = new Set(nodeIds);
-    targetNodes = nodes.filter((node) => nodeIdSet.has(node.id));
-  }
+  const defaultPadding = commandHandler.flowCore.config.zoom.zoomToFit.padding;
+  const effectivePadding = padding ?? defaultPadding;
 
-  if (edgeIds && edgeIds.length > 0) {
-    const edgeIdSet = new Set(edgeIds);
-    targetEdges = edges.filter((edge) => edgeIdSet.has(edge.id));
-  }
-
-  // Calculate combined bounding box in a single pass
+  const { targetNodes, targetEdges } = filterTargetElements(nodes, edges, nodeIds, edgeIds);
   const bounds = calculateBounds(targetNodes, targetEdges);
 
-  // Handle empty content
   if (!bounds) {
     return;
   }
 
-  const { minX, minY, maxX, maxY } = bounds;
-  const contentWidth = maxX - minX;
-  const contentHeight = maxY - minY;
+  const contentWidth = bounds.maxX - bounds.minX;
+  const contentHeight = bounds.maxY - bounds.minY;
 
   if (contentWidth <= 0 || contentHeight <= 0) {
     return;
   }
 
-  // Normalize padding to individual values
-  // Convert default padding to the same format as command padding for normalizePadding function
   const defaultPaddingValue = Array.isArray(defaultPadding) ? defaultPadding[0] : defaultPadding;
   const pad = normalizePadding(effectivePadding, defaultPaddingValue);
 
-  // Apply padding to available viewport space
-  const availableWidth = viewport.width - pad.left - pad.right;
-  const availableHeight = viewport.height - pad.top - pad.bottom;
+  const availableWidth = viewportWidth - pad.left - pad.right;
+  const availableHeight = viewportHeight - pad.top - pad.bottom;
 
   if (availableWidth <= 0 || availableHeight <= 0) {
     return;
   }
 
-  // Calculate scale to fit content within available space
-  const scaleX = availableWidth / contentWidth;
-  const scaleY = availableHeight / contentHeight;
-  let newScale = Math.min(scaleX, scaleY);
-
-  // Clamp scale to zoom constraints
   const { min, max } = commandHandler.flowCore.config.zoom;
-  if (newScale < min) {
-    newScale = min;
-  } else if (newScale > max) {
-    newScale = max;
-  }
+  const newScale = calculateOptimalScale(contentWidth, contentHeight, availableWidth, availableHeight, min, max);
+  const { x: newX, y: newY } = calculateViewportPosition(
+    bounds,
+    { width: viewportWidth, height: viewportHeight },
+    pad,
+    newScale
+  );
 
-  // Calculate content center
-  const contentCenterX = minX + contentWidth / 2;
-  const contentCenterY = minY + contentHeight / 2;
-
-  // Calculate viewport position to center the content with asymmetric padding
-  const centerOffsetX = (pad.left - pad.right) / 2;
-  const centerOffsetY = (pad.top - pad.bottom) / 2;
-  const newX = viewport.width / 2 - contentCenterX * newScale + centerOffsetX;
-  const newY = viewport.height / 2 - contentCenterY * newScale + centerOffsetY;
-
-  // Check if viewport needs updating
   if (viewport.x === newX && viewport.y === newY && viewport.scale === newScale) {
     return;
   }
 
-  // Apply the update
   await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
