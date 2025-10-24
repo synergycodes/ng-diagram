@@ -1,0 +1,34 @@
+---
+import { Badge } from '@astrojs/starlight/components';
+
+const { entry } = Astro.locals.starlightRoute;
+const title = entry.data.title;
+const version = entry.data.version;
+
+---
+
+<div class="custom-title-container">
+<h1 class="custom-title">
+	{title}
+</h1>
+	{version && <Badge text={version} variant="tip" />}
+</div>
+
+
+<style>
+	@layer starlight.core {
+		.custom-title-container {
+			margin-top: 1rem;
+			display: flex;
+			align-items: center;
+			gap: 2rem;
+		}
+
+		.custom-title {
+			font-size: var(--sl-text-h1);
+			line-height: var(--sl-line-height-headings);
+			font-weight: 600; 	
+			color: var(--sl-color-white);
+		}
+	}
+</style>
