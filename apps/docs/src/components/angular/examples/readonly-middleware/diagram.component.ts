@@ -32,6 +32,9 @@ export class DiagramComponent {
       enabled: false,
       allowedActions: ['changeSelection'],
     },
+    edgeRouting: {
+      defaultRouting: 'orthogonal',
+    },
   };
 
   model = initializeModel({
