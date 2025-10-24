@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RendererService } from '../../services';
 
 @Component({
   selector: 'ng-diagram-edge',
@@ -13,5 +14,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[style.visibility]': 'isVisible() ? null : "hidden"',
+  },
 })
-export class NgDiagramEdgeComponent {}
+export class NgDiagramEdgeComponent {
+  private readonly renderer = inject(RendererService);
+
+  readonly isVisible = this.renderer.isInitialized;
+}
