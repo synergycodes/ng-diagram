@@ -5,10 +5,12 @@ ng-diagram-base-edge.default-edge {
 
 ng-diagram-base-edge.default-edge:hover:not(.selected):not(.temporary) {
   --edge-stroke: var(--ngd-default-edge-stroke-hover);
+  --edge-label-border-color: var(--ngd-default-edge-stroke-hover);
 }
 
 ng-diagram-base-edge.default-edge.selected {
   --edge-stroke: var(--ngd-default-edge-stroke-selected);
+  --edge-label-border-color: var(--ngd-default-edge-stroke-selected);
 }
 
 ng-diagram-base-edge.default-edge.temporary {
