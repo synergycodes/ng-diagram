@@ -38,6 +38,7 @@ import { rotateNodeTo } from './rotate-node';
 import { deselect, deselectAll, select } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
+import { zoomToFit } from './zoom-to-fit';
 
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
@@ -91,4 +92,5 @@ export const commands: CommandMap = {
   removeFromGroup,
   centerOnNode,
   centerOnRect,
+  zoomToFit,
 };

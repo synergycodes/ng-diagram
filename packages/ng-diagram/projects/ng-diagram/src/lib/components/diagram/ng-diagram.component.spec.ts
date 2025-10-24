@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Middleware, ModelAdapter } from '../../../core/src';
@@ -43,6 +44,7 @@ describe('AngularAdapterDiagramComponent', () => {
             edges: vi.fn(),
             viewport: vi.fn(() => ({ x: 0, y: 0, scale: 1 })),
             draw: vi.fn(),
+            isInitialized: signal(false),
           },
         },
         {
@@ -73,8 +75,17 @@ describe('AngularAdapterDiagramComponent', () => {
                 setEnabled: vi.fn(),
                 hasListeners: vi.fn(),
               },
+              commandHandler: {
+                emit: vi.fn(),
+              },
               config: {
                 debugMode: false,
+                zoom: {
+                  zoomToFit: {
+                    padding: 20,
+                    onInit: false,
+                  },
+                },
               },
             }),
             isInitialized: vi.fn().mockReturnValue(true),

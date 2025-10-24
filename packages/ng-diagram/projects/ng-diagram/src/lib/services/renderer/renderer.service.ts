@@ -6,6 +6,9 @@ export class RendererService implements Renderer {
   clear(): void {
     throw new Error('Method not implemented.');
   }
+
+  isInitialized = signal<boolean>(false);
+
   nodes = signal<Node[]>([]);
   edges = signal<Edge[]>([]);
   viewport = signal<Viewport>({

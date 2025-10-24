@@ -104,6 +104,22 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
     this.flowCore.commandHandler.emit('zoom', { scale: factor, x, y });
   }
 
+  /**
+   * Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
+   *
+   * @param options Optional configuration object
+   * @param options.nodeIds Array of node IDs to fit. If not provided, all nodes are included.
+   * @param options.edgeIds Array of edge IDs to fit. If not provided, all edges are included.
+   * @param options.padding Padding around the content (default: 50). Supports CSS-like syntax:
+   */
+  zoomToFit(options?: {
+    nodeIds?: string[];
+    edgeIds?: string[];
+    padding?: number | [number, number] | [number, number, number] | [number, number, number, number];
+  }) {
+    this.flowCore.commandHandler.emit('zoomToFit', options ?? {});
+  }
+
   // ===================
   // CENTERING METHODS
   // ===================

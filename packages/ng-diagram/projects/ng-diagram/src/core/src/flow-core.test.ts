@@ -194,6 +194,7 @@ describe('FlowCore', () => {
           min: 0.5,
           max: 5.0,
           step: 0.1,
+          zoomToFit: { onInit: false, padding: 20 },
         },
       };
 

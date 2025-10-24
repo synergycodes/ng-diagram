@@ -22,6 +22,7 @@ import { CutCommand } from '../command-handler/commands/cut';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
 import { HighlightGroupClearCommand, HighlightGroupCommand } from '../command-handler/commands/highlight-group';
 import { InitCommand } from '../command-handler/commands/init';
+import { ZoomToFitCommand } from '../command-handler/commands/zoom-to-fit';
 import {
   FinishLinkingCommand,
   FinishLinkingToPositionCommand,
@@ -84,7 +85,8 @@ export type Command =
   | ClearModelCommand
   | RemoveFromGroupCommand
   | CenterOnNodeCommand
-  | CenterOnRectCommand;
+  | CenterOnRectCommand
+  | ZoomToFitCommand;
 
 /**
  * Type for command name

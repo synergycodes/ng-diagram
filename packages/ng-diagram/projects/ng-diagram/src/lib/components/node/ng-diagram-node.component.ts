@@ -4,7 +4,7 @@ import { Node } from '../../../core/src';
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
 import { NodeSelectionDirective } from '../../directives/input-events/object-selection/object-selection.directive';
 import { PointerMoveSelectionDirective } from '../../directives/input-events/pointer-move-selection/pointer-move-selection.directive';
-import { FlowCoreProviderService, UpdatePortsService } from '../../services';
+import { FlowCoreProviderService, RendererService, UpdatePortsService } from '../../services';
 
 @Component({
   selector: 'ng-diagram-node',
@@ -19,10 +19,14 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
     { directive: PointerMoveSelectionDirective, inputs: ['targetData: node'] },
     { directive: ZIndexDirective, inputs: ['data: node'] },
   ],
+  host: {
+    '[style.visibility]': 'isVisible() ? null : "hidden"',
+  },
 })
 export class NgDiagramNodeComponent {
   private readonly portsService = inject(UpdatePortsService);
   private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly renderer = inject(RendererService);
 
   node = input.required<Node>();
 
@@ -30,6 +34,7 @@ export class NgDiagramNodeComponent {
 
   readonly id = computed(() => this.node().id);
   readonly size = computed(() => this.node().size);
+  readonly isVisible = this.renderer.isInitialized;
 
   constructor() {
     this.setupPortSyncEffect();

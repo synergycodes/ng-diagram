@@ -221,3 +221,39 @@ The center point to zoom towards.
 #### Returns
 
 `void`
+
+***
+
+### zoomToFit()
+
+> **zoomToFit**(`options?`): `void`
+
+Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
+
+#### Parameters
+
+##### options?
+
+Optional configuration object
+
+###### edgeIds?
+
+`string`[]
+
+Array of edge IDs to fit. If not provided, all edges are included.
+
+###### nodeIds?
+
+`string`[]
+
+Array of node IDs to fit. If not provided, all nodes are included.
+
+###### padding?
+
+`number` \| \[`number`, `number`\] \| \[`number`, `number`, `number`\] \| \[`number`, `number`, `number`, `number`\]
+
+Padding around the content (default: 50). Supports CSS-like syntax:
+
+#### Returns
+
+`void`

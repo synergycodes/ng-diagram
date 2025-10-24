@@ -30,3 +30,11 @@ The minimum allowed zoom level.
 > **step**: `number`
 
 The zoom step increment.
+
+***
+
+### zoomToFit
+
+> **zoomToFit**: `ZoomToFitConfig`
+
+Configuration for zoom-to-fit operations.

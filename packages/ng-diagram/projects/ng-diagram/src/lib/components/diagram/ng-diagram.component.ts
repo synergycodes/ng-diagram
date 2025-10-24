@@ -154,6 +154,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
       if (this.initializedModel != model) {
         // Angular 18 backward compatibility
         untracked(() => {
+          this.renderer.isInitialized.set(false);
           this.flowCoreProvider.destroy();
           this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
         });
@@ -300,7 +301,15 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     const flowCore = this.flowCoreProvider.provide();
     const eventManager = flowCore.eventManager;
 
-    eventManager.on('diagramInit', (event) => this.diagramInit.emit(event));
+    eventManager.on('diagramInit', (event) => {
+      this.renderer.isInitialized.set(true);
+      this.diagramInit.emit(event);
+
+      if (flowCore.config.zoom.zoomToFit.onInit) {
+        flowCore.commandHandler.emit('zoomToFit', {});
+      }
+    });
+
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));

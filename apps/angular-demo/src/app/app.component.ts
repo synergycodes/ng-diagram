@@ -44,6 +44,10 @@ export class AppComponent {
   config: NgDiagramConfig = {
     zoom: {
       max: 2,
+      zoomToFit: {
+        onInit: true,
+        padding: [50, 50, 100, 350],
+      },
     },
     background: {
       dotSize: 40,
