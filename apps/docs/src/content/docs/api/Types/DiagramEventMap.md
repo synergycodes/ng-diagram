@@ -9,6 +9,14 @@ Map of all available diagram events and their payload types
 
 ## Properties
 
+### clipboardPaste
+
+> **clipboardPaste**: [`ClipboardPasteEvent`](/docs/api/types/clipboardpasteevent/)
+
+Event emitted when clipboard content is pasted
+
+***
+
 ### diagramInit
 
 > **diagramInit**: [`DiagramInitEvent`](/docs/api/types/diagraminitevent/)

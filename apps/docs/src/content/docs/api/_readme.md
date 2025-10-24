@@ -46,6 +46,7 @@ title: "ng-diagram"
 - [NgDiagramNodeTemplateMap](/docs/api/types/ngdiagramnodetemplatemap/)
 - [ActionState](/docs/api/types/actionstate/)
 - [BackgroundConfig](/docs/api/types/backgroundconfig/)
+- [ClipboardPasteEvent](/docs/api/types/clipboardpasteevent/)
 - [DiagramEventMap](/docs/api/types/diagrameventmap/)
 - [DiagramInitEvent](/docs/api/types/diagraminitevent/)
 - [Edge](/docs/api/types/edge/)

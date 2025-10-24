@@ -14,6 +14,14 @@ Diagram component
 
 ## Properties
 
+### clipboardPaste
+
+> **clipboardPaste**: `EventEmitter`\<[`ClipboardPasteEvent`](/docs/api/types/clipboardpasteevent/)\>
+
+Event emitted when clipboard content is pasted
+
+***
+
 ### config
 
 > **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>\>
