@@ -1,8 +1,3 @@
-<ng-diagram-node-rotate-adornment />
-<ng-diagram-node-resize-adornment>
-  <div [class]="classes()" ngDiagramNodeSelected [node]="node()">
-    <span>{{ label() }}</span>
-  </div>
-  <ng-diagram-port id="port-left" type="both" side="left" />
-  <ng-diagram-port id="port-right" type="both" side="right" />
-</ng-diagram-node-resize-adornment>
+<ng-diagram-base-node-template [node]="node()">
+  <span>{{ label() }}</span>
+</ng-diagram-base-node-template>

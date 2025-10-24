@@ -1,4 +1,5 @@
 import { NgDiagramNodeTemplateMap } from 'ng-diagram';
+import { CustomizedDefaultNodeComponent } from '../node-template/customized-default-node/customized-default-node.component';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from '../node-template/input-field-node/input-field-node.component';
@@ -8,6 +9,7 @@ export enum NodeTemplateType {
   InputField = 'input-field',
   Image = 'image',
   Resizable = 'resizable',
+  CustomizedDefault = 'customized-default',
   Group = 'group',
 }
 
@@ -16,4 +18,5 @@ export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
   [NodeTemplateType.Image, ImageNodeComponent],
   [NodeTemplateType.Resizable, ResizableNodeComponent],
   [NodeTemplateType.Group, GroupNodeComponent],
+  [NodeTemplateType.CustomizedDefault, CustomizedDefaultNodeComponent],
 ]);
