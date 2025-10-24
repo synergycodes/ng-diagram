@@ -2,15 +2,15 @@ import type { EventManager } from '../../../../event-manager/event-manager';
 import type { MiddlewareContext } from '../../../../types';
 import type { EventEmitter } from './event-emitter.interface';
 
-export class ClipboardPasteEmitter implements EventEmitter {
-  name = 'ClipboardPasteEmitter';
+export class ClipboardPastedEmitter implements EventEmitter {
+  name = 'ClipboardPastedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
     if (context.modelActionType !== 'paste') {
       return;
     }
 
-    eventManager.deferredEmit('clipboardPaste', {
+    eventManager.deferredEmit('clipboardPasted', {
       nodes: context.actionStateManager.getState().copyPaste?.copiedNodes || [],
       edges: context.actionStateManager.getState().copyPaste?.copiedEdges || [],
     });

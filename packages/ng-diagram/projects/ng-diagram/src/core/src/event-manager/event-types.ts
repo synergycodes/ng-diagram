@@ -17,7 +17,7 @@ export interface DiagramEventMap {
   /** Event emitted when an edge is drawn */
   edgeDrawn: EdgeDrawnEvent;
   /** Event emitted when clipboard content is pasted */
-  clipboardPaste: ClipboardPasteEvent;
+  clipboardPasted: ClipboardPastedEvent;
   /** Event emitted when node or group size changes */
   nodeResized: NodeResizedEvent;
 }
@@ -101,7 +101,7 @@ export interface EdgeDrawnEvent {
  * This event fires when nodes and edges are added via paste operations
  * @category Types
  */
-export interface ClipboardPasteEvent {
+export interface ClipboardPastedEvent {
   /** Edges that were pasted into the diagram */
   edges: Edge[];
   /** Nodes that were pasted into the diagram */

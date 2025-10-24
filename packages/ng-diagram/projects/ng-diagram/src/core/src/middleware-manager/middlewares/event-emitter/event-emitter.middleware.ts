@@ -1,7 +1,7 @@
 import type { EventManager } from '../../../event-manager/event-manager';
 import type { Middleware, MiddlewareContext } from '../../../types';
 import {
-  ClipboardPasteEmitter,
+  ClipboardPastedEmitter,
   DiagramInitEmitter,
   EdgeDrawnEmitter,
   EventEmitter,
@@ -22,7 +22,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new SelectionMovedEmitter(),
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
-    new ClipboardPasteEmitter(),
+    new ClipboardPastedEmitter(),
     new NodeResizedEmitter(),
   ];
 

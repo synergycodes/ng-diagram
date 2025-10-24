@@ -15,7 +15,7 @@ import {
 import { Edge, Node } from '../../../core/src';
 
 import type {
-  ClipboardPasteEvent,
+  ClipboardPastedEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
   GroupNode,
@@ -153,7 +153,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   /**
    * Event emitted when clipboard content is pasted
    */
-  @Output() clipboardPaste = new EventEmitter<ClipboardPasteEvent>();
+  @Output() clipboardPasted = new EventEmitter<ClipboardPastedEvent>();
 
   /**
    * Event emitted when node or group size changes
@@ -317,7 +317,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
-    eventManager.on('clipboardPaste', (event) => this.clipboardPaste.emit(event));
+    eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));
   }
 }

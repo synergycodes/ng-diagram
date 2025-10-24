@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
-  ClipboardPasteEvent,
+  ClipboardPastedEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
   initializeModel,
@@ -60,6 +60,7 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
+    // debugMode: true,
   };
 
   onDiagramInit(event: DiagramInitEvent): void {
@@ -114,8 +115,8 @@ export class AppComponent {
     });
   }
 
-  onClipboardPaste(event: ClipboardPasteEvent): void {
-    console.log('Clipboard Paste:', {
+  onClipboardPasted(event: ClipboardPastedEvent): void {
+    console.log('Clipboard Pasted:', {
       nodes: event.nodes.map((n: Node) => n.id),
       edges: event.edges.map((e: Edge) => e.id),
     });
@@ -123,9 +124,11 @@ export class AppComponent {
 
   onNodeResized(event: NodeResizedEvent): void {
     console.log('Size Changed:', {
-      id: event.node.id,
-      size: event.node.size,
-      previousSize: event.previousSize,
+      node: {
+        id: event.node.id,
+        size: event.node.size,
+        previousSize: event.previousSize,
+      },
     });
   }
 

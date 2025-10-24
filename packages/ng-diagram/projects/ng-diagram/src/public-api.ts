@@ -67,7 +67,7 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 export type {
   ActionState,
   BackgroundConfig,
-  ClipboardPasteEvent,
+  ClipboardPastedEvent,
   DiagramEventMap,
   DiagramInitEvent,
   Edge,

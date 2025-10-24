@@ -1,6 +1,6 @@
 export { EventManager } from './event-manager';
 export type {
-  ClipboardPasteEvent,
+  ClipboardPastedEvent,
   DiagramEventMap,
   DiagramInitEvent,
   EdgeDrawnEvent,
