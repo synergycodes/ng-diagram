@@ -4,7 +4,7 @@ description: Understanding how transactions work in ngDiagram
 ---
 
 import { Aside } from '@astrojs/starlight/components';
-import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 
 Transactions in ngDiagram provide a mechanism for batching multiple state changes into atomic operation.
 This is particularly useful for complex operations that involve multiple nodes and edges, ensuring better performance.
@@ -100,6 +100,6 @@ for (const node of nodes) {
 import Transactions from '@examples/transactions/transactions.astro';
 
 <Transactions />
-<ExampleViewer dirName="transactions" />
+<CodeViewer dirName="examples/transactions" />
 
 Whether you're building simple diagrams or complex applications, transactions help ensure data consistency and optimal performance.
