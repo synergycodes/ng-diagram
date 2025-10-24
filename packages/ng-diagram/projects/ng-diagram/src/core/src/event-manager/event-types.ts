@@ -16,6 +16,8 @@ export interface DiagramEventMap {
   viewportChanged: ViewportChangedEvent;
   /** Event emitted when an edge is drawn */
   edgeDrawn: EdgeDrawnEvent;
+  /** Event emitted when clipboard content is pasted */
+  clipboardPaste: ClipboardPasteEvent;
 }
 
 /**
@@ -90,6 +92,18 @@ export interface EdgeDrawnEvent {
   sourcePort?: string;
   /** Target port identifier if connected to a specific port */
   targetPort?: string;
+}
+
+/**
+ * Event payload emitted when clipboard content is pasted into the diagram.
+ * This event fires when nodes and edges are added via paste operations
+ * @category Types
+ */
+export interface ClipboardPasteEvent {
+  /** Edges that were pasted into the diagram */
+  edges: Edge[];
+  /** Nodes that were pasted into the diagram */
+  nodes: Node[];
 }
 
 /**

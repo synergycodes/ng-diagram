@@ -15,6 +15,7 @@ import {
 import { Edge, Node } from '../../../core/src';
 
 import type {
+  ClipboardPasteEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
   GroupNode,
@@ -147,6 +148,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * Event emitted when viewport changes (pan/zoom)
    */
   @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
+
+  /**
+   * Event emitted when clipboard content is pasted
+   */
+  @Output() clipboardPaste = new EventEmitter<ClipboardPasteEvent>();
 
   constructor() {
     effect(() => {
@@ -305,5 +311,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
+    eventManager.on('clipboardPaste', (event) => this.clipboardPaste.emit(event));
   }
 }

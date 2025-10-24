@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
+  ClipboardPasteEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
   initializeModel,
@@ -105,6 +106,13 @@ export class AppComponent {
       target: event.target.id,
       sourcePort: event.sourcePort,
       targetPort: event.targetPort,
+    });
+  }
+
+  onClipboardPaste(event: ClipboardPasteEvent): void {
+    console.log('Clipboard Paste:', {
+      nodes: event.nodes.map((n) => n.id),
+      edges: event.edges.map((e) => e.id),
     });
   }
 
