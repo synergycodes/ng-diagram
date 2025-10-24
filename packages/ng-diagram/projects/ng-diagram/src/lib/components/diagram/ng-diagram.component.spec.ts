@@ -73,8 +73,17 @@ describe('AngularAdapterDiagramComponent', () => {
                 setEnabled: vi.fn(),
                 hasListeners: vi.fn(),
               },
+              commandHandler: {
+                emit: vi.fn(),
+              },
               config: {
                 debugMode: false,
+                zoom: {
+                  zoomToFit: {
+                    padding: 20,
+                    onInit: false,
+                  },
+                },
               },
             }),
             isInitialized: vi.fn().mockReturnValue(true),

@@ -60,6 +60,7 @@ const defaultZoomConfig: ZoomConfig = {
   min: 0.1,
   max: 10.0,
   step: 0.05,
+  zoomToFit: defaultZoomToFitConfig,
 };
 
 const defaultBackgroundConfig: BackgroundConfig = {
@@ -129,7 +130,6 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       linking: defaultLinkingConfig,
       grouping: defaultGroupingConfig,
       zoom: defaultZoomConfig,
-      zoomToFit: defaultZoomToFitConfig,
       background: defaultBackgroundConfig,
       nodeRotation: defaultNodeRotationConfig,
       snapping: defaultNodeDraggingConfig,

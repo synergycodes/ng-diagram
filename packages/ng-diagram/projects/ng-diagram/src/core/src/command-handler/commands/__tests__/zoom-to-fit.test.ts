@@ -14,7 +14,7 @@ describe('zoomToFit command', () => {
         getState: vi.fn(),
         applyUpdate: mockApplyUpdate,
         config: {
-          zoom: { min: 0.1, max: 2, step: 0.1 },
+          zoom: { min: 0.1, max: 2, step: 0.1, zoomToFit: { padding: 20 } },
         },
       },
     } as unknown as CommandHandler;

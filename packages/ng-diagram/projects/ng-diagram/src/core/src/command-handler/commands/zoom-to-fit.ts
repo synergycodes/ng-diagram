@@ -111,7 +111,7 @@ export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeI
   const { viewport } = metadata;
 
   // Get default padding from config
-  const defaultPadding = commandHandler.flowCore.config.zoomToFit.padding;
+  const defaultPadding = commandHandler.flowCore.config.zoom.zoomToFit.padding;
   const effectivePadding = padding ?? defaultPadding;
 
   // Validate viewport dimensions

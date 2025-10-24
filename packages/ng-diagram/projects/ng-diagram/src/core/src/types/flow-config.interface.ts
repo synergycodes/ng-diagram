@@ -121,6 +121,11 @@ export interface ZoomConfig {
    * The zoom step increment.
    */
   step: number;
+
+  /**
+   * Configuration for zoom-to-fit operations.
+   */
+  zoomToFit: ZoomToFitConfig;
 }
 
 /**
@@ -320,11 +325,6 @@ export interface FlowConfig {
    * Configuration for zooming.
    */
   zoom: ZoomConfig;
-
-  /**
-   * Configuration for zoom-to-fit operations.
-   */
-  zoomToFit: ZoomToFitConfig;
 
   /**
    * Configuration for edge routing.

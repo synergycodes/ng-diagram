@@ -303,7 +303,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('diagramInit', (event) => {
       this.diagramInit.emit(event);
 
-      if (flowCore.config.zoomToFit.onInit) {
+      if (flowCore.config.zoom.zoomToFit.onInit) {
         flowCore.commandHandler.emit('zoomToFit', {});
       }
     });
