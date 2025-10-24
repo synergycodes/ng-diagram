@@ -300,7 +300,13 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     const flowCore = this.flowCoreProvider.provide();
     const eventManager = flowCore.eventManager;
 
-    eventManager.on('diagramInit', (event) => this.diagramInit.emit(event));
+    eventManager.on('diagramInit', (event) => {
+      this.diagramInit.emit(event);
+
+      if (flowCore.config.zoomToFit.onInit) {
+        flowCore.commandHandler.emit('zoomToFit', {});
+      }
+    });
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));

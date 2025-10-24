@@ -55,9 +55,9 @@ export class AppComponent {
       defaultRouting: 'orthogonal',
     },
     zoomToFit: {
+      onInit: true,
       padding: [50, 50, 100, 350],
     },
-    debugMode: true,
   };
 
   onDiagramInit(event: DiagramInitEvent): void {
