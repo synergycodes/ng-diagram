@@ -67,8 +67,9 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
             });
 
             this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
+
+            this.panDiagramOnScreenEdge(event.currentDiagramEdge);
           });
-          this.panDiagramOnScreenEdge(event.currentDiagramEdge);
         }
 
         this.lastInputPoint = event.lastInputPoint;
@@ -144,44 +145,47 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
   }
 
   private panDiagramOnScreenEdge(screenEdge: ContainerEdge) {
+    const { pointerEdgePanningForce } = this.flow.config.selectionMoving;
+
     if (!screenEdge) {
       return;
     }
-    const force = this.flow.config.selectionMoving.edgePanningForce;
+
     let x = 0;
     let y = 0;
     switch (screenEdge) {
       case 'left':
-        x = force;
+        x = pointerEdgePanningForce;
         break;
       case 'right':
-        x = -force;
+        x = -pointerEdgePanningForce;
         break;
       case 'top':
-        y = force;
+        y = pointerEdgePanningForce;
         break;
       case 'bottom':
-        y = -force;
+        y = -pointerEdgePanningForce;
         break;
       case 'topleft':
-        x = force;
-        y = force;
+        x = pointerEdgePanningForce;
+        y = pointerEdgePanningForce;
         break;
       case 'topright':
-        x = -force;
-        y = force;
+        x = -pointerEdgePanningForce;
+        y = pointerEdgePanningForce;
         break;
       case 'bottomleft':
-        x = force;
-        y = -force;
+        x = pointerEdgePanningForce;
+        y = -pointerEdgePanningForce;
         break;
       case 'bottomright':
-        x = -force;
-        y = -force;
+        x = -pointerEdgePanningForce;
+        y = -pointerEdgePanningForce;
         break;
       default:
         throw new Error(`Unknown screen edge: ${screenEdge}`);
     }
+
     this.flow.commandHandler.emit('moveViewportBy', { x, y });
   }
 }
