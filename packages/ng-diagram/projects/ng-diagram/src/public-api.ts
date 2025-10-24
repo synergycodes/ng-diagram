@@ -91,6 +91,7 @@ export type {
   ModelChanges,
   NgDiagramMath,
   Node,
+  NodeResizedEvent,
   NodeRotationConfig,
   Point,
   Port,

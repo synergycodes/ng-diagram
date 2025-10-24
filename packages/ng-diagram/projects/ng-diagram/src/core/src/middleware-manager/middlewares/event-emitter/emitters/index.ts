@@ -4,4 +4,5 @@ export { EdgeDrawnEmitter } from './edge-drawn.emitter';
 export { type EventEmitter } from './event-emitter.interface';
 export { SelectionChangedEmitter } from './selection-changed.emitter';
 export { SelectionMovedEmitter } from './selection-moved.emitter';
+export { NodeResizedEmitter } from './size-changed.emitter';
 export { ViewportChangedEmitter } from './viewport-changed.emitter';

@@ -21,6 +21,7 @@ import type {
   GroupNode,
   MiddlewareChain,
   ModelAdapter,
+  NodeResizedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
@@ -153,6 +154,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * Event emitted when clipboard content is pasted
    */
   @Output() clipboardPaste = new EventEmitter<ClipboardPasteEvent>();
+
+  /**
+   * Event emitted when node or group size changes
+   */
+  @Output() nodeResized = new EventEmitter<NodeResizedEvent>();
 
   constructor() {
     effect(() => {
@@ -312,5 +318,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPaste', (event) => this.clipboardPaste.emit(event));
+    eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));
   }
 }

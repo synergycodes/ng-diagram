@@ -1,4 +1,4 @@
-import type { Edge, Node, Viewport } from '../types';
+import type { Edge, Node, Size, Viewport } from '../types';
 
 /**
  * Map of all available diagram events and their payload types
@@ -18,6 +18,8 @@ export interface DiagramEventMap {
   edgeDrawn: EdgeDrawnEvent;
   /** Event emitted when clipboard content is pasted */
   clipboardPaste: ClipboardPasteEvent;
+  /** Event emitted when node or group size changes */
+  nodeResized: NodeResizedEvent;
 }
 
 /**
@@ -104,6 +106,19 @@ export interface ClipboardPasteEvent {
   edges: Edge[];
   /** Nodes that were pasted into the diagram */
   nodes: Node[];
+}
+
+/**
+ * Event payload emitted when node or group size changes.
+ * This event fires when node was resized manually by dragging resize handles
+ * or programmatically using resize methods.
+ * @category Types
+ */
+export interface NodeResizedEvent {
+  /** Node that was resized with their updated sizes */
+  node: Node;
+  /** Previous size of the node before the change */
+  previousSize: Size;
 }
 
 /**

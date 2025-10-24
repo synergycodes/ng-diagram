@@ -5,6 +5,7 @@ import {
   DiagramInitEmitter,
   EdgeDrawnEmitter,
   EventEmitter,
+  NodeResizedEmitter,
   SelectionChangedEmitter,
   SelectionMovedEmitter,
   ViewportChangedEmitter,
@@ -22,6 +23,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
     new ClipboardPasteEmitter(),
+    new NodeResizedEmitter(),
   ];
 
   return {

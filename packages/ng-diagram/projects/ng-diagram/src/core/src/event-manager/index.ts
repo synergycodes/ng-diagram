@@ -5,6 +5,7 @@ export type {
   DiagramInitEvent,
   EdgeDrawnEvent,
   EventListener,
+  NodeResizedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
   UnsubscribeFn,
