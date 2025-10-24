@@ -58,9 +58,6 @@ export class DiagramComponent {
         autoSize: false,
         type: 'myType',
         data: {},
-        // @mark-start:enabling
-        rotatable: true,
-        // @mark-end:enabling
       },
     ],
     // @collapse-start:enabling
