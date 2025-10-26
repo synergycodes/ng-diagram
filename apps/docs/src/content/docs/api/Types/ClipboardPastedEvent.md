@@ -2,7 +2,7 @@
 editUrl: false
 next: false
 prev: false
-title: "ClipboardPasteEvent"
+title: "ClipboardPastedEvent"
 ---
 
 Event payload emitted when clipboard content is pasted into the diagram.

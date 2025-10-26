@@ -10,6 +10,10 @@ export class ClipboardPastedEmitter implements EventEmitter {
       return;
     }
 
+    if (!context.actionStateManager.getState().copyPaste) {
+      return;
+    }
+
     eventManager.deferredEmit('clipboardPasted', {
       nodes: context.actionStateManager.getState().copyPaste?.copiedNodes || [],
       edges: context.actionStateManager.getState().copyPaste?.copiedEdges || [],

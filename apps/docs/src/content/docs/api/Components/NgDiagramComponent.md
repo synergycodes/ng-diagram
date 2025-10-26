@@ -14,9 +14,9 @@ Diagram component
 
 ## Properties
 
-### clipboardPaste
+### clipboardPasted
 
-> **clipboardPaste**: `EventEmitter`\<[`ClipboardPasteEvent`](/docs/api/types/clipboardpasteevent/)\>
+> **clipboardPasted**: `EventEmitter`\<[`ClipboardPastedEvent`](/docs/api/types/clipboardpastedevent/)\>
 
 Event emitted when clipboard content is pasted
 
@@ -76,11 +76,27 @@ The model to use in the diagram.
 
 ***
 
+### nodeResized
+
+> **nodeResized**: `EventEmitter`\<[`NodeResizedEvent`](/docs/api/types/noderesizedevent/)\>
+
+Event emitted when node or group size changes
+
+***
+
 ### nodeTemplateMap
 
 > **nodeTemplateMap**: `InputSignal`\<[`NgDiagramNodeTemplateMap`](/docs/api/types/ngdiagramnodetemplatemap/)\>
 
 The node template map to use for the diagram.
+
+***
+
+### paletteItemDropped
+
+> **paletteItemDropped**: `EventEmitter`\<[`PaletteItemDroppedEvent`](/docs/api/types/paletteitemdroppedevent/)\>
+
+Event emitted when a palette item is dropped into the diagram
 
 ***
 
@@ -92,11 +108,35 @@ Event emitted when selection changes
 
 ***
 
+### selectionGrouped
+
+> **selectionGrouped**: `EventEmitter`\<[`SelectionGroupedEvent`](/docs/api/types/selectiongroupedevent/)\>
+
+Event emitted when nodes are grouped into a group
+
+***
+
 ### selectionMoved
 
 > **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)\>
 
 Event emitted when selected nodes are moved
+
+***
+
+### selectionRemoved
+
+> **selectionRemoved**: `EventEmitter`\<[`SelectionRemovedEvent`](/docs/api/types/selectionremovedevent/)\>
+
+Event emitted when selected elements are deleted from the diagram
+
+***
+
+### selectionRotated
+
+> **selectionRotated**: `EventEmitter`\<[`SelectionRotatedEvent`](/docs/api/types/selectionrotatedevent/)\>
+
+Event emitted when a node is rotated
 
 ***
 
