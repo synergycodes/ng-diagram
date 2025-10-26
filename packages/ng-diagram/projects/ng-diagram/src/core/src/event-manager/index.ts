@@ -6,11 +6,12 @@ export type {
   EdgeDrawnEvent,
   EventListener,
   NodeResizedEvent,
-  PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionGroupedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
+  SelectionRotatedEvent,
+  PaletteItemDroppedEvent,
   UnsubscribeFn,
   ViewportChangedEvent,
 } from './event-types';

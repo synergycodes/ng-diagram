@@ -16,6 +16,8 @@ export interface DiagramEventMap {
   selectionRemoved: SelectionRemovedEvent;
   /** Event emitted when nodes are grouped into a group */
   selectionGrouped: SelectionGroupedEvent;
+  /** Event emitted when a node is rotated */
+  selectionRotated: SelectionRotatedEvent;
   /** Event emitted when the viewport changes */
   viewportChanged: ViewportChangedEvent;
   /** Event emitted when an edge is drawn */
@@ -163,6 +165,21 @@ export interface SelectionGroupedEvent {
   groupedNodes: Node[];
   /** The target group node that received the nodes */
   targetGroup: GroupNode;
+}
+
+/**
+ * Event payload emitted when a node is rotated in the diagram.
+ * This event fires when the user rotates a node manually using the rotation handle
+ * or programmatically using the `NgDiagramNodeService` rotation methods.
+ * @category Types
+ */
+export interface SelectionRotatedEvent {
+  /** The node that was rotated */
+  node: Node;
+  /** The new angle of the node in degrees */
+  angle: number;
+  /** The previous angle of the node in degrees */
+  previousAngle: number;
 }
 
 /**

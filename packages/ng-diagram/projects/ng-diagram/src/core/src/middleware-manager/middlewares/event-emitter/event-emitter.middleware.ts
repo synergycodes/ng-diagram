@@ -11,6 +11,7 @@ import {
   SelectionGroupedEmitter,
   SelectionMovedEmitter,
   SelectionRemovedEmitter,
+  SelectionRotatedEmitter,
   ViewportChangedEmitter,
 } from './emitters';
 
@@ -25,6 +26,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new SelectionMovedEmitter(),
     new SelectionRemovedEmitter(),
     new SelectionGroupedEmitter(),
+    new SelectionRotatedEmitter(),
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
     new ClipboardPastedEmitter(),

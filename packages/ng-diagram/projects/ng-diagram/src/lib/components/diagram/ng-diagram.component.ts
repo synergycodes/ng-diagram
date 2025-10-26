@@ -27,6 +27,7 @@ import type {
   SelectionGroupedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
+  SelectionRotatedEvent,
   ViewportChangedEvent,
 } from '../../../core/src';
 
@@ -157,6 +158,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * Event emitted when nodes are grouped into a group
    */
   @Output() selectionGrouped = new EventEmitter<SelectionGroupedEvent>();
+
+  /**
+   * Event emitted when a node is rotated
+   */
+  @Output() selectionRotated = new EventEmitter<SelectionRotatedEvent>();
 
   /**
    * Event emitted when viewport changes (pan/zoom)
@@ -336,6 +342,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('selectionRemoved', (event) => this.selectionRemoved.emit(event));
     eventManager.on('selectionGrouped', (event) => this.selectionGrouped.emit(event));
+    eventManager.on('selectionRotated', (event) => this.selectionRotated.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));

@@ -106,6 +106,7 @@ export type {
   SelectionMovedEvent,
   SelectionMovingConfig,
   SelectionRemovedEvent,
+  SelectionRotatedEvent,
   SimpleNode,
   Size,
   SnappingConfig,

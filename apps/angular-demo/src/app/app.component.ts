@@ -17,6 +17,7 @@ import {
   SelectionGroupedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
+  SelectionRotatedEvent,
   ViewportChangedEvent,
   type Edge,
   type EdgeLabel,
@@ -63,7 +64,6 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
-    debugMode: true,
   };
 
   onDiagramInit(event: DiagramInitEvent): void {
@@ -153,6 +153,14 @@ export class AppComponent {
     console.log('Selection Grouped:', {
       groupedNodes: event.groupedNodes.map((n: Node) => n.id),
       targetGroup: event.targetGroup.id,
+    });
+  }
+
+  onSelectionRotated(event: SelectionRotatedEvent): void {
+    console.log('Selection Rotated:', {
+      nodeId: event.node.id,
+      angle: event.angle,
+      previousAngle: event.previousAngle,
     });
   }
 
