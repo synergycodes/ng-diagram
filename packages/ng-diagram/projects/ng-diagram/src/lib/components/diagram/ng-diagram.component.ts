@@ -22,6 +22,7 @@ import type {
   MiddlewareChain,
   ModelAdapter,
   NodeResizedEvent,
+  PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
   ViewportChangedEvent,
@@ -159,6 +160,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * Event emitted when node or group size changes
    */
   @Output() nodeResized = new EventEmitter<NodeResizedEvent>();
+
+  /**
+   * Event emitted when a palette item is dropped into the diagram
+   */
+  @Output() paletteItemDropped = new EventEmitter<PaletteItemDroppedEvent>();
 
   constructor() {
     effect(() => {
@@ -319,5 +325,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));
+    eventManager.on('paletteItemDropped', (event) => this.paletteItemDropped.emit(event));
   }
 }

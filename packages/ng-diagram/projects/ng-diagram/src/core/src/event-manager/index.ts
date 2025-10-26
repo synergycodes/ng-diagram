@@ -8,6 +8,7 @@ export type {
   NodeResizedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  PaletteItemDroppedEvent,
   UnsubscribeFn,
   ViewportChangedEvent,
 } from './event-types';

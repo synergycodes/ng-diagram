@@ -2,6 +2,7 @@ export { ClipboardPastedEmitter } from './clipboard-paste.emitter';
 export { DiagramInitEmitter } from './diagram-init.emitter';
 export { EdgeDrawnEmitter } from './edge-drawn.emitter';
 export { type EventEmitter } from './event-emitter.interface';
+export { PaletteItemDroppedEmitter } from './palette-item-dropped.emitter';
 export { SelectionChangedEmitter } from './selection-changed.emitter';
 export { SelectionMovedEmitter } from './selection-moved.emitter';
 export { NodeResizedEmitter } from './size-changed.emitter';

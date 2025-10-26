@@ -1,4 +1,4 @@
-import type { Edge, Node, Size, Viewport } from '../types';
+import type { Edge, Node, Point, Size, Viewport } from '../types';
 
 /**
  * Map of all available diagram events and their payload types
@@ -20,6 +20,8 @@ export interface DiagramEventMap {
   clipboardPasted: ClipboardPastedEvent;
   /** Event emitted when node or group size changes */
   nodeResized: NodeResizedEvent;
+  /** Event emitted when a palette item is dropped */
+  paletteItemDropped: PaletteItemDroppedEvent;
 }
 
 /**
@@ -119,6 +121,18 @@ export interface NodeResizedEvent {
   node: Node;
   /** Previous size of the node before the change */
   previousSize: Size;
+}
+
+/**
+ * Event payload emitted when a palette item is dropped onto the diagram.
+ * This event fires when users drag items from the palette and drop them to create new nodes.
+ * @category Types
+ */
+export interface PaletteItemDroppedEvent {
+  /** The node that was created from the dropped palette item */
+  node: Node;
+  /** The position where the item was dropped */
+  dropPosition: Point;
 }
 
 /**

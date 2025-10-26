@@ -11,6 +11,7 @@ import {
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
   NodeResizedEvent,
+  PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
   SelectionMovedEvent,
@@ -60,7 +61,7 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
-    // debugMode: true,
+    debugMode: true,
   };
 
   onDiagramInit(event: DiagramInitEvent): void {
@@ -129,6 +130,13 @@ export class AppComponent {
         size: event.node.size,
         previousSize: event.previousSize,
       },
+    });
+  }
+
+  onPaletteItemDropped(event: PaletteItemDroppedEvent): void {
+    console.log('Palette Item Dropped:', {
+      node: event.node.id,
+      dropPosition: event.dropPosition,
     });
   }
 

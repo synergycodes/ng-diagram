@@ -6,6 +6,7 @@ import {
   EdgeDrawnEmitter,
   EventEmitter,
   NodeResizedEmitter,
+  PaletteItemDroppedEmitter,
   SelectionChangedEmitter,
   SelectionMovedEmitter,
   ViewportChangedEmitter,
@@ -24,6 +25,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new EdgeDrawnEmitter(),
     new ClipboardPastedEmitter(),
     new NodeResizedEmitter(),
+    new PaletteItemDroppedEmitter(),
   ];
 
   return {

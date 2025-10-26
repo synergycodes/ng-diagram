@@ -102,6 +102,7 @@ export type {
   RoutingMode,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  PaletteItemDroppedEvent,
   SelectionMovingConfig,
   SimpleNode,
   Size,
