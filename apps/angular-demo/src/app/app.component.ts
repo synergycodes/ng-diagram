@@ -15,6 +15,7 @@ import {
   provideNgDiagram,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  SelectionRemovedEvent,
   ViewportChangedEvent,
   type Edge,
   type EdgeLabel,
@@ -137,6 +138,13 @@ export class AppComponent {
     console.log('Palette Item Dropped:', {
       node: event.node.id,
       dropPosition: event.dropPosition,
+    });
+  }
+
+  onSelectionRemoved(event: SelectionRemovedEvent): void {
+    console.log('Selection Removed:', {
+      nodes: event.deletedNodes.map((n: Node) => n.id),
+      edges: event.deletedEdges.map((e: Edge) => e.id),
     });
   }
 

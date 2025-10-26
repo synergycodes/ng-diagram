@@ -12,6 +12,8 @@ export interface DiagramEventMap {
   selectionMoved: SelectionMovedEvent;
   /** Event emitted when the selection changes */
   selectionChanged: SelectionChangedEvent;
+  /** Event emitted when selected elements are deleted from the diagram */
+  selectionRemoved: SelectionRemovedEvent;
   /** Event emitted when the viewport changes */
   viewportChanged: ViewportChangedEvent;
   /** Event emitted when an edge is drawn */
@@ -133,6 +135,19 @@ export interface PaletteItemDroppedEvent {
   node: Node;
   /** The position where the item was dropped */
   dropPosition: Point;
+}
+
+/**
+ * Event payload emitted when selected elements are deleted from the diagram.
+ * This event fires when the user deletes nodes and edges using the delete key,
+ * context menu, or programmatically through the diagram service.
+ * @category Types
+ */
+export interface SelectionRemovedEvent {
+  /** Nodes that were deleted from the diagram */
+  deletedNodes: Node[];
+  /** Edges that were deleted from the diagram */
+  deletedEdges: Edge[];
 }
 
 /**

@@ -25,6 +25,7 @@ import type {
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  SelectionRemovedEvent,
   ViewportChangedEvent,
 } from '../../../core/src';
 
@@ -145,6 +146,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * Event emitted when selection changes
    */
   @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
+
+  /**
+   * Event emitted when selected elements are deleted from the diagram
+   */
+  @Output() selectionRemoved = new EventEmitter<SelectionRemovedEvent>();
 
   /**
    * Event emitted when viewport changes (pan/zoom)
@@ -322,6 +328,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
+    eventManager.on('selectionRemoved', (event) => this.selectionRemoved.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));

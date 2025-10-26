@@ -9,6 +9,7 @@ import {
   PaletteItemDroppedEmitter,
   SelectionChangedEmitter,
   SelectionMovedEmitter,
+  SelectionRemovedEmitter,
   ViewportChangedEmitter,
 } from './emitters';
 
@@ -21,6 +22,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new DiagramInitEmitter(),
     new SelectionChangedEmitter(),
     new SelectionMovedEmitter(),
+    new SelectionRemovedEmitter(),
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
     new ClipboardPastedEmitter(),
