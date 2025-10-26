@@ -4,6 +4,7 @@ export { EdgeDrawnEmitter } from './edge-drawn.emitter';
 export { type EventEmitter } from './event-emitter.interface';
 export { PaletteItemDroppedEmitter } from './palette-item-dropped.emitter';
 export { SelectionChangedEmitter } from './selection-changed.emitter';
+export { SelectionGroupedEmitter } from './selection-grouped.emitter';
 export { SelectionMovedEmitter } from './selection-moved.emitter';
 export { SelectionRemovedEmitter } from './selection-removed.emitter';
 export { NodeResizedEmitter } from './size-changed.emitter';

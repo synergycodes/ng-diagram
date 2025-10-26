@@ -1,4 +1,4 @@
-import type { Edge, Node, Point, Size, Viewport } from '../types';
+import type { Edge, GroupNode, Node, Point, Size, Viewport } from '../types';
 
 /**
  * Map of all available diagram events and their payload types
@@ -14,6 +14,8 @@ export interface DiagramEventMap {
   selectionChanged: SelectionChangedEvent;
   /** Event emitted when selected elements are deleted from the diagram */
   selectionRemoved: SelectionRemovedEvent;
+  /** Event emitted when nodes are grouped into a group */
+  selectionGrouped: SelectionGroupedEvent;
   /** Event emitted when the viewport changes */
   viewportChanged: ViewportChangedEvent;
   /** Event emitted when an edge is drawn */
@@ -148,6 +150,19 @@ export interface SelectionRemovedEvent {
   deletedNodes: Node[];
   /** Edges that were deleted from the diagram */
   deletedEdges: Edge[];
+}
+
+/**
+ * Event payload emitted when nodes are grouped by moving them into a group.
+ * This event fires when the user moves nodes onto a group node, causing them
+ * to be assigned to that group's groupId.
+ * @category Types
+ */
+export interface SelectionGroupedEvent {
+  /** Nodes that were added to the group */
+  groupedNodes: Node[];
+  /** The target group node that received the nodes */
+  targetGroup: GroupNode;
 }
 
 /**

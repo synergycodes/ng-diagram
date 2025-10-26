@@ -14,6 +14,7 @@ import {
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
+  SelectionGroupedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
   ViewportChangedEvent,
@@ -145,6 +146,13 @@ export class AppComponent {
     console.log('Selection Removed:', {
       nodes: event.deletedNodes.map((n: Node) => n.id),
       edges: event.deletedEdges.map((e: Edge) => e.id),
+    });
+  }
+
+  onSelectionGrouped(event: SelectionGroupedEvent): void {
+    console.log('Selection Grouped:', {
+      groupedNodes: event.groupedNodes.map((n: Node) => n.id),
+      targetGroup: event.targetGroup.id,
     });
   }
 
