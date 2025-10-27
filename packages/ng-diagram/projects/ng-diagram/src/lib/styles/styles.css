@@ -53,6 +53,10 @@
   --ngd-box-selection-border-size: 1px;
   --ngd-box-selection-background: rgba(43, 91, 213, 0.12);
 
+  --ngd-default-edge-label-background-color: var(--ngd-default-edge-label-bg-primary-default);
+  --ngd-default-edge-label-color: var(--ngd-txt-primary-default);
+  --ngd-default-edge-label-border-color: var(--ngd-colors-gray-500);
+
   /* change to 400 when ready*/
   --ngd-background-dot-color: var(--ngd-colors-gray-500);
 }

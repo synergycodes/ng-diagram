@@ -1,8 +1,8 @@
-import { glob } from 'glob';
 import { readFile } from 'fs/promises';
+import { glob } from 'glob';
 import path from 'node:path';
 
-const EXAMPLES_DIR = './src/components/angular/examples';
+const EXAMPLES_DIR = './src/components/angular';
 
 /*
  * @param dirName - The name of the directory in @examples

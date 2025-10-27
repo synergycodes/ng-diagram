@@ -1,0 +1,26 @@
+---
+title: Examples
+description: Explore practical examples showing how to implement various features in ngDiagram
+sidebar:
+  order: 0
+  label: Overview
+---
+
+import ContentTile from '../../../components/content-tile/content-tile.astro';
+import { examples } from './examples.ts';
+
+Explore these examples to learn how to implement various features in ngDiagram. Each example includes a live demo and full source code to help you get started quickly.
+
+<div class="content-tile-grid">
+  {examples.map((example) => (
+    <ContentTile
+      title={example.title}
+      description={example.description}
+      href={example.href}
+      navigationTitle={'View Example'}
+      image={example.image}
+      imageAlt={example.imageAlt}
+      openInNewTab={false}
+    />
+  ))}
+</div>

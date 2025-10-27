@@ -29,7 +29,8 @@ this.ngDiagramService.updateConfig({ gridSize: 20 });
 
 > **isInitialized**: `Signal`\<`boolean`\>
 
-Returns whether the diagram is initialized.
+Returns whether the diagram is fully initialized and all elements are measured.
+This signal is set to `true` when the `diagramInit` event fires.
 
 ## Methods
 

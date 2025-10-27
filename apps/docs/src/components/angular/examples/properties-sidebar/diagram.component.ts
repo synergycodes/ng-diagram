@@ -5,6 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 import { SidebarContainer } from './sidebar/sidebar.component';
 
@@ -13,17 +14,23 @@ import { SidebarContainer } from './sidebar/sidebar.component';
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [config]="config" />
     </div>
     <sidebar-container />
   `,
   styleUrls: ['./diagram.component.scss'],
 })
 export class DiagramComponent {
-  model = initializeModel({
-    metadata: {
-      viewport: { x: 0, y: 0, scale: 0.88 },
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+        padding: [50, 315, 50, 50],
+      },
     },
+  } satisfies NgDiagramConfig;
+
+  model = initializeModel({
     nodes: [
       {
         id: '1',

@@ -8,8 +8,9 @@ export { NgDiagramComponent } from './lib/components/diagram/ng-diagram.componen
 export {
   BaseEdgeLabelComponent,
   NgDiagramBaseEdgeLabelComponent,
-} from './lib/components/edge-label/base-edge-label.component';
+} from './lib/components/edge-label/base-edge-label/base-edge-label.component';
 export { NgDiagramBaseEdgeComponent } from './lib/components/edge/base-edge/base-edge.component';
+export { NgDiagramBaseNodeTemplateComponent } from './lib/components/node/base-node-template/ng-diagram-base-node-template.component';
 export { NgDiagramNodeResizeAdornmentComponent } from './lib/components/node/resize/ng-diagram-node-resize-adornment.component';
 export { NgDiagramNodeRotateAdornmentComponent } from './lib/components/node/rotate/ng-diagram-node-rotate-adornment.component';
 export { NgDiagramPaletteItemPreviewComponent } from './lib/components/palette/item-preview/ng-diagram-palette-item-preview.component';
@@ -96,6 +97,7 @@ export type {
   Port,
   PortLocation,
   PortSide,
+  Rect,
   ResizeConfig,
   RoutingMode,
   SelectionChangedEvent,

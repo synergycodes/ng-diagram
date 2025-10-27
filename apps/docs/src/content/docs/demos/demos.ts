@@ -1,12 +1,6 @@
-export interface Demo {
-  title: string;
-  description: string;
-  href: string;
-  image: string;
-  imageAlt?: string;
-}
+import type { ContentTile } from '../../../components/content-tile/content-tile.astro';
 
-export const demos: Demo[] = [
+export const demos: ContentTile[] = [
   {
     title: 'Yjs Collaboration App',
     description:

@@ -13,6 +13,7 @@ import type {
   SnappingConfig,
   ZIndexConfig,
   ZoomConfig,
+  ZoomToFitConfig,
 } from '../types/flow-config.interface';
 import { DeepPartial, Point, Size } from '../types/utils';
 import { deepMerge } from '../utils';
@@ -51,10 +52,16 @@ const defaultGroupingConfig: GroupingConfig = {
   },
 };
 
+const defaultZoomToFitConfig: ZoomToFitConfig = {
+  padding: 50,
+  onInit: false,
+};
+
 const defaultZoomConfig: ZoomConfig = {
   min: 0.1,
   max: 10.0,
   step: 0.05,
+  zoomToFit: defaultZoomToFitConfig,
 };
 
 const defaultBackgroundConfig: BackgroundConfig = {

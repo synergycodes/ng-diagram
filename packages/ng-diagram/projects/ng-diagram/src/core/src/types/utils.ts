@@ -37,10 +37,27 @@ export interface Point {
  */
 export type PortSide = 'top' | 'right' | 'bottom' | 'left';
 
+/**
+ * Interface representing a rect in the flow diagram
+ *
+ * @category Types
+ */
 export interface Rect {
+  /**
+   * X coordinate of the rect's top-left corner
+   */
   x: number;
+  /**
+   * Y coordinate of the rect's top-left corner
+   */
   y: number;
+  /**
+   * Width dimension
+   */
   width: number;
+  /**
+   * Height dimension
+   */
   height: number;
 }
 

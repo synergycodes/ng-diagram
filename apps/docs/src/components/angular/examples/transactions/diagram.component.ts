@@ -35,10 +35,15 @@ export class DiagramComponent {
   config: NgDiagramConfig = {
     debugMode: true,
     edgeRouting: { defaultRouting: 'orthogonal' },
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+        padding: 200,
+      },
+    },
   };
 
   model = initializeModel({
-    metadata: { viewport: { x: 130, y: 25, scale: 1 } },
     nodes: [
       {
         id: '1',

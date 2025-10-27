@@ -41,9 +41,13 @@ export class AppComponent {
     ['dashed-edge', DashedEdgeComponent],
   ]);
 
-  config: NgDiagramConfig = {
+  config = {
     zoom: {
       max: 2,
+      zoomToFit: {
+        onInit: true,
+        padding: [50, 50, 100, 350],
+      },
     },
     background: {
       dotSize: 40,
@@ -54,7 +58,7 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
-  };
+  } satisfies NgDiagramConfig;
 
   onDiagramInit(event: DiagramInitEvent): void {
     console.log('INIT');
@@ -190,6 +194,14 @@ export class AppComponent {
         resizable: true,
         rotatable: true,
       },
+      {
+        id: '12',
+        position: { x: 700, y: 750 },
+        data: {},
+        type: 'customized-default',
+        resizable: true,
+        rotatable: true,
+      },
     ],
     edges: [
       {
@@ -261,8 +273,5 @@ export class AppComponent {
         routing: 'orthogonal',
       },
     ],
-    metadata: {
-      viewport: { x: 300, y: 0, scale: 1 },
-    },
   });
 }
