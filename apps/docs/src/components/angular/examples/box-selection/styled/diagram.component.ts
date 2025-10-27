@@ -5,6 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 
 // @section-start:styling
@@ -13,7 +14,7 @@ import {
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [config]="config" />
     </div>
   `,
   styles: [
@@ -31,6 +32,15 @@ import {
 })
 // @section-end:styling
 export class DiagramComponent {
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+        padding: 100,
+      },
+    },
+  } satisfies NgDiagramConfig;
+
   model = initializeModel({
     nodes: [
       {

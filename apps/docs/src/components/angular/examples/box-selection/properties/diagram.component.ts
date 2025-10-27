@@ -99,14 +99,20 @@ export class DiagramComponent {
     });
   }
 
-  // @section-start:config
-  config: NgDiagramConfig = {
+  config = {
+    // @section-start:config
     boxSelection: {
       partialInclusion: true,
       realtime: true,
     },
-  };
-  // @section-end:config
+    // @section-end:config
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
+    },
+  } satisfies NgDiagramConfig;
+
   model = initializeModel({
     nodes: [
       {
