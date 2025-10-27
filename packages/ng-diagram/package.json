@@ -51,7 +51,7 @@
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
-    "jsdom": "^26.1.0",
+    "jsdom": "^27.0.1",
     "ng-packagr": "^19.2.2",
     "terser": "^5.44.0",
     "typescript": "~5.8.3",
