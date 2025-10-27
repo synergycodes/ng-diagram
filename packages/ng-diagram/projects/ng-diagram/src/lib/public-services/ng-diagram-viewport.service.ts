@@ -1,7 +1,7 @@
 import { computed, inject } from '@angular/core';
 import { Node, Point, Rect } from '../../core/src';
+import { RendererService } from '../services/renderer/renderer.service';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
-import { NgDiagramModelService } from './ng-diagram-model.service';
 
 /**
  * The `NgDiagramViewportService` provides methods and signals for interacting with the diagram viewport.
@@ -20,7 +20,7 @@ import { NgDiagramModelService } from './ng-diagram-model.service';
  * @category Services
  */
 export class NgDiagramViewportService extends NgDiagramBaseService {
-  private readonly modelService = inject(NgDiagramModelService);
+  private readonly renderer = inject(RendererService);
 
   // ===================
   // VIEWPORT SIGNALS
@@ -29,12 +29,12 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
   /**
    * Returns a computed signal for the viewport that safely handles uninitialized state.
    */
-  viewport = computed(() => this.modelService.metadata().viewport || { x: 0, y: 0, scale: 1 });
+  viewport = computed(() => this.renderer.viewport() || { x: 0, y: 0, scale: 1 });
 
   /**
    * Returns a computed signal for the scale that safely handles uninitialized state.
    */
-  scale = computed(() => this.modelService.metadata().viewport.scale || 1);
+  scale = computed(() => this.renderer.viewport().scale || 1);
 
   // ===================
   // POSITION CONVERSION METHODS

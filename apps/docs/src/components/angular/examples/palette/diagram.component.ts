@@ -5,6 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
+  type NgDiagramConfig,
   type NgDiagramPaletteItem,
 } from 'ng-diagram';
 import { Palette } from './palette/palette.component';
@@ -14,7 +15,7 @@ import { Palette } from './palette/palette.component';
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [config]="config" />
     </div>
     <palette-container [model]="paletteModel" />
   `,
@@ -26,14 +27,16 @@ export class DiagramComponent {
     { data: { label: 'Default Group' }, resizable: true, isGroup: true },
   ];
 
-  model = initializeModel({
-    metadata: {
-      viewport: {
-        x: 272,
-        y: 65,
-        scale: 1,
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+        padding: [150, 150, 150, 365],
       },
     },
+  } satisfies NgDiagramConfig;
+
+  model = initializeModel({
     nodes: [
       { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
     ],

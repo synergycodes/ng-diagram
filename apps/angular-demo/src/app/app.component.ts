@@ -41,7 +41,7 @@ export class AppComponent {
     ['dashed-edge', DashedEdgeComponent],
   ]);
 
-  config: NgDiagramConfig = {
+  config = {
     zoom: {
       max: 2,
       zoomToFit: {
@@ -58,7 +58,7 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
-  };
+  } satisfies NgDiagramConfig;
 
   onDiagramInit(event: DiagramInitEvent): void {
     console.log('INIT');
@@ -265,8 +265,5 @@ export class AppComponent {
         routing: 'orthogonal',
       },
     ],
-    metadata: {
-      viewport: { x: 300, y: 0, scale: 1 },
-    },
   });
 }
