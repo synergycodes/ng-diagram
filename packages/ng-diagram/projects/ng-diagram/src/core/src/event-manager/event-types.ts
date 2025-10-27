@@ -15,7 +15,7 @@ export interface DiagramEventMap {
   /** Event emitted when selected elements are deleted from the diagram */
   selectionRemoved: SelectionRemovedEvent;
   /** Event emitted when nodes are grouped into a group */
-  selectionGrouped: SelectionGroupedEvent;
+  selectionGroupChanged: SelectionGroupChangedEvent;
   /** Event emitted when a node is rotated */
   selectionRotated: SelectionRotatedEvent;
   /** Event emitted when the viewport changes */
@@ -160,11 +160,11 @@ export interface SelectionRemovedEvent {
  * to be assigned to that group's groupId.
  * @category Types
  */
-export interface SelectionGroupedEvent {
+export interface SelectionGroupChangedEvent {
   /** Nodes that were added to the group */
-  groupedNodes: Node[];
+  nodes: Node[];
   /** The target group node that received the nodes */
-  targetGroup: GroupNode;
+  targetGroup?: GroupNode;
 }
 
 /**

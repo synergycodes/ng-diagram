@@ -102,7 +102,7 @@ export type {
   ResizeConfig,
   RoutingMode,
   SelectionChangedEvent,
-  SelectionGroupedEvent,
+  SelectionGroupChangedEvent,
   SelectionMovedEvent,
   SelectionMovingConfig,
   SelectionRemovedEvent,

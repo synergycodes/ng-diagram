@@ -14,7 +14,7 @@ import {
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
-  SelectionGroupedEvent,
+  SelectionGroupChangedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
@@ -149,11 +149,17 @@ export class AppComponent {
     });
   }
 
-  onSelectionGrouped(event: SelectionGroupedEvent): void {
-    console.log('Selection Grouped:', {
-      groupedNodes: event.groupedNodes.map((n: Node) => n.id),
-      targetGroup: event.targetGroup.id,
-    });
+  onSelectionGroupChanged(event: SelectionGroupChangedEvent): void {
+    if (event.targetGroup) {
+      console.log('Selection Grouped:', {
+        groupedNodes: event.nodes.map((n: Node) => n.id),
+        targetGroup: event.targetGroup.id,
+      });
+    } else {
+      console.log('Selection Ungrouped:', {
+        ungroupedNodes: event.nodes.map((n: Node) => n.id),
+      });
+    }
   }
 
   onSelectionRotated(event: SelectionRotatedEvent): void {
