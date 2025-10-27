@@ -9,9 +9,65 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
 
-## Using Labels in Edge Components
+## Using Labels in Default Edges
 
-To display a label on an edge, use the `NgDiagramBaseEdgeLabelComponent` in the implementation of your edge component:
+To display a label on a **default edge**, you can add a `label` property to the edge's data.
+
+import DefaultLabel from '@components/angular/edges/labels/default-label/default-label.astro';
+
+<DefaultLabel />
+
+<CodeSnippet relativePath="edges/labels/default-label/diagram.component.ts" />
+
+### CSS Variables
+
+Default labels can be styled using CSS variables. You can customize these in your global styles:
+
+```scss
+ng-diagram-default-edge-label {
+  --edge-label-padding: 10px;
+  --edge-label-border-radius: 8px;
+  --edge-label-font-size: 14px;
+  --edge-label-background-color: #f3f4f6;
+  --edge-label-text-color: #1e293b;
+  --edge-label-border-width: 2px;
+  --edge-label-border-color: #334155;
+  --edge-label-border-transition: border-color 0.1s ease-in-out;
+}
+```
+
+**Available CSS variables:**
+
+- `--edge-label-padding` - Label padding
+- `--edge-label-border-radius` - Label border radius
+- `--edge-label-font-size` - Label font size
+- `--edge-label-background-color` - Label background color
+- `--edge-label-text-color` - Label text color
+- `--edge-label-border-width` - Label border width
+- `--edge-label-border-color` - Label border color
+- `--edge-label-border-transition` - Transition for border changes
+
+The default label also uses these semantic variables that map to the design system:
+
+- `--ngd-default-edge-label-color` - Label text color
+- `--ngd-default-edge-label-background-color` - Label background color
+- `--ngd-default-edge-label-border-color` - Label border color
+
+The default edge applies different styles to labels based on the edge state (normal, hover, selected). You can customize these styles by modifying the following CSS:
+
+```scss
+ng-diagram-base-edge.default-edge:hover:not(.selected) {
+  --edge-label-border-color: #2563eb;
+}
+
+ng-diagram-base-edge.default-edge.selected {
+  --edge-label-border-color: #3b82f6;
+}
+```
+
+## Custom Labels
+
+To display a custom label on an edge, use the `NgDiagramBaseEdgeLabelComponent` in an implementation of your **custom edge** component:
 
 import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
 
