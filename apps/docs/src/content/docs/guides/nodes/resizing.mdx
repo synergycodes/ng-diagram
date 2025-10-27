@@ -3,7 +3,8 @@ title: Resizing
 description: Understanding how resizing works in ngDiagram
 ---
 
-import Resizing from '@components/angular/nodes/resizing/resizing.astro';
+import Configuration from '@components/angular/nodes/resizing/configuration/configuration.astro';
+import Hierarchy from '@components/angular/nodes/resizing/hierarchy/hierarchy.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 The **resizing** feature in ngDiagram allows users to interactively change the size of nodes on the diagram canvas.
@@ -15,21 +16,68 @@ The new size is reflected in the node's appearance and can be used to create fle
 
 - Nodes can be resized by dragging the resize handles or lines.
 - The node's size is updated in its data model.
-- Resizing can be enabled per node and configured globally via diagram config.
+- Resizing can be enabled per node, configured globally via diagram config or in the resize adornment component of a custom node template.
+
+## Global Configuration
+
+Resizing is enabled by default. You can control the default resizing behavior for all nodes by setting the `defaultResizable` property in the `NgDiagramConfig`:
+
+```typescript
+import { NgDiagramConfig } from 'ng-diagram';
+
+const config: NgDiagramConfig = {
+  resize: {
+    defaultResizable: false,
+  },
+};
+```
+
+## Default Nodes
+
+Default nodes use the value from the global configuration to determine if they are resizable. You can override the global configuration for specific nodes by setting the `resizable` property on the node data.
+
+```typescript
+{
+  id: 'node1',
+  type: 'default',
+  position: { x: 100, y: 100 },
+  data: {
+    resizable: false,
+  },
+}
+```
 
 ## Custom Node Setup
 
 To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-adornment>` in your node template and import the `NgDiagramNodeResizeAdornmentComponent`.
 
-<CodeSnippet relativePath="nodes/resizing/node/node.component.ts" />
+<CodeSnippet relativePath="nodes/resizing/configuration/node/node.component.ts" />
 
-## Enabling Resizing
+In custom nodes, together with the global and data properties, the resizable state can also be controlled via the `defaultResizable` property on the `NgDiagramNodeResizeAdornmentComponent`.
 
-The adornment is shown when the node gets selected.
+```html
+<ng-diagram-node-resize-adornment [defaultResizable]="true"></ng-diagram-node-resize-adornment>
+```
 
-You can control whether the adornment is enabled either by setting the `value` input property on the adornment component or by setting the `resizable` property on the node data.
+## Hierarchy
 
-Setting `value` on the component to a boolean takes precedence over the node data property.
+The resizable state of a node is determined by the following hierarchy (from highest to lowest priority):
+
+1. The `resizable` property on the node data.
+2. The `defaultResizable` property on the `NgDiagramNodeResizeAdornmentComponent` (for custom nodes).
+3. The global `defaultResizable` setting in `NgDiagramConfig`.
+
+In the example below you can see how different nodes have different resizable states based on this hierarchy. Select a node to view its configuration.
+
+<Hierarchy />
+
+The above example uses this model:
+
+<CodeSnippet relativePath="nodes/resizing/hierarchy/diagram.component.ts" sectionId="model" />
+
+Setting the `NgDiagramNodeResizeAdornmentComponent` `defaultResizable` is done by using the `adornmentResizable` property in the nodes custom data:
+
+<CodeSnippet relativePath="nodes/resizing/hierarchy/node/node.component.ts" />
 
 ## Customization
 
@@ -70,11 +118,11 @@ This configuration allows you to control minimum node size and other resizing op
 
 You can set these options in your diagram configuration and pass them to the `ng-diagram` component:
 
-<CodeSnippet relativePath="nodes/resizing/diagram.component.ts" sectionId="config" />
+<CodeSnippet relativePath="nodes/resizing/configuration/diagram.component.ts" sectionId="config" />
 
 ## Example
 
-<Resizing />
+<Configuration />
 
 ## Further Reading
 

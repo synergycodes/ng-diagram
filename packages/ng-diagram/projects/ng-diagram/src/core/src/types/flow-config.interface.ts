@@ -21,6 +21,11 @@ export interface ResizeConfig {
    * Default: true (group can be resized below children size).
    */
   allowResizeBelowChildrenBounds: boolean;
+
+  /**
+   * The default resizable state for nodes.
+   */
+  defaultResizable: boolean;
 }
 
 /**
@@ -135,6 +140,11 @@ export interface NodeRotationConfig {
    * @default 15
    */
   defaultSnapAngle: number;
+
+  /**
+   * The default rotatable state for nodes.
+   */
+  defaultRotatable: boolean;
 }
 
 /**
