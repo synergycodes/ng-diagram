@@ -9,6 +9,7 @@ import {
   DeleteEdgesCommand,
   DeleteNodesCommand,
   DeletePortsCommand,
+  PaletteDropNodeCommand,
   UpdateEdgeCommand,
   UpdateEdgeLabelsCommand,
   UpdateEdgesCommand,
@@ -52,6 +53,7 @@ export type Command =
   | AddNodesCommand
   | UpdateNodeCommand
   | UpdateNodesCommand
+  | PaletteDropNodeCommand
   | DeleteNodesCommand
   | AddEdgesCommand
   | UpdateEdgeCommand

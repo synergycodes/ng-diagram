@@ -10,6 +10,7 @@ import {
   deleteEdges,
   deleteNodes,
   deletePorts,
+  paletteDropNode,
   updateEdge,
   updateEdgeLabels,
   updateEdges,
@@ -89,6 +90,7 @@ export const commands: CommandMap = {
   highlightGroupClear,
   addToGroup,
   removeFromGroup,
+  paletteDropNode,
   centerOnNode,
   centerOnRect,
 };

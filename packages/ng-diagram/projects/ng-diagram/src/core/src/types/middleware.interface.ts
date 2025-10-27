@@ -20,6 +20,7 @@ export type ModelActionType =
   | 'updateNodes'
   | 'deleteNodes'
   | 'clearModel'
+  | 'paletteDropNode'
   | 'addEdges'
   | 'updateEdge'
   | 'deleteEdges'
