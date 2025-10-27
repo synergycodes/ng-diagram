@@ -5,6 +5,7 @@ sidebar:
   order: 3
 ---
 
+import CustomDefaultNode from '@components/angular/nodes/custom-default-node/custom-default-node.astro';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -19,6 +20,16 @@ You can create a custom node by extending `NgDiagramNodeTemplate` and implementi
 <CustomNode />
 
 [Custom Node Example →](/docs/examples/custom-node)
+
+## Using the Default Node as a base
+
+If you don't want to start from scratch, you can use the `NgDiagramBaseNodeTemplateComponent` component as a way to add custom content into the default node.
+
+Simply wrap your custom content inside the `<ng-diagram-base-node-template>` component.
+
+<CodeSnippet relativePath="nodes/custom-default-node/node/node.component.ts" />
+
+<CustomDefaultNode />
 
 ## Registration
 
