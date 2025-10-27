@@ -75,7 +75,7 @@ title: "ng-diagram"
 - [Rect](/docs/api/types/rect/)
 - [ResizeConfig](/docs/api/types/resizeconfig/)
 - [SelectionChangedEvent](/docs/api/types/selectionchangedevent/)
-- [SelectionGroupedEvent](/docs/api/types/selectiongroupedevent/)
+- [SelectionGroupChangedEvent](/docs/api/types/selectiongroupchangedevent/)
 - [SelectionMovedEvent](/docs/api/types/selectionmovedevent/)
 - [SelectionMovingConfig](/docs/api/types/selectionmovingconfig/)
 - [SelectionRemovedEvent](/docs/api/types/selectionremovedevent/)

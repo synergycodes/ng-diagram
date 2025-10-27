@@ -6,27 +6,60 @@ import type { Edge, GroupNode, Node, Point, Size, Viewport } from '../types';
  * @category Types
  */
 export interface DiagramEventMap {
-  /** Event emitted when the diagram is initialized */
+  /**
+   * Event emitted when the diagram is initialized
+   * This event fires after all nodes and edges including their internal parts have been measured and positioned.
+   */
   diagramInit: DiagramInitEvent;
-  /** Event emitted when the selection is moved */
+  /**
+   * Event emitted when the selection is moved
+   * This event fires when the user moves nodes manually or programmatically
+   */
   selectionMoved: SelectionMovedEvent;
-  /** Event emitted when the selection changes */
+  /**
+   * Event emitted when the selection changes
+   * This event fires when the user selects or deselects nodes and edges
+   */
   selectionChanged: SelectionChangedEvent;
-  /** Event emitted when selected elements are deleted from the diagram */
+  /**
+   * Event emitted when selected elements are deleted from the diagram
+   * This event fires when the user deletes nodes and edges
+   */
   selectionRemoved: SelectionRemovedEvent;
-  /** Event emitted when nodes are grouped into a group */
+  /**
+   * Event emitted when nodes are grouped into a group
+   * This event fires when the user moves nodes in or out of a group node.
+   */
   selectionGroupChanged: SelectionGroupChangedEvent;
-  /** Event emitted when a node is rotated */
+  /**
+   * Event emitted when a node is rotated
+   * This event fires when the user rotates a node manually or programmatically
+   */
   selectionRotated: SelectionRotatedEvent;
-  /** Event emitted when the viewport changes */
+  /**
+   * Event emitted when the viewport changes
+   * This event fires during pan and zoom operations
+   */
   viewportChanged: ViewportChangedEvent;
-  /** Event emitted when an edge is drawn */
+  /**
+   * Event emitted when an edge is drawn
+   * This event fires when the user draws an edge manually through the UI
+   */
   edgeDrawn: EdgeDrawnEvent;
-  /** Event emitted when clipboard content is pasted */
+  /**
+   * Event emitted when clipboard content is pasted
+   * This event fires when nodes and edges are added via paste operations
+   */
   clipboardPasted: ClipboardPastedEvent;
-  /** Event emitted when node or group size changes */
+  /**
+   * Event emitted when node or group size changes
+   * This event fires when node was resized manually or programmatically
+   */
   nodeResized: NodeResizedEvent;
-  /** Event emitted when a palette item is dropped */
+  /**
+   * Event emitted when a palette item is dropped
+   * This event fires when users drag items from the palette and drop them to create new nodes
+   */
   paletteItemDropped: PaletteItemDroppedEvent;
 }
 
@@ -88,7 +121,7 @@ export interface ViewportChangedEvent {
 /**
  * Event payload emitted when a user manually draws an edge between two nodes.
  * This event only fires for user-initiated edge creation through the UI,
- * not for programmatically added edges.
+ * also from temporary links creation, but not for programmatically added edges.
  * @category Types
  */
 export interface EdgeDrawnEvent {
@@ -155,13 +188,12 @@ export interface SelectionRemovedEvent {
 }
 
 /**
- * Event payload emitted when nodes are grouped by moving them into a group.
- * This event fires when the user moves nodes onto a group node, causing them
- * to be assigned to that group's groupId.
+ * Event payload emitted when nodes are grouped or ungrouped by moving them into/out of a group.
+ * This event fires when the user moves nodes in or out of a group node.
  * @category Types
  */
 export interface SelectionGroupChangedEvent {
-  /** Nodes that were added to the group */
+  /** Nodes that were operated on (either grouped or ungrouped) */
   nodes: Node[];
   /** The target group node that received the nodes */
   targetGroup?: GroupNode;

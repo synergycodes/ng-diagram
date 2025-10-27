@@ -108,9 +108,9 @@ Event emitted when selection changes
 
 ***
 
-### selectionGrouped
+### selectionGroupChanged
 
-> **selectionGrouped**: `EventEmitter`\<[`SelectionGroupedEvent`](/docs/api/types/selectiongroupedevent/)\>
+> **selectionGroupChanged**: `EventEmitter`\<[`SelectionGroupChangedEvent`](/docs/api/types/selectiongroupchangedevent/)\>
 
 Event emitted when nodes are grouped into a group
 

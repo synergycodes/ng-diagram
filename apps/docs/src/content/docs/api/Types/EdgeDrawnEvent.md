@@ -7,7 +7,7 @@ title: "EdgeDrawnEvent"
 
 Event payload emitted when a user manually draws an edge between two nodes.
 This event only fires for user-initiated edge creation through the UI,
-not for programmatically added edges.
+also from temporary links creation, but not for programmatically added edges.
 
 ## Properties
 
