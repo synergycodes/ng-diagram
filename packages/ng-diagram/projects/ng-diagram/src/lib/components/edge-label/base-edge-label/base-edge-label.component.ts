@@ -38,6 +38,7 @@ import { NgDiagramBaseEdgeComponent } from '../../edge/base-edge/base-edge.compo
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.transform]': 'transform',
+    '[style.visibility]': 'isVisible() ? null : "hidden"',
   },
 })
 export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
@@ -63,6 +64,25 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     const edgeData = this.edgeData();
     const labelData = edgeData?.measuredLabels?.find((label) => label.id === this.id());
     return labelData?.position || { x: 0, y: 0 };
+  });
+
+  // Hide label when it doesn't have a valid position or edge has no points
+  // (prevents initial "blinking")
+  readonly isVisible = computed(() => {
+    const edgeData = this.edgeData();
+    if (!edgeData) return false;
+
+    const labelData = edgeData.measuredLabels?.find((label) => label.id === this.id());
+
+    const hasCalculatedPosition = !!(
+      labelData?.position &&
+      labelData?.position.x != null &&
+      labelData?.position.y != null
+    );
+
+    const hasValidPoints = !!(edgeData.points && edgeData.points.length >= 2);
+
+    return hasCalculatedPosition && hasValidPoints;
   });
 
   private lastPositionOnEdge = signal<EdgeLabel['positionOnEdge'] | undefined>(undefined);
