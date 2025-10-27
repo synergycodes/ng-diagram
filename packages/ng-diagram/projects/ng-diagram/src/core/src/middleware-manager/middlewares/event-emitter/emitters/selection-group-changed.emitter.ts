@@ -28,18 +28,14 @@ export class SelectionGroupChangedEmitter implements EventEmitter {
     const targetGroupId = groupUpdate.groupId;
     const groupedNodes: Node[] = [];
     const ungroupedNodes: Node[] = [];
-    console.log('aaaaaaaaaaaaaaaaaaaaa');
     // Check all updated nodes for groupId changes
     for (const nodeUpdate of nodesToUpdate) {
-      console.log('bbbbbbbbbbbbbbbbbbbbb');
       if (!('groupId' in nodeUpdate)) {
         continue;
       }
 
       const nodeId = nodeUpdate.id;
-      //updated node
       const currentNode = nodesMap.get(nodeId);
-      //node before update
       const initialNode = initialNodesMap.get(nodeId);
 
       if (!currentNode || !initialNode) {
@@ -71,8 +67,8 @@ export class SelectionGroupChangedEmitter implements EventEmitter {
         eventManager.deferredEmit('selectionGroupChanged', event);
       }
     }
-
-    if (ungroupedNodes.length > 0) {
+    // Emit event for nodes being ungrouped
+    else if (ungroupedNodes.length > 0) {
       const event: SelectionGroupChangedEvent = {
         nodes: ungroupedNodes,
         targetGroup: undefined,
