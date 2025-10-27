@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Node } from '../../../../core/src';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handle.component';
@@ -31,7 +29,6 @@ export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase 
   private readonly diagramService = inject(NgDiagramService);
   /**
    * Whether the node is rotatable.
-   * Takes precedence over {@link Node.rotatable}.
    *
    * @default undefined
    */

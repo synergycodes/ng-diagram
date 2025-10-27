@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Node } from '../../../../core/src';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramResizeHandleComponent } from './handle/ng-diagram-resize-handle.component';
@@ -32,7 +30,6 @@ export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase 
   private readonly diagramService = inject(NgDiagramService);
   /**
    * Whether the node is resizable.
-   * Takes precedence over {@link Node.resizable}.
    *
    * @default undefined
    */
