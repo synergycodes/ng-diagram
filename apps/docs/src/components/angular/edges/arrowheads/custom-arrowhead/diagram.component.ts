@@ -6,6 +6,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 // @collapse-end
 // @mark-start
@@ -17,7 +18,7 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [config]="config" />
       <!-- @mark-start -->
       <custom-arrowheads />
       <!-- @mark-end -->
@@ -33,12 +34,17 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
   // @collapse-end
 })
 export class DiagramComponent {
-  model = initializeModel({
-    // @collapse-start
-    metadata: {
-      viewport: { x: 100, y: 0, scale: 0.8 },
+  // @collapse-start
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
     },
-    // @collapse-end
+  } satisfies NgDiagramConfig;
+  // @collapse-end
+
+  model = initializeModel({
     nodes: [
       // @collapse-start
       {

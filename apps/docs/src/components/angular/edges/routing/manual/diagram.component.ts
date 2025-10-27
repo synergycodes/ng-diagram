@@ -5,6 +5,7 @@ import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 
 @Component({
@@ -12,7 +13,7 @@ import {
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [config]="config" />
     </div>
   `,
   styles: `
@@ -23,12 +24,19 @@ import {
   `,
 })
 export class DiagramComponent {
+  // @collapse-start
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
+    },
+  } satisfies NgDiagramConfig;
+  // @collapse-end
+
   // @section-start
   model = initializeModel({
     // @collapse-start
-    metadata: {
-      viewport: { x: 0, y: 0, scale: 0.9 },
-    },
     nodes: [
       {
         id: 'node1',

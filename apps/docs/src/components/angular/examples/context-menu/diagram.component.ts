@@ -40,6 +40,10 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+        padding: 130,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -54,8 +58,6 @@ export class DiagramComponent {
         },
       },
     ],
-    edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 
   onDiagramRightClick(event: MouseEvent) {

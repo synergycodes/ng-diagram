@@ -36,4 +36,8 @@ export class ToolbarComponent {
       this.ngDiagramViewportService.centerOnNode(node.id);
     }
   }
+
+  onZoomToFitClick() {
+    this.ngDiagramViewportService.zoomToFit();
+  }
 }

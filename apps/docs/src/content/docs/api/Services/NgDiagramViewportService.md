@@ -221,3 +221,59 @@ The center point to zoom towards.
 #### Returns
 
 `void`
+
+***
+
+### zoomToFit()
+
+> **zoomToFit**(`options?`): `void`
+
+Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
+
+#### Parameters
+
+##### options?
+
+Optional configuration object
+
+###### edgeIds?
+
+`string`[]
+
+Array of edge IDs to fit. If not provided, all edges are included.
+
+###### nodeIds?
+
+`string`[]
+
+Array of node IDs to fit. If not provided, all nodes are included.
+
+###### padding?
+
+`number` \| \[`number`, `number`\] \| \[`number`, `number`, `number`\] \| \[`number`, `number`, `number`, `number`\]
+
+Padding around the content (default: 50). Supports CSS-like syntax:
+  - Single number: uniform padding on all sides
+  - [top/bottom, left/right]: vertical and horizontal padding
+  - [top, left/right, bottom]: top, horizontal, bottom padding
+  - [top, right, bottom, left]: individual padding for each side
+
+#### Returns
+
+`void`
+
+#### Example
+
+```typescript
+// Fit all nodes and edges with default padding
+this.viewportService.zoomToFit();
+
+// Fit with custom uniform padding
+this.viewportService.zoomToFit({ padding: 100 });
+
+// Fit with different padding on each side [top, right, bottom, left]
+this.viewportService.zoomToFit({ padding: [50, 100, 50, 100] });
+
+// Fit only specific nodes
+this.viewportService.zoomToFit({ nodeIds: ['node1', 'node2'] });
+```

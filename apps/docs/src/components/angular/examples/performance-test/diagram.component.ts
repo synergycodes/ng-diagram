@@ -6,6 +6,7 @@ import {
   NgDiagramComponent,
   provideNgDiagram,
   type Edge,
+  type NgDiagramConfig,
   type Node,
 } from 'ng-diagram';
 
@@ -14,7 +15,7 @@ import {
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" />
+      <ng-diagram [model]="model" [config]="config" />
     </div>
   `,
   styles: `
@@ -27,14 +28,19 @@ import {
 export class DiagramComponent {
   model = initializeModel(this.generateModelData());
 
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
+    },
+  } satisfies NgDiagramConfig;
+
   generateModelData() {
     const nodes = this.generateNodes();
     const edges = this.generateEdges(nodes);
 
     return {
-      metadata: {
-        viewport: { x: 50, y: 100, scale: 0.1 },
-      },
       nodes,
       edges,
     };

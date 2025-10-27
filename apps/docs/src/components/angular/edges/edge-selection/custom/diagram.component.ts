@@ -21,6 +21,9 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
   } satisfies NgDiagramConfig;
 
