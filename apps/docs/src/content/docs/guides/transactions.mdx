@@ -20,12 +20,38 @@ this.ngDiagramService.transaction(() => {
 });
 ```
 
-<Aside type="caution" title="Caution">
+## How Transactions Work
+
+Understanding how transactions are applied internally helps you write better code and reason about your diagram state changes. When a transaction is committed, operations are executed in a specific sequence to maintain data integrity:
+
+```typescript
+stateUpdate.nodesToAdd?.forEach((node) => this.addNode(node));
+stateUpdate.edgesToAdd?.forEach((edge) => this.addEdge(edge));
+stateUpdate.edgesToRemove?.forEach((id) => this.removeEdge(id));
+stateUpdate.nodesToRemove?.forEach((id) => this.removeNode(id));
+stateUpdate.nodesToUpdate?.forEach((node) => this.updateNode(node));
+stateUpdate.edgesToUpdate?.forEach((edge) => this.updateEdge(edge));
+
+if (stateUpdate.metadataUpdate) {
+  this.metadata = { ...this.metadata, ...stateUpdate.metadataUpdate };
+}
+```
+
+This fixed order ensures that:
+
+- **Nodes are added first**, making them available before edges that might reference them
+- **Edges are added next**, after all required nodes exist
+- **Edges are removed before nodes**, preventing dangling edge references
+- **Nodes are removed after edges**, ensuring no edges point to non-existent nodes
+- **Updates are applied after all additions and removals**, ensuring the structure is stable before modifying properties
+- **Metadata is merged last**, after all other operations are complete
+
+<Aside type="tip">
   Operations are **grouped by type** and applied in this fixed order:
 
 Add nodes → Add edges → Remove edges → Remove nodes → Update nodes → Update edges → Merge metadata
 
-Call order inside transaction is **not preserved**. For example: `addNodes([node1])` → `addEdges([edge1])` → `addNodes([node2])` will execute both node additions together.
+This means call order inside transactions is **not preserved**. For example: `addNodes([node1])` → `addEdges([edge1])` → `addNodes([node2])` will execute both node additions together.
 
 </Aside>
 
