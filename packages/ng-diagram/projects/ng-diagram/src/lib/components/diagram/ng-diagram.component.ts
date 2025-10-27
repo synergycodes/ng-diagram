@@ -130,57 +130,72 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   readonly viewport = this.renderer.viewport;
 
   /**
-   * Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
+   * Event emitted when the diagram is initialized.
+   * It carries information about all nodes and edges in the diagram, and viewport state.
    */
   @Output() diagramInit = new EventEmitter<DiagramInitEvent>();
 
   /**
    * Event emitted when a user manually draws an edge between two nodes
+   * It carries information about the newly created edge, source and target nodes and ports that are connected by the edge.
    */
   @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
 
   /**
    * Event emitted when selected nodes are moved
+   * It carries information about the moved nodes and their new positions
    */
   @Output() selectionMoved = new EventEmitter<SelectionMovedEvent>();
 
   /**
    * Event emitted when selection changes
+   * This event fires when the user selects or deselects nodes and edges
+   * It carries information about the newly selected and deselected elements, and previous selection state.
    */
   @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
 
   /**
-   * Event emitted when selected elements are deleted from the diagram
+   * Event emitted when selected edges and nodes are removed from the diagram within deletion operation
+   * It carries information about the deleted nodes and edges.
    */
   @Output() selectionRemoved = new EventEmitter<SelectionRemovedEvent>();
 
   /**
-   * Event emitted when nodes are grouped into a group
+   * Event emitted when nodes are grouped or ungrouped.
+   * This event fires when the user moves nodes in or out of a group node.
+   * It carries information about the affected target group node and the nodes that were added or removed from the group.
+   * Depending on the operation, target group node may be undefined (for ungrouping operations).
    */
   @Output() selectionGroupChanged = new EventEmitter<SelectionGroupChangedEvent>();
 
   /**
    * Event emitted when a node is rotated
+   * It carries information about the rotated node and its new, and old rotation angle.
    */
   @Output() selectionRotated = new EventEmitter<SelectionRotatedEvent>();
 
   /**
-   * Event emitted when viewport changes (pan/zoom)
+   * Event emitted when viewport changes.
+   * This event fires during pan and zoom operations.
+   * It carries information about the new and old viewport state.
    */
   @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
 
   /**
-   * Event emitted when clipboard content is pasted
+   * Event emitted when elements are pasted via clipboard operations
+   * This event carries information about the pasted nodes and edges.
    */
   @Output() clipboardPasted = new EventEmitter<ClipboardPastedEvent>();
 
   /**
-   * Event emitted when node or group size changes
+   * Event emitted when node or group is resized through user interaction on UI
+   * This event carries information about the resized node, its new size and previous size.
    */
   @Output() nodeResized = new EventEmitter<NodeResizedEvent>();
 
   /**
-   * Event emitted when a palette item is dropped into the diagram
+   * Event emitted when a palette item (node or group) is dropped into the diagram.
+   * This event carries information about the newly created node and its drop position.
    */
   @Output() paletteItemDropped = new EventEmitter<PaletteItemDroppedEvent>();
 
