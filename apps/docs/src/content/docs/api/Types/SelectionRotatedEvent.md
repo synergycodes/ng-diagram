@@ -6,6 +6,7 @@ title: "SelectionRotatedEvent"
 ---
 
 Event payload emitted when a node is rotated in the diagram.
+
 This event fires when the user rotates a node manually using the rotation handle
 or programmatically using the `NgDiagramNodeService` rotation methods.
 

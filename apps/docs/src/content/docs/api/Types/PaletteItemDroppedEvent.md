@@ -6,7 +6,9 @@ title: "PaletteItemDroppedEvent"
 ---
 
 Event payload emitted when a palette item is dropped onto the diagram.
-This event fires when users drag items from the palette and drop them to create new nodes.
+
+This event fires when users drag items from the palette and drop them
+onto the canvas to create new nodes.
 
 ## Properties
 

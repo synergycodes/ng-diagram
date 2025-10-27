@@ -3,6 +3,7 @@ import {
   ClipboardPastedEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
+  GroupMembershipChangedEvent,
   initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
@@ -14,7 +15,6 @@ import {
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
-  SelectionGroupChangedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
@@ -149,15 +149,19 @@ export class AppComponent {
     });
   }
 
-  onSelectionGroupChanged(event: SelectionGroupChangedEvent): void {
-    if (event.targetGroup) {
-      console.log('Selection Grouped:', {
-        groupedNodes: event.nodes.map((n: Node) => n.id),
-        targetGroup: event.targetGroup.id,
+  onGroupMembershipChanged(event: GroupMembershipChangedEvent): void {
+    if (event.grouped.length > 0) {
+      event.grouped.forEach((operation) => {
+        console.log('Nodes Grouped:', {
+          groupedNodes: operation.nodes.map((n: Node) => n.id),
+          targetGroup: operation.targetGroup.id,
+        });
       });
-    } else {
-      console.log('Selection Ungrouped:', {
-        ungroupedNodes: event.nodes.map((n: Node) => n.id),
+    }
+
+    if (event.ungrouped.length > 0) {
+      console.log('Nodes Ungrouped:', {
+        ungroupedNodes: event.ungrouped.map((n: Node) => n.id),
       });
     }
   }

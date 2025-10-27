@@ -5,8 +5,9 @@ prev: false
 title: "NodeResizedEvent"
 ---
 
-Event payload emitted when node or group size changes.
-This event fires when node was resized manually by dragging resize handles
+Event payload emitted when a node or group size changes.
+
+This event fires when a node is resized manually by dragging resize handles
 or programmatically using resize methods.
 
 ## Properties
@@ -15,7 +16,7 @@ or programmatically using resize methods.
 
 > **node**: [`Node`](/docs/api/types/node/)
 
-Node that was resized with their updated sizes
+Node that was resized with its updated size
 
 ***
 

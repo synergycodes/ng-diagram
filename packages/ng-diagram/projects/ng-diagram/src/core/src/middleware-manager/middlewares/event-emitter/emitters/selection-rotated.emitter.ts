@@ -14,13 +14,11 @@ export class SelectionRotatedEmitter implements EventEmitter {
     const { initialNodesMap, nodesMap } = context;
     const rotatedNodeUpdate = context.initialUpdate.nodesToUpdate?.[0];
 
-    if (!rotatedNodeUpdate || !('angle' in rotatedNodeUpdate)) {
+    if (!rotatedNodeUpdate) {
       return;
     }
 
     const nodeId = rotatedNodeUpdate.id;
-    const newAngle = rotatedNodeUpdate.angle as number;
-
     const initialNode = initialNodesMap.get(nodeId);
     const currentNode = nodesMap.get(nodeId);
 
@@ -29,8 +27,8 @@ export class SelectionRotatedEmitter implements EventEmitter {
     }
 
     const previousAngle = initialNode.angle ?? 0;
+    const newAngle = currentNode.angle ?? 0;
 
-    // Only emit if the angle actually changed
     if (previousAngle !== newAngle) {
       const event: SelectionRotatedEvent = {
         node: currentNode,

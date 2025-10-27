@@ -18,13 +18,13 @@ import type {
   ClipboardPastedEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
+  GroupMembershipChangedEvent,
   GroupNode,
   MiddlewareChain,
   ModelAdapter,
   NodeResizedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
-  SelectionGroupChangedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
@@ -130,72 +130,90 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   readonly viewport = this.renderer.viewport;
 
   /**
-   * Event emitted when the diagram is initialized.
-   * It carries information about all nodes and edges in the diagram, and viewport state.
+   * Event emitted when the diagram initialization is complete.
+   *
+   * This event fires after all nodes and edges including their internal parts
+   * (ports, labels) have been measured and positioned.
    */
   @Output() diagramInit = new EventEmitter<DiagramInitEvent>();
 
   /**
-   * Event emitted when a user manually draws an edge between two nodes
-   * It carries information about the newly created edge, source and target nodes and ports that are connected by the edge.
+   * Event emitted when a user manually draws an edge between two nodes.
+   *
+   * This event only fires for user-initiated edge creation through the UI,
+   * but not for programmatically added edges.
    */
   @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
 
   /**
-   * Event emitted when selected nodes are moved
-   * It carries information about the moved nodes and their new positions
+   * Event emitted when selected nodes are moved within the diagram.
+   *
+   * This event fires when the user moves nodes manually by dragging or
+   * programmatically using the `NgDiagramNodeService.moveNodesBy()` method.
    */
   @Output() selectionMoved = new EventEmitter<SelectionMovedEvent>();
 
   /**
-   * Event emitted when selection changes
-   * This event fires when the user selects or deselects nodes and edges
-   * It carries information about the newly selected and deselected elements, and previous selection state.
+   * Event emitted when the selection state changes in the diagram.
+   *
+   * This event fires when the user selects or deselects nodes and edges through
+   * clicking or programmatically using the `NgDiagramSelectionService`.
    */
   @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
 
   /**
-   * Event emitted when selected edges and nodes are removed from the diagram within deletion operation
-   * It carries information about the deleted nodes and edges.
+   * Event emitted when selected elements are deleted from the diagram.
+   *
+   * This event fires when the user deletes nodes and edges using the delete key,
+   * or programmatically through the diagram service.
    */
   @Output() selectionRemoved = new EventEmitter<SelectionRemovedEvent>();
 
   /**
    * Event emitted when nodes are grouped or ungrouped.
-   * This event fires when the user moves nodes in or out of a group node.
-   * It carries information about the affected target group node and the nodes that were added or removed from the group.
-   * Depending on the operation, target group node may be undefined (for ungrouping operations).
+   *
+   * This event fires when the user moves nodes in or out of a group node,
+   * changing their group membership status.
    */
-  @Output() selectionGroupChanged = new EventEmitter<SelectionGroupChangedEvent>();
+  @Output() groupMembershipChanged = new EventEmitter<GroupMembershipChangedEvent>();
 
   /**
-   * Event emitted when a node is rotated
-   * It carries information about the rotated node and its new, and old rotation angle.
+   * Event emitted when a node is rotated in the diagram.
+   *
+   * This event fires when the user rotates a node manually using the rotation handle
+   * or programmatically using the `NgDiagramNodeService` rotation methods.
    */
   @Output() selectionRotated = new EventEmitter<SelectionRotatedEvent>();
 
   /**
-   * Event emitted when viewport changes.
-   * This event fires during pan and zoom operations.
-   * It carries information about the new and old viewport state.
+   * Event emitted when the viewport changes through panning or zooming.
+   *
+   * This event fires during pan and zoom operations, including mouse wheel zoom,
+   * and programmatic viewport changes.
    */
   @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
 
   /**
-   * Event emitted when elements are pasted via clipboard operations
-   * This event carries information about the pasted nodes and edges.
+   * Event emitted when clipboard content is pasted into the diagram.
+   *
+   * This event fires when nodes and edges are added via paste operations,
+   * either through keyboard shortcuts or programmatic paste commands.
    */
   @Output() clipboardPasted = new EventEmitter<ClipboardPastedEvent>();
 
   /**
-   * Event emitted when node or group is resized through user interaction on UI
-   * This event carries information about the resized node, its new size and previous size.
+   * Event emitted when a node or group size changes.
+   *
+   * This event fires when a node is resized manually by dragging resize handles
+   * or programmatically using resize methods.
    */
   @Output() nodeResized = new EventEmitter<NodeResizedEvent>();
 
   /**
-   * Event emitted when a palette item (node or group) is dropped into the diagram.
-   * This event carries information about the newly created node and its drop position.
+   * Event emitted when a palette item is dropped onto the diagram.
+   *
+   * This event fires when users drag items from the palette and drop them
+   * onto the canvas to create new nodes.
    */
   @Output() paletteItemDropped = new EventEmitter<PaletteItemDroppedEvent>();
 
@@ -356,7 +374,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('selectionRemoved', (event) => this.selectionRemoved.emit(event));
-    eventManager.on('selectionGroupChanged', (event) => this.selectionGroupChanged.emit(event));
+    eventManager.on('groupMembershipChanged', (event) => this.groupMembershipChanged.emit(event));
     eventManager.on('selectionRotated', (event) => this.selectionRotated.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));

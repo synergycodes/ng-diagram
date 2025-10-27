@@ -10,13 +10,20 @@ export class PaletteItemDroppedEmitter implements EventEmitter {
     if (context.modelActionType !== 'paletteDropNode') {
       return;
     }
-    // Get the newly added nodes
-    const addedNode = context.initialUpdate.nodesToAdd?.[0];
-    if (addedNode) {
-      // For palette drops, typically only one node is added at a time
+
+    const addedNodeRequest = context.initialUpdate.nodesToAdd?.[0];
+    if (!addedNodeRequest) {
+      return;
+    }
+
+    const nodeId = addedNodeRequest.id;
+    const initialNode = context.initialNodesMap.get(nodeId);
+    const currentNode = context.nodesMap.get(nodeId);
+
+    if (!initialNode && currentNode) {
       const event: PaletteItemDroppedEvent = {
-        node: addedNode,
-        dropPosition: addedNode.position,
+        node: currentNode,
+        dropPosition: currentNode.position,
       };
       eventManager.deferredEmit('paletteItemDropped', event);
     }

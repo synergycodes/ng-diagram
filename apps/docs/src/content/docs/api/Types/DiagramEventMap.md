@@ -13,8 +13,10 @@ Map of all available diagram events and their payload types
 
 > **clipboardPasted**: [`ClipboardPastedEvent`](/docs/api/types/clipboardpastedevent/)
 
-Event emitted when clipboard content is pasted
-This event fires when nodes and edges are added via paste operations
+Event emitted when clipboard content is pasted into the diagram.
+
+This event fires when nodes and edges are added via paste operations,
+either through keyboard shortcuts or programmatic paste commands.
 
 ***
 
@@ -22,8 +24,10 @@ This event fires when nodes and edges are added via paste operations
 
 > **diagramInit**: [`DiagramInitEvent`](/docs/api/types/diagraminitevent/)
 
-Event emitted when the diagram is initialized
-This event fires after all nodes and edges including their internal parts have been measured and positioned.
+Event emitted when the diagram initialization is complete.
+
+This event fires after all nodes and edges including their internal parts
+(ports, labels) have been measured and positioned.
 
 ***
 
@@ -31,8 +35,21 @@ This event fires after all nodes and edges including their internal parts have b
 
 > **edgeDrawn**: [`EdgeDrawnEvent`](/docs/api/types/edgedrawnevent/)
 
-Event emitted when an edge is drawn
-This event fires when the user draws an edge manually through the UI
+Event emitted when a user manually draws an edge between two nodes.
+
+This event only fires for user-initiated edge creation through the UI,
+but not for programmatically added edges.
+
+***
+
+### groupMembershipChanged
+
+> **groupMembershipChanged**: [`GroupMembershipChangedEvent`](/docs/api/types/groupmembershipchangedevent/)
+
+Event emitted when nodes are grouped or ungrouped.
+
+This event fires when the user moves nodes in or out of a group node,
+changing their group membership status.
 
 ***
 
@@ -40,8 +57,10 @@ This event fires when the user draws an edge manually through the UI
 
 > **nodeResized**: [`NodeResizedEvent`](/docs/api/types/noderesizedevent/)
 
-Event emitted when node or group size changes
-This event fires when node was resized manually or programmatically
+Event emitted when a node or group size changes.
+
+This event fires when a node is resized manually by dragging resize handles
+or programmatically using resize methods.
 
 ***
 
@@ -49,8 +68,10 @@ This event fires when node was resized manually or programmatically
 
 > **paletteItemDropped**: [`PaletteItemDroppedEvent`](/docs/api/types/paletteitemdroppedevent/)
 
-Event emitted when a palette item is dropped
-This event fires when users drag items from the palette and drop them to create new nodes
+Event emitted when a palette item is dropped onto the diagram.
+
+This event fires when users drag items from the palette and drop them
+onto the canvas to create new nodes.
 
 ***
 
@@ -58,17 +79,10 @@ This event fires when users drag items from the palette and drop them to create 
 
 > **selectionChanged**: [`SelectionChangedEvent`](/docs/api/types/selectionchangedevent/)
 
-Event emitted when the selection changes
-This event fires when the user selects or deselects nodes and edges
+Event emitted when the selection state changes in the diagram.
 
-***
-
-### selectionGroupChanged
-
-> **selectionGroupChanged**: [`SelectionGroupChangedEvent`](/docs/api/types/selectiongroupchangedevent/)
-
-Event emitted when nodes are grouped into a group
-This event fires when the user moves nodes in or out of a group node.
+This event fires when the user selects or deselects nodes and edges through
+clicking or programmatically using the diagram selection service.
 
 ***
 
@@ -76,8 +90,10 @@ This event fires when the user moves nodes in or out of a group node.
 
 > **selectionMoved**: [`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)
 
-Event emitted when the selection is moved
-This event fires when the user moves nodes manually or programmatically
+Event emitted when selected nodes are moved within the diagram.
+
+This event fires when the user moves nodes manually by dragging or
+programmatically using the diagram node service.
 
 ***
 
@@ -85,8 +101,10 @@ This event fires when the user moves nodes manually or programmatically
 
 > **selectionRemoved**: [`SelectionRemovedEvent`](/docs/api/types/selectionremovedevent/)
 
-Event emitted when selected elements are deleted from the diagram
-This event fires when the user deletes nodes and edges
+Event emitted when selected elements are deleted from the diagram.
+
+This event fires when the user deletes nodes and edges using the delete key,
+or programmatically through the diagram service.
 
 ***
 
@@ -94,8 +112,10 @@ This event fires when the user deletes nodes and edges
 
 > **selectionRotated**: [`SelectionRotatedEvent`](/docs/api/types/selectionrotatedevent/)
 
-Event emitted when a node is rotated
-This event fires when the user rotates a node manually or programmatically
+Event emitted when a node is rotated in the diagram.
+
+This event fires when the user rotates a node manually using the rotation handle
+or programmatically using the diagram node service.
 
 ***
 
@@ -103,5 +123,7 @@ This event fires when the user rotates a node manually or programmatically
 
 > **viewportChanged**: [`ViewportChangedEvent`](/docs/api/types/viewportchangedevent/)
 
-Event emitted when the viewport changes
-This event fires during pan and zoom operations
+Event emitted when the viewport changes through panning or zooming.
+
+This event fires during pan and zoom operations, including mouse wheel zoom,
+and programmatic viewport changes.

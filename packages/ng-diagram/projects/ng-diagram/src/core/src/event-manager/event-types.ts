@@ -7,65 +7,90 @@ import type { Edge, GroupNode, Node, Point, Size, Viewport } from '../types';
  */
 export interface DiagramEventMap {
   /**
-   * Event emitted when the diagram is initialized
-   * This event fires after all nodes and edges including their internal parts have been measured and positioned.
+   * Event emitted when the diagram initialization is complete.
+   *
+   * This event fires after all nodes and edges including their internal parts
+   * (ports, labels) have been measured and positioned.
    */
   diagramInit: DiagramInitEvent;
   /**
-   * Event emitted when the selection is moved
-   * This event fires when the user moves nodes manually or programmatically
+   * Event emitted when selected nodes are moved within the diagram.
+   *
+   * This event fires when the user moves nodes manually by dragging or
+   * programmatically using the diagram node service.
    */
   selectionMoved: SelectionMovedEvent;
   /**
-   * Event emitted when the selection changes
-   * This event fires when the user selects or deselects nodes and edges
+   * Event emitted when the selection state changes in the diagram.
+   *
+   * This event fires when the user selects or deselects nodes and edges through
+   * clicking or programmatically using the diagram selection service.
    */
   selectionChanged: SelectionChangedEvent;
   /**
-   * Event emitted when selected elements are deleted from the diagram
-   * This event fires when the user deletes nodes and edges
+   * Event emitted when selected elements are deleted from the diagram.
+   *
+   * This event fires when the user deletes nodes and edges using the delete key,
+   * or programmatically through the diagram service.
    */
   selectionRemoved: SelectionRemovedEvent;
   /**
-   * Event emitted when nodes are grouped into a group
-   * This event fires when the user moves nodes in or out of a group node.
+   * Event emitted when nodes are grouped or ungrouped.
+   *
+   * This event fires when the user moves nodes in or out of a group node,
+   * changing their group membership status.
    */
-  selectionGroupChanged: SelectionGroupChangedEvent;
+  groupMembershipChanged: GroupMembershipChangedEvent;
   /**
-   * Event emitted when a node is rotated
-   * This event fires when the user rotates a node manually or programmatically
+   * Event emitted when a node is rotated in the diagram.
+   *
+   * This event fires when the user rotates a node manually using the rotation handle
+   * or programmatically using the diagram node service.
    */
   selectionRotated: SelectionRotatedEvent;
   /**
-   * Event emitted when the viewport changes
-   * This event fires during pan and zoom operations
+   * Event emitted when the viewport changes through panning or zooming.
+   *
+   * This event fires during pan and zoom operations, including mouse wheel zoom,
+   * and programmatic viewport changes.
    */
   viewportChanged: ViewportChangedEvent;
   /**
-   * Event emitted when an edge is drawn
-   * This event fires when the user draws an edge manually through the UI
+   * Event emitted when a user manually draws an edge between two nodes.
+   *
+   * This event only fires for user-initiated edge creation through the UI,
+   * but not for programmatically added edges.
    */
   edgeDrawn: EdgeDrawnEvent;
   /**
-   * Event emitted when clipboard content is pasted
-   * This event fires when nodes and edges are added via paste operations
+   * Event emitted when clipboard content is pasted into the diagram.
+   *
+   * This event fires when nodes and edges are added via paste operations,
+   * either through keyboard shortcuts or programmatic paste commands.
    */
   clipboardPasted: ClipboardPastedEvent;
   /**
-   * Event emitted when node or group size changes
-   * This event fires when node was resized manually or programmatically
+   * Event emitted when a node or group size changes.
+   *
+   * This event fires when a node is resized manually by dragging resize handles
+   * or programmatically using resize methods.
    */
   nodeResized: NodeResizedEvent;
   /**
-   * Event emitted when a palette item is dropped
-   * This event fires when users drag items from the palette and drop them to create new nodes
+   * Event emitted when a palette item is dropped onto the diagram.
+   *
+   * This event fires when users drag items from the palette and drop them
+   * onto the canvas to create new nodes.
    */
   paletteItemDropped: PaletteItemDroppedEvent;
 }
 
 /**
  * Event payload emitted when the diagram initialization is complete.
- * This event fires after all nodes and edges including their internal parts have been measured and positioned.
+ *
+ * This event fires after all nodes and edges including their internal parts
+ * (ports, labels) have been measured and positioned.
+ *
  * @category Types
  */
 export interface DiagramInitEvent {
@@ -79,8 +104,10 @@ export interface DiagramInitEvent {
 
 /**
  * Event payload emitted when selected nodes are moved within the diagram.
+ *
  * This event fires when the user moves nodes manually by dragging or programmatically
- * using the `NgDiagramNodeService` `moveNodesBy` method.
+ * using the `NgDiagramNodeService.moveNodesBy()` method.
+ *
  * @category Types
  */
 export interface SelectionMovedEvent {
@@ -90,8 +117,10 @@ export interface SelectionMovedEvent {
 
 /**
  * Event payload emitted when the selection state changes in the diagram.
+ *
  * This event fires when the user selects or deselects nodes and edges through clicking
  * or programmatically using the `NgDiagramSelectionService`.
+ *
  * @category Types
  */
 export interface SelectionChangedEvent {
@@ -107,8 +136,10 @@ export interface SelectionChangedEvent {
 
 /**
  * Event payload emitted when the viewport changes through panning or zooming.
+ *
  * This event fires during pan and zoom operations, including mouse wheel zoom,
- * pinch zoom, and programmatic viewport changes.
+ * and programmatic viewport changes.
+ *
  * @category Types
  */
 export interface ViewportChangedEvent {
@@ -120,8 +151,10 @@ export interface ViewportChangedEvent {
 
 /**
  * Event payload emitted when a user manually draws an edge between two nodes.
+ *
  * This event only fires for user-initiated edge creation through the UI,
- * also from temporary links creation, but not for programmatically added edges.
+ * but not for programmatically added edges.
+ *
  * @category Types
  */
 export interface EdgeDrawnEvent {
@@ -139,24 +172,29 @@ export interface EdgeDrawnEvent {
 
 /**
  * Event payload emitted when clipboard content is pasted into the diagram.
- * This event fires when nodes and edges are added via paste operations
+ *
+ * This event fires when nodes and edges are added via paste operations,
+ * either through keyboard shortcuts or programmatic paste commands.
+ *
  * @category Types
  */
 export interface ClipboardPastedEvent {
-  /** Edges that were pasted into the diagram */
-  edges: Edge[];
   /** Nodes that were pasted into the diagram */
   nodes: Node[];
+  /** Edges that were pasted into the diagram */
+  edges: Edge[];
 }
 
 /**
- * Event payload emitted when node or group size changes.
- * This event fires when node was resized manually by dragging resize handles
+ * Event payload emitted when a node or group size changes.
+ *
+ * This event fires when a node is resized manually by dragging resize handles
  * or programmatically using resize methods.
+ *
  * @category Types
  */
 export interface NodeResizedEvent {
-  /** Node that was resized with their updated sizes */
+  /** Node that was resized with its updated size */
   node: Node;
   /** Previous size of the node before the change */
   previousSize: Size;
@@ -164,7 +202,10 @@ export interface NodeResizedEvent {
 
 /**
  * Event payload emitted when a palette item is dropped onto the diagram.
- * This event fires when users drag items from the palette and drop them to create new nodes.
+ *
+ * This event fires when users drag items from the palette and drop them
+ * onto the canvas to create new nodes.
+ *
  * @category Types
  */
 export interface PaletteItemDroppedEvent {
@@ -176,8 +217,10 @@ export interface PaletteItemDroppedEvent {
 
 /**
  * Event payload emitted when selected elements are deleted from the diagram.
+ *
  * This event fires when the user deletes nodes and edges using the delete key,
- * context menu, or programmatically through the diagram service.
+ * or programmatically through the diagram service.
+ *
  * @category Types
  */
 export interface SelectionRemovedEvent {
@@ -188,21 +231,26 @@ export interface SelectionRemovedEvent {
 }
 
 /**
- * Event payload emitted when nodes are grouped or ungrouped by moving them into/out of a group.
- * This event fires when the user moves nodes in or out of a group node.
+ * Event payload emitted when nodes are grouped or ungrouped.
+ *
+ * This event fires when the user moves nodes in or out of a group node,
+ * changing their group membership status.
+ *
  * @category Types
  */
-export interface SelectionGroupChangedEvent {
-  /** Nodes that were operated on (either grouped or ungrouped) */
-  nodes: Node[];
-  /** The target group node that received the nodes */
-  targetGroup?: GroupNode;
+export interface GroupMembershipChangedEvent {
+  /** Nodes added to groups, organized by target group */
+  grouped: { nodes: Node[]; targetGroup: GroupNode }[];
+  /** Nodes removed from groups */
+  ungrouped: Node[];
 }
 
 /**
  * Event payload emitted when a node is rotated in the diagram.
+ *
  * This event fires when the user rotates a node manually using the rotation handle
  * or programmatically using the `NgDiagramNodeService` rotation methods.
+ *
  * @category Types
  */
 export interface SelectionRotatedEvent {

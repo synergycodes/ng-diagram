@@ -7,18 +7,25 @@ export class SelectionRemovedEmitter implements EventEmitter {
   name = 'SelectionRemovedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    // // Only emit when nodes or edges are actually removed from the diagram
     if (context.modelActionType !== 'deleteSelection') {
       return;
     }
-    const {
-      initialNodesMap,
-      initialEdgesMap,
-      initialUpdate: { nodesToRemove, edgesToRemove },
-    } = context;
 
-    const edgesToDelete: Edge[] = this.findDeletedEdges(initialEdgesMap, edgesToRemove || []);
-    const nodesToDelete: Node[] = this.findDeletedNodes(initialNodesMap, nodesToRemove || []);
+    const { initialNodesMap, initialEdgesMap, nodesMap, edgesMap } = context;
+
+    const nodesToDelete: Node[] = [];
+    for (const [id, node] of initialNodesMap) {
+      if (!nodesMap.has(id)) {
+        nodesToDelete.push(node);
+      }
+    }
+
+    const edgesToDelete: Edge[] = [];
+    for (const [id, edge] of initialEdgesMap) {
+      if (!edgesMap.has(id)) {
+        edgesToDelete.push(edge);
+      }
+    }
 
     if (nodesToDelete.length > 0 || edgesToDelete.length > 0) {
       const event: SelectionRemovedEvent = {
@@ -27,31 +34,5 @@ export class SelectionRemovedEmitter implements EventEmitter {
       };
       eventManager.deferredEmit('selectionRemoved', event);
     }
-  }
-
-  private findDeletedNodes(initialNodesMap: Map<string, Node>, deletedNodesIds: string[]): Node[] {
-    const deletedNodes: Node[] = [];
-
-    for (const nodeId of deletedNodesIds) {
-      const node = initialNodesMap.get(nodeId);
-      if (node) {
-        deletedNodes.push(node);
-      }
-    }
-
-    return deletedNodes;
-  }
-
-  private findDeletedEdges(initialEdgesMap: Map<string, Edge>, deletedEdgesIds: string[]): Edge[] {
-    const deletedEdges: Edge[] = [];
-
-    for (const edgeId of deletedEdgesIds) {
-      const edge = initialEdgesMap.get(edgeId);
-      if (edge) {
-        deletedEdges.push(edge);
-      }
-    }
-
-    return deletedEdges;
   }
 }

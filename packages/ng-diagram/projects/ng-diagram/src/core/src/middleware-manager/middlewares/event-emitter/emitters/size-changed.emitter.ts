@@ -1,5 +1,5 @@
 import type { EventManager } from '../../../../event-manager/event-manager';
-import type { MiddlewareContext, Node } from '../../../../types';
+import type { MiddlewareContext } from '../../../../types';
 import type { EventEmitter } from './event-emitter.interface';
 
 export class NodeResizedEmitter implements EventEmitter {
@@ -10,25 +10,31 @@ export class NodeResizedEmitter implements EventEmitter {
       return;
     }
 
-    const resizedNode = context.initialUpdate.nodesToUpdate?.[0] as Node | undefined;
+    const resizedNodeUpdate = context.initialUpdate.nodesToUpdate?.[0];
 
-    if (resizedNode) {
-      const initialNode = context.initialNodesMap.get(resizedNode.id);
+    if (!resizedNodeUpdate) {
+      return;
+    }
 
-      if (initialNode && initialNode.size) {
-        const currentSize = resizedNode.size;
-        const initialSize = initialNode.size;
+    const nodeId = resizedNodeUpdate.id;
+    const initialNode = context.initialNodesMap.get(nodeId);
+    const currentNode = context.nodesMap.get(nodeId);
 
-        if (currentSize && initialSize) {
-          const sizeChanged = currentSize.width !== initialSize.width || currentSize.height !== initialSize.height;
+    if (!initialNode || !currentNode) {
+      return;
+    }
 
-          if (sizeChanged) {
-            eventManager.deferredEmit('nodeResized', {
-              node: resizedNode,
-              previousSize: { width: initialSize.width, height: initialSize.height },
-            });
-          }
-        }
+    const initialSize = initialNode.size;
+    const currentSize = currentNode.size;
+
+    if (initialSize && currentSize) {
+      const sizeChanged = currentSize.width !== initialSize.width || currentSize.height !== initialSize.height;
+
+      if (sizeChanged) {
+        eventManager.deferredEmit('nodeResized', {
+          node: currentNode,
+          previousSize: { width: initialSize.width, height: initialSize.height },
+        });
       }
     }
   }

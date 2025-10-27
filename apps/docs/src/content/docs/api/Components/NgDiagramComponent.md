@@ -18,8 +18,10 @@ Diagram component
 
 > **clipboardPasted**: `EventEmitter`\<[`ClipboardPastedEvent`](/docs/api/types/clipboardpastedevent/)\>
 
-Event emitted when elements are pasted via clipboard operations
-This event carries information about the pasted nodes and edges.
+Event emitted when clipboard content is pasted into the diagram.
+
+This event fires when nodes and edges are added via paste operations,
+either through keyboard shortcuts or programmatic paste commands.
 
 ***
 
@@ -35,8 +37,10 @@ Global configuration options for the diagram.
 
 > **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/types/diagraminitevent/)\>
 
-Event emitted when the diagram is initialized.
-It carries information about all nodes and edges in the diagram, and viewport state.
+Event emitted when the diagram initialization is complete.
+
+This event fires after all nodes and edges including their internal parts
+(ports, labels) have been measured and positioned.
 
 ***
 
@@ -44,8 +48,10 @@ It carries information about all nodes and edges in the diagram, and viewport st
 
 > **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/types/edgedrawnevent/)\>
 
-Event emitted when a user manually draws an edge between two nodes
-It carries information about the newly created edge, source and target nodes and ports that are connected by the edge.
+Event emitted when a user manually draws an edge between two nodes.
+
+This event only fires for user-initiated edge creation through the UI,
+but not for programmatically added edges.
 
 ***
 
@@ -55,6 +61,17 @@ It carries information about the newly created edge, source and target nodes and
 
 The edge template map to use for the diagram.
 Optional - if not provided, default edge rendering will be used.
+
+***
+
+### groupMembershipChanged
+
+> **groupMembershipChanged**: `EventEmitter`\<[`GroupMembershipChangedEvent`](/docs/api/types/groupmembershipchangedevent/)\>
+
+Event emitted when nodes are grouped or ungrouped.
+
+This event fires when the user moves nodes in or out of a group node,
+changing their group membership status.
 
 ***
 
@@ -83,8 +100,10 @@ The model to use in the diagram.
 
 > **nodeResized**: `EventEmitter`\<[`NodeResizedEvent`](/docs/api/types/noderesizedevent/)\>
 
-Event emitted when node or group is resized through user interaction on UI
-This event carries information about the resized node, its new size and previous size.
+Event emitted when a node or group size changes.
+
+This event fires when a node is resized manually by dragging resize handles
+or programmatically using resize methods.
 
 ***
 
@@ -100,8 +119,10 @@ The node template map to use for the diagram.
 
 > **paletteItemDropped**: `EventEmitter`\<[`PaletteItemDroppedEvent`](/docs/api/types/paletteitemdroppedevent/)\>
 
-Event emitted when a palette item (node or group) is dropped into the diagram.
-This event carries information about the newly created node and its drop position.
+Event emitted when a palette item is dropped onto the diagram.
+
+This event fires when users drag items from the palette and drop them
+onto the canvas to create new nodes.
 
 ***
 
@@ -109,20 +130,10 @@ This event carries information about the newly created node and its drop positio
 
 > **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/types/selectionchangedevent/)\>
 
-Event emitted when selection changes
-This event fires when the user selects or deselects nodes and edges
-It carries information about the newly selected and deselected elements, and previous selection state.
+Event emitted when the selection state changes in the diagram.
 
-***
-
-### selectionGroupChanged
-
-> **selectionGroupChanged**: `EventEmitter`\<[`SelectionGroupChangedEvent`](/docs/api/types/selectiongroupchangedevent/)\>
-
-Event emitted when nodes are grouped or ungrouped.
-This event fires when the user moves nodes in or out of a group node.
-It carries information about the affected target group node and the nodes that were added or removed from the group.
-Depending on the operation, target group node may be undefined (for ungrouping operations).
+This event fires when the user selects or deselects nodes and edges through
+clicking or programmatically using the `NgDiagramSelectionService`.
 
 ***
 
@@ -130,8 +141,10 @@ Depending on the operation, target group node may be undefined (for ungrouping o
 
 > **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)\>
 
-Event emitted when selected nodes are moved
-It carries information about the moved nodes and their new positions
+Event emitted when selected nodes are moved within the diagram.
+
+This event fires when the user moves nodes manually by dragging or
+programmatically using the `NgDiagramNodeService.moveNodesBy()` method.
 
 ***
 
@@ -139,8 +152,10 @@ It carries information about the moved nodes and their new positions
 
 > **selectionRemoved**: `EventEmitter`\<[`SelectionRemovedEvent`](/docs/api/types/selectionremovedevent/)\>
 
-Event emitted when selected edges and nodes are removed from the diagram within deletion operation
-It carries information about the deleted nodes and edges.
+Event emitted when selected elements are deleted from the diagram.
+
+This event fires when the user deletes nodes and edges using the delete key,
+or programmatically through the diagram service.
 
 ***
 
@@ -148,8 +163,10 @@ It carries information about the deleted nodes and edges.
 
 > **selectionRotated**: `EventEmitter`\<[`SelectionRotatedEvent`](/docs/api/types/selectionrotatedevent/)\>
 
-Event emitted when a node is rotated
-It carries information about the rotated node and its new, and old rotation angle.
+Event emitted when a node is rotated in the diagram.
+
+This event fires when the user rotates a node manually using the rotation handle
+or programmatically using the `NgDiagramNodeService` rotation methods.
 
 ***
 
@@ -157,9 +174,10 @@ It carries information about the rotated node and its new, and old rotation angl
 
 > **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/viewportchangedevent/)\>
 
-Event emitted when viewport changes.
-This event fires during pan and zoom operations.
-It carries information about the new and old viewport state.
+Event emitted when the viewport changes through panning or zooming.
+
+This event fires during pan and zoom operations, including mouse wheel zoom,
+and programmatic viewport changes.
 
 ## Methods
 
