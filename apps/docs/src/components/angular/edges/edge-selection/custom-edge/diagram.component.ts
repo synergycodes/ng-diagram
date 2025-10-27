@@ -28,6 +28,9 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -74,6 +77,5 @@ export class DiagramComponent {
         targetArrowhead: 'ng-diagram-arrow',
       },
     ],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 }

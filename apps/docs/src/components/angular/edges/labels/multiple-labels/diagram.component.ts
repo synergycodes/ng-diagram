@@ -7,6 +7,7 @@ import {
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
 
@@ -15,7 +16,11 @@ import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+      <ng-diagram
+        [model]="model"
+        [edgeTemplateMap]="edgeTemplateMap"
+        [config]="config"
+      />
     </div>
   `,
   styles: `
@@ -31,10 +36,15 @@ export class DiagramComponent {
     ['multiple-labels', MultipleLabelsEdgeComponent],
   ]);
 
-  model = initializeModel({
-    metadata: {
-      viewport: { x: 0, y: 0, scale: 0.7 },
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
     },
+  } satisfies NgDiagramConfig;
+
+  model = initializeModel({
     nodes: [
       {
         id: 'a',

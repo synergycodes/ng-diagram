@@ -55,10 +55,6 @@ export class DiagramComponent {
         data: {},
       },
     ],
-    // @collapse-start
-    edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
-    // @collapse-end
   });
   // @section-end:model
 }

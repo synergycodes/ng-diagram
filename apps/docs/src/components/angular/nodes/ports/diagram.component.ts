@@ -65,6 +65,5 @@ export class DiagramComponent {
         sourceArrowhead: 'ng-diagram-arrow',
       },
     ],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 }

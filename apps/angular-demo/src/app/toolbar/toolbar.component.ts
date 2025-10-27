@@ -48,6 +48,10 @@ export class ToolbarComponent {
     }
   }
 
+  onZoomToFitClick() {
+    this.ngDiagramViewportService.zoomToFit();
+  }
+
   onChangeNodeTypeClick() {
     const selectedNodes = this.ngDiagramSelectionService.selection().nodes;
 
