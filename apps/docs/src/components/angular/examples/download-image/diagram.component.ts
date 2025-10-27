@@ -30,6 +30,9 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -170,6 +173,5 @@ export class DiagramComponent {
         targetPort: 'port-left',
       },
     ],
-    metadata: { viewport: { x: -100, y: 100, scale: 0.75 } },
   });
 }

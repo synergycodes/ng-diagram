@@ -24,9 +24,12 @@ export class DiagramComponent {
     ...defaults,
   ]);
 
-  config: NgDiagramConfig & { readOnly: any } = {
+  config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
     readOnly: {
       enabled: false,
@@ -35,7 +38,7 @@ export class DiagramComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
-  };
+  } satisfies NgDiagramConfig & { readOnly: any };
 
   model = initializeModel({
     nodes: [
@@ -76,7 +79,6 @@ export class DiagramComponent {
         data: {},
       },
     ],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 
   toggleReadOnly() {

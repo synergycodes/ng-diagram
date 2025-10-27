@@ -6,6 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
+  type NgDiagramConfig,
 } from 'ng-diagram';
 import { CircleArrowheadComponent } from './circle-arrowhead.component';
 import { LabeledEdgeComponent } from './labeled-edge.component';
@@ -16,7 +17,11 @@ import { SinusoidEdgeComponent } from './sinusoid-edge.component';
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+      <ng-diagram
+        [model]="model"
+        [edgeTemplateMap]="edgeTemplateMap"
+        [config]="config"
+      />
       <circle-arrowhead />
     </div>
   `,
@@ -28,10 +33,15 @@ export class DiagramComponent {
     ['sinusoid', SinusoidEdgeComponent],
   ]);
 
-  model = initializeModel({
-    metadata: {
-      viewport: { x: -30, y: -30, scale: 0.7 },
+  config = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
     },
+  } satisfies NgDiagramConfig;
+
+  model = initializeModel({
     nodes: [
       {
         id: '1',
