@@ -47,11 +47,11 @@ This fixed order ensures that:
 - **Metadata is merged last**, after all other operations are complete
 
 <Aside type="tip">
-  Operations are **grouped by type** and applied in this fixed order:
+  That means operations are **grouped by type** regardless of call order:
 
-Add nodes → Add edges → Remove edges → Remove nodes → Update nodes → Update edges → Merge metadata
+**Add nodes → Add edges → Remove edges → Remove nodes → Update nodes → Update edges → Merge metadata**
 
-This means call order inside transactions is **not preserved**. For example: `addNodes([node1])` → `addEdges([edge1])` → `addNodes([node2])` will execute both node additions together.
+So call order inside transactions is **not preserved**. For example: `addNodes([node1])` → `addEdges([edge1])` → `addNodes([node2])` will execute both node additions together.
 
 </Aside>
 
