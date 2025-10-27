@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Edge } from '../../../../core/src';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { Edge } from '../../../../core/src';
 import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
 import { NgDiagramDefaultEdgeComponent } from './default-edge.component';
 

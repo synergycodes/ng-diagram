@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Edge, Point } from '../../../../core/src';
 import { FlowCoreProviderService, RendererService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { NgDiagramBaseEdgeLabelComponent } from '../../edge-label/base-edge-label.component';
+import { NgDiagramBaseEdgeLabelComponent } from '../../edge-label/base-edge-label/base-edge-label.component';
 import { NgDiagramBaseEdgeComponent } from './base-edge.component';
 
 @Component({
