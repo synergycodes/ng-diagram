@@ -18,6 +18,7 @@ export { NgDiagramPortComponent } from './lib/components/port/ng-diagram-port.co
 
 // Private directives (used via hostDirectives in exported components)
 export { CursorPositionTrackerDirective } from './lib/directives/cursor-position-tracker/cursor-position-tracker.directive';
+export { BoxSelectionDirective } from './lib/directives/input-events/box-selection/box-selection.directive';
 export { KeyboardInputsDirective } from './lib/directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 export { LinkingInputDirective } from './lib/directives/input-events/linking/linking.directive';
 export {

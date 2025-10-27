@@ -16,7 +16,8 @@ export type InputEventName =
   | 'zoom'
   | 'linking'
   | 'rotate'
-  | 'paletteDrop';
+  | 'paletteDrop'
+  | 'boxSelection';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

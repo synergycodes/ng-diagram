@@ -2,6 +2,7 @@ import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node, ResizeDirection } from '../../../../core/src';
 
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 
 @Directive({
   selector: '[ngDiagramResize]',
@@ -21,6 +22,10 @@ export class ResizeDirective implements OnDestroy {
     document.removeEventListener('pointerup', this.onPointerUp);
   }
   onPointerDown(event: PointerEvent): void {
+    if (BoxSelectionDirective.isBoxSelectionActive || event.shiftKey) {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 

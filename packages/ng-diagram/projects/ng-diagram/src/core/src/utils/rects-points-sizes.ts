@@ -39,6 +39,21 @@ export const doesRectsIntersect = (rect1: Rect, rect2: Rect): boolean => {
   );
 };
 
+/**
+ *
+ * @param rect1 Rectangle to check if it contains `rect2`
+ * @param rect2 Rectangle to check if it's contained within `rect1`
+ * @returns true if `rect2` is fully within `rect1` bounds, false otherwise.
+ */
+export const doesContainRect = (rect1: Rect, rect2: Rect): boolean => {
+  return (
+    rect1.x <= rect2.x &&
+    rect1.x + rect1.width >= rect2.x + rect2.width &&
+    rect1.y <= rect2.y &&
+    rect1.y + rect1.height >= rect2.y + rect2.height
+  );
+};
+
 export const getDistanceBetweenRects = (rect1: Rect, rect2: Rect): number => {
   if (doesRectsIntersect(rect1, rect2)) {
     return 0;
