@@ -6,7 +6,6 @@ export class SpatialHash {
   private readonly grid = new Map<string, RectWithId[]>();
   private readonly idToCells = new Map<string, string[]>();
   private readonly idToRect = new Map<string, RectWithId>();
-  private readonly idToNode = new Map<string, Node>();
 
   process(nodes: Node[]) {
     const previousIds = new Set(this.idToRect.keys());
