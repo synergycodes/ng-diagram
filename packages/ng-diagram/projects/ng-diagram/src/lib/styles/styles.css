@@ -57,8 +57,14 @@
   --ngd-default-edge-label-color: var(--ngd-txt-primary-default);
   --ngd-default-edge-label-border-color: var(--ngd-colors-gray-500);
 
-  /* change to 400 when ready*/
   --ngd-background-dot-color: var(--ngd-colors-gray-500);
+
+  --ngd-background-line-minor-color: var(--ngd-colors-gray-450);
+  --ngd-background-line-major-color: var(--ngd-colors-gray-500);
+  --ngd-background-line-minor-width: 0.5;
+  --ngd-background-line-major-width: 1;
+  --ngd-background-line-minor-opacity: 0.5;
+  --ngd-background-line-major-opacity: 0.6;
 }
 
 .ng-diagram-port-hoverable .ng-diagram-port:hover,

@@ -3,6 +3,10 @@
 </div>
 @if (!hasContent) {
   <div>
-    <ng-diagram-dotted-background />
+    @if (isDottedBackground()) {
+      <ng-diagram-dotted-background />
+    } @else {
+      <ng-diagram-grid-background />
+    }
   </div>
 }
