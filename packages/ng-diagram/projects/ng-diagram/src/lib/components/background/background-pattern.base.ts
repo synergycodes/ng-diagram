@@ -2,7 +2,8 @@ import { computed, ElementRef, inject, Signal } from '@angular/core';
 import { NgDiagramViewportService } from '../../public-services/ng-diagram-viewport.service';
 
 export abstract class BackgroundPatternBase {
-  protected readonly viewportService = inject(NgDiagramViewportService);
+  private readonly viewportService = inject(NgDiagramViewportService);
+
   protected abstract readonly backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>;
   protected viewport = this.viewportService.viewport;
 

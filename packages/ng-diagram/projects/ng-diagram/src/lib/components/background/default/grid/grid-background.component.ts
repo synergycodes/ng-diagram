@@ -3,6 +3,14 @@ import { Component, computed, ElementRef, inject, viewChild } from '@angular/cor
 import { FlowCoreProviderService } from '../../../../services';
 import { BackgroundPatternBase } from '../../background-pattern.base';
 
+interface GridLine {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  major: boolean;
+}
+
 @Component({
   selector: 'ng-diagram-grid-background',
   standalone: true,
@@ -12,43 +20,30 @@ import { BackgroundPatternBase } from '../../background-pattern.base';
 })
 export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
   private readonly flowCore = inject(FlowCoreProviderService);
+
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
-  /** rozmiar pojedynczej kratki w jednostkach bazowych */
-  gridSize = computed(() => {
-    return this.flowCore.isInitialized() ? (this.flowCore.provide().config.background.gridSize ?? 50) : 50;
-  });
+  readonly majorLineEvery = 5;
+  readonly gridSize = computed(() =>
+    this.flowCore.isInitialized() ? (this.flowCore.provide().config.background.gridSize ?? 50) : 50
+  );
 
-  /** co ile kratek ma być linia grubsza */
-  majorLineEvery = 5;
-
-  /** kolory siatki */
-  minorStroke = 'var(--ngd-background-line-minor, #c2c0c0ff)';
-  majorStroke = 'var(--ngd-background-line-major, #989898ff)';
-
-  /**
-   * 🔧 Siatka porusza się z panem i skaluje z zoomem.
-   *  - translate() zapewnia przesuwanie
-   *  - scale() zapewnia skalowanie
-   */
-  override patternTransform = computed(() => {
-    const viewport = this.viewportService.viewport();
+  override readonly patternTransform = computed(() => {
+    const viewport = this.viewport();
     const scale = viewport.scale ?? 1;
     const size = this.gridSize();
 
-    // przesunięcie zgodne z pozycją viewportu, ale znormalizowane do rozmiaru kratki
+    // Offset normalized to the grid size
     const dx = size ? viewport.x % (size * scale) : 0;
     const dy = size ? viewport.y % (size * scale) : 0;
 
-    // kolejność: najpierw translacja, potem skalowanie
     return `translate(${dx}, ${dy}) scale(${scale})`;
   });
 
-  /** generowanie linii siatki (minor + major) */
-  gridLines() {
+  gridLines(): GridLine[] {
     const size = this.gridSize();
     const step = size / this.majorLineEvery;
-    const lines: { x1: number; y1: number; x2: number; y2: number; major: boolean }[] = [];
+    const lines: GridLine[] = [];
 
     for (let i = 0; i <= size; i += step) {
       const isMajor = Math.round(i / step) % this.majorLineEvery === 0;

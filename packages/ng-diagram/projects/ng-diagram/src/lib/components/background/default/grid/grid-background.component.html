@@ -14,7 +14,7 @@
         [attr.y1]="line.y1"
         [attr.x2]="line.x2"
         [attr.y2]="line.y2"
-        [attr.stroke]="line.major ? majorStroke : minorStroke"
+        [attr.stroke]="line.major ? var(--ngd-background-line-major, #989898ff) : var(--ngd-background-line-minor, #c2c0c0ff)"
         [attr.stroke-width]="line.major ? 1.2 : 0.5"
         [attr.opacity]="line.major ? 0.6 : 0.3"
         shape-rendering="crispEdges"
