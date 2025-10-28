@@ -6,4 +6,8 @@
   left: 0px;
   pointer-events: none;
   background-color: var(--ngd-background-color, #ffffff);
+
+  [stroke] {
+    vector-effect: non-scaling-stroke;
+  }
 }
