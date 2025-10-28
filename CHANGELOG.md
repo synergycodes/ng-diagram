@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Zoom to fit feature with configurable padding and option to automatically apply on model initialization ([#386](https://github.com/synergycodes/ng-diagram/pull/386))
 - Environment layer for unified environment-related functionalities ([#350](https://github.com/synergycodes/ng-diagram/pull/350))
-- Helpers for node relationships and traversal ([#395]https://github.com/synergycodes/ng-diagram/pull/395)
+- Helpers for node relationships and traversal ([#395](https://github.com/synergycodes/ng-diagram/pull/395))
+- Box selection for selecting multiple nodes at once ([#374](https://github.com/synergycodes/ng-diagram/pull/374))
 
 ### Changed
 
