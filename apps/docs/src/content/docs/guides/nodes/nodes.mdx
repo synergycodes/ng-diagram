@@ -41,17 +41,12 @@ To use the default node template, leave the node’s `type` property **empty**.
 
 ### Features
 
-The default node comes with built-in support for resizing and rotating through interactive adornments. These features can also be enabled in custom node templates.
-To enable them explicitly, set the following properties on the node:
-
-- `resizable: true` - allows the user to resize the node directly on the diagram.
-- `rotatable: true` - allows the user to rotate the node on the diagram.
+The default node comes with built-in support for resizing and rotating through interactive adornments.
+These features can also be enabled in custom nodes by adding the adornments to their templates.
 
 import RotatableResizableNode from '@components/angular/nodes/nodes/rotatable-resizable-node/rotatable-resizable-node.astro';
 
 <RotatableResizableNode />
-
-<CodeSnippet relativePath="nodes/nodes/rotatable-resizable-node/diagram.component.ts" />
 
 [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation)
 
