@@ -61,8 +61,7 @@ export class AppComponent {
     },
     background: {
       dotSize: 40,
-      gridSize: 40, // <-- add this
-      gridPattern: 'simple', // <-- add this
+      gridSize: 50,
     },
     snapping: {
       shouldSnapDragForNode: () => true,
@@ -93,35 +92,35 @@ export class AppComponent {
   }
 
   onSelectionChanged(event: SelectionChangedEvent): void {
-    console.log('Selection Changed:', {
-      nodes: event.selectedNodes.map((n: Node) => n.id),
-      edges: event.selectedEdges.map((e: Edge) => e.id),
-      previousNodes: event.previousNodes.map((n: Node) => n.id),
-      previousEdges: event.previousEdges.map((e: Edge) => e.id),
-    });
+    // console.log('Selection Changed:', {
+    //   nodes: event.selectedNodes.map((n: Node) => n.id),
+    //   edges: event.selectedEdges.map((e: Edge) => e.id),
+    //   previousNodes: event.previousNodes.map((n: Node) => n.id),
+    //   previousEdges: event.previousEdges.map((e: Edge) => e.id),
+    // });
   }
 
   onSelectionMoved(event: SelectionMovedEvent): void {
-    console.log('Selection Moved:', {
-      nodes: event.nodes.map((n: Node) => n.id),
-    });
+    // console.log('Selection Moved:', {
+    //   nodes: event.nodes.map((n: Node) => n.id),
+    // });
   }
 
   onViewportChanged(event: ViewportChangedEvent): void {
-    console.log('Viewport Changed:', {
-      current: event.viewport,
-      previous: event.previousViewport,
-    });
+    // console.log('Viewport Changed:', {
+    //   current: event.viewport,
+    //   previous: event.previousViewport,
+    // });
   }
 
   onEdgeDrawn(event: EdgeDrawnEvent): void {
-    console.log('Edge Drawn:', {
-      edge: event.edge.id,
-      source: event.source.id,
-      target: event.target.id,
-      sourcePort: event.sourcePort,
-      targetPort: event.targetPort,
-    });
+    // console.log('Edge Drawn:', {
+    //   edge: event.edge.id,
+    //   source: event.source.id,
+    //   target: event.target.id,
+    //   sourcePort: event.sourcePort,
+    //   targetPort: event.targetPort,
+    // });
   }
 
   onClipboardPasted(event: ClipboardPastedEvent): void {
@@ -132,13 +131,13 @@ export class AppComponent {
   }
 
   onNodeResized(event: NodeResizedEvent): void {
-    console.log('Size Changed:', {
-      node: {
-        id: event.node.id,
-        size: event.node.size,
-        previousSize: event.previousSize,
-      },
-    });
+    // console.log('Size Changed:', {
+    //   node: {
+    //     id: event.node.id,
+    //     size: event.node.size,
+    //     previousSize: event.previousSize,
+    //   },
+    // });
   }
 
   onPaletteItemDropped(event: PaletteItemDroppedEvent): void {
@@ -149,10 +148,10 @@ export class AppComponent {
   }
 
   onSelectionRemoved(event: SelectionRemovedEvent): void {
-    console.log('Selection Removed:', {
-      nodes: event.deletedNodes.map((n: Node) => n.id),
-      edges: event.deletedEdges.map((e: Edge) => e.id),
-    });
+    // console.log('Selection Removed:', {
+    //   nodes: event.deletedNodes.map((n: Node) => n.id),
+    //   edges: event.deletedEdges.map((e: Edge) => e.id),
+    // });
   }
 
   onGroupMembershipChanged(event: GroupMembershipChangedEvent): void {

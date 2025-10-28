@@ -1,14 +1,9 @@
 .grid-background {
   position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
+  top: 0px;
+  left: 0px;
   pointer-events: none;
-  z-index: 0;
-  user-select: none;
-
-  line {
-    stroke: var(--ngd-background-grid-color, #d1d5db);
-    shape-rendering: crispEdges;
-  }
+  background-color: var(--ngd-background-color, #ffffff);
 }

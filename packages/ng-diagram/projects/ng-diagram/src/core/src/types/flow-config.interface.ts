@@ -135,8 +135,7 @@ export interface ZoomConfig {
  */
 export interface BackgroundConfig {
   dotSize?: number;
-  gridSize?: number; // <-- add this
-  gridPattern?: 'simple' | 'major-minor'; // <-- add this
+  gridSize?: number;
 }
 
 /**
