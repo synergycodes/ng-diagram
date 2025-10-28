@@ -1,19 +1,22 @@
 import { Directive, inject, type OnDestroy } from '@angular/core';
+import { FlowCoreProviderService } from '../../../services';
+import { BoxSelectionProviderService } from '../../../services/box-selection-provider/box-selection-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types/event';
-import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
-import { shouldDiscardEvent } from '../utils/should-discard-event';
-import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
 @Directive({
-  selector: '[ngDiagramPanning]',
+  selector: '[ngDiagramBoxSelection]',
   standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class PanningDirective implements OnDestroy {
+export class BoxSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly boxSelectionProvider = inject(BoxSelectionProviderService);
+  private readonly flowCore = inject(FlowCoreProviderService);
+  private startPoint: { x: number; y: number } | null = null;
+  static isBoxSelectionActive = false;
 
   ngOnDestroy(): void {
     document.removeEventListener('pointermove', this.onMouseMove);
@@ -25,13 +28,14 @@ export class PanningDirective implements OnDestroy {
       return;
     }
 
+    BoxSelectionDirective.isBoxSelectionActive = true;
     event.preventDefault();
     event.stopPropagation();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'panning',
+      name: 'boxSelection',
       phase: 'start',
       target: undefined,
       targetType: 'diagram',
@@ -41,11 +45,14 @@ export class PanningDirective implements OnDestroy {
       },
     });
 
+    this.startPoint = { x: event.clientX, y: event.clientY };
+
     document.addEventListener('pointermove', this.onMouseMove);
     document.addEventListener('pointerup', this.onPointerUp);
   }
 
   onPointerUp = (event: PointerEvent): void => {
+    BoxSelectionDirective.isBoxSelectionActive = false;
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
@@ -59,7 +66,7 @@ export class PanningDirective implements OnDestroy {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'panning',
+      name: 'boxSelection',
       phase: 'end',
       target: undefined,
       targetType: 'diagram',
@@ -68,6 +75,9 @@ export class PanningDirective implements OnDestroy {
         y: event.clientY,
       },
     });
+
+    this.startPoint = null;
+    this.boxSelectionProvider.boundingBox.set(null);
   };
 
   private onMouseMove = (event: PointerInputEvent) => {
@@ -77,7 +87,7 @@ export class PanningDirective implements OnDestroy {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'panning',
+      name: 'boxSelection',
       phase: 'continue',
       target: undefined,
       targetType: 'diagram',
@@ -86,21 +96,26 @@ export class PanningDirective implements OnDestroy {
         y: event.clientY,
       },
     });
+
+    if (this.startPoint) {
+      const flowCore = this.flowCore.provide();
+      const { x: startX, y: startY } = flowCore.clientToFlowViewportPosition(this.startPoint);
+      const { x: endX, y: endY } = flowCore.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
+
+      const x = Math.min(startX, endX);
+      const y = Math.min(startY, endY);
+      const width = Math.abs(endX - startX);
+      const height = Math.abs(endY - startY);
+      this.boxSelectionProvider.boundingBox.set({
+        x,
+        y,
+        width,
+        height,
+      });
+    }
   };
 
   private shouldHandle(event: PointerInputEvent): boolean {
-    if (shouldDiscardEvent(event, 'pan')) {
-      return false;
-    }
-
-    if (BoxSelectionDirective.isBoxSelectionActive) {
-      return false;
-    }
-
-    if (ZoomingPointerDirective.IsZoomingPointer) {
-      return true;
-    }
-
-    return !(event.moveSelectionHandled || event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+    return event.shiftKey;
   }
 }

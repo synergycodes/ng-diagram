@@ -1,6 +1,6 @@
 import { FlowCore } from '../flow-core';
-import { Node, Point, Port } from '../types';
-import { getDistanceBetweenRects, getPointRangeRect, getRect } from '../utils';
+import { Node, Point, Port, Rect } from '../types';
+import { doesContainRect, getDistanceBetweenRects, getPointRangeRect, getRect } from '../utils';
 
 export const getNodesInRange = (flowCore: FlowCore, point: Point, range: number): Node[] => {
   const foundNodesIds = new Set(flowCore.spatialHash.queryIds(getPointRangeRect(point, range)));
@@ -50,4 +50,27 @@ export const getNearestPortInRange = (flowCore: FlowCore, point: Point, range: n
   }
 
   return nearestPort;
+};
+
+export const getNodesInRect = (flowCore: FlowCore, rect: Rect, partialInclusion = true): Node[] => {
+  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(rect));
+  const foundNodes: Node[] = [];
+  const nodes = flowCore.getState().nodes;
+
+  nodes.forEach((node) => {
+    if (foundNodesIds.has(node.id)) {
+      foundNodes.push(node);
+    }
+  });
+
+  if (partialInclusion) {
+    return foundNodes;
+  }
+
+  const fullyContainedNodes = foundNodes.filter((node) => {
+    const nodeRect = getRect(node);
+    return doesContainRect(rect, nodeRect);
+  });
+
+  return fullyContainedNodes;
 };

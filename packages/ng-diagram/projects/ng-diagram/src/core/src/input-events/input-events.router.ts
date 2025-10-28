@@ -1,4 +1,5 @@
 import { FlowCore } from '../flow-core';
+import { BoxSelectionEventHandler } from './handlers/box-selection/box-selection.handler';
 import { CopyEventHandler } from './handlers/copy/copy.handler';
 import { CutEventHandler } from './handlers/cut/cut.handler';
 import { DeleteSelectionEventHandler } from './handlers/delete-selection/delete-selection.handler';
@@ -48,5 +49,6 @@ export abstract class InputEventsRouter {
     this.register('rotate', new RotateEventHandler(flow));
     this.register('paletteDrop', new PaletteDropEventHandler(flow));
     this.register('cut', new CutEventHandler(flow));
+    this.register('boxSelection', new BoxSelectionEventHandler(flow));
   }
 }

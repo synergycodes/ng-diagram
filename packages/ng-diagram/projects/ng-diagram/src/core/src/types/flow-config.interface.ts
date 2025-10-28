@@ -298,6 +298,21 @@ export interface EdgeRoutingConfig {
   [edgeRoutingName: string]: Record<string, unknown> | EdgeRoutingName | undefined;
 }
 
+export interface BoxSelectionConfig {
+  /**
+   * Whether to select nodes that are only partially within the selection box.
+   * @default true
+   */
+  partialInclusion?: boolean;
+
+  /**
+   * Whether to select nodes in real-time as the selection box is being drawn.
+   * If false, nodes will only be selected when the box selection ends.
+   * @default true
+   */
+  realtime?: boolean;
+}
+
 /**
  * The main configuration interface for the flow system.
  *
@@ -365,6 +380,11 @@ export interface FlowConfig {
    * Configuration for z-index layering behavior.
    */
   zIndex: ZIndexConfig;
+
+  /**
+   * Configuration for box selection behavior.
+   */
+  boxSelection: BoxSelectionConfig;
 
   /**
    * Enables or disables debug mode for the diagram.

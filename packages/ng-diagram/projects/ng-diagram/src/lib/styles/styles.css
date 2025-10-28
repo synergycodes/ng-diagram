@@ -49,6 +49,10 @@
   --ngd-default-edge-stroke-hover: var(--ngd-colors-gray-700);
   --ngd-default-edge-stroke-selected: var(--ngd-colors-acc1-500);
 
+  --ngd-box-selection-border-color: #961ce7;
+  --ngd-box-selection-border-size: 1px;
+  --ngd-box-selection-background: rgba(43, 91, 213, 0.12);
+
   --ngd-default-edge-label-background-color: var(--ngd-default-edge-label-bg-primary-default);
   --ngd-default-edge-label-color: var(--ngd-txt-primary-default);
   --ngd-default-edge-label-border-color: var(--ngd-colors-gray-500);

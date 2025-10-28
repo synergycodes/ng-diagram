@@ -3,6 +3,7 @@ import { Node } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';
+import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 
 @Directive({
   selector: '[ngDiagramLinkingInput]',
@@ -33,6 +34,11 @@ export class LinkingInputDirective implements OnDestroy {
       this.target.set(undefined);
       return;
     }
+
+    if (BoxSelectionDirective.isBoxSelectionActive || $event.shiftKey) {
+      return;
+    }
+
     $event.linkingHandled = true;
 
     document.addEventListener('pointermove', this.onPointerMove);

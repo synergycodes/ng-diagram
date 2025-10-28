@@ -2,6 +2,7 @@ import { FlowCore } from '../flow-core';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
+  BoxSelectionConfig,
   EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
@@ -120,6 +121,11 @@ const defaultZIndexConfig: ZIndexConfig = {
   temporaryEdgeZIndex: 1000,
 };
 
+const defaultBoxSelectionConfig: BoxSelectionConfig = {
+  partialInclusion: true,
+  realtime: true,
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -138,6 +144,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       selectionMoving: defaultSelectionMovingConfig,
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,
+      boxSelection: defaultBoxSelectionConfig,
       debugMode: false,
     },
     config
