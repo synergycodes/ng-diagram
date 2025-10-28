@@ -7,17 +7,15 @@ export class PaletteDropEventHandler extends EventHandler<PaletteDropInputEvent>
     const { data, lastInputPoint } = event;
     const node = data as unknown as Node;
 
-    this.flow.commandHandler.emit('addNodes', {
-      nodes: [
-        {
-          ...node,
-          id: this.flow.config.computeNodeId(),
-          position: this.flow.clientToFlowPosition({
-            x: lastInputPoint.x,
-            y: lastInputPoint.y,
-          }),
-        },
-      ],
+    this.flow.commandHandler.emit('paletteDropNode', {
+      node: {
+        ...node,
+        id: this.flow.config.computeNodeId(),
+        position: this.flow.clientToFlowPosition({
+          x: lastInputPoint.x,
+          y: lastInputPoint.y,
+        }),
+      },
     });
   }
 }

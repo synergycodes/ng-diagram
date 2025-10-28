@@ -60,10 +60,6 @@ export class DiagramComponent {
         data: {},
       },
     ],
-    // @collapse-start:enabling
-    edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
-    // @collapse-end:enabling
   });
   // @section-end:enabling
   // @collapse-end:config

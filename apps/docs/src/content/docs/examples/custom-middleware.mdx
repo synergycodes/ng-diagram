@@ -2,17 +2,18 @@
 title: Custom Middleware Example
 description: Example of how to create a custom middleware in ngDiagram
 sidebar:
+  order: 10
   label: Custom Middleware
 ---
 
-import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import ReadonlyMiddleware from '@examples/readonly-middleware/readonly-middleware.astro';
 
 This example demonstrates how to create a custom middleware that implements read-only functionality for ngDiagram.
 Middlewares provide a powerful plugin architecture for extending diagram behavior by intercepting state changes before they reach the model.
 
 <ReadonlyMiddleware />
-<ExampleViewer dirName="readonly-middleware" />
+<CodeViewer dirName="examples/readonly-middleware" />
 
 ## Additional Explanation
 

@@ -16,20 +16,16 @@ Get up and running with ngDiagram in minutes. This guide will help you create yo
 npm install ng-diagram
 ```
 
-**Note**: You can use `yarn` or `pnpm` too
-
 ## Import Styles
-
-<Aside type="caution" title="Caution">
-  You must import the required styles for the diagram to display correctly. Because the library uses **CSS variables**,
-  import the stylesheet in your **global file** (e.g. `src/styles.scss`), not inside a component.
-</Aside>
 
 ```css
 @import 'ng-diagram/styles.css';
 ```
 
-Without these styles, the diagram components will not render properly.
+<Aside type="caution" title="Caution">
+  Without these styles, the diagram components will not render properly. Because the library uses **CSS variables**,
+  import the stylesheet in your **global file** (e.g. `src/styles.scss`), not inside a component.
+</Aside>
 
 ## Create Your First Diagram
 
@@ -68,6 +64,10 @@ export class AppComponent {
 }
 ```
 
+That's it! You now have a working diagram with default node and edge templates.
+
+<NgDiagramComponentContainer />
+
 <Aside type="note" title="Note">
 The `<ng-diagram>` component must be placed inside a container element with an **explicitly defined size** (e.g. 300px, 100vh, etc.).
 The diagram will automatically scale to fit the dimensions of its parent container.
@@ -75,13 +75,9 @@ This approach ensures that the diagram renders correctly and responds to layout 
 </Aside>
 
 <Aside type="caution" title="Caution">
-The `<ng-diagram>` component must be used within a component or module that registers `provideNgDiagram()`, 
+The `<ng-diagram>` component must be used within a component or module that registers `provideNgDiagram()`,
 which provides the diagram-specific services and state management.
 </Aside>
-
-That's it! You now have a working diagram with default node and edge templates.
-
-<NgDiagramComponentContainer />
 
 ## What's Next?
 
@@ -119,4 +115,4 @@ Save and restore your diagram state:
 
 ---
 
-**Ready to dive deeper?** Start with [Custom Nodes](/docs/guides/nodes/custom-nodes) or explore our examples to see ngDiagram in action!
+**Ready to dive deeper?** Start with [Custom Nodes](/docs/guides/nodes/custom-nodes) or explore our [Examples](/docs/examples) to see ngDiagram in action!

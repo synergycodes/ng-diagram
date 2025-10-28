@@ -27,6 +27,10 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+        padding: 75,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -48,8 +52,6 @@ export class DiagramComponent {
         data: {},
       },
     ],
-    edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 
   loadModel(model: Partial<Model>): void {

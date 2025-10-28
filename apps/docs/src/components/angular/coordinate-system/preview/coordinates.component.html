@@ -1,0 +1,19 @@
+<span> x: {{ viewport().x | number: '1.0-2' }} </span>
+<span> y: {{ viewport().y | number: '1.0-2' }} </span>
+<span> scale: {{ scale() | number: '1.0-2' }} </span>
+<span
+  >selection x:
+  {{
+    selectionPosition() != null
+      ? (selectionPosition().x | number: '1.0-2')
+      : '-'
+  }}
+</span>
+<span
+  >selection y:
+  {{
+    selectionPosition() != null
+      ? (selectionPosition().y | number: '1.0-2')
+      : '-'
+  }}
+</span>

@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ViewportDirective } from '../../directives';
 import { InputEventsRouterService } from '../../services/input-events/input-events-router.service';
+import { RendererService } from '../../services/renderer/renderer.service';
 import { NgDiagramCanvasComponent } from './ng-diagram-canvas.component';
 
 @Component({
@@ -38,7 +39,7 @@ describe('AngularAdapterCanvasComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NgDiagramCanvasComponent, TestComponent],
-      providers: [InputEventsRouterService],
+      providers: [InputEventsRouterService, RendererService],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NgDiagramCanvasComponent);

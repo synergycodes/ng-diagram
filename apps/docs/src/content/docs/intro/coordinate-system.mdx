@@ -5,6 +5,8 @@ sidebar:
   order: 2
 ---
 
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import NgDiagramComponentContainer from '../../../components/angular/coordinate-system/coordinate-system.astro';
 
 NgDiagram uses a coordinate system that enables precise positioning of all diagram elements. Understanding this system is crucial for creating accurate diagrams and implementing custom behaviors.
@@ -29,13 +31,7 @@ The diagram has a **global coordinate system** with its origin at the top-left c
 
 Nodes are positioned using **absolute coordinates** relative to the diagram origin:
 
-```typescript
-{
-  id: 'node1',
-  position: { x: 100, y: 200 }, // 100px from left, 200px from top
-  // ... other properties
-}
-```
+<CodeSnippet relativePath="coordinate-system/diagram.component.ts" sectionId="element-positioning-nodes" />
 
 **Positioning Behavior:**
 
@@ -65,14 +61,7 @@ Ports can be positioned anywhere within the node using CSS properties:
 
 Groups follow the same positioning rules as regular nodes:
 
-```typescript
-{
-  id: 'group1',
-  isGroup: true,
-  position: { x: 300, y: 400 }, // Group's top-left corner
-  // ... other properties
-}
-```
+<CodeSnippet relativePath="coordinate-system/diagram.component.ts" sectionId="element-positioning-groups" />
 
 **Group Behavior:**
 
@@ -105,17 +94,7 @@ Edge labels are positioned using **absolute coordinates** along the edge path:
 
 The viewport represents the visible area of the diagram:
 
-```typescript
-{
-  viewport: {
-    x: 100,    // Horizontal offset from diagram origin
-    y: 50,     // Vertical offset from diagram origin
-    scale: 1.5, // Zoom level (1.0 = 100%)
-    width: 800, // Viewport width
-    height: 600 // Viewport height
-  }
-}
-```
+<CodeSnippet relativePath="coordinate-system/diagram.component.ts" sectionId="viewport-coordinates" />
 
 ### Coordinate Transformations
 
@@ -125,35 +104,21 @@ The `NgDiagramViewportService` offers methods for converting between different c
 
 ```typescript
 // Convert screen coordinates to diagram coordinates
-const flowPosition = service.clientToFlowPosition({ x: 150, y: 200 });
+const flowPosition = viewportService.clientToFlowPosition({ x: 150, y: 200 });
 ```
 
 **Flow to Client Position:**
 
 ```typescript
 // Convert diagram coordinates to screen coordinates
-const clientPosition = service.flowToClientPosition({ x: 100, y: 150 });
+const clientPosition = viewportService.flowToClientPosition({ x: 100, y: 150 });
 ```
 
 ### Reading Viewport Data
 
 Use the `NgDiagramViewportService` to access viewport information reactively:
 
-```typescript
-import { NgDiagramViewportService } from 'ng-diagram';
-
-export class MyComponent {
-  private readonly viewportService = inject(NgDiagramViewportService);
-
-  // Get reactive viewport data
-  viewport = this.viewportService.viewport;
-  scale = this.viewportService.scale;
-
-  // Access current values
-  currentViewport = this.viewport();
-  currentScale = this.scale();
-}
-```
+<CodeSnippet relativePath="/coordinate-system/preview/coordinates.component.ts" sectionId="coordinates-component" />
 
 **Available Viewport Properties:**
 
@@ -162,3 +127,4 @@ export class MyComponent {
 - `width`, `height`: Viewport dimensions
 
 <NgDiagramComponentContainer />
+<CodeViewer dirName="coordinate-system" />

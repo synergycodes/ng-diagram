@@ -1,1 +1,8 @@
-<ng-diagram-base-edge class="default-edge" [edge]="edge()" />
+<ng-diagram-base-edge class="default-edge" [edge]="edge()">
+  @let edgeLabel = label();
+  @if (edgeLabel) {
+    <ng-diagram-base-edge-label class="ng-diagram-default-label" [id]="'edge-label'" [positionOnEdge]="0.5">
+      <ng-diagram-default-edge-label>{{ edgeLabel }}</ng-diagram-default-edge-label>
+    </ng-diagram-base-edge-label>
+  }
+</ng-diagram-base-edge>

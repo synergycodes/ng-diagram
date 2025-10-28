@@ -4,7 +4,8 @@ import { assignNodeZIndex } from './utils/assign-node-z-index';
 import { initializeZIndex } from './utils/initialize-z-index';
 
 const checkIfIsInit = (modelActionType: ModelActionType) => modelActionType === 'init';
-const checkIfIsEdgeAdded = (modelActionType: ModelActionType) => modelActionType === 'finishLinking';
+const checkIfIsEdgeAdded = (modelActionType: ModelActionType) =>
+  modelActionType === 'finishLinking' || modelActionType === 'addEdges';
 
 export const zIndexMiddleware: Middleware<'z-index'> = {
   name: 'z-index',

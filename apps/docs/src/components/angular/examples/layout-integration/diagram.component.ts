@@ -31,15 +31,17 @@ export class DiagramComponent {
   private modelService = inject(NgDiagramModelService);
 
   model = initializeModel({
-    metadata: {
-      viewport: { x: 100, y: 80, scale: 0.5 },
-    },
     nodes: diagramModel.nodes,
     edges: diagramModel.edges,
   });
 
   config: NgDiagramConfig = {
     edgeRouting: { defaultRouting: 'orthogonal' },
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
+    },
   };
 
   // When user manually moves nodes, edges in manual routing mode should be

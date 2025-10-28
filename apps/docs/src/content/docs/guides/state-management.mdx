@@ -3,6 +3,8 @@ title: State Management
 description: Learn how to create models, access the model service, and perform operations on your diagram data
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ngDiagram uses a reactive state management system that allows you to create, access, and modify diagram data efficiently.
 Understanding this system is essential for building dynamic, interactive diagrams.
 
@@ -158,6 +160,13 @@ You can bind directly to the reactive signals in your templates:
 ## Performing Operations
 
 The model service provides comprehensive methods for adding, updating, deleting, and querying diagram elements.
+
+<Aside type="caution" title="Be careful">
+  Always modify the model through ngDiagram services. The architecture is designed so updates go through services to
+  validate changes, emit events, and coordinate rendering. This is what makes the diagram behave correctly — see the
+  [Architecture](/docs/intro/architecture/) overview. Bypassing services and mutating the model directly can
+  desynchronize UI and state, leading to inconsistent or "weird" results.
+</Aside>
 
 ### Adding Elements
 

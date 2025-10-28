@@ -15,13 +15,19 @@ import {
 import { Edge, Node } from '../../../core/src';
 
 import type {
+  ClipboardPastedEvent,
   DiagramInitEvent,
   EdgeDrawnEvent,
+  GroupMembershipChangedEvent,
   GroupNode,
   MiddlewareChain,
   ModelAdapter,
+  NodeResizedEvent,
+  PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  SelectionRemovedEvent,
+  SelectionRotatedEvent,
   ViewportChangedEvent,
 } from '../../../core/src';
 
@@ -124,29 +130,92 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   readonly viewport = this.renderer.viewport;
 
   /**
-   * Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
+   * Event emitted when the diagram initialization is complete.
+   *
+   * This event fires after all nodes and edges including their internal parts
+   * (ports, labels) have been measured and positioned.
    */
   @Output() diagramInit = new EventEmitter<DiagramInitEvent>();
 
   /**
-   * Event emitted when a user manually draws an edge between two nodes
+   * Event emitted when a user manually draws an edge between two nodes.
+   *
+   * This event only fires for user-initiated edge creation through the UI,
+   * but not for programmatically added edges.
    */
   @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
 
   /**
-   * Event emitted when selected nodes are moved
+   * Event emitted when selected nodes are moved within the diagram.
+   *
+   * This event fires when the user moves nodes manually by dragging or
+   * programmatically using the `NgDiagramNodeService.moveNodesBy()` method.
    */
   @Output() selectionMoved = new EventEmitter<SelectionMovedEvent>();
 
   /**
-   * Event emitted when selection changes
+   * Event emitted when the selection state changes in the diagram.
+   *
+   * This event fires when the user selects or deselects nodes and edges through
+   * clicking or programmatically using the `NgDiagramSelectionService`.
    */
   @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
 
   /**
-   * Event emitted when viewport changes (pan/zoom)
+   * Event emitted when selected elements are deleted from the diagram.
+   *
+   * This event fires when the user deletes nodes and edges using the delete key,
+   * or programmatically through the diagram service.
+   */
+  @Output() selectionRemoved = new EventEmitter<SelectionRemovedEvent>();
+
+  /**
+   * Event emitted when nodes are grouped or ungrouped.
+   *
+   * This event fires when the user moves nodes in or out of a group node,
+   * changing their group membership status.
+   */
+  @Output() groupMembershipChanged = new EventEmitter<GroupMembershipChangedEvent>();
+
+  /**
+   * Event emitted when a node is rotated in the diagram.
+   *
+   * This event fires when the user rotates a node manually using the rotation handle
+   * or programmatically using the `NgDiagramNodeService` rotation methods.
+   */
+  @Output() selectionRotated = new EventEmitter<SelectionRotatedEvent>();
+
+  /**
+   * Event emitted when the viewport changes through panning or zooming.
+   *
+   * This event fires during pan and zoom operations, including mouse wheel zoom,
+   * and programmatic viewport changes.
    */
   @Output() viewportChanged = new EventEmitter<ViewportChangedEvent>();
+
+  /**
+   * Event emitted when clipboard content is pasted into the diagram.
+   *
+   * This event fires when nodes and edges are added via paste operations,
+   * either through keyboard shortcuts or programmatic paste commands.
+   */
+  @Output() clipboardPasted = new EventEmitter<ClipboardPastedEvent>();
+
+  /**
+   * Event emitted when a node or group size changes.
+   *
+   * This event fires when a node is resized manually by dragging resize handles
+   * or programmatically using resize methods.
+   */
+  @Output() nodeResized = new EventEmitter<NodeResizedEvent>();
+
+  /**
+   * Event emitted when a palette item is dropped onto the diagram.
+   *
+   * This event fires when users drag items from the palette and drop them
+   * onto the canvas to create new nodes.
+   */
+  @Output() paletteItemDropped = new EventEmitter<PaletteItemDroppedEvent>();
 
   constructor() {
     effect(() => {
@@ -154,6 +223,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
       if (this.initializedModel != model) {
         // Angular 18 backward compatibility
         untracked(() => {
+          this.renderer.isInitialized.set(false);
           this.flowCoreProvider.destroy();
           this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
         });
@@ -300,10 +370,24 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     const flowCore = this.flowCoreProvider.provide();
     const eventManager = flowCore.eventManager;
 
-    eventManager.on('diagramInit', (event) => this.diagramInit.emit(event));
+    eventManager.on('diagramInit', (event) => {
+      this.renderer.isInitialized.set(true);
+      this.diagramInit.emit(event);
+
+      if (flowCore.config.zoom.zoomToFit.onInit) {
+        flowCore.commandHandler.emit('zoomToFit', {});
+      }
+    });
+
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
+    eventManager.on('selectionRemoved', (event) => this.selectionRemoved.emit(event));
+    eventManager.on('groupMembershipChanged', (event) => this.groupMembershipChanged.emit(event));
+    eventManager.on('selectionRotated', (event) => this.selectionRotated.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
+    eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
+    eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));
+    eventManager.on('paletteItemDropped', (event) => this.paletteItemDropped.emit(event));
   }
 }

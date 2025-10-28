@@ -11,6 +11,7 @@ import {
   UnsubscribeFn,
 } from '../../core/src';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
+import { RendererService } from '../services/renderer/renderer.service';
 import { NgDiagramConfig } from '../types';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
@@ -34,6 +35,7 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
 @Injectable()
 export class NgDiagramService extends NgDiagramBaseService {
   private readonly manualLinkingService = inject(ManualLinkingService);
+  private readonly renderer = inject(RendererService);
   private config$ = signal<Readonly<NgDiagramConfig>>({});
   readonly config = this.config$.asReadonly();
 
@@ -47,9 +49,10 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   /**
-   * Returns whether the diagram is initialized.
+   * Returns whether the diagram is fully initialized and all elements are measured.
+   * This signal is set to `true` when the `diagramInit` event fires.
    */
-  isInitialized = this.flowCoreProvider.isInitialized;
+  isInitialized = this.renderer.isInitialized.asReadonly();
 
   /**
    * Gets the current environment information.

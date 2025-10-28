@@ -13,7 +13,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
 @Component({
   imports: [NgDiagramComponent, NavBarComponent],
   template: `
-    <nav-bar [elementRef]="ngDiagram.elementRef"></nav-bar>
+    <nav-bar [diagramRef]="diagramElementRef()"></nav-bar>
     <div class="not-content diagram">
       <ng-diagram #ngDiagram [model]="model" [config]="config" />
     </div>
@@ -22,12 +22,17 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
   providers: [GenerateImageService, NgDiagramModelService, provideNgDiagram()],
 })
 export class DiagramComponent {
-  ngDiagram: Signal<ElementRef<HTMLElement> | undefined> =
-    viewChild('ngDiagram');
+  diagramElementRef: Signal<ElementRef<HTMLElement> | undefined> = viewChild(
+    'ngDiagram',
+    { read: ElementRef }
+  );
 
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -168,6 +173,5 @@ export class DiagramComponent {
         targetPort: 'port-left',
       },
     ],
-    metadata: { viewport: { x: -100, y: 100, scale: 0.75 } },
   });
 }

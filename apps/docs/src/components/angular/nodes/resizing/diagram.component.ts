@@ -63,8 +63,6 @@ export class DiagramComponent {
         data: {},
       },
     ],
-    edges: [],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
   // @collapse-end:config
 }

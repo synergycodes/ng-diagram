@@ -47,7 +47,10 @@ Base color values and fundamental design tokens defined in `primitives`. These a
 }
 ```
 
-> **Note:** The actual color values are defined in the library. Override these variables to customize the color palette for your design system.
+<Aside type="note">
+  The actual color values are defined in the library. Override these variables to customize the color palette for your
+  design system.
+</Aside>
 
 ### Tokens
 
@@ -100,8 +103,6 @@ ngDiagram supports both light and dark themes **out of the box by default**:
 
 ### Customization
 
-> **Note:** The following customization options are **optional**.
-
 #### Global Color Override
 
 To quickly adapt to your design system, override primitives:
@@ -126,6 +127,8 @@ For precise control, override component variables:
   /* Customize specific component properties */
 }
 ```
+
+<Aside type="note">The customization options above are **optional**</Aside>
 
 ## Utility Classes
 
@@ -157,7 +160,7 @@ Applied to node containers as well. The port is highlighted only when the cursor
 
 ## Directives
 
-> **Note:** Directives require access to node/group data. When used outside of node templates, they won't work. For manual control, use CSS classes instead.
+Directives require access to node/group data. When used outside of node templates, they won't work. For manual control, use CSS classes instead.
 
 ### NgDiagramNodeSelectedDirective
 

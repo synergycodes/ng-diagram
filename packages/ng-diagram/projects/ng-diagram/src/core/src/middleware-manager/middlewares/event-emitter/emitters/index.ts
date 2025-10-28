@@ -1,6 +1,12 @@
+export { ClipboardPastedEmitter } from './clipboard-paste.emitter';
 export { DiagramInitEmitter } from './diagram-init.emitter';
 export { EdgeDrawnEmitter } from './edge-drawn.emitter';
 export { type EventEmitter } from './event-emitter.interface';
+export { PaletteItemDroppedEmitter } from './palette-item-dropped.emitter';
 export { SelectionChangedEmitter } from './selection-changed.emitter';
+export { GroupMembershipChangedEmitter } from './group-membership-changed.emitter';
 export { SelectionMovedEmitter } from './selection-moved.emitter';
+export { SelectionRemovedEmitter } from './selection-removed.emitter';
+export { SelectionRotatedEmitter } from './selection-rotated.emitter';
+export { NodeResizedEmitter } from './size-changed.emitter';
 export { ViewportChangedEmitter } from './viewport-changed.emitter';
