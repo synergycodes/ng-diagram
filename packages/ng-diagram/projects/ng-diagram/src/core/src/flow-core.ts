@@ -19,6 +19,7 @@ import type {
   FlowConfig,
   FlowState,
   FlowStateUpdate,
+  GroupNode,
   LooseAutocomplete,
   Middleware,
   MiddlewareChain,
@@ -365,6 +366,84 @@ export class FlowCore {
    */
   getNearestPortInRange(point: Point, range: number): Port | null {
     return getNearestPortInRange(this, point, range);
+  }
+
+  /**
+   * Gets all edges connected to a node
+   * @param nodeId Node id
+   * @returns Array of edges where the node is either source or target
+   */
+  getConnectedEdges(nodeId: string): Edge[] {
+    return this.modelLookup.getConnectedEdges(nodeId);
+  }
+
+  /**
+   * Gets all nodes connected to a node via edges
+   * @param nodeId Node id
+   * @returns Array of nodes connected to the given node
+   */
+  getConnectedNodes(nodeId: string): Node[] {
+    return this.modelLookup.getConnectedNodes(nodeId);
+  }
+
+  /**
+   * Gets the source and target nodes of an edge
+   * @param edgeId Edge id
+   * @returns Object containing source and target nodes, or null if edge doesn't exist
+   */
+  getNodeEnds(edgeId: string): { source: Node; target: Node } | null {
+    return this.modelLookup.getNodeEnds(edgeId);
+  }
+
+  /**
+   * Gets all children nodes for a given group node id
+   * @param groupId group node id
+   * @returns Array of child nodes
+   */
+  getChildren(groupId: string): Node[] {
+    return this.modelLookup.getChildren(groupId);
+  }
+
+  /**
+   * Gets all nested children (descendants) of a group node
+   * @param groupId Group node id
+   * @returns Array of all descendant nodes (children, grandchildren, etc.)
+   */
+  getChildrenNested(groupId: string): Node[] {
+    return this.modelLookup.getAllDescendants(groupId);
+  }
+
+  /**
+   * Checks if a node is a nested child (descendant) of a group node
+   * @param nodeId Node id
+   * @param groupId Group node id
+   * @returns True if the node is part of the group's nested subgraph
+   */
+  isNestedChild(nodeId: string, groupId: string): boolean {
+    return this.modelLookup.isNodeDescendantOfGroup(nodeId, groupId);
+  }
+
+  /**
+   * Gets the full chain of parent group Nodes for a given nodeId.
+   * @param nodeId Node id
+   * @returns Array of parent group Node objects, from closest parent to farthest ancestor
+   */
+  getParentHierarchy(nodeId: string): GroupNode[] {
+    return this.modelLookup.getParentChain(nodeId);
+  }
+
+  /**
+   * Detects collision with other nodes by finding all nodes whose rectangles intersect
+   * with the specified node's bounding rectangle.
+   *
+   * @param nodeId - The ID of the node to check for collisions
+   * @returns An array of Nodes that overlap with the specified node
+   */
+  getOverlappingNodes(nodeId: string): Node[] {
+    return this.spatialHash
+      .getOverlappingNodes(nodeId)
+      .map((id) => this.modelLookup.getNodeById(id))
+      .filter((node): node is Node => node !== null);
   }
 
   /**
