@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { effect, inject, Injectable, signal } from '@angular/core';
 import {
   ActionState,
   DiagramEventMap,
@@ -36,6 +36,17 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
 export class NgDiagramService extends NgDiagramBaseService {
   private readonly manualLinkingService = inject(ManualLinkingService);
   private readonly renderer = inject(RendererService);
+  private config$ = signal<Readonly<NgDiagramConfig>>({});
+  readonly config = this.config$.asReadonly();
+
+  constructor() {
+    super();
+    effect(() => {
+      if (this.isInitialized()) {
+        this.config$.set(this.flowCore.config);
+      }
+    });
+  }
 
   /**
    * Returns whether the diagram is fully initialized and all elements are measured.
@@ -76,6 +87,7 @@ export class NgDiagramService extends NgDiagramBaseService {
    */
   updateConfig(config: Partial<NgDiagramConfig>) {
     this.flowCore.updateConfig(config);
+    this.config$.set(this.flowCore.config);
   }
 
   /**

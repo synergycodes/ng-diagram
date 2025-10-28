@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved documentation examples structure for consistency ([#360](https://github.com/synergycodes/ng-diagram/pull/360))
 - Unified documentation styles ([#357](https://github.com/synergycodes/ng-diagram/pull/357))
 - Redirected documentation root to quick-start page and reordered Intro articles ([#370](https://github.com/synergycodes/ng-diagram/pull/370))
+- Changed default behavior for resizable and rotatable properties on diagram nodes ([#374](https://github.com/synergycodes/ng-diagram/pull/374))
 
 ### Fixed
 

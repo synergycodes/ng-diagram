@@ -24,6 +24,7 @@ const defaultResizeConfig: ResizeConfig = {
     return { ...DEFAULT_NODE_MIN_SIZE };
   },
   allowResizeBelowChildrenBounds: true,
+  defaultResizable: true,
 };
 
 const defaultLinkingConfig: LinkingConfig = {
@@ -75,6 +76,7 @@ const defaultNodeRotationConfig: NodeRotationConfig = {
     return null;
   },
   defaultSnapAngle: 30,
+  defaultRotatable: true,
 };
 
 const defaultNodeDraggingConfig: SnappingConfig = {
