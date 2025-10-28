@@ -54,14 +54,18 @@ export class BoxSelectionEventHandler extends EventHandler<BoxSelectionEvent> {
 
     const edges = this.flow.model.getEdges();
 
-    const nodeIds = getNodesInRect(this.flow, rect, this.flow.config.boxSelection.partialInclusion).map(
-      (node) => node.id
+    const nodeIds = new Set(
+      getNodesInRect(this.flow, rect, this.flow.config.boxSelection.partialInclusion).map((node) => node.id)
     );
 
     const edgesBetweenIds = edges
-      .filter((edge) => nodeIds.includes(edge.source) && nodeIds.includes(edge.target))
+      .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
       .map((edge) => edge.id);
 
-    this.flow.commandHandler.emit('select', { nodeIds: nodeIds, edgeIds: edgesBetweenIds, preserveSelection: false });
+    this.flow.commandHandler.emit('select', {
+      nodeIds: [...nodeIds],
+      edgeIds: edgesBetweenIds,
+      preserveSelection: false,
+    });
   }
 }
