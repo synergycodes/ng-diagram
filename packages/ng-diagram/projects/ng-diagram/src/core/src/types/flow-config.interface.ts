@@ -134,10 +134,9 @@ export interface ZoomConfig {
  * @category Types
  */
 export interface BackgroundConfig {
-  /**
-   * The size of the dots in the background.
-   */
-  dotSize: number;
+  dotSize?: number;
+  gridSize?: number; // <-- add this
+  gridPattern?: 'simple' | 'major-minor'; // <-- add this
 }
 
 /**

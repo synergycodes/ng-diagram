@@ -16,7 +16,7 @@
     (paletteItemDropped)="onPaletteItemDropped($event)"
     (selectionRemoved)="onSelectionRemoved($event)"
   >
-    <ng-diagram-background></ng-diagram-background>
+    <ng-diagram-background [isGridBackground]="true"></ng-diagram-background>
   </ng-diagram>
   <app-toolbar />
   <app-palette [model]="paletteModel" />
