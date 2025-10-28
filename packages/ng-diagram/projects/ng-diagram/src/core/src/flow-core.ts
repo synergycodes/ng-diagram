@@ -437,10 +437,13 @@ export class FlowCore {
    * with the specified node's bounding rectangle.
    *
    * @param nodeId - The ID of the node to check for collisions
-   * @returns An array of node IDs that overlap with the specified node
+   * @returns An array of Nodes that overlap with the specified node
    */
-  getOverlappingNodes(nodeId: string): string[] {
-    return this.spatialHash.getOverlappingNodes(nodeId);
+  getOverlappingNodes(nodeId: string): Node[] {
+    return this.spatialHash
+      .getOverlappingNodes(nodeId)
+      .map((id) => this.modelLookup.getNodeById(id))
+      .filter((node): node is Node => node !== null);
   }
 
   /**

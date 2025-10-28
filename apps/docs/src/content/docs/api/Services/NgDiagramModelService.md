@@ -382,7 +382,7 @@ Array of nodes in range.
 
 ### getOverlappingNodes()
 
-> **getOverlappingNodes**(`nodeId`): `string`[]
+> **getOverlappingNodes**(`nodeId`): [`Node`](/docs/api/types/node/)[]
 
 Detects collision with other nodes by finding all nodes whose rectangles intersect
 with the specified node's bounding rectangle.
@@ -397,9 +397,9 @@ The ID of the node to check for collisions
 
 #### Returns
 
-`string`[]
+[`Node`](/docs/api/types/node/)[]
 
-An array of node IDs that overlap with the specified node
+An array of Nodes that overlap with the specified node
 
 ***
 
