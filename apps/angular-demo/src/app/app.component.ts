@@ -53,8 +53,7 @@ export class AppComponent {
 
   config = {
     zoom: {
-      max: 5,
-      min: 0.1,
+      max: 2,
       zoomToFit: {
         onInit: true,
         padding: [50, 50, 100, 350],

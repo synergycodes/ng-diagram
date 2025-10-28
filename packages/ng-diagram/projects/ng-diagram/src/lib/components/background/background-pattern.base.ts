@@ -10,7 +10,7 @@ export abstract class BackgroundPatternBase {
   size = computed(() => {
     const pattern = this.backgroundPattern();
     const widthAttr = pattern?.nativeElement.getAttribute('staticWidth');
-    console.log(widthAttr, this.viewport().scale);
+
     return Number(widthAttr) * this.viewport().scale;
   });
 

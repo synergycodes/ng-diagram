@@ -53,8 +53,8 @@
   --ngd-default-edge-label-color: var(--ngd-txt-primary-default);
   --ngd-default-edge-label-border-color: var(--ngd-colors-gray-500);
 
-  /* change to 400 when ready*/
   --ngd-background-dot-color: var(--ngd-colors-gray-500);
+  --ngd-background-grid-color: var(--ngd-colors-gray-400);
 }
 
 .ng-diagram-port-hoverable .ng-diagram-port:hover,
