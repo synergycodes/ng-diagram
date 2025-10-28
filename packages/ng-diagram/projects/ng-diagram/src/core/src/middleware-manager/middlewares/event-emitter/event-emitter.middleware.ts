@@ -1,11 +1,17 @@
 import type { EventManager } from '../../../event-manager/event-manager';
 import type { Middleware, MiddlewareContext } from '../../../types';
 import {
+  ClipboardPastedEmitter,
   DiagramInitEmitter,
   EdgeDrawnEmitter,
   EventEmitter,
+  GroupMembershipChangedEmitter,
+  NodeResizedEmitter,
+  PaletteItemDroppedEmitter,
   SelectionChangedEmitter,
   SelectionMovedEmitter,
+  SelectionRemovedEmitter,
+  SelectionRotatedEmitter,
   ViewportChangedEmitter,
 } from './emitters';
 
@@ -18,8 +24,14 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new DiagramInitEmitter(),
     new SelectionChangedEmitter(),
     new SelectionMovedEmitter(),
+    new SelectionRemovedEmitter(),
+    new GroupMembershipChangedEmitter(),
+    new SelectionRotatedEmitter(),
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
+    new ClipboardPastedEmitter(),
+    new NodeResizedEmitter(),
+    new PaletteItemDroppedEmitter(),
   ];
 
   return {

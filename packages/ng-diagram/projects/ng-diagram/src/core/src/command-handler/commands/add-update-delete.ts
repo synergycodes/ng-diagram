@@ -10,6 +10,16 @@ export const addNodes = async (commandHandler: CommandHandler, command: AddNodes
   await commandHandler.flowCore.applyUpdate({ nodesToAdd: nodes }, 'addNodes');
 };
 
+export interface PaletteDropNodeCommand {
+  name: 'paletteDropNode';
+  node: Node;
+}
+
+export const paletteDropNode = async (commandHandler: CommandHandler, command: PaletteDropNodeCommand) => {
+  const { node } = command;
+  await commandHandler.flowCore.applyUpdate({ nodesToAdd: [node] }, 'paletteDropNode');
+};
+
 export interface UpdateNodeCommand {
   name: 'updateNode';
   id: string;

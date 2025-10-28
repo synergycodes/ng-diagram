@@ -40,6 +40,28 @@ describe('Add Update Delete Command', () => {
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToAdd: [node1, node2] }, 'addNodes');
   });
 
+  it('should add a node dropped from palette', () => {
+    const node = { ...mockNode, id: 'palette-node-1', position: { x: 150, y: 200 } };
+
+    commandHandler.emit('paletteDropNode', { node });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToAdd: [node] }, 'paletteDropNode');
+  });
+
+  it('should add a node from palette with specific type', () => {
+    const node = {
+      ...mockNode,
+      id: 'custom-1',
+      type: 'custom-type',
+      position: { x: 100, y: 100 },
+      data: { label: 'Custom Node' },
+    };
+
+    commandHandler.emit('paletteDropNode', { node });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToAdd: [node] }, 'paletteDropNode');
+  });
+
   it('should update a node', () => {
     commandHandler.emit('updateNode', { id: '1', nodeChanges: { selected: true } });
 

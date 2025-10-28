@@ -6,8 +6,9 @@ title: "ViewportChangedEvent"
 ---
 
 Event payload emitted when the viewport changes through panning or zooming.
+
 This event fires during pan and zoom operations, including mouse wheel zoom,
-pinch zoom, and programmatic viewport changes.
+and programmatic viewport changes.
 
 ## Properties
 

@@ -6,7 +6,9 @@ title: "DiagramInitEvent"
 ---
 
 Event payload emitted when the diagram initialization is complete.
-This event fires after all nodes and edges including their internal parts have been measured and positioned.
+
+This event fires after all nodes and edges including their internal parts
+(ports, labels) have been measured and positioned.
 
 ## Properties
 
