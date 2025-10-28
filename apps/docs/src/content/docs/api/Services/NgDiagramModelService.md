@@ -129,6 +129,94 @@ Array of node IDs to delete.
 
 ***
 
+### getChildren()
+
+> **getChildren**(`groupId`): [`Node`](/docs/api/types/node/)[]
+
+Gets all children nodes for a given group node id
+
+#### Parameters
+
+##### groupId
+
+`string`
+
+group node id
+
+#### Returns
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of child nodes
+
+***
+
+### getChildrenNested()
+
+> **getChildrenNested**(`groupId`): [`Node`](/docs/api/types/node/)[]
+
+Gets all nested children (descendants) of a group node
+
+#### Parameters
+
+##### groupId
+
+`string`
+
+Group node id
+
+#### Returns
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of all descendant nodes (children, grandchildren, etc.)
+
+***
+
+### getConnectedEdges()
+
+> **getConnectedEdges**(`nodeId`): [`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Gets all edges connected to a node
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id
+
+#### Returns
+
+[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Array of edges where the node is either source or target
+
+***
+
+### getConnectedNodes()
+
+> **getConnectedNodes**(`nodeId`): [`Node`](/docs/api/types/node/)[]
+
+Gets all nodes connected to a node via edges
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id
+
+#### Returns
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of nodes connected to the given node
+
+***
+
 ### getEdgeById()
 
 > **getEdgeById**(`edgeId`): `null` \| [`Edge`](/docs/api/types/edge/)\<`object`\>
@@ -242,6 +330,28 @@ Node or null if not found.
 
 ***
 
+### getNodeEnds()
+
+> **getNodeEnds**(`edgeId`): `null` \| \{ `source`: [`Node`](/docs/api/types/node/); `target`: [`Node`](/docs/api/types/node/); \}
+
+Gets the source and target nodes of an edge
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+Edge id
+
+#### Returns
+
+`null` \| \{ `source`: [`Node`](/docs/api/types/node/); `target`: [`Node`](/docs/api/types/node/); \}
+
+Object containing source and target nodes, or null if edge doesn't exist
+
+***
+
 ### getNodesInRange()
 
 > **getNodesInRange**(`point`, `range`): [`Node`](/docs/api/types/node/)[]
@@ -267,6 +377,79 @@ Range to check in.
 [`Node`](/docs/api/types/node/)[]
 
 Array of nodes in range.
+
+***
+
+### getOverlappingNodes()
+
+> **getOverlappingNodes**(`nodeId`): `string`[]
+
+Detects collision with other nodes by finding all nodes whose rectangles intersect
+with the specified node's bounding rectangle.
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+The ID of the node to check for collisions
+
+#### Returns
+
+`string`[]
+
+An array of node IDs that overlap with the specified node
+
+***
+
+### getParentHierarchy()
+
+> **getParentHierarchy**(`nodeId`): [`GroupNode`](/docs/api/types/groupnode/)\<`object`\>[]
+
+Gets the full chain of parent group Nodes for a given nodeId.
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id
+
+#### Returns
+
+[`GroupNode`](/docs/api/types/groupnode/)\<`object`\>[]
+
+Array of parent group Node objects, from closest parent to farthest ancestor
+
+***
+
+### isNestedChild()
+
+> **isNestedChild**(`nodeId`, `groupId`): `boolean`
+
+Checks if a node is a nested child (descendant) of a group node
+
+#### Parameters
+
+##### nodeId
+
+`string`
+
+Node id
+
+##### groupId
+
+`string`
+
+Group node id
+
+#### Returns
+
+`boolean`
+
+True if the node is part of the group's nested subgraph
 
 ***
 
