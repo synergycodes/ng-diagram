@@ -134,8 +134,20 @@ export interface ZoomConfig {
  * @category Types
  */
 export interface BackgroundConfig {
+  /**
+   * The default background pattern.
+   * @default 'dots'
+   */
   default: 'grid' | 'dots';
+  /**
+   * The size of the dots pattern.
+   * @default 60
+   */
   dotSize?: number;
+  /**
+   * The size of the grid pattern.
+   * @default 100
+   */
   gridSize?: number;
 }
 
