@@ -65,6 +65,8 @@ const defaultZoomConfig: ZoomConfig = {
 
 const defaultBackgroundConfig: BackgroundConfig = {
   dotSize: 60,
+  gridSize: 100,
+  default: 'dots',
 };
 
 const defaultNodeRotationConfig: NodeRotationConfig = {

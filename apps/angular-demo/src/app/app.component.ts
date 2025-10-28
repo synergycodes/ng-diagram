@@ -53,14 +53,15 @@ export class AppComponent {
 
   config = {
     zoom: {
-      max: 2,
+      max: 5,
+      min: 0.1,
       zoomToFit: {
         onInit: true,
         padding: [50, 50, 100, 350],
       },
     },
     background: {
-      dotSize: 40,
+      default: 'grid',
       gridSize: 100,
     },
     snapping: {

@@ -2,13 +2,13 @@
   <ng-content></ng-content>
 </div>
 @if (!hasContent) {
-  @if (isGridBackground()) {
+  @if (isDottedBackground()) {
     <div>
-      <ng-diagram-grid-background />
+      <ng-diagram-dotted-background />
     </div>
   } @else {
     <div>
-      <ng-diagram-dotted-background />
+      <ng-diagram-grid-background />
     </div>
   }
 }

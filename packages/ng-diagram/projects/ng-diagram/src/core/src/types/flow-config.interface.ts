@@ -134,6 +134,7 @@ export interface ZoomConfig {
  * @category Types
  */
 export interface BackgroundConfig {
+  default: 'grid' | 'dots';
   dotSize?: number;
   gridSize?: number;
 }
