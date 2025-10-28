@@ -7,8 +7,14 @@
     (diagramInit)="onDiagramInit($event)"
     (selectionChanged)="onSelectionChanged($event)"
     (selectionMoved)="onSelectionMoved($event)"
+    (groupMembershipChanged)="onGroupMembershipChanged($event)"
+    (selectionRotated)="onSelectionRotated($event)"
     (viewportChanged)="onViewportChanged($event)"
     (edgeDrawn)="onEdgeDrawn($event)"
+    (clipboardPasted)="onClipboardPasted($event)"
+    (nodeResized)="onNodeResized($event)"
+    (paletteItemDropped)="onPaletteItemDropped($event)"
+    (selectionRemoved)="onSelectionRemoved($event)"
   >
     <ng-diagram-background></ng-diagram-background>
   </ng-diagram>

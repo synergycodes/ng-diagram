@@ -6,6 +6,7 @@ title: "SelectionChangedEvent"
 ---
 
 Event payload emitted when the selection state changes in the diagram.
+
 This event fires when the user selects or deselects nodes and edges through clicking
 or programmatically using the `NgDiagramSelectionService`.
 

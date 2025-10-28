@@ -14,6 +14,17 @@ Diagram component
 
 ## Properties
 
+### clipboardPasted
+
+> **clipboardPasted**: `EventEmitter`\<[`ClipboardPastedEvent`](/docs/api/types/clipboardpastedevent/)\>
+
+Event emitted when clipboard content is pasted into the diagram.
+
+This event fires when nodes and edges are added via paste operations,
+either through keyboard shortcuts or programmatic paste commands.
+
+***
+
 ### config
 
 > **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>\>
@@ -26,7 +37,10 @@ Global configuration options for the diagram.
 
 > **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/types/diagraminitevent/)\>
 
-Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
+Event emitted when the diagram initialization is complete.
+
+This event fires after all nodes and edges including their internal parts
+(ports, labels) have been measured and positioned.
 
 ***
 
@@ -34,7 +48,10 @@ Event emitted when the diagram is initialized and all nodes and edges including 
 
 > **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/types/edgedrawnevent/)\>
 
-Event emitted when a user manually draws an edge between two nodes
+Event emitted when a user manually draws an edge between two nodes.
+
+This event only fires for user-initiated edge creation through the UI,
+but not for programmatically added edges.
 
 ***
 
@@ -44,6 +61,17 @@ Event emitted when a user manually draws an edge between two nodes
 
 The edge template map to use for the diagram.
 Optional - if not provided, default edge rendering will be used.
+
+***
+
+### groupMembershipChanged
+
+> **groupMembershipChanged**: `EventEmitter`\<[`GroupMembershipChangedEvent`](/docs/api/types/groupmembershipchangedevent/)\>
+
+Event emitted when nodes are grouped or ungrouped.
+
+This event fires when the user moves nodes in or out of a group node,
+changing their group membership status.
 
 ***
 
@@ -68,6 +96,17 @@ The model to use in the diagram.
 
 ***
 
+### nodeResized
+
+> **nodeResized**: `EventEmitter`\<[`NodeResizedEvent`](/docs/api/types/noderesizedevent/)\>
+
+Event emitted when a node or group size changes.
+
+This event fires when a node is resized manually by dragging resize handles
+or programmatically using resize methods.
+
+***
+
 ### nodeTemplateMap
 
 > **nodeTemplateMap**: `InputSignal`\<[`NgDiagramNodeTemplateMap`](/docs/api/types/ngdiagramnodetemplatemap/)\>
@@ -76,11 +115,25 @@ The node template map to use for the diagram.
 
 ***
 
+### paletteItemDropped
+
+> **paletteItemDropped**: `EventEmitter`\<[`PaletteItemDroppedEvent`](/docs/api/types/paletteitemdroppedevent/)\>
+
+Event emitted when a palette item is dropped onto the diagram.
+
+This event fires when users drag items from the palette and drop them
+onto the canvas to create new nodes.
+
+***
+
 ### selectionChanged
 
 > **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/types/selectionchangedevent/)\>
 
-Event emitted when selection changes
+Event emitted when the selection state changes in the diagram.
+
+This event fires when the user selects or deselects nodes and edges through
+clicking or programmatically using the `NgDiagramSelectionService`.
 
 ***
 
@@ -88,7 +141,32 @@ Event emitted when selection changes
 
 > **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)\>
 
-Event emitted when selected nodes are moved
+Event emitted when selected nodes are moved within the diagram.
+
+This event fires when the user moves nodes manually by dragging or
+programmatically using the `NgDiagramNodeService.moveNodesBy()` method.
+
+***
+
+### selectionRemoved
+
+> **selectionRemoved**: `EventEmitter`\<[`SelectionRemovedEvent`](/docs/api/types/selectionremovedevent/)\>
+
+Event emitted when selected elements are deleted from the diagram.
+
+This event fires when the user deletes nodes and edges using the delete key,
+or programmatically through the diagram service.
+
+***
+
+### selectionRotated
+
+> **selectionRotated**: `EventEmitter`\<[`SelectionRotatedEvent`](/docs/api/types/selectionrotatedevent/)\>
+
+Event emitted when a node is rotated in the diagram.
+
+This event fires when the user rotates a node manually using the rotation handle
+or programmatically using the `NgDiagramNodeService` rotation methods.
 
 ***
 
@@ -96,7 +174,10 @@ Event emitted when selected nodes are moved
 
 > **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/viewportchangedevent/)\>
 
-Event emitted when viewport changes (pan/zoom)
+Event emitted when the viewport changes through panning or zooming.
+
+This event fires during pan and zoom operations, including mouse wheel zoom,
+and programmatic viewport changes.
 
 ## Methods
 
