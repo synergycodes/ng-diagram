@@ -29,7 +29,6 @@ describe('BoxSelectionEventHandler', () => {
   let mockFlowCore: FlowCore;
   let instance: BoxSelectionEventHandler;
 
-  // Mock nodes with various positions and sizes
   const node1: Node = {
     id: 'node1',
     type: 'node',
@@ -106,7 +105,7 @@ describe('BoxSelectionEventHandler', () => {
       },
       spatialHash: mockSpatialHash,
       model: mockModel,
-      clientToFlowPosition: vi.fn((point) => point), // 1:1 mapping for simplicity
+      clientToFlowPosition: vi.fn((point) => point),
     } as unknown as FlowCore;
 
     mockModel.getEdges.mockReturnValue([edge1, edge2, edge3]);
@@ -124,7 +123,6 @@ describe('BoxSelectionEventHandler', () => {
 
         instance.handle(event);
 
-        // No command should be emitted on start
         expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
     });
@@ -174,7 +172,6 @@ describe('BoxSelectionEventHandler', () => {
 
     describe('phase: end', () => {
       it('should select all nodes within the box selection rectangle', () => {
-        // Mock spatial hash to return nodes 1 and 2
         mockSpatialHash.queryIds.mockReturnValue(new Set(['node1', 'node2']));
 
         const startEvent = getSampleBoxSelectionEvent({
@@ -191,7 +188,7 @@ describe('BoxSelectionEventHandler', () => {
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node2'],
-          edgeIds: ['edge1'], // Edge between node1 and node2
+          edgeIds: ['edge1'],
           preserveSelection: false,
         });
       });
@@ -213,7 +210,7 @@ describe('BoxSelectionEventHandler', () => {
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node3', 'node4'],
-          edgeIds: ['edge3'], // Edge between node3 and node4
+          edgeIds: ['edge3'],
           preserveSelection: false,
         });
       });
@@ -233,8 +230,6 @@ describe('BoxSelectionEventHandler', () => {
         });
         instance.handle(endEvent);
 
-        // node1 and node3 are selected, but edge1 connects node1->node2, edge2 connects node2->node3
-        // No edge connects node1 directly to node3, so no edges should be selected
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node3'],
           edgeIds: [],
@@ -257,8 +252,6 @@ describe('BoxSelectionEventHandler', () => {
         });
         instance.handle(endEvent);
 
-        // node2, node3, node4 are selected
-        // edge2 connects node2->node3, edge3 connects node3->node4
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node2', 'node3', 'node4'],
           edgeIds: ['edge2', 'edge3'],
@@ -333,7 +326,6 @@ describe('BoxSelectionEventHandler', () => {
       });
 
       it('should not emit selection command if end is called without start', () => {
-        // No start event
         const endEvent = getSampleBoxSelectionEvent({
           phase: 'end',
           lastInputPoint: { x: 450, y: 250 },
@@ -358,14 +350,12 @@ describe('BoxSelectionEventHandler', () => {
         });
         instance.handle(endEvent);
 
-        // Try to continue after end
         const continueEvent = getSampleBoxSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 300, y: 300 },
         });
         instance.handle(continueEvent);
 
-        // Should only have been called once (on end), not on continue after end
         expect(mockCommandHandler.emit).toHaveBeenCalledTimes(1);
       });
     });
@@ -396,7 +386,6 @@ describe('BoxSelectionEventHandler', () => {
 
       it('should respect partialInclusion: false', () => {
         mockFlowCore.config.boxSelection.partialInclusion = false;
-        // Spatial hash returns nodes that intersect, but getNodesInRect will filter to only fully contained
         mockSpatialHash.queryIds.mockReturnValue(new Set(['node1', 'node2', 'node3']));
 
         const startEvent = getSampleBoxSelectionEvent({
@@ -411,8 +400,6 @@ describe('BoxSelectionEventHandler', () => {
         });
         instance.handle(endEvent);
 
-        // getNodesInRect is called with partialInclusion: false
-        // The actual filtering happens in the utility function
         expect(mockCommandHandler.emit).toHaveBeenCalled();
       });
     });
