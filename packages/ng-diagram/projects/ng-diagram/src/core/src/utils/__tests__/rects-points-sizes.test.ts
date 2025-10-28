@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  doesContainRect,
   doesRectsIntersect,
   equalPointsArrays,
   getDistanceBetweenRects,
@@ -82,6 +83,78 @@ describe('rects', () => {
       const rect2 = getRect({ position: { x: 15, y: 15 }, size: { width: 10, height: 10 } });
 
       expect(doesRectsIntersect(rect1, rect2)).toBe(false);
+    });
+  });
+
+  describe('doesContainRect', () => {
+    it('should return true when rect2 is fully contained within rect1', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 10, y: 10 }, size: { width: 20, height: 20 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(true);
+    });
+
+    it('should return true when rect2 is exactly the same as rect1', () => {
+      const rect1 = getRect({ position: { x: 5, y: 5 }, size: { width: 50, height: 50 } });
+      const rect2 = getRect({ position: { x: 5, y: 5 }, size: { width: 50, height: 50 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(true);
+    });
+
+    it('should return true when rect2 touches the edges of rect1', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(true);
+    });
+
+    it('should return false when rect2 extends beyond rect1 right edge', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 50, y: 10 }, size: { width: 60, height: 20 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
+    });
+
+    it('should return false when rect2 extends beyond rect1 bottom edge', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 10, y: 50 }, size: { width: 20, height: 60 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
+    });
+
+    it('should return false when rect2 extends beyond rect1 left edge', () => {
+      const rect1 = getRect({ position: { x: 10, y: 10 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 5, y: 20 }, size: { width: 20, height: 20 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
+    });
+
+    it('should return false when rect2 extends beyond rect1 top edge', () => {
+      const rect1 = getRect({ position: { x: 10, y: 10 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 20, y: 5 }, size: { width: 20, height: 20 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
+    });
+
+    it('should return false when rect2 is completely outside rect1', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 50, height: 50 } });
+      const rect2 = getRect({ position: { x: 100, y: 100 }, size: { width: 20, height: 20 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
+    });
+
+    it('should return false when rect2 partially overlaps rect1', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 50, height: 50 } });
+      const rect2 = getRect({ position: { x: 40, y: 40 }, size: { width: 20, height: 20 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
+    });
+
+    it('should return false when rect1 is smaller than rect2', () => {
+      const rect1 = getRect({ position: { x: 10, y: 10 }, size: { width: 20, height: 20 } });
+      const rect2 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+
+      expect(doesContainRect(rect1, rect2)).toBe(false);
     });
   });
 
