@@ -24,6 +24,8 @@ export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
   readonly majorLineEvery = 5;
+  readonly minorStroke = 'var(--ngd-background-line-minor, #c2c0c0ff)';
+  readonly majorStroke = 'var(--ngd-background-line-major, #989898ff)';
   readonly gridSize = computed(() =>
     this.flowCore.isInitialized() ? (this.flowCore.provide().config.background.gridSize ?? 50) : 50
   );
