@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment layer for unified environment-related functionalities ([#350](https://github.com/synergycodes/ng-diagram/pull/350))
 - Helpers for node relationships and traversal ([#395](https://github.com/synergycodes/ng-diagram/pull/395))
 - Box selection for selecting multiple nodes at once ([#374](https://github.com/synergycodes/ng-diagram/pull/374))
+- Implemented multiple event hooks for ng-diagram ([#387](https://github.com/synergycodes/ng-diagram/pull/387))
+- Configurable built-in grid background ([#397](https://github.com/synergycodes/ng-diagram/pull/397))
 
 ### Changed
 
