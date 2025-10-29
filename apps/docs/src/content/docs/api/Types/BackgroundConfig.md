@@ -42,9 +42,9 @@ Supports rectangular grids by specifying different x and y values.
 
 > `optional` **majorLinesFrequency**: `object`
 
-How often major grid lines appear (in number of minor grid cells).
-For example, { x: 5, y: 5 } means major vertical lines appear every 5 minor cells horizontally,
-and major horizontal lines appear every 5 minor cells vertically.
+Specifies how often major grid lines occur, measured in counts of minor grid cells.
+E.g., { x: 5, y: 5 } draws a major vertical line every 5 minor columns and
+a major horizontal line every 5 minor rows.
 
 #### x
 

@@ -13,6 +13,7 @@ The `NgDiagramBackgroundComponent` is responsible for rendering the background o
   <!-- Built-in backgrounds -->
   <ng-diagram-background type="grid" />
   <ng-diagram-background type="dots" />
+  <ng-diagram-background /> <!-- Defaults to dots -->
 
   <!-- Custom background via content projection -->
   <ng-diagram-background>
