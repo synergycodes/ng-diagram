@@ -60,7 +60,7 @@ export class AppComponent {
       },
     },
     background: {
-      dotSize: 40,
+      gridSize: { x: 10, y: 10 },
     },
     snapping: {
       shouldSnapDragForNode: () => true,

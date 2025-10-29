@@ -140,9 +140,23 @@ export interface ZoomConfig {
  */
 export interface BackgroundConfig {
   /**
-   * The size of the dots in the background.
+   * The size of the dots pattern.
+   * @default 60
    */
-  dotSize: number;
+  dotSize?: number;
+  /**
+   * The size of the smallest grid cell (minor grid spacing).
+   * Supports rectangular grids by specifying different x and y values.
+   * @default { x: 10, y: 10 }
+   */
+  gridSize?: Point;
+  /**
+   * Specifies how often major grid lines occur, measured in counts of minor grid cells.
+   * E.g., { x: 5, y: 5 } draws a major vertical line every 5 minor columns and
+   * a major horizontal line every 5 minor rows.
+   * @default { x: 5, y: 5 }
+   */
+  majorLinesFrequency?: { x: number; y: number };
 }
 
 /**
