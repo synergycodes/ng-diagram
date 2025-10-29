@@ -55,6 +55,13 @@
 
   --ngd-background-dot-color: var(--ngd-colors-gray-500);
   --ngd-background-grid-color: var(--ngd-colors-gray-400);
+
+  --ngd-background-line-minor: #c2c0c0;
+  --ngd-background-line-major: #989898;
+  --ngd-background-line-minor-width: 0.5;
+  --ngd-background-line-major-width: 1;
+  --ngd-background-line-minor-opacity: 0.5;
+  --ngd-background-line-major-opacity: 0.6;
 }
 
 .ng-diagram-port-hoverable .ng-diagram-port:hover,

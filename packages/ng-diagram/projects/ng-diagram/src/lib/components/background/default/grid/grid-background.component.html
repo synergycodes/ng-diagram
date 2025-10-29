@@ -2,9 +2,9 @@
   <pattern
     #backgroundPattern
     id="ng-diagram-background"
-    [attr.staticWidth]="gridSize()"
-    [attr.width]="gridSize()"
-    [attr.height]="gridSize()"
+    [attr.staticWidth]="patternSize().x"
+    [attr.width]="patternSize().x"
+    [attr.height]="patternSize().y"
     [attr.patternTransform]="patternTransform()"
     patternUnits="userSpaceOnUse"
   >
@@ -14,9 +14,13 @@
         [attr.y1]="line.y1"
         [attr.x2]="line.x2"
         [attr.y2]="line.y2"
-        [attr.stroke]="line.major ? majorStroke : minorStroke"
-        [attr.stroke-width]="line.major ? 1 : 0.5"
-        [attr.opacity]="line.major ? 0.6 : 0.5"
+        [attr.stroke]="line.major ? 'var(--ngd-background-line-major)' : 'var(--ngd-background-line-minor)'"
+        [attr.stroke-width]="
+          line.major ? 'var(--ngd-background-line-major-width)' : 'var(--ngd-background-line-minor-width)'
+        "
+        [attr.opacity]="
+          line.major ? 'var(--ngd-background-line-major-opacity)' : 'var(--ngd-background-line-minor-opacity)'
+        "
       ></line>
     }
   </pattern>

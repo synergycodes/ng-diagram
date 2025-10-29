@@ -1,5 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
+import { Point } from '../../../../../core/src';
 import { FlowCoreProviderService } from '../../../../services';
 import { BackgroundPatternBase } from '../../background-pattern.base';
 
@@ -23,35 +24,72 @@ export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
 
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
-  readonly majorLineEvery = 5;
-  readonly minorStroke = 'var(--ngd-background-line-minor, #c2c0c0ff)';
-  readonly majorStroke = 'var(--ngd-background-line-major, #989898ff)';
-  readonly gridSize = computed(() =>
-    this.flowCore.isInitialized() ? (this.flowCore.provide().config.background.gridSize ?? 50) : 50
-  );
+  // Size of the smallest grid cell (minor grid spacing)
+  readonly gridSize = computed<Point>(() => {
+    if (!this.flowCore.isInitialized()) {
+      return { x: 10, y: 10 };
+    }
+    const config = this.flowCore.provide().config.background.gridSize;
+    return config ?? { x: 10, y: 10 };
+  });
+
+  // How often major lines appear (in number of minor cells)
+  readonly majorLinesFrequency = computed<{ x: number; y: number }>(() => {
+    if (!this.flowCore.isInitialized()) {
+      return { x: 5, y: 5 };
+    }
+    const config = this.flowCore.provide().config.background.majorLinesFrequency;
+    return config ?? { x: 5, y: 5 };
+  });
+
+  // Pattern size is the major grid cell (contains NxM minor cells)
+  readonly patternSize = computed<Point>(() => {
+    const size = this.gridSize();
+    const frequency = this.majorLinesFrequency();
+    return {
+      x: size.x * frequency.x,
+      y: size.y * frequency.y,
+    };
+  });
 
   override readonly patternTransform = computed(() => {
     const viewport = this.viewport();
     const scale = viewport.scale ?? 1;
-    const size = this.gridSize();
+    const patternSize = this.patternSize();
 
-    // Offset normalized to the grid size
-    const dx = size ? viewport.x % (size * scale) : 0;
-    const dy = size ? viewport.y % (size * scale) : 0;
+    const dx = patternSize.x ? viewport.x % (patternSize.x * scale) : 0;
+    const dy = patternSize.y ? viewport.y % (patternSize.y * scale) : 0;
 
     return `translate(${dx}, ${dy}) scale(${scale})`;
   });
 
   gridLines(): GridLine[] {
-    const size = this.gridSize();
-    const step = size / this.majorLineEvery;
+    const minorGridSize = this.gridSize();
+    const majorGridSize = this.patternSize();
     const lines: GridLine[] = [];
 
-    for (let i = 0; i <= size; i += step) {
-      const isMajor = Math.round(i / step) % this.majorLineEvery === 0;
-      lines.push({ x1: i, y1: 0, x2: i, y2: size, major: isMajor });
-      lines.push({ x1: 0, y1: i, x2: size, y2: i, major: isMajor });
+    for (let x = 0; x <= majorGridSize.x; x += minorGridSize.x) {
+      const isMajor = x % majorGridSize.x === 0;
+      lines.push({
+        x1: x,
+        y1: 0,
+        x2: x,
+        y2: majorGridSize.y,
+        major: isMajor,
+      });
     }
+
+    for (let y = 0; y <= majorGridSize.y; y += minorGridSize.y) {
+      const isMajor = y % majorGridSize.y === 0;
+      lines.push({
+        x1: 0,
+        y1: y,
+        x2: majorGridSize.x,
+        y2: y,
+        major: isMajor,
+      });
+    }
+
     return lines;
   }
 }

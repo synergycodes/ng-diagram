@@ -60,8 +60,7 @@ export class AppComponent {
       },
     },
     background: {
-      default: 'grid',
-      gridSize: 100,
+      gridSize: { x: 10, y: 10 },
     },
     snapping: {
       shouldSnapDragForNode: () => true,
