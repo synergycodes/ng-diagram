@@ -26,20 +26,24 @@ export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
 
   // Size of the smallest grid cell (minor grid spacing)
   readonly gridSize = computed<Point>(() => {
+    const defaultSize = { x: 10, y: 10 };
     if (!this.flowCore.isInitialized()) {
-      return { x: 10, y: 10 };
+      return defaultSize;
     }
-    const config = this.flowCore.provide().config.background.gridSize;
-    return config ?? { x: 10, y: 10 };
+
+    const { gridSize } = this.flowCore.provide().config.background;
+    return gridSize ?? defaultSize;
   });
 
   // How often major lines appear (in number of minor cells)
   readonly majorLinesFrequency = computed<{ x: number; y: number }>(() => {
+    const defaultFrequency = { x: 5, y: 5 };
     if (!this.flowCore.isInitialized()) {
-      return { x: 5, y: 5 };
+      return defaultFrequency;
     }
-    const config = this.flowCore.provide().config.background.majorLinesFrequency;
-    return config ?? { x: 5, y: 5 };
+
+    const { majorLinesFrequency } = this.flowCore.provide().config.background;
+    return majorLinesFrequency ?? defaultFrequency;
   });
 
   // Pattern size is the major grid cell (contains NxM minor cells)
