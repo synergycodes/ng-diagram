@@ -43,5 +43,4 @@ html[data-theme='dark'] {
   --ngd-button-gray-bg-hover: var(--ngd-colors-gray-600);
   --ngd-button-gray-bg-active: var(--ngd-colors-gray-500);
   --ngd-default-edge-label-bg-primary-default: var(--ngd-colors-gray-700);
-  --ngd-background-grid-color: var(--ngd-colors-gray-400);
 }
