@@ -20,6 +20,8 @@
   --ngd-button-gray-bg-hover: var(--ngd-colors-gray-600);
   --ngd-button-gray-bg-active: var(--ngd-colors-gray-650);
   --ngd-default-edge-label-bg-primary-default: var(--ngd-colors-gray-100);
+  --ngd-background-line-minor-color: var(--ngd-colors-gray-450);
+  --ngd-background-line-major-color: var(--ngd-colors-gray-500);
 }
 
 /* OPTIONAL DARK THEME */
@@ -42,4 +44,6 @@ html[data-theme='dark'] {
   --ngd-button-gray-bg-hover: var(--ngd-colors-gray-600);
   --ngd-button-gray-bg-active: var(--ngd-colors-gray-500);
   --ngd-default-edge-label-bg-primary-default: var(--ngd-colors-gray-700);
+  --ngd-background-line-minor-color: var(--ngd-colors-gray-700);
+  --ngd-background-line-major-color: var(--ngd-colors-gray-600);
 }
