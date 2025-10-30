@@ -37,8 +37,6 @@ export interface ShortcutDefinition {
   actionName: ActionName;
   /** Platform-specific key bindings */
   bindings: ShortcutBinding[];
-  /** Can be disabled at runtime. Default: true */
-  enabled?: boolean;
 }
 
 export type DefaultShortcutDefinitions = typeof DEFAULT_SHORTCUTS;
