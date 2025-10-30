@@ -5,8 +5,7 @@ export abstract class BackgroundPatternBase {
   private readonly viewportService = inject(NgDiagramViewportService);
 
   protected abstract readonly backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>;
-
-  private viewport = this.viewportService.viewport;
+  protected viewport = this.viewportService.viewport;
 
   size = computed(() => {
     const pattern = this.backgroundPattern();

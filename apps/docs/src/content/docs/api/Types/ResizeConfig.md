@@ -19,6 +19,14 @@ Default: true (group can be resized below children size).
 
 ***
 
+### defaultResizable
+
+> **defaultResizable**: `boolean`
+
+The default resizable state for nodes.
+
+***
+
 ### getMinNodeSize()
 
 > **getMinNodeSize**: (`node`) => [`Size`](/docs/api/types/size/)

@@ -2,6 +2,7 @@ import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PointerInputEvent } from '../../../types';
+import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 
 @Directive({
   selector: '[ngDiagramRotateHandle]',
@@ -20,6 +21,10 @@ export class RotateHandleDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
+    if (BoxSelectionDirective.isBoxSelectionActive || $event.shiftKey) {
+      return;
+    }
+
     $event.rotateHandled = true;
 
     const targetData = this.targetData();

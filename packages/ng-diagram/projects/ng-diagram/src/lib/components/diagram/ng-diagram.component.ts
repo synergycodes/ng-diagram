@@ -33,6 +33,7 @@ import type {
 
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
+import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
@@ -43,6 +44,7 @@ import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererServi
 import { TemplateProviderService } from '../../services/template-provider/template-provider.service';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
+import { NgDiagramBoxSelectionComponent } from '../box-selection/ng-diagram-box-selection.component';
 import { NgDiagramCanvasComponent } from '../canvas/ng-diagram-canvas.component';
 import { NgDiagramDefaultEdgeComponent } from '../edge/default-edge/default-edge.component';
 import { NgDiagramMarkerArrowComponent } from '../edge/markers/marker-arrow.component';
@@ -69,12 +71,14 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
     NgDiagramDefaultGroupTemplateComponent,
     NgDiagramEdgeComponent,
     NgDiagramWatermarkComponent,
+    NgDiagramBoxSelectionComponent,
   ],
   templateUrl: './ng-diagram.component.html',
   styleUrl: './ng-diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     NgDiagramServicesAvailabilityCheckerDirective,
+    BoxSelectionDirective,
     CursorPositionTrackerDirective,
     ZoomingPointerDirective,
     ZoomingWheelDirective,

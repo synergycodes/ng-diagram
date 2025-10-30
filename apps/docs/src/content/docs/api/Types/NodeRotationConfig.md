@@ -31,6 +31,14 @@ The angle in degrees to snap to, or null if default snapping should be used.
 
 ***
 
+### defaultRotatable
+
+> **defaultRotatable**: `boolean`
+
+The default rotatable state for nodes.
+
+***
+
 ### defaultSnapAngle
 
 > **defaultSnapAngle**: `number`

@@ -1,3 +1,4 @@
+export * from './box-selection';
 export * from './copy';
 export * from './cut';
 export * from './delete-selection';

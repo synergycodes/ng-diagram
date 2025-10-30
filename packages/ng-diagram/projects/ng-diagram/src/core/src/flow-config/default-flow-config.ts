@@ -3,6 +3,7 @@ import { DEFAULT_SHORTCUTS } from '../shortcut-manager';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
+  BoxSelectionConfig,
   EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
@@ -25,6 +26,7 @@ const defaultResizeConfig: ResizeConfig = {
     return { ...DEFAULT_NODE_MIN_SIZE };
   },
   allowResizeBelowChildrenBounds: true,
+  defaultResizable: true,
 };
 
 const defaultLinkingConfig: LinkingConfig = {
@@ -66,6 +68,8 @@ const defaultZoomConfig: ZoomConfig = {
 
 const defaultBackgroundConfig: BackgroundConfig = {
   dotSize: 60,
+  gridSize: { x: 10, y: 10 },
+  majorLinesFrequency: { x: 5, y: 5 },
 };
 
 const defaultNodeRotationConfig: NodeRotationConfig = {
@@ -76,6 +80,7 @@ const defaultNodeRotationConfig: NodeRotationConfig = {
     return null;
   },
   defaultSnapAngle: 30,
+  defaultRotatable: true,
 };
 
 const defaultNodeDraggingConfig: SnappingConfig = {
@@ -119,6 +124,11 @@ const defaultZIndexConfig: ZIndexConfig = {
   temporaryEdgeZIndex: 1000,
 };
 
+const defaultBoxSelectionConfig: BoxSelectionConfig = {
+  partialInclusion: true,
+  realtime: true,
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -137,6 +147,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       selectionMoving: defaultSelectionMovingConfig,
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,
+      boxSelection: defaultBoxSelectionConfig,
       shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
     },

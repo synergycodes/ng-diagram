@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 
+import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramResizeHandleComponent } from './handle/ng-diagram-resize-handle.component';
 import { NgDiagramResizeLineComponent } from './line/ng-diagram-resize-line.component';
@@ -26,10 +27,20 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
   imports: [NgDiagramResizeLineComponent, NgDiagramResizeHandleComponent],
 })
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
+  private readonly diagramService = inject(NgDiagramService);
+  /**
+   * Whether the node is resizable.
+   *
+   * @default undefined
+   */
+  defaultResizable = input<boolean | undefined>(undefined);
   readonly nodeData = computed(() => this.nodeComponent?.node());
+  readonly dataResizable = computed(() => this.nodeData()?.resizable);
+  readonly isResizable = computed(
+    () => this.dataResizable() ?? this.defaultResizable() ?? this.diagramService.config().resize?.defaultResizable
+  );
   readonly showAdornment = computed(
-    () =>
-      !!this.nodeData()?.resizable && this.nodeData()?.selected && this.isRenderedOnCanvas() && !this.nodeData()?.angle
+    () => !!this.isResizable() && this.nodeData()?.selected && this.isRenderedOnCanvas() && !this.nodeData()?.angle
   );
   readonly linePositions: LinePosition[] = ['top', 'right', 'bottom', 'left'];
   readonly handlePositions: HandlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];

@@ -1,6 +1,7 @@
 import { Directive, inject, type OnDestroy } from '@angular/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types/event';
+import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 import { ZoomingPointerDirective } from '../zooming/zooming-pointer.directive';
 
@@ -89,6 +90,10 @@ export class PanningDirective implements OnDestroy {
 
   private shouldHandle(event: PointerInputEvent): boolean {
     if (shouldDiscardEvent(event, 'pan')) {
+      return false;
+    }
+
+    if (BoxSelectionDirective.isBoxSelectionActive) {
       return false;
     }
 

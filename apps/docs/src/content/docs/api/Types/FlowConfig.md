@@ -17,6 +17,14 @@ Configuration for background behavior.
 
 ***
 
+### boxSelection
+
+> **boxSelection**: `BoxSelectionConfig`
+
+Configuration for box selection behavior.
+
+***
+
 ### computeEdgeId()
 
 > **computeEdgeId**: () => `string`

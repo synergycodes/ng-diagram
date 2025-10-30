@@ -2,6 +2,7 @@ import { Directive, HostListener, inject, input } from '@angular/core';
 import type { BasePointerInputEvent, Edge, Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types';
+import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 
 @Directive()
 abstract class ObjectSelectionDirective {
@@ -13,6 +14,10 @@ abstract class ObjectSelectionDirective {
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
+      return;
+    }
+
+    if (BoxSelectionDirective.isBoxSelectionActive || event.shiftKey) {
       return;
     }
 

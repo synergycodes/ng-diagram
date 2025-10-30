@@ -22,6 +22,11 @@ export interface ResizeConfig {
    * Default: true (group can be resized below children size).
    */
   allowResizeBelowChildrenBounds: boolean;
+
+  /**
+   * The default resizable state for nodes.
+   */
+  defaultResizable: boolean;
 }
 
 /**
@@ -136,9 +141,23 @@ export interface ZoomConfig {
  */
 export interface BackgroundConfig {
   /**
-   * The size of the dots in the background.
+   * The size of the dots pattern.
+   * @default 60
    */
-  dotSize: number;
+  dotSize?: number;
+  /**
+   * The size of the smallest grid cell (minor grid spacing).
+   * Supports rectangular grids by specifying different x and y values.
+   * @default { x: 10, y: 10 }
+   */
+  gridSize?: Point;
+  /**
+   * Specifies how often major grid lines occur, measured in counts of minor grid cells.
+   * E.g., { x: 5, y: 5 } draws a major vertical line every 5 minor columns and
+   * a major horizontal line every 5 minor rows.
+   * @default { x: 5, y: 5 }
+   */
+  majorLinesFrequency?: { x: number; y: number };
 }
 
 /**
@@ -164,6 +183,11 @@ export interface NodeRotationConfig {
    * @default 15
    */
   defaultSnapAngle: number;
+
+  /**
+   * The default rotatable state for nodes.
+   */
+  defaultRotatable: boolean;
 }
 
 /**
@@ -289,6 +313,21 @@ export interface EdgeRoutingConfig {
   [edgeRoutingName: string]: Record<string, unknown> | EdgeRoutingName | undefined;
 }
 
+export interface BoxSelectionConfig {
+  /**
+   * Whether to select nodes that are only partially within the selection box.
+   * @default true
+   */
+  partialInclusion?: boolean;
+
+  /**
+   * Whether to select nodes in real-time as the selection box is being drawn.
+   * If false, nodes will only be selected when the box selection ends.
+   * @default true
+   */
+  realtime?: boolean;
+}
+
 /**
  * The main configuration interface for the flow system.
  *
@@ -356,6 +395,11 @@ export interface FlowConfig {
    * Configuration for z-index layering behavior.
    */
   zIndex: ZIndexConfig;
+
+  /**
+   * Configuration for box selection behavior.
+   */
+  boxSelection: BoxSelectionConfig;
 
   /**
    * Configuration for keyboard shortcuts.

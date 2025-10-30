@@ -52,7 +52,6 @@ export class DiagramComponent {
   } satisfies NgDiagramConfig;
   // @collapse-start:config
 
-  // @section-start:enabling
   model = initializeModel({
     nodes: [
       {
@@ -62,13 +61,9 @@ export class DiagramComponent {
         autoSize: false,
         type: 'myType',
         data: {},
-        // @mark-start:enabling
-        resizable: true,
-        // @mark-end:enabling
       },
     ],
   });
-  // @section-end:enabling
   // @collapse-end:config
 }
 // @section-end:config
