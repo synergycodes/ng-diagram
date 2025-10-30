@@ -7,13 +7,13 @@ import { Component } from '@angular/core';
       <defs>
         <marker
           id="circle-arrowhead"
-          markerWidth="10"
-          markerHeight="10"
-          refX="8"
-          refY="5"
+          markerWidth="8"
+          markerHeight="8"
+          refX="1"
+          refY="4"
           orient="auto"
         >
-          <circle cx="5" cy="5" r="4" fill="red" />
+          <circle cx="4" cy="4" r="3" fill="red" />
         </marker>
       </defs>
     </svg>
