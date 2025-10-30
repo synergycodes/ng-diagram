@@ -1,0 +1,31 @@
+---
+title: Shortcut Manager Example
+description: Example of how use Shortcut Manager in ngDiagram
+sidebar:
+  order: 12
+  label: Shortcut Manager
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ShortcutManager from '../../../components/angular/examples/shortcut-manager/shortcut-manager.astro';
+
+This example demonstrates how to configure and update keyboard shortcuts in ngDiagram.
+
+<ShortcutManager />
+<CodeViewer dirName="examples/shortcut-manager" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Initial Configuration:** Shortcuts can be customized during diagram initialization by providing a shortcuts array in the config object.
+- **Merge Helper Function:** The `mergeShortcuts()` helper function combines your custom shortcuts with the default ones automatically. You don't need to provide all shortcuts—only the ones you want to customize.
+- **Source of Truth:** The shortcuts list in the config is the source of truth. When updated at runtime using `updateConfig()`, the new shortcuts take effect immediately.
+- **Runtime Updates:** Use `ngDiagramService.updateConfig({ shortcuts: newShortcuts })` to dynamically change shortcuts while the diagram is running.
+
+### Example Features
+
+- **Custom Movement Keys:** The example configures WSAD keys in addition to arrow keys for moving selected nodes.
+- **Dynamic Paste Shortcut:** Click the button to update the paste shortcut from Ctrl/Cmd + V to Ctrl/Cmd + I at runtime.
+- **Modifier Support:** Shortcuts support modifiers like `primary` (Ctrl/Cmd), `shift`, `secondary` (Alt), and `meta`.
+- **Multiple Bindings:** A single action can have multiple key bindings (e.g., both 'W' and 'ArrowUp' for moving up).
