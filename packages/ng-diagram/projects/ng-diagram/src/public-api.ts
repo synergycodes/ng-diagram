@@ -50,6 +50,7 @@ export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewp
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
+export { mergeShortcuts } from './core/src';
 export { initializeModel } from './lib/model/initialize-model';
 export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
@@ -66,9 +67,11 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
 export type {
+  ActionName,
   ActionState,
   BackgroundConfig,
   ClipboardPastedEvent,
+  DefaultShortcutDefinitions,
   DiagramEventMap,
   DiagramInitEvent,
   Edge,
@@ -81,6 +84,7 @@ export type {
   EnvironmentInfo,
   FlowConfig,
   GroupingConfig,
+  GroupMembershipChangedEvent,
   GroupNode,
   LinkingConfig,
   loggerMiddleware,
@@ -103,7 +107,6 @@ export type {
   ResizeConfig,
   RoutingMode,
   SelectionChangedEvent,
-  GroupMembershipChangedEvent,
   SelectionMovedEvent,
   SelectionMovingConfig,
   SelectionRemovedEvent,

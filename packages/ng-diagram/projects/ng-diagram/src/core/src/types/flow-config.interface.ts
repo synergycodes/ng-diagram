@@ -1,6 +1,7 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
+import type { ShortcutDefinition } from './shortcut.interface';
 import { Point, Size } from './utils';
 
 /**
@@ -355,6 +356,11 @@ export interface FlowConfig {
    * Configuration for z-index layering behavior.
    */
   zIndex: ZIndexConfig;
+
+  /**
+   * Configuration for keyboard shortcuts.
+   */
+  shortcuts: ShortcutDefinition[];
 
   /**
    * Enables or disables debug mode for the diagram.

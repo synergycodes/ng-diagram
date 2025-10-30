@@ -102,6 +102,23 @@ Configuration for selection moving behavior.
 
 ***
 
+### shortcuts
+
+> **shortcuts**: `ShortcutDefinition`[]
+
+Configuration for keyboard shortcuts.
+This is the resolved array of shortcuts after initialization.
+
+#### Remarks
+
+During initialization, you can provide either:
+- Array of ShortcutDefinition to completely override defaults
+- Factory function receiving default shortcuts and returning modified array
+
+The function will be resolved during config creation.
+
+***
+
 ### snapping
 
 > **snapping**: [`SnappingConfig`](/docs/api/types/snappingconfig/)
