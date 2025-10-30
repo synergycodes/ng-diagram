@@ -154,8 +154,12 @@ export class FlowResizeBatchProcessorService {
 
       flowCore.updater.applyNodeSize(metadata.nodeId, size);
 
-      const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
-      flowCore.updater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
+      // Skip port measurement during active resize performed by user to avoid redundant updates
+      // NgDiagramNodeComponent.syncPorts() handles it
+      if (!flowCore.actionStateManager.isResizing()) {
+        const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
+        flowCore.updater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
+      }
     }
   }
 

@@ -82,7 +82,8 @@ export class DiagramComponent {
     edges: [
       {
         // @mark-start
-        targetArrowhead: 'square-arrowhead',
+        sourceArrowhead: 'square-arrowhead-source',
+        targetArrowhead: 'square-arrowhead-target',
         // @mark-end
         // @collapse-start
         id: '1',
