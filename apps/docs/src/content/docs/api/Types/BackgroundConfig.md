@@ -9,31 +9,31 @@ Configuration for the diagram background.
 
 ## Properties
 
-### dotSize?
+### cellSize?
 
-> `optional` **dotSize**: `number`
+> `optional` **cellSize**: [`Size`](/docs/api/types/size/)
 
-The size of the dots pattern.
+The size of the smallest grid cell (minor grid spacing).
+Supports rectangular grids by specifying different width and height values.
+
+#### Default
+
+```ts
+{ width: 10, height: 10 }
+```
+
+***
+
+### dotSpacing?
+
+> `optional` **dotSpacing**: `number`
+
+Distance in pixels between consecutive dots in the background pattern.
 
 #### Default
 
 ```ts
 60
-```
-
-***
-
-### gridSize?
-
-> `optional` **gridSize**: [`Point`](/docs/api/types/point/)
-
-The size of the smallest grid cell (minor grid spacing).
-Supports rectangular grids by specifying different x and y values.
-
-#### Default
-
-```ts
-{ x: 10, y: 10 }
 ```
 
 ***
