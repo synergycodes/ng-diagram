@@ -15,7 +15,13 @@ Configuration for node resizing behavior.
 
 Allows resizing a group node smaller than its children bounds.
 When set to false, a group node cannot be resized smaller than the bounding box of its children.
-Default: true (group can be resized below children size).
+By default a group can be resized below children size.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
@@ -24,6 +30,12 @@ Default: true (group can be resized below children size).
 > **defaultResizable**: `boolean`
 
 The default resizable state for nodes.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
@@ -44,3 +56,9 @@ The node to compute the minimum size for.
 #### Returns
 
 [`Size`](/docs/api/types/size/)
+
+#### Default
+
+```ts
+{ width: 20, height: 20 }
+```

@@ -31,6 +31,12 @@ The default finalized edge data (may be incomplete).
 
 The Edge object to use for the finalized edge.
 
+#### Default
+
+```ts
+returns Edge
+```
+
 ***
 
 ### portSnapDistance
@@ -38,6 +44,12 @@ The Edge object to use for the finalized edge.
 > **portSnapDistance**: `number`
 
 The maximum distance (in pixels) at temporary edge will snap to target port.
+
+#### Default
+
+```ts
+10
+```
 
 ***
 
@@ -62,6 +74,12 @@ The default temporary edge data (may be incomplete).
 [`Edge`](/docs/api/types/edge/)
 
 The Edge object to use for the temporary edge.
+
+#### Default
+
+```ts
+returns Edge
+```
 
 ***
 
@@ -102,3 +120,9 @@ The target port.
 `boolean`
 
 True if the connection is valid, false otherwise.
+
+#### Default
+
+```ts
+true
+```

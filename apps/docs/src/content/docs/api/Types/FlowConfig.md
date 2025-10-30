@@ -7,6 +7,10 @@ title: "FlowConfig"
 
 The main configuration interface for the flow system.
 
+This type defines all available configuration options for the diagram engine.
+
+For most use cases, you should use [NgDiagramConfig](/docs/api/types/ngdiagramconfig/), which allows you to override only the properties you need.
+
 ## Properties
 
 ### background
@@ -59,6 +63,12 @@ The node's unique ID.
 
 Enables or disables debug mode for the diagram.
 When enabled, additional console logs are printed.
+
+#### Default
+
+```ts
+false
+```
 
 ***
 

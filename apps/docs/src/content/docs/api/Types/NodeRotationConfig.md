@@ -29,6 +29,12 @@ The node to compute the snap angle for.
 
 The angle in degrees to snap to, or null if default snapping should be used.
 
+#### Default
+
+```ts
+null
+```
+
 ***
 
 ### defaultRotatable
@@ -36,6 +42,12 @@ The angle in degrees to snap to, or null if default snapping should be used.
 > **defaultRotatable**: `boolean`
 
 The default rotatable state for nodes.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
@@ -48,7 +60,7 @@ The default snap angle in degrees. Used if computeSnapAngleForNode returns null.
 #### Default
 
 ```ts
-15
+30
 ```
 
 ***
@@ -72,3 +84,9 @@ The node to check for rotation snapping.
 `boolean`
 
 True if rotation should snap, false otherwise.
+
+#### Default
+
+```ts
+true
+```

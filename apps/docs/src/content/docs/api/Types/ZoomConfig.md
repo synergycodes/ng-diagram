@@ -15,6 +15,12 @@ Configuration for zooming behavior.
 
 The maximum allowed zoom level.
 
+#### Default
+
+```ts
+10.0
+```
+
 ***
 
 ### min
@@ -23,6 +29,12 @@ The maximum allowed zoom level.
 
 The minimum allowed zoom level.
 
+#### Default
+
+```ts
+0.1
+```
+
 ***
 
 ### step
@@ -30,6 +42,12 @@ The minimum allowed zoom level.
 > **step**: `number`
 
 The zoom step increment.
+
+#### Default
+
+```ts
+0.05
+```
 
 ***
 

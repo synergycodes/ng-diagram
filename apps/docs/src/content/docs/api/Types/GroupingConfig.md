@@ -34,3 +34,9 @@ The group node.
 `boolean`
 
 True if the node can be grouped, false otherwise.
+
+#### Default
+
+```ts
+true
+```

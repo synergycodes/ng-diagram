@@ -27,6 +27,18 @@ configuration options for bezier routing
 
 bezier control point offset
 
+##### Default
+
+```ts
+100
+```
+
+#### Default
+
+```ts
+{ bezierControlOffset: 100 }
+```
+
 ***
 
 ### defaultRouting
@@ -39,6 +51,12 @@ Can be one of the built-in routing names or a custom string for user-defined rou
 #### See
 
 EdgeRoutingName
+
+#### Default
+
+```ts
+'polyline'
+```
 
 ***
 
@@ -54,8 +72,26 @@ configuration options for orthogonal routing
 
 first/last segment length
 
+##### Default
+
+```ts
+20
+```
+
 #### maxCornerRadius?
 
 > `optional` **maxCornerRadius**: `number`
 
 maximum corner radius
+
+##### Default
+
+```ts
+15
+```
+
+#### Default
+
+```ts
+{ maxCornerRadius: 15, firstLastSegmentLength: 20 }
+```
