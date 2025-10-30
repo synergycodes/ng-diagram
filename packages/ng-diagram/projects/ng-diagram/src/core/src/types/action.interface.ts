@@ -20,6 +20,7 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
  * Includes:
  * - Specific mapped actions (e.g., 'keyboardMoveSelectionUp', 'keyboardPanUp')
  * - Direct event names (e.g., 'copy', 'cut', 'deleteSelection')
+ * @category Types
  */
 export type ActionName =
   | KeyboardMoveSelectionAction

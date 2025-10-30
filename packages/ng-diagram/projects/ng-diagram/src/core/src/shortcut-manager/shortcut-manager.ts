@@ -11,7 +11,7 @@ import { DEFAULT_SHORTCUTS } from './default-shortcuts';
  * @param userShortcuts - User-provided shortcuts (optional)
  * @returns Merged array of shortcut definitions
  *
- * @category Shortcut Manager
+ * @category Other
  */
 export function mergeShortcuts(userShortcuts: ShortcutDefinition[] = []): ShortcutDefinition[] {
   const shortcutMap = new Map<string, ShortcutDefinition>();
