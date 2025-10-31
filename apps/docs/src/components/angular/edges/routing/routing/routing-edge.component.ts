@@ -25,7 +25,7 @@ export class RoutingEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
 
   getRoutingName(): string {
-    const routing = this.edge().routing || 'polyline';
+    const routing = this.edge().routing || 'orthogonal';
     return routing.charAt(0).toUpperCase() + routing.slice(1);
   }
 }

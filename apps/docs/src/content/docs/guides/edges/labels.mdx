@@ -90,35 +90,7 @@ import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-
 
 <AddingLabels />
 
-The edge component implementation looks like this:
-
-```typescript
-import { Component, computed, input } from '@angular/core';
-import {
-  NgDiagramBaseEdgeLabelComponent,
-  NgDiagramBaseEdgeComponent,
-  type Edge,
-  type NgDiagramEdgeTemplate,
-} from 'ng-diagram';
-
-@Component({
-  selector: 'multi-label-edge',
-  template: `<ng-diagram-base-edge
-    [edge]="edge()"
-    [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
-  >
-    <ng-diagram-base-edge-label id="1" [positionOnEdge]="0.5" class="custom-label">
-      {{ edge().data.label }}
-    </ng-diagram-base-edge-label>
-  </ng-diagram-base-edge>`,
-  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
-})
-export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate<{ label: string }> {
-  edge = input.required<Edge<{ label: string }>>();
-
-  selected = computed(() => this.edge().selected);
-}
-```
+<CodeSnippet relativePath="edges/labels/adding-labels/modifiable-label-edge.component.ts" />
 
 In the diagram model, the edge can be defined like this:
 
