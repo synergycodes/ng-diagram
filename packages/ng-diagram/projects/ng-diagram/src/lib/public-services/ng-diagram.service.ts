@@ -54,7 +54,6 @@ export class NgDiagramService extends NgDiagramBaseService {
       }
     });
 
-    // Subscribe to action state changes
     effect((onCleanup) => {
       if (!this.isInitialized()) return;
 
