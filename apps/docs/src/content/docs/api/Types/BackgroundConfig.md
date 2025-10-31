@@ -9,11 +9,11 @@ Configuration for the diagram background.
 
 ## Properties
 
-### dotSize?
+### dotSpacing?
 
-> `optional` **dotSize**: `number`
+> `optional` **dotSpacing**: `number`
 
-The size of the dots pattern.
+Distance in pixels between consecutive dots in the background pattern.
 
 #### Default
 

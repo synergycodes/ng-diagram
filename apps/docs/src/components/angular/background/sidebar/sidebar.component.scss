@@ -1,0 +1,32 @@
+:host {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 90%;
+  padding: 1rem;
+  margin-top: 0;
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--ngd-node-bg-primary-default);
+    border: var(--ngd-node-border-size) solid var(--ngd-node-border-color);
+    border-radius: var(--ngd-node-border-radius);
+    padding: 1rem;
+    gap: 0.5rem;
+    height: 100%;
+    width: 200px;
+    user-select: none;
+
+    .horizontal {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .vertical {
+      display: flex;
+      gap: 0.25rem;
+      flex-direction: column;
+    }
+  }
+}

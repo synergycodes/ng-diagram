@@ -3,9 +3,9 @@
     #backgroundPattern
     id="ng-diagram-background"
     [attr.fill]="fill()"
-    [attr.staticWidth]="dotSize()"
-    [attr.width]="size() || dotSize()"
-    [attr.height]="size() || dotSize()"
+    [attr.staticWidth]="dotSpacing()"
+    [attr.width]="size() || dotSpacing()"
+    [attr.height]="size() || dotSpacing()"
     [attr.patternTransform]="patternTransform()"
     [attr.fill-opacity]="fillOpacity()"
     x="0"

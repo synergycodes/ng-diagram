@@ -140,10 +140,10 @@ export interface ZoomConfig {
  */
 export interface BackgroundConfig {
   /**
-   * The size of the dots pattern.
+   * Distance in pixels between consecutive dots in the background pattern.
    * @default 60
    */
-  dotSize?: number;
+  dotSpacing?: number;
   /**
    * The size of the smallest grid cell (minor grid spacing).
    * Supports rectangular grids by specifying different x and y values.
