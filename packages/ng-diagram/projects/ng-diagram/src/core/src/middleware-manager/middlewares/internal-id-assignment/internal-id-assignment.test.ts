@@ -88,7 +88,7 @@ describe('InternalIdMiddleware', () => {
     expect(stateUpdate.nodesToAdd![1].position).toEqual({ x: 10, y: 10 });
   });
 
-  it('should preserve existing _internalId if already present', async () => {
+  it('should always generate new _internalId even if already present', async () => {
     const mockNodes = [
       {
         id: 'node1',
@@ -106,7 +106,12 @@ describe('InternalIdMiddleware', () => {
     expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
 
-    expect(stateUpdate.nodesToAdd![0]._internalId).toBe('existing-internal-id');
+    // Should generate a new _internalId, not preserve the existing one
+    // This prevents duplicated keys when copying a copy
+    expect(stateUpdate.nodesToAdd![0]._internalId).not.toBe('existing-internal-id');
+    expect(stateUpdate.nodesToAdd![0]._internalId).toMatch(
+      /^node1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
   });
 
   it('should generate unique _internalIds for multiple nodes', async () => {
@@ -247,14 +252,14 @@ describe('InternalIdMiddleware', () => {
     expect(stateUpdate.nodesToAdd![0].size).toEqual({ width: 100, height: 50 });
   });
 
-  it('should handle mixed nodes with and without existing _internalId', async () => {
+  it('should always generate new _internalId for all nodes', async () => {
     const mockNodes = [
       { id: 'node1', position: { x: 0, y: 0 }, data: {} },
       {
         id: 'node2',
         position: { x: 10, y: 10 },
         data: {},
-        _internalId: 'preserved-id',
+        _internalId: 'old-id-that-should-be-replaced',
       },
       { id: 'node3', position: { x: 20, y: 20 }, data: {} },
     ];
@@ -262,21 +267,26 @@ describe('InternalIdMiddleware', () => {
     context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
     context.initialUpdate = { nodesToAdd: mockNodes };
 
-    // Mock different UUIDs
+    // Mock different UUIDs for each node
     const randomUUIDMock = vi
       .spyOn(context.environment, 'generateId')
       .mockReturnValueOnce('550e8400-e29b-41d4-a716-446655440000')
-      .mockReturnValueOnce('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
+      .mockReturnValueOnce('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
+      .mockReturnValueOnce('7c9e6679-7425-40de-944b-e07fc1f90ae7');
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
 
+    // All nodes should get new _internalId values
     expect(stateUpdate.nodesToAdd![0]._internalId).toMatch(
       /^node1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
-    expect(stateUpdate.nodesToAdd![1]._internalId).toBe('preserved-id');
+    expect(stateUpdate.nodesToAdd![1]._internalId).not.toBe('old-id-that-should-be-replaced');
+    expect(stateUpdate.nodesToAdd![1]._internalId).toMatch(
+      /^node2-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
     expect(stateUpdate.nodesToAdd![2]._internalId).toMatch(
       /^node3-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
