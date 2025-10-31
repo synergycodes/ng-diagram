@@ -1,0 +1,17 @@
+:host {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  display: flex;
+
+  .btn {
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0;
+    border: 0;
+
+    &:hover {
+      background-color: var(--ngd-node-stroke-primary-default);
+    }
+  }
+}

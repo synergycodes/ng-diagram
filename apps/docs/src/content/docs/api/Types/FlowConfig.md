@@ -110,6 +110,14 @@ Configuration for selection moving behavior.
 
 ***
 
+### shortcuts
+
+> **shortcuts**: `ShortcutDefinition`[]
+
+Configuration for keyboard shortcuts.
+
+***
+
 ### snapping
 
 > **snapping**: [`SnappingConfig`](/docs/api/types/snappingconfig/)

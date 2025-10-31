@@ -5,6 +5,7 @@ import {
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
   initializeModel,
+  mergeShortcuts,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
@@ -68,6 +69,24 @@ export class AppComponent {
     edgeRouting: {
       defaultRouting: 'orthogonal',
     },
+    shortcuts: mergeShortcuts([
+      {
+        actionName: 'keyboardMoveSelectionUp',
+        bindings: [{ key: 'w' }, { key: 'ArrowUp' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionDown',
+        bindings: [{ key: 's' }, { key: 'ArrowDown' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionLeft',
+        bindings: [{ key: 'a' }, { key: 'ArrowLeft' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionRight',
+        bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
+      },
+    ]),
   } satisfies NgDiagramConfig;
 
   onDiagramInit(event: DiagramInitEvent): void {
