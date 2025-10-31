@@ -39,12 +39,30 @@ export class NgDiagramService extends NgDiagramBaseService {
   private config$ = signal<Readonly<NgDiagramConfig>>({});
   readonly config = this.config$.asReadonly();
 
+  private actionState$ = signal<Readonly<ActionState>>({});
+  /**
+   * Reactive signal that tracks the current action state.
+   * Updates automatically when actions like resizing, rotating, or linking start/end.
+   */
+  readonly actionState = this.actionState$.asReadonly();
+
   constructor() {
     super();
     effect(() => {
       if (this.isInitialized()) {
         this.config$.set(this.flowCore.config);
       }
+    });
+
+    // Subscribe to action state changes
+    effect((onCleanup) => {
+      if (!this.isInitialized()) return;
+
+      const unsubscribe = this.flowCore.eventManager.on('actionStateChanged', (event) => {
+        this.actionState$.set(event.actionState);
+      });
+
+      onCleanup(() => unsubscribe());
     });
   }
 

@@ -1,3 +1,4 @@
+import type { EventManager } from '../event-manager/event-manager';
 import type {
   ActionState,
   CopyPasteActionState,
@@ -13,10 +14,27 @@ import type {
  * (e.g., resizing or linking) until the action completes.
  */
 export class ActionStateManager {
-  private state: ActionState = {};
+  private state: ActionState;
+
+  constructor(private readonly eventManager: EventManager) {
+    this.state = new Proxy<ActionState>(
+      {},
+      {
+        set: (target, property, value) => {
+          target[property as keyof ActionState] = value;
+          this.emitStateChanged();
+          return true;
+        },
+      }
+    );
+  }
 
   getState(): Readonly<ActionState> {
     return this.state;
+  }
+
+  private emitStateChanged(): void {
+    this.eventManager.emit('actionStateChanged', { actionState: { ...this.state } });
   }
 
   get resize(): ResizeActionState | undefined {

@@ -1,20 +1,21 @@
-import type { DiagramEventMap, EventListener, UnsubscribeFn } from './event-types';
+import type { EventListener, UnsubscribeFn } from './event-types';
+import type { InternalDiagramEventMap } from './internal-event-types';
 
 interface ListenerEntry {
-  callback: EventListener<DiagramEventMap[keyof DiagramEventMap]>;
+  callback: EventListener<InternalDiagramEventMap[keyof InternalDiagramEventMap]>;
   once: boolean;
 }
 
 interface DeferredEmit {
-  event: keyof DiagramEventMap;
-  payload: DiagramEventMap[keyof DiagramEventMap];
+  event: keyof InternalDiagramEventMap;
+  payload: InternalDiagramEventMap[keyof InternalDiagramEventMap];
 }
 
 /**
  * Manages event subscriptions and emissions for the diagram
  */
 export class EventManager {
-  private listeners = new Map<keyof DiagramEventMap, Set<ListenerEntry>>();
+  private listeners = new Map<keyof InternalDiagramEventMap, Set<ListenerEntry>>();
   private enabled = true;
   private deferredEmits: DeferredEmit[] = [];
 
@@ -24,13 +25,16 @@ export class EventManager {
    * @param callback The callback to invoke when the event is emitted
    * @returns A function to unsubscribe
    */
-  on<K extends keyof DiagramEventMap>(event: K, callback: EventListener<DiagramEventMap[K]>): UnsubscribeFn {
+  on<K extends keyof InternalDiagramEventMap>(
+    event: K,
+    callback: EventListener<InternalDiagramEventMap[K]>
+  ): UnsubscribeFn {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
 
     const entry: ListenerEntry = {
-      callback: callback as EventListener<DiagramEventMap[keyof DiagramEventMap]>,
+      callback: callback as EventListener<InternalDiagramEventMap[keyof InternalDiagramEventMap]>,
       once: false,
     };
 
@@ -45,13 +49,16 @@ export class EventManager {
    * @param callback The callback to invoke when the event is emitted
    * @returns A function to unsubscribe
    */
-  once<K extends keyof DiagramEventMap>(event: K, callback: EventListener<DiagramEventMap[K]>): UnsubscribeFn {
+  once<K extends keyof InternalDiagramEventMap>(
+    event: K,
+    callback: EventListener<InternalDiagramEventMap[K]>
+  ): UnsubscribeFn {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
 
     const entry: ListenerEntry = {
-      callback: callback as EventListener<DiagramEventMap[keyof DiagramEventMap]>,
+      callback: callback as EventListener<InternalDiagramEventMap[keyof InternalDiagramEventMap]>,
       once: true,
     };
 
@@ -65,7 +72,7 @@ export class EventManager {
    * @param event The event name
    * @param payload The event payload
    */
-  emit<K extends keyof DiagramEventMap>(event: K, payload: DiagramEventMap[K]): void {
+  emit<K extends keyof InternalDiagramEventMap>(event: K, payload: InternalDiagramEventMap[K]): void {
     if (!this.enabled) {
       return;
     }
@@ -79,7 +86,7 @@ export class EventManager {
 
     for (const listener of eventListeners) {
       try {
-        listener.callback(payload as DiagramEventMap[keyof DiagramEventMap]);
+        listener.callback(payload as InternalDiagramEventMap[keyof InternalDiagramEventMap]);
 
         if (listener.once) {
           listenersToRemove.push(listener);
@@ -99,14 +106,14 @@ export class EventManager {
    * @param event The event name
    * @param payload The event payload
    */
-  deferredEmit<K extends keyof DiagramEventMap>(event: K, payload: DiagramEventMap[K]): void {
+  deferredEmit<K extends keyof InternalDiagramEventMap>(event: K, payload: InternalDiagramEventMap[K]): void {
     if (!this.enabled) {
       return;
     }
 
     this.deferredEmits.push({
       event,
-      payload: payload as DiagramEventMap[keyof DiagramEventMap],
+      payload: payload as InternalDiagramEventMap[keyof InternalDiagramEventMap],
     });
   }
 
@@ -115,7 +122,7 @@ export class EventManager {
    * @param event The event name
    * @param callback Optional specific callback to remove
    */
-  off<K extends keyof DiagramEventMap>(event: K, callback?: EventListener<DiagramEventMap[K]>): void {
+  off<K extends keyof InternalDiagramEventMap>(event: K, callback?: EventListener<InternalDiagramEventMap[K]>): void {
     if (!callback) {
       this.listeners.delete(event);
       return;
@@ -158,7 +165,7 @@ export class EventManager {
    * @param event The event name
    * @returns True if there are listeners
    */
-  hasListeners(event: keyof DiagramEventMap): boolean {
+  hasListeners(event: keyof InternalDiagramEventMap): boolean {
     return this.listeners.has(event) && this.listeners.get(event)!.size > 0;
   }
 
@@ -181,7 +188,7 @@ export class EventManager {
     this.deferredEmits = [];
   }
 
-  private removeListener<K extends keyof DiagramEventMap>(event: K, entry: ListenerEntry): void {
+  private removeListener<K extends keyof InternalDiagramEventMap>(event: K, entry: ListenerEntry): void {
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
       eventListeners.delete(entry);
