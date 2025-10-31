@@ -15,7 +15,6 @@ export class DiagramComponent {
   private modelService = inject(NgDiagramModelService);
 
   config: NgDiagramConfig = {
-    edgeRouting: { defaultRouting: 'orthogonal' },
     zoom: {
       zoomToFit: {
         onInit: true,

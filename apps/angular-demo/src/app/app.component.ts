@@ -65,9 +65,6 @@ export class AppComponent {
     snapping: {
       shouldSnapDragForNode: () => true,
     },
-    edgeRouting: {
-      defaultRouting: 'orthogonal',
-    },
   } satisfies NgDiagramConfig;
 
   onDiagramInit(event: DiagramInitEvent): void {

@@ -104,7 +104,7 @@ describe('EdgeRoutingManager', () => {
 
     it('should handle null/undefined default routing', () => {
       const customManager = new EdgeRoutingManager(null as unknown as EdgeRoutingName, getConfig);
-      expect(customManager.getDefaultRouting()).toBe('polyline');
+      expect(customManager.getDefaultRouting()).toBe('orthogonal');
     });
 
     it('should handle null/undefined config function', () => {

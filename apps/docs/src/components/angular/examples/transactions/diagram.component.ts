@@ -34,7 +34,6 @@ export class DiagramComponent {
 
   config: NgDiagramConfig = {
     debugMode: true,
-    edgeRouting: { defaultRouting: 'orthogonal' },
     zoom: {
       zoomToFit: {
         onInit: true,

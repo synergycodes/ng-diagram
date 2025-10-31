@@ -1,4 +1,5 @@
 // @section-start
+// @collapse-start
 import { Component, computed, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
@@ -6,6 +7,7 @@ import {
   type Edge,
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
+// @collapse-end
 
 const LABEL_COUNT = 10;
 const ANIMATION_DURATION = 0.5;
@@ -14,6 +16,7 @@ const ANIMATION_DURATION = 0.5;
   selector: 'multi-label-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
+    routing="bezier"
     [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
   >
     <!-- @mark-start -->

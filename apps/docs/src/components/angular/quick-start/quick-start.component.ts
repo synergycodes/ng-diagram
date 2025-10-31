@@ -34,6 +34,7 @@ export class DiagramComponent {
         source: '1',
         sourcePort: 'port-right',
         targetPort: 'port-left',
+        routing: 'orthogonal',
         target: '2',
         data: {},
       },

@@ -1,4 +1,5 @@
 // @section-start
+// @collapse-start
 import { Component, computed, input } from '@angular/core';
 import {
   NgDiagramBaseEdgeComponent,
@@ -6,11 +7,13 @@ import {
   type Edge,
   type NgDiagramEdgeTemplate,
 } from 'ng-diagram';
+// @collapse-end
 
 @Component({
   selector: 'multi-label-edge',
   template: `<ng-diagram-base-edge
     [edge]="edge()"
+    routing="bezier"
     [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
   >
     <!-- @mark-start -->
@@ -45,9 +48,7 @@ export class ModifiableLabelEdgeComponent
       return;
     }
 
-    if (!Array.isArray(label)) {
-      return { id: 'label', positionOnEdge: 0.5, content: label };
-    }
+    return { id: 'label', positionOnEdge: 0.5, content: label };
   });
   // @mark-end
 }
