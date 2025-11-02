@@ -31,6 +31,8 @@ Creates paths using only horizontal and vertical segments, ideal for technical d
 
 Produces smooth curved connections using cubic Bézier curves.
 
+<br />
+
 import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 <Routing />
@@ -78,6 +80,8 @@ Manual mode gives you full control over the edge path by allowing you to provide
 
 Try moving the nodes in the example below - notice how the edge path remains fixed:
 
+<br />
+
 import ManualMode from '@components/angular/edges/routing/manual/manual-mode.astro';
 
 <ManualMode />
@@ -99,6 +103,8 @@ NgDiagram's routing system is extensible. You can create custom routing algorith
 ### Manual Mode Approach
 
 You can create dynamic custom paths by computing points in your edge component and using manual routing mode. Here's an example of a sinusoid edge that updates its path dynamically as nodes move:
+
+<br />
 
 import Sinusoid from '@components/angular/edges/routing/sinusoid/sinusoid.astro';
 

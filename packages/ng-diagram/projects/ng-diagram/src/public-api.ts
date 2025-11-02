@@ -69,6 +69,7 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 export type {
   ActionState,
   BackgroundConfig,
+  BoxSelectionConfig,
   ClipboardPastedEvent,
   DiagramEventMap,
   DiagramInitEvent,
@@ -82,6 +83,7 @@ export type {
   EnvironmentInfo,
   FlowConfig,
   GroupingConfig,
+  GroupMembershipChangedEvent,
   GroupNode,
   LinkingConfig,
   loggerMiddleware,
@@ -104,7 +106,6 @@ export type {
   ResizeConfig,
   RoutingMode,
   SelectionChangedEvent,
-  GroupMembershipChangedEvent,
   SelectionMovedEvent,
   SelectionMovingConfig,
   SelectionRemovedEvent,

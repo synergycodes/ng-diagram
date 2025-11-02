@@ -70,6 +70,13 @@ ngDiagram provides default nodes that work out of the box with built-in features
 
 For specific requirements, you can create custom nodes with any Angular template, form controls, or visual elements you need.
 
+**Components for custom nodes:**
+
+- [`NgDiagramPortComponent`](/docs/api/components/ngdiagramportcomponent) - Define custom ports with specific IDs, sides, and connection types
+- [`NgDiagramNodeResizeAdornmentComponent`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent) - Add resize handles to custom nodes
+- [`NgDiagramNodeRotateAdornmentComponent`](/docs/api/components/ngdiagramnoderotateadornmentcomponent) - Add rotation handle to custom nodes
+- [`NgDiagramNodeSelectedDirective`](/docs/api/directives/ngdiagramnodeselecteddirective) - Apply selection styling to custom nodes
+
 [Nodes Documentation →](/docs/guides/nodes/nodes) | [Custom Nodes →](/docs/guides/nodes/custom-nodes)
 
 ## Groups
@@ -82,6 +89,7 @@ Groups are special nodes that can contain other nodes, helping organize complex 
 - Nested groups support
 - Visual hierarchy
 - Group-aware dragging
+- [`NgDiagramGroupHighlightedDirective`](/docs/api/directives/ngdiagramgrouphighlighteddirective) - Apply highlight styling to custom group nodes during drag-over operations
 
 [Groups Documentation →](/docs/guides/nodes/groups)
 
@@ -93,6 +101,8 @@ Edges connect nodes through ports. Default edges automatically calculate paths b
 
 - Automatic path calculation
 - Three routing modes (orthogonal, straight, bezier)
+- Labels support (default edges support labels out of the box)
+- Custom arrowheads (customizable using SVG markers)
 - Custom edge templates
 - Selection and hover states
 
@@ -124,6 +134,19 @@ The viewport is the interactive space where all diagram elements are rendered an
 
 [Viewport Features →](/docs/intro/coordinate-system/#viewport-and-scaling)
 
+## Background
+
+The diagram background can display visual patterns to help with alignment and spatial awareness. The [`NgDiagramBackgroundComponent`](/docs/api/components/ngdiagrambackgroundcomponent) needs to be added to your diagram template to display the background.
+
+**Background capabilities:**
+
+- Built-in patterns: dots, grid with major/minor lines
+- Customizable via `background` configuration (dot spacing, cell size, major lines frequency)
+- Support for custom backgrounds via content projection
+- Automatically scales with viewport zoom
+
+[Background Documentation →](/docs/guides/background)
+
 ## Labels and Arrowheads
 
 Custom edges can display labels for showing information along connections. You can add multiple labels with different positions in your custom edge templates. Arrowheads are customizable using SVG markers.
@@ -149,6 +172,9 @@ Nodes can be configured for different interaction modes. Enable resizing to allo
   - Custom nodes: Use [`NgDiagramNodeSelectedDirective`](/docs/api/directives/ngdiagramnodeselecteddirective) as hostDirective for selection styles
   - Custom edges: Use [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) or implement selection styles manually
   - Default templates have selection styles built-in
+- **Copy/Paste**: Copy, cut, and paste diagram elements
+  - Keyboard shortcuts: Ctrl/Cmd+C (copy), Ctrl/Cmd+X (cut), Ctrl/Cmd+V (paste)
+  - Programmatic access via [`NgDiagramClipboardService`](/docs/api/services/ngdiagramclipboardservice)
 
 [Selection →](/docs/guides/nodes/selection) | [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation)
 
@@ -158,19 +184,20 @@ Most diagram behavior is configurable through the config object passed to the di
 
 **Configurable aspects:**
 
-- `background` - Background dot grid size
+- `background` - Background dot spacing, cell size, and major lines frequency
+- `boxSelection` - Box selection behavior (partial inclusion, real-time selection)
 - `computeEdgeId` - Function to generate unique edge IDs
 - `computeNodeId` - Function to generate unique node IDs
 - `debugMode` - Enable additional console logging
 - `edgeRouting` - Default routing algorithm (orthogonal, bezier, polyline) and routing-specific settings
 - `grouping` - Rules for which nodes can be grouped together
 - `linking` - Edge creation validation, snap distance, and custom edge builders
-- `nodeRotation` - Rotation snapping angles
-- `resize` - Minimum node size constraints
+- `nodeRotation` - Rotation snapping angles and default rotatable state
+- `resize` - Minimum node size constraints and default resizable state
 - `selectionMoving` - Edge panning behavior when dragging near viewport edges
 - `snapping` - Grid snapping for dragging and resizing with customizable snap points
 - `zIndex` - Layer management for selected elements and edge-node relationships
-- `zoom` - Min/max zoom levels and zoom step
+- `zoom` - Min/max zoom levels, zoom step, and zoom-to-fit settings
 
 ## Services
 
@@ -178,9 +205,20 @@ ngDiagram provides injectable services for all diagram operations. Services are 
 
 **Core services:**
 
-- [**NgDiagramService**](/docs/api/services/ngdiagramservice) - diagram API access (config, events, transactions, middleware, routing)
-- [**NgDiagramModelService**](/docs/api/services/ngdiagrammodelservice) - CRUD operations for nodes, edges, and metadata
-- [**NgDiagramViewportService**](/docs/api/services/ngdiagramviewportservice) - Control zoom, pan, and viewport positioning
+- [**NgDiagramService**](/docs/api/services/ngdiagramservice) - Diagram API access:
+  - Config, events, transactions
+  - Middleware registration
+  - Routing management (`registerRouting()`, `unregisterRouting()`, `getRegisteredRoutings()`)
+  - Programmatic linking (`startLinking()`)
+  - Environment info (`getEnvironment()`)
+- [**NgDiagramModelService**](/docs/api/services/ngdiagrammodelservice) - CRUD operations:
+  - Nodes, edges, and metadata management
+  - Model serialization (`toJSON()`)
+  - Reactive signals for `nodes`, `edges`, `metadata`
+- [**NgDiagramViewportService**](/docs/api/services/ngdiagramviewportservice) - Viewport control:
+  - Zoom, pan, and positioning
+  - Coordinate conversion (`clientToFlowPosition()`, `flowToClientPosition()`)
+  - Navigation helpers (`centerOnNode()`, `centerOnRect()`)
 - [**NgDiagramSelectionService**](/docs/api/services/ngdiagramselectionservice) - Manage selection state for nodes and edges
 - [**NgDiagramNodeService**](/docs/api/services/ngdiagramnodeservice) - Node-specific operations (move, resize, rotate)
 - [**NgDiagramGroupsService**](/docs/api/services/ngdiagramgroupsservice) - Group/ungroup nodes and manage group hierarchies
@@ -197,10 +235,16 @@ The diagram emits events for user interactions and state changes. Subscribe to t
 **Available events:**
 
 - `diagramInit` - Fired when diagram is fully initialized with all nodes and edges measured
+- `edgeDrawn` - Fired when user manually creates an edge by dragging between nodes
 - `selectionChanged` - Fired when nodes/edges are selected or deselected
 - `selectionMoved` - Fired when selected nodes are moved (dragged)
+- `selectionRemoved` - Fired when selected nodes/edges are removed from the diagram
+- `selectionRotated` - Fired when selected nodes are rotated
+- `groupMembershipChanged` - Fired when nodes are grouped or ungrouped
 - `viewportChanged` - Fired when viewport is panned or zoomed
-- `edgeDrawn` - Fired when user manually creates an edge by dragging between nodes
+- `clipboardPasted` - Fired when elements are pasted from clipboard
+- `nodeResized` - Fired when a node is resized
+- `paletteItemDropped` - Fired when a palette item is dropped onto the diagram
 
 Events can be subscribed to via `@Output` bindings on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component or programmatically through [`NgDiagramService.addEventListener()`](/docs/api/services/ngdiagramservice#addeventlistener).
 
