@@ -1,26 +1,37 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { configureShortcuts, NgDiagramService } from 'ng-diagram';
 
 @Component({
   imports: [],
   selector: 'shortcut-buttons',
   template: `
-    <button class="btn" (click)="updatePasteShortcut()">
-      Update paste shortcut to Ctrl/Cmd + B
-    </button>
+    <label class="checkbox-label">
+      <input
+        type="checkbox"
+        [checked]="useCustomShortcut()"
+        (change)="togglePasteShortcut()"
+      />
+      <span>Use Ctrl/Cmd + B for paste</span>
+    </label>
   `,
   styleUrls: ['./shortcut-buttons.component.scss'],
 })
 export class ShortcutButtonsComponent {
   private readonly ngDiagramService = inject(NgDiagramService);
+  protected readonly useCustomShortcut = signal(false);
 
-  updatePasteShortcut(): void {
-    // Update paste shortcut to Ctrl/Cmd + B
+  togglePasteShortcut(): void {
+    this.useCustomShortcut.update((value) => !value);
+
     const updatedShortcuts = configureShortcuts([
-      // Update paste to Ctrl/Cmd + B
       {
         actionName: 'paste',
-        bindings: [{ key: 'b', modifiers: { primary: true } }],
+        bindings: [
+          {
+            key: this.useCustomShortcut() ? 'b' : 'v',
+            modifiers: { primary: true },
+          },
+        ],
       },
     ]);
 

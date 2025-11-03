@@ -4,14 +4,24 @@
   top: 0.5rem;
   display: flex;
 
-  .btn {
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--sl-color-bg-nav);
+    border-radius: 0.25rem;
+    user-select: none;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 0;
-    border: 0;
 
-    &:hover {
-      background-color: var(--ngd-node-stroke-primary-default);
+    input[type='checkbox'] {
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+    }
+
+    span {
+      font-size: 0.875rem;
     }
   }
 }
