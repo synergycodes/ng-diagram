@@ -20,9 +20,7 @@ export const internalIdMiddleware: Middleware = {
 
     const nodesToAdd = initialUpdate.nodesToAdd?.map((node) => ({
       ...node,
-      _internalId:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (node as any)._internalId || `${node.id}-${environment.generateId()}`,
+      _internalId: `${node.id}-${environment.generateId()}`,
     }));
 
     const stateUpdate: FlowStateUpdate = {

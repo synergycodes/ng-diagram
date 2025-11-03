@@ -6,12 +6,32 @@ import { Component } from '@angular/core';
     <svg height="0" width="0">
       <defs>
         <!-- @mark-start -->
-        <!-- Square Arrowhead -->
+        <!-- Square Arrowhead for Target -->
         <marker
-          id="square-arrowhead"
+          id="square-arrowhead-target"
           markerWidth="10"
           markerHeight="10"
           refX="8"
+          refY="5"
+          orient="auto"
+        >
+          <rect
+            x="1"
+            y="1"
+            width="8"
+            height="8"
+            fill="context-stroke"
+            stroke="context-stroke"
+          />
+        </marker>
+
+        <!-- Square Arrowhead for Source -->
+        <!-- refX change to prevent overlap with source node -->
+        <marker
+          id="square-arrowhead-source"
+          markerWidth="10"
+          markerHeight="10"
+          refX="2"
           refY="5"
           orient="auto"
         >

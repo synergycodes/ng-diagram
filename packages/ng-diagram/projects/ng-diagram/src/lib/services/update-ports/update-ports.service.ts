@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { ElementRef, inject, Injectable } from '@angular/core';
 import { Port } from '../../../core/src';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
@@ -6,6 +6,7 @@ import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provide
 @Injectable()
 export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly diagramElement = inject(ElementRef<HTMLElement>);
 
   getPortData(port: HTMLElement): Required<Pick<Port, 'size' | 'position'>> {
     const nodeElement = findParentWithClass(port, 'ng-diagram-node');
@@ -30,7 +31,9 @@ export class UpdatePortsService {
   }
 
   getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | 'size' | 'position'>>[] {
-    const node = document.querySelector(`.ng-diagram-node[data-node-id="${nodeId}"]`) as HTMLElement;
+    const node = this.diagramElement.nativeElement.querySelector(
+      `.ng-diagram-node[data-node-id="${nodeId}"]`
+    ) as HTMLElement;
     if (!node) {
       throw new Error(`Node with id ${nodeId} not found`);
     }

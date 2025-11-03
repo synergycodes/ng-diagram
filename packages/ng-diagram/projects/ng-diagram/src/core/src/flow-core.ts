@@ -76,14 +76,14 @@ export class FlowCore {
     this.modelLookup = new ModelLookup(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
-    this.actionStateManager = new ActionStateManager();
+    this.eventManager = new EventManager();
+    this.actionStateManager = new ActionStateManager(this.eventManager);
     this.portBatchProcessor = new PortBatchProcessor();
     this.labelBatchProcessor = new LabelBatchProcessor();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
     );
-    this.eventManager = new EventManager();
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
