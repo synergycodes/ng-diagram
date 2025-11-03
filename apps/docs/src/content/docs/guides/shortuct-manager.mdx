@@ -1,9 +1,6 @@
 ---
-title: Shortcut Manager Example
+title: Keyboard Shortcuts
 description: Example of how use Shortcut Manager in ngDiagram
-sidebar:
-  order: 12
-  label: Shortcut Manager
 ---
 
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
@@ -11,21 +8,29 @@ import ShortcutManager from '../../../components/angular/shortcut-manager/shortc
 
 The **ShortcutManager** handles keyboard input matching in ngDiagram. It supports platform-specific modifiers (Ctrl/Cmd normalization), multiple key bindings per action, and runtime configuration updates.
 
-## Default Shortcuts
+## Available Actions
 
-| Action                   | Shortcut                                            | Description                           |
-| ------------------------ | --------------------------------------------------- | ------------------------------------- |
-| `copy`                   | <kbd>Ctrl/Cmd + C</kbd>                             | Copy selected elements                |
-| `cut`                    | <kbd>Ctrl/Cmd + X</kbd>                             | Cut selected elements                 |
-| `paste`                  | <kbd>Ctrl/Cmd + V</kbd>                             | Paste elements                        |
-| `deleteSelection`        | <kbd>Delete</kbd> or <kbd>Backspace</kbd>           | Delete selected elements              |
-| `selectAll`              | <kbd>Ctrl/Cmd + A</kbd>                             | Select all elements                   |
-| `undo`                   | <kbd>Ctrl/Cmd + Z</kbd>                             | Undo last action                      |
-| `redo`                   | <kbd>Ctrl/Cmd + Y</kbd>                             | Redo last undone action               |
-| `keyboardMoveSelection*` | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> | Move selected elements                |
-| `keyboardPan*`           | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> | Pan viewport                          |
-| `boxSelection`           | <kbd>Shift</kbd> held                               | Enable box selection (pointer events) |
-| `preserveSelection`      | <kbd>Ctrl/Cmd</kbd> held                            | Preserve selection (pointer events)   |
+All available shortcut actions with their default key bindings. See [`ShortcutActionName`](/docs/api/types/shortcutactionname/) for the complete type reference.
+
+| Action                          | Default Shortcut                          | Description                              |
+| ------------------------------- | ----------------------------------------- | ---------------------------------------- |
+| `copy`                          | <kbd>Ctrl/Cmd + C</kbd>                   | Copy selected elements to clipboard      |
+| `cut`                           | <kbd>Ctrl/Cmd + X</kbd>                   | Cut selected elements to clipboard       |
+| `paste`                         | <kbd>Ctrl/Cmd + V</kbd>                   | Paste elements from clipboard            |
+| `deleteSelection`               | <kbd>Delete</kbd> or <kbd>Backspace</kbd> | Delete currently selected elements       |
+| `selectAll`                     | <kbd>Ctrl/Cmd + A</kbd>                   | Select all elements in the diagram       |
+| `boxSelection`                  | <kbd>Shift</kbd> held                     | Enable box selection mode (pointer only) |
+| `preserveSelection`             | <kbd>Ctrl/Cmd</kbd> held                  | Preserve selection mode (pointer only)   |
+| `keyboardMoveSelectionUp`       | <kbd>↑</kbd>                              | Move selected elements up                |
+| `keyboardMoveSelectionDown`     | <kbd>↓</kbd>                              | Move selected elements down              |
+| `keyboardMoveSelectionLeft`     | <kbd>←</kbd>                              | Move selected elements left              |
+| `keyboardMoveSelectionRight`    | <kbd>→</kbd>                              | Move selected elements right             |
+| `keyboardPanUp`                 | <kbd>↑</kbd>                              | Pan viewport up                          |
+| `keyboardPanDown`               | <kbd>↓</kbd>                              | Pan viewport down                        |
+| `keyboardPanLeft`               | <kbd>←</kbd>                              | Pan viewport left                        |
+| `keyboardPanRight`              | <kbd>→</kbd>                              | Pan viewport right                       |
+| `undo`                          | <kbd>Ctrl/Cmd + Z</kbd>                   | Undo last action                         |
+| `redo`                          | <kbd>Ctrl/Cmd + Y</kbd>                   | Redo last undone action                  |
 
 ## Basic Usage
 
@@ -46,7 +51,7 @@ const config = {
       actionName: 'undo',
       bindings: [],
     },
-    // Multiple bindings: WASD + Arrow keys
+    // Multiple bindings: WSAD + Arrow keys
     {
       actionName: 'keyboardMoveSelectionUp',
       bindings: [{ key: 'w' }, { key: 'ArrowUp' }],
@@ -82,16 +87,6 @@ interface ShortcutBinding {
   modifiers?: Partial<InputModifiers>; // Optional modifier requirements
 }
 ```
-
-### Available Actions
-
-See [`ShortcutActionName`](/docs/api/types/shortcutactionname/) API reference for all available action names.
-
-**Clipboard:** `copy`, `cut`, `paste`
-**Selection:** `deleteSelection`, `selectAll`, `boxSelection`, `preserveSelection`
-**Movement:** `keyboardMoveSelectionUp`, `keyboardMoveSelectionDown`, `keyboardMoveSelectionLeft`, `keyboardMoveSelectionRight`
-**Panning:** `keyboardPanUp`, `keyboardPanDown`, `keyboardPanLeft`, `keyboardPanRight`
-**History:** `undo`, `redo`
 
 ### Available Modifiers
 
