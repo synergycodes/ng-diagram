@@ -14,9 +14,7 @@ import {
   >
     <!-- @mark-start -->
     <ng-diagram-base-edge-label [id]="'custom-label'" [positionOnEdge]="0.5">
-      <div class="custom-label">
-        Custom Label
-      </div>
+      <div class="custom-label">Custom Label</div>
     </ng-diagram-base-edge-label>
     <!-- @mark-end -->
   </ng-diagram-base-edge>`,
