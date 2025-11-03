@@ -121,5 +121,25 @@ Shortcuts without a `key` property (only `modifiers`) match pointer events only.
 
 This prevents false triggers during keyboard typing.
 
+### Type Safety
+
+The `preserveSelection` and `boxSelection` actions are **pointer-only** and can only use modifier-only bindings:
+
+```typescript
+// ✅ VALID: Pointer-only action with modifiers
+{
+  actionName: 'preserveSelection',
+  bindings: [{ modifiers: { primary: true } }]
+}
+
+// ❌ INVALID: Cannot add key bindings to pointer-only actions
+{
+  actionName: 'preserveSelection',
+  bindings: [{ key: 'q', modifiers: { shift: true } }] // TypeScript error!
+}
+```
+
+All other actions are keyboard actions and can use key-based bindings.
+
 <ShortcutManager />
 <CodeViewer dirName="examples/shortcut-manager" />

@@ -5,10 +5,10 @@ prev: false
 title: "ShortcutActionName"
 ---
 
-> **ShortcutActionName** = `KeyboardMoveSelectionAction` \| `KeyboardPanAction` \| `Extract`\<`InputEventName`, `"cut"` \| `"paste"` \| `"copy"` \| `"deleteSelection"` \| `"boxSelection"` \| `"undo"` \| `"redo"` \| `"selectAll"`\> \| `"preserveSelection"`
+> **ShortcutActionName** = `KeyboardActionName` \| `PointerOnlyActionName`
 
 All valid action names for shortcuts
 
 Includes:
-- Specific mapped actions (e.g., 'keyboardMoveSelectionUp', 'keyboardPanUp')
-- Direct event names (e.g., 'copy', 'cut', 'deleteSelection')
+- Keyboard actions (e.g., 'keyboardMoveSelectionUp', 'copy', 'selectAll')
+- Pointer-only actions (e.g., 'preserveSelection', 'boxSelection')

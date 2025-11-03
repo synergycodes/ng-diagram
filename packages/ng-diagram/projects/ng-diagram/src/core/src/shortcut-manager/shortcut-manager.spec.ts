@@ -781,15 +781,18 @@ describe('ShortcutManager', () => {
       expect(matches.every((m) => m.actionName !== 'boxSelection')).toBe(true);
     });
 
-    it('should support both keyboard and pointer triggers with multiple bindings', () => {
-      // Use case: User wants Ctrl+B (keyboard) OR Ctrl+click (pointer) for box selection
+    it('should support both keyboard and pointer triggers with separate actions', () => {
+      // Use case: Ctrl+click for pointer selection, Ctrl+B for keyboard toggle
+      // With typed discriminated unions, pointer-only actions can't have key bindings
+      // So you need separate actions if you want both patterns
       mockFlowCore.config.shortcuts = [
         {
-          actionName: 'boxSelection',
-          bindings: [
-            { key: 'b', modifiers: { primary: true } }, // Keyboard trigger
-            { modifiers: { primary: true } }, // Pointer trigger
-          ],
+          actionName: 'copy',
+          bindings: [{ key: 'b', modifiers: { primary: true } }], // Keyboard trigger
+        },
+        {
+          actionName: 'preserveSelection',
+          bindings: [{ modifiers: { primary: true } }], // Pointer trigger
         },
       ];
 
@@ -806,7 +809,7 @@ describe('ShortcutManager', () => {
 
       const keyboardMatches = shortcutManager.match(keyboardInput);
       expect(keyboardMatches.length).toBe(1);
-      expect(keyboardMatches[0].actionName).toBe('boxSelection');
+      expect(keyboardMatches[0].actionName).toBe('copy');
 
       // Test pointer event: Ctrl held (no key)
       const pointerInput: NormalizedKeyboardInput = {
@@ -820,14 +823,14 @@ describe('ShortcutManager', () => {
 
       const pointerMatches = shortcutManager.match(pointerInput);
       expect(pointerMatches.length).toBe(1);
-      expect(pointerMatches[0].actionName).toBe('boxSelection');
+      expect(pointerMatches[0].actionName).toBe('preserveSelection');
     });
 
     it('should NOT match pointer event when binding requires a key', () => {
       // User defines ONLY keyboard binding (Ctrl+B)
       mockFlowCore.config.shortcuts = [
         {
-          actionName: 'boxSelection',
+          actionName: 'copy',
           bindings: [{ key: 'b', modifiers: { primary: true } }], // Only keyboard binding
         },
       ];
@@ -845,7 +848,7 @@ describe('ShortcutManager', () => {
 
       const keyboardMatches = shortcutManager.match(keyboardInput);
       expect(keyboardMatches.length).toBe(1);
-      expect(keyboardMatches[0].actionName).toBe('boxSelection');
+      expect(keyboardMatches[0].actionName).toBe('copy');
 
       // Pointer event: Ctrl held - SHOULD NOT match (binding requires key 'b')
       const pointerInput: NormalizedKeyboardInput = {
@@ -964,7 +967,7 @@ describe('ShortcutManager', () => {
             bindings: [{ key: 's', modifiers: { primary: true } }],
           },
           {
-            actionName: 'boxSelection',
+            actionName: 'deleteSelection',
             bindings: [{ key: 's', modifiers: { shift: true } }],
           },
           {
@@ -992,7 +995,7 @@ describe('ShortcutManager', () => {
           key: 's',
           modifiers: { primary: false, secondary: false, shift: true, meta: false },
         };
-        expect(shortcutManager.match(inputShift).map((m) => m.actionName)).toEqual(['boxSelection']);
+        expect(shortcutManager.match(inputShift).map((m) => m.actionName)).toEqual(['deleteSelection']);
 
         // Test 4: Press S + Command + Shift
         const inputBoth: NormalizedKeyboardInput = {

@@ -5,24 +5,10 @@ prev: false
 title: "ShortcutDefinition"
 ---
 
-Shortcut definition for registering keyboard shortcuts
+> **ShortcutDefinition** = `KeyboardShortcutDefinition` \| `PointerOnlyShortcutDefinition`
 
-Minimal configuration required - only id, actionName, and bindings are mandatory.
-Defaults:
-- enabled: true
+Shortcut definition for registering keyboard and pointer shortcuts
 
-## Properties
-
-### actionName
-
-> **actionName**: [`ShortcutActionName`](/docs/api/types/shortcutactionname/)
-
-Action name that will be mapped to input event via ActionMapper
-
-***
-
-### bindings
-
-> **bindings**: `ShortcutBinding`[]
-
-Platform-specific key bindings
+This is a discriminated union that enforces:
+- Pointer-only actions (preserveSelection, boxSelection) can only have modifier-only bindings
+- Keyboard actions must have at least one key-based binding
