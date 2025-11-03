@@ -36,12 +36,22 @@ export class NgDiagramNodeComponent {
   }
 
   private syncPorts(): void {
-    queueMicrotask(() => {
-      const id = this.id();
-      const portsData = this.portsService.getNodePortsData(id);
+    const id = this.id();
+    const flowCore = this.flowCore.provide();
+    const isResizing = flowCore.actionStateManager.isResizing();
 
-      this.flowCore.provide().updater.applyPortsSizesAndPositions(id, portsData);
-    });
+    if (isResizing) {
+      // For resizing we don't have to wait for transforms to compute and removing the "wait"
+      // helps to minimize visual lag between new port positions and edge routing applied afterwards the ports are measured
+      const portsData = this.portsService.getNodePortsData(id);
+      flowCore.updater.applyPortsSizesAndPositions(id, portsData);
+    } else {
+      // Async for rotation and other cases - wait for browser to apply transforms
+      queueMicrotask(() => {
+        const portsData = this.portsService.getNodePortsData(id);
+        flowCore.updater.applyPortsSizesAndPositions(id, portsData);
+      });
+    }
   }
 
   private setupPortSyncEffect(): void {

@@ -12,8 +12,7 @@ const getRotatedPortSide = (initialPosition: PortSide, rotation: number): PortSi
     left: ['left', 'top', 'right', 'bottom'],
   };
 
-  // Calculate the rotation index (0° -> 0, 90° -> 1, 180° -> 2, 270° -> 3)
-  const rotationIndex = Math.floor(rotation / 90) % 4;
+  const rotationIndex = Math.round(rotation / 90) % 4;
 
   return positionMap[initialPosition][rotationIndex];
 };

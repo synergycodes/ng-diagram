@@ -110,6 +110,21 @@ Flag indicating the node is a group
 
 ***
 
+### measuredBounds?
+
+> `readonly` `optional` **measuredBounds**: [`Rect`](/docs/api/types/rect/)
+
+#### Remarks
+
+MeasuredBounds are computed by the system and should not be set manually.
+Computed bounds of the node based on its position, size, and rotation.
+
+#### Inherited from
+
+[`SimpleNode`](/docs/api/types/simplenode/).[`measuredBounds`](/docs/api/types/simplenode/#measuredbounds)
+
+***
+
 ### measuredPorts?
 
 > `readonly` `optional` **measuredPorts**: [`Port`](/docs/api/types/port/)[]

@@ -1,0 +1,29 @@
+<svg class="grid-background">
+  <pattern
+    #backgroundPattern
+    id="ng-diagram-background"
+    [attr.staticWidth]="patternSize().x"
+    [attr.width]="patternSize().x"
+    [attr.height]="patternSize().y"
+    [attr.patternTransform]="patternTransform()"
+    patternUnits="userSpaceOnUse"
+  >
+    @for (line of gridLines(); track $index) {
+      <line
+        [attr.x1]="line.x1"
+        [attr.y1]="line.y1"
+        [attr.x2]="line.x2"
+        [attr.y2]="line.y2"
+        [attr.stroke]="line.major ? 'var(--ngd-background-line-major-color)' : 'var(--ngd-background-line-minor-color)'"
+        [attr.stroke-width]="
+          line.major ? 'var(--ngd-background-line-major-width)' : 'var(--ngd-background-line-minor-width)'
+        "
+        [attr.opacity]="
+          line.major ? 'var(--ngd-background-line-major-opacity)' : 'var(--ngd-background-line-minor-opacity)'
+        "
+      ></line>
+    }
+  </pattern>
+
+  <rect fill="url(#ng-diagram-background)" width="100%" height="100%" x="0" y="0"></rect>
+</svg>

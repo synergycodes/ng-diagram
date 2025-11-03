@@ -25,6 +25,15 @@ this.ngDiagramService.updateConfig({ gridSize: 20 });
 
 ## Properties
 
+### actionState
+
+> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/actionstate/)\>\>
+
+Reactive signal that tracks the current action state.
+Updates automatically when actions like resizing, rotating, or linking start/end.
+
+***
+
 ### isInitialized
 
 > **isInitialized**: `Signal`\<`boolean`\>

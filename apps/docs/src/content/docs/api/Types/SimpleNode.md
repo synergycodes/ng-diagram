@@ -70,6 +70,17 @@ The unique identifier for the node.
 
 ***
 
+### measuredBounds?
+
+> `readonly` `optional` **measuredBounds**: [`Rect`](/docs/api/types/rect/)
+
+#### Remarks
+
+MeasuredBounds are computed by the system and should not be set manually.
+Computed bounds of the node based on its position, size, and rotation.
+
+***
+
 ### measuredPorts?
 
 > `readonly` `optional` **measuredPorts**: [`Port`](/docs/api/types/port/)[]
