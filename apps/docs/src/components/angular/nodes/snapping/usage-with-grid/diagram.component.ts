@@ -25,7 +25,10 @@ export class DiagramComponent {
   // @section-start:config
   config = {
     zoom: {
-      max: 3,
+      max: 2,
+      zoomToFit: {
+        onInit: true,
+      },
     },
     background: {
       cellSize: { width: 20, height: 20 },

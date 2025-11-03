@@ -22,7 +22,10 @@ export class DiagramComponent {
   // @section-start:config
   config = {
     zoom: {
-      max: 3,
+      max: 2,
+      zoomToFit: {
+        onInit: true,
+      },
     },
     snapping: {
       shouldSnapDragForNode: () => true,
