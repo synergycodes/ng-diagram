@@ -139,29 +139,39 @@ export class ShortcutManager {
   /**
    * Check if modifiers match a binding's modifier requirements
    *
+   * Ensures exact modifier matching:
+   * - All modifiers specified in binding must match the input
+   * - All modifiers NOT specified in binding must be false in the input
+   * - Exception: meta modifier is ignored when checking if not explicitly specified in binding,
+   *   because on macOS, meta and primary both map to the Command key
+   *
    * @param modifiers - Current modifier state
    * @param binding - Shortcut binding to match against
-   * @returns true if modifiers match the binding's requirements
+   * @returns true if modifiers match the binding's requirements exactly
    */
   private matchModifiers(modifiers: NormalizedKeyboardInput['modifiers'], binding: ShortcutBinding): boolean {
-    if (!binding.modifiers) {
-      return true;
-    }
-
-    if (binding.modifiers.primary !== undefined && modifiers.primary !== binding.modifiers.primary) {
+    const expectedPrimary = binding.modifiers?.primary ?? false;
+    if (modifiers.primary !== expectedPrimary) {
       return false;
     }
 
-    if (binding.modifiers.shift !== undefined && modifiers.shift !== binding.modifiers.shift) {
+    const expectedShift = binding.modifiers?.shift ?? false;
+    if (modifiers.shift !== expectedShift) {
       return false;
     }
 
-    if (binding.modifiers.secondary !== undefined && modifiers.secondary !== binding.modifiers.secondary) {
+    const expectedSecondary = binding.modifiers?.secondary ?? false;
+    if (modifiers.secondary !== expectedSecondary) {
       return false;
     }
 
-    if (binding.modifiers.meta !== undefined && modifiers.meta !== binding.modifiers.meta) {
-      return false;
+    // Check meta modifier ONLY if explicitly specified in binding
+    // This is because on macOS, both primary and meta map to the Command key,
+    // so meta will be true whenever primary is true, causing false negatives
+    if (binding.modifiers?.meta !== undefined) {
+      if (modifiers.meta !== binding.modifiers.meta) {
+        return false;
+      }
     }
 
     return true;

@@ -219,12 +219,10 @@ describe('ShortcutManager', () => {
 
       const matches = shortcutManager.match(input);
 
-      // Delete should match without modifiers, but with primary modifier it might not
-      // depending on the binding definition
+      // Delete binding has no modifiers, so pressing Delete WITH primary modifier should NOT match
+      // This ensures exact modifier matching
       const deleteMatch = matches.find((m) => m.actionName === 'deleteSelection');
-      // Since the default binding doesn't specify modifiers, it should still match
-      // because undefined modifiers mean "don't care"
-      expect(deleteMatch).toBeDefined();
+      expect(deleteMatch).toBeUndefined();
     });
 
     it('should match shortcut with multiple bindings', () => {
@@ -861,6 +859,350 @@ describe('ShortcutManager', () => {
 
       const pointerMatches = shortcutManager.match(pointerInput);
       expect(pointerMatches.length).toBe(0); // No match because binding requires 'b' key
+    });
+
+    describe('exact modifier matching - regression tests', () => {
+      it('should NOT match shortcut with only "A" when pressing "A + Command"', () => {
+        // Regression test for the exact issue reported
+        // If user defines two shortcuts: one with just "A", another with "A + Command"
+        // Pressing "A + Command" should ONLY match the second shortcut
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'keyboardPanLeft',
+            bindings: [{ key: 'a' }], // No modifiers
+          },
+          {
+            actionName: 'selectAll',
+            bindings: [{ key: 'a', modifiers: { primary: true } }], // With primary (Command/Ctrl)
+          },
+        ];
+
+        // User presses A + Command
+        const input: NormalizedKeyboardInput = {
+          key: 'a',
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
+        };
+
+        const matches = shortcutManager.match(input);
+
+        // Should ONLY match selectAll, NOT keyboardPanLeft
+        expect(matches.length).toBe(1);
+        expect(matches[0].actionName).toBe('selectAll');
+        expect(matches.some((m) => m.actionName === 'keyboardPanLeft')).toBe(false);
+      });
+
+      it('should NOT match shortcut with "A + Command" when pressing only "A"', () => {
+        // The reverse case: pressing "A" without modifiers should not match "A + Command"
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'keyboardPanLeft',
+            bindings: [{ key: 'a' }], // No modifiers
+          },
+          {
+            actionName: 'selectAll',
+            bindings: [{ key: 'a', modifiers: { primary: true } }], // With primary (Command/Ctrl)
+          },
+        ];
+
+        // User presses just A (no modifiers)
+        const input: NormalizedKeyboardInput = {
+          key: 'a',
+          modifiers: {
+            primary: false,
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
+        };
+
+        const matches = shortcutManager.match(input);
+
+        // Should ONLY match keyboardPanLeft, NOT selectAll
+        expect(matches.length).toBe(1);
+        expect(matches[0].actionName).toBe('keyboardPanLeft');
+        expect(matches.some((m) => m.actionName === 'selectAll')).toBe(false);
+      });
+
+      it('should NOT match when extra modifiers are pressed beyond what binding requires', () => {
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'cut',
+            bindings: [{ key: 'k', modifiers: { primary: true } }],
+          },
+        ];
+
+        // User presses K + Command + Shift (extra shift modifier)
+        const input: NormalizedKeyboardInput = {
+          key: 'k',
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: true, // Extra modifier not in binding
+            meta: false,
+          },
+        };
+
+        const matches = shortcutManager.match(input);
+
+        // Should NOT match because shift is pressed but not in binding
+        expect(matches).toEqual([]);
+      });
+
+      it('should match only shortcuts with exact modifier combination', () => {
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'keyboardPanLeft',
+            bindings: [{ key: 's' }],
+          },
+          {
+            actionName: 'copy',
+            bindings: [{ key: 's', modifiers: { primary: true } }],
+          },
+          {
+            actionName: 'boxSelection',
+            bindings: [{ key: 's', modifiers: { shift: true } }],
+          },
+          {
+            actionName: 'undo',
+            bindings: [{ key: 's', modifiers: { primary: true, shift: true } }],
+          },
+        ];
+
+        // Test 1: Press S alone
+        const inputNoMods: NormalizedKeyboardInput = {
+          key: 's',
+          modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        };
+        expect(shortcutManager.match(inputNoMods).map((m) => m.actionName)).toEqual(['keyboardPanLeft']);
+
+        // Test 2: Press S + Command
+        const inputPrimary: NormalizedKeyboardInput = {
+          key: 's',
+          modifiers: { primary: true, secondary: false, shift: false, meta: false },
+        };
+        expect(shortcutManager.match(inputPrimary).map((m) => m.actionName)).toEqual(['copy']);
+
+        // Test 3: Press S + Shift
+        const inputShift: NormalizedKeyboardInput = {
+          key: 's',
+          modifiers: { primary: false, secondary: false, shift: true, meta: false },
+        };
+        expect(shortcutManager.match(inputShift).map((m) => m.actionName)).toEqual(['boxSelection']);
+
+        // Test 4: Press S + Command + Shift
+        const inputBoth: NormalizedKeyboardInput = {
+          key: 's',
+          modifiers: { primary: true, secondary: false, shift: true, meta: false },
+        };
+        expect(shortcutManager.match(inputBoth).map((m) => m.actionName)).toEqual(['undo']);
+      });
+
+      it('should require exact match for all modifier types', () => {
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'paste',
+            bindings: [{ key: 't', modifiers: { secondary: true } }], // Only secondary (Alt)
+          },
+        ];
+
+        // Test with wrong modifier type
+        const inputWrongModifier: NormalizedKeyboardInput = {
+          key: 't',
+          modifiers: {
+            primary: true, // Wrong modifier
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
+        };
+
+        expect(shortcutManager.match(inputWrongModifier)).toEqual([]);
+
+        // Test with correct modifier
+        const inputCorrect: NormalizedKeyboardInput = {
+          key: 't',
+          modifiers: {
+            primary: false,
+            secondary: true, // Correct modifier
+            shift: false,
+            meta: false,
+          },
+        };
+
+        expect(shortcutManager.match(inputCorrect).map((m) => m.actionName)).toEqual(['paste']);
+      });
+
+      it('should match selectAll with Command + A and not conflict with preserveSelection', () => {
+        // Regression test for Command + A not working
+        // This tests the real default shortcuts configuration
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'selectAll',
+            bindings: [{ key: 'a', modifiers: { primary: true } }],
+          },
+          {
+            actionName: 'preserveSelection',
+            bindings: [{ modifiers: { primary: true } }], // Modifier-only (no key)
+          },
+        ];
+
+        // User presses Command + A (keyboard event)
+        const input: NormalizedKeyboardInput = {
+          key: 'a',
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
+        };
+
+        const matches = shortcutManager.match(input);
+
+        // Should ONLY match selectAll, NOT preserveSelection
+        // preserveSelection is modifier-only (no key), so it shouldn't match keyboard events
+        expect(matches.length).toBe(1);
+        expect(matches[0].actionName).toBe('selectAll');
+        expect(matches.some((m) => m.actionName === 'preserveSelection')).toBe(false);
+      });
+
+      it('should match copy with Command + C from default shortcuts', () => {
+        // Test another common shortcut to ensure the fix works generally
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'copy',
+            bindings: [{ key: 'c', modifiers: { primary: true } }],
+          },
+        ];
+
+        const input: NormalizedKeyboardInput = {
+          key: 'c',
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
+        };
+
+        const matches = shortcutManager.match(input);
+
+        expect(matches.length).toBe(1);
+        expect(matches[0].actionName).toBe('copy');
+      });
+
+      it('should work with ALL default shortcuts including selectAll', () => {
+        // Use the ACTUAL default shortcuts to ensure nothing breaks
+        mockFlowCore.config.shortcuts = DEFAULT_SHORTCUTS;
+
+        // Test Command + A for selectAll
+        const inputSelectAll: NormalizedKeyboardInput = {
+          key: 'a',
+          modifiers: { primary: true, secondary: false, shift: false, meta: false },
+        };
+        const matchesSelectAll = shortcutManager.match(inputSelectAll);
+        expect(matchesSelectAll.length).toBe(1);
+        expect(matchesSelectAll[0].actionName).toBe('selectAll');
+
+        // Test Command + C for copy
+        const inputCopy: NormalizedKeyboardInput = {
+          key: 'c',
+          modifiers: { primary: true, secondary: false, shift: false, meta: false },
+        };
+        const matchesCopy = shortcutManager.match(inputCopy);
+        expect(matchesCopy.length).toBe(1);
+        expect(matchesCopy[0].actionName).toBe('copy');
+
+        // Test Delete without modifiers
+        const inputDelete: NormalizedKeyboardInput = {
+          key: 'Delete',
+          modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        };
+        const matchesDelete = shortcutManager.match(inputDelete);
+        expect(matchesDelete.some((m) => m.actionName === 'deleteSelection')).toBe(true);
+
+        // Test Delete WITH modifier should NOT match deleteSelection
+        const inputDeleteWithMod: NormalizedKeyboardInput = {
+          key: 'Delete',
+          modifiers: { primary: true, secondary: false, shift: false, meta: false },
+        };
+        const matchesDeleteWithMod = shortcutManager.match(inputDeleteWithMod);
+        expect(matchesDeleteWithMod.some((m) => m.actionName === 'deleteSelection')).toBe(false);
+      });
+
+      it('should handle macOS Command key where both primary and meta are true', () => {
+        // On macOS, pressing Command sets both primary=true and meta=true
+        // This test ensures shortcuts still work in this scenario
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'selectAll',
+            bindings: [{ key: 'a', modifiers: { primary: true } }],
+          },
+          {
+            actionName: 'copy',
+            bindings: [{ key: 'c', modifiers: { primary: true } }],
+          },
+        ];
+
+        // Simulate macOS: Command + A (both primary and meta are true)
+        const inputSelectAll: NormalizedKeyboardInput = {
+          key: 'a',
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: false,
+            meta: true, // Also true on macOS when Command is pressed
+          },
+        };
+
+        const matchesSelectAll = shortcutManager.match(inputSelectAll);
+        expect(matchesSelectAll.length).toBe(1);
+        expect(matchesSelectAll[0].actionName).toBe('selectAll');
+
+        // Simulate macOS: Command + C
+        const inputCopy: NormalizedKeyboardInput = {
+          key: 'c',
+          modifiers: {
+            primary: true,
+            secondary: false,
+            shift: false,
+            meta: true, // Also true on macOS when Command is pressed
+          },
+        };
+
+        const matchesCopy = shortcutManager.match(inputCopy);
+        expect(matchesCopy.length).toBe(1);
+        expect(matchesCopy[0].actionName).toBe('copy');
+      });
+
+      it('should respect meta modifier when explicitly specified in binding', () => {
+        // When a binding explicitly requires meta, it should be checked
+        mockFlowCore.config.shortcuts = [
+          {
+            actionName: 'redo',
+            bindings: [{ key: 'm', modifiers: { meta: true } }],
+          },
+        ];
+
+        // Should match when meta is true
+        const inputMetaTrue: NormalizedKeyboardInput = {
+          key: 'm',
+          modifiers: { primary: false, secondary: false, shift: false, meta: true },
+        };
+        expect(shortcutManager.match(inputMetaTrue).map((m) => m.actionName)).toEqual(['redo']);
+
+        // Should NOT match when meta is false
+        const inputMetaFalse: NormalizedKeyboardInput = {
+          key: 'm',
+          modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        };
+        expect(shortcutManager.match(inputMetaFalse)).toEqual([]);
+      });
     });
   });
 });
