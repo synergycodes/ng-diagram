@@ -84,14 +84,6 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Angular Material Node example',
   },
   {
-    title: 'Shortcut Manager',
-    description:
-      'Configure and update keyboard shortcuts with configureShortcuts() helper. Customize shortcuts at initialization or update them dynamically at runtime.',
-    href: '/docs/examples/shortuct-manager',
-    image: '/docs/assets/examples/shortcut-manager.png',
-    imageAlt: 'Screenshot of Shortcut Manager example',
-  },
-  {
     title: 'Performance Test',
     description: 'Explore the performance capabilities with 500 nodes arranged in a grid with almost 500 connections.',
     href: '/docs/examples/performance-test',

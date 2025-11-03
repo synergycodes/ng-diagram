@@ -1,0 +1,130 @@
+---
+title: Shortcut Manager Example
+description: Example of how use Shortcut Manager in ngDiagram
+sidebar:
+  order: 12
+  label: Shortcut Manager
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ShortcutManager from '../../../components/angular/shortcut-manager/shortcut-manager.astro';
+
+The **ShortcutManager** handles keyboard input matching in ngDiagram. It supports platform-specific modifiers (Ctrl/Cmd normalization), multiple key bindings per action, and runtime configuration updates.
+
+## Default Shortcuts
+
+| Action                   | Shortcut                                            | Description                           |
+| ------------------------ | --------------------------------------------------- | ------------------------------------- |
+| `copy`                   | <kbd>Ctrl/Cmd + C</kbd>                             | Copy selected elements                |
+| `cut`                    | <kbd>Ctrl/Cmd + X</kbd>                             | Cut selected elements                 |
+| `paste`                  | <kbd>Ctrl/Cmd + V</kbd>                             | Paste elements                        |
+| `deleteSelection`        | <kbd>Delete</kbd> or <kbd>Backspace</kbd>           | Delete selected elements              |
+| `selectAll`              | <kbd>Ctrl/Cmd + A</kbd>                             | Select all elements                   |
+| `undo`                   | <kbd>Ctrl/Cmd + Z</kbd>                             | Undo last action                      |
+| `redo`                   | <kbd>Ctrl/Cmd + Y</kbd>                             | Redo last undone action               |
+| `keyboardMoveSelection*` | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> | Move selected elements                |
+| `keyboardPan*`           | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> | Pan viewport                          |
+| `boxSelection`           | <kbd>Shift</kbd> held                               | Enable box selection (pointer events) |
+| `preserveSelection`      | <kbd>Ctrl/Cmd</kbd> held                            | Preserve selection (pointer events)   |
+
+## Basic Usage
+
+Use the `configureShortcuts()` helper to customize shortcuts:
+
+```typescript
+import { configureShortcuts } from 'ng-diagram';
+
+const config = {
+  shortcuts: configureShortcuts([
+    // Override: Change paste to Ctrl+B
+    {
+      actionName: 'paste',
+      bindings: [{ key: 'b', modifiers: { primary: true } }],
+    },
+    // Disable: Empty bindings array
+    {
+      actionName: 'undo',
+      bindings: [],
+    },
+    // Multiple bindings: WASD + Arrow keys
+    {
+      actionName: 'keyboardMoveSelectionUp',
+      bindings: [{ key: 'w' }, { key: 'ArrowUp' }],
+    },
+  ]),
+};
+```
+
+## Helper Function
+
+[`configureShortcuts(customShortcuts, baseShortcuts?)`](/docs/api/other/configureshortcuts/) merges your custom shortcuts with defaults:
+
+- **First parameter:** Your custom shortcuts (overrides matching `actionName`)
+- **Second parameter:** Base shortcuts (defaults to `DEFAULT_SHORTCUTS`)
+- **Returns:** Merged shortcuts array
+
+You only specify shortcuts you want to customize. Unspecified shortcuts keep their defaults.
+
+## Configuration Reference
+
+### Shortcut Structure
+
+See [`ShortcutDefinition`](/docs/api/other/shortcutdefinition/) API reference.
+
+```typescript
+interface ShortcutDefinition {
+  actionName: ShortcutActionName; // Which action to trigger
+  bindings: ShortcutBinding[]; // One or more key combinations
+}
+
+interface ShortcutBinding {
+  key?: string; // Optional: 'c', 'Delete', 'ArrowUp', etc.
+  modifiers?: Partial<InputModifiers>; // Optional modifier requirements
+}
+```
+
+### Available Actions
+
+See [`ShortcutActionName`](/docs/api/types/shortcutactionname/) API reference for all available action names.
+
+**Clipboard:** `copy`, `cut`, `paste`
+**Selection:** `deleteSelection`, `selectAll`, `boxSelection`, `preserveSelection`
+**Movement:** `keyboardMoveSelectionUp`, `keyboardMoveSelectionDown`, `keyboardMoveSelectionLeft`, `keyboardMoveSelectionRight`
+**Panning:** `keyboardPanUp`, `keyboardPanDown`, `keyboardPanLeft`, `keyboardPanRight`
+**History:** `undo`, `redo`
+
+### Available Modifiers
+
+```typescript
+interface InputModifiers {
+  primary: boolean; // Ctrl (Windows/Linux) OR Cmd (macOS) - auto-normalized
+  secondary: boolean; // Alt key
+  shift: boolean; // Shift key
+  meta: boolean; // Windows key or Cmd key
+}
+```
+
+**Platform Normalization:** The `primary` modifier automatically maps to **Ctrl** on Windows/Linux and **Cmd** on macOS, so you write shortcuts once and they work correctly on all platforms.
+
+### Key Names
+
+Use standard browser key names: `'a'`, `'b'`, `'Delete'`, `'Backspace'`, `'ArrowUp'`, `'ArrowDown'`, `'ArrowLeft'`, `'ArrowRight'`, etc. Keys are case-sensitive.
+
+See [MDN KeyboardEvent.key documentation](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values) for the complete list of valid key values.
+
+### Modifier-Only Shortcuts
+
+Shortcuts without a `key` property (only `modifiers`) match pointer events only. Example:
+
+```typescript
+{
+  modifiers: {
+    shift: true;
+  }
+} // Matches when Shift held during click
+```
+
+This prevents false triggers during keyboard typing.
+
+<ShortcutManager />
+<CodeViewer dirName="examples/shortcut-manager" />
