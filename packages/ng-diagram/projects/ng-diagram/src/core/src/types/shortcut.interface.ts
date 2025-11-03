@@ -7,7 +7,7 @@ import type { ShortcutActionName } from './shortcut-action.interface';
  * Contains the key and already-normalized modifiers
  */
 export interface NormalizedKeyboardInput {
-  key: string;
+  key?: string;
   modifiers: InputModifiers;
 }
 
@@ -17,10 +17,11 @@ export interface NormalizedKeyboardInput {
 export interface ShortcutBinding {
   /**
    * Key value (e.g., 'c', 'Delete', 'ArrowUp')
+   * Optional - if omitted, matches on modifiers only
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values - Complete list of valid key values
    */
-  key: string;
+  key?: string;
   /** Required modifier keys (all are optional - omitted means no modifiers required) */
   modifiers?: Partial<InputModifiers>;
 }

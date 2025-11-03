@@ -491,5 +491,205 @@ describe('ShortcutManager', () => {
 
       expect(matches).toEqual([]);
     });
+
+    it('should match modifier-only shortcut with secondary modifier', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { secondary: true } }],
+        },
+      ];
+
+      const input: NormalizedKeyboardInput = {
+        key: 'Alt',
+        modifiers: {
+          primary: false,
+          secondary: true,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches.length).toBe(1);
+      expect(matches[0].actionName).toBe('boxSelection');
+    });
+
+    it('should match modifier-only shortcut with primary modifier', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { primary: true } }],
+        },
+      ];
+
+      const input: NormalizedKeyboardInput = {
+        key: 'Control',
+        modifiers: {
+          primary: true,
+          secondary: false,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches.length).toBe(1);
+      expect(matches[0].actionName).toBe('boxSelection');
+    });
+
+    it('should match modifier-only shortcut regardless of key pressed', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { secondary: true } }],
+        },
+      ];
+
+      // Test with a regular key
+      const inputWithRegularKey: NormalizedKeyboardInput = {
+        key: 'a',
+        modifiers: {
+          primary: false,
+          secondary: true,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matchesRegular = shortcutManager.match(inputWithRegularKey);
+      expect(matchesRegular.length).toBe(1);
+      expect(matchesRegular[0].actionName).toBe('boxSelection');
+
+      // Test with modifier key itself
+      const inputWithModifierKey: NormalizedKeyboardInput = {
+        key: 'Alt',
+        modifiers: {
+          primary: false,
+          secondary: true,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matchesModifier = shortcutManager.match(inputWithModifierKey);
+      expect(matchesModifier.length).toBe(1);
+      expect(matchesModifier[0].actionName).toBe('boxSelection');
+    });
+
+    it('should not match modifier-only shortcut when modifier is not active', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { secondary: true } }],
+        },
+      ];
+
+      const input: NormalizedKeyboardInput = {
+        key: 'a',
+        modifiers: {
+          primary: false,
+          secondary: false,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches).toEqual([]);
+    });
+
+    it('should match modifier-only shortcut with multiple modifiers', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { primary: true, shift: true } }],
+        },
+      ];
+
+      const input: NormalizedKeyboardInput = {
+        key: 'Shift',
+        modifiers: {
+          primary: true,
+          secondary: false,
+          shift: true,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches.length).toBe(1);
+      expect(matches[0].actionName).toBe('boxSelection');
+    });
+
+    it('should not match modifier-only shortcut when one required modifier is missing', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { primary: true, shift: true } }],
+        },
+      ];
+
+      const input: NormalizedKeyboardInput = {
+        key: 'Shift',
+        modifiers: {
+          primary: false,
+          secondary: false,
+          shift: true,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches).toEqual([]);
+    });
+
+    it('should distinguish between key-based and modifier-only shortcuts', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'boxSelection',
+          bindings: [{ modifiers: { secondary: true } }],
+        },
+        {
+          actionName: 'copy',
+          bindings: [{ key: 'c', modifiers: { primary: true } }],
+        },
+      ];
+
+      // Should match only the modifier-only shortcut
+      const inputModifierOnly: NormalizedKeyboardInput = {
+        key: 'Alt',
+        modifiers: {
+          primary: false,
+          secondary: true,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matchesModifierOnly = shortcutManager.match(inputModifierOnly);
+      expect(matchesModifierOnly.length).toBe(1);
+      expect(matchesModifierOnly[0].actionName).toBe('boxSelection');
+
+      // Should match only the key-based shortcut
+      const inputKeyBased: NormalizedKeyboardInput = {
+        key: 'c',
+        modifiers: {
+          primary: true,
+          secondary: false,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matchesKeyBased = shortcutManager.match(inputKeyBased);
+      expect(matchesKeyBased.length).toBe(1);
+      expect(matchesKeyBased[0].actionName).toBe('copy');
+    });
   });
 });

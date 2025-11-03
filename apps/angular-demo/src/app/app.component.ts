@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   ClipboardPastedEvent,
+  configureShortcuts,
   DiagramInitEvent,
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
   initializeModel,
-  configureShortcuts,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
@@ -85,6 +85,10 @@ export class AppComponent {
       {
         actionName: 'keyboardMoveSelectionRight',
         bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
+      },
+      {
+        actionName: 'boxSelection',
+        bindings: [{ modifiers: { primary: true } }, { modifiers: { shift: true } }],
       },
     ]),
   } satisfies NgDiagramConfig;

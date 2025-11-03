@@ -25,4 +25,4 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
 export type ShortcutActionName =
   | KeyboardMoveSelectionAction
   | KeyboardPanAction
-  | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection'>;
+  | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'boxSelection'>;

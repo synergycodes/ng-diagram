@@ -59,4 +59,10 @@ export const DEFAULT_SHORTCUTS = [
     actionName: 'keyboardPanRight',
     bindings: [{ key: 'ArrowRight' }],
   },
+
+  // Box selection (modifier-only shortcut)
+  {
+    actionName: 'boxSelection',
+    bindings: [{ modifiers: { shift: true } }],
+  },
 ] satisfies ShortcutDefinition[];
