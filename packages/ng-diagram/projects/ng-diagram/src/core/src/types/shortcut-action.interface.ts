@@ -22,7 +22,7 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
  * - Direct event names (e.g., 'copy', 'cut', 'deleteSelection')
  * @category Types
  */
-export type ActionName =
+export type ShortcutActionName =
   | KeyboardMoveSelectionAction
   | KeyboardPanAction
   | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection'>;

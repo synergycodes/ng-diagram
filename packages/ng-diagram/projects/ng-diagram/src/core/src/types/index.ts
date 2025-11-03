@@ -28,5 +28,5 @@ export * from './transaction.interface';
 export * from './action-state.interface';
 
 // Shortcuts and Actions
-export * from './action.interface';
+export * from './shortcut-action.interface';
 export * from './shortcut.interface';

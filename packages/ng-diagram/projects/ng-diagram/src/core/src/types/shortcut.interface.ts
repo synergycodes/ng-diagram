@@ -1,6 +1,6 @@
 import type { InputModifiers } from '../input-events/input-events.interface';
 import { DEFAULT_SHORTCUTS } from '../shortcut-manager';
-import type { ActionName } from './action.interface';
+import type { ShortcutActionName } from './shortcut-action.interface';
 
 /**
  * Normalized keyboard input for shortcut matching
@@ -34,7 +34,7 @@ export interface ShortcutBinding {
  */
 export interface ShortcutDefinition {
   /** Action name that will be mapped to input event via ActionMapper */
-  actionName: ActionName;
+  actionName: ShortcutActionName;
   /** Platform-specific key bindings */
   bindings: ShortcutBinding[];
 }

@@ -86,7 +86,7 @@ export const examples: ContentTile[] = [
   {
     title: 'Shortcut Manager',
     description:
-      'Configure and update keyboard shortcuts with mergeShortcuts() helper. Customize shortcuts at initialization or update them dynamically at runtime.',
+      'Configure and update keyboard shortcuts with configureShortcuts() helper. Customize shortcuts at initialization or update them dynamically at runtime.',
     href: '/docs/examples/shortuct-manager',
     image: '/docs/assets/examples/shortcut-manager.png',
     imageAlt: 'Screenshot of Shortcut Manager example',

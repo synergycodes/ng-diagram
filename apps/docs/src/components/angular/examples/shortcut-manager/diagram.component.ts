@@ -2,7 +2,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
-  mergeShortcuts,
+  configureShortcuts,
   NgDiagramComponent,
   NgDiagramViewportService,
   type NgDiagramConfig,
@@ -29,7 +29,7 @@ export class DiagramComponent {
         padding: [100, 50, 50, 50],
       },
     },
-    shortcuts: mergeShortcuts([
+    shortcuts: configureShortcuts([
       // Custom keyboard shortcuts for moving selection
       {
         actionName: 'keyboardMoveSelectionUp',

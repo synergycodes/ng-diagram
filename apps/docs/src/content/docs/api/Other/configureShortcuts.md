@@ -2,12 +2,12 @@
 editUrl: false
 next: false
 prev: false
-title: "mergeShortcuts"
+title: "configureShortcuts"
 ---
 
-> **mergeShortcuts**(`userShortcuts`): `ShortcutDefinition`[]
+> **configureShortcuts**(`userShortcuts`): `ShortcutDefinition`[]
 
-Merges default shortcuts with user-provided shortcuts
+Configures keyboard shortcuts by combining user-provided shortcuts with defaults
 
 User shortcuts with the same actionName will override default ones.
 New shortcuts from the user will be added.
@@ -24,4 +24,4 @@ User-provided shortcuts (optional)
 
 `ShortcutDefinition`[]
 
-Merged array of shortcut definitions
+Configured array of shortcut definitions

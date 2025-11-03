@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { mergeShortcuts, NgDiagramService } from 'ng-diagram';
+import { configureShortcuts, NgDiagramService } from 'ng-diagram';
 
 @Component({
   imports: [],
@@ -16,7 +16,7 @@ export class ShortcutButtonsComponent {
 
   updatePasteShortcut(): void {
     // Update paste shortcut to Ctrl/Cmd + I
-    const updatedShortcuts = mergeShortcuts([
+    const updatedShortcuts = configureShortcuts([
       // Update paste to Ctrl/Cmd + I
       {
         actionName: 'paste',

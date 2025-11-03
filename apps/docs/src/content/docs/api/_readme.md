@@ -26,9 +26,9 @@ title: "ng-diagram"
 
 - [EdgeRouting](/docs/api/other/edgerouting/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
+- [configureShortcuts](/docs/api/other/configureshortcuts/)
 - [createMiddlewares](/docs/api/other/createmiddlewares/)
 - [initializeModel](/docs/api/other/initializemodel/)
-- [mergeShortcuts](/docs/api/other/mergeshortcuts/)
 - [provideNgDiagram](/docs/api/other/providengdiagram/)
 
 ## Services
@@ -89,7 +89,6 @@ title: "ng-diagram"
 - [ViewportChangedEvent](/docs/api/types/viewportchangedevent/)
 - [ZIndexConfig](/docs/api/types/zindexconfig/)
 - [ZoomConfig](/docs/api/types/zoomconfig/)
-- [ActionName](/docs/api/types/actionname/)
 - [EdgeRoutingName](/docs/api/types/edgeroutingname/)
 - [MiddlewareChain](/docs/api/types/middlewarechain/)
 - [NgDiagramConfig](/docs/api/types/ngdiagramconfig/)
@@ -98,3 +97,4 @@ title: "ng-diagram"
 - [PortLocation](/docs/api/types/portlocation/)
 - [PortSide](/docs/api/types/portside/)
 - [RoutingMode](/docs/api/types/routingmode/)
+- [ShortcutActionName](/docs/api/types/shortcutactionname/)

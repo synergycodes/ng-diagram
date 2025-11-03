@@ -3,17 +3,17 @@ import { FlowCore } from '../flow-core';
 import { FlowConfig } from '../types/flow-config.interface';
 import { NormalizedKeyboardInput, ShortcutDefinition } from '../types/shortcut.interface';
 import { DEFAULT_SHORTCUTS } from './default-shortcuts';
-import { mergeShortcuts, ShortcutManager } from './shortcut-manager';
+import { configureShortcuts, ShortcutManager } from './shortcut-manager';
 
-describe('mergeShortcuts', () => {
+describe('configureShortcuts', () => {
   it('should return default shortcuts when no user shortcuts provided', () => {
-    const result = mergeShortcuts();
+    const result = configureShortcuts();
 
     expect(result).toEqual(DEFAULT_SHORTCUTS);
   });
 
   it('should return default shortcuts when empty array provided', () => {
-    const result = mergeShortcuts([]);
+    const result = configureShortcuts([]);
 
     expect(result).toEqual(DEFAULT_SHORTCUTS);
   });
@@ -26,7 +26,7 @@ describe('mergeShortcuts', () => {
       },
     ];
 
-    const result = mergeShortcuts(userShortcuts);
+    const result = configureShortcuts(userShortcuts);
 
     const copyShortcut = result.find((s) => s.actionName === 'copy');
     expect(copyShortcut).toBeDefined();
@@ -41,7 +41,7 @@ describe('mergeShortcuts', () => {
       },
     ];
 
-    const result = mergeShortcuts(userShortcuts);
+    const result = configureShortcuts(userShortcuts);
 
     expect(result.length).toBe(DEFAULT_SHORTCUTS.length);
     const movedShortcut = result.find((s) => s.actionName === 'keyboardMoveSelectionUp');
@@ -65,7 +65,7 @@ describe('mergeShortcuts', () => {
       },
     ];
 
-    const result = mergeShortcuts(userShortcuts);
+    const result = configureShortcuts(userShortcuts);
 
     expect(result.length).toBe(DEFAULT_SHORTCUTS.length);
     expect(result.find((s) => s.actionName === 'copy')?.bindings).toEqual([{ key: 'y', modifiers: { primary: true } }]);
@@ -83,7 +83,7 @@ describe('mergeShortcuts', () => {
       },
     ];
 
-    const result = mergeShortcuts(userShortcuts);
+    const result = configureShortcuts(userShortcuts);
 
     const cutShortcut = result.find((s) => s.actionName === 'cut');
     const pasteShortcut = result.find((s) => s.actionName === 'paste');

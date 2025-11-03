@@ -19,7 +19,7 @@ This example demonstrates how to configure and update keyboard shortcuts in ngDi
 ### Key Concepts
 
 - **Initial Configuration:** Shortcuts can be customized during diagram initialization by providing a shortcuts array in the config object.
-- **Merge Helper Function:** The `mergeShortcuts()` helper function combines your custom shortcuts with the default ones automatically. You don't need to provide all shortcuts—only the ones you want to customize.
+- **Configuration Helper Function:** The `configureShortcuts()` helper function combines your custom shortcuts with the default ones automatically. You don't need to provide all shortcuts—only the ones you want to customize.
 - **Source of Truth:** The shortcuts list in the config is the source of truth. When updated at runtime using `updateConfig()`, the new shortcuts take effect immediately.
 - **Runtime Updates:** Use `ngDiagramService.updateConfig({ shortcuts: newShortcuts })` to dynamically change shortcuts while the diagram is running.
 
