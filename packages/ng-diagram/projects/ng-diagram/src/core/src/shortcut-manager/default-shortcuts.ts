@@ -72,6 +72,12 @@ export const DEFAULT_SHORTCUTS = [
     bindings: [{ modifiers: { primary: true } }],
   },
 
+  // Select all nodes and edges
+  {
+    actionName: 'selectAll',
+    bindings: [{ key: 'a', modifiers: { primary: true } }],
+  },
+
   // Undo/Redo operations
   {
     actionName: 'undo',

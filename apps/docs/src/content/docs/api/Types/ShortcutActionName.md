@@ -5,7 +5,7 @@ prev: false
 title: "ShortcutActionName"
 ---
 
-> **ShortcutActionName** = `KeyboardMoveSelectionAction` \| `KeyboardPanAction` \| `Extract`\<`InputEventName`, `"cut"` \| `"paste"` \| `"copy"` \| `"deleteSelection"` \| `"boxSelection"` \| `"undo"` \| `"redo"`\> \| `"preserveSelection"`
+> **ShortcutActionName** = `KeyboardMoveSelectionAction` \| `KeyboardPanAction` \| `Extract`\<`InputEventName`, `"cut"` \| `"paste"` \| `"copy"` \| `"deleteSelection"` \| `"boxSelection"` \| `"undo"` \| `"redo"` \| `"selectAll"`\> \| `"preserveSelection"`
 
 All valid action names for shortcuts
 

@@ -7,6 +7,7 @@ export type InputEventName =
   | 'cut'
   | 'paste'
   | 'select'
+  | 'selectAll'
   | 'deleteSelection'
   | 'panning'
   | 'keyboardPanning'

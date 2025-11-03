@@ -23,7 +23,6 @@ import { CutCommand } from '../command-handler/commands/cut';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
 import { HighlightGroupClearCommand, HighlightGroupCommand } from '../command-handler/commands/highlight-group';
 import { InitCommand } from '../command-handler/commands/init';
-import { ZoomToFitCommand } from '../command-handler/commands/zoom-to-fit';
 import {
   FinishLinkingCommand,
   FinishLinkingToPositionCommand,
@@ -36,9 +35,15 @@ import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/c
 import { RemoveFromGroupCommand } from '../command-handler/commands/remove-from-group';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { RotateNodeToCommand } from '../command-handler/commands/rotate-node';
-import { DeselectAllCommand, DeselectCommand, SelectCommand } from '../command-handler/commands/selection';
+import {
+  DeselectAllCommand,
+  DeselectCommand,
+  SelectAllCommand,
+  SelectCommand,
+} from '../command-handler/commands/selection';
 import { BringToFrontCommand, SendToBackCommand } from '../command-handler/commands/z-order';
 import { ZoomCommand } from '../command-handler/commands/zoom';
+import { ZoomToFitCommand } from '../command-handler/commands/zoom-to-fit';
 import { FlowCore } from '../flow-core';
 
 /**
@@ -47,6 +52,7 @@ import { FlowCore } from '../flow-core';
 export type Command =
   | InitCommand
   | SelectCommand
+  | SelectAllCommand
   | DeselectCommand
   | DeselectAllCommand
   | MoveNodesByCommand
