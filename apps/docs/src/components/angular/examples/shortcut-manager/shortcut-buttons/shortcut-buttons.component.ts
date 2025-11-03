@@ -1,5 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { configureShortcuts, NgDiagramService } from 'ng-diagram';
+import {
+  configureShortcuts,
+  NgDiagramService,
+  type ShortcutDefinition,
+} from 'ng-diagram';
 
 @Component({
   imports: [],
@@ -23,17 +27,22 @@ export class ShortcutButtonsComponent {
   togglePasteShortcut(): void {
     this.useCustomShortcut.update((value) => !value);
 
-    const updatedShortcuts = configureShortcuts([
-      {
-        actionName: 'paste',
-        bindings: [
-          {
-            key: this.useCustomShortcut() ? 'b' : 'v',
-            modifiers: { primary: true },
-          },
-        ],
-      },
-    ]);
+    const currentShortcuts = this.ngDiagramService.config()
+      .shortcuts as ShortcutDefinition[];
+    const updatedShortcuts = configureShortcuts(
+      [
+        {
+          actionName: 'paste',
+          bindings: [
+            {
+              key: this.useCustomShortcut() ? 'b' : 'v',
+              modifiers: { primary: true },
+            },
+          ],
+        },
+      ],
+      currentShortcuts
+    );
 
     this.ngDiagramService.updateConfig({
       shortcuts: updatedShortcuts,

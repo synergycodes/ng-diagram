@@ -5,23 +5,26 @@ prev: false
 title: "configureShortcuts"
 ---
 
-> **configureShortcuts**(`userShortcuts`): `ShortcutDefinition`[]
+> **configureShortcuts**(`userShortcuts`, `baseShortcuts`): [`ShortcutDefinition`](/docs/api/other/shortcutdefinition/)[]
 
-Configures keyboard shortcuts by combining user-provided shortcuts with defaults
-
-User shortcuts with the same actionName will override default ones.
-New shortcuts from the user will be added.
+Merges user shortcuts with base shortcuts, user shortcuts override by actionName
 
 ## Parameters
 
 ### userShortcuts
 
-`ShortcutDefinition`[] = `[]`
+[`ShortcutDefinition`](/docs/api/other/shortcutdefinition/)[]
 
-User-provided shortcuts (optional)
+User-provided shortcuts that will override matching base shortcuts
+
+### baseShortcuts
+
+[`ShortcutDefinition`](/docs/api/other/shortcutdefinition/)[] = `DEFAULT_SHORTCUTS`
+
+Base shortcuts to merge with. Optional parameter that defaults to DEFAULT_SHORTCUTS array
 
 ## Returns
 
-`ShortcutDefinition`[]
+[`ShortcutDefinition`](/docs/api/other/shortcutdefinition/)[]
 
-Configured array of shortcut definitions
+Merged shortcut definitions

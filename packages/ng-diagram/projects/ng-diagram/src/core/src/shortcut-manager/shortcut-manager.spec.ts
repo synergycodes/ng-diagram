@@ -6,12 +6,6 @@ import { DEFAULT_SHORTCUTS } from './default-shortcuts';
 import { configureShortcuts, ShortcutManager } from './shortcut-manager';
 
 describe('configureShortcuts', () => {
-  it('should return default shortcuts when no user shortcuts provided', () => {
-    const result = configureShortcuts();
-
-    expect(result).toEqual(DEFAULT_SHORTCUTS);
-  });
-
   it('should return default shortcuts when empty array provided', () => {
     const result = configureShortcuts([]);
 

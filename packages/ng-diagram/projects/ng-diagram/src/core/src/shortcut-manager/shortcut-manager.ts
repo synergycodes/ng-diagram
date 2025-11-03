@@ -3,21 +3,22 @@ import { NormalizedKeyboardInput, ShortcutBinding, ShortcutDefinition } from '..
 import { DEFAULT_SHORTCUTS } from './default-shortcuts';
 
 /**
- * Configures keyboard shortcuts by combining user-provided shortcuts with defaults
+ * Merges user shortcuts with base shortcuts, user shortcuts override by actionName
  *
- * User shortcuts with the same actionName will override default ones.
- * New shortcuts from the user will be added.
- *
- * @param userShortcuts - User-provided shortcuts (optional)
- * @returns Configured array of shortcut definitions
+ * @param userShortcuts - User-provided shortcuts that will override matching base shortcuts
+ * @param baseShortcuts - Base shortcuts to merge with. Optional parameter that defaults to DEFAULT_SHORTCUTS array
+ * @returns Merged shortcut definitions
  *
  * @category Other
  */
-export function configureShortcuts(userShortcuts: ShortcutDefinition[] = []): ShortcutDefinition[] {
+export function configureShortcuts(
+  userShortcuts: ShortcutDefinition[],
+  baseShortcuts: ShortcutDefinition[] = DEFAULT_SHORTCUTS
+): ShortcutDefinition[] {
   const shortcutMap = new Map<string, ShortcutDefinition>();
 
-  // Add all default shortcuts to the map
-  for (const shortcut of DEFAULT_SHORTCUTS) {
+  // Add all base shortcuts to the map
+  for (const shortcut of baseShortcuts) {
     shortcutMap.set(shortcut.actionName, shortcut);
   }
 

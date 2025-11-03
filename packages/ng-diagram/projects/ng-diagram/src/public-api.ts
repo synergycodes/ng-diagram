@@ -112,6 +112,7 @@ export type {
   SelectionRemovedEvent,
   SelectionRotatedEvent,
   ShortcutActionName,
+  ShortcutDefinition,
   SimpleNode,
   Size,
   SnappingConfig,

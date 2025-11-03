@@ -25,6 +25,7 @@ title: "ng-diagram"
 ## Other
 
 - [EdgeRouting](/docs/api/other/edgerouting/)
+- [ShortcutDefinition](/docs/api/other/shortcutdefinition/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
 - [configureShortcuts](/docs/api/other/configureshortcuts/)
 - [createMiddlewares](/docs/api/other/createmiddlewares/)

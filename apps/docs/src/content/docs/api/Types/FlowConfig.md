@@ -112,7 +112,7 @@ Configuration for selection moving behavior.
 
 ### shortcuts
 
-> **shortcuts**: `ShortcutDefinition`[]
+> **shortcuts**: [`ShortcutDefinition`](/docs/api/other/shortcutdefinition/)[]
 
 Configuration for keyboard shortcuts.
 
