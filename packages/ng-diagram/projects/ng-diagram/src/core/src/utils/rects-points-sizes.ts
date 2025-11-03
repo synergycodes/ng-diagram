@@ -134,10 +134,10 @@ export const unionRect = (rects: Rect[]): Rect => {
     return { x: 0, y: 0, width: 0, height: 0 };
   }
 
-  let minX = 0;
-  let minY = 0;
-  let maxX = 0;
-  let maxY = 0;
+  let minX = rects[0].x;
+  let minY = rects[0].y;
+  let maxX = rects[0].x + rects[0].width;
+  let maxY = rects[0].y + rects[0].height;
 
   rects.forEach((rect) => {
     minX = Math.min(minX, rect.x);
