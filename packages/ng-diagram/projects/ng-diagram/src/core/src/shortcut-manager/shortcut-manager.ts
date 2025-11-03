@@ -112,13 +112,24 @@ export class ShortcutManager {
    * - Key values (if specified in binding)
    * - Modifier states
    *
+   * Matching rules:
+   * - If binding has a key: input must have the same key
+   * - If binding has no key (modifier-only): input must also have no key
+   *   (modifier-only shortcuts are for pointer events, not keyboard events)
+   *
    * @param input - Normalized keyboard input
    * @param binding - Shortcut binding to match against
    * @returns true if the input matches the binding
    */
   private matchBinding(input: NormalizedKeyboardInput, binding: ShortcutBinding): boolean {
-    // If binding specifies a key, it must match
+    // If binding specifies a key, input must match that key
     if (binding.key !== undefined && input.key !== binding.key) {
+      return false;
+    }
+
+    // If binding has no key (modifier-only), input must also have no key
+    // Modifier-only shortcuts are for pointer events, not keyboard events
+    if (binding.key === undefined && input.key !== undefined) {
       return false;
     }
 

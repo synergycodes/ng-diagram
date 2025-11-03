@@ -86,10 +86,6 @@ export class AppComponent {
         actionName: 'keyboardMoveSelectionRight',
         bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
       },
-      {
-        actionName: 'boxSelection',
-        bindings: [{ modifiers: { primary: true } }, { modifiers: { shift: true } }],
-      },
     ]),
   } satisfies NgDiagramConfig;
 

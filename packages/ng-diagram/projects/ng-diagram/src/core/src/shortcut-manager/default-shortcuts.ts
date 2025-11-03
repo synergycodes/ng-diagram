@@ -66,6 +66,12 @@ export const DEFAULT_SHORTCUTS = [
     bindings: [{ modifiers: { shift: true } }],
   },
 
+  // Preserve selection when clicking another node (modifier-only shortcut)
+  {
+    actionName: 'preserveSelection',
+    bindings: [{ modifiers: { primary: true } }],
+  },
+
   // Undo/Redo operations
   {
     actionName: 'undo',
