@@ -75,11 +75,15 @@ export class SignalModelAdapter implements ModelAdapter {
   }
 
   undo(): void {
-    // lint:fix
+    console.warn(
+      'Undo is not implemented in the current model. Please implement a custom ModelAdapter to support undo functionality.'
+    );
   }
 
   redo(): void {
-    // lint:fix
+    console.warn(
+      'Redo is not implemented in the current model. Please implement a custom ModelAdapter to support redo functionality.'
+    );
   }
 
   toJSON(): string {

@@ -17,7 +17,9 @@ export type InputEventName =
   | 'linking'
   | 'rotate'
   | 'paletteDrop'
-  | 'boxSelection';
+  | 'boxSelection'
+  | 'undo'
+  | 'redo';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

@@ -65,4 +65,14 @@ export const DEFAULT_SHORTCUTS = [
     actionName: 'boxSelection',
     bindings: [{ modifiers: { shift: true } }],
   },
+
+  // Undo/Redo operations
+  {
+    actionName: 'undo',
+    bindings: [{ key: 'z', modifiers: { primary: true } }],
+  },
+  {
+    actionName: 'redo',
+    bindings: [{ key: 'y', modifiers: { primary: true } }],
+  },
 ] satisfies ShortcutDefinition[];

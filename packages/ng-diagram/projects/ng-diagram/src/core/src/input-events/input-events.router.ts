@@ -11,9 +11,11 @@ import { PaletteDropEventHandler } from './handlers/palette-drop/palette-drop.ha
 import { PanningEventHandler } from './handlers/panning/panning.handler';
 import { PasteEventHandler } from './handlers/paste/paste.handler';
 import { PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
+import { RedoEventHandler } from './handlers/redo/redo.handler';
 import { ResizeEventHandler } from './handlers/resize/resize.handler';
 import { RotateEventHandler } from './handlers/rotate/rotate.handler';
 import { SelectEventHandler } from './handlers/select/select.handler';
+import { UndoEventHandler } from './handlers/undo/undo.handler';
 import { ZoomingEventHandler } from './handlers/zooming/zooming.handler';
 import { BaseInputEvent, InputEventName } from './input-events.interface';
 
@@ -50,5 +52,7 @@ export abstract class InputEventsRouter {
     this.register('paletteDrop', new PaletteDropEventHandler(flow));
     this.register('cut', new CutEventHandler(flow));
     this.register('boxSelection', new BoxSelectionEventHandler(flow));
+    this.register('undo', new UndoEventHandler(flow));
+    this.register('redo', new RedoEventHandler(flow));
   }
 }
