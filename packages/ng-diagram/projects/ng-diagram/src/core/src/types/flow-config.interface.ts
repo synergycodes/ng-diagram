@@ -146,10 +146,10 @@ export interface BackgroundConfig {
   dotSpacing?: number;
   /**
    * The size of the smallest grid cell (minor grid spacing).
-   * Supports rectangular grids by specifying different x and y values.
-   * @default { x: 10, y: 10 }
+   * Supports rectangular grids by specifying different width and height values.
+   * @default { width: 10, height: 10 }
    */
-  gridSize?: Point;
+  cellSize?: Size;
   /**
    * Specifies how often major grid lines occur, measured in counts of minor grid cells.
    * E.g., { x: 5, y: 5 } draws a major vertical line every 5 minor columns and

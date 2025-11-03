@@ -16,56 +16,7 @@ import {
 @Component({
   imports: [NgDiagramComponent, SidebarContainer, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
-  template: `
-    <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config">
-        @if (backgroundStyle() === 'dot') {
-          <ng-diagram-background />
-        } @else if (backgroundStyle() === 'grid') {
-          <ng-diagram-background type="grid" />
-        } @else if (backgroundStyle() === 'custom') {
-          <ng-diagram-background>
-            <svg width="100%" height="100%" style="display:block">
-              <defs>
-                <pattern
-                  id="pattern-diagram-bg"
-                  width="40"
-                  height="40"
-                  patternUnits="userSpaceOnUse"
-                >
-                  <rect width="40" height="40" fill="#f8fafc" />
-                  <circle cx="10" cy="10" r="2.5" fill="#c7e3ff" />
-                  <circle cx="30" cy="30" r="2.5" fill="#d6f5d6" />
-                  <path
-                    d="M0 40 L40 0"
-                    stroke="#e6eef8"
-                    stroke-width="1"
-                    opacity="0.6"
-                  />
-                  <path
-                    d="M-10 10 L10 -10 M30 50 L50 30"
-                    stroke="#eef6ef"
-                    stroke-width="0.6"
-                    opacity="0.5"
-                  />
-                </pattern>
-              </defs>
-
-              <rect
-                width="100%"
-                height="100%"
-                fill="url(#pattern-diagram-bg)"
-              />
-            </svg>
-          </ng-diagram-background>
-        }
-      </ng-diagram>
-    </div>
-    <sidebar-container
-      [backgroundStyle]="backgroundStyle()"
-      (backgroundStyleChange)="onBackgroundStyleChange($event)"
-    />
-  `,
+  templateUrl: './diagram.component.html',
   styleUrls: ['./diagram.component.scss'],
 })
 export class DiagramComponent {

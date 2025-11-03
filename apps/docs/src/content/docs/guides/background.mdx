@@ -1,5 +1,5 @@
 ---
-title: Background Guide
+title: Background
 description: Example of how to set a background in ngDiagram
 sidebar:
   label: Background
@@ -51,7 +51,7 @@ Our grid pattern is fully customizable, allowing you to adjust preferences.
 
 **Configurable settings:**
 
-- **Grid size**: Controlled via the diagram config [BackgroundConfig.gridSize](/docs/api/types/backgroundconfig/#gridsize)
+- **Minor cell size **: Size of the smallest grid cell (used for minor grid lines). Controlled via the diagram config [BackgroundConfig.cellSize](/docs/api/types/backgroundconfig/#cellSize)
 - **Major line frequency**: How often a major line appears [BackgroundConfig.majorLinesFrequency](/docs/api/types/backgroundconfig/#majorlinesfrequency)
 - **Line colors, widths, and opacity**: Controlled via CSS variables.
 
@@ -83,7 +83,7 @@ This is the default background type.
 
 **Configurable settings:**
 
-- **Dot dotSpacing**: Controlled via the diagram config [BackgroundConfig.dotSpacing](/docs/api/types/backgroundconfig/#dotSpacing)
+- **Dot spacing**: Controlled via the diagram config [BackgroundConfig.dotSpacing](/docs/api/types/backgroundconfig/#dotSpacing)
 - **Dot color**: Controlled via CSS variable.
 
 **CSS Variables:**
@@ -110,7 +110,7 @@ When you apply a custom background, it will completely replace any built-in patt
 
 Custom background will be stretched to cover the entire diagram area.
 
-Background would not be panned or zoomed along with the diagram content.
+Such background would not be panned or zoomed along with the diagram content.
 You can write a custom logic to achieve that if needed.
 
 ## Example

@@ -67,7 +67,7 @@ const defaultZoomConfig: ZoomConfig = {
 
 const defaultBackgroundConfig: BackgroundConfig = {
   dotSpacing: 60,
-  gridSize: { x: 10, y: 10 },
+  cellSize: { width: 10, height: 10 },
   majorLinesFrequency: { x: 5, y: 5 },
 };
 
