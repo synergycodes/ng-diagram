@@ -22,6 +22,10 @@ describe('FlowResizeBatchProcessorService', () => {
     updater: typeof mockInternalUpdater;
     getNodeById: ReturnType<typeof vi.fn>;
     getEdgeById: ReturnType<typeof vi.fn>;
+    actionStateManager: {
+      isResizing: ReturnType<typeof vi.fn>;
+      isRotating: ReturnType<typeof vi.fn>;
+    };
   };
   let mockFlowCoreProvider: { provide: () => typeof mockFlowCore };
   let mockUpdatePortsService: {
@@ -43,6 +47,10 @@ describe('FlowResizeBatchProcessorService', () => {
       updater: mockInternalUpdater,
       getNodeById: vi.fn(),
       getEdgeById: vi.fn(),
+      actionStateManager: {
+        isResizing: vi.fn().mockReturnValue(false),
+        isRotating: vi.fn().mockReturnValue(false),
+      },
     };
     mockFlowCoreProvider = { provide: vi.fn().mockReturnValue(mockFlowCore) };
     mockUpdatePortsService = {
@@ -115,6 +123,25 @@ describe('FlowResizeBatchProcessorService', () => {
 
     expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
     expect(mockInternalUpdater.applyPortsSizesAndPositions).toHaveBeenCalled();
+  });
+
+  it('should skip port measurement during active resize', () => {
+    const entry = { target: {} } as ResizeObserverEntry;
+    const metadata: ObservedElementMetadata = { type: 'node', nodeId: 'n1' };
+
+    mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
+    mockFlowCore.getNodeById.mockReturnValue({ size: { width: 1, height: 2 } });
+    mockFlowCore.actionStateManager.isResizing.mockReturnValue(true);
+
+    vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
+      width: 10,
+      height: 20,
+    });
+    service['isInitialized'] = true;
+    service['processAllResizes']([entry]);
+
+    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortsSizesAndPositions).not.toHaveBeenCalled();
   });
 
   it('should process edge label batch', () => {
