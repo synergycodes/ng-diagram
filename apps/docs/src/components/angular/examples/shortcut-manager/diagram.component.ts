@@ -1,8 +1,8 @@
 import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
-  initializeModel,
   configureShortcuts,
+  initializeModel,
   NgDiagramComponent,
   NgDiagramViewportService,
   type NgDiagramConfig,
@@ -56,21 +56,21 @@ export class DiagramComponent {
         id: '1',
         position: { x: 100, y: 100 },
         data: {
-          name: 'Node 1',
+          label: 'Node 1',
         },
       },
       {
         id: '2',
         position: { x: 400, y: 100 },
         data: {
-          name: 'Node 2',
+          label: 'Node 2',
         },
       },
       {
         id: '3',
         position: { x: 250, y: 300 },
         data: {
-          name: 'Node 3',
+          label: 'Node 3',
         },
       },
     ],
