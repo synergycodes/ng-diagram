@@ -1,4 +1,4 @@
-import type { DataObject, Point, PortSide, Size } from './utils';
+import type { DataObject, Point, PortSide, Rect, Size } from './utils';
 
 /**
  * Interface representing all possible node types in the diagram
@@ -90,6 +90,12 @@ export interface SimpleNode<T extends DataObject = DataObject> {
    * The id of the parent node.
    */
   groupId?: Node<T>['id'];
+  /**
+   * @readonly
+   * @remarks MeasuredBounds are computed by the system and should not be set manually.
+   * Computed bounds of the node based on its position, size, and rotation.
+   */
+  measuredBounds?: Rect;
 }
 
 /**
