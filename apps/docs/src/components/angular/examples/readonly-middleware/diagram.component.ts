@@ -35,9 +35,6 @@ export class DiagramComponent {
       enabled: false,
       allowedActions: ['changeSelection'],
     },
-    edgeRouting: {
-      defaultRouting: 'orthogonal',
-    },
   } satisfies NgDiagramConfig & { readOnly: any };
 
   model = initializeModel({

@@ -24,12 +24,12 @@ export class EdgeRoutingManager {
   /**
    * Creates a new {@link EdgeRoutingManager}.
    *
-   * @param defaultEdgeRouting - The routing to use when none is specified. Defaults to `'polyline'`.
+   * @param defaultEdgeRouting - The routing to use when none is specified. Defaults to `'orthogonal'`.
    * @param getRoutingConfiguration - A function returning the current routing configuration object.
    * Defaults to a function that returns an empty object.
    */
   constructor(defaultEdgeRouting: EdgeRoutingName, getRoutingConfiguration: () => EdgeRoutingConfig) {
-    this.defaultRouting = defaultEdgeRouting || 'polyline';
+    this.defaultRouting = defaultEdgeRouting || 'orthogonal';
     this.getRoutingConfig = getRoutingConfiguration || (() => ({}));
 
     this.registerRouting(new OrthogonalRouting());
