@@ -19,7 +19,7 @@ A port is defined by several key properties:
 - **type**: Determines if the port is a source, target, or both for edge connections.
 - **side**: Specifies which side of the node the port appears on (e.g., left, right, top, bottom).
 
-Ports are stored in the `measuredPorts` property, which is read-only and cannot be modified in the node definition.
+Each node has a `measuredPorts` property that provides information about its ports and their computed position and dimensions. This property is read-only and should not be modified.
 
 ## Styling Ports
 
@@ -72,6 +72,8 @@ To add ports to a node, render them in your node template:
 <CodeSnippet relativePath="nodes/ports/node/node.component.ts" sectionId="usage" />
 
 ## Live example
+
+<br />
 
 <Ports />
 

@@ -73,7 +73,7 @@ const defaultBackgroundConfig: BackgroundConfig = {
 
 const defaultNodeRotationConfig: NodeRotationConfig = {
   shouldSnapForNode: (): boolean => {
-    return true;
+    return false;
   },
   computeSnapAngleForNode: (): number | null => {
     return null;
@@ -82,12 +82,12 @@ const defaultNodeRotationConfig: NodeRotationConfig = {
   defaultRotatable: true,
 };
 
-const defaultNodeDraggingConfig: SnappingConfig = {
+const defaultNodeSnappingConfig: SnappingConfig = {
   shouldSnapDragForNode: (): boolean => {
     return false;
   },
   shouldSnapResizeForNode: (): boolean => {
-    return true;
+    return false;
   },
   computeSnapForNodeDrag: (): Size | null => {
     return null;
@@ -105,7 +105,7 @@ const defaultSelectionMovingConfig: SelectionMovingConfig = {
 };
 
 const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
-  defaultRouting: 'polyline',
+  defaultRouting: 'orthogonal',
   bezier: {
     bezierControlOffset: 100,
   },
@@ -142,7 +142,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       zoom: defaultZoomConfig,
       background: defaultBackgroundConfig,
       nodeRotation: defaultNodeRotationConfig,
-      snapping: defaultNodeDraggingConfig,
+      snapping: defaultNodeSnappingConfig,
       selectionMoving: defaultSelectionMovingConfig,
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,

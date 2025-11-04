@@ -5,7 +5,7 @@ prev: false
 title: "EdgeRoutingConfig"
 ---
 
-Interface representing configurable properties of the edge routing.
+Configuration for edge routing behavior.
 
 ## Indexable
 
