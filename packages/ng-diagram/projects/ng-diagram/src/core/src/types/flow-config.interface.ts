@@ -63,7 +63,7 @@ export interface LinkingConfig {
    * and should return a fully-formed Edge object for rendering the temporary edge.
    * @param defaultTemporaryEdgeData The default temporary edge data (may be incomplete).
    * @returns The Edge object to use for the temporary edge.
-   * @default () => Edge
+   * @default (edge) => Edge
    */
   temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
   /**
@@ -72,7 +72,7 @@ export interface LinkingConfig {
    * and should return a fully-formed Edge object to be added to the flow.
    * @param defaultFinalEdgeData The default finalized edge data (may be incomplete).
    * @returns The Edge object to use for the finalized edge.
-   * @default () => Edge
+   * @default (edge) => Edge
    */
   finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
 }
@@ -230,7 +230,7 @@ export interface SnappingConfig {
    * Computes the snap point for a node while dragging. If null is returned, a default snap point will be used.
    * @param node The node to compute the snap point for dragging.
    * @returns The snap point for the node while dragging, or null.
-   * @default null
+   * @default () => null
    */
   computeSnapForNodeDrag: (node: Node) => Point | null;
 
@@ -321,7 +321,6 @@ export interface EdgeRoutingConfig {
    */
   defaultRouting: EdgeRoutingName;
   /** configuration options for bezier routing
-   * @default { bezierControlOffset: 100 }
    */
   bezier?: {
     /** bezier control point offset
@@ -330,7 +329,6 @@ export interface EdgeRoutingConfig {
     bezierControlOffset?: number;
   };
   /** configuration options for orthogonal routing
-   * @default { maxCornerRadius: 15, firstLastSegmentLength: 20 }
    */
   orthogonal?: {
     /** first/last segment length

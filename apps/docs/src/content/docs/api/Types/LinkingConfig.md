@@ -34,7 +34,7 @@ The Edge object to use for the finalized edge.
 #### Default
 
 ```ts
-() => Edge
+(edge) => Edge
 ```
 
 ***
@@ -78,7 +78,7 @@ The Edge object to use for the temporary edge.
 #### Default
 
 ```ts
-() => Edge
+(edge) => Edge
 ```
 
 ***

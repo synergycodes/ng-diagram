@@ -32,7 +32,7 @@ The snap point for the node while dragging, or null.
 #### Default
 
 ```ts
-null
+() => null
 ```
 
 ***

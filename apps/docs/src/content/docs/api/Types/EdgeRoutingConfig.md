@@ -33,12 +33,6 @@ bezier control point offset
 100
 ```
 
-#### Default
-
-```ts
-{ bezierControlOffset: 100 }
-```
-
 ***
 
 ### defaultRouting
@@ -88,10 +82,4 @@ maximum corner radius
 
 ```ts
 15
-```
-
-#### Default
-
-```ts
-{ maxCornerRadius: 15, firstLastSegmentLength: 20 }
 ```
