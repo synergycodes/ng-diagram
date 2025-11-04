@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   ClipboardPastedEvent,
+  configureShortcuts,
   DiagramInitEvent,
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
@@ -65,6 +66,24 @@ export class AppComponent {
     snapping: {
       shouldSnapDragForNode: () => true,
     },
+    shortcuts: configureShortcuts([
+      {
+        actionName: 'keyboardMoveSelectionUp',
+        bindings: [{ key: 'w' }, { key: 'ArrowUp' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionDown',
+        bindings: [{ key: 's' }, { key: 'ArrowDown' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionLeft',
+        bindings: [{ key: 'a' }, { key: 'ArrowLeft' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionRight',
+        bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
+      },
+    ]),
   } satisfies NgDiagramConfig;
 
   onDiagramInit(event: DiagramInitEvent): void {

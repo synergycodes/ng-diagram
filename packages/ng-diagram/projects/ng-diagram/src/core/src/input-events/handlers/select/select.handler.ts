@@ -4,7 +4,9 @@ import { SelectEvent } from './select.event';
 export class SelectEventHandler extends EventHandler<SelectEvent> {
   handle(event: SelectEvent): void {
     const targetElements = this.getTargetElements(event);
-    const isModifierPressed = event.modifiers.primary;
+    const isModifierPressed = this.flow.shortcutManager.matchesAction('preserveSelection', {
+      modifiers: event.modifiers,
+    });
 
     if (!targetElements && !isModifierPressed) {
       this.flow.commandHandler.emit('deselectAll');

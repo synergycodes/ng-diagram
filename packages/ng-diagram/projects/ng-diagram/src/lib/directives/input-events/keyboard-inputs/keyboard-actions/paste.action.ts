@@ -1,23 +1,36 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+
+import type { BaseInputEvent, BasePointerInputEvent, ShortcutDefinition } from '../../../../../core/src';
 import { CursorPositionTrackerService } from '../../../../services/cursor-position-tracker/cursor-position-tracker.service';
-import { InputEventsRouterService } from '../../../../services/input-events/input-events-router.service';
-import { KeyboardAction } from './keyboard-action';
+import type { KeyboardAction } from './keyboard-action.interface';
 
+/**
+ * Handles paste keyboard shortcut with cursor position enrichment
+ *
+ * This action:
+ * - Only handles 'paste' action
+ * - Enriches paste events with cursor position when available
+ *
+ * @category Services
+ */
 @Injectable()
-export class PasteAction extends KeyboardAction {
-  private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
+export class PasteAction implements KeyboardAction {
+  private readonly cursorPositionTracker = inject(CursorPositionTrackerService);
 
-  override matches(event: KeyboardEvent): boolean {
-    return this.inputEventsRouter.eventGuards.isKeyComboPressed('v', 'primary')(event);
+  canHandle(shortcut: ShortcutDefinition): boolean {
+    return shortcut.actionName === 'paste';
   }
 
-  override handle(event: KeyboardEvent): void {
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      name: 'paste',
+  createEvent(shortcut: ShortcutDefinition, baseEvent: Omit<BaseInputEvent, 'name'>): BaseInputEvent | null {
+    const event = {
       ...baseEvent,
-      lastInputPoint: this.cursorPositionTrackerService.getLastPosition(),
-    });
+      name: shortcut.actionName,
+    } as BasePointerInputEvent;
+
+    if (this.cursorPositionTracker.hasRecentPosition()) {
+      event.lastInputPoint = this.cursorPositionTracker.getLastPosition();
+    }
+
+    return event;
   }
 }

@@ -26,3 +26,7 @@ export * from './transaction.interface';
 
 // Action state types
 export * from './action-state.interface';
+
+// Shortcuts and Actions
+export * from './shortcut-action.interface';
+export * from './shortcut.interface';

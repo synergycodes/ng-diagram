@@ -25,7 +25,17 @@ title: "ng-diagram"
 ## Other
 
 - [EdgeRouting](/docs/api/other/edgerouting/)
+- [KeyboardShortcutBinding](/docs/api/other/keyboardshortcutbinding/)
+- [KeyboardShortcutDefinition](/docs/api/other/keyboardshortcutdefinition/)
+- [ModifierOnlyShortcutBinding](/docs/api/other/modifieronlyshortcutbinding/)
+- [PointerOnlyShortcutDefinition](/docs/api/other/pointeronlyshortcutdefinition/)
+- [KeyboardActionName](/docs/api/other/keyboardactionname/)
+- [KeyboardMoveSelectionAction](/docs/api/other/keyboardmoveselectionaction/)
+- [KeyboardPanAction](/docs/api/other/keyboardpanaction/)
+- [PointerOnlyActionName](/docs/api/other/pointeronlyactionname/)
+- [ShortcutDefinition](/docs/api/other/shortcutdefinition/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
+- [configureShortcuts](/docs/api/other/configureshortcuts/)
 - [createMiddlewares](/docs/api/other/createmiddlewares/)
 - [initializeModel](/docs/api/other/initializemodel/)
 - [provideNgDiagram](/docs/api/other/providengdiagram/)
@@ -97,3 +107,4 @@ title: "ng-diagram"
 - [PortLocation](/docs/api/types/portlocation/)
 - [PortSide](/docs/api/types/portside/)
 - [RoutingMode](/docs/api/types/routingmode/)
+- [ShortcutActionName](/docs/api/types/shortcutactionname/)

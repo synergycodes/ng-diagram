@@ -1,4 +1,5 @@
 import { FlowCore } from '../flow-core';
+import { DEFAULT_SHORTCUTS } from '../shortcut-manager';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
@@ -147,6 +148,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,
       boxSelection: defaultBoxSelectionConfig,
+      shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
     },
     config
