@@ -36,8 +36,11 @@ this.ngDiagramService.updateConfig({ cellSize: 20 });
 
 > `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/actionstate/)\>\>
 
-Reactive signal that tracks the current action state.
-Updates automatically when actions like resizing, rotating, or linking start/end.
+Reactive signal that tracks the current action state (readonly).
+This signal is managed internally by the diagram and updates automatically
+when actions like resizing, rotating, or linking start/end.
+
+ - This property cannot be modified directly.
 
 ***
 
