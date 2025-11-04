@@ -23,8 +23,15 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * ```typescript
  * private ngDiagramService = inject(NgDiagramService);
  *
- * // Check if diagram is initialized
- * const ready = this.ngDiagramService.isInitialized();
+ * // Check if diagram is initialized (reactive signal)
+ * effect(() => {
+ *   if (this.ngDiagramService.isInitialized()) {
+ *     console.log('Diagram ready!');
+ *   }
+ * });
+ *
+ * // Access reactive config
+ * const cellSize = this.ngDiagramService.config().cellSize;
  *
  * // Update configuration
  * this.ngDiagramService.updateConfig({ cellSize: 20 });
@@ -36,13 +43,31 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
 export class NgDiagramService extends NgDiagramBaseService {
   private readonly manualLinkingService = inject(ManualLinkingService);
   private readonly renderer = inject(RendererService);
+
+  // ==============================
+  // Reactive State (Signals)
+  // ==============================
+
+  /**
+   * Returns whether the diagram is fully initialized and all elements are measured.
+   * This signal is set to `true` when the `diagramInit` event fires.
+   */
+  isInitialized = this.renderer.isInitialized.asReadonly();
+
   private config$ = signal<Readonly<NgDiagramConfig>>({});
+  /**
+   * Reactive signal that tracks the current configuration (readonly).
+   * To update the configuration, use {@link updateConfig}.
+   */
   readonly config = this.config$.asReadonly();
 
   private actionState$ = signal<Readonly<ActionState>>({});
   /**
-   * Reactive signal that tracks the current action state.
-   * Updates automatically when actions like resizing, rotating, or linking start/end.
+   * Reactive signal that tracks the current action state (readonly).
+   * This signal is managed internally by the diagram and updates automatically
+   * when actions like resizing, rotating, or linking start/end.
+   *
+   * @readonly - This property cannot be modified directly.
    */
   readonly actionState = this.actionState$.asReadonly();
 
@@ -65,11 +90,25 @@ export class NgDiagramService extends NgDiagramBaseService {
     });
   }
 
+  // ==============================
+  // Configuration
+  // ==============================
+
   /**
-   * Returns whether the diagram is fully initialized and all elements are measured.
-   * This signal is set to `true` when the `diagramInit` event fires.
+   * Updates the current configuration.
+   * @param config Partial configuration object containing properties to update.
+   * @example
+   * // Update cell size
+   * ngDiagramService.updateConfig({ cellSize: 20 });
    */
-  isInitialized = this.renderer.isInitialized.asReadonly();
+  updateConfig(config: Partial<NgDiagramConfig>) {
+    this.flowCore.updateConfig(config);
+    this.config$.set(this.flowCore.config);
+  }
+
+  // ==============================
+  // Queries
+  // ==============================
 
   /**
    * Gets the current environment information.
@@ -79,33 +118,9 @@ export class NgDiagramService extends NgDiagramBaseService {
     return this.flowCore.getEnvironment();
   }
 
-  /**
-   * Returns the current action state (readonly).
-   * This includes information about ongoing actions like resizing and linking.
-   * @returns The current action state.
-   */
-  getActionState(): Readonly<ActionState> {
-    return this.flowCore.actionStateManager.getState();
-  }
-
-  /**
-   * Returns the current configuration (readonly).
-   * The returned object cannot be modified directly —
-   * use {@link updateConfig} to make changes.
-   * @returns The current configuration.
-   */
-  getConfig(): Readonly<NgDiagramConfig> {
-    return this.flowCore.config;
-  }
-
-  /**
-   * Updates the current configuration.
-   * @param config Partial configuration object containing properties to update.
-   */
-  updateConfig(config: Partial<NgDiagramConfig>) {
-    this.flowCore.updateConfig(config);
-    this.config$.set(this.flowCore.config);
-  }
+  // ==============================
+  // Middleware
+  // ==============================
 
   /**
    * Registers a new middleware in the chain.
@@ -123,6 +138,10 @@ export class NgDiagramService extends NgDiagramBaseService {
   unregisterMiddleware(name: string): void {
     this.flowCore.unregisterMiddleware(name);
   }
+
+  // ==============================
+  // Edge Routing
+  // ==============================
 
   /**
    * Registers a custom routing implementation.
@@ -171,6 +190,10 @@ export class NgDiagramService extends NgDiagramBaseService {
     return this.flowCore.edgeRoutingManager.getDefaultRouting();
   }
 
+  // ==============================
+  // Manual Linking
+  // ==============================
+
   /**
    * Call this method to start linking from your custom logic.
    * @param node The node from which the linking starts.
@@ -179,6 +202,10 @@ export class NgDiagramService extends NgDiagramBaseService {
   startLinking(node: Node, portId: string) {
     this.manualLinkingService.startLinking(node, portId);
   }
+
+  // ==============================
+  // Event Management
+  // ==============================
 
   /**
    * Add an event listener for a diagram event.
@@ -272,6 +299,10 @@ export class NgDiagramService extends NgDiagramBaseService {
   hasEventListeners(event: keyof DiagramEventMap): boolean {
     return this.flowCore.eventManager.hasListeners(event);
   }
+
+  // ==============================
+  // Transactions
+  // ==============================
 
   /**
    * Executes a function within a transaction context.
