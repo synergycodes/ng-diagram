@@ -31,7 +31,7 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * });
  *
  * // Access reactive config
- * const cellSize = this.ngDiagramService.config().cellSize;
+ * const cellSize = this.ngDiagramService.config().background.cellSize;
  *
  * // Update configuration
  * this.ngDiagramService.updateConfig({ cellSize: 20 });
