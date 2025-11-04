@@ -514,6 +514,6 @@ Partial configuration object containing properties to update.
 #### Example
 
 ```ts
-// Update cell size
-ngDiagramService.updateConfig({ cellSize: 20 });
+// Enable debug mode
+this.ngDiagramService.updateConfig({ debugMode: true });
 ```

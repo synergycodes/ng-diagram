@@ -98,8 +98,8 @@ export class NgDiagramService extends NgDiagramBaseService {
    * Updates the current configuration.
    * @param config Partial configuration object containing properties to update.
    * @example
-   * // Update cell size
-   * ngDiagramService.updateConfig({ cellSize: 20 });
+   * // Enable debug mode
+   * this.ngDiagramService.updateConfig({ debugMode: true });
    */
   updateConfig(config: Partial<NgDiagramConfig>) {
     this.flowCore.updateConfig(config);
