@@ -31,10 +31,10 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * });
  *
  * // Access reactive config
- * const cellSize = this.ngDiagramService.config().background.cellSize;
+ * const isDebugMode = this.ngDiagramService.config().debugMode;
  *
  * // Update configuration
- * this.ngDiagramService.updateConfig({ cellSize: 20 });
+ * this.ngDiagramService.updateConfig({ debugMode: true });
  * ```
  *
  * @category Services
