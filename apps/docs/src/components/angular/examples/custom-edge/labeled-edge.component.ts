@@ -11,7 +11,7 @@ const STROKE_WIDTH_SELECTED = 4;
 
 @Component({
   template: `<ng-diagram-base-edge
-    [edge]="customEdge()"
+    [edge]="edge()"
     stroke="orange"
     [strokeWidth]="strokeWidth()"
   >
@@ -37,26 +37,4 @@ export class LabeledEdgeComponent implements NgDiagramEdgeTemplate {
     const edge = this.edge();
     alert(`Edge ID: ${edge.id}`);
   }
-
-  customEdge = computed(() => {
-    const edge = this.edge();
-    const { sourcePosition, targetPosition } = edge;
-
-    if (!sourcePosition || !targetPosition) {
-      return edge;
-    }
-
-    // Create custom points for the edge path
-    const points = [
-      { x: sourcePosition.x, y: sourcePosition.y },
-      { x: targetPosition.x, y: targetPosition.y },
-    ];
-
-    return {
-      ...edge,
-      points,
-      routing: 'polyline',
-      routingMode: 'manual' as const,
-    };
-  });
 }

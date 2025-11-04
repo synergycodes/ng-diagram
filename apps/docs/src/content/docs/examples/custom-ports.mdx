@@ -11,6 +11,8 @@ import CustomPorts from '@examples/custom-ports/custom-ports.astro';
 
 This example demonstrates how to create custom ports in ngDiagram by customizing their appearance and behavior.
 
+<br />
+
 <CustomPorts />
 <CodeViewer dirName="examples/custom-ports" />
 
@@ -20,9 +22,9 @@ This example demonstrates how to create custom ports in ngDiagram by customizing
 
 Two nodes are rendered, each with four ports (left, top, right, bottom).
 
-- The right port of the second node uses a data property to apply red background.
+- The left port of the second node uses a data property to apply red background.
 - The top port has a changed inline position in both nodes.
-- The left port is customized with styles based on class property.
+- The right port is customized with styles based on class property.
 
 ### Key Concepts
 
@@ -34,7 +36,6 @@ Two nodes are rendered, each with four ports (left, top, right, bottom).
 
 - **Node Template Customization:**
   The `NodeComponent` template defines the arrangement and styling of ports within each node.
-  Ports are stored in the `measuredPorts` property, which is read-only and cannot be modified in the node definition.
 
 - **Port Binding:**
   Ports have a `type` property to set the connection type for each port. You can set it to `'both'`, `'target'`, or `'source'`.

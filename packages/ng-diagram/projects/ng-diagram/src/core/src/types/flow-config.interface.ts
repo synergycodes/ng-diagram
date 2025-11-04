@@ -282,7 +282,7 @@ export interface ZIndexConfig {
 }
 
 /**
- * Interface representing configurable properties of the edge routing.
+ * Configuration for edge routing behavior.
  *
  * @category Types
  */
@@ -312,6 +312,11 @@ export interface EdgeRoutingConfig {
   [edgeRoutingName: string]: Record<string, unknown> | EdgeRoutingName | undefined;
 }
 
+/**
+ * Configuration for box selection behavior.
+ *
+ * @category Types
+ */
 export interface BoxSelectionConfig {
   /**
    * Whether to select nodes that are only partially within the selection box.
