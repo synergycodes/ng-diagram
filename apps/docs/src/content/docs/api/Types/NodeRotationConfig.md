@@ -32,7 +32,7 @@ The angle in degrees to snap to, or null if default snapping should be used.
 #### Default
 
 ```ts
-null
+() => null
 ```
 
 ***
@@ -88,5 +88,5 @@ True if rotation should snap, false otherwise.
 #### Default
 
 ```ts
-true
+() => false
 ```

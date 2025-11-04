@@ -55,7 +55,7 @@ EdgeRoutingName
 #### Default
 
 ```ts
-'polyline'
+'orthogonal'
 ```
 
 ***

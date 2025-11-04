@@ -34,7 +34,7 @@ The Edge object to use for the finalized edge.
 #### Default
 
 ```ts
-returns Edge
+() => Edge
 ```
 
 ***
@@ -78,7 +78,7 @@ The Edge object to use for the temporary edge.
 #### Default
 
 ```ts
-returns Edge
+() => Edge
 ```
 
 ***
@@ -124,5 +124,5 @@ True if the connection is valid, false otherwise.
 #### Default
 
 ```ts
-true
+() => true
 ```

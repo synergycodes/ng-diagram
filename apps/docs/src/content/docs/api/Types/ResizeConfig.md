@@ -60,5 +60,5 @@ The node to compute the minimum size for.
 #### Default
 
 ```ts
-{ width: 20, height: 20 }
+() => ({ width: 20, height: 20 })
 ```

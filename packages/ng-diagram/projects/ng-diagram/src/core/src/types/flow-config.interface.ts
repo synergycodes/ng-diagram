@@ -12,7 +12,7 @@ export interface ResizeConfig {
   /**
    * Returns the minimum allowed size for a node.
    * @param node The node to compute the minimum size for.
-   * @default { width: 20, height: 20 }
+   * @default () => ({ width: 20, height: 20 })
    */
   getMinNodeSize: (node: Node) => Size;
 
@@ -49,7 +49,7 @@ export interface LinkingConfig {
    * @param target The target node.
    * @param targetPort The target port.
    * @returns True if the connection is valid, false otherwise.
-   * @default true
+   * @default () => true
    */
   validateConnection: (
     source: Node | null,
@@ -63,7 +63,7 @@ export interface LinkingConfig {
    * and should return a fully-formed Edge object for rendering the temporary edge.
    * @param defaultTemporaryEdgeData The default temporary edge data (may be incomplete).
    * @returns The Edge object to use for the temporary edge.
-   * @default returns Edge
+   * @default () => Edge
    */
   temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
   /**
@@ -72,7 +72,7 @@ export interface LinkingConfig {
    * and should return a fully-formed Edge object to be added to the flow.
    * @param defaultFinalEdgeData The default finalized edge data (may be incomplete).
    * @returns The Edge object to use for the finalized edge.
-   * @default returns Edge
+   * @default () => Edge
    */
   finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
 }
@@ -88,7 +88,7 @@ export interface GroupingConfig {
    * @param node The node to group.
    * @param group The group node.
    * @returns True if the node can be grouped, false otherwise.
-   * @default true
+   * @default () => true
    */
   canGroup: (node: Node, group: Node) => boolean;
 }
@@ -181,14 +181,14 @@ export interface NodeRotationConfig {
    * Determines if rotation snapping should be enabled for a node.
    * @param node The node to check for rotation snapping.
    * @returns True if rotation should snap, false otherwise.
-   * @default true
+   * @default () => false
    */
   shouldSnapForNode: (node: Node) => boolean;
   /**
    * Computes the snap angle for a node's rotation.
    * @param node The node to compute the snap angle for.
    * @returns The angle in degrees to snap to, or null if default snapping should be used.
-   * @default null
+   * @default () => null
    */
   computeSnapAngleForNode: (node: Node) => number | null;
   /**
@@ -214,7 +214,7 @@ export interface SnappingConfig {
    * Determines if a node should snap to grid while dragging.
    * @param node The node being dragged.
    * @returns True if the node should snap to grid, false otherwise.
-   * @default false
+   * @default () => false
    */
   shouldSnapDragForNode: (node: Node) => boolean;
 
@@ -222,7 +222,7 @@ export interface SnappingConfig {
    * Determines if a node should snap to grid while resizing.
    * @param node The node being resized.
    * @returns True if the node should snap to grid, false otherwise.
-   * @default true
+   * @default () => false
    */
   shouldSnapResizeForNode: (node: Node) => boolean;
 
@@ -238,7 +238,7 @@ export interface SnappingConfig {
    * Computes the snap point for a node while resizing. If null is returned, a default snap point will be used.
    * @param node The node to compute the snap point for resizing.
    * @returns The snap point for the node while resizing, or null.
-   * @default null
+   * @default () => null
    */
   computeSnapForNodeSize: (node: Node) => Point | null;
 
@@ -317,7 +317,7 @@ export interface EdgeRoutingConfig {
    * The default edge routing algorithm to use for edges.
    * Can be one of the built-in routing names or a custom string for user-defined routing.
    * @see EdgeRoutingName
-   * @default 'polyline'
+   * @default 'orthogonal'
    */
   defaultRouting: EdgeRoutingName;
   /** configuration options for bezier routing

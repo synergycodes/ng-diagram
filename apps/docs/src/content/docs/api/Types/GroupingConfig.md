@@ -38,5 +38,5 @@ True if the node can be grouped, false otherwise.
 #### Default
 
 ```ts
-true
+() => true
 ```

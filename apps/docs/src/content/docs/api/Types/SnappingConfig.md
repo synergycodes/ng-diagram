@@ -60,7 +60,7 @@ The snap point for the node while resizing, or null.
 #### Default
 
 ```ts
-null
+() => null
 ```
 
 ***
@@ -116,7 +116,7 @@ True if the node should snap to grid, false otherwise.
 #### Default
 
 ```ts
-false
+() => false
 ```
 
 ***
@@ -144,5 +144,5 @@ True if the node should snap to grid, false otherwise.
 #### Default
 
 ```ts
-true
+() => false
 ```
