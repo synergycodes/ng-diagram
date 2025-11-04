@@ -6,6 +6,7 @@ import starlightTypeDoc from 'starlight-typedoc';
 
 import angular from '@analogjs/astro-angular';
 import umami from '@yeskunall/astro-umami';
+import tailwindcss from '@tailwindcss/vite';
 
 const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 
@@ -13,6 +14,9 @@ export default defineConfig({
   base: '/docs',
   redirects: {
     '/': '/docs/intro/quick-start/',
+  },
+  vite: {
+    plugins: [tailwindcss()],
   },
   integrations: [
     umami({

@@ -1,0 +1,44 @@
+<ng-diagram-node-rotate-adornment />
+<ng-diagram-node-resize-adornment>
+  <div
+    class="flex flex-col p-3 rounded-lg bg-white border border-gray-300 w-full h-full"
+  >
+    <div class="flex justify-between items-center font-bold mb-1">
+      <div>
+        {{ node().data.name }}
+      </div>
+      <div>
+        <span
+          class="inline-block text-xs h-5 px-2 rounded-full text-white mb-2 leading-5"
+          [ngClass]="{
+            'bg-green-500': selectedState === 'Active',
+            'bg-red-500': selectedState === 'Error',
+            'bg-gray-400': selectedState === 'Inactive',
+          }"
+          >{{ selectedState }}</span
+        >
+      </div>
+    </div>
+    <div class="text-sm cursor-help" title="{{ node().data.tooltip }}">
+      {{ node().data.description }}
+      <form class="h-12 mt-2">
+        <label for="state-select" class="mr-2">State:</label>
+        <select
+          id="state-select"
+          [value]="selectedState"
+          name="state"
+          (change)="onStateChange($event)"
+          class="min-w-[120px] px-2 py-1 rounded border border-gray-300 text-sm ml-2"
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Error">Error</option>
+        </select>
+      </form>
+    </div>
+  </div>
+  <ng-diagram-port id="port-left" type="both" side="left" />
+  <ng-diagram-port id="port-top" type="both" side="top" />
+  <ng-diagram-port id="port-right" type="both" side="right" />
+  <ng-diagram-port id="port-bottom" type="both" side="bottom" />
+</ng-diagram-node-resize-adornment>

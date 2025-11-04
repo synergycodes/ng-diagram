@@ -1,3 +1,4 @@
+@import 'tailwindcss';
 @layer reset, starlight;
 @import 'ng-diagram/styles.css';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
