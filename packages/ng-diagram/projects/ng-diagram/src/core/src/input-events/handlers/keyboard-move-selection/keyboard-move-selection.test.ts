@@ -43,7 +43,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       },
       config: {
         snapping: {
-          defaultDragSnap: { x: 10, y: 10 },
+          defaultDragSnap: { width: 10, height: 10 },
         },
         selectionMoving: {
           edgePanningThreshold: 10,

@@ -1,7 +1,7 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
-import { Point, Size } from './utils';
+import { Size } from './utils';
 
 /**
  * Configuration for node resizing behavior.
@@ -210,30 +210,30 @@ export interface SnappingConfig {
   shouldSnapResizeForNode: (node: Node) => boolean;
 
   /**
-   * Computes the snap point for a node while dragging. If null is returned, a default snap point will be used.
-   * @param node The node to compute the snap point for dragging.
-   * @returns The snap point for the node while dragging, or null.
+   * Computes the snap size for a node while dragging. If null is returned, a default snap size will be used.
+   * @param node The node to compute the snap size for dragging.
+   * @returns The snap size for the node while dragging, or null.
    */
-  computeSnapForNodeDrag: (node: Node) => Point | null;
+  computeSnapForNodeDrag: (node: Node) => Size | null;
 
   /**
-   * Computes the snap point for a node while resizing. If null is returned, a default snap point will be used.
-   * @param node The node to compute the snap point for resizing.
-   * @returns The snap point for the node while resizing, or null.
+   * Computes the snap size for a node while resizing. If null is returned, a default snap size will be used.
+   * @param node The node to compute the snap size for resizing.
+   * @returns The snap size for the node while resizing, or null.
    */
-  computeSnapForNodeSize: (node: Node) => Point | null;
+  computeSnapForNodeSize: (node: Node) => Size | null;
 
   /**
-   * The default snap point for node dragging.
-   * @default { x: 10, y: 10 }
+   * The default snap size for node dragging.
+   * @default { width: 10, height: 10 }
    */
-  defaultDragSnap: Point;
+  defaultDragSnap: Size;
 
   /**
-   * The default snap point for node resizing.
-   * @default { x: 10, y: 10 }
+   * The default snap size for node resizing.
+   * @default { width: 10, height: 10 }
    */
-  defaultResizeSnap: Point;
+  defaultResizeSnap: Size;
 }
 
 /**

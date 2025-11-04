@@ -15,7 +15,7 @@ import type {
   ZoomConfig,
   ZoomToFitConfig,
 } from '../types/flow-config.interface';
-import { DeepPartial, Point, Size } from '../types/utils';
+import { DeepPartial, Size } from '../types/utils';
 import { deepMerge } from '../utils';
 
 export const DEFAULT_NODE_MIN_SIZE = { width: 20, height: 20 };
@@ -89,14 +89,14 @@ const defaultNodeDraggingConfig: SnappingConfig = {
   shouldSnapResizeForNode: (): boolean => {
     return true;
   },
-  computeSnapForNodeDrag: (): Point | null => {
+  computeSnapForNodeDrag: (): Size | null => {
     return null;
   },
-  computeSnapForNodeSize: (): Point | null => {
+  computeSnapForNodeSize: (): Size | null => {
     return null;
   },
-  defaultDragSnap: { x: 10, y: 10 },
-  defaultResizeSnap: { x: 10, y: 10 },
+  defaultDragSnap: { width: 10, height: 10 },
+  defaultResizeSnap: { width: 10, height: 10 },
 };
 
 const defaultSelectionMovingConfig: SelectionMovingConfig = {

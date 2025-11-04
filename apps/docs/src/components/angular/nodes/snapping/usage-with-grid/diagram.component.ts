@@ -35,9 +35,9 @@ export class DiagramComponent {
     },
     snapping: {
       shouldSnapDragForNode: () => true,
-      computeSnapForNodeDrag: () => ({ x: 20, y: 20 }),
+      computeSnapForNodeDrag: () => ({ width: 20, height: 20 }),
       shouldSnapResizeForNode: () => true,
-      computeSnapForNodeSize: () => ({ x: 20, y: 20 }),
+      computeSnapForNodeSize: () => ({ width: 20, height: 20 }),
     },
   } satisfies NgDiagramConfig;
   // @section-end:config

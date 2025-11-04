@@ -7,6 +7,7 @@ import {
   type NgDiagramConfig,
 } from 'ng-diagram';
 
+// @section-start:usage
 @Component({
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
@@ -19,7 +20,6 @@ import {
   styleUrl: './diagram.component.scss',
 })
 export class DiagramComponent {
-  // @section-start:config
   config = {
     zoom: {
       max: 2,
@@ -29,11 +29,11 @@ export class DiagramComponent {
     },
     snapping: {
       shouldSnapDragForNode: () => true,
-      computeSnapForNodeDrag: () => ({ x: 20, y: 20 }),
-      defaultDragSnap: { x: 20, y: 20 },
+      computeSnapForNodeDrag: () => ({ width: 20, height: 20 }),
+      defaultDragSnap: { width: 20, height: 20 },
     },
   } satisfies NgDiagramConfig;
-  // @section-end:config
+  // @section-end:usage
 
   model = initializeModel({
     nodes: [

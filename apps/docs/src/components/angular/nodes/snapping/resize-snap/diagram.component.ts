@@ -29,8 +29,8 @@ export class DiagramComponent {
     },
     snapping: {
       shouldSnapResizeForNode: () => true,
-      computeSnapForNodeSize: () => ({ x: 20, y: 20 }),
-      defaultResizeSnap: { x: 20, y: 20 },
+      computeSnapForNodeSize: () => ({ width: 20, height: 20 }),
+      defaultResizeSnap: { width: 20, height: 20 },
     },
   } satisfies NgDiagramConfig;
   // @section-end:config
