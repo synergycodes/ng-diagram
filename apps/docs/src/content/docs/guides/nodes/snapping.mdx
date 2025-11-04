@@ -12,7 +12,6 @@ The **snapping** feature in ngDiagram allows nodes to be moved and resized in st
 
 ## Snap Drag Configuration
 
-Snap drag functionality is disabled by default. The default snap step is set to `{ width: 10, height: 10 }`.
 The following configuration options are available for snapping nodes during drag operations:
 
 ```typescript
@@ -30,7 +29,7 @@ const config = {
 
 - `computeSnapForNodeDrag` defines the snap step for dragging nodes.
 
-- `defaultDragSnap` sets a default snap step for dragging nodes if `computeSnapForNodeDrag` is not provided.
+- `defaultDragSnap` sets a default snap step for dragging nodes if `computeSnapForNodeDrag` is not provided. The default value is `{ width: 10, height: 10 }`.
 
 <br />
 <DragSnapExample />
@@ -39,7 +38,6 @@ const config = {
 
 ## Snap Resize Configuration
 
-Snap resize functionality is enabled by default. The default snap step is set to `{ width: 10, height: 10 }`.
 The following configuration options allow you to configure snapping when resizing nodes:
 
 ```typescript
@@ -57,7 +55,7 @@ const config = {
 
 - `computeSnapForNodeResize` defines the snap step for resizing nodes.
 
-- `defaultResizeSnap` sets a default snap step for resizing nodes if `computeSnapForNodeResize` is not provided.
+- `defaultResizeSnap` sets a default snap step for resizing nodes if `computeSnapForNodeResize` is not provided. The default value is `{ width: 10, height: 10 }`.
 
 <br />
 <ResizeSnapExample />
