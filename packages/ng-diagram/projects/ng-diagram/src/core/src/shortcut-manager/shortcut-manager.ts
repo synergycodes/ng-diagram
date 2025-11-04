@@ -6,8 +6,36 @@ import { DEFAULT_SHORTCUTS } from './default-shortcuts';
  * Merges user shortcuts with base shortcuts, user shortcuts override by actionName
  *
  * @param userShortcuts - User-provided shortcuts that will override matching base shortcuts
- * @param baseShortcuts - Base shortcuts to merge with. Optional parameter that defaults to DEFAULT_SHORTCUTS array
+ * @param baseShortcuts - Base shortcuts to merge with. Optional parameter that defaults to built-in shortcuts
  * @returns Merged shortcut definitions
+ *
+ * @example
+ * ```ts
+ * // Merge with default built-in shortcuts
+ * config = {
+ *   shortcuts: configureShortcuts([
+ *     {
+ *       actionName: 'keyboardMoveSelectionUp',
+ *       bindings: [{ key: 'w' }],
+ *     },
+ *   ]),
+ * } satisfies NgDiagramConfig;
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Merge with existing config shortcuts
+ * const currentShortcuts = ngDiagramService.config().shortcuts;
+ * const updatedShortcuts = configureShortcuts(
+ *   [
+ *     {
+ *       actionName: 'paste',
+ *       bindings: [{ key: 'b', modifiers: { primary: true } }],
+ *     },
+ *   ],
+ *   currentShortcuts
+ * );
+ * ```
  *
  * @category Other
  */

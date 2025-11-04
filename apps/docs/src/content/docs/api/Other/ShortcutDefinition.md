@@ -5,7 +5,7 @@ prev: false
 title: "ShortcutDefinition"
 ---
 
-> **ShortcutDefinition** = `KeyboardShortcutDefinition` \| `PointerOnlyShortcutDefinition`
+> **ShortcutDefinition** = [`KeyboardShortcutDefinition`](/docs/api/other/keyboardshortcutdefinition/) \| [`PointerOnlyShortcutDefinition`](/docs/api/other/pointeronlyshortcutdefinition/)
 
 Shortcut definition for registering keyboard and pointer shortcuts
 

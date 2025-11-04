@@ -25,6 +25,14 @@ title: "ng-diagram"
 ## Other
 
 - [EdgeRouting](/docs/api/other/edgerouting/)
+- [KeyboardShortcutBinding](/docs/api/other/keyboardshortcutbinding/)
+- [KeyboardShortcutDefinition](/docs/api/other/keyboardshortcutdefinition/)
+- [ModifierOnlyShortcutBinding](/docs/api/other/modifieronlyshortcutbinding/)
+- [PointerOnlyShortcutDefinition](/docs/api/other/pointeronlyshortcutdefinition/)
+- [KeyboardActionName](/docs/api/other/keyboardactionname/)
+- [KeyboardMoveSelectionAction](/docs/api/other/keyboardmoveselectionaction/)
+- [KeyboardPanAction](/docs/api/other/keyboardpanaction/)
+- [PointerOnlyActionName](/docs/api/other/pointeronlyactionname/)
 - [ShortcutDefinition](/docs/api/other/shortcutdefinition/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
 - [configureShortcuts](/docs/api/other/configureshortcuts/)

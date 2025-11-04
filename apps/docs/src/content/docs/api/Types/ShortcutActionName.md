@@ -5,7 +5,7 @@ prev: false
 title: "ShortcutActionName"
 ---
 
-> **ShortcutActionName** = `KeyboardActionName` \| `PointerOnlyActionName`
+> **ShortcutActionName** = [`KeyboardActionName`](/docs/api/other/keyboardactionname/) \| [`PointerOnlyActionName`](/docs/api/other/pointeronlyactionname/)
 
 All valid action names for shortcuts
 
