@@ -46,9 +46,6 @@ export class DiagramComponent {
       },
     },
     // @mark-end:config
-    snapping: {
-      shouldSnapResizeForNode: () => false,
-    },
   } satisfies NgDiagramConfig;
   // @collapse-start:config
 

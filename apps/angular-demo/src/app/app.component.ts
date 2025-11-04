@@ -61,13 +61,10 @@ export class AppComponent {
       },
     },
     background: {
-      gridSize: { x: 10, y: 10 },
+      cellSize: { width: 10, height: 10 },
     },
     snapping: {
       shouldSnapDragForNode: () => true,
-    },
-    edgeRouting: {
-      defaultRouting: 'orthogonal',
     },
     shortcuts: configureShortcuts([
       {

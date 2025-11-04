@@ -11,6 +11,8 @@ import DownloadImage from '../../../components/angular/examples/download-image/d
 
 This example demonstrates how to export the current flow as an image using Angular features and the `html-to-image` library.
 
+<br />
+
 <DownloadImage />
 <CodeViewer dirName="examples/download-image" />
 
@@ -23,14 +25,14 @@ This example demonstrates how to export the current flow as an image using Angul
 
 ### Implementation Details
 
-- **Generate Image Service:**  
+- **Generate Image Service:**
   Handles the logic for exporting the flow as an image, using the `html-to-image` library and bounding box calculation.
 
-- **Helper Functions:**  
+- **Helper Functions:**
   Manage the download process and calculate the bounding box for the flow.
 
-- **NavBar Component:**  
-  Provides a button to trigger the download action.  
+- **NavBar Component:**
+  Provides a button to trigger the download action.
   Calculates the bounding box for the entire flow and passes the flow element reference to the service.
 
 ### Actions

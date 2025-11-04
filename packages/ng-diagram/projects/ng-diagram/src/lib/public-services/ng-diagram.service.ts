@@ -27,7 +27,7 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * const ready = this.ngDiagramService.isInitialized();
  *
  * // Update configuration
- * this.ngDiagramService.updateConfig({ gridSize: 20 });
+ * this.ngDiagramService.updateConfig({ cellSize: 20 });
  * ```
  *
  * @category Services

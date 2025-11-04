@@ -141,16 +141,16 @@ export interface ZoomConfig {
  */
 export interface BackgroundConfig {
   /**
-   * The size of the dots pattern.
+   * Distance in pixels between consecutive dots in the background pattern.
    * @default 60
    */
-  dotSize?: number;
+  dotSpacing?: number;
   /**
    * The size of the smallest grid cell (minor grid spacing).
-   * Supports rectangular grids by specifying different x and y values.
-   * @default { x: 10, y: 10 }
+   * Supports rectangular grids by specifying different width and height values.
+   * @default { width: 10, height: 10 }
    */
-  gridSize?: Point;
+  cellSize?: Size;
   /**
    * Specifies how often major grid lines occur, measured in counts of minor grid cells.
    * E.g., { x: 5, y: 5 } draws a major vertical line every 5 minor columns and
@@ -283,7 +283,7 @@ export interface ZIndexConfig {
 }
 
 /**
- * Interface representing configurable properties of the edge routing.
+ * Configuration for edge routing behavior.
  *
  * @category Types
  */
@@ -313,6 +313,11 @@ export interface EdgeRoutingConfig {
   [edgeRoutingName: string]: Record<string, unknown> | EdgeRoutingName | undefined;
 }
 
+/**
+ * Configuration for box selection behavior.
+ *
+ * @category Types
+ */
 export interface BoxSelectionConfig {
   /**
    * Whether to select nodes that are only partially within the selection box.

@@ -3,6 +3,7 @@
 /* DEFAULT LIGHT THEME */
 :root {
   --ngd-txt-primary-default: var(--ngd-colors-gray-800);
+  --ngd-diagram-background-color: var(--ngd-colors-gray-200);
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-100);
   --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-200);
   --ngd-ui-stroke-primary-focus: var(--ngd-colors-gray-500);
@@ -27,6 +28,7 @@
 /* OPTIONAL DARK THEME */
 html[data-theme='dark'] {
   --ngd-txt-primary-default: var(--ngd-colors-gray-100);
+  --ngd-diagram-background-color: var(--ngd-colors-gray-800);
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-800);
   --ngd-ui-stroke-primary-focus: var(--ngd-colors-gray-500);

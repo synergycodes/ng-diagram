@@ -1,0 +1,59 @@
+<div class="sidebar">
+  <div class="group">
+    <fieldset>
+      <legend>Background Style</legend>
+
+      <div class="horizontal">
+        <input
+          #solidRadio
+          type="radio"
+          id="bgSolid"
+          name="bgStyle"
+          value="solid"
+          [checked]="backgroundStyle() === 'solid'"
+          (change)="onBackgroundStyleChange('solid')"
+        />
+        <label for="bgSolid">Solid</label>
+      </div>
+
+      <div class="horizontal">
+        <input
+          #dotRadio
+          type="radio"
+          id="bgDot"
+          name="bgStyle"
+          value="dot"
+          [checked]="backgroundStyle() === 'dot'"
+          (change)="onBackgroundStyleChange('dot')"
+        />
+        <label for="bgDot">Dot</label>
+      </div>
+
+      <div class="horizontal">
+        <input
+          #gridRadio
+          type="radio"
+          id="bgGrid"
+          name="bgStyle"
+          value="grid"
+          [checked]="backgroundStyle() === 'grid'"
+          (change)="onBackgroundStyleChange('grid')"
+        />
+        <label for="bgGrid">Grid</label>
+      </div>
+
+      <div class="horizontal">
+        <input
+          #customRadio
+          type="radio"
+          id="bgCustom"
+          name="bgStyle"
+          value="custom"
+          [checked]="backgroundStyle() === 'custom'"
+          (change)="onBackgroundStyleChange('custom')"
+        />
+        <label for="bgCustom">Custom</label>
+      </div>
+    </fieldset>
+  </div>
+</div>

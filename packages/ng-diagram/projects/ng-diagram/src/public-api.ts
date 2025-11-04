@@ -70,6 +70,7 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 export type {
   ActionState,
   BackgroundConfig,
+  BoxSelectionConfig,
   ClipboardPastedEvent,
   DefaultShortcutDefinitions,
   DiagramEventMap,

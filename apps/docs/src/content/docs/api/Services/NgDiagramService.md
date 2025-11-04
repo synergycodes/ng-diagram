@@ -16,7 +16,7 @@ private ngDiagramService = inject(NgDiagramService);
 const ready = this.ngDiagramService.isInitialized();
 
 // Update configuration
-this.ngDiagramService.updateConfig({ gridSize: 20 });
+this.ngDiagramService.updateConfig({ cellSize: 20 });
 ```
 
 ## Extends

@@ -1,16 +1,16 @@
 // Base state
 ng-diagram-base-edge {
-  --edge-stroke: black;
+  --edge-stroke: steelblue;
   --edge-stroke-width: 2;
 }
 
 // Selected state
 ng-diagram-base-edge.selected {
-  --edge-stroke: blue;
+  --edge-stroke: dodgerblue;
   --edge-stroke-width: 3;
 }
 
 // Hover state
 ng-diagram-base-edge:hover:not(.selected) {
-  --edge-stroke: lightblue;
+  --edge-stroke: deepskyblue;
 }

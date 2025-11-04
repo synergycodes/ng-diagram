@@ -19,7 +19,7 @@ Configuration for background behavior.
 
 ### boxSelection
 
-> **boxSelection**: `BoxSelectionConfig`
+> **boxSelection**: [`BoxSelectionConfig`](/docs/api/types/boxselectionconfig/)
 
 Configuration for box selection behavior.
 

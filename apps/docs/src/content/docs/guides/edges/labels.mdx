@@ -9,9 +9,13 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
 
+Each edge has a `measuredLabels` property that provides information about its labels and their computed position and dimensions. This property is read-only and should not be modified.
+
 ## Using Labels in Default Edges
 
 To display a label on a **default edge**, you can add a `label` property to the edge's data.
+
+<br />
 
 import DefaultLabel from '@components/angular/edges/labels/default-label/default-label.astro';
 
@@ -69,11 +73,13 @@ ng-diagram-base-edge.default-edge.selected {
 
 To display a custom label on an edge, use the `NgDiagramBaseEdgeLabelComponent` in an implementation of your **custom edge** component:
 
-import LabeledEdge from '@components/angular/edges/custom-edges/labeled-edge/labeled-edge.astro';
+<br />
 
-<LabeledEdge />
+import CustomLabel from '@components/angular/edges/labels/custom-label/custom-label.astro';
 
-<CodeSnippet relativePath="edges/custom-edges/labeled-edge/labeled-edge.component.ts" />
+<CustomLabel />
+
+<CodeSnippet relativePath="edges/labels/custom-label/custom-label-edge.component.ts" />
 
 ## Label Positioning
 
@@ -84,58 +90,14 @@ The `positionOnEdge` property determines where the label appears along the edge 
 Labels can be added and modified dynamically. One way to achieve this is by using diagram's model. The `ModifiableLabelEdgeComponent` shows how to map such data into an actual label implementation.
 
 Click on an edge to select it in the example below. Then fill the label's name and click "Set Label".
-It'll modify selected edge's data to include a new element in a `measuredLabels` property.
 
+<br />
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-labels.astro';
 
 <AddingLabels />
-
-The edge component implementation looks like this:
-
-```typescript
-import { Component, computed, input } from '@angular/core';
-import {
-  NgDiagramBaseEdgeLabelComponent,
-  NgDiagramBaseEdgeComponent,
-  type Edge,
-  type NgDiagramEdgeTemplate,
-} from 'ng-diagram';
-
-@Component({
-  selector: 'multi-label-edge',
-  template: `<ng-diagram-base-edge
-    [edge]="edge()"
-    [stroke]="selected() ? 'rebeccapurple' : 'var(--ngd-default-edge-stroke)'"
-  >
-    <ng-diagram-base-edge-label id="1" [positionOnEdge]="0.5" class="custom-label">
-      {{ edge().data.label }}
-    </ng-diagram-base-edge-label>
-  </ng-diagram-base-edge>`,
-  imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
-})
-export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate<{ label: string }> {
-  edge = input.required<Edge<{ label: string }>>();
-
-  selected = computed(() => this.edge().selected);
-}
-```
-
-In the diagram model, the edge can be defined like this:
-
-```typescript
-...
-edges: [
-        {
-          id: '1',
-          source: '1',
-          sourcePort: 'port-right',
-          target: '2',
-          targetPort: 'port-left',
-          data: { label: 'Label text...' },
-        }
-]
-...
-```
+<CodeViewer dirName="edges/labels/adding-labels" />
 
 ## Handling Interactive Elements in Labels
 
@@ -153,6 +115,8 @@ When adding interactive elements like inputs to edge labels, dragging on these e
 
 NgDiagram supports multiple labels and they can be used to display images, shapes, or any other content.
 The example below demonstrates how to add multiple labels to an edge to create a flow animation.
+
+<br />
 
 import MultipleLabels from '@components/angular/edges/labels/multiple-labels/multiple-labels.astro';
 

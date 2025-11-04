@@ -30,7 +30,6 @@ export class DiagramComponent {
   ]);
 
   config = {
-    edgeRouting: { defaultRouting: 'orthogonal' },
     zoom: {
       max: 3,
       zoomToFit: {
