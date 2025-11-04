@@ -104,6 +104,14 @@ const defaultSelectionMovingConfig: SelectionMovingConfig = {
   edgePanningThreshold: 10,
 };
 
+const defaultZIndexConfig: ZIndexConfig = {
+  enabled: true,
+  selectedZIndex: 1000,
+  temporaryEdgeZIndex: 1000,
+  edgesAboveConnectedNodes: false,
+  elevateOnSelection: true,
+};
+
 const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
   defaultRouting: 'orthogonal',
   bezier: {
@@ -113,14 +121,6 @@ const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
     maxCornerRadius: 15,
     firstLastSegmentLength: 20,
   },
-};
-
-const defaultZIndexConfig: ZIndexConfig = {
-  enabled: true,
-  selectedZIndex: 1000,
-  edgesAboveConnectedNodes: false,
-  elevateOnSelection: true,
-  temporaryEdgeZIndex: 1000,
 };
 
 const defaultBoxSelectionConfig: BoxSelectionConfig = {

@@ -15,6 +15,12 @@ Configuration for z-index layering behavior.
 
 Whether edges should appear above their connected nodes.
 
+#### Default
+
+```ts
+false
+```
+
 ***
 
 ### elevateOnSelection
@@ -22,6 +28,12 @@ Whether edges should appear above their connected nodes.
 > **elevateOnSelection**: `boolean`
 
 Whether selected elements should be elevated to selectedZIndex.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
@@ -31,6 +43,12 @@ Whether selected elements should be elevated to selectedZIndex.
 
 Whether z-index middleware is enabled.
 
+#### Default
+
+```ts
+true
+```
+
 ***
 
 ### selectedZIndex
@@ -39,6 +57,12 @@ Whether z-index middleware is enabled.
 
 The z-index value for selected elements.
 
+#### Default
+
+```ts
+1000
+```
+
 ***
 
 ### temporaryEdgeZIndex
@@ -46,3 +70,9 @@ The z-index value for selected elements.
 > **temporaryEdgeZIndex**: `number`
 
 The z-index value for temporary edge.
+
+#### Default
+
+```ts
+1000
+```

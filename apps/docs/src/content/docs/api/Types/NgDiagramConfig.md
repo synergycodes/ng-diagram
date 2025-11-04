@@ -7,13 +7,19 @@ title: "NgDiagramConfig"
 
 > **NgDiagramConfig** = `DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>
 
-`NgDiagramConfig` is the main configuration type for the ngDiagram library.
-This configuration object allows you to override only the properties you need from the full [FlowConfig](/docs/api/types/flowconfig/).
+The recommended configuration type for ng-diagram.
 
-This type is used as the type for the `config` input in [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
-and throughout the public API, such as in [NgDiagramService](/docs/api/services/ngdiagramservice/).
+This type allows you to provide only the configuration options you want to override.
+All properties are optional and correspond to those in [FlowConfig](/docs/api/types/flowconfig/).
 
-Example usage:
+## See
+
+ - [FlowConfig](/docs/api/types/flowconfig/) – for the full list of available configuration options
+ - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
+ - [NgDiagramService](/docs/api/services/ngdiagramservice/)
+
+## Examples
+
 ```ts
 // define configuration in a component
 const config: NgDiagramConfig = {
@@ -21,7 +27,8 @@ const config: NgDiagramConfig = {
   edgeRouting: { defaultRouting: 'orthogonal' },
 };
 ```
+
 ```html
- <!-- use configuration in your template with ngDiagram -->
-  <ng-diagram [config]="config"></ng-diagram>
+<!-- use configuration in your template with ngDiagram -->
+<ng-diagram [config]="config"></ng-diagram>
 ```
