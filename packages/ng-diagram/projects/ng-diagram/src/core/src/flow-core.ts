@@ -10,8 +10,12 @@ import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
 import { SpatialHash } from './spatial-hash/spatial-hash';
-import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange, getNodesInRect } from './spatial-hash/utils';
-import { getNodeMeasuredBounds } from './utils/dimensions';
+import {
+  getNearestNodeInRange,
+  getNearestPortInRange,
+  getNodesInRange,
+  getOverlappingNodes,
+} from './spatial-hash/utils';
 import { TransactionManager } from './transaction-manager/transaction-manager';
 import type {
   DeepPartial,
@@ -441,13 +445,7 @@ export class FlowCore {
    * @returns An array of Nodes that overlap with the specified node
    */
   getOverlappingNodes(nodeId: string): Node[] {
-    const targetNode = this.modelLookup.getNodeById(nodeId);
-    if (!targetNode) {
-      return [];
-    }
-
-    const measuredBounds = targetNode.measuredBounds ?? getNodeMeasuredBounds(targetNode);
-    return getNodesInRect(this, measuredBounds).filter((node) => node.id !== nodeId);
+    return getOverlappingNodes(this, nodeId);
   }
 
   /**
