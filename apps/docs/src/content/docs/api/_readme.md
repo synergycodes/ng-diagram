@@ -78,6 +78,7 @@ title: "ng-diagram"
 - [Metadata](/docs/api/types/metadata/)
 - [Middleware](/docs/api/types/middleware/)
 - [MiddlewareContext](/docs/api/types/middlewarecontext/)
+- [MiddlewareHelpers](/docs/api/types/middlewarehelpers/)
 - [MiddlewareHistoryUpdate](/docs/api/types/middlewarehistoryupdate/)
 - [Model](/docs/api/types/model/)
 - [ModelAdapter](/docs/api/types/modeladapter/)

@@ -103,6 +103,7 @@ export type {
   Middleware,
   MiddlewareChain,
   MiddlewareContext,
+  MiddlewareHelpers,
   MiddlewareHistoryUpdate,
   Model,
   ModelActionType,

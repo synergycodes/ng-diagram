@@ -1,6 +1,5 @@
 import type { ActionStateManager } from '../action-state-manager/action-state-manager';
 import type { EdgeRoutingManager } from '../edge-routing-manager';
-import type { MiddlewareExecutor } from '../middleware-manager/middleware-executor';
 import type { Edge } from './edge.interface';
 import { EnvironmentInfo } from './environment.interface';
 import { FlowConfig } from './flow-config.interface';
@@ -145,6 +144,108 @@ export interface FlowStateUpdate {
 export type MiddlewareArray = readonly Middleware[];
 
 /**
+ * Helper functions for checking what changed during middleware execution.
+ * These helpers track all cumulative changes from the initial action and all previous middlewares.
+ *
+ * @category Types
+ */
+export interface MiddlewareHelpers {
+  /**
+   * Checks if a specific node has been modified.
+   * @param id - The node ID to check
+   * @returns true if the node was modified (any property changed)
+   */
+  checkIfNodeChanged: (id: string) => boolean;
+
+  /**
+   * Checks if a specific edge has been modified.
+   * @param id - The edge ID to check
+   * @returns true if the edge was modified (any property changed)
+   */
+  checkIfEdgeChanged: (id: string) => boolean;
+
+  /**
+   * Checks if a specific node was added.
+   * @param id - The node ID to check
+   * @returns true if the node was added during this middleware chain
+   */
+  checkIfNodeAdded: (id: string) => boolean;
+
+  /**
+   * Checks if a specific node was removed.
+   * @param id - The node ID to check
+   * @returns true if the node was removed during this middleware chain
+   */
+  checkIfNodeRemoved: (id: string) => boolean;
+
+  /**
+   * Checks if a specific edge was added.
+   * @param id - The edge ID to check
+   * @returns true if the edge was added during this middleware chain
+   */
+  checkIfEdgeAdded: (id: string) => boolean;
+
+  /**
+   * Checks if a specific edge was removed.
+   * @param id - The edge ID to check
+   * @returns true if the edge was removed during this middleware chain
+   */
+  checkIfEdgeRemoved: (id: string) => boolean;
+
+  /**
+   * Checks if any node has one or more of the specified properties changed.
+   * @param props - Array of property names to check (e.g., ['position', 'size'])
+   * @returns true if any node has any of these properties modified
+   */
+  checkIfAnyNodePropsChanged: (props: string[]) => boolean;
+
+  /**
+   * Checks if any edge has one or more of the specified properties changed.
+   * @param props - Array of property names to check (e.g., ['sourcePosition', 'targetPosition'])
+   * @returns true if any edge has any of these properties modified
+   */
+  checkIfAnyEdgePropsChanged: (props: string[]) => boolean;
+
+  /**
+   * Checks if any nodes were added.
+   * @returns true if at least one node was added
+   */
+  anyNodesAdded: () => boolean;
+
+  /**
+   * Checks if any edges were added.
+   * @returns true if at least one edge was added
+   */
+  anyEdgesAdded: () => boolean;
+
+  /**
+   * Checks if any nodes were removed.
+   * @returns true if at least one node was removed
+   */
+  anyNodesRemoved: () => boolean;
+
+  /**
+   * Checks if any edges were removed.
+   * @returns true if at least one edge was removed
+   */
+  anyEdgesRemoved: () => boolean;
+
+  /**
+   * Gets all node IDs that have one or more of the specified properties changed.
+   * @param props - Array of property names to check (e.g., ['position', 'size'])
+   * @returns Array of node IDs that have any of these properties modified
+   */
+  getAffectedNodeIds: (props: string[]) => string[];
+
+  /**
+   * Gets all edge IDs that have one or more of the specified properties changed.
+   * @param props - Array of property names to check (e.g., ['sourcePosition', 'targetPosition'])
+   * @returns Array of edge IDs that have any of these properties modified
+   */
+  getAffectedEdgeIds: (props: string[]) => string[];
+}
+
+/**
  * The context object passed to middleware execute functions.
  * Provides access to the current state, helper functions, and configuration.
  *
@@ -209,8 +310,8 @@ export interface MiddlewareContext {
   initialEdgesMap: Map<string, Edge>;
   /** The action that triggered the middleware execution */
   modelActionType: ModelActionType;
-  /** Helper functions to check what changed */
-  helpers: ReturnType<MiddlewareExecutor['helpers']>;
+  /** Helper functions to check what changed (tracks all cumulative changes from the initial action and all previous middlewares) */
+  helpers: MiddlewareHelpers;
   /** All state updates from previous middlewares in the chain */
   history: MiddlewareHistoryUpdate[];
   /** Manager for action states (resizing, linking, etc.) */
