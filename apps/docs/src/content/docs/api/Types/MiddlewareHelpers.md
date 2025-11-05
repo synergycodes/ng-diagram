@@ -6,7 +6,7 @@ title: "MiddlewareHelpers"
 ---
 
 Helper functions for checking what changed during middleware execution.
-These helpers track all cumulative changes from the initial action and all previous middlewares.
+These helpers track all cumulative changes from the initial state update and all previous middlewares.
 
 ## Properties
 
@@ -20,7 +20,7 @@ Checks if any edges were added.
 
 `boolean`
 
-true if at least one edge was added
+true if at least one edge was added by the initial state update or any previous middleware
 
 ***
 
@@ -34,7 +34,7 @@ Checks if any edges were removed.
 
 `boolean`
 
-true if at least one edge was removed
+true if at least one edge was removed by the initial state update or any previous middleware
 
 ***
 
@@ -48,7 +48,7 @@ Checks if any nodes were added.
 
 `boolean`
 
-true if at least one node was added
+true if at least one node was added by the initial state update or any previous middleware
 
 ***
 
@@ -62,7 +62,7 @@ Checks if any nodes were removed.
 
 `boolean`
 
-true if at least one node was removed
+true if at least one node was removed by the initial state update or any previous middleware
 
 ***
 
@@ -84,7 +84,7 @@ Array of property names to check (e.g., ['sourcePosition', 'targetPosition'])
 
 `boolean`
 
-true if any edge has any of these properties modified
+true if any edge has any of these properties modified by the initial state update or any previous middleware
 
 ***
 
@@ -106,7 +106,7 @@ Array of property names to check (e.g., ['position', 'size'])
 
 `boolean`
 
-true if any node has any of these properties modified
+true if any node has any of these properties modified by the initial state update or any previous middleware
 
 ***
 
@@ -128,7 +128,7 @@ The edge ID to check
 
 `boolean`
 
-true if the edge was added during this middleware chain
+true if the edge was added by the initial state update or any previous middleware
 
 ***
 
@@ -150,7 +150,7 @@ The edge ID to check
 
 `boolean`
 
-true if the edge was modified (any property changed)
+true if the edge was modified (any property changed) by the initial state update or any previous middleware
 
 ***
 
@@ -172,7 +172,7 @@ The edge ID to check
 
 `boolean`
 
-true if the edge was removed during this middleware chain
+true if the edge was removed by the initial state update or any previous middleware
 
 ***
 
@@ -194,7 +194,7 @@ The node ID to check
 
 `boolean`
 
-true if the node was added during this middleware chain
+true if the node was added by the initial state update or any previous middleware
 
 ***
 
@@ -216,7 +216,7 @@ The node ID to check
 
 `boolean`
 
-true if the node was modified (any property changed)
+true if the node was modified (any property changed) by the initial state update or any previous middleware
 
 ***
 
@@ -238,7 +238,35 @@ The node ID to check
 
 `boolean`
 
-true if the node was removed during this middleware chain
+true if the node was removed by the initial state update or any previous middleware
+
+***
+
+### getAddedEdges()
+
+> **getAddedEdges**: () => [`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Gets all edges that were added.
+
+#### Returns
+
+[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Array of edge instances that were added by the initial state update or any previous middleware
+
+***
+
+### getAddedNodes()
+
+> **getAddedNodes**: () => [`Node`](/docs/api/types/node/)[]
+
+Gets all nodes that were added.
+
+#### Returns
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of node instances that were added by the initial state update or any previous middleware
 
 ***
 
@@ -260,7 +288,7 @@ Array of property names to check (e.g., ['sourcePosition', 'targetPosition'])
 
 `string`[]
 
-Array of edge IDs that have any of these properties modified
+Array of edge IDs that have any of these properties modified by the initial state update or any previous middleware
 
 ***
 
@@ -282,4 +310,34 @@ Array of property names to check (e.g., ['position', 'size'])
 
 `string`[]
 
-Array of node IDs that have any of these properties modified
+Array of node IDs that have any of these properties modified by the initial state update or any previous middleware
+
+***
+
+### getRemovedEdges()
+
+> **getRemovedEdges**: () => [`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Gets all edges that were removed.
+Uses `initialEdgesMap` to access the removed instances.
+
+#### Returns
+
+[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+
+Array of edge instances that were removed by the initial state update or any previous middleware
+
+***
+
+### getRemovedNodes()
+
+> **getRemovedNodes**: () => [`Node`](/docs/api/types/node/)[]
+
+Gets all nodes that were removed.
+Uses `initialNodesMap` to access the removed instances.
+
+#### Returns
+
+[`Node`](/docs/api/types/node/)[]
+
+Array of node instances that were removed by the initial state update or any previous middleware

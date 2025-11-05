@@ -145,7 +145,7 @@ export type MiddlewareArray = readonly Middleware[];
 
 /**
  * Helper functions for checking what changed during middleware execution.
- * These helpers track all cumulative changes from the initial action and all previous middlewares.
+ * These helpers track all cumulative changes from the initial state update and all previous middlewares.
  *
  * @category Types
  */
@@ -153,96 +153,122 @@ export interface MiddlewareHelpers {
   /**
    * Checks if a specific node has been modified.
    * @param id - The node ID to check
-   * @returns true if the node was modified (any property changed)
+   * @returns true if the node was modified (any property changed) by the initial state update or any previous middleware
    */
   checkIfNodeChanged: (id: string) => boolean;
 
   /**
    * Checks if a specific edge has been modified.
    * @param id - The edge ID to check
-   * @returns true if the edge was modified (any property changed)
+   * @returns true if the edge was modified (any property changed) by the initial state update or any previous middleware
    */
   checkIfEdgeChanged: (id: string) => boolean;
 
   /**
    * Checks if a specific node was added.
    * @param id - The node ID to check
-   * @returns true if the node was added during this middleware chain
+   * @returns true if the node was added by the initial state update or any previous middleware
    */
   checkIfNodeAdded: (id: string) => boolean;
 
   /**
    * Checks if a specific node was removed.
    * @param id - The node ID to check
-   * @returns true if the node was removed during this middleware chain
+   * @returns true if the node was removed by the initial state update or any previous middleware
    */
   checkIfNodeRemoved: (id: string) => boolean;
 
   /**
    * Checks if a specific edge was added.
    * @param id - The edge ID to check
-   * @returns true if the edge was added during this middleware chain
+   * @returns true if the edge was added by the initial state update or any previous middleware
    */
   checkIfEdgeAdded: (id: string) => boolean;
 
   /**
    * Checks if a specific edge was removed.
    * @param id - The edge ID to check
-   * @returns true if the edge was removed during this middleware chain
+   * @returns true if the edge was removed by the initial state update or any previous middleware
    */
   checkIfEdgeRemoved: (id: string) => boolean;
 
   /**
    * Checks if any node has one or more of the specified properties changed.
    * @param props - Array of property names to check (e.g., ['position', 'size'])
-   * @returns true if any node has any of these properties modified
+   * @returns true if any node has any of these properties modified by the initial state update or any previous middleware
    */
   checkIfAnyNodePropsChanged: (props: string[]) => boolean;
 
   /**
    * Checks if any edge has one or more of the specified properties changed.
    * @param props - Array of property names to check (e.g., ['sourcePosition', 'targetPosition'])
-   * @returns true if any edge has any of these properties modified
+   * @returns true if any edge has any of these properties modified by the initial state update or any previous middleware
    */
   checkIfAnyEdgePropsChanged: (props: string[]) => boolean;
 
   /**
    * Checks if any nodes were added.
-   * @returns true if at least one node was added
+   * @returns true if at least one node was added by the initial state update or any previous middleware
    */
   anyNodesAdded: () => boolean;
 
   /**
    * Checks if any edges were added.
-   * @returns true if at least one edge was added
+   * @returns true if at least one edge was added by the initial state update or any previous middleware
    */
   anyEdgesAdded: () => boolean;
 
   /**
    * Checks if any nodes were removed.
-   * @returns true if at least one node was removed
+   * @returns true if at least one node was removed by the initial state update or any previous middleware
    */
   anyNodesRemoved: () => boolean;
 
   /**
    * Checks if any edges were removed.
-   * @returns true if at least one edge was removed
+   * @returns true if at least one edge was removed by the initial state update or any previous middleware
    */
   anyEdgesRemoved: () => boolean;
 
   /**
    * Gets all node IDs that have one or more of the specified properties changed.
    * @param props - Array of property names to check (e.g., ['position', 'size'])
-   * @returns Array of node IDs that have any of these properties modified
+   * @returns Array of node IDs that have any of these properties modified by the initial state update or any previous middleware
    */
   getAffectedNodeIds: (props: string[]) => string[];
 
   /**
    * Gets all edge IDs that have one or more of the specified properties changed.
    * @param props - Array of property names to check (e.g., ['sourcePosition', 'targetPosition'])
-   * @returns Array of edge IDs that have any of these properties modified
+   * @returns Array of edge IDs that have any of these properties modified by the initial state update or any previous middleware
    */
   getAffectedEdgeIds: (props: string[]) => string[];
+
+  /**
+   * Gets all nodes that were added.
+   * @returns Array of node instances that were added by the initial state update or any previous middleware
+   */
+  getAddedNodes: () => Node[];
+
+  /**
+   * Gets all edges that were added.
+   * @returns Array of edge instances that were added by the initial state update or any previous middleware
+   */
+  getAddedEdges: () => Edge[];
+
+  /**
+   * Gets all nodes that were removed.
+   * Uses `initialNodesMap` to access the removed instances.
+   * @returns Array of node instances that were removed by the initial state update or any previous middleware
+   */
+  getRemovedNodes: () => Node[];
+
+  /**
+   * Gets all edges that were removed.
+   * Uses `initialEdgesMap` to access the removed instances.
+   * @returns Array of edge instances that were removed by the initial state update or any previous middleware
+   */
+  getRemovedEdges: () => Edge[];
 }
 
 /**
