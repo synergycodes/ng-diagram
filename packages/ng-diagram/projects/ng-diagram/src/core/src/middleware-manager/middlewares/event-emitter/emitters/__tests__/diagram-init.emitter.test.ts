@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { EventManager } from '../../../../../event-manager/event-manager';
 import type { DiagramInitEvent } from '../../../../../event-manager/event-types';
 import { mockEdge, mockNode } from '../../../../../test-utils';
@@ -802,6 +802,267 @@ describe('DiagramInitEmitter', () => {
       const event = emitSpy.mock.calls[0][1] as DiagramInitEvent;
       expect(event.nodes).toHaveLength(3);
       expect(event.edges).toHaveLength(1);
+    });
+  });
+
+  describe('safety hatch', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should not start timeout if all items are measured on init', () => {
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // Should emit immediately
+      expect(emitSpy).toHaveBeenCalledOnce();
+
+      // Advance time to check timeout doesn't trigger
+      vi.advanceTimersByTime(5000);
+
+      // Should still only be called once
+      expect(emitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should emit event after timeout if items remain unmeasured', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: undefined,
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit yet
+      expect(emitSpy).not.toHaveBeenCalled();
+
+      // Advance time past the timeout (3000ms)
+      vi.advanceTimersByTime(3000);
+
+      // Should emit now via safety hatch
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(consoleWarnSpy).toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should clear timeout if all items are measured before timeout', () => {
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: undefined,
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit yet
+      expect(emitSpy).not.toHaveBeenCalled();
+
+      // Advance time partially
+      vi.advanceTimersByTime(1000);
+
+      // Update node to complete measurements
+      context.modelActionType = 'updateNode';
+      context.initialUpdate = {
+        nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
+      };
+
+      emitter.emit(context, eventManager);
+
+      // Should emit now
+      expect(emitSpy).toHaveBeenCalledOnce();
+
+      // Advance time past original timeout
+      vi.advanceTimersByTime(5000);
+
+      // Should still only be called once (timeout was cleared)
+      expect(emitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should reset timeout when measurement progress is made', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: undefined,
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        size: undefined,
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node1);
+      context.nodesMap.set('node2', node2);
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit yet
+      expect(emitSpy).not.toHaveBeenCalled();
+
+      // Advance time to 2.5 seconds (before timeout)
+      vi.advanceTimersByTime(2500);
+
+      // Update first node - this should reset the timeout
+      context.modelActionType = 'updateNode';
+      context.initialUpdate = {
+        nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
+      };
+
+      emitter.emit(context, eventManager);
+
+      // Should not emit yet (node2 still unmeasured)
+      expect(emitSpy).not.toHaveBeenCalled();
+
+      // Advance another 2.5 seconds (would be past original timeout, but timeout was reset)
+      vi.advanceTimersByTime(2500);
+
+      // Should still not emit (only 2.5s since last progress)
+      expect(emitSpy).not.toHaveBeenCalled();
+
+      // Advance final 500ms to trigger new timeout
+      vi.advanceTimersByTime(500);
+
+      // Now safety hatch should trigger
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(consoleWarnSpy).toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should log detailed warnings when safety hatch triggers', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const unmeasuredNode: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: undefined,
+      };
+
+      const nodeWithUnmeasuredPort: Node = {
+        ...mockNode,
+        id: 'node2',
+        size: { width: 100, height: 50 },
+        measuredPorts: [
+          {
+            id: 'port1',
+            type: 'both',
+            side: 'left',
+            position: undefined,
+            size: undefined,
+            nodeId: 'node2',
+          },
+        ],
+      };
+
+      const edgeWithUnmeasuredLabel: Edge = {
+        ...mockEdge,
+        id: 'edge1',
+        measuredLabels: [
+          {
+            id: 'label1',
+            position: undefined,
+            size: undefined,
+            positionOnEdge: 0.5,
+          },
+        ],
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', unmeasuredNode);
+      context.nodesMap.set('node2', nodeWithUnmeasuredPort);
+      context.edgesMap.set('edge1', edgeWithUnmeasuredLabel);
+
+      emitter.emit(context, eventManager);
+
+      // Advance past timeout
+      vi.advanceTimersByTime(3000);
+
+      // Should emit via safety hatch
+      expect(emitSpy).toHaveBeenCalledOnce();
+
+      // Check console warnings were called
+      expect(consoleWarnSpy).toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should only log warnings for categories with unmeasured items', () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const unmeasuredNode: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: undefined,
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', unmeasuredNode);
+
+      emitter.emit(context, eventManager);
+
+      // Advance past timeout
+      vi.advanceTimersByTime(3000);
+
+      // Should emit via safety hatch
+      expect(emitSpy).toHaveBeenCalledOnce();
+
+      // Check console warnings were called
+      expect(consoleWarnSpy).toHaveBeenCalled();
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should not emit twice if safety hatch triggers after event already emitted', () => {
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: undefined,
+      };
+
+      context.modelActionType = 'init';
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // Update node before timeout
+      vi.advanceTimersByTime(1000);
+
+      context.modelActionType = 'updateNode';
+      context.initialUpdate = {
+        nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
+      };
+
+      emitter.emit(context, eventManager);
+
+      // Should have emitted once
+      expect(emitSpy).toHaveBeenCalledOnce();
+
+      // Advance past timeout
+      vi.advanceTimersByTime(5000);
+
+      // Should still only be called once
+      expect(emitSpy).toHaveBeenCalledOnce();
     });
   });
 });
