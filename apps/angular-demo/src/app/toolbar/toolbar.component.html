@@ -1,5 +1,5 @@
 <div>
-  <button (click)="onToggleDebugModeClick()">Toggle debug mode</button>
+  <button (click)="onToggleDebugModeClick()">{{ `${isDebugModeEnabled() ? 'Disable' : 'Enable'}` }} debug mode</button>
   <button (click)="onLinkCreationClick()">Start Link Creation</button>
   <button (click)="onCenterOnClick()">Center on selected</button>
   <button [disabled]="!isNodeSelected()" (click)="onCenterOnClick()">Center on selected node</button>

@@ -12,11 +12,18 @@ including configuration, layout, event management, routing, transactions, and mo
 ```typescript
 private ngDiagramService = inject(NgDiagramService);
 
-// Check if diagram is initialized
-const ready = this.ngDiagramService.isInitialized();
+// Check if diagram is initialized (reactive signal)
+effect(() => {
+  if (this.ngDiagramService.isInitialized()) {
+    console.log('Diagram ready!');
+  }
+});
+
+// Access reactive config
+const isDebugMode = this.ngDiagramService.config().debugMode;
 
 // Update configuration
-this.ngDiagramService.updateConfig({ cellSize: 20 });
+this.ngDiagramService.updateConfig({ debugMode: true });
 ```
 
 ## Extends
@@ -29,8 +36,20 @@ this.ngDiagramService.updateConfig({ cellSize: 20 });
 
 > `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/actionstate/)\>\>
 
-Reactive signal that tracks the current action state.
-Updates automatically when actions like resizing, rotating, or linking start/end.
+Reactive signal that tracks the current action state (readonly).
+This signal is managed internally by the diagram and updates automatically
+when actions like resizing, rotating, or linking start/end.
+
+ - This property cannot be modified directly.
+
+***
+
+### config
+
+> `readonly` **config**: `Signal`\<`Readonly`\<`DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>\>\>
+
+Reactive signal that tracks the current configuration (readonly).
+To update the configuration, use [updateConfig](/docs/api/services/ngdiagramservice/#updateconfig).
 
 ***
 
@@ -138,37 +157,6 @@ Check if event emissions are enabled.
 `boolean`
 
 True if events are enabled.
-
-***
-
-### getActionState()
-
-> **getActionState**(): `Readonly`\<[`ActionState`](/docs/api/types/actionstate/)\>
-
-Returns the current action state (readonly).
-This includes information about ongoing actions like resizing and linking.
-
-#### Returns
-
-`Readonly`\<[`ActionState`](/docs/api/types/actionstate/)\>
-
-The current action state.
-
-***
-
-### getConfig()
-
-> **getConfig**(): `Readonly`\<[`NgDiagramConfig`](/docs/api/types/ngdiagramconfig/)\>
-
-Returns the current configuration (readonly).
-The returned object cannot be modified directly —
-use [updateConfig](/docs/api/services/ngdiagramservice/#updateconfig) to make changes.
-
-#### Returns
-
-`Readonly`\<[`NgDiagramConfig`](/docs/api/types/ngdiagramconfig/)\>
-
-The current configuration.
 
 ***
 
@@ -522,3 +510,10 @@ Partial configuration object containing properties to update.
 #### Returns
 
 `void`
+
+#### Example
+
+```ts
+// Enable debug mode
+this.ngDiagramService.updateConfig({ debugMode: true });
+```
