@@ -1,4 +1,5 @@
 import { FlowCore } from '../flow-core';
+import { DEFAULT_SHORTCUTS } from '../shortcut-manager';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
@@ -104,6 +105,14 @@ const defaultSelectionMovingConfig: SelectionMovingConfig = {
   edgePanningThreshold: 10,
 };
 
+const defaultZIndexConfig: ZIndexConfig = {
+  enabled: true,
+  selectedZIndex: 1000,
+  temporaryEdgeZIndex: 1000,
+  edgesAboveConnectedNodes: false,
+  elevateOnSelection: true,
+};
+
 const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
   defaultRouting: 'orthogonal',
   bezier: {
@@ -113,14 +122,6 @@ const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
     maxCornerRadius: 15,
     firstLastSegmentLength: 20,
   },
-};
-
-const defaultZIndexConfig: ZIndexConfig = {
-  enabled: true,
-  selectedZIndex: 1000,
-  edgesAboveConnectedNodes: false,
-  elevateOnSelection: true,
-  temporaryEdgeZIndex: 1000,
 };
 
 const defaultBoxSelectionConfig: BoxSelectionConfig = {
@@ -147,6 +148,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,
       boxSelection: defaultBoxSelectionConfig,
+      shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
     },
     config

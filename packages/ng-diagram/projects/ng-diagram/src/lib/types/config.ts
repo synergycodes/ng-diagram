@@ -1,13 +1,16 @@
 import { DeepPartial, FlowConfig } from '../../core/src';
 
 /**
- * `NgDiagramConfig` is the main configuration type for the ngDiagram library.
- * This configuration object allows you to override only the properties you need from the full {@link FlowConfig}.
+ * The recommended configuration type for ng-diagram.
  *
- * This type is used as the type for the `config` input in {@link NgDiagramComponent}
- * and throughout the public API, such as in {@link NgDiagramService}.
+ * This type allows you to provide only the configuration options you want to override.
+ * All properties are optional and correspond to those in {@link FlowConfig}.
  *
- * Example usage:
+ * @see {@link FlowConfig} – for the full list of available configuration options
+ * @see {@link NgDiagramComponent}
+ * @see {@link NgDiagramService}
+ *
+ * @example
  * ```ts
  * // define configuration in a component
  * const config: NgDiagramConfig = {
@@ -15,9 +18,10 @@ import { DeepPartial, FlowConfig } from '../../core/src';
  *   edgeRouting: { defaultRouting: 'orthogonal' },
  * };
  * ```
+ * @example
  * ```html
- *  <!-- use configuration in your template with ngDiagram -->
- *   <ng-diagram [config]="config"></ng-diagram>
+ * <!-- use configuration in your template with ngDiagram -->
+ * <ng-diagram [config]="config"></ng-diagram>
  * ```
  *
  * @category Types

@@ -29,6 +29,12 @@ The node to compute the snap size for dragging.
 
 The snap size for the node while dragging, or null.
 
+#### Default
+
+```ts
+() => null
+```
+
 ***
 
 ### computeSnapForNodeSize()
@@ -50,6 +56,12 @@ The node to compute the snap size for resizing.
 `null` \| [`Size`](/docs/api/types/size/)
 
 The snap size for the node while resizing, or null.
+
+#### Default
+
+```ts
+() => null
+```
 
 ***
 
@@ -101,6 +113,12 @@ The node being dragged.
 
 True if the node should snap to grid, false otherwise.
 
+#### Default
+
+```ts
+() => false
+```
+
 ***
 
 ### shouldSnapResizeForNode()
@@ -122,3 +140,9 @@ The node being resized.
 `boolean`
 
 True if the node should snap to grid, false otherwise.
+
+#### Default
+
+```ts
+() => false
+```

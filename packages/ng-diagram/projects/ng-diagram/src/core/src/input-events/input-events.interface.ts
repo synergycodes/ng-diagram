@@ -7,6 +7,7 @@ export type InputEventName =
   | 'cut'
   | 'paste'
   | 'select'
+  | 'selectAll'
   | 'deleteSelection'
   | 'panning'
   | 'keyboardPanning'
@@ -17,7 +18,9 @@ export type InputEventName =
   | 'linking'
   | 'rotate'
   | 'paletteDrop'
-  | 'boxSelection';
+  | 'boxSelection'
+  | 'undo'
+  | 'redo';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

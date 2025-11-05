@@ -14,7 +14,7 @@ import type { PointerInputEvent } from '../../../types/event';
 export class BoxSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly boxSelectionProvider = inject(BoxSelectionProviderService);
-  private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private startPoint: { x: number; y: number } | null = null;
   static isBoxSelectionActive = false;
 
@@ -24,7 +24,7 @@ export class BoxSelectionDirective implements OnDestroy {
   }
 
   onPointerDown(event: PointerInputEvent): void {
-    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event) || !this.shouldHandle(event)) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -98,7 +98,7 @@ export class BoxSelectionDirective implements OnDestroy {
     });
 
     if (this.startPoint) {
-      const flowCore = this.flowCore.provide();
+      const flowCore = this.flowCoreProvider.provide();
       const { x: startX, y: startY } = flowCore.clientToFlowViewportPosition(this.startPoint);
       const { x: endX, y: endY } = flowCore.clientToFlowViewportPosition({ x: event.clientX, y: event.clientY });
 
@@ -116,6 +116,9 @@ export class BoxSelectionDirective implements OnDestroy {
   };
 
   private shouldHandle(event: PointerInputEvent): boolean {
-    return event.shiftKey;
+    const flowCore = this.flowCoreProvider.provide();
+    const modifiers = this.inputEventsRouter.getBaseEvent(event).modifiers;
+
+    return flowCore.shortcutManager.matchesAction('boxSelection', { modifiers });
   }
 }
