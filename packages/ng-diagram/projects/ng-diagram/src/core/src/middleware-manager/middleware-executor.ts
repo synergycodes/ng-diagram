@@ -71,6 +71,22 @@ export class MiddlewareExecutor {
     anyEdgesRemoved: () => this.removedEdgesIds.size > 0,
     getAffectedNodeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToNodeIds.get(prop) ?? [])]),
     getAffectedEdgeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToEdgeIds.get(prop) ?? [])]),
+    getAddedNodes: () =>
+      Array.from(this.addedNodesIds)
+        .map((id) => this.nodesMap.get(id))
+        .filter((node): node is Node => node !== undefined),
+    getAddedEdges: () =>
+      Array.from(this.addedEdgesIds)
+        .map((id) => this.edgesMap.get(id))
+        .filter((edge): edge is Edge => edge !== undefined),
+    getRemovedNodes: () =>
+      Array.from(this.removedNodesIds)
+        .map((id) => this.initialNodesMap.get(id))
+        .filter((node): node is Node => node !== undefined),
+    getRemovedEdges: () =>
+      Array.from(this.removedEdgesIds)
+        .map((id) => this.initialEdgesMap.get(id))
+        .filter((edge): edge is Edge => edge !== undefined),
   });
 
   private getState = (): FlowState => ({

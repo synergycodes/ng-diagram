@@ -1,18 +1,28 @@
-import { FlowStateUpdate, Middleware, Node } from '../../../types';
+import { FlowStateUpdate, Middleware } from '../../../types';
 import { getNodeMeasuredBounds } from '../../../utils/dimensions';
+import { isNodeFullyMeasured } from './is-node-fully-measured';
 
+/**
+ * Middleware that calculates and assigns measured bounds for nodes.
+ *
+ * Computes bounding boxes that encompass each node including its ports,
+ * accounting for rotation. Only processes fully measured nodes (valid size, position,
+ * and all ports measured).
+ */
 export const measuredBoundsMiddleware: Middleware<'measured-bounds'> = {
   name: 'measured-bounds',
   execute: (context, next) => {
-    const { nodesMap, modelActionType, initialUpdate } = context;
+    const { nodesMap, modelActionType, helpers } = context;
 
     if (modelActionType === 'init') {
       const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
       nodesMap.forEach((node) => {
-        nodesToUpdate.push({
-          id: node.id,
-          measuredBounds: getNodeMeasuredBounds(node),
-        });
+        if (isNodeFullyMeasured(node)) {
+          nodesToUpdate.push({
+            id: node.id,
+            measuredBounds: getNodeMeasuredBounds(node),
+          });
+        }
       });
 
       next({
@@ -21,31 +31,45 @@ export const measuredBoundsMiddleware: Middleware<'measured-bounds'> = {
       return;
     }
 
-    const nodesToAdd = initialUpdate.nodesToAdd?.map((node) => ({
-      ...node,
-      measuredBounds: getNodeMeasuredBounds(node),
-    }));
-    const nodesToUpdate = initialUpdate.nodesToUpdate?.map((update) => {
-      if (update.position !== undefined || update.size !== undefined || update.measuredPorts !== undefined) {
-        const existingNode = nodesMap.get(update.id);
-        if (existingNode) {
-          const updatedNode: Node = {
-            ...existingNode,
-            ...update,
-          };
-          const measuredBounds = getNodeMeasuredBounds(updatedNode);
-          return {
-            ...update,
-            measuredBounds,
-          };
+    if (
+      !helpers.anyNodesAdded() &&
+      !helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'measuredPorts'])
+    ) {
+      next();
+      return;
+    }
+
+    const nodesToAdd: FlowStateUpdate['nodesToAdd'] = [];
+    const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
+
+    if (helpers.anyNodesAdded()) {
+      const addedNodes = helpers.getAddedNodes();
+      for (const node of addedNodes) {
+        if (isNodeFullyMeasured(node)) {
+          nodesToAdd.push({
+            ...node,
+            measuredBounds: getNodeMeasuredBounds(node),
+          });
         }
       }
-      return update;
-    });
+    }
+
+    if (helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'measuredPorts'])) {
+      const affectedNodeIds = helpers.getAffectedNodeIds(['position', 'size', 'angle', 'measuredPorts']);
+      for (const nodeId of affectedNodeIds) {
+        const node = nodesMap.get(nodeId);
+        if (node && isNodeFullyMeasured(node)) {
+          nodesToUpdate.push({
+            id: node.id,
+            measuredBounds: getNodeMeasuredBounds(node),
+          });
+        }
+      }
+    }
 
     next({
-      ...(nodesToAdd ? { nodesToAdd } : {}),
-      ...(nodesToUpdate ? { nodesToUpdate } : {}),
+      ...(nodesToAdd.length ? { nodesToAdd } : {}),
+      ...(nodesToUpdate.length ? { nodesToUpdate } : {}),
     });
   },
 };

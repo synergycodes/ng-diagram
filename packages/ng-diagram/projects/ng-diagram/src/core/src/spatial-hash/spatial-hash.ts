@@ -43,17 +43,6 @@ export class SpatialHash {
     return results;
   }
 
-  getOverlappingNodes(nodeId: string): string[] {
-    const nodeRect = this.idToRect.get(nodeId);
-    if (!nodeRect) {
-      return [];
-    }
-
-    const overlappingIds = this.queryIds(nodeRect);
-
-    return overlappingIds.filter((id) => id !== nodeId);
-  }
-
   private _query(range: Rect, addToCollection: (rect: RectWithId) => void): void {
     const cells = this.getCells(range);
     const checkedRects = new Set<string>();

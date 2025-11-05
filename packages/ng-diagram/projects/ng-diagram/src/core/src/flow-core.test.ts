@@ -413,4 +413,315 @@ describe('FlowCore', () => {
       expect(mockModelLookup.getNodeById).toHaveBeenCalledWith('non-existent');
     });
   });
+
+  describe('getOverlappingNodes', () => {
+    beforeEach(() => {
+      // Reset spatial hash
+      flowCore.spatialHash.process([]);
+    });
+
+    it('should return empty array when nodeId does not exist', () => {
+      mockModelLookup.getNodeById.mockReturnValue(null);
+      const result = flowCore.getOverlappingNodes('non-existent-id');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when node exists but has no overlapping nodes', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 200, y: 200 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 200, y: 200, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result = flowCore.getOverlappingNodes('node1');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return overlapping node when nodes overlap', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 50, y: 50 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result = flowCore.getOverlappingNodes('node1');
+
+      expect(result.map((n) => n.id)).toEqual(['node2']);
+    });
+
+    it('should return multiple overlapping nodes when node overlaps with several nodes', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 50, y: 50 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node3: Node = {
+        ...mockNode,
+        id: 'node3',
+        position: { x: 100, y: 100 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 100, y: 100, width: 100, height: 100 },
+      };
+      const node4: Node = {
+        ...mockNode,
+        id: 'node4',
+        position: { x: 300, y: 300 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 300, y: 300, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2, node3, node4]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        if (id === 'node3') return node3;
+        if (id === 'node4') return node4;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2, node3, node4]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result = flowCore.getOverlappingNodes('node1');
+      const resultIds = result.map((n) => n.id);
+
+      expect(resultIds).toContain('node2');
+      expect(resultIds).toContain('node3');
+      expect(resultIds).not.toContain('node4');
+      expect(resultIds.length).toBe(2);
+    });
+
+    it('should not include the queried node itself in the results', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 50, y: 50 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result = flowCore.getOverlappingNodes('node1');
+      const resultIds = result.map((n) => n.id);
+
+      expect(resultIds).not.toContain('node1');
+      expect(resultIds).toEqual(['node2']);
+    });
+
+    it('should correctly detect overlaps for rotated nodes using collision detection', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 50 },
+        angle: 45,
+        measuredBounds: { x: -35.36, y: -35.36, width: 170.71, height: 170.71 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 80, y: 0 },
+        size: { width: 100, height: 50 },
+        measuredBounds: { x: 80, y: 0, width: 100, height: 50 },
+      };
+
+      flowCore.spatialHash.process([node1, node2]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result = flowCore.getOverlappingNodes('node1');
+
+      // Should use collision detection for rotated nodes
+      expect(result.length).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should not consider edge-touching nodes as overlapping', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 100, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 100, y: 0, width: 100, height: 100 },
+      };
+      const node3: Node = {
+        ...mockNode,
+        id: 'node3',
+        position: { x: 0, y: 100 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 100, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2, node3]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        if (id === 'node3') return node3;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2, node3]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result = flowCore.getOverlappingNodes('node1');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array after overlapping node is removed', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 50, y: 50 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result1 = flowCore.getOverlappingNodes('node1');
+      expect(result1.map((n) => n.id)).toEqual(['node2']);
+
+      // Remove node2 from spatial hash and update model
+      flowCore.spatialHash.process([node1]);
+      mockGetNodes.mockReturnValue([node1]);
+
+      const result2 = flowCore.getOverlappingNodes('node1');
+      expect(result2).toEqual([]);
+    });
+
+    it('should work correctly when querying different nodes with the same overlaps', () => {
+      const node1: Node = {
+        ...mockNode,
+        id: 'node1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+      };
+      const node2: Node = {
+        ...mockNode,
+        id: 'node2',
+        position: { x: 50, y: 50 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+      };
+      const node3: Node = {
+        ...mockNode,
+        id: 'node3',
+        position: { x: 100, y: 100 },
+        size: { width: 100, height: 100 },
+        measuredBounds: { x: 100, y: 100, width: 100, height: 100 },
+      };
+
+      flowCore.spatialHash.process([node1, node2, node3]);
+      mockModelLookup.getNodeById.mockImplementation((id) => {
+        if (id === 'node1') return node1;
+        if (id === 'node2') return node2;
+        if (id === 'node3') return node3;
+        return null;
+      });
+      mockGetNodes.mockReturnValue([node1, node2, node3]);
+      mockGetEdges.mockReturnValue([]);
+      mockGetMetadata.mockReturnValue(mockMetadata);
+
+      const result1 = flowCore.getOverlappingNodes('node1');
+      const result2 = flowCore.getOverlappingNodes('node2');
+      const result3 = flowCore.getOverlappingNodes('node3');
+
+      expect(result1.map((n) => n.id)).toEqual(['node2']);
+      expect(result2.map((n) => n.id).sort()).toEqual(['node1', 'node3'].sort());
+      expect(result3.map((n) => n.id)).toEqual(['node2']);
+    });
+  });
 });

@@ -93,7 +93,7 @@ export interface SimpleNode<T extends DataObject = DataObject> {
   /**
    * @readonly
    * @remarks MeasuredBounds are computed by the system and should not be set manually.
-   * Computed bounds of the node based on its position, size, and rotation.
+   * Bounding box that encompasses the node including its ports, accounting for rotation.
    */
   measuredBounds?: Rect;
 }
