@@ -1,17 +1,11 @@
-import type { CommandHandler, Edge, Node } from '../../types';
+import type { CommandHandler, Edge, Node, Rect } from '../../types';
+import { calculatePartsBounds } from '../../utils/dimensions';
 
 export interface ZoomToFitCommand {
   name: 'zoomToFit';
   nodeIds?: string[];
   edgeIds?: string[];
   padding?: number | [number, number] | [number, number, number] | [number, number, number, number];
-}
-
-interface Bounds {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
 }
 
 interface Padding {
@@ -45,63 +39,6 @@ const normalizePadding = (padding: number | number[], defaultPadding: number): P
   }
 };
 
-/**
- * Calculates the bounding box for a set of nodes and edges in a single pass
- * Returns null if validation fails or bounds cannot be calculated
- */
-const calculateBounds = (nodes: Node[], edges: Edge[]): Bounds | null => {
-  if (nodes.length === 0 && edges.length === 0) {
-    return null;
-  }
-
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-
-  // Process nodes - validate that all nodes have size
-  for (const node of nodes) {
-    const { position, size } = node;
-
-    if (!size || size.width == null || size.height == null) {
-      console.warn(`zoomToFit: Node "${node.id}" is missing size. All nodes must have size defined.`);
-      return null;
-    }
-
-    const x1 = position.x;
-    const y1 = position.y;
-    const x2 = x1 + size.width;
-    const y2 = y1 + size.height;
-
-    if (x1 < minX) minX = x1;
-    if (y1 < minY) minY = y1;
-    if (x2 > maxX) maxX = x2;
-    if (y2 > maxY) maxY = y2;
-  }
-
-  // Process edges - validate that all edges have points
-  for (const edge of edges) {
-    if (!edge.points || edge.points.length === 0) {
-      console.warn(`zoomToFit: Edge "${edge.id}" is missing points. All edges must have points defined.`);
-      return null;
-    }
-
-    // Process all points
-    for (const { x, y } of edge.points) {
-      if (x < minX) minX = x;
-      if (y < minY) minY = y;
-      if (x > maxX) maxX = x;
-      if (y > maxY) maxY = y;
-    }
-  }
-
-  if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
-    return null;
-  }
-
-  return { minX, minY, maxX, maxY };
-};
-
 const filterTargetElements = (
   nodes: Node[],
   edges: Edge[],
@@ -131,15 +68,13 @@ const calculateOptimalScale = (
 };
 
 const calculateViewportPosition = (
-  bounds: Bounds,
+  bounds: Rect,
   viewport: { width: number; height: number },
   padding: Padding,
   scale: number
 ): { x: number; y: number } => {
-  const contentWidth = bounds.maxX - bounds.minX;
-  const contentHeight = bounds.maxY - bounds.minY;
-  const contentCenterX = bounds.minX + contentWidth / 2;
-  const contentCenterY = bounds.minY + contentHeight / 2;
+  const contentCenterX = bounds.x + bounds.width / 2;
+  const contentCenterY = bounds.y + bounds.height / 2;
 
   const centerOffsetX = (padding.left - padding.right) / 2;
   const centerOffsetY = (padding.top - padding.bottom) / 2;
@@ -173,16 +108,9 @@ export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeI
   const effectivePadding = padding ?? defaultPadding;
 
   const { targetNodes, targetEdges } = filterTargetElements(nodes, edges, nodeIds, edgeIds);
-  const bounds = calculateBounds(targetNodes, targetEdges);
+  const bounds = calculatePartsBounds(targetNodes, targetEdges);
 
   if (!bounds) {
-    return;
-  }
-
-  const contentWidth = bounds.maxX - bounds.minX;
-  const contentHeight = bounds.maxY - bounds.minY;
-
-  if (contentWidth <= 0 || contentHeight <= 0) {
     return;
   }
 
@@ -197,7 +125,7 @@ export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeI
   }
 
   const { min, max } = commandHandler.flowCore.config.zoom;
-  const newScale = calculateOptimalScale(contentWidth, contentHeight, availableWidth, availableHeight, min, max);
+  const newScale = calculateOptimalScale(bounds.width, bounds.height, availableWidth, availableHeight, min, max);
   const { x: newX, y: newY } = calculateViewportPosition(
     bounds,
     { width: viewportWidth, height: viewportHeight },
