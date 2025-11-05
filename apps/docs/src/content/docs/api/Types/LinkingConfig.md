@@ -32,7 +32,7 @@ Multiplier for edge panning speed while routing edge is near the edge of the vie
 #### Default
 
 ```ts
-1
+10
 ```
 
 ***

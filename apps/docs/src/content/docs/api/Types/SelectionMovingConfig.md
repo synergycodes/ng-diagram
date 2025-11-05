@@ -32,7 +32,7 @@ Multiplier for edge panning speed while dragging nodes near the edge of the view
 #### Default
 
 ```ts
-1
+10
 ```
 
 ***
