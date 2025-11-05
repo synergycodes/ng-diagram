@@ -3,9 +3,9 @@ title: Rotation
 description: Understanding how rotation works in ngDiagram
 ---
 
+import { Aside } from '@astrojs/starlight/components';
 import Configuration from '@components/angular/nodes/rotation/rotation.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
-import { Aside } from '@astrojs/starlight/components';
 
 The **rotation** feature in ngDiagram allows users to interactively rotate nodes on the diagram canvas.
 Rotatable nodes display a rotation handle that users can drag to change the node's angle.
@@ -123,6 +123,8 @@ This establishes the fallback behavior for all nodes unless overridden by a temp
   If your rotation configuration seems to be ignored, check for overrides at higher priority levels — node-level
   settings always take precedence over template or global configurations.
 </Aside>
+
+[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
 ## Further Reading
 

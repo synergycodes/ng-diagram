@@ -3,9 +3,9 @@ title: Resizing
 description: Understanding how resizing works in ngDiagram
 ---
 
+import { Aside } from '@astrojs/starlight/components';
 import Configuration from '@components/angular/nodes/resizing/resizing.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
-import { Aside } from '@astrojs/starlight/components';
 
 The **resizing** feature in ngDiagram allows users to interactively change the size of nodes on the diagram canvas.
 Resizable nodes display resize handles and lines that users can drag to adjust the node's width and height.
@@ -118,6 +118,8 @@ This establishes the fallback behavior for all nodes unless overridden by a temp
   If your resizing configuration seems to be ignored, check for overrides at higher priority levels — node-level
   settings always take precedence over template or global configurations.
 </Aside>
+
+[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
 ## Further Reading
 
