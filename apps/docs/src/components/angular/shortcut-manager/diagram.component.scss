@@ -1,0 +1,12 @@
+:host {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block; // needed for flex children to work, otherwise children renders outside of host
+}
+
+.diagram {
+  display: flex;
+  height: 20rem;
+  margin-top: 0;
+}

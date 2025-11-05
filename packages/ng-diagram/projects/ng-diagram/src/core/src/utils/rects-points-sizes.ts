@@ -128,3 +128,43 @@ export const equalPointsArrays = (path1: Point[], path2: Point[]) => {
   }
   return true;
 };
+
+export const unionRect = (rects: Rect[]): Rect => {
+  if (rects.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+
+  let minX = rects[0].x;
+  let minY = rects[0].y;
+  let maxX = rects[0].x + rects[0].width;
+  let maxY = rects[0].y + rects[0].height;
+
+  rects.forEach((rect) => {
+    minX = Math.min(minX, rect.x);
+    minY = Math.min(minY, rect.y);
+    maxX = Math.max(maxX, rect.x + rect.width);
+    maxY = Math.max(maxY, rect.y + rect.height);
+  });
+
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+};
+
+export const boundingRectOfPoints = (points: Point[]): Rect => {
+  if (points.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+
+  let minX = points[0].x;
+  let minY = points[0].y;
+  let maxX = points[0].x;
+  let maxY = points[0].y;
+
+  points.forEach((point) => {
+    minX = Math.min(minX, point.x);
+    minY = Math.min(minY, point.y);
+    maxX = Math.max(maxX, point.x);
+    maxY = Math.max(maxY, point.y);
+  });
+
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+};

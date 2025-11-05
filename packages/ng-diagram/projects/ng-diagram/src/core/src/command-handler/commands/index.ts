@@ -36,7 +36,7 @@ import { moveViewport, moveViewportBy } from './move-viewport';
 import { removeFromGroup } from './remove-from-group';
 import { resizeNode } from './resize-node';
 import { rotateNodeTo } from './rotate-node';
-import { deselect, deselectAll, select } from './selection';
+import { deselect, deselectAll, select, selectAll } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
 import { zoomToFit } from './zoom-to-fit';
@@ -53,6 +53,7 @@ export type CommandMap = {
 export const commands: CommandMap = {
   init,
   select,
+  selectAll,
   deselect,
   deselectAll,
   moveNodesBy,

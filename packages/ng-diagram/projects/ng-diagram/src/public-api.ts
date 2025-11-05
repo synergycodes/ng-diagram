@@ -51,6 +51,7 @@ export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewp
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
+export { configureShortcuts } from './core/src';
 export { initializeModel } from './lib/model/initialize-model';
 export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
@@ -71,6 +72,7 @@ export type {
   BackgroundConfig,
   BoxSelectionConfig,
   ClipboardPastedEvent,
+  DefaultShortcutDefinitions,
   DiagramEventMap,
   DiagramInitEvent,
   Edge,
@@ -85,6 +87,12 @@ export type {
   GroupingConfig,
   GroupMembershipChangedEvent,
   GroupNode,
+  InputModifiers,
+  KeyboardActionName,
+  KeyboardMoveSelectionAction,
+  KeyboardPanAction,
+  KeyboardShortcutBinding,
+  KeyboardShortcutDefinition,
   LinkingConfig,
   loggerMiddleware,
   Metadata,
@@ -93,12 +101,15 @@ export type {
   Model,
   ModelAdapter,
   ModelChanges,
+  ModifierOnlyShortcutBinding,
   NgDiagramMath,
   Node,
   NodeResizedEvent,
   NodeRotationConfig,
   PaletteItemDroppedEvent,
   Point,
+  PointerOnlyActionName,
+  PointerOnlyShortcutDefinition,
   Port,
   PortLocation,
   PortSide,
@@ -110,6 +121,8 @@ export type {
   SelectionMovingConfig,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
+  ShortcutActionName,
+  ShortcutDefinition,
   SimpleNode,
   Size,
   SnappingConfig,

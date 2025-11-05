@@ -33,6 +33,11 @@ export class DiagramComponent {
         padding: [50, 315, 50, 50],
       },
     },
+    // background: {
+    //   cellSize: { width: 20, height: 20 }, // Size of each minor cell in the 'grid' background
+    //   dotSpacing: 30, // Spacing between dots in the 'dot' background
+    //   majorLinesFrequency: { x: 10, y: 10 }, // Frequency of major lines in the 'grid' background
+    // },
   } satisfies NgDiagramConfig;
 
   model = initializeModel({

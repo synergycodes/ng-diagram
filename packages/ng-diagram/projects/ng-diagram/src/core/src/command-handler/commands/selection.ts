@@ -90,3 +90,18 @@ export const deselectAll = async (commandHandler: CommandHandler) => {
   }
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
+
+export interface SelectAllCommand {
+  name: 'selectAll';
+}
+
+export const selectAll = async (commandHandler: CommandHandler) => {
+  const { nodes, edges } = commandHandler.flowCore.getState();
+  const allNodeIds = nodes.map((node) => node.id);
+  const allEdgeIds = edges.map((edge) => edge.id);
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, allNodeIds, allEdgeIds);
+  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
+    return;
+  }
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+};

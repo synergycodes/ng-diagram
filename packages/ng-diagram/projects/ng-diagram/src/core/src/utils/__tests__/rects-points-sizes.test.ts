@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  boundingRectOfPoints,
   doesContainRect,
   doesRectsIntersect,
   equalPointsArrays,
@@ -9,6 +10,7 @@ import {
   isSamePoint,
   isSameRect,
   isSameSize,
+  unionRect,
 } from '../rects-points-sizes';
 
 describe('rects', () => {
@@ -291,6 +293,136 @@ describe('rects', () => {
         { x: 5, y: 6 },
       ];
       expect(equalPointsArrays(a1, a2)).toBe(false);
+    });
+  });
+
+  describe('unionRect', () => {
+    it('should return a zero rect for empty array', () => {
+      const result = unionRect([]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    });
+
+    it('should return the same rect for single rect', () => {
+      const rect = getRect({ position: { x: 10, y: 20 }, size: { width: 30, height: 40 } });
+      const result = unionRect([rect]);
+
+      expect(result).toEqual({ x: 10, y: 20, width: 30, height: 40 });
+    });
+
+    it('should return union of two non-overlapping rects', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 10, height: 10 } });
+      const rect2 = getRect({ position: { x: 20, y: 20 }, size: { width: 10, height: 10 } });
+      const result = unionRect([rect1, rect2]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 30, height: 30 });
+    });
+
+    it('should return union of two overlapping rects', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 20, height: 20 } });
+      const rect2 = getRect({ position: { x: 10, y: 10 }, size: { width: 20, height: 20 } });
+      const result = unionRect([rect1, rect2]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 30, height: 30 });
+    });
+
+    it('should return union of multiple rects', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 10, height: 10 } });
+      const rect2 = getRect({ position: { x: 20, y: 20 }, size: { width: 10, height: 10 } });
+      const rect3 = getRect({ position: { x: 40, y: 40 }, size: { width: 10, height: 10 } });
+      const result = unionRect([rect1, rect2, rect3]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 50, height: 50 });
+    });
+
+    it('should handle negative coordinates', () => {
+      const rect1 = getRect({ position: { x: -10, y: -10 }, size: { width: 10, height: 10 } });
+      const rect2 = getRect({ position: { x: 10, y: 10 }, size: { width: 10, height: 10 } });
+      const result = unionRect([rect1, rect2]);
+
+      expect(result).toEqual({ x: -10, y: -10, width: 30, height: 30 });
+    });
+
+    it('should handle rect contained within another', () => {
+      const rect1 = getRect({ position: { x: 0, y: 0 }, size: { width: 100, height: 100 } });
+      const rect2 = getRect({ position: { x: 25, y: 25 }, size: { width: 50, height: 50 } });
+      const result = unionRect([rect1, rect2]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 100, height: 100 });
+    });
+  });
+
+  describe('boundingRectOfPoints', () => {
+    it('should return a zero rect for empty array', () => {
+      const result = boundingRectOfPoints([]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    });
+
+    it('should return a zero-sized rect for single point', () => {
+      const result = boundingRectOfPoints([{ x: 10, y: 20 }]);
+
+      expect(result).toEqual({ x: 10, y: 20, width: 0, height: 0 });
+    });
+
+    it('should return bounding rect for two points', () => {
+      const result = boundingRectOfPoints([
+        { x: 0, y: 0 },
+        { x: 10, y: 20 },
+      ]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 10, height: 20 });
+    });
+
+    it('should return bounding rect for multiple points', () => {
+      const result = boundingRectOfPoints([
+        { x: 5, y: 10 },
+        { x: 15, y: 30 },
+        { x: 25, y: 20 },
+        { x: 10, y: 5 },
+      ]);
+
+      expect(result).toEqual({ x: 5, y: 5, width: 20, height: 25 });
+    });
+
+    it('should handle negative coordinates', () => {
+      const result = boundingRectOfPoints([
+        { x: -10, y: -20 },
+        { x: 10, y: 20 },
+      ]);
+
+      expect(result).toEqual({ x: -10, y: -20, width: 20, height: 40 });
+    });
+
+    it('should handle points in random order', () => {
+      const result = boundingRectOfPoints([
+        { x: 50, y: 50 },
+        { x: 0, y: 0 },
+        { x: 25, y: 75 },
+        { x: 100, y: 25 },
+      ]);
+
+      expect(result).toEqual({ x: 0, y: 0, width: 100, height: 75 });
+    });
+
+    it('should handle collinear points horizontally', () => {
+      const result = boundingRectOfPoints([
+        { x: 0, y: 10 },
+        { x: 50, y: 10 },
+        { x: 100, y: 10 },
+      ]);
+
+      expect(result).toEqual({ x: 0, y: 10, width: 100, height: 0 });
+    });
+
+    it('should handle collinear points vertically', () => {
+      const result = boundingRectOfPoints([
+        { x: 10, y: 0 },
+        { x: 10, y: 50 },
+        { x: 10, y: 100 },
+      ]);
+
+      expect(result).toEqual({ x: 10, y: 0, width: 0, height: 100 });
     });
   });
 });

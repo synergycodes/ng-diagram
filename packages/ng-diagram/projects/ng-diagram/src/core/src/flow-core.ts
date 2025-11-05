@@ -9,8 +9,14 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
+import { ShortcutManager } from './shortcut-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
-import { getNearestNodeInRange, getNearestPortInRange, getNodesInRange } from './spatial-hash/utils';
+import {
+  getNearestNodeInRange,
+  getNearestPortInRange,
+  getNodesInRange,
+  getOverlappingNodes,
+} from './spatial-hash/utils';
 import { TransactionManager } from './transaction-manager/transaction-manager';
 import type {
   DeepPartial,
@@ -54,6 +60,7 @@ export class FlowCore {
   readonly actionStateManager: ActionStateManager;
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
+  readonly shortcutManager: ShortcutManager;
 
   readonly getFlowOffset: () => Point;
 
@@ -85,6 +92,8 @@ export class FlowCore {
       () => this.config.edgeRouting || {}
     );
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
+
+    this.shortcutManager = new ShortcutManager(this);
 
     this.inputEventsRouter.registerDefaultCallbacks(this);
 
@@ -440,10 +449,7 @@ export class FlowCore {
    * @returns An array of Nodes that overlap with the specified node
    */
   getOverlappingNodes(nodeId: string): Node[] {
-    return this.spatialHash
-      .getOverlappingNodes(nodeId)
-      .map((id) => this.modelLookup.getNodeById(id))
-      .filter((node): node is Node => node !== null);
+    return getOverlappingNodes(this, nodeId);
   }
 
   /**
