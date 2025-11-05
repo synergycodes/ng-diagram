@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { EventManager } from '../../../../../event-manager/event-manager';
 import type { DiagramInitEvent } from '../../../../../event-manager/event-types';
