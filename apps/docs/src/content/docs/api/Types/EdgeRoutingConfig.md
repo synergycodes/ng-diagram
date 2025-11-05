@@ -9,7 +9,7 @@ Configuration for edge routing behavior.
 
 ## Indexable
 
-\[`edgeRoutingName`: `string`\]: `undefined` \| [`EdgeRoutingName`](/docs/api/types/edgeroutingname/) \| `Record`\<`string`, `unknown`\>
+\[`edgeRoutingName`: `string`\]: `undefined` \| `Record`\<`string`, `unknown`\> \| [`EdgeRoutingName`](/docs/api/types/edgeroutingname/)
 
 Allow custom edge routing configurations.
 

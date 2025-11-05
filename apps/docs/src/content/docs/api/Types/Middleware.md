@@ -5,7 +5,56 @@ prev: false
 title: "Middleware"
 ---
 
-Interface for middleware that can modify the flow state
+Middleware interface for intercepting and modifying diagram state changes.
+
+Middlewares form a chain where each can:
+- Inspect the current state and action type
+- Modify the state by passing updates to `next()`
+- Block operations by calling `cancel()`
+- Perform side effects (logging, validation, etc.)
+
+## Example
+
+```typescript
+// Read-only middleware that blocks modifications
+const readOnlyMiddleware: Middleware<'read-only'> = {
+  name: 'read-only',
+  execute: (context, next, cancel) => {
+    const blockedActions = ['addNodes', 'deleteNodes', 'updateNode'];
+    if (blockedActions.includes(context.modelActionType)) {
+      console.warn('Action blocked in read-only mode');
+      cancel();
+      return;
+    }
+    next();
+  }
+};
+
+// Auto-snap middleware that modifies positions
+const snapMiddleware: Middleware<'auto-snap'> = {
+  name: 'auto-snap',
+  execute: (context, next) => {
+    const gridSize = 20;
+    const nodesToSnap = context.helpers.getAffectedNodeIds(['position']);
+
+    const updates = nodesToSnap.map(id => {
+      const node = context.nodesMap.get(id)!;
+      return {
+        id,
+        position: {
+          x: Math.round(node.position.x / gridSize) * gridSize,
+          y: Math.round(node.position.y / gridSize) * gridSize
+        }
+      };
+    });
+
+    next({ nodesToUpdate: updates });
+  }
+};
+
+// Register middleware
+ngDiagramService.registerMiddleware(snapMiddleware);
+```
 
 ## Type Parameters
 
@@ -13,7 +62,7 @@ Interface for middleware that can modify the flow state
 
 `TName` *extends* `string` = `string`
 
-Type of the name of the middleware (should be a string literal)
+The middleware name type (string literal for type safety)
 
 ## Properties
 
@@ -21,27 +70,27 @@ Type of the name of the middleware (should be a string literal)
 
 > **execute**: (`context`, `next`, `cancel`) => `void` \| `Promise`\<`void`\>
 
-The function that executes the middleware logic
+The middleware execution function.
 
 #### Parameters
 
 ##### context
 
-`MiddlewareContext`
+[`MiddlewareContext`](/docs/api/types/middlewarecontext/)
 
-The context of the middleware
+Complete context including state, helpers, and configuration
 
 ##### next
 
-(`stateUpdate?`) => `Promise`\<`FlowState`\>
+(`stateUpdate?`) => `Promise`\<[`FlowState`](/docs/api/types/flowstate/)\>
 
-Function to call to apply the state update and continue to the next middleware
+Call this to continue to the next middleware (optionally with state updates)
 
 ##### cancel
 
 () => `void`
 
-Function to call to cancel the middleware execution
+Call this to abort the entire operation
 
 #### Returns
 
@@ -53,4 +102,4 @@ Function to call to cancel the middleware execution
 
 > **name**: `TName`
 
-The name of the middleware
+Unique identifier for the middleware

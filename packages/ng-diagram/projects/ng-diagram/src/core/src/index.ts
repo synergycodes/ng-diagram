@@ -1,5 +1,6 @@
 import './set.polyfill';
 
+export * from './action-state-manager/action-state-manager';
 export * from './edge-routing-manager';
 export * from './event-manager';
 export * from './flow-core';
