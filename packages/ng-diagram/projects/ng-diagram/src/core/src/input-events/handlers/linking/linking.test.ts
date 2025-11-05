@@ -21,6 +21,7 @@ function getSampleLinkingEvent(overrides: Partial<LinkingInputEvent> = {}): Link
     lastInputPoint: { x: 100, y: 100 },
     phase: 'start',
     portId: 'port-1',
+    panningForce: null,
     ...overrides,
   };
 }

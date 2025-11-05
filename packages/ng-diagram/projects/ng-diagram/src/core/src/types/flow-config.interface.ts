@@ -68,6 +68,25 @@ export interface LinkingConfig {
    * @returns The Edge object to use for the finalized edge.
    */
   finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
+  /**
+   * Enable edge panning when the routed edge is near the edge of the viewport.
+   *
+   * @default true
+   */
+  edgePanningEnabled: boolean;
+  /**
+   * Multiplier for edge panning speed while routing edge is near the edge of the viewport.
+   *
+   * @default 1
+   */
+  edgePanningForce: number;
+  /**
+   * The threshold in pixels for edge panning to start.
+   * If the mouse pointer is within this distance from the edge of the viewport, panning will be triggered.
+   *
+   * @default 30
+   */
+  edgePanningThreshold: number;
 }
 
 /**
@@ -243,12 +262,22 @@ export interface SnappingConfig {
  */
 export interface SelectionMovingConfig {
   /**
-   * Distance in pixels to move the screen while dragging nodes near the edge of the viewport.
+   * Enable edge panning when the moved node is near the edge of the viewport.
+   *
+   * @default true
+   */
+  edgePanningEnabled: boolean;
+  /**
+   * Multiplier for edge panning speed while dragging nodes near the edge of the viewport.
+   *
+   * @default 1
    */
   edgePanningForce: number;
   /**
    * The threshold in pixels for edge panning to start.
    * If the mouse pointer is within this distance from the edge of the viewport, panning will be triggered.
+   *
+   * @default 30
    */
   edgePanningThreshold: number;
 }
