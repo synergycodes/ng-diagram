@@ -85,7 +85,7 @@ export interface LinkingConfig {
   /**
    * Multiplier for edge panning speed while routing edge is near the edge of the viewport.
    *
-   * @default 1
+   * @default 10
    */
   edgePanningForce: number;
   /**
@@ -290,7 +290,7 @@ export interface SelectionMovingConfig {
   /**
    * Multiplier for edge panning speed while dragging nodes near the edge of the viewport.
    *
-   * @default 1
+   * @default 10
    */
   edgePanningForce: number;
   /**

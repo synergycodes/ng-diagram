@@ -1,4 +1,5 @@
 import { Point, Rect } from '../../types';
+import { clamp } from '../clamp/clamp';
 
 export const calculateEdgePanningForce = (
   containerBox: Rect,
@@ -8,8 +9,8 @@ export const calculateEdgePanningForce = (
 ): Point | null => {
   const { x: containerX, y: containerY, width: containerWidth, height: containerHeight } = containerBox;
   const { x: clientX, y: clientY } = clientPosition;
-  let forceX = 0;
-  let forceY = 0;
+  let deltaX = 0;
+  let deltaY = 0;
 
   const deltaLeft = clientX - containerX;
   const deltaRight = containerX + containerWidth - clientX;
@@ -17,29 +18,29 @@ export const calculateEdgePanningForce = (
   const deltaBottom = containerY + containerHeight - clientY;
 
   if (deltaLeft < detectionThreshold) {
-    forceX = -(deltaLeft - detectionThreshold);
+    deltaX = clamp({ min: 0, max: detectionThreshold, value: -(deltaLeft - detectionThreshold) });
   } else if (deltaRight < detectionThreshold) {
-    forceX = deltaRight - detectionThreshold;
+    deltaX = -clamp({ min: 0, max: detectionThreshold, value: -(deltaRight - detectionThreshold) });
   }
 
   if (deltaTop < detectionThreshold) {
-    forceY = -(deltaTop - detectionThreshold);
+    deltaY = clamp({ min: 0, max: detectionThreshold, value: -(deltaTop - detectionThreshold) });
   } else if (deltaBottom < detectionThreshold) {
-    forceY = deltaBottom - detectionThreshold;
+    deltaY = -clamp({ min: 0, max: detectionThreshold, value: -(deltaBottom - detectionThreshold) });
   }
 
-  if (forceX === 0 && forceY === 0) {
+  if (deltaX === 0 && deltaY === 0) {
     return null;
   }
 
-  forceX =
-    forceX === 0
-      ? forceX
-      : Math.sign(forceX) * Math.abs(forceX) * (1 / Math.log(Math.abs(forceX) + 1)) * forceMultiplier;
-  forceY =
-    forceY === 0
-      ? forceY
-      : Math.sign(forceY) * Math.abs(forceY) * (1 / Math.log(Math.abs(forceY) + 1)) * forceMultiplier;
+  let normalizedX = deltaX / detectionThreshold;
+  let normalizedY = deltaY / detectionThreshold;
+
+  normalizedX = isFinite(normalizedX) ? normalizedX : 1;
+  normalizedY = isFinite(normalizedY) ? normalizedY : 1;
+
+  const forceX = normalizedX * forceMultiplier;
+  const forceY = normalizedY * forceMultiplier;
 
   return { x: forceX, y: forceY };
 };
