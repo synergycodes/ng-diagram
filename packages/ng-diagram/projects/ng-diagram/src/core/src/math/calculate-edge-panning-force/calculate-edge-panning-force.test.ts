@@ -59,9 +59,9 @@ describe('calculateEdgePanningForce', () => {
       expect(result2!.x).toBeGreaterThan(0);
       expect(result3!.x).toBeGreaterThan(0);
 
-      // Due to logarithmic scaling, the relationship is not linear
-      // but closer to edge should still have stronger absolute force
-      expect(Math.abs(result3!.x)).toBeGreaterThan(Math.abs(result1!.x));
+      // Linear scaling: closer to edge should have stronger force
+      expect(Math.abs(result3!.x)).toBeGreaterThan(Math.abs(result2!.x));
+      expect(Math.abs(result2!.x)).toBeGreaterThan(Math.abs(result1!.x));
     });
 
     it('should apply force multiplier for left edge', () => {
@@ -278,21 +278,21 @@ describe('calculateEdgePanningForce', () => {
     });
   });
 
-  describe('force calculation with logarithmic scaling', () => {
-    it('should apply logarithmic scaling to force values', () => {
-      const position1: Point = { x: 0, y: 400 }; // 50 units from edge
+  describe('force calculation with linear scaling', () => {
+    it('should apply linear scaling to force values', () => {
+      const position1: Point = { x: 0, y: 400 }; // 50 units from edge (at edge)
       const position2: Point = { x: 25, y: 400 }; // 25 units from edge
 
       const result1 = calculateEdgePanningForce(containerBox, position1, detectionThreshold, forceMultiplier);
       const result2 = calculateEdgePanningForce(containerBox, position2, detectionThreshold, forceMultiplier);
 
-      // Raw delta is doubled, but with logarithmic scaling the force shouldn't double
-      const rawDelta1 = 50;
-      const rawDelta2 = 25;
+      // With linear scaling, the force ratio should match the distance ratio
+      // position1: deltaLeft = 0, clamped delta = 50 (detectionThreshold)
+      // position2: deltaLeft = 25, clamped delta = 25 (detectionThreshold - deltaLeft)
+      // Expected forces: position1 = 50/50 = 1.0, position2 = 25/50 = 0.5
       const ratio = Math.abs(result1!.x) / Math.abs(result2!.x);
 
-      // Ratio should be less than the raw delta ratio due to logarithmic dampening
-      expect(ratio).toBeLessThan(rawDelta1 / rawDelta2);
+      expect(ratio).toBeCloseTo(2, 1); // Should be approximately 2:1 ratio
     });
 
     it('should scale force correctly with different multipliers', () => {
@@ -307,6 +307,28 @@ describe('calculateEdgePanningForce', () => {
 
       expect(Math.abs(result3!.x)).toBeCloseTo(Math.abs(result1!.x) * 0.5);
       expect(Math.abs(result3!.y)).toBeCloseTo(Math.abs(result1!.y) * 0.5);
+    });
+
+    it('should have proportional force based on distance from edge', () => {
+      // Test that force is linearly proportional to distance into the threshold
+      const threshold = 100;
+      const multiplier = 1;
+
+      // 25% into threshold
+      const pos1: Point = { x: 75, y: 400 };
+      // 50% into threshold
+      const pos2: Point = { x: 50, y: 400 };
+      // 75% into threshold
+      const pos3: Point = { x: 25, y: 400 };
+
+      const result1 = calculateEdgePanningForce(containerBox, pos1, threshold, multiplier);
+      const result2 = calculateEdgePanningForce(containerBox, pos2, threshold, multiplier);
+      const result3 = calculateEdgePanningForce(containerBox, pos3, threshold, multiplier);
+
+      // Force should be proportional: 0.25, 0.5, 0.75
+      expect(result1!.x).toBeCloseTo(0.25, 2);
+      expect(result2!.x).toBeCloseTo(0.5, 2);
+      expect(result3!.x).toBeCloseTo(0.75, 2);
     });
   });
 
