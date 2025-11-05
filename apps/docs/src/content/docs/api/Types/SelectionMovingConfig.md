@@ -35,12 +35,6 @@ Multiplier for edge panning speed while dragging nodes near the edge of the view
 1
 ```
 
-#### Default
-
-```ts
-15
-```
-
 ***
 
 ### edgePanningThreshold

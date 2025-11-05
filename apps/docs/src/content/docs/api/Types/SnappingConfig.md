@@ -29,6 +29,12 @@ The node to compute the snap size for dragging.
 
 The snap size for the node while dragging, or null.
 
+#### Default
+
+```ts
+() => null
+```
+
 ***
 
 ### computeSnapForNodeSize()
