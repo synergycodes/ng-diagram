@@ -7,8 +7,4 @@ title: "MiddlewareChain"
 
 > **MiddlewareChain** = [`Middleware`](/docs/api/types/middleware/)[]
 
-Type for middleware chain
-
-## Template
-
-Type of the state being modified
+An array of middlewares that will be executed in sequence.

@@ -19,6 +19,6 @@ Number of commands emitted during the transaction
 
 ### results
 
-> **results**: `FlowStateUpdate`
+> **results**: [`FlowStateUpdate`](/docs/api/types/flowstateupdate/)
 
 Results of the transaction as a state update
