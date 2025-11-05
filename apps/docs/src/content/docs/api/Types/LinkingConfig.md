@@ -9,6 +9,49 @@ Configuration for linking (edge creation) behavior.
 
 ## Properties
 
+### edgePanningEnabled
+
+> **edgePanningEnabled**: `boolean`
+
+Enable edge panning when the routed edge is near the edge of the viewport.
+
+#### Default
+
+```ts
+true
+```
+
+***
+
+### edgePanningForce
+
+> **edgePanningForce**: `number`
+
+Multiplier for edge panning speed while routing edge is near the edge of the viewport.
+
+#### Default
+
+```ts
+1
+```
+
+***
+
+### edgePanningThreshold
+
+> **edgePanningThreshold**: `number`
+
+The threshold in pixels for edge panning to start.
+If the mouse pointer is within this distance from the edge of the viewport, panning will be triggered.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
 ### finalEdgeDataBuilder()
 
 > **finalEdgeDataBuilder**: (`defaultFinalEdgeData`) => [`Edge`](/docs/api/types/edge/)
