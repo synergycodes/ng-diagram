@@ -21,7 +21,7 @@ describe('Resize Node Command with Snapping', () => {
 
   const MIN_WIDTH = 100;
   const MIN_HEIGHT = 100;
-  const SNAP_GRID = { x: 10, y: 10 };
+  const SNAP_GRID = { width: 10, height: 10 };
 
   beforeEach(() => {
     flowCore = {
@@ -554,7 +554,7 @@ describe('Resize Node Command with Snapping', () => {
 
     it('should handle different snap grid sizes', async () => {
       // Use different snap grid
-      const customSnap = { x: 25, y: 15 };
+      const customSnap = { width: 25, height: 15 };
       (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue(customSnap);
 
       const node = {

@@ -11,9 +11,9 @@ Configuration for node dragging behavior.
 
 ### computeSnapForNodeDrag()
 
-> **computeSnapForNodeDrag**: (`node`) => `null` \| [`Point`](/docs/api/types/point/)
+> **computeSnapForNodeDrag**: (`node`) => `null` \| [`Size`](/docs/api/types/size/)
 
-Computes the snap point for a node while dragging. If null is returned, a default snap point will be used.
+Computes the snap size for a node while dragging. If null is returned, a default snap size will be used.
 
 #### Parameters
 
@@ -21,13 +21,13 @@ Computes the snap point for a node while dragging. If null is returned, a defaul
 
 [`Node`](/docs/api/types/node/)
 
-The node to compute the snap point for dragging.
+The node to compute the snap size for dragging.
 
 #### Returns
 
-`null` \| [`Point`](/docs/api/types/point/)
+`null` \| [`Size`](/docs/api/types/size/)
 
-The snap point for the node while dragging, or null.
+The snap size for the node while dragging, or null.
 
 #### Default
 
@@ -39,9 +39,9 @@ The snap point for the node while dragging, or null.
 
 ### computeSnapForNodeSize()
 
-> **computeSnapForNodeSize**: (`node`) => `null` \| [`Point`](/docs/api/types/point/)
+> **computeSnapForNodeSize**: (`node`) => `null` \| [`Size`](/docs/api/types/size/)
 
-Computes the snap point for a node while resizing. If null is returned, a default snap point will be used.
+Computes the snap size for a node while resizing. If null is returned, a default snap size will be used.
 
 #### Parameters
 
@@ -49,13 +49,13 @@ Computes the snap point for a node while resizing. If null is returned, a defaul
 
 [`Node`](/docs/api/types/node/)
 
-The node to compute the snap point for resizing.
+The node to compute the snap size for resizing.
 
 #### Returns
 
-`null` \| [`Point`](/docs/api/types/point/)
+`null` \| [`Size`](/docs/api/types/size/)
 
-The snap point for the node while resizing, or null.
+The snap size for the node while resizing, or null.
 
 #### Default
 
@@ -67,28 +67,28 @@ The snap point for the node while resizing, or null.
 
 ### defaultDragSnap
 
-> **defaultDragSnap**: [`Point`](/docs/api/types/point/)
+> **defaultDragSnap**: [`Size`](/docs/api/types/size/)
 
-The default snap point for node dragging.
+The default snap size for node dragging.
 
 #### Default
 
 ```ts
-{ x: 10, y: 10 }
+{ width: 10, height: 10 }
 ```
 
 ***
 
 ### defaultResizeSnap
 
-> **defaultResizeSnap**: [`Point`](/docs/api/types/point/)
+> **defaultResizeSnap**: [`Size`](/docs/api/types/size/)
 
-The default snap point for node resizing.
+The default snap size for node resizing.
 
 #### Default
 
 ```ts
-{ x: 10, y: 10 }
+{ width: 10, height: 10 }
 ```
 
 ***
