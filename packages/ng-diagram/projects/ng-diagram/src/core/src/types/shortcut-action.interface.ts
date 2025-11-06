@@ -21,7 +21,7 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
  * (e.g., Shift+Click, Ctrl+Click)
  * @category Types/Configuration/Shortcuts
  */
-export type PointerOnlyActionName = 'preserveSelection' | 'boxSelection';
+export type PointerOnlyActionName = 'multiSelection' | 'boxSelection';
 
 /**
  * Keyboard action names that can be triggered by keyboard events
@@ -37,7 +37,7 @@ export type KeyboardActionName =
  *
  * Includes:
  * - Keyboard actions (e.g., 'keyboardMoveSelectionUp', 'copy', 'selectAll')
- * - Pointer-only actions (e.g., 'preserveSelection', 'boxSelection')
+ * - Pointer-only actions (e.g., 'multiSelection', 'boxSelection')
  * @category Types/Configuration/Shortcuts
  */
 export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName;

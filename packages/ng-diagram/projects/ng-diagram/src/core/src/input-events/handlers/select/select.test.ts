@@ -79,9 +79,9 @@ describe('SelectEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: [mockNode.id],
           edgeIds: undefined,
-          preserveSelection: false,
+          multiSelection: false,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });
@@ -110,9 +110,9 @@ describe('SelectEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: [selectedNode.id],
           edgeIds: undefined,
-          preserveSelection: true,
+          multiSelection: true,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });
@@ -142,7 +142,7 @@ describe('SelectEventHandler', () => {
           nodeIds: [selectedNode.id],
           edgeIds: undefined,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });
@@ -174,9 +174,9 @@ describe('SelectEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: undefined,
           edgeIds: [mockEdge.id],
-          preserveSelection: false,
+          multiSelection: false,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });
@@ -205,9 +205,9 @@ describe('SelectEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: undefined,
           edgeIds: [selectedEdge.id],
-          preserveSelection: true,
+          multiSelection: true,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });
@@ -237,7 +237,7 @@ describe('SelectEventHandler', () => {
           nodeIds: undefined,
           edgeIds: [selectedEdge.id],
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });
@@ -269,7 +269,7 @@ describe('SelectEventHandler', () => {
           nodeIds: [selectedNode.id],
           edgeIds: undefined,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('preserveSelection', {
+        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
           modifiers: event.modifiers,
         });
       });

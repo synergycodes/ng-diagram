@@ -68,7 +68,7 @@ export const DEFAULT_SHORTCUTS = [
 
   // Preserve selection when clicking another node (modifier-only shortcut)
   {
-    actionName: 'preserveSelection',
+    actionName: 'multiSelection',
     bindings: [{ modifiers: { primary: true } }],
   },
 

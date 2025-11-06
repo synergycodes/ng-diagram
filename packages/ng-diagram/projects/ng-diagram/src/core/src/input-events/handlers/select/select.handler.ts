@@ -4,7 +4,7 @@ import { SelectEvent } from './select.event';
 export class SelectEventHandler extends EventHandler<SelectEvent> {
   handle(event: SelectEvent): void {
     const targetElements = this.getTargetElements(event);
-    const isModifierPressed = this.flow.shortcutManager.matchesAction('preserveSelection', {
+    const isModifierPressed = this.flow.shortcutManager.matchesAction('multiSelection', {
       modifiers: event.modifiers,
     });
 
@@ -26,7 +26,7 @@ export class SelectEventHandler extends EventHandler<SelectEvent> {
     }
     this.flow.commandHandler.emit('select', {
       ...targetElements,
-      preserveSelection: isAlreadySelected || isModifierPressed,
+      multiSelection: isAlreadySelected || isModifierPressed,
     });
   }
 

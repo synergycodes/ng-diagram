@@ -65,7 +65,7 @@ export class BoxSelectionEventHandler extends EventHandler<BoxSelectionEvent> {
     this.flow.commandHandler.emit('select', {
       nodeIds: [...nodeIds],
       edgeIds: edgesBetweenIds,
-      preserveSelection: false,
+      multiSelection: false,
     });
   }
 }
