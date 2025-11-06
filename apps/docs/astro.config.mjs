@@ -77,11 +77,6 @@ export default defineConfig({
               autogenerate: { directory: 'api/Directives' },
             },
             {
-              label: 'Other',
-              collapsed: true,
-              autogenerate: { directory: 'api/Other' },
-            },
-            {
               label: 'Services',
               collapsed: true,
               autogenerate: { directory: 'api/Services' },
@@ -100,6 +95,11 @@ export default defineConfig({
               label: 'Internals',
               collapsed: true,
               autogenerate: { directory: 'api/Internals' },
+            },
+            {
+              label: 'Other',
+              collapsed: true,
+              autogenerate: { directory: 'api/Other' },
             },
           ],
         },
