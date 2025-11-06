@@ -21,7 +21,7 @@ export class DiagramInitEmitter implements EventEmitter {
   private initialized = false;
   private initEventEmitted = false;
   private safetyHatchTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  private readonly SAFETY_HATCH_TIMEOUT_MS = 3000;
+  private readonly SAFETY_HATCH_TIMEOUT_MS = 2000;
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
     const { modelActionType } = context;
@@ -57,8 +57,7 @@ export class DiagramInitEmitter implements EventEmitter {
 
     const { modelActionType, initialUpdate, nodesMap, edgesMap } = context;
 
-    const previousUnmeasuredCount =
-      this.unmeasuredNodes.size + this.unmeasuredNodePorts.size + this.unmeasuredEdgeLabels.size;
+    const previousUnmeasuredCount = this.countUnmeasuredItems();
 
     if (modelActionType === 'updateNode') {
       this.processNodeUpdates(initialUpdate, nodesMap);
@@ -66,8 +65,7 @@ export class DiagramInitEmitter implements EventEmitter {
       this.processEdgeUpdates(initialUpdate, edgesMap);
     }
 
-    const currentUnmeasuredCount =
-      this.unmeasuredNodes.size + this.unmeasuredNodePorts.size + this.unmeasuredEdgeLabels.size;
+    const currentUnmeasuredCount = this.countUnmeasuredItems();
 
     if (currentUnmeasuredCount < previousUnmeasuredCount) {
       this.restartSafetyHatchTimeout(context, eventManager);
@@ -156,7 +154,7 @@ export class DiagramInitEmitter implements EventEmitter {
     );
   }
 
-  private emitInitEvent(context: MiddlewareContext, eventManager: EventManager): void {
+  private emitInitEvent(context: MiddlewareContext, eventManager: EventManager, useDeferred = true): void {
     this.clearSafetyHatchTimeout();
 
     const { nodesMap, edgesMap } = context;
@@ -166,7 +164,11 @@ export class DiagramInitEmitter implements EventEmitter {
       viewport: context.state.metadata.viewport,
     };
 
-    eventManager.deferredEmit('diagramInit', event);
+    if (useDeferred) {
+      eventManager.deferredEmit('diagramInit', event);
+    } else {
+      eventManager.emit('diagramInit', event);
+    }
     this.initEventEmitted = true;
   }
 
@@ -193,11 +195,10 @@ export class DiagramInitEmitter implements EventEmitter {
       edgeLabels: Array.from(this.unmeasuredEdgeLabels),
     };
 
-    const totalUnmeasured =
-      unmeasuredItems.nodes.length + unmeasuredItems.nodePorts.length + unmeasuredItems.edgeLabels.length;
+    const totalUnmeasured = this.countUnmeasuredItems();
 
     console.warn(
-      `[DiagramInitEmitter] Not all elements were measured within ${this.SAFETY_HATCH_TIMEOUT_MS}ms from last measurement. Emitting diagramInit event anyway.`
+      `[DiagramInitEmitter] Measurement timeout reached from last measurement. Emitting diagramInit event anyway.`
     );
     console.warn(`Total unmeasured elements: ${totalUnmeasured}`);
 
@@ -213,6 +214,10 @@ export class DiagramInitEmitter implements EventEmitter {
       console.warn(`Unmeasured edge labels (${unmeasuredItems.edgeLabels.length}):`, unmeasuredItems.edgeLabels);
     }
 
-    this.emitInitEvent(context, eventManager);
+    this.emitInitEvent(context, eventManager, false);
+  }
+
+  private countUnmeasuredItems() {
+    return this.unmeasuredNodes.size + this.unmeasuredEdgeLabels.size + this.unmeasuredNodePorts.size;
   }
 }

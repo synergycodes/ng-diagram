@@ -9,14 +9,17 @@ import { DiagramInitEmitter } from '../diagram-init.emitter';
 describe('DiagramInitEmitter', () => {
   let emitter: DiagramInitEmitter;
   let eventManager: EventManager;
+  let deferredEmitSpy: ReturnType<typeof vi.fn>;
   let emitSpy: ReturnType<typeof vi.fn>;
   let context: MiddlewareContext;
 
   beforeEach(() => {
     emitter = new DiagramInitEmitter();
+    deferredEmitSpy = vi.fn();
     emitSpy = vi.fn();
     eventManager = {
-      deferredEmit: emitSpy,
+      deferredEmit: deferredEmitSpy,
+      emit: emitSpy,
     } as unknown as EventManager;
 
     context = {
@@ -46,8 +49,8 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit immediately since node is already measured
-      expect(emitSpy).toHaveBeenCalledOnce();
-      const event = emitSpy.mock.calls[0][1] as DiagramInitEvent;
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      const event = deferredEmitSpy.mock.calls[0][1] as DiagramInitEvent;
       expect(event.nodes).toHaveLength(1);
       expect(event.edges).toHaveLength(0);
     });
@@ -64,7 +67,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
     });
 
     it('should track unmeasured nodes during init', () => {
@@ -85,7 +88,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Now simulate updateNode to provide measurements
       context.modelActionType = 'updateNode';
@@ -96,8 +99,8 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that all nodes are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
-      const event = emitSpy.mock.calls[0][1] as DiagramInitEvent;
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      const event = deferredEmitSpy.mock.calls[0][1] as DiagramInitEvent;
       expect(event.nodes).toHaveLength(2);
       expect(event.edges).toHaveLength(0);
     });
@@ -124,7 +127,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Now simulate updateNode to provide port measurements
       context.modelActionType = 'updateNode';
@@ -149,7 +152,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that all ports are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should track unmeasured edge labels during init', () => {
@@ -178,7 +181,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Now simulate updateEdge to provide label measurements
       context.modelActionType = 'updateEdge';
@@ -201,7 +204,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that all labels are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
   });
 
@@ -219,7 +222,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit - width is 0
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update with valid width
       context.modelActionType = 'updateNode';
@@ -230,7 +233,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should treat port with 0 size as unmeasured', () => {
@@ -256,7 +259,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit - port width is 0
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
     });
 
     it('should accept port position with 0 coordinates as valid', () => {
@@ -282,7 +285,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit - position (0, 0) is valid
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should treat label with 0 size as unmeasured', () => {
@@ -312,7 +315,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit - label width is 0
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
     });
 
     it('should accept label position with 0 coordinates as valid', () => {
@@ -342,7 +345,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit - position (0, 0) is valid
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
   });
 
@@ -365,7 +368,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update first node
       context.modelActionType = 'updateNode';
@@ -376,7 +379,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit yet - node2 is still unmeasured
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update second node
       context.initialUpdate = {
@@ -386,7 +389,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that all nodes are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should handle partial node measurements', () => {
@@ -402,7 +405,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update with only width
       context.modelActionType = 'updateNode';
@@ -414,7 +417,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit - height is still undefined
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update with both width and height
       context.initialUpdate = {
@@ -424,7 +427,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should handle multiple port updates', () => {
@@ -457,7 +460,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update both ports
       context.modelActionType = 'updateNode';
@@ -490,7 +493,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that all ports are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should handle multiple label updates', () => {
@@ -525,7 +528,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update both labels
       context.modelActionType = 'updateEdge';
@@ -554,7 +557,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that all labels are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
   });
 
@@ -568,7 +571,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
     });
 
     it('should emit only once', () => {
@@ -587,13 +590,13 @@ describe('DiagramInitEmitter', () => {
       context.modelActionType = 'updateNode';
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Subsequent updates should not trigger the event
       context.modelActionType = 'updateNode';
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should handle empty diagram', () => {
@@ -603,8 +606,8 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit immediately during init for empty diagram
-      expect(emitSpy).toHaveBeenCalledOnce();
-      const event = emitSpy.mock.calls[0][1] as DiagramInitEvent;
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      const event = deferredEmitSpy.mock.calls[0][1] as DiagramInitEvent;
       expect(event.nodes).toHaveLength(0);
       expect(event.edges).toHaveLength(0);
       expect(event.viewport).toBeDefined();
@@ -630,7 +633,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit immediately during init as there are no ports/labels to measure and node is measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should skip non-existent nodes in updateNode', () => {
@@ -646,7 +649,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should have already emitted during init as all existing nodes are measured
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Update with non-existent node
       context.modelActionType = 'updateNode';
@@ -657,7 +660,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should still only be called once (from init)
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should skip non-existent edges in updateEdge', () => {
@@ -673,7 +676,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should have already emitted during init as node is measured and there are no edges
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Update with non-existent edge
       context.modelActionType = 'updateEdge';
@@ -696,7 +699,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should still only be called once (from init)
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
   });
 
@@ -748,7 +751,7 @@ describe('DiagramInitEmitter', () => {
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update node2
       context.modelActionType = 'updateNode';
@@ -756,7 +759,7 @@ describe('DiagramInitEmitter', () => {
         nodesToUpdate: [{ id: 'node2', size: { width: 150, height: 75 } }],
       };
       emitter.emit(context, eventManager);
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update port1
       context.initialUpdate = {
@@ -777,7 +780,7 @@ describe('DiagramInitEmitter', () => {
         ],
       };
       emitter.emit(context, eventManager);
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update label1
       context.modelActionType = 'updateEdge';
@@ -799,8 +802,8 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now that everything is measured
-      expect(emitSpy).toHaveBeenCalledOnce();
-      const event = emitSpy.mock.calls[0][1] as DiagramInitEvent;
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      const event = deferredEmitSpy.mock.calls[0][1] as DiagramInitEvent;
       expect(event.nodes).toHaveLength(3);
       expect(event.edges).toHaveLength(1);
     });
@@ -828,13 +831,13 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit immediately
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Advance time to check timeout doesn't trigger
       vi.advanceTimersByTime(5000);
 
       // Should still only be called once
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should emit event after timeout if items remain unmeasured', () => {
@@ -851,13 +854,14 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit yet
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Advance time past the timeout (3000ms)
       vi.advanceTimersByTime(3000);
 
-      // Should emit now via safety hatch
+      // Should emit now via safety hatch using immediate emit (not deferred)
       expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
       expect(consoleWarnSpy).toHaveBeenCalled();
 
       consoleWarnSpy.mockRestore();
@@ -876,7 +880,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit yet
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Advance time partially
       vi.advanceTimersByTime(1000);
@@ -890,13 +894,13 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should emit now
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Advance time past original timeout
       vi.advanceTimersByTime(5000);
 
       // Should still only be called once (timeout was cleared)
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should reset timeout when measurement progress is made', () => {
@@ -919,7 +923,7 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit yet
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Advance time to 2.5 seconds (before timeout)
       vi.advanceTimersByTime(2500);
@@ -933,19 +937,20 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should not emit yet (node2 still unmeasured)
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Advance another 2.5 seconds (would be past original timeout, but timeout was reset)
       vi.advanceTimersByTime(2500);
 
       // Should still not emit (only 2.5s since last progress)
-      expect(emitSpy).not.toHaveBeenCalled();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Advance final 500ms to trigger new timeout
       vi.advanceTimersByTime(500);
 
-      // Now safety hatch should trigger
+      // Now safety hatch should trigger using immediate emit (not deferred)
       expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
       expect(consoleWarnSpy).toHaveBeenCalled();
 
       consoleWarnSpy.mockRestore();
@@ -999,8 +1004,9 @@ describe('DiagramInitEmitter', () => {
       // Advance past timeout
       vi.advanceTimersByTime(3000);
 
-      // Should emit via safety hatch
+      // Should emit via safety hatch using immediate emit (not deferred)
       expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Check console warnings were called
       expect(consoleWarnSpy).toHaveBeenCalled();
@@ -1025,8 +1031,9 @@ describe('DiagramInitEmitter', () => {
       // Advance past timeout
       vi.advanceTimersByTime(3000);
 
-      // Should emit via safety hatch
+      // Should emit via safety hatch using immediate emit (not deferred)
       expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Check console warnings were called
       expect(consoleWarnSpy).toHaveBeenCalled();
@@ -1057,13 +1064,13 @@ describe('DiagramInitEmitter', () => {
       emitter.emit(context, eventManager);
 
       // Should have emitted once
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Advance past timeout
       vi.advanceTimersByTime(5000);
 
       // Should still only be called once
-      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
   });
 });
