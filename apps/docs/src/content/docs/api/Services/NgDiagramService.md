@@ -34,7 +34,7 @@ this.ngDiagramService.updateConfig({ debugMode: true });
 
 ### actionState
 
-> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/middleware/actionstate/)\>\>
+> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/internals/actionstate/)\>\>
 
 Reactive signal that tracks the current action state (readonly).
 This signal is managed internally by the diagram and updates automatically
@@ -176,13 +176,13 @@ Name of the default routing.
 
 ### getEnvironment()
 
-> **getEnvironment**(): [`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
+> **getEnvironment**(): [`EnvironmentInfo`](/docs/api/internals/environmentinfo/)
 
 Gets the current environment information.
 
 #### Returns
 
-[`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
+[`EnvironmentInfo`](/docs/api/internals/environmentinfo/)
 
 The environment info object.
 

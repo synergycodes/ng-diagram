@@ -22,12 +22,22 @@ title: "ng-diagram"
 - [NgDiagramGroupHighlightedDirective](/docs/api/directives/ngdiagramgrouphighlighteddirective/)
 - [NgDiagramNodeSelectedDirective](/docs/api/directives/ngdiagramnodeselecteddirective/)
 
+## Internals
+
+- [ActionState](/docs/api/internals/actionstate/)
+- [ActionStateManager](/docs/api/internals/actionstatemanager/)
+- [CopyPasteActionState](/docs/api/internals/copypasteactionstate/)
+- [DraggingActionState](/docs/api/internals/draggingactionstate/)
+- [EdgeRoutingManager](/docs/api/internals/edgeroutingmanager/)
+- [EnvironmentInfo](/docs/api/internals/environmentinfo/)
+- [HighlightGroupActionState](/docs/api/internals/highlightgroupactionstate/)
+- [LinkingActionState](/docs/api/internals/linkingactionstate/)
+- [ResizeActionState](/docs/api/internals/resizeactionstate/)
+- [RotationActionState](/docs/api/internals/rotationactionstate/)
+
 ## Other
 
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
-- [createMiddlewares](/docs/api/other/createmiddlewares/)
-- [initializeModel](/docs/api/other/initializemodel/)
-- [provideNgDiagram](/docs/api/other/providengdiagram/)
 
 ## Services
 
@@ -96,10 +106,6 @@ title: "ng-diagram"
 
 ## Types/Middleware
 
-- [ActionState](/docs/api/types/middleware/actionstate/)
-- [ActionStateManager](/docs/api/types/middleware/actionstatemanager/)
-- [EdgeRoutingManager](/docs/api/types/middleware/edgeroutingmanager/)
-- [EnvironmentInfo](/docs/api/types/middleware/environmentinfo/)
 - [FlowStateUpdate](/docs/api/types/middleware/flowstateupdate/)
 - [Middleware](/docs/api/types/middleware/middleware/)
 - [MiddlewareContext](/docs/api/types/middleware/middlewarecontext/)
@@ -151,3 +157,6 @@ title: "ng-diagram"
 ## Utilities
 
 - [configureShortcuts](/docs/api/utilities/configureshortcuts/)
+- [createMiddlewares](/docs/api/utilities/createmiddlewares/)
+- [initializeModel](/docs/api/utilities/initializemodel/)
+- [provideNgDiagram](/docs/api/utilities/providengdiagram/)

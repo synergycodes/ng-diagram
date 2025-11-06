@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ActionStateManager } from './action-state-manager';
 import { EventManager } from '../event-manager/event-manager';
 import type { ActionStateChangedEvent } from '../event-manager/internal-event-types';
+import { ActionStateManager } from './action-state-manager';
 
 describe('ActionStateManager', () => {
   let actionStateManager: ActionStateManager;
@@ -35,7 +35,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       actionStateManager.resize = resizeState;
 
@@ -51,7 +51,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       actionStateManager.resize = resizeState;
 
@@ -68,7 +68,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       actionStateManager.clearResize();
 
@@ -84,7 +84,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       emitSpy.mockClear();
 
@@ -245,7 +245,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       const linkingState = { sourceNodeId: 'n2', sourcePortId: 'p1', temporaryEdge: null };
 
@@ -267,7 +267,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       const linkingState = { sourceNodeId: 'n2', sourcePortId: 'p1', temporaryEdge: null };
 
@@ -296,7 +296,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       actionStateManager.resize = resizeState;
 
@@ -316,7 +316,7 @@ describe('ActionStateManager', () => {
         startY: 0,
         startNodePositionX: 50,
         startNodePositionY: 50,
-        draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+        resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
       };
       actionStateManager.linking = { sourceNodeId: 'n2', sourcePortId: 'p1', temporaryEdge: null };
 

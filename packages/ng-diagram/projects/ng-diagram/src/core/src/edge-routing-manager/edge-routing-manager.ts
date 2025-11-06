@@ -41,7 +41,7 @@ export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as co
  * };
  * ```
  *
- * @category Types/Middleware
+ * @category Internals
  */
 export class EdgeRoutingManager {
   private routings = new Map<string, EdgeRouting>();
