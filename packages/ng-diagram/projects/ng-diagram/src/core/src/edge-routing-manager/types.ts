@@ -11,14 +11,14 @@ export type BuiltInEdgeRoutingName = (typeof BUILT_IN_EDGE_ROUTINGS)[number];
  * Type representing edge routing name - can be built-in or custom
  *
  * **Allowed values:** `'orthogonal' | 'bezier' | 'polyline'`
- * @category Types
+ * @category Types/Routing
  */
 export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 
 /**
  * Context object containing all information needed for routing computation
  *
- * @category Types
+ * @category Types/Routing
  */
 export interface EdgeRoutingContext {
   /**
@@ -59,6 +59,8 @@ export interface EdgeRoutingContext {
 
 /**
  * Interface for routing implementations
+ *
+ *  @category Types/Routing
  */
 export interface EdgeRouting {
   /**

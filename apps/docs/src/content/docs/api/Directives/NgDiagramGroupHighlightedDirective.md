@@ -20,6 +20,6 @@ When the group's `highlighted` property is `true`, the `ng-diagram-group-highlig
 
 ### node
 
-> **node**: `InputSignal`\<[`GroupNode`](/docs/api/types/groupnode/)\<`object`\>\>
+> **node**: `InputSignal`\<[`GroupNode`](/docs/api/types/model/groupnode/)\<`object`\>\>
 
 The group node instance to monitor for highlight state.

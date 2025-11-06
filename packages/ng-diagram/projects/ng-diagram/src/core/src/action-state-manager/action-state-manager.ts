@@ -33,7 +33,7 @@ import type {
  * };
  * ```
  *
- * @category Other
+ * @category Types/Middleware
  */
 export class ActionStateManager {
   private state: ActionState;

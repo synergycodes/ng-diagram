@@ -24,20 +24,7 @@ title: "ng-diagram"
 
 ## Other
 
-- [ActionStateManager](/docs/api/other/actionstatemanager/)
-- [EdgeRouting](/docs/api/other/edgerouting/)
-- [EdgeRoutingManager](/docs/api/other/edgeroutingmanager/)
-- [KeyboardShortcutBinding](/docs/api/other/keyboardshortcutbinding/)
-- [KeyboardShortcutDefinition](/docs/api/other/keyboardshortcutdefinition/)
-- [ModifierOnlyShortcutBinding](/docs/api/other/modifieronlyshortcutbinding/)
-- [PointerOnlyShortcutDefinition](/docs/api/other/pointeronlyshortcutdefinition/)
-- [KeyboardActionName](/docs/api/other/keyboardactionname/)
-- [KeyboardMoveSelectionAction](/docs/api/other/keyboardmoveselectionaction/)
-- [KeyboardPanAction](/docs/api/other/keyboardpanaction/)
-- [PointerOnlyActionName](/docs/api/other/pointeronlyactionname/)
-- [ShortcutDefinition](/docs/api/other/shortcutdefinition/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
-- [configureShortcuts](/docs/api/other/configureshortcuts/)
 - [createMiddlewares](/docs/api/other/createmiddlewares/)
 - [initializeModel](/docs/api/other/initializemodel/)
 - [provideNgDiagram](/docs/api/other/providengdiagram/)
@@ -53,66 +40,124 @@ title: "ng-diagram"
 - [NgDiagramViewportService](/docs/api/services/ngdiagramviewportservice/)
 
 ## Types
+=======
+- Pointer-only actions (e.g., 'preserveSelection', 'boxSelection')
 
-- [NgDiagramEdgeTemplateMap](/docs/api/types/ngdiagramedgetemplatemap/)
-- [NgDiagramNodeTemplateMap](/docs/api/types/ngdiagramnodetemplatemap/)
-- [ActionState](/docs/api/types/actionstate/)
-- [BackgroundConfig](/docs/api/types/backgroundconfig/)
-- [BoxSelectionConfig](/docs/api/types/boxselectionconfig/)
-- [ClipboardPastedEvent](/docs/api/types/clipboardpastedevent/)
-- [DiagramEventMap](/docs/api/types/diagrameventmap/)
-- [DiagramInitEvent](/docs/api/types/diagraminitevent/)
-- [Edge](/docs/api/types/edge/)
-- [EdgeDrawnEvent](/docs/api/types/edgedrawnevent/)
-- [EdgeLabel](/docs/api/types/edgelabel/)
-- [EdgeRoutingConfig](/docs/api/types/edgeroutingconfig/)
-- [EdgeRoutingContext](/docs/api/types/edgeroutingcontext/)
-- [EnvironmentInfo](/docs/api/types/environmentinfo/)
-- [FlowConfig](/docs/api/types/flowconfig/)
-- [FlowState](/docs/api/types/flowstate/)
-- [FlowStateUpdate](/docs/api/types/flowstateupdate/)
-- [GroupingConfig](/docs/api/types/groupingconfig/)
-- [GroupMembershipChangedEvent](/docs/api/types/groupmembershipchangedevent/)
-- [GroupNode](/docs/api/types/groupnode/)
-- [LinkingConfig](/docs/api/types/linkingconfig/)
-- [Metadata](/docs/api/types/metadata/)
-- [Middleware](/docs/api/types/middleware/)
-- [MiddlewareContext](/docs/api/types/middlewarecontext/)
-- [MiddlewareHelpers](/docs/api/types/middlewarehelpers/)
-- [MiddlewareHistoryUpdate](/docs/api/types/middlewarehistoryupdate/)
-- [Model](/docs/api/types/model/)
-- [ModelAdapter](/docs/api/types/modeladapter/)
-- [NgDiagramEdgeTemplate](/docs/api/types/ngdiagramedgetemplate/)
-- [NgDiagramGroupNodeTemplate](/docs/api/types/ngdiagramgroupnodetemplate/)
-- [NgDiagramNodeTemplate](/docs/api/types/ngdiagramnodetemplate/)
-- [NodeResizedEvent](/docs/api/types/noderesizedevent/)
-- [NodeRotationConfig](/docs/api/types/noderotationconfig/)
-- [PaletteItemDroppedEvent](/docs/api/types/paletteitemdroppedevent/)
-- [Point](/docs/api/types/point/)
-- [PointerInputEvent](/docs/api/types/pointerinputevent/)
-- [Port](/docs/api/types/port/)
-- [Rect](/docs/api/types/rect/)
-- [ResizeConfig](/docs/api/types/resizeconfig/)
-- [SelectionChangedEvent](/docs/api/types/selectionchangedevent/)
-- [SelectionMovedEvent](/docs/api/types/selectionmovedevent/)
-- [SelectionMovingConfig](/docs/api/types/selectionmovingconfig/)
-- [SelectionRemovedEvent](/docs/api/types/selectionremovedevent/)
-- [SelectionRotatedEvent](/docs/api/types/selectionrotatedevent/)
-- [SimpleNode](/docs/api/types/simplenode/)
-- [Size](/docs/api/types/size/)
-- [SnappingConfig](/docs/api/types/snappingconfig/)
-- [TransactionResult](/docs/api/types/transactionresult/)
-- [Viewport](/docs/api/types/viewport/)
-- [ViewportChangedEvent](/docs/api/types/viewportchangedevent/)
-- [ZIndexConfig](/docs/api/types/zindexconfig/)
-- [ZoomConfig](/docs/api/types/zoomconfig/)
-- [EdgeRoutingName](/docs/api/types/edgeroutingname/)
-- [MiddlewareChain](/docs/api/types/middlewarechain/)
-- [ModelActionType](/docs/api/types/modelactiontype/)
-- [NgDiagramConfig](/docs/api/types/ngdiagramconfig/)
-- [NgDiagramPaletteItem](/docs/api/types/ngdiagrampaletteitem/)
-- [Node](/docs/api/types/node/)
-- [PortLocation](/docs/api/types/portlocation/)
-- [PortSide](/docs/api/types/portside/)
-- [RoutingMode](/docs/api/types/routingmode/)
-- [ShortcutActionName](/docs/api/types/shortcutactionname/)
+- [ShortcutActionName](/docs/api/types_________-_pointer-only_actions_eg__preserveselection___boxselection_/shortcutactionname/)
+
+## Types/Configuration
+
+- [FlowConfig](/docs/api/types/configuration/flowconfig/)
+- [NgDiagramConfig](/docs/api/types/configuration/ngdiagramconfig/)
+
+## Types/Configuration/Features
+
+- [BackgroundConfig](/docs/api/types/configuration/features/backgroundconfig/)
+- [BoxSelectionConfig](/docs/api/types/configuration/features/boxselectionconfig/)
+- [EdgeRoutingConfig](/docs/api/types/configuration/features/edgeroutingconfig/)
+- [GroupingConfig](/docs/api/types/configuration/features/groupingconfig/)
+- [LinkingConfig](/docs/api/types/configuration/features/linkingconfig/)
+- [NodeRotationConfig](/docs/api/types/configuration/features/noderotationconfig/)
+- [ResizeConfig](/docs/api/types/configuration/features/resizeconfig/)
+- [SelectionMovingConfig](/docs/api/types/configuration/features/selectionmovingconfig/)
+- [SnappingConfig](/docs/api/types/configuration/features/snappingconfig/)
+- [ZIndexConfig](/docs/api/types/configuration/features/zindexconfig/)
+- [ZoomConfig](/docs/api/types/configuration/features/zoomconfig/)
+
+## Types/Configuration/Shortcuts
+
+- [InputModifiers](/docs/api/types/configuration/shortcuts/inputmodifiers/)
+- [KeyboardShortcutBinding](/docs/api/types/configuration/shortcuts/keyboardshortcutbinding/)
+- [KeyboardShortcutDefinition](/docs/api/types/configuration/shortcuts/keyboardshortcutdefinition/)
+- [ModifierOnlyShortcutBinding](/docs/api/types/configuration/shortcuts/modifieronlyshortcutbinding/)
+- [PointerOnlyShortcutDefinition](/docs/api/types/configuration/shortcuts/pointeronlyshortcutdefinition/)
+- [KeyboardActionName](/docs/api/types/configuration/shortcuts/keyboardactionname/)
+- [KeyboardMoveSelectionAction](/docs/api/types/configuration/shortcuts/keyboardmoveselectionaction/)
+- [KeyboardPanAction](/docs/api/types/configuration/shortcuts/keyboardpanaction/)
+- [PointerOnlyActionName](/docs/api/types/configuration/shortcuts/pointeronlyactionname/)
+- [ShortcutDefinition](/docs/api/types/configuration/shortcuts/shortcutdefinition/)
+
+## Types/Configuration/Shortcuts
+>>>>>>> origin/main
+
+- [ShortcutActionName](/docs/api/types_________-_pointer-only_actions_eg__preserveselection___boxselection_/shortcutactionname/)
+
+## Types/Events
+
+- [ClipboardPastedEvent](/docs/api/types/events/clipboardpastedevent/)
+- [DiagramEventMap](/docs/api/types/events/diagrameventmap/)
+- [DiagramInitEvent](/docs/api/types/events/diagraminitevent/)
+- [EdgeDrawnEvent](/docs/api/types/events/edgedrawnevent/)
+- [GroupMembershipChangedEvent](/docs/api/types/events/groupmembershipchangedevent/)
+- [NodeResizedEvent](/docs/api/types/events/noderesizedevent/)
+- [PaletteItemDroppedEvent](/docs/api/types/events/paletteitemdroppedevent/)
+- [PointerInputEvent](/docs/api/types/events/pointerinputevent/)
+- [SelectionChangedEvent](/docs/api/types/events/selectionchangedevent/)
+- [SelectionMovedEvent](/docs/api/types/events/selectionmovedevent/)
+- [SelectionRemovedEvent](/docs/api/types/events/selectionremovedevent/)
+- [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
+- [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
+
+## Types/Geometry
+
+- [Point](/docs/api/types/geometry/point/)
+- [Rect](/docs/api/types/geometry/rect/)
+- [Size](/docs/api/types/geometry/size/)
+
+## Types/Middleware
+
+- [ActionState](/docs/api/types/middleware/actionstate/)
+- [ActionStateManager](/docs/api/types/middleware/actionstatemanager/)
+- [EdgeRoutingManager](/docs/api/types/middleware/edgeroutingmanager/)
+- [EnvironmentInfo](/docs/api/types/middleware/environmentinfo/)
+- [FlowStateUpdate](/docs/api/types/middleware/flowstateupdate/)
+- [Middleware](/docs/api/types/middleware/middleware/)
+- [MiddlewareContext](/docs/api/types/middleware/middlewarecontext/)
+- [MiddlewareHelpers](/docs/api/types/middleware/middlewarehelpers/)
+- [MiddlewareHistoryUpdate](/docs/api/types/middleware/middlewarehistoryupdate/)
+- [TransactionResult](/docs/api/types/middleware/transactionresult/)
+- [MiddlewareChain](/docs/api/types/middleware/middlewarechain/)
+- [ModelActionType](/docs/api/types/middleware/modelactiontype/)
+
+## Types/Model
+
+- [Edge](/docs/api/types/model/edge/)
+- [EdgeLabel](/docs/api/types/model/edgelabel/)
+- [FlowState](/docs/api/types/model/flowstate/)
+- [GroupNode](/docs/api/types/model/groupnode/)
+- [Metadata](/docs/api/types/model/metadata/)
+- [Model](/docs/api/types/model/model/)
+- [ModelAdapter](/docs/api/types/model/modeladapter/)
+- [ModelChanges](/docs/api/types/model/modelchanges/)
+- [Port](/docs/api/types/model/port/)
+- [SimpleNode](/docs/api/types/model/simplenode/)
+- [Viewport](/docs/api/types/model/viewport/)
+- [Node](/docs/api/types/model/node/)
+- [PortLocation](/docs/api/types/model/portlocation/)
+- [PortSide](/docs/api/types/model/portside/)
+
+## Types/Palette
+
+- [BasePaletteItemData](/docs/api/types/palette/basepaletteitemdata/)
+- [GroupNodeData](/docs/api/types/palette/groupnodedata/)
+- [NgDiagramPaletteItem](/docs/api/types/palette/ngdiagrampaletteitem/)
+- [SimpleNodeData](/docs/api/types/palette/simplenodedata/)
+
+## Types/Routing
+
+- [EdgeRouting](/docs/api/types/routing/edgerouting/)
+- [EdgeRoutingContext](/docs/api/types/routing/edgeroutingcontext/)
+- [EdgeRoutingName](/docs/api/types/routing/edgeroutingname/)
+- [RoutingMode](/docs/api/types/routing/routingmode/)
+
+## Types/Templates
+
+- [NgDiagramEdgeTemplateMap](/docs/api/types/templates/ngdiagramedgetemplatemap/)
+- [NgDiagramNodeTemplateMap](/docs/api/types/templates/ngdiagramnodetemplatemap/)
+- [NgDiagramEdgeTemplate](/docs/api/types/templates/ngdiagramedgetemplate/)
+- [NgDiagramGroupNodeTemplate](/docs/api/types/templates/ngdiagramgroupnodetemplate/)
+- [NgDiagramNodeTemplate](/docs/api/types/templates/ngdiagramnodetemplate/)
+
+## Utilities
+
+- [configureShortcuts](/docs/api/utilities/configureshortcuts/)

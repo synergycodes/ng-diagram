@@ -55,7 +55,7 @@ Pastes the clipboard content at the specified position.
 
 ##### position
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 The position where to paste the content.
 

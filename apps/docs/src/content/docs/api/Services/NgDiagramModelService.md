@@ -27,7 +27,7 @@ this.modelService.addNodes([node1, node2]);
 
 ### edges
 
-> `readonly` **edges**: `Signal`\<[`Edge`](/docs/api/types/edge/)\<`object`\>[]\>
+> `readonly` **edges**: `Signal`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>[]\>
 
 Readonly signal of current edges in the diagram.
 
@@ -35,7 +35,7 @@ Readonly signal of current edges in the diagram.
 
 ### metadata
 
-> `readonly` **metadata**: `Signal`\<[`Metadata`](/docs/api/types/metadata/)\<`object`\>\>
+> `readonly` **metadata**: `Signal`\<[`Metadata`](/docs/api/types/model/metadata/)\<`object`\>\>
 
 Readonly signal of current diagram metadata.
 
@@ -43,7 +43,7 @@ Readonly signal of current diagram metadata.
 
 ### nodes
 
-> `readonly` **nodes**: `Signal`\<[`Node`](/docs/api/types/node/)[]\>
+> `readonly` **nodes**: `Signal`\<[`Node`](/docs/api/types/model/node/)[]\>
 
 Readonly signal of current nodes in the diagram.
 
@@ -59,7 +59,7 @@ Adds new edges to the diagram.
 
 ##### edges
 
-[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+[`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
 Array of edges to add.
 
@@ -79,7 +79,7 @@ Adds new nodes to the diagram.
 
 ##### nodes
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 Array of nodes to add.
 
@@ -131,7 +131,7 @@ Array of node IDs to delete.
 
 ### getChildren()
 
-> **getChildren**(`groupId`): [`Node`](/docs/api/types/node/)[]
+> **getChildren**(`groupId`): [`Node`](/docs/api/types/model/node/)[]
 
 Gets all children nodes for a given group node id
 
@@ -145,7 +145,7 @@ group node id
 
 #### Returns
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 Array of child nodes
 
@@ -153,7 +153,7 @@ Array of child nodes
 
 ### getChildrenNested()
 
-> **getChildrenNested**(`groupId`): [`Node`](/docs/api/types/node/)[]
+> **getChildrenNested**(`groupId`): [`Node`](/docs/api/types/model/node/)[]
 
 Gets all nested children (descendants) of a group node
 
@@ -167,7 +167,7 @@ Group node id
 
 #### Returns
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 Array of all descendant nodes (children, grandchildren, etc.)
 
@@ -175,7 +175,7 @@ Array of all descendant nodes (children, grandchildren, etc.)
 
 ### getConnectedEdges()
 
-> **getConnectedEdges**(`nodeId`): [`Edge`](/docs/api/types/edge/)\<`object`\>[]
+> **getConnectedEdges**(`nodeId`): [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
 Gets all edges connected to a node
 
@@ -189,7 +189,7 @@ Node id
 
 #### Returns
 
-[`Edge`](/docs/api/types/edge/)\<`object`\>[]
+[`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
 Array of edges where the node is either source or target
 
@@ -197,7 +197,7 @@ Array of edges where the node is either source or target
 
 ### getConnectedNodes()
 
-> **getConnectedNodes**(`nodeId`): [`Node`](/docs/api/types/node/)[]
+> **getConnectedNodes**(`nodeId`): [`Node`](/docs/api/types/model/node/)[]
 
 Gets all nodes connected to a node via edges
 
@@ -211,7 +211,7 @@ Node id
 
 #### Returns
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 Array of nodes connected to the given node
 
@@ -219,7 +219,7 @@ Array of nodes connected to the given node
 
 ### getEdgeById()
 
-> **getEdgeById**(`edgeId`): `null` \| [`Edge`](/docs/api/types/edge/)\<`object`\>
+> **getEdgeById**(`edgeId`): `null` \| [`Edge`](/docs/api/types/model/edge/)\<`object`\>
 
 Gets an edge by id.
 
@@ -233,7 +233,7 @@ Edge id.
 
 #### Returns
 
-`null` \| [`Edge`](/docs/api/types/edge/)\<`object`\>
+`null` \| [`Edge`](/docs/api/types/model/edge/)\<`object`\>
 
 Edge or null if not found.
 
@@ -241,20 +241,20 @@ Edge or null if not found.
 
 ### getModel()
 
-> **getModel**(): [`ModelAdapter`](/docs/api/types/modeladapter/)
+> **getModel**(): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 Returns the current model that NgDiagram instance is using.
 Returns null if flowCore is not initialized.
 
 #### Returns
 
-[`ModelAdapter`](/docs/api/types/modeladapter/)
+[`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 ***
 
 ### getNearestNodeInRange()
 
-> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/docs/api/types/node/)
+> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/docs/api/types/model/node/)
 
 Gets the nearest node in a range from a point.
 
@@ -262,7 +262,7 @@ Gets the nearest node in a range from a point.
 
 ##### point
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Point to check from.
 
@@ -274,7 +274,7 @@ Range to check in.
 
 #### Returns
 
-`null` \| [`Node`](/docs/api/types/node/)
+`null` \| [`Node`](/docs/api/types/model/node/)
 
 Nearest node in range or null.
 
@@ -282,7 +282,7 @@ Nearest node in range or null.
 
 ### getNearestPortInRange()
 
-> **getNearestPortInRange**(`point`, `range`): `null` \| [`Port`](/docs/api/types/port/)
+> **getNearestPortInRange**(`point`, `range`): `null` \| [`Port`](/docs/api/types/model/port/)
 
 Gets the nearest port in a range from a point.
 
@@ -290,7 +290,7 @@ Gets the nearest port in a range from a point.
 
 ##### point
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Point to check from.
 
@@ -302,7 +302,7 @@ Range to check in.
 
 #### Returns
 
-`null` \| [`Port`](/docs/api/types/port/)
+`null` \| [`Port`](/docs/api/types/model/port/)
 
 Nearest port in range or null.
 
@@ -310,7 +310,7 @@ Nearest port in range or null.
 
 ### getNodeById()
 
-> **getNodeById**(`nodeId`): `null` \| [`Node`](/docs/api/types/node/)
+> **getNodeById**(`nodeId`): `null` \| [`Node`](/docs/api/types/model/node/)
 
 Gets a node by id.
 
@@ -324,7 +324,7 @@ Node id.
 
 #### Returns
 
-`null` \| [`Node`](/docs/api/types/node/)
+`null` \| [`Node`](/docs/api/types/model/node/)
 
 Node or null if not found.
 
@@ -332,7 +332,7 @@ Node or null if not found.
 
 ### getNodeEnds()
 
-> **getNodeEnds**(`edgeId`): `null` \| \{ `source`: [`Node`](/docs/api/types/node/); `target`: [`Node`](/docs/api/types/node/); \}
+> **getNodeEnds**(`edgeId`): `null` \| \{ `source`: [`Node`](/docs/api/types/model/node/); `target`: [`Node`](/docs/api/types/model/node/); \}
 
 Gets the source and target nodes of an edge
 
@@ -346,7 +346,7 @@ Edge id
 
 #### Returns
 
-`null` \| \{ `source`: [`Node`](/docs/api/types/node/); `target`: [`Node`](/docs/api/types/node/); \}
+`null` \| \{ `source`: [`Node`](/docs/api/types/model/node/); `target`: [`Node`](/docs/api/types/model/node/); \}
 
 Object containing source and target nodes, or null if edge doesn't exist
 
@@ -354,7 +354,7 @@ Object containing source and target nodes, or null if edge doesn't exist
 
 ### getNodesInRange()
 
-> **getNodesInRange**(`point`, `range`): [`Node`](/docs/api/types/node/)[]
+> **getNodesInRange**(`point`, `range`): [`Node`](/docs/api/types/model/node/)[]
 
 Gets all nodes in a range from a point.
 
@@ -362,7 +362,7 @@ Gets all nodes in a range from a point.
 
 ##### point
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Point to check from.
 
@@ -374,7 +374,7 @@ Range to check in.
 
 #### Returns
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 Array of nodes in range.
 
@@ -382,7 +382,7 @@ Array of nodes in range.
 
 ### getOverlappingNodes()
 
-> **getOverlappingNodes**(`nodeId`): [`Node`](/docs/api/types/node/)[]
+> **getOverlappingNodes**(`nodeId`): [`Node`](/docs/api/types/model/node/)[]
 
 Detects collision with other nodes by finding all nodes whose rectangles intersect
 with the specified node's bounding rectangle.
@@ -397,7 +397,7 @@ The ID of the node to check for collisions
 
 #### Returns
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 An array of Nodes that overlap with the specified node
 
@@ -405,7 +405,7 @@ An array of Nodes that overlap with the specified node
 
 ### getParentHierarchy()
 
-> **getParentHierarchy**(`nodeId`): [`GroupNode`](/docs/api/types/groupnode/)\<`object`\>[]
+> **getParentHierarchy**(`nodeId`): [`GroupNode`](/docs/api/types/model/groupnode/)\<`object`\>[]
 
 Gets the full chain of parent group Nodes for a given nodeId.
 
@@ -419,7 +419,7 @@ Node id
 
 #### Returns
 
-[`GroupNode`](/docs/api/types/groupnode/)\<`object`\>[]
+[`GroupNode`](/docs/api/types/model/groupnode/)\<`object`\>[]
 
 Array of parent group Node objects, from closest parent to farthest ancestor
 
@@ -483,7 +483,7 @@ Edge id.
 
 ##### edge
 
-`Partial`\<[`Edge`](/docs/api/types/edge/)\>
+`Partial`\<[`Edge`](/docs/api/types/model/edge/)\>
 
 New edge properties.
 
@@ -535,7 +535,7 @@ Updates multiple edges at once.
 
 ##### edges
 
-`Pick`\<[`Edge`](/docs/api/types/edge/)\<`object`\>, `"id"`\> & `Partial`\<[`Edge`](/docs/api/types/edge/)\<`object`\>\>[]
+`Pick`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>, `"id"`\> & `Partial`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>\>[]
 
 Array of edge updates (must include id and any properties to update).
 
@@ -561,7 +561,7 @@ Node id.
 
 ##### node
 
-`Partial`\<[`Node`](/docs/api/types/node/)\>
+`Partial`\<[`Node`](/docs/api/types/model/node/)\>
 
 New node properties.
 
@@ -613,7 +613,7 @@ Updates multiple nodes at once.
 
 ##### nodes
 
-`Pick`\<[`Node`](/docs/api/types/node/), `"id"`\> & `Partial`\<[`Node`](/docs/api/types/node/)\>[]
+`Pick`\<[`Node`](/docs/api/types/model/node/), `"id"`\> & `Partial`\<[`Node`](/docs/api/types/model/node/)\>[]
 
 Array of node updates (must include id and any properties to update).
 

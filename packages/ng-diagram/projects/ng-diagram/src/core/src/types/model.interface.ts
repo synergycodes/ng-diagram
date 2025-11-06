@@ -5,7 +5,7 @@ import { Node } from './node.interface';
 /**
  * Interface representing the entire model of the flow diagram
  *
- * @category Types
+ * @category Types/Model
  */
 export interface Model {
   /**

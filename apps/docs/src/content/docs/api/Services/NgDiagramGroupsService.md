@@ -63,7 +63,7 @@ The ID of the group to highlight.
 
 ##### nodes
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 The nodes to highlight as part of the group.
 

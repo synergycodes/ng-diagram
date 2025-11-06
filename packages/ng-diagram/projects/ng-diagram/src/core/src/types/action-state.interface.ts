@@ -40,7 +40,7 @@ export interface DraggingActionState {
 /**
  * Interface representing the current state of various user actions in the flow diagram
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface ActionState {
   /**

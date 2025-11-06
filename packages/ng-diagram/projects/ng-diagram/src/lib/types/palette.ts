@@ -15,18 +15,36 @@ import { GroupNode, SimpleNode } from '../../core/src';
  *   rotatable: false,
  * };
  * ```
- * @category Types
+ * @category Types/Palette
  */
 export type NgDiagramPaletteItem<Data extends object = BasePaletteItemData> =
   | SimpleNodeData<Data>
   | GroupNodeData<Data>;
 
-type SimpleNodeData<Data extends object = BasePaletteItemData> = Pick<
+/**
+ * Data structure for node palette items. Contains the essential properties needed to create a fully configured node from the palette.
+ * @category Types/Palette
+ */
+export type SimpleNodeData<Data extends object = BasePaletteItemData> = Pick<
   SimpleNode<Data>,
   'type' | 'data' | 'resizable' | 'rotatable' | 'size' | 'angle' | 'autoSize' | 'zOrder'
 >;
-type GroupNodeData<Data extends object = BasePaletteItemData> = SimpleNodeData<Data> & Pick<GroupNode, 'isGroup'>;
 
-interface BasePaletteItemData {
+/**
+ * Data structure for group node palette items. Extends {@link SimpleNodeData} with the `isGroup` property to identify it as a group.
+ * @category Types/Palette
+ */
+export type GroupNodeData<Data extends object = BasePaletteItemData> = SimpleNodeData<Data> &
+  Pick<GroupNode, 'isGroup'>;
+
+/**
+ * Base data interface for palette items. All palette item data should extend this interface and include at minimum a `label` property.
+ *
+ * @category Types/Palette
+ */
+export interface BasePaletteItemData {
+  /**
+   * The display label for the palette item.
+   */
   label: string;
 }
