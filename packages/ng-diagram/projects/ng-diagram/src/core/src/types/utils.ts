@@ -73,16 +73,6 @@ export interface Bounds {
 }
 
 export type Direction = 'top' | 'bottom' | 'left' | 'right';
-export type ContainerEdge =
-  | 'left'
-  | 'right'
-  | 'top'
-  | 'bottom'
-  | 'topleft'
-  | 'topright'
-  | 'bottomleft'
-  | 'bottomright'
-  | null;
 
 /**
  * Interface representing the location of a port on a node

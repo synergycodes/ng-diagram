@@ -31,6 +31,9 @@ const defaultResizeConfig: ResizeConfig = {
 
 const defaultLinkingConfig: LinkingConfig = {
   portSnapDistance: 10,
+  edgePanningEnabled: true,
+  edgePanningForce: 10,
+  edgePanningThreshold: 30,
   validateConnection: (): boolean => {
     // Allow connection by default
     return true;
@@ -101,8 +104,9 @@ const defaultNodeSnappingConfig: SnappingConfig = {
 };
 
 const defaultSelectionMovingConfig: SelectionMovingConfig = {
-  edgePanningForce: 15,
-  edgePanningThreshold: 10,
+  edgePanningForce: 10,
+  edgePanningThreshold: 30,
+  edgePanningEnabled: true,
 };
 
 const defaultZIndexConfig: ZIndexConfig = {

@@ -28,12 +28,10 @@ function getSamplePointerMoveSelectionEvent(
       shift: false,
       meta: false,
     },
-    currentDiagramEdge: null,
+    panningForce: null,
     ...overrides,
   };
 }
-
-const EDGE_PANNING_FORCE = 15;
 
 describe('PointerMoveSelectionEventHandler', () => {
   let handler: PointerMoveSelectionEventHandler;
@@ -91,7 +89,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       }),
       config: {
         selectionMoving: {
-          edgePanningForce: EDGE_PANNING_FORCE,
+          edgePanningForce: 20,
           edgePanningThreshold: 10,
         },
       },
@@ -131,7 +129,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     it('should not pan during start phase even with screen edge', () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'start',
-        currentDiagramEdge: 'left',
+        panningForce: { x: 10, y: 5 },
       });
 
       handler.handle(event);
@@ -349,7 +347,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointBelowThreshold,
-          currentDiagramEdge: 'left',
+          panningForce: { x: 8, y: 0 },
         });
 
         handler.handle(event);
@@ -361,12 +359,12 @@ describe('PointerMoveSelectionEventHandler', () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointOverThreshold,
-          currentDiagramEdge: 'left',
+          panningForce: { x: 12, y: 3 },
         });
 
         handler.handle(event);
 
-        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: EDGE_PANNING_FORCE, y: 0 });
+        expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 12, y: 3 });
       });
     });
   });
@@ -534,7 +532,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     it('should not pan during end phase even with screen edge', async () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'end',
-        currentDiagramEdge: 'left',
+        panningForce: { x: 7, y: 9 },
       });
 
       await handler.handle(event);

@@ -9,16 +9,30 @@ Configuration for selection moving behavior.
 
 ## Properties
 
-### edgePanningForce
+### edgePanningEnabled
 
-> **edgePanningForce**: `number`
+> **edgePanningEnabled**: `boolean`
 
-Distance in pixels to move the screen while dragging nodes near the edge of the viewport.
+Enable edge panning when the moved node is near the edge of the viewport.
 
 #### Default
 
 ```ts
-15
+true
+```
+
+***
+
+### edgePanningForce
+
+> **edgePanningForce**: `number`
+
+Multiplier for edge panning speed while dragging nodes near the edge of the viewport.
+
+#### Default
+
+```ts
+10
 ```
 
 ***
@@ -33,5 +47,5 @@ If the mouse pointer is within this distance from the edge of the viewport, pann
 #### Default
 
 ```ts
-10
+30
 ```

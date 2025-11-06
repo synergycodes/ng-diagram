@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Node } from '../../../core/src';
+import { Node, Point } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { InputEventsRouterService } from './input-events-router.service';
 
@@ -20,7 +20,7 @@ export class LinkingEventService {
     });
   }
 
-  emitContinue(event: PointerInputEvent, target?: Node, portId?: string) {
+  emitContinue(event: PointerInputEvent, target?: Node, portId?: string, panningForce: Point | null = null) {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -30,6 +30,7 @@ export class LinkingEventService {
       targetType: 'node',
       portId: portId,
       lastInputPoint: { x: event.clientX, y: event.clientY },
+      panningForce,
     });
   }
 
