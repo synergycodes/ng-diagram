@@ -23,6 +23,8 @@ import { UpdatePortsService } from '../services/update-ports/update-ports.servic
  *
  * @returns Array of providers for all ng-diagram services
  *
+ * @category Utilities
+ *
  * @example
  * ```typescript
  * @Component({

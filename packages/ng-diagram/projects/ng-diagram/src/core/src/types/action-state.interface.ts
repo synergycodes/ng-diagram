@@ -2,45 +2,96 @@ import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
 
+/**
+ * State tracking a node resize operation in progress.
+ *
+ * @category Internals
+ */
 export interface ResizeActionState {
+  /** Initial width of the node before resize. */
   startWidth: number;
+  /** Initial height of the node before resize. */
   startHeight: number;
+  /** Initial X coordinate in screen space where the resize started. */
   startX: number;
+  /** Initial Y coordinate in screen space where the resize started. */
   startY: number;
+  /** Initial X position of the node in diagram space. */
   startNodePositionX: number;
+  /** Initial Y position of the node in diagram space. */
   startNodePositionY: number;
-  draggingNode: Node;
+  /** Reference to the node being resized. */
+  resizingNode: Node;
 }
 
+/**
+ * State tracking an edge creation operation in progress.
+ *
+ * @category Internals
+ */
 export interface LinkingActionState {
+  /** ID of the node where the edge starts. */
   sourceNodeId: string;
+  /** ID of the port where the edge starts. */
   sourcePortId: string;
+  /** Temporary edge displayed while creating the connection. */
   temporaryEdge: Edge | null;
 }
 
+/**
+ * State containing copied nodes and edges for paste operations.
+ *
+ * @category Internals
+ */
 export interface CopyPasteActionState {
+  /** Array of nodes that were copied. */
   copiedNodes: Node[];
+  /** Array of edges that were copied. */
   copiedEdges: Edge[];
 }
 
+/**
+ * State tracking which group is currently highlighted.
+ *
+ * @category Internals
+ */
 export interface HighlightGroupActionState {
+  /** ID of the highlighted group, or null if no group is highlighted. */
   highlightedGroupId: string | null;
 }
 
+/**
+ * State tracking a node rotation operation in progress.
+ *
+ * @category Internals
+ */
 export interface RotationActionState {
+  /** Angle in degrees at the start of the rotation operation. */
   startAngle: number;
+  /** Initial angle of the node before rotation. */
   initialNodeAngle: number;
+  /** ID of the node being rotated. */
   nodeId: string;
 }
 
+/**
+ * State tracking a drag operation in progress.
+ *
+ * @category Internals
+ */
 export interface DraggingActionState {
+  /** Input modifiers (e.g., Ctrl, Shift) active during the drag. */
   modifiers: InputModifiers;
 }
 
 /**
- * Interface representing the current state of various user actions in the flow diagram
+ * Interface representing the current state of various user interactions in the diagram.
  *
- * @category Types/Middleware
+ * This state is read-only and automatically managed by the library. It provides
+ * information about active operations such as resizing, linking, dragging, and other
+ * user interactions. Use this to observe the current state, not to modify it.
+ *
+ * @category Internals
  */
 export interface ActionState {
   /**

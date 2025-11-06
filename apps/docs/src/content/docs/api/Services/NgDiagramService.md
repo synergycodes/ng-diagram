@@ -34,7 +34,7 @@ this.ngDiagramService.updateConfig({ debugMode: true });
 
 ### actionState
 
-> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/middleware/actionstate/)\>\>
+> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/internals/actionstate/)\>\>
 
 Reactive signal that tracks the current action state (readonly).
 This signal is managed internally by the diagram and updates automatically

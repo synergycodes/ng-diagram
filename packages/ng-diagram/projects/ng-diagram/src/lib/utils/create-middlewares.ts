@@ -35,6 +35,8 @@ export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;
  * @returns The modified middleware chain
  *
  * Use with extreme caution - incorrectly modifying required middlewares can break the library
+ *
+ * @category Utilities
  */
 export function createMiddlewares<TMiddlewares extends MiddlewareChain = AppMiddlewares>(
   middlewares: (defaults: AppMiddlewares) => TMiddlewares

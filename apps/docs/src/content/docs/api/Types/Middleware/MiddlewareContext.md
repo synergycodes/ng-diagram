@@ -41,7 +41,7 @@ const middleware: Middleware = {
 
 ### actionStateManager
 
-> **actionStateManager**: [`ActionStateManager`](/docs/api/types/middleware/actionstatemanager/)
+> **actionStateManager**: [`ActionStateManager`](/docs/api/internals/actionstatemanager/)
 
 Manager for action states (resizing, linking, etc.)
 
@@ -57,7 +57,7 @@ The current diagram configuration
 
 ### edgeRoutingManager
 
-> **edgeRoutingManager**: [`EdgeRoutingManager`](/docs/api/types/middleware/edgeroutingmanager/)
+> **edgeRoutingManager**: [`EdgeRoutingManager`](/docs/api/internals/edgeroutingmanager/)
 
 Manager for edge routing algorithms
 

@@ -64,8 +64,44 @@ export default defineConfig({
         // },
         {
           label: 'API',
-          autogenerate: { directory: 'api', collapsed: true },
-          collapsed: false,
+          collapsed: true,
+          items: [
+            {
+              label: 'Components',
+              collapsed: true,
+              autogenerate: { directory: 'api/Components' },
+            },
+            {
+              label: 'Directives',
+              collapsed: true,
+              autogenerate: { directory: 'api/Directives' },
+            },
+            {
+              label: 'Other',
+              collapsed: true,
+              autogenerate: { directory: 'api/Other' },
+            },
+            {
+              label: 'Services',
+              collapsed: true,
+              autogenerate: { directory: 'api/Services' },
+            },
+            {
+              label: 'Types',
+              collapsed: true,
+              autogenerate: { directory: 'api/Types' },
+            },
+            {
+              label: 'Utilities',
+              collapsed: true,
+              autogenerate: { directory: 'api/Utilities' },
+            },
+            {
+              label: 'Internals',
+              collapsed: true,
+              autogenerate: { directory: 'api/Internals' },
+            },
+          ],
         },
         {
           label: 'Changelog',

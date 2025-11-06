@@ -36,13 +36,13 @@ const middleware: Middleware = {
 
 #### Get Signature
 
-> **get** **copyPaste**(): `undefined` \| `CopyPasteActionState`
+> **get** **copyPaste**(): `undefined` \| [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
 
 Gets the current copy/paste action state.
 
 ##### Returns
 
-`undefined` \| `CopyPasteActionState`
+`undefined` \| [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
 
 The copy/paste state if a copy/paste operation is in progress, undefined otherwise
 
@@ -58,7 +58,7 @@ Sets the copy/paste action state.
 
 The copy/paste state to set, or undefined to clear
 
-`undefined` | `CopyPasteActionState`
+`undefined` | [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
 
 ##### Returns
 
@@ -70,13 +70,13 @@ The copy/paste state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **dragging**(): `undefined` \| `DraggingActionState`
+> **get** **dragging**(): `undefined` \| [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
 
 Gets the current dragging action state.
 
 ##### Returns
 
-`undefined` \| `DraggingActionState`
+`undefined` \| [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
 
 The dragging state if nodes are being dragged, undefined otherwise
 
@@ -92,7 +92,7 @@ Sets the dragging action state.
 
 The dragging state to set, or undefined to clear
 
-`undefined` | `DraggingActionState`
+`undefined` | [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
 
 ##### Returns
 
@@ -104,13 +104,13 @@ The dragging state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **highlightGroup**(): `undefined` \| `HighlightGroupActionState`
+> **get** **highlightGroup**(): `undefined` \| [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
 
 Gets the current highlight group action state.
 
 ##### Returns
 
-`undefined` \| `HighlightGroupActionState`
+`undefined` \| [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
 
 The highlight group state if a group is being highlighted, undefined otherwise
 
@@ -126,7 +126,7 @@ Sets the highlight group action state.
 
 The highlight group state to set, or undefined to clear
 
-`undefined` | `HighlightGroupActionState`
+`undefined` | [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
 
 ##### Returns
 
@@ -138,13 +138,13 @@ The highlight group state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **linking**(): `undefined` \| `LinkingActionState`
+> **get** **linking**(): `undefined` \| [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
 
 Gets the current linking action state.
 
 ##### Returns
 
-`undefined` \| `LinkingActionState`
+`undefined` \| [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
 
 The linking state if a link is being created, undefined otherwise
 
@@ -160,7 +160,7 @@ Sets the linking action state.
 
 The linking state to set, or undefined to clear
 
-`undefined` | `LinkingActionState`
+`undefined` | [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
 
 ##### Returns
 
@@ -172,13 +172,13 @@ The linking state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **resize**(): `undefined` \| `ResizeActionState`
+> **get** **resize**(): `undefined` \| [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
 
 Gets the current resize action state.
 
 ##### Returns
 
-`undefined` \| `ResizeActionState`
+`undefined` \| [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
 
 The resize state if a resize is in progress, undefined otherwise
 
@@ -194,7 +194,7 @@ Sets the resize action state.
 
 The resize state to set, or undefined to clear
 
-`undefined` | `ResizeActionState`
+`undefined` | [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
 
 ##### Returns
 
@@ -206,13 +206,13 @@ The resize state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **rotation**(): `undefined` \| `RotationActionState`
+> **get** **rotation**(): `undefined` \| [`RotationActionState`](/docs/api/internals/rotationactionstate/)
 
 Gets the current rotation action state.
 
 ##### Returns
 
-`undefined` \| `RotationActionState`
+`undefined` \| [`RotationActionState`](/docs/api/internals/rotationactionstate/)
 
 The rotation state if a rotation is in progress, undefined otherwise
 
@@ -228,7 +228,7 @@ Sets the rotation action state.
 
 The rotation state to set, or undefined to clear
 
-`undefined` | `RotationActionState`
+`undefined` | [`RotationActionState`](/docs/api/internals/rotationactionstate/)
 
 ##### Returns
 
@@ -310,13 +310,13 @@ Clears the rotation action state.
 
 ### getState()
 
-> **getState**(): `Readonly`\<[`ActionState`](/docs/api/types/middleware/actionstate/)\>
+> **getState**(): `Readonly`\<[`ActionState`](/docs/api/internals/actionstate/)\>
 
 Gets the current action state (readonly).
 
 #### Returns
 
-`Readonly`\<[`ActionState`](/docs/api/types/middleware/actionstate/)\>
+`Readonly`\<[`ActionState`](/docs/api/internals/actionstate/)\>
 
 The complete action state object
 
