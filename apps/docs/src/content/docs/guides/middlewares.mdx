@@ -77,6 +77,24 @@ The `helpers` object provides optimized functions to inspect all cumulative chan
 
 These helpers allow you to efficiently check what changed during the middleware execution chain.
 
+#### Example: Using Helpers
+
+```typescript
+// Example with a middleware that checks if any node was added into a group
+export const myMiddleware: Middleware = {
+  name: 'group-node-checker',
+  execute: async (context, next) => {
+    const { helpers } = context;
+    if (helpers.checkIfAnyNodePropsChanged(['groupId']).length > 0) {
+      const affectedNodeIds = helpers.getAffectedNodeIds(['groupId']);
+      console.log('Nodes were added to groups:', affectedNodeIds);
+    }
+
+    next(); // Continue to next middleware
+  },
+};
+```
+
 ### Middleware History
 
 The `history` array in the context tracks all state updates made by previous middlewares, including the name of the middleware and the specific state update applied. This is useful for auditing or debugging complex middleware chains.
