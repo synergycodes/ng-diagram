@@ -13,7 +13,7 @@ import { EdgeRouting, EdgeRoutingContext, EdgeRoutingName } from './types';
  * - `bezier`: Routes edges with smooth Bezier curves
  * - `polyline`: Routes edges as straight line segments
  *
- * @category Other
+ * @category Types/Routing
  */
 export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as const;
 
@@ -41,7 +41,7 @@ export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as co
  * };
  * ```
  *
- * @category Other
+ * @category Types/Middleware
  */
 export class EdgeRoutingManager {
   private routings = new Map<string, EdgeRouting>();

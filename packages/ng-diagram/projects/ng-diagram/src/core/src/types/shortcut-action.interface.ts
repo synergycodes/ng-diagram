@@ -2,6 +2,7 @@ import type { InputEventName } from '../input-events/input-events.interface';
 
 /**
  * Keyboard movement actions that map to directional events
+ * @category Types/Configuration/Shortcuts
  */
 export type KeyboardMoveSelectionAction =
   | 'keyboardMoveSelectionUp'
@@ -11,17 +12,20 @@ export type KeyboardMoveSelectionAction =
 
 /**
  * Keyboard panning actions that map to directional events
+ * @category Types/Configuration/Shortcuts
  */
 export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardPanLeft' | 'keyboardPanRight';
 
 /**
  * Pointer-only action names that can only be triggered by pointer events with modifiers
  * (e.g., Shift+Click, Ctrl+Click)
+ * @category Types/Configuration/Shortcuts
  */
 export type PointerOnlyActionName = 'preserveSelection' | 'boxSelection';
 
 /**
  * Keyboard action names that can be triggered by keyboard events
+ * @category Types/Configuration/Shortcuts
  */
 export type KeyboardActionName =
   | KeyboardMoveSelectionAction
@@ -34,6 +38,6 @@ export type KeyboardActionName =
  * Includes:
  * - Keyboard actions (e.g., 'keyboardMoveSelectionUp', 'copy', 'selectAll')
  * - Pointer-only actions (e.g., 'preserveSelection', 'boxSelection')
- * @category Types
+ * @category Types/Configuration/Shortcuts
  */
 export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName;

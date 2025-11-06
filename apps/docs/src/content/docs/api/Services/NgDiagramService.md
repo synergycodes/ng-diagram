@@ -34,7 +34,7 @@ this.ngDiagramService.updateConfig({ debugMode: true });
 
 ### actionState
 
-> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/actionstate/)\>\>
+> `readonly` **actionState**: `Signal`\<`Readonly`\<[`ActionState`](/docs/api/types/middleware/actionstate/)\>\>
 
 Reactive signal that tracks the current action state (readonly).
 This signal is managed internally by the diagram and updates automatically
@@ -46,7 +46,7 @@ when actions like resizing, rotating, or linking start/end.
 
 ### config
 
-> `readonly` **config**: `Signal`\<`Readonly`\<`DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>\>\>
+> `readonly` **config**: `Signal`\<`Readonly`\<`DeepPartial`\<[`FlowConfig`](/docs/api/types/configuration/flowconfig/)\>\>\>
 
 Reactive signal that tracks the current configuration (readonly).
 To update the configuration, use [updateConfig](/docs/api/services/ngdiagramservice/#updateconfig).
@@ -72,7 +72,7 @@ Add an event listener for a diagram event.
 
 ##### K
 
-`K` *extends* keyof [`DiagramEventMap`](/docs/api/types/diagrameventmap/)
+`K` *extends* keyof [`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)
 
 #### Parameters
 
@@ -84,7 +84,7 @@ The event name.
 
 ##### callback
 
-`EventListener`\<[`DiagramEventMap`](/docs/api/types/diagrameventmap/)\[`K`\]\>
+`EventListener`\<[`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)\[`K`\]\>
 
 The callback to invoke when the event is emitted.
 
@@ -114,7 +114,7 @@ Add an event listener that will only fire once.
 
 ##### K
 
-`K` *extends* keyof [`DiagramEventMap`](/docs/api/types/diagrameventmap/)
+`K` *extends* keyof [`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)
 
 #### Parameters
 
@@ -126,7 +126,7 @@ The event name.
 
 ##### callback
 
-`EventListener`\<[`DiagramEventMap`](/docs/api/types/diagrameventmap/)\[`K`\]\>
+`EventListener`\<[`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)\[`K`\]\>
 
 The callback to invoke when the event is emitted.
 
@@ -176,13 +176,13 @@ Name of the default routing.
 
 ### getEnvironment()
 
-> **getEnvironment**(): [`EnvironmentInfo`](/docs/api/types/environmentinfo/)
+> **getEnvironment**(): [`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
 
 Gets the current environment information.
 
 #### Returns
 
-[`EnvironmentInfo`](/docs/api/types/environmentinfo/)
+[`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
 
 The environment info object.
 
@@ -212,7 +212,7 @@ Check if there are any listeners for an event.
 
 ##### event
 
-keyof [`DiagramEventMap`](/docs/api/types/diagrameventmap/)
+keyof [`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)
 
 The event name.
 
@@ -242,7 +242,7 @@ Registers a new middleware in the chain.
 
 ##### middleware
 
-[`Middleware`](/docs/api/types/middleware/)
+[`Middleware`](/docs/api/types/middleware/middleware/)
 
 Middleware to register.
 
@@ -268,7 +268,7 @@ Registers a custom routing implementation.
 
 ##### routing
 
-[`EdgeRouting`](/docs/api/other/edgerouting/)
+[`EdgeRouting`](/docs/api/types/routing/edgerouting/)
 
 Routing implementation to register.
 
@@ -317,7 +317,7 @@ Remove an event listener.
 
 ##### K
 
-`K` *extends* keyof [`DiagramEventMap`](/docs/api/types/diagrameventmap/)
+`K` *extends* keyof [`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)
 
 #### Parameters
 
@@ -329,7 +329,7 @@ The event name.
 
 ##### callback?
 
-`EventListener`\<[`DiagramEventMap`](/docs/api/types/diagrameventmap/)\[`K`\]\>
+`EventListener`\<[`DiagramEventMap`](/docs/api/types/events/diagrameventmap/)\[`K`\]\>
 
 Optional specific callback to remove.
 
@@ -409,7 +409,7 @@ Call this method to start linking from your custom logic.
 
 ##### node
 
-[`Node`](/docs/api/types/node/)
+[`Node`](/docs/api/types/model/node/)
 
 The node from which the linking starts.
 
@@ -503,7 +503,7 @@ Updates the current configuration.
 
 ##### config
 
-`Partial`\<[`NgDiagramConfig`](/docs/api/types/ngdiagramconfig/)\>
+`Partial`\<[`NgDiagramConfig`](/docs/api/types/configuration/ngdiagramconfig/)\>
 
 Partial configuration object containing properties to update.
 

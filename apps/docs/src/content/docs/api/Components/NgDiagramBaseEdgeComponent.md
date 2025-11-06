@@ -12,7 +12,7 @@ It can be extended or used directly to render edges in the diagram.
 
 ### edge
 
-> **edge**: `InputSignal`\<[`Edge`](/docs/api/types/edge/)\<`object`\>\>
+> **edge**: `InputSignal`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>\>
 
 Edge data model
 

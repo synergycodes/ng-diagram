@@ -3,7 +3,7 @@ import type { LooseAutocomplete } from './utils';
 /**
  * Interface representing environment information
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface EnvironmentInfo {
   /** User Operating system name */

@@ -3,7 +3,7 @@ import { DataObject } from './utils';
 /**
  * Interface representing the viewport of the diagram.
  *
- * @category Types
+ * @category Types/Model
  */
 export interface Viewport {
   /** X coordinate of the viewport center */
@@ -21,7 +21,7 @@ export interface Viewport {
 /**
  * Interface representing the metadata of the diagram.
  *
- * @category Types
+ * @category Types/Model
  */
 export interface Metadata<T extends DataObject = DataObject> {
   /**

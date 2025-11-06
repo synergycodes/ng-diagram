@@ -18,7 +18,7 @@
  *   }
  * }
  * ```
- * @category Types
+ * @category Types/Events
  */
 export interface PointerInputEvent extends PointerEvent {
   moveSelectionHandled?: boolean;

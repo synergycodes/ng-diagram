@@ -19,7 +19,7 @@ access to current data should be done via [NgDiagramModelService](/docs/api/serv
 
 ### model
 
-`Partial`\<[`Model`](/docs/api/types/model/)\> = `{}`
+`Partial`\<[`Model`](/docs/api/types/model/model/)\> = `{}`
 
 Initial model data (nodes, edges, metadata).
 
