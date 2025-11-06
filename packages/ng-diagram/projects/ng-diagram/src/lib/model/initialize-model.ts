@@ -13,6 +13,8 @@ import { SignalModelAdapter } from './signal-model-adapter';
  *
  * @param model Initial model data (nodes, edges, metadata).
  * @param injector Optional Angular `Injector` if not running inside an injection context.
+ *
+ * @category Utilities
  */
 export function initializeModel(model: Partial<Model> = {}, injector?: Injector) {
   const create = () => {

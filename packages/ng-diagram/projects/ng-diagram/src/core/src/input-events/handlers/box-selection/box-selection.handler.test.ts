@@ -165,7 +165,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node2'],
           edgeIds: ['edge1'],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
     });
@@ -189,7 +189,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node2'],
           edgeIds: ['edge1'],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -211,7 +211,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node3', 'node4'],
           edgeIds: ['edge3'],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -233,7 +233,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node3'],
           edgeIds: [],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -255,7 +255,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node2', 'node3', 'node4'],
           edgeIds: ['edge2', 'edge3'],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -277,7 +277,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: [],
           edgeIds: [],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -299,7 +299,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node5'],
           edgeIds: [],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -321,7 +321,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node2', 'node3', 'node4', 'node5'],
           edgeIds: ['edge1', 'edge2', 'edge3'],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 
@@ -380,7 +380,7 @@ describe('BoxSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: ['node1', 'node2'],
           edgeIds: ['edge1'],
-          preserveSelection: false,
+          multiSelection: false,
         });
       });
 

@@ -57,13 +57,13 @@ Moves nodes by the specified amounts.
 
 ##### nodes
 
-[`Node`](/docs/api/types/node/)[]
+[`Node`](/docs/api/types/model/node/)[]
 
 Array of nodes to move.
 
 ##### delta
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 The amount to move the nodes by.
 
@@ -89,13 +89,13 @@ The ID of the node to resize.
 
 ##### size
 
-[`Size`](/docs/api/types/size/)
+[`Size`](/docs/api/types/geometry/size/)
 
 The new size of the node.
 
 ##### position?
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Optional new position of the node.
 

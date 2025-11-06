@@ -516,7 +516,7 @@ describe('ShortcutManager', () => {
     it('should match modifier-only shortcut with primary modifier when no key provided', () => {
       mockFlowCore.config.shortcuts = [
         {
-          actionName: 'preserveSelection',
+          actionName: 'multiSelection',
           bindings: [{ modifiers: { primary: true } }],
         },
       ];
@@ -533,7 +533,7 @@ describe('ShortcutManager', () => {
       const matches = shortcutManager.match(input);
 
       expect(matches.length).toBe(1);
-      expect(matches[0].actionName).toBe('preserveSelection');
+      expect(matches[0].actionName).toBe('multiSelection');
     });
 
     it('should NOT match modifier-only shortcut when a key is pressed (keyboard events)', () => {
@@ -543,7 +543,7 @@ describe('ShortcutManager', () => {
           bindings: [{ modifiers: { secondary: true } }],
         },
         {
-          actionName: 'preserveSelection',
+          actionName: 'multiSelection',
           bindings: [{ modifiers: { primary: true } }],
         },
       ];
@@ -562,7 +562,7 @@ describe('ShortcutManager', () => {
       const matchesRegular = shortcutManager.match(inputWithRegularKey);
       expect(matchesRegular.length).toBe(0);
 
-      // Test with Ctrl+C - should NOT match preserveSelection (modifier-only)
+      // Test with Ctrl+C - should NOT match multiSelection (modifier-only)
       const inputCtrlC: NormalizedKeyboardInput = {
         key: 'c',
         modifiers: {
@@ -574,7 +574,7 @@ describe('ShortcutManager', () => {
       };
 
       const matchesCtrlC = shortcutManager.match(inputCtrlC);
-      expect(matchesCtrlC.every((m) => m.actionName !== 'preserveSelection')).toBe(true);
+      expect(matchesCtrlC.every((m) => m.actionName !== 'multiSelection')).toBe(true);
     });
 
     it('should not match modifier-only shortcut when modifier is not active', () => {
@@ -686,16 +686,16 @@ describe('ShortcutManager', () => {
       expect(matchesKeyBased[0].actionName).toBe('copy');
     });
 
-    it('should not trigger preserveSelection when pressing Ctrl+C (keyboard event)', () => {
+    it('should not trigger multiSelection when pressing Ctrl+C (keyboard event)', () => {
       // Regression test for bug where modifier-only shortcuts were matching keyboard events
-      // Context: When user presses Ctrl+C, it should only trigger 'copy', not 'preserveSelection'
+      // Context: When user presses Ctrl+C, it should only trigger 'copy', not 'multiSelection'
       mockFlowCore.config.shortcuts = [
         {
           actionName: 'copy',
           bindings: [{ key: 'c', modifiers: { primary: true } }],
         },
         {
-          actionName: 'preserveSelection',
+          actionName: 'multiSelection',
           bindings: [{ modifiers: { primary: true } }], // Modifier-only (for pointer events)
         },
       ];
@@ -713,21 +713,21 @@ describe('ShortcutManager', () => {
 
       const matches = shortcutManager.match(keyboardInput);
 
-      // Should only match 'copy', NOT 'preserveSelection'
+      // Should only match 'copy', NOT 'multiSelection'
       expect(matches.length).toBe(1);
       expect(matches[0].actionName).toBe('copy');
-      expect(matches.every((m) => m.actionName !== 'preserveSelection')).toBe(true);
+      expect(matches.every((m) => m.actionName !== 'multiSelection')).toBe(true);
     });
 
-    it('should trigger preserveSelection only for pointer events (no key)', () => {
-      // Context: preserveSelection is a modifier-only shortcut for pointer interactions
+    it('should trigger multiSelection only for pointer events (no key)', () => {
+      // Context: multiSelection is a modifier-only shortcut for pointer interactions
       mockFlowCore.config.shortcuts = [
         {
           actionName: 'copy',
           bindings: [{ key: 'c', modifiers: { primary: true } }],
         },
         {
-          actionName: 'preserveSelection',
+          actionName: 'multiSelection',
           bindings: [{ modifiers: { primary: true } }], // Modifier-only (for pointer events)
         },
       ];
@@ -744,9 +744,9 @@ describe('ShortcutManager', () => {
 
       const matches = shortcutManager.match(pointerInput);
 
-      // Should only match 'preserveSelection', NOT 'copy' (which requires key 'c')
+      // Should only match 'multiSelection', NOT 'copy' (which requires key 'c')
       expect(matches.length).toBe(1);
-      expect(matches[0].actionName).toBe('preserveSelection');
+      expect(matches[0].actionName).toBe('multiSelection');
     });
 
     it('should not trigger boxSelection when pressing Shift+A (keyboard event)', () => {
@@ -791,7 +791,7 @@ describe('ShortcutManager', () => {
           bindings: [{ key: 'b', modifiers: { primary: true } }], // Keyboard trigger
         },
         {
-          actionName: 'preserveSelection',
+          actionName: 'multiSelection',
           bindings: [{ modifiers: { primary: true } }], // Pointer trigger
         },
       ];
@@ -823,7 +823,7 @@ describe('ShortcutManager', () => {
 
       const pointerMatches = shortcutManager.match(pointerInput);
       expect(pointerMatches.length).toBe(1);
-      expect(pointerMatches[0].actionName).toBe('preserveSelection');
+      expect(pointerMatches[0].actionName).toBe('multiSelection');
     });
 
     it('should NOT match pointer event when binding requires a key', () => {
@@ -1040,7 +1040,7 @@ describe('ShortcutManager', () => {
         expect(shortcutManager.match(inputCorrect).map((m) => m.actionName)).toEqual(['paste']);
       });
 
-      it('should match selectAll with Command + A and not conflict with preserveSelection', () => {
+      it('should match selectAll with Command + A and not conflict with multiSelection', () => {
         // Regression test for Command + A not working
         // This tests the real default shortcuts configuration
         mockFlowCore.config.shortcuts = [
@@ -1049,7 +1049,7 @@ describe('ShortcutManager', () => {
             bindings: [{ key: 'a', modifiers: { primary: true } }],
           },
           {
-            actionName: 'preserveSelection',
+            actionName: 'multiSelection',
             bindings: [{ modifiers: { primary: true } }], // Modifier-only (no key)
           },
         ];
@@ -1067,11 +1067,11 @@ describe('ShortcutManager', () => {
 
         const matches = shortcutManager.match(input);
 
-        // Should ONLY match selectAll, NOT preserveSelection
-        // preserveSelection is modifier-only (no key), so it shouldn't match keyboard events
+        // Should ONLY match selectAll, NOT multiSelection
+        // multiSelection is modifier-only (no key), so it shouldn't match keyboard events
         expect(matches.length).toBe(1);
         expect(matches[0].actionName).toBe('selectAll');
-        expect(matches.some((m) => m.actionName === 'preserveSelection')).toBe(false);
+        expect(matches.some((m) => m.actionName === 'multiSelection')).toBe(false);
       });
 
       it('should match copy with Command + C from default shortcuts', () => {

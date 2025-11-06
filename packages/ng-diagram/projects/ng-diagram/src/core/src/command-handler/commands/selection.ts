@@ -5,21 +5,21 @@ const changeSelection = (
   edges: Edge[],
   selectedNodeIds: string[],
   selectedEdgeIds: string[],
-  preserveSelection = false
+  multiSelection = false
 ): Pick<FlowStateUpdate, 'nodesToUpdate' | 'edgesToUpdate'> => {
   const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
   const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
 
   nodes.forEach((node) => {
     const isSelected = selectedNodeIds.includes(node.id);
-    if (!!node.selected === isSelected || (preserveSelection && !!node.selected)) {
+    if (!!node.selected === isSelected || (multiSelection && !!node.selected)) {
       return;
     }
     nodesToUpdate.push({ id: node.id, selected: isSelected });
   });
   edges.forEach((edge) => {
     const isSelected = selectedEdgeIds.includes(edge.id);
-    if (!!edge.selected === isSelected || (preserveSelection && !!edge.selected)) {
+    if (!!edge.selected === isSelected || (multiSelection && !!edge.selected)) {
       return;
     }
     edgesToUpdate.push({ id: edge.id, selected: isSelected });
@@ -31,21 +31,15 @@ export interface SelectCommand {
   name: 'select';
   nodeIds?: string[];
   edgeIds?: string[];
-  preserveSelection?: boolean;
+  multiSelection?: boolean;
 }
 
 export const select = async (
   commandHandler: CommandHandler,
-  { nodeIds, edgeIds, preserveSelection = false }: SelectCommand
+  { nodeIds, edgeIds, multiSelection = false }: SelectCommand
 ) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(
-    nodes,
-    edges,
-    nodeIds ?? [],
-    edgeIds ?? [],
-    preserveSelection
-  );
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, nodeIds ?? [], edgeIds ?? [], multiSelection);
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }

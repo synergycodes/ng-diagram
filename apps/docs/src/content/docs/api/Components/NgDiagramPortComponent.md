@@ -33,7 +33,7 @@ The unique identifier for the port. test
 
 ### side
 
-> **side**: `InputSignal`\<[`PortSide`](/docs/api/types/portside/)\>
+> **side**: `InputSignal`\<[`PortSide`](/docs/api/types/model/portside/)\>
 
 The side of the node where the port is rendered (e.g., top, right, bottom, left).
 

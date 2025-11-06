@@ -23,7 +23,7 @@ this.selectionService.select(['nodeId1'], ['edgeId1']);
 
 ### selection
 
-> **selection**: `Signal`\<\{ `edges`: [`Edge`](/docs/api/types/edge/)\<`object`\>[]; `nodes`: [`Node`](/docs/api/types/node/)[]; \}\>
+> **selection**: `Signal`\<\{ `edges`: [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]; `nodes`: [`Node`](/docs/api/types/model/node/)[]; \}\>
 
 Returns a computed signal for the current selection of nodes and edges.
 

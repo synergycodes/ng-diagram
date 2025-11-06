@@ -26,10 +26,10 @@ export class ToolbarComponent {
 
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 
-  onToggleDebugModeClick(): void {
-    const { debugMode } = this.ngDiagramService.getConfig();
+  isDebugModeEnabled = computed(() => this.ngDiagramService.config().debugMode || false);
 
-    this.ngDiagramService.updateConfig({ debugMode: !debugMode });
+  onToggleDebugModeClick(): void {
+    this.ngDiagramService.updateConfig({ debugMode: !this.isDebugModeEnabled() });
   }
 
   onLinkCreationClick() {

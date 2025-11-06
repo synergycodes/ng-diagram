@@ -3,7 +3,6 @@ import { FPS_60, NgDiagramMath, Node, Point } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';
-import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 
 @Directive({
   selector: '[ngDiagramLinkingInput]',
@@ -31,12 +30,7 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
-    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
-      this.target.set(undefined);
-      return;
-    }
-
-    if (BoxSelectionDirective.isBoxSelectionActive || $event.shiftKey) {
+    if (!this.shouldHandle($event)) {
       return;
     }
 
@@ -78,6 +72,15 @@ export class LinkingInputDirective implements OnDestroy {
     this.linkingEventService.emitEnd($event, this.target(), this.portId());
     this.cleanup();
   };
+
+  private shouldHandle(event: PointerInputEvent) {
+    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
+      this.target.set(undefined);
+      return false;
+    }
+
+    return !event.boxSelectionHandled;
+  }
 
   private cleanup() {
     document.removeEventListener('pointermove', this.onPointerMove);

@@ -1,5 +1,4 @@
 import type { InputModifiers } from '../input-events/input-events.interface';
-import { DEFAULT_SHORTCUTS } from '../shortcut-manager';
 import type { KeyboardActionName, PointerOnlyActionName } from './shortcut-action.interface';
 
 /**
@@ -13,6 +12,7 @@ export interface NormalizedKeyboardInput {
 
 /**
  * Defines a keyboard shortcut binding with a key
+ * @category Types/Configuration/Shortcuts
  */
 export interface KeyboardShortcutBinding {
   /**
@@ -27,6 +27,7 @@ export interface KeyboardShortcutBinding {
 
 /**
  * Defines a modifier-only shortcut binding (for pointer events)
+ * @category Types/Configuration/Shortcuts
  */
 export interface ModifierOnlyShortcutBinding {
   /**
@@ -39,11 +40,13 @@ export interface ModifierOnlyShortcutBinding {
 
 /**
  * Union of all possible shortcut bindings
+ * @category Types/Configuration/Shortcuts
  */
 export type ShortcutBinding = KeyboardShortcutBinding | ModifierOnlyShortcutBinding;
 
 /**
  * Keyboard shortcut definition with key-based bindings
+ * @category Types/Configuration/Shortcuts
  */
 export interface KeyboardShortcutDefinition {
   /** Action name for keyboard events */
@@ -54,6 +57,7 @@ export interface KeyboardShortcutDefinition {
 
 /**
  * Pointer-only shortcut definition with modifier-only bindings
+ * @category Types/Configuration/Shortcuts
  */
 export interface PointerOnlyShortcutDefinition {
   /** Action name for pointer events */
@@ -66,9 +70,8 @@ export interface PointerOnlyShortcutDefinition {
  * Shortcut definition for registering keyboard and pointer shortcuts
  *
  * This is a discriminated union that enforces:
- * - Pointer-only actions (preserveSelection, boxSelection) can only have modifier-only bindings
+ * - Pointer-only actions (multiSelection, boxSelection) can only have modifier-only bindings
  * - Keyboard actions must have at least one key-based binding
+ * @category Types/Configuration/Shortcuts
  */
 export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition;
-
-export type DefaultShortcutDefinitions = typeof DEFAULT_SHORTCUTS;

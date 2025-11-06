@@ -538,7 +538,7 @@ describe('EventManager', () => {
             startY: 0,
             startNodePositionX: 50,
             startNodePositionY: 50,
-            draggingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+            resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
           },
         },
       };

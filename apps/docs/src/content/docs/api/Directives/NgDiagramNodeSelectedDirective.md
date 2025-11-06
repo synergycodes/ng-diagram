@@ -20,6 +20,6 @@ When the node's `selected` property is `true`, the `ng-diagram-node-selected` CS
 
 ### node
 
-> **node**: `InputSignal`\<[`Node`](/docs/api/types/node/)\>
+> **node**: `InputSignal`\<[`Node`](/docs/api/types/model/node/)\>
 
 The node instance to monitor for selection state.

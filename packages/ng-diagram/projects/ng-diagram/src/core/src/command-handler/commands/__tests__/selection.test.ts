@@ -59,7 +59,7 @@ describe('Selection Commands', () => {
       );
     });
 
-    it('should preserve existing selection when preserveSelection is true', () => {
+    it('should preserve existing selection when multiSelection is true', () => {
       const nodes = [
         { ...mockNode, selected: true },
         { ...mockNode, id: 'node2', selected: true },
@@ -79,7 +79,7 @@ describe('Selection Commands', () => {
       select(commandHandler, {
         name: 'select',
         nodeIds: ['node3'],
-        preserveSelection: true,
+        multiSelection: true,
       });
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
