@@ -832,12 +832,14 @@ describe('DiagramInitEmitter', () => {
 
       // Should emit immediately
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).not.toHaveBeenCalled();
 
       // Advance time to check timeout doesn't trigger
       vi.advanceTimersByTime(5000);
 
       // Should still only be called once
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).not.toHaveBeenCalled();
     });
 
     it('should emit event after timeout if items remain unmeasured', () => {
@@ -855,6 +857,7 @@ describe('DiagramInitEmitter', () => {
 
       // Should not emit yet
       expect(deferredEmitSpy).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalled();
 
       // Advance time past the timeout (3000ms)
       vi.advanceTimersByTime(3000);
@@ -881,6 +884,7 @@ describe('DiagramInitEmitter', () => {
 
       // Should not emit yet
       expect(deferredEmitSpy).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalled();
 
       // Advance time partially
       vi.advanceTimersByTime(1000);
@@ -895,12 +899,14 @@ describe('DiagramInitEmitter', () => {
 
       // Should emit now
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).not.toHaveBeenCalled();
 
       // Advance time past original timeout
       vi.advanceTimersByTime(5000);
 
       // Should still only be called once (timeout was cleared)
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).not.toHaveBeenCalled();
     });
 
     it('should reset timeout when measurement progress is made', () => {
@@ -924,9 +930,10 @@ describe('DiagramInitEmitter', () => {
 
       // Should not emit yet
       expect(deferredEmitSpy).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalled();
 
-      // Advance time to 2.5 seconds (before timeout)
-      vi.advanceTimersByTime(2500);
+      // Advance time to 1.5 seconds (before timeout)
+      vi.advanceTimersByTime(1500);
 
       // Update first node - this should reset the timeout
       context.modelActionType = 'updateNode';
@@ -938,12 +945,14 @@ describe('DiagramInitEmitter', () => {
 
       // Should not emit yet (node2 still unmeasured)
       expect(deferredEmitSpy).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalled();
 
-      // Advance another 2.5 seconds (would be past original timeout, but timeout was reset)
-      vi.advanceTimersByTime(2500);
+      // Advance another 1.5 seconds (would be past original timeout, but timeout was reset)
+      vi.advanceTimersByTime(1500);
 
-      // Should still not emit (only 2.5s since last progress)
+      // Should still not emit (only 1.5s since last progress)
       expect(deferredEmitSpy).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalled();
 
       // Advance final 500ms to trigger new timeout
       vi.advanceTimersByTime(500);
@@ -1014,33 +1023,6 @@ describe('DiagramInitEmitter', () => {
       consoleWarnSpy.mockRestore();
     });
 
-    it('should only log warnings for categories with unmeasured items', () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      const unmeasuredNode: Node = {
-        ...mockNode,
-        id: 'node1',
-        size: undefined,
-      };
-
-      context.modelActionType = 'init';
-      context.nodesMap.set('node1', unmeasuredNode);
-
-      emitter.emit(context, eventManager);
-
-      // Advance past timeout
-      vi.advanceTimersByTime(3000);
-
-      // Should emit via safety hatch using immediate emit (not deferred)
-      expect(emitSpy).toHaveBeenCalledOnce();
-      expect(deferredEmitSpy).not.toHaveBeenCalled();
-
-      // Check console warnings were called
-      expect(consoleWarnSpy).toHaveBeenCalled();
-
-      consoleWarnSpy.mockRestore();
-    });
-
     it('should not emit twice if safety hatch triggers after event already emitted', () => {
       const node: Node = {
         ...mockNode,
@@ -1065,12 +1047,14 @@ describe('DiagramInitEmitter', () => {
 
       // Should have emitted once
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).not.toHaveBeenCalled();
 
       // Advance past timeout
       vi.advanceTimersByTime(5000);
 
       // Should still only be called once
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).not.toHaveBeenCalled();
     });
   });
 });
