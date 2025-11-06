@@ -11,5 +11,4 @@ All valid action names for shortcuts
 
 Includes:
 - Keyboard actions (e.g., 'keyboardMoveSelectionUp', 'copy', 'selectAll')
-<<<<<<< HEAD
 - Pointer-only actions (e.g., 'multiSelection', 'boxSelection')

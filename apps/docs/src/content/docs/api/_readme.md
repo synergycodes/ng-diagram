@@ -39,12 +39,6 @@ title: "ng-diagram"
 - [NgDiagramService](/docs/api/services/ngdiagramservice/)
 - [NgDiagramViewportService](/docs/api/services/ngdiagramviewportservice/)
 
-## Types
-=======
-- Pointer-only actions (e.g., 'preserveSelection', 'boxSelection')
-
-- [ShortcutActionName](/docs/api/types_________-_pointer-only_actions_eg__preserveselection___boxselection_/shortcutactionname/)
-
 ## Types/Configuration
 
 - [FlowConfig](/docs/api/types/configuration/flowconfig/)
@@ -75,12 +69,8 @@ title: "ng-diagram"
 - [KeyboardMoveSelectionAction](/docs/api/types/configuration/shortcuts/keyboardmoveselectionaction/)
 - [KeyboardPanAction](/docs/api/types/configuration/shortcuts/keyboardpanaction/)
 - [PointerOnlyActionName](/docs/api/types/configuration/shortcuts/pointeronlyactionname/)
+- [ShortcutActionName](/docs/api/types/configuration/shortcuts/shortcutactionname/)
 - [ShortcutDefinition](/docs/api/types/configuration/shortcuts/shortcutdefinition/)
-
-## Types/Configuration/Shortcuts
->>>>>>> origin/main
-
-- [ShortcutActionName](/docs/api/types_________-_pointer-only_actions_eg__preserveselection___boxselection_/shortcutactionname/)
 
 ## Types/Events
 
