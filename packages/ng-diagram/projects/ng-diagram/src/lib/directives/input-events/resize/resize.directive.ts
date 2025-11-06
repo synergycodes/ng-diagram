@@ -22,7 +22,7 @@ export class ResizeDirective implements OnDestroy {
     document.removeEventListener('pointerup', this.onPointerUp);
   }
   onPointerDown(event: PointerInputEvent): void {
-    if (event.boxSelectionHandled) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -81,4 +81,8 @@ export class ResizeDirective implements OnDestroy {
       },
     });
   };
+
+  private shouldHandle(event: PointerInputEvent) {
+    return !event.boxSelectionHandled;
+  }
 }

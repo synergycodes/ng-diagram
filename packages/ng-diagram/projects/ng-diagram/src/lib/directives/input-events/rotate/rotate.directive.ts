@@ -20,7 +20,7 @@ export class RotateHandleDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
-    if ($event.boxSelectionHandled) {
+    if (!this.shouldHandle($event)) {
       return;
     }
 
@@ -112,6 +112,10 @@ export class RotateHandleDirective implements OnDestroy {
     });
     this.cleanup();
   };
+
+  private shouldHandle(event: PointerInputEvent) {
+    return !event.boxSelectionHandled;
+  }
 
   private cleanup() {
     document.removeEventListener('pointermove', this.onPointerMove);

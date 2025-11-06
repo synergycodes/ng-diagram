@@ -68,31 +68,15 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
-    const targetData = this.targetData();
-    if (!targetData) {
-      return;
-    }
-
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
-    this.stopEdgePanning();
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'pointerMoveSelection',
-      phase: 'end',
-      target: targetData,
-      targetType: 'node',
-      lastInputPoint: {
-        x: event.clientX,
-        y: event.clientY,
-      },
-      currentDiagramEdge: null,
-    });
+    this.finishDragging(event);
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
+    if (event.zoomingHandled) {
+      this.finishDragging(event);
+      return;
+    }
+
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -124,16 +108,43 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     });
   };
 
+  private finishDragging(event: PointerInputEvent): void {
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+    this.stopEdgePanning();
+
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'pointerMoveSelection',
+      phase: 'end',
+      target: targetData,
+      targetType: 'node',
+      lastInputPoint: {
+        x: event.clientX,
+        y: event.clientY,
+      },
+      currentDiagramEdge: null,
+    });
+  }
+
   private shouldHandle(event: PointerInputEvent): boolean {
     if (shouldDiscardEvent(event, 'drag')) {
       return false;
     }
 
-    if (event.boxSelectionHandled) {
-      return false;
-    }
-
-    return !(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+    return !(
+      event.zoomingHandled ||
+      event.linkingHandled ||
+      event.rotateHandled ||
+      event.boxSelectionHandled ||
+      event.zoomingHandled
+    );
   }
 
   private getDiagramEdge(x: number, y: number): ContainerEdge {

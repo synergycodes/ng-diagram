@@ -29,12 +29,7 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
-    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
-      this.target.set(undefined);
-      return;
-    }
-
-    if ($event.boxSelectionHandled) {
+    if (!this.shouldHandle($event)) {
       return;
     }
 
@@ -54,6 +49,15 @@ export class LinkingInputDirective implements OnDestroy {
     this.linkingEventService.emitEnd($event, this.target(), this.portId());
     this.cleanup();
   };
+
+  private shouldHandle(event: PointerInputEvent) {
+    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
+      this.target.set(undefined);
+      return false;
+    }
+
+    return !event.boxSelectionHandled;
+  }
 
   private cleanup() {
     document.removeEventListener('pointermove', this.onPointerMove);
