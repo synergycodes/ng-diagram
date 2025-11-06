@@ -4,7 +4,6 @@ import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.compo
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types/event';
-import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
@@ -130,7 +129,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return false;
     }
 
-    if (BoxSelectionDirective.isBoxSelectionActive || event.shiftKey) {
+    if (event.boxSelectionHandled) {
       return false;
     }
 

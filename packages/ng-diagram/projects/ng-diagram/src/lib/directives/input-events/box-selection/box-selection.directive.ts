@@ -1,4 +1,4 @@
-import { Directive, inject, type OnDestroy } from '@angular/core';
+import { Directive, ElementRef, inject, type OnDestroy, type OnInit } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services';
 import { BoxSelectionProviderService } from '../../../services/box-selection-provider/box-selection-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -11,24 +11,37 @@ import type { PointerInputEvent } from '../../../types/event';
     '(pointerdown)': 'onPointerDown($event)',
   },
 })
-export class BoxSelectionDirective implements OnDestroy {
+export class BoxSelectionDirective implements OnInit, OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly boxSelectionProvider = inject(BoxSelectionProviderService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly elementRef = inject(ElementRef);
   private startPoint: { x: number; y: number } | null = null;
-  static isBoxSelectionActive = false;
+
+  ngOnInit(): void {
+    this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerDownCapture, { capture: true });
+  }
 
   ngOnDestroy(): void {
+    this.elementRef.nativeElement.removeEventListener('pointerdown', this.onPointerDownCapture, { capture: true });
     document.removeEventListener('pointermove', this.onMouseMove);
     document.removeEventListener('pointerup', this.onPointerUp);
   }
 
-  onPointerDown(event: PointerInputEvent): void {
+  // capture flag before children thanks to the capture phase
+  private onPointerDownCapture = (event: PointerInputEvent): void => {
     if (!this.shouldHandle(event)) {
       return;
     }
 
-    BoxSelectionDirective.isBoxSelectionActive = true;
+    event.boxSelectionHandled = true;
+  };
+
+  onPointerDown(event: PointerInputEvent): void {
+    if (!event.boxSelectionHandled) {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
@@ -52,7 +65,6 @@ export class BoxSelectionDirective implements OnDestroy {
   }
 
   onPointerUp = (event: PointerEvent): void => {
-    BoxSelectionDirective.isBoxSelectionActive = false;
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }

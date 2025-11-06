@@ -18,7 +18,7 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
  * Pointer-only action names that can only be triggered by pointer events with modifiers
  * (e.g., Shift+Click, Ctrl+Click)
  */
-export type PointerOnlyActionName = 'preserveSelection' | 'boxSelection';
+export type PointerOnlyActionName = 'multiSelection' | 'boxSelection';
 
 /**
  * Keyboard action names that can be triggered by keyboard events
@@ -33,7 +33,7 @@ export type KeyboardActionName =
  *
  * Includes:
  * - Keyboard actions (e.g., 'keyboardMoveSelectionUp', 'copy', 'selectAll')
- * - Pointer-only actions (e.g., 'preserveSelection', 'boxSelection')
+ * - Pointer-only actions (e.g., 'multiSelection', 'boxSelection')
  * @category Types
  */
 export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName;

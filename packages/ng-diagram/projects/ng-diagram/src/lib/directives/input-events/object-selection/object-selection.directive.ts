@@ -2,7 +2,6 @@ import { Directive, HostListener, inject, input } from '@angular/core';
 import type { BasePointerInputEvent, Edge, Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types';
-import { BoxSelectionDirective } from '../box-selection/box-selection.directive';
 
 @Directive()
 abstract class ObjectSelectionDirective {
@@ -17,7 +16,7 @@ abstract class ObjectSelectionDirective {
       return;
     }
 
-    if (BoxSelectionDirective.isBoxSelectionActive || event.shiftKey) {
+    if (event.boxSelectionHandled) {
       return;
     }
 
