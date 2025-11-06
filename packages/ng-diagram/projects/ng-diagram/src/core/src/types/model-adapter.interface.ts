@@ -2,6 +2,9 @@ import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
+/**
+ * @category Types/Model
+ */
 export interface ModelChanges {
   nodes: Node[];
   edges: Edge[];
@@ -11,7 +14,7 @@ export interface ModelChanges {
 /**
  * Interface for model adapters that handle the data management of a flow diagram
  *
- * @category Types
+ * @category Types/Model
  */
 export interface ModelAdapter {
   /**

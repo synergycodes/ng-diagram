@@ -4,13 +4,13 @@ import { DataObject, Point, Size } from './utils';
 /**
  * Type representing edge routing mode
  *
- * @category Types
+ * @category Types/Routing
  */
 export type RoutingMode = 'manual' | 'auto';
 
 /**
  * Interface representing an edge (connection) between nodes in the flow diagram
- * @category Types
+ * @category Types/Model
  */
 export interface Edge<T extends DataObject = DataObject> {
   /**
@@ -100,7 +100,7 @@ export interface Edge<T extends DataObject = DataObject> {
 /**
  * Interface representing a label of an edge.
  *
- * @category Types
+ * @category Types/Model
  */
 export interface EdgeLabel {
   /**

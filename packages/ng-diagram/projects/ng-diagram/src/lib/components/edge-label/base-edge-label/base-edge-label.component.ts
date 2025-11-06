@@ -136,5 +136,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
 
 /**
  * @deprecated Use {@link NgDiagramBaseEdgeLabelComponent} instead. This alias will be removed in a future version.
+ *
+ * @category Other
  */
 export const BaseEdgeLabelComponent = NgDiagramBaseEdgeLabelComponent;

@@ -2,6 +2,7 @@ import { Middleware } from '../../../types';
 
 /**
  * Middleware used for logging NgDiagram internal events and state changes
+ * @category Types/Middleware
  * @internal
  */
 export const loggerMiddleware: Middleware = {

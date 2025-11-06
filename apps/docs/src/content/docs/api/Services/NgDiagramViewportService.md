@@ -34,7 +34,7 @@ Returns a computed signal for the scale that safely handles uninitialized state.
 
 ### viewport
 
-> **viewport**: `Signal`\<[`Viewport`](/docs/api/types/viewport/)\>
+> **viewport**: `Signal`\<[`Viewport`](/docs/api/types/model/viewport/)\>
 
 Returns a computed signal for the viewport that safely handles uninitialized state.
 
@@ -52,7 +52,7 @@ Centers the Node within the current viewport bounds.
 
 The ID of the node or the node object to center on.
 
-`string` | [`Node`](/docs/api/types/node/)
+`string` | [`Node`](/docs/api/types/model/node/)
 
 #### Returns
 
@@ -70,7 +70,7 @@ Centers the rectangle within the current viewport bounds.
 
 ##### rect
 
-[`Rect`](/docs/api/types/rect/)
+[`Rect`](/docs/api/types/geometry/rect/)
 
 The rectangle to center on.
 
@@ -82,7 +82,7 @@ The rectangle to center on.
 
 ### clientToFlowPosition()
 
-> **clientToFlowPosition**(`clientPosition`): [`Point`](/docs/api/types/point/)
+> **clientToFlowPosition**(`clientPosition`): [`Point`](/docs/api/types/geometry/point/)
 
 Converts a client position to a flow position.
 
@@ -90,13 +90,13 @@ Converts a client position to a flow position.
 
 ##### clientPosition
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Client position to convert.
 
 #### Returns
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Flow position.
 
@@ -104,7 +104,7 @@ Flow position.
 
 ### clientToFlowViewportPosition()
 
-> **clientToFlowViewportPosition**(`clientPosition`): [`Point`](/docs/api/types/point/)
+> **clientToFlowViewportPosition**(`clientPosition`): [`Point`](/docs/api/types/geometry/point/)
 
 Converts a client position to a position relative to the flow viewport.
 
@@ -112,13 +112,13 @@ Converts a client position to a position relative to the flow viewport.
 
 ##### clientPosition
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Client position.
 
 #### Returns
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Position on the flow viewport.
 
@@ -126,7 +126,7 @@ Position on the flow viewport.
 
 ### flowToClientPosition()
 
-> **flowToClientPosition**(`flowPosition`): [`Point`](/docs/api/types/point/)
+> **flowToClientPosition**(`flowPosition`): [`Point`](/docs/api/types/geometry/point/)
 
 Converts a flow position to a client position.
 
@@ -134,13 +134,13 @@ Converts a flow position to a client position.
 
 ##### flowPosition
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Flow position to convert.
 
 #### Returns
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Client position.
 
@@ -214,7 +214,7 @@ The factor to zoom by.
 
 ##### center?
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 The center point to zoom towards.
 

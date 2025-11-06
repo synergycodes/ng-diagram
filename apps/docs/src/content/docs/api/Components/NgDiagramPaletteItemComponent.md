@@ -21,6 +21,6 @@ The `NgDiagramPaletteItemComponent` represents a single item in the diagram pale
 
 ### item
 
-> **item**: `InputSignal`\<[`NgDiagramPaletteItem`](/docs/api/types/ngdiagrampaletteitem/)\>
+> **item**: `InputSignal`\<[`NgDiagramPaletteItem`](/docs/api/types/palette/ngdiagrampaletteitem/)\>
 
 The palette item data to be rendered and managed.

@@ -21,6 +21,7 @@ export const BUILTIN_MIDDLEWARES = [
  * This type is used as the default for the `createMiddlewares` factory and as the base type for customizing
  * or extending the middleware chain in your application.
  *
+ * @category Types/Utilities
  * @internal
  */
 export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;

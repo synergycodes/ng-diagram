@@ -1,7 +1,7 @@
 /**
  * Interface representing size in the flow diagram
  *
- * @category Types
+ * @category Types/Geometry
  */
 export interface Size {
   /**
@@ -17,7 +17,7 @@ export interface Size {
 /**
  * Interface representing a point in the flow diagram
  *
- * @category Types
+ * @category Types/Geometry
  */
 export interface Point {
   /**
@@ -33,14 +33,14 @@ export interface Point {
 /**
  * Interface representing a port side on a node in the diagram
  *
- * @category Types
+ * @category Types/Model
  */
 export type PortSide = 'top' | 'right' | 'bottom' | 'left';
 
 /**
  * Interface representing a rect in the flow diagram
  *
- * @category Types
+ * @category Types/Geometry
  */
 export interface Rect {
   /**
@@ -87,7 +87,7 @@ export type ContainerEdge =
 /**
  * Interface representing the location of a port on a node
  *
- * @category Types
+ * @category Types/Model
  */
 export type PortLocation = {
   side: PortSide;

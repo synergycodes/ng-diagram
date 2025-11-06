@@ -61,7 +61,7 @@ export type TransactionCallback = (context: TransactionContext) => void | Promis
 /**
  * Result of a transaction execution.
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface TransactionResult {
   /**

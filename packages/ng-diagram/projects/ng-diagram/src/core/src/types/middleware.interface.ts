@@ -21,7 +21,7 @@ import type { Node } from './node.interface';
  * };
  * ```
  *
- * @category Types
+ * @category Types/Middleware
  */
 export type ModelActionType =
   | 'init'
@@ -56,7 +56,7 @@ export type ModelActionType =
  * The complete state of the flow diagram.
  * Represents the current state of all nodes, edges, and metadata.
  *
- * @category Types
+ * @category Types/Model
  */
 export interface FlowState {
   /** All nodes currently in the diagram */
@@ -85,7 +85,7 @@ export interface FlowState {
  * };
  * ```
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface MiddlewareHistoryUpdate {
   /** The name of the middleware that made the update */
@@ -117,7 +117,7 @@ export interface MiddlewareHistoryUpdate {
  * };
  * ```
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface FlowStateUpdate {
   /** Nodes to add to the diagram */
@@ -139,7 +139,7 @@ export interface FlowStateUpdate {
 /**
  * Array of middlewares (readonly for type safety).
  *
- * @category Types
+ * @category Types/Middleware
  */
 export type MiddlewareArray = readonly Middleware[];
 
@@ -147,7 +147,7 @@ export type MiddlewareArray = readonly Middleware[];
  * Helper functions for checking what changed during middleware execution.
  * These helpers track all cumulative changes from the initial state update and all previous middlewares.
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface MiddlewareHelpers {
   /**
@@ -303,7 +303,7 @@ export interface MiddlewareHelpers {
  * };
  * ```
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface MiddlewareContext {
   /** The state before any modifications (before the initial action and before any middleware modifications) */
@@ -409,7 +409,7 @@ export interface MiddlewareContext {
  * ngDiagramService.registerMiddleware(snapMiddleware);
  * ```
  *
- * @category Types
+ * @category Types/Middleware
  */
 export interface Middleware<TName extends string = string> {
   /** Unique identifier for the middleware */
@@ -431,6 +431,6 @@ export interface Middleware<TName extends string = string> {
 /**
  * An array of middlewares that will be executed in sequence.
  *
- * @category Types
+ * @category Types/Middleware
  */
 export type MiddlewareChain = Middleware[];

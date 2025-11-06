@@ -63,7 +63,7 @@ export type { NgDiagramConfig } from './lib/types/config';
 export type { NgDiagramEdgeTemplate } from './lib/types/edge-template-map';
 export type { PointerInputEvent } from './lib/types/event';
 export type { NgDiagramGroupNodeTemplate, NgDiagramNodeTemplate } from './lib/types/node-template-map';
-export type { NgDiagramPaletteItem } from './lib/types/palette';
+export type { BasePaletteItemData, GroupNodeData, NgDiagramPaletteItem, SimpleNodeData } from './lib/types/palette';
 export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
@@ -73,7 +73,6 @@ export type {
   BackgroundConfig,
   BoxSelectionConfig,
   ClipboardPastedEvent,
-  DefaultShortcutDefinitions,
   DiagramEventMap,
   DiagramInitEvent,
   Edge,
