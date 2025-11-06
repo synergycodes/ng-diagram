@@ -29,6 +29,7 @@ title: "ng-diagram"
 - [CopyPasteActionState](/docs/api/internals/copypasteactionstate/)
 - [DraggingActionState](/docs/api/internals/draggingactionstate/)
 - [EdgeRoutingManager](/docs/api/internals/edgeroutingmanager/)
+- [EnvironmentInfo](/docs/api/internals/environmentinfo/)
 - [HighlightGroupActionState](/docs/api/internals/highlightgroupactionstate/)
 - [LinkingActionState](/docs/api/internals/linkingactionstate/)
 - [ResizeActionState](/docs/api/internals/resizeactionstate/)
@@ -105,7 +106,6 @@ title: "ng-diagram"
 
 ## Types/Middleware
 
-- [EnvironmentInfo](/docs/api/types/middleware/environmentinfo/)
 - [FlowStateUpdate](/docs/api/types/middleware/flowstateupdate/)
 - [Middleware](/docs/api/types/middleware/middleware/)
 - [MiddlewareContext](/docs/api/types/middleware/middlewarecontext/)

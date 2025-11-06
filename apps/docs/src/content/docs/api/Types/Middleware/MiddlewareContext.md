@@ -75,7 +75,7 @@ Use this to access edges by ID instead of iterating through `state.edges`.
 
 ### environment
 
-> **environment**: [`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
+> **environment**: [`EnvironmentInfo`](/docs/api/internals/environmentinfo/)
 
 Environment information (browser, rendering engine, etc.)
 

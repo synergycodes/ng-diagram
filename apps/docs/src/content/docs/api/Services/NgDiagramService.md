@@ -176,13 +176,13 @@ Name of the default routing.
 
 ### getEnvironment()
 
-> **getEnvironment**(): [`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
+> **getEnvironment**(): [`EnvironmentInfo`](/docs/api/internals/environmentinfo/)
 
 Gets the current environment information.
 
 #### Returns
 
-[`EnvironmentInfo`](/docs/api/types/middleware/environmentinfo/)
+[`EnvironmentInfo`](/docs/api/internals/environmentinfo/)
 
 The environment info object.
 
