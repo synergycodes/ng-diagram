@@ -5,18 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.8.0] - 2025-11-07
 
 ### Added
 
 - Zoom to fit feature with configurable padding and option to automatically apply on model initialization ([#386](https://github.com/synergycodes/ng-diagram/pull/386))
-- Environment layer for unified environment-related functionalities ([#350](https://github.com/synergycodes/ng-diagram/pull/350))
+- Environment layer for unified environment - related functionalities ([#350](https://github.com/synergycodes/ng-diagram/pull/350))
 - Helpers for node relationships and traversal ([#395](https://github.com/synergycodes/ng-diagram/pull/395))
 - Box selection for selecting multiple nodes at once ([#374](https://github.com/synergycodes/ng-diagram/pull/374))
 - Implemented multiple event hooks for ng-diagram ([#387](https://github.com/synergycodes/ng-diagram/pull/387))
 - Configurable built-in grid background ([#397](https://github.com/synergycodes/ng-diagram/pull/397))
 - Configurable Shortcut Manager ([#398](https://github.com/synergycodes/ng-diagram/pull/398))
 - Improved collision detection for rotated nodes ([#407](https://github.com/synergycodes/ng-diagram/pull/407))
+- Improved diagram navigation experience - smooth panning ([#417](https://github.com/synergycodes/ng-diagram/pull/417))
 
 ### Changed
 
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unified documentation styles ([#357](https://github.com/synergycodes/ng-diagram/pull/357))
 - Redirected documentation root to quick-start page and reordered Intro articles ([#370](https://github.com/synergycodes/ng-diagram/pull/370))
 - Changed default behavior for resizable and rotatable properties on diagram nodes ([#374](https://github.com/synergycodes/ng-diagram/pull/374))
+- Complete API documentation reorganization and improvements ([#421]https://github.com/synergycodes/ng-diagram/pull/421)
 
 ### Fixed
 
@@ -42,4 +44,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial tagged release.
 
 [unreleased]: https://github.com/synergycodes/ng-diagram/compare/v0.4.0-beta.5...HEAD
+[0.8.0]: https://github.com/synergycodes/ng-diagram/releases/tag/v0.8.0
 [0.4.0-beta.5]: https://github.com/synergycodes/ng-diagram/releases/tag/v0.4.0-beta.5
