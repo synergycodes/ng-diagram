@@ -49,7 +49,16 @@ export class FlowCoreProviderService {
 
   provide(): FlowCore {
     if (!this.flowCore) {
-      throw new Error('FlowCore not initialized');
+      throw new Error(
+        `[ngDiagram] Library engine not initialized yet.
+
+To fix this, wait for initialization to complete using one of these methods:
+  • Use "isInitialized" signal from NgDiagramService
+  • Use "diagramInit" event handler passed to NgDiagramComponent
+
+Documentation: https://www.ngdiagram.dev/docs/guides/model-initialization/#waiting-for-initialization
+`
+      );
     }
 
     return this.flowCore;

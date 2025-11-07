@@ -79,6 +79,16 @@ export const computeAutoModePoints = (
     return routingManager.computePoints(edge.routing, context);
   }
 
+  // Warn if edge specified a routing that wasn't registered
+  if (edge.routing && !routingManager.hasRouting(edge.routing)) {
+    console.warn(
+      `[ngDiagram] Edge routing '${edge.routing}' is not registered. Falling back to default routing.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/routing/
+`
+    );
+  }
+
   const defaultRouting = routingManager.getDefaultRouting();
   if (routingManager.hasRouting(defaultRouting)) {
     return routingManager.computePoints(defaultRouting, context);

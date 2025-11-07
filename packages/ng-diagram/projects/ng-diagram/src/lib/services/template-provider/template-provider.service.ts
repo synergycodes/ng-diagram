@@ -29,8 +29,13 @@ export class TemplateProviderService {
 
     const template = this.nodeTemplateMap.get(nodeType || '');
 
-    if (!template && !this.accessedNodeTypes.has(nodeType) && this.flowConfig.provide().config.debugMode) {
-      console.warn(`No template found for node type: '${nodeType}'`);
+    if (!template && !this.accessedNodeTypes.has(nodeType)) {
+      console.warn(
+        `[ngDiagram] Node template '${nodeType}' is not registered. Falling back to default node template.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes/
+`
+      );
       this.accessedNodeTypes.add(nodeType);
     }
 
@@ -44,8 +49,13 @@ export class TemplateProviderService {
 
     const template = this.edgeTemplateMap.get(edgeType || '');
 
-    if (!template && !this.accessedEdgeTypes.has(edgeType) && this.flowConfig.provide().config.debugMode) {
-      console.warn(`No template found for edge type: '${edgeType}'`);
+    if (!template && !this.accessedEdgeTypes.has(edgeType)) {
+      console.warn(
+        `[ngDiagram] Edge template '${edgeType}' is not registered. Falling back to default edge template.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/custom-edges/
+`
+      );
       this.accessedEdgeTypes.add(edgeType);
     }
 

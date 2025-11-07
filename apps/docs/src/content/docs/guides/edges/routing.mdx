@@ -116,56 +116,18 @@ This approach is ideal when you want the path to update automatically based on n
 
 ### EdgeRouting Interface
 
-For more control and reusability across different edge types, you can create a custom routing algorithm by implementing the `EdgeRouting` interface:
+For more control and reusability across different edge types, you can create a custom routing algorithm by implementing the `EdgeRouting` interface. Here's a complete example of an arc routing that uses SVG elliptical arcs to create curved connections:
 
-```typescript
-import { EdgeRouting, EdgeRoutingContext, Point } from 'ng-diagram';
+<br />
 
-export class CustomRouting implements EdgeRouting {
-  name = 'custom';
+import Arc from '@components/angular/edges/routing/arc/arc.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 
-  computePoints(context: EdgeRoutingContext): Point[] {
-    const { sourcePoint, targetPoint, edge, sourceNode, targetNode } = context;
+<Arc />
 
-    // Your custom routing logic here
-    // Return array of points defining the path
-    return [sourcePoint /* ...waypoints */, , targetPoint];
-  }
+<CodeViewer dirName="edges/routing/arc" />
 
-  computeSvgPath(points: Point[]): string {
-    // Convert points to SVG path string
-    return `M ${points[0].x},${points[0].y} ...`;
-  }
-
-  computePointOnPath(points: Point[], percentage: number): Point {
-    // Calculate point at given percentage along path
-    // Used for label positioning
-    return { x: 0, y: 0 };
-  }
-}
-```
-
-Register your custom routing:
-
-```typescript
-import { NgDiagramService } from 'ng-diagram';
-
-constructor(private diagramService: NgDiagramService) {
-  this.diagramService.registerRouting(new CustomRouting());
-}
-```
-
-Then use it in your edges:
-
-```typescript
-const edge = {
-  id: 'edge1',
-  source: 'node1',
-  target: 'node2',
-  routing: 'custom', // Your custom routing name
-  data: {},
-};
-```
+This approach gives you full control over path generation, configuration options, and point calculations. The three required methods work together: `computePoints` defines the geometric points, `computeSvgPath` renders them as SVG, and `computePointOnPath` positions labels and decorations along the path.
 
 ## Related Topics
 

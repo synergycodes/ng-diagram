@@ -6,7 +6,7 @@
     <ng-diagram-edge>
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { edge }" />
-      } @else if (!edge.type) {
+      } @else {
         <ng-diagram-default-edge [edge]="edge" />
       }
     </ng-diagram-edge>
