@@ -78,6 +78,7 @@ The amount to move the nodes by.
 > **resizeNode**(`id`, `size`, `position?`, `disableAutoSize?`): `void`
 
 Resizes a node to the specified dimensions.
+`Node.autoSize` must be set to false to resize a node.
 
 #### Parameters
 
