@@ -4,6 +4,39 @@ import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
 import { PolylineRouting } from './routings/polyline/polyline-routing';
 import { EdgeRouting, EdgeRoutingContext, EdgeRoutingName } from './types';
 
+const ROUTING_MUST_HAVE_NAME_WARNING = `[ngDiagram] Routing must have a non-empty name property. Registration skipped.
+
+To fix this:
+  • Ensure your EdgeRouting implementation has a 'name' property
+  • The name should be a non-empty string
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/routing/
+`;
+
+const ROUTING_NOT_FOUND_WARNING = (name: string, registeredRoutings: string[], fallback: string) =>
+  `[ngDiagram] Routing '${name}' is not registered. Falling back to '${fallback}' routing.
+
+Available routings: ${registeredRoutings.join(', ')}
+
+To fix this:
+  • Register the routing using NgDiagramService.registerRouting()
+  • Or use one of the available routings listed above
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/routing/
+`;
+
+const CANNOT_SET_DEFAULT_ROUTING_WARNING = (name: string, registeredRoutings: string[]) =>
+  `[ngDiagram] Cannot set default routing to '${name}': routing not registered. Default routing unchanged.
+
+Available routings: ${registeredRoutings.join(', ')}
+
+To fix this:
+  • First register the routing using NgDiagramService.registerRouting()
+  • Then set it as default
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/routing/
+`;
+
 /**
  * List of built-in edge routing names in registration order.
  *
@@ -69,11 +102,11 @@ export class EdgeRoutingManager {
    * Registers (or replaces) a routing implementation.
    *
    * @param routing - The routing instance to register. Its name must be non-empty.
-   * @throws Will throw if `routing.name` is falsy.
    */
   registerRouting(routing: EdgeRouting): void {
     if (!routing.name) {
-      throw new Error('Routing must have a name');
+      console.warn(ROUTING_MUST_HAVE_NAME_WARNING);
+      return;
     }
     this.routings.set(routing.name, routing);
   }
@@ -122,7 +155,6 @@ export class EdgeRoutingManager {
    * @param routingName - The routing to use. If omitted or undefined, the default routing is used.
    * @param context - The routing context containing source/target nodes, ports, edge data, etc.
    * @returns The computed polyline as an array of points
-   * @throws Will throw if the resolved routing is not registered
    *
    * @example
    * ```typescript
@@ -137,10 +169,16 @@ export class EdgeRoutingManager {
    */
   computePoints(routingName: EdgeRoutingName | undefined, context: EdgeRoutingContext): Point[] {
     const name = routingName || this.defaultRouting;
-    const routing = this.routings.get(name);
+    let routing = this.routings.get(name);
 
     if (!routing) {
-      throw new Error(`Routing '${name}' not found`);
+      const fallback = this.defaultRouting;
+      console.warn(ROUTING_NOT_FOUND_WARNING(name, this.getRegisteredRoutings(), fallback));
+      routing = this.routings.get(fallback);
+
+      if (!routing) {
+        return [context.sourcePoint, context.targetPoint].filter((p) => !!p);
+      }
     }
 
     return routing.computePoints(context, this.getRoutingConfig());
@@ -152,7 +190,6 @@ export class EdgeRoutingManager {
    * @param routingName - The routing to use. If omitted or undefined, the default routing is used.
    * @param points - The points to convert into an SVG path string
    * @returns An SVG path string suitable for the `d` attribute of an SVG `<path>` element
-   * @throws Will throw if the resolved routing is not registered
    *
    * @example
    * ```typescript
@@ -163,10 +200,17 @@ export class EdgeRoutingManager {
    */
   computePath(routingName: EdgeRoutingName | undefined, points: Point[]): string {
     const name = routingName || this.defaultRouting;
-    const routing = this.routings.get(name);
+    let routing = this.routings.get(name);
 
     if (!routing) {
-      throw new Error(`Routing '${name}' not found`);
+      const fallback = this.defaultRouting;
+      console.warn(ROUTING_NOT_FOUND_WARNING(name, this.getRegisteredRoutings(), fallback));
+      routing = this.routings.get(fallback);
+
+      if (!routing) {
+        if (points.length === 0) return '';
+        return `M ${points[0].x},${points[0].y}`;
+      }
     }
 
     return routing.computeSvgPath(points, this.getRoutingConfig());
@@ -183,7 +227,6 @@ export class EdgeRoutingManager {
    * @param points - The path points
    * @param percentage - Position along the path in range [0, 1] where 0 = start, 1 = end
    * @returns The interpolated point on the path
-   * @throws Will throw if the resolved routing is not registered
    *
    * @example
    * ```typescript
@@ -196,14 +239,16 @@ export class EdgeRoutingManager {
    */
   computePointOnPath(routingName: EdgeRoutingName | undefined, points: Point[], percentage: number): Point {
     const name = routingName || this.defaultRouting;
-    const routing = this.routings.get(name);
+    let routing = this.routings.get(name);
 
     if (!routing) {
-      throw new Error(`Routing '${name}' not found`);
+      const fallback = this.defaultRouting;
+      console.warn(ROUTING_NOT_FOUND_WARNING(name, this.getRegisteredRoutings(), fallback));
+      routing = this.routings.get(fallback);
     }
 
     // Use routing's implementation if available
-    if (routing.computePointOnPath) {
+    if (routing?.computePointOnPath) {
       return routing.computePointOnPath(points, percentage);
     }
 
@@ -222,11 +267,11 @@ export class EdgeRoutingManager {
    * Sets the default routing to use for all edges when no specific routing is specified.
    *
    * @param name - The routing name to set as default
-   * @throws Will throw if the routing is not registered
    */
   setDefaultRouting(name: EdgeRoutingName): void {
     if (!this.routings.has(name)) {
-      throw new Error(`Cannot set default routing to '${name}': routing not registered`);
+      console.warn(CANNOT_SET_DEFAULT_ROUTING_WARNING(name, this.getRegisteredRoutings()));
+      return;
     }
     this.defaultRouting = name;
   }

@@ -15,6 +15,7 @@ import { ArcRouting } from './arc-routing';
   selector: 'custom-routing',
   imports: [NgDiagramComponent],
   providers: [provideNgDiagram()],
+  // @mark-substring:(diagramInit)="onDiagramInit($event)"
   template: `
     <div class="not-content diagram">
       <ng-diagram
@@ -40,16 +41,20 @@ export class DiagramComponent {
         onInit: true,
       },
     },
+    // @mark-start
     edgeRouting: {
       arc: {
         radiusMultiplier: 0.5,
       },
     },
+    // @mark-end
   } satisfies NgDiagramConfig;
 
+  // @mark-start
   onDiagramInit(_: DiagramInitEvent) {
     this.diagramService.registerRouting(new ArcRouting());
   }
+  // @mark-end
 
   model = initializeModel({
     nodes: [
@@ -72,7 +77,9 @@ export class DiagramComponent {
         sourcePort: 'port-right',
         targetPort: 'port-left',
         data: {},
+        // @mark-start
         routing: 'arc',
+        // @mark-end
       },
     ],
   });
