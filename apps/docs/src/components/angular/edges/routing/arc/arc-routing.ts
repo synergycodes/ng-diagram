@@ -1,4 +1,3 @@
-// @section-start
 import type {
   EdgeRouting,
   EdgeRoutingConfig,
@@ -9,7 +8,7 @@ import type {
 /**
  * Arc routing implementation using SVG elliptical arcs.
  *
- * Creates curved connections using SVG arc commands instead of bezier curves.
+ * Creates curved connections using SVG arc commands
  * The arc radius can be configured, creating anything from subtle curves to dramatic swoops.
  */
 export class ArcRouting implements EdgeRouting {
@@ -103,4 +102,3 @@ export class ArcRouting implements EdgeRouting {
     return { x, y };
   }
 }
-// @section-end
