@@ -100,4 +100,16 @@ describe('isValidPosition', () => {
   it('should return false for null', () => {
     expect(isValidPosition(null)).toBe(false);
   });
+
+  it('should return false for position with NaN x', () => {
+    expect(isValidPosition({ x: NaN, y: 50 })).toBe(false);
+  });
+
+  it('should return false for position with NaN y', () => {
+    expect(isValidPosition({ x: 100, y: NaN })).toBe(false);
+  });
+
+  it('should return false for position with both coordinates NaN', () => {
+    expect(isValidPosition({ x: NaN, y: NaN })).toBe(false);
+  });
 });

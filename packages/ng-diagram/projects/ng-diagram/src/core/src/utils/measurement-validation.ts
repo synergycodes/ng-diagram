@@ -12,13 +12,13 @@ export const isValidSize = (size: Size | undefined | null): boolean => {
 };
 
 /**
- * Checks if a position has valid (non-null) coordinates.
+ * Checks if a position has valid (non-null, non-NaN) coordinates.
  * Used during initialization to determine if an entity has been positioned.
  * Note: Position values of 0 are valid (e.g., top-left corner).
  *
  * @param position - Position to validate
- * @returns true if both x and y are not null/undefined
+ * @returns true if both x and y are not null/undefined/NaN
  */
 export const isValidPosition = (position: Point | undefined | null): boolean => {
-  return position?.x != null && position?.y != null;
+  return position?.x != null && position?.y != null && !isNaN(position.x) && !isNaN(position.y);
 };

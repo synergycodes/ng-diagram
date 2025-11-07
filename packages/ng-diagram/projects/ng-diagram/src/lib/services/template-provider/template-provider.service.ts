@@ -3,6 +3,18 @@ import { Edge, Node } from '../../../public-api';
 import { NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 
+const NODE_TEMPLATE_NOT_REGISTERED_WARNING = (nodeType: string) =>
+  `[ngDiagram] Node template '${nodeType}' is not registered. Falling back to default node template.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes/
+`;
+
+const EDGE_TEMPLATE_NOT_REGISTERED_WARNING = (edgeType: string) =>
+  `[ngDiagram] Edge template '${edgeType}' is not registered. Falling back to default edge template.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/custom-edges/
+`;
+
 @Injectable()
 export class TemplateProviderService {
   private flowConfig = inject(FlowCoreProviderService);
@@ -30,12 +42,7 @@ export class TemplateProviderService {
     const template = this.nodeTemplateMap.get(nodeType || '');
 
     if (!template && !this.accessedNodeTypes.has(nodeType)) {
-      console.warn(
-        `[ngDiagram] Node template '${nodeType}' is not registered. Falling back to default node template.
-
-Documentation: https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes/
-`
-      );
+      console.warn(NODE_TEMPLATE_NOT_REGISTERED_WARNING(nodeType));
       this.accessedNodeTypes.add(nodeType);
     }
 
@@ -50,12 +57,7 @@ Documentation: https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes/
     const template = this.edgeTemplateMap.get(edgeType || '');
 
     if (!template && !this.accessedEdgeTypes.has(edgeType)) {
-      console.warn(
-        `[ngDiagram] Edge template '${edgeType}' is not registered. Falling back to default edge template.
-
-Documentation: https://www.ngdiagram.dev/docs/guides/edges/custom-edges/
-`
-      );
+      console.warn(EDGE_TEMPLATE_NOT_REGISTERED_WARNING(edgeType));
       this.accessedEdgeTypes.add(edgeType);
     }
 
