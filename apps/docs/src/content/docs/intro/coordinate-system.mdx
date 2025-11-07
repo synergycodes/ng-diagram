@@ -35,7 +35,7 @@ Nodes are positioned using **absolute coordinates** relative to the diagram orig
 
 **Positioning Behavior:**
 
-- The `position` property defines the top-left corner of the node
+- The [`position`](/docs/api/types/model/simplenode#position) property defines the top-left corner of the node
 - Nodes are positioned using CSS `transform: translate(x, y)`
 - Position is independent of the node's size or content
 
@@ -84,8 +84,8 @@ Edge labels are positioned using **absolute coordinates** along the edge path:
 
 **Label Positioning:**
 
-- `positionOnEdge`: Value from 0 to 1 indicating position along the edge
-- `position`: Absolute coordinates calculated by the system
+- [`positionOnEdge`](/docs/api/types/model/edgelabel#positiononedge): Value from 0 to 1 indicating position along the edge
+- [`position`](/docs/api/types/model/edgelabel#position): Absolute coordinates calculated by the system
 - Labels are positioned using `transform: translate(x, y) translate(-50%, -50%)` for center alignment
 
 ## Viewport and Scaling
@@ -98,7 +98,7 @@ The viewport represents the visible area of the diagram:
 
 ### Coordinate Transformations
 
-The `NgDiagramViewportService` offers methods for converting between different coordinate systems in `ngDiagram`:
+The [`NgDiagramViewportService`](/docs/api/services/ngdiagramviewportservice) offers methods for converting between different coordinate systems in ngDiagram:
 
 **Client to Flow Position:**
 
@@ -116,15 +116,15 @@ const clientPosition = viewportService.flowToClientPosition({ x: 100, y: 150 });
 
 ### Reading Viewport Data
 
-Use the `NgDiagramViewportService` to access viewport information reactively:
+Use the [`NgDiagramViewportService`](/docs/api/services/ngdiagramviewportservice) to access viewport information reactively:
 
 <CodeSnippet relativePath="/coordinate-system/preview/coordinates.component.ts" sectionId="coordinates-component" />
 
 **Available Viewport Properties:**
 
-- `x`, `y`: Current pan offset
-- `scale`: Current zoom level
-- `width`, `height`: Viewport dimensions
+- [`x`](/docs/api/types/model/viewport#x), [`y`](/docs/api/types/model/viewport#y): Current pan offset
+- [`scale`](/docs/api/types/model/viewport#scale): Current zoom level
+- [`width`](/docs/api/types/model/viewport#width), [`height`](/docs/api/types/model/viewport#height): Viewport dimensions
 
 <br />
 
