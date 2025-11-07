@@ -22,10 +22,10 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 **Key concepts:**
 
 - Initialize model with [`initializeModel()`](/docs/api/other/initializemodel)
-- Nodes require: `id`, `position`, `data`
-- Edges require: `id`, `source`, `target`, `sourcePort`, `targetPort`, `data`
+- Nodes require: [`id`](/docs/api/types/model/simplenode#id), [`position`](/docs/api/types/model/simplenode#position), [`data`](/docs/api/types/model/simplenode#data)
+- Edges require: [`id`](/docs/api/types/model/edge#id), [`source`](/docs/api/types/model/edge#source), [`target`](/docs/api/types/model/edge#target), [`sourcePort`](/docs/api/types/model/edge#sourceport), [`targetPort`](/docs/api/types/model/edge#targetport), [`data`](/docs/api/types/model/edge#data)
 - Custom properties can be stored in the `data` field of nodes and edges
-- Use `metadata` for diagram-level custom information
+- Use [`metadata`](/docs/api/types/model/metadata) for diagram-level custom information
 
 You can also implement custom model adapters to connect to external data sources like databases or real-time services.
 
@@ -61,10 +61,10 @@ ngDiagram provides default nodes that work out of the box with built-in features
 - Resize handles
 - Rotation handle
 - Automatic port hover indicators
-- Automatic sizing by default (`autoSize: true`) - nodes resize to fit their content
+- Automatic sizing by default ([`autoSize: true`](/docs/api/types/model/simplenode#autosize)) - nodes resize to fit their content
 
 <Aside type="note">
-  To set a manual size for nodes, you must explicitly set `autoSize: false` along with the `size` property. Without
+  To set a manual size for nodes, you must explicitly set [`autoSize: false`](/docs/api/types/model/simplenode#autosize) along with the [`size`](/docs/api/types/model/simplenode#size) property. Without
   this, the size property will be overridden by the automatic sizing behavior.
 </Aside>
 
@@ -114,9 +114,9 @@ Ports define where edges can connect to nodes. Default nodes have two ports (lef
 
 **Port system:**
 
-- Default ports: `port-left`, `port-right` (bidirectional)
-- Four possible sides: `top`, `right`, `bottom`, `left`
-- Three connection types: `source` (outgoing only), `target` (incoming only), `both` (bidirectional)
+- Default ports: [`port-left`](/docs/api/types/model/port#id), [`port-right`](/docs/api/types/model/port#id) (bidirectional)
+- Four possible [`sides`](/docs/api/types/model/portside): `top`, `right`, `bottom`, `left`
+- Three connection [`types`](/docs/api/types/model/port#type): `source` (outgoing only), `target` (incoming only), `both` (bidirectional)
 - Custom port positions and IDs in custom node templates
 - Visual hover indicators when dragging connections
 
@@ -141,7 +141,7 @@ The diagram background can display visual patterns to help with alignment and sp
 **Background capabilities:**
 
 - Built-in patterns: dots, grid with major/minor lines
-- Customizable via `background` configuration (dot spacing, cell size, major lines frequency)
+- Customizable via [`background`](/docs/api/types/configuration/features/backgroundconfig) configuration ([`dotSpacing`](/docs/api/types/configuration/features/backgroundconfig#dotspacing), [`cellSize`](/docs/api/types/configuration/features/backgroundconfig#cellsize), [`majorLinesFrequency`](/docs/api/types/configuration/features/backgroundconfig#majorlinesfrequency))
 - Support for custom backgrounds via content projection
 - Automatically scales with viewport zoom
 
@@ -166,17 +166,17 @@ Nodes can be configured for different interaction modes. Enable resizing to allo
 
 **Interaction options:**
 
-- **Resizable**: Enable resize handles on nodes by setting `resizable: true`
-- **Rotatable**: Enable rotation handle on nodes by setting `rotatable: true`
+- **Resizable**: Enable resize handles on nodes by setting [`resizable: true`](/docs/api/types/model/simplenode#resizable)
+- **Rotatable**: Enable rotation handle on nodes by setting [`rotatable: true`](/docs/api/types/model/simplenode#rotatable)
 - **Selection**: Click to select nodes and edges
   - Custom nodes: Use [`NgDiagramNodeSelectedDirective`](/docs/api/directives/ngdiagramnodeselecteddirective) as hostDirective for selection styles
   - Custom edges: Use [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) or implement selection styles manually
   - Default templates have selection styles built-in
 - **Copy/Paste**: Copy, cut, and paste diagram elements
-  - Keyboard shortcuts: Ctrl/Cmd+C (copy), Ctrl/Cmd+X (cut), Ctrl/Cmd+V (paste)
+  - Keyboard shortcuts can be updated via [`configureShortcuts()`](/docs/api/utilities/configureshortcuts), defaults are: Ctrl/Cmd+C (copy), Ctrl/Cmd+X (cut), Ctrl/Cmd+V (paste)
   - Programmatic access via [`NgDiagramClipboardService`](/docs/api/services/ngdiagramclipboardservice)
 
-[Selection →](/docs/guides/nodes/selection) | [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation)
+[Selection →](/docs/guides/nodes/selection) | [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation) | [Keyboard Shortcuts →](/docs/api/utilities/configureshortcuts)
 
 ## Configuration
 
@@ -184,20 +184,20 @@ Most diagram behavior is configurable through the config object passed to the di
 
 **Configurable aspects:**
 
-- `background` - Background dot spacing, cell size, and major lines frequency
-- `boxSelection` - Box selection behavior (partial inclusion, real-time selection)
-- `computeEdgeId` - Function to generate unique edge IDs
-- `computeNodeId` - Function to generate unique node IDs
-- `debugMode` - Enable additional console logging
-- `edgeRouting` - Default routing algorithm (orthogonal, bezier, polyline) and routing-specific settings
-- `grouping` - Rules for which nodes can be grouped together
-- `linking` - Edge creation validation, snap distance, and custom edge builders
-- `nodeRotation` - Rotation snapping angles and default rotatable state
-- `resize` - Minimum node size constraints and default resizable state
-- `selectionMoving` - Edge panning behavior when dragging near viewport edges
-- `snapping` - Grid snapping for dragging and resizing with customizable snap points
-- `zIndex` - Layer management for selected elements and edge-node relationships
-- `zoom` - Min/max zoom levels, zoom step, and zoom-to-fit settings
+- [`background`](/docs/api/types/configuration/features/backgroundconfig) - Background dot spacing, cell size, and major lines frequency
+- [`boxSelection`](/docs/api/types/configuration/features/boxselectionconfig) - Box selection behavior (partial inclusion, real-time selection)
+- [`computeEdgeId`](/docs/api/types/configuration/flowconfig#computeedgeid) - Function to generate unique edge IDs
+- [`computeNodeId`](/docs/api/types/configuration/flowconfig#computenodeid) - Function to generate unique node IDs
+- [`debugMode`](/docs/api/types/configuration/flowconfig#debugmode) - Enable additional console logging
+- [`edgeRouting`](/docs/api/types/configuration/features/edgeroutingconfig) - Default routing algorithm (orthogonal, bezier, polyline) and routing-specific settings
+- [`grouping`](/docs/api/types/configuration/features/groupingconfig) - Rules for which nodes can be grouped together
+- [`linking`](/docs/api/types/configuration/features/linkingconfig) - Edge creation validation, snap distance, and custom edge builders
+- [`nodeRotation`](/docs/api/types/configuration/features/noderotationconfig) - Rotation snapping angles and default rotatable state
+- [`resize`](/docs/api/types/configuration/features/resizeconfig) - Minimum node size constraints and default resizable state
+- [`selectionMoving`](/docs/api/types/configuration/features/selectionmovingconfig) - Edge panning behavior when dragging near viewport edges
+- [`snapping`](/docs/api/types/configuration/features/snappingconfig) - Grid snapping for dragging and resizing with customizable snap points
+- [`zIndex`](/docs/api/types/configuration/features/zindexconfig) - Layer management for selected elements and edge-node relationships
+- [`zoom`](/docs/api/types/configuration/features/zoomconfig) - Min/max zoom levels, zoom step, and zoom-to-fit settings
 
 ## Services
 
@@ -208,17 +208,17 @@ ngDiagram provides injectable services for all diagram operations. Services are 
 - [**NgDiagramService**](/docs/api/services/ngdiagramservice) - Diagram API access:
   - Config, events, transactions
   - Middleware registration
-  - Routing management (`registerRouting()`, `unregisterRouting()`, `getRegisteredRoutings()`)
-  - Programmatic linking (`startLinking()`)
-  - Environment info (`getEnvironment()`)
+  - Routing management ([`registerRouting()`](/docs/api/services/ngdiagramservice#registerrouting), [`unregisterRouting()`](/docs/api/services/ngdiagramservice#unregisterrouting), [`getRegisteredRoutings()`](/docs/api/services/ngdiagramservice#getregisteredroutings))
+  - Programmatic linking ([`startLinking()`](/docs/api/services/ngdiagramservice#startlinking))
+  - Environment info ([`getEnvironment()`](/docs/api/services/ngdiagramservice#getenvironment))
 - [**NgDiagramModelService**](/docs/api/services/ngdiagrammodelservice) - CRUD operations:
   - Nodes, edges, and metadata management
-  - Model serialization (`toJSON()`)
-  - Reactive signals for `nodes`, `edges`, `metadata`
+  - Model serialization ([`toJSON()`](/docs/api/services/ngdiagrammodelservice#tojson))
+  - Reactive signals for [`nodes`](/docs/api/services/ngdiagrammodelservice#nodes), [`edges`](/docs/api/services/ngdiagrammodelservice#edges), [`metadata`](/docs/api/services/ngdiagrammodelservice#metadata)
 - [**NgDiagramViewportService**](/docs/api/services/ngdiagramviewportservice) - Viewport control:
-  - Zoom, pan, and positioning
-  - Coordinate conversion (`clientToFlowPosition()`, `flowToClientPosition()`)
-  - Navigation helpers (`centerOnNode()`, `centerOnRect()`)
+  - Zoom, pan, and positioning ([`zoomToFit()`](/docs/api/services/ngdiagramviewportservice#zoomtofit))
+  - Coordinate conversion ([`clientToFlowPosition()`](/docs/api/services/ngdiagramviewportservice#clienttoflowposition), [`flowToClientPosition()`](/docs/api/services/ngdiagramviewportservice#flowtoclientposition))
+  - Navigation helpers ([`centerOnNode()`](/docs/api/services/ngdiagramviewportservice#centeronnode), [`centerOnRect()`](/docs/api/services/ngdiagramviewportservice#centeronrect))
 - [**NgDiagramSelectionService**](/docs/api/services/ngdiagramselectionservice) - Manage selection state for nodes and edges
 - [**NgDiagramNodeService**](/docs/api/services/ngdiagramnodeservice) - Node-specific operations (move, resize, rotate)
 - [**NgDiagramGroupsService**](/docs/api/services/ngdiagramgroupsservice) - Group/ungroup nodes and manage group hierarchies
@@ -234,17 +234,17 @@ The diagram emits events for user interactions and state changes. Subscribe to t
 
 **Available events:**
 
-- `diagramInit` - Fired when diagram is fully initialized with all nodes and edges measured
-- `edgeDrawn` - Fired when user manually creates an edge by dragging between nodes
-- `selectionChanged` - Fired when nodes/edges are selected or deselected
-- `selectionMoved` - Fired when selected nodes are moved (dragged)
-- `selectionRemoved` - Fired when selected nodes/edges are removed from the diagram
-- `selectionRotated` - Fired when selected nodes are rotated
-- `groupMembershipChanged` - Fired when nodes are grouped or ungrouped
-- `viewportChanged` - Fired when viewport is panned or zoomed
-- `clipboardPasted` - Fired when elements are pasted from clipboard
-- `nodeResized` - Fired when a node is resized
-- `paletteItemDropped` - Fired when a palette item is dropped onto the diagram
+- [`diagramInit`](/docs/api/types/events/diagraminitevent) - Fired when diagram is fully initialized with all nodes and edges measured
+- [`edgeDrawn`](/docs/api/types/events/edgedrawnevent) - Fired when user manually creates an edge by dragging between nodes
+- [`selectionChanged`](/docs/api/types/events/selectionchangedevent) - Fired when nodes/edges are selected or deselected
+- [`selectionMoved`](/docs/api/types/events/selectionmovedevent) - Fired when selected nodes are moved (dragged)
+- [`selectionRemoved`](/docs/api/types/events/selectionremovedevent) - Fired when selected nodes/edges are removed from the diagram
+- [`selectionRotated`](/docs/api/types/events/selectionrotatedevent) - Fired when selected nodes are rotated
+- [`groupMembershipChanged`](/docs/api/types/events/groupmembershipchangedevent) - Fired when nodes are grouped or ungrouped
+- [`viewportChanged`](/docs/api/types/events/viewportchangedevent) - Fired when viewport is panned or zoomed
+- [`clipboardPasted`](/docs/api/types/events/clipboardpastedevent) - Fired when elements are pasted from clipboard
+- [`nodeResized`](/docs/api/types/events/noderesizedevent) - Fired when a node is resized
+- [`paletteItemDropped`](/docs/api/types/events/paletteitemdroppedevent) - Fired when a palette item is dropped onto the diagram
 
 Events can be subscribed to via `@Output` bindings on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component or programmatically through [`NgDiagramService.addEventListener()`](/docs/api/services/ngdiagramservice#addeventlistener).
 
@@ -260,10 +260,10 @@ Edges support multiple routing algorithms for different visual styles. You can c
 
 **Routing modes:**
 
-- **Auto mode** (`routingMode: 'auto'`) - Algorithm automatically calculates the path between nodes
-- **Manual mode** (`routingMode: 'manual'`) - You provide custom waypoints in the `points` array, algorithm renders the path through your points
+- **Auto mode** ([`routingMode: 'auto'`](/docs/api/types/model/edge#routingmode)) - Algorithm automatically calculates the path between nodes
+- **Manual mode** ([`routingMode: 'manual'`](/docs/api/types/model/edge#routingmode)) - You provide custom waypoints in the [`points`](/docs/api/types/model/edge#points) array, algorithm renders the path through your points
 
-Set routing per edge with the `routing` property, or globally through configuration with `edgeRouting.defaultRouting`. For complete custom routing algorithms, use [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice#registerrouting).
+Set routing per edge with the [`routing`](/docs/api/types/model/edge#routing) property, or globally through configuration with [`edgeRouting.defaultRouting`](/docs/api/types/configuration/features/edgeroutingconfig#defaultrouting). For complete custom routing algorithms, use [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice#registerrouting).
 
 [Routing Documentation →](/docs/guides/edges/routing)
 
