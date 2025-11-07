@@ -3,6 +3,11 @@
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import './content-tiles.css';
 
+* {
+  --sl-content-width: 60rem;
+  --sl-sidebar-width: 24.75rem;
+}
+
 @layer reset {
   * {
     margin: 0;
