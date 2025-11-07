@@ -1,4 +1,4 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal, untracked } from '@angular/core';
 import {
   ActionState,
   DiagramEventMap,
@@ -75,7 +75,10 @@ export class NgDiagramService extends NgDiagramBaseService {
     super();
     effect(() => {
       if (this.isInitialized()) {
-        this.config$.set(this.flowCore.config);
+        // Angular 18 backward compatibility
+        untracked(() => {
+          this.config$.set(this.flowCore.config);
+        });
       }
     });
 
@@ -83,7 +86,10 @@ export class NgDiagramService extends NgDiagramBaseService {
       if (!this.isInitialized()) return;
 
       const unsubscribe = this.flowCore.eventManager.on('actionStateChanged', (event) => {
-        this.actionState$.set(event.actionState);
+        // Angular 18 backward compatibility
+        untracked(() => {
+          this.actionState$.set(event.actionState);
+        });
       });
 
       onCleanup(() => unsubscribe());
