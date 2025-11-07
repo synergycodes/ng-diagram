@@ -11,6 +11,8 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 Groups in **ngDiagram** are containers for other nodes, allowing you to organize, move, and manage multiple nodes as a single unit.
 They are essential for structuring complex diagrams, enabling collective operations and visual grouping.
 
+[GroupNode API Reference →](/docs/api/types/model/groupnode)
+
 ## What is a Group?
 
 A group is a node that can contain other nodes (children), serving as both a visual and logical container.
@@ -27,8 +29,8 @@ To remove a node from a group, drag the node out of the group.
 
 ## Creating a Group
 
-To create a group, add a node with `isGroup: true` to your diagram model.
-Child nodes reference their parent group via the `groupId` property.
+To create a group, add a node with [`isGroup: true`](/docs/api/types/model/groupnode#isgroup) to your diagram model.
+Child nodes reference their parent group via the [`groupId`](/docs/api/types/model/simplenode#groupid) property.
 
 ```typescript {3,11}
 {
@@ -70,12 +72,12 @@ For more details, see the [Group Resizing via diagram config](/docs/guides/nodes
 
 ### Resizing Configuration
 
-You can control resizing behavior globally via the `resize` config in `NgDiagramConfig`, such as setting minimum group size.
+You can control resizing behavior globally via the [`resize`](/docs/api/types/configuration/features/resizeconfig) config in [`NgDiagramConfig`](/docs/api/types/configuration/ngdiagramconfig), such as setting minimum group size.
 
-The `grouping` configuration in `NgDiagramConfig` lets you control advanced grouping behavior:
+The [`grouping`](/docs/api/types/configuration/features/groupingconfig) configuration in [`NgDiagramConfig`](/docs/api/types/configuration/ngdiagramconfig) lets you control advanced grouping behavior:
 
 - **canGroup callback:**
-  Use the `canGroup` function to control which nodes can be grouped together.
+  Use the [`canGroup`](/docs/api/types/configuration/features/groupingconfig#cangroup) function to control which nodes can be grouped together.
   This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
 
 ```typescript {3,6}
@@ -93,7 +95,7 @@ config = {
 
 ## Highlighting Groups
 
-Groups can be visually highlighted when nodes are dragged over them or programmatically via the `highlighted` property.
+Groups can be visually highlighted when nodes are dragged over them or programmatically via the [`highlighted`](/docs/api/types/model/groupnode#highlighted) property.
 
 ## Selecting Groups
 

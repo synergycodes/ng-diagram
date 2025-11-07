@@ -7,6 +7,24 @@ import { NgDiagramPortComponent } from '../../port/ng-diagram-port.component';
 import { NgDiagramNodeResizeAdornmentComponent } from '../resize/ng-diagram-node-resize-adornment.component';
 import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node-rotate-adornment.component';
 
+/**
+ * The `NgDiagramBaseNodeTemplateComponent` provides a base template for custom nodes with default node styling and features.
+ *
+ * This component wraps custom node content while providing the default node's visual appearance, selection states,
+ * resize and rotate adornments, and default ports. Use this as a convenient way to create custom nodes that
+ * maintain the default node's look and feel while adding custom content.
+ *
+ * @example
+ * ```html
+ * <ng-diagram-base-node-template [node]="node">
+ *   <!-- Custom node content here -->
+ *   <div class="custom-header">{{ node().data.title }}</div>
+ *   <div class="custom-body">{{ node().data.description }}</div>
+ * </ng-diagram-base-node-template>
+ * ```
+ *
+ * @category Components
+ */
 @Component({
   selector: 'ng-diagram-base-node-template',
   standalone: true,

@@ -188,6 +188,7 @@ export class ViewportControlsComponent {
   }
 
   // Coordinate conversion examples
+  // <ng-diagram [model]="model" (click)="onMouseClick($event)" />
   onMouseClick(event: MouseEvent) {
     // Convert click position to diagram coordinates
     const flowPosition = this.viewportService.clientToFlowPosition({
