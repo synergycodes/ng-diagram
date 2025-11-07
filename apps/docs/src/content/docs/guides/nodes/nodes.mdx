@@ -19,11 +19,11 @@ interface Node<T = any> {
 }
 ```
 
-[Node API Reference →](/docs/api/types/node)
+[Node API Reference →](/docs/api/types/model/simplenode)
 
 ## Adding Nodes to a Diagram
 
-To add nodes to your diagram, include them in the `nodes` array of your model:
+To add nodes to your diagram, include them in the [`nodes`](/docs/api/services/ngdiagrammodelservice#nodes) array of your model:
 
 <CodeSnippet relativePath="nodes/nodes/minimal/diagram.component.ts" />
 
@@ -32,16 +32,17 @@ To add nodes to your diagram, include them in the `nodes` array of your model:
 NgDiagram provides a default node implementation that covers the most common scenarios. The default node:
 
 - Is a fully styled component representing a visual entity with one input and one output
-- Supports rotation and resizing (when enabled in the node definition)
+- Supports rotation and resizing (enabled by default through [`resize.defaultResizable`](/docs/api/types/configuration/features/resizeconfig#defaultresizable) and [`nodeRotation.defaultRotatable`](/docs/api/types/configuration/features/noderotationconfig#defaultrotatable) config)
 - Displays a label (provided by convention in `data.label`)
 - Responds to hover and selection states for better interactivity
 - Is ideal for representing simple text-based entities
 
-To use the default node template, leave the node’s `type` property **empty**.
+To use the default node template, leave the node's [`type`](/docs/api/types/model/simplenode#type) property **empty**.
 
 ### Features
 
 The default node comes with built-in support for resizing and rotating through interactive adornments.
+By default, these features are enabled through the [`resize.defaultResizable`](/docs/api/types/configuration/features/resizeconfig#defaultresizable) and [`nodeRotation.defaultRotatable`](/docs/api/types/configuration/features/noderotationconfig#defaultrotatable) configuration options, but can be overridden per node using the [`resizable`](/docs/api/types/model/simplenode#resizable) and [`rotatable`](/docs/api/types/model/simplenode#rotatable) properties.
 These features can also be enabled in custom nodes by adding the adornments to their templates.
 
 <br />
@@ -54,7 +55,11 @@ import RotatableResizableNode from '@components/angular/nodes/nodes/rotatable-re
 
 ### Ports
 
-Every node can expose one or more **ports**, which define the connection points for edges. By convention, the default node includes a single input and a single output port, but you can customize the number, placement, and appearance of ports in your own node templates.
+Nodes can expose one or more **ports**, which define the connection points for edges. By convention, the default node includes a single input and a single output port, but you can customize the number, placement, and appearance of ports in your own node templates.
+
+:::note
+Nodes can also have no ports at all, but without ports, they cannot be connected to other nodes with edges.
+:::
 
 [Ports →](/docs/guides/nodes/ports)
 
@@ -76,7 +81,7 @@ For deeper customization, you can also define your own node templates, giving yo
 
 ## Position
 
-A node’s position can be set manually through the `position` property:
+A node's position can be set manually through the [`position`](/docs/api/types/model/simplenode#position) property:
 
 ```typescript
 {
@@ -94,12 +99,12 @@ The position also updates automatically when a user **moves the node** by draggi
 
 NgDiagram provides two main approaches to control node sizing:
 
-- **Manual sizing** – explicitly set the node’s dimensions with the `size` property.
+- **Manual sizing** – explicitly set the node's dimensions with the [`size`](/docs/api/types/model/simplenode#size) property.
 - **Automatic sizing** – let the node adjust to its content automatically.
 
-The `size` property is **optional**. If not provided, the size will be calculated based on the content of the node.
+The [`size`](/docs/api/types/model/simplenode#size) property is **optional**. If not provided, the size will be calculated based on the content of the node.
 
-To precisely control the size of a node, use the `size` property:
+To precisely control the size of a node, use the [`size`](/docs/api/types/model/simplenode#size) property:
 
 ```typescript
 {
@@ -111,7 +116,7 @@ To precisely control the size of a node, use the `size` property:
 ```
 
 :::note
-By default, nodes use **automatic sizing** (`autoSize: true`). In this mode, the provided `size` property is ignored, and the node resizes itself to fit its content. The `size` property is then updated with the **measured values**.
+By default, nodes use **automatic sizing** ([`autoSize: true`](/docs/api/types/model/simplenode#autosize)). In this mode, the provided [`size`](/docs/api/types/model/simplenode#size) property is ignored, and the node resizes itself to fit its content. The [`size`](/docs/api/types/model/simplenode#size) property is then updated with the **measured values**.
 
-To set a manual size for a node, you must explicitly set `autoSize: false`. Without this, the `size` property will be overridden by the automatic sizing behavior.
+To set a manual size for a node, you must explicitly set [`autoSize: false`](/docs/api/types/model/simplenode#autosize). Without this, the [`size`](/docs/api/types/model/simplenode#size) property will be overridden by the automatic sizing behavior.
 :::
