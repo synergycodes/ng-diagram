@@ -10,6 +10,7 @@ title: "ng-diagram"
 - [NgDiagramBackgroundComponent](/docs/api/components/ngdiagrambackgroundcomponent/)
 - [NgDiagramBaseEdgeComponent](/docs/api/components/ngdiagrambaseedgecomponent/)
 - [NgDiagramBaseEdgeLabelComponent](/docs/api/components/ngdiagrambaseedgelabelcomponent/)
+- [NgDiagramBaseNodeTemplateComponent](/docs/api/components/ngdiagrambasenodetemplatecomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
 - [NgDiagramNodeResizeAdornmentComponent](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/)
 - [NgDiagramNodeRotateAdornmentComponent](/docs/api/components/ngdiagramnoderotateadornmentcomponent/)
