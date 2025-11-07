@@ -1,12 +1,15 @@
 import { FlowCore } from '../flow-core';
-import { Node, Point, Port } from '../types';
-import { getDistanceBetweenRects, getPointRangeRect, getRect } from '../utils';
+import { Node, Point, Port, Rect } from '../types';
+import { doesContainRect, getDistanceBetweenRects, getPointRangeRect, getRect } from '../utils';
+import { getNodeMeasuredBounds } from '../utils/dimensions';
+import { checkCollision } from './collision-detection';
 
 export const getNodesInRange = (flowCore: FlowCore, point: Point, range: number): Node[] => {
-  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(getPointRangeRect(point, range)));
+  const rangeRect = getPointRangeRect(point, range);
+  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(rangeRect));
   const foundNodes: Node[] = [];
   flowCore.getState().nodes.forEach((node) => {
-    if (foundNodesIds.has(node.id)) {
+    if (foundNodesIds.has(node.id) && checkCollision(rangeRect, node)) {
       foundNodes.push(node);
     }
   });
@@ -50,4 +53,49 @@ export const getNearestPortInRange = (flowCore: FlowCore, point: Point, range: n
   }
 
   return nearestPort;
+};
+
+export const getNodesInRect = (flowCore: FlowCore, rect: Rect, partialInclusion = true): Node[] => {
+  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(rect));
+  const foundNodes: Node[] = [];
+  const nodes = flowCore.getState().nodes;
+
+  nodes.forEach((node) => {
+    if (foundNodesIds.has(node.id) && checkCollision(rect, node)) {
+      foundNodes.push(node);
+    }
+  });
+
+  if (partialInclusion) {
+    return foundNodes;
+  }
+
+  const fullyContainedNodes = foundNodes.filter((node) => {
+    const nodeRect = getRect(node);
+    return doesContainRect(rect, nodeRect);
+  });
+
+  return fullyContainedNodes;
+};
+
+export const getOverlappingNodes = (flowCore: FlowCore, nodeId: string): Node[] => {
+  const targetNode = flowCore.modelLookup.getNodeById(nodeId);
+  if (!targetNode) {
+    return [];
+  }
+
+  const measuredBounds = targetNode.measuredBounds ?? getNodeMeasuredBounds(targetNode);
+  const foundNodesIds = flowCore.spatialHash.queryIds(measuredBounds);
+  const foundNodes: Node[] = [];
+
+  for (const candidateNodeId of foundNodesIds) {
+    if (candidateNodeId === nodeId) continue;
+
+    const candidateNode = flowCore.modelLookup.getNodeById(candidateNodeId);
+    if (candidateNode && checkCollision(targetNode, candidateNode)) {
+      foundNodes.push(candidateNode);
+    }
+  }
+
+  return foundNodes;
 };

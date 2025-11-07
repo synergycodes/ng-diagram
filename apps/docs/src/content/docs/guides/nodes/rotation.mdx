@@ -3,7 +3,8 @@ title: Rotation
 description: Understanding how rotation works in ngDiagram
 ---
 
-import Rotation from '@components/angular/nodes/rotation/rotation.astro';
+import { Aside } from '@astrojs/starlight/components';
+import Configuration from '@components/angular/nodes/rotation/rotation.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 The **rotation** feature in ngDiagram allows users to interactively rotate nodes on the diagram canvas.
@@ -11,25 +12,21 @@ Rotatable nodes display a rotation handle that users can drag to change the node
 
 The rotation is reflected in the node's appearance and can be used to create various diagrams.
 
+<br />
+
+<Configuration />
+
 ## How It Works
 
 - Nodes can be rotated by dragging the rotation handle.
 - The rotation angle is stored in the node's `angle` property.
-- Rotation can be enabled per node and configured globally via diagram config.
+- Rotation can be enabled per node, per custom template, or globally in the configuration. It can also be configured through the global configuration.
 
 ## Custom Node Setup
 
 To make a custom node rotatable, include `<ng-diagram-node-rotate-adornment />` in your node template and import the `NgDiagramNodeRotateAdornmentComponent` reference.
 
 <CodeSnippet relativePath="nodes/rotation/node/node.component.ts" />
-
-## Enabling Rotation
-
-Enable rotation by setting the `rotatable` property to `true` in your node definition:
-
-<CodeSnippet relativePath="nodes/rotation/diagram.component.ts" sectionId="enabling" />
-
-When `rotatable` is set, the rotation handle will appear, and the node can be rotated by the user.
 
 ## Customization
 
@@ -66,9 +63,11 @@ If you do not provide any content inside `<ng-diagram-node-rotate-adornment>`, t
 
 ## Configuration
 
-You can further customize rotation behavior using the `nodeRotation` configuration in `NgDiagramConfig`.
-This configuration allows you to control snapping and snap angles for node rotation:
+### Rotation Settings
 
+You can further customize rotation behavior using the `nodeRotation` configuration in `NgDiagramConfig`:
+
+- **defaultRotatable** – Controls whether rotation is enabled by default for all nodes. Default is `true`.
 - **computeSnapAngleForNode** - Computes the snap angle for a node's rotation.
 - **defaultSnapAngle** - The default snap angle in degrees, used if `computeSnapAngleForNode` returns null.
 - **shouldSnapForNode** - Determines whether rotation snapping should be enabled for a node.
@@ -77,9 +76,55 @@ You can set these options in your diagram by passing the configuration to the `n
 
 <CodeSnippet relativePath="nodes/rotation/diagram.component.ts" sectionId="config" />
 
-## Example
+### Rotation Setting Priority
 
-<Rotation />
+The **rotatable** property controls whether a node can be rotated.
+This property can be defined at several levels, and when multiple levels specify it, the one with the highest priority takes effect.
+
+The following list shows the order of priority — from highest to lowest:
+
+1. **Node-level setting** – Directly set the `rotatable` property on the node data object.
+
+```typescript
+import { Node } from 'ng-diagram';
+
+const node: Node = {
+  id: 'my-id',
+  rotatable: true,
+  // other node properties
+};
+```
+
+This setting applies specifically to that node and overrides all other defaults.
+
+2. **Template-level setting** – Use the `defaultRotatable` input on the `NgDiagramNodeRotateAdornmentComponent` within your custom node template.
+
+```html
+<ng-diagram-node-rotate-adornment [defaultRotatable]="true"></ng-diagram-node-rotate-adornment>
+```
+
+This defines the default rotation behavior for all nodes that use that template.
+
+3. **Global configuration** – Define the global `defaultRotatable` setting inside your `NgDiagramConfig`.
+
+```typescript
+import { NgDiagramConfig } from 'ng-diagram';
+
+const config: NgDiagramConfig = {
+  nodeRotation: {
+    defaultRotatable: false,
+  },
+};
+```
+
+This establishes the fallback behavior for all nodes unless overridden by a template or individual node.
+
+<Aside type="tip">
+  If your rotation configuration seems to be ignored, check for overrides at higher priority levels — node-level
+  settings always take precedence over template or global configurations.
+</Aside>
+
+[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
 ## Further Reading
 

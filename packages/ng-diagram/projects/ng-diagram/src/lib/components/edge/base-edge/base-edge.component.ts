@@ -1,7 +1,28 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
+import { isValidPosition } from '../../../../core/src/utils/measurement-validation';
 import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
+
+const INVALID_EDGE_COORDINATES_ERROR = (
+  edgeId: string,
+  source: string,
+  sourcePort: string | undefined,
+  target: string,
+  targetPort: string | undefined
+) =>
+  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'. This usually happens when sourcePort or targetPort is missing or doesn't exist on the node.
+
+Edge details:
+  • source: ${source} (port: ${sourcePort || 'not specified'})
+  • target: ${target} (port: ${targetPort || 'not specified'})
+
+To fix this:
+  • Ensure sourcePort and targetPort are specified on the edge
+  • Verify the ports exist in the source and target nodes
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/
+`;
 
 /**
  * Base edge component that handles edge rendering.
@@ -76,6 +97,14 @@ export class NgDiagramBaseEdgeComponent {
     // Generate SVG path from points using the routing
     const points = this.points();
     if (points.length === 0) return '';
+
+    const hasInvalidPoints = points.some((p) => !isValidPosition(p));
+    if (hasInvalidPoints) {
+      console.error(
+        INVALID_EDGE_COORDINATES_ERROR(edge.id, edge.source, edge.sourcePort, edge.target, edge.targetPort)
+      );
+      return '';
+    }
 
     if (routingName && flowCore.edgeRoutingManager.hasRouting(routingName)) {
       const path = flowCore.edgeRoutingManager.computePath(routingName, points);

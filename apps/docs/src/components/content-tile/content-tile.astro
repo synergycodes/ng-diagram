@@ -1,0 +1,30 @@
+---
+export type Props = {
+  title: string;
+  description: string;
+  href: string;
+  navigationTitle: string;
+  image: string;
+  imageAlt?: string;
+  openInNewTab?: boolean;
+}
+
+export type ContentTile = Omit<Props, 'openInNewTab' | 'navigationTitle'>;
+
+const { title, description, href, navigationTitle, image, imageAlt = title, openInNewTab = false } = Astro.props;
+const targetAttr = openInNewTab ? '_blank' : undefined;
+const relAttr = openInNewTab ? 'noopener noreferrer' : undefined;
+---
+
+<a href={href} class="content-tile" target={targetAttr} rel={relAttr}>
+  <div class="content-tile-image">
+    <img src={image} alt={imageAlt} />
+  </div>
+  <div class="content-tile-content">
+    <h4>{title}</h4>
+    <p class="content-tile-description">{description}</p>
+    <span class="content-tile-link">
+      {`${navigationTitle} →`}
+    </span>
+  </div>
+</a>

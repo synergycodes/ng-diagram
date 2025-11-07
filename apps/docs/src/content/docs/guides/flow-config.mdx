@@ -1,0 +1,119 @@
+---
+title: 'Global Configuration'
+slug: 'guides/configuration'
+sidebar:
+  label: 'Global Configuration'
+  order: 3
+---
+
+The configuration system in ngDiagram is the central mechanism for customizing and orchestrating the behavior, appearance, and interaction logic of your diagrams.
+
+It empowers developers to fine-tune many aspects of the diagram engine.
+
+## What is the Configuration?
+
+The configuration (commonly referred to as `config`) is a comprehensive object that defines how your diagram should behave and look.
+
+It encapsulates all available options for the diagram engine, allowing you to:
+
+- **Shape the user experience**: Control zoom, selection, snapping, and more.
+- **Customize visuals**: Adjust backgrounds, z-index layering, and node/edge behaviors.
+- **Enable advanced behaviors**: Configure routing algorithms, grouping, resizing, and keyboard shortcuts.
+
+By leveraging the configuration, you gain full control over the diagram's capabilities, ensuring it fits seamlessly into your application's requirements.
+
+## How to Initialize the Configuration
+
+To initialize the configuration, define a `config` object in your Angular component using the [NgDiagramConfig](/docs/api/types/ngdiagramconfig/) type.
+Only specify the properties you wish to override; all others will use sensible defaults.
+
+```typescript
+import { NgDiagramConfig } from 'ng-diagram';
+
+const config: NgDiagramConfig = {
+  zoom: { max: 3 },
+  edgeRouting: { defaultRouting: 'bezier' },
+};
+```
+
+Assign the configuration to the `<ng-diagram>` component using the `[config]` input:
+
+```html
+<ng-diagram [model]="model" [config]="config" />
+```
+
+## Configuration Type
+
+ngDiagram uses the [NgDiagramConfig](/docs/api/types/ngdiagramconfig/) type, which is a `DeepPartial` of [FlowConfig](/docs/api/types/flowconfig/).
+
+This means every property is optional, and you can override only what you need.
+
+## Signals in Configuration
+
+The configuration is exposed as a **readonly signal** via [NgDiagramService.config](/docs/api/services/ngdiagramservice/#config).
+
+This enables reactive programming patterns—your UI can automatically respond to configuration changes, and you can subscribe to updates for advanced scenarios.
+
+## Updating Configuration at Runtime
+
+ngDiagram supports dynamic configuration updates.
+If your application allows users to change diagram settings (e.g., toggling grid snapping, switching routing algorithms), you can update the config reactively using the [NgDiagramService](/docs/api/services/ngdiagramservice/):
+
+```typescript
+private ngDiagramService = inject(NgDiagramService);
+
+// Update configuration dynamically
+this.ngDiagramService.updateConfig({ zoom: { step: 0.1 } });
+```
+
+The configuration changes are immediately reflected in the diagram UI.
+
+## Main Configuration Categories
+
+ngDiagram's configuration is organized into logical categories, each controlling a specific aspect of the diagram engine.
+
+The most important categories include:
+
+- **background**: Configures background visuals (grid, dot spacing, cell size).
+- **boxSelection**: Configures box selection behavior.
+- **debugMode**: Enables verbose logging for development and debugging.
+- **edgeRouting**: Defines edge routing algorithms and their parameters.
+- **grouping**: Enables node grouping and related logic.
+- **linking**: Customizes edge creation and connection validation.
+- **nodeRotation**: Enables and customizes node rotation and snapping.
+- **resize**: Manages node resizing logic, minimum sizes, and resizability.
+- **shortcuts**: Defines keyboard shortcuts for diagram actions.
+- **snapping**: Controls snapping for node movement and resizing.
+- **zIndex**: Manages layering and stacking order of diagram elements.
+- **zoom**: Controls zooming behavior, limits, and zoom-to-fit options.
+
+For detailed options and advanced usage, refer to the documentation for each category in [FlowConfig](/docs/api/types/flowconfig/).
+
+## Example
+
+```typescript
+const config: NgDiagramConfig = {
+  zoom: {
+    max: 4,
+    zoomToFit: { onInit: true, padding: 100 },
+  },
+  background: {
+    dotSpacing: 30,
+  },
+  edgeRouting: {
+    defaultRouting: 'bezier',
+    bezier: { bezierControlOffset: 50 },
+  },
+  resize: {
+    defaultResizable: false,
+    getMinNodeSize: () => ({ width: 50, height: 50 }),
+  },
+  debugMode: true,
+};
+```
+
+## Further Reading
+
+[NgDiagramConfig →](/docs/api/types/ngdiagramconfig/) | [FlowConfig →](/docs/api/types/flowconfig/) | [NgDiagramService →](/docs/api/services/ngdiagramservice/) | [NgDiagramComponent →](/docs/api/components/ngdiagramcomponent/)
+
+---

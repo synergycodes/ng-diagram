@@ -2,16 +2,28 @@ import type { Edge } from './edge.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
 
+/**
+ * Interface representing a snapshot of the diagram model state.
+ *
+ * This read-only interface is provided by the library when the model changes.
+ * It contains the complete current state of nodes, edges, and metadata.
+ * Typically received in `onChange` callbacks to observe model updates.
+ *
+ * @category Types/Model
+ */
 export interface ModelChanges {
+  /** Current array of all nodes in the diagram. */
   nodes: Node[];
+  /** Current array of all edges in the diagram. */
   edges: Edge[];
+  /** Current metadata associated with the diagram. */
   metadata: Metadata;
 }
 
 /**
  * Interface for model adapters that handle the data management of a flow diagram
  *
- * @category Types
+ * @category Types/Model
  */
 export interface ModelAdapter {
   /**

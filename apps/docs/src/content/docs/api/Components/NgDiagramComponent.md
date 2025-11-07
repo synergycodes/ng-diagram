@@ -14,9 +14,20 @@ Diagram component
 
 ## Properties
 
+### clipboardPasted
+
+> **clipboardPasted**: `EventEmitter`\<[`ClipboardPastedEvent`](/docs/api/types/events/clipboardpastedevent/)\>
+
+Event emitted when clipboard content is pasted into the diagram.
+
+This event fires when nodes and edges are added via paste operations,
+either through keyboard shortcuts or programmatic paste commands.
+
+***
+
 ### config
 
-> **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<[`FlowConfig`](/docs/api/types/flowconfig/)\>\>
+> **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<[`FlowConfig`](/docs/api/types/configuration/flowconfig/)\>\>
 
 Global configuration options for the diagram.
 
@@ -24,32 +35,49 @@ Global configuration options for the diagram.
 
 ### diagramInit
 
-> **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/types/diagraminitevent/)\>
+> **diagramInit**: `EventEmitter`\<[`DiagramInitEvent`](/docs/api/types/events/diagraminitevent/)\>
 
-Event emitted when the diagram is initialized and all nodes and edges including their internal parts are measured
+Event emitted when the diagram initialization is complete.
+
+This event fires after all nodes and edges including their internal parts
+(ports, labels) have been measured and positioned.
 
 ***
 
 ### edgeDrawn
 
-> **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/types/edgedrawnevent/)\>
+> **edgeDrawn**: `EventEmitter`\<[`EdgeDrawnEvent`](/docs/api/types/events/edgedrawnevent/)\>
 
-Event emitted when a user manually draws an edge between two nodes
+Event emitted when a user manually draws an edge between two nodes.
+
+This event only fires for user-initiated edge creation through the UI,
+but not for programmatically added edges.
 
 ***
 
 ### edgeTemplateMap
 
-> **edgeTemplateMap**: `InputSignal`\<[`NgDiagramEdgeTemplateMap`](/docs/api/types/ngdiagramedgetemplatemap/)\>
+> **edgeTemplateMap**: `InputSignal`\<[`NgDiagramEdgeTemplateMap`](/docs/api/types/templates/ngdiagramedgetemplatemap/)\>
 
 The edge template map to use for the diagram.
 Optional - if not provided, default edge rendering will be used.
 
 ***
 
+### groupMembershipChanged
+
+> **groupMembershipChanged**: `EventEmitter`\<[`GroupMembershipChangedEvent`](/docs/api/types/events/groupmembershipchangedevent/)\>
+
+Event emitted when nodes are grouped or ungrouped.
+
+This event fires when the user moves nodes in or out of a group node,
+changing their group membership status.
+
+***
+
 ### middlewares
 
-> **middlewares**: `InputSignal`\<[`MiddlewareChain`](/docs/api/types/middlewarechain/)\>
+> **middlewares**: `InputSignal`\<[`MiddlewareChain`](/docs/api/types/middleware/middlewarechain/)\>
 
 Optional — the initial middlewares to use.
 When provided, the middleware list can be modified to add new items,
@@ -62,47 +90,100 @@ can degrade performance or completely break the data flow.
 
 ### model
 
-> **model**: `InputSignal`\<[`ModelAdapter`](/docs/api/types/modeladapter/)\>
+> **model**: `InputSignal`\<[`ModelAdapter`](/docs/api/types/model/modeladapter/)\>
 
 The model to use in the diagram.
 
 ***
 
+### nodeResized
+
+> **nodeResized**: `EventEmitter`\<[`NodeResizedEvent`](/docs/api/types/events/noderesizedevent/)\>
+
+Event emitted when a node or group size changes.
+
+This event fires when a node is resized manually by dragging resize handles
+or programmatically using resize methods.
+
+***
+
 ### nodeTemplateMap
 
-> **nodeTemplateMap**: `InputSignal`\<[`NgDiagramNodeTemplateMap`](/docs/api/types/ngdiagramnodetemplatemap/)\>
+> **nodeTemplateMap**: `InputSignal`\<[`NgDiagramNodeTemplateMap`](/docs/api/types/templates/ngdiagramnodetemplatemap/)\>
 
 The node template map to use for the diagram.
 
 ***
 
+### paletteItemDropped
+
+> **paletteItemDropped**: `EventEmitter`\<[`PaletteItemDroppedEvent`](/docs/api/types/events/paletteitemdroppedevent/)\>
+
+Event emitted when a palette item is dropped onto the diagram.
+
+This event fires when users drag items from the palette and drop them
+onto the canvas to create new nodes.
+
+***
+
 ### selectionChanged
 
-> **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/types/selectionchangedevent/)\>
+> **selectionChanged**: `EventEmitter`\<[`SelectionChangedEvent`](/docs/api/types/events/selectionchangedevent/)\>
 
-Event emitted when selection changes
+Event emitted when the selection state changes in the diagram.
+
+This event fires when the user selects or deselects nodes and edges through
+clicking or programmatically using the `NgDiagramSelectionService`.
 
 ***
 
 ### selectionMoved
 
-> **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/selectionmovedevent/)\>
+> **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/events/selectionmovedevent/)\>
 
-Event emitted when selected nodes are moved
+Event emitted when selected nodes are moved within the diagram.
+
+This event fires when the user moves nodes manually by dragging or
+programmatically using the `NgDiagramNodeService.moveNodesBy()` method.
+
+***
+
+### selectionRemoved
+
+> **selectionRemoved**: `EventEmitter`\<[`SelectionRemovedEvent`](/docs/api/types/events/selectionremovedevent/)\>
+
+Event emitted when selected elements are deleted from the diagram.
+
+This event fires when the user deletes nodes and edges using the delete key,
+or programmatically through the diagram service.
+
+***
+
+### selectionRotated
+
+> **selectionRotated**: `EventEmitter`\<[`SelectionRotatedEvent`](/docs/api/types/events/selectionrotatedevent/)\>
+
+Event emitted when a node is rotated in the diagram.
+
+This event fires when the user rotates a node manually using the rotation handle
+or programmatically using the `NgDiagramNodeService` rotation methods.
 
 ***
 
 ### viewportChanged
 
-> **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/viewportchangedevent/)\>
+> **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/events/viewportchangedevent/)\>
 
-Event emitted when viewport changes (pan/zoom)
+Event emitted when the viewport changes through panning or zooming.
+
+This event fires during pan and zoom operations, including mouse wheel zoom,
+and programmatic viewport changes.
 
 ## Methods
 
 ### getNodeTemplate()
 
-> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/ngdiagramgroupnodetemplate/)\<`any`\>\>
+> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/model/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate/)\<`any`\>\>
 
 Retrieves the custom Angular component template for rendering a specific node type.
 
@@ -120,7 +201,7 @@ The type identifier of the node to get a template for.
 
 #### Returns
 
-`null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/ngdiagramgroupnodetemplate/)\<`any`\>\>
+`null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/model/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate/)\<`any`\>\>
 
 The Angular component class registered for the node type, or
 null if no custom template is registered for this type
@@ -142,7 +223,7 @@ const dbTemplate = this.getNodeTemplate('database'); // Returns DatabaseNodeComp
 #### See
 
  - [nodeTemplateMap](/docs/api/components/ngdiagramcomponent/#nodetemplatemap) - The input property where templates are registered
- - [NgDiagramNodeTemplateMap](/docs/api/types/ngdiagramnodetemplatemap/) - Type definition for the template map
+ - [NgDiagramNodeTemplateMap](/docs/api/types/templates/ngdiagramnodetemplatemap/) - Type definition for the template map
 
 #### Throws
 

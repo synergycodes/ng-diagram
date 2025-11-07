@@ -17,3 +17,17 @@ The `NgDiagramNodeResizeAdornmentComponent` displays resize handles and lines ar
 ## Extends
 
 - `NodeContextGuardBase`
+
+## Properties
+
+### defaultResizable
+
+> **defaultResizable**: `InputSignal`\<`undefined` \| `boolean`\>
+
+Whether the node is resizable.
+
+#### Default
+
+```ts
+undefined
+```

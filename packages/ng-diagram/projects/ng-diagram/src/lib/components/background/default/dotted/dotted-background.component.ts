@@ -13,7 +13,7 @@ export class DottedBackgroundComponent extends BackgroundPatternBase {
 
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
-  dotSize = computed(() => {
-    return this.flowCoreService.isInitialized() ? this.flowCoreService.provide().config.background.dotSize : 0;
+  dotSpacing = computed(() => {
+    return this.flowCoreService.isInitialized() ? this.flowCoreService.provide().config.background.dotSpacing : 0;
   });
 }

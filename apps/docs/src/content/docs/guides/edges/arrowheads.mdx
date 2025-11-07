@@ -5,15 +5,17 @@ sidebar:
   order: 4
 ---
 
-import CodeSnippet from '@components/code-snippet/code-snippet.astro';
-import DefaultArrowhead from '@components/angular/edges/arrowheads/default-arrowhead/default-arrowhead.astro';
 import CustomArrowhead from '@components/angular/edges/arrowheads/custom-arrowhead/custom-arrowhead.astro';
+import DefaultArrowhead from '@components/angular/edges/arrowheads/default-arrowhead/default-arrowhead.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Arrowheads in NgDiagram are visual markers that indicate the start or end of the edge. They are implemented using SVG markers and can be applied to either the source end (`sourceArrowhead`) or target end (`targetArrowhead`) of an edge.
 
 ## Default Arrowhead
 
-NgDiagram provides a built-in arrowhead called `ng-diagram-arrow` that can be used out of the box. This default arrowhead is a simple triangular arrow that adapts to the edge's stroke color.
+NgDiagram provides a built-in arrowhead called `ng-diagram-arrow` that can be used out of the box. This default arrowhead is an outlined arrow with rounded edges that adapts to the edge's stroke color.
+
+<br />
 
 <DefaultArrowhead />
 
@@ -24,6 +26,8 @@ To use the default arrowhead, specify it in your edge configuration:
 ## Custom Arrowhead
 
 You can create custom arrowheads by defining SVG markers with unique IDs. Custom arrowheads allow you to create distinctive visual styles that match your application's design requirements.
+
+<br />
 
 <CustomArrowhead />
 

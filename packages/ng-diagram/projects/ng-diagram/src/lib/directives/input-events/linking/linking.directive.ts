@@ -1,5 +1,5 @@
 import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
-import { Node } from '../../../../core/src';
+import { FPS_60, NgDiagramMath, Node, Point } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { PointerInputEvent } from '../../../types';
@@ -17,6 +17,7 @@ export class LinkingInputDirective implements OnDestroy {
   private readonly flowCoreProviderService = inject(FlowCoreProviderService);
 
   private target = signal<Node | undefined>(undefined);
+  private edgePanningInterval: number | null = null;
 
   portId = input.required<string>();
 
@@ -29,10 +30,10 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
-    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
-      this.target.set(undefined);
+    if (!this.shouldHandle($event)) {
       return;
     }
+
     $event.linkingHandled = true;
 
     document.addEventListener('pointermove', this.onPointerMove);
@@ -42,7 +43,29 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
-    this.linkingEventService.emitContinue($event, this.target(), this.portId());
+    const { edgePanningThreshold, edgePanningEnabled, edgePanningForce } =
+      this.flowCoreProviderService.provide().config.linking;
+    const flowCore = this.flowCoreProviderService.provide();
+
+    let panningForce: Point | null = null;
+    if (edgePanningEnabled) {
+      const { width, height } = flowCore.getViewport();
+      const { x, y } = flowCore.getFlowOffset();
+      const boundingRect = { x, y, width: width ?? 0, height: height ?? 0 };
+      panningForce = NgDiagramMath.calculateEdgePanningForce(
+        boundingRect,
+        { x: $event.clientX, y: $event.clientY },
+        edgePanningThreshold,
+        edgePanningForce
+      );
+      if (panningForce) {
+        this.startEdgePanning($event, panningForce);
+      } else {
+        this.stopEdgePanning();
+      }
+    }
+
+    this.linkingEventService.emitContinue($event, this.target(), this.portId(), panningForce);
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
@@ -50,8 +73,33 @@ export class LinkingInputDirective implements OnDestroy {
     this.cleanup();
   };
 
+  private shouldHandle(event: PointerInputEvent) {
+    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
+      this.target.set(undefined);
+      return false;
+    }
+
+    return !event.boxSelectionHandled;
+  }
+
   private cleanup() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    this.stopEdgePanning();
+  }
+
+  private startEdgePanning($event: PointerInputEvent, panningForce: Point | null): void {
+    this.stopEdgePanning();
+
+    this.edgePanningInterval = window.setInterval(() => {
+      this.linkingEventService.emitContinue($event, this.target(), this.portId(), panningForce);
+    }, FPS_60);
+  }
+
+  private stopEdgePanning(): void {
+    if (this.edgePanningInterval != null) {
+      window.clearInterval(this.edgePanningInterval);
+      this.edgePanningInterval = null;
+    }
   }
 }

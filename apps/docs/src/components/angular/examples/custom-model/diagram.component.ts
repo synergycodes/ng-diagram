@@ -15,7 +15,11 @@ export class DiagramComponent {
   private modelService = inject(NgDiagramModelService);
 
   config: NgDiagramConfig = {
-    edgeRouting: { defaultRouting: 'orthogonal' },
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
+    },
   };
 
   modelAdapter: LocalStorageModelAdapter = new LocalStorageModelAdapter(
@@ -79,7 +83,6 @@ export class DiagramComponent {
           data: {},
         },
       ],
-      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
     };
   }
 }

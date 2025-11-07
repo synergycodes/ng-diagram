@@ -1,6 +1,6 @@
 // @collapse-start
 import { Component, computed, inject, output, signal } from '@angular/core';
-import { NgDiagramModelService } from 'ng-diagram';
+import { NgDiagramModelService, type Model } from 'ng-diagram';
 import { SaveStateService } from '../save.service';
 // @collapse-end
 
@@ -22,8 +22,7 @@ import { SaveStateService } from '../save.service';
 })
 export class NavBarComponent {
   // @collapse-start
-  //TODO - change any type to the correct one
-  loadModel = output<any>();
+  loadModel = output<Partial<Model>>();
 
   private readonly saveStateService = inject(SaveStateService);
   private readonly modelService = inject(NgDiagramModelService);

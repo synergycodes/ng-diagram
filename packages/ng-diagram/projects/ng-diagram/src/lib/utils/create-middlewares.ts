@@ -2,6 +2,7 @@ import {
   edgesRoutingMiddleware,
   internalIdMiddleware,
   loggerMiddleware,
+  measuredBoundsMiddleware,
   MiddlewareChain,
   zIndexMiddleware,
 } from '../../core/src';
@@ -10,6 +11,7 @@ export const BUILTIN_MIDDLEWARES = [
   internalIdMiddleware,
   zIndexMiddleware,
   edgesRoutingMiddleware,
+  measuredBoundsMiddleware,
   loggerMiddleware,
 ] as const satisfies MiddlewareChain;
 
@@ -19,6 +21,7 @@ export const BUILTIN_MIDDLEWARES = [
  * This type is used as the default for the `createMiddlewares` factory and as the base type for customizing
  * or extending the middleware chain in your application.
  *
+ * @category Types/Utilities
  * @internal
  */
 export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;
@@ -32,6 +35,8 @@ export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;
  * @returns The modified middleware chain
  *
  * Use with extreme caution - incorrectly modifying required middlewares can break the library
+ *
+ * @category Utilities
  */
 export function createMiddlewares<TMiddlewares extends MiddlewareChain = AppMiddlewares>(
   middlewares: (defaults: AppMiddlewares) => TMiddlewares

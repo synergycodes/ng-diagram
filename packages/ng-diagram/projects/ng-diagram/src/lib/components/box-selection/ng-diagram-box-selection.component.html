@@ -1,0 +1,9 @@
+@let boundingBox = this.boxSelectionProvider.boundingBox();
+@if (boundingBox) {
+  <div
+    [style.left.px]="boundingBox.x"
+    [style.top.px]="boundingBox.y"
+    [style.width.px]="boundingBox.width"
+    [style.height.px]="boundingBox.height"
+  ></div>
+}

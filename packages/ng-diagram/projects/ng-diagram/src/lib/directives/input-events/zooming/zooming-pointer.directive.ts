@@ -1,6 +1,7 @@
-import { Directive, inject } from '@angular/core';
+import { Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { PointerInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramZoomingPointer]',
@@ -11,68 +12,69 @@ import { InputEventsRouterService } from '../../../services/input-events/input-e
     '(touchmove)': 'onTouchMove($event)',
   },
 })
-export class ZoomingPointerDirective {
-  static IsZoomingPointer = false;
-
+export class ZoomingPointerDirective implements OnInit, OnDestroy {
+  private readonly elementRef = inject(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouterService = inject(InputEventsRouterService);
 
   private touchCache: Touch[] = [];
   private lastDistance?: number;
 
-  onTouchStart(event: TouchEvent) {
-    ZoomingPointerDirective.IsZoomingPointer = true;
+  ngOnInit(): void {
+    this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
+    this.elementRef.nativeElement.addEventListener('pointermove', this.onPointerEventCapture, { capture: true });
+  }
 
-    // Add new touches to cache
+  ngOnDestroy(): void {
+    this.elementRef.nativeElement.removeEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
+    this.elementRef.nativeElement.removeEventListener('pointermove', this.onPointerEventCapture, { capture: true });
+  }
+
+  private onPointerEventCapture = (event: PointerInputEvent): void => {
+    if (this.touchCache.length >= 2) {
+      event.zoomingHandled = true;
+    }
+  };
+
+  onTouchStart(event: TouchEvent) {
     for (const touch of event.changedTouches) {
       this.touchCache.push(touch);
     }
 
-    // Initialize distance when we have exactly 2 touches
     if (this.touchCache.length === 2) {
       this.lastDistance = this.computeDistance();
     }
   }
 
   onTouchEnd(event: TouchEvent) {
-    ZoomingPointerDirective.IsZoomingPointer = false;
-
-    // Remove ended touches from cache
     for (const touch of event.changedTouches) {
       this.removeTouchFromCache(touch);
     }
 
-    // Reset when we don't have 2 touches anymore
     if (this.touchCache.length < 2) {
       this.lastDistance = undefined;
+      this.touchCache = [];
     }
   }
 
   onTouchMove(event: TouchEvent) {
-    ZoomingPointerDirective.IsZoomingPointer = true;
-
-    // Update cache with moved touches
     for (const touch of event.changedTouches) {
       this.updateTouchInCache(touch);
     }
 
-    // Only zoom with exactly 2 touches and valid last distance
     if (this.touchCache.length !== 2 || this.lastDistance === undefined) {
       return;
     }
 
     const flow = this.flowCoreProvider.provide();
 
-    // Calculate current center and distance
     const centerX = (this.touchCache[0].clientX + this.touchCache[1].clientX) / 2;
     const centerY = (this.touchCache[0].clientY + this.touchCache[1].clientY) / 2;
     const currentDistance = this.computeDistance();
 
-    // Calculate zoom factor based on distance change
     const distanceRatio = currentDistance / this.lastDistance;
     const zoomFactor = Math.min(Math.max(1 - flow.config.zoom.step, distanceRatio), 1 + flow.config.zoom.step);
 
-    // Update for next iteration
     this.lastDistance = currentDistance;
 
     const baseEvent = this.inputEventsRouterService.getBaseEvent(event);

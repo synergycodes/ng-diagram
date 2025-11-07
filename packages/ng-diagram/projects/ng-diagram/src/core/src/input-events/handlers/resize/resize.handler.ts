@@ -20,7 +20,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
             startHeight: node.size.height,
             startNodePositionX: node.position.x,
             startNodePositionY: node.position.y,
-            draggingNode: node,
+            resizingNode: node,
           };
         }
 

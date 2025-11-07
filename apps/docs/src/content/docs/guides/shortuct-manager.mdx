@@ -1,0 +1,147 @@
+---
+title: Keyboard Shortcuts
+description: Learn how to customize and use keyboard shortcuts in ngDiagram
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ShortcutManager from '../../../components/angular/shortcut-manager/shortcut-manager.astro';
+
+The keyboard shortcuts system in ngDiagram lets users perform common actions quickly using customizable key combinations.
+It supports platform-specific modifier keys (automatically handling Ctrl/Cmd differences), multiple shortcuts per action, and dynamic runtime updates.
+
+## Available Actions
+
+All available shortcut actions with their default key bindings. See [`ShortcutActionName`](/docs/api/types/shortcutactionname/) for the complete type reference.
+
+| Action                       | Default Shortcut                          | Description                                                                 |
+| ---------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `copy`                       | <kbd>Ctrl/Cmd + C</kbd>                   | Copy selected elements to clipboard                                         |
+| `cut`                        | <kbd>Ctrl/Cmd + X</kbd>                   | Cut selected elements to clipboard                                          |
+| `paste`                      | <kbd>Ctrl/Cmd + V</kbd>                   | Paste elements from clipboard                                               |
+| `deleteSelection`            | <kbd>Delete</kbd> or <kbd>Backspace</kbd> | Delete currently selected elements                                          |
+| `selectAll`                  | <kbd>Ctrl/Cmd + A</kbd>                   | Select all elements in the diagram                                          |
+| `boxSelection`               | <kbd>Shift</kbd> held                     | Enable box selection mode (pointer only)                                    |
+| `multiSelection`             | <kbd>Ctrl/Cmd</kbd> held                  | Multi-selection mode (pointer only)                                         |
+| `keyboardMoveSelectionUp`    | <kbd>↑</kbd>                              | Move selected elements up                                                   |
+| `keyboardMoveSelectionDown`  | <kbd>↓</kbd>                              | Move selected elements down                                                 |
+| `keyboardMoveSelectionLeft`  | <kbd>←</kbd>                              | Move selected elements left                                                 |
+| `keyboardMoveSelectionRight` | <kbd>→</kbd>                              | Move selected elements right                                                |
+| `keyboardPanUp`              | <kbd>↑</kbd>                              | Pan viewport up                                                             |
+| `keyboardPanDown`            | <kbd>↓</kbd>                              | Pan viewport down                                                           |
+| `keyboardPanLeft`            | <kbd>←</kbd>                              | Pan viewport left                                                           |
+| `keyboardPanRight`           | <kbd>→</kbd>                              | Pan viewport right                                                          |
+| `undo`                       | <kbd>Ctrl/Cmd + Z</kbd>                   | Undo last action (not implemented by default; requires custom model)        |
+| `redo`                       | <kbd>Ctrl/Cmd + Y</kbd>                   | Redo last undone action (not implemented by default; requires custom model) |
+
+## Basic Usage
+
+To override, disable, or extend default shortcuts, use the `configureShortcuts()` helper:
+
+```typescript
+import { configureShortcuts } from 'ng-diagram';
+
+const config = {
+  shortcuts: configureShortcuts([
+    // Override: Change paste to Ctrl+B
+    {
+      actionName: 'paste',
+      bindings: [{ key: 'b', modifiers: { primary: true } }],
+    },
+    // Disable: Empty bindings array
+    {
+      actionName: 'undo',
+      bindings: [],
+    },
+    // Multiple bindings: WSAD + Arrow keys
+    {
+      actionName: 'keyboardMoveSelectionUp',
+      bindings: [{ key: 'w' }, { key: 'ArrowUp' }],
+    },
+  ]),
+};
+```
+
+You can also merge custom shortcuts with existing ones at runtime:
+
+```typescript
+// Get current shortcuts from the service
+const currentShortcuts = ngDiagramService.config().shortcuts;
+
+// Merge custom shortcuts with existing ones
+const updatedShortcuts = configureShortcuts(
+  [
+    {
+      actionName: 'paste',
+      bindings: [{ key: 'b', modifiers: { primary: true } }],
+    },
+  ],
+  currentShortcuts // Pass existing shortcuts as base
+);
+
+// Update the configuration
+ngDiagramService.updateConfig({ shortcuts: updatedShortcuts });
+```
+
+[`configureShortcuts(customShortcuts, baseShortcuts?)`](/docs/api/other/configureshortcuts/) merges your custom shortcuts with defaults:
+
+- **First parameter:** Custom shortcuts (overrides actions with matching `actionName`)
+- **Second parameter:** Optional base shortcuts. Defaults are used if omitted.
+- **Returns:** A merged shortcuts array
+
+Unspecified actions retain their existing shortcuts.
+
+## Configuration Reference
+
+### Shortcut Structure
+
+Keyboard and pointer shortcuts in ngDiagram are defined through the ShortcutDefinition interface.
+A shortcut definition maps an action name to one or more key bindings (keyboard or modifier-only combinations).
+
+Each shortcut may include:
+
+- **One or more keyboard bindings** (e.g., <kbd>Ctrl</kbd> + <kbd>C</kbd>)
+- **Or one or more modifier-only bindings** (e.g., <kbd>Shift</kbd> + click for box selection)
+
+See [`ShortcutDefinition`](/docs/api/other/shortcutdefinition/) API reference.
+
+### Available Modifiers
+
+```typescript
+interface InputModifiers {
+  primary: boolean; // Ctrl (Windows/Linux) OR Cmd (macOS) - auto-normalized
+  secondary: boolean; // Alt key
+  shift: boolean; // Shift key
+  meta: boolean; // Windows key or Cmd key
+}
+```
+
+**Platform normalization:**
+
+The `primary` modifier automatically maps to **Ctrl** on Windows/Linux and **Cmd** on macOS,
+allowing you to define shortcuts once that work seamlessly across platforms.
+
+### Key Names
+
+Use standard browser key names: `'a'`, `'b'`, `'Delete'`, `'Backspace'`, `'ArrowUp'`, `'ArrowDown'`, `'ArrowLeft'`, `'ArrowRight'`, etc. Keys are case-sensitive.
+
+See [MDN KeyboardEvent.key documentation](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values) for the complete list of valid key values.
+
+### Modifier-Only Shortcuts
+
+Modifier-only shortcuts (bindings without a `key`) are used for pointer-based interactions,
+such as holding <kbd>Shift</kbd> for box selection.
+
+```typescript
+{
+  modifiers: {
+    shift: true,
+  }
+} // Matches when Shift held during click
+```
+
+These shortcuts ensure that typing keys won't accidentally trigger diagram actions.
+
+## Example
+
+<ShortcutManager />
+<CodeViewer dirName="shortcut-manager" />

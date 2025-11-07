@@ -6,8 +6,8 @@ sidebar:
 ---
 
 You can create custom group templates, similar to custom nodes.
-All you need to do is implement a component that extends `NgDiagramGroupNodeTemplate` and register it in the `nodeTemplateMap` with a unique `type`.
-Remember that in your diagram model, the group node must have `isGroup: true` set to function as a group.
+All you need to do is implement a component that extends [`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate) and register it in the [`nodeTemplateMap`](/docs/api/types/templates/ngdiagramnodetemplatemap) with a unique [`type`](/docs/api/types/model/simplenode#type).
+Remember that in your diagram model, the group node must have [`isGroup: true`](/docs/api/types/model/groupnode#isgroup) set to function as a group.
 
 ```typescript {22}
 import { Component, input } from '@angular/core';
@@ -36,7 +36,7 @@ export class CustomGroupComponent implements NgDiagramGroupNodeTemplate {
 }
 ```
 
-Register your custom group in the `nodeTemplateMap` and assign its `type` to the group node.
+Register your custom group in the [`nodeTemplateMap`](/docs/api/types/templates/ngdiagramnodetemplatemap) and assign its [`type`](/docs/api/types/model/simplenode#type) to the group node.
 
 [Registering Custom Types →](/docs/guides/nodes/custom-nodes/#registration)
 
@@ -46,7 +46,7 @@ For more information on resizing, see [Resizing →](/docs/guides/nodes/resizing
 
 ## Highlighting Custom Group
 
-Use `NgDiagramGroupHighlightedDirective` for highlight styles.
+Use [`NgDiagramGroupHighlightedDirective`](/docs/api/directives/ngdiagramgrouphighlighteddirective) for highlight styles.
 
 ```html
 <div ngDiagramGroupHighlighted [node]="node()">
@@ -56,7 +56,7 @@ Use `NgDiagramGroupHighlightedDirective` for highlight styles.
 
 ## Selecting Custom Group
 
-Use `NgDiagramNodeSelectedDirective` for selection styles.
+Use [`NgDiagramNodeSelectedDirective`](/docs/api/directives/ngdiagramnodeselecteddirective) for selection styles.
 
 ```html
 <div ngDiagramNodeSelected [node]="node()">

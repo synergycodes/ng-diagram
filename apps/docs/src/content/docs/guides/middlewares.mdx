@@ -19,6 +19,13 @@ Middlewares execute in sequence, with each middleware receiving the output of th
 
 ## Middleware API
 
+### Middleware Action Types
+
+The `ModelActionType` type lists all possible actions that can trigger middleware execution.
+These represent every operation that modifies the diagram state, such as adding nodes, moving elements, deleting selections, resizing, linking, rotating, and more.
+
+[Refer to the source for the full list →](/docs/api/types/middleware/modelactiontype/)
+
 ### Middleware Interface
 
 Each middleware implements the `Middleware` interface:
@@ -34,25 +41,63 @@ interface Middleware<TName extends string = string> {
 }
 ```
 
-### Context and Helpers
+### Middleware Context
 
-The **context** provides access to the current state, configuration, and metadata about what triggered the change. Key properties include:
+The **context** object passed to middleware functions provides comprehensive access to the diagram state and metadata:
 
-- `state` - Current diagram state with nodes, edges, and metadata.
-- `modelActionType` - What action triggered this middleware (e.g., 'addNode', 'moveNodes').
-- `nodesMap`/`edgesMap` - Maps of nodes and edges by ID for quick lookup. Lookup is updated after each middleware.
-- `config` - Current diagram configuration.
-- `helpers` - Utility functions for checking what changed.
+- `initialState` – The state before any modifications
+- `state` – The current state after all previous modifications.
+- `nodesMap` / `edgesMap` – Maps for quick lookup of nodes and edges by ID
+- `initialNodesMap` / `initialEdgesMap` – Maps for accessing nodes/edges before any changes
+- `modelActionType` – The action that triggered the middleware.
+- `helpers` – Utility functions for inspecting what changed
+- `history` – Array of all state updates made by previous middlewares in the chain.
+- `actionStateManager` – Manager for temporary action states.
+- `edgeRoutingManager` – Manager for edge routing algorithms.
+- `initialUpdate` – The initial state update that triggered the middleware chain.
+- `config` – Current diagram configuration.
+- `environment` – Environment information (browser, rendering engine, etc.).
 
-There are also more specialized properties depending on the action type, such as access to ActionStateManager, which provides temporary state for actions like resizing or linking.
+### Middleware Helpers
 
-The **helpers** object provides convenient methods to inspect changes:
+The `helpers` object provides optimized functions to inspect all cumulative changes from the initial update and previous middlewares:
 
-- `helpers.anyNodesAdded()` - Check if any nodes were added
-- `helpers.checkIfNodeChanged(id)` - Check if specific node was modified
-- `helpers.checkIfAnyNodePropsChanged(['position', 'size'])` - Check if any node had specific properties changed
+- `checkIfNodeChanged(id)` – Was this node modified?
+- `checkIfEdgeChanged(id)` – Was this edge modified?
+- `checkIfNodeAdded(id)` / `checkIfNodeRemoved(id)` – Was this node added/removed?
+- `checkIfEdgeAdded(id)` / `checkIfEdgeRemoved(id)` – Was this edge added/removed?
+- `checkIfAnyNodePropsChanged(['prop1', 'prop2'])` – Did any node have these properties changed?
+- `checkIfAnyEdgePropsChanged(['prop1', 'prop2'])` – Did any edge have these properties changed?
+- `anyNodesAdded()` / `anyEdgesAdded()` – Were any nodes/edges added?
+- `anyNodesRemoved()` / `anyEdgesRemoved()` – Were any nodes/edges removed?
+- `getAffectedNodeIds(['prop1', 'prop2'])` – Get IDs of nodes with specified properties changed.
+- `getAffectedEdgeIds(['prop1', 'prop2'])` – Get IDs of edges with specified properties changed.
+- `getAddedNodes()` / `getAddedEdges()` – Get instances of added nodes/edges.
+- `getRemovedNodes()` / `getRemovedEdges()` – Get instances of removed nodes/edges (from initial state).
 
-Use **`next()`** to continue to the next middleware, optionally passing state updates. Use **`cancel()`** to abort the operation entirely.
+These helpers allow you to efficiently check what changed during the middleware execution chain.
+
+#### Example: Using Helpers
+
+```typescript
+// Example with a middleware that checks if any node was added into a group
+export const myMiddleware: Middleware = {
+  name: 'group-node-checker',
+  execute: async (context, next) => {
+    const { helpers } = context;
+    if (helpers.checkIfAnyNodePropsChanged(['groupId']).length > 0) {
+      const affectedNodeIds = helpers.getAffectedNodeIds(['groupId']);
+      console.log('Nodes were added to groups:', affectedNodeIds);
+    }
+
+    next(); // Continue to next middleware
+  },
+};
+```
+
+### Middleware History
+
+The `history` array in the context tracks all state updates made by previous middlewares, including the name of the middleware and the specific state update applied. This is useful for auditing or debugging complex middleware chains.
 
 ## Managing Middlewares
 
@@ -160,7 +205,23 @@ For a complete example of creating custom middleware, see the [Custom Middleware
 
 #### Modifying State
 
-Middlewares can modify the state by passing updates to `next()`:
+Middlewares can modify the diagram state by passing a `FlowStateUpdate` object to `next()`:
+
+```typescript
+interface FlowStateUpdate {
+  nodesToAdd?: Node[];
+  nodesToUpdate?: (Partial<Node> & { id: Node['id'] })[];
+  nodesToRemove?: string[];
+  edgesToAdd?: Edge[];
+  edgesToUpdate?: (Partial<Edge> & { id: Edge['id'] })[];
+  edgesToRemove?: string[];
+  metadataUpdate?: Partial<Metadata>;
+}
+```
+
+This allows you to add, update, or remove nodes/edges, and update metadata in a granular way.
+
+#### Example: Rotating New Nodes
 
 ```typescript
 export const myCustomMiddleware: Middleware = {

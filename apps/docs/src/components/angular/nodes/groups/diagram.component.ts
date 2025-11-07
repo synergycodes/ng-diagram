@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramComponent,
   provideNgDiagram,
-  type NgDiagramConfig,
 } from 'ng-diagram';
 
 @Component({
@@ -14,16 +13,11 @@ import {
   styleUrls: ['./diagram.component.scss'],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" />
     </div>
   `,
 })
 export class DiagramComponent {
-  config: NgDiagramConfig = {
-    snapping: {
-      shouldSnapResizeForNode: () => false,
-    },
-  };
   model = initializeModel({
     nodes: [
       {

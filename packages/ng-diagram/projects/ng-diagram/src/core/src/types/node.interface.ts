@@ -1,15 +1,15 @@
-import type { DataObject, Point, PortSide, Size } from './utils';
+import type { DataObject, Point, PortSide, Rect, Size } from './utils';
 
 /**
  * Interface representing all possible node types in the diagram
- * @category Types
+ * @category Types/Model
  */
 
 export type Node<T extends DataObject = DataObject> = SimpleNode<T> | GroupNode<T>;
 
 /**
  * Interface representing a group node in the diagram
- * @category Types
+ * @category Types/Model
  */
 
 export interface GroupNode<T extends DataObject = DataObject> extends SimpleNode<T> {
@@ -26,7 +26,7 @@ export interface GroupNode<T extends DataObject = DataObject> extends SimpleNode
 /**
  * Interface representing the most basic node in the diagram
  *
- * @category Types
+ * @category Types/Model
  */
 
 export interface SimpleNode<T extends DataObject = DataObject> {
@@ -90,12 +90,18 @@ export interface SimpleNode<T extends DataObject = DataObject> {
    * The id of the parent node.
    */
   groupId?: Node<T>['id'];
+  /**
+   * @readonly
+   * @remarks MeasuredBounds are computed by the system and should not be set manually.
+   * Bounding box that encompasses the node including its ports, accounting for rotation.
+   */
+  measuredBounds?: Rect;
 }
 
 /**
  * Interface representing a port in the node.
  *
- * @category Types
+ * @category Types/Model
  */
 export interface Port {
   /**

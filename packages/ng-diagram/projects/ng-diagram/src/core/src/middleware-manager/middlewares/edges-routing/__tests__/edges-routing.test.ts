@@ -33,6 +33,8 @@ describe('Edges Routing Middleware', () => {
   const checkIfNodeChangedMock = vi.fn();
   const mockActionStateManager = {
     linking: null as any,
+    isResizing: vi.fn().mockReturnValue(false),
+    isRotating: vi.fn().mockReturnValue(false),
   };
 
   const nodesMap = new Map();
@@ -53,6 +55,11 @@ describe('Edges Routing Middleware', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Reset action state manager mocks
+    mockActionStateManager.isResizing.mockReturnValue(false);
+    mockActionStateManager.isRotating.mockReturnValue(false);
+    mockActionStateManager.linking = null;
 
     initialState = {
       nodes: [mockNode],
@@ -100,6 +107,26 @@ describe('Edges Routing Middleware', () => {
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith();
+    });
+
+    it('should skip edge routing during active resize', () => {
+      context.modelActionType = 'resizeNode';
+      mockActionStateManager.isResizing.mockReturnValue(true);
+
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
+
+      expect(nextMock).toHaveBeenCalledWith();
+    });
+
+    it('should allow edge routing for resizeNode when not actively resizing', () => {
+      context.modelActionType = 'resizeNode';
+      mockActionStateManager.isResizing.mockReturnValue(false);
+      checkIfAnyNodePropsChangedMock.mockReturnValue(true);
+      checkIfEdgeChangedMock.mockReturnValue(true);
+
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
+
+      expect(nextMock).toHaveBeenCalled();
     });
 
     it('should proceed when edges need routing on init', () => {

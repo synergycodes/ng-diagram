@@ -1,7 +1,9 @@
 import { FlowCore } from '../flow-core';
+import { DEFAULT_SHORTCUTS } from '../shortcut-manager';
 import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
+  BoxSelectionConfig,
   EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
@@ -12,8 +14,9 @@ import type {
   SnappingConfig,
   ZIndexConfig,
   ZoomConfig,
+  ZoomToFitConfig,
 } from '../types/flow-config.interface';
-import { DeepPartial, Point, Size } from '../types/utils';
+import { DeepPartial, Size } from '../types/utils';
 import { deepMerge } from '../utils';
 
 export const DEFAULT_NODE_MIN_SIZE = { width: 20, height: 20 };
@@ -23,10 +26,14 @@ const defaultResizeConfig: ResizeConfig = {
     return { ...DEFAULT_NODE_MIN_SIZE };
   },
   allowResizeBelowChildrenBounds: true,
+  defaultResizable: true,
 };
 
 const defaultLinkingConfig: LinkingConfig = {
   portSnapDistance: 10,
+  edgePanningEnabled: true,
+  edgePanningForce: 10,
+  edgePanningThreshold: 30,
   validateConnection: (): boolean => {
     // Allow connection by default
     return true;
@@ -50,50 +57,68 @@ const defaultGroupingConfig: GroupingConfig = {
   },
 };
 
+const defaultZoomToFitConfig: ZoomToFitConfig = {
+  padding: 50,
+  onInit: false,
+};
+
 const defaultZoomConfig: ZoomConfig = {
   min: 0.1,
   max: 10.0,
   step: 0.05,
+  zoomToFit: defaultZoomToFitConfig,
 };
 
 const defaultBackgroundConfig: BackgroundConfig = {
-  dotSize: 60,
+  dotSpacing: 60,
+  cellSize: { width: 10, height: 10 },
+  majorLinesFrequency: { x: 5, y: 5 },
 };
 
 const defaultNodeRotationConfig: NodeRotationConfig = {
   shouldSnapForNode: (): boolean => {
-    return true;
+    return false;
   },
   computeSnapAngleForNode: (): number | null => {
     return null;
   },
   defaultSnapAngle: 30,
+  defaultRotatable: true,
 };
 
-const defaultNodeDraggingConfig: SnappingConfig = {
+const defaultNodeSnappingConfig: SnappingConfig = {
   shouldSnapDragForNode: (): boolean => {
     return false;
   },
   shouldSnapResizeForNode: (): boolean => {
-    return true;
+    return false;
   },
-  computeSnapForNodeDrag: (): Point | null => {
+  computeSnapForNodeDrag: (): Size | null => {
     return null;
   },
-  computeSnapForNodeSize: (): Point | null => {
+  computeSnapForNodeSize: (): Size | null => {
     return null;
   },
-  defaultDragSnap: { x: 10, y: 10 },
-  defaultResizeSnap: { x: 10, y: 10 },
+  defaultDragSnap: { width: 10, height: 10 },
+  defaultResizeSnap: { width: 10, height: 10 },
 };
 
 const defaultSelectionMovingConfig: SelectionMovingConfig = {
-  edgePanningForce: 15,
-  edgePanningThreshold: 10,
+  edgePanningForce: 10,
+  edgePanningThreshold: 30,
+  edgePanningEnabled: true,
+};
+
+const defaultZIndexConfig: ZIndexConfig = {
+  enabled: true,
+  selectedZIndex: 1000,
+  temporaryEdgeZIndex: 1000,
+  edgesAboveConnectedNodes: false,
+  elevateOnSelection: true,
 };
 
 const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
-  defaultRouting: 'polyline',
+  defaultRouting: 'orthogonal',
   bezier: {
     bezierControlOffset: 100,
   },
@@ -103,12 +128,9 @@ const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
   },
 };
 
-const defaultZIndexConfig: ZIndexConfig = {
-  enabled: true,
-  selectedZIndex: 1000,
-  edgesAboveConnectedNodes: false,
-  elevateOnSelection: true,
-  temporaryEdgeZIndex: 1000,
+const defaultBoxSelectionConfig: BoxSelectionConfig = {
+  partialInclusion: true,
+  realtime: true,
 };
 
 /**
@@ -125,10 +147,12 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       zoom: defaultZoomConfig,
       background: defaultBackgroundConfig,
       nodeRotation: defaultNodeRotationConfig,
-      snapping: defaultNodeDraggingConfig,
+      snapping: defaultNodeSnappingConfig,
       selectionMoving: defaultSelectionMovingConfig,
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,
+      boxSelection: defaultBoxSelectionConfig,
+      shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
     },
     config

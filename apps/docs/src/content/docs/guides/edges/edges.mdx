@@ -42,6 +42,7 @@ NgDiagram provides a default edge implementation that handles most common use ca
 - Automatically calculates the path between connected nodes
 - Supports three [built-in routing algorithms](/docs/guides/edges/routing)
 - Can display arrowheads at either end
+- Supports [labels](/docs/guides/edges/labels) for displaying text on edges
 
 ### Customization
 
@@ -50,6 +51,8 @@ NgDiagram's default edges offer several customization options:
 - Custom arrowheads (defined as SVG markers)
 - CSS variable based styling (stroke, hover / selection states etc.)
 - [Built-in routing algorithms](/docs/guides/edges/routing)
+
+<br />
 
 import DefaultEdge from '@components/angular/edges/edges/default-edge/default-edge.astro';
 
@@ -131,6 +134,8 @@ Edges can be routed using three [built-in routing algorithms](/docs/guides/edges
 - `orthogonal`: Draws a series of horizontal and vertical lines
 - `bezier`: Draws a bezier curve
 
+<br />
+
 import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 <Routing />
@@ -182,6 +187,8 @@ This allows you to:
 - Add custom data to newly created edges
 - Apply specific routing algorithms
 - Control the visual appearance and behavior
+
+[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
 ## Further reading
 

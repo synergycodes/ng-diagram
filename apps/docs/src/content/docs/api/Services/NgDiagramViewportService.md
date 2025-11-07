@@ -34,15 +34,55 @@ Returns a computed signal for the scale that safely handles uninitialized state.
 
 ### viewport
 
-> **viewport**: `Signal`\<[`Viewport`](/docs/api/types/viewport/)\>
+> **viewport**: `Signal`\<[`Viewport`](/docs/api/types/model/viewport/)\>
 
 Returns a computed signal for the viewport that safely handles uninitialized state.
 
 ## Methods
 
+### centerOnNode()
+
+> **centerOnNode**(`nodeOrId`): `void`
+
+Centers the Node within the current viewport bounds.
+
+#### Parameters
+
+##### nodeOrId
+
+The ID of the node or the node object to center on.
+
+`string` | [`Node`](/docs/api/types/model/node/)
+
+#### Returns
+
+`void`
+
+***
+
+### centerOnRect()
+
+> **centerOnRect**(`rect`): `void`
+
+Centers the rectangle within the current viewport bounds.
+
+#### Parameters
+
+##### rect
+
+[`Rect`](/docs/api/types/geometry/rect/)
+
+The rectangle to center on.
+
+#### Returns
+
+`void`
+
+***
+
 ### clientToFlowPosition()
 
-> **clientToFlowPosition**(`clientPosition`): [`Point`](/docs/api/types/point/)
+> **clientToFlowPosition**(`clientPosition`): [`Point`](/docs/api/types/geometry/point/)
 
 Converts a client position to a flow position.
 
@@ -50,13 +90,13 @@ Converts a client position to a flow position.
 
 ##### clientPosition
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Client position to convert.
 
 #### Returns
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Flow position.
 
@@ -64,7 +104,7 @@ Flow position.
 
 ### clientToFlowViewportPosition()
 
-> **clientToFlowViewportPosition**(`clientPosition`): [`Point`](/docs/api/types/point/)
+> **clientToFlowViewportPosition**(`clientPosition`): [`Point`](/docs/api/types/geometry/point/)
 
 Converts a client position to a position relative to the flow viewport.
 
@@ -72,13 +112,13 @@ Converts a client position to a position relative to the flow viewport.
 
 ##### clientPosition
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Client position.
 
 #### Returns
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Position on the flow viewport.
 
@@ -86,7 +126,7 @@ Position on the flow viewport.
 
 ### flowToClientPosition()
 
-> **flowToClientPosition**(`flowPosition`): [`Point`](/docs/api/types/point/)
+> **flowToClientPosition**(`flowPosition`): [`Point`](/docs/api/types/geometry/point/)
 
 Converts a flow position to a client position.
 
@@ -94,13 +134,13 @@ Converts a flow position to a client position.
 
 ##### flowPosition
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Flow position to convert.
 
 #### Returns
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 Client position.
 
@@ -174,10 +214,66 @@ The factor to zoom by.
 
 ##### center?
 
-[`Point`](/docs/api/types/point/)
+[`Point`](/docs/api/types/geometry/point/)
 
 The center point to zoom towards.
 
 #### Returns
 
 `void`
+
+***
+
+### zoomToFit()
+
+> **zoomToFit**(`options?`): `void`
+
+Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
+
+#### Parameters
+
+##### options?
+
+Optional configuration object
+
+###### edgeIds?
+
+`string`[]
+
+Array of edge IDs to fit. If not provided, all edges are included.
+
+###### nodeIds?
+
+`string`[]
+
+Array of node IDs to fit. If not provided, all nodes are included.
+
+###### padding?
+
+`number` \| \[`number`, `number`\] \| \[`number`, `number`, `number`\] \| \[`number`, `number`, `number`, `number`\]
+
+Padding around the content (default: 50). Supports CSS-like syntax:
+  - Single number: uniform padding on all sides
+  - [top/bottom, left/right]: vertical and horizontal padding
+  - [top, left/right, bottom]: top, horizontal, bottom padding
+  - [top, right, bottom, left]: individual padding for each side
+
+#### Returns
+
+`void`
+
+#### Example
+
+```typescript
+// Fit all nodes and edges with default padding
+this.viewportService.zoomToFit();
+
+// Fit with custom uniform padding
+this.viewportService.zoomToFit({ padding: 100 });
+
+// Fit with different padding on each side [top, right, bottom, left]
+this.viewportService.zoomToFit({ padding: [50, 100, 50, 100] });
+
+// Fit only specific nodes
+this.viewportService.zoomToFit({ nodeIds: ['node1', 'node2'] });
+```

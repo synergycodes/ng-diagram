@@ -7,6 +7,7 @@ export class ModelLookup {
   private _edgesMap = { map: new Map<string, Edge>(), synchronized: false };
   private _directChildrenMap = { map: new Map<Node['id'], Node['id'][]>(), synchronized: false };
   private _descendantsCache = { map: new Map<Node['id'], Node['id'][]>(), synchronized: false }; // Cache for all descendants
+  private _connectedEdgesMap = { map: new Map<Node['id'], Edge['id'][]>(), synchronized: false };
 
   constructor(private readonly flowCore: FlowCore) {}
 
@@ -18,6 +19,7 @@ export class ModelLookup {
     this._edgesMap.synchronized = false;
     this._directChildrenMap.synchronized = false;
     this._descendantsCache.synchronized = false;
+    this._connectedEdgesMap.synchronized = false;
   }
 
   /**
@@ -63,6 +65,20 @@ export class ModelLookup {
   }
 
   /**
+   * Gets the connected edges map if it is not synchronized synchronize it
+   * @returns Connected edges map
+   */
+  get connectedEdgesMap() {
+    if (!this._connectedEdgesMap.synchronized) {
+      this._connectedEdgesMap = {
+        map: this.buildConnectedEdgesMap(this.flowCore.getState().edges),
+        synchronized: true,
+      };
+    }
+    return this._connectedEdgesMap.map;
+  }
+
+  /**
    * Gets the descendants cache if it is not synchronized synchronize it
    * @returns Descendants cache
    */
@@ -95,11 +111,34 @@ export class ModelLookup {
   }
 
   /**
+   * Builds a map of nodes to their connected edges
+   * @param edges Edges array
+   * @returns Map where key is node id and value is array of connected edge ids
+   */
+  private buildConnectedEdgesMap(edges: Edge[]): Map<Node['id'], Edge['id'][]> {
+    const connectedEdgesMap = new Map<Node['id'], Edge['id'][]>();
+
+    for (const edge of edges) {
+      // Add edge to source node's connected edges
+      const sourceEdges = connectedEdgesMap.get(edge.source) || [];
+      sourceEdges.push(edge.id);
+      connectedEdgesMap.set(edge.source, sourceEdges);
+
+      // Add edge to target node's connected edges
+      const targetEdges = connectedEdgesMap.get(edge.target) || [];
+      targetEdges.push(edge.id);
+      connectedEdgesMap.set(edge.target, targetEdges);
+    }
+
+    return connectedEdgesMap;
+  }
+
+  /**
    * Gets a node by id
    * @param nodeId Node id
    * @returns Node
    */
-  public getNodeById(nodeId: string): Node | null {
+  getNodeById(nodeId: string): Node | null {
     return this.nodesMap.get(nodeId) ?? null;
   }
 
@@ -108,8 +147,62 @@ export class ModelLookup {
    * @param edgeId Edge id
    * @returns Edge
    */
-  public getEdgeById(edgeId: string): Edge | null {
+  getEdgeById(edgeId: string): Edge | null {
     return this.edgesMap.get(edgeId) ?? null;
+  }
+
+  /**
+   * Gets all edges connected to a node
+   * @param nodeId Node id
+   * @returns Array of edges where the node is either source or target
+   */
+  getConnectedEdges(nodeId: string): Edge[] {
+    const edgeIds = this.connectedEdgesMap.get(nodeId) ?? [];
+
+    return edgeIds.map((id) => this.getEdgeById(id)).filter((edge): edge is Edge => edge !== null);
+  }
+
+  /**
+   * Gets all nodes connected to a node via edges
+   * @param nodeId Node id
+   * @returns Array of nodes connected to the given node
+   */
+  getConnectedNodes(nodeId: string): Node[] {
+    const edgeIds = this.connectedEdgesMap.get(nodeId) ?? [];
+    const connectedNodeIds = new Set<Node['id']>();
+
+    for (const edgeId of edgeIds) {
+      const edge = this.getEdgeById(edgeId);
+      if (edge) {
+        const otherNodeId = edge.source === nodeId ? edge.target : edge.source;
+        connectedNodeIds.add(otherNodeId);
+      }
+    }
+
+    return Array.from(connectedNodeIds)
+      .map((id) => this.getNodeById(id))
+      .filter((node): node is Node => node !== null);
+  }
+
+  /**
+   * Gets the source and target nodes of an edge
+   * @param edgeId Edge id
+   * @returns Object containing source and target nodes, or null if edge doesn't exist
+   */
+  getNodeEnds(edgeId: string): { source: Node; target: Node } | null {
+    const edge = this.getEdgeById(edgeId);
+    if (!edge) {
+      return null;
+    }
+
+    const source = this.getNodeById(edge.source);
+    const target = this.getNodeById(edge.target);
+
+    if (!source || !target) {
+      return null;
+    }
+
+    return { source, target };
   }
 
   /**
@@ -126,7 +219,7 @@ export class ModelLookup {
    * @param groupId group node id
    * @returns Array of child nodes
    */
-  private getChildren(groupId: string): Node[] {
+  public getChildren(groupId: string): Node[] {
     const childrenIds = this.getChildrenIds(groupId);
 
     if (!childrenIds) return [];
@@ -139,7 +232,7 @@ export class ModelLookup {
    * @param groupId group node id
    * @returns Array of all descendant node ids (children, grandchildren, etc.)
    */
-  private getAllDescendantIds(groupId: string): Node['id'][] {
+  getAllDescendantIds(groupId: string): Node['id'][] {
     // Check cache first
     if (this.descendantsCache.has(groupId)) {
       return this.descendantsCache.get(groupId)!;
@@ -182,7 +275,7 @@ export class ModelLookup {
    * @param groupId group node id
    * @returns Array of all descendant nodes (children, grandchildren, etc.)
    */
-  private getAllDescendants(groupId: string): Node[] {
+  getAllDescendants(groupId: string): Node[] {
     const descendantIds = this.getAllDescendantIds(groupId);
 
     return descendantIds.map((id) => this.getNodeById(id)).filter((node): node is Node => node !== null);
@@ -270,7 +363,7 @@ export class ModelLookup {
    * Gets all selected edges
    * @returns Array of selected edges
    */
-  public getSelectedEdges(): Edge[] {
+  getSelectedEdges(): Edge[] {
     return this.flowCore.getState().edges.filter((edge) => edge.selected);
   }
 
@@ -280,7 +373,7 @@ export class ModelLookup {
    * @param groupId Group node id
    * @returns True if the node is descendant of the group node
    */
-  public isNodeDescendantOfGroup(nodeId: string, groupId: string): boolean {
+  isNodeDescendantOfGroup(nodeId: string, groupId: string): boolean {
     return this.getAllDescendantIds(groupId).includes(nodeId);
   }
 
@@ -290,7 +383,7 @@ export class ModelLookup {
    * @param groupId Group node id
    * @returns True if the group is a descendant of the node or the node is the group
    */
-  public wouldCreateCircularDependency(nodeId: string, groupId: string): boolean {
+  wouldCreateCircularDependency(nodeId: string, groupId: string): boolean {
     // If trying to make a node its own parent
     if (nodeId === groupId) {
       return true;
@@ -305,7 +398,7 @@ export class ModelLookup {
    * @param nodeId Node id
    * @returns Array of parent group Node objects, from closest parent to farthest ancestor
    */
-  public getParentChain(nodeId: string): GroupNode[] {
+  getParentChain(nodeId: string): GroupNode[] {
     const chain: GroupNode[] = [];
     let current = this.getNodeById(nodeId);
 

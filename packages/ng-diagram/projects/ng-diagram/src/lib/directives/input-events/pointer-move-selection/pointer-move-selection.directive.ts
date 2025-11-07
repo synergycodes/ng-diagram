@@ -1,5 +1,5 @@
 import { Directive, inject, input, type OnDestroy } from '@angular/core';
-import { type ContainerEdge, FPS_60, NgDiagramMath, type Node } from '../../../../core/src';
+import { FPS_60, NgDiagramMath, type Node, Point } from '../../../../core/src';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -21,7 +21,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   targetData = input<Node>();
 
   private edgePanningInterval: number | null = null;
-  private currentEdge: ContainerEdge = null;
 
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
@@ -68,6 +67,55 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
+    this.finishDragging(event);
+  };
+
+  private onPointerMove = (event: PointerInputEvent) => {
+    if (event.zoomingHandled) {
+      this.finishDragging(event);
+      return;
+    }
+
+    const targetData = this.targetData();
+    if (!targetData) {
+      return;
+    }
+
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    const { edgePanningThreshold, edgePanningEnabled, edgePanningForce } =
+      this.flowCoreProvider.provide().config.selectionMoving;
+
+    let panningForce: Point | null = null;
+    if (edgePanningEnabled) {
+      panningForce = NgDiagramMath.calculateEdgePanningForce(
+        this.diagramComponent.getBoundingClientRect(),
+        { x: event.clientX, y: event.clientY },
+        edgePanningThreshold,
+        edgePanningForce
+      );
+
+      if (panningForce) {
+        this.startEdgePanning(event.clientX, event.clientY, panningForce);
+      } else {
+        this.stopEdgePanning();
+      }
+    }
+
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'pointerMoveSelection',
+      phase: 'continue',
+      target: targetData,
+      targetType: 'node',
+      lastInputPoint: {
+        x: event.clientX,
+        y: event.clientY,
+      },
+      panningForce,
+    });
+  };
+
+  private finishDragging(event: PointerInputEvent): void {
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -90,56 +138,23 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       },
       currentDiagramEdge: null,
     });
-  };
-
-  private onPointerMove = (event: PointerInputEvent) => {
-    const targetData = this.targetData();
-    if (!targetData) {
-      return;
-    }
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    const screenEdge = this.getDiagramEdge(event.clientX, event.clientY);
-
-    if (screenEdge !== this.currentEdge) {
-      this.currentEdge = screenEdge;
-      if (screenEdge) {
-        this.startEdgePanning(event.clientX, event.clientY);
-      } else {
-        this.stopEdgePanning();
-      }
-    }
-
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'pointerMoveSelection',
-      phase: 'continue',
-      target: targetData,
-      targetType: 'node',
-      lastInputPoint: {
-        x: event.clientX,
-        y: event.clientY,
-      },
-      currentDiagramEdge: screenEdge,
-    });
-  };
+  }
 
   private shouldHandle(event: PointerInputEvent): boolean {
     if (shouldDiscardEvent(event, 'drag')) {
       return false;
     }
 
-    return !(event.zoomingHandled || event.linkingHandled || event.rotateHandled);
+    return !(
+      event.zoomingHandled ||
+      event.linkingHandled ||
+      event.rotateHandled ||
+      event.boxSelectionHandled ||
+      event.zoomingHandled
+    );
   }
 
-  private getDiagramEdge(x: number, y: number): ContainerEdge {
-    const threshold = this.flowCoreProvider.provide().config.selectionMoving.edgePanningThreshold;
-    const bbox = this.diagramComponent.getBoundingClientRect();
-    const edge = NgDiagramMath.detectContainerEdge(bbox, { x, y }, threshold);
-    return edge;
-  }
-
-  private startEdgePanning(x: number, y: number): void {
+  private startEdgePanning(x: number, y: number, panningForce: Point | null): void {
     this.stopEdgePanning();
 
     this.edgePanningInterval = window.setInterval(() => {
@@ -157,7 +172,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
         target: targetData,
         targetType: 'node',
         lastInputPoint: { x, y },
-        currentDiagramEdge: this.currentEdge,
+        panningForce,
       });
     }, FPS_60);
   }

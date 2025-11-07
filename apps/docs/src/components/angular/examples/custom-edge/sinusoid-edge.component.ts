@@ -10,7 +10,7 @@ import {
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
     stroke="rebeccapurple"
-    targetArrowhead="ng-diagram-arrow"
+    sourceArrowhead="ng-diagram-arrow"
   />`,
   imports: [NgDiagramBaseEdgeComponent],
 })

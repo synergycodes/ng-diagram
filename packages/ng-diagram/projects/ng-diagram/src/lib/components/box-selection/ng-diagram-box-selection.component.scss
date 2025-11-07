@@ -1,0 +1,6 @@
+div {
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--ngd-box-selection-background);
+  border: var(--ngd-box-selection-border-size) solid var(--ngd-box-selection-border-color);
+}

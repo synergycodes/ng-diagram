@@ -7,6 +7,7 @@ export type InputEventName =
   | 'cut'
   | 'paste'
   | 'select'
+  | 'selectAll'
   | 'deleteSelection'
   | 'panning'
   | 'keyboardPanning'
@@ -16,7 +17,10 @@ export type InputEventName =
   | 'zoom'
   | 'linking'
   | 'rotate'
-  | 'paletteDrop';
+  | 'paletteDrop'
+  | 'boxSelection'
+  | 'undo'
+  | 'redo';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 
@@ -36,9 +40,24 @@ export interface BasePointerInputEvent extends BaseInputEvent {
   lastInputPoint: Point;
 }
 
+/**
+ * @category Types/Configuration/Shortcuts
+ */
 export interface InputModifiers {
-  primary: boolean; // Ctrl key (Windows/Linux) OR Cmd key (Mac)
-  secondary: boolean; // Alt key
-  shift: boolean; // Shift key
-  meta: boolean; // Windows key OR Cmd key
+  /**
+   * Ctrl key (Windows/Linux) OR Cmd key (Mac)
+   */
+  primary: boolean;
+  /**
+   * Alt key
+   */
+  secondary: boolean;
+  /**
+   * Shift key
+   */
+  shift: boolean;
+  /**
+   * Windows key OR Cmd key
+   */
+  meta: boolean;
 }

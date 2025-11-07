@@ -1,0 +1,44 @@
+---
+title: Box Selection
+description: Selecting multiple nodes using box selection in ngDiagram
+---
+
+import Properties from '@components/angular/examples/box-selection/properties/properties.astro';
+import Styled from '@components/angular/examples/box-selection/styled/styled.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+The **box selection** feature in ngDiagram allows users to select multiple nodes and edges on the canvas by drawing a rectangle around them.
+
+## Usage
+
+To activate box selection, hold down the `Shift` key and click and drag on the canvas. If two selected nodes are connected by an edge, the edge will also be included in the selection.
+
+## Configuration
+
+Box selection behavior can be configured via the `boxSelection` property in `NgDiagramConfig`.
+
+<CodeSnippet relativePath="examples/box-selection/properties/diagram.component.ts" sectionId="config" />
+
+Available options:
+
+- `partialInclusion`: If set to `true`, nodes that are partially within the selection rectangle will be included in the selection.
+
+  Default: `true`
+
+- `realtime`: If set to `true`, the selection rectangle will update the selection in real-time as the user drags the mouse. If `false` the selection will happen after releasing the mouse button.
+
+  Default: `true`
+
+[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
+
+<Properties />
+
+## Customization
+
+You can customize the appearance of the box selection rectangle by using predefined CSS variables:
+
+<CodeSnippet relativePath="examples/box-selection/styled/diagram.component.ts" sectionId="styling" />
+
+<br />
+
+<Styled />

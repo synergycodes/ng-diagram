@@ -50,7 +50,6 @@ export class DiagramComponent {
         targetPort: 'port-left',
         target: '2',
         type: 'labeled',
-        measuredLabels: [{ id: 'label1', positionOnEdge: 0.5 }],
         data: {},
       },
     ],

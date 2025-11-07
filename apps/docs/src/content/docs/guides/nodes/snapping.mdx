@@ -1,0 +1,77 @@
+---
+title: Snapping
+description: Understanding how snapping works in ngDiagram
+---
+
+import DragSnapExample from '@components/angular/nodes/snapping/drag-snap/drag-snap.astro';
+import ResizeSnapExample from '@components/angular/nodes/snapping/resize-snap/resize-snap.astro';
+import GridExample from '@components/angular/nodes/snapping/usage-with-grid/usage-with-grid.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+The **snapping** feature in ngDiagram allows nodes to be moved and resized in steps, making it easier to align elements on the diagram canvas.
+
+## Snap Drag Configuration
+
+The following configuration options are available for snapping nodes during drag operations:
+
+```typescript
+const config = {
+  snapping: {
+    shouldSnapDragForNode: (node) => true,
+    computeSnapForNodeDrag: (node) => ({ width: 10, height: 10 }),
+    defaultDragSnap: { width: 10, height: 10 },
+  },
+} satisfies NgDiagramConfig;
+```
+
+- `shouldSnapDragForNode` determines whether a node should snap to a grid when being dragged.
+  When this function returns `true` for a given node, the node's position will align to the nearest snap points during drag operations.
+
+- `computeSnapForNodeDrag` defines the snap step for dragging nodes.
+
+- `defaultDragSnap` sets a default snap step for dragging nodes if `computeSnapForNodeDrag` is not provided. The default value is `{ width: 10, height: 10 }`.
+
+<br />
+<DragSnapExample />
+<br />
+<CodeSnippet relativePath="nodes/snapping/drag-snap/diagram.component.ts" sectionId="usage" />
+
+## Snap Resize Configuration
+
+The following configuration options allow you to configure snapping when resizing nodes:
+
+```typescript
+const config = {
+  snapping: {
+    shouldSnapResizeForNode: (node) => true,
+    computeSnapForNodeResize: (node) => ({ width: 10, height: 10 }),
+    defaultResizeSnap: { width: 10, height: 10 },
+  },
+} satisfies NgDiagramConfig;
+```
+
+- `shouldSnapResizeForNode` determines whether a node should snap to a grid when being resized.
+  When this function returns `true` for a given node, the node's size will align to the nearest snap points during resize operations.
+
+- `computeSnapForNodeResize` defines the snap step for resizing nodes.
+
+- `defaultResizeSnap` sets a default snap step for resizing nodes if `computeSnapForNodeResize` is not provided. The default value is `{ width: 10, height: 10 }`.
+
+<br />
+<ResizeSnapExample />
+<br />
+<CodeSnippet relativePath="nodes/snapping/resize-snap/diagram.component.ts" sectionId="config" />
+
+## Usage with Background Grid
+
+Snapping can be configured to work in conjunction with the background grid feature.
+When both the grid and snapping are using multiples of the same size, nodes will snap to the grid lines during drag and resize operations.
+
+<br />
+<GridExample />
+<br />
+<CodeSnippet relativePath="nodes/snapping/usage-with-grid/diagram.component.ts" sectionId="config" />
+
+<br />
+[Background reference →](/docs/guides/background) | [Read more about global configuration in ngDiagram
+→](/docs/guides/configuration/)

@@ -30,9 +30,11 @@ export class DiagramComponent {
   ]);
 
   config = {
-    edgeRouting: { defaultRouting: 'orthogonal' },
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
     zIndex: {
       edgesAboveConnectedNodes: true,
@@ -88,6 +90,5 @@ export class DiagramComponent {
         sourceArrowhead: 'ng-diagram-arrow',
       },
     ],
-    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 }

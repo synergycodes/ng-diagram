@@ -7,21 +7,34 @@ import { getEdgePoints } from './get-edge-points';
 /**
  * Determines if edges should be re-routed based on changes in the flow state.
  */
-export const checkIfShouldRouteEdges = ({ helpers, modelActionType }: MiddlewareContext): boolean =>
-  modelActionType === 'init' ||
-  helpers.anyEdgesAdded() ||
-  helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'measuredPorts']) ||
-  helpers.checkIfAnyEdgePropsChanged([
-    'targetPosition',
-    'sourcePosition',
-    'points',
-    'sourcePort',
-    'targetPort',
-    'source',
-    'target',
-    'routing',
-    'routingMode',
-  ]);
+export const checkIfShouldRouteEdges = ({
+  helpers,
+  modelActionType,
+  actionStateManager,
+}: MiddlewareContext): boolean => {
+  // Skip edge routing during resize - ports will be updated separately and trigger routing then
+  // This prevents visual lag where edges are drawn with old port positions
+  if (modelActionType === 'resizeNode' && actionStateManager.isResizing()) {
+    return false;
+  }
+
+  return (
+    modelActionType === 'init' ||
+    helpers.anyEdgesAdded() ||
+    helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'measuredPorts']) ||
+    helpers.checkIfAnyEdgePropsChanged([
+      'targetPosition',
+      'sourcePosition',
+      'points',
+      'sourcePort',
+      'targetPort',
+      'source',
+      'target',
+      'routing',
+      'routingMode',
+    ])
+  );
+};
 
 /**
  * Determines if a specific edge should be routed based on changes.

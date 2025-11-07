@@ -10,7 +10,7 @@ import { DataObject, GroupNode, Node, SimpleNode } from '../../core/src';
  * @template Data - The type of data associated with the node
  * @template NodeType - The type of node (SimpleNode or GroupNode)
  *
- * @category Types
+ * @category Types/Templates
  */
 export interface NgDiagramNodeTemplate<
   Data extends DataObject = DataObject,
@@ -25,7 +25,7 @@ export interface NgDiagramNodeTemplate<
  *
  * @template Data - The type of data associated with the group node
  *
- * @category Types
+ * @category Types/Templates
  */
 export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject>
   extends NgDiagramNodeTemplate<Data, GroupNode<Data>> {}
@@ -33,7 +33,7 @@ export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject
 /**
  * Map that associates node type names with their corresponding Angular component classes.
  * Used by ng-diagram to determine which custom node component to render based on node type.
- * @category Types
+ * @category Types/Templates
  */
 export class NgDiagramNodeTemplateMap extends Map<
   string,

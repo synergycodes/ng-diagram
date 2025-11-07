@@ -10,13 +10,15 @@ import {
   deleteEdges,
   deleteNodes,
   deletePorts,
+  paletteDropNode,
   updateEdge,
-  updateEdges,
   updateEdgeLabels,
+  updateEdges,
   updateNode,
   updateNodes,
   updatePorts,
 } from './add-update-delete';
+import { centerOnNode, centerOnRect } from './centering';
 import { copy, paste } from './copy-paste';
 import { cut } from './cut';
 import { deleteSelection } from './delete-selection';
@@ -34,9 +36,10 @@ import { moveViewport, moveViewportBy } from './move-viewport';
 import { removeFromGroup } from './remove-from-group';
 import { resizeNode } from './resize-node';
 import { rotateNodeTo } from './rotate-node';
-import { deselect, deselectAll, select } from './selection';
+import { deselect, deselectAll, select, selectAll } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
+import { zoomToFit } from './zoom-to-fit';
 
 export type CommandHandlerFunction<K extends CommandName> = (
   commandHandler: CommandHandler,
@@ -50,6 +53,7 @@ export type CommandMap = {
 export const commands: CommandMap = {
   init,
   select,
+  selectAll,
   deselect,
   deselectAll,
   moveNodesBy,
@@ -88,4 +92,8 @@ export const commands: CommandMap = {
   highlightGroupClear,
   addToGroup,
   removeFromGroup,
+  paletteDropNode,
+  centerOnNode,
+  centerOnRect,
+  zoomToFit,
 };

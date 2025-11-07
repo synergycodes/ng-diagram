@@ -18,7 +18,7 @@
  *   }
  * }
  * ```
- * @category Types
+ * @category Types/Events
  */
 export interface PointerInputEvent extends PointerEvent {
   moveSelectionHandled?: boolean;
@@ -26,4 +26,5 @@ export interface PointerInputEvent extends PointerEvent {
   linkingHandled?: boolean;
   rotateHandled?: boolean;
   selectHandled?: boolean;
+  boxSelectionHandled?: boolean;
 }

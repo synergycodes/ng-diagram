@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
+  ClipboardPastedEvent,
+  configureShortcuts,
   DiagramInitEvent,
   EdgeDrawnEvent,
+  GroupMembershipChangedEvent,
   initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
@@ -9,10 +12,18 @@ import {
   NgDiagramEdgeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  NodeResizedEvent,
+  PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
   SelectionMovedEvent,
+  SelectionRemovedEvent,
+  SelectionRotatedEvent,
   ViewportChangedEvent,
+  type Edge,
+  type EdgeLabel,
+  type Node,
+  type Port,
 } from 'ng-diagram';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
@@ -41,35 +52,54 @@ export class AppComponent {
     ['dashed-edge', DashedEdgeComponent],
   ]);
 
-  config: NgDiagramConfig = {
+  config = {
     zoom: {
       max: 2,
+      zoomToFit: {
+        onInit: true,
+        padding: [50, 50, 100, 350],
+      },
     },
     background: {
-      dotSize: 40,
+      cellSize: { width: 10, height: 10 },
     },
     snapping: {
       shouldSnapDragForNode: () => true,
     },
-    edgeRouting: {
-      defaultRouting: 'orthogonal',
-    },
-  };
+    shortcuts: configureShortcuts([
+      {
+        actionName: 'keyboardMoveSelectionUp',
+        bindings: [{ key: 'w' }, { key: 'ArrowUp' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionDown',
+        bindings: [{ key: 's' }, { key: 'ArrowDown' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionLeft',
+        bindings: [{ key: 'a' }, { key: 'ArrowLeft' }],
+      },
+      {
+        actionName: 'keyboardMoveSelectionRight',
+        bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
+      },
+    ]),
+  } satisfies NgDiagramConfig;
 
   onDiagramInit(event: DiagramInitEvent): void {
     console.log('INIT');
-    event.nodes.forEach((node) => {
+    event.nodes.forEach((node: Node) => {
       console.log(`${node.size?.width} ${node.size?.height}`);
       if (node.measuredPorts) {
-        node.measuredPorts.forEach((port) =>
+        node.measuredPorts.forEach((port: Port) =>
           console.log(`${port.size?.width} ${port.size?.height} ${port.position?.x} ${port.position?.y}`)
         );
       }
     });
 
-    event.edges.forEach((edge) => {
+    event.edges.forEach((edge: Edge) => {
       if (edge.measuredLabels) {
-        edge.measuredLabels.forEach((label) => {
+        edge.measuredLabels.forEach((label: EdgeLabel) => {
           console.log(`${label.size?.width} ${label.size?.height} ${label.position?.x} ${label.position?.y}`);
         });
       }
@@ -78,16 +108,16 @@ export class AppComponent {
 
   onSelectionChanged(event: SelectionChangedEvent): void {
     console.log('Selection Changed:', {
-      nodes: event.selectedNodes.map((n) => n.id),
-      edges: event.selectedEdges.map((e) => e.id),
-      previousNodes: event.previousNodes.map((n) => n.id),
-      previousEdges: event.previousEdges.map((e) => e.id),
+      nodes: event.selectedNodes.map((n: Node) => n.id),
+      edges: event.selectedEdges.map((e: Edge) => e.id),
+      previousNodes: event.previousNodes.map((n: Node) => n.id),
+      previousEdges: event.previousEdges.map((e: Edge) => e.id),
     });
   }
 
   onSelectionMoved(event: SelectionMovedEvent): void {
     console.log('Selection Moved:', {
-      nodes: event.nodes.map((n) => n.id),
+      nodes: event.nodes.map((n: Node) => n.id),
     });
   }
 
@@ -108,6 +138,62 @@ export class AppComponent {
     });
   }
 
+  onClipboardPasted(event: ClipboardPastedEvent): void {
+    console.log('Clipboard Pasted:', {
+      nodes: event.nodes.map((n: Node) => n.id),
+      edges: event.edges.map((e: Edge) => e.id),
+    });
+  }
+
+  onNodeResized(event: NodeResizedEvent): void {
+    console.log('Size Changed:', {
+      node: {
+        id: event.node.id,
+        size: event.node.size,
+        previousSize: event.previousSize,
+      },
+    });
+  }
+
+  onPaletteItemDropped(event: PaletteItemDroppedEvent): void {
+    console.log('Palette Item Dropped:', {
+      node: event.node.id,
+      dropPosition: event.dropPosition,
+    });
+  }
+
+  onSelectionRemoved(event: SelectionRemovedEvent): void {
+    console.log('Selection Removed:', {
+      nodes: event.deletedNodes.map((n: Node) => n.id),
+      edges: event.deletedEdges.map((e: Edge) => e.id),
+    });
+  }
+
+  onGroupMembershipChanged(event: GroupMembershipChangedEvent): void {
+    if (event.grouped.length > 0) {
+      event.grouped.forEach((operation) => {
+        console.log('Nodes Grouped:', {
+          groupedNodes: operation.nodes.map((n: Node) => n.id),
+          targetGroup: operation.targetGroup.id,
+        });
+      });
+    }
+
+    if (event.ungrouped.length > 0) {
+      console.log('Nodes Ungrouped:', {
+        ungroupedNodes: event.ungrouped.map((n: Node) => n.id),
+      });
+    }
+  }
+
+  onSelectionRotated(event: SelectionRotatedEvent): void {
+    console.log('Selection Rotated:', {
+      nodeId: event.node.id,
+      angle: event.angle,
+      previousAngle: event.previousAngle,
+    });
+  }
+
   model = initializeModel({
     nodes: [
       {
@@ -115,9 +201,8 @@ export class AppComponent {
         type: 'image',
         position: { x: 100, y: 50 },
         data: { imageUrl: 'https://tinyurl.com/bddnt44s' },
-        resizable: true,
       },
-      { id: '2', type: 'input-field', position: { x: 400, y: 100 }, data: {}, resizable: true },
+      { id: '2', type: 'input-field', position: { x: 400, y: 100 }, data: {} },
       {
         id: '3',
         type: 'resizable',
@@ -131,62 +216,53 @@ export class AppComponent {
         id: '4',
         position: { x: 800, y: 350 },
         data: {},
-        resizable: true,
         isGroup: true,
       },
       {
         id: '5',
         position: { x: 100, y: 250 },
         data: { label: 'edge is manual' },
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '6',
         position: { x: 463, y: 382 },
         data: { label: "so it's ok it's unconnected after move" },
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '7',
         position: { x: 100, y: 450 },
         data: {},
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '8',
         position: { x: 550, y: 550 },
         data: {},
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '9',
         position: { x: 100, y: 650 },
         data: { label: 'just bezier edge' },
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '10',
         position: { x: 450, y: 750 },
         data: {},
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '11',
         position: { x: 600, y: 650 },
         data: { label: 'test linking' },
-        resizable: true,
-        rotatable: true,
       },
       {
         id: '12',
         position: { x: 1000, y: 550 },
         data: {},
+      },
+      {
+        id: '12',
+        position: { x: 700, y: 750 },
+        data: {},
+        type: 'customized-default',
         resizable: true,
         rotatable: true,
       },
@@ -261,8 +337,5 @@ export class AppComponent {
         routing: 'orthogonal',
       },
     ],
-    metadata: {
-      viewport: { x: 300, y: 0, scale: 1 },
-    },
   });
 }

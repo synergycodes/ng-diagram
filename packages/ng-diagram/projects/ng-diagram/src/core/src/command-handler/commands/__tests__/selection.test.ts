@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
 import { CommandHandler } from '../../command-handler';
-import { deselect, deselectAll, select } from '../selection';
+import { deselect, deselectAll, select, selectAll } from '../selection';
 
 describe('Selection Commands', () => {
   let commandHandler: CommandHandler;
@@ -59,7 +59,7 @@ describe('Selection Commands', () => {
       );
     });
 
-    it('should preserve existing selection when preserveSelection is true', () => {
+    it('should preserve existing selection when multiSelection is true', () => {
       const nodes = [
         { ...mockNode, selected: true },
         { ...mockNode, id: 'node2', selected: true },
@@ -79,7 +79,7 @@ describe('Selection Commands', () => {
       select(commandHandler, {
         name: 'select',
         nodeIds: ['node3'],
-        preserveSelection: true,
+        multiSelection: true,
       });
 
       expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
@@ -221,6 +221,101 @@ describe('Selection Commands', () => {
       });
 
       deselectAll(commandHandler);
+
+      expect(commandHandler.flowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('selectAll', () => {
+    it('should select all nodes and edges', () => {
+      const nodes = [
+        { ...mockNode, id: '1', selected: false },
+        { ...mockNode, id: '2', selected: false },
+      ];
+      const edges = [
+        { ...mockEdge, id: 'e1', selected: false },
+        { ...mockEdge, id: 'e2', selected: false },
+      ];
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes,
+        edges,
+        metadata: mockMetadata,
+      });
+
+      selectAll(commandHandler);
+
+      expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            { id: '1', selected: true },
+            { id: '2', selected: true },
+          ],
+          edgesToUpdate: [
+            { id: 'e1', selected: true },
+            { id: 'e2', selected: true },
+          ],
+        },
+        'changeSelection'
+      );
+    });
+
+    it('should not apply update if all nodes and edges are already selected', () => {
+      const nodes = [
+        { ...mockNode, id: '1', selected: true },
+        { ...mockNode, id: '2', selected: true },
+      ];
+      const edges = [
+        { ...mockEdge, id: 'e1', selected: true },
+        { ...mockEdge, id: 'e2', selected: true },
+      ];
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes,
+        edges,
+        metadata: mockMetadata,
+      });
+
+      selectAll(commandHandler);
+
+      expect(commandHandler.flowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should select only unselected nodes and edges', () => {
+      const nodes = [
+        { ...mockNode, id: '1', selected: true },
+        { ...mockNode, id: '2', selected: false },
+      ];
+      const edges = [
+        { ...mockEdge, id: 'e1', selected: false },
+        { ...mockEdge, id: 'e2', selected: true },
+      ];
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes,
+        edges,
+        metadata: mockMetadata,
+      });
+
+      selectAll(commandHandler);
+
+      expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [{ id: '2', selected: true }],
+          edgesToUpdate: [{ id: 'e1', selected: true }],
+        },
+        'changeSelection'
+      );
+    });
+
+    it('should handle empty diagram', () => {
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: mockMetadata,
+      });
+
+      selectAll(commandHandler);
 
       expect(commandHandler.flowCore.applyUpdate).not.toHaveBeenCalled();
     });

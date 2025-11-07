@@ -5,6 +5,7 @@ sidebar:
   order: 3
 ---
 
+import CustomDefaultNode from '@components/angular/nodes/custom-default-node/custom-default-node.astro';
 import CustomNode from '@components/angular/nodes/custom-node/custom-node.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -12,29 +13,43 @@ When ngDiagram's default node is not sufficient, you can create custom nodes tha
 
 This allows you to build interactive and highly customized flow elements.
 
-You can create a custom node by extending `NgDiagramNodeTemplate` and implementing `CustomNodeComponent`.
+You can create a custom node by extending [`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate) and implementing `CustomNodeComponent`.
 
 <CodeSnippet relativePath="nodes/custom-node/node/node.component.ts" />
+
+<br />
 
 <CustomNode />
 
 [Custom Node Example →](/docs/examples/custom-node)
 
+## Using the Default Node as a base
+
+If you don't want to start from scratch, you can use the [`NgDiagramBaseNodeTemplateComponent`](/docs/api/components/ngdiagrambasenodetemplatecomponent) component as a way to add custom content into the default node.
+
+Simply wrap your custom content inside the `<ng-diagram-base-node-template>` component.
+
+<CodeSnippet relativePath="nodes/custom-default-node/node/node.component.ts" />
+
+<br />
+
+<CustomDefaultNode />
+
 ## Registration
 
-To register a custom node, you need to add it to the `nodeTemplateMap`.
+To register a custom node, you need to add it to the [`nodeTemplateMap`](/docs/api/types/templates/ngdiagramnodetemplatemap).
 
 The map associates a string key, such as `myType`, with a value like `CustomNodeComponent`, which is a reference to an Angular component class.
 
 <CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="registering" />
 
-After registering, you need to pass the map to the `ngDiagram` component.
+After registering, you need to pass the map to the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component.
 
 <CodeSnippet relativePath="nodes/custom-node/diagram.component.ts" sectionId="usage" />
 
 ## Setting Node Type
 
-Assigning the `type` property as `myType` for the node allows you to precisely control which template is used to render each node.
+Assigning the [`type`](/docs/api/types/model/simplenode#type) property as `myType` for the node allows you to precisely control which template is used to render each node.
 
 This approach makes your diagram highly extensible and flexible, as you can easily introduce new node types and associate them with different components.
 
@@ -47,7 +62,7 @@ In the example, the node displays a header and some content, but you can fully c
 
 ## Node Properties
 
-By using this approach—creating custom node components that implement NgDiagramNodeTemplate and receive the node data as input—you gain full access to the Node definition and all its properties.
+By using this approach—creating custom node components that implement [`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate) and receive the node data as input—you gain full access to the Node definition and all its properties.
 This means your custom node can leverage any property defined in the Node interface, such as:
 
 ```typescript
@@ -69,7 +84,7 @@ interface SimpleNode<T = any> {
 }
 ```
 
-[Node API →](/docs/api/types/node)
+[SimpleNode API Reference →](/docs/api/types/model/simplenode)
 
 ## Handling Interactive Elements
 

@@ -12,12 +12,7 @@ abstract class ObjectSelectionDirective {
 
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
-    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
-      return;
-    }
-
-    // Prevent duplicate select events — without this, selection can toggle unintentionally.
-    if (event.selectHandled) {
+    if (!this.shouldHandle(event)) {
       return;
     }
 
@@ -34,6 +29,14 @@ abstract class ObjectSelectionDirective {
         y: event.clientY,
       },
     });
+  }
+
+  private shouldHandle(event: PointerInputEvent) {
+    if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
+      return false;
+    }
+    // event.selectHandled - Prevent duplicate select events — without this, selection can toggle unintentionally.
+    return !(event.boxSelectionHandled || event.selectHandled);
   }
 }
 

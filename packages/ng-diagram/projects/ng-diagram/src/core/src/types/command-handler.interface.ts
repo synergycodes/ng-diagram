@@ -9,13 +9,15 @@ import {
   DeleteEdgesCommand,
   DeleteNodesCommand,
   DeletePortsCommand,
+  PaletteDropNodeCommand,
   UpdateEdgeCommand,
-  UpdateEdgesCommand,
   UpdateEdgeLabelsCommand,
+  UpdateEdgesCommand,
   UpdateNodeCommand,
   UpdateNodesCommand,
   UpdatePortsCommand,
 } from '../command-handler/commands/add-update-delete';
+import { CenterOnNodeCommand, CenterOnRectCommand } from '../command-handler/commands/centering';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
 import { CutCommand } from '../command-handler/commands/cut';
 import { DeleteSelectionCommand } from '../command-handler/commands/delete-selection';
@@ -33,9 +35,15 @@ import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/c
 import { RemoveFromGroupCommand } from '../command-handler/commands/remove-from-group';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { RotateNodeToCommand } from '../command-handler/commands/rotate-node';
-import { DeselectAllCommand, DeselectCommand, SelectCommand } from '../command-handler/commands/selection';
+import {
+  DeselectAllCommand,
+  DeselectCommand,
+  SelectAllCommand,
+  SelectCommand,
+} from '../command-handler/commands/selection';
 import { BringToFrontCommand, SendToBackCommand } from '../command-handler/commands/z-order';
 import { ZoomCommand } from '../command-handler/commands/zoom';
+import { ZoomToFitCommand } from '../command-handler/commands/zoom-to-fit';
 import { FlowCore } from '../flow-core';
 
 /**
@@ -44,6 +52,7 @@ import { FlowCore } from '../flow-core';
 export type Command =
   | InitCommand
   | SelectCommand
+  | SelectAllCommand
   | DeselectCommand
   | DeselectAllCommand
   | MoveNodesByCommand
@@ -51,6 +60,7 @@ export type Command =
   | AddNodesCommand
   | UpdateNodeCommand
   | UpdateNodesCommand
+  | PaletteDropNodeCommand
   | DeleteNodesCommand
   | AddEdgesCommand
   | UpdateEdgeCommand
@@ -81,7 +91,10 @@ export type Command =
   | HighlightGroupClearCommand
   | AddToGroupCommand
   | ClearModelCommand
-  | RemoveFromGroupCommand;
+  | RemoveFromGroupCommand
+  | CenterOnNodeCommand
+  | CenterOnRectCommand
+  | ZoomToFitCommand;
 
 /**
  * Type for command name

@@ -6,13 +6,15 @@ sidebar:
   label: Download Image
 ---
 
-import ExampleViewer from '@components/example-viewer/example-viewer.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import DownloadImage from '../../../components/angular/examples/download-image/download-image.astro';
 
 This example demonstrates how to export the current flow as an image using Angular features and the `html-to-image` library.
 
+<br />
+
 <DownloadImage />
-<ExampleViewer dirName="download-image" />
+<CodeViewer dirName="examples/download-image" />
 
 ## Additional Explanation
 
@@ -23,14 +25,14 @@ This example demonstrates how to export the current flow as an image using Angul
 
 ### Implementation Details
 
-- **Generate Image Service:**  
+- **Generate Image Service:**
   Handles the logic for exporting the flow as an image, using the `html-to-image` library and bounding box calculation.
 
-- **Helper Functions:**  
+- **Helper Functions:**
   Manage the download process and calculate the bounding box for the flow.
 
-- **NavBar Component:**  
-  Provides a button to trigger the download action.  
+- **NavBar Component:**
+  Provides a button to trigger the download action.
   Calculates the bounding box for the entire flow and passes the flow element reference to the service.
 
 ### Actions

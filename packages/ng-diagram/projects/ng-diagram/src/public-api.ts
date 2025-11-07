@@ -8,8 +8,9 @@ export { NgDiagramComponent } from './lib/components/diagram/ng-diagram.componen
 export {
   BaseEdgeLabelComponent,
   NgDiagramBaseEdgeLabelComponent,
-} from './lib/components/edge-label/base-edge-label.component';
+} from './lib/components/edge-label/base-edge-label/base-edge-label.component';
 export { NgDiagramBaseEdgeComponent } from './lib/components/edge/base-edge/base-edge.component';
+export { NgDiagramBaseNodeTemplateComponent } from './lib/components/node/base-node-template/ng-diagram-base-node-template.component';
 export { NgDiagramNodeResizeAdornmentComponent } from './lib/components/node/resize/ng-diagram-node-resize-adornment.component';
 export { NgDiagramNodeRotateAdornmentComponent } from './lib/components/node/rotate/ng-diagram-node-rotate-adornment.component';
 export { NgDiagramPaletteItemPreviewComponent } from './lib/components/palette/item-preview/ng-diagram-palette-item-preview.component';
@@ -18,6 +19,7 @@ export { NgDiagramPortComponent } from './lib/components/port/ng-diagram-port.co
 
 // Private directives (used via hostDirectives in exported components)
 export { CursorPositionTrackerDirective } from './lib/directives/cursor-position-tracker/cursor-position-tracker.directive';
+export { BoxSelectionDirective } from './lib/directives/input-events/box-selection/box-selection.directive';
 export { KeyboardInputsDirective } from './lib/directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 export { LinkingInputDirective } from './lib/directives/input-events/linking/linking.directive';
 export {
@@ -49,6 +51,7 @@ export { NgDiagramViewportService } from './lib/public-services/ng-diagram-viewp
 export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
+export { configureShortcuts } from './core/src';
 export { initializeModel } from './lib/model/initialize-model';
 export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
@@ -60,46 +63,79 @@ export type { NgDiagramConfig } from './lib/types/config';
 export type { NgDiagramEdgeTemplate } from './lib/types/edge-template-map';
 export type { PointerInputEvent } from './lib/types/event';
 export type { NgDiagramGroupNodeTemplate, NgDiagramNodeTemplate } from './lib/types/node-template-map';
-export type { NgDiagramPaletteItem } from './lib/types/palette';
+export type { BasePaletteItemData, GroupNodeData, NgDiagramPaletteItem, SimpleNodeData } from './lib/types/palette';
 export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
 export type {
   ActionState,
+  ActionStateManager,
   BackgroundConfig,
+  BoxSelectionConfig,
+  ClipboardPastedEvent,
+  CopyPasteActionState,
   DiagramEventMap,
   DiagramInitEvent,
+  DraggingActionState,
   Edge,
   EdgeDrawnEvent,
   EdgeLabel,
   EdgeRouting,
   EdgeRoutingConfig,
   EdgeRoutingContext,
+  EdgeRoutingManager,
   EdgeRoutingName,
   EnvironmentInfo,
   FlowConfig,
+  FlowState,
+  FlowStateUpdate,
   GroupingConfig,
+  GroupMembershipChangedEvent,
   GroupNode,
+  HighlightGroupActionState,
+  InputModifiers,
+  KeyboardActionName,
+  KeyboardMoveSelectionAction,
+  KeyboardPanAction,
+  KeyboardShortcutBinding,
+  KeyboardShortcutDefinition,
+  LinkingActionState,
   LinkingConfig,
   loggerMiddleware,
   Metadata,
   Middleware,
   MiddlewareChain,
+  MiddlewareContext,
+  MiddlewareHelpers,
+  MiddlewareHistoryUpdate,
   Model,
+  ModelActionType,
   ModelAdapter,
   ModelChanges,
+  ModifierOnlyShortcutBinding,
   NgDiagramMath,
   Node,
+  NodeResizedEvent,
   NodeRotationConfig,
+  PaletteItemDroppedEvent,
   Point,
+  PointerOnlyActionName,
+  PointerOnlyShortcutDefinition,
   Port,
   PortLocation,
   PortSide,
+  Rect,
+  ResizeActionState,
   ResizeConfig,
+  RotationActionState,
   RoutingMode,
   SelectionChangedEvent,
   SelectionMovedEvent,
   SelectionMovingConfig,
+  SelectionRemovedEvent,
+  SelectionRotatedEvent,
+  ShortcutActionName,
+  ShortcutDefinition,
   SimpleNode,
   Size,
   SnappingConfig,

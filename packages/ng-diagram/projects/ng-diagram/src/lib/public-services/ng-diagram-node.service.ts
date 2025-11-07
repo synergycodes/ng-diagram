@@ -28,6 +28,7 @@ export class NgDiagramNodeService extends NgDiagramBaseService {
 
   /**
    * Resizes a node to the specified dimensions.
+   * `Node.autoSize` must be set to false to resize a node.
    * @param id The ID of the node to resize.
    * @param size The new size of the node.
    * @param position Optional new position of the node.

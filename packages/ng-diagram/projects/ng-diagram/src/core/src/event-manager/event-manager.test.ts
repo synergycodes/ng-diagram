@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventManager } from './event-manager';
 import type { DiagramInitEvent, EdgeDrawnEvent, SelectionMovedEvent } from './event-types';
+import type { ActionStateChangedEvent } from './internal-event-types';
 
 describe('EventManager', () => {
   let eventManager: EventManager;
@@ -520,6 +521,60 @@ describe('EventManager', () => {
 
       unsubscribe();
       expect(eventManager.hasListeners('selectionMoved')).toBe(false);
+    });
+  });
+
+  describe('internal events', () => {
+    it('should handle actionStateChanged event', () => {
+      const callback = vi.fn();
+      eventManager.on('actionStateChanged', callback);
+
+      const event: ActionStateChangedEvent = {
+        actionState: {
+          resize: {
+            startWidth: 100,
+            startHeight: 100,
+            startX: 0,
+            startY: 0,
+            startNodePositionX: 50,
+            startNodePositionY: 50,
+            resizingNode: { id: 'n1', position: { x: 0, y: 0 }, data: {} },
+          },
+        },
+      };
+
+      eventManager.emit('actionStateChanged', event);
+      expect(callback).toHaveBeenCalledWith(event);
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should support deferred emit for actionStateChanged', () => {
+      const callback = vi.fn();
+      eventManager.on('actionStateChanged', callback);
+
+      const event: ActionStateChangedEvent = {
+        actionState: {
+          linking: { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null },
+        },
+      };
+
+      eventManager.deferredEmit('actionStateChanged', event);
+      expect(callback).not.toHaveBeenCalled();
+
+      eventManager.flushDeferredEmits();
+      expect(callback).toHaveBeenCalledWith(event);
+    });
+
+    it('should handle actionStateChanged with empty state', () => {
+      const callback = vi.fn();
+      eventManager.on('actionStateChanged', callback);
+
+      const event: ActionStateChangedEvent = {
+        actionState: {},
+      };
+
+      eventManager.emit('actionStateChanged', event);
+      expect(callback).toHaveBeenCalledWith(event);
     });
   });
 });

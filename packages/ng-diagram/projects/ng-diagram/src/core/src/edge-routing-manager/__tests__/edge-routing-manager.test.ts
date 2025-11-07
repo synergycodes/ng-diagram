@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Edge, EdgeRoutingConfig, Node, Point, PortLocation } from '../../types';
 import { EdgeRoutingManager } from '../edge-routing-manager';
 import { EdgeRouting, EdgeRoutingContext, EdgeRoutingName } from '../types';
@@ -46,6 +47,7 @@ describe('EdgeRoutingManager', () => {
   let manager: EdgeRoutingManager;
   let mockConfig: EdgeRoutingConfig;
   let getConfig: () => EdgeRoutingConfig;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     mockConfig = {
@@ -55,6 +57,11 @@ describe('EdgeRoutingManager', () => {
     };
     getConfig = vi.fn(() => mockConfig);
     manager = new EdgeRoutingManager('polyline', getConfig);
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleWarnSpy.mockRestore();
   });
 
   // Helper function to create mock edge
@@ -104,7 +111,7 @@ describe('EdgeRoutingManager', () => {
 
     it('should handle null/undefined default routing', () => {
       const customManager = new EdgeRoutingManager(null as unknown as EdgeRoutingName, getConfig);
-      expect(customManager.getDefaultRouting()).toBe('polyline');
+      expect(customManager.getDefaultRouting()).toBe('orthogonal');
     });
 
     it('should handle null/undefined config function', () => {
@@ -135,14 +142,19 @@ describe('EdgeRoutingManager', () => {
       expect(manager.getRouting('custom')).toBe(routing2);
     });
 
-    it('should throw error if routing has no name', () => {
+    it('should warn and skip registration if routing has no name', () => {
       const namelessRouting = new MockRouting('');
-      expect(() => manager.registerRouting(namelessRouting)).toThrow('Routing must have a name');
+      manager.registerRouting(namelessRouting);
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(manager.hasRouting('')).toBe(false);
     });
 
-    it('should throw error if routing name is null/undefined', () => {
+    it('should warn and skip registration if routing name is null/undefined', () => {
       const nullNameRouting = new MockRouting(null as unknown as string);
-      expect(() => manager.registerRouting(nullNameRouting)).toThrow('Routing must have a name');
+      manager.registerRouting(nullNameRouting);
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
     });
   });
 
@@ -232,8 +244,12 @@ describe('EdgeRoutingManager', () => {
       expect(points.length).toBeGreaterThanOrEqual(2);
     });
 
-    it('should throw error for non-existent routing', () => {
-      expect(() => manager.computePoints('non-existent', mockContext)).toThrow("Routing 'non-existent' not found");
+    it('should warn and fall back to default routing for non-existent routing', () => {
+      const points = manager.computePoints('non-existent', mockContext);
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(points).toBeDefined();
+      expect(points.length).toBeGreaterThanOrEqual(2);
     });
 
     it('should pass configuration to routing', () => {
@@ -268,8 +284,12 @@ describe('EdgeRoutingManager', () => {
       expect(path).toContain('M');
     });
 
-    it('should throw error for non-existent routing', () => {
-      expect(() => manager.computePath('non-existent', points)).toThrow("Routing 'non-existent' not found");
+    it('should warn and fall back to default routing for non-existent routing', () => {
+      const path = manager.computePath('non-existent', points);
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(path).toBeDefined();
+      expect(path).toContain('M');
     });
 
     it('should handle empty points array', () => {
@@ -312,8 +332,13 @@ describe('EdgeRoutingManager', () => {
       expect(point.y).toBeGreaterThanOrEqual(0);
     });
 
-    it('should throw error for non-existent routing', () => {
-      expect(() => manager.computePointOnPath('non-existent', points, 0.5)).toThrow("Routing 'non-existent' not found");
+    it('should warn and fall back to default routing for non-existent routing', () => {
+      const point = manager.computePointOnPath('non-existent', points, 0.5);
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(point).toBeDefined();
+      expect(point.x).toBeGreaterThanOrEqual(0);
+      expect(point.y).toBeGreaterThanOrEqual(0);
     });
 
     it('should handle edge cases in fallback', () => {
@@ -340,10 +365,12 @@ describe('EdgeRoutingManager', () => {
       expect(manager.getDefaultRouting()).toBe('bezier');
     });
 
-    it('should throw error for non-existent routing', () => {
-      expect(() => manager.setDefaultRouting('non-existent')).toThrow(
-        "Cannot set default routing to 'non-existent': routing not registered"
-      );
+    it('should warn and keep current default for non-existent routing', () => {
+      const currentDefault = manager.getDefaultRouting();
+      manager.setDefaultRouting('non-existent');
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(manager.getDefaultRouting()).toBe(currentDefault);
     });
 
     it('should allow setting custom routing as default', () => {

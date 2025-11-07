@@ -1,7 +1,7 @@
 import { angleBetweenPoints } from './angle-between-points/angle-between-points';
 import { angleToSide } from './angle-to-side/angle-to-side';
+import { calculateEdgePanningForce } from './calculate-edge-panning-force/calculate-edge-panning-force';
 import { clamp } from './clamp/clamp';
-import { detectContainerEdge } from './detect-container-edge/detect-container-edge';
 import { distanceBetweenPoints } from './distance-between-points/distance-between-points';
 import { normalizeAngle } from './normalize-angle/normalize-angle';
 import { snapAngle } from './snap-angle/snap-angle';
@@ -15,7 +15,7 @@ export const NgDiagramMath = {
   distanceBetweenPoints,
   normalizeAngle,
   snapAngle,
-  detectContainerEdge,
   snapNumber,
   snapPoint,
+  calculateEdgePanningForce,
 };
