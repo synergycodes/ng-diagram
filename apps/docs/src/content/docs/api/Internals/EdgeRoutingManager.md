@@ -58,10 +58,6 @@ The points to convert into an SVG path string
 
 An SVG path string suitable for the `d` attribute of an SVG `<path>` element
 
-#### Throws
-
-Will throw if the resolved routing is not registered
-
 #### Example
 
 ```typescript
@@ -109,10 +105,6 @@ The interpolated point on the path
 If the selected routing implements `computePointOnPath`, it will be used.
 Otherwise, falls back to linear interpolation between the first and last points.
 
-#### Throws
-
-Will throw if the resolved routing is not registered
-
 #### Example
 
 ```typescript
@@ -150,10 +142,6 @@ The routing context containing source/target nodes, ports, edge data, etc.
 [`Point`](/docs/api/types/geometry/point/)[]
 
 The computed polyline as an array of points
-
-#### Throws
-
-Will throw if the resolved routing is not registered
 
 #### Example
 
@@ -259,10 +247,6 @@ The routing instance to register. Its name must be non-empty.
 
 `void`
 
-#### Throws
-
-Will throw if `routing.name` is falsy.
-
 ***
 
 ### setDefaultRouting()
@@ -282,10 +266,6 @@ The routing name to set as default
 #### Returns
 
 `void`
-
-#### Throws
-
-Will throw if the routing is not registered
 
 ***
 

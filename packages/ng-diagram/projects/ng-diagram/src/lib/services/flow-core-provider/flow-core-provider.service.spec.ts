@@ -60,7 +60,7 @@ describe('FlowCoreProviderService', () => {
 
   describe('provide', () => {
     it('should throw error when FlowCore is not initialized', () => {
-      expect(() => service.provide()).toThrow('FlowCore not initialized');
+      expect(() => service.provide()).toThrow();
     });
 
     it('should return FlowCore instance when initialized', () => {

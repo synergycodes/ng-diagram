@@ -1,6 +1,33 @@
 import { EdgeRoutingContext, EdgeRoutingManager } from '../../../edge-routing-manager';
 import { Edge, Node, Point, PortLocation } from '../../../types';
+import { isValidPosition } from '../../../utils/measurement-validation';
 import { getSourceTargetPositions } from './get-source-target-positions';
+
+const INVALID_EDGE_COORDINATES_WARNING = (
+  edgeId: string,
+  source: string,
+  sourcePort: string | undefined,
+  target: string,
+  targetPort: string | undefined
+) =>
+  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'. This usually happens when sourcePort or targetPort is missing or doesn't exist on the node.
+
+Edge details:
+  • source: ${source} (port: ${sourcePort || 'not specified'})
+  • target: ${target} (port: ${targetPort || 'not specified'})
+
+To fix this:
+  • Ensure sourcePort and targetPort are specified on the edge
+  • Verify the ports exist in the source and target nodes
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/
+`;
+
+const ROUTING_NOT_REGISTERED_WARNING = (routing: string) =>
+  `[ngDiagram] Edge routing '${routing}' is not registered. Falling back to default routing.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/routing/
+`;
 
 /**
  * Checks if the required ports for an edge are properly initialized with position and size.
@@ -79,6 +106,11 @@ export const computeAutoModePoints = (
     return routingManager.computePoints(edge.routing, context);
   }
 
+  // Warn if edge specified a routing that wasn't registered
+  if (edge.routing && !routingManager.hasRouting(edge.routing)) {
+    console.warn(ROUTING_NOT_REGISTERED_WARNING(edge.routing));
+  }
+
   const defaultRouting = routingManager.getDefaultRouting();
   if (routingManager.hasRouting(defaultRouting)) {
     return routingManager.computePoints(defaultRouting, context);
@@ -105,6 +137,13 @@ export const getEdgePoints = (edge: Edge, nodesMap: Map<string, Node>, routingMa
   const [source, target] = getSourceTargetPositions(edge, nodesMap) as [PortLocation, PortLocation];
   const sourcePoint = portLocationToPoint(source);
   const targetPoint = portLocationToPoint(target);
+
+  if (!isValidPosition(sourcePoint) || !isValidPosition(targetPoint)) {
+    console.error(
+      INVALID_EDGE_COORDINATES_WARNING(edge.id, edge.source, edge.sourcePort, edge.target, edge.targetPort)
+    );
+    return { sourcePoint: undefined, targetPoint: undefined, points: [] };
+  }
 
   const isManualMode = edge.routingMode === 'manual';
   const hasManualPoints = edge.points && edge.points.length > 0;
