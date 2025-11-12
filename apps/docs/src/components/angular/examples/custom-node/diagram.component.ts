@@ -52,7 +52,7 @@ export class DiagramComponent {
           tooltip: 'Node 1 is a custom node',
         },
         rotatable: true,
-        resizable: true,
+        resizable: false,
       },
       {
         id: '2',
@@ -64,7 +64,7 @@ export class DiagramComponent {
           tooltip: 'Node 2 is a custom node',
         },
         rotatable: true,
-        resizable: true,
+        resizable: false,
         angle: 30,
       },
     ],

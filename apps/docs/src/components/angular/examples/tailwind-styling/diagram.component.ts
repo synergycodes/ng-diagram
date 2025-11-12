@@ -51,7 +51,7 @@ export class DiagramComponent {
           tooltip: 'Styles are applied with Tailwind CSS',
         },
         rotatable: true,
-        resizable: true,
+        resizable: false,
       },
       {
         id: '2',
@@ -63,7 +63,7 @@ export class DiagramComponent {
           tooltip: 'Styles are applied with Tailwind CSS',
         },
         rotatable: true,
-        resizable: true,
+        resizable: false,
         angle: 30,
       },
     ],

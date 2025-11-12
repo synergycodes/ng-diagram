@@ -1,28 +1,29 @@
 <ng-diagram-node-rotate-adornment />
 <ng-diagram-node-resize-adornment>
   <div
-    class="flex flex-col p-3 rounded-lg bg-white border border-gray-300 w-full h-full"
+    class="flex flex-col p-3 rounded-lg bg-white border border-gray-300 w-full h-full text-xs"
   >
-    <div class="flex justify-between items-center font-bold mb-1">
-      <div>
+    <div class="flex justify-between items-center mb-1">
+      <div class="font-bold text-lg">
         {{ node().data.name }}
       </div>
       <div>
-        <span
+        <div
           class="inline-block text-xs h-5 px-2 rounded-full text-white mb-2 leading-5"
           [ngClass]="{
             'bg-green-500': selectedState === 'Active',
             'bg-red-500': selectedState === 'Error',
             'bg-gray-400': selectedState === 'Inactive',
           }"
-          >{{ selectedState }}</span
         >
+          {{ selectedState }}
+        </div>
       </div>
     </div>
-    <div class="text-sm cursor-help" title="{{ node().data.tooltip }}">
-      {{ node().data.description }}
+    <div class="text-xs cursor-help" title="{{ node().data.tooltip }}">
+      <div class="py-2">{{ node().data.description }}</div>
       <form class="h-12 mt-2">
-        <label for="state-select" class="mr-2">State:</label>
+        <label for="state-select" class="!mr-2">State:</label>
         <select
           id="state-select"
           [value]="selectedState"

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, input, model } from '@angular/core';
 import {
   NgDiagramNodeResizeAdornmentComponent,
@@ -19,6 +20,7 @@ type CustomDataType = {
     NgDiagramNodeRotateAdornmentComponent,
     NgDiagramPortComponent,
     NgDiagramNodeResizeAdornmentComponent,
+    CommonModule,
   ],
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
