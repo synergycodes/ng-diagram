@@ -9,8 +9,8 @@ import {
 @Component({
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
-    stroke="rebeccapurple"
-    sourceArrowhead="ng-diagram-arrow"
+    stroke="#4C75F2"
+    targetArrowhead="ng-diagram-arrow"
   />`,
   imports: [NgDiagramBaseEdgeComponent],
 })
@@ -48,9 +48,9 @@ export class SinusoidEdgeComponent implements NgDiagramEdgeTemplate {
     const angle = Math.atan2(endY - startY, endX - startX);
 
     // Sinusoidal wave parameters
-    const amplitude = 20;
-    const frequency = Math.max(2, distance / 100);
-    const segments = Math.max(20, Math.floor(distance / 5));
+    const amplitude = 50;
+    const frequency = Math.max(2, distance / 75);
+    const segments = Math.max(20, Math.floor(distance / 2));
 
     const points = [{ x: startX, y: startY }];
 

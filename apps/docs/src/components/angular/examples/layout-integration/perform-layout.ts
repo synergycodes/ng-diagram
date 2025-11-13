@@ -8,12 +8,12 @@ const layoutOptions = {
   'elk.layered.nodePlacement.strategy': 'SIMPLE',
   'elk.layered.cycleBreaking.strategy': 'DEPTH_FIRST',
   'elk.layered.spacing.edgeNodeBetweenLayers': '30',
-  'spacing.edgeNode': '50',
+  'spacing.edgeNode': '70',
   'spacing.nodeNode': '50',
   'layered.spacing.edgeNodeBetweenLayers': '50',
   'layered.spacing.nodeNodeBetweenLayers': '50',
   'edgeLabels.sideSelection': 'ALWAYS_UP',
-  'layering.strategy': 'COFFMAN_GRAHAM',
+  'layering.strategy': 'NETWORK_SIMPLEX',
   'nodePlacement.strategy': 'BRANDES_KOEPF',
 };
 

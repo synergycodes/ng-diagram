@@ -37,6 +37,9 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -44,7 +47,7 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 80, y: 100 },
+        position: { x: 80, y: 140 },
         type: 'customNodeType',
         data: {
           name: 'Node 1',
@@ -56,7 +59,7 @@ export class DiagramComponent {
       },
       {
         id: '2',
-        position: { x: 450, y: 100 },
+        position: { x: 500, y: 0 },
         type: 'customNodeType',
         data: {
           name: 'Node 2',
@@ -74,7 +77,7 @@ export class DiagramComponent {
         source: '1',
         target: '2',
         data: {},
-        sourcePort: 'port-right',
+        sourcePort: 'port-top',
         targetPort: 'port-left',
         sourceArrowhead: 'ng-diagram-arrow',
       },
