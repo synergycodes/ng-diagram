@@ -9,7 +9,7 @@ import {
 @Component({
   template: `<ng-diagram-base-edge
     [edge]="customEdge()"
-    stroke="#4C75F2"
+    stroke="var(--ngd-sinusoid-edge-stroke)"
     targetArrowhead="ng-diagram-arrow"
   />`,
   imports: [NgDiagramBaseEdgeComponent],

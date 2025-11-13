@@ -12,7 +12,7 @@ const STROKE_WIDTH_SELECTED = 4;
 @Component({
   template: `<ng-diagram-base-edge
     [edge]="edge()"
-    stroke="#ECAF40"
+    stroke="var(--ngd-labeled-edge-stroke)"
     [strokeWidth]="strokeWidth()"
   >
     <ng-diagram-base-edge-label id="test-label" [positionOnEdge]="0.5">
