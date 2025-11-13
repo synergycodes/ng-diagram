@@ -29,7 +29,7 @@ type CustomDataType = {
   ],
   host: {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
-    class: 'flex w-full h-full rounded-lg',
+    class: 'flex w-full h-full rounded-lg bg-white dark:bg-neutral-800',
   },
 })
 export class NodeComponent implements NgDiagramNodeTemplate<CustomDataType> {
