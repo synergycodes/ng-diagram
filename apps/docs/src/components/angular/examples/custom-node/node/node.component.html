@@ -28,6 +28,8 @@
           id="state-select"
           [value]="selectedState"
           name="state"
+          data-no-drag="true"
+          data-no-pan="true"
           (change)="onStateChange($event)"
         >
           <option value="Active">Active</option>
