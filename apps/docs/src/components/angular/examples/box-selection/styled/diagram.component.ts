@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -10,18 +11,21 @@ import {
 
 // @section-start:styling
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: [
     `
       .diagram {
         display: flex;
-        height: 20rem;
+        height: var(--ng-diagram-height);
+        border: var(--ng-diagram-border);
 
         --ngd-box-selection-border-color: rgba(40, 255, 2, 0.5);
         --ngd-box-selection-border-size: 2px;
@@ -36,7 +40,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: 100,
+        padding: 200,
       },
     },
   } satisfies NgDiagramConfig;

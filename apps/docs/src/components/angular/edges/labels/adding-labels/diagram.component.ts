@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
@@ -14,7 +15,12 @@ import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component'
 
 @Component({
   selector: 'diagram',
-  imports: [NgDiagramComponent, FormsModule, LabelPanel],
+  imports: [
+    NgDiagramComponent,
+    FormsModule,
+    LabelPanel,
+    NgDiagramBackgroundComponent,
+  ],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
@@ -22,7 +28,9 @@ import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component'
         [model]="model"
         [edgeTemplateMap]="edgeTemplateMap"
         [config]="config"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
       <label-panel />
     </div>
   `,
@@ -30,7 +38,8 @@ import { ModifiableLabelEdgeComponent } from './modifiable-label-edge.component'
     .diagram {
       position: relative;
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })

@@ -23,6 +23,7 @@
   --ngd-default-edge-label-bg-primary-default: var(--ngd-colors-gray-100);
   --ngd-background-line-minor-color: var(--ngd-colors-gray-450);
   --ngd-background-line-major-color: var(--ngd-colors-gray-500);
+  --ngd-ui-border-color: var(--ngd-colors-gray-300);
 }
 
 /* OPTIONAL DARK THEME */
@@ -48,4 +49,5 @@ html[data-theme='dark'] {
   --ngd-default-edge-label-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-background-line-minor-color: var(--ngd-colors-gray-700);
   --ngd-background-line-major-color: var(--ngd-colors-gray-600);
+  --ngd-ui-border-color: var(--ngd-colors-gray-700);
 }

@@ -6,6 +6,22 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Custom layout styles for the documentation site */
+html {
+  --sl-content-width: 50rem;
+  --sl-sidebar-width: 20rem;
+  --sl-content-pad-x: 3.5rem;
+
+  --ng-diagram-height: 30rem;
+  --ng-diagram-border: 1px solid var(--ngd-ui-border-color);
+}
+@media (min-width: 80rem) {
+  html {
+    --sl-content-width: 60rem;
+    --sl-sidebar-width: 24.75rem;
+  }
+}
+
 @layer reset {
   * {
     margin: 0;

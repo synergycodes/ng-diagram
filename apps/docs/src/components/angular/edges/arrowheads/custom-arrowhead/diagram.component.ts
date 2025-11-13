@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 // @collapse-start
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -14,11 +15,17 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
 // @mark-end
 
 @Component({
-  imports: [NgDiagramComponent, CustomArrowheadsComponent],
+  imports: [
+    NgDiagramComponent,
+    CustomArrowheadsComponent,
+    NgDiagramBackgroundComponent,
+  ],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
       <!-- @mark-start -->
       <custom-arrowheads />
       <!-- @mark-end -->
@@ -28,7 +35,8 @@ import { CustomArrowheadsComponent } from './custom-arrowheads.component';
   styles: `
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
   // @collapse-end
@@ -39,6 +47,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
+        padding: 100,
       },
     },
   } satisfies NgDiagramConfig;

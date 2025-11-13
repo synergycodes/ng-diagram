@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -11,7 +12,7 @@ import {
 import { CustomNodeComponent } from './node/node.component';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -20,7 +21,9 @@ import { CustomNodeComponent } from './node/node.component';
         [model]="model"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrl: './diagram.component.scss',
@@ -33,6 +36,10 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+        padding: 180,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -47,6 +54,6 @@ export class DiagramComponent {
       },
     ],
     edges: [],
-    metadata: { viewport: { x: 200, y: 130, scale: 1.6 } },
+    metadata: { viewport: { x: 0, y: 0, scale: 1 } },
   });
 }

@@ -18,6 +18,8 @@
     </button>
   </div>
   <div class="not-content diagram">
-    <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares" />
+    <ng-diagram [model]="model" [config]="config" [middlewares]="middlewares">
+      <ng-diagram-background />
+    </ng-diagram>
   </div>
 </div>

@@ -33,7 +33,7 @@ Distance in pixels between consecutive dots in the background pattern.
 #### Default
 
 ```ts
-60
+30
 ```
 
 ***

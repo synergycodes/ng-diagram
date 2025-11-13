@@ -1,7 +1,8 @@
 // @section-start
 .custom-diagram {
   display: flex;
-  height: 20rem;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
 
   // @mark-start:styles
   --ngd-default-edge-stroke: sienna;
