@@ -12,12 +12,12 @@ const STROKE_WIDTH_SELECTED = 4;
 @Component({
   template: `<ng-diagram-base-edge
     [edge]="edge()"
-    stroke="orange"
+    stroke="var(--ngd-labeled-edge-stroke)"
     [strokeWidth]="strokeWidth()"
   >
     <ng-diagram-base-edge-label id="test-label" [positionOnEdge]="0.5">
       <button
-        style="white-space: nowrap; padding: 4px 8px;"
+        style="white-space: nowrap; padding: 4px 8px; background: var(--ngd-node-bg-primary-default); border: none;"
         (click)="onButtonClick()"
       >
         Click Me

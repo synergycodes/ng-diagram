@@ -1,5 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
-import { NgDiagramModelService, NgDiagramService } from 'ng-diagram';
+import {
+  NgDiagramModelService,
+  NgDiagramService,
+  NgDiagramViewportService,
+} from 'ng-diagram';
 import { performLayout } from '../perform-layout';
 
 @Component({
@@ -15,6 +19,7 @@ import { performLayout } from '../perform-layout';
 export class LayoutButtonsComponent {
   diagramService = inject(NgDiagramService);
   modelService = inject(NgDiagramModelService);
+  viewportService = inject(NgDiagramViewportService);
 
   nodes = computed(() => this.modelService.getModel().getNodes());
   edges = computed(() => this.modelService.getModel().getEdges());
@@ -32,5 +37,9 @@ export class LayoutButtonsComponent {
     if (finalEdges.length > 0) {
       this.modelService.updateEdges(finalEdges);
     }
+
+    setTimeout(() => {
+      this.viewportService.zoomToFit();
+    }, 1);
   }
 }
