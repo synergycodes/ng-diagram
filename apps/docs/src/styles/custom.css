@@ -1,7 +1,10 @@
+@import 'tailwindcss';
 @layer reset, starlight;
 @import 'ng-diagram/styles.css';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import './content-tiles.css';
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer reset {
   * {
