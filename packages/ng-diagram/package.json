@@ -44,7 +44,7 @@
     "@angular-eslint/builder": "^19.3.0",
     "@angular/cli": "^19.2.8",
     "@angular/compiler-cli": "^19.2.7",
-    "@eslint/js": "^9.25.1",
+    "@eslint/js": "^9.39.1",
     "@microsoft/api-extractor": "^7.53.1",
     "@nx/vite": "^20.8.0",
     "angular-eslint": "19.3.0",
