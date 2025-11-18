@@ -127,7 +127,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
     if (!topLevelGroupNode) {
       for (const node of selectedNodes) {
-        if (node.groupId != null) {
+        if (node.groupId !== undefined && !selectedNodes.find((n) => n.id === node.groupId)) {
           await this.flow.commandHandler.emit('removeFromGroup', {
             groupId: node.groupId,
             nodeIds: [node.id],
