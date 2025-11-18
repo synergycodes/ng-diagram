@@ -450,7 +450,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       });
 
       it('should handle nodes with null groupId correctly', async () => {
-        const nodeWithNullGroup = { ...mockNode, id: 'node1', groupId: null };
+        const nodeWithNullGroup = { ...mockNode, id: 'node1', groupId: undefined };
 
         mockModelLookup.getSelectedNodes.mockReturnValue([nodeWithNullGroup]);
         mockGetNodesInRange.mockReturnValue([]);
