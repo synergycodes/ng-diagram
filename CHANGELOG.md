@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed multiple documentation issues and broken API links ([#356](https://github.com/synergycodes/ng-diagram/pull/356))
 - Fixed post-release Angular 18 issues ([#355](https://github.com/synergycodes/ng-diagram/pull/355))
 - Resolved context menu example to enable copying multiple nodes
+- Fixed diagram capturing all keyboard events on page ([#355](https://github.com/synergycodes/ng-diagram/pull/444))
 
 ## [0.4.0-beta.5] - 2025-10-14
 

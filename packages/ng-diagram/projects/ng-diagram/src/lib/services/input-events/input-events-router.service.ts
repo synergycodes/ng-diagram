@@ -49,7 +49,6 @@ export class InputEventsRouterService extends InputEventsRouter {
     isArrowKeyPressed: this.isArrowKeyPressed.bind(this),
     isKeyPressed: this.isKeyPressed.bind(this),
     isKeyComboPressed: this.isKeyComboPressed.bind(this),
-    isDeleteKeyPressed: this.isDeleteKeyPressed.bind(this),
   };
 
   private keysMap = {
@@ -150,18 +149,5 @@ export class InputEventsRouterService extends InputEventsRouter {
 
       return this.isKeyPressed(key)(event);
     };
-  }
-
-  private isDeleteKeyPressed(event: Event): boolean {
-    if (!this.isKeyboardEvent(event)) return false;
-
-    const target = event.target as HTMLElement | null;
-
-    const isEditableTarget = (el: HTMLElement | null) =>
-      el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
-
-    if (isEditableTarget(target)) return false;
-
-    return event.key === this.keysMap.keys.delete || event.key === this.keysMap.keys.backspace;
   }
 }
