@@ -42,7 +42,7 @@ export class DiagramComponent {
       max: 3,
       zoomToFit: {
         onInit: true,
-        padding: 120,
+        padding: 50,
       },
     },
   } satisfies NgDiagramConfig;
