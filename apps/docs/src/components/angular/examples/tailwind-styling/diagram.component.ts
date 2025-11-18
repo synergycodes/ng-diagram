@@ -19,7 +19,7 @@ enum NodeTemplateType {
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="not-content diagram">
+    <div class="not-content diagram flex h-[30rem]">
       <ng-diagram
         [model]="model"
         [config]="config"
@@ -27,7 +27,6 @@ enum NodeTemplateType {
       />
     </div>
   `,
-  styleUrl: './diagram.component.scss',
 })
 export class DiagramComponent {
   nodeTemplateMap = new NgDiagramNodeTemplateMap([
@@ -37,9 +36,6 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
-      zoomToFit: {
-        onInit: true,
-      },
     },
   } satisfies NgDiagramConfig;
 
@@ -47,24 +43,24 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 80, y: 140 },
+        position: { x: 80, y: 100 },
         type: 'customNodeType',
         data: {
           name: 'Node 1',
-          description: 'This is Node 1',
-          tooltip: 'Node 1 is a custom node',
+          description: 'This is Tailwind Node 1',
+          tooltip: 'Styles are applied with Tailwind CSS',
         },
         rotatable: true,
         resizable: false,
       },
       {
         id: '2',
-        position: { x: 500, y: 0 },
+        position: { x: 450, y: 100 },
         type: 'customNodeType',
         data: {
           name: 'Node 2',
-          description: 'This is Node 2',
-          tooltip: 'Node 2 is a custom node',
+          description: 'This is Tailwind Node 2',
+          tooltip: 'Styles are applied with Tailwind CSS',
         },
         rotatable: true,
         resizable: false,
@@ -77,7 +73,7 @@ export class DiagramComponent {
         source: '1',
         target: '2',
         data: {},
-        sourcePort: 'port-top',
+        sourcePort: 'port-right',
         targetPort: 'port-left',
         sourceArrowhead: 'ng-diagram-arrow',
       },
