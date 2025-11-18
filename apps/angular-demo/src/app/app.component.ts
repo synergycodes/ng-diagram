@@ -6,6 +6,8 @@ import {
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
   initializeModel,
+  ModelAdapter,
+  ModelChanges,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
@@ -33,6 +35,26 @@ import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.com
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
+
+const registerNgDiagramExtension = (model: ModelAdapter) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const win = window as any;
+
+  const changeListener = (change: ModelChanges) => {
+    win.ngDiagramExtension?.sendDiagram(change);
+  };
+
+  model.onChange(changeListener);
+  changeListener({
+    nodes: model.getNodes(),
+    edges: model.getEdges(),
+    metadata: model.getMetadata(),
+  });
+
+  return () => {
+    model.unregisterOnChange(changeListener);
+  };
+};
 
 @Component({
   selector: 'app-root',
@@ -88,6 +110,7 @@ export class AppComponent {
 
   onDiagramInit(event: DiagramInitEvent): void {
     console.log('INIT');
+    registerNgDiagramExtension(this.model);
     event.nodes.forEach((node: Node) => {
       console.log(`${node.size?.width} ${node.size?.height}`);
       if (node.measuredPorts) {
