@@ -14,8 +14,8 @@ import { PointerMoveSelectionEventHandler } from './handlers/pointer-move-select
 import { RedoEventHandler } from './handlers/redo/redo.handler';
 import { ResizeEventHandler } from './handlers/resize/resize.handler';
 import { RotateEventHandler } from './handlers/rotate/rotate.handler';
-import { SelectEventHandler } from './handlers/select/select.handler';
 import { SelectAllEventHandler } from './handlers/select-all/select-all.handler';
+import { SelectEventHandler } from './handlers/select/select.handler';
 import { UndoEventHandler } from './handlers/undo/undo.handler';
 import { ZoomingEventHandler } from './handlers/zooming/zooming.handler';
 import { BaseInputEvent, InputEventName } from './input-events.interface';
@@ -56,5 +56,9 @@ export abstract class InputEventsRouter {
     this.register('boxSelection', new BoxSelectionEventHandler(flow));
     this.register('undo', new UndoEventHandler(flow));
     this.register('redo', new RedoEventHandler(flow));
+  }
+
+  hasHandler(eventName: InputEventName): boolean {
+    return !!this.handlers[eventName];
   }
 }
