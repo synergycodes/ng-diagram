@@ -21,6 +21,8 @@ describe('zIndexMiddleware', () => {
       checkIfAnyEdgePropsChanged: vi.fn(),
       getAffectedNodeIds: vi.fn(),
       getAffectedEdgeIds: vi.fn(),
+      anyNodesAdded: vi.fn(),
+      getAddedNodes: vi.fn(),
     };
 
     nodesMap = new Map();
@@ -637,9 +639,9 @@ describe('zIndexMiddleware', () => {
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
-      // Should process node only once with selected z-index (selected takes precedence)
+      // Should process node only once with group-based z-index (group's z-index + 1)
       expect(nextMock).toHaveBeenCalledWith({
-        nodesToUpdate: [{ id: 'child1', computedZIndex: DEFAULT_SELECTED_Z_INDEX }],
+        nodesToUpdate: [{ id: 'child1', computedZIndex: 6 }],
       });
 
       // Verify no duplicate updates
@@ -684,7 +686,7 @@ describe('zIndexMiddleware', () => {
 
       expect(nodeIds.length).toBe(1);
       expect(nodeIds[0]).toBe('node1');
-      expect(updates[0].computedZIndex).toBe(DEFAULT_SELECTED_Z_INDEX); // selected takes precedence
+      expect(updates[0].computedZIndex).toBe(6); // group's z-index (5) + 1
     });
 
     it('should allow zOrder to override previous processing (intentional behavior)', () => {
