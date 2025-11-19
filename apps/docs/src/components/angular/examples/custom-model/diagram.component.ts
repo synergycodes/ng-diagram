@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import type { NgDiagramConfig, Node } from 'ng-diagram';
 import {
+  NgDiagramNodeTemplateMap,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
-  NgDiagramNodeTemplateMap,
 } from 'ng-diagram';
 import { LocalStorageModelAdapter } from './local-storage-model-adapter';
 import { NodeComponent } from './node/node.component';
@@ -15,7 +16,7 @@ enum NodeTemplateType {
 
 @Component({
   selector: 'diagram',
-  imports: [CommonModule, NgDiagramComponent],
+  imports: [CommonModule, NgDiagramComponent, NgDiagramBackgroundComponent],
   templateUrl: './diagram.component.html',
   styleUrl: './diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +31,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
+        padding: 180,
       },
     },
   };

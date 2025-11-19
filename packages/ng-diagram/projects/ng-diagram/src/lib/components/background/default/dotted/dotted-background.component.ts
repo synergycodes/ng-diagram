@@ -1,4 +1,5 @@
 import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
+import { NgDiagramService } from '../../../../../public-api';
 import { FlowCoreProviderService } from '../../../../services';
 import { BackgroundPatternBase } from '../../background-pattern.base';
 
@@ -10,10 +11,12 @@ import { BackgroundPatternBase } from '../../background-pattern.base';
 })
 export class DottedBackgroundComponent extends BackgroundPatternBase {
   private readonly flowCoreService = inject(FlowCoreProviderService);
+  private readonly diagramService = inject(NgDiagramService);
 
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
   dotSpacing = computed(() => {
-    return this.flowCoreService.isInitialized() ? this.flowCoreService.provide().config.background.dotSpacing : 0;
+    const backgroundConfig = this.diagramService.config().background;
+    return this.flowCoreService.isInitialized() && backgroundConfig ? backgroundConfig.dotSpacing : 0;
   });
 }

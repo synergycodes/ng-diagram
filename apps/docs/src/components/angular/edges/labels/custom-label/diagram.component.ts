@@ -4,6 +4,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
@@ -13,7 +14,7 @@ import {
 import { CustomLabelEdgeComponent } from './custom-label-edge.component';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
@@ -21,13 +22,16 @@ import { CustomLabelEdgeComponent } from './custom-label-edge.component';
         [model]="model"
         [edgeTemplateMap]="edgeTemplateMap"
         [config]="config"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: `
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })

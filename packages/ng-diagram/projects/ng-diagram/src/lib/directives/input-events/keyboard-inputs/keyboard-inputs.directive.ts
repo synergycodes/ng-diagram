@@ -1,5 +1,6 @@
 import { Directive, ElementRef, inject } from '@angular/core';
 
+import { InputEventName } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { KeyboardAction } from './keyboard-actions/keyboard-action.interface';
@@ -58,6 +59,13 @@ export class KeyboardInputsDirective {
 
       if (event) {
         this.inputEventsRouter.emit(event);
+      } else {
+        if (this.inputEventsRouter.hasHandler(shortcut.actionName as InputEventName)) {
+          this.inputEventsRouter.emit({
+            ...baseEvent,
+            name: shortcut.actionName as InputEventName,
+          });
+        }
       }
     }
   }

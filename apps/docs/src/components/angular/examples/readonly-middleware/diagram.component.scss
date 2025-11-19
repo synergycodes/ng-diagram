@@ -6,22 +6,27 @@
 }
 
 .diagram-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 25rem;
-  border: 5px solid var(--ngd-ui-border-default);
-  background-color: var(--ngd-ui-bg-tertiary-default);
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
 }
 
 .controls {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  right: 1rem;
   padding: 1rem;
-  background: var(--sl-color-bg-nav);
   display: flex;
   align-items: center;
   gap: 1rem;
   flex-shrink: 0;
   justify-content: end;
+  background-color: var(--ngd-node-bg-primary-default);
+  border: var(--ng-diagram-border);
 }
 
 .readonly-toggle {
@@ -59,6 +64,7 @@
 }
 
 .diagram {
+  margin-top: 0;
   flex-grow: 1;
 
   ng-diagram {

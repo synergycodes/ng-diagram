@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
@@ -12,13 +13,15 @@ import { CustomEdgeComponent } from './custom-edge.component';
 
 // @section-start
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   // @mark-substring:[edgeTemplateMap]="edgeTemplateMap"
   // @mark-start
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap" />
+      <ng-diagram [model]="model" [edgeTemplateMap]="edgeTemplateMap">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   // @mark-end
@@ -26,7 +29,8 @@ import { CustomEdgeComponent } from './custom-edge.component';
   styles: `
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
   // @collapse-end

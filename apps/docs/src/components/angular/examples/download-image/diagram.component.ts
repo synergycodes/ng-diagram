@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { Component, ElementRef, viewChild, type Signal } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
   provideNgDiagram,
@@ -11,11 +12,15 @@ import { GenerateImageService } from './generate-image.service';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 
 @Component({
-  imports: [NgDiagramComponent, NavBarComponent],
+  imports: [NgDiagramComponent, NavBarComponent, NgDiagramBackgroundComponent],
   template: `
-    <nav-bar [diagramRef]="diagramElementRef()"></nav-bar>
     <div class="not-content diagram">
-      <ng-diagram #ngDiagram [model]="model" [config]="config" />
+      <ng-diagram #ngDiagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
+      <div class="nav-bar">
+        <nav-bar [diagramRef]="diagramElementRef()"></nav-bar>
+      </div>
     </div>
   `,
   styleUrl: './diagram.component.scss',

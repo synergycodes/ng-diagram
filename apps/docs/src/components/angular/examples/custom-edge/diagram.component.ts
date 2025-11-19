@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   NgDiagramNodeTemplateMap,
@@ -19,7 +20,11 @@ enum NodeTemplateType {
 }
 
 @Component({
-  imports: [NgDiagramComponent, CircleArrowheadComponent],
+  imports: [
+    NgDiagramComponent,
+    NgDiagramBackgroundComponent,
+    CircleArrowheadComponent,
+  ],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
@@ -28,7 +33,9 @@ enum NodeTemplateType {
         [edgeTemplateMap]="edgeTemplateMap"
         [nodeTemplateMap]="nodeTemplateMap"
         [config]="config"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
       <circle-arrowhead />
     </div>
   `,

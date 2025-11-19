@@ -4,17 +4,20 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [config]="config" [model]="model" />
+      <ng-diagram [config]="config" [model]="model">
+        <ng-diagram-background />
+      </ng-diagram>
       <svg height="0" width="0">
         <defs>
           <!-- @mark-start -->
@@ -43,7 +46,8 @@ import {
     }
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })
