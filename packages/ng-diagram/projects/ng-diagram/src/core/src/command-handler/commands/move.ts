@@ -1,14 +1,11 @@
 import { NgDiagramMath } from '../../math';
-import type { CommandHandler, Node } from '../../types';
+import type { CommandHandler, Node, Point } from '../../types';
 import { isSamePoint } from '../../utils';
 
 export interface MoveNodesByCommand {
   name: 'moveNodesBy';
   nodes: Node[];
-  delta: {
-    x: number;
-    y: number;
-  };
+  delta: Point;
 }
 
 export const moveNodesBy = async (
@@ -31,9 +28,9 @@ const processRootNodesWithDescendants = (
   commandHandler: CommandHandler,
   rootNodes: Node[],
   nodeIdsBeingMoved: Set<string>,
-  delta: { x: number; y: number }
-): { id: Node['id']; position: Node['position'] }[] => {
-  const nodesToUpdate: { id: Node['id']; position: Node['position'] }[] = [];
+  delta: Point
+): { id: string; position: Point }[] => {
+  const nodesToUpdate: { id: string; position: Point }[] = [];
   const processedNodeIds = new Set<string>();
 
   rootNodes.forEach((rootNode) => {
@@ -60,8 +57,8 @@ const processRootNodesWithDescendants = (
 const calculateRootNodeMovement = (
   commandHandler: CommandHandler,
   node: Node,
-  delta: { x: number; y: number }
-): { snappedPosition: Node['position']; actualDelta: { x: number; y: number } } => {
+  delta: Point
+): { snappedPosition: Point; actualDelta: Point } => {
   const newPosition = {
     x: node.position.x + delta.x,
     y: node.position.y + delta.y,
@@ -78,10 +75,10 @@ const calculateRootNodeMovement = (
 const applyDeltaToDescendants = (
   commandHandler: CommandHandler,
   rootNodeId: string,
-  actualDelta: { x: number; y: number },
+  actualDelta: Point,
   nodeIdsBeingMoved: Set<string>,
   processedNodeIds: Set<string>,
-  nodesToUpdate: { id: Node['id']; position: Node['position'] }[]
+  nodesToUpdate: { id: string; position: Point }[]
 ): void => {
   const descendants = commandHandler.flowCore.modelLookup.getAllDescendants(rootNodeId);
 
@@ -100,11 +97,7 @@ const applyDeltaToDescendants = (
   });
 };
 
-const applySnappingIfNeeded = (
-  commandHandler: CommandHandler,
-  node: Node,
-  nextPosition: Node['position']
-): Node['position'] => {
+const applySnappingIfNeeded = (commandHandler: CommandHandler, node: Node, nextPosition: Point): Point => {
   const { shouldSnapDragForNode, computeSnapForNodeDrag, defaultDragSnap } = commandHandler.flowCore.config.snapping;
   if (!shouldSnapDragForNode(node)) {
     return nextPosition;
