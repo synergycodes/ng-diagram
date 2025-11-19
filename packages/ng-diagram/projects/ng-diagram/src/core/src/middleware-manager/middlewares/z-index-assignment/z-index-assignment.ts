@@ -27,13 +27,15 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     const shouldSnapZOrderNode = helpers.checkIfAnyNodePropsChanged(['zOrder']);
     const shouldSnapEdge = helpers.checkIfAnyEdgePropsChanged(['selected']);
     const isEdgeAdded = checkIfIsEdgeAdded(modelActionType);
+    const isNodeAdded = helpers.anyNodesAdded();
     const shouldReOrder =
       isInit ||
       shouldSnapGroupIdNode ||
       shouldSnapSelectedNode ||
       isEdgeAdded ||
       shouldSnapEdge ||
-      shouldSnapZOrderNode;
+      shouldSnapZOrderNode ||
+      isNodeAdded;
 
     if (!isEnabled || !shouldReOrder) {
       next();
@@ -50,11 +52,40 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
       nodesWithZIndex = initializeZIndex(nodesMap);
       nodesWithZIndex.forEach((node) => processedNodeIds.add(node.id));
     }
+
+    if (isNodeAdded) {
+      nodesWithZIndex = [
+        ...nodesWithZIndex,
+        ...initializeZIndex(
+          helpers.getAddedNodes().reduce((map, node) => map.set(node.id, node), new Map<string, Node>())
+        ),
+      ];
+    }
+
     const selectedZIndex = zIndexConfig.selectedZIndex;
+
+    const getGroupCurrentZIndex = (node: Node): number => {
+      return node.groupId
+        ? ((nodesWithZIndex.find((n) => n.id === node.groupId) ?? nodesMap.get(node.groupId))?.computedZIndex ?? -1)
+        : -1;
+    };
+
+    const sortWithGroupBefore = (a: string, b: string) => {
+      const nodeA = nodesMap.get(a);
+      const nodeB = nodesMap.get(b);
+      if (!nodeA || !nodeB) return 0;
+
+      if (nodeA.groupId && nodeA.groupId === nodeB.id) {
+        return 1;
+      } else if (nodeB.groupId && nodeB.groupId === nodeA.id) {
+        return -1;
+      }
+      return 0;
+    };
 
     // Partial for Node
     if (shouldSnapSelectedNode) {
-      for (const nodeId of helpers.getAffectedNodeIds(['selected'])) {
+      for (const nodeId of helpers.getAffectedNodeIds(['selected']).sort(sortWithGroupBefore)) {
         if (processedNodeIds.has(nodeId)) {
           // If the node is already processed, skip it
           continue;
@@ -63,11 +94,13 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         if (!node) continue;
         const baseZIndex =
           node.selected && zIndexConfig.elevateOnSelection
-            ? selectedZIndex
+            ? node.groupId
+              ? getGroupCurrentZIndex(node) + 1
+              : selectedZIndex
             : node.zOrder !== undefined
               ? node.zOrder
               : node.groupId
-                ? (nodesMap.get(node.groupId)?.computedZIndex ?? -1) + 1
+                ? getGroupCurrentZIndex(node) + 1
                 : 0;
         const assignedNodes = assignNodeZIndex(
           node,
@@ -79,22 +112,22 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         assignedNodes.forEach((n) => processedNodeIds.add(n.id));
       }
     } else if (shouldSnapGroupIdNode) {
-      for (const nodeId of helpers.getAffectedNodeIds(['groupId'])) {
+      for (const nodeId of helpers.getAffectedNodeIds(['groupId']).sort(sortWithGroupBefore)) {
         if (processedNodeIds.has(nodeId)) {
           // If the node is already processed, skip it
           continue;
         }
         const node = nodesMap.get(nodeId);
         if (!node || node?.selected) continue;
-        const baseZIndex = node.groupId ? (nodesMap.get(node.groupId)?.computedZIndex ?? -1) + 1 : 0;
-        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex);
+        const baseZIndex = node.groupId ? getGroupCurrentZIndex(node) + 1 : 0;
+        const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex, node.selected);
         nodesWithZIndex.push(...assignedNodes);
         assignedNodes.forEach((n) => processedNodeIds.add(n.id));
       }
     }
 
     if (shouldSnapZOrderNode) {
-      for (const nodeId of helpers.getAffectedNodeIds(['zOrder'])) {
+      for (const nodeId of helpers.getAffectedNodeIds(['zOrder']).sort(sortWithGroupBefore)) {
         const node = nodesMap.get(nodeId);
         if (!node) continue;
         nodesWithZIndex.push({ ...node, computedZIndex: node.zOrder });
