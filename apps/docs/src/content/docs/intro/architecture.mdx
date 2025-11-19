@@ -34,6 +34,7 @@ The user-facing components that render the diagram and handle user interactions:
 - [**ng-diagram-base-edge**](/docs/api/components/ngdiagrambaseedgecomponent): Foundation component for building custom edge templates with advanced styling and behavior
 - [**ng-diagram-base-edge-label**](/docs/api/components/ngdiagrambaseedgelabelcomponent): Base component for creating custom edge labels with consistent styling and positioning
 - [**ng-diagram-port**](/docs/api/components/ngdiagramportcomponent): Port component that defines connection points on nodes for edge connections
+- [**ng-diagram-base-node-template**](/docs/api/components/ngdiagrambasenodetemplatecomponent): Base component for creating custom node templates with default styling and features.
 
 ### Service Layer
 
@@ -47,7 +48,7 @@ Specialized services provide different levels of control and functionality:
 - [**NgDiagramGroupsService**](/docs/api/services/ngdiagramgroupsservice): Manages group node operations such as member management
 - [**NgDiagramClipboardService**](/docs/api/services/ngdiagramclipboardservice): Manages copy/paste operations for diagram elements
 
-All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior. Learn more in the [Services documentation](/docs/intro/services).
+All services are provided through [`provideNgDiagram()`](/docs/api/utilities/providengdiagram), allowing multiple diagrams on the same page to maintain their own isolated state and behavior. Learn more in the [Services documentation](/docs/intro/services).
 
 ### Event Layer
 
