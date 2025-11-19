@@ -27,7 +27,7 @@ export const deleteSelection = async (commandHandler: CommandHandler) => {
   }
 
   const nodesToDeleteIds = isAnyNodeSelected
-    ? commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren().map((node) => node.id)
+    ? commandHandler.flowCore.modelLookup.getSelectedNodesWithChildren({ directOnly: false }).map((node) => node.id)
     : [];
 
   const edgesToDeleteIds = getEdgesToRemove({ edges, nodesToDeleteIds });

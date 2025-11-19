@@ -4,7 +4,7 @@ import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
 export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMoveSelectionEvent> {
   handle(event: KeyboardMoveSelectionEvent): void {
-    const nodesToMove = this.flow.modelLookup.getSelectedNodesWithChildren();
+    const nodesToMove = this.flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
     if (nodesToMove.length === 0) {
       return;
     }

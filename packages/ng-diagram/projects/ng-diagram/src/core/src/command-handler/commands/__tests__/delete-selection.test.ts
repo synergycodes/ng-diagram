@@ -83,4 +83,37 @@ describe('Delete Selection Command', () => {
       'deleteSelection'
     );
   });
+
+  it('should delete all nodes in a 3-level nested group when grandparent is selected', () => {
+    const nodes = [
+      { id: 'grandparent', selected: true },
+      { id: 'parent', selected: false, groupId: 'grandparent' },
+      { id: 'child', selected: false, groupId: 'parent' },
+      { id: 'standalone', selected: false },
+    ];
+    const edges = [
+      { id: 'edge1', selected: false, source: 'grandparent', target: 'standalone' },
+      { id: 'edge2', selected: false, source: 'parent', target: 'standalone' },
+      { id: 'edge3', selected: false, source: 'child', target: 'standalone' },
+      { id: 'edge4', selected: false, source: 'standalone', target: 'standalone' },
+    ];
+
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+
+    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+      nodes[0], // grandparent
+      nodes[1], // parent
+      nodes[2], // child
+    ]);
+
+    commandHandler.emit('deleteSelection');
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        nodesToRemove: ['grandparent', 'parent', 'child'],
+        edgesToRemove: ['edge1', 'edge2', 'edge3'],
+      },
+      'deleteSelection'
+    );
+  });
 });
