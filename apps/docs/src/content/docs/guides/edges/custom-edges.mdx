@@ -9,13 +9,13 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 When ngDiagram's default edge customizations are not sufficient, you can create custom edges that provide more precise control over edge rendering, including routing.
 
-You can create a custom edge by extending `NgDiagramBaseEdgeComponent` and implementing `NgDiagramEdgeTemplate`
+You can create a custom edge by extending [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) and implementing `NgDiagramEdgeTemplate`
 
 <CodeSnippet relativePath="edges/custom-edges/custom-edge.component.ts" />
 
 ## Registration
 
-Custom edge types need to be registered in the `edgeTemplateMap` and passed to the `ngDiagram` component.
+Custom edge types need to be registered in the [`edgeTemplateMap`](/docs/api/components/ngdiagramcomponent/#edgetemplatemap) and passed to the [`ngDiagram`](/docs/api/components/ngdiagramcomponent) component.
 
 After registering the custom edge, you can use it in your diagram model by specifying the `type` property of the edge.
 
@@ -23,7 +23,8 @@ After registering the custom edge, you can use it in your diagram model by speci
 
 ## Styling Custom Edges
 
-Custom edges can be styled using CSS variables that the `NgDiagramBaseEdgeComponent` exposes. This approach provides a clean way to customize edge appearance without breaking encapsulation.
+Custom edges can be styled using CSS variables that the [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) exposes.
+This approach provides a clean way to customize edge appearance without breaking encapsulation.
 
 ### Available CSS Variables
 
@@ -55,7 +56,7 @@ ng-diagram-base-edge:hover:not(.selected) {
 
 ### Alternative: Component Inputs
 
-You can also pass styling properties directly to the `NgDiagramBaseEdgeComponent`:
+You can also pass styling properties directly to the [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent):
 
 ```typescript
 @Component({
@@ -76,13 +77,15 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
 
 ## Custom Routing
 
-Custom routing is an extensible mechanism that allows you to create sophisticated edge paths tailored to your specific needs. You can implement custom routing algorithms, create dynamic paths based on node positions, or define manual waypoints for precise control.
+Custom routing is an extensible mechanism that allows you to create sophisticated edge paths tailored to your specific needs.
+You can implement custom routing algorithms, create dynamic paths based on node positions, or define manual waypoints for precise control.
 
 [Routing →](/docs/guides/edges/routing)
 
 ## Adding Edge Labels
 
-To add labels to your custom edges, integrate the `NgDiagramBaseEdgeLabelComponent` within your custom edge component. Here's an implementation example:
+To add labels to your custom edges, integrate the [`NgDiagramBaseEdgeLabelComponent`](/docs/api/components/ngdiagrambaseedgelabelcomponent) within your custom edge component.\
+Here's an implementation example:
 
 <br />
 

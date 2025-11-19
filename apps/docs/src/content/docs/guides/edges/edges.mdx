@@ -31,7 +31,7 @@ interface Edge<T = any> {
 
 ## Adding Edges to a Diagram
 
-To add edges to your diagram, include them in the `edges` array of your model:
+To add edges to your diagram, include them in the [`edges`](/docs/api/types/model/model/#edges) array of your model:
 
 <CodeSnippet relativePath="edges/edges/diagram.component.ts" sectionId="adding-edges" />
 
@@ -42,7 +42,7 @@ NgDiagram provides a default edge implementation that handles most common use ca
 - Automatically calculates the path between connected nodes
 - Supports three [built-in routing algorithms](/docs/guides/edges/routing)
 - Can display arrowheads at either end
-- Supports [labels](/docs/guides/edges/labels) for displaying text on edges
+- Supports [`labels`](/docs/guides/edges/labels) for displaying text on edges
 
 ### Customization
 
@@ -144,7 +144,8 @@ import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 ## User-Created Edges
 
-When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created. This is done through the `linking` configuration in your diagram's config.
+When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created.
+This is done through the [`linking`](/docs/api/types/configuration/flowconfig/#linking) configuration in your diagram's config.
 
 ### Customization
 
