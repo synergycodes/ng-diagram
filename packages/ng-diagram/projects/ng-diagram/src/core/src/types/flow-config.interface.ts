@@ -155,7 +155,7 @@ export interface ZoomConfig {
   max: number;
   /**
    * The zoom step increment.
-   * @default 0.05
+   * @default 0.03
    */
   step: number;
 

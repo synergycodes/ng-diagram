@@ -46,7 +46,7 @@ The zoom step increment.
 #### Default
 
 ```ts
-0.05
+0.03
 ```
 
 ***
