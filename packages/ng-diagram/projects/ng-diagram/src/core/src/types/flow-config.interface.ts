@@ -173,7 +173,7 @@ export interface ZoomConfig {
 export interface BackgroundConfig {
   /**
    * Distance in pixels between consecutive dots in the background pattern.
-   * @default 60
+   * @default 30
    */
   dotSpacing?: number;
   /**

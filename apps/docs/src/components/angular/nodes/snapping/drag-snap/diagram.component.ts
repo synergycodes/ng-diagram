@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -9,12 +10,14 @@ import {
 
 // @section-start:usage
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background type="dots" />
+      </ng-diagram>
     </div>
   `,
   styleUrl: './diagram.component.scss',
@@ -25,6 +28,7 @@ export class DiagramComponent {
       max: 2,
       zoomToFit: {
         onInit: true,
+        padding: 100,
       },
     },
     snapping: {
@@ -40,7 +44,6 @@ export class DiagramComponent {
       {
         id: '1',
         position: { x: 0, y: 0 },
-        size: { width: 260, height: 200 },
         data: { label: 'Node' },
       },
     ],

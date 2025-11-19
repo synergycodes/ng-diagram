@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component, inject } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
   NgDiagramNodeTemplateMap,
@@ -16,19 +17,25 @@ import { NodeComponent } from './node/node.component';
 import { NodeTemplateType } from './types';
 
 @Component({
-  imports: [NgDiagramComponent, LayoutButtonsComponent],
+  imports: [
+    NgDiagramComponent,
+    NgDiagramBackgroundComponent,
+    LayoutButtonsComponent,
+  ],
   template: `
-    <layout-buttons />
     <div class="not-content diagram">
       <ng-diagram
         [model]="model"
         [config]="config"
         (selectionMoved)="onSelectionMoved($event)"
         [nodeTemplateMap]="nodeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
+      <layout-buttons />
     </div>
   `,
-  styleUrls: ['./diagram.component.scss'],
+  styleUrl: './diagram.component.scss',
   providers: [provideNgDiagram()],
 })
 export class DiagramComponent {
@@ -46,6 +53,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
+        padding: 80,
       },
     },
   };

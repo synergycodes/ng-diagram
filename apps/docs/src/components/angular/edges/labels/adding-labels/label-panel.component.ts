@@ -20,11 +20,13 @@ import { NgDiagramModelService } from 'ng-diagram';
   styles: `
     :host {
       z-index: 1;
-      background: #222;
+      background-color: var(--ngd-node-bg-primary-default);
+      border: var(--ng-diagram-border);
       position: absolute;
       width: 8rem;
-      right: 0;
-      height: 100%;
+      top: 1rem;
+      right: 1rem;
+      height: calc(100% - 2rem);
       display: flex;
       flex-direction: column;
       align-items: center;

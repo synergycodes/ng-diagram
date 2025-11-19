@@ -18,15 +18,16 @@ import {
   styles: `
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })
 export class DiagramComponent {
   model = initializeModel({
     nodes: [
-      { id: '1', position: { x: 100, y: 150 }, data: { label: 'Node 1' } },
-      { id: '2', position: { x: 400, y: 150 }, data: { label: 'Node 2' } },
+      { id: '1', position: { x: 200, y: 200 }, data: { label: 'Node 1' } },
+      { id: '2', position: { x: 500, y: 200 }, data: { label: 'Node 2' } },
     ],
     edges: [
       {

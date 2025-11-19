@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -11,23 +12,31 @@ import {
 // @section-start
 @Component({
   // @collapse-start
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: `
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
   // @collapse-end
 })
 export class DiagramComponent {
   config: NgDiagramConfig = {
+    zoom: {
+      zoomToFit: {
+        onInit: true,
+      },
+    },
     // @mark-start
     edgeRouting: {
       defaultRouting: 'orthogonal', // Set default routing

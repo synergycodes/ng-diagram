@@ -7,12 +7,7 @@ import { GenerateImageService } from '../generate-image.service';
 
 @Component({
   selector: 'nav-bar',
-  template: `
-    <div class="nav-bar">
-      <button class="btn" (click)="download()">Download</button>
-    </div>
-  `,
-  styleUrls: ['./nav-bar.component.scss'],
+  template: `<button (click)="download()">Download Image</button>`,
 })
 export class NavBarComponent {
   private readonly generateImageService = inject(GenerateImageService);

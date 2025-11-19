@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
   provideNgDiagram,
@@ -11,7 +12,7 @@ import {
 import { NodeComponent } from './node/node.component';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [NgDiagramModelService, provideNgDiagram()],
   template: `
     <div class="not-content diagram">
@@ -19,7 +20,9 @@ import { NodeComponent } from './node/node.component';
         [model]="model"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrl: './diagram.component.scss',
@@ -34,6 +37,7 @@ export class DiagramComponent {
       max: 3,
       zoomToFit: {
         onInit: true,
+        padding: 100,
       },
     },
     zIndex: {
@@ -45,7 +49,7 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 100 },
+        position: { x: 0, y: 0 },
         type: 'myType',
         data: {
           name: 'Custom Node',
@@ -53,7 +57,7 @@ export class DiagramComponent {
       },
       {
         id: '2',
-        position: { x: 300, y: 200 },
+        position: { x: 200, y: 100 },
         type: 'myType',
         data: {
           name: 'Custom Node 2',

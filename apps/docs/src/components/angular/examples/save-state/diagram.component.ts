@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { Component, inject, Injector } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
   provideNgDiagram,
@@ -12,11 +13,13 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { SaveStateService } from './save.service';
 
 @Component({
-  imports: [NgDiagramComponent, NavBarComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent, NavBarComponent],
   template: `
     <nav-bar (loadModel)="loadModel($event)"></nav-bar>
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrl: './diagram.component.scss',
@@ -29,7 +32,7 @@ export class DiagramComponent {
       max: 3,
       zoomToFit: {
         onInit: true,
-        padding: 75,
+        padding: 155,
       },
     },
   } satisfies NgDiagramConfig;
@@ -38,17 +41,17 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 100 },
+        position: { x: 0, y: 0 },
         data: {},
       },
       {
         id: '2',
-        position: { x: 200, y: 150 },
+        position: { x: 100, y: 50 },
         data: {},
       },
       {
         id: '3',
-        position: { x: 300, y: 200 },
+        position: { x: 200, y: 100 },
         data: {},
       },
     ],
