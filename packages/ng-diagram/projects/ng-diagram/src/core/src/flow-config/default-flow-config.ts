@@ -65,7 +65,7 @@ const defaultZoomToFitConfig: ZoomToFitConfig = {
 const defaultZoomConfig: ZoomConfig = {
   min: 0.1,
   max: 10.0,
-  step: 0.05,
+  step: 0.03,
   zoomToFit: defaultZoomToFitConfig,
 };
 
