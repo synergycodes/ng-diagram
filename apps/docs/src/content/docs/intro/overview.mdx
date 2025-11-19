@@ -11,7 +11,7 @@ A comprehensive overview of ngDiagram's core concepts, helping you understand th
 
 ## Getting Started
 
-The simplest way to start is by installing the library, importing the required styles, and creating a component with the [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) and [`provideNgDiagram()`](/docs/api/other/providengdiagram) in its providers. The diagram component needs a model with nodes and edges to display.
+The simplest way to start is by installing the library, importing the required styles, and creating a component with the [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) and [`provideNgDiagram()`](/docs/api/utilities/providengdiagram) in its providers. The diagram component needs a model with nodes and edges to display.
 
 [Quick Start Guide](/docs/intro/quick-start) for step-by-step setup
 
@@ -21,7 +21,7 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 
 **Key concepts:**
 
-- Initialize model with [`initializeModel()`](/docs/api/other/initializemodel)
+- Initialize model with [`initializeModel()`](/docs/api/utilities/initializemodel)
 - Nodes require: [`id`](/docs/api/types/model/simplenode#id), [`position`](/docs/api/types/model/simplenode#position), [`data`](/docs/api/types/model/simplenode#data)
 - Edges require: [`id`](/docs/api/types/model/edge#id), [`source`](/docs/api/types/model/edge#source), [`target`](/docs/api/types/model/edge#target), [`sourcePort`](/docs/api/types/model/edge#sourceport), [`targetPort`](/docs/api/types/model/edge#targetport), [`data`](/docs/api/types/model/edge#data)
 - Custom properties can be stored in the `data` field of nodes and edges
@@ -37,7 +37,7 @@ You can also implement custom model adapters to connect to external data sources
 
 ## Service Isolation
 
-Every diagram requires [`provideNgDiagram()`](/docs/api/other/providengdiagram) in its component's providers array, which supplies all necessary services with proper scope isolation. This architecture allows you to have multiple independent diagrams on the same page, each with its own state and services.
+Every diagram requires [`provideNgDiagram()`](/docs/api/utilities/providengdiagram) in its component's providers array, which supplies all necessary services with proper scope isolation. This architecture allows you to have multiple independent diagrams on the same page, each with its own state and services.
 
 **Benefits:**
 
