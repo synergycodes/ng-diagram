@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2025-11-20
+
+### Added
+
+- Tailwind CSS example in documentation ([#436](https://github.com/synergycodes/ng-diagram/pull/436))
+
+### Fixed
+
+- Fixed drag snapping with different snapping config issue ([#451](https://github.com/synergycodes/ng-diagram/pull/451))
+- Fixed ungrouping when dragging node selected with group ([#446](https://github.com/synergycodes/ng-diagram/pull/446))
+- Fixed shortcut capture, events, and collision with inputs ([#447](https://github.com/synergycodes/ng-diagram/pull/447))
+- Fixed zIndex assignment ([#449](https://github.com/synergycodes/ng-diagram/pull/449))
+- Fixed Layout in documentation ([#438](https://github.com/synergycodes/ng-diagram/pull/438))
+- Fixed Reactive config in background ([#445](https://github.com/synergycodes/ng-diagram/pull/445))
+- Fixed Example zomming in documentation ([#448](https://github.com/synergycodes/ng-diagram/pull/448))
+
 ## [0.8.0] - 2025-11-07
 
 🎉 **This is our first stable release!** We've graduated from beta and are proud to present a production-ready version.
@@ -55,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v0.4.0-beta.5...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/synergycodes/ng-diagram/releases/tag/v0.8.1
 [0.8.0]: https://github.com/synergycodes/ng-diagram/releases/tag/v0.8.0
 [0.4.0-beta.5]: https://github.com/synergycodes/ng-diagram/releases/tag/v0.4.0-beta.5
