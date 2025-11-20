@@ -24,12 +24,12 @@ const config = {
 } satisfies NgDiagramConfig;
 ```
 
-- `shouldSnapDragForNode` determines whether a node should snap to a grid when being dragged.
+- [`shouldSnapDragForNode`](/docs/api/types/configuration/features/snappingconfig/#shouldsnapdragfornode) determines whether a node should snap to a grid when being dragged.
   When this function returns `true` for a given node, the node's position will align to the nearest snap points during drag operations.
 
-- `computeSnapForNodeDrag` defines the snap step for dragging nodes.
+- [`computeSnapForNodeDrag`](/docs/api/types/configuration/features/snappingconfig/#computesnapfornodedrag) defines the snap step for dragging nodes.
 
-- `defaultDragSnap` sets a default snap step for dragging nodes if `computeSnapForNodeDrag` is not provided. The default value is `{ width: 10, height: 10 }`.
+- [`defaultDragSnap`](/docs/api/types/configuration/features/snappingconfig/#defaultdragsnap) sets a default snap step for dragging nodes if [`computeSnapForNodeDrag`](/docs/api/types/configuration/features/snappingconfig/#computesnapfornodedrag) is not provided. The default value is `{ width: 10, height: 10 }`.
 
 <br />
 <DragSnapExample />

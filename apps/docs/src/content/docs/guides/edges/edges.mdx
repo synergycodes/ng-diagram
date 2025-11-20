@@ -130,9 +130,9 @@ These IDs (along with their parent node IDs) are used to specify the exact posit
 
 Edges can be routed using three [built-in routing algorithms](/docs/guides/edges/routing):
 
-- `polyline`: Draws a polyline (straight line by default)
-- `orthogonal`: Draws a series of horizontal and vertical lines
-- `bezier`: Draws a bezier curve
+- [`polyline`](/docs/api/types/routing/edgeroutingname): Draws a polyline (straight line by default)
+- [`orthogonal`](/docs/api/types/routing/edgeroutingname): Draws a series of horizontal and vertical lines
+- [`bezier`](/docs/api/types/routing/edgeroutingname): Draws a bezier curve
 
 <br />
 
@@ -149,10 +149,10 @@ This is done through the [`linking`](/docs/api/types/configuration/flowconfig/#l
 
 ### Customization
 
-The `linking` configuration provides two builder functions:
+The [`linking`](/docs/api/types/configuration/features/linkingconfig) configuration provides two builder functions:
 
-- **`temporaryEdgeDataBuilder`** - Customizes the edge shown while dragging
-- **`finalEdgeDataBuilder`** - Customizes the final edge when connection is completed
+- **[`temporaryEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#temporaryedgedatabuilder)** - Customizes the edge shown while dragging
+- **[`finalEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#finaledgedatabuilder)** - Customizes the final edge when connection is completed
 
 ```typescript
 export class MyDiagramComponent {

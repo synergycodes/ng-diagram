@@ -20,9 +20,9 @@ This example demonstrates how to integrate external layout libraries and use bui
 
 ### Key Concepts
 
-- **External Layout Libraries:** Integrate solutions like ELK.js for advanced layouts. ELK.js assigns positions to nodes and generates edge paths automatically.
-- **User Interaction Detection:** Use the `selectionMoved` event to detect manual node movement.
+- **External Layout Libraries:** Integrate solutions like ELK.js for advanced layouts. ELK.js assigns [`position`](/docs/api/types/model/simplenode/#position) to nodes and generates edge paths automatically.
+- **User Interaction Detection:** Use the [`selectionMoved`](/docs/api/types/events/selectionmovedevent/) event to detect manual node movement.
 - **Edge Routing Modes:**
-  - Set edges to `manual` mode to preserve custom layout points from ELK.
-  - Reset edges to `auto` mode when connected nodes are moved manually.
-- **Batch Updates:** Use `updateNodes` and `updateEdges` for efficient diagram updates.
+  - Set edges to [`manual`](/docs/api/types/routing/routingmode/) mode to preserve custom layout points from ELK.
+  - Reset edges to [`auto`](/docs/api/types/routing/routingmode/) mode when connected nodes are moved manually.
+- **Batch Updates:** Use [`updateNodes`](/docs/api/types/model/modeladapter/#updatenodes) and [`updateEdges`](/docs/api/types/model/modeladapter/#updateedges) for efficient diagram updates.
