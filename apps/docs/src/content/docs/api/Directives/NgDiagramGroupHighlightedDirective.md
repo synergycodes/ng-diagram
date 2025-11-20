@@ -14,7 +14,7 @@ The `NgDiagramGroupHighlightedDirective` conditionally applies a highlight class
 </div>
 ```
 
-When the group's `highlighted` property is `true`, the `ng-diagram-group-highlight` CSS class is applied.
+When the group's [GroupNode#highlighted](/docs/api/types/model/groupnode/#highlighted) property is `true`, the `ng-diagram-group-highlight` CSS class is applied.
 
 ## Properties
 

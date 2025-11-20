@@ -14,7 +14,7 @@ The `NgDiagramNodeSelectedDirective` conditionally applies a selected class to a
 </div>
 ```
 
-When the node's `selected` property is `true`, the `ng-diagram-node-selected` CSS class is applied.
+When the node's [SimpleNode#selected](/docs/api/types/model/simplenode/#selected) property is `true`, the `ng-diagram-node-selected` CSS class is applied.
 
 ## Properties
 
