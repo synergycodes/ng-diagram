@@ -24,7 +24,7 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 - Initialize model with [`initializeModel()`](/docs/api/utilities/initializemodel)
 - Nodes require: [`id`](/docs/api/types/model/simplenode#id), [`position`](/docs/api/types/model/simplenode#position), [`data`](/docs/api/types/model/simplenode#data)
 - Edges require: [`id`](/docs/api/types/model/edge#id), [`source`](/docs/api/types/model/edge#source), [`target`](/docs/api/types/model/edge#target), [`sourcePort`](/docs/api/types/model/edge#sourceport), [`targetPort`](/docs/api/types/model/edge#targetport), [`data`](/docs/api/types/model/edge#data)
-- Custom properties can be stored in the `data` field of nodes and edges
+- Custom properties can be stored in the `data` field of [`nodes`](/docs/api/types/model/simplenode/#data) and [`edges`](/docs/api/types/model/edge/#data)
 - Use [`metadata`](/docs/api/types/model/metadata) for diagram-level custom information
 
 You can also implement custom model adapters to connect to external data sources like databases or real-time services.
