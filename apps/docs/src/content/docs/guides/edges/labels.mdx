@@ -9,11 +9,12 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
 
-Each edge has a `measuredLabels` property that provides information about its labels and their computed position and dimensions. This property is read-only and should not be modified.
+Each edge has a [`measuredLabels`](/docs/api/types/model/edge/#measuredlabels) property that provides information about its labels and their computed [`position`](/docs/api/types/model/edgelabel/#position) and [`size`](/docs/api/types/model/edgelabel/#size).
+This property is read-only and should not be modified.
 
 ## Using Labels in Default Edges
 
-To display a label on a **default edge**, you can add a `label` property to the edge's data.
+To display a label on a **default edge**, you can add a `label` property to the edge's [`data`](/docs/api/types/model/edge/#data).
 
 <br />
 
@@ -71,7 +72,7 @@ ng-diagram-base-edge.default-edge.selected {
 
 ## Custom Labels
 
-To display a custom label on an edge, use the `NgDiagramBaseEdgeLabelComponent` in an implementation of your **custom edge** component:
+To display a custom label on an edge, use the [`NgDiagramBaseEdgeLabelComponent`](/docs/api/components/ngdiagrambaseedgelabelcomponent) in an implementation of your **custom edge** component:
 
 <br />
 
@@ -83,18 +84,18 @@ import CustomLabel from '@components/angular/edges/labels/custom-label/custom-la
 
 ## Label Positioning
 
-The `positionOnEdge` property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/docs/guides/edges/routing).
+The [`positionOnEdge`](/docs/api/types/model/edgelabel/#positiononedge) property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/docs/guides/edges/routing).
 
 ## Adding labels
 
-Labels can be added and modified dynamically. One way to achieve this is by using diagram's model. The `ModifiableLabelEdgeComponent` shows how to map such data into an actual label implementation.
+Labels can be added and modified dynamically. One way to achieve this is by using diagram's model. The `ModifiableLabelEdgeComponent` (see below) shows how to map such data into an actual label implementation.
 
 Click on an edge to select it in the example below. Then fill the label's name and click "Set Label".
 
 <br />
 
-import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import AddingLabels from '@components/angular/edges/labels/adding-labels/adding-labels.astro';
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
 
 <AddingLabels />
 <CodeViewer dirName="edges/labels/adding-labels" />

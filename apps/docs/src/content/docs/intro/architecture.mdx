@@ -34,6 +34,7 @@ The user-facing components that render the diagram and handle user interactions:
 - [**ng-diagram-base-edge**](/docs/api/components/ngdiagrambaseedgecomponent): Foundation component for building custom edge templates with advanced styling and behavior
 - [**ng-diagram-base-edge-label**](/docs/api/components/ngdiagrambaseedgelabelcomponent): Base component for creating custom edge labels with consistent styling and positioning
 - [**ng-diagram-port**](/docs/api/components/ngdiagramportcomponent): Port component that defines connection points on nodes for edge connections
+- [**ng-diagram-base-node-template**](/docs/api/components/ngdiagrambasenodetemplatecomponent): Base component for creating custom node templates with default styling and features.
 
 ### Service Layer
 
@@ -47,17 +48,30 @@ Specialized services provide different levels of control and functionality:
 - [**NgDiagramGroupsService**](/docs/api/services/ngdiagramgroupsservice): Manages group node operations such as member management
 - [**NgDiagramClipboardService**](/docs/api/services/ngdiagramclipboardservice): Manages copy/paste operations for diagram elements
 
-All services are provided through `provideNgDiagram()`, allowing multiple diagrams on the same page to maintain their own isolated state and behavior. Learn more in the [Services documentation](/docs/intro/services).
+All services are provided through [`provideNgDiagram()`](/docs/api/utilities/providengdiagram), allowing multiple diagrams on the same page to maintain their own isolated state and behavior. Learn more in the [Services documentation](/docs/intro/services).
 
 ### Event Layer
 
-The event layer captures user interactions and translates them into commands that modify the diagram state:
+The event layer captures user interactions and translates them into commands that modify the diagram state.
+Events are emitted by the [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) and can be handled via Angular outputs.
 
-- **Event Capture**: User interactions (clicks, drags, keyboard input) are captured by the diagram components
-- **Event Processing**: Each interaction type is processed to understand the user's intent and context (what was clicked, modifier keys, coordinates)
-- **Command Emission**: Based on the processed event, appropriate commands are emitted to perform the desired operation
+**Available events:**
 
-Supported interactions include: selection, panning, zooming, node movement, resizing, rotation, edge creation (linking), clipboard operations (copy/paste/cut), and palette item drops.
+- [**DiagramInitEvent**](/docs/api/types/events/diagraminitevent): Fired when the diagram is fully initialized and all nodes, edges, and their internal parts are measured and positioned.
+- [**EdgeDrawnEvent**](/docs/api/types/events/edgedrawnevent): Fired when a user manually creates an edge by dragging between nodes.
+- [**SelectionChangedEvent**](/docs/api/types/events/selectionchangedevent): Fired when nodes or edges are selected or deselected.
+- [**SelectionMovedEvent**](/docs/api/types/events/selectionmovedevent): Fired when selected nodes are moved (dragged) on the canvas.
+- [**SelectionRemovedEvent**](/docs/api/types/events/selectionremovedevent): Fired when selected nodes or edges are removed from the diagram.
+- [**SelectionRotatedEvent**](/docs/api/types/events/selectionrotatedevent): Fired when selected nodes are rotated.
+- [**GroupMembershipChangedEvent**](/docs/api/types/events/groupmembershipchangedevent): Fired when nodes are grouped or ungrouped, changing their group membership.
+- [**ViewportChangedEvent**](/docs/api/types/events/viewportchangedevent): Fired when the viewport changes due to panning or zooming.
+- [**ClipboardPastedEvent**](/docs/api/types/events/clipboardpastedevent): Fired when nodes and edges are added via paste operations (keyboard shortcut or programmatic paste).
+- [**NodeResizedEvent**](/docs/api/types/events/noderesizedevent): Fired when a node or group is resized manually or programmatically.
+- [**PaletteItemDroppedEvent**](/docs/api/types/events/paletteitemdroppedevent): Fired when a palette item is dropped onto the diagram to create a new node.
+
+Each event provides a strongly-typed payload with relevant details. You can subscribe to these events using Angular outputs (e.g. `(selectionChanged)="..."`) on the [`<ng-diagram>`](/docs/api/components/ngdiagramcomponent) component.
+
+See [DiagramEventMap](/docs/api/types/events/diagrameventmap/) for more information on available events and their payloads.
 
 ### Command System
 

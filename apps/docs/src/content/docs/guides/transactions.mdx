@@ -51,7 +51,7 @@ This fixed order ensures that:
 
 **Add nodes → Add edges → Remove edges → Remove nodes → Update nodes → Update edges → Merge metadata**
 
-So call order inside transactions is **not preserved**. For example: `addNodes([node1])` → `addEdges([edge1])` → `addNodes([node2])` will execute both node additions together.
+So call order inside transactions is **not preserved**. For example: [`addNodes([node1])`](/docs/api/services/ngdiagrammodelservice/#addnodes) → [`addEdges([edge1])`](/docs/api/services/ngdiagrammodelservice/#addedges) → [`addNodes([node2])`](/docs/api/services/ngdiagrammodelservice/#addnodes) will execute both node additions together.
 
 </Aside>
 
@@ -114,7 +114,7 @@ for (const node of nodes) {
 ## Example
 
 <Aside type="note">
-  When testing the demo example below, you can see detailed transaction logs in the browser console. This is enabled by setting `debugMode: true` in the diagram configuration:
+  When testing the demo example below, you can see detailed transaction logs in the browser console. This is enabled by setting [`debugMode: true`](/docs/api/types/configuration/flowconfig/#debugmode) in the diagram configuration:
   ```typescript
   config: NgDiagramConfig = {
     debugMode: true,

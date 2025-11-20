@@ -7,7 +7,7 @@ title: "NgDiagramPaletteItem"
 
 > **NgDiagramPaletteItem**\<`Data`\> = [`SimpleNodeData`](/docs/api/types/palette/simplenodedata/)\<`Data`\> \| [`GroupNodeData`](/docs/api/types/palette/groupnodedata/)\<`Data`\>
 
-The `NgDiagramPaletteItem` represents the data structure for items that can be shown in the diagram palette
+The [NgDiagramPaletteItem](/docs/api/types/palette/ngdiagrampaletteitem/) represents the data structure for items that can be shown in the diagram palette
 and dragged onto the canvas to create nodes or groups.
 It supports both simple nodes and group nodes, allowing you to specify
 properties such as type, data, size, rotation, and grouping.

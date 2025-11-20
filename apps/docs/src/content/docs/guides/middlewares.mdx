@@ -21,14 +21,12 @@ Middlewares execute in sequence, with each middleware receiving the output of th
 
 ### Middleware Action Types
 
-The `ModelActionType` type lists all possible actions that can trigger middleware execution.
+The [`ModelActionType`](/docs/api/types/middleware/modelactiontype/) type lists all possible actions that can trigger middleware execution.
 These represent every operation that modifies the diagram state, such as adding nodes, moving elements, deleting selections, resizing, linking, rotating, and more.
-
-[Refer to the source for the full list →](/docs/api/types/middleware/modelactiontype/)
 
 ### Middleware Interface
 
-Each middleware implements the `Middleware` interface:
+Each middleware implements the [`Middleware`](/docs/api/types/middleware/middleware/) interface:
 
 ```typescript
 interface Middleware<TName extends string = string> {
@@ -45,35 +43,35 @@ interface Middleware<TName extends string = string> {
 
 The **context** object passed to middleware functions provides comprehensive access to the diagram state and metadata:
 
-- `initialState` – The state before any modifications
-- `state` – The current state after all previous modifications.
-- `nodesMap` / `edgesMap` – Maps for quick lookup of nodes and edges by ID
-- `initialNodesMap` / `initialEdgesMap` – Maps for accessing nodes/edges before any changes
-- `modelActionType` – The action that triggered the middleware.
-- `helpers` – Utility functions for inspecting what changed
-- `history` – Array of all state updates made by previous middlewares in the chain.
-- `actionStateManager` – Manager for temporary action states.
-- `edgeRoutingManager` – Manager for edge routing algorithms.
-- `initialUpdate` – The initial state update that triggered the middleware chain.
-- `config` – Current diagram configuration.
-- `environment` – Environment information (browser, rendering engine, etc.).
+- [`initialState`](/docs/api/types/middleware/middlewarecontext/#initialstate) – The state before any modifications
+- [`state`](/docs/api/types/middleware/middlewarecontext/#state) – The current state after all previous modifications.
+- [`nodesMap`](/docs/api/types/middleware/middlewarecontext/#nodesmap) / [`edgesMap`](/docs/api/types/middleware/middlewarecontext/#edgesmap) – Maps for quick lookup of nodes and edges by ID
+- [`initialNodesMap`](/docs/api/types/middleware/middlewarecontext/#initialnodesmap) / [`initialEdgesMap`](/docs/api/types/middleware/middlewarecontext/#initialedgesmap) – Maps for accessing nodes/edges before any changes
+- [`modelActionType`](/docs/api/types/middleware/middlewarecontext/#modelactiontype) – The action that triggered the middleware.
+- [`helpers`](/docs/api/types/middleware/middlewarecontext/#helpers) – Utility functions for inspecting what changed
+- [`history`](/docs/api/types/middleware/middlewarecontext/#history) – Array of all state updates made by previous middlewares in the chain.
+- [`actionStateManager`](/docs/api/types/middleware/middlewarecontext/#actionstatemanager) – Manager for temporary action states.
+- [`edgeRoutingManager`](/docs/api/types/middleware/middlewarecontext/#edgeroutingmanager) – Manager for edge routing algorithms.
+- [`initialUpdate`](/docs/api/types/middleware/middlewarecontext/#initialupdate) – The initial state update that triggered the middleware chain.
+- [`config`](/docs/api/types/middleware/middlewarecontext/#config) – Current diagram configuration.
+- [`environment`](/docs/api/types/middleware/middlewarecontext/#environment) – Environment information (browser, rendering engine, etc.).
 
 ### Middleware Helpers
 
-The `helpers` object provides optimized functions to inspect all cumulative changes from the initial update and previous middlewares:
+The [`helpers`](/docs/api/types/middleware/middlewarecontext/#helpers) object provides optimized functions to inspect all cumulative changes from the initial update and previous middlewares:
 
-- `checkIfNodeChanged(id)` – Was this node modified?
-- `checkIfEdgeChanged(id)` – Was this edge modified?
-- `checkIfNodeAdded(id)` / `checkIfNodeRemoved(id)` – Was this node added/removed?
-- `checkIfEdgeAdded(id)` / `checkIfEdgeRemoved(id)` – Was this edge added/removed?
-- `checkIfAnyNodePropsChanged(['prop1', 'prop2'])` – Did any node have these properties changed?
-- `checkIfAnyEdgePropsChanged(['prop1', 'prop2'])` – Did any edge have these properties changed?
-- `anyNodesAdded()` / `anyEdgesAdded()` – Were any nodes/edges added?
-- `anyNodesRemoved()` / `anyEdgesRemoved()` – Were any nodes/edges removed?
-- `getAffectedNodeIds(['prop1', 'prop2'])` – Get IDs of nodes with specified properties changed.
-- `getAffectedEdgeIds(['prop1', 'prop2'])` – Get IDs of edges with specified properties changed.
-- `getAddedNodes()` / `getAddedEdges()` – Get instances of added nodes/edges.
-- `getRemovedNodes()` / `getRemovedEdges()` – Get instances of removed nodes/edges (from initial state).
+- [`checkIfNodeChanged(id)`](/docs/api/types/middleware/middlewarehelpers/#checkifnodechanged) – Was this node modified?
+- [`checkIfEdgeChanged(id)`](/docs/api/types/middleware/middlewarehelpers/#checkifedgechanged) – Was this edge modified?
+- [`checkIfNodeAdded(id)`](/docs/api/types/middleware/middlewarehelpers/#checkifnodeadded) / [`checkIfNodeRemoved(id)`](/docs/api/types/middleware/middlewarehelpers/#checkifnoderemoved) – Was this node added/removed?
+- [`checkIfEdgeAdded(id)`](/docs/api/types/middleware/middlewarehelpers/#checkifedgeadded) / [`checkIfEdgeRemoved(id)`](/docs/api/types/middleware/middlewarehelpers/#checkifedgeremoved) – Was this edge added/removed?
+- [`checkIfAnyNodePropsChanged(['prop1', 'prop2'])`](/docs/api/types/middleware/middlewarehelpers/#checkifanynodepropschanged) – Did any node have these properties changed?
+- [`checkIfAnyEdgePropsChanged(['prop1', 'prop2'])`](/docs/api/types/middleware/middlewarehelpers/#checkifanyedgepropschanged) – Did any edge have these properties changed?
+- [`anyNodesAdded()`](/docs/api/types/middleware/middlewarehelpers/#anynodesadded) / [`anyEdgesAdded()`](/docs/api/types/middleware/middlewarehelpers/#anyedgesadded) – Were any nodes/edges added?
+- [`anyNodesRemoved()`](/docs/api/types/middleware/middlewarehelpers/#anynodesremoved) / [`anyEdgesRemoved()`](/docs/api/types/middleware/middlewarehelpers/#anyedgesremoved) – Were any nodes/edges removed?
+- [`getAffectedNodeIds(['prop1', 'prop2'])`](/docs/api/types/middleware/middlewarehelpers/#getaffectednodeids) – Get IDs of nodes with specified properties changed.
+- [`getAffectedEdgeIds(['prop1', 'prop2'])`](/docs/api/types/middleware/middlewarehelpers/#getaffectededgeids) – Get IDs of edges with specified properties changed.
+- [`getAddedNodes()`](/docs/api/types/middleware/middlewarehelpers/#getaddednodes) / [`getAddedEdges()`](/docs/api/types/middleware/middlewarehelpers/#getaddededges) – Get instances of added nodes/edges.
+- [`getRemovedNodes()`](/docs/api/types/middleware/middlewarehelpers/#getremovednodes) / [`getRemovedEdges()`](/docs/api/types/middleware/middlewarehelpers/#getremovededges) – Get instances of removed nodes/edges (from initial state).
 
 These helpers allow you to efficiently check what changed during the middleware execution chain.
 
@@ -97,13 +95,14 @@ export const myMiddleware: Middleware = {
 
 ### Middleware History
 
-The `history` array in the context tracks all state updates made by previous middlewares, including the name of the middleware and the specific state update applied. This is useful for auditing or debugging complex middleware chains.
+The [`history`](/docs/api/types/middleware/middlewarecontext/#history) array in the context tracks all state updates made by previous middlewares, including the name of the middleware and the specific state update applied.\
+This is useful for auditing or debugging complex middleware chains.
 
 ## Managing Middlewares
 
 ### Initial Registration
 
-The primary way to configure middlewares is using the `createMiddlewares` helper and passing them to the `<ng-diagram>` component:
+The primary way to configure middlewares is using the [`createMiddlewares`](/docs/api/utilities/createmiddlewares) helper and passing them to the [`<ng-diagram>`](/docs/api/components/ngdiagramcomponent) component:
 
 ```typescript
 import { createMiddlewares } from 'ng-diagram';
@@ -132,7 +131,8 @@ export class MyDiagramComponent {
 
 ### Runtime Registration
 
-You can also register and unregister middlewares dynamically using the `NgDiagramService`. **Note**: This can only be done when the diagram is initialized, which you can check using `isInitialized` signal:
+You can also register and unregister middlewares dynamically using the [`NgDiagramService`](/docs/api/services/ngdiagramservice/).\
+ **Note**: This can only be done when the diagram is initialized, which you can check using [`isInitialized`](/docs/api/services/ngdiagramservice/#isinitialized) signal:
 
 ```typescript
 import { inject } from '@angular/core';
@@ -205,7 +205,7 @@ For a complete example of creating custom middleware, see the [Custom Middleware
 
 #### Modifying State
 
-Middlewares can modify the diagram state by passing a `FlowStateUpdate` object to `next()`:
+Middlewares can modify the diagram state by passing a [`FlowStateUpdate`](/docs/api/types/middleware/flowstateupdate/) object to `next()`:
 
 ```typescript
 interface FlowStateUpdate {

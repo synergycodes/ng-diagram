@@ -29,13 +29,14 @@ To add nodes to your diagram, include them in the [`nodes`](/docs/api/services/n
 
 ## Default Node
 
-NgDiagram provides a default node implementation that covers the most common scenarios. The default node:
+NgDiagram provides a default node implementation that covers the most common scenarios.\
+The default node provides the following features:
 
-- Is a fully styled component representing a visual entity with one input and one output
-- Supports rotation and resizing (enabled by default through [`resize.defaultResizable`](/docs/api/types/configuration/features/resizeconfig#defaultresizable) and [`nodeRotation.defaultRotatable`](/docs/api/types/configuration/features/noderotationconfig#defaultrotatable) config)
-- Displays a label (provided by convention in `data.label`)
-- Responds to hover and selection states for better interactivity
-- Is ideal for representing simple text-based entities
+- **Fully styled component** — Represents a visual entity with one input and one output.
+- **Rotation and resizing support** — Enabled by default through [`resize.defaultResizable`](/docs/api/types/configuration/features/resizeconfig#defaultresizable) and [`nodeRotation.defaultRotatable`](/docs/api/types/configuration/features/noderotationconfig#defaultrotatable).
+- **Label display** — Shows a label, provided by convention in `data.label`.
+- **Interactive states** — Responds to hover and selection for better interactivity.
+- **Simplicity** — Ideal for representing simple text-based entities.
 
 To use the default node template, leave the node's [`type`](/docs/api/types/model/simplenode#type) property **empty**.
 
