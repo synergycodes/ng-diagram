@@ -19,12 +19,12 @@ The rotation is reflected in the node's appearance and can be used to create var
 ## How It Works
 
 - Nodes can be rotated by dragging the rotation handle.
-- The rotation angle is stored in the node's `angle` property.
+- The rotation angle is stored in the node's [`angle`](/docs/api/types/model/simplenode/#angle) property.
 - Rotation can be enabled per node, per custom template, or globally in the configuration. It can also be configured through the global configuration.
 
 ## Custom Node Setup
 
-To make a custom node rotatable, include `<ng-diagram-node-rotate-adornment />` in your node template and import the `NgDiagramNodeRotateAdornmentComponent` reference.
+To make a custom node rotatable, include [`<ng-diagram-node-rotate-adornment />`](/docs/api/components/ngdiagramnoderotateadornmentcomponent) in your node template and import the [`NgDiagramNodeRotateAdornmentComponent`](/docs/api/components/ngdiagramnoderotateadornmentcomponent) reference.
 
 <CodeSnippet relativePath="nodes/rotation/node/node.component.ts" />
 
@@ -49,7 +49,7 @@ You can override these variables in your styles to customize the appearance and 
 
 ### Custom Handle
 
-If you want to use a custom icon as a handle, simply place your SVG or Angular component inside `<ng-diagram-node-rotate-adornment>`.
+If you want to use a custom icon as a handle, simply place your SVG or Angular component inside [`<ng-diagram-node-rotate-adornment>`](/docs/api/components/ngdiagramnoderotateadornmentcomponent).
 The content you provide will be rendered inside the handle.
 
 ```typescript
@@ -59,31 +59,31 @@ The content you provide will be rendered inside the handle.
 </ng-diagram-node-rotate-adornment>
 ```
 
-If you do not provide any content inside `<ng-diagram-node-rotate-adornment>`, the component will automatically display its built-in default rotation icon.
+If you do not provide any content inside [`<ng-diagram-node-rotate-adornment>`](/docs/api/components/ngdiagramnoderotateadornmentcomponent), the component will automatically display its built-in default rotation icon.
 
 ## Configuration
 
 ### Rotation Settings
 
-You can further customize rotation behavior using the `nodeRotation` configuration in `NgDiagramConfig`:
+You can further customize rotation behavior using the [`nodeRotation`](/docs/api/types/configuration/flowconfig/#noderotation) configuration in [`NgDiagramConfig`](/docs/api/types/configuration/flowconfig):
 
-- **defaultRotatable** – Controls whether rotation is enabled by default for all nodes. Default is `true`.
-- **computeSnapAngleForNode** - Computes the snap angle for a node's rotation.
-- **defaultSnapAngle** - The default snap angle in degrees, used if `computeSnapAngleForNode` returns null.
-- **shouldSnapForNode** - Determines whether rotation snapping should be enabled for a node.
+- **[`defaultRotatable`](/docs/api/types/configuration/features/noderotationconfig/#defaultrotatable)** – Controls whether rotation is enabled by default for all nodes. Default is `true`.
+- **[`computeSnapAngleForNode`](/docs/api/types/configuration/features/noderotationconfig/#computesnapanglefornode)** - Computes the snap angle for a node's rotation.
+- **[`defaultSnapAngle`](/docs/api/types/configuration/features/noderotationconfig/#defaultsnapangle)** - The default snap angle in degrees, used if `computeSnapAngleForNode` returns null.
+- **[`shouldSnapForNode`](/docs/api/types/configuration/features/noderotationconfig/#shouldsnapfornode)** - Determines whether rotation snapping should be enabled for a node.
 
-You can set these options in your diagram by passing the configuration to the `ng-diagram` component:
+You can set these options in your diagram by passing the configuration to the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component:
 
 <CodeSnippet relativePath="nodes/rotation/diagram.component.ts" sectionId="config" />
 
 ### Rotation Setting Priority
 
-The **rotatable** property controls whether a node can be rotated.
+The [`rotatable`](/docs/api/types/model/simplenode/#rotatable) property controls whether a node can be rotated.
 This property can be defined at several levels, and when multiple levels specify it, the one with the highest priority takes effect.
 
 The following list shows the order of priority — from highest to lowest:
 
-1. **Node-level setting** – Directly set the `rotatable` property on the node data object.
+1. **Node-level setting** – Directly set the [`rotatable`](/docs/api/types/model/simplenode/#rotatable) property on the node data object.
 
 ```typescript
 import { Node } from 'ng-diagram';
@@ -97,7 +97,7 @@ const node: Node = {
 
 This setting applies specifically to that node and overrides all other defaults.
 
-2. **Template-level setting** – Use the `defaultRotatable` input on the `NgDiagramNodeRotateAdornmentComponent` within your custom node template.
+2. **Template-level setting** – Use the [`defaultRotatable`](/docs/api/components/ngdiagramnoderotateadornmentcomponent/#defaultrotatable) input on the [`NgDiagramNodeRotateAdornmentComponent`](/docs/api/components/ngdiagramnoderotateadornmentcomponent) within your custom node template.
 
 ```html
 <ng-diagram-node-rotate-adornment [defaultRotatable]="true"></ng-diagram-node-rotate-adornment>
@@ -105,7 +105,7 @@ This setting applies specifically to that node and overrides all other defaults.
 
 This defines the default rotation behavior for all nodes that use that template.
 
-3. **Global configuration** – Define the global `defaultRotatable` setting inside your `NgDiagramConfig`.
+3. **Global configuration** – Define the global [`defaultRotatable`](/docs/api/types/configuration/features/noderotationconfig/#defaultrotatable) setting inside your [`NgDiagramConfig`](/docs/api/types/configuration/flowconfig).
 
 ```typescript
 import { NgDiagramConfig } from 'ng-diagram';

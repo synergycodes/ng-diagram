@@ -15,17 +15,17 @@ To activate box selection, hold down the `Shift` key and click and drag on the c
 
 ## Configuration
 
-Box selection behavior can be configured via the `boxSelection` property in `NgDiagramConfig`.
+Box selection behavior can be configured via the [`boxSelection`](/docs/api/types/configuration/features/boxselectionconfig/) property.
 
 <CodeSnippet relativePath="examples/box-selection/properties/diagram.component.ts" sectionId="config" />
 
 Available options:
 
-- `partialInclusion`: If set to `true`, nodes that are partially within the selection rectangle will be included in the selection.
+- [`partialInclusion`](/docs/api/types/configuration/features/boxselectionconfig/#partialinclusion): If set to `true`, nodes that are partially within the selection rectangle will be included in the selection.
 
   Default: `true`
 
-- `realtime`: If set to `true`, the selection rectangle will update the selection in real-time as the user drags the mouse. If `false` the selection will happen after releasing the mouse button.
+- [`realtime`](/docs/api/types/configuration/features/boxselectionconfig/#realtime): If set to `true`, the selection rectangle will update the selection in real-time as the user drags the mouse. If `false` the selection will happen after releasing the mouse button.
 
   Default: `true`
 

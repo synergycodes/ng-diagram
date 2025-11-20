@@ -12,7 +12,7 @@ It empowers developers to fine-tune many aspects of the diagram engine.
 
 ## What is the Configuration?
 
-The configuration (commonly referred to as `config`) is a comprehensive object that defines how your diagram should behave and look.
+The configuration (commonly referred to as [`config`](/docs/api/types/configuration/flowconfig)) is a comprehensive object that defines how your diagram should behave and look.
 
 It encapsulates all available options for the diagram engine, allowing you to:
 
@@ -24,7 +24,7 @@ By leveraging the configuration, you gain full control over the diagram's capabi
 
 ## How to Initialize the Configuration
 
-To initialize the configuration, define a `config` object in your Angular component using the [NgDiagramConfig](/docs/api/types/ngdiagramconfig/) type.
+To initialize the configuration, define a [`config`](/docs/api/types/configuration/flowconfig/) object in your Angular component using the [NgDiagramConfig](/docs/api/types/ngdiagramconfig/) type.\
 Only specify the properties you wish to override; all others will use sensible defaults.
 
 ```typescript
@@ -36,7 +36,7 @@ const config: NgDiagramConfig = {
 };
 ```
 
-Assign the configuration to the `<ng-diagram>` component using the `[config]` input:
+Assign the configuration to the [`<ng-diagram>`](/docs/api/components/ngdiagramcomponent/) component using the `[config]` input:
 
 ```html
 <ng-diagram [model]="model" [config]="config" />
@@ -74,18 +74,18 @@ ngDiagram's configuration is organized into logical categories, each controlling
 
 The most important categories include:
 
-- **background**: Configures background visuals (grid, dot spacing, cell size).
-- **boxSelection**: Configures box selection behavior.
-- **debugMode**: Enables verbose logging for development and debugging.
-- **edgeRouting**: Defines edge routing algorithms and their parameters.
-- **grouping**: Enables node grouping and related logic.
-- **linking**: Customizes edge creation and connection validation.
-- **nodeRotation**: Enables and customizes node rotation and snapping.
-- **resize**: Manages node resizing logic, minimum sizes, and resizability.
-- **shortcuts**: Defines keyboard shortcuts for diagram actions.
-- **snapping**: Controls snapping for node movement and resizing.
-- **zIndex**: Manages layering and stacking order of diagram elements.
-- **zoom**: Controls zooming behavior, limits, and zoom-to-fit options.
+- [`background`](/docs/api/types/configuration/features/backgroundconfig): Configures background visuals (grid, dot spacing, cell size).
+- [`boxSelection`](/docs/api/types/configuration/features/boxselectionconfig): Configures box selection behavior.
+- [`debugMode`](/docs/api/types/configuration/flowconfig/#debugmode): Enables verbose logging for development and debugging.
+- [`edgeRouting`](/docs/api/types/configuration/features/edgeroutingconfig): Defines edge routing algorithms and their parameters.
+- [`grouping`](/docs/api/types/configuration/features/groupingconfig): Enables node grouping and related logic.
+- [`linking`](/docs/api/types/configuration/features/linkingconfig): Customizes edge creation and connection validation.
+- [`nodeRotation`](/docs/api/types/configuration/features/noderotationconfig): Enables and customizes node rotation and snapping.
+- [`resize`](/docs/api/types/configuration/features/resizeconfig): Manages node resizing logic, minimum sizes, and resizability.
+- [`shortcuts`](/docs/api/types/configuration/shortcuts/shortcutdefinition): Defines keyboard shortcuts for diagram actions.
+- [`snapping`](/docs/api/types/configuration/features/snappingconfig): Controls snapping for node movement and resizing.
+- [`zIndex`](/docs/api/types/configuration/features/zindexconfig): Manages layering and stacking order of diagram elements.
+- [`zoom`](/docs/api/types/configuration/features/zoomconfig): Controls zooming behavior, limits, and zoom-to-fit options.
 
 For detailed options and advanced usage, refer to the documentation for each category in [FlowConfig](/docs/api/types/flowconfig/).
 
