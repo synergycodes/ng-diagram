@@ -61,6 +61,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
 
       instance.handle(event);
 
+      expect(mockFlowCore.modelLookup.getSelectedNodesWithChildren).toHaveBeenCalledWith({ directOnly: false });
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
         nodes: [mockNode],
         delta: { x: 10, y: 0 },
@@ -201,6 +202,45 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       instance.handle(event);
 
       expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should move all nodes in a 3-level nested group', () => {
+      const grandparent = {
+        id: 'grandparent',
+        position: { x: 0, y: 0 },
+        selected: true,
+        size: { width: 100, height: 50 },
+      };
+
+      const parent = {
+        id: 'parent',
+        position: { x: 10, y: 10 },
+        selected: false,
+        groupId: 'grandparent',
+        size: { width: 80, height: 40 },
+      };
+
+      const child = {
+        id: 'child',
+        position: { x: 20, y: 20 },
+        selected: false,
+        groupId: 'parent',
+        size: { width: 60, height: 30 },
+      };
+
+      (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+        grandparent,
+        parent,
+        child,
+      ]);
+
+      const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+      instance.handle(event);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+        nodes: [grandparent, parent, child],
+        delta: { x: 10, y: 0 },
+      });
     });
   });
 });
