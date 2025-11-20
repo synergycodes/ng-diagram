@@ -8,7 +8,7 @@ title: "SelectionMovedEvent"
 Event payload emitted when selected nodes are moved within the diagram.
 
 This event fires when the user moves nodes manually by dragging or programmatically
-using the `NgDiagramNodeService.moveNodesBy()` method.
+using the [NgDiagramNodeService.moveNodesBy](/docs/api/services/ngdiagramnodeservice/#movenodesby) method.
 
 ## Properties
 

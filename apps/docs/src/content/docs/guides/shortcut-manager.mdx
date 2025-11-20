@@ -11,7 +11,7 @@ It supports platform-specific modifier keys (automatically handling Ctrl/Cmd dif
 
 ## Available Actions
 
-All available shortcut actions with their default key bindings. See [`ShortcutActionName`](/docs/api/types/shortcutactionname/) for the complete type reference.
+All available shortcut actions with their default key bindings. See [`ShortcutActionName`](/docs/api/types/configuration/shortcuts/shortcutactionname) for the complete type reference.
 
 | Action                       | Default Shortcut                          | Description                                                                 |
 | ---------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
@@ -35,7 +35,7 @@ All available shortcut actions with their default key bindings. See [`ShortcutAc
 
 ## Basic Usage
 
-To override, disable, or extend default shortcuts, use the `configureShortcuts()` helper:
+To override, disable, or extend default shortcuts, use the [`configureShortcuts()`](/docs/api/utilities/configureshortcuts) helper:
 
 ```typescript
 import { configureShortcuts } from 'ng-diagram';
@@ -82,7 +82,7 @@ const updatedShortcuts = configureShortcuts(
 ngDiagramService.updateConfig({ shortcuts: updatedShortcuts });
 ```
 
-[`configureShortcuts(customShortcuts, baseShortcuts?)`](/docs/api/other/configureshortcuts/) merges your custom shortcuts with defaults:
+[`configureShortcuts(customShortcuts, baseShortcuts?)`](/docs/api/utilities/configureshortcuts/) merges your custom shortcuts with defaults:
 
 - **First parameter:** Custom shortcuts (overrides actions with matching `actionName`)
 - **Second parameter:** Optional base shortcuts. Defaults are used if omitted.
@@ -102,7 +102,7 @@ Each shortcut may include:
 - **One or more keyboard bindings** (e.g., <kbd>Ctrl</kbd> + <kbd>C</kbd>)
 - **Or one or more modifier-only bindings** (e.g., <kbd>Shift</kbd> + click for box selection)
 
-See [`ShortcutDefinition`](/docs/api/other/shortcutdefinition/) API reference.
+See [`ShortcutDefinition`](/docs/api/types/configuration/shortcuts/shortcutdefinition/) API reference.
 
 ### Available Modifiers
 

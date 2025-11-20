@@ -18,7 +18,7 @@ import { SaveStateService } from '../save.service';
     </div>
   `,
   // @mark-end
-  styleUrls: ['./nav-bar.component.scss'],
+  styleUrl: './nav-bar.component.scss',
 })
 export class NavBarComponent {
   // @collapse-start

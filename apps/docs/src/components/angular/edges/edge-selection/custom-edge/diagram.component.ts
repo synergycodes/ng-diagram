@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
@@ -11,7 +12,7 @@ import {
 import { CustomEdgeComponent } from './custom-edge.component';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
@@ -19,7 +20,9 @@ import { CustomEdgeComponent } from './custom-edge.component';
         [model]="model"
         [config]="config"
         [edgeTemplateMap]="edgeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrls: ['./diagram.component.scss'],

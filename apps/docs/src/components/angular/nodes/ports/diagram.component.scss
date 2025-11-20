@@ -1,4 +1,5 @@
 .diagram {
   display: flex;
-  height: 20rem;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
 }

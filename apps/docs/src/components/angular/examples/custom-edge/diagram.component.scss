@@ -1,8 +1,8 @@
 .diagram {
   display: flex;
-  height: 20rem;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
 
-  --ngd-default-edge-stroke: #cccccc;
-  --ngd-default-edge-stroke-hover: gray;
-  --ngd-default-edge-stroke-selected: blue;
+  --ngd-labeled-edge-stroke: #ecaf40;
+  --ngd-sinusoid-edge-stroke: #4c75f2;
 }

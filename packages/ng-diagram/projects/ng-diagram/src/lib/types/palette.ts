@@ -1,7 +1,7 @@
 import { GroupNode, SimpleNode } from '../../core/src';
 
 /**
- * The `NgDiagramPaletteItem` represents the data structure for items that can be shown in the diagram palette
+ * The {@link NgDiagramPaletteItem} represents the data structure for items that can be shown in the diagram palette
  * and dragged onto the canvas to create nodes or groups.
  * It supports both simple nodes and group nodes, allowing you to specify
  * properties such as type, data, size, rotation, and grouping.
@@ -31,7 +31,7 @@ export type SimpleNodeData<Data extends object = BasePaletteItemData> = Pick<
 >;
 
 /**
- * Data structure for group node palette items. Extends {@link SimpleNodeData} with the `isGroup` property to identify it as a group.
+ * Data structure for group node palette items. Extends {@link SimpleNodeData} with the {@link GroupNode#isGroup} property to identify it as a group.
  * @category Types/Palette
  */
 export type GroupNodeData<Data extends object = BasePaletteItemData> = SimpleNodeData<Data> &

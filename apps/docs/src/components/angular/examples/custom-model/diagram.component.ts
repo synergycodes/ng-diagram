@@ -1,23 +1,37 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import type { NgDiagramConfig, Node } from 'ng-diagram';
-import { NgDiagramComponent, NgDiagramModelService } from 'ng-diagram';
+import {
+  NgDiagramNodeTemplateMap,
+  NgDiagramBackgroundComponent,
+  NgDiagramComponent,
+  NgDiagramModelService,
+} from 'ng-diagram';
 import { LocalStorageModelAdapter } from './local-storage-model-adapter';
+import { NodeComponent } from './node/node.component';
+
+enum NodeTemplateType {
+  CustomNodeType = 'customNodeType',
+}
 
 @Component({
   selector: 'diagram',
-  imports: [CommonModule, NgDiagramComponent],
+  imports: [CommonModule, NgDiagramComponent, NgDiagramBackgroundComponent],
   templateUrl: './diagram.component.html',
   styleUrl: './diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiagramComponent {
+  nodeTemplateMap = new NgDiagramNodeTemplateMap([
+    [NodeTemplateType.CustomNodeType, NodeComponent],
+  ]);
   private modelService = inject(NgDiagramModelService);
 
   config: NgDiagramConfig = {
     zoom: {
       zoomToFit: {
         onInit: true,
+        padding: 180,
       },
     },
   };
@@ -37,6 +51,7 @@ export class DiagramComponent {
       id: newId,
       position: { x: randomX, y: randomY },
       data: { label: `Custom Node ${existingNodes.length + 1}` },
+      type: NodeTemplateType.CustomNodeType,
     };
 
     this.modelService.addNodes([newNode]);
@@ -64,13 +79,15 @@ export class DiagramComponent {
       nodes: [
         {
           id: '1',
-          position: { x: 100, y: 100 },
-          data: { label: 'Custom Node 1' },
+          position: { x: 0, y: 0 },
+          data: { label: 'Node 1' },
+          type: NodeTemplateType.CustomNodeType,
         },
         {
           id: '2',
-          position: { x: 300, y: 100 },
-          data: { label: 'Custom Node 2' },
+          position: { x: 420, y: 0 },
+          data: { label: 'Node 2' },
+          type: NodeTemplateType.CustomNodeType,
         },
       ],
       edges: [

@@ -10,10 +10,10 @@ The palette system consists of built-in components that can be customized to cre
 
 ## Palette Items
 
-The core building block of the palette is the `<ng-diagram-palette-item>` component.
+The core building block of the palette is the [`<ng-diagram-palette-item>`](/docs/api/components/ngdiagrampaletteitemcomponent) component.
 It transforms any content into a draggable palette item. This wrapper provides drag-and-drop capabilities without imposing visual constraints on the content itself.
 
-A palette item is defined by an `NgDiagramPaletteItem`:
+A palette item is defined by an [`NgDiagramPaletteItem`](/docs/api/components/ngdiagrampaletteitemcomponent/):
 
 ```typescript
 interface NgDiagramPaletteItem {
@@ -28,7 +28,7 @@ interface NgDiagramPaletteItem {
 }
 ```
 
-A palette item is essentially a definition of a node. You can specify its data or other properties that will be used when the node is initialized on the diagram.
+A palette item is essentially a definition of a [`node`](/docs/api/types/model/node). You can specify its data or other properties that will be used when the node is initialized on the diagram.
 
 Think of it as similar to an Angular component definition:
 
@@ -40,13 +40,13 @@ Think of it as similar to an Angular component definition:
 
 ## Custom content
 
-When using `<ng-diagram-palette-item>`, you can pass any HTML or Angular template as its content to represent the item in the palette.
+When using [`<ng-diagram-palette-item>`](/docs/api/components/ngdiagrampaletteitemcomponent), you can pass any HTML or Angular template as its content to represent the item in the palette.
 For example, this could be plain text, an image, or a more complex Angular component.
 
 ## Previews
 
 When dragging, a preview of the node is shown.
-To define the preview, wrap your content in `<ng-diagram-palette-item-preview>` inside `<ng-diagram-palette-item>`.
+To define the preview, wrap your content in [`<ng-diagram-palette-item-preview>`](/docs/api/components/ngdiagrampaletteitempreviewcomponent) inside [`<ng-diagram-palette-item>`](/docs/api/components/ngdiagrampaletteitemcomponent).
 
 The preview itself can be any HTML or Angular component.
 

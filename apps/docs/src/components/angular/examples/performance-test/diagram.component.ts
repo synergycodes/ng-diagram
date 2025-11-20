@@ -21,7 +21,8 @@ import {
   styles: `
     .diagram {
       display: flex;
-      height: 30rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })

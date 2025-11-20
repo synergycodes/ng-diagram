@@ -8,7 +8,7 @@ sidebar:
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import Background from '../../../components/angular/background/background.astro';
 
-The background of your diagram canvas can be easily customized in ngDiagram.
+The background of your diagram canvas can be easily customized in ngDiagram.\
 You can choose between built-in patterns (`solid`, `grid`, `dotted`), or provide your own custom background.
 
 ## Available Background Types
@@ -17,8 +17,8 @@ You can choose between built-in patterns (`solid`, `grid`, `dotted`), or provide
 
 You can set a solid color background by overriding the background color of the diagram container.
 
-To do this, simply override the CSS variable or set the background style directly on the `ng-diagram` component.
-To use solid background, you don't need to add the `<ng-diagram-background>` component.
+To do this, simply override the CSS variable or set the background style directly on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent/) component.
+To use solid background, you don't need to add the [`<ng-diagram-background>`](/docs/api/components/ngdiagrambackgroundcomponent/) component.
 
 **Example:**
 
@@ -51,8 +51,8 @@ Our grid pattern is fully customizable, allowing you to adjust preferences.
 
 **Configurable settings:**
 
-- **Minor cell size**: Size of the smallest grid cell (used for minor grid lines). Controlled via the diagram config [BackgroundConfig.cellSize](/docs/api/types/backgroundconfig/#cellSize)
-- **Major line frequency**: How often a major line appears [BackgroundConfig.majorLinesFrequency](/docs/api/types/backgroundconfig/#majorlinesfrequency)
+- **Minor cell size**: Size of the smallest grid cell (used for minor grid lines). Controlled via the diagram config [BackgroundConfig.cellSize](/docs/api/types/configuration/features/backgroundconfig/#cellSize)
+- **Major line frequency**: How often a major line appears [BackgroundConfig.majorLinesFrequency](/docs/api/types/configuration/features/backgroundconfig/#majorlinesfrequency)
 - **Line colors, widths, and opacity**: Controlled via CSS variables.
 
 **CSS Variables:**
@@ -83,7 +83,7 @@ This is the default background type.
 
 **Configurable settings:**
 
-- **Dot spacing**: Controlled via the diagram config [BackgroundConfig.dotSpacing](/docs/api/types/backgroundconfig/#dotSpacing)
+- **Dot spacing**: Controlled via the diagram config [BackgroundConfig.dotSpacing](/docs/api/types/configuration/features/backgroundconfig/#dotSpacing)
 - **Dot color**: Controlled via CSS variable.
 
 **CSS Variables:**
@@ -96,7 +96,7 @@ This is the default background type.
 
 ### Custom Background
 
-You can provide any custom SVG, HTML, or image as the background by projecting content into the `<ng-diagram-background>` component.
+You can provide any custom SVG, HTML, or image as the background by projecting content into the [`<ng-diagram-background>`](/docs/api/components/ngdiagrambackgroundcomponent/) component.
 When you apply a custom background, it will completely replace any built-in patterns.
 
 **Usage:**

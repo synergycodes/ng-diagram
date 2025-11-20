@@ -1,7 +1,7 @@
 <svg class="dotted-background">
   <pattern
     #backgroundPattern
-    id="ng-diagram-background"
+    id="ng-diagram-background{{ randomHash }}"
     [attr.fill]="fill()"
     [attr.staticWidth]="dotSpacing()"
     [attr.width]="size() || dotSpacing()"
@@ -14,5 +14,5 @@
   >
     <circle r="1" cx="1" cy="1"></circle>
   </pattern>
-  <rect id="test" fill="url(#ng-diagram-background)" width="100%" height="100%" x="0" y="0"></rect>
+  <rect [attr.fill]="'url(#ng-diagram-background' + randomHash + ')'" width="100%" height="100%" x="0" y="0"></rect>
 </svg>

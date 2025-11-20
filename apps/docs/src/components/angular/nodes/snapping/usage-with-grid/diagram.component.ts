@@ -13,7 +13,7 @@ import {
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="not-content diagram">
+    <div class="not-content diagram-grid">
       <ng-diagram [model]="model" [config]="config">
         <ng-diagram-background type="grid" />
       </ng-diagram>
@@ -46,8 +46,7 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 0, y: 0 },
-        size: { width: 260, height: 200 },
+        position: { x: 20, y: 20 },
         data: { label: 'Node' },
       },
     ],

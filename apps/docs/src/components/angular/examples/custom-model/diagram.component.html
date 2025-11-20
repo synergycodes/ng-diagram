@@ -1,14 +1,17 @@
 <div class="example-container">
   <div class="button-controls">
-    <button class="btn" (click)="addNode()">Add Node</button>
-    <button class="btn secondary" (click)="reset()">Reset to Default</button>
+    <button (click)="addNode()">Add Node</button>
+    <button class="secondary" (click)="reset()">Reset to Default</button>
   </div>
 
   <div class="not-content diagram">
     <ng-diagram
       [model]="modelAdapter"
       [config]="config"
+      [nodeTemplateMap]="nodeTemplateMap"
       class="diagram"
-    ></ng-diagram>
+    >
+      <ng-diagram-background />
+    </ng-diagram>
   </div>
 </div>

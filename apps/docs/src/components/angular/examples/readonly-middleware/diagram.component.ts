@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import {
   createMiddlewares,
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramService,
   type NgDiagramConfig,
@@ -10,7 +11,7 @@ import { readOnlyMiddleware } from './read-only-middleware';
 
 @Component({
   selector: 'diagram',
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   styleUrl: './diagram.component.scss',
   templateUrl: './diagram.component.html',
 })
@@ -29,6 +30,7 @@ export class DiagramComponent {
       max: 3,
       zoomToFit: {
         onInit: true,
+        padding: 120,
       },
     },
     readOnly: {

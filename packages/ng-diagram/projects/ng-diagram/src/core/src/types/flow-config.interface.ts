@@ -155,7 +155,7 @@ export interface ZoomConfig {
   max: number;
   /**
    * The zoom step increment.
-   * @default 0.05
+   * @default 0.03
    */
   step: number;
 
@@ -173,7 +173,7 @@ export interface ZoomConfig {
 export interface BackgroundConfig {
   /**
    * Distance in pixels between consecutive dots in the background pattern.
-   * @default 60
+   * @default 30
    */
   dotSpacing?: number;
   /**

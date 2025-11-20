@@ -1,15 +1,17 @@
 :host {
   position: absolute;
-  right: 0.5rem;
-  top: 0.5rem;
+  right: 1rem;
+  top: 1rem;
   display: flex;
+  background-color: var(--ngd-node-bg-primary-default);
+  border: var(--ng-diagram-border);
+  margin-top: 0;
 
   .checkbox-label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background-color: var(--sl-color-bg-nav);
     border-radius: 0.25rem;
     user-select: none;
     cursor: pointer;

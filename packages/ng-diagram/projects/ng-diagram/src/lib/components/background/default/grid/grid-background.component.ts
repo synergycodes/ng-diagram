@@ -1,6 +1,6 @@
-import { NgFor, NgIf } from '@angular/common';
 import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
 import { Point, Size } from '../../../../../core/src';
+import { NgDiagramService } from '../../../../../public-api';
 import { FlowCoreProviderService } from '../../../../services';
 import { BackgroundPatternBase } from '../../background-pattern.base';
 
@@ -17,10 +17,10 @@ interface GridLine {
   standalone: true,
   templateUrl: './grid-background.component.html',
   styleUrl: './grid-background.component.scss',
-  imports: [NgFor, NgIf],
 })
 export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
   private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly diagramService = inject(NgDiagramService);
 
   protected readonly backgroundPattern = viewChild<ElementRef<SVGPatternElement>>('backgroundPattern');
 
@@ -31,7 +31,7 @@ export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
       return defaultSize;
     }
 
-    const { cellSize } = this.flowCore.provide().config.background;
+    const cellSize = this.diagramService.config().background?.cellSize;
     return cellSize ?? defaultSize;
   });
 
@@ -42,7 +42,7 @@ export class NgDiagramGridBackgroundComponent extends BackgroundPatternBase {
       return defaultFrequency;
     }
 
-    const { majorLinesFrequency } = this.flowCore.provide().config.background;
+    const majorLinesFrequency = this.diagramService.config().background?.majorLinesFrequency;
     return majorLinesFrequency ?? defaultFrequency;
   });
 

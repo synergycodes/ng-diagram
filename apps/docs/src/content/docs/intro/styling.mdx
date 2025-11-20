@@ -164,7 +164,7 @@ Directives require access to node/group data. When used outside of node template
 
 ### NgDiagramNodeSelectedDirective
 
-Automatically adds selection styling based on the node's `selected` property:
+Automatically adds selection styling based on the node's [`selected`](/docs/api/types/model/simplenode/#selected) property:
 
 ```html
 <div ngDiagramNodeSelected [node]="node">
@@ -174,7 +174,7 @@ Automatically adds selection styling based on the node's `selected` property:
 
 **Applied styling:**
 
-- Adds `ng-diagram-node-selected` class when `selected` is `true`
+- Adds `ng-diagram-node-selected` class when [`selected`](/docs/api/types/model/simplenode/#selected) is `true`
 - Provides focus ring and outline styling
 - Works for both nodes and groups
 
@@ -190,7 +190,7 @@ Adds highlight styling to groups based on the `highlighted` property:
 
 **Applied styling:**
 
-- Adds `ng-diagram-group-highlight` class when `highlighted` is `true`
+- Adds `ng-diagram-group-highlight` class when [`highlighted`](/docs/api/types/model/groupnode/#highlighted) is `true`
 - Provides inner outline and background highlight
 - Indicates when dragging elements can be added to the group
 

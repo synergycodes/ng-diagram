@@ -4,23 +4,27 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content default-diagram">
-      <ng-diagram [config]="config" [model]="model" />
+      <ng-diagram [config]="config" [model]="model">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: `
     .default-diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
 
       // @mark-start
       --ngd-node-border-color: #d04a02;
@@ -44,7 +48,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: 120,
+        padding: 190,
       },
     },
   } satisfies NgDiagramConfig;

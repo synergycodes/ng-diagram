@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramNodeTemplateMap,
   provideNgDiagram,
@@ -15,7 +16,7 @@ enum NodeTemplateType {
 }
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -24,7 +25,9 @@ enum NodeTemplateType {
         [model]="model"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrl: './diagram.component.scss',
@@ -37,6 +40,10 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+        padding: 50,
+      },
     },
   } satisfies NgDiagramConfig;
 
@@ -44,7 +51,7 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 80, y: 100 },
+        position: { x: 80, y: 140 },
         type: 'customNodeType',
         data: {
           name: 'Node 1',
@@ -52,11 +59,11 @@ export class DiagramComponent {
           tooltip: 'Node 1 is a custom node',
         },
         rotatable: true,
-        resizable: true,
+        resizable: false,
       },
       {
         id: '2',
-        position: { x: 450, y: 100 },
+        position: { x: 500, y: 0 },
         type: 'customNodeType',
         data: {
           name: 'Node 2',
@@ -64,7 +71,7 @@ export class DiagramComponent {
           tooltip: 'Node 2 is a custom node',
         },
         rotatable: true,
-        resizable: true,
+        resizable: false,
         angle: 30,
       },
     ],
@@ -74,7 +81,7 @@ export class DiagramComponent {
         source: '1',
         target: '2',
         data: {},
-        sourcePort: 'port-right',
+        sourcePort: 'port-top',
         targetPort: 'port-left',
         sourceArrowhead: 'ng-diagram-arrow',
       },

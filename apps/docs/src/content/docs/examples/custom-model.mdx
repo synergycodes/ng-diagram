@@ -9,7 +9,7 @@ sidebar:
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import CustomModel from '../../../components/angular/examples/custom-model/custom-model.astro';
 
-This example demonstrates how to create a custom model implementation that persists data directly to localStorage, providing automatic persistence without keeping local copies in memory.
+This example demonstrates how to create a custom [`model`](/docs/api/types/model/model/) implementation that persists data directly to localStorage, providing automatic persistence without keeping local copies in memory.
 
 <br />
 
@@ -20,8 +20,8 @@ This example demonstrates how to create a custom model implementation that persi
 
 ### Custom Model Overview
 
-The `NgDiagramComponent` accepts any object, via the `model` input property (e.g. `[model]="customModelAdapter"`), that implements the `ModelAdapter` interface.
-This means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by `initializeModel`.
+The [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) accepts any object, via the [`model`](/docs/api/components/ngdiagramcomponent/#model) input property (e.g. `[model]="customModelAdapter"`), that implements the [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface.
+This means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by [`initializeModel`](/docs/api/utilities/initializemodel/).
 This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
 
 #### Key Features
@@ -35,12 +35,13 @@ This allows for advanced use cases like connecting to external data sources, imp
 
 #### Understanding the ModelAdapter Interface
 
-The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/types/modeladapter/). The key methods include:
+The [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface defines the contract that any model implementation must fulfill.
+You can find the complete interface documentation in the [API reference](/docs/api/types/model/modeladapter/). The key methods include:
 
-- **Data access**: `getNodes`, `getEdges`, `getMetadata`
-- **Data modification**: `updateNodes`, `updateEdges`, `updateMetadata`
-- **Change notification**: `onChange`, `unregisterOnChange`
-- **Lifecycle management**: `destroy`, `undo`, `redo`, `toJSON`
+- **Data access**: [`getNodes`](/docs/api/types/model/modeladapter/#getnodes), [`getEdges`](/docs/api/types/model/modeladapter/#getedges), [`getMetadata`](/docs/api/types/model/modeladapter/#getmetadata)
+- **Data modification**: [`updateNodes`](/docs/api/types/model/modeladapter/#updatenodes), [`updateEdges`](/docs/api/types/model/modeladapter/#updateedges), [`updateMetadata`](/docs/api/types/model/modeladapter/#updatemetadata)
+- **Change notification**: [`onChange`](/docs/api/types/model/modeladapter/#onchange), [`unregisterOnChange`](/docs/api/types/model/modeladapter/#unregisteronchange)
+- **Lifecycle management**: [`destroy`](/docs/api/types/model/modeladapter/#destroy), [`undo`](/docs/api/types/model/modeladapter/#undo), [`redo`](/docs/api/types/model/modeladapter/#redo), [`toJSON`](/docs/api/types/model/modeladapter/#tojson)
 
 #### LocalStorageModelAdapter Implementation
 

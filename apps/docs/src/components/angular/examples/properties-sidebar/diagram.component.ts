@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -10,11 +11,13 @@ import {
 import { SidebarContainer } from './sidebar/sidebar.component';
 
 @Component({
-  imports: [NgDiagramComponent, SidebarContainer],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent, SidebarContainer],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
     <sidebar-container />
   `,

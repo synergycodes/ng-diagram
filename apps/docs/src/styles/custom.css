@@ -1,7 +1,26 @@
+@import 'tailwindcss';
 @layer reset, starlight;
 @import 'ng-diagram/styles.css';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import './content-tiles.css';
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Custom layout styles for the documentation site */
+html {
+  --sl-content-width: 50rem;
+  --sl-sidebar-width: 20rem;
+  --sl-content-pad-x: 3.5rem;
+
+  --ng-diagram-height: 30rem;
+  --ng-diagram-border: 1px solid var(--ngd-ui-border-color);
+}
+@media (min-width: 80rem) {
+  html {
+    --sl-content-width: 60rem;
+    --sl-sidebar-width: 24.75rem;
+  }
+}
 
 @layer reset {
   * {
@@ -37,5 +56,26 @@ ng-diagram-canvas {
 
   code {
     border-top: var(--ec-brdWd) solid var(--ec-brdCol);
+  }
+}
+
+/* 
+  * TODO - move this to wrapper stylesheet when created
+  * Style diagram buttons inside markdown content 
+  */
+.sl-markdown-content {
+  button {
+    border: 1px solid var(--ngd-pt-stroke-primary-default);
+    padding: 1px 6px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  button:hover {
+    background-color: var(--ngd-node-bg-primary-default);
+  }
+
+  button:active {
+    background-color: var(--ngd-node-stroke-primary-default);
   }
 }

@@ -1,8 +1,11 @@
 :host {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 1rem;
+  right: 1rem;
   z-index: 1;
+  background-color: var(--ngd-node-bg-primary-default);
+  border: var(--ng-diagram-border);
+  padding: 1rem;
 }
 
 .nav-bar {
@@ -10,24 +13,29 @@
   gap: 8px;
   align-items: flex-end;
   justify-content: end;
-  padding: 2px 16px;
 
   & .status {
     flex: 1;
-    background: var(--ngd-node-stroke-primary-default);
     padding: 2px 12px;
 
     &:empty {
       background: none;
+      padding: 0;
     }
   }
 
-  & > button {
+  button {
+    margin-top: 0;
     cursor: pointer;
-    border: none;
 
     &.clear {
       background: darkred;
+      border-style: solid;
+      border-color: darkred;
+
+      &:disabled {
+        border-color: var(--ngd-node-border-color);
+      }
     }
 
     &:disabled {

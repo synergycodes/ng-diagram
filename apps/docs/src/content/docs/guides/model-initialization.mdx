@@ -15,7 +15,7 @@ For comprehensive information about state management patterns and model operatio
 
 ## Model Initialization
 
-The `initializeModel` function is the primary way to create a model for use in ngDiagram.
+The [`initializeModel`](/docs/api/utilities/initializemodel) function is the primary way to create a model for use in ngDiagram.
 It creates a model instance that wraps your diagram data and provides reactive state management.
 
 ### Basic Model Creation
@@ -106,10 +106,10 @@ You need to wait for this process to complete before performing operations on th
 The initialization process involves several steps:
 
 1. **Model Assignment** – A new model is assigned to the diagram component.
-2. **Logic Recreation** – The internal core logic is destroyed and recreated. Because the logic is recreated, the `isInitialized` signal has its default value (`false`).
+2. **Logic Recreation** – The internal core logic is destroyed and recreated. Because the logic is recreated, the [`isInitialized`](/docs/api/services/ngdiagramservice/#isinitialized) signal has its default value (`false`).
 3. **Element Measurement** – All nodes, edges, and their internal parts are measured.
 4. **Layout Calculation** – Positions and sizes are calculated.
-5. **Event Emission & Signal Update** – The `diagramInit` event is emitted when everything is ready, and the `isInitialized` signal is set to `true`.
+5. **Event Emission & Signal Update** – The [`diagramInit`](/docs/api/types/events/diagraminitevent/) event is emitted when everything is ready, and the [`isInitialized`](/docs/api/services/ngdiagramservice/#isinitialized) signal is set to `true`.
 
 ### Waiting for Initialization
 
@@ -117,7 +117,7 @@ There are three main ways to detect when the diagram is fully initialized:
 
 #### Using the diagramInit Event
 
-The most convenient way is to listen for the `diagramInit` event from the `ng-diagram` component:
+The most convenient way is to listen for the [`diagramInit`](/docs/api/types/events/diagraminitevent/) event from the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component:
 
 ```typescript
 export class MyComponent {
@@ -148,7 +148,7 @@ export class MyComponent {
 
 #### Using the isInitialized Signal
 
-You can also check the `isInitialized` signal from `NgDiagramService`:
+You can also check the [`isInitialized`](/docs/api/services/ngdiagramservice/#isinitialized) signal from [`NgDiagramService`](/docs/api/services/ngdiagramservice):
 
 ```typescript
 export class MyComponent {
@@ -196,8 +196,9 @@ export class MyComponent {
 ### Always Wait for Initialization
 
 <Aside type="tip">
-  **Rule of Thumb**: Never perform model operations immediately after reinitializing. Always wait for the `diagramInit`
-  event or check `isInitialized()` signal.
+  **Rule of Thumb**: Never perform model operations immediately after reinitializing. Always wait for the
+  [`diagramInit`](/docs/api/types/events/diagraminitevent/) event or check
+  [`isInitialized`](/docs/api/services/ngdiagramservice/#isinitialized) signal.
 </Aside>
 
 ```typescript
@@ -253,7 +254,7 @@ export class MemoryConsciousComponent {
 
 **Operations not working after model reinitialization:**
 
-- Ensure you're waiting for the `diagramInit` event
+- Ensure you're waiting for the [`diagramInit`](/docs/api/types/events/diagraminitevent/) event
 - Check that you're using the model service, not the model directly
 
 **Initialization events not firing:**

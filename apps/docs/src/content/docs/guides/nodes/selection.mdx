@@ -14,12 +14,12 @@ Selected nodes are visually highlighted, making it easier to identify and intera
 
 - Nodes can be selected by clicking on them.
 - When a node is selected, it will be visually highlighted according to the styles defined in your application.
-- The selected state is managed by ngDiagram and can be accessed via the node's `selected` property.
+- The selected state is managed by ngDiagram and can be accessed via the node's [`selected`](/docs/api/types/model/simplenode/#selected) property.
 - Default selection style can be enabled per node using a directive provided by ngDiagram.
 
 ## Custom Node Styling
 
-Selection can be fully customized by using the `selected` property from the node to control its state.
+Selection can be fully customized by using the [`selected`](/docs/api/types/model/simplenode/#selected) property from the node to control its state.
 You can assign any CSS class you prefer based on this property and define your own styles for selected nodes.
 This allows you to tailor the selection appearance and behavior to fit your application's needs.
 
@@ -33,7 +33,7 @@ This allows you to tailor the selection appearance and behavior to fit your appl
 
 ## Using Default Styles
 
-To make a custom node selectable with default functionality, add the `NgDiagramNodeSelectedDirective` as a host directive in your node component.
+To make a custom node selectable with default functionality, add the [`NgDiagramNodeSelectedDirective`](/docs/api/directives/ngdiagramnodeselecteddirective) as a host directive in your node component.
 
 There is no need to define anything else in your node or to provide custom selection styles.
 

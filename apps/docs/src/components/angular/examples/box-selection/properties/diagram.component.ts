@@ -4,6 +4,7 @@ import '@angular/compiler';
 import { Component, inject } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramService,
   provideNgDiagram,
@@ -11,7 +12,7 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="toolbar">
@@ -35,7 +36,9 @@ import {
       </div>
     </div>
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: [
@@ -48,19 +51,21 @@ import {
       .diagram {
         display: flex;
         width: 100%;
-        height: 20rem;
+        height: var(--ng-diagram-height);
+        border: var(--ng-diagram-border);
       }
 
       .toolbar {
         position: absolute;
-        top: 0;
-        right: 0;
+        top: 16px;
+        right: 16px;
         display: flex;
         padding: 0.5rem;
         margin-top: 1rem;
         flex-direction: column;
         align-items: end;
-        background-color: var(--ngd-ui-bg-tertiary-default);
+        background-color: var(--ngd-node-bg-primary-default);
+        border: var(--ng-diagram-border);
         z-index: 1;
 
         button {
@@ -109,6 +114,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
+        padding: 180,
       },
     },
   } satisfies NgDiagramConfig;

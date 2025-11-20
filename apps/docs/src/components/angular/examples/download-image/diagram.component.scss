@@ -1,5 +1,23 @@
 .diagram {
-  display: flex;
-  height: 24rem;
+  position: relative;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
   margin-top: 0;
+}
+
+.nav-bar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5px;
+  align-items: flex-end;
+  justify-content: end;
+  padding: 1rem;
+  background-color: var(--ngd-node-bg-primary-default);
+  border: var(--ng-diagram-border);
+
+  button {
+    margin-top: 0;
+  }
 }
