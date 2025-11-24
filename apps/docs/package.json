@@ -34,7 +34,7 @@
     "@tailwindcss/vite": "^4.1.16",
     "@yeskunall/astro-umami": "~0.0.7",
     "astro": "^5.6.1",
-    "elkjs": "^0.10.0",
+    "elkjs": "^0.11.0",
     "html-to-image": "1.11.11",
     "ng-diagram": "workspace:*",
     "rxjs": "~7.8.2",
