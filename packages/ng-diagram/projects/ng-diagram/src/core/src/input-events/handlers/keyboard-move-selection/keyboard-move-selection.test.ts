@@ -43,6 +43,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       },
       config: {
         snapping: {
+          computeSnapForNodeDrag: vi.fn(),
           defaultDragSnap: { width: 10, height: 10 },
         },
         selectionMoving: {
@@ -115,7 +116,6 @@ describe('KeyboardMoveSelectionEventHandler', () => {
         nodes: [mockNode],
         delta: { x: 10, y: 0 },
       });
-
       expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
     });
 
@@ -135,7 +135,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           nodes: [nodeNearRightEdge],
           delta: { x: 10, y: 0 },
         });
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: -15, y: 0 });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: -10, y: 0 });
       });
 
       it('should trigger panning to the right when node is near left edge', () => {
@@ -153,7 +153,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           nodes: [nodeNearLeftEdge],
           delta: { x: -10, y: 0 },
         });
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 15, y: 0 });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 0 });
       });
 
       it('should trigger panning upward when node is near bottom edge', () => {
@@ -171,7 +171,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           nodes: [nodeNearBottomEdge],
           delta: { x: 0, y: 10 },
         });
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: -15 });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: -10 });
       });
 
       it('should trigger panning downward when node is near top edge', () => {
@@ -189,12 +189,73 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           nodes: [nodeNearTopEdge],
           delta: { x: 0, y: -10 },
         });
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: 15 });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 0, y: 10 });
+      });
+
+      it('should trigger panning with greater value from edgePanningThreshold or snapping values', () => {
+        mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 50, height: 50 });
+        mockFlowCore.config.snapping.defaultDragSnap = { width: 30, height: 30 };
+        mockFlowCore.config.selectionMoving.edgePanningThreshold = 40;
+
+        const nodeNearRightEdge = {
+          ...mockNode,
+          position: { x: 760, y: 100 }, // 760 + 100 (node width) = 860, which is > 800 - 40 = 760
+        };
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeNearRightEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [nodeNearRightEdge],
+          delta: { x: 50, y: 0 },
+        });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: -50, y: 0 });
+      });
+
+      it('should trigger panning with edgePanningThreshold value from config being greater than snapping values', () => {
+        mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 50, height: 50 });
+        mockFlowCore.config.snapping.defaultDragSnap = { width: 30, height: 30 };
+        mockFlowCore.config.selectionMoving.edgePanningThreshold = 60;
+
+        const nodeNearRightEdge = {
+          ...mockNode,
+          position: { x: 760, y: 100 }, // 760 + 100 (node width) = 860, which is > 800 - 60 = 740
+        };
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeNearRightEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [nodeNearRightEdge],
+          delta: { x: 50, y: 0 },
+        });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: -60, y: 0 });
+      });
+
+      it('should not trigger edge panning if node is not near any edge', () => {
+        const nodeFarFromEdge = {
+          ...mockNode,
+          position: { x: 400, y: 300 },
+        };
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeFarFromEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [nodeFarFromEdge],
+          delta: { x: 10, y: 0 },
+        });
+        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
       });
     });
 
     it('should not emit command if no nodes are selected', () => {
-      // Reset the mock to return empty array
       (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
       const event = getSampleKeyboardMoveEvent({ direction: 'right' });
@@ -241,6 +302,40 @@ describe('KeyboardMoveSelectionEventHandler', () => {
         nodes: [grandparent, parent, child],
         delta: { x: 10, y: 0 },
       });
+    });
+
+    // Additional tests
+
+    it('should use computeSnapForNodeDrag if available', () => {
+      mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 20, height: 30 });
+
+      const event = getSampleKeyboardMoveEvent({ direction: 'bottom' });
+      instance.handle(event);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+        nodes: [mockNode],
+        delta: { x: 0, y: 30 },
+      });
+    });
+
+    it('should use computeSnapForNodeDrag and take precedence over defaultDragSnap.', () => {
+      mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 50, height: 50 });
+      mockFlowCore.config.snapping.defaultDragSnap = { width: 30, height: 30 };
+
+      const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+      instance.handle(event);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+        nodes: [mockNode],
+        delta: { x: 50, y: 0 },
+      });
+    });
+
+    it('should throw error for unknown direction', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const event = getSampleKeyboardMoveEvent({ direction: 'unknown' as any });
+
+      expect(() => instance.handle(event)).toThrowError('Unknown direction: unknown');
     });
   });
 });
