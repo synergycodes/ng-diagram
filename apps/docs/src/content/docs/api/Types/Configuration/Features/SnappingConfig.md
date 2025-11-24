@@ -14,6 +14,7 @@ Configuration for node dragging behavior.
 > **computeSnapForNodeDrag**: (`node`) => `null` \| [`Size`](/docs/api/types/geometry/size/)
 
 Computes the snap size for a node while dragging. If null is returned, a default snap size will be used.
+If computeSnapForNodeDrag is used, it takes precedence over defaultDragSnap.
 
 #### Parameters
 
@@ -70,6 +71,7 @@ The snap size for the node while resizing, or null.
 > **defaultDragSnap**: [`Size`](/docs/api/types/geometry/size/)
 
 The default snap size for node dragging.
+If computeSnapForNodeDrag is used, it takes precedence over this value.
 
 #### Default
 
