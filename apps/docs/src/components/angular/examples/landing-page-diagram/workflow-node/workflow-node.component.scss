@@ -1,0 +1,65 @@
+@use '../mixins' as *;
+
+:host {
+  display: block;
+  position: relative;
+}
+
+.workflow-node {
+  background: var(--ngdlp-component-bg-alt);
+  border: 1px solid var(--ngdlp-border-secondary-80);
+  border-radius: 12px;
+  padding: 0.5rem;
+  min-width: 250px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+
+  @include glow-gradient;
+}
+
+.workflow-node-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.workflow-node-content {
+  display: flex;
+  align-items: center;
+}
+
+.workflow-node-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ngdlp-bg-dark-deep);
+  color: var(--ngdlp-green-bright);
+  font-size: 24px;
+  border: 1px solid var(--ngdlp-border-secondary-80);
+}
+
+.workflow-node-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workflow-node-title {
+  color: var(--ngdlp-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.workflow-node-subtitle {
+  color: var(--ngdlp-text-secondary);
+  font-size: 12px;
+  line-height: 1.2;
+}

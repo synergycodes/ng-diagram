@@ -1,0 +1,17 @@
+<div ngDiagramNodeSelected [node]="node()" class="workflow-node">
+  <ng-diagram-port id="port-left" side="left" type="both" />
+  <ng-diagram-port id="port-right" side="right" type="both" />
+
+  <div class="workflow-node-header">
+    <div class="workflow-node-icon">
+      <i [class]="className()"></i>
+    </div>
+    <div class="workflow-node-text">
+      <div class="workflow-node-title">{{ title() }}</div>
+      @if (subtitle()) {
+        <div class="workflow-node-subtitle">{{ subtitle() }}</div>
+      }
+    </div>
+  </div>
+  <ng-content />
+</div>

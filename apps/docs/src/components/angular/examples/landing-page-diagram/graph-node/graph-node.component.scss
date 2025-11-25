@@ -1,0 +1,76 @@
+:host {
+  display: block;
+}
+
+.graph-node {
+  background: var(--ngdlp-component-bg);
+  border: 1px solid var(--ngdlp-border-primary-80);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px var(--ngdlp-shadow-dark);
+}
+
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.graph-title {
+  color: var(--ngdlp-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.graph-expand-btn {
+  background: var(--ngdlp-transparent);
+  border: 1px solid var(--ngdlp-border-secondary-60);
+  color: var(--ngdlp-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--ngdlp-border-secondary-30);
+    color: var(--ngdlp-white-90);
+  }
+}
+
+.graph-content {
+  display: flex;
+  width: 100%;
+}
+
+.chart-container {
+  flex: 1;
+  display: block;
+
+  :global(.u-wrap) {
+    background: var(--ngdlp-transparent) !important;
+  }
+
+  :global(.u-over) {
+    background: var(--ngdlp-transparent) !important;
+  }
+
+  :global(.u-legend) {
+    display: none !important;
+  }
+
+  :global(.u-axis) {
+    color: var(--ngdlp-text-tertiary) !important;
+    font-size: 11px !important;
+  }
+
+  :global(.u-value) {
+    color: var(--ngdlp-white-90) !important;
+    background: var(--ngdlp-component-bg) !important;
+    border: 1px solid var(--ngdlp-border-primary-80) !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+  }
+}

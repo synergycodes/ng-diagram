@@ -1,0 +1,15 @@
+<ng-diagram-node-resize-adornment>
+<div
+  ngDiagramNodeSelected
+  ngDiagramGroupHighlighted
+  [node]="node()"
+  class="group-node"
+>
+  <ng-diagram-port id="port-right" side="right" type="both" style="top: 30px" />
+
+  <div class="group-node-header">
+    <span class="group-node-title">{{ title() }}</span>
+  </div>
+  <div class="group-node-content"></div>
+</div>
+</ng-diagram-node-resize-adornment>
