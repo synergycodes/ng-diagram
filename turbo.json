@@ -17,6 +17,15 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "api:report": {
+      "dependsOn": ["^api:report"]
+    },
+    "api:check": {
+      "dependsOn": ["^api:check"]
+    },
+    "api:update": {
+      "dependsOn": ["^api:update"]
+    },
     "dev": {
       "cache": false,
       "persistent": true,

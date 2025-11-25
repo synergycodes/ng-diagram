@@ -35,3 +35,13 @@ jobs:
 
       - name: Run unit tests
         run: pnpm run test
+
+      - name: Check API report
+        run: api:check
+
+      - name: Upload API report if check failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-report
+          path: packages/ng-diagram/api-report/ng-diagram.api.md
