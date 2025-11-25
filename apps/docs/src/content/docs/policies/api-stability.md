@@ -11,12 +11,12 @@ This document outlines ngDiagram's API stability levels and version support poli
 
 ngDiagram uses TSDoc tags to indicate API stability:
 
-| Tag              | Level        | Breaking Changes                    | Migration Support | Production Use          |
-| ---------------- | ------------ | ----------------------------------- | ----------------- | ----------------------- |
-| `@public`        | Stable       | Only in major versions              | Yes, guaranteed   | ✅ Safe                 |
-| `@beta`          | Preview      | Possible in minor versions          | Yes, provided     | ⚠️ Use with caution     |
-| `@experimental`  | Unstable     | May change or be removed anytime    | Not guaranteed    | ❌ Testing only         |
-| `@internal`      | Private      | May change without notice           | No                | ❌ Do not use           |
+| Tag             | Level    | Breaking Changes                 | Migration Support | Production Use      |
+| --------------- | -------- | -------------------------------- | ----------------- | ------------------- |
+| `@public`       | Stable   | Only in major versions           | Yes, guaranteed   | ✅ Safe             |
+| `@beta`         | Preview  | Possible in minor versions       | Yes, provided     | ⚠️ Use with caution |
+| `@experimental` | Unstable | May change or be removed anytime | Not guaranteed    | ❌ Testing only     |
+| `@internal`     | Private  | May change without notice        | No                | ❌ Do not use       |
 
 **Note**: APIs without tags are treated as `@beta` before v1.0, and `@public` after v1.0.
 

@@ -7,6 +7,7 @@ This guide details the step-by-step process for deprecating APIs in the ng-diagr
 ## Policy Summary
 
 According to our [deprecation policy](https://www.ngdiagram.dev/docs/policies/deprecation-policy):
+
 - Deprecated APIs are removed in the next major version
 - Clear migration paths must be provided
 - Deprecations must be documented in code, changelog, and docs
@@ -82,18 +83,21 @@ See [API Extractor](api-extractor.md) for more details on API verification.
 Here's a complete example of deprecating a component:
 
 1. **PR #1: Introduce new API**
+
    ```typescript
    // Add new component
    export class NewComponent {}
    ```
 
 2. **PR #2: Deprecate old API**
+
    ```typescript
    /**
     * @deprecated Use {@link NewComponent} instead. Will be removed in v3.0.0.
     */
    export class OldComponent {}
    ```
+
    - Update CHANGELOG.md
    - Add migration guide
    - Update API report
