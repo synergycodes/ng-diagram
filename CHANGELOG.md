@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Landing page diagram example in documentation ([#464](https://github.com/synergycodes/ng-diagram/pull/464))
+
 ### Changed
 
 - Standardized error messages across the ng-diagram library ([#463](https://github.com/synergycodes/ng-diagram/pull/463))
