@@ -1,6 +1,6 @@
 @mixin glow-gradient {
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     bottom: -100px;
     left: 50%;

@@ -1,5 +1,5 @@
-import uPlot from "uplot";
-import { NgDiagramViewportService } from "ng-diagram";
+import uPlot from 'uplot';
+import { NgDiagramViewportService } from 'ng-diagram';
 
 const CHART_CONFIG = {
   WIDTH: 300,
@@ -38,9 +38,9 @@ const AXIS_CONFIG = {
   },
 } as const;
 
-const DAY_LABELS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"] as const;
+const DAY_LABELS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] as const;
 
-function createScales(): uPlot.Options["scales"] {
+function createScales(): uPlot.Options['scales'] {
   return {
     x: { time: false },
     y: { range: [0, CHART_CONFIG.Y_RANGE_MAX] },
@@ -108,7 +108,7 @@ function createSeries(): uPlot.Series[] {
   return [
     {}, // First series is for x-axis
     {
-      label: "New Users",
+      label: 'New Users',
       stroke: (u) => createLineGradient(u),
       width: CHART_CONFIG.LINE_WIDTH,
       fill: (u) => createFillGradient(u),
