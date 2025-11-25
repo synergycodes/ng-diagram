@@ -1,6 +1,16 @@
-import { Point, Size } from '../../../types';
+import { DIRECTIONS, Point, Size } from '../../../types';
 import { EventHandler } from '../event-handler';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
+
+const UNKNOWN_DIRECTION_ERROR = (direction: string) =>
+  `[ngDiagram] Unknown keyboard move direction: "${direction}"
+
+Valid directions are: ${DIRECTIONS.map((d) => `'${d}'`).join(', ')}
+
+This indicates a programming error. Check keyboard shortcut configuration.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/shortcut-manager/
+`;
 
 export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMoveSelectionEvent> {
   handle(event: KeyboardMoveSelectionEvent): void {
@@ -28,7 +38,7 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
       case 'right':
         return { x: snapWidth, y: 0 };
       default:
-        throw new Error(`Unknown direction: ${event.direction}`);
+        throw new Error(UNKNOWN_DIRECTION_ERROR(event.direction));
     }
   }
 

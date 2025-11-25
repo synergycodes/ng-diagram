@@ -3,6 +3,14 @@ import { Edge, GroupNode, Metadata, Node, Point, Port } from '../../core/src';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
+const MODEL_LISTENER_CLEANUP_ERROR = (error: unknown) =>
+  `[ngDiagram] Failed to unregister model listener during cleanup.
+
+Error: ${error instanceof Error ? error.message : String(error)}
+
+This may indicate the diagram was already destroyed or the model was not properly initialized.
+`;
+
 /**
  * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
  *
@@ -53,7 +61,7 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     try {
       this.flowCore.model.unregisterOnChange(this.modelListener);
     } catch (error) {
-      console.error('Error unregistering model listener:', error);
+      console.error(MODEL_LISTENER_CLEANUP_ERROR(error));
     }
   }
 

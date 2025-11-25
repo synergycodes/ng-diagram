@@ -3,15 +3,51 @@ import { Port } from '../../../core/src';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 
+const PORT_PARENT_NOT_FOUND_ERROR = (portId: string) =>
+  `[ngDiagram] Port measurement failed: Parent node not found.
+
+Port ID: ${portId}
+
+This may occur during DOM updates or node removal.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/ports/
+`;
+
+const NODE_ELEMENT_NOT_FOUND_ERROR = (nodeId: string) =>
+  `[ngDiagram] Node measurement failed: Node element not found.
+
+Node ID: ${nodeId}
+
+This may occur during DOM updates or node removal.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/nodes/
+`;
+
+const PORT_ID_MISSING_ERROR = (portElementId: string, nodeId: string) =>
+  `[ngDiagram] Port measurement failed: Missing data-port-id attribute.
+
+Port element ID: ${portElementId}
+Node ID: ${nodeId}
+
+To fix this:
+  • Add [id]="port.id" to port components
+  • Ensure all ports have unique IDs
+
+Skipping this port.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/ports/
+`;
+
 @Injectable()
 export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly diagramElement = inject(ElementRef<HTMLElement>);
 
-  getPortData(port: HTMLElement): Required<Pick<Port, 'size' | 'position'>> {
+  getPortData(port: HTMLElement): Required<Pick<Port, 'size' | 'position'>> | null {
     const nodeElement = findParentWithClass(port, 'ng-diagram-node');
     if (!nodeElement) {
-      throw new Error(`Parent node of port with id ${port.id} not found`);
+      console.error(PORT_PARENT_NOT_FOUND_ERROR(port.id));
+      return null;
     }
     const portRect = port.getBoundingClientRect();
     const nodeRect = nodeElement.getBoundingClientRect();
@@ -35,7 +71,8 @@ export class UpdatePortsService {
       `.ng-diagram-node[data-node-id="${nodeId}"]`
     ) as HTMLElement;
     if (!node) {
-      throw new Error(`Node with id ${nodeId} not found`);
+      console.error(NODE_ELEMENT_NOT_FOUND_ERROR(nodeId));
+      return [];
     }
 
     const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
@@ -44,11 +81,17 @@ export class UpdatePortsService {
     ports.forEach((port) => {
       const portId = port.getAttribute('data-port-id');
       if (!portId) {
-        throw new Error(`Port with id ${port.id} in node ${nodeId} not found`);
+        console.error(PORT_ID_MISSING_ERROR(port.id, nodeId));
+        return;
       }
 
-      const { size, position } = this.getPortData(port);
-      portsData.push({ id: portId, size, position });
+      const portData = this.getPortData(port);
+      if (!portData) {
+        // Error already logged in getPortData
+        return;
+      }
+
+      portsData.push({ id: portId, size: portData.size, position: portData.position });
     });
 
     return portsData;

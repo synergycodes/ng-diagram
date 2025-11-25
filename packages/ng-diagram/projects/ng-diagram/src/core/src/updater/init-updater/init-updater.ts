@@ -11,6 +11,27 @@ export const STABILITY_DELAY = 50;
 /** Milliseconds to wait for measurements after entities stabilize before forcing finish */
 export const MEASUREMENT_TIMEOUT = 2000;
 
+const INIT_STABILIZATION_FAILED_ERROR = (error: unknown) =>
+  `[ngDiagram] Initialization stabilization failed.
+
+Error: ${error instanceof Error ? error.message : String(error)}
+
+The diagram will force-finish initialization without waiting for all measurements.
+This may result in:
+  • Ports without measured positions/sizes
+  • Edge labels without measured sizes
+  • Incorrect initial edge routing
+
+This usually indicates:
+  • Resize observers not functioning properly
+  • Port/label elements not rendering
+  • Very slow initial render (> ${STABILITY_DELAY}ms between additions)
+
+The diagram will still be functional, but initial layout may be incomplete.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/model-initialization/
+`;
+
 /**
  * InitUpdater batches all initialization data and applies it in a single state update.
  *
@@ -84,7 +105,7 @@ export class InitUpdater implements Updater {
         this.tryFinish();
       })
       .catch((err) => {
-        console.error('[InitUpdater] Entity stabilization failed:', err);
+        console.error(INIT_STABILIZATION_FAILED_ERROR(err));
         this.forceFinish();
       });
   }

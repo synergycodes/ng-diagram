@@ -2,10 +2,23 @@ import { Point, Size } from '../../..';
 import { EventHandler } from '../event-handler';
 import { ResizeEvent } from './resize.event';
 
+const RESIZE_MISSING_TARGET_ERROR = (event: ResizeEvent) =>
+  `[ngDiagram] Resize event missing target node.
+
+Event details:
+  • Phase: ${event.phase}
+  • Direction: ${event.direction}
+  • Target type: ${event.targetType}
+  • Pointer position: (${event.lastInputPoint.x}, ${event.lastInputPoint.y})
+
+This indicates a programming error. Resize events must have a target node.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/resizing/`;
+
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
   handle(event: ResizeEvent): void {
     if (!event.target) {
-      throw new Error('Resize event must have a target Node');
+      throw new Error(RESIZE_MISSING_TARGET_ERROR(event));
     }
 
     const { x, y } = this.flow.clientToFlowPosition(event.lastInputPoint);

@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../flow-core';
 import type { Edge, Node } from '../types';
-import { ModelLookup } from './model-lookup';
+import {
+  ModelLookup,
+  MODEL_INTEGRITY_MISSING_PARENT_ERROR,
+  MODEL_INTEGRITY_INVALID_PARENT_ERROR,
+} from './model-lookup';
 
 describe('ModelLookup', () => {
   let modelLookup: ModelLookup;
@@ -650,7 +654,7 @@ describe('ModelLookup', () => {
       modelLookup.desynchronize();
       const chain = modelLookup.getParentChain('node1');
       expect(chain).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith('Node node1 has a non-existent parent');
+      expect(consoleSpy).toHaveBeenCalledWith(MODEL_INTEGRITY_MISSING_PARENT_ERROR('node1', 'nonExistentGroup'));
 
       consoleSpy.mockRestore();
     });
@@ -683,7 +687,7 @@ describe('ModelLookup', () => {
       modelLookup.desynchronize();
       const chain = modelLookup.getParentChain('node1');
       expect(chain).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith('Node node1 has a non-group parent parent');
+      expect(consoleSpy).toHaveBeenCalledWith(MODEL_INTEGRITY_INVALID_PARENT_ERROR('node1', 'parent', 'default'));
 
       consoleSpy.mockRestore();
     });

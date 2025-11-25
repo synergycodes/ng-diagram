@@ -2,6 +2,16 @@ import { NgDiagramMath } from '../../math';
 import type { Bounds, CommandHandler, FlowConfig, GroupNode, Node, Size } from '../../types';
 import { calculateGroupBounds, isGroup, isSameSize } from '../../utils';
 
+/** @internal */
+export const RESIZE_NODE_NOT_FOUND_ERROR = (nodeId: string) =>
+  `[ngDiagram] Resize node failed: Node not found.
+
+Node ID: ${nodeId}
+
+This may occur if the node was deleted before the resize command executed.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/nodes/`;
+
 export interface ResizeNodeCommand {
   name: 'resizeNode';
   id: string;
@@ -92,7 +102,8 @@ export const resizeNode = async (commandHandler: CommandHandler, command: Resize
   const node = commandHandler.flowCore.getNodeById(command.id);
 
   if (!node) {
-    throw new Error(`Node with id ${command.id} not found.`);
+    console.error(RESIZE_NODE_NOT_FOUND_ERROR(command.id));
+    return;
   }
 
   // The node is missing size, which can happen when a node is dropped from the palette

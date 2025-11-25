@@ -1,5 +1,12 @@
 import type { CommandHandler } from '../../types';
 
+const INVALID_ZOOM_SCALE_ERROR = (scale: number) =>
+  `[ngDiagram] Invalid zoom scale: ${scale}
+
+Scale must be a positive finite number.
+
+Documentation: https://www.ngdiagram.dev/docs/intro/coordinate-system/#viewport-and-scaling`;
+
 export interface ZoomCommand {
   name: 'zoom';
   x: number;
@@ -9,6 +16,12 @@ export interface ZoomCommand {
 
 export const zoom = async (commandHandler: CommandHandler, { x, y, scale }: ZoomCommand) => {
   const { metadata } = commandHandler.flowCore.getState();
+
+  // Ensure scale is never zero or invalid to prevent division by zero
+  if (scale <= 0 || !isFinite(scale) || isNaN(scale)) {
+    console.error(INVALID_ZOOM_SCALE_ERROR(scale));
+    return;
+  }
 
   const { min, max } = commandHandler.flowCore.config.zoom;
   if (scale < min || scale > max) {
