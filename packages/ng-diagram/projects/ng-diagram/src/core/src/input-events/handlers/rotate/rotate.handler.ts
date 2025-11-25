@@ -4,11 +4,24 @@ import { RotateInputEvent } from './rotate.event';
 
 const MIN_DISTANCE_TO_CENTER = 30;
 
+const ROTATE_MISSING_TARGET_ERROR = (event: RotateInputEvent) =>
+  `[ngDiagram] Rotate event missing target node.
+
+Event details:
+  • Phase: ${event.phase}
+  • Target type: ${event.targetType}
+  • Pointer position: (${event.lastInputPoint.x}, ${event.lastInputPoint.y})
+  • Center: (${event.center.x}, ${event.center.y})
+
+This indicates a programming error. Rotation events must have a target node.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
+
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
   handle(event: RotateInputEvent): void {
     const { center, lastInputPoint, target, phase } = event;
     if (!target) {
-      throw new Error('Rotate event must have a target Node');
+      throw new Error(ROTATE_MISSING_TARGET_ERROR(event));
     }
 
     const nodeId = target?.id;

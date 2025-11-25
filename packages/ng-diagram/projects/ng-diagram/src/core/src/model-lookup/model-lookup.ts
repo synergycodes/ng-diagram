@@ -2,6 +2,29 @@ import { FlowCore } from '../flow-core';
 import type { Edge, GroupNode, Node } from '../types';
 import { isGroup } from '../utils';
 
+/** @internal */
+export const MODEL_INTEGRITY_MISSING_PARENT_ERROR = (nodeId: string, parentId: string) =>
+  `[ngDiagram] Model integrity error: Node references non-existent parent.
+
+Node ID: ${nodeId}
+Parent ID: ${parentId}
+
+This indicates corrupted model data. The group hierarchy will be incomplete.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/groups/`;
+
+/** @internal */
+export const MODEL_INTEGRITY_INVALID_PARENT_ERROR = (nodeId: string, parentId: string, parentType: string) =>
+  `[ngDiagram] Model integrity error: Node's parent is not a group.
+
+Node ID: ${nodeId}
+Parent ID: ${parentId}
+Parent type: ${parentType}
+
+This indicates incorrect model structure. The group hierarchy will be incomplete.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/groups/`;
+
 export class ModelLookup {
   private _nodesMap = { map: new Map<string, Node>(), synchronized: false };
   private _edgesMap = { map: new Map<string, Edge>(), synchronized: false };
@@ -406,12 +429,12 @@ export class ModelLookup {
       const parent = this.getNodeById(current.groupId);
 
       if (!parent) {
-        console.error(`Node ${current.id} has a non-existent parent`);
+        console.error(MODEL_INTEGRITY_MISSING_PARENT_ERROR(current.id, current.groupId));
         return chain;
       }
 
       if (!isGroup(parent)) {
-        console.error(`Node ${current.id} has a non-group parent ${parent.id}`);
+        console.error(MODEL_INTEGRITY_INVALID_PARENT_ERROR(current.id, parent.id, parent.type || 'unknown'));
         return chain;
       }
 

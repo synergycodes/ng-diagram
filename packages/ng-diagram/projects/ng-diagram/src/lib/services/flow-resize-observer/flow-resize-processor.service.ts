@@ -4,6 +4,14 @@ import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provide
 import { UpdatePortsService } from '../update-ports/update-ports.service';
 import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
 
+const UNKNOWN_ELEMENT_TYPE_ERROR = (elementType: string) =>
+  `[ngDiagram] Unknown element type: "${elementType}"
+
+Expected types: 'port', 'edge-label', 'node'
+
+This indicates a programming error in the resize observer metadata configuration.
+Check that elements are registered with the correct type.`;
+
 interface ProcessedEntry {
   entry: ResizeObserverEntry;
   metadata: ObservedElementMetadata;
@@ -62,7 +70,7 @@ export class FlowResizeBatchProcessorService {
           nodeEntries.push({ metadata, entry });
           break;
         default:
-          throw new Error('Unknown element type:', metadata);
+          throw new Error(UNKNOWN_ELEMENT_TYPE_ERROR((metadata as ObservedElementMetadata).type));
       }
     }
 
@@ -101,7 +109,8 @@ export class FlowResizeBatchProcessorService {
       const size = this.getBorderBoxSize(entry);
       if (!size) continue;
 
-      const { position } = this.updatePortsService.getPortData(entry.target as HTMLElement);
+      const portData = this.updatePortsService.getPortData(entry.target as HTMLElement);
+      if (!portData) continue;
 
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
@@ -114,7 +123,7 @@ export class FlowResizeBatchProcessorService {
         currentSize &&
         !this.isSizeChanged(currentSize, size) &&
         currentPosition &&
-        !this.isPositionChanged(currentPosition, position)
+        !this.isPositionChanged(currentPosition, portData.position)
       ) {
         continue;
       }
@@ -126,7 +135,7 @@ export class FlowResizeBatchProcessorService {
       updatesByNode.get(metadata.nodeId)!.push({
         id: metadata.portId,
         size,
-        position,
+        position: portData.position,
       });
     }
 

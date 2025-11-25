@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import type { GroupNode } from '../../../types/node.interface';
 import { CommandHandler } from '../../command-handler';
-import { applyChildrenBoundsConstraints, resizeNode } from '../resize-node';
+import { applyChildrenBoundsConstraints, resizeNode, RESIZE_NODE_NOT_FOUND_ERROR } from '../resize-node';
 
 // Mock the utils module properly for vitest
 vi.mock('../../../utils', () => ({
@@ -52,13 +52,15 @@ describe('Resize Node Command', () => {
 
   describe('resizeNode', () => {
     it('should not call applyUpdate if node is not found', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(null);
 
-      await expect(
-        resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } })
-      ).rejects.toThrow('Node with id 1 not found.');
+      await resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } });
 
+      expect(consoleSpy).toHaveBeenCalledWith(RESIZE_NODE_NOT_FOUND_ERROR('1'));
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
     });
 
     it('should not call applyUpdate if new size is same as current size', () => {
