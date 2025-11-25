@@ -70,8 +70,7 @@ export class FlowResizeBatchProcessorService {
           nodeEntries.push({ metadata, entry });
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          throw new Error(UNKNOWN_ELEMENT_TYPE_ERROR((metadata as any).type));
+          throw new Error(UNKNOWN_ELEMENT_TYPE_ERROR((metadata as ObservedElementMetadata).type));
       }
     }
 

@@ -87,7 +87,6 @@ export class UpdatePortsService {
 
       const portData = this.getPortData(port);
       if (!portData) {
-        // Error already logged in getPortData
         return;
       }
 
