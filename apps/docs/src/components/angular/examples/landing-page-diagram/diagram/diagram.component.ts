@@ -30,7 +30,6 @@ import { DIAGRAM_EDGES, DIAGRAM_NODES } from './diagram-data.config';
       >
         <ng-diagram-background />
       </ng-diagram>
-      <div></div>
     </div>
   `,
 })
