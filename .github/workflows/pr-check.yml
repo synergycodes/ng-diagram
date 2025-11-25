@@ -37,7 +37,7 @@ jobs:
         run: pnpm run test
 
       - name: Check API report
-        run: api:check
+        run: pnpm run api:check
 
       - name: Upload API report if check failed
         if: failure()
