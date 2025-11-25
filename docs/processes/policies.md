@@ -26,7 +26,7 @@ See [Deprecation Policy](https://www.ngdiagram.dev/docs/policies/deprecation-pol
 ### 3. Angular Support
 
 - Support current Angular version + 2 previous versions (3 total)
-- Example: If current is v18, we support v16, v17, v18
+- Example: If current is v20, we support v18, v19, v20
 
 ### 4. Breaking Change Detection
 
