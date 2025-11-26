@@ -16,14 +16,13 @@ import {
       <ng-diagram [model]="model" [config]="config" />
     </div>
   `,
-  styles: [
-    `
-      .diagram {
-        display: flex;
-        height: 30rem;
-      }
-    `,
-  ],
+  styles: `
+    .diagram {
+      display: flex;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
+    }
+  `,
 })
 export class DiagramComponent {
   config = {
