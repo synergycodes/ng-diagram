@@ -37,8 +37,9 @@ vi.mock('../../../../utils', () => ({
     const dy = nodeCenter.y - from.y;
 
     // Simple mock: determine which side based on angle
+    // When dx and dy are equal, prefer horizontal (right/left) over vertical
     let side: PortSide = 'right';
-    if (Math.abs(dx) > Math.abs(dy)) {
+    if (Math.abs(dx) >= Math.abs(dy)) {
       side = dx > 0 ? 'left' : 'right';
     } else {
       side = dy > 0 ? 'top' : 'bottom';

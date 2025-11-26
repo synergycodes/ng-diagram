@@ -74,8 +74,10 @@ export const getSourceTargetPositions = (edge: Edge, nodesMap: Map<string, Node>
   };
 };
 
-const isValidPortLocation = (location: { x?: number; y?: number } | undefined): location is PortLocation => {
-  return !!location && !!location?.x && !!location?.y;
+const isValidPortLocation = (
+  location: { x?: number; y?: number; side?: PortSide } | undefined
+): location is PortLocation => {
+  return !!location && location.x !== undefined && location.y !== undefined && !!location.side;
 };
 
 /**

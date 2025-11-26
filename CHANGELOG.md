@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Tailwind CSS example in documentation ([#436](https://github.com/synergycodes/ng-diagram/pull/436))
+- Floating edges for edges with no ports specified ([#465](https://github.com/synergycodes/ng-diagram/pull/465))
 
 ### Fixed
 
