@@ -1,8 +1,9 @@
-import { DIRECTIONS, Point, Size, Node } from '../../../types';
+import { DIRECTIONS, Node, Point, Size } from '../../../types';
 import { EventHandler } from '../event-handler';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
-const UNKNOWN_DIRECTION_ERROR = (direction: string) =>
+/** @internal */
+export const UNKNOWN_DIRECTION_ERROR = (direction: string) =>
   `[ngDiagram] Unknown keyboard move direction: "${direction}"
 
 Valid directions are: ${DIRECTIONS.map((d) => `'${d}'`).join(', ')}

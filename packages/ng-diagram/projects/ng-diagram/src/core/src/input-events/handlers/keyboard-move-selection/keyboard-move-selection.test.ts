@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockNode } from '../../../test-utils';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
-import { KeyboardMoveSelectionEventHandler } from './keyboard-move-selection.handler';
+import { KeyboardMoveSelectionEventHandler, UNKNOWN_DIRECTION_ERROR } from './keyboard-move-selection.handler';
 
 function getSampleKeyboardMoveEvent(overrides: Partial<KeyboardMoveSelectionEvent> = {}): KeyboardMoveSelectionEvent {
   return {
@@ -335,7 +335,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const event = getSampleKeyboardMoveEvent({ direction: 'unknown' as any });
 
-      expect(() => instance.handle(event)).toThrowError('Unknown direction: unknown');
+      expect(() => instance.handle(event)).toThrowError(UNKNOWN_DIRECTION_ERROR('unknown'));
     });
   });
 });
