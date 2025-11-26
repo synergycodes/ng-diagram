@@ -1,5 +1,5 @@
 import { EdgeRoutingContext, EdgeRoutingManager } from '../../../edge-routing-manager';
-import { Edge, Node, Point, PortLocation } from '../../../types';
+import { Edge, Node, Point, PortLocation, PortSide } from '../../../types';
 import { isValidPosition } from '../../../utils/measurement-validation';
 import { getSourceTargetPositions } from './get-source-target-positions';
 
@@ -10,15 +10,11 @@ const INVALID_EDGE_COORDINATES_WARNING = (
   target: string,
   targetPort: string | undefined
 ) =>
-  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'. This usually happens when sourcePort or targetPort is missing or doesn't exist on the node.
+  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'.
 
 Edge details:
   • source: ${source} (port: ${sourcePort || 'not specified'})
   • target: ${target} (port: ${targetPort || 'not specified'})
-
-To fix this:
-  • Ensure sourcePort and targetPort are specified on the edge
-  • Verify the ports exist in the source and target nodes
 
 Documentation: https://www.ngdiagram.dev/docs/guides/edges/
 `;
@@ -70,8 +66,10 @@ export const shouldSkipPortInitCheck = (edge: Edge): boolean => {
 /**
  * Converts a PortLocation to a Point object.
  */
-export const portLocationToPoint = (location: PortLocation | undefined): Point | undefined => {
-  return location?.x !== undefined ? { x: location.x, y: location.y } : undefined;
+export const portLocationToPoint = (
+  location: { side: PortSide; x?: number | undefined; y?: number | undefined } | undefined
+): Point | undefined => {
+  return location?.x !== undefined && location?.y !== undefined ? { x: location.x, y: location.y } : undefined;
 };
 
 /**
@@ -134,11 +132,11 @@ export const getEdgePoints = (edge: Edge, nodesMap: Map<string, Node>, routingMa
     return { sourcePoint: undefined, targetPoint: undefined, points: [] };
   }
 
-  const [source, target] = getSourceTargetPositions(edge, nodesMap) as [PortLocation, PortLocation];
+  const { source, target } = getSourceTargetPositions(edge, nodesMap);
   const sourcePoint = portLocationToPoint(source);
   const targetPoint = portLocationToPoint(target);
 
-  if (!isValidPosition(sourcePoint) || !isValidPosition(targetPoint)) {
+  if (!source || !target || !isValidPosition(sourcePoint) || !isValidPosition(targetPoint)) {
     console.error(
       INVALID_EDGE_COORDINATES_WARNING(edge.id, edge.source, edge.sourcePort, edge.target, edge.targetPort)
     );

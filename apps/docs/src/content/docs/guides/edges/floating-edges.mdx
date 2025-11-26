@@ -1,0 +1,90 @@
+---
+title: Floating Edges
+description: Understanding how floating edges work in ngDiagram
+sidebar:
+  order: 4
+---
+
+import DefaultEdge from '@components/angular/edges/floating-edge/basic/basic.astro';
+import EdgeCreation from '@components/angular/edges/floating-edge/edge-creation/edge-creation.astro';
+import Mixed from '@components/angular/edges/floating-edge/mixed/mixed.astro';
+import RoutingType from '@components/angular/edges/floating-edge/routing-type/routing-type.astro';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+
+Floating edges are connections between nodes that don't use specific ports. Instead of connecting to fixed port positions, floating edges automatically calculate their connection points on the node borders based on the positions of the connected nodes.
+
+## How Floating Edges Work
+
+When an edge doesn't specify the `sourcePort` or `targetPort`, the corresponding connection point is calculated dynamically.
+
+## Declaring Floating Edges
+
+To declare a floating edge, simply omit the `sourcePort` and `targetPort` properties when defining your edge:
+
+<CodeSnippet relativePath="edges/floating-edge/basic/diagram.component.ts" />
+<br />
+<DefaultEdge />
+
+## Mixed Port and Floating Edges
+
+You can mix floating and port-based connections. An edge can have a specific port on one end and float on the other by specifying only one of the ports.
+
+```typescript
+edges: [
+  {
+    id: '1',
+    source: '1',
+    sourcePort: undefined,
+    target: '2',
+    targetPort: 'port-left',
+    data: {},
+  },
+],
+```
+
+<br />
+<Mixed />
+
+## Routing Types with Floating Edges
+
+Floating edges work seamlessly with different routing types. You can specify the routing type for floating edges just like you would for port-based edges.
+
+```typescript
+edges: [
+  {
+    id: '1',
+    source: '1',
+    sourcePort: undefined,
+    target: '2',
+    targetPort: 'port-left',
+    routing: 'bezier',
+    data: {},
+  },
+],
+```
+
+<br />
+<RoutingType />
+
+## Creating Floating Edges
+
+To create floating edges by using the diagram's linking feature you need to customize the diagram config.
+
+For example:
+
+<CodeSnippet relativePath="edges/floating-edge/edge-creation/diagram.component.ts" />
+
+Setting `sourcePort` in `temporaryEdgeDataBuilder` ensures that the temporary edge being drawn is a floating edge.
+
+After completing the edge creation the both ports are set to `undefined` in `finalEdgeDataBuilder` to create a floating edge on both ends of the edge.
+
+In the example below try to connect Node 1 to Node 3:
+
+<br />
+<EdgeCreation />
+
+The config can be adjusted to fit your specific requirements based on node types, starting ports, and other criteria.
+
+## Related Topics
+
+[Routing →](/docs/guides/edges/routing) | [Ports →](/docs/guides/nodes/ports)

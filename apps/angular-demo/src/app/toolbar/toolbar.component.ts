@@ -5,6 +5,7 @@ import {
   NgDiagramSelectionService,
   NgDiagramService,
   NgDiagramViewportService,
+  type Port,
 } from 'ng-diagram';
 import { nodeTemplateMap, NodeTemplateType } from '../data/node-template';
 
@@ -35,7 +36,7 @@ export class ToolbarComponent {
   onLinkCreationClick() {
     const node = this.ngDiagramSelectionService.selection().nodes[0];
     if (node) {
-      const port = node.measuredPorts?.find((p) => p.type === 'source' || p.type === 'both')?.id || 'port-right';
+      const port = node.measuredPorts?.find((p: Port) => p.type === 'source' || p.type === 'both')?.id || 'port-right';
       this.ngDiagramService.startLinking(node, port);
     }
   }

@@ -11,15 +11,11 @@ const INVALID_EDGE_COORDINATES_ERROR = (
   target: string,
   targetPort: string | undefined
 ) =>
-  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'. This usually happens when sourcePort or targetPort is missing or doesn't exist on the node.
+  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'.
 
 Edge details:
   • source: ${source} (port: ${sourcePort || 'not specified'})
   • target: ${target} (port: ${targetPort || 'not specified'})
-
-To fix this:
-  • Ensure sourcePort and targetPort are specified on the edge
-  • Verify the ports exist in the source and target nodes
 
 Documentation: https://www.ngdiagram.dev/docs/guides/edges/
 `;
