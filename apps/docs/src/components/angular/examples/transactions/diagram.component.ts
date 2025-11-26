@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component, inject } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
   NgDiagramService,
@@ -11,7 +12,7 @@ import {
 } from 'ng-diagram';
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="toolbar">
@@ -23,7 +24,9 @@ import {
       </button>
     </div>
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrls: ['./diagram.component.scss'],
@@ -34,19 +37,13 @@ export class DiagramComponent {
 
   config: NgDiagramConfig = {
     debugMode: true,
-    zoom: {
-      zoomToFit: {
-        onInit: true,
-        padding: 200,
-      },
-    },
   };
 
   model = initializeModel({
     nodes: [
       {
         id: '1',
-        position: { x: 100, y: 200 },
+        position: { x: 200, y: 200 },
         data: { label: 'Use Buttons to test transaction' },
       },
     ],

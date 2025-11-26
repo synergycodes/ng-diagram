@@ -198,7 +198,7 @@ describe('EventEmitterMiddleware', () => {
 
     expect(nextMock).toHaveBeenCalled();
     expect(consoleErrorSpy).toHaveBeenCalled();
-    expect(consoleErrorSpy.mock.calls[0][0]).toContain('Error in');
+    expect(consoleErrorSpy.mock.calls[0][0]).toContain('[ngDiagram] Event emitter error:');
   });
 
   it('should process multiple emitters even if one fails', () => {

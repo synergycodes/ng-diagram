@@ -17,7 +17,7 @@ Edge details:
   • source: ${source} (port: ${sourcePort || 'not specified'})
   • target: ${target} (port: ${targetPort || 'not specified'})
 
-Documentation: https://www.ngdiagram.dev/docs/guides/edges/
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 `;
 
 /**

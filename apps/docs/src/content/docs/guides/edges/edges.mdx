@@ -31,7 +31,7 @@ interface Edge<T = any> {
 
 ## Adding Edges to a Diagram
 
-To add edges to your diagram, include them in the `edges` array of your model:
+To add edges to your diagram, include them in the [`edges`](/docs/api/types/model/model/#edges) array of your model:
 
 <CodeSnippet relativePath="edges/edges/diagram.component.ts" sectionId="adding-edges" />
 
@@ -42,7 +42,7 @@ NgDiagram provides a default edge implementation that handles most common use ca
 - Automatically calculates the path between connected nodes
 - Supports three [built-in routing algorithms](/docs/guides/edges/routing)
 - Can display arrowheads at either end
-- Supports [labels](/docs/guides/edges/labels) for displaying text on edges
+- Supports [`labels`](/docs/guides/edges/labels) for displaying text on edges
 
 ### Customization
 
@@ -130,9 +130,9 @@ These IDs (along with their parent node IDs) are used to specify the exact posit
 
 Edges can be routed using three [built-in routing algorithms](/docs/guides/edges/routing):
 
-- `polyline`: Draws a polyline (straight line by default)
-- `orthogonal`: Draws a series of horizontal and vertical lines
-- `bezier`: Draws a bezier curve
+- [`polyline`](/docs/api/types/routing/edgeroutingname): Draws a polyline (straight line by default)
+- [`orthogonal`](/docs/api/types/routing/edgeroutingname): Draws a series of horizontal and vertical lines
+- [`bezier`](/docs/api/types/routing/edgeroutingname): Draws a bezier curve
 
 <br />
 
@@ -144,14 +144,15 @@ import Routing from '@components/angular/edges/routing/routing/routing.astro';
 
 ## User-Created Edges
 
-When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created. This is done through the `linking` configuration in your diagram's config.
+When users create edges by dragging between ports, you can customize both the temporary edge shown during dragging and the final edge that gets created.
+This is done through the [`linking`](/docs/api/types/configuration/flowconfig/#linking) configuration in your diagram's config.
 
 ### Customization
 
-The `linking` configuration provides two builder functions:
+The [`linking`](/docs/api/types/configuration/features/linkingconfig) configuration provides two builder functions:
 
-- **`temporaryEdgeDataBuilder`** - Customizes the edge shown while dragging
-- **`finalEdgeDataBuilder`** - Customizes the final edge when connection is completed
+- **[`temporaryEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#temporaryedgedatabuilder)** - Customizes the edge shown while dragging
+- **[`finalEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#finaledgedatabuilder)** - Customizes the final edge when connection is completed
 
 ```typescript
 export class MyDiagramComponent {

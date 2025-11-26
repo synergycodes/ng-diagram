@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component, inject } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramService,
   provideNgDiagram,
@@ -13,7 +14,7 @@ import { ArcRouting } from './arc-routing';
 
 @Component({
   selector: 'custom-routing',
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   // @mark-substring:(diagramInit)="onDiagramInit($event)"
   template: `
@@ -23,12 +24,15 @@ import { ArcRouting } from './arc-routing';
         [config]="config"
         (diagramInit)="onDiagramInit($event)"
       />
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: `
     .diagram {
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })

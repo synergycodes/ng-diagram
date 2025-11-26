@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramEdgeTemplateMap,
   provideNgDiagram,
@@ -12,7 +13,7 @@ import {
 import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
 
 @Component({
-  imports: [NgDiagramComponent, FormsModule],
+  imports: [NgDiagramComponent, FormsModule, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
@@ -20,14 +21,17 @@ import { MultipleLabelsEdgeComponent } from './multiple-labels-edge.component';
         [model]="model"
         [edgeTemplateMap]="edgeTemplateMap"
         [config]="config"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styles: `
     .diagram {
       position: relative;
       display: flex;
-      height: 20rem;
+      height: var(--ng-diagram-height);
+      border: var(--ng-diagram-border);
     }
   `,
 })

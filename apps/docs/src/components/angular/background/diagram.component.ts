@@ -30,7 +30,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: [50, 315, 50, 50],
+        padding: [50, 285, 50, 50],
       },
     },
     // background: {

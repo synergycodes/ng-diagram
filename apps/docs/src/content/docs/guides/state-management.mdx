@@ -11,7 +11,7 @@ Understanding this system is essential for building dynamic, interactive diagram
 ## Creating a Model
 
 The model is the core data structure that holds all your diagram information including nodes, edges, and metadata.
-Use the `initializeModel` function to create a new model with initial data.
+Use the [`initializeModel`](/docs/api/utilities/initializemodel) function to create a new model with initial data.
 For more information about model initialization scenarios and best practices, see [Model Initialization](/docs/guides/model-initialization/).
 
 ### Basic Model Creation
@@ -105,7 +105,8 @@ const model = initializeModel({
 
 ## Model Service
 
-The `NgDiagramModelService` provides a reactive interface to interact with your diagram's state. It becomes available once you register `provideNgDiagram()` and can then be injected into your components.
+The [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice) provides a reactive interface to interact with your diagram's state. \
+It becomes available once you register [`provideNgDiagram()`](/docs/api/utilities/providengdiagram) and can then be injected into your components.
 
 ### Injecting the Service
 
@@ -359,11 +360,16 @@ The state management system provides a robust foundation for building dynamic di
 
 ## Custom Models
 
-The `NgDiagramComponent` accepts any object that implements the `ModelAdapter` interface, which means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by `initializeModel`. This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
+The [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) accepts any object that implements the [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface, which means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by [`initializeModel`](/docs/api/utilities/initializemodel).\
+This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
 
 ### ModelAdapter Interface
 
-The `ModelAdapter` interface defines the contract that any model implementation must fulfill. You can find the complete interface documentation in the [API reference](/docs/api/types/modeladapter/). The key methods include data access (`getNodes`, `getEdges`, `getMetadata`), data modification (`updateNodes`, `updateEdges`, `updateMetadata`), change notification system (`onChange`, `unregisterOnChange`), and lifecycle management (`destroy`, `undo`, `redo`, `toJSON`).
+The [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface defines the contract that any model implementation must fulfill.
+The key methods include data access ([`getNodes`](/docs/api/types/model/modeladapter/#getnodes), [`getEdges`](/docs/api/types/model/modeladapter/#getedges), [`getMetadata`](/docs/api/types/model/modeladapter/#getmetadata)),
+data modification ([`updateNodes`](/docs/api/types/model/modeladapter/#updatenodes), [`updateEdges`](/docs/api/types/model/modeladapter/#updateedges), [`updateMetadata`](/docs/api/types/model/modeladapter/#updatemetadata)),
+change notification system ([`onChange`](/docs/api/types/model/modeladapter/#onchange), [`unregisterOnChange`](/docs/api/types/model/modeladapter/#unregisteronchange)),
+and lifecycle management ([`destroy`](/docs/api/types/model/modeladapter/#destroy), [`undo`](/docs/api/types/model/modeladapter/#undo), [`redo`](/docs/api/types/model/modeladapter/#redo), [`toJSON`](/docs/api/types/model/modeladapter/#tojson)).
 
 For a complete example of implementing a custom model adapter, see the [Custom Model example](/docs/examples/custom-model/).
 

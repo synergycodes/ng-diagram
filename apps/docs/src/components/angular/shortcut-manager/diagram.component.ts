@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import {
   configureShortcuts,
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramViewportService,
   type NgDiagramConfig,
@@ -11,10 +12,16 @@ import { ShortcutButtonsComponent } from './shortcut-buttons/shortcut-buttons.co
 
 @Component({
   selector: 'shortcut-manager-example',
-  imports: [NgDiagramComponent, ShortcutButtonsComponent],
+  imports: [
+    NgDiagramComponent,
+    NgDiagramBackgroundComponent,
+    ShortcutButtonsComponent,
+  ],
   template: `
     <div class="not-content diagram">
-      <ng-diagram [model]="model" [config]="config" />
+      <ng-diagram [model]="model" [config]="config">
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
     <shortcut-buttons />
   `,
@@ -26,7 +33,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: [100, 50, 50, 50],
+        padding: 100,
       },
     },
     shortcuts: configureShortcuts([

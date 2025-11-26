@@ -65,12 +65,12 @@ const defaultZoomToFitConfig: ZoomToFitConfig = {
 const defaultZoomConfig: ZoomConfig = {
   min: 0.1,
   max: 10.0,
-  step: 0.05,
+  step: 0.03,
   zoomToFit: defaultZoomToFitConfig,
 };
 
 const defaultBackgroundConfig: BackgroundConfig = {
-  dotSpacing: 60,
+  dotSpacing: 30,
   cellSize: { width: 10, height: 10 },
   majorLinesFrequency: { x: 5, y: 5 },
 };

@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   provideNgDiagram,
   type NgDiagramConfig,
@@ -14,7 +15,7 @@ import { CustomNodeComponent } from './node/node.component';
 // @mark-substring:config:config
 @Component({
   // @collapse-start:config
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   // @collapse-end:config
   template: `
@@ -23,7 +24,9 @@ import { CustomNodeComponent } from './node/node.component';
         [model]="model"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
   styleUrl: './diagram.component.scss',
@@ -38,6 +41,10 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+        padding: 140,
+      },
     },
     // @mark-start:config
     nodeRotation: {
@@ -53,7 +60,7 @@ export class DiagramComponent {
     nodes: [
       {
         id: '1',
-        position: { x: 200, y: 70 },
+        position: { x: 0, y: 0 },
         size: { width: 250, height: 170 },
         autoSize: false,
         type: 'myType',

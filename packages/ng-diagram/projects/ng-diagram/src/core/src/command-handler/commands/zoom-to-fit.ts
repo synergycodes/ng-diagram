@@ -1,6 +1,13 @@
 import type { CommandHandler, Edge, Node, Rect } from '../../types';
 import { calculatePartsBounds } from '../../utils/dimensions';
 
+const INVALID_ZOOM_TO_FIT_SCALE_ERROR = (scale: number) =>
+  `[ngDiagram] Invalid scale calculated in zoom-to-fit: ${scale}
+
+Scale must be a positive finite number.
+
+Documentation: https://www.ngdiagram.dev/docs/intro/coordinate-system/#viewport-and-scaling`;
+
 export interface ZoomToFitCommand {
   name: 'zoomToFit';
   nodeIds?: string[];
@@ -126,6 +133,13 @@ export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeI
 
   const { min, max } = commandHandler.flowCore.config.zoom;
   const newScale = calculateOptimalScale(bounds.width, bounds.height, availableWidth, availableHeight, min, max);
+
+  // Ensure scale is never zero or invalid to prevent division by zero
+  if (newScale <= 0 || !isFinite(newScale) || isNaN(newScale)) {
+    console.error(INVALID_ZOOM_TO_FIT_SCALE_ERROR(newScale));
+    return;
+  }
+
   const { x: newX, y: newY } = calculateViewportPosition(
     bounds,
     { width: viewportWidth, height: viewportHeight },

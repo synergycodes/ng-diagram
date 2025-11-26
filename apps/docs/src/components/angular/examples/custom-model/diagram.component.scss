@@ -7,33 +7,30 @@
 .example-container {
   display: flex;
   flex-direction: column;
-  height: 600px;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
   overflow: hidden;
+  position: relative;
 
   .button-controls {
     display: flex;
-    height: 66px;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    z-index: 1;
     gap: 0.5rem;
     align-items: flex-end;
     justify-content: end;
     padding: 1rem;
-    background-color: var(--ngd-ui-bg-tertiary-default);
+    background-color: var(--ngd-node-bg-primary-default);
+    border: var(--ng-diagram-border);
 
-    .btn {
-      cursor: pointer;
-      transition: all 0.2s;
+    button {
       margin-top: 0;
-      border: 0;
-
-      &.secondary {
-        background-color: #8b0000;
-        color: white;
-      }
-
-      &:hover {
-        color: black;
-        background-color: var(--ngd-node-stroke-primary-default);
-      }
+    }
+    .btn-secondary {
+      background-color: #8b0000;
+      color: white;
     }
   }
 }

@@ -7,6 +7,9 @@ export abstract class BackgroundPatternBase {
   protected abstract readonly backgroundPattern: Signal<ElementRef<SVGPatternElement> | undefined>;
   protected viewport = this.viewportService.viewport;
 
+  // Random hash to ensure unique pattern IDs in case of multiple diagrams on the same page
+  readonly randomHash = Math.random().toString(36).substring(2, 10);
+
   size = computed(() => {
     const pattern = this.backgroundPattern();
     const widthAttr = pattern?.nativeElement.getAttribute('staticWidth');

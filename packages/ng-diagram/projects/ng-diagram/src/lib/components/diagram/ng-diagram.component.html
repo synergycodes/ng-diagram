@@ -3,7 +3,7 @@
 </div>
 <ng-diagram-canvas [viewport]="viewport()">
   @for (edge of edges(); track edge.id) {
-    <ng-diagram-edge>
+    <ng-diagram-edge [attr.data-edge-id]="edge.id">
       @if (getEdgeTemplate(edge.type)) {
         <ng-container *ngComponentOutlet="getEdgeTemplate(edge.type); inputs: { edge }" />
       } @else {

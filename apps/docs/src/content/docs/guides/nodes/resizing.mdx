@@ -24,7 +24,7 @@ The new size is reflected in the node's appearance and can be used to create fle
 
 ## Custom Node Setup
 
-To make a custom node resizable, wrap your node with `<ng-diagram-node-resize-adornment>` in your node template and import the `NgDiagramNodeResizeAdornmentComponent`.
+To make a custom node resizable, wrap your node with [`<ng-diagram-node-resize-adornment>`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent) in your node template and import the [`NgDiagramNodeResizeAdornmentComponent`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent).
 
 <CodeSnippet relativePath="nodes/resizing/node/node.component.ts" />
 
@@ -61,24 +61,24 @@ You can override these variables in your styles to customize the appearance and 
 
 ### Resizing Settings
 
-You can further customize resizing behavior using the `resize` configuration in `NgDiagramConfig`:
+You can further customize resizing behavior using the [`resize`](/docs/api/types/configuration/flowconfig/#resize) configuration in [`NgDiagramConfig`](/docs/api/types/configuration/flowconfig):
 
-- **defaultResizable** – Controls whether resizing is enabled by default for all nodes. Default is `true`.
-- **getMinNodeSize** – Returns the minimum size for a node during resizing. Default is 20x20px.
-- **allowResizeBelowChildrenBounds** – By default, groups can be resized to any size, even smaller than their children. If you want to prevent resizing a group smaller than its children (so all children always remain fully contained), set this option to `false`.
+- **[`defaultResizable`](/docs/api/types/configuration/features/resizeconfig/#allowresizebelowchildrenbounds)** – Controls whether resizing is enabled by default for all nodes. Default is `true`.
+- **[`getMinNodeSize`](/docs/api/types/configuration/features/resizeconfig/#getminnodesize)** – Returns the minimum size for a node during resizing. Default is 20x20px.
+- **[`allowResizeBelowChildrenBounds`](/docs/api/types/configuration/features/resizeconfig/#allowresizebelowchildrenbounds)** – By default, groups can be resized to any size, even smaller than their children. If you want to prevent resizing a group smaller than its children (so all children always remain fully contained), set this option to `false`.
 
-You can set these options in your diagram configuration and pass them to the `ng-diagram` component:
+You can set these options in your diagram configuration and pass them to the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component:
 
 <CodeSnippet relativePath="nodes/resizing/diagram.component.ts" sectionId="config" />
 
 ### Resizing Setting Priority
 
-The **resizable** property controls whether a node can be resized.
+The [`resizable`](/docs/api/types/model/simplenode/#resizable) property controls whether a node can be resized.
 This property can be defined at several levels, and when multiple levels specify it, the one with the highest priority takes effect.
 
 The following list shows the order of priority — from highest to lowest:
 
-1. **Node-level setting** – Directly set the `resizable` property on the node data object.
+1. **Node-level setting** – Directly set the [`resizable`](/docs/api/types/model/simplenode/#resizable) property on the node data object.
 
 ```typescript
 import { Node } from 'ng-diagram';
@@ -92,7 +92,7 @@ const node: Node = {
 
 This setting applies specifically to that node and overrides all other defaults.
 
-2. **Template-level setting** – Use the `defaultResizable` input on the `NgDiagramNodeResizeAdornmentComponent` within your custom node template.
+2. **Template-level setting** – Use the [`defaultResizable`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/#defaultresizable) input on the [`NgDiagramNodeResizeAdornmentComponent`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent) within your custom node template.
 
 ```html
 <ng-diagram-node-resize-adornment [defaultResizable]="true"></ng-diagram-node-resize-adornment>
@@ -100,7 +100,7 @@ This setting applies specifically to that node and overrides all other defaults.
 
 This defines the default resizing behavior for all nodes that use that template.
 
-3. **Global configuration** – Define the global `defaultResizable` setting inside your `NgDiagramConfig`.
+3. **Global configuration** – Define the global [`defaultResizable`](/docs/api/types/configuration/features/resizeconfig/#defaultresizable) setting inside your [`NgDiagramConfig`](/docs/api/types/configuration/flowconfig):
 
 ```typescript
 import { NgDiagramConfig } from 'ng-diagram';

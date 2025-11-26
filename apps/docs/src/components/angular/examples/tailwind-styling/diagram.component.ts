@@ -2,6 +2,7 @@ import '@angular/compiler';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   initializeModel,
+  NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramNodeTemplateMap,
   provideNgDiagram,
@@ -15,16 +16,20 @@ enum NodeTemplateType {
 }
 
 @Component({
-  imports: [NgDiagramComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="not-content diagram flex h-[30rem]">
+    <div
+      class="not-content diagram flex h-[30rem] border border-gray-200 dark:border-gray-700"
+    >
       <ng-diagram
         [model]="model"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
-      />
+      >
+        <ng-diagram-background />
+      </ng-diagram>
     </div>
   `,
 })
@@ -36,6 +41,10 @@ export class DiagramComponent {
   config = {
     zoom: {
       max: 3,
+      zoomToFit: {
+        onInit: true,
+        padding: 70,
+      },
     },
   } satisfies NgDiagramConfig;
 
