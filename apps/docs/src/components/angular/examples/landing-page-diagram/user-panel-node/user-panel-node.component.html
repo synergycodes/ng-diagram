@@ -1,16 +1,16 @@
 <div ngDiagramNodeSelected [node]="node()" class="user-panel">
   <ng-diagram-port id="port-right" side="right" type="both" />
 
-  @for (user of users(); track user.name) {
+  @for (user of users(); track user.id) {
     <div
-      class="user-item"
-      [class.is-selected]="user.id === selectedUser()"
+      class="user-panel__item"
+      [class.user-panel__item--selected]="user.id === selectedUser()"
       (click)="selectUser(user.id)"
     >
-      <div class="user-avatar" [style.background-color]="user.color">
+      <div class="user-panel__avatar" [style.background-color]="user.color">
         {{ user.avatar }}
       </div>
-      <span class="user-name">{{ user.name }}</span>
+      <span class="user-panel__name">{{ user.name }}</span>
     </div>
   }
 </div>

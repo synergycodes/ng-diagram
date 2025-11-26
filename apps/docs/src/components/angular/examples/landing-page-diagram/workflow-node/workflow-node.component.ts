@@ -37,10 +37,10 @@ export class WorkflowNodeComponent
   implements NgDiagramNodeTemplate<WorkflowNodeData>
 {
   node = input.required<Node<WorkflowNodeData>>();
-  className = computed(() => `ph ph-${this.node().data.icon}`);
 
+  className = computed(() => `ph ph-${this.node().data.icon}`);
   title = computed(() => this.node()?.data?.title || '');
   subtitle = computed(() => this.node()?.data?.subtitle || '');
   icon = computed(() => this.node()?.data?.icon || '');
-  iconColor = computed(() => this.node()?.data?.iconColor || '#4CAF50');
+  iconColor = computed(() => this.node()?.data?.iconColor || 'gray');
 }

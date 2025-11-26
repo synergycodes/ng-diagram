@@ -8,58 +8,58 @@
 .workflow-node {
   background: var(--ngdlp-component-bg-alt);
   border: 1px solid var(--ngdlp-border-secondary-80);
-  border-radius: 12px;
+  border-radius: 0.75rem;
   padding: 0.5rem;
   min-width: 250px;
   transition: all 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
   position: relative;
 
   @include glow-gradient;
-}
 
-.workflow-node-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
 
-.workflow-node-content {
-  display: flex;
-  align-items: center;
-}
+  &__content {
+    display: flex;
+    align-items: center;
+  }
 
-.workflow-node-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--ngdlp-bg-dark-deep);
-  color: var(--ngdlp-green-bright);
-  font-size: 24px;
-  border: 1px solid var(--ngdlp-border-secondary-80);
-}
+  &__icon {
+    width: 2.875rem;
+    height: 2.875rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--ngdlp-bg-dark-deep);
+    color: var(--ngdlp-green-bright);
+    font-size: 1.5rem;
+    border: 1px solid var(--ngdlp-border-secondary-80);
+  }
 
-.workflow-node-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
 
-.workflow-node-title {
-  color: var(--ngdlp-text-primary);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.2;
-}
+  &__title {
+    color: var(--ngdlp-text-primary);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
 
-.workflow-node-subtitle {
-  color: var(--ngdlp-text-secondary);
-  font-size: 12px;
-  line-height: 1.2;
+  &__subtitle {
+    color: var(--ngdlp-text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
 }

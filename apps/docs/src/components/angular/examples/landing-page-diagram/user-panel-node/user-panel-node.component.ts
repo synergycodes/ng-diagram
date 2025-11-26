@@ -14,7 +14,7 @@ import {
 } from 'ng-diagram';
 
 export interface UserPanelData {
-  users: Array<{ id: number; name: string; avatar: string; color: string }>;
+  users: { id: number; name: string; avatar: string; color: string }[];
 }
 
 @Component({

@@ -22,10 +22,6 @@ import {
 } from '../workflow-node/workflow-node.component';
 import { createChartOptions } from './configure-chart';
 
-export interface GraphNodeData {
-  title: string;
-}
-
 @Component({
   selector: 'app-graph-node',
   imports: [CommonModule, WorkflowNodeComponent],

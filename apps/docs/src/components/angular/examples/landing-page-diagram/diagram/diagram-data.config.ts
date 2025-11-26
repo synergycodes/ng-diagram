@@ -1,13 +1,5 @@
-/**
- * Diagram Data Configuration
- *
- * Contains all node and edge definitions for the diagram model.
- */
 import type { Edge, Node } from 'ng-diagram';
 
-/**
- * User data for the user panel node
- */
 export const USERS = [
   { id: 1, name: 'Lena Wu', avatar: '👩', color: '#349A97' },
   { id: 2, name: 'Marcus Grant', avatar: '👨', color: '#292E78' },
@@ -16,11 +8,7 @@ export const USERS = [
   { id: 5, name: 'Sofia Lemaire', avatar: '👩', color: '#E7D9CE' },
 ] as const;
 
-/**
- * All nodes in the diagram
- */
 export const DIAGRAM_NODES: Node[] = [
-  // Sub Process Group
   {
     id: 'sub-process',
     type: 'group',
@@ -30,8 +18,6 @@ export const DIAGRAM_NODES: Node[] = [
     data: { title: 'Sub Process' },
     isGroup: true,
   },
-
-  // Nodes inside Sub Process
   {
     id: 'start-flow',
     type: 'workflow',
@@ -68,8 +54,6 @@ export const DIAGRAM_NODES: Node[] = [
       iconColor: '#2196F3',
     },
   },
-
-  // Conditional Node
   {
     id: 'proceed-if-true',
     type: 'workflow',
@@ -81,16 +65,12 @@ export const DIAGRAM_NODES: Node[] = [
       iconColor: '#4CAF50',
     },
   },
-
-  // User Panel
   {
     id: 'user-panel',
     type: 'userPanel',
     position: { x: 190, y: 600 },
     data: { users: USERS },
   },
-
-  // Graph Node
   {
     id: 'notify-users',
     type: 'graph',
@@ -104,9 +84,6 @@ export const DIAGRAM_NODES: Node[] = [
   },
 ];
 
-/**
- * All edges in the diagram
- */
 export const DIAGRAM_EDGES: Edge[] = [
   // Sub Process internal connections
   {
