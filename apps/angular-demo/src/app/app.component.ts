@@ -66,14 +66,6 @@ export class AppComponent {
     snapping: {
       shouldSnapDragForNode: () => true,
     },
-    linking: {
-      temporaryEdgeDataBuilder: (edge: Edge) =>
-        ({
-          ...edge,
-          sourcePort: undefined,
-          temporary: true,
-        }) satisfies Edge,
-    },
     shortcuts: configureShortcuts([
       {
         actionName: 'keyboardMoveSelectionUp',
@@ -329,8 +321,6 @@ export class AppComponent {
         source: '9',
         target: '10',
         data: { labelPosition: 0.7 },
-        // sourcePort: 'port-right',
-        // targetPort: 'port-left',
         type: 'labelled-edge',
         routing: 'bezier',
       },
