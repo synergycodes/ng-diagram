@@ -11,6 +11,9 @@
     "format:check": "prettier . --check",
     "format:fix": "prettier . --write",
     "check-types": "turbo run check-types --parallel",
+    "api:report": "turbo run api:report",
+    "api:check": "turbo run api:check",
+    "api:update": "turbo run api:update",
     "test": "turbo run test --parallel",
     "test:coverage": "turbo run test --parallel -- --coverage",
     "prepare": "husky"

@@ -1,11 +1,12 @@
 ---
+version: "since v0.4.0"
 editUrl: false
 next: false
 prev: false
 title: "NgDiagramModelService"
 ---
 
-The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model.
 
 ## Example usage
 ```typescript

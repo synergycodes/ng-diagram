@@ -108,6 +108,11 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Policies',
+          autogenerate: { directory: 'policies' },
+          collapsed: true,
+        },
+        {
           label: 'Changelog',
           link: '/changelog/',
         },
@@ -118,6 +123,15 @@ export default defineConfig({
           entryPoints: ['../../packages/ng-diagram/projects/ng-diagram/src/public-api.ts'],
           tsconfig: '../../packages/ng-diagram/projects/ng-diagram/tsconfig.lib.json',
           typeDoc: {
+            plugin: ['typedoc-plugin-frontmatter', './plugins/since-frontmatter.mjs'],
+            // YAML stringify options for typedoc-plugin-frontmatter
+            // Ensures consistent formatting with quoted values and unquoted keys
+            // See: https://eemeli.org/yaml/#tostring-options
+            // @ts-expect-error - yamlStringifyOptions is a valid option for typedoc-plugin-frontmatter
+            yamlStringifyOptions: {
+              defaultStringType: 'QUOTE_DOUBLE',
+              defaultKeyType: 'PLAIN',
+            },
             router: 'category',
             disableSources: true,
             excludeNotDocumented: true,

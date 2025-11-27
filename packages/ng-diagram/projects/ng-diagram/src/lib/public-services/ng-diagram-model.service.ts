@@ -12,7 +12,7 @@ This may indicate the diagram was already destroyed or the model was not properl
 `;
 
 /**
- * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+ * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model.
  *
  * ## Example usage
  * ```typescript
@@ -23,6 +23,7 @@ This may indicate the diagram was already destroyed or the model was not properl
  * ```
  *
  * @category Services
+ * @since v0.4.0
  */
 @Injectable()
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {

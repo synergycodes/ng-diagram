@@ -6,6 +6,12 @@
 /out-tsc
 /bazel-out
 
+# API Extractor
+/temp
+# Keep API reports tracked for version control
+!/etc
+!/api-report/ng-diagram.api.md
+
 # Node
 /node_modules
 npm-debug.log
