@@ -68,7 +68,9 @@ export class DiagramComponent {
         id: `${id}`,
         position: { x, y },
         data: { label: `Node ${id}`, row },
-      };
+        resizable: false,
+        rotatable: false,
+      } satisfies Node;
     }).sort((a, b) => Number(a.id) - Number(b.id));
   }
 
