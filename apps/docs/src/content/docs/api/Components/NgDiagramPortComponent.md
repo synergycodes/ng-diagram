@@ -20,6 +20,7 @@ The `NgDiagramPortComponent` represents a single port on a node within the diagr
 
 - `OnInit`
 - `OnDestroy`
+- `AfterContentInit`
 
 ## Properties
 
@@ -28,6 +29,14 @@ The `NgDiagramPortComponent` represents a single port on a node within the diagr
 > **id**: `InputSignal`\<`string`\>
 
 The unique identifier for the port. test
+
+***
+
+### originPoint
+
+> **originPoint**: `InputSignal`\<`string`\>
+
+The origin point for the port (e.g., leftTop, centerMiddle, rightBottom).
 
 ***
 

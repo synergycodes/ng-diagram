@@ -1,0 +1,116 @@
+<div class="header-node">
+  <div class="header-node__title">{{ text() }}</div>
+  <!-- Left ports -->
+  <ng-diagram-port
+    id="port-en"
+    type="both"
+    side="left"
+    style="top: 20%"
+    originPoint="leftMiddle"
+  >
+    <div class="header-node-port-content header-node-port">
+      <svg width="30" height="30" viewBox="1 0 32 32">
+        <circle cx="15" cy="15" r="13" fill="transparent" stroke-width="1" />
+      </svg>
+      <span>EN</span>
+    </div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-r3out"
+    type="both"
+    side="left"
+    style="top: 33%"
+    originPoint="leftMiddle"
+  >
+    <div class="header-node-port">R3OUT</div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-r4out"
+    type="both"
+    side="left"
+    style="top: 58%"
+    originPoint="leftMiddle"
+  >
+    <div class="header-node-port">R4OUT</div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-t3in"
+    type="both"
+    side="left"
+    style="top: 70%"
+    originPoint="leftMiddle"
+  >
+    <div class="header-node-port">T3IN</div>
+  </ng-diagram-port>
+  <!-- Right ports -->
+  <ng-diagram-port
+    id="port-c1plus"
+    type="both"
+    side="right"
+    style="top: 20%"
+    originPoint="rightMiddle"
+  >
+    <div class="header-node-port">C1+</div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-r3in"
+    type="both"
+    side="right"
+    style="top: 33%"
+    originPoint="rightMiddle"
+  >
+    <div class="header-node-port">R3IN</div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-r4in"
+    type="both"
+    side="right"
+    style="top: 45%"
+    originPoint="rightMiddle"
+  >
+    <div class="header-node-port">R4IN</div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-t3out"
+    type="both"
+    side="right"
+    style="top: 58%"
+    originPoint="rightMiddle"
+  >
+    <div class="header-node-port">T3OUT</div>
+  </ng-diagram-port>
+  <ng-diagram-port
+    id="port-t1out"
+    type="both"
+    side="right"
+    style="top: 70%"
+    originPoint="rightMiddle"
+  >
+    <div
+      class="header-node-port"
+      style="width: 35px; height: 35px; margin-top: 2px; margin-bottom: 2px"
+    >
+      <img alt="" src="/docs/assets/examples/ground-icon.png" />
+    </div>
+  </ng-diagram-port>
+  <!-- top ports -->
+  <ng-diagram-port
+    id="port-v-plus"
+    type="both"
+    side="top"
+    style=""
+    originPoint="centerTop"
+  >
+    <div style="padding: 0.25rem 0">V<sub>+</sub></div>
+  </ng-diagram-port>
+  <!-- bottom ports -->
+  <ng-diagram-port
+    id="port-v-minus"
+    type="both"
+    side="bottom"
+    style=""
+    originPoint="centerBottom"
+  >
+    <div style="padding: 0.25rem 0">V<sub>-</sub></div>
+  </ng-diagram-port>
+</div>

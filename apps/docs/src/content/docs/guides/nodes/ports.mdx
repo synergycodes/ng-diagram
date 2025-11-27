@@ -24,7 +24,22 @@ Each node has a [`measuredPorts`](/docs/api/types/model/simplenode/#measuredport
 ## Styling Ports
 
 Ports are rendered using the [`<ng-diagram-port>`](/docs/api/components/ngdiagramportcomponent) component.
-You can customize their appearance by overriding CSS variables in your styles, adding inline styles, or by applying custom classes.
+You can customize their appearance by overriding CSS variables, adding inline styles, custom classes, **or by providing custom content directly inside the port**.
+
+### Custom Content
+
+You can render any content inside a port, such as text, images, SVGs, or any icons.
+
+```html
+<ng-diagram-port id="port-custom" type="both" side="left">
+  <div>
+    <img src="icon.png" alt="icon" />
+    <span>Custom</span>
+  </div>
+</ng-diagram-port>
+```
+
+Custom content automatically disables the default circular style and allows full control over the port's appearance.
 
 ### Default CSS Variables
 
@@ -36,11 +51,16 @@ The following CSS variables can be overridden to change the look and feel of por
 --ngd-port-background-color-hover: #9140ff; // based on theme
 --ngd-port-border-size: 2px;
 --ngd-port-border-color: #6f7480; // based on theme
+--ngd-port-border-radius: 50%; // makes the port circular for default style
 ```
+
+> **Note:** `--ngd-port-size` property is only for default ports.
+> When using custom content, the port size automatically adjusts to fit the content.
+> When using circular shapes in custom content, use `--ngd-port-border-radius` to control the hover roundness.
 
 ### Custom CSS
 
-For example, to create a custom style, you can define a CSS class and assign it to a port:
+To create a custom style, define a CSS class and assign it to a port:
 
 ```scss
 .some-custom-class {
@@ -61,7 +81,7 @@ For example, to create a custom style, you can define a CSS class and assign it 
 
 ### Hover style
 
-You can enable default hover styles on ports by adding following code into your component:
+You can enable default hover styles on ports by adding the following code into your component:
 
 <CodeSnippet relativePath="nodes/ports/node/node.component.ts" sectionId="hover-style" />
 
@@ -83,5 +103,6 @@ You can fully customize port appearance and behavior by:
 
 - Overriding CSS variables for color, size, and border
 - Applying custom classes for unique effects
+- Providing custom content for advanced visuals
 
 [Custom Ports Example →](/docs/examples/custom-ports)
