@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Standardized error messages across the ng-diagram library ([#463](https://github.com/synergycodes/ng-diagram/pull/463))
 
+### Fixed
+
+- Fixed misleading error when destroying `NgDiagramModelService` after core is already destroyed ([#466](https://github.com/synergycodes/ng-diagram/issues/466) - thanks for finding this [@Filipstrozik](https://github.com/Filipstrozik) 💪)
+
 ## [0.8.1] - 2025-11-20
 
 ### Added
