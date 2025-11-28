@@ -26,6 +26,41 @@ vi.mock('../../../../utils', () => ({
       side,
     };
   }),
+  getNodeBorderIntersection: vi.fn().mockImplementation((node: Node, from) => {
+    // Mock implementation for border intersection
+    const nodeCenter = {
+      x: node.position.x + (node.size?.width ?? 0) / 2,
+      y: node.position.y + (node.size?.height ?? 0) / 2,
+    };
+
+    const dx = nodeCenter.x - from.x;
+    const dy = nodeCenter.y - from.y;
+
+    // Simple mock: determine which side based on angle
+    // When dx and dy are equal, prefer horizontal (right/left) over vertical
+    let side: PortSide = 'right';
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      side = dx > 0 ? 'left' : 'right';
+    } else {
+      side = dy > 0 ? 'top' : 'bottom';
+    }
+
+    // Return a point on the appropriate edge
+    let x = nodeCenter.x;
+    let y = nodeCenter.y;
+
+    if (side === 'left') {
+      x = node.position.x;
+    } else if (side === 'right') {
+      x = node.position.x + (node.size?.width ?? 0);
+    } else if (side === 'top') {
+      y = node.position.y;
+    } else if (side === 'bottom') {
+      y = node.position.y + (node.size?.height ?? 0);
+    }
+
+    return { x, y, side };
+  }),
 }));
 
 vi.mock('../../../../utils/compute-floating-edge-side', () => ({
@@ -62,9 +97,8 @@ describe('getSourceTargetPositions', () => {
 
     const result = getSourceTargetPositions(edge, nodesMap);
 
-    expect(result).toHaveLength(2);
-    expect(result[0]).toHaveProperty('side', 'right');
-    expect(result[1]).toHaveProperty('side', 'left');
+    expect(result.source).toHaveProperty('side', 'right');
+    expect(result.target).toHaveProperty('side', 'left');
   });
 
   it('should use edge positions when nodes are not found', () => {
@@ -80,10 +114,8 @@ describe('getSourceTargetPositions', () => {
 
     const result = getSourceTargetPositions(edge, nodesMap);
 
-    expect(result).toEqual([
-      { x: 10, y: 20, side: 'right' },
-      { x: 30, y: 40, side: 'left' },
-    ]);
+    expect(result.source).toEqual({ x: 10, y: 20, side: 'right' });
+    expect(result.target).toEqual({ x: 30, y: 40, side: 'left' });
   });
 
   it('should handle edge with ports', () => {
@@ -134,9 +166,8 @@ describe('getSourceTargetPositions', () => {
 
     const result = getSourceTargetPositions(edge, nodesMap);
 
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({ x: 95, y: 50, side: 'right' });
-    expect(result[1]).toEqual({ x: 205, y: 50, side: 'left' });
+    expect(result.source).toEqual({ x: 95, y: 50, side: 'right' });
+    expect(result.target).toEqual({ x: 205, y: 50, side: 'left' });
   });
 
   it('should handle rotated nodes with ports', () => {
@@ -188,9 +219,8 @@ describe('getSourceTargetPositions', () => {
 
     const result = getSourceTargetPositions(edge, nodesMap);
 
-    expect(result).toHaveLength(2);
-    expect(result[0].side).toBe('right');
-    expect(result[1].side).toBe('left');
+    expect(result.source?.side).toBe('right');
+    expect(result.target?.side).toBe('left');
   });
 
   describe('temporary edges', () => {
@@ -226,9 +256,8 @@ describe('getSourceTargetPositions', () => {
 
       const result = getSourceTargetPositions(edge, nodesMap);
 
-      expect(result).toHaveLength(2);
-      expect(result[0].side).toBe('right'); // Source side remains default
-      expect(result[1].side).toBe('top'); // Target side computed dynamically (cursor is below, not to the right)
+      expect(result.source?.side).toBe('right'); // Source side remains default
+      expect(result.target?.side).toBe('top'); // Target side computed dynamically (cursor is below, not to the right)
     });
 
     it('should compute dynamic side for temporary edge with floating source', () => {
@@ -264,9 +293,8 @@ describe('getSourceTargetPositions', () => {
 
       const result = getSourceTargetPositions(edge, nodesMap);
 
-      expect(result).toHaveLength(2);
-      expect(result[0].side).toBe('bottom'); // Source side computed dynamically (cursor is above, not to the left)
-      expect(result[1].side).toBe('left'); // Target side remains default
+      expect(result.source?.side).toBe('bottom'); // Source side computed dynamically (cursor is above, not to the left)
+      expect(result.target?.side).toBe('left'); // Target side remains default
     });
 
     it('should use default sides for temporary edge without floating ends', () => {
@@ -284,9 +312,8 @@ describe('getSourceTargetPositions', () => {
 
       const result = getSourceTargetPositions(edge, nodesMap);
 
-      expect(result).toHaveLength(2);
-      expect(result[0].side).toBe('right'); // Default source side
-      expect(result[1].side).toBe('left'); // Default target side
+      expect(result.source?.side).toBe('right'); // Default source side
+      expect(result.target?.side).toBe('left'); // Default target side
     });
 
     it('should handle temporary edge with no nodes and positions', () => {
@@ -303,9 +330,8 @@ describe('getSourceTargetPositions', () => {
 
       const result = getSourceTargetPositions(edge, nodesMap);
 
-      expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ x: 50, y: 50, side: 'right' });
-      expect(result[1]).toEqual({ x: 150, y: 150, side: 'left' });
+      expect(result.source).toEqual({ x: 50, y: 50, side: 'right' });
+      expect(result.target).toEqual({ x: 150, y: 150, side: 'left' });
     });
   });
 });
@@ -337,15 +363,20 @@ describe('getPoint', () => {
     expect(result).toEqual({ x: 25, y: 25, side: 'right' });
   });
 
-  it('should return fallback position when port ID is not provided', () => {
+  it('should calculate border intersection when port ID is not provided', () => {
     const node: Node = {
       ...mockNode,
       position: { x: 100, y: 100 },
+      size: { width: 100, height: 50 },
     };
 
-    const result = getPoint(node, 'bottom', undefined, { x: 30, y: 30 });
+    // When no port is provided, it should call getNodeBorderIntersection with fromPoint
+    const fromPoint = { x: 250, y: 125 }; // Point to the right of the node
+    const result = getPoint(node, 'bottom', undefined, { x: 30, y: 30 }, fromPoint);
 
-    expect(result).toEqual({ x: 30, y: 30, side: 'bottom' });
+    // The mock should calculate the intersection on the right side
+    expect(result.side).toBe('right');
+    expect(result.x).toBe(200); // node.position.x + node.size.width
   });
 
   it('should handle rotated node ports', () => {
@@ -380,5 +411,125 @@ describe('getPoint', () => {
     const result = getPoint(node, 'bottom', 'non-existent-port', { x: 15, y: 15 });
 
     expect(result).toEqual({ x: 15, y: 15, side: 'bottom' });
+  });
+
+  describe('edges without ports (direct node connections)', () => {
+    it('should calculate correct positions for horizontal flow without ports', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: 'node-1',
+        target: 'node-2',
+        // No sourcePort or targetPort specified
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-1',
+          {
+            ...mockNode,
+            id: 'node-1',
+            position: { x: 0, y: 50 },
+            size: { width: 100, height: 50 },
+          },
+        ],
+        [
+          'node-2',
+          {
+            ...mockNode,
+            id: 'node-2',
+            position: { x: 200, y: 50 },
+            size: { width: 100, height: 50 },
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      // Source should connect on the right side pointing toward target
+      expect(result.source?.side).toBe('right');
+      expect(result.source?.x).toBe(100); // Right edge of node-1
+      // Target should connect on the left side
+      expect(result.target?.side).toBe('left');
+      expect(result.target?.x).toBe(200); // Left edge of node-2
+    });
+
+    it('should calculate correct positions for vertical flow without ports', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: 'node-1',
+        target: 'node-2',
+        // No sourcePort or targetPort specified
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-1',
+          {
+            ...mockNode,
+            id: 'node-1',
+            position: { x: 50, y: 0 },
+            size: { width: 100, height: 50 },
+          },
+        ],
+        [
+          'node-2',
+          {
+            ...mockNode,
+            id: 'node-2',
+            position: { x: 50, y: 200 },
+            size: { width: 100, height: 50 },
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      // Source should connect on the bottom side pointing toward target
+      expect(result.source?.side).toBe('bottom');
+      expect(result.source?.y).toBe(50); // Bottom edge of node-1
+      // Target should connect on the top side
+      expect(result.target?.side).toBe('top');
+      expect(result.target?.y).toBe(200); // Top edge of node-2
+    });
+
+    it('should calculate correct positions for diagonal flow without ports', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: 'node-1',
+        target: 'node-2',
+        // No sourcePort or targetPort specified
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-1',
+          {
+            ...mockNode,
+            id: 'node-1',
+            position: { x: 0, y: 0 },
+            size: { width: 100, height: 50 },
+          },
+        ],
+        [
+          'node-2',
+          {
+            ...mockNode,
+            id: 'node-2',
+            position: { x: 200, y: 200 },
+            size: { width: 100, height: 50 },
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      // For diagonal connections, the side depends on which dimension has greater distance
+      expect(result.source).toHaveProperty('side');
+      expect(result.source).toHaveProperty('x');
+      expect(result.source).toHaveProperty('y');
+      expect(result.target).toHaveProperty('side');
+      expect(result.target).toHaveProperty('x');
+      expect(result.target).toHaveProperty('y');
+    });
   });
 });

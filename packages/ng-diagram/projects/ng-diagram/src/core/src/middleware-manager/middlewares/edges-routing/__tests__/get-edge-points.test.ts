@@ -13,10 +13,10 @@ vi.mock('../get-source-target-positions', () => ({
     const sourcePosition = edge.sourcePosition || sourceNode?.position || { x: 0, y: 0 };
     const targetPosition = edge.targetPosition || targetNode?.position || { x: 100, y: 100 };
 
-    return [
-      { ...sourcePosition, side: 'right' },
-      { ...targetPosition, side: 'left' },
-    ];
+    return {
+      source: { ...sourcePosition, side: 'right' },
+      target: { ...targetPosition, side: 'left' },
+    };
   }),
 }));
 
