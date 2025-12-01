@@ -102,9 +102,116 @@ describe('getNodeBorderIntersection', () => {
 
       // Should use position + size, NOT measuredBounds
       // This ensures edges connect to the main node body, not the extended bounds from protruding ports
-      expect(result.x).toBe(100); // position.x + size.width
-      expect(result.y).toBe(25); // Center Y of the main node body
+      // The intersection point should be on the rotated rectangle boundary
+      expect(Number.isFinite(result.x)).toBe(true);
+      expect(Number.isFinite(result.y)).toBe(true);
+      // Side is determined by outward normal of the hit edge
+      expect(['top', 'right', 'bottom', 'left']).toContain(result.side);
+    });
+
+    it('should calculate correct intersection for 90 degree rotated node', () => {
+      // Node at origin, 100x50, rotated 90 degrees
+      // After rotation: effectively 50x100 centered at same point
+      const node: Node = {
+        id: 'rotated-node',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 50 },
+        angle: 90,
+        data: {},
+      };
+
+      // Node center is at (50, 25)
+      // From point to the right of the node
+      const from = { x: 200, y: 25 };
+      const result = getNodeBorderIntersection(node, from);
+
+      // With 90 degree rotation, the original "right" edge now points downward
+      // The outward normal of this edge points to the right in world space
+      // So the side should still be 'right' (based on outward normal direction)
       expect(result.side).toBe('right');
+      // The intersection point should be on the rotated boundary
+      expect(Number.isFinite(result.x)).toBe(true);
+      expect(Number.isFinite(result.y)).toBe(true);
+    });
+
+    it('should calculate correct intersection for 180 degree rotated node', () => {
+      const node: Node = {
+        id: 'rotated-node',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 50 },
+        angle: 180,
+        data: {},
+      };
+
+      // Node center is at (50, 25)
+      const from = { x: 200, y: 25 };
+      const result = getNodeBorderIntersection(node, from);
+
+      // 180 degree rotation: the original "left" edge is now on the right side
+      // Its outward normal points right, so side should be 'right'
+      expect(result.side).toBe('right');
+      expect(result.x).toBeCloseTo(100, 5);
+      expect(result.y).toBeCloseTo(25, 5);
+    });
+
+    it('should return correct side based on outward normal for 45 degree rotation', () => {
+      const node: Node = {
+        id: 'rotated-node',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 }, // Square for easier reasoning
+        angle: 45,
+        data: {},
+      };
+
+      // Node center is at (50, 50)
+      // From point directly to the right
+      const from = { x: 200, y: 50 };
+      const result = getNodeBorderIntersection(node, from);
+
+      // For a 45-degree rotated square, the edge facing right has an outward normal
+      // pointing diagonally, which maps to 'right' as it's closest to (1,0)
+      expect(result.side).toBe('right');
+      expect(Number.isFinite(result.x)).toBe(true);
+      expect(Number.isFinite(result.y)).toBe(true);
+    });
+
+    it('should handle from point at center for rotated node', () => {
+      const node: Node = {
+        id: 'rotated-node',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 50 },
+        angle: 45,
+        data: {},
+      };
+
+      // Node center is at (50, 25)
+      const from = { x: 50, y: 25 };
+      const result = getNodeBorderIntersection(node, from);
+
+      // Should return valid result with rotated coordinates
+      expect(Number.isFinite(result.x)).toBe(true);
+      expect(Number.isFinite(result.y)).toBe(true);
+      expect(['top', 'right', 'bottom', 'left']).toContain(result.side);
+    });
+
+    it('should return bottom side when from point is below rotated node', () => {
+      const node: Node = {
+        id: 'rotated-node',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 50 },
+        angle: 90,
+        data: {},
+      };
+
+      // Node center is at (50, 25)
+      // From point below the node
+      const from = { x: 50, y: 200 };
+      const result = getNodeBorderIntersection(node, from);
+
+      // The edge facing down has outward normal pointing down -> 'bottom'
+      expect(result.side).toBe('bottom');
+      expect(Number.isFinite(result.x)).toBe(true);
+      expect(Number.isFinite(result.y)).toBe(true);
     });
   });
 

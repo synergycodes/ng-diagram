@@ -1,14 +1,96 @@
-import type { Node, Point, PortLocation } from '../types';
+import type { Node, Point, PortLocation, PortSide } from '../types';
 import { getRect } from './rects-points-sizes';
+
+/**
+ * Rotates a point around a center by a given angle (in radians)
+ */
+const rotatePoint = (point: Point, center: Point, angle: number): Point => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  const dx = point.x - center.x;
+  const dy = point.y - center.y;
+  return {
+    x: center.x + dx * cos - dy * sin,
+    y: center.y + dx * sin + dy * cos,
+  };
+};
+
+/**
+ * Finds intersection of two line segments, returns null if no intersection.
+ * Uses parametric form to find intersection point.
+ *
+ * @param p1 - Start of first segment
+ * @param p2 - End of first segment
+ * @param p3 - Start of second segment
+ * @param p4 - End of second segment
+ * @returns Intersection point or null if segments don't intersect
+ */
+const lineSegmentIntersection = (p1: Point, p2: Point, p3: Point, p4: Point): Point | null => {
+  const d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+  if (Math.abs(d) < 1e-10) return null; // Parallel lines
+
+  const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / d;
+  const u = -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / d;
+
+  if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+    return {
+      x: p1.x + t * (p2.x - p1.x),
+      y: p1.y + t * (p2.y - p1.y),
+    };
+  }
+  return null;
+};
+
+/**
+ * Computes the outward normal vector of an edge defined by two points.
+ * The normal points outward from the rectangle (perpendicular to edge, pointing away from center).
+ *
+ * @param edgeStart - Start point of the edge
+ * @param edgeEnd - End point of the edge
+ * @returns Normalized outward normal vector
+ */
+const getOutwardNormal = (edgeStart: Point, edgeEnd: Point): Point => {
+  // Edge vector
+  const edgeX = edgeEnd.x - edgeStart.x;
+  const edgeY = edgeEnd.y - edgeStart.y;
+
+  // Perpendicular vector (rotated 90 degrees clockwise)
+  // For corners defined in order: top-left, top-right, bottom-right, bottom-left
+  // This gives outward-pointing normals
+  const normalX = edgeY;
+  const normalY = -edgeX;
+
+  // Normalize
+  const length = Math.hypot(normalX, normalY);
+  if (length === 0) return { x: 1, y: 0 };
+
+  return { x: normalX / length, y: normalY / length };
+};
+
+/**
+ * Maps an outward normal vector to the closest cardinal direction (side).
+ * This determines which direction the edge should exit from the node.
+ *
+ * @param normal - The outward normal vector (should be normalized)
+ * @returns The side representing the exit direction
+ */
+const normalToSide = (normal: Point): PortSide => {
+  // Find which cardinal direction the normal is closest to
+  // right: (1, 0), left: (-1, 0), bottom: (0, 1), top: (0, -1)
+  if (Math.abs(normal.x) >= Math.abs(normal.y)) {
+    return normal.x >= 0 ? 'right' : 'left';
+  } else {
+    return normal.y >= 0 ? 'bottom' : 'top';
+  }
+};
 
 /**
  * Calculates the intersection point where a line from one point to another
  * intersects with the border of a rectangular node. This is used for floating
  * edges that don't have specific ports defined.
  *
- * The function calculates the exact intersection point on the node's border
- * by finding where a line from 'from' to the node's center intersects with
- * the rectangle edges.
+ * The function supports rotated nodes by calculating intersections with the
+ * rotated rectangle edges.
  *
  * @param node - The node to calculate intersection with
  * @param from - Starting point of the line (typically the other node's center or port position)
@@ -16,78 +98,68 @@ import { getRect } from './rects-points-sizes';
  */
 export const getNodeBorderIntersection = (node: Node, from: Point): PortLocation => {
   const nodeRect = getRect({ position: node.position, size: node.size });
+  const angle = ((node.angle || 0) * Math.PI) / 180;
 
-  const nodeCenter: Point = {
+  const center: Point = {
     x: nodeRect.x + nodeRect.width / 2,
     y: nodeRect.y + nodeRect.height / 2,
   };
 
-  const deltaX = nodeCenter.x - from.x;
-  const deltaY = nodeCenter.y - from.y;
+  if (from.x === center.x && from.y === center.y) {
+    const rightPoint =
+      angle !== 0
+        ? rotatePoint({ x: nodeRect.x + nodeRect.width, y: center.y }, center, angle)
+        : { x: nodeRect.x + nodeRect.width, y: center.y };
 
-  if (deltaX === 0 && deltaY === 0) {
+    const exitNormal = angle !== 0 ? rotatePoint({ x: 1, y: 0 }, { x: 0, y: 0 }, angle) : { x: 1, y: 0 };
+
     return {
-      x: nodeRect.x + nodeRect.width,
-      y: nodeCenter.y,
-      side: 'right',
+      x: rightPoint.x,
+      y: rightPoint.y,
+      side: normalToSide(exitNormal),
     };
   }
 
-  const left = deltaX !== 0 ? (nodeRect.x - from.x) / deltaX : -Infinity;
-  const right = deltaX !== 0 ? (nodeRect.x + nodeRect.width - from.x) / deltaX : -Infinity;
-  const top = deltaY !== 0 ? (nodeRect.y - from.y) / deltaY : -Infinity;
-  const bottom = deltaY !== 0 ? (nodeRect.y + nodeRect.height - from.y) / deltaY : -Infinity;
+  const corners: Point[] = [
+    { x: nodeRect.x, y: nodeRect.y },
+    { x: nodeRect.x + nodeRect.width, y: nodeRect.y },
+    { x: nodeRect.x + nodeRect.width, y: nodeRect.y + nodeRect.height },
+    { x: nodeRect.x, y: nodeRect.y + nodeRect.height },
+  ];
 
-  let result = Infinity;
-  let side: PortLocation['side'] = 'right';
+  const rotatedCorners = angle !== 0 ? corners.map((c) => rotatePoint(c, center, angle)) : corners;
 
-  if (left > 0 && left <= 1) {
-    const y = from.y + left * deltaY;
-    if (y >= nodeRect.y && y <= nodeRect.y + nodeRect.height && left < result) {
-      result = left;
-      side = 'left';
+  let closestIntersection: Point | null = null;
+  let closestDistance = Infinity;
+  let hitEdgeStart: Point | null = null;
+  let hitEdgeEnd: Point | null = null;
+
+  for (let i = 0; i < 4; i++) {
+    const edgeStart = rotatedCorners[i];
+    const edgeEnd = rotatedCorners[(i + 1) % 4];
+
+    const intersection = lineSegmentIntersection(from, center, edgeStart, edgeEnd);
+    if (intersection) {
+      const dist = Math.hypot(intersection.x - from.x, intersection.y - from.y);
+      if (dist < closestDistance) {
+        closestDistance = dist;
+        closestIntersection = intersection;
+        hitEdgeStart = edgeStart;
+        hitEdgeEnd = edgeEnd;
+      }
     }
   }
 
-  if (right > 0 && right <= 1) {
-    const y = from.y + right * deltaY;
-    if (y >= nodeRect.y && y <= nodeRect.y + nodeRect.height && right < result) {
-      result = right;
-      side = 'right';
-    }
+  if (!closestIntersection || !hitEdgeStart || !hitEdgeEnd) {
+    return { x: center.x, y: center.y, side: 'right' };
   }
 
-  if (top > 0 && top <= 1) {
-    const x = from.x + top * deltaX;
-    if (x >= nodeRect.x && x <= nodeRect.x + nodeRect.width && top < result) {
-      result = top;
-      side = 'top';
-    }
-  }
-
-  if (bottom > 0 && bottom <= 1) {
-    const x = from.x + bottom * deltaX;
-    if (x >= nodeRect.x && x <= nodeRect.x + nodeRect.width && bottom < result) {
-      result = bottom;
-      side = 'bottom';
-    }
-  }
-
-  if (result === Infinity) {
-    return {
-      x: nodeCenter.x,
-      y: nodeCenter.y,
-      side,
-    };
-  }
-
-  const intersectionPoint: Point = {
-    x: from.x + result * deltaX,
-    y: from.y + result * deltaY,
-  };
+  const outwardNormal = getOutwardNormal(hitEdgeStart, hitEdgeEnd);
+  const side = normalToSide(outwardNormal);
 
   return {
-    ...intersectionPoint,
+    x: closestIntersection.x,
+    y: closestIntersection.y,
     side,
   };
 };
