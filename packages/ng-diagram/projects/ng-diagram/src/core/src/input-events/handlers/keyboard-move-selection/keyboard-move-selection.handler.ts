@@ -1,4 +1,6 @@
-import { DIRECTIONS, Node, Point, Size } from '../../../types';
+import { NgDiagramMath } from '../../../math';
+import { Bounds, Direction, DIRECTIONS, Node, Point } from '../../../types';
+import { getRotatedBoundingRect } from '../../../utils';
 import { EventHandler } from '../event-handler';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
@@ -13,12 +15,12 @@ This indicates a programming error. Check keyboard shortcut configuration.
 Documentation: https://www.ngdiagram.dev/docs/guides/shortcut-manager/
 `;
 
-enum Side {
-  Top = 'top',
-  Bottom = 'bottom',
-  Left = 'left',
-  Right = 'right',
-}
+const DIRECTION_VECTORS: Record<Direction, Point> = {
+  top: { x: 0, y: -1 },
+  bottom: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};
 
 export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMoveSelectionEvent> {
   handle(event: KeyboardMoveSelectionEvent): void {
@@ -27,101 +29,127 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
       return;
     }
 
-    this.flow.commandHandler.emit('moveNodesBy', { nodes: nodesToMove, delta: this.getDelta(event, nodesToMove) });
-    this.handleEdgePanning(event, nodesToMove);
+    const rootNodes = this.getRootNodes(nodesToMove);
+    const delta = this.getDelta(event.direction, rootNodes);
+    this.flow.commandHandler.emit('moveNodesBy', { nodes: nodesToMove, delta });
+    this.panViewportIfNeeded(event.direction, nodesToMove, delta);
   }
 
-  private getDelta(event: KeyboardMoveSelectionEvent, nodes: Node[]): Point {
+  private getRootNodes(nodes: Node[]): Node[] {
+    const nodeIds = new Set(nodes.map((node) => node.id));
+    return nodes.filter((node) => node.groupId == null || !nodeIds.has(node.groupId));
+  }
+
+  private getDelta(direction: Direction, rootNodes: Node[]): Point {
     const { computeSnapForNodeDrag, defaultDragSnap } = this.flow.config.snapping;
-    const { width, height } = computeSnapForNodeDrag(nodes[0]) ?? defaultDragSnap;
 
-    switch (event.direction) {
-      case Side.Top:
-        return { x: 0, y: -height };
-      case Side.Bottom:
-        return { x: 0, y: height };
-      case Side.Left:
-        return { x: -width, y: 0 };
-      case Side.Right:
-        return { x: width, y: 0 };
-      default:
-        throw new Error(UNKNOWN_DIRECTION_ERROR(event.direction));
-    }
-  }
+    const maxSnap = rootNodes.reduce(
+      (max, node) => {
+        const { width, height } = computeSnapForNodeDrag(node) ?? defaultDragSnap;
+        return { width: Math.max(max.width, width), height: Math.max(max.height, height) };
+      },
+      { width: 0, height: 0 }
+    );
 
-  private handleEdgePanning(event: KeyboardMoveSelectionEvent, nodes: Node[]): void {
-    const needsPanning = this.checkIfNodesNearEdge(nodes, event.direction);
-
-    if (needsPanning) {
-      this.performEdgePan(event.direction, nodes);
-    }
-  }
-
-  private checkIfNodesNearEdge(nodes: Node[], direction: KeyboardMoveSelectionEvent['direction']): boolean {
-    const metadata = this.flow.model.getMetadata();
-    const { viewport } = metadata;
-    const { width, height } = this.getFlowThreshold(nodes[0]);
-
-    if (!viewport.width || !viewport.height) {
-      return false;
+    const vector = DIRECTION_VECTORS[direction];
+    if (!vector) {
+      throw new Error(UNKNOWN_DIRECTION_ERROR(direction));
     }
 
-    const viewportBounds = {
-      left: -viewport.x / viewport.scale,
-      top: -viewport.y / viewport.scale,
-      right: (-viewport.x + viewport.width) / viewport.scale,
-      bottom: (-viewport.y + viewport.height) / viewport.scale,
+    return {
+      x: vector.x * maxSnap.width,
+      y: vector.y * maxSnap.height,
     };
-
-    return nodes.some((node) => {
-      const nodeRight = node.position.x + (node.size?.width || 100);
-      const nodeBottom = node.position.y + (node.size?.height || 50);
-
-      switch (direction) {
-        case Side.Left:
-          return node.position.x <= viewportBounds.left + width * viewport.scale;
-        case Side.Right:
-          return nodeRight >= viewportBounds.right - width * viewport.scale;
-        case Side.Top:
-          return node.position.y <= viewportBounds.top + height * viewport.scale;
-        case Side.Bottom:
-          return nodeBottom >= viewportBounds.bottom - height * viewport.scale;
-        default:
-          return false;
-      }
-    });
   }
 
-  private performEdgePan(direction: KeyboardMoveSelectionEvent['direction'], nodes: Node[]): void {
-    const metadata = this.flow.model.getMetadata();
-    const { viewport } = metadata;
-    const { width, height } = this.getFlowThreshold(nodes[0]);
-    let x = 0;
-    let y = 0;
+  private panViewportIfNeeded(direction: Direction, nodes: Node[], delta: Point): void {
+    const panAmount = this.calculatePanAmount(direction, nodes, delta);
+    if (panAmount > 0) {
+      this.emitViewportPan(direction, panAmount);
+    }
+  }
+
+  private calculatePanAmount(direction: Direction, nodes: Node[], delta: Point): number {
+    const { viewport } = this.flow.model.getMetadata();
+    if (!viewport.width || !viewport.height) {
+      return 0;
+    }
+
+    const viewportBounds = this.getViewportBounds(
+      viewport.x,
+      viewport.y,
+      viewport.width,
+      viewport.height,
+      viewport.scale
+    );
+
+    return nodes.reduce((maxOverflow, node) => {
+      const overflow = this.calculateNodeOverflow(node, delta, direction, viewportBounds);
+      return Math.max(maxOverflow, overflow);
+    }, 0);
+  }
+
+  private getViewportBounds(x: number, y: number, width: number, height: number, scale: number): Bounds {
+    const { edgePanningThreshold } = this.flow.config.selectionMoving;
+    const threshold = edgePanningThreshold / scale;
+
+    return {
+      left: -x / scale + threshold,
+      top: -y / scale + threshold,
+      right: (-x + width) / scale - threshold,
+      bottom: (-y + height) / scale - threshold,
+    };
+  }
+
+  private calculateNodeOverflow(node: Node, delta: Point, direction: Direction, bounds: Bounds): number {
+    const snappedPosition = this.getSnappedPosition(node, delta);
+    const nodeBounds = this.getNodeBounds(node, snappedPosition);
 
     switch (direction) {
-      case Side.Left:
-        x = width * viewport.scale;
-        break;
-      case Side.Right:
-        x = -width * viewport.scale;
-        break;
-      case Side.Top:
-        y = height * viewport.scale;
-        break;
-      case Side.Bottom:
-        y = -height * viewport.scale;
-        break;
+      case 'left':
+        return bounds.left - nodeBounds.left;
+      case 'right':
+        return nodeBounds.right - bounds.right;
+      case 'top':
+        return bounds.top - nodeBounds.top;
+      case 'bottom':
+        return nodeBounds.bottom - bounds.bottom;
     }
-
-    this.flow.commandHandler.emit('moveViewportBy', { x, y });
   }
 
-  private getFlowThreshold(node: Node): Size {
-    const { computeSnapForNodeDrag, defaultDragSnap } = this.flow.config.snapping;
-    const { edgePanningThreshold } = this.flow.config.selectionMoving;
-    const { width, height } = computeSnapForNodeDrag(node) ?? defaultDragSnap;
+  private getNodeBounds(node: Node, newPosition: Point): Bounds {
+    const width = node.size?.width ?? 100;
+    const height = node.size?.height ?? 50;
+    const rect = { x: newPosition.x, y: newPosition.y, width, height };
+    const boundingRect = getRotatedBoundingRect(rect, node.angle ?? 0);
 
-    return { width: Math.max(width, edgePanningThreshold), height: Math.max(height, edgePanningThreshold) };
+    return {
+      left: boundingRect.x,
+      top: boundingRect.y,
+      right: boundingRect.x + boundingRect.width,
+      bottom: boundingRect.y + boundingRect.height,
+    };
+  }
+
+  private getSnappedPosition(node: Node, delta: Point): Point {
+    const { shouldSnapDragForNode, computeSnapForNodeDrag, defaultDragSnap } = this.flow.config.snapping;
+    const newPosition = { x: node.position.x + delta.x, y: node.position.y + delta.y };
+
+    if (!shouldSnapDragForNode(node)) {
+      return newPosition;
+    }
+
+    return NgDiagramMath.snapPoint(newPosition, computeSnapForNodeDrag(node) ?? defaultDragSnap);
+  }
+
+  private emitViewportPan(direction: Direction, amount: number): void {
+    const { viewport } = this.flow.model.getMetadata();
+    const screenAmount = amount * viewport.scale;
+    const vector = DIRECTION_VECTORS[direction];
+
+    this.flow.commandHandler.emit('moveViewportBy', {
+      x: vector.x === 0 ? 0 : -vector.x * screenAmount,
+      y: vector.y === 0 ? 0 : -vector.y * screenAmount,
+    });
   }
 }

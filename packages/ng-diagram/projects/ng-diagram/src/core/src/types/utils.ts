@@ -66,10 +66,10 @@ export interface RectWithId extends Rect {
 }
 
 export interface Bounds {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
 }
 
 export const DIRECTIONS = ['top', 'bottom', 'left', 'right'] as const;

@@ -7,6 +7,8 @@ import {
   getDistanceBetweenRects,
   getPointRangeRect,
   getRect,
+  getRotatedBoundingRect,
+  getRotatedCorners,
   isSamePoint,
   isSameRect,
   isSameSize,
@@ -423,6 +425,199 @@ describe('rects', () => {
       ]);
 
       expect(result).toEqual({ x: 10, y: 0, width: 0, height: 100 });
+    });
+  });
+
+  describe('getRotatedCorners', () => {
+    it('should return unrotated corners when angle is 0', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const corners = getRotatedCorners(rect, 0);
+
+      expect(corners).toHaveLength(4);
+      expect(corners[0]).toEqual({ x: 0, y: 0 });
+      expect(corners[1]).toEqual({ x: 100, y: 0 });
+      expect(corners[2]).toEqual({ x: 100, y: 50 });
+      expect(corners[3]).toEqual({ x: 0, y: 50 });
+    });
+
+    it('should return unrotated corners when angle is undefined', () => {
+      const rect = { x: 10, y: 20, width: 30, height: 40 };
+      const corners = getRotatedCorners(rect);
+
+      expect(corners).toHaveLength(4);
+      expect(corners[0]).toEqual({ x: 10, y: 20 });
+      expect(corners[1]).toEqual({ x: 40, y: 20 });
+      expect(corners[2]).toEqual({ x: 40, y: 60 });
+      expect(corners[3]).toEqual({ x: 10, y: 60 });
+    });
+
+    it('should rotate corners 90 degrees clockwise', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const corners = getRotatedCorners(rect, 90);
+
+      // Center is at (50, 25)
+      // After 90° rotation around center:
+      // (0,0) -> (75, -25) relative to center -> (50+25, 25-50) = (75, -25)
+      expect(corners[0].x).toBeCloseTo(75, 5);
+      expect(corners[0].y).toBeCloseTo(-25, 5);
+      expect(corners[1].x).toBeCloseTo(75, 5);
+      expect(corners[1].y).toBeCloseTo(75, 5);
+      expect(corners[2].x).toBeCloseTo(25, 5);
+      expect(corners[2].y).toBeCloseTo(75, 5);
+      expect(corners[3].x).toBeCloseTo(25, 5);
+      expect(corners[3].y).toBeCloseTo(-25, 5);
+    });
+
+    it('should rotate corners 180 degrees', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const corners = getRotatedCorners(rect, 180);
+
+      // 180° rotation flips the rectangle
+      expect(corners[0].x).toBeCloseTo(100, 5);
+      expect(corners[0].y).toBeCloseTo(50, 5);
+      expect(corners[1].x).toBeCloseTo(0, 5);
+      expect(corners[1].y).toBeCloseTo(50, 5);
+      expect(corners[2].x).toBeCloseTo(0, 5);
+      expect(corners[2].y).toBeCloseTo(0, 5);
+      expect(corners[3].x).toBeCloseTo(100, 5);
+      expect(corners[3].y).toBeCloseTo(0, 5);
+    });
+
+    it('should rotate corners 45 degrees', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 100 };
+      const corners = getRotatedCorners(rect, 45);
+
+      // For a square rotated 45°, corners should form a diamond
+      // Center is at (50, 50), diagonal half-length is ~70.71
+      const diagonal = (100 * Math.sqrt(2)) / 2;
+      expect(corners[0].x).toBeCloseTo(50, 5);
+      expect(corners[0].y).toBeCloseTo(50 - diagonal, 5);
+      expect(corners[1].x).toBeCloseTo(50 + diagonal, 5);
+      expect(corners[1].y).toBeCloseTo(50, 5);
+      expect(corners[2].x).toBeCloseTo(50, 5);
+      expect(corners[2].y).toBeCloseTo(50 + diagonal, 5);
+      expect(corners[3].x).toBeCloseTo(50 - diagonal, 5);
+      expect(corners[3].y).toBeCloseTo(50, 5);
+    });
+
+    it('should handle negative angles', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const cornersNegative = getRotatedCorners(rect, -90);
+      const cornersPositive = getRotatedCorners(rect, 270);
+
+      // -90° should be equivalent to 270°
+      cornersNegative.forEach((corner, i) => {
+        expect(corner.x).toBeCloseTo(cornersPositive[i].x, 5);
+        expect(corner.y).toBeCloseTo(cornersPositive[i].y, 5);
+      });
+    });
+
+    it('should handle 360 degree rotation as same as 0', () => {
+      const rect = { x: 10, y: 20, width: 30, height: 40 };
+      const corners0 = getRotatedCorners(rect, 0);
+      const corners360 = getRotatedCorners(rect, 360);
+
+      corners0.forEach((corner, i) => {
+        expect(corner.x).toBeCloseTo(corners360[i].x, 5);
+        expect(corner.y).toBeCloseTo(corners360[i].y, 5);
+      });
+    });
+
+    it('should rotate around the center of the rectangle', () => {
+      const rect = { x: 100, y: 100, width: 50, height: 50 };
+      const corners = getRotatedCorners(rect, 45);
+
+      // Center should remain at (125, 125)
+      const centerX = corners.reduce((sum, c) => sum + c.x, 0) / 4;
+      const centerY = corners.reduce((sum, c) => sum + c.y, 0) / 4;
+
+      expect(centerX).toBeCloseTo(125, 5);
+      expect(centerY).toBeCloseTo(125, 5);
+    });
+  });
+
+  describe('getRotatedBoundingRect', () => {
+    it('should return the same rect when angle is 0', () => {
+      const rect = { x: 10, y: 20, width: 30, height: 40 };
+      const result = getRotatedBoundingRect(rect, 0);
+
+      expect(result).toEqual(rect);
+    });
+
+    it('should return the same rect when angle is undefined', () => {
+      const rect = { x: 10, y: 20, width: 30, height: 40 };
+      const result = getRotatedBoundingRect(rect);
+
+      expect(result).toEqual(rect);
+    });
+
+    it('should return larger bounding rect for 45 degree rotation of a square', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 100 };
+      const result = getRotatedBoundingRect(rect, 45);
+
+      // A 100x100 square rotated 45° has a diagonal of ~141.42
+      const diagonal = 100 * Math.sqrt(2);
+      const expectedSize = diagonal;
+      const offset = (diagonal - 100) / 2;
+
+      expect(result.width).toBeCloseTo(expectedSize, 5);
+      expect(result.height).toBeCloseTo(expectedSize, 5);
+      expect(result.x).toBeCloseTo(-offset, 5);
+      expect(result.y).toBeCloseTo(-offset, 5);
+    });
+
+    it('should swap width and height for 90 degree rotation of non-square', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const result = getRotatedBoundingRect(rect, 90);
+
+      // Center is at (50, 25)
+      // After 90° rotation, width becomes height and vice versa
+      expect(result.width).toBeCloseTo(50, 5);
+      expect(result.height).toBeCloseTo(100, 5);
+    });
+
+    it('should return same dimensions for 180 degree rotation', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const result = getRotatedBoundingRect(rect, 180);
+
+      expect(result.width).toBeCloseTo(100, 5);
+      expect(result.height).toBeCloseTo(50, 5);
+      expect(result.x).toBeCloseTo(0, 5);
+      expect(result.y).toBeCloseTo(0, 5);
+    });
+
+    it('should handle negative angles', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const resultNegative = getRotatedBoundingRect(rect, -45);
+      const resultPositive = getRotatedBoundingRect(rect, 315);
+
+      expect(resultNegative.x).toBeCloseTo(resultPositive.x, 5);
+      expect(resultNegative.y).toBeCloseTo(resultPositive.y, 5);
+      expect(resultNegative.width).toBeCloseTo(resultPositive.width, 5);
+      expect(resultNegative.height).toBeCloseTo(resultPositive.height, 5);
+    });
+
+    it('should handle non-origin positioned rectangles', () => {
+      const rect = { x: 100, y: 200, width: 50, height: 50 };
+      const result = getRotatedBoundingRect(rect, 45);
+
+      // Center is at (125, 225)
+      const diagonal = 50 * Math.sqrt(2);
+      const halfDiagonal = diagonal / 2;
+
+      expect(result.x).toBeCloseTo(125 - halfDiagonal, 5);
+      expect(result.y).toBeCloseTo(225 - halfDiagonal, 5);
+      expect(result.width).toBeCloseTo(diagonal, 5);
+      expect(result.height).toBeCloseTo(diagonal, 5);
+    });
+
+    it('should handle small rotation angles', () => {
+      const rect = { x: 0, y: 0, width: 100, height: 50 };
+      const result = getRotatedBoundingRect(rect, 5);
+
+      // Small rotation should slightly increase bounding box
+      expect(result.width).toBeGreaterThan(100);
+      expect(result.height).toBeGreaterThan(50);
     });
   });
 });

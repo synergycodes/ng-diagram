@@ -1,6 +1,5 @@
-import type { Node, Rect } from '../types';
-import { Point } from '../types';
-import { getRect } from '../utils';
+import type { Node, Point, Rect } from '../types';
+import { getRect, getRotatedCorners } from '../utils';
 
 export type RectWithAngle = Rect & { angle?: number };
 
@@ -12,8 +11,8 @@ export const checkCollision = (a: Node | RectWithAngle, b: Node | RectWithAngle)
     return false;
   }
 
-  const cornersA = getRotatedCorners(a);
-  const cornersB = getRotatedCorners(b);
+  const cornersA = getCollisionCorners(a);
+  const cornersB = getCollisionCorners(b);
 
   if (cornersA.length === 0 || cornersB.length === 0) {
     return false;
@@ -37,42 +36,14 @@ const isNode = (obj: Node | RectWithAngle): obj is Node => {
   return 'position' in obj;
 };
 
-const getRotatedCorners = (obj: Node | RectWithAngle): Point[] => {
-  let rect: Rect;
-  let angle: number;
-
+const getCollisionCorners = (obj: Node | RectWithAngle): Point[] => {
   if (isNode(obj)) {
     if (!obj.size) {
       return [];
     }
-    rect = getRect(obj);
-    angle = ((obj.angle || 0) * Math.PI) / 180;
-  } else {
-    rect = obj;
-    angle = ((obj.angle || 0) * Math.PI) / 180;
+    return getRotatedCorners(getRect(obj), obj.angle ?? 0);
   }
-
-  const { x, y, width, height } = rect;
-  const cx = x + width / 2;
-  const cy = y + height / 2;
-
-  const corners = [
-    { x, y },
-    { x: x + width, y },
-    { x: x + width, y: y + height },
-    { x, y: y + height },
-  ];
-
-  return corners.map(({ x: px, y: py }) => {
-    const dx = px - cx;
-    const dy = py - cy;
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    return {
-      x: cx + dx * cos - dy * sin,
-      y: cy + dx * sin + dy * cos,
-    };
-  });
+  return getRotatedCorners(obj, obj.angle ?? 0);
 };
 
 const projectRectangle = (corners: Point[], axis: Point): { min: number; max: number } => {
