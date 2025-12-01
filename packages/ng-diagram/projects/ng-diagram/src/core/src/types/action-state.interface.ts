@@ -1,6 +1,7 @@
 import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
+import type { Point } from './utils';
 
 /**
  * State tracking a node resize operation in progress.
@@ -82,6 +83,11 @@ export interface RotationActionState {
 export interface DraggingActionState {
   /** Input modifiers (e.g., Ctrl, Shift) active during the drag. */
   modifiers: InputModifiers;
+  /**
+   * Accumulated deltas per node that haven't yet resulted in a snap movement.
+   * Key is node ID, value is the accumulated delta that hasn't been applied due to snapping.
+   */
+  accumulatedDeltas: Map<string, Point>;
 }
 
 /**
