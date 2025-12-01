@@ -24,5 +24,8 @@
     </ng-diagram-node>
   }
 </ng-diagram-canvas>
-<ng-diagram-watermark />
+
+@if (!config()?.hideWatermark) {
+  <ng-diagram-watermark />
+}
 <ng-diagram-box-selection />

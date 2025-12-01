@@ -483,4 +483,10 @@ export interface FlowConfig {
    * @default false
    */
   debugMode: boolean;
+
+  /**
+   * Hides the ngDiagram watermark when set to true.
+   * @default undefined
+   */
+  hideWatermark?: boolean;
 }
