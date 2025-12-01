@@ -150,6 +150,15 @@ Configuration for snapping behavior.
 
 ***
 
+### virtualization
+
+> **virtualization**: `VirtualizationConfig`
+
+Configuration for viewport virtualization.
+Improves performance for large diagrams by only rendering visible elements.
+
+***
+
 ### zIndex
 
 > **zIndex**: [`ZIndexConfig`](/docs/api/types/configuration/features/zindexconfig/)

@@ -396,6 +396,36 @@ export interface BoxSelectionConfig {
 }
 
 /**
+ * Configuration for viewport virtualization behavior.
+ * When enabled, only nodes and edges visible in the viewport (plus padding) are rendered,
+ * significantly improving performance for large diagrams.
+ *
+ * @category Types/Configuration/Features
+ */
+export interface VirtualizationConfig {
+  /**
+   * Whether viewport virtualization is enabled.
+   * When disabled, all nodes/edges are rendered regardless of viewport.
+   * @default true
+   */
+  enabled: boolean;
+
+  /**
+   * Padding in flow coordinates around the viewport.
+   * Nodes within this padding area are pre-rendered for smoother scrolling.
+   * @default 200
+   */
+  padding: number;
+
+  /**
+   * Maximum number of nodes below which virtualization is skipped.
+   * If fewer nodes exist than this threshold, render all nodes.
+   * @default 500
+   */
+  nodeCountThreshold: number;
+}
+
+/**
  * The main configuration interface for the flow system.
  *
  * This type defines all available configuration options for the diagram engine.
@@ -471,6 +501,12 @@ export interface FlowConfig {
    * Configuration for box selection behavior.
    */
   boxSelection: BoxSelectionConfig;
+
+  /**
+   * Configuration for viewport virtualization.
+   * Improves performance for large diagrams by only rendering visible elements.
+   */
+  virtualization: VirtualizationConfig;
 
   /**
    * Configuration for keyboard shortcuts.

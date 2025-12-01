@@ -147,13 +147,16 @@ describe('FlowCore', () => {
 
     it('should emit init command after initialization completes', async () => {
       // Initially, init command should not be called yet
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('init');
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('init', expect.anything());
 
       // Wait for the initialization callback to be executed
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // Now init command should have been emitted
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init');
+      // Now init command should have been emitted with rendered node/edge IDs
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {
+        renderedNodeIds: expect.any(Array),
+        renderedEdgeIds: expect.any(Array),
+      });
     });
 
     it('should initialize with default getFlowOffset when not provided', () => {

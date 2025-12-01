@@ -38,10 +38,13 @@ export class DiagramInitEmitter implements EventEmitter {
   }
 
   private handleInit(context: MiddlewareContext, eventManager: EventManager): void {
-    const { nodesMap, edgesMap } = context;
-
-    this.collectUnmeasuredItems(nodesMap, edgesMap);
     this.initialized = true;
+
+    const { nodesMap, edgesMap, initialUpdate } = context;
+
+    // With virtualization, only track rendered nodes/edges for measurement
+    // Non-rendered nodes won't be measured until they enter the viewport
+    this.collectUnmeasuredItems(nodesMap, edgesMap, initialUpdate.renderedNodeIds, initialUpdate.renderedEdgeIds);
 
     if (this.areAllMeasured()) {
       this.emitInitEvent(context, eventManager);
@@ -76,12 +79,24 @@ export class DiagramInitEmitter implements EventEmitter {
     }
   }
 
-  private collectUnmeasuredItems(nodesMap: Map<string, Node>, edgesMap: Map<string, Edge>): void {
+  private collectUnmeasuredItems(
+    nodesMap: Map<string, Node>,
+    edgesMap: Map<string, Edge>,
+    renderedNodeIds?: string[],
+    renderedEdgeIds?: string[]
+  ): void {
     this.unmeasuredNodes.clear();
     this.unmeasuredNodePorts.clear();
     this.unmeasuredEdgeLabels.clear();
 
-    for (const [nodeId, node] of nodesMap) {
+    // If renderedNodeIds provided (virtualization), only track those nodes
+    // Otherwise track all nodes (no virtualization or fallback)
+    const nodeIdsToTrack = renderedNodeIds ?? Array.from(nodesMap.keys());
+
+    for (const nodeId of nodeIdsToTrack) {
+      const node = nodesMap.get(nodeId);
+      if (!node) continue;
+
       if (!isValidSize(node.size)) {
         this.unmeasuredNodes.add(nodeId);
       }
@@ -93,7 +108,14 @@ export class DiagramInitEmitter implements EventEmitter {
       }
     }
 
-    for (const [edgeId, edge] of edgesMap) {
+    // If renderedEdgeIds provided (virtualization), only track those edges
+    // Otherwise track all edges (no virtualization or fallback)
+    const edgeIdsToTrack = renderedEdgeIds ?? Array.from(edgesMap.keys());
+
+    for (const edgeId of edgeIdsToTrack) {
+      const edge = edgesMap.get(edgeId);
+      if (!edge) continue;
+
       for (const label of edge.measuredLabels ?? []) {
         if (!isValidSize(label.size) || !isValidPosition(label.position)) {
           this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
@@ -157,10 +179,16 @@ export class DiagramInitEmitter implements EventEmitter {
   private emitInitEvent(context: MiddlewareContext, eventManager: EventManager, useDeferred = true): void {
     this.clearSafetyHatchTimeout();
 
-    const { nodesMap, edgesMap } = context;
+    const { nodesMap, edgesMap, initialUpdate } = context;
     const event: DiagramInitEvent = {
-      nodes: Array.from(nodesMap.values()),
-      edges: Array.from(edgesMap.values()),
+      // undefined means all nodes/edges are rendered (DirectRenderStrategy)
+      // string[] means only those specific IDs are rendered (VirtualizedRenderStrategy)
+      nodes: initialUpdate.renderedNodeIds
+        ? Array.from(nodesMap.values()).filter((x) => initialUpdate.renderedNodeIds!.includes(x.id))
+        : Array.from(nodesMap.values()),
+      edges: initialUpdate.renderedEdgeIds
+        ? Array.from(edgesMap.values()).filter((x) => initialUpdate.renderedEdgeIds!.includes(x.id))
+        : Array.from(edgesMap.values()),
       viewport: context.state.metadata.viewport,
     };
 

@@ -12,6 +12,7 @@ import type {
   ResizeConfig,
   SelectionMovingConfig,
   SnappingConfig,
+  VirtualizationConfig,
   ZIndexConfig,
   ZoomConfig,
   ZoomToFitConfig,
@@ -133,6 +134,12 @@ const defaultBoxSelectionConfig: BoxSelectionConfig = {
   realtime: true,
 };
 
+const defaultVirtualizationConfig: VirtualizationConfig = {
+  enabled: true,
+  padding: 500, // Larger padding reduces frequency of hitting viewport edge during fast panning
+  nodeCountThreshold: 500,
+};
+
 /**
  * Default configuration for the flow system.
  */
@@ -152,6 +159,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       edgeRouting: defaultEdgeRoutingConfig,
       zIndex: defaultZIndexConfig,
       boxSelection: defaultBoxSelectionConfig,
+      virtualization: defaultVirtualizationConfig,
       shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
     },

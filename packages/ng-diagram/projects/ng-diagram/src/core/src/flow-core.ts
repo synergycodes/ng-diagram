@@ -9,6 +9,7 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
+import { DirectRenderStrategy, RenderStrategy, VirtualizedRenderStrategy } from './render-strategy';
 import { ShortcutManager } from './shortcut-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import {
@@ -62,6 +63,9 @@ export class FlowCore {
   readonly eventManager: EventManager;
   readonly shortcutManager: ShortcutManager;
 
+  private readonly directRenderStrategy: DirectRenderStrategy;
+  private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
+
   readonly getFlowOffset: () => Point;
 
   constructor(
@@ -81,6 +85,8 @@ export class FlowCore {
     this.initUpdater = new InitUpdater(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
+    this.directRenderStrategy = new DirectRenderStrategy();
+    this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
     this.eventManager = new EventManager();
@@ -105,20 +111,32 @@ export class FlowCore {
     this.model.destroy();
   }
 
-  /**
-   * Starts listening to model changes and emits init command
-   */
+  private lastNodesRef: Node[] | null = null;
+
   private init() {
-    this.render();
+    this.spatialHash.process(this.model.getNodes());
+    this.lastNodesRef = this.model.getNodes();
+
+    // this.render();
 
     this.model.onChange((state) => {
-      this.spatialHash.process(state.nodes);
-      this.modelLookup.desynchronize();
+      // Only update spatial hash when nodes actually changed (skip during panning/zooming)
+      if (state.nodes !== this.lastNodesRef) {
+        this.spatialHash.process(state.nodes);
+        this.modelLookup.desynchronize();
+        this.lastNodesRef = state.nodes;
+      }
       this.render();
     });
 
     this.initUpdater.start(async () => {
-      await this.commandHandler.emit('init');
+      const { nodes, edges } = this.getRenderedModel();
+      // Only pass rendered IDs when virtualization is active (undefined = all rendered)
+      const virtualized = this.config.virtualization.enabled;
+      await this.commandHandler.emit('init', {
+        renderedNodeIds: virtualized ? nodes.map((n) => n.id) : undefined,
+        renderedEdgeIds: virtualized ? edges.map((e) => e.id) : undefined,
+      });
     });
   }
 
@@ -179,6 +197,25 @@ export class FlowCore {
       edges: this.model.getEdges(),
       metadata: this.model.getMetadata(),
     };
+  }
+
+  /**
+   * Gets the active render strategy based on virtualization config.
+   * When virtualization is enabled, uses VirtualizedRenderStrategy.
+   * When disabled, uses DirectRenderStrategy.
+   */
+  get renderStrategy(): RenderStrategy {
+    return this.config.virtualization.enabled ? this.virtualizedRenderStrategy : this.directRenderStrategy;
+  }
+
+  /**
+   * Gets nodes and edges after applying the active render strategy.
+   * When virtualization is enabled, returns only the subset visible in the viewport.
+   * When disabled, returns all nodes and edges.
+   */
+  getRenderedModel(): { nodes: Node[]; edges: Edge[] } {
+    const { nodes, edges, metadata } = this.getState();
+    return this.renderStrategy.process(nodes, edges, metadata.viewport);
   }
 
   /**
@@ -262,16 +299,28 @@ export class FlowCore {
     await this.updateSemaphore.acquire();
 
     try {
-      // Get the current state - guaranteed to be fresh since we hold the lock
+      // ===== PERF LOGGING - only for resize-related actions =====
+      const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
+      const shouldLog = logActions.includes(modelActionType as string);
+
+      if (shouldLog) console.time(`[PERF] applyUpdate TOTAL (${modelActionType})`);
+
       const currentState = this.getState();
+
+      if (shouldLog) console.time(`[PERF] middleware.execute (${modelActionType})`);
       const finalState = await this.middlewareManager.execute(currentState, stateUpdate, modelActionType);
+      if (shouldLog) console.timeEnd(`[PERF] middleware.execute (${modelActionType})`);
 
       if (finalState) {
+        if (shouldLog) console.time(`[PERF] setState`);
         this.setState(finalState);
+        if (shouldLog) console.timeEnd(`[PERF] setState`);
         this.eventManager.flushDeferredEmits();
       } else {
         this.eventManager.clearDeferredEmits();
       }
+
+      if (shouldLog) console.timeEnd(`[PERF] applyUpdate TOTAL (${modelActionType})`);
     } finally {
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();
@@ -319,14 +368,27 @@ export class FlowCore {
     };
   }
 
+  private lastRenderedNodeCount = 0;
+
   /**
    * Renders the flow
    */
   private render(): void {
     const { nodes, edges, metadata } = this.getState();
     const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
-    const finalEdges = temporaryEdge && temporaryEdge.temporary ? [...edges, temporaryEdge] : edges;
-    this.renderer.draw(nodes, finalEdges, metadata.viewport);
+
+    // Apply render strategy (virtualization or direct)
+    const { nodes: visibleNodes, edges: visibleEdges } = this.renderStrategy.process(nodes, edges, metadata.viewport);
+
+    // Log when node count changes (new nodes rendered)
+    const diff = visibleNodes.length - this.lastRenderedNodeCount;
+    if (diff > 0) {
+      console.log(`[PERF] render: ${diff} NEW nodes (${this.lastRenderedNodeCount} -> ${visibleNodes.length})`);
+    }
+    this.lastRenderedNodeCount = visibleNodes.length;
+
+    const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
+    this.renderer.draw(visibleNodes, finalEdges, metadata.viewport);
   }
 
   /**

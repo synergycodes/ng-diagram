@@ -44,16 +44,32 @@ export class MiddlewareExecutor {
     stateUpdate: FlowStateUpdate,
     modelActionType: ModelActionType
   ): Promise<FlowState | undefined> {
+    const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
+    const shouldLog = logActions.includes(modelActionType);
+
+    if (shouldLog) console.time(`[PERF] executor.run setup (${modelActionType})`);
+
     this.initialState = initialState;
     this.modelActionType = modelActionType;
     this.metadata = initialState.metadata;
+
+    if (shouldLog) console.time(`[PERF] map copies`);
     this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
     this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
     this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
     this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+    if (shouldLog) console.timeEnd(`[PERF] map copies`);
+
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
-    return this.resolveMiddlewares();
+
+    if (shouldLog) console.timeEnd(`[PERF] executor.run setup (${modelActionType})`);
+
+    if (shouldLog) console.time(`[PERF] resolveMiddlewares (${modelActionType})`);
+    const result = await this.resolveMiddlewares();
+    if (shouldLog) console.timeEnd(`[PERF] resolveMiddlewares (${modelActionType})`);
+
+    return result;
   }
 
   helpers = () => ({

@@ -134,6 +134,22 @@ export interface FlowStateUpdate {
   edgesToRemove?: string[];
   /** Partial metadata update (viewport, selection, etc.) */
   metadataUpdate?: Partial<Metadata>;
+  /**
+   * IDs of nodes currently rendered in the viewport.
+   * - `undefined` means all nodes are rendered (DirectRenderStrategy / no virtualization)
+   * - `string[]` means only those specific IDs are rendered (VirtualizedRenderStrategy)
+   * Used by 'init' action to track which nodes need measurement.
+   * @internal
+   */
+  renderedNodeIds?: string[];
+  /**
+   * IDs of edges currently rendered in the viewport.
+   * - `undefined` means all edges are rendered (DirectRenderStrategy / no virtualization)
+   * - `string[]` means only those specific IDs are rendered (VirtualizedRenderStrategy)
+   * Used by 'init' action to track which edges need measurement.
+   * @internal
+   */
+  renderedEdgeIds?: string[];
 }
 
 /**
