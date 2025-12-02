@@ -317,6 +317,7 @@ export interface FlowConfig {
     debugMode: boolean;
     edgeRouting: EdgeRoutingConfig;
     grouping: GroupingConfig;
+    hideWatermark?: boolean;
     linking: LinkingConfig;
     nodeRotation: NodeRotationConfig;
     resize: ResizeConfig;
@@ -860,7 +861,7 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     isNestedChild(nodeId: string, groupId: string): boolean;
     readonly metadata: Signal<Metadata<object>>;
-    // @internal (undocumented)
+    // @internal
     ngOnDestroy(): void;
     readonly nodes: Signal<Node_2[]>;
     toJSON(): string;
@@ -920,8 +921,8 @@ export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase 
     defaultRotatable: InputSignal<boolean | undefined>;
     // (undocumented)
     readonly eventTarget: Signal<    {
-    type: "rotate-handle";
-    element: Node_2 | undefined;
+        type: "rotate-handle";
+        element: Node_2 | undefined;
     }>;
     // (undocumented)
     readonly isRotatable: Signal<boolean | undefined>;
@@ -1057,8 +1058,8 @@ export class NgDiagramSelectionService extends NgDiagramBaseService {
     // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     select(nodeIds?: string[], edgeIds?: string[]): void;
     selection: Signal<    {
-    nodes: Node_2[];
-    edges: Edge<object>[];
+        nodes: Node_2[];
+        edges: Edge<object>[];
     }>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramSelectionService, never>;
@@ -1242,8 +1243,8 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
     size: Signal<Size | undefined>;
     // (undocumented)
     sizeState: Signal<    {
-    size: Size | undefined;
-    autoSize: boolean;
+        size: Size | undefined;
+        autoSize: boolean;
     }>;
     // (undocumented)
     static ɵdir: i0.ɵɵDirectiveDeclaration<NodeSizeDirective, "[ngDiagramNodeSize]", never, { "node": { "alias": "node"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
@@ -1560,33 +1561,33 @@ export class ZoomingWheelDirective {
 
 // Warnings were encountered during analysis:
 //
-// projects/ng-diagram/src/core/src/math/ng-diagram-math.ts:11:27 - (ae-forgotten-export) The symbol "angleBetweenPoints" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/core/src/math/ng-diagram-math.ts:11:27 - (ae-forgotten-export) The symbol "snapAngle" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/core/src/math/snap-angle/snap-angle.ts:19:4 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// projects/ng-diagram/src/core/src/math/snap-angle/snap-angle.ts:20:4 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:70:4 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:72:56 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:72:58 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:72:17 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:72:40 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:73:4 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:77:4 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:79:48 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:79:50 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:79:17 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:79:30 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// projects/ng-diagram/src/core/src/shortcut-manager/shortcut-manager.ts:80:4 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i1" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i2" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i3" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i4" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i5" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i6" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i7" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/diagram/ng-diagram.component.ts:93:32 - (ae-forgotten-export) The symbol "i8" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/edge/base-edge/base-edge.component.ts:47:40 - (ae-forgotten-export) The symbol "i1_2" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/edge/base-edge/base-edge.component.ts:47:40 - (ae-forgotten-export) The symbol "i9" needs to be exported by the entry point index.d.ts
-// projects/ng-diagram/src/lib/components/port/ng-diagram-port.component.ts:43:36 - (ae-forgotten-export) The symbol "i1_4" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:2894:783 - (ae-forgotten-export) The symbol "i1_2" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:2894:870 - (ae-forgotten-export) The symbol "i9" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:955 - (ae-forgotten-export) The symbol "i1" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1053 - (ae-forgotten-export) The symbol "i2" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1127 - (ae-forgotten-export) The symbol "i3" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1210 - (ae-forgotten-export) The symbol "i4" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1286 - (ae-forgotten-export) The symbol "i5" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1360 - (ae-forgotten-export) The symbol "i6" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1429 - (ae-forgotten-export) The symbol "i7" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3176:1505 - (ae-forgotten-export) The symbol "i8" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3321:10 - (ae-forgotten-export) The symbol "angleBetweenPoints" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3330:10 - (ae-forgotten-export) The symbol "snapAngle" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:3819:325 - (ae-forgotten-export) The symbol "i1_4" needs to be exported by the entry point index.d.ts
+// dist/ng-diagram/ng-diagram.d.ts:4876:9 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// dist/ng-diagram/ng-diagram.d.ts:4878:61 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// dist/ng-diagram/ng-diagram.d.ts:4878:63 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// dist/ng-diagram/ng-diagram.d.ts:4878:22 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// dist/ng-diagram/ng-diagram.d.ts:4878:45 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// dist/ng-diagram/ng-diagram.d.ts:4879:9 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// dist/ng-diagram/ng-diagram.d.ts:4883:9 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// dist/ng-diagram/ng-diagram.d.ts:4885:53 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// dist/ng-diagram/ng-diagram.d.ts:4885:55 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// dist/ng-diagram/ng-diagram.d.ts:4885:22 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// dist/ng-diagram/ng-diagram.d.ts:4885:35 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// dist/ng-diagram/ng-diagram.d.ts:4886:9 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// dist/ng-diagram/ng-diagram.d.ts:5075:9 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// dist/ng-diagram/ng-diagram.d.ts:5076:9 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 
 // (No @packageDocumentation comment for this package)
 
