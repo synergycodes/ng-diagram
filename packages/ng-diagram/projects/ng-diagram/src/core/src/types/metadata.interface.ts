@@ -16,6 +16,8 @@ export interface Viewport {
   width?: number;
   /** Height of the viewport */
   height?: number;
+  /** TEST PROPERTY - REMOVE AFTER TESTING */
+  testApiChange?: string;
 }
 
 /**
