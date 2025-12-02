@@ -90,4 +90,11 @@ export const examples: ContentTile[] = [
     image: '/docs/assets/examples/performance-test.png',
     imageAlt: 'Screenshot of Performance Test example',
   },
+  {
+    title: 'Landing Page Diagram',
+    description: `Demonstrates the library's capabilities and integration with external libraries like charts in real-case scenario.`,
+    href: '/docs/examples/landing-page-diagram',
+    image: '/docs/assets/examples/landing-page-diagram.png',
+    imageAlt: 'Screenshot of Performance Landing Page Diagram example',
+  },
 ];

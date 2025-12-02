@@ -3,7 +3,7 @@ import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockNode } from '../../../test-utils';
 import type { LinkingActionState } from '../../../types/action-state.interface';
 import { LinkingInputEvent } from './linking.event';
-import { LinkingEventHandler } from './linking.handler';
+import { LinkingEventHandler, LINKING_MISSING_TARGET_ERROR } from './linking.handler';
 
 function getSampleLinkingEvent(overrides: Partial<LinkingInputEvent> = {}): LinkingInputEvent {
   return {
@@ -84,7 +84,7 @@ describe('LinkingEventHandler', () => {
           portId: 'port-1',
         });
 
-        expect(() => instance.handle(event)).toThrow('Linking event must have a target Node');
+        expect(() => instance.handle(event)).toThrow(LINKING_MISSING_TARGET_ERROR(event));
       });
     });
 

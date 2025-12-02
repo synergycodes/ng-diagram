@@ -66,13 +66,14 @@ export interface RectWithId extends Rect {
 }
 
 export interface Bounds {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
 }
 
-export type Direction = 'top' | 'bottom' | 'left' | 'right';
+export const DIRECTIONS = ['top', 'bottom', 'left', 'right'] as const;
+export type Direction = (typeof DIRECTIONS)[number];
 
 /**
  * Interface representing the location of a port on a node

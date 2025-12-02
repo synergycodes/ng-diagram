@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import type { GroupNode } from '../../../types/node.interface';
 import { CommandHandler } from '../../command-handler';
-import { applyChildrenBoundsConstraints, resizeNode } from '../resize-node';
+import { applyChildrenBoundsConstraints, RESIZE_NODE_NOT_FOUND_ERROR, resizeNode } from '../resize-node';
 
 // Mock the utils module properly for vitest
 vi.mock('../../../utils', () => ({
@@ -52,13 +52,15 @@ describe('Resize Node Command', () => {
 
   describe('resizeNode', () => {
     it('should not call applyUpdate if node is not found', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(null);
 
-      await expect(
-        resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } })
-      ).rejects.toThrow('Node with id 1 not found.');
+      await resizeNode(commandHandler, { name: 'resizeNode', id: '1', size: { width: 100, height: 100 } });
 
+      expect(consoleSpy).toHaveBeenCalledWith(RESIZE_NODE_NOT_FOUND_ERROR('1'));
       expect(flowCore.applyUpdate).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
     });
 
     it('should not call applyUpdate if new size is same as current size', () => {
@@ -457,10 +459,10 @@ describe('Resize Node Command', () => {
 
       // Mock calculateGroupBounds to return bounds that extend beyond requested size
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 120,
-        minY: 120,
-        maxX: 550, // extends beyond requested maxX of 450 (100 + 350)
-        maxY: 210,
+        left: 120,
+        top: 120,
+        right: 550, // extends beyond requested maxX of 450 (100 + 350)
+        bottom: 210,
       });
 
       await resizeNode(commandHandler, {
@@ -503,10 +505,10 @@ describe('Resize Node Command', () => {
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
 
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 120,
-        minY: 120,
-        maxX: 210,
-        maxY: 480, // extends beyond requested maxY of 350 (100 + 250)
+        left: 120,
+        top: 120,
+        right: 210,
+        bottom: 480, // extends beyond requested maxY of 350 (100 + 250)
       });
 
       await resizeNode(commandHandler, {
@@ -549,10 +551,10 @@ describe('Resize Node Command', () => {
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
 
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 50, // extends left of requested minX of 100
-        minY: 60, // extends above requested minY of 100
-        maxX: 250,
-        maxY: 250,
+        left: 50, // extends left of requested minX of 100
+        top: 60, // extends above requested minY of 100
+        right: 250,
+        bottom: 250,
       });
 
       await resizeNode(commandHandler, {
@@ -595,10 +597,10 @@ describe('Resize Node Command', () => {
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
 
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 80, // extends left of requested 100
-        minY: 90, // extends up from requested 100
-        maxX: 570, // extends right of requested 450 (100 + 350)
-        maxY: 530, // extends down from requested 350 (100 + 250)
+        left: 80, // extends left of requested 100
+        top: 90, // extends up from requested 100
+        right: 570, // extends right of requested 450 (100 + 350)
+        bottom: 530, // extends down from requested 350 (100 + 250)
       });
 
       await resizeNode(commandHandler, {
@@ -638,10 +640,10 @@ describe('Resize Node Command', () => {
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
 
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 120,
-        minY: 120,
-        maxX: 170, // small children bounds
-        maxY: 170,
+        left: 120,
+        top: 120,
+        right: 170, // small children bounds
+        bottom: 170,
       });
 
       // Request a size smaller than minimum
@@ -685,10 +687,10 @@ describe('Resize Node Command', () => {
       (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
 
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 120,
-        minY: 120,
-        maxX: 300,
-        maxY: 410, // children extend beyond minimum size constraints
+        left: 120,
+        top: 120,
+        right: 300,
+        bottom: 410, // children extend beyond minimum size constraints
       });
 
       await resizeNode(commandHandler, {
@@ -756,10 +758,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
-        minX: 120,
-        minY: 120,
-        maxX: 450, // extends beyond requested maxX of 400 (100 + 300)
-        maxY: 250,
+        left: 120,
+        top: 120,
+        right: 450, // extends beyond requested maxX of 400 (100 + 300)
+        bottom: 250,
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
@@ -774,10 +776,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
-        minX: 120,
-        minY: 120,
-        maxX: 350,
-        maxY: 350, // extends beyond requested maxY of 300 (100 + 200)
+        left: 120,
+        top: 120,
+        right: 350,
+        bottom: 350, // extends beyond requested maxY of 300 (100 + 200)
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
@@ -792,10 +794,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
-        minX: 80, // extends left of requested minX of 100
-        minY: 120,
-        maxX: 350,
-        maxY: 250,
+        left: 80, // extends left of requested minX of 100
+        top: 120,
+        right: 350,
+        bottom: 250,
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
@@ -810,10 +812,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
-        minX: 120,
-        minY: 80, // extends above requested minY of 100
-        maxX: 350,
-        maxY: 250,
+        left: 120,
+        top: 80, // extends above requested minY of 100
+        right: 350,
+        bottom: 250,
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
@@ -828,10 +830,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
-        minX: 80, // extends left
-        minY: 90, // extends up
-        maxX: 450, // extends right
-        maxY: 350, // extends down
+        left: 80, // extends left
+        top: 90, // extends up
+        right: 450, // extends right
+        bottom: 350, // extends down
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
@@ -846,10 +848,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = { x: 100, y: 100 };
       const childrenBounds = {
-        minX: 120, // within requested bounds
-        minY: 120,
-        maxX: 350, // within requested bounds (100 + 300 = 400)
-        maxY: 250, // within requested bounds (100 + 200 = 300)
+        left: 120, // within requested bounds
+        top: 120,
+        right: 350, // within requested bounds (100 + 300 = 400)
+        bottom: 250, // within requested bounds (100 + 200 = 300)
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);
@@ -864,10 +866,10 @@ describe('Resize Node Command', () => {
       const requestedSize = { width: 300, height: 200 };
       const requestedPosition = undefined;
       const childrenBounds = {
-        minX: 80, // extends left of original position
-        minY: 90, // extends up from original position
-        maxX: 450, // extends right
-        maxY: 350, // extends down
+        left: 80, // extends left of original position
+        top: 90, // extends up from original position
+        right: 450, // extends right
+        bottom: 350, // extends down
       };
 
       const result = applyChildrenBoundsConstraints(requestedSize, requestedPosition, originalPosition, childrenBounds);

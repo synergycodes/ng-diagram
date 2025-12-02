@@ -49,12 +49,14 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     });
   }
 
-  /** @internal */
+  /**
+   * Unregisters the model listener to support custom model adapters
+   * that may outlive this service (e.g., singleton or shared adapters).
+   * @internal
+   */
   ngOnDestroy(): void {
-    try {
+    if (this.flowCoreProvider.isInitialized()) {
       this.flowCore.model.unregisterOnChange(this.modelListener);
-    } catch (error) {
-      console.error('Error unregistering model listener:', error);
     }
   }
 

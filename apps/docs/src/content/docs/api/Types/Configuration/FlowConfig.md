@@ -88,6 +88,20 @@ Configuration for node grouping.
 
 ***
 
+### hideWatermark?
+
+> `optional` **hideWatermark**: `boolean`
+
+Hides the ngDiagram watermark when set to true.
+
+#### Default
+
+```ts
+undefined
+```
+
+***
+
 ### linking
 
 > **linking**: [`LinkingConfig`](/docs/api/types/configuration/features/linkingconfig/)

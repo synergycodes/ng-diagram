@@ -20,7 +20,7 @@ To fix this:
   • Ensure sourcePort and targetPort are specified on the edge
   • Verify the ports exist in the source and target nodes
 
-Documentation: https://www.ngdiagram.dev/docs/guides/edges/
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 `;
 
 const ROUTING_NOT_REGISTERED_WARNING = (routing: string) =>

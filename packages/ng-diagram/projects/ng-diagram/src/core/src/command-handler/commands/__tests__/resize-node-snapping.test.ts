@@ -242,10 +242,10 @@ describe('Resize Node Command with Snapping', () => {
         { id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } },
       ]);
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 120,
-        minY: 120,
-        maxX: 170,
-        maxY: 170,
+        left: 120,
+        top: 120,
+        right: 170,
+        bottom: 170,
       });
 
       // Resize from left edge
@@ -295,10 +295,10 @@ describe('Resize Node Command with Snapping', () => {
         { id: 'child2', position: { x: 250, y: 250 }, size: { width: 100, height: 100 } },
       ]);
       mockCalculateGroupBounds.mockReturnValue({
-        minX: 120,
-        minY: 120,
-        maxX: 350,
-        maxY: 350,
+        left: 120,
+        top: 120,
+        right: 350,
+        bottom: 350,
       });
 
       // Resize from top-left corner
@@ -315,10 +315,10 @@ describe('Resize Node Command with Snapping', () => {
       // Height calculated from snapped position: 400 - 160 = 240
       // But children bounds require group to extend from 120,120 to 350,350
       // Final bounds must include both requested bounds and children bounds
-      // minX = min(150, 120) = 120
-      // minY = min(160, 120) = 120
-      // maxX = max(150+250, 350) = max(400, 350) = 400
-      // maxY = max(160+240, 350) = max(400, 350) = 400
+      // left = min(150, 120) = 120
+      // top = min(160, 120) = 120
+      // right = max(150+250, 350) = max(400, 350) = 400
+      // bottom = max(160+240, 350) = max(400, 350) = 400
       // Final size: width = 400-120 = 280, height = 400-120 = 280
       expect(flowCore.applyUpdate).toHaveBeenCalledWith(
         {
