@@ -33,26 +33,26 @@
     "compilerMessageReporting": {
       "default": {
         "logLevel": "warning",
-        "addToApiReportFile": true
+        "addToApiReportFile": false
       }
     },
     "extractorMessageReporting": {
       "default": {
         "logLevel": "warning",
-        "addToApiReportFile": true
+        "addToApiReportFile": false
       },
       "ae-missing-release-tag": {
         "logLevel": "none"
       },
       "ae-forgotten-export": {
         "logLevel": "warning",
-        "addToApiReportFile": true
+        "addToApiReportFile": false
       }
     },
     "tsdocMessageReporting": {
       "default": {
         "logLevel": "warning",
-        "addToApiReportFile": true
+        "addToApiReportFile": false
       },
       "tsdoc-undefined-tag": {
         "logLevel": "none"

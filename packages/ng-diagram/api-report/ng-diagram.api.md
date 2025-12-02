@@ -29,7 +29,6 @@ export interface ActionState {
 
 // @public
 export class ActionStateManager {
-    // Warning: (ae-forgotten-export) The symbol "EventManager" needs to be exported by the entry point index.d.ts
     constructor(eventManager: EventManager);
     clearCopyPaste(): void;
     clearDragging(): void;
@@ -38,31 +37,24 @@ export class ActionStateManager {
     clearResize(): void;
     clearRotation(): void;
     get copyPaste(): CopyPasteActionState | undefined;
-    // Warning: (ae-setter-with-docs) The doc comment for the property "copyPaste" must appear on the getter, not the setter.
     set copyPaste(value: CopyPasteActionState | undefined);
     get dragging(): DraggingActionState | undefined;
-    // Warning: (ae-setter-with-docs) The doc comment for the property "dragging" must appear on the getter, not the setter.
     set dragging(value: DraggingActionState | undefined);
     getState(): Readonly<ActionState>;
     get highlightGroup(): HighlightGroupActionState | undefined;
-    // Warning: (ae-setter-with-docs) The doc comment for the property "highlightGroup" must appear on the getter, not the setter.
     set highlightGroup(value: HighlightGroupActionState | undefined);
     isDragging(): boolean;
     isLinking(): boolean;
     isResizing(): boolean;
     isRotating(): boolean;
     get linking(): LinkingActionState | undefined;
-    // Warning: (ae-setter-with-docs) The doc comment for the property "linking" must appear on the getter, not the setter.
     set linking(value: LinkingActionState | undefined);
     get resize(): ResizeActionState | undefined;
-    // Warning: (ae-setter-with-docs) The doc comment for the property "resize" must appear on the getter, not the setter.
     set resize(value: ResizeActionState | undefined);
     get rotation(): RotationActionState | undefined;
-    // Warning: (ae-setter-with-docs) The doc comment for the property "rotation" must appear on the getter, not the setter.
     set rotation(value: RotationActionState | undefined);
 }
 
-// Warning: (ae-forgotten-export) The symbol "BUILTIN_MIDDLEWARES" needs to be exported by the entry point index.d.ts
 // Warning: (ae-internal-missing-underscore) The name "AppMiddlewares" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -70,14 +62,8 @@ export type AppMiddlewares = typeof BUILTIN_MIDDLEWARES;
 
 // @public
 export interface BackgroundConfig {
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     cellSize?: Size;
     dotSpacing?: number;
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     majorLinesFrequency?: {
         x: number;
         y: number;
@@ -166,14 +152,10 @@ export interface DiagramInitEvent {
     viewport: Viewport;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ObjectSelectionDirective" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
     readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
-    // Warning: (ae-forgotten-export) The symbol "BasePointerInputEvent" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -187,8 +169,6 @@ export interface DraggingActionState {
     modifiers: InputModifiers;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DataObject" needs to be exported by the entry point index.d.ts
-//
 // @public
 export interface Edge<T extends DataObject = DataObject> {
     // (undocumented)
@@ -234,9 +214,7 @@ export interface EdgeLabel {
 // @public
 export interface EdgeRouting {
     computePointOnPath?(points: Point[], percentage: number): Point;
-    // Warning: (tsdoc-param-tag-with-invalid-optional-name) The @param should not include a JSDoc-style optional name; it must not be enclosed in '[ ]' brackets.
     computePoints(context: EdgeRoutingContext, config?: EdgeRoutingConfig): Point[];
-    // Warning: (tsdoc-param-tag-with-invalid-optional-name) The @param should not include a JSDoc-style optional name; it must not be enclosed in '[ ]' brackets.
     computeSvgPath(points: Point[], config?: EdgeRoutingConfig): string;
     name: string;
 }
@@ -281,9 +259,6 @@ export class EdgeRoutingManager {
     unregisterRouting(name: EdgeRoutingName): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "LooseAutocomplete" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "BuiltInEdgeRoutingName" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 
@@ -352,9 +327,6 @@ export interface FlowStateUpdate {
 
 // @public
 export interface GroupingConfig {
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     canGroup: (node: Node_2, group: Node_2) => boolean;
 }
 
@@ -381,10 +353,6 @@ export interface HighlightGroupActionState {
     highlightedGroupId: string | null;
 }
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (ae-forgotten-export) The symbol "SignalModelAdapter" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function initializeModel(model?: Partial<Model>, injector?: Injector): SignalModelAdapter;
 
@@ -396,8 +364,6 @@ export interface InputModifiers {
     shift: boolean;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InputEventName" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
 
@@ -443,18 +409,9 @@ export interface LinkingConfig {
     edgePanningEnabled: boolean;
     edgePanningForce: number;
     edgePanningThreshold: number;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
     portSnapDistance: number;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null) => boolean;
 }
 
@@ -560,25 +517,17 @@ export interface ModelAdapter {
     getEdges(): Edge[];
     getMetadata(): Metadata;
     getNodes(): Node_2[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     onChange(callback: ({ nodes, edges, metadata }: ModelChanges) => void): void;
     redo(): void;
     toJSON(): string;
     undo(): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     unregisterOnChange(callback: ({ nodes, edges, metadata }: ModelChanges) => void): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateEdges(edges: Edge[]): void;
     // (undocumented)
     updateEdges(edgesFn: (edges: Edge[]) => Edge[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateMetadata(metadata: Metadata): void;
     // (undocumented)
     updateMetadata(metadataFn: (metadata: Metadata) => Metadata): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateNodes(nodes: Node_2[]): void;
     // (undocumented)
     updateNodes(nodesFn: (nodes: Node_2[]) => Node_2[]): void;
@@ -688,13 +637,10 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramBaseNodeTemplateComponent, never>;
 }
 
-// Warning: (ae-forgotten-export) The symbol "NgDiagramBaseService" needs to be exported by the entry point index.d.ts
-//
 // @public
 export class NgDiagramClipboardService extends NgDiagramBaseService {
     copy(): void;
     cut(): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     paste(position: Point): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramClipboardService, never>;
@@ -708,7 +654,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     // (undocumented)
     castToGroupNode(node: Node_2): GroupNode;
     clipboardPasted: EventEmitter<ClipboardPastedEvent>;
-    // Warning: (ae-forgotten-export) The symbol "DeepPartial" needs to be exported by the entry point index.d.ts
     config: InputSignal<DeepPartial<FlowConfig> | undefined>;
     diagramInit: EventEmitter<DiagramInitEvent>;
     edgeDrawn: EventEmitter<EdgeDrawnEvent>;
@@ -719,7 +664,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     getBoundingClientRect(): DOMRect;
     // (undocumented)
     getEdgeTemplate(edgeType: Edge['type']): Type<NgDiagramEdgeTemplate<any>> | null;
-    // Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "ng-diagram" does not have an export "nodeTemplateMap"
     getNodeTemplate(nodeType: Node_2['type']): Type<NgDiagramNodeTemplate<any, SimpleNode<any>>> | Type<NgDiagramGroupNodeTemplate<any>> | null;
     groupMembershipChanged: EventEmitter<GroupMembershipChangedEvent>;
     // (undocumented)
@@ -779,15 +723,9 @@ export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject
 
 // @public
 export class NgDiagramGroupsService extends NgDiagramBaseService {
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     addToGroup(groupId: string, nodeIds: string[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     highlightGroup(groupId: string, nodes: Node_2[]): void;
     highlightGroupClear(): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     removeFromGroup(groupId: string, nodeIds: string[]): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramGroupsService, never>;
@@ -818,68 +756,38 @@ export const NgDiagramMath: {
 // @public
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
     constructor();
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     addEdges(edges: Edge[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     addNodes(nodes: Node_2[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     deleteEdges(ids: string[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     deleteNodes(ids: string[]): void;
     readonly edges: Signal<Edge<object>[]>;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getChildren(groupId: string): Node_2[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getChildrenNested(groupId: string): Node_2[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getConnectedEdges(nodeId: string): Edge[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getConnectedNodes(nodeId: string): Node_2[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getEdgeById(edgeId: string): Edge | null;
     getModel(): ModelAdapter;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getNearestNodeInRange(point: Point, range: number): Node_2 | null;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getNearestPortInRange(point: Point, range: number): Port | null;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getNodeById(nodeId: string): Node_2 | null;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getNodeEnds(edgeId: string): {
         source: Node_2;
         target: Node_2;
     } | null;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getNodesInRange(point: Point, range: number): Node_2[];
     getOverlappingNodes(nodeId: string): Node_2[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     getParentHierarchy(nodeId: string): GroupNode[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     isNestedChild(nodeId: string, groupId: string): boolean;
     readonly metadata: Signal<Metadata<object>>;
     // @internal
     ngOnDestroy(): void;
     readonly nodes: Signal<Node_2[]>;
     toJSON(): string;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateEdge(edgeId: string, edge: Partial<Edge>): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateEdgeData<T extends Record<string, unknown> | undefined>(edgeId: string, data: T): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateNode(nodeId: string, node: Partial<Node_2>): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     updateNodes(nodes: (Pick<Node_2, 'id'> & Partial<Node_2>)[]): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramModelService, never>;
@@ -887,21 +795,15 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     static ɵprov: i0.ɵɵInjectableDeclaration<NgDiagramModelService>;
 }
 
-// Warning: (ae-forgotten-export) The symbol "NodeContextGuardBase" needs to be exported by the entry point index.d.ts
-//
 // @public
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
     // (undocumented)
     readonly dataResizable: Signal<boolean | undefined>;
     defaultResizable: InputSignal<boolean | undefined>;
-    // Warning: (ae-forgotten-export) The symbol "HandlePosition" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readonly handlePositions: HandlePosition[];
     // (undocumented)
     readonly isResizable: Signal<boolean | undefined>;
-    // Warning: (ae-forgotten-export) The symbol "LinePosition" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readonly linePositions: LinePosition[];
     // (undocumented)
@@ -921,8 +823,8 @@ export class NgDiagramNodeRotateAdornmentComponent extends NodeContextGuardBase 
     defaultRotatable: InputSignal<boolean | undefined>;
     // (undocumented)
     readonly eventTarget: Signal<    {
-        type: "rotate-handle";
-        element: Node_2 | undefined;
+    type: "rotate-handle";
+    element: Node_2 | undefined;
     }>;
     // (undocumented)
     readonly isRotatable: Signal<boolean | undefined>;
@@ -951,22 +853,10 @@ export class NgDiagramNodeSelectedDirective {
 
 // @public
 export class NgDiagramNodeService extends NgDiagramBaseService {
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     bringToFront(nodeIds?: string[], edgeIds?: string[]): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     moveNodesBy(nodes: Node_2[], delta: Point): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     resizeNode(id: string, size: Size, position?: Point, disableAutoSize?: boolean): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     rotateNodeTo(nodeId: string, angle: number): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     sendToBack(nodeIds?: string[], edgeIds?: string[]): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramNodeService, never>;
@@ -1050,16 +940,12 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 // @public
 export class NgDiagramSelectionService extends NgDiagramBaseService {
     deleteSelection(): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     deselect(nodeIds?: string[], edgeIds?: string[]): void;
     deselectAll(): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     select(nodeIds?: string[], edgeIds?: string[]): void;
     selection: Signal<    {
-        nodes: Node_2[];
-        edges: Edge<object>[];
+    nodes: Node_2[];
+    edges: Edge<object>[];
     }>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramSelectionService, never>;
@@ -1071,61 +957,25 @@ export class NgDiagramSelectionService extends NgDiagramBaseService {
 export class NgDiagramService extends NgDiagramBaseService {
     constructor();
     readonly actionState: Signal<Readonly<ActionState>>;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (ae-forgotten-export) The symbol "EventListener_2" needs to be exported by the entry point index.d.ts
-    // Warning: (ae-forgotten-export) The symbol "UnsubscribeFn" needs to be exported by the entry point index.d.ts
     addEventListener<K extends keyof DiagramEventMap>(event: K, callback: EventListener_2<DiagramEventMap[K]>): UnsubscribeFn;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     addEventListenerOnce<K extends keyof DiagramEventMap>(event: K, callback: EventListener_2<DiagramEventMap[K]>): UnsubscribeFn;
     areEventsEnabled(): boolean;
-    // Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "ng-diagram" does not have an export "updateConfig"
     readonly config: Signal<Readonly<DeepPartial<FlowConfig>>>;
     getDefaultRouting(): string;
     getEnvironment(): EnvironmentInfo;
     getRegisteredRoutings(): string[];
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     hasEventListeners(event: keyof DiagramEventMap): boolean;
     isInitialized: Signal<boolean>;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     registerMiddleware(middleware: Middleware): () => void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     registerRouting(routing: EdgeRouting): void;
     removeAllEventListeners(): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     removeEventListener<K extends keyof DiagramEventMap>(event: K, callback?: EventListener_2<DiagramEventMap[K]>): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     setDefaultRouting(name: string): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     setEventsEnabled(enabled: boolean): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     startLinking(node: Node_2, portId: string): void;
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     transaction(callback: () => void): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     unregisterMiddleware(name: string): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     unregisterRouting(name: string): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     updateConfig(config: Partial<NgDiagramConfig>): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramService, never>;
@@ -1144,31 +994,16 @@ export class NgDiagramServicesAvailabilityCheckerDirective {
 
 // @public
 export class NgDiagramViewportService extends NgDiagramBaseService {
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     centerOnNode(nodeOrId: string | Node_2): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     centerOnRect(rect: Rect): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     clientToFlowPosition(clientPosition: Point): Point;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     clientToFlowViewportPosition(clientPosition: Point): Point;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     flowToClientPosition(flowPosition: Point): Point;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     moveViewport(x: number, y: number): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     moveViewportBy(dx: number, dy: number): void;
     scale: Signal<number>;
     viewport: Signal<Viewport>;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
     zoom(factor: number, center?: Point | undefined): void;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
-    // Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
-    // Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
     zoomToFit(options?: {
         nodeIds?: string[];
         edgeIds?: string[];
@@ -1202,13 +1037,9 @@ export interface NodeResizedEvent {
 
 // @public
 export interface NodeRotationConfig {
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     computeSnapAngleForNode: (node: Node_2) => number | null;
     defaultRotatable: boolean;
     defaultSnapAngle: number;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     shouldSnapForNode: (node: Node_2) => boolean;
 }
 
@@ -1243,8 +1074,8 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
     size: Signal<Size | undefined>;
     // (undocumented)
     sizeState: Signal<    {
-        size: Size | undefined;
-        autoSize: boolean;
+    size: Size | undefined;
+    autoSize: boolean;
     }>;
     // (undocumented)
     static ɵdir: i0.ɵɵDirectiveDeclaration<NodeSizeDirective, "[ngDiagramNodeSize]", never, { "node": { "alias": "node"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
@@ -1359,10 +1190,6 @@ export interface ResizeActionState {
 export interface ResizeConfig {
     allowResizeBelowChildrenBounds: boolean;
     defaultResizable: boolean;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     getMinNodeSize: (node: Node_2) => Size;
 }
 
@@ -1448,23 +1275,11 @@ export interface Size {
 
 // @public
 export interface SnappingConfig {
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     computeSnapForNodeDrag: (node: Node_2) => Size | null;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     computeSnapForNodeSize: (node: Node_2) => Size | null;
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     defaultDragSnap: Size;
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     defaultResizeSnap: Size;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     shouldSnapDragForNode: (node: Node_2) => boolean;
-    // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
     shouldSnapResizeForNode: (node: Node_2) => boolean;
 }
 
@@ -1527,7 +1342,6 @@ export interface ZoomConfig {
     max: number;
     min: number;
     step: number;
-    // Warning: (ae-forgotten-export) The symbol "ZoomToFitConfig" needs to be exported by the entry point index.d.ts
     zoomToFit: ZoomToFitConfig;
 }
 
@@ -1558,36 +1372,6 @@ export class ZoomingWheelDirective {
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<ZoomingWheelDirective, never>;
 }
-
-// Warnings were encountered during analysis:
-//
-// dist/ng-diagram/ng-diagram.d.ts:2884:783 - (ae-forgotten-export) The symbol "i1_2" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:2884:870 - (ae-forgotten-export) The symbol "i9" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:955 - (ae-forgotten-export) The symbol "i1" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1053 - (ae-forgotten-export) The symbol "i2" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1127 - (ae-forgotten-export) The symbol "i3" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1210 - (ae-forgotten-export) The symbol "i4" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1286 - (ae-forgotten-export) The symbol "i5" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1360 - (ae-forgotten-export) The symbol "i6" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1429 - (ae-forgotten-export) The symbol "i7" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3166:1505 - (ae-forgotten-export) The symbol "i8" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3311:10 - (ae-forgotten-export) The symbol "angleBetweenPoints" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3320:10 - (ae-forgotten-export) The symbol "snapAngle" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:3809:325 - (ae-forgotten-export) The symbol "i1_4" needs to be exported by the entry point index.d.ts
-// dist/ng-diagram/ng-diagram.d.ts:4848:9 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// dist/ng-diagram/ng-diagram.d.ts:4850:61 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// dist/ng-diagram/ng-diagram.d.ts:4850:63 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// dist/ng-diagram/ng-diagram.d.ts:4850:22 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// dist/ng-diagram/ng-diagram.d.ts:4850:45 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// dist/ng-diagram/ng-diagram.d.ts:4851:9 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// dist/ng-diagram/ng-diagram.d.ts:4855:9 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// dist/ng-diagram/ng-diagram.d.ts:4857:53 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// dist/ng-diagram/ng-diagram.d.ts:4857:55 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// dist/ng-diagram/ng-diagram.d.ts:4857:22 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// dist/ng-diagram/ng-diagram.d.ts:4857:35 - (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// dist/ng-diagram/ng-diagram.d.ts:4858:9 - (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// dist/ng-diagram/ng-diagram.d.ts:5047:9 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// dist/ng-diagram/ng-diagram.d.ts:5048:9 - (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 
 // (No @packageDocumentation comment for this package)
 
