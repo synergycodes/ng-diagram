@@ -129,7 +129,6 @@ export const getNodeBorderIntersection = (node: Node, from: Point): PortLocation
 
   const rotatedCorners = angle !== 0 ? corners.map((c) => rotatePoint(c, center, angle)) : corners;
 
-  let closestIntersection: Point | null = null;
   let closestDistance = Infinity;
   let hitEdgeStart: Point | null = null;
   let hitEdgeEnd: Point | null = null;
@@ -143,23 +142,26 @@ export const getNodeBorderIntersection = (node: Node, from: Point): PortLocation
       const dist = Math.hypot(intersection.x - from.x, intersection.y - from.y);
       if (dist < closestDistance) {
         closestDistance = dist;
-        closestIntersection = intersection;
         hitEdgeStart = edgeStart;
         hitEdgeEnd = edgeEnd;
       }
     }
   }
 
-  if (!closestIntersection || !hitEdgeStart || !hitEdgeEnd) {
+  if (!hitEdgeStart || !hitEdgeEnd) {
     return { x: center.x, y: center.y, side: 'right' };
   }
 
   const outwardNormal = getOutwardNormal(hitEdgeStart, hitEdgeEnd);
   const side = normalToSide(outwardNormal);
+  const sideCenter = {
+    x: (hitEdgeStart.x + hitEdgeEnd.x) / 2,
+    y: (hitEdgeStart.y + hitEdgeEnd.y) / 2,
+  };
 
   return {
-    x: closestIntersection.x,
-    y: closestIntersection.y,
+    x: sideCenter.x,
+    y: sideCenter.y,
     side,
   };
 };
