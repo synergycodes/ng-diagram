@@ -1,11 +1,12 @@
 ---
+version: "since v0.4.0"
 editUrl: false
 next: false
 prev: false
 title: "NgDiagramComponent"
 ---
 
-Diagram component
+Main diagram component for rendering flow diagrams with nodes and edges.
 
 ## Implements
 

@@ -4,7 +4,7 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
 /**
- * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+ * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model.
  *
  * ## Example usage
  * ```typescript
@@ -15,6 +15,7 @@ import { NgDiagramService } from './ng-diagram.service';
  * ```
  *
  * @category Services
+ * @since v0.4.0
  */
 @Injectable()
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
