@@ -203,9 +203,9 @@ export class NgDiagramService extends NgDiagramBaseService {
   /**
    * Call this method to start linking from your custom logic.
    * @param node The node from which the linking starts.
-   * @param portId The port ID from which the linking starts.
+   * @param portId The port ID from which the linking starts. Creates a floating edge when undefined.
    */
-  startLinking(node: Node, portId: string) {
+  startLinking(node: Node, portId?: string) {
     this.manualLinkingService.startLinking(node, portId);
   }
 

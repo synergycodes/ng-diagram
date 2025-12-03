@@ -401,7 +401,7 @@ ngDiagramService.setEventsEnabled(true);
 
 ### startLinking()
 
-> **startLinking**(`node`, `portId`): `void`
+> **startLinking**(`node`, `portId?`): `void`
 
 Call this method to start linking from your custom logic.
 
@@ -413,11 +413,11 @@ Call this method to start linking from your custom logic.
 
 The node from which the linking starts.
 
-##### portId
+##### portId?
 
 `string`
 
-The port ID from which the linking starts.
+The port ID from which the linking starts. Creates a floating edge when undefined.
 
 #### Returns
 
