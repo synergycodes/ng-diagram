@@ -972,7 +972,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     removeEventListener<K extends keyof DiagramEventMap>(event: K, callback?: EventListener_2<DiagramEventMap[K]>): void;
     setDefaultRouting(name: string): void;
     setEventsEnabled(enabled: boolean): void;
-    startLinking(node: Node_2, portId: string): void;
+    startLinking(node: Node_2, portId?: string): void;
     transaction(callback: () => void): void;
     unregisterMiddleware(name: string): void;
     unregisterRouting(name: string): void;
