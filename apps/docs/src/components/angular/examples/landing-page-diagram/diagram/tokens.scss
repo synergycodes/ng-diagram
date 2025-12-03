@@ -1,0 +1,108 @@
+:host {
+  --ngdlp-diagram-background-size: 400px;
+
+  /* ===== Base Colors ===== */
+  --ngdlp-white: #ffffff;
+  --ngdlp-black: #000000;
+  --ngdlp-transparent: transparent;
+
+  /* ===== Dark Background Colors ===== */
+  --ngdlp-bg-dark-primary: rgb(30, 30, 35);
+  --ngdlp-bg-dark-primary-95: rgba(30, 30, 35, 0.95);
+  --ngdlp-bg-dark-primary-60: rgba(30, 30, 35, 0.6);
+
+  --ngdlp-bg-dark-secondary: rgb(40, 40, 45);
+  --ngdlp-bg-dark-secondary-95: rgba(40, 40, 45, 0.95);
+
+  --ngdlp-bg-dark-deep: rgb(21, 21, 22);
+
+  --ngdlp-bg-dark-deepest: rgb(9, 9, 16);
+
+  --ngdlp-bg-selected: #27282b;
+
+  /* ===== Border & Separator Colors ===== */
+  --ngdlp-border-primary: rgb(60, 60, 70);
+  --ngdlp-border-primary-80: rgba(60, 60, 70, 0.8);
+  --ngdlp-border-primary-50: rgba(60, 60, 70, 0.5);
+
+  --ngdlp-border-secondary: rgb(80, 80, 90);
+  --ngdlp-border-secondary-80: rgba(80, 80, 90, 0.8);
+  --ngdlp-border-secondary-60: rgba(80, 80, 90, 0.6);
+  --ngdlp-border-secondary-30: rgba(80, 80, 90, 0.3);
+
+  --ngdlp-border-diagram: #262629;
+
+  /* ===== Shadow Colors ===== */
+  --ngdlp-shadow-dark: rgba(0, 0, 0, 0.4);
+
+  /* ===== Purple/Violet Color Palette ===== */
+  --ngdlp-purple-900: rgb(88, 28, 135);
+  --ngdlp-purple-900-15: rgba(88, 28, 135, 0.15);
+  --ngdlp-purple-700: rgb(124, 58, 237);
+  --ngdlp-purple-700-90: rgba(124, 58, 237, 0.9);
+  --ngdlp-purple-700-60: rgba(124, 58, 237, 0.6);
+
+  --ngdlp-purple-500: rgb(139, 92, 246);
+  --ngdlp-purple-500-80: rgba(139, 92, 246, 0.8);
+  --ngdlp-purple-500-50: rgba(139, 92, 246, 0.5);
+  --ngdlp-purple-500-30: rgba(139, 92, 246, 0.3);
+
+  --ngdlp-purple-600: rgb(147, 51, 234);
+  --ngdlp-purple-600-40: rgba(147, 51, 234, 0.4);
+  --ngdlp-purple-600-0: rgba(147, 51, 234, 0);
+
+  --ngdlp-purple-400: rgb(168, 85, 247);
+  --ngdlp-purple-400-100: rgba(168, 85, 247, 1);
+  --ngdlp-purple-400-60: rgba(168, 85, 247, 0.6);
+
+  --ngdlp-purple-300: rgb(192, 132, 252);
+
+  --ngdlp-purple-100: rgb(233, 213, 255);
+  --ngdlp-purple-100-80: rgba(233, 213, 255, 0.8);
+  --ngdlp-purple-100-40: rgba(233, 213, 255, 0.4);
+
+  /* ===== White/Gray Variations ===== */
+  --ngdlp-white-90: rgba(255, 255, 255, 0.9);
+  --ngdlp-white-60: rgba(255, 255, 255, 0.6);
+  --ngdlp-white-50: rgba(255, 255, 255, 0.5);
+  --ngdlp-white-30: rgba(255, 255, 255, 0.3);
+  --ngdlp-white-20: rgba(255, 255, 255, 0.2);
+  --ngdlp-white-10: rgba(255, 255, 255, 0.1);
+
+  --ngdlp-gray-light: #c2c0c0;
+
+  /* ===== Accent Colors ===== */
+  --ngdlp-green-bright: rgb(145, 255, 55);
+  --ngdlp-green-500: #4caf50;
+
+  --ngdlp-blue-500: #2196f3;
+
+  --ngdlp-amber-500: #ffc107;
+  --ngdlp-amber-600: #fbaa03;
+
+  /* ===== User Avatar Colors ===== */
+  --ngdlp-user-teal: #349a97;
+  --ngdlp-user-navy: #292e78;
+  --ngdlp-user-pink: #dd667c;
+  --ngdlp-user-beige: #e7d9ce;
+
+  /* ===== Semantic Color Mappings ===== */
+  --ngdlp-text-primary: var(--ngdlp-white);
+  --ngdlp-text-secondary: var(--ngdlp-white-60);
+  --ngdlp-text-tertiary: var(--ngdlp-white-50);
+
+  --ngdlp-component-bg: var(--ngdlp-bg-dark-primary-95);
+  --ngdlp-component-bg-alt: var(--ngdlp-bg-dark-secondary-95);
+  --ngdlp-component-bg-glass: var(--ngdlp-bg-dark-primary-60);
+
+  --ngdlp-hover-bg: var(--ngdlp-border-primary-50);
+  --ngdlp-active-bg: var(--ngdlp-bg-selected);
+
+  --ngdlp-port-bg: var(--ngdlp-black);
+  --ngdlp-edge-hover: var(--ngdlp-gray-light);
+  --ngdlp-diagram-bg: var(--ngdlp-transparent);
+
+  --ngdlp-status-success: var(--ngdlp-green-500);
+  --ngdlp-status-warning: var(--ngdlp-amber-500);
+  --ngdlp-status-info: var(--ngdlp-blue-500);
+}

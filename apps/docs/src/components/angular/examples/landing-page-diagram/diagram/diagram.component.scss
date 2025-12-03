@@ -1,0 +1,28 @@
+@import url('https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css');
+
+:host {
+  --ngd-port-background-color: var(--ngdlp-port-bg);
+  --ngd-default-edge-stroke-hover: var(--ngdlp-edge-hover);
+  --ngd-diagram-background-color: var(--ngdlp-diagram-bg);
+  --ngd-ui-bg-tertiary-default: var(--ngdlp-bg-dark-deepest);
+
+  .diagram {
+    position: relative;
+    display: flex;
+    height: 40rem;
+    border: var(--ng-diagram-border);
+    margin-top: 0;
+  }
+
+  ::ng-deep {
+    .diagram-background-container svg.dotted-background {
+      width: var(--ngdlp-diagram-background-size);
+      height: var(--ngdlp-diagram-background-size);
+      border: 1px solid var(--ngdlp-border-diagram);
+      border-radius: 20px;
+      background-color: var(--ngd-ui-bg-tertiary-default);
+      top: calc((100% - var(--ngdlp-diagram-background-size)) / 2);
+      left: calc((100% - var(--ngdlp-diagram-background-size)) / 2);
+    }
+  }
+}

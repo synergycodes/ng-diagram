@@ -248,6 +248,7 @@ export interface SnappingConfig {
 
   /**
    * Computes the snap size for a node while dragging. If null is returned, a default snap size will be used.
+   * If computeSnapForNodeDrag is used, it takes precedence over defaultDragSnap.
    * @param node The node to compute the snap size for dragging.
    * @returns The snap size for the node while dragging, or null.
    * @default () => null
@@ -264,6 +265,7 @@ export interface SnappingConfig {
 
   /**
    * The default snap size for node dragging.
+   * If computeSnapForNodeDrag is used, it takes precedence over this value.
    * @default { width: 10, height: 10 }
    */
   defaultDragSnap: Size;
@@ -483,4 +485,10 @@ export interface FlowConfig {
    * @default false
    */
   debugMode: boolean;
+
+  /**
+   * Hides the ngDiagram watermark when set to true.
+   * @default undefined
+   */
+  hideWatermark?: boolean;
 }
