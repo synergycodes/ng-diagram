@@ -912,8 +912,10 @@ export class NgDiagramPaletteItemPreviewComponent {
 }
 
 // @public
-export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy {
+export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy, AfterContentInit {
     constructor();
+    // (undocumented)
+    protected hasContent: boolean;
     id: InputSignal<string>;
     // (undocumented)
     protected readonly isInitialized: WritableSignal<boolean>;
@@ -922,17 +924,20 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     protected readonly lastType: WritableSignal<"source" | "target" | "both" | undefined>;
     // @internal (undocumented)
+    ngAfterContentInit(): void;
+    // @internal (undocumented)
     ngOnDestroy(): void;
     // @internal (undocumented)
     ngOnInit(): void;
     // (undocumented)
     protected readonly nodeData: Signal<Node_2 | undefined>;
+    originPoint: InputSignal<string>;
     // (undocumented)
     get portClass(): string;
     side: InputSignal<PortSide>;
     type: InputSignal<"source" | "target" | "both">;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; }, {}, never, never, true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramPortComponent, never>;
 }
