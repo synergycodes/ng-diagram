@@ -12,6 +12,9 @@ export interface NormalizedKeyboardInput {
 
 /**
  * Defines a keyboard shortcut binding with a key
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
 export interface KeyboardShortcutBinding {
@@ -27,6 +30,9 @@ export interface KeyboardShortcutBinding {
 
 /**
  * Defines a modifier-only shortcut binding (for pointer events)
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
 export interface ModifierOnlyShortcutBinding {
@@ -46,6 +52,9 @@ export type ShortcutBinding = KeyboardShortcutBinding | ModifierOnlyShortcutBind
 
 /**
  * Keyboard shortcut definition with key-based bindings
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
 export interface KeyboardShortcutDefinition {
@@ -57,6 +66,9 @@ export interface KeyboardShortcutDefinition {
 
 /**
  * Pointer-only shortcut definition with modifier-only bindings
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
 export interface PointerOnlyShortcutDefinition {
@@ -72,6 +84,9 @@ export interface PointerOnlyShortcutDefinition {
  * This is a discriminated union that enforces:
  * - Pointer-only actions (multiSelection, boxSelection) can only have modifier-only bindings
  * - Keyboard actions must have at least one key-based binding
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
 export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition;

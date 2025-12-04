@@ -2,6 +2,9 @@ import type { DataObject, Point, PortSide, Rect, Size } from './utils';
 
 /**
  * Interface representing all possible node types in the diagram
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 
@@ -9,6 +12,9 @@ export type Node<T extends DataObject = DataObject> = SimpleNode<T> | GroupNode<
 
 /**
  * Interface representing a group node in the diagram
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 
@@ -26,6 +32,8 @@ export interface GroupNode<T extends DataObject = DataObject> extends SimpleNode
 /**
  * Interface representing the most basic node in the diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 
@@ -101,6 +109,8 @@ export interface SimpleNode<T extends DataObject = DataObject> {
 /**
  * Interface representing a port in the node.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface Port {

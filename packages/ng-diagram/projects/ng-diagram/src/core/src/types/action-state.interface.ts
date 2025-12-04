@@ -6,6 +6,8 @@ import type { Point } from './utils';
 /**
  * State tracking a node resize operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface ResizeActionState {
@@ -28,6 +30,8 @@ export interface ResizeActionState {
 /**
  * State tracking an edge creation operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface LinkingActionState {
@@ -42,6 +46,8 @@ export interface LinkingActionState {
 /**
  * State containing copied nodes and edges for paste operations.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface CopyPasteActionState {
@@ -54,6 +60,8 @@ export interface CopyPasteActionState {
 /**
  * State tracking which group is currently highlighted.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface HighlightGroupActionState {
@@ -64,6 +72,8 @@ export interface HighlightGroupActionState {
 /**
  * State tracking a node rotation operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface RotationActionState {
@@ -78,6 +88,8 @@ export interface RotationActionState {
 /**
  * State tracking a drag operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface DraggingActionState {
@@ -97,6 +109,8 @@ export interface DraggingActionState {
  * information about active operations such as resizing, linking, dragging, and other
  * user interactions. Use this to observe the current state, not to modify it.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface ActionState {

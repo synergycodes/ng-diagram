@@ -33,6 +33,8 @@ import type {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export class ActionStateManager {

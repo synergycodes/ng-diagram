@@ -7,6 +7,8 @@ import { Size } from './utils';
 /**
  * Configuration for node resizing behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface ResizeConfig {
@@ -35,6 +37,8 @@ export interface ResizeConfig {
 /**
  * Configuration for linking (edge creation) behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface LinkingConfig {
@@ -100,6 +104,8 @@ export interface LinkingConfig {
 /**
  * Configuration for node grouping behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface GroupingConfig {
@@ -140,6 +146,8 @@ export interface ZoomToFitConfig {
 /**
  * Configuration for zooming behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface ZoomConfig {
@@ -168,6 +176,8 @@ export interface ZoomConfig {
 /**
  * Configuration for the diagram background.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface BackgroundConfig {
@@ -194,6 +204,8 @@ export interface BackgroundConfig {
 /**
  * Configuration for node rotation behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface NodeRotationConfig {
@@ -227,6 +239,8 @@ export interface NodeRotationConfig {
 /**
  * Configuration for node dragging behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface SnappingConfig {
@@ -280,6 +294,8 @@ export interface SnappingConfig {
 /**
  * Configuration for selection moving behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface SelectionMovingConfig {
@@ -307,6 +323,8 @@ export interface SelectionMovingConfig {
 /**
  * Configuration for z-index layering behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface ZIndexConfig {
@@ -340,6 +358,8 @@ export interface ZIndexConfig {
 /**
  * Configuration for edge routing behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface EdgeRoutingConfig {
@@ -380,6 +400,8 @@ export interface EdgeRoutingConfig {
 /**
  * Configuration for box selection behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface BoxSelectionConfig {
@@ -404,6 +426,8 @@ export interface BoxSelectionConfig {
  *
  * For most use cases, you should use {@link NgDiagramConfig}, which allows you to override only the properties you need.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration
  */
 export interface FlowConfig {

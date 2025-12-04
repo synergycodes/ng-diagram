@@ -14,8 +14,9 @@ import { NgDiagramService } from './ng-diagram.service';
  * this.modelService.addNodes([node1, node2]);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
- * @since v0.4.0
  */
 @Injectable()
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {

@@ -13,6 +13,8 @@ import { Node } from '../../../core/src';
  *
  * When the node's {@link SimpleNode#selected} property is `true`, the `ng-diagram-node-selected` CSS class is applied.
  *
+ * @public
+ * @since 0.8.0
  * @category Directives
  */
 @Directive({

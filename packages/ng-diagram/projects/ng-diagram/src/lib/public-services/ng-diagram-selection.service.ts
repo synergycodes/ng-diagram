@@ -13,6 +13,8 @@ import { NgDiagramModelService } from './ng-diagram-model.service';
  * this.selectionService.select(['nodeId1'], ['edgeId1']);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()

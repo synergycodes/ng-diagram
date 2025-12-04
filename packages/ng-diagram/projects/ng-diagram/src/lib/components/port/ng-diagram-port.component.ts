@@ -25,6 +25,8 @@ import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
  * <ng-diagram-port [id]="port.id" [type]="port.type" [side]="port.side" />
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

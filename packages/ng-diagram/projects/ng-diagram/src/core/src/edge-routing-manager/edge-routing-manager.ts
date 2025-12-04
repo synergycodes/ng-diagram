@@ -74,6 +74,8 @@ export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as co
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export class EdgeRoutingManager {

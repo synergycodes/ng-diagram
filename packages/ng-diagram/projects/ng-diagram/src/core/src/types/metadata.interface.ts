@@ -3,6 +3,8 @@ import { DataObject } from './utils';
 /**
  * Interface representing the viewport of the diagram.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface Viewport {
@@ -21,6 +23,8 @@ export interface Viewport {
 /**
  * Interface representing the metadata of the diagram.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface Metadata<T extends DataObject = DataObject> {

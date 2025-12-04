@@ -23,6 +23,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 /**
  * Base edge component that handles edge rendering.
  * It can be extended or used directly to render edges in the diagram.
+ *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

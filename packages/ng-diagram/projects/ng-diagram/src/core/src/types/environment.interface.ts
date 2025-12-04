@@ -3,6 +3,8 @@ import type { LooseAutocomplete } from './utils';
 /**
  * Interface representing environment information
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface EnvironmentInfo {
