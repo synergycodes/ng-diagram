@@ -117,6 +117,7 @@ export type {
   Node,
   NodeResizedEvent,
   NodeRotationConfig,
+  OriginPoint,
   PaletteItemDroppedEvent,
   Point,
   PointerOnlyActionName,

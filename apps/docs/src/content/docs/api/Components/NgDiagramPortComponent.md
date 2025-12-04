@@ -34,7 +34,7 @@ The unique identifier for the port. test
 
 ### originPoint
 
-> **originPoint**: `InputSignal`\<`string`\>
+> **originPoint**: `InputSignal`\<[`OriginPoint`](/docs/api/types/model/originpoint/)\>
 
 The origin point for the port (e.g., leftTop, centerMiddle, rightBottom).
 

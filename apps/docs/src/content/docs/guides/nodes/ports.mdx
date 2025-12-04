@@ -18,6 +18,8 @@ A port is defined by several key properties:
 - **id**: Uniquely identifies the port within the diagram.
 - **type**: Determines if the port is a source, target, or both for edge connections.
 - **side**: Specifies which side of the node the port appears on (e.g., left, right, top, bottom).
+- **originPoint**: Controls the transform origin of the port for precise placement.
+- **ng-content**: You can provide any custom content (text, images, SVGs, or Angular components) to be rendered inside the port.
 
 Each node has a [`measuredPorts`](/docs/api/types/model/simplenode/#measuredports) property that provides information about its ports and their computed position and dimensions. This property is read-only and should not be modified.
 
@@ -40,6 +42,21 @@ You can render any content inside a port, such as text, images, SVGs, or any ico
 ```
 
 Custom content automatically disables the default circular style and allows full control over the port's appearance.
+
+### Origin Point Customization
+
+You can use the `originPoint` input to precisely control the transform origin of each port.  
+Supported values: `leftTop`, `leftMiddle`, `leftBottom`, `centerTop`, `centerMiddle`, `centerBottom`, `rightTop`, `rightMiddle`, `rightBottom`.
+
+Example usage:
+
+```html
+<ng-diagram-port id="port-en" type="both" side="left" originPoint="leftTop">
+  <div><img src="..." /></div>
+</ng-diagram-port>
+```
+
+This applies the corresponding CSS transform for accurate port placement.
 
 ### Default CSS Variables
 

@@ -13,7 +13,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { Port } from '../../../core/src';
+import { OriginPoint, Port } from '../../../core/src';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
 import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
@@ -90,7 +90,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   /**
    * The origin point for the port (e.g., leftTop, centerMiddle, rightBottom).
    */
-  originPoint = input<string>('centerMiddle');
+  originPoint = input<OriginPoint>('centerMiddle');
 
   get portClass(): string {
     const originClass = originPointClassMap[this.originPoint()] || 'center-middle';

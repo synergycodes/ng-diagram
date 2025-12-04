@@ -47,4 +47,13 @@ Two nodes are rendered, each with four ports (left, top, right, bottom).
 
 - **Port Positioning:**  
   Ports have a [`side`](/docs/api/types/model/port/#side) property to set their placement.
-  To further customize port placement, you can use CSS styling.
+
+- **Origin Point Customization:**  
+  You can now use the `originPoint` input to precisely control the transform origin of each port.  
+  Supported values: `leftTop`, `leftMiddle`, `leftBottom`, `centerTop`, `centerMiddle`, `centerBottom`, `rightTop`, `rightMiddle`, `rightBottom`.
+
+  This will apply the corresponding CSS transform for accurate port placement.
+
+  For details, see the [`NgDiagramPortComponent`](/docs/api/components/ngdiagramportcomponent#originpoint) documentation.
+
+To further customize port placement, you can use CSS styling.

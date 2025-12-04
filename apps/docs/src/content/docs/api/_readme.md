@@ -130,6 +130,7 @@ title: "ng-diagram"
 - [SimpleNode](/docs/api/types/model/simplenode/)
 - [Viewport](/docs/api/types/model/viewport/)
 - [Node](/docs/api/types/model/node/)
+- [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)
 - [PortSide](/docs/api/types/model/portside/)
 
