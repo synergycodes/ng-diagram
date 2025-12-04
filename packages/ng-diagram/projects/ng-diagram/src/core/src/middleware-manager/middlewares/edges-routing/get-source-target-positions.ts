@@ -1,5 +1,5 @@
-import type { Edge, Node, Point, PortSide } from '../../../types';
-import { getPortFlowPositionSide } from '../../../utils';
+import type { Edge, Node, Point, PortLocation, PortSide } from '../../../types';
+import { getNodeBorderIntersection, getPortFlowPositionSide } from '../../../utils';
 import { computeFloatingEndSide } from '../../../utils/compute-floating-edge-side';
 
 /**
@@ -42,17 +42,87 @@ export const getSourceTargetPositions = (edge: Edge, nodesMap: Map<string, Node>
   const sourceSide = temporarySides.sourceSide ?? 'right';
   const targetSide = temporarySides.targetSide ?? 'left';
 
-  const sourcePoint = getPosition(nodesMap, edge.source, sourceSide, edge.sourcePort, edge.sourcePosition);
-  const targetPoint = getPosition(nodesMap, edge.target, targetSide, edge.targetPort, edge.targetPosition);
-  return [sourcePoint, targetPoint].filter((point) => !!point);
+  // First pass: get preliminary positions to use as reference points
+  const sourceNode = nodesMap.get(edge.source);
+  const targetNode = nodesMap.get(edge.target);
+
+  const preliminarySourcePoint = getPreliminaryPosition(sourceNode, edge.sourcePort, edge.sourcePosition);
+  const preliminaryTargetPoint = getPreliminaryPosition(targetNode, edge.targetPort, edge.targetPosition);
+
+  // Second pass: calculate final positions with correct 'from' points for border intersections
+  const sourcePoint = getPosition(
+    nodesMap,
+    edge.source,
+    sourceSide,
+    edge.sourcePort,
+    edge.sourcePosition,
+    preliminaryTargetPoint
+  );
+
+  const targetPoint = getPosition(
+    nodesMap,
+    edge.target,
+    targetSide,
+    edge.targetPort,
+    edge.targetPosition,
+    preliminarySourcePoint
+  );
+
+  return {
+    source: isValidPortLocation(sourcePoint) ? sourcePoint : undefined,
+    target: isValidPortLocation(targetPoint) ? targetPoint : undefined,
+  };
+};
+
+const isValidPortLocation = (
+  location: { x?: number; y?: number; side?: PortSide } | undefined
+): location is PortLocation => {
+  return !!location && location.x !== undefined && location.y !== undefined && !!location.side;
+};
+
+/**
+ * Gets a preliminary position for a node endpoint.
+ * This is used as a reference point when calculating border intersections.
+ * Returns either the port position, the node center, or a fallback position.
+ */
+const getPreliminaryPosition = (node: Node | undefined, portId?: string, fallbackPosition?: Point): Point => {
+  if (!node) {
+    return fallbackPosition || { x: 0, y: 0 };
+  }
+
+  // If there's a port, use its position
+  if (portId) {
+    const portPosition = getPortFlowPositionSide(node, portId);
+    if (portPosition) {
+      return { x: portPosition.x, y: portPosition.y };
+    }
+  }
+
+  // Otherwise, use the node center as reference point
+  return {
+    x: node.position.x + (node.size?.width || 0) / 2,
+    y: node.position.y + (node.size?.height || 0) / 2,
+  };
 };
 
 /**
  * Calculates and returns the coordinates of a port on a given node and edge.
+ *
+ * @param node - The node to get the position from
+ * @param defaultSide - Default side to use if port not found
+ * @param portId - Optional port ID
+ * @param position - Optional fallback position
+ * @param fromPoint - Point where the edge is coming from (used for border intersection calculation)
  */
-export const getPoint = (node: Node, defaultSide: PortSide, portId?: string, position?: Point) => {
-  if (!node || !portId) {
+export const getPoint = (node: Node, defaultSide: PortSide, portId?: string, position?: Point, fromPoint?: Point) => {
+  if (!node) {
     return { ...position, side: defaultSide };
+  }
+
+  if (!portId) {
+    // Use fromPoint for border intersection, or fall back to node center of opposite end
+    const from = fromPoint || position || { x: 0, y: 0 };
+    return getNodeBorderIntersection(node, from);
   }
 
   const portPosition = getPortFlowPositionSide(node, portId);
@@ -65,11 +135,12 @@ const getPosition = (
   nodeId: string,
   defaultSide: PortSide,
   portId?: string,
-  position?: Point
+  position?: Point,
+  fromPoint?: Point
 ) => {
   const node = nodesMap.get(nodeId);
   if (!node) {
     return { ...position, side: defaultSide };
   }
-  return getPoint(node, defaultSide, portId, position);
+  return getPoint(node, defaultSide, portId, position, fromPoint);
 };
