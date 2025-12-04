@@ -19,7 +19,6 @@ A port is defined by several key properties:
 - **type**: Determines if the port is a source, target, or both for edge connections.
 - **side**: Specifies which side of the node the port appears on (e.g., left, right, top, bottom).
 - **originPoint**: Controls the transform origin of the port for precise placement.
-- **ng-content**: You can provide any custom content (text, images, SVGs, or Angular components) to be rendered inside the port.
 
 Each node has a [`measuredPorts`](/docs/api/types/model/simplenode/#measuredports) property that provides information about its ports and their computed position and dimensions. This property is read-only and should not be modified.
 
@@ -43,20 +42,28 @@ You can render any content inside a port, such as text, images, SVGs, or any ico
 
 Custom content automatically disables the default circular style and allows full control over the port's appearance.
 
-### Origin Point Customization
+### Port positioning with Origin Point
 
-You can use the `originPoint` input to precisely control the transform origin of each port.  
+You can use the [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input to precisely control the transform origin of each port.  
 Supported values: `leftTop`, `leftMiddle`, `leftBottom`, `centerTop`, `centerMiddle`, `centerBottom`, `rightTop`, `rightMiddle`, `rightBottom`.
 
 Example usage:
 
 ```html
 <ng-diagram-port id="port-en" type="both" side="left" originPoint="leftTop">
-  <div><img src="..." /></div>
+  <div><img src="icon.png" alt="icon" /></div>
 </ng-diagram-port>
 ```
 
 This applies the corresponding CSS transform for accurate port placement.
+
+If you need further customization of port placement, you can use CSS styling by adding styles directly to the port or via a [custom class](/docs/guides/nodes/ports/#custom-css).
+
+```html
+<ng-diagram-port id="port-custom" type="both" side="left" style="transform: translate(-10%, -95%)">
+  <div><img src="icon.png" alt="icon" /></div>
+</ng-diagram-port>
+```
 
 ### Default CSS Variables
 
@@ -84,6 +91,9 @@ To create a custom style, define a CSS class and assign it to a port:
   --ngd-port-size: 18px;
   --ngd-port-background-color: #7dd184;
   --ngd-port-border-size: 0px;
+
+  /* Change to custom position of port */
+  transform: translate(-10%, -95%);
 }
 ```
 
