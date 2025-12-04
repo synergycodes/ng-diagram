@@ -931,7 +931,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     ngOnInit(): void;
     // (undocumented)
     protected readonly nodeData: Signal<Node_2 | undefined>;
-    originPoint: InputSignal<string>;
+    originPoint: InputSignal<OriginPoint>;
     // (undocumented)
     get portClass(): string;
     side: InputSignal<PortSide>;
@@ -1087,6 +1087,9 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NodeSizeDirective, never>;
 }
+
+// @public
+export type OriginPoint = 'leftTop' | 'leftMiddle' | 'leftBottom' | 'centerTop' | 'centerMiddle' | 'centerBottom' | 'rightTop' | 'rightMiddle' | 'rightBottom';
 
 // @public (undocumented)
 export class PaletteDropDirective {
