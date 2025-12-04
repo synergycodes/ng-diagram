@@ -15,7 +15,14 @@ export const moveNodesBy = async (
   const nodeIdsBeingMoved = new Set(nodes.map((node) => node.id));
   const rootNodes = nodes.filter((node) => !node.groupId || !nodeIdsBeingMoved.has(node.groupId));
 
-  const nodesToUpdate = processRootNodesWithDescendants(commandHandler, rootNodes, nodeIdsBeingMoved, delta);
+  const accumulatedDeltas = commandHandler.flowCore.actionStateManager?.dragging?.accumulatedDeltas;
+  const nodesToUpdate = processRootNodesWithDescendants(
+    commandHandler,
+    rootNodes,
+    nodeIdsBeingMoved,
+    delta,
+    accumulatedDeltas
+  );
 
   if (nodesToUpdate.length === 0) {
     return;
@@ -28,13 +35,19 @@ const processRootNodesWithDescendants = (
   commandHandler: CommandHandler,
   rootNodes: Node[],
   nodeIdsBeingMoved: Set<string>,
-  delta: Point
+  delta: Point,
+  accumulatedDeltas: Map<string, Point> | undefined
 ): { id: string; position: Point }[] => {
   const nodesToUpdate: { id: string; position: Point }[] = [];
   const processedNodeIds = new Set<string>();
 
   rootNodes.forEach((rootNode) => {
-    const { snappedPosition, actualDelta } = calculateRootNodeMovement(commandHandler, rootNode, delta);
+    const { snappedPosition, actualDelta } = calculateRootNodeMovement(
+      commandHandler,
+      rootNode,
+      delta,
+      accumulatedDeltas
+    );
 
     if (!isSamePoint(rootNode.position, snappedPosition)) {
       nodesToUpdate.push({ id: rootNode.id, position: snappedPosition });
@@ -57,13 +70,20 @@ const processRootNodesWithDescendants = (
 const calculateRootNodeMovement = (
   commandHandler: CommandHandler,
   node: Node,
-  delta: Point
+  delta: Point,
+  accumulatedDeltas: Map<string, Point> | undefined
 ): { snappedPosition: Point; actualDelta: Point } => {
-  const newPosition = {
-    x: node.position.x + delta.x,
-    y: node.position.y + delta.y,
-  };
-  const snappedPosition = applySnappingIfNeeded(commandHandler, node, newPosition);
+  const { snappedPosition, newAccumulated } = applySnappingWithAccumulation(
+    commandHandler,
+    node,
+    delta,
+    accumulatedDeltas
+  );
+
+  if (accumulatedDeltas) {
+    accumulatedDeltas.set(node.id, newAccumulated);
+  }
+
   const actualDelta = {
     x: snappedPosition.x - node.position.x,
     y: snappedPosition.y - node.position.y,
@@ -97,14 +117,45 @@ const applyDeltaToDescendants = (
   });
 };
 
-const applySnappingIfNeeded = (commandHandler: CommandHandler, node: Node, nextPosition: Point): Point => {
+const applySnappingWithAccumulation = (
+  commandHandler: CommandHandler,
+  node: Node,
+  delta: Point,
+  accumulatedDeltas: Map<string, Point> | undefined
+): { snappedPosition: Point; newAccumulated: Point } => {
   const { shouldSnapDragForNode, computeSnapForNodeDrag, defaultDragSnap } = commandHandler.flowCore.config.snapping;
+
+  const accumulated = accumulatedDeltas?.get(node.id) ?? { x: 0, y: 0 };
+  const totalDelta = {
+    x: accumulated.x + delta.x,
+    y: accumulated.y + delta.y,
+  };
+
   if (!shouldSnapDragForNode(node)) {
-    return nextPosition;
+    return {
+      snappedPosition: {
+        x: node.position.x + totalDelta.x,
+        y: node.position.y + totalDelta.y,
+      },
+      newAccumulated: { x: 0, y: 0 },
+    };
   }
 
   const snap = computeSnapForNodeDrag(node) ?? defaultDragSnap;
-  const snappedPosition = NgDiagramMath.snapPoint(nextPosition, snap);
+  const targetPosition = {
+    x: node.position.x + totalDelta.x,
+    y: node.position.y + totalDelta.y,
+  };
+  const snappedPosition = NgDiagramMath.snapPoint(targetPosition, snap);
 
-  return snappedPosition;
+  const actualMovement = {
+    x: snappedPosition.x - node.position.x,
+    y: snappedPosition.y - node.position.y,
+  };
+  const newAccumulated = {
+    x: totalDelta.x - actualMovement.x,
+    y: totalDelta.y - actualMovement.y,
+  };
+
+  return { snappedPosition, newAccumulated };
 };

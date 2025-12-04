@@ -8,9 +8,8 @@ import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 export const MOVE_THRESHOLD = 5; // to find out if move was intended
 
 export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSelectionEvent> {
-  private lastInputPoint: Point | undefined;
+  private lastPointerPosition: Point | undefined;
   private startPoint: Point | undefined;
-  private initialNodePosition: Point | undefined;
   private isMoving = false;
   private hasMoved = false;
 
@@ -19,11 +18,12 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       case 'start': {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        this.lastInputPoint = flowPosition;
+        this.lastPointerPosition = flowPosition;
         this.startPoint = flowPosition;
         this.isMoving = true;
         this.flow.actionStateManager.dragging = {
           modifiers: { ...event.modifiers },
+          accumulatedDeltas: new Map(),
         };
 
         break;
@@ -31,29 +31,23 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       case 'continue': {
         const selectedNodesWithChildren = this.flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
         const selectedNodes = this.flow.modelLookup.getSelectedNodes();
-        if (selectedNodesWithChildren.length === 0 || !this.isMoving || !this.lastInputPoint || !this.startPoint) {
+        if (selectedNodesWithChildren.length === 0 || !this.isMoving || !this.lastPointerPosition || !this.startPoint) {
           return;
         }
 
-        const firstNode = selectedNodesWithChildren[0];
-        if (!this.initialNodePosition) {
-          this.initialNodePosition = { ...firstNode.position };
-        }
-
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
-        const { x, y } = pointer;
-        const deltaX = x - this.startPoint.x;
-        const deltaY = y - this.startPoint.y;
 
         if (!this.hasMoved) {
-          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const totalDeltaX = pointer.x - this.startPoint.x;
+          const totalDeltaY = pointer.y - this.startPoint.y;
+          const distance = Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY);
           if (distance >= MOVE_THRESHOLD) {
             this.hasMoved = true;
           }
         }
 
-        const dx = deltaX - (firstNode.position.x - this.initialNodePosition.x);
-        const dy = deltaY - (firstNode.position.y - this.initialNodePosition.y);
+        const dx = pointer.x - this.lastPointerPosition.x;
+        const dy = pointer.y - this.lastPointerPosition.y;
 
         if (this.flow.actionStateManager.dragging) {
           this.flow.actionStateManager.dragging.modifiers = { ...event.modifiers };
@@ -71,7 +65,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           this.panDiagramOnScreenEdge(event.panningForce);
         }
 
-        this.lastInputPoint = event.lastInputPoint;
+        this.lastPointerPosition = pointer;
         break;
       }
       case 'end': {
@@ -81,9 +75,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         }
 
         this.flow.actionStateManager.clearDragging();
-        this.lastInputPoint = undefined;
+        this.lastPointerPosition = undefined;
         this.startPoint = undefined;
-        this.initialNodePosition = undefined;
         this.isMoving = false;
         this.hasMoved = false;
       }

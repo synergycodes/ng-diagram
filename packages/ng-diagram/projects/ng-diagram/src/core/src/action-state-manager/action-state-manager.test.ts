@@ -152,7 +152,10 @@ describe('ActionStateManager', () => {
 
   describe('dragging state', () => {
     it('should set and get dragging state', () => {
-      const draggingState = { modifiers: { primary: false, secondary: false, shift: false, meta: false } };
+      const draggingState = {
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        accumulatedDeltas: new Map(),
+      };
       actionStateManager.dragging = draggingState;
 
       expect(actionStateManager.dragging).toEqual(draggingState);
@@ -160,7 +163,10 @@ describe('ActionStateManager', () => {
     });
 
     it('should emit actionStateChanged when dragging is set', () => {
-      const draggingState = { modifiers: { primary: false, secondary: false, shift: false, meta: false } };
+      const draggingState = {
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        accumulatedDeltas: new Map(),
+      };
       actionStateManager.dragging = draggingState;
 
       expect(emitSpy).toHaveBeenCalledWith('actionStateChanged', {
@@ -169,7 +175,10 @@ describe('ActionStateManager', () => {
     });
 
     it('should clear dragging state', () => {
-      actionStateManager.dragging = { modifiers: { primary: false, secondary: false, shift: false, meta: false } };
+      actionStateManager.dragging = {
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        accumulatedDeltas: new Map(),
+      };
       actionStateManager.clearDragging();
 
       expect(actionStateManager.dragging).toBeUndefined();

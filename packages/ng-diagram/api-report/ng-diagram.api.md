@@ -166,6 +166,7 @@ export class DiagramSelectionDirective extends ObjectSelectionDirective {
 
 // @public
 export interface DraggingActionState {
+    accumulatedDeltas: Map<string, Point>;
     modifiers: InputModifiers;
 }
 

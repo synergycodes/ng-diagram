@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API stability and deprecation policy documentation with defined stability levels and Angular version support matrix ([#462](https://github.com/synergycodes/ng-diagram/pull/462))
 - API Extractor integration for automated breaking change detection with CI validation ([#462](https://github.com/synergycodes/ng-diagram/pull/462))
 - Landing page diagram example in documentation ([#464](https://github.com/synergycodes/ng-diagram/pull/464))
+- Floating edges for edges with no ports specified ([#465](https://github.com/synergycodes/ng-diagram/pull/465))
 
 ### Changed
 
@@ -20,13 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed misleading error when destroying `NgDiagramModelService` after engine is already destroyed. The error incorrectly reported "Library engine not initialized yet". Now the service checks if engine is available and skips listener cleanup if already destroyed. ([#466](https://github.com/synergycodes/ng-diagram/issues/466) - thanks for finding this [@Filipstrozik](https://github.com/Filipstrozik) 💪)
+- Fixed drag-snapping issues with different snapping configurations. The issue still occurred when dragging multiple nodes at the same hierarchy level (i.e., nodes without groups) ([#470](https://github.com/synergycodes/ng-diagram/pull/470))
 
 ## [0.8.1] - 2025-11-20
 
 ### Added
 
 - Tailwind CSS example in documentation ([#436](https://github.com/synergycodes/ng-diagram/pull/436))
-- Floating edges for edges with no ports specified ([#465](https://github.com/synergycodes/ng-diagram/pull/465))
 
 ### Fixed
 
