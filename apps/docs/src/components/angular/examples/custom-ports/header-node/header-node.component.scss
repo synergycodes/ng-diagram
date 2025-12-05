@@ -39,9 +39,27 @@
       pointer-events: none;
     }
 
+    .theme-img-light {
+      display: block;
+    }
+    .theme-img-dark {
+      display: none;
+    }
+
     &__title {
       font-weight: bold;
       margin-bottom: 2rem;
+    }
+  }
+}
+
+:host-context([data-theme='dark']) {
+  .header-node {
+    .theme-img-light {
+      display: none;
+    }
+    .theme-img-dark {
+      display: block;
     }
   }
 }
