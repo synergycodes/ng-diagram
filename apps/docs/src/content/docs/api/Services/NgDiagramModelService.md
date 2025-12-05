@@ -90,6 +90,34 @@ Array of nodes to add.
 
 ***
 
+### computePartsBounds()
+
+> **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
+
+Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
+
+#### Parameters
+
+##### nodes
+
+[`Node`](/docs/api/types/model/node/)[]
+
+Array of nodes
+
+##### edges
+
+[`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
+
+Array of edges
+
+#### Returns
+
+[`Rect`](/docs/api/types/geometry/rect/)
+
+Bounding rectangle containing all nodes and edges
+
+***
+
 ### deleteEdges()
 
 > **deleteEdges**(`ids`): `void`

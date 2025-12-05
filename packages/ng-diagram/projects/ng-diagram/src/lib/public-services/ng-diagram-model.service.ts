@@ -1,5 +1,6 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, GroupNode, Metadata, Node, Point, Port } from '../../core/src';
+import { Edge, GroupNode, Metadata, Node, Point, Port, Rect } from '../../core/src';
+import { calculatePartsBounds } from '../../core/src/utils/dimensions';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
@@ -225,6 +226,16 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    */
   getOverlappingNodes(nodeId: string): Node[] {
     return this.flowCore.getOverlappingNodes(nodeId);
+  }
+
+  /**
+   * Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
+   * @param nodes Array of nodes
+   * @param edges Array of edges
+   * @returns Bounding rectangle containing all nodes and edges
+   */
+  computePartsBounds(nodes: Node[], edges: Edge[]): Rect {
+    return calculatePartsBounds(nodes, edges);
   }
 
   // ===================
