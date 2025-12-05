@@ -41,6 +41,10 @@ export interface BasePointerInputEvent extends BaseInputEvent {
 }
 
 /**
+ * Interface representing keyboard and modifier keys state during an input event.
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
 export interface InputModifiers {

@@ -16,6 +16,8 @@ import { NgDiagramPaletteItemPreviewComponent } from '../item-preview/ng-diagram
  * </ng-diagram-palette-item>
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

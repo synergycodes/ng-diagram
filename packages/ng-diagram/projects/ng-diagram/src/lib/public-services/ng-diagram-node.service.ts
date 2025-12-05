@@ -13,6 +13,8 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * this.nodeService.moveNodesBy([node1, node2], { x: 10, y: 20 });
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()

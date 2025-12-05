@@ -17,6 +17,8 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * this.viewportService.zoom(1.2);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 export class NgDiagramViewportService extends NgDiagramBaseService {

@@ -21,6 +21,8 @@ import type { Node } from './node.interface';
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export type ModelActionType =
@@ -56,6 +58,8 @@ export type ModelActionType =
  * The complete state of the flow diagram.
  * Represents the current state of all nodes, edges, and metadata.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface FlowState {
@@ -85,6 +89,8 @@ export interface FlowState {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface MiddlewareHistoryUpdate {
@@ -117,6 +123,8 @@ export interface MiddlewareHistoryUpdate {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface FlowStateUpdate {
@@ -147,6 +155,8 @@ export type MiddlewareArray = readonly Middleware[];
  * Helper functions for checking what changed during middleware execution.
  * These helpers track all cumulative changes from the initial state update and all previous middlewares.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface MiddlewareHelpers {
@@ -303,6 +313,8 @@ export interface MiddlewareHelpers {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface MiddlewareContext {
@@ -409,6 +421,8 @@ export interface MiddlewareContext {
  * ngDiagramService.registerMiddleware(snapMiddleware);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface Middleware<TName extends string = string> {
@@ -431,6 +445,8 @@ export interface Middleware<TName extends string = string> {
 /**
  * An array of middlewares that will be executed in sequence.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export type MiddlewareChain = Middleware[];

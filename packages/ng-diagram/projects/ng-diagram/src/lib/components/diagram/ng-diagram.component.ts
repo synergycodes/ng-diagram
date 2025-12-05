@@ -57,8 +57,9 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
 /**
  * Main diagram component for rendering flow diagrams with nodes and edges.
  *
+ * @public
+ * @since 0.8.0
  * @category Components
- * @since v0.4.0
  */
 @Component({
   selector: 'ng-diagram',

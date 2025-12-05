@@ -13,6 +13,8 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * this.groupsService.addToGroup('groupId', ['nodeId1', 'nodeId2']);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()

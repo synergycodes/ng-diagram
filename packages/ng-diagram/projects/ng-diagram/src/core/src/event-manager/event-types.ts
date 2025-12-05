@@ -3,6 +3,8 @@ import type { Edge, GroupNode, Node, Point, Size, Viewport } from '../types';
 /**
  * Map of all available diagram events and their payload types
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface DiagramEventMap {
@@ -91,6 +93,8 @@ export interface DiagramEventMap {
  * This event fires after all nodes and edges including their internal parts
  * (ports, labels) have been measured and positioned.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface DiagramInitEvent {
@@ -108,6 +112,8 @@ export interface DiagramInitEvent {
  * This event fires when the user moves nodes manually by dragging or programmatically
  * using the {@link NgDiagramNodeService.moveNodesBy} method.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface SelectionMovedEvent {
@@ -121,6 +127,8 @@ export interface SelectionMovedEvent {
  * This event fires when the user selects or deselects nodes and edges through clicking
  * or programmatically using the {@link NgDiagramSelectionService}.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface SelectionChangedEvent {
@@ -140,6 +148,8 @@ export interface SelectionChangedEvent {
  * This event fires during pan and zoom operations, including mouse wheel zoom,
  * and programmatic viewport changes.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface ViewportChangedEvent {
@@ -155,6 +165,8 @@ export interface ViewportChangedEvent {
  * This event only fires for user-initiated edge creation through the UI,
  * but not for programmatically added edges.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface EdgeDrawnEvent {
@@ -176,6 +188,8 @@ export interface EdgeDrawnEvent {
  * This event fires when nodes and edges are added via paste operations,
  * either through keyboard shortcuts or programmatic paste commands.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface ClipboardPastedEvent {
@@ -191,6 +205,8 @@ export interface ClipboardPastedEvent {
  * This event fires when a node is resized manually by dragging resize handles
  * or programmatically using resize methods.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface NodeResizedEvent {
@@ -206,6 +222,8 @@ export interface NodeResizedEvent {
  * This event fires when users drag items from the palette and drop them
  * onto the canvas to create new nodes.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface PaletteItemDroppedEvent {
@@ -221,6 +239,8 @@ export interface PaletteItemDroppedEvent {
  * This event fires when the user deletes nodes and edges using the delete key,
  * or programmatically through the diagram service.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface SelectionRemovedEvent {
@@ -236,6 +256,8 @@ export interface SelectionRemovedEvent {
  * This event fires when the user moves nodes in or out of a group node,
  * changing their group membership status.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface GroupMembershipChangedEvent {
@@ -251,6 +273,8 @@ export interface GroupMembershipChangedEvent {
  * This event fires when the user rotates a node manually using the rotation handle
  * or programmatically using the {@link NgDiagramNodeService} rotation methods.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface SelectionRotatedEvent {

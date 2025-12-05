@@ -734,7 +734,9 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
     static ɵprov: i0.ɵɵInjectableDeclaration<NgDiagramGroupsService>;
 }
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "NgDiagramMath" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export const NgDiagramMath: {
     angleBetweenPoints: typeof angleBetweenPoints;
     angleToSide: (angleDegrees: number, inverse?: boolean) => PortSide;

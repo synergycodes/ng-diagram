@@ -23,6 +23,8 @@ import { NgDiagramNodeRotateAdornmentComponent } from '../rotate/ng-diagram-node
  * </ng-diagram-base-node-template>
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

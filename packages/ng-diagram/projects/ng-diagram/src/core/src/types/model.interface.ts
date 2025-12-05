@@ -5,6 +5,8 @@ import { Node } from './node.interface';
 /**
  * Interface representing the entire model of the flow diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface Model {

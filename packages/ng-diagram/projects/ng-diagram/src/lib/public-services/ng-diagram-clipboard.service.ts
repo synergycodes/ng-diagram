@@ -13,6 +13,8 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * this.clipboardService.copy();
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()

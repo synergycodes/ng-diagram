@@ -37,6 +37,8 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * this.ngDiagramService.updateConfig({ debugMode: true });
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()

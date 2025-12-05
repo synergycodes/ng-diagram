@@ -28,6 +28,8 @@ import { NgDiagramBaseEdgeComponent } from '../../edge/base-edge/base-edge.compo
  * </ng-diagram-base-edge-label>
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({
@@ -137,6 +139,8 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
 /**
  * @deprecated Use {@link NgDiagramBaseEdgeLabelComponent} instead. This alias will be removed in a future version.
  *
+ * @public
+ * @since 0.8.0
  * @category Other
  */
 export const BaseEdgeLabelComponent = NgDiagramBaseEdgeLabelComponent;

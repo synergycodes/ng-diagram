@@ -16,6 +16,8 @@ import { HandlePosition, LinePosition } from './ng-diagram-node-resize-adornment
  * </ng-diagram-node-resize-adornment>
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

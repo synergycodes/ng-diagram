@@ -24,6 +24,8 @@ import { DeepPartial, FlowConfig } from '../../core/src';
  * <ng-diagram [config]="config"></ng-diagram>
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration
  */
 export type NgDiagramConfig = DeepPartial<FlowConfig>;

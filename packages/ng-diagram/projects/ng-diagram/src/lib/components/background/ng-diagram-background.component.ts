@@ -19,6 +19,9 @@ import { NgDiagramGridBackgroundComponent } from './default/grid/grid-background
  *   </ng-diagram-background>
  * </ng-diagram>
  * ```
+ *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({
