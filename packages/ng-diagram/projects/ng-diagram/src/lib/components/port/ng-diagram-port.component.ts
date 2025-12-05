@@ -89,6 +89,8 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
   /**
    * The origin point for the port (e.g., topLeft, center, bottomRight).
+   * This value determines the transform origin of the port for precise positioning.
+   * By default, it is set to 'center'.
    */
   originPoint = input<OriginPoint>('center');
 

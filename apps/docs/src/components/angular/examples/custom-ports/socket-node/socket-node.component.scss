@@ -7,7 +7,8 @@
   color: var(--ngd-txt-primary-default);
 
   --ngd-node-bg-primary-default: transparent;
-  --ngd-port-border-size: 1px;
+  --ngd-port-border-size: 2px;
+  --ngd-port-border-size-hover: 0px;
   --ngd-port-size: 10px;
   --ngd-port-background-color: transparent;
 

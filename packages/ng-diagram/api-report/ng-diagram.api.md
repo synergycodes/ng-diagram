@@ -1089,7 +1089,7 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
 }
 
 // @public
-export type OriginPoint = 'leftTop' | 'leftMiddle' | 'leftBottom' | 'centerTop' | 'centerMiddle' | 'centerBottom' | 'rightTop' | 'rightMiddle' | 'rightBottom';
+export type OriginPoint = 'topLeft' | 'topCenter' | 'topRight' | 'centerLeft' | 'center' | 'centerRight' | 'bottomLeft' | 'bottomCenter' | 'bottomRight';
 
 // @public (undocumented)
 export class PaletteDropDirective {
