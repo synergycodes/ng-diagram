@@ -5,6 +5,6 @@ prev: false
 title: "OriginPoint"
 ---
 
-> **OriginPoint** = `"leftTop"` \| `"leftMiddle"` \| `"leftBottom"` \| `"centerTop"` \| `"centerMiddle"` \| `"centerBottom"` \| `"rightTop"` \| `"rightMiddle"` \| `"rightBottom"`
+> **OriginPoint** = `"topLeft"` \| `"topCenter"` \| `"topRight"` \| `"centerLeft"` \| `"center"` \| `"centerRight"` \| `"bottomLeft"` \| `"bottomCenter"` \| `"bottomRight"`
 
 The origin point options for port placement.

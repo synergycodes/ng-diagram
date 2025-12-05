@@ -23,16 +23,16 @@ import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
  * Mapping of origin point values to their corresponding CSS class names.
  * @internal
  */
-const originPointClassMap: Record<string, string> = {
-  leftTop: 'left-top',
-  leftMiddle: 'left-middle',
-  leftBottom: 'left-bottom',
-  centerTop: 'center-top',
-  centerMiddle: 'center-middle',
-  centerBottom: 'center-bottom',
-  rightTop: 'right-top',
-  rightMiddle: 'right-middle',
-  rightBottom: 'right-bottom',
+const originPointClassMap: Record<OriginPoint, string> = {
+  topLeft: 'top-left',
+  topCenter: 'top-center',
+  topRight: 'top-right',
+  centerLeft: 'center-left',
+  center: 'center',
+  centerRight: 'center-right',
+  bottomLeft: 'bottom-left',
+  bottomCenter: 'bottom-center',
+  bottomRight: 'bottom-right',
 };
 
 /**
@@ -88,12 +88,12 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   side = input.required<Port['side']>();
 
   /**
-   * The origin point for the port (e.g., leftTop, centerMiddle, rightBottom).
+   * The origin point for the port (e.g., topLeft, center, bottomRight).
    */
-  originPoint = input<OriginPoint>('centerMiddle');
+  originPoint = input<OriginPoint>('center');
 
   get portClass(): string {
-    const originClass = originPointClassMap[this.originPoint()] || 'center-middle';
+    const originClass = originPointClassMap[this.originPoint()] || 'center';
     return `ng-diagram-port ${this.hasContent ? 'custom-content' : ''} ${this.side()} origin-${originClass}`;
   }
 

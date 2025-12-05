@@ -45,12 +45,12 @@ Custom content automatically disables the default circular style and allows full
 ### Port positioning with Origin Point
 
 You can use the [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input to precisely control the transform origin of each port.  
-Supported values: `leftTop`, `leftMiddle`, `leftBottom`, `centerTop`, `centerMiddle`, `centerBottom`, `rightTop`, `rightMiddle`, `rightBottom`.
+Supported values: `topLeft`, `centerLeft`, `bottomLeft`, `topCenter`, `center`, `bottomCenter`, `topRight`, `centerRight`, `bottomRight`.
 
 Example usage:
 
 ```html
-<ng-diagram-port id="port-en" type="both" side="left" originPoint="leftTop">
+<ng-diagram-port id="port-en" type="both" side="left" originPoint="topLeft">
   <div><img src="icon.png" alt="icon" /></div>
 </ng-diagram-port>
 ```

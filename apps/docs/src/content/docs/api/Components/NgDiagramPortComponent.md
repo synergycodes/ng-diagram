@@ -36,7 +36,7 @@ The unique identifier for the port. test
 
 > **originPoint**: `InputSignal`\<[`OriginPoint`](/docs/api/types/model/originpoint/)\>
 
-The origin point for the port (e.g., leftTop, centerMiddle, rightBottom).
+The origin point for the port (e.g., topLeft, center, bottomRight).
 
 ***
 

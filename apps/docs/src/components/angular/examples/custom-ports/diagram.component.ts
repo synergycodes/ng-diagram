@@ -43,7 +43,6 @@ export class DiagramComponent {
       },
     },
     edgeRouting: {
-      defaultRouting: 'orthogonal',
       orthogonal: {
         maxCornerRadius: 0,
       },

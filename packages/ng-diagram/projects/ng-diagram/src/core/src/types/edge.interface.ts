@@ -126,12 +126,12 @@ export interface EdgeLabel {
  * @category Types/Model
  */
 export type OriginPoint =
-  | 'leftTop'
-  | 'leftMiddle'
-  | 'leftBottom'
-  | 'centerTop'
-  | 'centerMiddle'
-  | 'centerBottom'
-  | 'rightTop'
-  | 'rightMiddle'
-  | 'rightBottom';
+  | 'topLeft'
+  | 'topCenter'
+  | 'topRight'
+  | 'centerLeft'
+  | 'center'
+  | 'centerRight'
+  | 'bottomLeft'
+  | 'bottomCenter'
+  | 'bottomRight';
