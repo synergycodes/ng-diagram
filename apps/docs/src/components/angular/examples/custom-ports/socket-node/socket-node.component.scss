@@ -1,0 +1,19 @@
+/* @collapse-start */
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: var(--ngd-txt-primary-default);
+
+  --ngd-node-bg-primary-default: transparent;
+  --ngd-port-border-size: 2px;
+  --ngd-port-border-size-hover: 0px;
+  --ngd-port-size: 10px;
+  --ngd-port-background-color: transparent;
+
+  svg {
+    fill: var(--ngd-ui-bg-primary-default);
+    stroke: var(--ngd-pt-stroke-primary-default);
+  }
+}

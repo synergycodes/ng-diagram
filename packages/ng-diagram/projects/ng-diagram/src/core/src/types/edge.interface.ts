@@ -127,3 +127,18 @@ export interface EdgeLabel {
    */
   size?: Size;
 }
+
+/**
+ * The origin point options for port placement.
+ * @category Types/Model
+ */
+export type OriginPoint =
+  | 'topLeft'
+  | 'topCenter'
+  | 'topRight'
+  | 'centerLeft'
+  | 'center'
+  | 'centerRight'
+  | 'bottomLeft'
+  | 'bottomCenter'
+  | 'bottomRight';

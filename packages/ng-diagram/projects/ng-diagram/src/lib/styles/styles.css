@@ -41,6 +41,7 @@
   --ngd-port-background-color: var(--ngd-node-port-fill-default);
   --ngd-port-border-color: var(--ngd-node-port-stroke-default);
   --ngd-port-border-size: 0.125rem;
+  --ngd-port-border-radius: 50%;
   --ngd-port-background-color-hover: var(--ngd-node-port-fill-active);
   --ngd-port-border-color-hover: var(--ngd-node-port-stroke-active);
   --ngd-port-border-size-hover: 0.25rem;
@@ -66,6 +67,11 @@
 }
 
 .ng-diagram-port-hoverable .ng-diagram-port:hover,
+.ng-diagram-port-hoverable .ng-diagram-port:hover,
+.ng-diagram-port-hoverable .ng-diagram-port.custom-content:hover .content-projection,
+.ng-diagram-port-hoverable-over-node:hover:not(:has(.ng-diagram-rotate-handle:hover)):not(:has([data-rotating]))
+  .ng-diagram-port.custom-content
+  .content-projection,
 .ng-diagram-port-hoverable-over-node:hover:not(:has(.ng-diagram-rotate-handle:hover)):not(:has([data-rotating]))
   .ng-diagram-port {
   background-color: var(--ngd-port-background-color-hover);

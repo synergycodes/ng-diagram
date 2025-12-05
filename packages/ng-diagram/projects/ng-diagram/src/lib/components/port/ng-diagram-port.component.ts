@@ -1,4 +1,5 @@
 import {
+  AfterContentInit,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -10,12 +11,29 @@ import {
   OnInit,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
-import { Port } from '../../../core/src';
+import { OriginPoint, Port } from '../../../core/src';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
 import { FlowCoreProviderService } from '../../services';
 import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
 import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
+
+/**
+ * Mapping of origin point values to their corresponding CSS class names.
+ * @internal
+ */
+const originPointClassMap: Record<OriginPoint, string> = {
+  topLeft: 'top-left',
+  topCenter: 'top-center',
+  topRight: 'top-right',
+  centerLeft: 'center-left',
+  center: 'center',
+  centerRight: 'center-right',
+  bottomLeft: 'bottom-left',
+  bottomCenter: 'bottom-center',
+  bottomRight: 'bottom-right',
+};
 
 /**
  * The `NgDiagramPortComponent` represents a single port on a node within the diagram.
@@ -32,7 +50,11 @@ import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
 @Component({
   selector: 'ng-diagram-port',
   standalone: true,
-  template: '',
+  template: `
+    <div #contentProjection class="content-projection">
+      <ng-content />
+    </div>
+  `,
   styleUrl: './ng-diagram-port.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -42,7 +64,7 @@ import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['portId: id'] }],
 })
-export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy {
+export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy, AfterContentInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly batchResizeObserver = inject(BatchResizeObserverService);
@@ -67,8 +89,16 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
    */
   side = input.required<Port['side']>();
 
+  /**
+   * The origin point for the port (e.g., topLeft, center, bottomRight).
+   * This value determines the transform origin of the port for precise positioning.
+   * By default, it is set to 'center'.
+   */
+  originPoint = input<OriginPoint>('center');
+
   get portClass(): string {
-    return `ng-diagram-port ${this.side()}`;
+    const originClass = originPointClassMap[this.originPoint()] || 'center';
+    return `ng-diagram-port ${this.hasContent ? 'custom-content' : ''} ${this.side()} origin-${originClass}`;
   }
 
   constructor() {
@@ -146,5 +176,13 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     });
 
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+  }
+
+  private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');
+  protected hasContent = false;
+
+  /** @internal */
+  ngAfterContentInit() {
+    this.hasContent = (this.custom()?.nativeElement?.childNodes?.length ?? 0) > 0;
   }
 }
