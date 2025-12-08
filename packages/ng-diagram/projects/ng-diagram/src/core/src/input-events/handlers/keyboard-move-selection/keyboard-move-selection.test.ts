@@ -140,6 +140,44 @@ describe('KeyboardMoveSelectionEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: -10, y: 0 });
       });
 
+      it('should trigger panning when node is moved and panning is not disabled by config', () => {
+        const nodeNearRightEdge = {
+          ...mockNode,
+          position: { x: 690, y: 100 },
+          size: { width: 100, height: 50 },
+        };
+
+        mockFlowCore.config.viewportPanningEnabled = true;
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeNearRightEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [nodeNearRightEdge],
+          delta: { x: 10, y: 0 },
+        });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+      });
+
+      it('should not trigger panning when node is moved but panning is disabled by config', () => {
+        const nodeNearRightEdge = {
+          ...mockNode,
+          position: { x: 690, y: 100 },
+          size: { width: 100, height: 50 },
+        };
+
+        mockFlowCore.config.viewportPanningEnabled = false;
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeNearRightEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+      });
+
       it('should trigger panning when node will exit viewport on the left after move', () => {
         const nodeNearLeftEdge = {
           ...mockNode,

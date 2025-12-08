@@ -8,16 +8,18 @@
   touch-action: none;
   transform: translateZ(0px);
   -webkit-font-smoothing: antialiased;
-  cursor: grab;
-
   outline: none;
+
+  &.pannable {
+    cursor: grab;
+
+    &.panning {
+      cursor: grabbing;
+    }
+  }
 
   .diagram-background-container {
     width: 100%;
     height: 100%;
-  }
-
-  &.grabbing {
-    cursor: grabbing;
   }
 }

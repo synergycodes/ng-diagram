@@ -154,6 +154,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       boxSelection: defaultBoxSelectionConfig,
       shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
+      viewportPanningEnabled: true,
     },
     config
   );

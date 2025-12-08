@@ -180,6 +180,14 @@ Event emitted when the viewport changes through panning or zooming.
 This event fires during pan and zoom operations, including mouse wheel zoom,
 and programmatic viewport changes.
 
+***
+
+### viewportPannable
+
+> `readonly` **viewportPannable**: `WritableSignal`\<`boolean`\>
+
+Whether panning is enabled in the diagram.
+
 ## Methods
 
 ### getNodeTemplate()

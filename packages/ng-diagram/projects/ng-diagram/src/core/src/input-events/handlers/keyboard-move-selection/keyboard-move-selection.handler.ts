@@ -32,7 +32,9 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
     const rootNodes = this.getRootNodes(nodesToMove);
     const delta = this.getDelta(event.direction, rootNodes);
     this.flow.commandHandler.emit('moveNodesBy', { nodes: nodesToMove, delta });
-    this.panViewportIfNeeded(event.direction, nodesToMove, delta);
+    if (this.flow.config.viewportPanningEnabled) {
+      this.panViewportIfNeeded(event.direction, nodesToMove, delta);
+    }
   }
 
   private getRootNodes(nodes: Node[]): Node[] {

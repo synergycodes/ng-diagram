@@ -82,11 +82,13 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     }
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    const { edgePanningThreshold, edgePanningEnabled, edgePanningForce } =
-      this.flowCoreProvider.provide().config.selectionMoving;
+    const {
+      selectionMoving: { edgePanningThreshold, edgePanningEnabled, edgePanningForce },
+      viewportPanningEnabled,
+    } = this.flowCoreProvider.provide().config;
 
     let panningForce: Point | null = null;
-    if (edgePanningEnabled) {
+    if (viewportPanningEnabled && edgePanningEnabled) {
       panningForce = NgDiagramMath.calculateEdgePanningForce(
         this.diagramComponent.getBoundingClientRect(),
         { x: event.clientX, y: event.clientY },

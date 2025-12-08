@@ -1,4 +1,5 @@
 import { Directive, ElementRef, inject, type OnDestroy } from '@angular/core';
+import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
@@ -13,6 +14,7 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
 export class PanningDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly elementRef = inject(ElementRef);
+  private readonly diagramService = inject(NgDiagramService);
 
   ngOnDestroy(): void {
     document.removeEventListener('pointermove', this.onMouseMove);
@@ -99,7 +101,8 @@ export class PanningDirective implements OnDestroy {
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {
-    if (shouldDiscardEvent(event, 'pan')) {
+    const { viewportPanningEnabled } = this.diagramService.config();
+    if (!viewportPanningEnabled || shouldDiscardEvent(event, 'pan')) {
       return false;
     }
 
@@ -115,6 +118,6 @@ export class PanningDirective implements OnDestroy {
 
   private toggleGrabbingCursor(isGrabbing: boolean): void {
     const diagramElement = this.elementRef.nativeElement;
-    diagramElement.classList.toggle('grabbing', isGrabbing);
+    diagramElement.classList.toggle('panning', isGrabbing);
   }
 }

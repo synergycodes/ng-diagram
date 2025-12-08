@@ -156,7 +156,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -267,7 +267,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -301,6 +301,7 @@ export interface FlowConfig {
     selectionMoving: SelectionMovingConfig;
     shortcuts: ShortcutDefinition[];
     snapping: SnappingConfig;
+    viewportPanningEnabled: boolean;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -700,6 +701,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     // (undocumented)
     readonly viewport: WritableSignal<Viewport>;
     viewportChanged: EventEmitter<ViewportChangedEvent>;
+    readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.ZoomingPointerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
@@ -1077,7 +1079,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1363,7 +1365,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)

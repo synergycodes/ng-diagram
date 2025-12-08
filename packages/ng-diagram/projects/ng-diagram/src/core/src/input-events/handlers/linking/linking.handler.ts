@@ -43,7 +43,7 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
 
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        if (event.panningForce) {
+        if (this.flow.config.viewportPanningEnabled && event.panningForce) {
           this.flow.commandHandler.emit('moveViewportBy', { x: event.panningForce.x, y: event.panningForce.y });
         }
 

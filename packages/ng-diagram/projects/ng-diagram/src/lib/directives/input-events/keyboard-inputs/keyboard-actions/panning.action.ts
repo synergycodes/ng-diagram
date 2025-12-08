@@ -15,7 +15,11 @@ import type { KeyboardAction } from './keyboard-action.interface';
 @Injectable()
 export class PanningAction implements KeyboardAction {
   canHandle(shortcut: ShortcutDefinition, flowCore: FlowCore): boolean {
-    return shortcut.actionName.startsWith('keyboardPan') && flowCore.modelLookup.getSelectedNodes().length === 0;
+    return (
+      flowCore.config.viewportPanningEnabled &&
+      shortcut.actionName.startsWith('keyboardPan') &&
+      flowCore.modelLookup.getSelectedNodes().length === 0
+    );
   }
 
   createEvent(shortcut: ShortcutDefinition, baseEvent: Omit<BaseInputEvent, 'name'>): BaseInputEvent | null {
