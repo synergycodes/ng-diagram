@@ -663,8 +663,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     edgeTemplateMap: InputSignal<NgDiagramEdgeTemplateMap>;
     // (undocumented)
     getBoundingClientRect(): DOMRect;
-    // @internal (undocumented)
-    getDiagramElement(): HTMLElement;
     // (undocumented)
     getEdgeTemplate(edgeType: Edge['type']): Type<NgDiagramEdgeTemplate<any>> | null;
     getNodeTemplate(nodeType: Node_2['type']): Type<NgDiagramNodeTemplate<any, SimpleNode<any>>> | Type<NgDiagramGroupNodeTemplate<any>> | null;
@@ -928,7 +926,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     protected readonly lastSide: WritableSignal<PortSide | undefined>;
     // (undocumented)
-    protected readonly lastType: WritableSignal<"target" | "source" | "both" | undefined>;
+    protected readonly lastType: WritableSignal<"source" | "target" | "both" | undefined>;
     // @internal (undocumented)
     ngAfterContentInit(): void;
     // @internal (undocumented)
@@ -941,7 +939,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     get portClass(): string;
     side: InputSignal<PortSide>;
-    type: InputSignal<"target" | "source" | "both">;
+    type: InputSignal<"source" | "target" | "both">;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
     // (undocumented)
