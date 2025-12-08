@@ -317,6 +317,9 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     return this.elementRef.nativeElement.getBoundingClientRect();
   }
 
+  /**
+   * @internal
+   */
   getDiagramElement(): HTMLElement {
     return this.elementRef.nativeElement;
   }
