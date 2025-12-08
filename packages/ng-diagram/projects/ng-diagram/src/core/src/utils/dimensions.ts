@@ -18,7 +18,18 @@ export const calculatePartsBounds = (nodes: Node[], edges: Edge[]): Rect => {
 
 export const getEdgeMeasuredBounds = (edge: Edge): Rect => {
   const points = edge.points || [];
-  return boundingRectOfPoints(points);
+  const pointsBounds = boundingRectOfPoints(points);
+
+  const labels = edge.measuredLabels || [];
+  if (labels.length === 0) {
+    return pointsBounds;
+  }
+
+  const labelRects = labels
+    .filter((label) => label.position && label.size)
+    .map((label) => getRect({ position: label.position, size: label.size }));
+
+  return unionRect([pointsBounds, ...labelRects]);
 };
 
 export const getNodeMeasuredBounds = (node: Node): Rect => {

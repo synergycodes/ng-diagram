@@ -104,6 +104,128 @@ describe('dimensions', () => {
         height: 40,
       });
     });
+
+    it('should include measuredLabels in bounds calculation', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 10, y: 10 },
+          { x: 100, y: 10 },
+        ],
+        measuredLabels: [
+          {
+            id: 'label-1',
+            positionOnEdge: 0.5,
+            position: { x: 50, y: -20 },
+            size: { width: 40, height: 20 },
+          },
+        ],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 10,
+        y: -20,
+        width: 90,
+        height: 30,
+      });
+    });
+
+    it('should handle labels extending beyond edge points', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 50, y: 50 },
+          { x: 100, y: 50 },
+        ],
+        measuredLabels: [
+          {
+            id: 'label-1',
+            positionOnEdge: 0,
+            position: { x: 20, y: 30 },
+            size: { width: 60, height: 40 },
+          },
+          {
+            id: 'label-2',
+            positionOnEdge: 1,
+            position: { x: 90, y: 60 },
+            size: { width: 50, height: 30 },
+          },
+        ],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 20,
+        y: 30,
+        width: 120,
+        height: 60,
+      });
+    });
+
+    it('should handle labels without position or size', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 10, y: 20 },
+          { x: 50, y: 100 },
+        ],
+        measuredLabels: [
+          {
+            id: 'label-1',
+            positionOnEdge: 0.5,
+          },
+          {
+            id: 'label-2',
+            positionOnEdge: 0.5,
+            position: { x: 30, y: 60 },
+          },
+        ],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 10,
+        y: 20,
+        width: 40,
+        height: 80,
+      });
+    });
+
+    it('should handle empty measuredLabels array', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 10, y: 20 },
+          { x: 50, y: 100 },
+        ],
+        measuredLabels: [],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 10,
+        y: 20,
+        width: 40,
+        height: 80,
+      });
+    });
   });
 
   describe('getNodeMeasuredBounds', () => {
