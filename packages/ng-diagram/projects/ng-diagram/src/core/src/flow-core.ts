@@ -230,18 +230,21 @@ export class FlowCore {
     callback?: TransactionCallback
   ): Promise<TransactionResult> {
     let results: TransactionResult;
+    let transactionName: ModelActionType;
 
     if (typeof nameOrCallback === 'function') {
+      transactionName = 'Transaction' as ModelActionType;
       results = await this.transactionManager.transaction(nameOrCallback);
     } else {
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
       }
+      transactionName = nameOrCallback;
       results = await this.transactionManager.transaction(nameOrCallback, callback);
     }
 
     if (results.commandsCount > 0) {
-      await this.applyUpdate(results.results, nameOrCallback as ModelActionType);
+      await this.applyUpdate(results.results, transactionName);
     }
 
     return results;
