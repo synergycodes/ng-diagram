@@ -74,16 +74,16 @@ importers:
     devDependencies:
       '@analogjs/platform':
         specifier: ^1.16.0
-        version: 1.21.1(287dab2532c0a46f545da8517a0c6b85)
+        version: 1.21.1(ae7169a7425d8d18b49cea9d7d61f337)
       '@analogjs/vite-plugin-angular':
         specifier: ^1.15.1
-        version: 1.21.1(2c9ccd32bcc231d9b5a28ac80bb0c1ea)
+        version: 1.21.1(d761a882bd37d1b3b57efe28fe6cf5ee)
       '@analogjs/vitest-angular':
         specifier: ^1.19.1
-        version: 1.21.1(@analogjs/vite-plugin-angular@1.21.1(2c9ccd32bcc231d9b5a28ac80bb0c1ea))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.8.1))
+        version: 1.21.1(@analogjs/vite-plugin-angular@1.21.1(d761a882bd37d1b3b57efe28fe6cf5ee))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.8.1))
       '@angular-devkit/build-angular':
         specifier: ^19.2.7
-        version: 19.2.17(7fdcaa5f2779c6513c6c836caffc78c6)
+        version: 19.2.17(b90232b15112f2d5104341a6c2c8a1eb)
       '@angular-eslint/builder':
         specifier: ^19.3.0
         version: 19.8.1(chokidar@4.0.3)(eslint@9.36.0(jiti@2.6.1))(typescript@5.8.3)
@@ -128,10 +128,10 @@ importers:
     dependencies:
       '@analogjs/astro-angular':
         specifier: ^1.19.4
-        version: 1.21.1(a1fb33e30a2d76b40dc05f3e51d2d419)
+        version: 1.21.1(c2df8f3e774efc3267ae3dfa0da5ab4a)
       '@angular-devkit/build-angular':
         specifier: ^19.2.7
-        version: 19.2.17(75d1d303c97e53e0b25d3f3a17ea0d55)
+        version: 19.2.17(2a090f3bc23328900c87c4507a8a1c9a)
       '@angular/animations':
         specifier: ^19.2.7
         version: 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
@@ -205,8 +205,8 @@ importers:
         specifier: ^0.21.3
         version: 0.21.3(@astrojs/starlight@0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)))(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.8.3)))(typedoc@0.28.13(typescript@5.8.3))
       tailwindcss:
-        specifier: ^4.1.16
-        version: 4.1.16
+        specifier: ^4.1.17
+        version: 4.1.17
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -313,16 +313,16 @@ importers:
     devDependencies:
       '@analogjs/platform':
         specifier: ^1.16.0
-        version: 1.21.1(d77eb5863fcbb68848ddadbb97622640)
+        version: 1.21.1(b678359fd292eaf787fddc5accb81dcc)
       '@analogjs/vite-plugin-angular':
         specifier: ^1.15.1
-        version: 1.21.1(8f84d0321c197e4c7650c3c4450c6208)
+        version: 1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb)
       '@analogjs/vitest-angular':
         specifier: ^1.19.1
-        version: 1.21.1(@analogjs/vite-plugin-angular@1.21.1(8f84d0321c197e4c7650c3c4450c6208))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1))
+        version: 1.21.1(@analogjs/vite-plugin-angular@1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1))
       '@angular-devkit/build-angular':
         specifier: ^19.2.8
-        version: 19.2.17(75d1d303c97e53e0b25d3f3a17ea0d55)
+        version: 19.2.17(2a090f3bc23328900c87c4507a8a1c9a)
       '@angular-eslint/builder':
         specifier: ^19.3.0
         version: 19.8.1(chokidar@4.0.3)(eslint@9.36.0(jiti@2.6.1))(typescript@5.8.3)
@@ -358,7 +358,7 @@ importers:
         version: 26.1.0
       ng-packagr:
         specifier: ^19.2.2
-        version: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3)
+        version: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3)
       terser:
         specifier: ^5.44.0
         version: 5.44.0
@@ -7206,6 +7206,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   slash@5.1.0:
@@ -7430,6 +7431,9 @@ packages:
 
   tailwindcss@4.1.16:
     resolution: {integrity: sha512-pONL5awpaQX4LN5eiv7moSiSPd/DLDzKVRJz8Q9PgzmAdd1R4307GQS2ZpfiN7ZmekdQrfhZZiSE5jkLR4WNaA==}
+
+  tailwindcss@4.1.17:
+    resolution: {integrity: sha512-j9Ee2YjuQqYT9bbRTfTZht9W/ytp5H+jJpZKiYdP/bpnXARAuELt9ofP0lPnmHjbga7SNQIxdTAXCmtKVYjN+Q==}
 
   tapable@2.2.3:
     resolution: {integrity: sha512-ZL6DDuAlRlLGghwcfmSn9sK3Hr6ArtyudlSAiCqQ6IfE+b+HHbydbYDIG15IfS5do+7XQQBdBiubF/cV2dnDzg==}
@@ -8400,10 +8404,10 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@analogjs/astro-angular@1.21.1(a1fb33e30a2d76b40dc05f3e51d2d419)':
+  '@analogjs/astro-angular@1.21.1(c2df8f3e774efc3267ae3dfa0da5ab4a)':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(8f84d0321c197e4c7650c3c4450c6208)
-      '@angular-devkit/build-angular': 19.2.17(75d1d303c97e53e0b25d3f3a17ea0d55)
+      '@analogjs/vite-plugin-angular': 1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb)
+      '@angular-devkit/build-angular': 19.2.17(2a090f3bc23328900c87c4507a8a1c9a)
       '@angular/animations': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
       '@angular/common': 19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@angular/compiler': 19.2.15
@@ -8419,9 +8423,9 @@ snapshots:
     transitivePeerDependencies:
       - '@angular/build'
 
-  '@analogjs/platform@1.21.1(287dab2532c0a46f545da8517a0c6b85)':
+  '@analogjs/platform@1.21.1(ae7169a7425d8d18b49cea9d7d61f337)':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(2c9ccd32bcc231d9b5a28ac80bb0c1ea)
+      '@analogjs/vite-plugin-angular': 1.21.1(d761a882bd37d1b3b57efe28fe6cf5ee)
       '@analogjs/vite-plugin-nitro': 1.21.1(encoding@0.1.13)
       marked: 15.0.12
       marked-gfm-heading-id: 4.1.2(marked@15.0.12)
@@ -8464,9 +8468,9 @@ snapshots:
       - uploadthing
       - xml2js
 
-  '@analogjs/platform@1.21.1(d77eb5863fcbb68848ddadbb97622640)':
+  '@analogjs/platform@1.21.1(b678359fd292eaf787fddc5accb81dcc)':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(8f84d0321c197e4c7650c3c4450c6208)
+      '@analogjs/vite-plugin-angular': 1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb)
       '@analogjs/vite-plugin-nitro': 1.21.1(encoding@0.1.13)
       marked: 15.0.12
       marked-gfm-heading-id: 4.1.2(marked@15.0.12)
@@ -8509,21 +8513,21 @@ snapshots:
       - uploadthing
       - xml2js
 
-  '@analogjs/vite-plugin-angular@1.21.1(2c9ccd32bcc231d9b5a28ac80bb0c1ea)':
+  '@analogjs/vite-plugin-angular@1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb)':
     dependencies:
       ts-morph: 21.0.1
       vfile: 6.0.3
     optionalDependencies:
-      '@angular-devkit/build-angular': 19.2.17(7fdcaa5f2779c6513c6c836caffc78c6)
-      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.16)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)
+      '@angular-devkit/build-angular': 19.2.17(2a090f3bc23328900c87c4507a8a1c9a)
+      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.6)(tailwindcss@4.1.17)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)
 
-  '@analogjs/vite-plugin-angular@1.21.1(8f84d0321c197e4c7650c3c4450c6208)':
+  '@analogjs/vite-plugin-angular@1.21.1(d761a882bd37d1b3b57efe28fe6cf5ee)':
     dependencies:
       ts-morph: 21.0.1
       vfile: 6.0.3
     optionalDependencies:
-      '@angular-devkit/build-angular': 19.2.17(75d1d303c97e53e0b25d3f3a17ea0d55)
-      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.6)(tailwindcss@4.1.16)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)
+      '@angular-devkit/build-angular': 19.2.17(b90232b15112f2d5104341a6c2c8a1eb)
+      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.17)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)
 
   '@analogjs/vite-plugin-nitro@1.21.1(encoding@0.1.13)':
     dependencies:
@@ -8562,17 +8566,17 @@ snapshots:
       - uploadthing
       - xml2js
 
-  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@1.21.1(2c9ccd32bcc231d9b5a28ac80bb0c1ea))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.8.1))':
+  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1))':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(2c9ccd32bcc231d9b5a28ac80bb0c1ea)
-      '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.8.1)
-
-  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@1.21.1(8f84d0321c197e4c7650c3c4450c6208))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1))':
-    dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(8f84d0321c197e4c7650c3c4450c6208)
+      '@analogjs/vite-plugin-angular': 1.21.1(a24a4b0685e5d037d9d7d6a00348bcdb)
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
       vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1)
+
+  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@1.21.1(d761a882bd37d1b3b57efe28fe6cf5ee))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.8.1))':
+    dependencies:
+      '@analogjs/vite-plugin-angular': 1.21.1(d761a882bd37d1b3b57efe28fe6cf5ee)
+      '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.8.1)
 
   '@angular-devkit/architect@0.1902.17(chokidar@4.0.3)':
     dependencies:
@@ -8581,13 +8585,13 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@angular-devkit/build-angular@19.2.17(75d1d303c97e53e0b25d3f3a17ea0d55)':
+  '@angular-devkit/build-angular@19.2.17(2a090f3bc23328900c87c4507a8a1c9a)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
       '@angular-devkit/build-webpack': 0.1902.17(chokidar@4.0.3)(webpack-dev-server@5.2.2(webpack@5.98.0(esbuild@0.25.4)))(webpack@5.98.0(esbuild@0.25.4))
       '@angular-devkit/core': 19.2.17(chokidar@4.0.3)
-      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.16)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)
+      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.17)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)
       '@angular/compiler-cli': 19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3)
       '@babel/core': 7.26.10
       '@babel/generator': 7.26.10
@@ -8643,8 +8647,8 @@ snapshots:
     optionalDependencies:
       '@angular/platform-server': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       esbuild: 0.25.4
-      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3)
-      tailwindcss: 4.1.16
+      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3)
+      tailwindcss: 4.1.17
     transitivePeerDependencies:
       - '@angular/compiler'
       - '@rspack/core'
@@ -8668,13 +8672,13 @@ snapshots:
       - webpack-cli
       - yaml
 
-  '@angular-devkit/build-angular@19.2.17(7fdcaa5f2779c6513c6c836caffc78c6)':
+  '@angular-devkit/build-angular@19.2.17(b90232b15112f2d5104341a6c2c8a1eb)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
       '@angular-devkit/build-webpack': 0.1902.17(chokidar@4.0.3)(webpack-dev-server@5.2.2(webpack@5.98.0(esbuild@0.25.4)))(webpack@5.98.0(esbuild@0.25.4))
       '@angular-devkit/core': 19.2.17(chokidar@4.0.3)
-      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.16)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)
+      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.17)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)
       '@angular/compiler-cli': 19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3)
       '@babel/core': 7.26.10
       '@babel/generator': 7.26.10
@@ -8730,8 +8734,8 @@ snapshots:
     optionalDependencies:
       '@angular/platform-server': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       esbuild: 0.25.4
-      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3)
-      tailwindcss: 4.1.16
+      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3)
+      tailwindcss: 4.1.17
     transitivePeerDependencies:
       - '@angular/compiler'
       - '@rspack/core'
@@ -8860,7 +8864,7 @@ snapshots:
       '@angular/core': 19.2.15(rxjs@7.8.2)(zone.js@0.15.1)
       tslib: 2.8.1
 
-  '@angular/build@19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.16)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)':
+  '@angular/build@19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.17)(terser@5.39.0)(typescript@5.8.3)(yaml@2.8.1)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
@@ -8895,9 +8899,9 @@ snapshots:
       '@angular/platform-server': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       less: 4.2.2
       lmdb: 3.2.6
-      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3)
+      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3)
       postcss: 8.5.2
-      tailwindcss: 4.1.16
+      tailwindcss: 4.1.17
     transitivePeerDependencies:
       - '@types/node'
       - chokidar
@@ -8911,7 +8915,7 @@ snapshots:
       - tsx
       - yaml
 
-  '@angular/build@19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.6)(tailwindcss@4.1.16)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)':
+  '@angular/build@19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.6)(tailwindcss@4.1.17)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
@@ -8946,9 +8950,9 @@ snapshots:
       '@angular/platform-server': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       less: 4.4.1
       lmdb: 3.2.6
-      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3)
+      ng-packagr: 19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3)
       postcss: 8.5.6
-      tailwindcss: 4.1.16
+      tailwindcss: 4.1.17
     transitivePeerDependencies:
       - '@types/node'
       - chokidar
@@ -15973,7 +15977,7 @@ snapshots:
 
   neotraverse@0.6.18: {}
 
-  ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3):
+  ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.17)(tslib@2.8.1)(typescript@5.8.3):
     dependencies:
       '@angular/compiler-cli': 19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3)
       '@rollup/plugin-json': 6.1.0(rollup@4.52.3)
@@ -16000,7 +16004,7 @@ snapshots:
       typescript: 5.8.3
     optionalDependencies:
       rollup: 4.52.3
-      tailwindcss: 4.1.16
+      tailwindcss: 4.1.17
 
   nitropack@2.12.6(encoding@0.1.13):
     dependencies:
@@ -17563,6 +17567,8 @@ snapshots:
   system-architecture@0.1.0: {}
 
   tailwindcss@4.1.16: {}
+
+  tailwindcss@4.1.17: {}
 
   tapable@2.2.3: {}
 
