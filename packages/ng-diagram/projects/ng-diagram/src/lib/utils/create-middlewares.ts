@@ -2,7 +2,6 @@ import {
   edgesRoutingMiddleware,
   internalIdMiddleware,
   loggerMiddleware,
-  measuredBoundsMiddleware,
   MiddlewareChain,
   zIndexMiddleware,
 } from '../../core/src';
@@ -11,7 +10,6 @@ export const BUILTIN_MIDDLEWARES = [
   internalIdMiddleware,
   zIndexMiddleware,
   edgesRoutingMiddleware,
-  measuredBoundsMiddleware,
   loggerMiddleware,
 ] as const satisfies MiddlewareChain;
 
