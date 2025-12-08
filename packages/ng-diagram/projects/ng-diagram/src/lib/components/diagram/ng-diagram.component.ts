@@ -317,6 +317,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     return this.elementRef.nativeElement.getBoundingClientRect();
   }
 
+  getDiagramElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
   private getFlowOffset = () => {
     const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
     return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
