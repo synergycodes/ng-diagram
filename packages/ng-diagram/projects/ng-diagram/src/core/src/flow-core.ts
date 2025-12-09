@@ -257,7 +257,6 @@ export class FlowCore {
     stateUpdate: FlowStateUpdate,
     modelActionTypes: LooseAutocomplete<ModelActionType> | ModelActionTypes
   ): Promise<void> {
-    // Normalize to array
     const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
 
     if (this.transactionManager.isActive()) {

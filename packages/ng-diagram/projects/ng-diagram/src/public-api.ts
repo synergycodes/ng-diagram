@@ -110,6 +110,7 @@ export type {
   MiddlewareHistoryUpdate,
   Model,
   ModelActionType,
+  ModelActionTypes,
   ModelAdapter,
   ModelChanges,
   ModifierOnlyShortcutBinding,

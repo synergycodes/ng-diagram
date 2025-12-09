@@ -171,8 +171,6 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     }
 
     const commandsCount = this.queue.length;
-    // Use Set to deduplicate action types while preserving insertion order
-    // Start with the transaction name, then add all individual action types
     const actionTypesSet = new Set<ModelActionTypes[number]>([this.name]);
 
     const nodesToAddBatches: NonNullable<FlowStateUpdate['nodesToAdd']>[] = [];

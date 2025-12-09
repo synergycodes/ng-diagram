@@ -12,10 +12,9 @@ Result of a transaction execution.
 
 ### actionTypes
 
-> **actionTypes**: `ModelActionTypes`
+> **actionTypes**: [`ModelActionTypes`](/docs/api/types/middleware/modelactiontypes/)
 
 All action types that were executed within the transaction.
-Preserves the order in which commands were emitted.
 
 #### Since
 

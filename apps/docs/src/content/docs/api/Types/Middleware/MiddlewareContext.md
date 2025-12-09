@@ -151,11 +151,22 @@ For single actions, this returns the first (and only) action type.
 
 ### modelActionTypes
 
-> **modelActionTypes**: `ModelActionTypes`
+> **modelActionTypes**: [`ModelActionTypes`](/docs/api/types/middleware/modelactiontypes/)
 
 All action types that triggered the middleware execution.
-For transactions, this contains all action types from commands executed within the transaction.
+For transactions, this contains the transaction name followed by all action types
+from commands executed within the transaction.
 For single commands outside transactions, this is a single-element array.
+
+#### Example
+
+```typescript
+// For a transaction named 'batchUpdate' with addNodes and moveViewport commands:
+// modelActionTypes = ['batchUpdate', 'addNodes', 'moveViewport']
+
+// For a single command outside a transaction:
+// modelActionTypes = ['addNodes']
+```
 
 #### Since
 

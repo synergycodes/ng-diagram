@@ -11,16 +11,6 @@ import type { LooseAutocomplete } from './utils';
  * Array of model action types, used to track all actions in a transaction or a single action.
  * Supports both known action types with autocomplete and custom string action types.
  *
- * @public
- * @since 0.9.0
- * @category Types/Middleware
- */
-export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
-
-/**
- * Model action types that can trigger middleware execution.
- * These represent all possible operations that modify the diagram state.
- *
  * @example
  * ```typescript
  * const middleware: Middleware = {
@@ -30,6 +20,21 @@ export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
  *     next();
  *   }
  * };
+ * ```
+ *
+ * @public
+ * @since 0.9.0
+ * @category Types/Middleware
+ */
+export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
+
+/**
+ * Individual model action type that can trigger middleware execution.
+ * These represent all possible operations that modify the diagram state.
+ *
+ * @example
+ * ```typescript
+ * const blockedActions: ModelActionType[] = ['addNodes', 'deleteNodes', 'updateNode'];
  * ```
  *
  * @public
@@ -365,8 +370,19 @@ export interface MiddlewareContext {
   modelActionType: ModelActionType;
   /**
    * All action types that triggered the middleware execution.
-   * For transactions, this contains all action types from commands executed within the transaction.
+   * For transactions, this contains the transaction name followed by all action types
+   * from commands executed within the transaction.
    * For single commands outside transactions, this is a single-element array.
+   *
+   * @example
+   * ```typescript
+   * // For a transaction named 'batchUpdate' with addNodes and moveViewport commands:
+   * // modelActionTypes = ['batchUpdate', 'addNodes', 'moveViewport']
+   *
+   * // For a single command outside a transaction:
+   * // modelActionTypes = ['addNodes']
+   * ```
+   *
    * @since 0.9.0
    */
   modelActionTypes: ModelActionTypes;
