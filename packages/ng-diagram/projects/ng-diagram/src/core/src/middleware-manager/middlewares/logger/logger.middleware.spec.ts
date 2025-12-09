@@ -46,6 +46,7 @@ describe('LoggerMiddleware', () => {
     const newContext = {
       ...context,
       modelActionType: 'changeSelection',
+      modelActionTypes: ['changeSelection'],
       state,
     } as unknown as MiddlewareContext;
 

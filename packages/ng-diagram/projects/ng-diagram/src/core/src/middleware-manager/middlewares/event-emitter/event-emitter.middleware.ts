@@ -15,10 +15,10 @@ import {
   ViewportChangedEmitter,
 } from './emitters';
 
-const EVENT_EMITTER_ERROR = (emitterName: string, actionType: string, error: unknown) =>
+const EVENT_EMITTER_ERROR = (emitterName: string, actionTypes: string[], error: unknown) =>
   `[ngDiagram] Event emitter error: ${emitterName} failed.
 
-Action type: ${actionType}
+Action types: ${actionTypes.join(', ')}
 Error: ${error instanceof Error ? error.message : String(error)}
 
 This may indicate an issue with event handling logic.
@@ -57,7 +57,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
         try {
           emitter.emit(context, eventManager);
         } catch (error) {
-          console.error(EVENT_EMITTER_ERROR(emitter.name, context.modelActionType, error));
+          console.error(EVENT_EMITTER_ERROR(emitter.name, context.modelActionTypes, error));
         }
       }
     },

@@ -1,5 +1,5 @@
 import type { FlowCore } from '../flow-core';
-import type { FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
+import type { FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '../types';
 import type { TransactionContext } from '../types/transaction.interface';
 import { createTransactionContext } from './transaction-context';
 
@@ -165,12 +165,15 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     });
   }
 
-  getMergedUpdates(): { mergedUpdate: FlowStateUpdate; commandsCount: number } {
+  getMergedUpdates(): { mergedUpdate: FlowStateUpdate; commandsCount: number; actionTypes: ModelActionTypes } {
     if (this._isAborted) {
-      return { mergedUpdate: {}, commandsCount: 0 };
+      return { mergedUpdate: {}, commandsCount: 0, actionTypes: [] };
     }
 
     const commandsCount = this.queue.length;
+    // Use Set to deduplicate action types while preserving insertion order
+    // Start with the transaction name, then add all individual action types
+    const actionTypesSet = new Set<ModelActionTypes[number]>([this.name]);
 
     const nodesToAddBatches: NonNullable<FlowStateUpdate['nodesToAdd']>[] = [];
     const nodesToRemoveBatches: NonNullable<FlowStateUpdate['nodesToRemove']>[] = [];
@@ -180,7 +183,8 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     const edgesToUpdateBatches: NonNullable<FlowStateUpdate['edgesToUpdate']>[] = [];
     const metadataUpdates: NonNullable<FlowStateUpdate['metadataUpdate']>[] = [];
 
-    for (const { update } of this.queue) {
+    for (const { update, actionType } of this.queue) {
+      actionTypesSet.add(actionType);
       if (update.nodesToAdd?.length) nodesToAddBatches.push(update.nodesToAdd);
       if (update.nodesToRemove?.length) nodesToRemoveBatches.push(update.nodesToRemove);
       if (update.nodesToUpdate?.length) nodesToUpdateBatches.push(update.nodesToUpdate);
@@ -200,6 +204,6 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     if (metadataUpdates.length > 0) {
       mergedUpdate.metadataUpdate = Object.assign({}, ...metadataUpdates);
     }
-    return { mergedUpdate, commandsCount };
+    return { mergedUpdate, commandsCount, actionTypes: [...actionTypesSet] };
   }
 }

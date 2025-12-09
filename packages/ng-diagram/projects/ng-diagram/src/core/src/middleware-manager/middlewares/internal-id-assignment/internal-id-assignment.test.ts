@@ -12,6 +12,7 @@ describe('InternalIdMiddleware', () => {
 
     context = {
       modelActionType: 'addNodes',
+      modelActionTypes: ['addNodes'],
       initialState: {
         nodes: [],
         edges: [],

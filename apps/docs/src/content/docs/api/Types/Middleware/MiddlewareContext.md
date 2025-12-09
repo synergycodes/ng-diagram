@@ -24,7 +24,7 @@ const middleware: Middleware = {
     console.log('Cell size:', context.config.background.cellSize);
 
     // Check what action triggered this
-    if (context.modelActionType === 'addNodes') {
+    if (context.modelActionTypes.includes('addNodes')) {
       // Validate new nodes
       const isValid = validateNodes(context.state.nodes);
       if (!isValid) {

@@ -1,4 +1,4 @@
-import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType } from '.';
+import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '.';
 
 export interface TransactionContext {
   // Command emission
@@ -74,4 +74,10 @@ export interface TransactionResult {
    * Number of commands emitted during the transaction
    */
   commandsCount: number;
+  /**
+   * All action types that were executed within the transaction.
+   * Preserves the order in which commands were emitted.
+   * @since 0.9.0
+   */
+  actionTypes: ModelActionTypes;
 }

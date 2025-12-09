@@ -7,7 +7,7 @@ export class GroupMembershipChangedEmitter implements EventEmitter {
   name = 'GroupMembershipChangedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'updateNodes') {
+    if (!context.modelActionTypes.includes('updateNodes')) {
       return;
     }
 

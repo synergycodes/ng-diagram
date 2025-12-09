@@ -102,7 +102,7 @@ describe('createTransactionContext', () => {
   describe('transaction', () => {
     it('should delegate to flowCore.transactionManager.transaction', async () => {
       const mockCallback = vi.fn();
-      const expectedResult = { results: {}, commandsCount: 0 };
+      const expectedResult = { results: {}, commandsCount: 0, actionTypes: [] };
 
       vi.mocked(mockFlowCore.transactionManager.transaction).mockResolvedValue(expectedResult);
 

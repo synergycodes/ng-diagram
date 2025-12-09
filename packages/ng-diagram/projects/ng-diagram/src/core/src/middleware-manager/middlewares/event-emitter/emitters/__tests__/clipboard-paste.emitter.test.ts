@@ -20,6 +20,7 @@ describe('ClipboardPastedEmitter', () => {
 
     context = {
       modelActionType: 'paste',
+      modelActionTypes: ['paste'],
       initialNodesMap: new Map<string, Node>(),
       initialEdgesMap: new Map<string, Edge>(),
       nodesMap: new Map<string, Node>(),
@@ -32,7 +33,7 @@ describe('ClipboardPastedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not paste', () => {
-      context.modelActionType = 'addNodes';
+      context.modelActionTypes = ['addNodes'];
       const node: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 } };
       context.nodesMap.set('node1', node);
 
@@ -42,7 +43,7 @@ describe('ClipboardPastedEmitter', () => {
     });
 
     it('should emit event for paste action', () => {
-      context.modelActionType = 'paste';
+      context.modelActionTypes = ['paste'];
       const node: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 } };
       context.nodesMap.set('node1', node);
 

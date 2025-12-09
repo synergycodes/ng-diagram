@@ -7,7 +7,7 @@ export class EdgeDrawnEmitter implements EventEmitter {
   name = 'EdgeDrawnEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'finishLinking') {
+    if (!context.modelActionTypes.includes('finishLinking')) {
       return;
     }
 

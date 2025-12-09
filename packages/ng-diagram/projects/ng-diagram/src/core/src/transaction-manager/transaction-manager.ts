@@ -34,11 +34,12 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
           transaction.mergeToParent();
         } else {
           // Root transaction - apply changes
-          const { mergedUpdate, commandsCount } = transaction.getMergedUpdates();
+          const { mergedUpdate, commandsCount, actionTypes } = transaction.getMergedUpdates();
 
           return {
             results: mergedUpdate,
             commandsCount,
+            actionTypes,
           };
         }
       }
@@ -46,6 +47,7 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
       return {
         results: {},
         commandsCount: 0,
+        actionTypes: [],
       };
     } catch (error) {
       // Automatic rollback on error

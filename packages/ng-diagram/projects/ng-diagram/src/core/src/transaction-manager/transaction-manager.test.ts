@@ -80,6 +80,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.any(Object),
         commandsCount: 1,
+        actionTypes: expect.any(Array),
       });
     });
 
@@ -117,6 +118,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode] }),
         commandsCount: 1,
+        actionTypes: expect.any(Array),
       });
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ nodesToAdd: [mockNode] }),
@@ -304,6 +306,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }),
         commandsCount: 2,
+        actionTypes: expect.any(Array),
       });
     });
   });
