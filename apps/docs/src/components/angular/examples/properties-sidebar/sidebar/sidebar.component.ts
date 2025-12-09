@@ -14,10 +14,10 @@ type Data = {
 export class SidebarContainer {
   private readonly modelService = inject(NgDiagramModelService);
   private readonly selectionService = inject(NgDiagramSelectionService);
-  private readonly selectedNode = computed(
+
+  selectedNode = computed(
     () => this.selectionService.selection().nodes[0] ?? null
   );
-
   id = computed(() => this.selectedNode()?.id ?? null);
   label = computed(() => {
     const data = this.selectedNode()?.data as Data | undefined;
