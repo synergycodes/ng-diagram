@@ -20,7 +20,7 @@ registers the marker element for automatic inline rendering with `currentColor` 
 
 ```html
 <ng-diagram-marker>
-  <svg xmlns="http://www.w3.org/2000/svg">
+  <svg>
     <defs>
       <marker
         id="square-arrowhead"
