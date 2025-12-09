@@ -53,7 +53,7 @@ export interface TransactionContext {
    * Gets the queued updates in the transaction.
    * @returns Readonly array of queued updates.
    */
-  getQueuedUpdates(): readonly { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[];
+  getQueuedUpdates(): readonly { update: FlowStateUpdate; actionTypes: ModelActionTypes }[];
 }
 
 export type TransactionCallback = (context: TransactionContext) => void | Promise<void>;

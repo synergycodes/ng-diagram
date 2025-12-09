@@ -5,14 +5,14 @@ import { createTransactionContext } from './transaction-context';
 
 export interface TransactionState<TFlowCore extends FlowCore> {
   name: LooseAutocomplete<ModelActionType>;
-  queue: { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[];
+  queue: { update: FlowStateUpdate; actionTypes: ModelActionTypes }[];
   savepoints: Map<string, number>;
   isAborted: boolean;
   parent: Transaction<TFlowCore> | null;
 }
 
 export class Transaction<TFlowCore extends FlowCore = FlowCore> {
-  private queue: { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[] = [];
+  private queue: { update: FlowStateUpdate; actionTypes: ModelActionTypes }[] = [];
   private savepoints = new Map<string, number>();
   private _isAborted = false;
   private children: Transaction<TFlowCore>[] = [];
@@ -136,13 +136,13 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     return this.queue.length > 0 || this.children.some((child) => child.hasChanges());
   }
 
-  getQueue(): readonly { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[] {
+  getQueue(): readonly { update: FlowStateUpdate; actionTypes: ModelActionTypes }[] {
     return [...this.queue] as const;
   }
 
-  queueUpdate(update: FlowStateUpdate, actionType: LooseAutocomplete<ModelActionType>): void {
+  queueUpdate(update: FlowStateUpdate, actionTypes: ModelActionTypes): void {
     this.ensureNotAborted();
-    this.queue.push({ update, actionType });
+    this.queue.push({ update, actionTypes });
   }
 
   getState(): TransactionState<TFlowCore> {
@@ -161,7 +161,7 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
       return;
     }
     this.queue.forEach((item) => {
-      this.parent!.queueUpdate(item.update, item.actionType);
+      this.parent!.queueUpdate(item.update, item.actionTypes);
     });
   }
 
@@ -183,8 +183,8 @@ export class Transaction<TFlowCore extends FlowCore = FlowCore> {
     const edgesToUpdateBatches: NonNullable<FlowStateUpdate['edgesToUpdate']>[] = [];
     const metadataUpdates: NonNullable<FlowStateUpdate['metadataUpdate']>[] = [];
 
-    for (const { update, actionType } of this.queue) {
-      actionTypesSet.add(actionType);
+    for (const { update, actionTypes } of this.queue) {
+      actionTypes.forEach((t) => actionTypesSet.add(t));
       if (update.nodesToAdd?.length) nodesToAddBatches.push(update.nodesToAdd);
       if (update.nodesToRemove?.length) nodesToRemoveBatches.push(update.nodesToRemove);
       if (update.nodesToUpdate?.length) nodesToUpdateBatches.push(update.nodesToUpdate);

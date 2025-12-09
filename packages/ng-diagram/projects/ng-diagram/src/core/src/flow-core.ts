@@ -261,8 +261,7 @@ export class FlowCore {
     const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
 
     if (this.transactionManager.isActive()) {
-      // When queuing to a transaction, use the first (primary) action type
-      this.transactionManager.queueUpdate(stateUpdate, actionTypesArray[0]);
+      this.transactionManager.queueUpdate(stateUpdate, actionTypesArray);
       return;
     }
 
