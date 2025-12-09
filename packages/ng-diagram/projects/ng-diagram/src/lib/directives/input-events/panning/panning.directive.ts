@@ -115,10 +115,6 @@ export class PanningDirective implements OnDestroy {
 
   private toggleGrabbingCursor(isGrabbing: boolean): void {
     const diagramElement = this.elementRef.nativeElement;
-    if (isGrabbing) {
-      diagramElement.classList.add('grabbing');
-    } else {
-      diagramElement.classList.remove('grabbing');
-    }
+    diagramElement.classList.toggle('grabbing', isGrabbing);
   }
 }
