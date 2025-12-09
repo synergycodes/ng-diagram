@@ -411,20 +411,43 @@ Array of nodes in range.
 
 ### getOverlappingNodes()
 
+#### Call Signature
+
 > **getOverlappingNodes**(`nodeId`): [`Node`](/docs/api/types/model/node/)[]
 
 Detects collision with other nodes by finding all nodes whose rectangles intersect
 with the specified node's bounding rectangle.
 
-#### Parameters
+##### Parameters
 
-##### nodeId
+###### nodeId
 
 `string`
 
 The ID of the node to check for collisions
 
-#### Returns
+##### Returns
+
+[`Node`](/docs/api/types/model/node/)[]
+
+An array of Nodes that overlap with the specified node
+
+#### Call Signature
+
+> **getOverlappingNodes**(`node`): [`Node`](/docs/api/types/model/node/)[]
+
+Detects collision with other nodes by finding all nodes whose rectangles intersect
+with the specified node's bounding rectangle.
+
+##### Parameters
+
+###### node
+
+[`Node`](/docs/api/types/model/node/)
+
+The node to check for collisions
+
+##### Returns
 
 [`Node`](/docs/api/types/model/node/)[]
 

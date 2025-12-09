@@ -8,7 +8,7 @@ import type {
   ModelActionType,
 } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { createEventEmitterMiddleware } from './middlewares/event-emitter';
+import { createEventEmitterMiddleware, loggerMiddleware, measuredBoundsMiddleware } from './middlewares';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
@@ -70,11 +70,17 @@ export class MiddlewareManager {
       this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
     }
 
-    const chainWithEventEmitter = this.eventEmitterMiddleware
-      ? [...this.middlewareChain, this.eventEmitterMiddleware]
-      : this.middlewareChain;
+    // measuredBoundsMiddleware runs after all user middlewares to ensure bounds are computed
+    // after all position/size changes. loggerMiddleware runs after measuredBounds to log final state.
+    // eventEmitterMiddleware runs last to emit events with final state.
+    const finalChain = [
+      ...this.middlewareChain,
+      measuredBoundsMiddleware,
+      loggerMiddleware,
+      ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
+    ];
 
-    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, chainWithEventEmitter);
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, finalChain);
     return await middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
   }
 }
