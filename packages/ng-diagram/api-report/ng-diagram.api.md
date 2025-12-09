@@ -5,6 +5,7 @@
 ```ts
 
 import { AfterContentInit } from '@angular/core';
+import { AfterViewInit } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import * as i0 from '@angular/core';
@@ -582,13 +583,18 @@ export class NgDiagramBaseEdgeComponent {
     // (undocumented)
     readonly selected: Signal<boolean | undefined>;
     sourceArrowhead: InputSignal<string | undefined>;
+    // (undocumented)
+    readonly sourceMarkerId: Signal<string | undefined>;
     stroke: InputSignal<string | undefined>;
     strokeDasharray: InputSignal<string | undefined>;
     strokeOpacity: InputSignal<number | undefined>;
     strokeWidth: InputSignal<number | undefined>;
     targetArrowhead: InputSignal<string | undefined>;
     // (undocumented)
+    readonly targetMarkerId: Signal<string | undefined>;
+    // (undocumented)
     readonly temporary: Signal<boolean | undefined>;
+    readonly useInlineMarkers: boolean;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeComponent, "ng-diagram-base-edge", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "routing": { "alias": "routing"; "required": false; "isSignal": true; }; "stroke": { "alias": "stroke"; "required": false; "isSignal": true; }; "sourceArrowhead": { "alias": "sourceArrowhead"; "required": false; "isSignal": true; }; "targetArrowhead": { "alias": "targetArrowhead"; "required": false; "isSignal": true; }; "strokeOpacity": { "alias": "strokeOpacity"; "required": false; "isSignal": true; }; "strokeWidth": { "alias": "strokeWidth"; "required": false; "isSignal": true; }; "strokeDasharray": { "alias": "strokeDasharray"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_2.ZIndexDirective; inputs: { "data": "edge"; }; outputs: {}; }, { directive: typeof i9.EdgeSelectionDirective; inputs: { "targetData": "edge"; }; outputs: {}; }]>;
     // (undocumented)
@@ -732,6 +738,16 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramGroupsService, never>;
     // (undocumented)
     static ɵprov: i0.ɵɵInjectableDeclaration<NgDiagramGroupsService>;
+}
+
+// @public
+export class NgDiagramMarkerComponent implements AfterViewInit {
+    // (undocumented)
+    ngAfterViewInit(): void;
+    // (undocumented)
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMarkerComponent, "ng-diagram-marker", never, {}, {}, never, ["*"], true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMarkerComponent, never>;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "NgDiagramMath" should be prefixed with an underscore because the declaration is marked as @internal

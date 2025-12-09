@@ -13,6 +13,7 @@ import { FlowResizeBatchProcessorService } from '../services/flow-resize-observe
 import { InputEventsRouterService } from '../services/input-events/input-events-router.service';
 import { LinkingEventService } from '../services/input-events/linking-event.service';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
+import { MarkerRegistryService } from '../services/marker-registry/marker-registry.service';
 import { PaletteService } from '../services/palette/palette.service';
 import { RendererService } from '../services/renderer/renderer.service';
 import { TemplateProviderService } from '../services/template-provider/template-provider.service';
@@ -67,5 +68,6 @@ export function provideNgDiagram(): Provider[] {
     LinkingEventService,
     ManualLinkingService,
     TemplateProviderService,
+    MarkerRegistryService,
   ];
 }

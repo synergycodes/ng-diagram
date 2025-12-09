@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
 import { isValidPosition } from '../../../../core/src/utils/measurement-validation';
-import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
+import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
+import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
 
 const INVALID_EDGE_COORDINATES_ERROR = (
   edgeId: string,
@@ -31,6 +32,7 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 @Component({
   selector: 'ng-diagram-base-edge',
   standalone: true,
+  imports: [InlineMarkersDirective],
   templateUrl: './base-edge.component.html',
   styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,6 +47,13 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly markerRegistry = inject(MarkerRegistryService);
+
+  /**
+   * Whether to use inline markers (Safari fallback).
+   * Safari doesn't support context-stroke, so we render markers inline per edge.
+   */
+  readonly useInlineMarkers = this.markerRegistry.useInlineMarkers;
 
   /**
    * Edge data model
@@ -120,24 +129,24 @@ export class NgDiagramBaseEdgeComponent {
     return `M ${points[0].x},${points[0].y}`;
   });
 
-  readonly markerStart = computed(() => {
-    const markerId = this.edge()?.sourceArrowhead ?? this.sourceArrowhead();
+  readonly sourceMarkerId = computed(() => this.edge()?.sourceArrowhead ?? this.sourceArrowhead());
 
+  readonly targetMarkerId = computed(() => this.edge()?.targetArrowhead ?? this.targetArrowhead());
+
+  readonly markerStart = computed(() => {
+    const markerId = this.sourceMarkerId();
     if (!markerId) {
       return null;
     }
-
-    return `url(#${markerId})`;
+    return this.markerRegistry.getMarkerUrl(markerId, this.edge().id, 'source');
   });
 
   readonly markerEnd = computed(() => {
-    const markerId = this.edge()?.targetArrowhead ?? this.targetArrowhead();
-
+    const markerId = this.targetMarkerId();
     if (!markerId) {
       return null;
     }
-
-    return `url(#${markerId})`;
+    return this.markerRegistry.getMarkerUrl(markerId, this.edge().id, 'target');
   });
 
   readonly selected = computed(() => this.edge().selected);

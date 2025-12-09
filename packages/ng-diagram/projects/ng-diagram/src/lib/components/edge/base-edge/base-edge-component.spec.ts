@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Edge, Point } from '../../../../core/src';
 import { FlowCoreProviderService, RendererService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
 import { NgDiagramBaseEdgeLabelComponent } from '../../edge-label/base-edge-label/base-edge-label.component';
 import { NgDiagramBaseEdgeComponent } from './base-edge.component';
 
@@ -54,6 +55,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
         { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
         RendererService,
         InputEventsRouterService,
+        MarkerRegistryService,
       ],
       imports: [NgDiagramBaseEdgeComponent],
     })
