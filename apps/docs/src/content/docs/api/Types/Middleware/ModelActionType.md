@@ -17,7 +17,7 @@ These represent all possible operations that modify the diagram state.
 const middleware: Middleware = {
   name: 'logger',
   execute: (context, next) => {
-    console.log('Action type:', context.modelActionType);
+    console.log('Action types:', context.modelActionTypes.join(', '));
     next();
   }
 };

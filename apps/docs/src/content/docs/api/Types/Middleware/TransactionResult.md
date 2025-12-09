@@ -10,6 +10,19 @@ Result of a transaction execution.
 
 ## Properties
 
+### actionTypes
+
+> **actionTypes**: `ModelActionTypes`
+
+All action types that were executed within the transaction.
+Preserves the order in which commands were emitted.
+
+#### Since
+
+0.9.0
+
+***
+
 ### commandsCount
 
 > **commandsCount**: `number`

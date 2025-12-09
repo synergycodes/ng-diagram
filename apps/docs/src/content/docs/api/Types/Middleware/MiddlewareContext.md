@@ -23,7 +23,7 @@ const middleware: Middleware = {
     // Access configuration
     console.log('Cell size:', context.config.background.cellSize);
 
-    // Check what action triggered this
+    // Check what actions triggered this (supports transactions with multiple actions)
     if (context.modelActionTypes.includes('addNodes')) {
       // Validate new nodes
       const isValid = validateNodes(context.state.nodes);
@@ -136,11 +136,30 @@ that will be applied. Use `helpers` to get actual knowledge about all changes.
 
 ***
 
-### modelActionType
+### ~~modelActionType~~
 
 > **modelActionType**: [`ModelActionType`](/docs/api/types/middleware/modelactiontype/)
 
-The action that triggered the middleware execution
+The action that triggered the middleware execution.
+
+:::caution[Deprecated]
+Use `modelActionTypes` instead, which supports multiple actions from transactions.
+For single actions, this returns the first (and only) action type.
+:::
+
+***
+
+### modelActionTypes
+
+> **modelActionTypes**: `ModelActionTypes`
+
+All action types that triggered the middleware execution.
+For transactions, this contains all action types from commands executed within the transaction.
+For single commands outside transactions, this is a single-element array.
+
+#### Since
+
+0.9.0
 
 ***
 
