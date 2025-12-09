@@ -1,4 +1,4 @@
-import { Directive, inject, type OnDestroy } from '@angular/core';
+import { Directive, ElementRef, inject, type OnDestroy } from '@angular/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
@@ -12,6 +12,7 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
 })
 export class PanningDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly elementRef = inject(ElementRef);
 
   ngOnDestroy(): void {
     document.removeEventListener('pointermove', this.onMouseMove);
@@ -22,6 +23,7 @@ export class PanningDirective implements OnDestroy {
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
+    this.toggleGrabbingCursor(true);
 
     event.preventDefault();
     event.stopPropagation();
@@ -47,6 +49,7 @@ export class PanningDirective implements OnDestroy {
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
+    this.toggleGrabbingCursor(false);
 
     event.preventDefault();
     event.stopPropagation();
@@ -108,5 +111,10 @@ export class PanningDirective implements OnDestroy {
       event.boxSelectionHandled ||
       event.zoomingHandled
     );
+  }
+
+  private toggleGrabbingCursor(isGrabbing: boolean): void {
+    const diagramElement = this.elementRef.nativeElement;
+    diagramElement.classList.toggle('grabbing', isGrabbing);
   }
 }
