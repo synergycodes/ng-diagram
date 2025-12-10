@@ -21,6 +21,13 @@
       margin: 1rem 0;
     }
 
+    input {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: var(--ngd-node-bg-primary-default);
+      border: 1px solid var(--ngd-node-stroke-primary-default);
+    }
+
     .horizontal {
       display: flex;
       gap: 0.5rem;
