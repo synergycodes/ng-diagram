@@ -454,5 +454,156 @@ describe('Copy-Paste Commands', () => {
         expect(updateCall).not.toHaveBeenCalled();
       });
     });
+
+    describe('groupId handling', () => {
+      it('should remove groupId when copying node without its group', async () => {
+        commandHandler.flowCore.getState = () => ({
+          nodes: [
+            { ...mockNode, id: 'group1', selected: false }, // Group not selected
+            { ...mockNode, id: 'node1', groupId: 'group1', selected: true }, // Child node selected
+          ],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        expect(update.nodesToAdd).toHaveLength(1);
+        const pastedNode = update.nodesToAdd[0];
+        expect(pastedNode.groupId).toBeUndefined();
+      });
+
+      it('should update groupId to new group ID when copying node with its group', async () => {
+        commandHandler.flowCore.getState = () => ({
+          nodes: [
+            { ...mockNode, id: 'group1', selected: true }, // Group selected
+            { ...mockNode, id: 'node1', groupId: 'group1', selected: true }, // Child node selected
+          ],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        expect(update.nodesToAdd).toHaveLength(2);
+
+        // Find the pasted group and child node
+        const pastedGroup = update.nodesToAdd.find((node: Node) => !node.groupId);
+        const pastedChild = update.nodesToAdd.find((node: Node) => node.groupId);
+
+        expect(pastedGroup).toBeDefined();
+        expect(pastedChild).toBeDefined();
+        // Child's groupId should reference the new group's ID
+        expect(pastedChild!.groupId).toBe(pastedGroup!.id);
+        // New IDs should be generated
+        expect(pastedGroup!.id).not.toBe('group1');
+        expect(pastedChild!.id).not.toBe('node1');
+      });
+
+      it('should update groupId for multiple children when copying with their group', async () => {
+        commandHandler.flowCore.getState = () => ({
+          nodes: [
+            { ...mockNode, id: 'group1', selected: true },
+            { ...mockNode, id: 'node1', groupId: 'group1', selected: true },
+            { ...mockNode, id: 'node2', groupId: 'group1', selected: true },
+          ],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        expect(update.nodesToAdd).toHaveLength(3);
+
+        const pastedGroup = update.nodesToAdd.find((node: Node) => !node.groupId);
+        const pastedChildren = update.nodesToAdd.filter((node: Node) => node.groupId);
+
+        expect(pastedGroup).toBeDefined();
+        expect(pastedChildren).toHaveLength(2);
+        // All children should reference the same new group ID
+        pastedChildren.forEach((child: Node) => {
+          expect(child.groupId).toBe(pastedGroup!.id);
+        });
+      });
+
+      it('should handle nested groups correctly', async () => {
+        commandHandler.flowCore.getState = () => ({
+          nodes: [
+            { ...mockNode, id: 'outerGroup', selected: true },
+            { ...mockNode, id: 'innerGroup', groupId: 'outerGroup', selected: true },
+            { ...mockNode, id: 'node1', groupId: 'innerGroup', selected: true },
+          ],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        expect(update.nodesToAdd).toHaveLength(3);
+
+        // Find nodes by their groupId relationships
+        const pastedOuterGroup = update.nodesToAdd.find((node: Node) => !node.groupId);
+        const pastedInnerGroup = update.nodesToAdd.find(
+          (node: Node) =>
+            node.groupId === pastedOuterGroup?.id && update.nodesToAdd.some((n: Node) => n.groupId === node.id)
+        );
+        const pastedNode = update.nodesToAdd.find((node: Node) => node.groupId === pastedInnerGroup?.id);
+
+        expect(pastedOuterGroup).toBeDefined();
+        expect(pastedInnerGroup).toBeDefined();
+        expect(pastedNode).toBeDefined();
+
+        // Verify the hierarchy is preserved with new IDs
+        expect(pastedInnerGroup!.groupId).toBe(pastedOuterGroup!.id);
+        expect(pastedNode!.groupId).toBe(pastedInnerGroup!.id);
+      });
+
+      it('should remove groupId when copying only inner group without outer group', async () => {
+        commandHandler.flowCore.getState = () => ({
+          nodes: [
+            { ...mockNode, id: 'outerGroup', selected: false }, // Outer group NOT selected
+            { ...mockNode, id: 'innerGroup', groupId: 'outerGroup', selected: true },
+            { ...mockNode, id: 'node1', groupId: 'innerGroup', selected: true },
+          ],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        expect(update.nodesToAdd).toHaveLength(2);
+
+        // Find the pasted inner group (should have no groupId since outer wasn't copied)
+        const pastedInnerGroup = update.nodesToAdd.find(
+          (node: Node) => !node.groupId && update.nodesToAdd.some((n: Node) => n.groupId === node.id)
+        );
+        const pastedNode = update.nodesToAdd.find((node: Node) => node.groupId);
+
+        expect(pastedInnerGroup).toBeDefined();
+        expect(pastedInnerGroup!.groupId).toBeUndefined(); // Inner group should no longer reference outer
+        expect(pastedNode).toBeDefined();
+        expect(pastedNode!.groupId).toBe(pastedInnerGroup!.id); // Node should still reference inner group
+      });
+    });
   });
 });
