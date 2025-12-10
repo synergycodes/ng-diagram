@@ -14,7 +14,7 @@ export const loggerMiddleware: Middleware = {
       return;
     }
 
-    console.log(`[ngDiagram] ${context.modelActionType}`, {
+    console.log(`[ngDiagram] ${context.modelActionTypes.join(', ')}`, {
       initialState: context.initialState,
       finalState: context.state,
       history: context.history,

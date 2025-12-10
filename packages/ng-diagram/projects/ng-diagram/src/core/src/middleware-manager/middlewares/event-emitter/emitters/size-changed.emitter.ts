@@ -6,7 +6,7 @@ export class NodeResizedEmitter implements EventEmitter {
   name = 'NodeResizedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'resizeNode') {
+    if (!context.modelActionTypes.includes('resizeNode')) {
       return;
     }
 

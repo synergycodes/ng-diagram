@@ -30,6 +30,7 @@ import type {
   Middleware,
   MiddlewareChain,
   ModelActionType,
+  ModelActionTypes,
   ModelAdapter,
   Node,
   Point,
@@ -241,7 +242,7 @@ export class FlowCore {
     }
 
     if (results.commandsCount > 0) {
-      await this.applyUpdate(results.results, nameOrCallback as ModelActionType);
+      await this.applyUpdate(results.results, results.actionTypes);
     }
 
     return results;
@@ -250,11 +251,16 @@ export class FlowCore {
   /**
    * Applies an update to the flow state
    * @param stateUpdate Partial state to apply
-   * @param modelActionType Type of model action to apply
+   * @param modelActionTypes Action type(s) that triggered this update. Can be a single type or an array of types (from transactions).
    */
-  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: LooseAutocomplete<ModelActionType>): Promise<void> {
+  async applyUpdate(
+    stateUpdate: FlowStateUpdate,
+    modelActionTypes: LooseAutocomplete<ModelActionType> | ModelActionTypes
+  ): Promise<void> {
+    const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
+
     if (this.transactionManager.isActive()) {
-      this.transactionManager.queueUpdate(stateUpdate, modelActionType);
+      this.transactionManager.queueUpdate(stateUpdate, actionTypesArray);
       return;
     }
 
@@ -264,7 +270,7 @@ export class FlowCore {
     try {
       // Get the current state - guaranteed to be fresh since we hold the lock
       const currentState = this.getState();
-      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, modelActionType);
+      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
 
       if (finalState) {
         this.setState(finalState);

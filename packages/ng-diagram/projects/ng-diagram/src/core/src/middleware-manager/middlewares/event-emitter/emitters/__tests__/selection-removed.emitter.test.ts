@@ -20,6 +20,7 @@ describe('SelectionRemovedEmitter', () => {
 
     context = {
       modelActionType: 'deleteSelection',
+      modelActionTypes: ['deleteSelection'],
       initialNodesMap: new Map<string, Node>(),
       initialEdgesMap: new Map<string, Edge>(),
       nodesMap: new Map<string, Node>(),
@@ -29,7 +30,7 @@ describe('SelectionRemovedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not deleteSelection', () => {
-      context.modelActionType = 'addNodes';
+      context.modelActionTypes = ['addNodes'];
 
       const node: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 } };
       context.initialNodesMap.set('node1', node);
@@ -41,7 +42,7 @@ describe('SelectionRemovedEmitter', () => {
     });
 
     it('should check for deleteSelection action type', () => {
-      context.modelActionType = 'deleteSelection';
+      context.modelActionTypes = ['deleteSelection'];
 
       const node: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 } };
       context.initialNodesMap.set('node1', node);

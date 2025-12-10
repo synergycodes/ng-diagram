@@ -20,6 +20,7 @@ describe('SelectionRotatedEmitter', () => {
 
     context = {
       modelActionType: 'rotateNodeTo',
+      modelActionTypes: ['rotateNodeTo'],
       initialNodesMap: new Map<string, Node>(),
       nodesMap: new Map<string, Node>(),
       initialUpdate: {},
@@ -28,7 +29,7 @@ describe('SelectionRotatedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not rotateNodeTo', () => {
-      context.modelActionType = 'addNodes';
+      context.modelActionTypes = ['addNodes'];
       const initialNode: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, angle: 0 };
       const rotatedNode: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, angle: 45 };
 
@@ -42,7 +43,7 @@ describe('SelectionRotatedEmitter', () => {
     });
 
     it('should check for rotateNodeTo action type', () => {
-      context.modelActionType = 'rotateNodeTo';
+      context.modelActionTypes = ['rotateNodeTo'];
       const initialNode: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, angle: 0 };
       const rotatedNode: Node = { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, angle: 45 };
 

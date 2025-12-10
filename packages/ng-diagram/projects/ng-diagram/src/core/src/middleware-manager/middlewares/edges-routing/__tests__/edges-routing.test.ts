@@ -78,6 +78,7 @@ describe('Edges Routing Middleware', () => {
       edgeRoutingManager: mockRoutingManager,
       actionStateManager: mockActionStateManager,
       modelActionType: 'addNodes',
+      modelActionTypes: ['addNodes'],
       helpers: {
         anyEdgesAdded: anyEdgesAddedMock,
         checkIfAnyNodePropsChanged: checkIfAnyNodePropsChangedMock,
@@ -110,7 +111,7 @@ describe('Edges Routing Middleware', () => {
     });
 
     it('should skip edge routing during active resize', () => {
-      context.modelActionType = 'resizeNode';
+      context.modelActionTypes = ['resizeNode'];
       mockActionStateManager.isResizing.mockReturnValue(true);
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
@@ -119,7 +120,7 @@ describe('Edges Routing Middleware', () => {
     });
 
     it('should allow edge routing for resizeNode when not actively resizing', () => {
-      context.modelActionType = 'resizeNode';
+      context.modelActionTypes = ['resizeNode'];
       mockActionStateManager.isResizing.mockReturnValue(false);
       checkIfAnyNodePropsChangedMock.mockReturnValue(true);
       checkIfEdgeChangedMock.mockReturnValue(true);
@@ -130,7 +131,7 @@ describe('Edges Routing Middleware', () => {
     });
 
     it('should proceed when edges need routing on init', () => {
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -151,7 +152,7 @@ describe('Edges Routing Middleware', () => {
       checkIfEdgeChangedMock.mockReturnValue(false);
       checkIfEdgeAddedMock.mockReturnValue(true);
 
-      context.modelActionType = 'addEdges';
+      context.modelActionTypes = ['addEdges'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -182,7 +183,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -224,7 +225,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -269,7 +270,7 @@ describe('Edges Routing Middleware', () => {
 
       // Update context with new state
       context.state = newState;
-      context.modelActionType = 'updateNodes';
+      context.modelActionTypes = ['updateNodes'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -304,7 +305,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -338,7 +339,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -381,7 +382,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -422,7 +423,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context, nextMock, () => null);
 
@@ -469,7 +470,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'updateNodes';
+      context.modelActionTypes = ['updateNodes'];
 
       checkIfMetadataPropsChangedMock.mockReturnValue(false);
       checkIfAnyNodePropsChangedMock.mockReturnValue(false);
@@ -505,7 +506,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
@@ -550,7 +551,7 @@ describe('Edges Routing Middleware', () => {
       nodesMap.clear();
       newState.nodes.forEach((node) => nodesMap.set(node.id, node));
       context.state = newState;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 

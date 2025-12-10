@@ -20,6 +20,7 @@ describe('SelectionMovedEmitter', () => {
 
     context = {
       modelActionType: 'moveNodes',
+      modelActionTypes: ['moveNodes'],
       initialNodesMap: new Map<string, Node>(),
       nodesMap: new Map<string, Node>(),
       initialUpdate: {},
@@ -29,7 +30,7 @@ describe('SelectionMovedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not a move action', () => {
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', position: { x: 100, y: 100 } }],
       };
@@ -44,12 +45,12 @@ describe('SelectionMovedEmitter', () => {
     });
 
     it('should emit event for moveNodes action', () => {
-      context.modelActionType = 'moveNodes';
+      context.modelActionTypes = ['moveNodes'];
       testMoveAction(context, emitter, eventManager, emitSpy);
     });
 
     it('should emit event for moveNodesBy action', () => {
-      context.modelActionType = 'moveNodesBy';
+      context.modelActionTypes = ['moveNodesBy'];
       testMoveAction(context, emitter, eventManager, emitSpy);
     });
   });

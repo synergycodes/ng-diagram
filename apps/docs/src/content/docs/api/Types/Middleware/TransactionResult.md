@@ -10,6 +10,18 @@ Result of a transaction execution.
 
 ## Properties
 
+### actionTypes
+
+> **actionTypes**: [`ModelActionTypes`](/docs/api/types/middleware/modelactiontypes/)
+
+All action types that were executed within the transaction.
+
+#### Since
+
+0.9.0
+
+***
+
 ### commandsCount
 
 > **commandsCount**: `number`

@@ -7,7 +7,7 @@ export class SelectionRemovedEmitter implements EventEmitter {
   name = 'SelectionRemovedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'deleteSelection') {
+    if (!context.modelActionTypes.includes('deleteSelection')) {
       return;
     }
 

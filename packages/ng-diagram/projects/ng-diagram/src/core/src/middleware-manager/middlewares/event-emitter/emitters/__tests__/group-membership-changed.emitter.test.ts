@@ -26,6 +26,7 @@ describe('GroupMembershipChangedEmitter', () => {
 
     context = {
       modelActionType: 'updateNodes',
+      modelActionTypes: ['updateNodes'],
       initialNodesMap: new Map<string, Node>(),
       nodesMap: new Map<string, Node>(),
       helpers,
@@ -34,7 +35,7 @@ describe('GroupMembershipChangedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not updateNodes', () => {
-      context.modelActionType = 'moveNodes';
+      context.modelActionTypes = ['moveNodes'];
       vi.mocked(helpers.checkIfAnyNodePropsChanged).mockReturnValue(true);
 
       emitter.emit(context, eventManager);
@@ -43,7 +44,7 @@ describe('GroupMembershipChangedEmitter', () => {
     });
 
     it('should check for groupId changes when modelActionType is updateNodes', () => {
-      context.modelActionType = 'updateNodes';
+      context.modelActionTypes = ['updateNodes'];
       vi.mocked(helpers.checkIfAnyNodePropsChanged).mockReturnValue(false);
 
       emitter.emit(context, eventManager);
