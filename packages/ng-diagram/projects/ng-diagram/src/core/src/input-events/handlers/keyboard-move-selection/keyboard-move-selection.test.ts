@@ -51,6 +51,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           edgePanningThreshold: 10,
           edgePanningForce: 15,
         },
+        viewportPanningEnabled: true,
       },
     } as unknown as FlowCore;
 
