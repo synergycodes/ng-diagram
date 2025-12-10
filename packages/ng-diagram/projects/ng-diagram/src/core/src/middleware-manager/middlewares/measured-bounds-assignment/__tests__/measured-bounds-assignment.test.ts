@@ -15,6 +15,7 @@ describe('measuredBoundsMiddleware', () => {
     mockContext = {
       nodesMap,
       modelActionType: 'updateNode',
+      modelActionTypes: ['updateNode'],
       helpers: {
         anyNodesAdded: vi.fn(() => false),
         checkIfAnyNodePropsChanged: vi.fn(() => false),
@@ -26,7 +27,7 @@ describe('measuredBoundsMiddleware', () => {
 
   describe('init case', () => {
     beforeEach(() => {
-      mockContext.modelActionType = 'init';
+      mockContext.modelActionTypes = ['init'];
     });
 
     it('should calculate measured bounds for all fully measured nodes', () => {
@@ -451,7 +452,7 @@ describe('measuredBoundsMiddleware', () => {
         ],
       };
 
-      mockContext.modelActionType = 'init';
+      mockContext.modelActionTypes = ['init'];
       nodesMap.set('node1', node);
 
       measuredBoundsMiddleware.execute(mockContext as MiddlewareContext, mockNext, vi.fn());
@@ -471,7 +472,7 @@ describe('measuredBoundsMiddleware', () => {
         angle: 45, // Rotated
       };
 
-      mockContext.modelActionType = 'init';
+      mockContext.modelActionTypes = ['init'];
       nodesMap.set('node1', node);
 
       measuredBoundsMiddleware.execute(mockContext as MiddlewareContext, mockNext, vi.fn());

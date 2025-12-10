@@ -20,6 +20,7 @@ describe('NodeResizedEmitter', () => {
 
     context = {
       modelActionType: 'resizeNode',
+      modelActionTypes: ['resizeNode'],
       initialNodesMap: new Map<string, Node>(),
       nodesMap: new Map<string, Node>(),
       initialUpdate: {},
@@ -28,7 +29,7 @@ describe('NodeResizedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not resizeNode', () => {
-      context.modelActionType = 'addNodes';
+      context.modelActionTypes = ['addNodes'];
       const initialNode: Node = {
         ...mockNode,
         id: 'node1',
@@ -52,7 +53,7 @@ describe('NodeResizedEmitter', () => {
     });
 
     it('should check for resizeNode action type', () => {
-      context.modelActionType = 'resizeNode';
+      context.modelActionTypes = ['resizeNode'];
       const initialNode: Node = {
         ...mockNode,
         id: 'node1',

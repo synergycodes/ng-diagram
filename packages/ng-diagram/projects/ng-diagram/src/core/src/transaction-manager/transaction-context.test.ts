@@ -102,7 +102,7 @@ describe('createTransactionContext', () => {
   describe('transaction', () => {
     it('should delegate to flowCore.transactionManager.transaction', async () => {
       const mockCallback = vi.fn();
-      const expectedResult = { results: {}, commandsCount: 0 };
+      const expectedResult = { results: {}, commandsCount: 0, actionTypes: [] };
 
       vi.mocked(mockFlowCore.transactionManager.transaction).mockResolvedValue(expectedResult);
 
@@ -144,8 +144,8 @@ describe('createTransactionContext', () => {
 
     it('should return queued updates from transaction', () => {
       const mockQueue = [
-        { update: { nodesToAdd: [] }, actionType: 'addNodes' },
-        { update: { edgesToAdd: [] }, actionType: 'addEdges' },
+        { update: { nodesToAdd: [] }, actionTypes: ['addNodes'] },
+        { update: { edgesToAdd: [] }, actionTypes: ['addEdges'] },
       ];
       vi.mocked(mockTransaction.getQueue).mockReturnValue(mockQueue);
 

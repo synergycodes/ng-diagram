@@ -121,7 +121,7 @@ describe('MiddlewareManager', () => {
   describe('constructor', () => {
     it('should register starting middlewares if they are provided', () => {
       const middlewareManager = new MiddlewareManager(flowCore, [mockMiddleware1] as unknown as TestMiddlewares);
-      middlewareManager.execute(initialState, stateUpdate, 'init');
+      middlewareManager.execute(initialState, stateUpdate, ['init']);
 
       expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
         mockMiddleware1,
@@ -164,8 +164,8 @@ describe('MiddlewareManager', () => {
       middlewareManager.register(mockMiddleware1);
       middlewareManager.unregister(mockMiddleware1.name);
 
-      middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
-      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      middlewareManager.execute(initialState, stateUpdate, ['changeSelection']);
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, ['changeSelection']);
     });
 
     it('should handle unregistering a non-existent middleware gracefully', () => {
@@ -191,15 +191,15 @@ describe('MiddlewareManager', () => {
       middlewareManager.register(mockMiddleware1);
       middlewareManager.register(mockMiddleware2);
 
-      middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
+      middlewareManager.execute(initialState, stateUpdate, ['changeSelection']);
 
-      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, ['changeSelection']);
     });
 
     it('should return passed next state when no middlewares are registered', () => {
-      middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
+      middlewareManager.execute(initialState, stateUpdate, ['changeSelection']);
 
-      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, ['changeSelection']);
     });
   });
 
@@ -244,9 +244,9 @@ describe('MiddlewareManager', () => {
       // Ensure no middlewares are registered
       expect(middlewareManager['middlewareChain']).toHaveLength(0);
 
-      middlewareManager.execute(initialState, stateUpdate, 'changeSelection');
+      middlewareManager.execute(initialState, stateUpdate, ['changeSelection']);
 
-      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, 'changeSelection');
+      expect(mockRun).toHaveBeenCalledWith(initialState, stateUpdate, ['changeSelection']);
     });
   });
 });

@@ -8,17 +8,11 @@ title: "ModelActionType"
 
 > **ModelActionType** = `"init"` \| `"changeSelection"` \| `"moveNodesBy"` \| `"deleteSelection"` \| `"addNodes"` \| `"updateNode"` \| `"updateNodes"` \| `"deleteNodes"` \| `"clearModel"` \| `"paletteDropNode"` \| `"addEdges"` \| `"updateEdge"` \| `"deleteEdges"` \| `"deleteElements"` \| `"paste"` \| `"moveViewport"` \| `"resizeNode"` \| `"startLinking"` \| `"moveTemporaryEdge"` \| `"finishLinking"` \| `"zoom"` \| `"changeZOrder"` \| `"rotateNodeTo"` \| `"highlightGroup"` \| `"highlightGroupClear"` \| `"moveNodes"` \| `"moveNodesStop"`
 
-Model action types that can trigger middleware execution.
+Individual model action type that can trigger middleware execution.
 These represent all possible operations that modify the diagram state.
 
 ## Example
 
 ```typescript
-const middleware: Middleware = {
-  name: 'logger',
-  execute: (context, next) => {
-    console.log('Action type:', context.modelActionType);
-    next();
-  }
-};
+const blockedActions: ModelActionType[] = ['addNodes', 'deleteNodes', 'updateNode'];
 ```

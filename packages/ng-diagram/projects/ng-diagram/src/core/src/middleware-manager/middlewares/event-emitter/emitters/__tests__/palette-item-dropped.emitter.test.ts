@@ -20,6 +20,7 @@ describe('PaletteItemDroppedEmitter', () => {
 
     context = {
       modelActionType: 'paletteDropNode',
+      modelActionTypes: ['paletteDropNode'],
       initialNodesMap: new Map<string, Node>(),
       nodesMap: new Map<string, Node>(),
       initialUpdate: {},
@@ -28,7 +29,7 @@ describe('PaletteItemDroppedEmitter', () => {
 
   describe('modelActionType filtering', () => {
     it('should not emit event when modelActionType is not paletteDropNode', () => {
-      context.modelActionType = 'addNodes';
+      context.modelActionTypes = ['addNodes'];
       context.initialUpdate = {
         nodesToAdd: [{ ...mockNode, id: 'node1', position: { x: 100, y: 100 } }],
       };
@@ -41,7 +42,7 @@ describe('PaletteItemDroppedEmitter', () => {
     });
 
     it('should check for paletteDropNode action type', () => {
-      context.modelActionType = 'paletteDropNode';
+      context.modelActionTypes = ['paletteDropNode'];
       const node: Node = { ...mockNode, id: 'node1', position: { x: 100, y: 100 } };
       context.initialUpdate = { nodesToAdd: [node] };
       context.nodesMap.set('node1', node);

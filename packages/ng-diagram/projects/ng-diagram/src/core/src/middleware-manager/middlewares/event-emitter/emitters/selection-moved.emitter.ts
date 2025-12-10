@@ -9,7 +9,7 @@ export class SelectionMovedEmitter implements EventEmitter {
   private readonly moveActions = ['moveNodes', 'moveNodesBy'];
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (!this.moveActions.includes(context.modelActionType)) {
+    if (!this.moveActions.some((action) => context.modelActionTypes.includes(action))) {
       return;
     }
 

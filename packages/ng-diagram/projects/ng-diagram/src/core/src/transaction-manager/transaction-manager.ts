@@ -1,5 +1,5 @@
 import type { FlowCore } from '../flow-core';
-import type { FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
+import type { FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '../types';
 import type { TransactionCallback, TransactionResult } from '../types/transaction.interface';
 import { Transaction } from './transaction';
 
@@ -34,11 +34,12 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
           transaction.mergeToParent();
         } else {
           // Root transaction - apply changes
-          const { mergedUpdate, commandsCount } = transaction.getMergedUpdates();
+          const { mergedUpdate, commandsCount, actionTypes } = transaction.getMergedUpdates();
 
           return {
             results: mergedUpdate,
             commandsCount,
+            actionTypes,
           };
         }
       }
@@ -46,6 +47,7 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
       return {
         results: {},
         commandsCount: 0,
+        actionTypes: [],
       };
     } catch (error) {
       // Automatic rollback on error
@@ -57,13 +59,13 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
     }
   }
 
-  queueUpdate(update: FlowStateUpdate, actionType: LooseAutocomplete<ModelActionType>): void {
+  queueUpdate(update: FlowStateUpdate, actionTypes: ModelActionTypes): void {
     const currentTransaction = this.getCurrentTransaction();
 
     if (!currentTransaction) {
       throw new Error('No active transaction. Cannot queue update.');
     }
-    currentTransaction.queueUpdate(update, actionType);
+    currentTransaction.queueUpdate(update, actionTypes);
   }
 
   isActive(): boolean {

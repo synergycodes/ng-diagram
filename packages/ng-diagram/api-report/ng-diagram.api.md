@@ -470,7 +470,9 @@ export interface MiddlewareContext {
     initialNodesMap: Map<string, Node_2>;
     initialState: FlowState;
     initialUpdate: FlowStateUpdate;
+    // @deprecated
     modelActionType: ModelActionType;
+    modelActionTypes: ModelActionTypes;
     nodesMap: Map<string, Node_2>;
     state: FlowState;
 }
@@ -512,6 +514,9 @@ export interface Model {
 
 // @public
 export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'paste' | 'moveViewport' | 'resizeNode' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStop';
+
+// @public
+export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
 
 // @public
 export interface ModelAdapter {
@@ -1314,6 +1319,7 @@ export interface SnappingConfig {
 
 // @public
 export interface TransactionResult {
+    actionTypes: ModelActionTypes;
     commandsCount: number;
     results: FlowStateUpdate;
 }

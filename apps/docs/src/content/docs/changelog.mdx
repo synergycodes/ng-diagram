@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Floating edges for edges with no ports specified ([#465](https://github.com/synergycodes/ng-diagram/pull/465))
 - Expose `computePartsBounds` method in API ([#477](https://github.com/synergycodes/ng-diagram/pull/477))
 - Added overload to `getOverlappingNodes` to accept `Node` object in addition to node ID, supporting cases when the node object has newer data than the node in state (e.g., within middlewares) ([#486](https://github.com/synergycodes/ng-diagram/pull/486))
+- `modelActionTypes` property on `MiddlewareContext` - an array containing all action types that triggered the middleware execution. For transactions, this includes the transaction name followed by all action types from commands executed within the transaction. For single commands, this is a single-element array. ([#489](https://github.com/synergycodes/ng-diagram/pull/489))
 
 ### Changed
 
@@ -31,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed drag-snapping issues with different snapping configurations. The issue still occurred when dragging multiple nodes at the same hierarchy level (i.e., nodes without groups) ([#470](https://github.com/synergycodes/ng-diagram/pull/470))
 - Fixed incorrectly computed measuredBounds for nodes ([#486]https://github.com/synergycodes/ng-diagram/pull/486)
 - Fixed missing edge arrowheads in Safari. Safari doesn't support `context-stroke` in SVG markers, so a fallback using inline markers with `currentColor` substitution is now used for Safari compatibility ([#487](https://github.com/synergycodes/ng-diagram/pull/487))
+
+### Deprecated
+
+- `modelActionType` property on `MiddlewareContext` is now deprecated. Use `modelActionTypes` instead, which supports multiple actions from transactions. ([#489](https://github.com/synergycodes/ng-diagram/pull/489))
 
 ## [0.8.1] - 2025-11-20
 

@@ -116,6 +116,7 @@ title: "ng-diagram"
 - [TransactionResult](/docs/api/types/middleware/transactionresult/)
 - [MiddlewareChain](/docs/api/types/middleware/middlewarechain/)
 - [ModelActionType](/docs/api/types/middleware/modelactiontype/)
+- [ModelActionTypes](/docs/api/types/middleware/modelactiontypes/)
 
 ## Types/Model
 

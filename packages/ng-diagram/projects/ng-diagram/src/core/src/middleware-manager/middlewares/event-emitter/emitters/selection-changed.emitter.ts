@@ -7,7 +7,7 @@ export class SelectionChangedEmitter implements EventEmitter {
   name = 'SelectionChangedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'changeSelection') {
+    if (!context.modelActionTypes.includes('changeSelection')) {
       return;
     }
 

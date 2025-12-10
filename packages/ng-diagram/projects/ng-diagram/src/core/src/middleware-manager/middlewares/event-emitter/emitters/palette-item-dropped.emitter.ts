@@ -7,7 +7,7 @@ export class PaletteItemDroppedEmitter implements EventEmitter {
   name = 'PaletteItemDroppedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'paletteDropNode') {
+    if (!context.modelActionTypes.includes('paletteDropNode')) {
       return;
     }
 
