@@ -796,6 +796,7 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     } | null;
     getNodesInRange(point: Point, range: number): Node_2[];
     getOverlappingNodes(nodeId: string): Node_2[];
+    getOverlappingNodes(node: Node_2): Node_2[];
     getParentHierarchy(nodeId: string): GroupNode[];
     isNestedChild(nodeId: string, groupId: string): boolean;
     readonly metadata: Signal<Metadata<object>>;

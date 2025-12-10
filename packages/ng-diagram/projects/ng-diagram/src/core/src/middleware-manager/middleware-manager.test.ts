@@ -12,6 +12,22 @@ vi.mock('./middlewares/edges-routing', () => ({
   },
 }));
 
+const mockMeasuredBoundsMiddleware = vi.hoisted(() => ({
+  name: 'measured-bounds',
+  execute: vi.fn(),
+}));
+
+const mockLoggerMiddleware = vi.hoisted(() => ({
+  name: 'logger',
+  execute: vi.fn(),
+}));
+
+vi.mock('./middlewares', () => ({
+  createEventEmitterMiddleware: vi.fn(),
+  measuredBoundsMiddleware: mockMeasuredBoundsMiddleware,
+  loggerMiddleware: mockLoggerMiddleware,
+}));
+
 const mockRun = vi.fn();
 vi.mock('./middleware-executor', () => ({
   MiddlewareExecutor: vi.fn().mockImplementation(() => ({
@@ -107,7 +123,11 @@ describe('MiddlewareManager', () => {
       const middlewareManager = new MiddlewareManager(flowCore, [mockMiddleware1] as unknown as TestMiddlewares);
       middlewareManager.execute(initialState, stateUpdate, 'init');
 
-      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [mockMiddleware1]);
+      expect(MiddlewareExecutor).toHaveBeenCalledWith(flowCore, [
+        mockMiddleware1,
+        mockMeasuredBoundsMiddleware,
+        mockLoggerMiddleware,
+      ]);
     });
   });
 

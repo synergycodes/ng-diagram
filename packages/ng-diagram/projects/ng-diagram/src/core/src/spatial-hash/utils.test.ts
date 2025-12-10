@@ -554,5 +554,154 @@ describe('SpatialHash utils', () => {
       expect(result2.map((n) => n.id).sort()).toEqual(['node1', 'node3'].sort());
       expect(result3.map((n) => n.id)).toEqual(['node2']);
     });
+
+    describe('when called with node object', () => {
+      it('should return overlapping nodes when passing node object directly', () => {
+        const node1: Node = {
+          ...mockNode,
+          id: 'node1',
+          position: { x: 0, y: 0 },
+          size: { width: 100, height: 100 },
+        };
+        const node2: Node = {
+          ...mockNode,
+          id: 'node2',
+          position: { x: 50, y: 50 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+        };
+
+        mockGetNodeById.mockImplementation((id) => {
+          if (id === 'node2') return node2;
+          return null;
+        });
+        mockQueryIds.mockReturnValue(['node1', 'node2']);
+
+        const result = getOverlappingNodes(flowCore, node1);
+
+        expect(result.map((n) => n.id)).toEqual(['node2']);
+      });
+
+      it('should compute fresh bounds when node object is passed (ignoring stale measuredBounds)', () => {
+        // Node with stale measuredBounds that doesn't match current position
+        const nodeWithStaleBounds: Node = {
+          ...mockNode,
+          id: 'node1',
+          position: { x: 50, y: 50 }, // Current position
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 0, y: 0, width: 100, height: 100 }, // Stale bounds from old position
+        };
+        const node2: Node = {
+          ...mockNode,
+          id: 'node2',
+          position: { x: 110, y: 100 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 110, y: 100, width: 100, height: 100 },
+        };
+
+        mockGetNodeById.mockImplementation((id) => {
+          if (id === 'node2') return node2;
+          return null;
+        });
+        mockQueryIds.mockReturnValue(['node1', 'node2']);
+
+        const result = getOverlappingNodes(flowCore, nodeWithStaleBounds);
+
+        expect(result.map((n) => n.id)).toEqual(['node2']);
+        expect(mockQueryIds).toHaveBeenCalledWith({ x: 50, y: 50, width: 100, height: 100 });
+      });
+
+      it('should use cached measuredBounds when nodeId string is passed', () => {
+        const node1: Node = {
+          ...mockNode,
+          id: 'node1',
+          position: { x: 50, y: 50 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+        };
+        const node2: Node = {
+          ...mockNode,
+          id: 'node2',
+          position: { x: 50, y: 50 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+        };
+
+        mockGetNodeById.mockImplementation((id) => {
+          if (id === 'node1') return node1;
+          if (id === 'node2') return node2;
+          return null;
+        });
+        mockQueryIds.mockReturnValue(['node1', 'node2']);
+
+        getOverlappingNodes(flowCore, 'node1');
+
+        expect(mockQueryIds).toHaveBeenCalledWith({ x: 0, y: 0, width: 100, height: 100 });
+      });
+
+      it('should not include the passed node itself in the results', () => {
+        const node1: Node = {
+          ...mockNode,
+          id: 'node1',
+          position: { x: 0, y: 0 },
+          size: { width: 100, height: 100 },
+        };
+        const node2: Node = {
+          ...mockNode,
+          id: 'node2',
+          position: { x: 50, y: 50 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 50, y: 50, width: 100, height: 100 },
+        };
+
+        mockGetNodeById.mockImplementation((id) => {
+          if (id === 'node1') return node1;
+          if (id === 'node2') return node2;
+          return null;
+        });
+        mockQueryIds.mockReturnValue(['node1', 'node2']);
+
+        const result = getOverlappingNodes(flowCore, node1);
+        const resultIds = result.map((n) => n.id);
+
+        expect(resultIds).not.toContain('node1');
+        expect(resultIds).toEqual(['node2']);
+      });
+
+      it('should handle node object with updated position for middleware use case', () => {
+        const originalNode: Node = {
+          ...mockNode,
+          id: 'node1',
+          position: { x: 0, y: 0 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+        };
+
+        const updatedNode: Node = {
+          ...originalNode,
+          position: { x: 150, y: 150 },
+        };
+
+        const node2: Node = {
+          ...mockNode,
+          id: 'node2',
+          position: { x: 200, y: 200 },
+          size: { width: 100, height: 100 },
+          measuredBounds: { x: 200, y: 200, width: 100, height: 100 },
+        };
+
+        mockGetNodeById.mockImplementation((id) => {
+          if (id === 'node1') return originalNode;
+          if (id === 'node2') return node2;
+          return null;
+        });
+        mockQueryIds.mockReturnValue(['node1', 'node2']);
+
+        const result = getOverlappingNodes(flowCore, updatedNode);
+
+        expect(result.map((n) => n.id)).toEqual(['node2']);
+        expect(mockQueryIds).toHaveBeenCalledWith({ x: 150, y: 150, width: 100, height: 100 });
+      });
+    });
   });
 });

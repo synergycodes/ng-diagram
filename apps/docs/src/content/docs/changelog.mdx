@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Landing page diagram example in documentation ([#464](https://github.com/synergycodes/ng-diagram/pull/464))
 - Floating edges for edges with no ports specified ([#465](https://github.com/synergycodes/ng-diagram/pull/465))
 - Expose `computePartsBounds` method in API ([#477](https://github.com/synergycodes/ng-diagram/pull/477))
+- Added overload to `getOverlappingNodes` to accept `Node` object in addition to node ID, supporting cases when the node object has newer data than the node in state (e.g., within middlewares) ([#486](https://github.com/synergycodes/ng-diagram/pull/486))
 
 ### Changed
 
@@ -28,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed misleading error when destroying `NgDiagramModelService` after engine is already destroyed. The error incorrectly reported "Library engine not initialized yet". Now the service checks if engine is available and skips listener cleanup if already destroyed. ([#466](https://github.com/synergycodes/ng-diagram/issues/466) - thanks for finding this [@Filipstrozik](https://github.com/Filipstrozik) 💪)
 - Fixed drag-snapping issues with different snapping configurations. The issue still occurred when dragging multiple nodes at the same hierarchy level (i.e., nodes without groups) ([#470](https://github.com/synergycodes/ng-diagram/pull/470))
+- Fixed incorrectly computed measuredBounds for nodes ([#486]https://github.com/synergycodes/ng-diagram/pull/486)
 - Fixed missing edge arrowheads in Safari. Safari doesn't support `context-stroke` in SVG markers, so a fallback using inline markers with `currentColor` substitution is now used for Safari compatibility ([#487](https://github.com/synergycodes/ng-diagram/pull/487))
 
 ## [0.8.1] - 2025-11-20

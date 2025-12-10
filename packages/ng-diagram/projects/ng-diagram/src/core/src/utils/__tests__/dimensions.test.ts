@@ -104,6 +104,128 @@ describe('dimensions', () => {
         height: 40,
       });
     });
+
+    it('should include measuredLabels in bounds calculation', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 10, y: 10 },
+          { x: 100, y: 10 },
+        ],
+        measuredLabels: [
+          {
+            id: 'label-1',
+            positionOnEdge: 0.5,
+            position: { x: 50, y: -20 },
+            size: { width: 40, height: 20 },
+          },
+        ],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 10,
+        y: -20,
+        width: 90,
+        height: 30,
+      });
+    });
+
+    it('should handle labels extending beyond edge points', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 50, y: 50 },
+          { x: 100, y: 50 },
+        ],
+        measuredLabels: [
+          {
+            id: 'label-1',
+            positionOnEdge: 0,
+            position: { x: 20, y: 30 },
+            size: { width: 60, height: 40 },
+          },
+          {
+            id: 'label-2',
+            positionOnEdge: 1,
+            position: { x: 90, y: 60 },
+            size: { width: 50, height: 30 },
+          },
+        ],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 20,
+        y: 30,
+        width: 120,
+        height: 60,
+      });
+    });
+
+    it('should handle labels without position or size', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 10, y: 20 },
+          { x: 50, y: 100 },
+        ],
+        measuredLabels: [
+          {
+            id: 'label-1',
+            positionOnEdge: 0.5,
+          },
+          {
+            id: 'label-2',
+            positionOnEdge: 0.5,
+            position: { x: 30, y: 60 },
+          },
+        ],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 10,
+        y: 20,
+        width: 40,
+        height: 80,
+      });
+    });
+
+    it('should handle empty measuredLabels array', () => {
+      const edge: Edge = {
+        id: 'edge-1',
+        source: 'node-1',
+        target: 'node-2',
+        data: {},
+        points: [
+          { x: 10, y: 20 },
+          { x: 50, y: 100 },
+        ],
+        measuredLabels: [],
+      };
+
+      const result = getEdgeMeasuredBounds(edge);
+
+      expect(result).toEqual({
+        x: 10,
+        y: 20,
+        width: 40,
+        height: 80,
+      });
+    });
   });
 
   describe('getNodeMeasuredBounds', () => {
@@ -297,7 +419,7 @@ describe('dimensions', () => {
       });
     });
 
-    it('should handle rotated node with ports', () => {
+    it('should handle 90 degree rotated node with port extending left in host-local space', () => {
       const node: Node = {
         id: 'node-1',
         position: { x: 0, y: 0 },
@@ -318,10 +440,67 @@ describe('dimensions', () => {
 
       const result = getNodeMeasuredBounds(node);
 
-      expect(result.width).toBeGreaterThanOrEqual(50);
-      expect(result.height).toBeGreaterThanOrEqual(100);
-      expect(Number.isFinite(result.x)).toBe(true);
-      expect(Number.isFinite(result.y)).toBe(true);
+      expect(result.x).toBeCloseTo(-10, 1);
+      expect(result.y).toBeCloseTo(-25, 1);
+      expect(result.width).toBeCloseTo(85, 1);
+      expect(result.height).toBeCloseTo(100, 1);
+    });
+
+    it('should handle 180 degree rotated node with port on opposite side', () => {
+      const node: Node = {
+        id: 'node-1',
+        position: { x: 100, y: 100 },
+        size: { width: 180, height: 32 },
+        angle: 180,
+        data: {},
+        measuredPorts: [
+          {
+            id: 'port-1',
+            position: { x: 176, y: 12 },
+            size: { width: 6, height: 8 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'left',
+          },
+        ],
+      };
+
+      const result = getNodeMeasuredBounds(node);
+
+      expect(result.x).toBeCloseTo(100, 1);
+      expect(result.y).toBeCloseTo(100, 1);
+      expect(result.width).toBeCloseTo(182, 1);
+      expect(result.height).toBeCloseTo(32, 1);
+    });
+
+    it('should handle 45 degree rotated node with port', () => {
+      const node: Node = {
+        id: 'node-1',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 100 },
+        angle: 45,
+        data: {},
+        measuredPorts: [
+          {
+            id: 'port-1',
+            position: { x: -30, y: 40 },
+            size: { width: 10, height: 20 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'left',
+          },
+        ],
+      };
+
+      const result = getNodeMeasuredBounds(node);
+
+      const diagonal = 100 * Math.sqrt(2);
+      const rotatedOffset = (diagonal - 100) / 2;
+
+      expect(result.x).toBeCloseTo(-30, 1);
+      expect(result.y).toBeCloseTo(-rotatedOffset, 1);
+      expect(result.width).toBeCloseTo(30 + 100 + rotatedOffset, 1);
+      expect(result.height).toBeCloseTo(diagonal, 1);
     });
 
     it('should handle node with default size', () => {

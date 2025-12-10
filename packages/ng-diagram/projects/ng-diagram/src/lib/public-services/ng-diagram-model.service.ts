@@ -225,8 +225,17 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @param nodeId - The ID of the node to check for collisions
    * @returns An array of Nodes that overlap with the specified node
    */
-  getOverlappingNodes(nodeId: string): Node[] {
-    return this.flowCore.getOverlappingNodes(nodeId);
+  getOverlappingNodes(nodeId: string): Node[];
+  /**
+   * Detects collision with other nodes by finding all nodes whose rectangles intersect
+   * with the specified node's bounding rectangle.
+   *
+   * @param node - The node to check for collisions
+   * @returns An array of Nodes that overlap with the specified node
+   */
+  getOverlappingNodes(node: Node): Node[];
+  getOverlappingNodes(nodeOrId: Node | string): Node[] {
+    return this.flowCore.getOverlappingNodes(nodeOrId as Node & string);
   }
 
   /**

@@ -78,18 +78,27 @@ export const getNodesInRect = (flowCore: FlowCore, rect: Rect, partialInclusion 
   return fullyContainedNodes;
 };
 
-export const getOverlappingNodes = (flowCore: FlowCore, nodeId: string): Node[] => {
-  const targetNode = flowCore.modelLookup.getNodeById(nodeId);
+export function getOverlappingNodes(flowCore: FlowCore, nodeId: string): Node[];
+export function getOverlappingNodes(flowCore: FlowCore, node: Node): Node[];
+export function getOverlappingNodes(flowCore: FlowCore, nodeOrId: Node | string): Node[] {
+  const isNodeId = typeof nodeOrId === 'string';
+  const targetNode = isNodeId ? flowCore.modelLookup.getNodeById(nodeOrId) : nodeOrId;
+
   if (!targetNode) {
     return [];
   }
 
-  const measuredBounds = targetNode.measuredBounds ?? getNodeMeasuredBounds(targetNode);
+  // When a node object is passed, always compute fresh bounds - edge case if it is used
+  // inside a middleware, measuredBounds may be obsolete
+  const measuredBounds = isNodeId
+    ? (targetNode.measuredBounds ?? getNodeMeasuredBounds(targetNode))
+    : getNodeMeasuredBounds(targetNode);
+
   const foundNodesIds = flowCore.spatialHash.queryIds(measuredBounds);
   const foundNodes: Node[] = [];
 
   for (const candidateNodeId of foundNodesIds) {
-    if (candidateNodeId === nodeId) continue;
+    if (candidateNodeId === targetNode.id) continue;
 
     const candidateNode = flowCore.modelLookup.getNodeById(candidateNodeId);
     if (candidateNode && checkCollision(targetNode, candidateNode)) {
@@ -98,4 +107,4 @@ export const getOverlappingNodes = (flowCore: FlowCore, nodeId: string): Node[] 
   }
 
   return foundNodes;
-};
+}
