@@ -1,4 +1,14 @@
-<svg>
+<svg [style.color]="stroke() || 'var(--edge-stroke, var(--ngd-default-edge-stroke))'">
+  <!-- Inline markers for Safari (context-stroke not supported) -->
+  @if (useInlineMarkers) {
+    <defs
+      ngDiagramInlineMarkers
+      [sourceMarkerId]="sourceMarkerId()"
+      [targetMarkerId]="targetMarkerId()"
+      [edgeId]="edge().id"
+    ></defs>
+  }
+
   <path
     [class]="class()"
     [attr.d]="path()"
