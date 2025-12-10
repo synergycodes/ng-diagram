@@ -40,8 +40,15 @@ export class DiagramComponent {
         position: { x: 50, y: 120 },
         data: { label: 'Node 1' },
         rotatable: true,
+        resizable: false,
       },
-      { id: '2', position: { x: 300, y: 120 }, data: { label: 'Node 2' } },
+      {
+        id: '2',
+        position: { x: 300, y: 120 },
+        data: { label: 'Node 2' },
+        rotatable: false,
+        resizable: true,
+      },
     ],
     edges: [
       {
