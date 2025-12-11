@@ -156,7 +156,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -267,7 +267,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1006,7 +1006,10 @@ export class NgDiagramService extends NgDiagramBaseService {
     setDefaultRouting(name: string): void;
     setEventsEnabled(enabled: boolean): void;
     startLinking(node: Node_2, portId?: string): void;
+    transaction(callback: () => Promise<void>): Promise<TransactionResult>;
+    transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
     transaction(callback: () => void): void;
+    transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
     unregisterMiddleware(name: string): void;
     unregisterRouting(name: string): void;
     updateConfig(config: Partial<NgDiagramConfig>): void;
@@ -1079,7 +1082,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1320,6 +1323,11 @@ export interface SnappingConfig {
 }
 
 // @public
+export interface TransactionOptions {
+    waitForMeasurements?: boolean;
+}
+
+// @public
 export interface TransactionResult {
     actionTypes: ModelActionTypes;
     commandsCount: number;
@@ -1365,7 +1373,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)

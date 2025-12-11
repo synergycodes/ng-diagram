@@ -93,6 +93,10 @@ Configuration for node grouping.
 
 > `optional` **hideWatermark**: `boolean`
 
+#### Since
+
+0.9.0
+
 Hides the ngDiagram watermark when set to true.
 
 #### Default
