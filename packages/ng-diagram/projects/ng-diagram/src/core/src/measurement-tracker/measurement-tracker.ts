@@ -26,7 +26,7 @@ import type { FlowStateUpdate } from '../types';
  * tracker.trackStateUpdate(stateUpdate);
  *
  * // Middleware signals activity when size changes
- * tracker.signalActivity('node:n1'); // Cancels initialTimeout, starts debounce
+ * tracker.signalNodeActivity(nodeId); // Cancels initialTimeout, starts debounce
  *
  * // Wait for all measurements to settle
  * await tracker.waitForMeasurements();
@@ -42,17 +42,11 @@ export class MeasurementTracker {
   private waitingPromise: Promise<void> | null = null;
   private waitingResolve: (() => void) | null = null;
 
-  /** Current debounce timeout in milliseconds */
-  private debounceMs = 50;
-
-  /** Current initial timeout in milliseconds */
-  private initialTimeoutMs = 2000;
-
-  /** Default debounce timeout in milliseconds */
   private readonly defaultDebounceMs = 50;
-
-  /** Default initial timeout in milliseconds */
   private readonly defaultInitialTimeoutMs = 2000;
+
+  private debounceMs = this.defaultDebounceMs;
+  private initialTimeoutMs = this.defaultInitialTimeoutMs;
 
   /**
    * Tracks all entities from a state update for measurement completion.
@@ -62,11 +56,9 @@ export class MeasurementTracker {
    * @param initialTimeoutMs - Initial timeout in milliseconds to wait for first activity (default: 2000)
    */
   trackStateUpdate(stateUpdate: FlowStateUpdate, debounceMs?: number, initialTimeoutMs?: number): void {
-    // Update timeouts if provided
     this.debounceMs = debounceMs ?? this.defaultDebounceMs;
     this.initialTimeoutMs = initialTimeoutMs ?? this.defaultInitialTimeoutMs;
 
-    // Collect all entity IDs
     if (stateUpdate.nodesToAdd) {
       for (const node of stateUpdate.nodesToAdd) {
         this.trackedIds.add(`node:${node.id}`);
@@ -88,10 +80,9 @@ export class MeasurementTracker {
       }
     }
 
-    // Start initial timeout if not already running
     if (!this.initialTimeoutId && !this.hasReceivedActivity) {
       this.initialTimeoutId = setTimeout(() => {
-        this.complete();
+        this.onInitialTimeout();
       }, this.initialTimeoutMs);
     }
   }
@@ -110,28 +101,6 @@ export class MeasurementTracker {
     this.signalActivity(`edge:${edgeId}`);
   }
 
-  private signalActivity(id: string): void {
-    if (!this.trackedIds.has(id)) return;
-
-    // First activity - cancel initial timeout
-    if (!this.hasReceivedActivity) {
-      this.hasReceivedActivity = true;
-      if (this.initialTimeoutId) {
-        clearTimeout(this.initialTimeoutId);
-        this.initialTimeoutId = null;
-      }
-    }
-
-    // Reset debounce timer
-    if (this.debounceTimeoutId) {
-      clearTimeout(this.debounceTimeoutId);
-    }
-
-    this.debounceTimeoutId = setTimeout(() => {
-      this.complete();
-    }, this.debounceMs);
-  }
-
   /**
    * Returns a promise that resolves when all currently pending measurements are complete.
    * If there are no pending measurements, resolves immediately.
@@ -141,7 +110,6 @@ export class MeasurementTracker {
       return Promise.resolve();
     }
 
-    // Reuse existing waiting promise if available
     if (this.waitingPromise) {
       return this.waitingPromise;
     }
@@ -153,25 +121,40 @@ export class MeasurementTracker {
     return this.waitingPromise;
   }
 
-  /**
-   * Returns true if there are pending measurements.
-   */
   hasPendingMeasurements(): boolean {
     return this.trackedIds.size > 0;
   }
 
-  /**
-   * Returns the number of pending measurements.
-   */
-  getPendingCount(): number {
-    return this.trackedIds.size;
+  private onInitialTimeout(): void {
+    const pendingIds = [...this.trackedIds];
+    console.warn('[MeasurementTracker] Initial timeout reached. No measurement activity received.', {
+      pendingEntities: pendingIds,
+      timeoutMs: this.initialTimeoutMs,
+    });
+    this.clear();
   }
 
-  /**
-   * Clears all pending measurements and resolves all waiting promises.
-   * Use this to reset state or handle error scenarios.
-   */
-  clear(): void {
+  private signalActivity(id: string): void {
+    if (!this.trackedIds.has(id)) return;
+
+    if (!this.hasReceivedActivity) {
+      this.hasReceivedActivity = true;
+      if (this.initialTimeoutId) {
+        clearTimeout(this.initialTimeoutId);
+        this.initialTimeoutId = null;
+      }
+    }
+
+    if (this.debounceTimeoutId) {
+      clearTimeout(this.debounceTimeoutId);
+    }
+
+    this.debounceTimeoutId = setTimeout(() => {
+      this.clear();
+    }, this.debounceMs);
+  }
+
+  private clear(): void {
     if (this.initialTimeoutId) {
       clearTimeout(this.initialTimeoutId);
       this.initialTimeoutId = null;
@@ -183,31 +166,7 @@ export class MeasurementTracker {
 
     this.trackedIds.clear();
     this.hasReceivedActivity = false;
-    this.notifyWaiting();
-  }
 
-  /**
-   * Completes measurement tracking and notifies waiting promises.
-   */
-  private complete(): void {
-    if (this.initialTimeoutId) {
-      clearTimeout(this.initialTimeoutId);
-      this.initialTimeoutId = null;
-    }
-    if (this.debounceTimeoutId) {
-      clearTimeout(this.debounceTimeoutId);
-      this.debounceTimeoutId = null;
-    }
-
-    this.trackedIds.clear();
-    this.hasReceivedActivity = false;
-    this.notifyWaiting();
-  }
-
-  /**
-   * Resolves the waiting promise and clears it.
-   */
-  private notifyWaiting(): void {
     if (this.waitingResolve) {
       this.waitingResolve();
       this.waitingResolve = null;

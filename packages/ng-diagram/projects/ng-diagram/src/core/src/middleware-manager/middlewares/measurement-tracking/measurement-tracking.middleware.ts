@@ -1,4 +1,4 @@
-import { MeasurementTracker } from '../../../measurement-tracker';
+import { MeasurementTracker } from '../../../measurement-tracker/measurement-tracker';
 import { Middleware } from '../../../types';
 
 /**

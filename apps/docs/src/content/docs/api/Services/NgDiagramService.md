@@ -454,8 +454,8 @@ A promise that resolves with the transaction result.
 ```ts
 // Async transaction with data fetching
 await this.ngDiagramService.transaction(async () => {
-  const data = await fetchDataFromServer();
-  this.ngDiagramModelService.addNodes([{ id: '1', position: { x: 0, y: 0 }, data }]);
+  const nodes = await fetchNodesFromServer();
+  this.ngDiagramModelService.addNodes(node);
 });
 ```
 
@@ -491,7 +491,7 @@ A promise that resolves with the transaction result.
 ```ts
 // Async transaction that waits for measurements
 await this.ngDiagramService.transaction(async () => {
-  const nodes = await loadNodesFromDatabase();
+  const nodes = await fetchNodesFromServer();
   this.ngDiagramModelService.addNodes(nodes);
 }, { waitForMeasurements: true });
 ```
