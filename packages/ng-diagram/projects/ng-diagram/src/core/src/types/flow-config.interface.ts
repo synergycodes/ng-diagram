@@ -153,7 +153,7 @@ export interface ZoomToFitConfig {
 export interface ZoomConfig {
   /**
    * The minimum allowed zoom level.
-   * @default 0.1
+   * @default 0.01
    */
   min: number;
   /**

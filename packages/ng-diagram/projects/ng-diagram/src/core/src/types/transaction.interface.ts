@@ -4,8 +4,8 @@ import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionTyp
  * Options for configuring transaction behavior.
  *
  * @public
- * @since 0.10.0
- * @category Types/Transaction
+ * @since 0.9.0
+ * @category Types/Middleware
  */
 export interface TransactionOptions {
   /**
@@ -13,27 +13,23 @@ export interface TransactionOptions {
    * (node sizes, port positions, etc.) triggered by the transaction are complete.
    *
    * This is useful when you need to perform operations that depend on measured values,
-   * such as `zoomToFit()` after adding nodes.
-   *
-   * The measurement tracking uses a debounce-based approach: when DOM measurements
-   * change (e.g., ResizeObserver fires), the debounce timer resets. Only when the
-   * debounce expires without new changes is the measurement considered complete.
+   * such as `zoomToFit()` after adding nodes or edges.
    *
    * @default false
    *
    * @example
    * ```typescript
    * // Without waitForMeasurements - zoomToFit might not include new nodes
-   * await flowCore.transaction(async (tx) => {
-   *   await tx.emit('addNodes', { nodes: [newNode] });
+   * await diagramService.transaction(() => {
+   *   modelService.addNodes([newNode]);
    * });
-   * await viewportService.zoomToFit(); // May not account for new node dimensions
+   * viewportService.zoomToFit(); // May not account for new node dimensions
    *
    * // With waitForMeasurements - zoomToFit will include new nodes
-   * await flowCore.transaction(async (tx) => {
-   *   await tx.emit('addNodes', { nodes: [newNode] });
+   * await diagramService.transaction(() => {
+   *   modelService.addNodes([newNode]);
    * }, { waitForMeasurements: true });
-   * await viewportService.zoomToFit(); // Correctly includes new node dimensions
+   * viewportService.zoomToFit(); // Correctly includes new node dimensions
    * ```
    */
   waitForMeasurements?: boolean;
@@ -48,7 +44,7 @@ export interface TransactionOptions {
 export interface InternalTransactionOptions extends TransactionOptions {
   /** Debounce timeout in ms after last measurement activity before completing. @default 50 */
   _measurementDebounceTimeout?: number;
-  /** Initial timeout in ms to wait for first measurement activity. @default 1000 */
+  /** Initial timeout in ms to wait for first measurement activity. @default 2000 */
   _measurementInitialTimeout?: number;
 }
 

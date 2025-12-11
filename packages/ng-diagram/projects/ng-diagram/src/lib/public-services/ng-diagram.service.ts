@@ -315,37 +315,6 @@ export class NgDiagramService extends NgDiagramBaseService {
   // ==============================
 
   /**
-   * Executes a function within a transaction context.
-   * All state updates within the callback are batched and applied atomically.
-   *
-   * @param callback The function to execute within the transaction.
-   *
-   * @example
-   * this.ngDiagramService.transaction(() => {
-   *   this.ngDiagramModelService.addNodes([node1, node2]);
-   *   this.ngDiagramModelService.addEdges([edge1]);
-   * });
-   */
-  transaction(callback: () => void): void;
-  /**
-   * Executes a function within a transaction context with options.
-   * All state updates within the callback are batched and applied atomically.
-   *
-   * @param callback The function to execute within the transaction.
-   * @param options Transaction options.
-   * @returns A promise that resolves with the transaction result.
-   *
-   * @example
-   * // Transaction that waits for measurements to complete
-   * await this.ngDiagramService.transaction(() => {
-   *   this.ngDiagramModelService.addNodes([node1, node2]);
-   * }, { waitForMeasurements: true });
-   *
-   * // Now safe to zoom to fit - node dimensions are measured
-   * this.ngDiagramViewportService.zoomToFit();
-   */
-  transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
-  /**
    * Executes an async function within a transaction context.
    * All state updates within the callback are batched and applied atomically.
    *
@@ -374,22 +343,40 @@ export class NgDiagramService extends NgDiagramBaseService {
    *   const nodes = await loadNodesFromDatabase();
    *   this.ngDiagramModelService.addNodes(nodes);
    * }, { waitForMeasurements: true });
-   *
-   * // Now safe to zoom - all nodes are measured
-   * this.ngDiagramViewportService.zoomToFit();
    */
   transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
+  /**
+   * Executes a function within a transaction context.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The function to execute within the transaction.
+   *
+   * @example
+   * this.ngDiagramService.transaction(() => {
+   *   this.ngDiagramModelService.addNodes([node1, node2]);
+   *   this.ngDiagramModelService.addEdges([edge1]);
+   * });
+   */
+  transaction(callback: () => void): void;
+  /**
+   * Executes a function within a transaction context with options.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The function to execute within the transaction.
+   * @param options Transaction options.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Transaction that waits for measurements to complete
+   * await this.ngDiagramService.transaction(() => {
+   *   this.ngDiagramModelService.addNodes([node1, node2]);
+   * }, { waitForMeasurements: true });
+   */
+  transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
   transaction(
     callback: (() => void) | (() => Promise<void>),
     options?: TransactionOptions
   ): void | Promise<TransactionResult> {
-    // If options provided, always return promise
-    if (options) {
-      const transactionCallback: TransactionCallback = () => callback();
-      return this.flowCore.transaction(transactionCallback, options);
-    }
-
-    // Execute and check if callback returns a promise
     let isAsync = false;
     const wrappedCallback: TransactionCallback = () => {
       const result = callback();
@@ -399,13 +386,10 @@ export class NgDiagramService extends NgDiagramBaseService {
       return result;
     };
 
-    const promise = this.flowCore.transaction(wrappedCallback, {});
+    const promise = this.flowCore.transaction(wrappedCallback, options ?? {});
 
-    // Return promise only if callback was async
-    if (isAsync) {
+    if (options || isAsync) {
       return promise;
     }
-
-    // Sync callback without options - fire and forget (backward compatibility)
   }
 }

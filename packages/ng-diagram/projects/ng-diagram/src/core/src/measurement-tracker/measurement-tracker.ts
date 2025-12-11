@@ -1,18 +1,4 @@
-/**
- * Entry for tracking a pending measurement with debounce logic.
- */
-interface MeasurementEntry {
-  /** Resolves the measurement promise */
-  resolve: () => void;
-  /** Debounce timer ID - starts after first activity, reset on subsequent activity */
-  debounceTimeoutId: ReturnType<typeof setTimeout> | null;
-  /** Max timeout timer ID - window to wait for first activity to arrive */
-  maxTimeoutId: ReturnType<typeof setTimeout> | null;
-  /** Debounce duration in milliseconds */
-  debounceMs: number;
-  /** Whether first activity has been received */
-  hasReceivedActivity: boolean;
-}
+import type { FlowStateUpdate } from '../types';
 
 /**
  * Tracks pending measurements and notifies when all measurements are complete.
@@ -22,30 +8,25 @@ interface MeasurementEntry {
  *
  * ## Timing Model
  *
- * 1. **When tracking starts**: A `maxTimeout` window begins. This is the maximum time
+ * 1. **When tracking starts**: An `initialTimeout` window begins. This is the maximum time
  *    to wait for the first measurement activity to arrive.
  *
- * 2. **If no activity arrives before maxTimeout**: The measurement completes (nothing changed).
+ * 2. **If no activity arrives before initialTimeout**: The measurement completes (nothing changed).
  *
- * 3. **When first activity arrives**: The `maxTimeout` is cancelled, and a `debounceTimeout`
+ * 3. **When first activity arrives**: The `initialTimeout` is cancelled, and a `debounceTimeout`
  *    starts. This debounce ensures we wait for the DOM to settle.
  *
  * 4. **On subsequent activity**: The `debounceTimeout` resets.
  *
  * 5. **When debounceTimeout expires**: The measurement completes (DOM has settled).
  *
- * This model ensures:
- * - Fast completion when nothing changes (maxTimeout is short)
- * - Proper settling when changes occur (debounce waits for stability)
- * - No artificial cap on debounce duration
- *
  * @example
  * ```typescript
- * // Track a node measurement with 50ms debounce
- * tracker.trackMeasurement('node:n1', 50);
+ * // Track entities from a state update
+ * tracker.trackStateUpdate(stateUpdate);
  *
  * // Middleware signals activity when size changes
- * tracker.signalMeasurementActivity('node:n1'); // Cancels maxTimeout, starts debounce
+ * tracker.signalActivity('node:n1'); // Cancels initialTimeout, starts debounce
  *
  * // Wait for all measurements to settle
  * await tracker.waitForMeasurements();
@@ -54,162 +35,101 @@ interface MeasurementEntry {
  * @internal
  */
 export class MeasurementTracker {
-  private pending = new Map<string, MeasurementEntry>();
+  private trackedIds = new Set<string>();
+  private initialTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private debounceTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private hasReceivedActivity = false;
   private waitingPromise: Promise<void> | null = null;
   private waitingResolve: (() => void) | null = null;
 
-  /** Default debounce timeout in milliseconds (used after first activity arrives) */
+  /** Current debounce timeout in milliseconds */
+  private debounceMs = 50;
+
+  /** Current initial timeout in milliseconds */
+  private initialTimeoutMs = 2000;
+
+  /** Default debounce timeout in milliseconds */
   private readonly defaultDebounceMs = 50;
 
-  /** Maximum timeout in milliseconds - window to wait for first activity */
-  private readonly maxTimeoutMs = 1000;
+  /** Default initial timeout in milliseconds */
+  private readonly defaultInitialTimeoutMs = 2000;
 
   /**
-   * Registers an entity for measurement tracking.
+   * Tracks all entities from a state update for measurement completion.
    *
-   * The measurement is considered pending until either:
-   * 1. maxTimeout expires without any activity (nothing changed), OR
-   * 2. Activity arrives, then debounceTimeout expires without new activity (DOM settled)
-   *
-   * @param id - Unique identifier for the measurement (e.g., 'node:n1', 'edge:e1')
+   * @param stateUpdate - The state update containing entities to track
    * @param debounceMs - Debounce duration in milliseconds (default: 50)
-   * @param initialTimeoutMs - Initial timeout in milliseconds to wait for first activity (default: 1000)
+   * @param initialTimeoutMs - Initial timeout in milliseconds to wait for first activity (default: 2000)
    */
-  trackMeasurement(id: string, debounceMs?: number, initialTimeoutMs?: number): void {
-    if (this.pending.has(id)) {
-      // Already tracking - update debounce if provided
-      const entry = this.pending.get(id)!;
-      if (debounceMs !== undefined) {
-        entry.debounceMs = debounceMs;
+  trackStateUpdate(stateUpdate: FlowStateUpdate, debounceMs?: number, initialTimeoutMs?: number): void {
+    // Update timeouts if provided
+    this.debounceMs = debounceMs ?? this.defaultDebounceMs;
+    this.initialTimeoutMs = initialTimeoutMs ?? this.defaultInitialTimeoutMs;
+
+    // Collect all entity IDs
+    if (stateUpdate.nodesToAdd) {
+      for (const node of stateUpdate.nodesToAdd) {
+        this.trackedIds.add(`node:${node.id}`);
       }
-      return;
+    }
+    if (stateUpdate.nodesToUpdate) {
+      for (const update of stateUpdate.nodesToUpdate) {
+        this.trackedIds.add(`node:${update.id}`);
+      }
+    }
+    if (stateUpdate.edgesToAdd) {
+      for (const edge of stateUpdate.edgesToAdd) {
+        this.trackedIds.add(`edge:${edge.id}`);
+      }
+    }
+    if (stateUpdate.edgesToUpdate) {
+      for (const update of stateUpdate.edgesToUpdate) {
+        this.trackedIds.add(`edge:${update.id}`);
+      }
     }
 
-    const effectiveDebounceMs = debounceMs ?? this.defaultDebounceMs;
-    const effectiveInitialTimeoutMs = initialTimeoutMs ?? this.maxTimeoutMs;
-
-    const entry: MeasurementEntry = {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      resolve: () => {},
-      debounceTimeoutId: null,
-      maxTimeoutId: null,
-      debounceMs: effectiveDebounceMs,
-      hasReceivedActivity: false,
-    };
-
-    // Create promise for this measurement
-    new Promise<void>((resolve) => {
-      entry.resolve = resolve;
-    });
-
-    // Start max timeout - window to wait for first activity
-    // If no activity arrives within this window, complete immediately
-    entry.maxTimeoutId = setTimeout(() => {
-      this.completeMeasurement(id);
-    }, effectiveInitialTimeoutMs);
-
-    this.pending.set(id, entry);
-  }
-
-  /**
-   * Registers multiple entities for measurement tracking.
-   *
-   * @param ids - Array of unique identifiers for the measurements
-   * @param debounceMs - Debounce duration in milliseconds (default: 50)
-   * @param initialTimeoutMs - Initial timeout in milliseconds to wait for first activity (default: 1000)
-   */
-  trackMeasurements(ids: string[], debounceMs?: number, initialTimeoutMs?: number): void {
-    for (const id of ids) {
-      this.trackMeasurement(id, debounceMs, initialTimeoutMs);
+    // Start initial timeout if not already running
+    if (!this.initialTimeoutId && !this.hasReceivedActivity) {
+      this.initialTimeoutId = setTimeout(() => {
+        this.complete();
+      }, this.initialTimeoutMs);
     }
   }
 
   /**
-   * Signals that measurement activity occurred for an entity.
-   *
-   * On first activity: cancels maxTimeout and starts debounceTimeout.
-   * On subsequent activity: resets debounceTimeout.
-   *
-   * @param id - Unique identifier for the measurement
+   * Signals that measurement activity occurred for a node.
    */
-  signalMeasurementActivity(id: string): void {
-    const entry = this.pending.get(id);
-    if (!entry) return;
+  signalNodeMeasurement(nodeId: string): void {
+    this.signalActivity(`node:${nodeId}`);
+  }
 
-    // First activity - cancel max timeout and switch to debounce mode
-    if (!entry.hasReceivedActivity) {
-      entry.hasReceivedActivity = true;
-      if (entry.maxTimeoutId) {
-        clearTimeout(entry.maxTimeoutId);
-        entry.maxTimeoutId = null;
+  /**
+   * Signals that measurement activity occurred for an edge.
+   */
+  signalEdgeMeasurement(edgeId: string): void {
+    this.signalActivity(`edge:${edgeId}`);
+  }
+
+  private signalActivity(id: string): void {
+    if (!this.trackedIds.has(id)) return;
+
+    // First activity - cancel initial timeout
+    if (!this.hasReceivedActivity) {
+      this.hasReceivedActivity = true;
+      if (this.initialTimeoutId) {
+        clearTimeout(this.initialTimeoutId);
+        this.initialTimeoutId = null;
       }
     }
 
     // Reset debounce timer
-    if (entry.debounceTimeoutId) {
-      clearTimeout(entry.debounceTimeoutId);
+    if (this.debounceTimeoutId) {
+      clearTimeout(this.debounceTimeoutId);
     }
 
-    entry.debounceTimeoutId = setTimeout(() => {
-      this.completeMeasurement(id);
-    }, entry.debounceMs);
-  }
-
-  /**
-   * Force-completes a measurement immediately.
-   *
-   * @param id - Unique identifier for the measurement
-   */
-  completeMeasurement(id: string): void {
-    const entry = this.pending.get(id);
-    if (!entry) return;
-
-    // Clear timers
-    if (entry.debounceTimeoutId) {
-      clearTimeout(entry.debounceTimeoutId);
-    }
-    if (entry.maxTimeoutId) {
-      clearTimeout(entry.maxTimeoutId);
-    }
-
-    // Resolve and remove
-    entry.resolve();
-    this.pending.delete(id);
-
-    // Check if all done
-    this.checkAndNotify();
-  }
-
-  /**
-   * Force-completes multiple measurements immediately.
-   *
-   * @param ids - Array of unique identifiers for the measurements
-   */
-  completeMeasurements(ids: string[]): void {
-    for (const id of ids) {
-      this.completeMeasurement(id);
-    }
-  }
-
-  /**
-   * Returns true if there are pending measurements.
-   */
-  hasPendingMeasurements(): boolean {
-    return this.pending.size > 0;
-  }
-
-  /**
-   * Returns the number of pending measurements.
-   */
-  getPendingCount(): number {
-    return this.pending.size;
-  }
-
-  /**
-   * Returns a copy of the pending measurement IDs.
-   */
-  getPendingIds(): string[] {
-    return [...this.pending.keys()];
+    this.debounceTimeoutId = setTimeout(() => {
+      this.complete();
+    }, this.debounceMs);
   }
 
   /**
@@ -234,32 +154,54 @@ export class MeasurementTracker {
   }
 
   /**
+   * Returns true if there are pending measurements.
+   */
+  hasPendingMeasurements(): boolean {
+    return this.trackedIds.size > 0;
+  }
+
+  /**
+   * Returns the number of pending measurements.
+   */
+  getPendingCount(): number {
+    return this.trackedIds.size;
+  }
+
+  /**
    * Clears all pending measurements and resolves all waiting promises.
    * Use this to reset state or handle error scenarios.
    */
   clear(): void {
-    // Clear all timers
-    for (const entry of this.pending.values()) {
-      if (entry.debounceTimeoutId) {
-        clearTimeout(entry.debounceTimeoutId);
-      }
-      if (entry.maxTimeoutId) {
-        clearTimeout(entry.maxTimeoutId);
-      }
-      entry.resolve();
+    if (this.initialTimeoutId) {
+      clearTimeout(this.initialTimeoutId);
+      this.initialTimeoutId = null;
+    }
+    if (this.debounceTimeoutId) {
+      clearTimeout(this.debounceTimeoutId);
+      this.debounceTimeoutId = null;
     }
 
-    this.pending.clear();
+    this.trackedIds.clear();
+    this.hasReceivedActivity = false;
     this.notifyWaiting();
   }
 
   /**
-   * Checks if all measurements are complete and notifies waiting promise.
+   * Completes measurement tracking and notifies waiting promises.
    */
-  private checkAndNotify(): void {
-    if (!this.hasPendingMeasurements()) {
-      this.notifyWaiting();
+  private complete(): void {
+    if (this.initialTimeoutId) {
+      clearTimeout(this.initialTimeoutId);
+      this.initialTimeoutId = null;
     }
+    if (this.debounceTimeoutId) {
+      clearTimeout(this.debounceTimeoutId);
+      this.debounceTimeoutId = null;
+    }
+
+    this.trackedIds.clear();
+    this.hasReceivedActivity = false;
+    this.notifyWaiting();
   }
 
   /**

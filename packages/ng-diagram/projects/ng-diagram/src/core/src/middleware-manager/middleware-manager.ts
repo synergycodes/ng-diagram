@@ -74,17 +74,17 @@ export class MiddlewareManager {
     }
 
     // Middleware execution order:
-    // 1. User middlewares - custom processing
+    // 1. User and default middlewares - custom processing
     // 2. measuredBoundsMiddleware - compute node bounds after all position/size changes
     // 3. loggerMiddleware - log final state for debugging
-    // 4. eventEmitterMiddleware - emit events with final state
-    // 5. measurementTrackingMiddleware - signal measurement activity (runs last to catch all changes)
+    // 4. measurementTrackingMiddleware - signal measurement activity
+    // 5. eventEmitterMiddleware - emit events with final state
     const finalChain = [
       ...this.middlewareChain,
       measuredBoundsMiddleware,
       loggerMiddleware,
-      ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
       ...(this.measurementTrackingMiddleware ? [this.measurementTrackingMiddleware] : []),
+      ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
     ];
 
     const middlewareExecutor = new MiddlewareExecutor(this.flowCore, finalChain);

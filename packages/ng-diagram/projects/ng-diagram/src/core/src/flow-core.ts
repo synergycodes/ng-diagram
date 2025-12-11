@@ -256,11 +256,9 @@ export class FlowCore {
     let transactionOptions: TransactionOptions | undefined;
 
     if (typeof nameOrCallback === 'function') {
-      // transaction(callback) or transaction(callback, options)
       transactionOptions = callbackOrOptions as TransactionOptions | undefined;
       results = await this.transactionManager.transaction(nameOrCallback, transactionOptions ?? {});
     } else {
-      // transaction(name, callback) or transaction(name, callback, options)
       const callback = callbackOrOptions as TransactionCallback | undefined;
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
@@ -270,10 +268,9 @@ export class FlowCore {
     }
 
     if (results.commandsCount > 0) {
-      // Track entities for measurement before applying updates
       if (transactionOptions?.waitForMeasurements) {
         const internalOptions = transactionOptions as InternalTransactionOptions;
-        this.trackEntitiesForMeasurement(
+        this.measurementTracker.trackStateUpdate(
           results.results,
           internalOptions._measurementDebounceTimeout,
           internalOptions._measurementInitialTimeout
@@ -283,46 +280,11 @@ export class FlowCore {
       await this.applyUpdate(results.results, results.actionTypes);
     }
 
-    // Wait for measurements if requested
     if (transactionOptions?.waitForMeasurements) {
       await this.measurementTracker.waitForMeasurements();
     }
 
     return results;
-  }
-
-  /**
-   * Tracks entities from a state update for measurement completion.
-   * Called when waitForMeasurements option is enabled.
-   */
-  private trackEntitiesForMeasurement(
-    stateUpdate: FlowStateUpdate,
-    debounceMs?: number,
-    initialTimeoutMs?: number
-  ): void {
-    // Track all nodes being added or updated
-    if (stateUpdate.nodesToAdd) {
-      for (const node of stateUpdate.nodesToAdd) {
-        this.measurementTracker.trackMeasurement(`node:${node.id}`, debounceMs, initialTimeoutMs);
-      }
-    }
-    if (stateUpdate.nodesToUpdate) {
-      for (const update of stateUpdate.nodesToUpdate) {
-        this.measurementTracker.trackMeasurement(`node:${update.id}`, debounceMs, initialTimeoutMs);
-      }
-    }
-
-    // Track edges (for label measurements)
-    if (stateUpdate.edgesToAdd) {
-      for (const edge of stateUpdate.edgesToAdd) {
-        this.measurementTracker.trackMeasurement(`edge:${edge.id}`, debounceMs, initialTimeoutMs);
-      }
-    }
-    if (stateUpdate.edgesToUpdate) {
-      for (const update of stateUpdate.edgesToUpdate) {
-        this.measurementTracker.trackMeasurement(`edge:${update.id}`, debounceMs, initialTimeoutMs);
-      }
-    }
   }
 
   /**

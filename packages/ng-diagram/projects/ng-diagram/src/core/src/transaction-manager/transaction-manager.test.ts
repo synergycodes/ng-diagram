@@ -271,7 +271,7 @@ describe('TransactionManager', () => {
 
     it('should return default name when using callback-only form', async () => {
       await transactionManager.transaction(async () => {
-        expect(transactionManager.getTransactionName()).toBe('Transaction');
+        expect(transactionManager.getTransactionName()).toBe('transaction');
       });
     });
   });

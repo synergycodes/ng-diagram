@@ -113,6 +113,7 @@ title: "ng-diagram"
 - [MiddlewareContext](/docs/api/types/middleware/middlewarecontext/)
 - [MiddlewareHelpers](/docs/api/types/middleware/middlewarehelpers/)
 - [MiddlewareHistoryUpdate](/docs/api/types/middleware/middlewarehistoryupdate/)
+- [TransactionOptions](/docs/api/types/middleware/transactionoptions/)
 - [TransactionResult](/docs/api/types/middleware/transactionresult/)
 - [MiddlewareChain](/docs/api/types/middleware/middlewarechain/)
 - [ModelActionType](/docs/api/types/middleware/modelactiontype/)
@@ -157,10 +158,6 @@ title: "ng-diagram"
 - [NgDiagramEdgeTemplate](/docs/api/types/templates/ngdiagramedgetemplate/)
 - [NgDiagramGroupNodeTemplate](/docs/api/types/templates/ngdiagramgroupnodetemplate/)
 - [NgDiagramNodeTemplate](/docs/api/types/templates/ngdiagramnodetemplate/)
-
-## Types/Transaction
-
-- [TransactionOptions](/docs/api/types/transaction/transactionoptions/)
 
 ## Utilities
 

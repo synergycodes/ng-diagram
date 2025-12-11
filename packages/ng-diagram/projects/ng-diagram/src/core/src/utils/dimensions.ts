@@ -25,8 +25,6 @@ export const getEdgeMeasuredBounds = (edge: Edge): Rect => {
     return pointsBounds;
   }
 
-  // Label position is the CENTER of the label (labels are rendered with CSS translate(-50%, -50%))
-  // Convert to top-left corner for bounding box calculation
   const labelRects = labels
     .filter((label) => label.position && label.size)
     .map((label) => ({
