@@ -238,6 +238,8 @@ describe('AngularAdapterDiagramComponent', () => {
     });
 
     it('should emit diagramInit output when eventManager emits diagramInit', () => {
+      vi.useFakeTimers();
+
       const flowCore = TestBed.inject(FlowCoreProviderService).provide();
       const eventManager = flowCore.eventManager;
       const diagramInitSpy = vi.fn();
@@ -251,7 +253,11 @@ describe('AngularAdapterDiagramComponent', () => {
       const event = { nodes: [], edges: [], viewport: { x: 0, y: 0, scale: 1 } };
       diagramInitCallback?.(event);
 
+      vi.runAllTimers();
+
       expect(diagramInitSpy).toHaveBeenCalledWith(event);
+
+      vi.useRealTimers();
     });
 
     it('should emit edgeDrawn output when eventManager emits edgeDrawn', () => {
