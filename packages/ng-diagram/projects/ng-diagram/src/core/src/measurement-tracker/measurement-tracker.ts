@@ -1,5 +1,8 @@
 import type { FlowStateUpdate } from '../types';
 
+export const DEFAULT_INITIAL_TIMEOUT = 2000;
+export const DEFAULT_DEBOUNCE_TIMEOUT = 50;
+
 /**
  * Tracks pending measurements and notifies when all measurements are complete.
  *
@@ -42,11 +45,8 @@ export class MeasurementTracker {
   private waitingPromise: Promise<void> | null = null;
   private waitingResolve: (() => void) | null = null;
 
-  private readonly defaultDebounceMs = 50;
-  private readonly defaultInitialTimeoutMs = 2000;
-
-  private debounceMs = this.defaultDebounceMs;
-  private initialTimeoutMs = this.defaultInitialTimeoutMs;
+  private debounceMs = DEFAULT_DEBOUNCE_TIMEOUT;
+  private initialTimeoutMs = DEFAULT_INITIAL_TIMEOUT;
 
   /**
    * Tracks all entities from a state update for measurement completion.
@@ -56,8 +56,8 @@ export class MeasurementTracker {
    * @param initialTimeoutMs - Initial timeout in milliseconds to wait for first activity (default: 2000)
    */
   trackStateUpdate(stateUpdate: FlowStateUpdate, debounceMs?: number, initialTimeoutMs?: number): void {
-    this.debounceMs = debounceMs ?? this.defaultDebounceMs;
-    this.initialTimeoutMs = initialTimeoutMs ?? this.defaultInitialTimeoutMs;
+    this.debounceMs = debounceMs ?? DEFAULT_DEBOUNCE_TIMEOUT;
+    this.initialTimeoutMs = initialTimeoutMs ?? DEFAULT_INITIAL_TIMEOUT;
 
     if (stateUpdate.nodesToAdd) {
       for (const node of stateUpdate.nodesToAdd) {

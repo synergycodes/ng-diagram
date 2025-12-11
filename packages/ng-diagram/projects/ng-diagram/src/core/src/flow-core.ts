@@ -241,14 +241,17 @@ export class FlowCore {
    */
   async transaction(callback: TransactionCallback): Promise<TransactionResult>;
   async transaction(callback: TransactionCallback, options: TransactionOptions): Promise<TransactionResult>;
-  async transaction(name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult>;
   async transaction(
-    name: ModelActionType,
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback
+  ): Promise<TransactionResult>;
+  async transaction(
+    name: LooseAutocomplete<ModelActionType>,
     callback: TransactionCallback,
     options: TransactionOptions
   ): Promise<TransactionResult>;
   async transaction(
-    nameOrCallback: ModelActionType | TransactionCallback,
+    nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
     callbackOrOptions?: TransactionCallback | TransactionOptions,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
