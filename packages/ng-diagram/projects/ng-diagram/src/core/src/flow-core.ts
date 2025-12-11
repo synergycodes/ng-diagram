@@ -307,15 +307,15 @@ export class FlowCore {
     try {
       // ===== PERF LOGGING - only for resize-related actions =====
       const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
-      const shouldLog = logActions.includes(modelActionType as string);
+      const shouldLog = logActions.includes(modelActionTypes as string);
 
-      if (shouldLog) console.time(`[PERF] applyUpdate TOTAL (${modelActionType})`);
+      if (shouldLog) console.time(`[PERF] applyUpdate TOTAL (${modelActionTypes})`);
 
       const currentState = this.getState();
 
-      if (shouldLog) console.time(`[PERF] middleware.execute (${modelActionType})`);
+      if (shouldLog) console.time(`[PERF] middleware.execute (${modelActionTypes})`);
       const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
-      if (shouldLog) console.timeEnd(`[PERF] middleware.execute (${modelActionType})`);
+      if (shouldLog) console.timeEnd(`[PERF] middleware.execute (${modelActionTypes})`);
 
       if (finalState) {
         if (shouldLog) console.time(`[PERF] setState`);
@@ -326,7 +326,7 @@ export class FlowCore {
         this.eventManager.clearDeferredEmits();
       }
 
-      if (shouldLog) console.timeEnd(`[PERF] applyUpdate TOTAL (${modelActionType})`);
+      if (shouldLog) console.timeEnd(`[PERF] applyUpdate TOTAL (${modelActionTypes})`);
     } finally {
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();

@@ -46,9 +46,9 @@ export class MiddlewareExecutor {
     modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
     const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
-    const shouldLog = logActions.includes(modelActionType);
+    const shouldLog = modelActionTypes.some((type) => logActions.includes(type));
 
-    if (shouldLog) console.time(`[PERF] executor.run setup (${modelActionType})`);
+    if (shouldLog) console.time(`[PERF] executor.run setup (${modelActionTypes})`);
 
     this.initialState = initialState;
     this.modelActionTypes = modelActionTypes;
@@ -64,11 +64,11 @@ export class MiddlewareExecutor {
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
 
-    if (shouldLog) console.timeEnd(`[PERF] executor.run setup (${modelActionType})`);
+    if (shouldLog) console.timeEnd(`[PERF] executor.run setup (${modelActionTypes})`);
 
-    if (shouldLog) console.time(`[PERF] resolveMiddlewares (${modelActionType})`);
+    if (shouldLog) console.time(`[PERF] resolveMiddlewares (${modelActionTypes})`);
     const result = await this.resolveMiddlewares();
-    if (shouldLog) console.timeEnd(`[PERF] resolveMiddlewares (${modelActionType})`);
+    if (shouldLog) console.timeEnd(`[PERF] resolveMiddlewares (${modelActionTypes})`);
 
     return result;
   }
