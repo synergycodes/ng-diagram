@@ -301,6 +301,7 @@ export interface FlowConfig {
     selectionMoving: SelectionMovingConfig;
     shortcuts: ShortcutDefinition[];
     snapping: SnappingConfig;
+    viewportPanningEnabled: boolean;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -700,6 +701,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     // (undocumented)
     readonly viewport: WritableSignal<Viewport>;
     viewportChanged: EventEmitter<ViewportChangedEvent>;
+    readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.ZoomingPointerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)

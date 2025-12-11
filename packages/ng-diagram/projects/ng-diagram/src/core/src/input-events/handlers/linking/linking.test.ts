@@ -3,7 +3,7 @@ import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockNode } from '../../../test-utils';
 import type { LinkingActionState } from '../../../types/action-state.interface';
 import { LinkingInputEvent } from './linking.event';
-import { LinkingEventHandler, LINKING_MISSING_TARGET_ERROR } from './linking.handler';
+import { LINKING_MISSING_TARGET_ERROR, LinkingEventHandler } from './linking.handler';
 
 function getSampleLinkingEvent(overrides: Partial<LinkingInputEvent> = {}): LinkingInputEvent {
   return {
@@ -47,6 +47,7 @@ describe('LinkingEventHandler', () => {
       environment: mockEnvironment,
       actionStateManager: mockActionStateManager,
       clientToFlowPosition: mockClientToFlowPosition,
+      config: { viewportPanningEnabled: true },
     } as unknown as FlowCore;
 
     instance = new LinkingEventHandler(mockFlowCore);
@@ -183,6 +184,62 @@ describe('LinkingEventHandler', () => {
 
         expect(mockCommandHandler.emit).not.toHaveBeenCalled();
         expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Panning behavior', () => {
+      let mockFlowCore: FlowCore;
+      let instance: LinkingEventHandler;
+      const mockCommandHandler = { emit: vi.fn() };
+      const mockActionStateManager = {
+        linking: {},
+        clearLinking: vi.fn(),
+        isLinking: vi.fn(),
+      };
+      const mockClientToFlowPosition = vi.fn();
+
+      beforeEach(() => {
+        vi.clearAllMocks();
+        mockClientToFlowPosition.mockImplementation((args) => args);
+
+        mockFlowCore = {
+          commandHandler: mockCommandHandler,
+          environment: mockEnvironment,
+          actionStateManager: mockActionStateManager,
+          clientToFlowPosition: mockClientToFlowPosition,
+          config: { viewportPanningEnabled: true },
+        } as unknown as FlowCore;
+
+        instance = new LinkingEventHandler(mockFlowCore);
+      });
+
+      it('should emit moveViewportBy when panning is enabled and panningForce is present', () => {
+        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1', temporaryEdge: null };
+        mockActionStateManager.isLinking.mockReturnValue(true);
+
+        const event = getSampleLinkingEvent({
+          phase: 'continue',
+          panningForce: { x: 10, y: 5 },
+        });
+
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 5 });
+      });
+
+      it('should NOT emit moveViewportBy when panning is disabled', () => {
+        mockFlowCore.config.viewportPanningEnabled = false;
+        mockActionStateManager.linking = { sourceNodeId: 'node-1', sourcePortId: 'port-1', temporaryEdge: null };
+        mockActionStateManager.isLinking.mockReturnValue(true);
+
+        const event = getSampleLinkingEvent({
+          phase: 'continue',
+          panningForce: { x: 10, y: 5 },
+        });
+
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveViewportBy', expect.anything());
       });
     });
   });

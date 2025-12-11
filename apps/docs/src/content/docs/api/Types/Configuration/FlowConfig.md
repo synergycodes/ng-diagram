@@ -151,6 +151,21 @@ Configuration for snapping behavior.
 
 ***
 
+### viewportPanningEnabled
+
+> **viewportPanningEnabled**: `boolean`
+
+Enables or disables panning on the diagram.
+When set to false, user is not able to move the viewport by panning.
+
+#### Default
+
+```ts
+true
+```
+
+***
+
 ### zIndex
 
 > **zIndex**: [`ZIndexConfig`](/docs/api/types/configuration/features/zindexconfig/)

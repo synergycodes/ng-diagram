@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Middleware, ModelAdapter } from '../../../core/src';
 
+import { NgDiagramService } from '../../public-services/ng-diagram.service';
 import {
   FlowCoreProviderService,
   FlowResizeBatchProcessorService,
@@ -46,12 +47,19 @@ describe('AngularAdapterDiagramComponent', () => {
             viewport: vi.fn(() => ({ x: 0, y: 0, scale: 1 })),
             draw: vi.fn(),
             isInitialized: signal(false),
+            viewportPannable: signal(true),
           },
         },
         {
           provide: FlowResizeBatchProcessorService,
           useValue: {
             initialize: vi.fn(),
+          },
+        },
+        {
+          provide: NgDiagramService,
+          useValue: {
+            isInitialized: vi.fn().mockReturnValue(true),
           },
         },
         {
@@ -87,6 +95,7 @@ describe('AngularAdapterDiagramComponent', () => {
                     onInit: false,
                   },
                 },
+                viewportPanningEnabled: true,
               },
             }),
             isInitialized: vi.fn().mockReturnValue(true),

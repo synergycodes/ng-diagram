@@ -515,4 +515,11 @@ export interface FlowConfig {
    * @default undefined
    */
   hideWatermark?: boolean;
+
+  /**
+   * Enables or disables panning on the diagram.
+   * When set to false, user is not able to move the viewport by panning.
+   * @default true
+   */
+  viewportPanningEnabled: boolean;
 }

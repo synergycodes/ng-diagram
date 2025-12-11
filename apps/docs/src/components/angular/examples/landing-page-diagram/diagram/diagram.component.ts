@@ -23,7 +23,6 @@ import { DIAGRAM_EDGES, DIAGRAM_NODES } from './diagram-data.config';
   template: `
     <div class="not-content diagram">
       <ng-diagram
-        data-no-pan="true"
         [model]="model"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
@@ -63,6 +62,7 @@ export class DiagramComponent {
         onInit: true,
       },
     },
+    viewportPanningEnabled: false,
   };
 
   readonly model = initializeModel({

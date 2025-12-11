@@ -90,6 +90,9 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
     PaletteDropDirective,
     DiagramSelectionDirective,
   ],
+  host: {
+    '[class.pannable]': 'viewportPannable()',
+  },
 })
 export class NgDiagramComponent implements OnInit, OnDestroy {
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -135,6 +138,9 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   readonly nodes = this.renderer.nodes;
   readonly edges = this.renderer.edges;
   readonly viewport = this.renderer.viewport;
+
+  /** Whether panning is enabled in the diagram. */
+  readonly viewportPannable = this.renderer.viewportPannable;
 
   /**
    * Event emitted when the diagram initialization is complete.
@@ -231,6 +237,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
         // Angular 18 backward compatibility
         untracked(() => {
           this.renderer.isInitialized.set(false);
+          this.renderer.viewportPannable.set(this.config()?.viewportPanningEnabled ?? true);
           this.flowCoreProvider.destroy();
           this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
         });
