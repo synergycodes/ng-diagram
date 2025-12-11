@@ -432,9 +432,6 @@ The port ID from which the linking starts. Creates a floating edge when undefine
 
 > **transaction**(`callback`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
 
-Executes an async function within a transaction context.
-All state updates within the callback are batched and applied atomically.
-
 ##### Parameters
 
 ###### callback
@@ -449,6 +446,13 @@ The async function to execute within the transaction.
 
 A promise that resolves with the transaction result.
 
+##### Since
+
+0.9.0
+
+Executes an async function within a transaction context.
+All state updates within the callback are batched and applied atomically.
+
 ##### Example
 
 ```ts
@@ -462,9 +466,6 @@ await this.ngDiagramService.transaction(async () => {
 #### Call Signature
 
 > **transaction**(`callback`, `options`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
-
-Executes an async function within a transaction context with options.
-All state updates within the callback are batched and applied atomically.
 
 ##### Parameters
 
@@ -485,6 +486,13 @@ Transaction options.
 `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
 
 A promise that resolves with the transaction result.
+
+##### Since
+
+0.9.0
+
+Executes an async function within a transaction context with options.
+All state updates within the callback are batched and applied atomically.
 
 ##### Example
 
@@ -528,9 +536,6 @@ this.ngDiagramService.transaction(() => {
 
 > **transaction**(`callback`, `options`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
 
-Executes a function within a transaction context with options.
-All state updates within the callback are batched and applied atomically.
-
 ##### Parameters
 
 ###### callback
@@ -550,6 +555,13 @@ Transaction options.
 `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
 
 A promise that resolves with the transaction result.
+
+##### Since
+
+0.9.0
+
+Executes a function within a transaction context with options.
+All state updates within the callback are batched and applied atomically.
 
 ##### Example
 

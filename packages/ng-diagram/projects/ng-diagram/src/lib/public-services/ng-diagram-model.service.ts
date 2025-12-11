@@ -227,6 +227,8 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    */
   getOverlappingNodes(nodeId: string): Node[];
   /**
+   * @since 0.9.0
+   *
    * Detects collision with other nodes by finding all nodes whose rectangles intersect
    * with the specified node's bounding rectangle.
    *
@@ -239,6 +241,8 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
+   * @since 0.9.0
+   *
    * Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
    * @param nodes Array of nodes
    * @param edges Array of edges

@@ -109,6 +109,16 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
   /**
    * Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
    *
+   * @remarks
+   * When calling `zoomToFit()` immediately after adding or modifying nodes/edges, their dimensions may not be measured yet.
+   * Use the `waitForMeasurements` transaction option to ensure accurate results:
+   * ```typescript
+   * await this.ngDiagramService.transaction(() => {
+   *   this.modelService.addNodes([newNode]);
+   * }, { waitForMeasurements: true });
+   * this.viewportService.zoomToFit(); // Now includes new node dimensions
+   * ```
+   *
    * @param options Optional configuration object
    * @param options.nodeIds Array of node IDs to fit. If not provided, all nodes are included.
    * @param options.edgeIds Array of edge IDs to fit. If not provided, all edges are included.
@@ -147,6 +157,17 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
 
   /**
    * Centers the Node within the current viewport bounds.
+   *
+   * @remarks
+   * When calling `centerOnNode()` immediately after adding or modifying a node, its dimensions may not be measured yet.
+   * Use the `waitForMeasurements` transaction option to ensure accurate centering:
+   * ```typescript
+   * await this.ngDiagramService.transaction(() => {
+   *   this.modelService.addNodes([newNode]);
+   * }, { waitForMeasurements: true });
+   * this.viewportService.centerOnNode(newNode.id); // Now centers correctly
+   * ```
+   *
    * @param nodeOrId The ID of the node or the node object to center on.
    */
   centerOnNode(nodeOrId: string | Node) {

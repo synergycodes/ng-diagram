@@ -155,6 +155,10 @@ Configuration for snapping behavior.
 
 > **viewportPanningEnabled**: `boolean`
 
+#### Since
+
+0.9.0
+
 Enables or disables panning on the diagram.
 When set to false, user is not able to move the viewport by panning.
 

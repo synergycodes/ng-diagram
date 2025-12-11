@@ -315,6 +315,8 @@ export class NgDiagramService extends NgDiagramBaseService {
   // ==============================
 
   /**
+   * @since 0.9.0
+   *
    * Executes an async function within a transaction context.
    * All state updates within the callback are batched and applied atomically.
    *
@@ -330,6 +332,8 @@ export class NgDiagramService extends NgDiagramBaseService {
    */
   transaction(callback: () => Promise<void>): Promise<TransactionResult>;
   /**
+   * @since 0.9.0
+   *
    * Executes an async function within a transaction context with options.
    * All state updates within the callback are batched and applied atomically.
    *
@@ -359,6 +363,8 @@ export class NgDiagramService extends NgDiagramBaseService {
    */
   transaction(callback: () => void): void;
   /**
+   * @since 0.9.0
+   *
    * Executes a function within a transaction context with options.
    * All state updates within the callback are batched and applied atomically.
    *
