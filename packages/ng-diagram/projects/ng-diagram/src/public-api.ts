@@ -142,6 +142,7 @@ export type {
   SimpleNode,
   Size,
   SnappingConfig,
+  TransactionOptions,
   TransactionResult,
   Viewport,
   ViewportChangedEvent,

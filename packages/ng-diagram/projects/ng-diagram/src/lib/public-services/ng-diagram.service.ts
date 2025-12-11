@@ -8,6 +8,8 @@ import {
   Middleware,
   Node,
   TransactionCallback,
+  TransactionOptions,
+  TransactionResult,
   UnsubscribeFn,
 } from '../../core/src';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
@@ -316,17 +318,94 @@ export class NgDiagramService extends NgDiagramBaseService {
    * Executes a function within a transaction context.
    * All state updates within the callback are batched and applied atomically.
    *
-   * @example
+   * @param callback The function to execute within the transaction.
    *
+   * @example
    * this.ngDiagramService.transaction(() => {
-   *  this.ngDiagramModelService.addNodes([node1, node2]);
-   *  this.ngDiagramModelService.addEdges([edge1]);
+   *   this.ngDiagramModelService.addNodes([node1, node2]);
+   *   this.ngDiagramModelService.addEdges([edge1]);
    * });
-   **/
-  transaction(callback: () => void): void {
-    const transactionCallback: TransactionCallback = () => {
-      return callback();
+   */
+  transaction(callback: () => void): void;
+  /**
+   * Executes a function within a transaction context with options.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The function to execute within the transaction.
+   * @param options Transaction options.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Transaction that waits for measurements to complete
+   * await this.ngDiagramService.transaction(() => {
+   *   this.ngDiagramModelService.addNodes([node1, node2]);
+   * }, { waitForMeasurements: true });
+   *
+   * // Now safe to zoom to fit - node dimensions are measured
+   * this.ngDiagramViewportService.zoomToFit();
+   */
+  transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
+  /**
+   * Executes an async function within a transaction context.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The async function to execute within the transaction.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Async transaction with data fetching
+   * await this.ngDiagramService.transaction(async () => {
+   *   const data = await fetchDataFromServer();
+   *   this.ngDiagramModelService.addNodes([{ id: '1', position: { x: 0, y: 0 }, data }]);
+   * });
+   */
+  transaction(callback: () => Promise<void>): Promise<TransactionResult>;
+  /**
+   * Executes an async function within a transaction context with options.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The async function to execute within the transaction.
+   * @param options Transaction options.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Async transaction that waits for measurements
+   * await this.ngDiagramService.transaction(async () => {
+   *   const nodes = await loadNodesFromDatabase();
+   *   this.ngDiagramModelService.addNodes(nodes);
+   * }, { waitForMeasurements: true });
+   *
+   * // Now safe to zoom - all nodes are measured
+   * this.ngDiagramViewportService.zoomToFit();
+   */
+  transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
+  transaction(
+    callback: (() => void) | (() => Promise<void>),
+    options?: TransactionOptions
+  ): void | Promise<TransactionResult> {
+    // If options provided, always return promise
+    if (options) {
+      const transactionCallback: TransactionCallback = () => callback();
+      return this.flowCore.transaction(transactionCallback, options);
+    }
+
+    // Execute and check if callback returns a promise
+    let isAsync = false;
+    const wrappedCallback: TransactionCallback = () => {
+      const result = callback();
+      if (result instanceof Promise) {
+        isAsync = true;
+      }
+      return result;
     };
-    this.flowCore.transaction(transactionCallback);
+
+    const promise = this.flowCore.transaction(wrappedCallback, {});
+
+    // Return promise only if callback was async
+    if (isAsync) {
+      return promise;
+    }
+
+    // Sync callback without options - fire and forget (backward compatibility)
   }
 }

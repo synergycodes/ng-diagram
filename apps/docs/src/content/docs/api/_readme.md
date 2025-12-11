@@ -158,6 +158,10 @@ title: "ng-diagram"
 - [NgDiagramGroupNodeTemplate](/docs/api/types/templates/ngdiagramgroupnodetemplate/)
 - [NgDiagramNodeTemplate](/docs/api/types/templates/ngdiagramnodetemplate/)
 
+## Types/Transaction
+
+- [TransactionOptions](/docs/api/types/transaction/transactionoptions/)
+
 ## Utilities
 
 - [configureShortcuts](/docs/api/utilities/configureshortcuts/)

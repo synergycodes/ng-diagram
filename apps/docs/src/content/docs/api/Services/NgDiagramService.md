@@ -428,28 +428,142 @@ The port ID from which the linking starts. Creates a floating edge when undefine
 
 ### transaction()
 
+#### Call Signature
+
 > **transaction**(`callback`): `void`
 
 Executes a function within a transaction context.
 All state updates within the callback are batched and applied atomically.
 
-#### Parameters
+##### Parameters
 
-##### callback
+###### callback
 
 () => `void`
 
-#### Returns
+The function to execute within the transaction.
+
+##### Returns
 
 `void`
 
-#### Example
+##### Example
 
 ```ts
 this.ngDiagramService.transaction(() => {
- this.ngDiagramModelService.addNodes([node1, node2]);
- this.ngDiagramModelService.addEdges([edge1]);
+  this.ngDiagramModelService.addNodes([node1, node2]);
+  this.ngDiagramModelService.addEdges([edge1]);
 });
+```
+
+#### Call Signature
+
+> **transaction**(`callback`, `options`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+Executes a function within a transaction context with options.
+All state updates within the callback are batched and applied atomically.
+
+##### Parameters
+
+###### callback
+
+() => `void`
+
+The function to execute within the transaction.
+
+###### options
+
+[`TransactionOptions`](/docs/api/types/transaction/transactionoptions/)
+
+Transaction options.
+
+##### Returns
+
+`Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+A promise that resolves with the transaction result.
+
+##### Example
+
+```ts
+// Transaction that waits for measurements to complete
+await this.ngDiagramService.transaction(() => {
+  this.ngDiagramModelService.addNodes([node1, node2]);
+}, { waitForMeasurements: true });
+
+// Now safe to zoom to fit - node dimensions are measured
+this.ngDiagramViewportService.zoomToFit();
+```
+
+#### Call Signature
+
+> **transaction**(`callback`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+Executes an async function within a transaction context.
+All state updates within the callback are batched and applied atomically.
+
+##### Parameters
+
+###### callback
+
+() => `Promise`\<`void`\>
+
+The async function to execute within the transaction.
+
+##### Returns
+
+`Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+A promise that resolves with the transaction result.
+
+##### Example
+
+```ts
+// Async transaction with data fetching
+await this.ngDiagramService.transaction(async () => {
+  const data = await fetchDataFromServer();
+  this.ngDiagramModelService.addNodes([{ id: '1', position: { x: 0, y: 0 }, data }]);
+});
+```
+
+#### Call Signature
+
+> **transaction**(`callback`, `options`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+Executes an async function within a transaction context with options.
+All state updates within the callback are batched and applied atomically.
+
+##### Parameters
+
+###### callback
+
+() => `Promise`\<`void`\>
+
+The async function to execute within the transaction.
+
+###### options
+
+[`TransactionOptions`](/docs/api/types/transaction/transactionoptions/)
+
+Transaction options.
+
+##### Returns
+
+`Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+A promise that resolves with the transaction result.
+
+##### Example
+
+```ts
+// Async transaction that waits for measurements
+await this.ngDiagramService.transaction(async () => {
+  const nodes = await loadNodesFromDatabase();
+  this.ngDiagramModelService.addNodes(nodes);
+}, { waitForMeasurements: true });
+
+// Now safe to zoom - all nodes are measured
+this.ngDiagramViewportService.zoomToFit();
 ```
 
 ***

@@ -1,26 +1,43 @@
 import type { FlowCore } from '../flow-core';
 import type { FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '../types';
-import type { TransactionCallback, TransactionResult } from '../types/transaction.interface';
+import type { TransactionCallback, TransactionOptions, TransactionResult } from '../types/transaction.interface';
 import { Transaction } from './transaction';
 
 export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
   private transactionStack: Transaction[] = [];
+  private pendingOptions: TransactionOptions | null = null;
 
   constructor(private readonly flowCore: TFlowCore) {}
 
   async transaction(callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(callback: TransactionCallback, options: TransactionOptions): Promise<TransactionResult>;
   async transaction(
     name: LooseAutocomplete<ModelActionType>,
     callback: TransactionCallback
   ): Promise<TransactionResult>;
   async transaction(
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback,
+    options: TransactionOptions
+  ): Promise<TransactionResult>;
+  async transaction(
     nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
-    callback?: TransactionCallback
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const [transactionName, transactionCallback] = this.parseArgs(nameOrCallback, callback);
+    const [transactionName, transactionCallback, transactionOptions] = this.parseArgs(
+      nameOrCallback,
+      callbackOrOptions,
+      options
+    );
 
     const parentTransaction = this.getCurrentTransaction();
     const transaction = new Transaction(transactionName, parentTransaction, this.flowCore);
+
+    // Only root transactions can have options - nested transactions inherit from parent
+    if (!parentTransaction && transactionOptions) {
+      this.pendingOptions = transactionOptions;
+    }
 
     this.transactionStack.push(transaction);
 
@@ -56,7 +73,19 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
     } finally {
       // Remove from stack
       this.transactionStack.pop();
+      // Clear options when root transaction ends
+      if (!parentTransaction) {
+        this.pendingOptions = null;
+      }
     }
+  }
+
+  /**
+   * Gets the options for the current root transaction.
+   * Returns null if no transaction is active or no options were provided.
+   */
+  getCurrentOptions(): TransactionOptions | null {
+    return this.pendingOptions;
   }
 
   queueUpdate(update: FlowStateUpdate, actionTypes: ModelActionTypes): void {
@@ -84,16 +113,22 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
 
   private parseArgs(
     nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
-    callback?: TransactionCallback
-  ): [LooseAutocomplete<ModelActionType>, TransactionCallback] {
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
+  ): [LooseAutocomplete<ModelActionType>, TransactionCallback, TransactionOptions | undefined] {
+    // Case 1: transaction(callback)
+    // Case 2: transaction(callback, options)
     if (typeof nameOrCallback === 'function') {
-      return ['Transaction' as ModelActionType, nameOrCallback];
+      const transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+      return ['Transaction' as ModelActionType, nameOrCallback, transactionOptions];
     }
 
-    if (!callback) {
+    // Case 3: transaction(name, callback)
+    // Case 4: transaction(name, callback, options)
+    if (typeof callbackOrOptions !== 'function') {
       throw new Error('Callback is required when transaction name is provided');
     }
 
-    return [nameOrCallback, callback];
+    return [nameOrCallback, callbackOrOptions, options];
   }
 }

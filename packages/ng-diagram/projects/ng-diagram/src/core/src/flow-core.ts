@@ -5,6 +5,7 @@ import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
+import { MeasurementTracker } from './measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -37,7 +38,12 @@ import type {
   Port,
   Renderer,
 } from './types';
-import { TransactionCallback, TransactionResult } from './types/transaction.interface';
+import {
+  InternalTransactionOptions,
+  TransactionCallback,
+  TransactionOptions,
+  TransactionResult,
+} from './types/transaction.interface';
 import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
@@ -62,6 +68,7 @@ export class FlowCore {
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
   readonly shortcutManager: ShortcutManager;
+  readonly measurementTracker: MeasurementTracker;
 
   readonly getFlowOffset: () => Point;
 
@@ -88,6 +95,7 @@ export class FlowCore {
     this.actionStateManager = new ActionStateManager(this.eventManager);
     this.portBatchProcessor = new PortBatchProcessor();
     this.labelBatchProcessor = new LabelBatchProcessor();
+    this.measurementTracker = new MeasurementTracker();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
@@ -223,29 +231,98 @@ export class FlowCore {
    *     tx.rollbackTo('afterStep1');
    *   }
    * });
+   *
+   * // Wait for measurements to complete before continuing
+   * await flowCore.transaction(async (tx) => {
+   *   await tx.emit('addNodes', { nodes: [newNode] });
+   * }, { waitForMeasurements: true });
+   * // Now safe to call zoomToFit() - node dimensions are measured
+   * await viewportService.zoomToFit();
    */
   async transaction(callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(callback: TransactionCallback, options: TransactionOptions): Promise<TransactionResult>;
   async transaction(name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult>;
   async transaction(
+    name: ModelActionType,
+    callback: TransactionCallback,
+    options: TransactionOptions
+  ): Promise<TransactionResult>;
+  async transaction(
     nameOrCallback: ModelActionType | TransactionCallback,
-    callback?: TransactionCallback
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
   ): Promise<TransactionResult> {
     let results: TransactionResult;
+    let transactionOptions: TransactionOptions | undefined;
 
     if (typeof nameOrCallback === 'function') {
-      results = await this.transactionManager.transaction(nameOrCallback);
+      // transaction(callback) or transaction(callback, options)
+      transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+      results = await this.transactionManager.transaction(nameOrCallback, transactionOptions ?? {});
     } else {
+      // transaction(name, callback) or transaction(name, callback, options)
+      const callback = callbackOrOptions as TransactionCallback | undefined;
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
       }
-      results = await this.transactionManager.transaction(nameOrCallback, callback);
+      transactionOptions = options;
+      results = await this.transactionManager.transaction(nameOrCallback, callback, transactionOptions ?? {});
     }
 
     if (results.commandsCount > 0) {
+      // Track entities for measurement before applying updates
+      if (transactionOptions?.waitForMeasurements) {
+        const internalOptions = transactionOptions as InternalTransactionOptions;
+        this.trackEntitiesForMeasurement(
+          results.results,
+          internalOptions._measurementDebounceTimeout,
+          internalOptions._measurementInitialTimeout
+        );
+      }
+
       await this.applyUpdate(results.results, results.actionTypes);
     }
 
+    // Wait for measurements if requested
+    if (transactionOptions?.waitForMeasurements) {
+      await this.measurementTracker.waitForMeasurements();
+    }
+
     return results;
+  }
+
+  /**
+   * Tracks entities from a state update for measurement completion.
+   * Called when waitForMeasurements option is enabled.
+   */
+  private trackEntitiesForMeasurement(
+    stateUpdate: FlowStateUpdate,
+    debounceMs?: number,
+    initialTimeoutMs?: number
+  ): void {
+    // Track all nodes being added or updated
+    if (stateUpdate.nodesToAdd) {
+      for (const node of stateUpdate.nodesToAdd) {
+        this.measurementTracker.trackMeasurement(`node:${node.id}`, debounceMs, initialTimeoutMs);
+      }
+    }
+    if (stateUpdate.nodesToUpdate) {
+      for (const update of stateUpdate.nodesToUpdate) {
+        this.measurementTracker.trackMeasurement(`node:${update.id}`, debounceMs, initialTimeoutMs);
+      }
+    }
+
+    // Track edges (for label measurements)
+    if (stateUpdate.edgesToAdd) {
+      for (const edge of stateUpdate.edgesToAdd) {
+        this.measurementTracker.trackMeasurement(`edge:${edge.id}`, debounceMs, initialTimeoutMs);
+      }
+    }
+    if (stateUpdate.edgesToUpdate) {
+      for (const update of stateUpdate.edgesToUpdate) {
+        this.measurementTracker.trackMeasurement(`edge:${update.id}`, debounceMs, initialTimeoutMs);
+      }
+    }
   }
 
   /**

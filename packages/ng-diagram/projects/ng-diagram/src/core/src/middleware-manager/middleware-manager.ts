@@ -1,11 +1,17 @@
 import { FlowCore } from '../flow-core';
 import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionTypes } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { createEventEmitterMiddleware, loggerMiddleware, measuredBoundsMiddleware } from './middlewares';
+import {
+  createEventEmitterMiddleware,
+  createMeasurementTrackingMiddleware,
+  loggerMiddleware,
+  measuredBoundsMiddleware,
+} from './middlewares';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
   private eventEmitterMiddleware: Middleware | null = null;
+  private measurementTrackingMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -63,14 +69,22 @@ export class MiddlewareManager {
       this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
     }
 
-    // measuredBoundsMiddleware runs after all user middlewares to ensure bounds are computed
-    // after all position/size changes. loggerMiddleware runs after measuredBounds to log final state.
-    // eventEmitterMiddleware runs last to emit events with final state.
+    if (!this.measurementTrackingMiddleware && this.flowCore.measurementTracker) {
+      this.measurementTrackingMiddleware = createMeasurementTrackingMiddleware(this.flowCore.measurementTracker);
+    }
+
+    // Middleware execution order:
+    // 1. User middlewares - custom processing
+    // 2. measuredBoundsMiddleware - compute node bounds after all position/size changes
+    // 3. loggerMiddleware - log final state for debugging
+    // 4. eventEmitterMiddleware - emit events with final state
+    // 5. measurementTrackingMiddleware - signal measurement activity (runs last to catch all changes)
     const finalChain = [
       ...this.middlewareChain,
       measuredBoundsMiddleware,
       loggerMiddleware,
       ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
+      ...(this.measurementTrackingMiddleware ? [this.measurementTrackingMiddleware] : []),
     ];
 
     const middlewareExecutor = new MiddlewareExecutor(this.flowCore, finalChain);

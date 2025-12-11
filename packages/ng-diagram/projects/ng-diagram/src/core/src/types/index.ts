@@ -21,8 +21,13 @@ export * from './environment.interface';
 // Utils types
 export * from './utils';
 
-// Transaction types
-export * from './transaction.interface';
+// Transaction types (InternalTransactionOptions intentionally not exported)
+export type {
+  TransactionCallback,
+  TransactionContext,
+  TransactionOptions,
+  TransactionResult,
+} from './transaction.interface';
 
 // Action state types
 export * from './action-state.interface';
