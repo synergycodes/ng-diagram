@@ -13,6 +13,8 @@ import { GroupNode } from '../../../core/src';
  *
  * When the group's {@link GroupNode#highlighted} property is `true`, the `ng-diagram-group-highlight` CSS class is applied.
  *
+ * @public
+ * @since 0.8.0
  * @category Directives
  */
 @Directive({

@@ -55,7 +55,10 @@ import { NgDiagramNodeComponent } from '../node/ng-diagram-node.component';
 import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
 
 /**
- * Diagram component
+ * Main diagram component for rendering flow diagrams with nodes and edges.
+ *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

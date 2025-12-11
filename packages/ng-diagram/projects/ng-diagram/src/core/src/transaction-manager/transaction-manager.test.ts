@@ -29,8 +29,9 @@ describe('TransactionManager', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (mockFlowCore as any).transactionManager = transactionManager;
 
-    mockApplyUpdate.mockImplementation(async (update, actionType) => {
-      transactionManager.queueUpdate(update, actionType);
+    mockApplyUpdate.mockImplementation(async (update, actionTypes) => {
+      const actionTypesArray = Array.isArray(actionTypes) ? actionTypes : [actionTypes];
+      transactionManager.queueUpdate(update, actionTypesArray);
     });
 
     // Setup emitInternal to simulate actual command emission behavior
@@ -80,6 +81,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.any(Object),
         commandsCount: 1,
+        actionTypes: expect.any(Array),
       });
     });
 
@@ -117,6 +119,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode] }),
         commandsCount: 1,
+        actionTypes: expect.any(Array),
       });
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ nodesToAdd: [mockNode] }),
@@ -224,13 +227,13 @@ describe('TransactionManager', () => {
   describe('queueUpdate', () => {
     it('should queue update when transaction is active', async () => {
       await transactionManager.transaction(async () => {
-        transactionManager.queueUpdate({ nodesToAdd: [] }, 'testAction' as ModelActionType);
+        transactionManager.queueUpdate({ nodesToAdd: [] }, ['testAction' as ModelActionType]);
         expect(transactionManager.isActive()).toBe(true);
       });
     });
 
     it('should throw error when no transaction is active', () => {
-      expect(() => transactionManager.queueUpdate({ nodesToAdd: [] }, 'testAction' as ModelActionType)).toThrow(
+      expect(() => transactionManager.queueUpdate({ nodesToAdd: [] }, ['testAction' as ModelActionType])).toThrow(
         'No active transaction. Cannot queue update.'
       );
     });
@@ -304,6 +307,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }),
         commandsCount: 2,
+        actionTypes: expect.any(Array),
       });
     });
   });

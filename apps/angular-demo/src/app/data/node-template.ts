@@ -1,4 +1,5 @@
 import { NgDiagramNodeTemplateMap } from 'ng-diagram';
+import { ChipNodeComponent } from '../node-template/chip-node/chip-node.component';
 import { CustomizedDefaultNodeComponent } from '../node-template/customized-default-node/customized-default-node.component';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
@@ -11,6 +12,7 @@ export enum NodeTemplateType {
   Resizable = 'resizable',
   CustomizedDefault = 'customized-default',
   Group = 'group',
+  Chip = 'chip',
 }
 
 export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
@@ -19,4 +21,5 @@ export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
   [NodeTemplateType.Resizable, ResizableNodeComponent],
   [NodeTemplateType.Group, GroupNodeComponent],
   [NodeTemplateType.CustomizedDefault, CustomizedDefaultNodeComponent],
+  [NodeTemplateType.Chip, ChipNodeComponent],
 ]);

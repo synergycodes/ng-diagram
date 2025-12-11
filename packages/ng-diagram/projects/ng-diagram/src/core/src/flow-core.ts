@@ -31,6 +31,7 @@ import type {
   Middleware,
   MiddlewareChain,
   ModelActionType,
+  ModelActionTypes,
   ModelAdapter,
   Node,
   Point,
@@ -278,7 +279,7 @@ export class FlowCore {
     }
 
     if (results.commandsCount > 0) {
-      await this.applyUpdate(results.results, nameOrCallback as ModelActionType);
+      await this.applyUpdate(results.results, results.actionTypes);
     }
 
     return results;
@@ -287,11 +288,16 @@ export class FlowCore {
   /**
    * Applies an update to the flow state
    * @param stateUpdate Partial state to apply
-   * @param modelActionType Type of model action to apply
+   * @param modelActionTypes Action type(s) that triggered this update. Can be a single type or an array of types (from transactions).
    */
-  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: LooseAutocomplete<ModelActionType>): Promise<void> {
+  async applyUpdate(
+    stateUpdate: FlowStateUpdate,
+    modelActionTypes: LooseAutocomplete<ModelActionType> | ModelActionTypes
+  ): Promise<void> {
+    const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
+
     if (this.transactionManager.isActive()) {
-      this.transactionManager.queueUpdate(stateUpdate, modelActionType);
+      this.transactionManager.queueUpdate(stateUpdate, actionTypesArray);
       return;
     }
 
@@ -308,7 +314,7 @@ export class FlowCore {
       const currentState = this.getState();
 
       if (shouldLog) console.time(`[PERF] middleware.execute (${modelActionType})`);
-      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, modelActionType);
+      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
       if (shouldLog) console.timeEnd(`[PERF] middleware.execute (${modelActionType})`);
 
       if (finalState) {
@@ -510,8 +516,17 @@ export class FlowCore {
    * @param nodeId - The ID of the node to check for collisions
    * @returns An array of Nodes that overlap with the specified node
    */
-  getOverlappingNodes(nodeId: string): Node[] {
-    return getOverlappingNodes(this, nodeId);
+  getOverlappingNodes(nodeId: string): Node[];
+  /**
+   * Detects collision with other nodes by finding all nodes whose rectangles intersect
+   * with the specified node's bounding rectangle.
+   *
+   * @param node - The node to check for collisions
+   * @returns An array of Nodes that overlap with the specified node
+   */
+  getOverlappingNodes(node: Node): Node[];
+  getOverlappingNodes(nodeOrId: Node | string): Node[] {
+    return getOverlappingNodes(this, nodeOrId as Node & string);
   }
 
   /**

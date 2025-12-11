@@ -8,6 +8,7 @@ import type {
   MiddlewareContext,
   MiddlewareHistoryUpdate,
   ModelActionType,
+  ModelActionTypes,
   Node,
 } from '../types';
 import { isSamePoint, isSameSize } from '../utils';
@@ -19,7 +20,7 @@ export class MiddlewareExecutor {
   private history: MiddlewareHistoryUpdate[] = [];
   private initialState!: FlowState;
   private initialStateUpdate!: FlowStateUpdate;
-  private modelActionType!: ModelActionType;
+  private modelActionTypes!: ModelActionTypes;
   private metadata!: Metadata;
   private edgesMap = new Map<string, Edge>();
   private nodesMap = new Map<string, Node>();
@@ -42,7 +43,7 @@ export class MiddlewareExecutor {
   async run(
     initialState: FlowState,
     stateUpdate: FlowStateUpdate,
-    modelActionType: ModelActionType
+    modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
     const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
     const shouldLog = logActions.includes(modelActionType);
@@ -50,7 +51,7 @@ export class MiddlewareExecutor {
     if (shouldLog) console.time(`[PERF] executor.run setup (${modelActionType})`);
 
     this.initialState = initialState;
-    this.modelActionType = modelActionType;
+    this.modelActionTypes = modelActionTypes;
     this.metadata = initialState.metadata;
 
     if (shouldLog) console.time(`[PERF] map copies`);
@@ -118,7 +119,8 @@ export class MiddlewareExecutor {
     initialNodesMap: this.initialNodesMap,
     initialEdgesMap: this.initialEdgesMap,
     initialState: this.initialState,
-    modelActionType: this.modelActionType,
+    modelActionType: this.modelActionTypes[0] as ModelActionType,
+    modelActionTypes: this.modelActionTypes,
     actionStateManager: this.flowCore.actionStateManager,
     edgeRoutingManager: this.flowCore.edgeRoutingManager,
     helpers: this.helpers(),

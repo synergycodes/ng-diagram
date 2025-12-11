@@ -24,16 +24,12 @@ export class DiagramInitEmitter implements EventEmitter {
   private readonly SAFETY_HATCH_TIMEOUT_MS = 2000;
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    const { modelActionType } = context;
+    const { modelActionTypes } = context;
 
-    switch (modelActionType) {
-      case 'init':
-        this.handleInit(context, eventManager);
-        break;
-      case 'updateNode':
-      case 'updateEdge':
-        this.handleUpdate(context, eventManager);
-        break;
+    if (modelActionTypes.includes('init')) {
+      this.handleInit(context, eventManager);
+    } else if (modelActionTypes.includes('updateNode') || modelActionTypes.includes('updateEdge')) {
+      this.handleUpdate(context, eventManager);
     }
   }
 
@@ -58,13 +54,14 @@ export class DiagramInitEmitter implements EventEmitter {
       return;
     }
 
-    const { modelActionType, initialUpdate, nodesMap, edgesMap } = context;
+    const { modelActionTypes, initialUpdate, nodesMap, edgesMap } = context;
 
     const previousUnmeasuredCount = this.countUnmeasuredItems();
 
-    if (modelActionType === 'updateNode') {
+    if (modelActionTypes.includes('updateNode')) {
       this.processNodeUpdates(initialUpdate, nodesMap);
-    } else if (modelActionType === 'updateEdge') {
+    }
+    if (modelActionTypes.includes('updateEdge')) {
       this.processEdgeUpdates(initialUpdate, edgesMap);
     }
 

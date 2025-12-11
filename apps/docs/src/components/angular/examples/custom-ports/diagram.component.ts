@@ -6,10 +6,12 @@ import {
   NgDiagramComponent,
   NgDiagramModelService,
   provideNgDiagram,
+  type Edge,
   type NgDiagramConfig,
   type NgDiagramNodeTemplateMap,
 } from 'ng-diagram';
-import { NodeComponent } from './node/node.component';
+import { HeaderNodeComponent } from './header-node/header-node.component';
+import { SocketNodeComponent } from './socket-node/socket-node.component';
 
 @Component({
   imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
@@ -29,16 +31,27 @@ import { NodeComponent } from './node/node.component';
 })
 export class DiagramComponent {
   nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
-    ['myType', NodeComponent],
+    ['headerNodeType', HeaderNodeComponent],
+    ['socketNodeType', SocketNodeComponent],
   ]);
 
   config = {
     zoom: {
       max: 3,
       zoomToFit: {
-        onInit: true,
-        padding: 100,
+        onInit: false,
       },
+    },
+    edgeRouting: {
+      orthogonal: {
+        maxCornerRadius: 0,
+      },
+    },
+    linking: {
+      finalEdgeDataBuilder: (edge: Edge) => ({
+        ...edge,
+        targetArrowhead: undefined,
+      }),
     },
     zIndex: {
       edgesAboveConnectedNodes: true,
@@ -46,52 +59,70 @@ export class DiagramComponent {
   } satisfies NgDiagramConfig;
 
   model = initializeModel({
+    metadata: { viewport: { x: 200, y: 50, scale: 1 } },
     nodes: [
       {
         id: '1',
         position: { x: 0, y: 0 },
-        type: 'myType',
+        autoSize: false,
+        size: { width: 200, height: 400 },
+        type: 'headerNodeType',
         data: {
-          name: 'Custom Node',
+          name: 'IC 111111',
         },
       },
       {
         id: '2',
-        position: { x: 200, y: 100 },
-        type: 'myType',
+        position: { x: 300, y: 140 },
+        autoSize: false,
+        angle: 90,
+        size: { width: 250, height: 80 },
+        type: 'socketNodeType',
         data: {
-          name: 'Custom Node 2',
-          leftPortColor: 'red',
+          name: 'Socket 01',
         },
       },
     ],
     edges: [
       {
-        id: '1',
-        source: '1',
-        target: '2',
+        id: 'abf5265b-c5c3-45af-a382-77776faa65aa',
         data: {},
-        sourcePort: 'port-bottom',
-        targetPort: 'port-left',
-        sourceArrowhead: 'ng-diagram-arrow',
+        source: '2',
+        sourcePort: 'port-bottom-1',
+        target: '1',
+        targetPort: 'port-c1plus',
       },
       {
-        id: '2',
-        source: '2',
-        target: '1',
+        id: 'ffde2e9d-3fd8-4463-b570-ff9b3d3ec6ac',
         data: {},
-        sourcePort: 'port-top',
-        targetPort: 'port-right',
-        sourceArrowhead: 'ng-diagram-arrow',
+        source: '2',
+        sourcePort: 'port-bottom-2',
+        target: '1',
+        targetPort: 'port-r3in',
       },
       {
-        id: '3',
-        source: '2',
-        target: '1',
+        id: '96b05c41-c4bb-4c65-a737-dc0e480cc15e',
         data: {},
-        sourcePort: 'port-right',
-        targetPort: 'port-left',
-        sourceArrowhead: 'ng-diagram-arrow',
+        source: '2',
+        sourcePort: 'port-bottom-3',
+        target: '1',
+        targetPort: 'port-r4in',
+      },
+      {
+        id: 'c74539f0-1ab5-4bf7-a0af-49e194ed8063',
+        data: {},
+        source: '2',
+        sourcePort: 'port-bottom-4',
+        target: '1',
+        targetPort: 'port-t3out',
+      },
+      {
+        id: 'd86312f4-4269-4006-bd1f-3d9bbbe49cee',
+        data: {},
+        source: '2',
+        sourcePort: 'port-bottom-5',
+        target: '1',
+        targetPort: 'port-t1out',
       },
     ],
   });

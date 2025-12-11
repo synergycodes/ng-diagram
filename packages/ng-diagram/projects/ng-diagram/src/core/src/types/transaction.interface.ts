@@ -1,4 +1,4 @@
-import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType } from '.';
+import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '.';
 
 export interface TransactionContext {
   // Command emission
@@ -53,7 +53,7 @@ export interface TransactionContext {
    * Gets the queued updates in the transaction.
    * @returns Readonly array of queued updates.
    */
-  getQueuedUpdates(): readonly { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[];
+  getQueuedUpdates(): readonly { update: FlowStateUpdate; actionTypes: ModelActionTypes }[];
 }
 
 export type TransactionCallback = (context: TransactionContext) => void | Promise<void>;
@@ -61,6 +61,8 @@ export type TransactionCallback = (context: TransactionContext) => void | Promis
 /**
  * Result of a transaction execution.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface TransactionResult {
@@ -72,4 +74,9 @@ export interface TransactionResult {
    * Number of commands emitted during the transaction
    */
   commandsCount: number;
+  /**
+   * All action types that were executed within the transaction.
+   * @since 0.9.0
+   */
+  actionTypes: ModelActionTypes;
 }

@@ -7,7 +7,7 @@ export class SelectionRotatedEmitter implements EventEmitter {
   name = 'SelectionRotatedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'rotateNodeTo') {
+    if (!context.modelActionTypes.includes('rotateNodeTo')) {
       return;
     }
 

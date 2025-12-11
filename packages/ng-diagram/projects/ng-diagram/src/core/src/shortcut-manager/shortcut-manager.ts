@@ -37,6 +37,8 @@ import { DEFAULT_SHORTCUTS } from './default-shortcuts';
  * );
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Utilities
  */
 export function configureShortcuts(

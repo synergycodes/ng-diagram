@@ -477,4 +477,180 @@ describe('Move Selection Commands', () => {
       expect(childUpdates).toHaveLength(1);
     });
   });
+
+  describe('accumulated deltas with different snap configs', () => {
+    const createFlowCoreWithAccumulatedDeltas = (accumulatedDeltas: Map<string, { x: number; y: number }>) => {
+      const mockFlowCore = {
+        getState: vi.fn(),
+        applyUpdate: vi.fn(),
+        modelLookup: {
+          getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+          getAllDescendants: vi.fn().mockReturnValue([]),
+        },
+        actionStateManager: {
+          dragging: {
+            modifiers: {},
+            accumulatedDeltas,
+          },
+        },
+        config: {
+          snapping: {
+            shouldSnapDragForNode: vi.fn().mockReturnValue(true),
+            shouldSnapResizeForNode: vi.fn().mockReturnValue(false),
+            computeSnapForNodeDrag: vi.fn().mockReturnValue({ width: 100, height: 100 }),
+            computeSnapForNodeSize: vi.fn().mockReturnValue(null),
+            defaultDragSnap: { width: 1, height: 1 },
+            defaultResizeSnap: { width: 1, height: 1 },
+          },
+        },
+      } as unknown as FlowCore;
+      return mockFlowCore;
+    };
+
+    it('should accumulate deltas when snapping prevents movement', () => {
+      const accumulatedDeltas = new Map<string, { x: number; y: number }>();
+      const mockFlowCore = createFlowCoreWithAccumulatedDeltas(accumulatedDeltas);
+      const mockCommandHandler = new CommandHandler(mockFlowCore);
+
+      const mockNode = {
+        id: '1',
+        position: { x: 0, y: 0 },
+        selected: true,
+        data: {},
+        type: 'node',
+      };
+
+      // First small move - should not result in position change but should accumulate
+      moveNodesBy(mockCommandHandler, {
+        name: 'moveNodesBy',
+        delta: { x: 30, y: 30 },
+        nodes: [mockNode],
+      });
+
+      // Node shouldn't move yet (30 rounds to 0 on a 100 grid)
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+
+      // But delta should be accumulated
+      expect(accumulatedDeltas.get('1')).toEqual({ x: 30, y: 30 });
+    });
+
+    it('should snap when accumulated delta crosses threshold', () => {
+      const accumulatedDeltas = new Map<string, { x: number; y: number }>();
+      // Pre-populate with accumulated delta
+      accumulatedDeltas.set('1', { x: 30, y: 30 });
+
+      const mockFlowCore = createFlowCoreWithAccumulatedDeltas(accumulatedDeltas);
+      const mockCommandHandler = new CommandHandler(mockFlowCore);
+
+      const mockNode = {
+        id: '1',
+        position: { x: 0, y: 0 },
+        selected: true,
+        data: {},
+        type: 'node',
+      };
+
+      // Another move that pushes total past threshold (30 + 25 = 55, rounds to 100)
+      moveNodesBy(mockCommandHandler, {
+        name: 'moveNodesBy',
+        delta: { x: 25, y: 25 },
+        nodes: [mockNode],
+      });
+
+      // Now node should move to snapped position
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [{ id: '1', position: { x: 100, y: 100 } }],
+        },
+        'moveNodesBy'
+      );
+
+      // Accumulated delta should be updated: 55 - 100 = -45
+      expect(accumulatedDeltas.get('1')).toEqual({ x: -45, y: -45 });
+    });
+
+    it('should handle nodes with different snap configs independently', () => {
+      const accumulatedDeltas = new Map<string, { x: number; y: number }>();
+      const mockFlowCore = createFlowCoreWithAccumulatedDeltas(accumulatedDeltas);
+      const mockCommandHandler = new CommandHandler(mockFlowCore);
+
+      // Node A has 100px snap, Node B has 10px snap
+      mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockImplementation((node: Node) => {
+        if (node.id === 'A') return { width: 100, height: 100 };
+        if (node.id === 'B') return { width: 10, height: 10 };
+        return null;
+      });
+
+      const nodeA = { id: 'A', position: { x: 0, y: 0 }, selected: true, data: {}, type: 'node' };
+      const nodeB = { id: 'B', position: { x: 0, y: 0 }, selected: true, data: {}, type: 'node' };
+
+      // Move by 15px - Node B should snap to 20, Node A should accumulate
+      moveNodesBy(mockCommandHandler, {
+        name: 'moveNodesBy',
+        delta: { x: 15, y: 15 },
+        nodes: [nodeA, nodeB],
+      });
+
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            // Node A doesn't move (15 rounds to 0 on 100 grid)
+            // Node B moves to 20 (15 rounds to 20 on 10 grid)
+            { id: 'B', position: { x: 20, y: 20 } },
+          ],
+        },
+        'moveNodesBy'
+      );
+
+      // Node A should have accumulated delta, Node B should have leftover
+      expect(accumulatedDeltas.get('A')).toEqual({ x: 15, y: 15 });
+      expect(accumulatedDeltas.get('B')).toEqual({ x: -5, y: -5 }); // 15 - 20 = -5
+    });
+
+    it('should work without actionStateManager (e.g., keyboard movement)', () => {
+      // Create FlowCore without actionStateManager
+      const mockFlowCore = {
+        getState: vi.fn(),
+        applyUpdate: vi.fn(),
+        modelLookup: {
+          getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+          getAllDescendants: vi.fn().mockReturnValue([]),
+        },
+        actionStateManager: undefined,
+        config: {
+          snapping: {
+            shouldSnapDragForNode: vi.fn().mockReturnValue(true),
+            shouldSnapResizeForNode: vi.fn().mockReturnValue(false),
+            computeSnapForNodeDrag: vi.fn().mockReturnValue({ width: 10, height: 10 }),
+            computeSnapForNodeSize: vi.fn().mockReturnValue(null),
+            defaultDragSnap: { width: 1, height: 1 },
+            defaultResizeSnap: { width: 1, height: 1 },
+          },
+        },
+      } as unknown as FlowCore;
+      const mockCommandHandler = new CommandHandler(mockFlowCore);
+
+      const mockNode = {
+        id: '1',
+        position: { x: 0, y: 0 },
+        selected: true,
+        data: {},
+        type: 'node',
+      };
+
+      // Should still work, just without accumulation
+      moveNodesBy(mockCommandHandler, {
+        name: 'moveNodesBy',
+        delta: { x: 15, y: 15 },
+        nodes: [mockNode],
+      });
+
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [{ id: '1', position: { x: 20, y: 20 } }],
+        },
+        'moveNodesBy'
+      );
+    });
+  });
 });

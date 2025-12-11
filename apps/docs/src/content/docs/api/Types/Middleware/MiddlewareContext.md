@@ -1,4 +1,5 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
@@ -22,8 +23,8 @@ const middleware: Middleware = {
     // Access configuration
     console.log('Cell size:', context.config.background.cellSize);
 
-    // Check what action triggered this
-    if (context.modelActionType === 'addNodes') {
+    // Check what actions triggered this (supports transactions with multiple actions)
+    if (context.modelActionTypes.includes('addNodes')) {
       // Validate new nodes
       const isValid = validateNodes(context.state.nodes);
       if (!isValid) {
@@ -135,11 +136,41 @@ that will be applied. Use `helpers` to get actual knowledge about all changes.
 
 ***
 
-### modelActionType
+### ~~modelActionType~~
 
 > **modelActionType**: [`ModelActionType`](/docs/api/types/middleware/modelactiontype/)
 
-The action that triggered the middleware execution
+The action that triggered the middleware execution.
+
+:::caution[Deprecated]
+Use `modelActionTypes` instead, which supports multiple actions from transactions.
+For single actions, this returns the first (and only) action type.
+:::
+
+***
+
+### modelActionTypes
+
+> **modelActionTypes**: [`ModelActionTypes`](/docs/api/types/middleware/modelactiontypes/)
+
+All action types that triggered the middleware execution.
+For transactions, this contains the transaction name followed by all action types
+from commands executed within the transaction.
+For single commands outside transactions, this is a single-element array.
+
+#### Example
+
+```typescript
+// For a transaction named 'batchUpdate' with addNodes and moveViewport commands:
+// modelActionTypes = ['batchUpdate', 'addNodes', 'moveViewport']
+
+// For a single command outside a transaction:
+// modelActionTypes = ['addNodes']
+```
+
+#### Since
+
+0.9.0
 
 ***
 

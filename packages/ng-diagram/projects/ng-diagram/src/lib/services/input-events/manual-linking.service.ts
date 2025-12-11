@@ -12,7 +12,7 @@ export class ManualLinkingService {
   private portId: string | undefined;
 
   /** Call this method to start linking from your custom logic */
-  startLinking(node: Node, portId: string) {
+  startLinking(node: Node, portId?: string) {
     this.node = node;
     this.portId = portId;
     const position = this.cursorPositionTrackerService.getLastPosition();

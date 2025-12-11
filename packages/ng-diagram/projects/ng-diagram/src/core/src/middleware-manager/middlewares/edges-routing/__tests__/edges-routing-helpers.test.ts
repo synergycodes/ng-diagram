@@ -52,6 +52,7 @@ describe('Edge Routing Helper Functions', () => {
     it('should return true when modelActionType is init', () => {
       const context = {
         modelActionType: 'init',
+        modelActionTypes: ['init'],
         helpers: mockHelpers,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
@@ -64,6 +65,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
       const context = {
         modelActionType: 'addEdges',
+        modelActionTypes: ['addEdges'],
         helpers: mockHelpers,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
@@ -76,6 +78,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfAnyNodePropsChanged = vi.fn().mockReturnValue(true);
       const context = {
         modelActionType: 'updateNodes',
+        modelActionTypes: ['updateNodes'],
         helpers: mockHelpers,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
@@ -94,6 +97,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfAnyEdgePropsChanged = vi.fn().mockReturnValue(true);
       const context = {
         modelActionType: 'updateEdges',
+        modelActionTypes: ['updateEdges'],
         helpers: mockHelpers,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
@@ -120,6 +124,7 @@ describe('Edge Routing Helper Functions', () => {
 
       const context = {
         modelActionType: 'updateNodes',
+        modelActionTypes: ['updateNodes'],
         helpers: mockHelpers,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
@@ -134,7 +139,7 @@ describe('Edge Routing Helper Functions', () => {
       const edge: Edge = { ...mockEdge, id: 'edge-1' };
       mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(true);
 
-      const result = shouldRouteEdge(edge, mockHelpers, 'updateEdge');
+      const result = shouldRouteEdge(edge, mockHelpers, ['updateEdge']);
 
       expect(result).toBe(true);
       expect(mockHelpers.checkIfEdgeChanged).toHaveBeenCalledWith('edge-1');
@@ -145,7 +150,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(false);
       mockHelpers.checkIfNodeChanged = vi.fn().mockImplementation((id) => id === 'node-1');
 
-      const result = shouldRouteEdge(edge, mockHelpers, 'updateNodes');
+      const result = shouldRouteEdge(edge, mockHelpers, ['updateNodes']);
 
       expect(result).toBe(true);
       expect(mockHelpers.checkIfNodeChanged).toHaveBeenCalledWith('node-1');
@@ -156,7 +161,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(false);
       mockHelpers.checkIfNodeChanged = vi.fn().mockImplementation((id) => id === 'node-2');
 
-      const result = shouldRouteEdge(edge, mockHelpers, 'updateNodes');
+      const result = shouldRouteEdge(edge, mockHelpers, ['updateNodes']);
 
       expect(result).toBe(true);
       expect(mockHelpers.checkIfNodeChanged).toHaveBeenCalledWith('node-2');
@@ -167,7 +172,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(false);
       mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(false);
 
-      const result = shouldRouteEdge(edge, mockHelpers, 'init');
+      const result = shouldRouteEdge(edge, mockHelpers, ['init']);
 
       expect(result).toBe(true);
     });
@@ -177,7 +182,7 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(false);
       mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(false);
 
-      const result = shouldRouteEdge(edge, mockHelpers, 'updateNodes');
+      const result = shouldRouteEdge(edge, mockHelpers, ['updateNodes']);
 
       expect(result).toBe(false);
     });
@@ -186,7 +191,7 @@ describe('Edge Routing Helper Functions', () => {
       const edge: Edge = { ...mockEdge, id: 'edge-4' };
       mockHelpers.checkIfEdgeAdded = vi.fn().mockReturnValue(true);
 
-      const result = shouldRouteEdge(edge, mockHelpers, 'addEdges');
+      const result = shouldRouteEdge(edge, mockHelpers, ['addEdges']);
 
       expect(result).toBe(true);
       expect(mockHelpers.checkIfEdgeAdded).toHaveBeenCalledWith('edge-4');
@@ -499,13 +504,9 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(true);
       mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(false);
 
-      const result = processEdgesForRouting(
-        edges,
-        nodesMap,
-        mockRoutingManager as EdgeRoutingManager,
-        mockHelpers,
-        'updateEdge'
-      );
+      const result = processEdgesForRouting(edges, nodesMap, mockRoutingManager as EdgeRoutingManager, mockHelpers, [
+        'updateEdge',
+      ]);
 
       expect(result).toHaveLength(2);
       expect(result![0]).toMatchObject({ id: 'auto-edge', points: expect.any(Array) });
@@ -523,26 +524,18 @@ describe('Edge Routing Helper Functions', () => {
       mockHelpers.checkIfEdgeChanged = vi.fn().mockImplementation((id) => id === 'edge-1');
       mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(false);
 
-      const result = processEdgesForRouting(
-        edges,
-        nodesMap,
-        mockRoutingManager as EdgeRoutingManager,
-        mockHelpers,
-        'updateEdge'
-      );
+      const result = processEdgesForRouting(edges, nodesMap, mockRoutingManager as EdgeRoutingManager, mockHelpers, [
+        'updateEdge',
+      ]);
 
       expect(result).toHaveLength(1);
       expect(result![0].id).toBe('edge-1');
     });
 
     it('should handle empty edges array', () => {
-      const result = processEdgesForRouting(
-        [],
-        new Map(),
-        mockRoutingManager as EdgeRoutingManager,
-        mockHelpers,
-        'init'
-      );
+      const result = processEdgesForRouting([], new Map(), mockRoutingManager as EdgeRoutingManager, mockHelpers, [
+        'init',
+      ]);
 
       expect(result).toEqual([]);
     });

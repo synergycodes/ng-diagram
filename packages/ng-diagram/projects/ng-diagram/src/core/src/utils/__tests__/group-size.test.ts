@@ -15,10 +15,10 @@ describe('Group Size Utils', () => {
       const bounds = calculateGroupBounds([], group, { allowResizeBelowChildrenBounds: false });
 
       expect(bounds).toEqual({
-        minX: 100,
-        minY: 100,
-        maxX: 300,
-        maxY: 250,
+        left: 100,
+        top: 100,
+        right: 300,
+        bottom: 250,
       });
     });
 
@@ -65,10 +65,10 @@ describe('Group Size Utils', () => {
       const bounds = calculateGroupBounds([childNode], group, { allowResizeBelowChildrenBounds: false });
 
       expect(bounds).toEqual({
-        minX: 100,
-        minY: 100,
-        maxX: 300,
-        maxY: 250,
+        left: 100,
+        top: 100,
+        right: 300,
+        bottom: 250,
       });
     });
 
@@ -95,10 +95,10 @@ describe('Group Size Utils', () => {
       const bounds = calculateGroupBounds(childNodes, group, { allowResizeBelowChildrenBounds: false });
 
       expect(bounds).toEqual({
-        minX: 50,
-        minY: 50,
-        maxX: 360, // rightmost node x (300) + width (60)
-        maxY: 345, // bottommost node y (300) + height (45)
+        left: 50,
+        top: 50,
+        right: 360, // rightmost node x (300) + width (60)
+        bottom: 345, // bottommost node y (300) + height (45)
       });
     });
 
@@ -128,10 +128,10 @@ describe('Group Size Utils', () => {
       });
 
       expect(bounds).toEqual({
-        minX: 50,
-        minY: 50,
-        maxX: 360,
-        maxY: 345,
+        left: 50,
+        top: 50,
+        right: 360,
+        bottom: 345,
       });
     });
 

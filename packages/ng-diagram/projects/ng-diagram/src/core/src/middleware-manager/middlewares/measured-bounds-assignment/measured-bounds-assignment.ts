@@ -12,9 +12,9 @@ import { isNodeFullyMeasured } from './is-node-fully-measured';
 export const measuredBoundsMiddleware: Middleware<'measured-bounds'> = {
   name: 'measured-bounds',
   execute: (context, next) => {
-    const { nodesMap, modelActionType, helpers } = context;
+    const { nodesMap, modelActionTypes, helpers } = context;
 
-    if (modelActionType === 'init') {
+    if (modelActionTypes.includes('init')) {
       const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
       nodesMap.forEach((node) => {
         if (isNodeFullyMeasured(node)) {

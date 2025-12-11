@@ -1,0 +1,28 @@
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+
+  /* Non-applicable port CSS variables for custom styling */
+  // --ngd-port-size - is not needed for custom styled ports - size is determined by content
+
+  /* Applicable port CSS variables for custom styling */
+  --ngd-port-border-size: 0px;
+  // --ngd-port-border-radius: 0%; //disable border radius for square ports
+  // --ngd-port-background-color: yellow;
+  // --ngd-port-border-color: red;
+  // --ngd-port-background-color-hover: #1565c0;
+  // --ngd-port-border-color-hover: #0c373b;
+  // --ngd-port-border-size-hover: 0.25rem;
+
+  .chip-node {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+  }
+}

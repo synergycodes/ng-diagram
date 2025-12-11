@@ -16,7 +16,7 @@ export const calculateGroupBounds = (
   }
 
   if (allowResizeBelowChildrenBounds) {
-    return { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+    return { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
   }
 
   const groupBounds: Bounds = getBoundsFromRect(getRect(group));
@@ -34,14 +34,14 @@ export const calculateGroupBounds = (
 
       const nodeBounds = getBoundsFromRect(getRect(node));
 
-      acc.minX = Math.min(acc.minX, nodeBounds.minX);
-      acc.minY = Math.min(acc.minY, nodeBounds.minY);
-      acc.maxX = Math.max(acc.maxX, nodeBounds.maxX);
-      acc.maxY = Math.max(acc.maxY, nodeBounds.maxY);
+      acc.left = Math.min(acc.left, nodeBounds.left);
+      acc.top = Math.min(acc.top, nodeBounds.top);
+      acc.right = Math.max(acc.right, nodeBounds.right);
+      acc.bottom = Math.max(acc.bottom, nodeBounds.bottom);
 
       return acc;
     },
-    useGroupRect ? groupBounds : { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+    useGroupRect ? groupBounds : { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity }
   );
 
   return bounds;

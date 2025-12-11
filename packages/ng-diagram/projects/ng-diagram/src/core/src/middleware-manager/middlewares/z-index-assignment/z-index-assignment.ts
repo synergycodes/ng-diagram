@@ -1,11 +1,11 @@
-import { Edge, FlowStateUpdate, Middleware, ModelActionType, Node } from '../../../types';
+import { Edge, FlowStateUpdate, Middleware, ModelActionTypes, Node } from '../../../types';
 import { assignEdgesZIndex, assignEdgeZIndex } from './utils/assign-edges-z-index';
 import { assignNodeZIndex } from './utils/assign-node-z-index';
 import { initializeZIndex } from './utils/initialize-z-index';
 
-const checkIfIsInit = (modelActionType: ModelActionType) => modelActionType === 'init';
-const checkIfIsEdgeAdded = (modelActionType: ModelActionType) =>
-  modelActionType === 'finishLinking' || modelActionType === 'addEdges';
+const checkIfIsInit = (modelActionTypes: ModelActionTypes) => modelActionTypes.includes('init');
+const checkIfIsEdgeAdded = (modelActionTypes: ModelActionTypes) =>
+  modelActionTypes.includes('finishLinking') || modelActionTypes.includes('addEdges');
 
 export const zIndexMiddleware: Middleware<'z-index'> = {
   name: 'z-index',
@@ -15,18 +15,18 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
       nodesMap,
       edgesMap,
       helpers,
-      modelActionType,
+      modelActionTypes,
       config,
     } = context;
 
     const zIndexConfig = config.zIndex;
     const isEnabled = zIndexConfig.enabled;
-    const isInit = checkIfIsInit(modelActionType);
+    const isInit = checkIfIsInit(modelActionTypes);
     const shouldSnapSelectedNode = helpers.checkIfAnyNodePropsChanged(['selected']);
     const shouldSnapGroupIdNode = helpers.checkIfAnyNodePropsChanged(['groupId']);
     const shouldSnapZOrderNode = helpers.checkIfAnyNodePropsChanged(['zOrder']);
     const shouldSnapEdge = helpers.checkIfAnyEdgePropsChanged(['selected']);
-    const isEdgeAdded = checkIfIsEdgeAdded(modelActionType);
+    const isEdgeAdded = checkIfIsEdgeAdded(modelActionTypes);
     const isNodeAdded = helpers.anyNodesAdded();
     const shouldReOrder =
       isInit ||

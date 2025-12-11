@@ -37,6 +37,8 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
  * this.ngDiagramService.updateConfig({ debugMode: true });
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()
@@ -203,9 +205,9 @@ export class NgDiagramService extends NgDiagramBaseService {
   /**
    * Call this method to start linking from your custom logic.
    * @param node The node from which the linking starts.
-   * @param portId The port ID from which the linking starts.
+   * @param portId The port ID from which the linking starts. Creates a floating edge when undefined.
    */
-  startLinking(node: Node, portId: string) {
+  startLinking(node: Node, portId?: string) {
     this.manualLinkingService.startLinking(node, portId);
   }
 

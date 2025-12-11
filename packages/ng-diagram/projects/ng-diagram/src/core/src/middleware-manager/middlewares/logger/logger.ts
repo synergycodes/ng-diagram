@@ -1,9 +1,10 @@
 import { Middleware } from '../../../types';
 
 /**
- * Middleware used for logging NgDiagram internal events and state changes
- * @category Types/Middleware
+ * Middleware used for logging NgDiagram internal events and state changes.
+ *
  * @internal
+ * @category Types/Middleware
  */
 export const loggerMiddleware: Middleware = {
   name: 'logger',
@@ -13,7 +14,7 @@ export const loggerMiddleware: Middleware = {
       return;
     }
 
-    console.log(`[ngDiagram] ${context.modelActionType}`, {
+    console.log(`[ngDiagram] ${context.modelActionTypes.join(', ')}`, {
       initialState: context.initialState,
       finalState: context.state,
       history: context.history,

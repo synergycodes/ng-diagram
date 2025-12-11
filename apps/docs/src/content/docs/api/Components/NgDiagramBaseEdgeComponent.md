@@ -1,4 +1,5 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
@@ -71,3 +72,12 @@ Stroke width of the edge
 > **targetArrowhead**: `InputSignal`\<`undefined` \| `string`\>
 
 ID of a target <marker> element in the SVG document. Edge model data has precedence over this property.
+
+***
+
+### useInlineMarkers
+
+> `readonly` **useInlineMarkers**: `boolean`
+
+Whether to use inline markers (Safari fallback).
+Safari doesn't support context-stroke, so we render markers inline per edge.

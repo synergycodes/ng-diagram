@@ -27,6 +27,7 @@ describe('EdgeDrawnEmitter', () => {
 
     context = {
       modelActionType: 'finishLinking',
+      modelActionTypes: ['finishLinking'],
       helpers: helpers as unknown as MiddlewareContext['helpers'],
       initialEdgesMap: new Map<string, Edge>(),
       edgesMap: new Map<string, Edge>(),
@@ -35,7 +36,7 @@ describe('EdgeDrawnEmitter', () => {
   });
 
   it('should not emit event when modelActionType is not finishLinking', () => {
-    context.modelActionType = 'addEdges';
+    context.modelActionTypes = ['addEdges'];
     helpers.anyEdgesAdded.mockReturnValue(true);
 
     const edge: Edge = { ...mockEdge, id: 'edge1', source: 'node1', target: 'node2' };

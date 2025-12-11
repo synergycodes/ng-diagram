@@ -1,53 +1,88 @@
 :host {
   position: absolute;
+  width: fit-content;
+  height: fit-content;
   inset: 0;
-  border-radius: 50%;
+  box-sizing: content-box;
+  z-index: 2;
+  border-radius: var(--ngd-port-border-radius);
   cursor: crosshair;
 
-  box-sizing: content-box;
-  width: var(--ngd-port-size);
-  height: var(--ngd-port-size);
+  &:has(.content-projection:not(:empty)) {
+    // Override the default border radius for custom content ports
+    --ngd-port-border-radius: 0%;
+  }
 
-  transform: translate(-50%, -50%);
+  &:has(.content-projection:empty),
+  .content-projection:not(:empty) {
+    display: flex;
+    background: var(--ngd-port-background-color);
+    border: var(--ngd-port-border-size) solid var(--ngd-port-border-color);
+    border-radius: var(--ngd-port-border-radius);
 
-  background: var(--ngd-port-background-color);
-  border: var(--ngd-port-border-size) solid var(--ngd-port-border-color);
+    transition-property: background-color, border-color, outline, box-shadow;
+    transition-timing-function: ease-in-out;
+    transition-duration: 0.1s;
+    transform-origin: center;
+  }
 
-  transition-property: background-color, border-color, outline, box-shadow;
-  transition-timing-function: ease-in-out;
-  transition-duration: 0.1s;
-  transform-origin: center;
+  &:has(.content-projection:empty) {
+    width: var(--ngd-port-size);
+    height: var(--ngd-port-size);
 
-  z-index: 2;
-
-  &::before {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
+    &::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      top: 50%;
+      left: 50%;
+      border-radius: var(--ngd-port-border-radius);
+    }
   }
 
   &.left {
     top: 50%;
     left: 0;
   }
-
   &.right {
     top: 50%;
     left: 100%;
   }
-
   &.top {
     top: 0;
     left: 50%;
   }
-
   &.bottom {
     top: 100%;
     left: 50%;
+  }
+
+  &.origin-top-left {
+    transform: translate(0, 0);
+  }
+  &.origin-top-center {
+    transform: translate(-50%, 0);
+  }
+  &.origin-top-right {
+    transform: translate(-100%, 0);
+  }
+  &.origin-center-left {
+    transform: translate(0, -50%);
+  }
+  &.origin-center {
+    transform: translate(-50%, -50%);
+  }
+  &.origin-center-right {
+    transform: translate(-100%, -50%);
+  }
+  &.origin-bottom-left {
+    transform: translate(0, -100%);
+  }
+  &.origin-bottom-center {
+    transform: translate(-50%, -100%);
+  }
+  &.origin-bottom-right {
+    transform: translate(-100%, -100%);
   }
 }

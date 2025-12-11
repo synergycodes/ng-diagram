@@ -18,13 +18,52 @@ A port is defined by several key properties:
 - **id**: Uniquely identifies the port within the diagram.
 - **type**: Determines if the port is a source, target, or both for edge connections.
 - **side**: Specifies which side of the node the port appears on (e.g., left, right, top, bottom).
+- **originPoint**: Controls the transform origin of the port for precise placement.
 
 Each node has a [`measuredPorts`](/docs/api/types/model/simplenode/#measuredports) property that provides information about its ports and their computed position and dimensions. This property is read-only and should not be modified.
 
 ## Styling Ports
 
 Ports are rendered using the [`<ng-diagram-port>`](/docs/api/components/ngdiagramportcomponent) component.
-You can customize their appearance by overriding CSS variables in your styles, adding inline styles, or by applying custom classes.
+You can customize their appearance by overriding CSS variables, adding inline styles, custom classes, **or by providing custom content directly inside the port**.
+
+### Custom Content
+
+You can render any content inside a port, such as text, images, SVGs, or any icons.
+
+```html
+<ng-diagram-port id="port-custom" type="both" side="left">
+  <div>
+    <img src="icon.png" alt="icon" />
+    <span>Custom</span>
+  </div>
+</ng-diagram-port>
+```
+
+Custom content automatically disables the default circular style and allows full control over the port's appearance.
+
+### Port positioning with Origin Point
+
+You can use the [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input to precisely control the transform origin of each port.  
+Supported values: `topLeft`, `centerLeft`, `bottomLeft`, `topCenter`, `center`, `bottomCenter`, `topRight`, `centerRight`, `bottomRight`.
+
+Example usage:
+
+```html
+<ng-diagram-port id="port-en" type="both" side="left" originPoint="topLeft">
+  <div><img src="icon.png" alt="icon" /></div>
+</ng-diagram-port>
+```
+
+This applies the corresponding CSS transform for accurate port placement.
+
+If you need further customization of port placement, you can use CSS styling by adding styles directly to the port or via a [custom class](/docs/guides/nodes/ports/#custom-css).
+
+```html
+<ng-diagram-port id="port-custom" type="both" side="left" style="transform: translate(-10%, -95%)">
+  <div><img src="icon.png" alt="icon" /></div>
+</ng-diagram-port>
+```
 
 ### Default CSS Variables
 
@@ -36,17 +75,25 @@ The following CSS variables can be overridden to change the look and feel of por
 --ngd-port-background-color-hover: #9140ff; // based on theme
 --ngd-port-border-size: 2px;
 --ngd-port-border-color: #6f7480; // based on theme
+--ngd-port-border-radius: 50%; // makes the port circular for default style
 ```
+
+> **Note:** `--ngd-port-size` property is only for default ports.
+> When using custom content, the port size automatically adjusts to fit the content.
+> When using circular shapes in custom content, use `--ngd-port-border-radius` to control the hover roundness.
 
 ### Custom CSS
 
-For example, to create a custom style, you can define a CSS class and assign it to a port:
+To create a custom style, define a CSS class and assign it to a port:
 
 ```scss
 .some-custom-class {
   --ngd-port-size: 18px;
   --ngd-port-background-color: #7dd184;
   --ngd-port-border-size: 0px;
+
+  /* Change to custom position of port */
+  transform: translate(-10%, -95%);
 }
 ```
 
@@ -61,7 +108,7 @@ For example, to create a custom style, you can define a CSS class and assign it 
 
 ### Hover style
 
-You can enable default hover styles on ports by adding following code into your component:
+You can enable default hover styles on ports by adding the following code into your component:
 
 <CodeSnippet relativePath="nodes/ports/node/node.component.ts" sectionId="hover-style" />
 
@@ -83,5 +130,6 @@ You can fully customize port appearance and behavior by:
 
 - Overriding CSS variables for color, size, and border
 - Applying custom classes for unique effects
+- Providing custom content for advanced visuals
 
 [Custom Ports Example →](/docs/examples/custom-ports)

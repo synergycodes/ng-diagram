@@ -1,17 +1,62 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+
   "mainEntryPointFilePath": "<projectFolder>/dist/ng-diagram/index.d.ts",
-  "apiReport": {
-    "enabled": false
+
+  "compiler": {
+    "tsconfigFilePath": "<projectFolder>/projects/ng-diagram/tsconfig.lib.prod.json"
   },
+
+  "apiReport": {
+    "enabled": true,
+    "reportFolder": "<projectFolder>/api-report/",
+    "reportFileName": "ng-diagram.api.md",
+    "reportTempFolder": "<projectFolder>/temp/"
+  },
+
   "docModel": {
     "enabled": false
   },
+
   "dtsRollup": {
     "enabled": true,
-    "untrimmedFilePath": "<projectFolder>/dist/ng-diagram/ng-diagram.d.ts"
+    "untrimmedFilePath": "<projectFolder>/dist/ng-diagram/ng-diagram.d.ts",
+    "publicTrimmedFilePath": "<projectFolder>/dist/ng-diagram/ng-diagram.d.ts"
   },
+
   "tsdocMetadata": {
-    "enabled": false
+    "enabled": true,
+    "tsdocMetadataFilePath": "<projectFolder>/dist/ng-diagram/tsdoc-metadata.json"
+  },
+
+  "messages": {
+    "compilerMessageReporting": {
+      "default": {
+        "logLevel": "warning",
+        "addToApiReportFile": false
+      }
+    },
+    "extractorMessageReporting": {
+      "default": {
+        "logLevel": "warning",
+        "addToApiReportFile": false
+      },
+      "ae-missing-release-tag": {
+        "logLevel": "none"
+      },
+      "ae-forgotten-export": {
+        "logLevel": "warning",
+        "addToApiReportFile": false
+      }
+    },
+    "tsdocMessageReporting": {
+      "default": {
+        "logLevel": "warning",
+        "addToApiReportFile": false
+      },
+      "tsdoc-undefined-tag": {
+        "logLevel": "none"
+      }
+    }
   }
 }

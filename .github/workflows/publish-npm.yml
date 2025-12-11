@@ -20,6 +20,9 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -41,8 +44,5 @@ jobs:
         run: cd packages/ng-diagram && pnpm build:prod
 
       - name: Publish to npm
-        run: |
-          cd packages/ng-diagram/dist/ng-diagram
-          npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
+        working-directory: packages/ng-diagram/dist/ng-diagram

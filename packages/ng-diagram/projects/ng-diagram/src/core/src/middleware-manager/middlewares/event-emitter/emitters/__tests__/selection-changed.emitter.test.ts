@@ -20,6 +20,7 @@ describe('SelectionChangedEmitter', () => {
 
     context = {
       modelActionType: 'changeSelection',
+      modelActionTypes: ['changeSelection'],
       initialNodesMap: new Map<string, Node>(),
       initialEdgesMap: new Map<string, Edge>(),
       nodesMap: new Map<string, Node>(),
@@ -28,7 +29,7 @@ describe('SelectionChangedEmitter', () => {
   });
 
   it('should not emit event when modelActionType is not changeSelection', () => {
-    context.modelActionType = 'updateNode';
+    context.modelActionTypes = ['updateNode'];
 
     const node: Node = { ...mockNode, id: 'node1', selected: true };
     context.nodesMap.set('node1', node);

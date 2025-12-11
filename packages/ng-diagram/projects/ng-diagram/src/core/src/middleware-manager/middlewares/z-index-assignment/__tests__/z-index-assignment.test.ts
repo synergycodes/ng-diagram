@@ -48,13 +48,14 @@ describe('zIndexMiddleware', () => {
         },
       },
       modelActionType: 'updateNode',
+      modelActionTypes: ['updateNode'],
     } as unknown as MiddlewareContext;
   });
 
   describe('execution conditions', () => {
     it('should call next() without changes when middleware is disabled', () => {
       context.config.zIndex.enabled = false;
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
@@ -64,7 +65,7 @@ describe('zIndexMiddleware', () => {
     it('should call next() without changes when no relevant changes detected', () => {
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
       (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
@@ -72,7 +73,7 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should process changes when init action is triggered', () => {
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.state.nodes = [];
       context.state.edges = [];
 
@@ -82,7 +83,7 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should process changes when finishLinking action is triggered', () => {
-      context.modelActionType = 'finishLinking';
+      context.modelActionTypes = ['finishLinking'];
       context.state.edges = [{ ...mockEdge, id: 'edge1' }];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
@@ -91,7 +92,7 @@ describe('zIndexMiddleware', () => {
     });
 
     it('should process changes when addEdges action is triggered', () => {
-      context.modelActionType = 'addEdges';
+      context.modelActionTypes = ['addEdges'];
       context.state.edges = [{ ...mockEdge, id: 'edge1' }];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
@@ -358,7 +359,7 @@ describe('zIndexMiddleware', () => {
       nodesMap.set('node2', node2);
       edgesMap.set('edge1', newEdge);
       context.state.edges = [newEdge];
-      context.modelActionType = 'finishLinking';
+      context.modelActionTypes = ['finishLinking'];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
@@ -404,7 +405,7 @@ describe('zIndexMiddleware', () => {
 
       context.state.nodes = [rootNode, groupNode, childNode];
       context.state.edges = [edge];
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
@@ -427,7 +428,7 @@ describe('zIndexMiddleware', () => {
 
       context.state.nodes = [nodeWithoutZOrder];
       context.state.edges = [edge];
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
 
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
@@ -590,7 +591,7 @@ describe('zIndexMiddleware', () => {
       context.state.nodes = [node1, node2];
 
       // First, init action processes all nodes
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       zIndexMiddleware.execute(context, nextMock, cancelMock);
 
       // Reset the mock
@@ -600,7 +601,7 @@ describe('zIndexMiddleware', () => {
       const selectedNode1 = { ...node1, selected: true };
       nodesMap.set('node1', selectedNode1);
       context.state.nodes = [selectedNode1, node2];
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
 
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
         props.includes('selected')

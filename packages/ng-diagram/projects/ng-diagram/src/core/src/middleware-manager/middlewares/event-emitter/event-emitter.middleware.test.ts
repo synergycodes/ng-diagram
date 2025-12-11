@@ -28,6 +28,7 @@ describe('EventEmitterMiddleware', () => {
 
     context = {
       modelActionType: 'init',
+      modelActionTypes: ['init'],
       initialState: {
         nodes: [],
         edges: [],
@@ -93,7 +94,7 @@ describe('EventEmitterMiddleware', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
     // Set up context for init event (empty diagram should emit immediately)
-    context.modelActionType = 'init';
+    context.modelActionTypes = ['init'];
 
     middleware.execute(context, nextMock, vi.fn());
 
@@ -105,7 +106,7 @@ describe('EventEmitterMiddleware', () => {
   it('should handle viewport change events', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
-    context.modelActionType = 'moveViewport';
+    context.modelActionTypes = ['moveViewport'];
     context.initialState.metadata.viewport = { x: 0, y: 0, scale: 1, width: 800, height: 600 };
     context.state.metadata.viewport = { x: 100, y: 100, scale: 2, width: 800, height: 600 };
 
@@ -120,7 +121,7 @@ describe('EventEmitterMiddleware', () => {
   it('should handle selection change events', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
-    context.modelActionType = 'changeSelection';
+    context.modelActionTypes = ['changeSelection'];
 
     const node1 = { id: 'node1', selected: false, position: { x: 0, y: 0 }, data: {} };
     const node2 = { id: 'node2', selected: true, position: { x: 0, y: 0 }, data: {} };
@@ -142,7 +143,7 @@ describe('EventEmitterMiddleware', () => {
   it('should handle node movement events', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
-    context.modelActionType = 'moveNodes';
+    context.modelActionTypes = ['moveNodes'];
 
     const initialNode = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
     const movedNode = { id: 'node1', position: { x: 100, y: 100 }, data: {} };
@@ -163,7 +164,7 @@ describe('EventEmitterMiddleware', () => {
   it('should handle edge drawn events', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
-    context.modelActionType = 'finishLinking';
+    context.modelActionTypes = ['finishLinking'];
 
     const sourceNode = { id: 'node1', position: { x: 0, y: 0 }, data: {} };
     const targetNode = { id: 'node2', position: { x: 100, y: 100 }, data: {} };
@@ -189,7 +190,7 @@ describe('EventEmitterMiddleware', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
     // Mock an emitter to throw an error
-    context.modelActionType = 'changeSelection';
+    context.modelActionTypes = ['changeSelection'];
 
     // Force an error by making the context invalid for SelectionChangedEmitter
     context.nodesMap = null as any;
@@ -205,7 +206,7 @@ describe('EventEmitterMiddleware', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
     // Set up for viewport change (should work)
-    context.modelActionType = 'changeSelection';
+    context.modelActionTypes = ['changeSelection'];
     context.initialState.metadata.viewport = { x: 0, y: 0, scale: 1, width: 800, height: 600 };
     context.state.metadata.viewport = { x: 100, y: 100, scale: 1, width: 800, height: 600 };
 
@@ -227,7 +228,7 @@ describe('EventEmitterMiddleware', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
     // Set up context where no events should be emitted
-    context.modelActionType = 'updateNode';
+    context.modelActionTypes = ['updateNode'];
     context.initialState.metadata.viewport = { x: 0, y: 0, scale: 1, width: 800, height: 600 };
     context.state.metadata.viewport = { x: 0, y: 0, scale: 1, width: 800, height: 600 }; // No change
 
@@ -252,7 +253,7 @@ describe('EventEmitterMiddleware', () => {
     const middleware1 = createEventEmitterMiddleware(eventManager1);
     const middleware2 = createEventEmitterMiddleware(eventManager2);
 
-    context.modelActionType = 'init';
+    context.modelActionTypes = ['init'];
 
     middleware1.execute(context, nextMock, vi.fn());
     middleware2.execute(context, nextMock, vi.fn());
@@ -266,7 +267,7 @@ describe('EventEmitterMiddleware', () => {
     const middleware = createEventEmitterMiddleware(eventManager);
 
     // Simulate a complex operation with multiple changes
-    context.modelActionType = 'changeSelection';
+    context.modelActionTypes = ['changeSelection'];
 
     const node1 = { id: 'node1', selected: true, position: { x: 0, y: 0 }, data: {} };
     const node2 = { id: 'node2', selected: false, position: { x: 100, y: 100 }, data: {} };

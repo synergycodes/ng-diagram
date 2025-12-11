@@ -47,7 +47,8 @@ The **context** object passed to middleware functions provides comprehensive acc
 - [`state`](/docs/api/types/middleware/middlewarecontext/#state) – The current state after all previous modifications.
 - [`nodesMap`](/docs/api/types/middleware/middlewarecontext/#nodesmap) / [`edgesMap`](/docs/api/types/middleware/middlewarecontext/#edgesmap) – Maps for quick lookup of nodes and edges by ID
 - [`initialNodesMap`](/docs/api/types/middleware/middlewarecontext/#initialnodesmap) / [`initialEdgesMap`](/docs/api/types/middleware/middlewarecontext/#initialedgesmap) – Maps for accessing nodes/edges before any changes
-- [`modelActionType`](/docs/api/types/middleware/middlewarecontext/#modelactiontype) – The action that triggered the middleware.
+- [`modelActionType`](/docs/api/types/middleware/middlewarecontext/#modelactiontype) – (**deprecated**) The action that triggered the middleware.
+- [`modelActionTypes`](/docs/api/types/middleware/middlewarecontext/#modelactiontypes) - Actions that triggered the middleware (multiple if transaction is active)
 - [`helpers`](/docs/api/types/middleware/middlewarecontext/#helpers) – Utility functions for inspecting what changed
 - [`history`](/docs/api/types/middleware/middlewarecontext/#history) – Array of all state updates made by previous middlewares in the chain.
 - [`actionStateManager`](/docs/api/types/middleware/middlewarecontext/#actionstatemanager) – Manager for temporary action states.
@@ -180,10 +181,10 @@ import { Middleware } from 'ng-diagram';
 export const myMiddleware: Middleware = {
   name: 'my-middleware',
   execute: async (context, next) => {
-    const { state, modelActionType } = context;
+    const { state, modelActionTypes } = context;
 
     // Check if this middleware should run
-    if (modelActionType !== 'updateNode') {
+    if (!modelActionTypes.includes('updateNode')) {
       next(); // Pass through without changes
       return;
     }

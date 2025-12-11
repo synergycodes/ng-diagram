@@ -1,14 +1,7 @@
 import { FlowCore } from '../flow-core';
-import type {
-  FlowState,
-  FlowStateUpdate,
-  LooseAutocomplete,
-  Middleware,
-  MiddlewareChain,
-  ModelActionType,
-} from '../types';
+import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionTypes } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { createEventEmitterMiddleware } from './middlewares/event-emitter';
+import { createEventEmitterMiddleware, loggerMiddleware, measuredBoundsMiddleware } from './middlewares';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
@@ -58,23 +51,29 @@ export class MiddlewareManager {
    * Executes all registered middlewares in sequence
    * @param initialState Initial state to be transformed
    * @param stateUpdate State update to be applied
-   * @param modelActionType Model action type which triggers the middleware
+   * @param modelActionTypes Model action types which trigger the middleware (array for transactions, single-element for direct calls)
    * @returns State after all middlewares have been applied
    */
   async execute(
     initialState: FlowState,
     stateUpdate: FlowStateUpdate,
-    modelActionType: LooseAutocomplete<ModelActionType>
+    modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
     if (!this.eventEmitterMiddleware && this.flowCore.eventManager) {
       this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
     }
 
-    const chainWithEventEmitter = this.eventEmitterMiddleware
-      ? [...this.middlewareChain, this.eventEmitterMiddleware]
-      : this.middlewareChain;
+    // measuredBoundsMiddleware runs after all user middlewares to ensure bounds are computed
+    // after all position/size changes. loggerMiddleware runs after measuredBounds to log final state.
+    // eventEmitterMiddleware runs last to emit events with final state.
+    const finalChain = [
+      ...this.middlewareChain,
+      measuredBoundsMiddleware,
+      loggerMiddleware,
+      ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
+    ];
 
-    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, chainWithEventEmitter);
-    return await middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, finalChain);
+    return await middlewareExecutor.run(initialState, stateUpdate, modelActionTypes);
   }
 }

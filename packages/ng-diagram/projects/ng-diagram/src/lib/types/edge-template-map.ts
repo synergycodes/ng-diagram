@@ -14,6 +14,9 @@ import { DataObject, Edge } from '../../core/src';
  *   edge!: InputSignal<Edge<MyEdgeData>>;
  * }
  * ```
+ *
+ * @public
+ * @since 0.8.0
  * @template Data - The type of data associated with the edge
  * @category Types/Templates
  */
@@ -35,6 +38,9 @@ export interface NgDiagramEdgeTemplate<Data extends DataObject = DataObject> {
  *  <!-- use the edge template map in your diagram component -->
  *  <ng-diagram [edgeTemplateMap]="edgeTemplateMap" />
  * ```
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Templates
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

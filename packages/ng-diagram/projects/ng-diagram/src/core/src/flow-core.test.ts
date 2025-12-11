@@ -307,7 +307,7 @@ describe('FlowCore', () => {
       expect(mockMiddlewareManager.execute).toHaveBeenCalledWith(
         { nodes: [mockNode], edges: [mockEdge], metadata: mockMetadata },
         { nodesToUpdate: [mockNode] },
-        'changeSelection'
+        ['changeSelection']
       );
     });
 

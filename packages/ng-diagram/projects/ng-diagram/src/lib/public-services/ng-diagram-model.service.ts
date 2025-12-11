@@ -1,10 +1,11 @@
 import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { Edge, GroupNode, Metadata, Node, Point, Port } from '../../core/src';
+import { Edge, GroupNode, Metadata, Node, Point, Port, Rect } from '../../core/src';
+import { calculatePartsBounds } from '../../core/src/utils/dimensions';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
 /**
- * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+ * The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model.
  *
  * ## Example usage
  * ```typescript
@@ -14,6 +15,8 @@ import { NgDiagramService } from './ng-diagram.service';
  * this.modelService.addNodes([node1, node2]);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Services
  */
 @Injectable()
@@ -222,8 +225,27 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @param nodeId - The ID of the node to check for collisions
    * @returns An array of Nodes that overlap with the specified node
    */
-  getOverlappingNodes(nodeId: string): Node[] {
-    return this.flowCore.getOverlappingNodes(nodeId);
+  getOverlappingNodes(nodeId: string): Node[];
+  /**
+   * Detects collision with other nodes by finding all nodes whose rectangles intersect
+   * with the specified node's bounding rectangle.
+   *
+   * @param node - The node to check for collisions
+   * @returns An array of Nodes that overlap with the specified node
+   */
+  getOverlappingNodes(node: Node): Node[];
+  getOverlappingNodes(nodeOrId: Node | string): Node[] {
+    return this.flowCore.getOverlappingNodes(nodeOrId as Node & string);
+  }
+
+  /**
+   * Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
+   * @param nodes Array of nodes
+   * @param edges Array of edges
+   * @returns Bounding rectangle containing all nodes and edges
+   */
+  computePartsBounds(nodes: Node[], edges: Edge[]): Rect {
+    return calculatePartsBounds(nodes, edges);
   }
 
   // ===================
