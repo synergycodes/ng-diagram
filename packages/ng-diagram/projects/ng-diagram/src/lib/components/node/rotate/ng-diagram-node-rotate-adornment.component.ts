@@ -12,6 +12,8 @@ import { NgDiagramRotateHandleComponent } from './handle/ng-diagram-rotate-handl
  * <!-- Add your node content here -->
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({

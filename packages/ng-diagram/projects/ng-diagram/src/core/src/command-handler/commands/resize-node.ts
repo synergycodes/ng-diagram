@@ -2,6 +2,16 @@ import { NgDiagramMath } from '../../math';
 import type { Bounds, CommandHandler, FlowConfig, GroupNode, Node, Size } from '../../types';
 import { calculateGroupBounds, isGroup, isSameSize } from '../../utils';
 
+/** @internal */
+export const RESIZE_NODE_NOT_FOUND_ERROR = (nodeId: string) =>
+  `[ngDiagram] Resize node failed: Node not found.
+
+Node ID: ${nodeId}
+
+This may occur if the node was deleted before the resize command executed.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/nodes/nodes/`;
+
 export interface ResizeNodeCommand {
   name: 'resizeNode';
   id: string;
@@ -63,27 +73,27 @@ export const applyChildrenBoundsConstraints = (
   childrenBounds: Bounds
 ): { size: Required<Node>['size']; position: Node['position'] } => {
   const requestedBounds: Bounds = {
-    minX: requestedPosition?.x ?? originalPosition.x,
-    minY: requestedPosition?.y ?? originalPosition.y,
-    maxX: (requestedPosition?.x ?? originalPosition.x) + requestedSize.width,
-    maxY: (requestedPosition?.y ?? originalPosition.y) + requestedSize.height,
+    left: requestedPosition?.x ?? originalPosition.x,
+    top: requestedPosition?.y ?? originalPosition.y,
+    right: (requestedPosition?.x ?? originalPosition.x) + requestedSize.width,
+    bottom: (requestedPosition?.y ?? originalPosition.y) + requestedSize.height,
   };
 
   const finalBounds: Bounds = {
-    minX: Math.min(requestedBounds.minX, childrenBounds.minX),
-    minY: Math.min(requestedBounds.minY, childrenBounds.minY),
-    maxX: Math.max(requestedBounds.maxX, childrenBounds.maxX),
-    maxY: Math.max(requestedBounds.maxY, childrenBounds.maxY),
+    left: Math.min(requestedBounds.left, childrenBounds.left),
+    top: Math.min(requestedBounds.top, childrenBounds.top),
+    right: Math.max(requestedBounds.right, childrenBounds.right),
+    bottom: Math.max(requestedBounds.bottom, childrenBounds.bottom),
   };
 
   return {
     size: {
-      width: finalBounds.maxX - finalBounds.minX,
-      height: finalBounds.maxY - finalBounds.minY,
+      width: finalBounds.right - finalBounds.left,
+      height: finalBounds.bottom - finalBounds.top,
     },
     position: {
-      x: finalBounds.minX,
-      y: finalBounds.minY,
+      x: finalBounds.left,
+      y: finalBounds.top,
     },
   };
 };
@@ -92,7 +102,8 @@ export const resizeNode = async (commandHandler: CommandHandler, command: Resize
   const node = commandHandler.flowCore.getNodeById(command.id);
 
   if (!node) {
-    throw new Error(`Node with id ${command.id} not found.`);
+    console.error(RESIZE_NODE_NOT_FOUND_ERROR(command.id));
+    return;
   }
 
   // The node is missing size, which can happen when a node is dropped from the palette

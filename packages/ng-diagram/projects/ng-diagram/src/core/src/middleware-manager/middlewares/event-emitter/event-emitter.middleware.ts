@@ -15,6 +15,16 @@ import {
   ViewportChangedEmitter,
 } from './emitters';
 
+const EVENT_EMITTER_ERROR = (emitterName: string, actionTypes: string[], error: unknown) =>
+  `[ngDiagram] Event emitter error: ${emitterName} failed.
+
+Action types: ${actionTypes.join(', ')}
+Error: ${error instanceof Error ? error.message : String(error)}
+
+This may indicate an issue with event handling logic.
+The diagram will continue to function, but some events may not be emitted.
+`;
+
 /**
  * Creates an event emitter middleware that analyzes state changes and emits appropriate events.
  * This middleware is designed to run last and leverages the context maps for optimal performance.
@@ -47,7 +57,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
         try {
           emitter.emit(context, eventManager);
         } catch (error) {
-          console.error(`Error in ${emitter.name}:`, error);
+          console.error(EVENT_EMITTER_ERROR(emitter.name, context.modelActionTypes, error));
         }
       }
     },

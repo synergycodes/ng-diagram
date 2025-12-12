@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
 import { isValidPosition } from '../../../../core/src/utils/measurement-validation';
-import { EdgeSelectionDirective, ZIndexDirective } from '../../../directives';
+import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
 import { FlowCoreProviderService } from '../../../services';
+import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
 
 const INVALID_EDGE_COORDINATES_ERROR = (
   edgeId: string,
@@ -11,27 +12,27 @@ const INVALID_EDGE_COORDINATES_ERROR = (
   target: string,
   targetPort: string | undefined
 ) =>
-  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'. This usually happens when sourcePort or targetPort is missing or doesn't exist on the node.
+  `[ngDiagram] Invalid edge coordinates detected for edge '${edgeId}'.
 
 Edge details:
   • source: ${source} (port: ${sourcePort || 'not specified'})
   • target: ${target} (port: ${targetPort || 'not specified'})
 
-To fix this:
-  • Ensure sourcePort and targetPort are specified on the edge
-  • Verify the ports exist in the source and target nodes
-
-Documentation: https://www.ngdiagram.dev/docs/guides/edges/
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 `;
 
 /**
  * Base edge component that handles edge rendering.
  * It can be extended or used directly to render edges in the diagram.
+ *
+ * @public
+ * @since 0.8.0
  * @category Components
  */
 @Component({
   selector: 'ng-diagram-base-edge',
   standalone: true,
+  imports: [InlineMarkersDirective],
   templateUrl: './base-edge.component.html',
   styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +47,13 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly markerRegistry = inject(MarkerRegistryService);
+
+  /**
+   * Whether to use inline markers (Safari fallback).
+   * Safari doesn't support context-stroke, so we render markers inline per edge.
+   */
+  readonly useInlineMarkers = this.markerRegistry.useInlineMarkers;
 
   /**
    * Edge data model
@@ -121,24 +129,24 @@ export class NgDiagramBaseEdgeComponent {
     return `M ${points[0].x},${points[0].y}`;
   });
 
-  readonly markerStart = computed(() => {
-    const markerId = this.edge()?.sourceArrowhead ?? this.sourceArrowhead();
+  readonly sourceMarkerId = computed(() => this.edge()?.sourceArrowhead ?? this.sourceArrowhead());
 
+  readonly targetMarkerId = computed(() => this.edge()?.targetArrowhead ?? this.targetArrowhead());
+
+  readonly markerStart = computed(() => {
+    const markerId = this.sourceMarkerId();
     if (!markerId) {
       return null;
     }
-
-    return `url(#${markerId})`;
+    return this.markerRegistry.getMarkerUrl(markerId, this.edge().id, 'source');
   });
 
   readonly markerEnd = computed(() => {
-    const markerId = this.edge()?.targetArrowhead ?? this.targetArrowhead();
-
+    const markerId = this.targetMarkerId();
     if (!markerId) {
       return null;
     }
-
-    return `url(#${markerId})`;
+    return this.markerRegistry.getMarkerUrl(markerId, this.edge().id, 'target');
   });
 
   readonly selected = computed(() => this.edge().selected);

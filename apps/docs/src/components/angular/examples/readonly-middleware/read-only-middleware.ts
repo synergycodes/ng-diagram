@@ -34,7 +34,7 @@ const blockedActions = new Set([
 export const readOnlyMiddleware: Middleware<'read-only'> = {
   name: 'read-only',
   execute: (context, next, cancel) => {
-    const { modelActionType, config } = context;
+    const { modelActionTypes, config } = context;
 
     // Get read-only configuration
     const readOnlyConfig = (config as any).readOnly;
@@ -47,11 +47,13 @@ export const readOnlyMiddleware: Middleware<'read-only'> = {
     // Allow specific actions if configured
     const allowedActions = readOnlyConfig.allowedActions || [];
     const isActionBlocked =
-      blockedActions.has(modelActionType) &&
-      !allowedActions.includes(modelActionType);
+      modelActionTypes.some((action) => blockedActions.has(action)) &&
+      !modelActionTypes.every((action) => allowedActions.includes(action));
 
     if (isActionBlocked) {
-      console.warn(`🔒 Action "${modelActionType}" blocked by read-only mode`);
+      console.warn(
+        `🔒 Actions "${modelActionTypes.join(', ')}" blocked by read-only mode`
+      );
       cancel(); // Cancel the operation
       return;
     }

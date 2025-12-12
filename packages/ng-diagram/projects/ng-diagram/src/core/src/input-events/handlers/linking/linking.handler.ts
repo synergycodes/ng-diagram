@@ -1,13 +1,28 @@
 import { EventHandler } from '../event-handler';
 import { LinkingInputEvent } from './linking.event';
 
+/** @internal */
+export const LINKING_MISSING_TARGET_ERROR = (event: LinkingInputEvent) =>
+  `[ngDiagram] Linking event missing target node.
+
+Event details:
+  • Phase: ${event.phase}
+  • Port ID: ${event.portId}
+  • Target type: ${event.targetType}
+  • Pointer position: (${event.lastInputPoint.x}, ${event.lastInputPoint.y})
+
+This indicates a programming error. Linking start events must have a target node.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
+`;
+
 export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
   handle(event: LinkingInputEvent): void {
     switch (event.phase) {
       case 'start': {
         const sourceNodeId = event.target?.id;
         if (!sourceNodeId) {
-          throw new Error('Linking event must have a target Node');
+          throw new Error(LINKING_MISSING_TARGET_ERROR(event));
         }
 
         this.flow.actionStateManager.linking = {
@@ -28,7 +43,7 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
 
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        if (event.panningForce) {
+        if (this.flow.config.viewportPanningEnabled && event.panningForce) {
           this.flow.commandHandler.emit('moveViewportBy', { x: event.panningForce.x, y: event.panningForce.y });
         }
 

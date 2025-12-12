@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Middleware, ModelAdapter } from '../../../core/src';
 
+import { NgDiagramService } from '../../public-services/ng-diagram.service';
 import {
   FlowCoreProviderService,
   FlowResizeBatchProcessorService,
@@ -11,6 +12,7 @@ import {
 } from '../../services';
 import { CursorPositionTrackerService } from '../../services/cursor-position-tracker/cursor-position-tracker.service';
 import { InputEventsRouterService } from '../../services/input-events/input-events-router.service';
+import { MarkerRegistryService } from '../../services/marker-registry/marker-registry.service';
 import { TemplateProviderService } from '../../services/template-provider/template-provider.service';
 import { NgDiagramComponent } from './ng-diagram.component';
 
@@ -45,12 +47,19 @@ describe('AngularAdapterDiagramComponent', () => {
             viewport: vi.fn(() => ({ x: 0, y: 0, scale: 1 })),
             draw: vi.fn(),
             isInitialized: signal(false),
+            viewportPannable: signal(true),
           },
         },
         {
           provide: FlowResizeBatchProcessorService,
           useValue: {
             initialize: vi.fn(),
+          },
+        },
+        {
+          provide: NgDiagramService,
+          useValue: {
+            isInitialized: vi.fn().mockReturnValue(true),
           },
         },
         {
@@ -86,6 +95,7 @@ describe('AngularAdapterDiagramComponent', () => {
                     onInit: false,
                   },
                 },
+                viewportPanningEnabled: true,
               },
             }),
             isInitialized: vi.fn().mockReturnValue(true),
@@ -101,6 +111,7 @@ describe('AngularAdapterDiagramComponent', () => {
         TemplateProviderService,
         CursorPositionTrackerService,
         InputEventsRouterService,
+        MarkerRegistryService,
       ],
     }).compileComponents();
 
@@ -236,6 +247,8 @@ describe('AngularAdapterDiagramComponent', () => {
     });
 
     it('should emit diagramInit output when eventManager emits diagramInit', () => {
+      vi.useFakeTimers();
+
       const flowCore = TestBed.inject(FlowCoreProviderService).provide();
       const eventManager = flowCore.eventManager;
       const diagramInitSpy = vi.fn();
@@ -249,7 +262,11 @@ describe('AngularAdapterDiagramComponent', () => {
       const event = { nodes: [], edges: [], viewport: { x: 0, y: 0, scale: 1 } };
       diagramInitCallback?.(event);
 
+      vi.runAllTimers();
+
       expect(diagramInitSpy).toHaveBeenCalledWith(event);
+
+      vi.useRealTimers();
     });
 
     it('should emit edgeDrawn output when eventManager emits edgeDrawn', () => {

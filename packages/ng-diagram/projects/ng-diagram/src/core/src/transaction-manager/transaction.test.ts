@@ -37,7 +37,7 @@ describe('Transaction', () => {
       expect(parentTransaction.hasChanges()).toBe(false);
 
       // Queue something in child to verify parent-child relationship
-      childTransaction.queueUpdate({ nodesToAdd: [] }, 'test');
+      childTransaction.queueUpdate({ nodesToAdd: [] }, ['test']);
       expect(parentTransaction.hasChanges()).toBe(true); // Parent sees child changes
     });
   });
@@ -55,7 +55,7 @@ describe('Transaction', () => {
 
   describe('abort', () => {
     it('should set aborted state and clear queue', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'test');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['test']);
       expect(transaction.hasChanges()).toBe(true);
 
       transaction.abort();
@@ -69,8 +69,8 @@ describe('Transaction', () => {
       const child1 = new Transaction('child1', transaction, mockFlowCore as FlowCore);
       const child2 = new Transaction('child2', transaction, mockFlowCore as FlowCore);
 
-      child1.queueUpdate({ nodesToAdd: [] }, 'test');
-      child2.queueUpdate({ edgesToAdd: [] }, 'test');
+      child1.queueUpdate({ nodesToAdd: [] }, ['test']);
+      child2.queueUpdate({ edgesToAdd: [] }, ['test']);
 
       transaction.abort();
 
@@ -81,24 +81,24 @@ describe('Transaction', () => {
 
   describe('savepoints', () => {
     it('should add savepoint at current queue position', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'add1');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['add1']);
       transaction.addSavepoint('checkpoint1');
-      transaction.queueUpdate({ nodesToAdd: [] }, 'add2');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['add2']);
       transaction.addSavepoint('checkpoint2');
 
       expect(transaction.getQueue()).toHaveLength(2);
     });
 
     it('should rollback to savepoint correctly', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'add1');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['add1']);
       transaction.addSavepoint('checkpoint1');
-      transaction.queueUpdate({ edgesToAdd: [] }, 'add2');
-      transaction.queueUpdate({ nodesToUpdate: [] }, 'add3');
+      transaction.queueUpdate({ edgesToAdd: [] }, ['add2']);
+      transaction.queueUpdate({ nodesToUpdate: [] }, ['add3']);
 
       transaction.rollback('checkpoint1');
 
       expect(transaction.getQueue()).toHaveLength(1);
-      expect(transaction.getQueue()[0].actionType).toBe('add1');
+      expect(transaction.getQueue()[0].actionTypes).toEqual(['add1']);
     });
 
     it('should throw error when savepoint not found', () => {
@@ -106,11 +106,11 @@ describe('Transaction', () => {
     });
 
     it('should remove savepoints created after rollback point', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'add1');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['add1']);
       transaction.addSavepoint('checkpoint1');
-      transaction.queueUpdate({ edgesToAdd: [] }, 'add2');
+      transaction.queueUpdate({ edgesToAdd: [] }, ['add2']);
       transaction.addSavepoint('checkpoint2');
-      transaction.queueUpdate({ nodesToUpdate: [] }, 'add3');
+      transaction.queueUpdate({ nodesToUpdate: [] }, ['add3']);
       transaction.addSavepoint('checkpoint3');
 
       transaction.rollback('checkpoint1');
@@ -126,19 +126,19 @@ describe('Transaction', () => {
       const update1: FlowStateUpdate = { nodesToAdd: [] };
       const update2: FlowStateUpdate = { edgesToAdd: [] };
 
-      transaction.queueUpdate(update1, 'action1');
-      transaction.queueUpdate(update2, 'action2');
+      transaction.queueUpdate(update1, ['action1']);
+      transaction.queueUpdate(update2, ['action2']);
 
       const queue = transaction.getQueue();
       expect(queue).toHaveLength(2);
-      expect(queue[0]).toEqual({ update: update1, actionType: 'action1' });
-      expect(queue[1]).toEqual({ update: update2, actionType: 'action2' });
+      expect(queue[0]).toEqual({ update: update1, actionTypes: ['action1'] });
+      expect(queue[1]).toEqual({ update: update2, actionTypes: ['action2'] });
     });
 
     it('should throw error when queuing on aborted back transaction', () => {
       transaction.abort();
 
-      expect(() => transaction.queueUpdate({ nodesToAdd: [] }, 'test')).toThrow(
+      expect(() => transaction.queueUpdate({ nodesToAdd: [] }, ['test'])).toThrow(
         'Cannot perform operation on aborted transaction'
       );
     });
@@ -150,7 +150,7 @@ describe('Transaction', () => {
     });
 
     it('should return true when updates are queued', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'test');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['test']);
       expect(transaction.hasChanges()).toBe(true);
     });
 
@@ -159,7 +159,7 @@ describe('Transaction', () => {
 
       expect(transaction.hasChanges()).toBe(false);
 
-      child.queueUpdate({ nodesToAdd: [] }, 'test');
+      child.queueUpdate({ nodesToAdd: [] }, ['test']);
 
       expect(transaction.hasChanges()).toBe(true);
     });
@@ -170,18 +170,18 @@ describe('Transaction', () => {
       const parent = new Transaction('parent', null, mockFlowCore as FlowCore);
       const child = new Transaction('child', parent, mockFlowCore as FlowCore);
 
-      child.queueUpdate({ nodesToAdd: [] }, 'childAction');
+      child.queueUpdate({ nodesToAdd: [] }, ['childAction']);
       child.mergeToParent();
 
       expect(parent.getQueue()).toHaveLength(1);
-      expect(parent.getQueue()[0].actionType).toBe('childAction');
+      expect(parent.getQueue()[0].actionTypes).toEqual(['childAction']);
     });
 
     it('should not merge when rolled back', () => {
       const parent = new Transaction('parent', null, mockFlowCore as FlowCore);
       const child = new Transaction('child', parent, mockFlowCore as FlowCore);
 
-      child.queueUpdate({ nodesToAdd: [] }, 'childAction');
+      child.queueUpdate({ nodesToAdd: [] }, ['childAction']);
       child.rollback();
       child.mergeToParent();
 
@@ -189,7 +189,7 @@ describe('Transaction', () => {
     });
 
     it('should not merge when no parent', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'action');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['action']);
 
       // Should not throw
       expect(() => transaction.mergeToParent()).not.toThrow();
@@ -198,7 +198,7 @@ describe('Transaction', () => {
 
   describe('getMergedUpdates', () => {
     it('should return empty update when rolled back', () => {
-      transaction.queueUpdate({ nodesToAdd: [mockNode] }, 'addNodes');
+      transaction.queueUpdate({ nodesToAdd: [mockNode] }, ['addNodes']);
       transaction.rollback();
 
       const result = transaction.getMergedUpdates();
@@ -208,9 +208,9 @@ describe('Transaction', () => {
     });
 
     it('should merge all queued updates correctly', () => {
-      transaction.queueUpdate({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }, 'addNodes');
-      transaction.queueUpdate({ nodesToAdd: [{ ...mockNode, id: '2' }], nodesToRemove: ['3'] }, 'addNodes');
-      transaction.queueUpdate({ metadataUpdate: { viewport: { x: 100, y: 200, scale: 1 } } }, 'updateViewport');
+      transaction.queueUpdate({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }, ['addNodes']);
+      transaction.queueUpdate({ nodesToAdd: [{ ...mockNode, id: '2' }], nodesToRemove: ['3'] }, ['addNodes']);
+      transaction.queueUpdate({ metadataUpdate: { viewport: { x: 100, y: 200, scale: 1 } } }, ['updateViewport']);
 
       const result = transaction.getMergedUpdates();
 
@@ -226,7 +226,7 @@ describe('Transaction', () => {
 
   describe('getState', () => {
     it('should return complete transaction state', () => {
-      transaction.queueUpdate({ nodesToAdd: [] }, 'action1');
+      transaction.queueUpdate({ nodesToAdd: [] }, ['action1']);
       transaction.addSavepoint('checkpoint1');
 
       const state = transaction.getState();

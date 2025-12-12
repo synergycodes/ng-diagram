@@ -1,6 +1,18 @@
 import type { EventListener, UnsubscribeFn } from './event-types';
 import type { InternalDiagramEventMap } from './internal-event-types';
 
+/** @internal */
+export const EVENT_LISTENER_ERROR = (event: string, listenerType: 'once' | 'on', error: unknown) =>
+  `[ngDiagram] Event listener error: Listener for "${event}" event threw an error.
+
+Event: ${event}
+Listener type: ${listenerType}
+Error: ${error instanceof Error ? error.message : String(error)}
+
+This indicates an error in your event listener callback.
+Check your event listener implementation for the "${event}" event.
+The diagram will continue to function, but this listener failed to execute.`;
+
 interface ListenerEntry {
   callback: EventListener<InternalDiagramEventMap[keyof InternalDiagramEventMap]>;
   once: boolean;
@@ -92,7 +104,7 @@ export class EventManager {
           listenersToRemove.push(listener);
         }
       } catch (error) {
-        console.error(`Error in event listener for "${String(event)}":`, error);
+        console.error(EVENT_LISTENER_ERROR(String(event), listener.once ? 'once' : 'on', error));
       }
     }
 

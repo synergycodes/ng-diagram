@@ -1,11 +1,12 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
 title: "NgDiagramModelService"
 ---
 
-The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model,
+The `NgDiagramModelService` provides methods for accessing and manipulating the diagram's model.
 
 ## Example usage
 ```typescript
@@ -86,6 +87,38 @@ Array of nodes to add.
 #### Returns
 
 `void`
+
+***
+
+### computePartsBounds()
+
+> **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
+
+#### Parameters
+
+##### nodes
+
+[`Node`](/docs/api/types/model/node/)[]
+
+Array of nodes
+
+##### edges
+
+[`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
+
+Array of edges
+
+#### Returns
+
+[`Rect`](/docs/api/types/geometry/rect/)
+
+Bounding rectangle containing all nodes and edges
+
+#### Since
+
+0.9.0
+
+Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
 
 ***
 
@@ -382,24 +415,51 @@ Array of nodes in range.
 
 ### getOverlappingNodes()
 
+#### Call Signature
+
 > **getOverlappingNodes**(`nodeId`): [`Node`](/docs/api/types/model/node/)[]
 
 Detects collision with other nodes by finding all nodes whose rectangles intersect
 with the specified node's bounding rectangle.
 
-#### Parameters
+##### Parameters
 
-##### nodeId
+###### nodeId
 
 `string`
 
 The ID of the node to check for collisions
 
-#### Returns
+##### Returns
 
 [`Node`](/docs/api/types/model/node/)[]
 
 An array of Nodes that overlap with the specified node
+
+#### Call Signature
+
+> **getOverlappingNodes**(`node`): [`Node`](/docs/api/types/model/node/)[]
+
+##### Parameters
+
+###### node
+
+[`Node`](/docs/api/types/model/node/)
+
+The node to check for collisions
+
+##### Returns
+
+[`Node`](/docs/api/types/model/node/)[]
+
+An array of Nodes that overlap with the specified node
+
+##### Since
+
+0.9.0
+
+Detects collision with other nodes by finding all nodes whose rectangles intersect
+with the specified node's bounding rectangle.
 
 ***
 

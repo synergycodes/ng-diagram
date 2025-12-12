@@ -6,7 +6,7 @@ export class ClipboardPastedEmitter implements EventEmitter {
   name = 'ClipboardPastedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (context.modelActionType !== 'paste') {
+    if (!context.modelActionTypes.includes('paste')) {
       return;
     }
 

@@ -1,4 +1,52 @@
-import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType } from '.';
+import type { CommandHandler, FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '.';
+
+/**
+ * Options for configuring transaction behavior.
+ *
+ * @public
+ * @since 0.9.0
+ * @category Types/Middleware
+ */
+export interface TransactionOptions {
+  /**
+   * When true, the transaction promise will not resolve until all measurements
+   * (node sizes, port positions, etc.) triggered by the transaction are complete.
+   *
+   * This is useful when you need to perform operations that depend on measured values,
+   * such as `zoomToFit()` after adding nodes or edges.
+   *
+   * @default false
+   *
+   * @example
+   * ```typescript
+   * // Without waitForMeasurements - zoomToFit might not include new nodes
+   * await diagramService.transaction(() => {
+   *   modelService.addNodes([newNode]);
+   * });
+   * viewportService.zoomToFit(); // May not account for new node dimensions
+   *
+   * // With waitForMeasurements - zoomToFit will include new nodes
+   * await diagramService.transaction(() => {
+   *   modelService.addNodes([newNode]);
+   * }, { waitForMeasurements: true });
+   * viewportService.zoomToFit(); // Correctly includes new node dimensions
+   * ```
+   */
+  waitForMeasurements?: boolean;
+}
+
+/**
+ * Internal options for measurement tracking. These are escape hatches for edge cases.
+ * Not part of the public API - use by casting to `any`.
+ *
+ * @internal
+ */
+export interface InternalTransactionOptions extends TransactionOptions {
+  /** Debounce timeout in ms after last measurement activity before completing. @default 50 */
+  _measurementDebounceTimeout?: number;
+  /** Initial timeout in ms to wait for first measurement activity. @default 2000 */
+  _measurementInitialTimeout?: number;
+}
 
 export interface TransactionContext {
   // Command emission
@@ -53,7 +101,7 @@ export interface TransactionContext {
    * Gets the queued updates in the transaction.
    * @returns Readonly array of queued updates.
    */
-  getQueuedUpdates(): readonly { update: FlowStateUpdate; actionType: LooseAutocomplete<ModelActionType> }[];
+  getQueuedUpdates(): readonly { update: FlowStateUpdate; actionTypes: ModelActionTypes }[];
 }
 
 export type TransactionCallback = (context: TransactionContext) => void | Promise<void>;
@@ -61,6 +109,8 @@ export type TransactionCallback = (context: TransactionContext) => void | Promis
 /**
  * Result of a transaction execution.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface TransactionResult {
@@ -72,4 +122,9 @@ export interface TransactionResult {
    * Number of commands emitted during the transaction
    */
   commandsCount: number;
+  /**
+   * All action types that were executed within the transaction.
+   * @since 0.9.0
+   */
+  actionTypes: ModelActionTypes;
 }

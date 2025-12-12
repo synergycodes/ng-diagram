@@ -7,6 +7,8 @@ import { Size } from './utils';
 /**
  * Configuration for node resizing behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface ResizeConfig {
@@ -35,6 +37,8 @@ export interface ResizeConfig {
 /**
  * Configuration for linking (edge creation) behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface LinkingConfig {
@@ -100,6 +104,8 @@ export interface LinkingConfig {
 /**
  * Configuration for node grouping behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface GroupingConfig {
@@ -140,12 +146,14 @@ export interface ZoomToFitConfig {
 /**
  * Configuration for zooming behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface ZoomConfig {
   /**
    * The minimum allowed zoom level.
-   * @default 0.1
+   * @default 0.01
    */
   min: number;
   /**
@@ -168,6 +176,8 @@ export interface ZoomConfig {
 /**
  * Configuration for the diagram background.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface BackgroundConfig {
@@ -194,6 +204,8 @@ export interface BackgroundConfig {
 /**
  * Configuration for node rotation behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface NodeRotationConfig {
@@ -227,6 +239,8 @@ export interface NodeRotationConfig {
 /**
  * Configuration for node dragging behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface SnappingConfig {
@@ -248,6 +262,7 @@ export interface SnappingConfig {
 
   /**
    * Computes the snap size for a node while dragging. If null is returned, a default snap size will be used.
+   * If computeSnapForNodeDrag is used, it takes precedence over defaultDragSnap.
    * @param node The node to compute the snap size for dragging.
    * @returns The snap size for the node while dragging, or null.
    * @default () => null
@@ -264,6 +279,7 @@ export interface SnappingConfig {
 
   /**
    * The default snap size for node dragging.
+   * If computeSnapForNodeDrag is used, it takes precedence over this value.
    * @default { width: 10, height: 10 }
    */
   defaultDragSnap: Size;
@@ -278,6 +294,8 @@ export interface SnappingConfig {
 /**
  * Configuration for selection moving behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface SelectionMovingConfig {
@@ -305,6 +323,8 @@ export interface SelectionMovingConfig {
 /**
  * Configuration for z-index layering behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface ZIndexConfig {
@@ -338,6 +358,8 @@ export interface ZIndexConfig {
 /**
  * Configuration for edge routing behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface EdgeRoutingConfig {
@@ -378,6 +400,8 @@ export interface EdgeRoutingConfig {
 /**
  * Configuration for box selection behavior.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration/Features
  */
 export interface BoxSelectionConfig {
@@ -402,6 +426,8 @@ export interface BoxSelectionConfig {
  *
  * For most use cases, you should use {@link NgDiagramConfig}, which allows you to override only the properties you need.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Configuration
  */
 export interface FlowConfig {
@@ -483,4 +509,21 @@ export interface FlowConfig {
    * @default false
    */
   debugMode: boolean;
+
+  /**
+   * @since 0.9.0
+   *
+   * Hides the ngDiagram watermark when set to true.
+   * @default undefined
+   */
+  hideWatermark?: boolean;
+
+  /**
+   * @since 0.9.0
+   *
+   * Enables or disables panning on the diagram.
+   * When set to false, user is not able to move the viewport by panning.
+   * @default true
+   */
+  viewportPanningEnabled: boolean;
 }

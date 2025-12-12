@@ -5,6 +5,7 @@ import {
   NgDiagramSelectionService,
   NgDiagramService,
   NgDiagramViewportService,
+  Node,
 } from 'ng-diagram';
 import { nodeTemplateMap, NodeTemplateType } from '../data/node-template';
 
@@ -35,8 +36,7 @@ export class ToolbarComponent {
   onLinkCreationClick() {
     const node = this.ngDiagramSelectionService.selection().nodes[0];
     if (node) {
-      const port = node.measuredPorts?.find((p) => p.type === 'source' || p.type === 'both')?.id || 'port-right';
-      this.ngDiagramService.startLinking(node, port);
+      this.ngDiagramService.startLinking(node);
     }
   }
 
@@ -69,5 +69,43 @@ export class ToolbarComponent {
         type: newType,
       });
     });
+  }
+
+  /**
+   * Demonstrates async transaction with waitForMeasurements.
+   * Fetches data, adds node, waits for measurements, then zooms to fit.
+   */
+  async onAsyncTransactionWithMeasurementsDemo() {
+    console.log('Starting async transaction with measurements demo...');
+
+    const t1 = performance.now();
+
+    // Async transaction with waitForMeasurements
+    await this.ngDiagramService.transaction(
+      async () => {
+        console.log('Fetching data from server (simulated 500ms delay)...');
+
+        const data = await new Promise<{ label: string }>((resolve) => {
+          setTimeout(() => {
+            resolve({ label: `Async + Measured Node` });
+          }, 500);
+        });
+
+        const newNode: Node = {
+          id: `async-measured-node-${Date.now()}`,
+          type: 'resizable',
+          position: { x: 3000, y: 3000 }, // Far outside viewport
+          data,
+        };
+
+        this.ngDiagramModelService.addNodes([newNode]);
+      },
+      { waitForMeasurements: true }
+    );
+
+    console.log(`Async transaction with measurements complete in ${(performance.now() - t1).toFixed(0)}ms`);
+    console.log('Zooming to fit...');
+
+    this.ngDiagramViewportService.zoomToFit();
   }
 }

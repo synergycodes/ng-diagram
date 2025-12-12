@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EventManager } from './event-manager';
+import { EVENT_LISTENER_ERROR, EventManager } from './event-manager';
 import type { DiagramInitEvent, EdgeDrawnEvent, SelectionMovedEvent } from './event-types';
 import type { ActionStateChangedEvent } from './internal-event-types';
 
@@ -163,8 +163,9 @@ describe('EventManager', () => {
     });
 
     it('should handle errors in listeners gracefully', () => {
+      const error = new Error('Listener error');
       const errorCallback = vi.fn().mockImplementation(() => {
-        throw new Error('Listener error');
+        throw error;
       });
       const normalCallback = vi.fn();
 
@@ -182,7 +183,7 @@ describe('EventManager', () => {
 
       expect(errorCallback).toHaveBeenCalled();
       expect(normalCallback).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith('Error in event listener for "selectionMoved":', expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith(EVENT_LISTENER_ERROR('selectionMoved', 'on', error));
 
       consoleSpy.mockRestore();
     });

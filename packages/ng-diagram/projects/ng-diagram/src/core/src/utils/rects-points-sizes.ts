@@ -102,19 +102,19 @@ export const isSameSize = (size1?: Size, size2?: Size): boolean => {
 
 export const getRectFromBounds = (bounds: Bounds): Rect => {
   return {
-    x: bounds.minX,
-    y: bounds.minY,
-    width: bounds.maxX - bounds.minX,
-    height: bounds.maxY - bounds.minY,
+    x: bounds.left,
+    y: bounds.top,
+    width: bounds.right - bounds.left,
+    height: bounds.bottom - bounds.top,
   };
 };
 
 export const getBoundsFromRect = (rect: Rect): Bounds => {
   return {
-    minX: rect.x,
-    minY: rect.y,
-    maxX: rect.x + rect.width,
-    maxY: rect.y + rect.height,
+    left: rect.x,
+    top: rect.y,
+    right: rect.x + rect.width,
+    bottom: rect.y + rect.height,
   };
 };
 
@@ -167,4 +167,48 @@ export const boundingRectOfPoints = (points: Point[]): Rect => {
   });
 
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+};
+
+/**
+ * Calculates the four corners of a rectangle rotated around its center.
+ * @param rect The rectangle with position and size
+ * @param angleDegrees The rotation angle in degrees
+ * @returns Array of 4 corner points after rotation
+ */
+export const getRotatedCorners = (rect: Rect, angleDegrees = 0): Point[] => {
+  const { x, y, width, height } = rect;
+  const cx = x + width / 2;
+  const cy = y + height / 2;
+  const angle = (angleDegrees * Math.PI) / 180;
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  const corners = [
+    { x, y },
+    { x: x + width, y },
+    { x: x + width, y: y + height },
+    { x, y: y + height },
+  ];
+
+  return corners.map(({ x: px, y: py }) => {
+    const dx = px - cx;
+    const dy = py - cy;
+    return {
+      x: cx + dx * cos - dy * sin,
+      y: cy + dx * sin + dy * cos,
+    };
+  });
+};
+
+/**
+ * Calculates the axis-aligned bounding box of a rotated rectangle.
+ * @param rect The rectangle with position and size
+ * @param angleDegrees The rotation angle in degrees
+ * @returns The bounding rect that encompasses the rotated rectangle
+ */
+export const getRotatedBoundingRect = (rect: Rect, angleDegrees = 0): Rect => {
+  if (angleDegrees === 0) {
+    return rect;
+  }
+  return boundingRectOfPoints(getRotatedCorners(rect, angleDegrees));
 };

@@ -1,4 +1,5 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
@@ -88,6 +89,24 @@ Configuration for node grouping.
 
 ***
 
+### hideWatermark?
+
+> `optional` **hideWatermark**: `boolean`
+
+#### Since
+
+0.9.0
+
+Hides the ngDiagram watermark when set to true.
+
+#### Default
+
+```ts
+undefined
+```
+
+***
+
 ### linking
 
 > **linking**: [`LinkingConfig`](/docs/api/types/configuration/features/linkingconfig/)
@@ -133,6 +152,25 @@ Configuration for keyboard shortcuts.
 > **snapping**: [`SnappingConfig`](/docs/api/types/configuration/features/snappingconfig/)
 
 Configuration for snapping behavior.
+
+***
+
+### viewportPanningEnabled
+
+> **viewportPanningEnabled**: `boolean`
+
+#### Since
+
+0.9.0
+
+Enables or disables panning on the diagram.
+When set to false, user is not able to move the viewport by panning.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 

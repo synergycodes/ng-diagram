@@ -1,26 +1,42 @@
 import type { FlowCore } from '../flow-core';
-import type { FlowStateUpdate, LooseAutocomplete, ModelActionType } from '../types';
-import type { TransactionCallback, TransactionResult } from '../types/transaction.interface';
+import type { FlowStateUpdate, LooseAutocomplete, ModelActionType, ModelActionTypes } from '../types';
+import type { TransactionCallback, TransactionOptions, TransactionResult } from '../types/transaction.interface';
 import { Transaction } from './transaction';
 
 export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
   private transactionStack: Transaction[] = [];
+  private pendingOptions: TransactionOptions | null = null;
 
   constructor(private readonly flowCore: TFlowCore) {}
 
   async transaction(callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(callback: TransactionCallback, options: TransactionOptions): Promise<TransactionResult>;
   async transaction(
     name: LooseAutocomplete<ModelActionType>,
     callback: TransactionCallback
   ): Promise<TransactionResult>;
   async transaction(
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback,
+    options: TransactionOptions
+  ): Promise<TransactionResult>;
+  async transaction(
     nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
-    callback?: TransactionCallback
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const [transactionName, transactionCallback] = this.parseArgs(nameOrCallback, callback);
+    const [transactionName, transactionCallback, transactionOptions] = this.parseArgs(
+      nameOrCallback,
+      callbackOrOptions,
+      options
+    );
 
     const parentTransaction = this.getCurrentTransaction();
     const transaction = new Transaction(transactionName, parentTransaction, this.flowCore);
+
+    if (!parentTransaction && transactionOptions) {
+      this.pendingOptions = transactionOptions;
+    }
 
     this.transactionStack.push(transaction);
 
@@ -34,11 +50,12 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
           transaction.mergeToParent();
         } else {
           // Root transaction - apply changes
-          const { mergedUpdate, commandsCount } = transaction.getMergedUpdates();
+          const { mergedUpdate, commandsCount, actionTypes } = transaction.getMergedUpdates();
 
           return {
             results: mergedUpdate,
             commandsCount,
+            actionTypes,
           };
         }
       }
@@ -46,6 +63,7 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
       return {
         results: {},
         commandsCount: 0,
+        actionTypes: [],
       };
     } catch (error) {
       // Automatic rollback on error
@@ -54,16 +72,27 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
     } finally {
       // Remove from stack
       this.transactionStack.pop();
+      if (!parentTransaction) {
+        this.pendingOptions = null;
+      }
     }
   }
 
-  queueUpdate(update: FlowStateUpdate, actionType: LooseAutocomplete<ModelActionType>): void {
+  /**
+   * Gets the options for the current root transaction.
+   * Returns null if no transaction is active or no options were provided.
+   */
+  getCurrentOptions(): TransactionOptions | null {
+    return this.pendingOptions;
+  }
+
+  queueUpdate(update: FlowStateUpdate, actionTypes: ModelActionTypes): void {
     const currentTransaction = this.getCurrentTransaction();
 
     if (!currentTransaction) {
       throw new Error('No active transaction. Cannot queue update.');
     }
-    currentTransaction.queueUpdate(update, actionType);
+    currentTransaction.queueUpdate(update, actionTypes);
   }
 
   isActive(): boolean {
@@ -82,16 +111,18 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
 
   private parseArgs(
     nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
-    callback?: TransactionCallback
-  ): [LooseAutocomplete<ModelActionType>, TransactionCallback] {
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
+  ): [LooseAutocomplete<ModelActionType>, TransactionCallback, TransactionOptions | undefined] {
     if (typeof nameOrCallback === 'function') {
-      return ['Transaction' as ModelActionType, nameOrCallback];
+      const transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+      return ['transaction' as ModelActionType, nameOrCallback, transactionOptions];
     }
 
-    if (!callback) {
+    if (typeof callbackOrOptions !== 'function') {
       throw new Error('Callback is required when transaction name is provided');
     }
 
-    return [nameOrCallback, callback];
+    return [nameOrCallback, callbackOrOptions, options];
   }
 }

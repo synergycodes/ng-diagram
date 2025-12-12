@@ -12,6 +12,7 @@ title: "ng-diagram"
 - [NgDiagramBaseEdgeLabelComponent](/docs/api/components/ngdiagrambaseedgelabelcomponent/)
 - [NgDiagramBaseNodeTemplateComponent](/docs/api/components/ngdiagrambasenodetemplatecomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
+- [NgDiagramMarkerComponent](/docs/api/components/ngdiagrammarkercomponent/)
 - [NgDiagramNodeResizeAdornmentComponent](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/)
 - [NgDiagramNodeRotateAdornmentComponent](/docs/api/components/ngdiagramnoderotateadornmentcomponent/)
 - [NgDiagramPaletteItemComponent](/docs/api/components/ngdiagrampaletteitemcomponent/)
@@ -112,9 +113,11 @@ title: "ng-diagram"
 - [MiddlewareContext](/docs/api/types/middleware/middlewarecontext/)
 - [MiddlewareHelpers](/docs/api/types/middleware/middlewarehelpers/)
 - [MiddlewareHistoryUpdate](/docs/api/types/middleware/middlewarehistoryupdate/)
+- [TransactionOptions](/docs/api/types/middleware/transactionoptions/)
 - [TransactionResult](/docs/api/types/middleware/transactionresult/)
 - [MiddlewareChain](/docs/api/types/middleware/middlewarechain/)
 - [ModelActionType](/docs/api/types/middleware/modelactiontype/)
+- [ModelActionTypes](/docs/api/types/middleware/modelactiontypes/)
 
 ## Types/Model
 
@@ -130,6 +133,7 @@ title: "ng-diagram"
 - [SimpleNode](/docs/api/types/model/simplenode/)
 - [Viewport](/docs/api/types/model/viewport/)
 - [Node](/docs/api/types/model/node/)
+- [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)
 - [PortSide](/docs/api/types/model/portside/)
 

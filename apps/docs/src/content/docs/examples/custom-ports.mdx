@@ -4,12 +4,13 @@ description: Example of how to create custom ports in ngDiagram
 sidebar:
   order: 4
   label: Custom Ports
+  badge: New
 ---
 
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import CustomPorts from '@examples/custom-ports/custom-ports.astro';
 
-This example demonstrates how to create custom ports in ngDiagram by customizing their appearance and behavior.
+This example demonstrates how to create custom ports in ngDiagram by providing any custom content (text, images, SVGs, or Angular components) and customizing their appearance and behavior.
 
 <br />
 
@@ -18,28 +19,35 @@ This example demonstrates how to create custom ports in ngDiagram by customizing
 
 ## Additional Explanation
 
-### Example Overview
-
-Two nodes are rendered, each with four ports (left, top, right, bottom).
-
-- The left port of the second node uses a data property to apply red background.
-- The top port has a changed inline position in both nodes.
-- The right port is customized with styles based on class property.
-
 ### Key Concepts
 
-- **Custom Port Styling:**
+- **Custom Port Content:**  
+  You can provide any custom content inside a port. The default style is disabled and the port adapts to the content's size and shape.
+
+- **Custom Port Styling:**  
   Ports can be styled individually using CSS classes, inline styles, or by overriding CSS variables used in port styling.
 
-- **Dynamic Port Rendering:**
+- **Dynamic Port Rendering:**  
   Ports are rendered using the [`<ng-diagram-port>`](/docs/api/components/ngdiagramportcomponent) component, which supports various attributes.
 
-- **Node Template Customization:**
+- **Node Template Customization:**  
   The `NodeComponent` template defines the arrangement and styling of ports within each node.
 
-- **Port Binding:**
+- **Custom Content Rendering:**  
+  You can render any content inside a port, such as text, images, SVGs, or icons. This allows for full control over the port's appearance.
+
+- **Port Binding:**  
   Ports have a [`type`](/docs/api/types/model/port/#type) property to set the connection type for each port. You can set it to `'both'`, `'target'`, or `'source'`.
 
-- **Port Positioning:**
+- **Port Positioning:**  
   Ports have a [`side`](/docs/api/types/model/port/#side) property to set their placement.
-  To further customize port placement, you can use CSS styling.
+
+- **Origin Point Customization:**  
+  You can now use the `originPoint` input to precisely control the transform origin of each port.  
+  Supported values: `leftTop`, `leftMiddle`, `leftBottom`, `centerTop`, `centerMiddle`, `centerBottom`, `rightTop`, `rightMiddle`, `rightBottom`.
+
+  This will apply the corresponding CSS transform for accurate port placement.
+
+  For details, see the [`NgDiagramPortComponent`](/docs/api/components/ngdiagramportcomponent#originpoint) documentation.
+
+To further customize port placement, you can use CSS styling.

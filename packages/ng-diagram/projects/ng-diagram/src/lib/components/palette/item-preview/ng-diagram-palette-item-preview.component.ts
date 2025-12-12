@@ -22,8 +22,11 @@ import { EnvironmentProviderService } from '../../../services/environment-provid
  * </ng-diagram-palette-item-preview>
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Components
- */ @Component({
+ */
+@Component({
   selector: 'ng-diagram-palette-item-preview',
   standalone: true,
   templateUrl: './ng-diagram-palette-item-preview.component.html',

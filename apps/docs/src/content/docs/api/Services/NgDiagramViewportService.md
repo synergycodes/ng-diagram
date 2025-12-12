@@ -1,4 +1,5 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
@@ -57,6 +58,17 @@ The ID of the node or the node object to center on.
 #### Returns
 
 `void`
+
+#### Remarks
+
+When calling `centerOnNode()` immediately after adding or modifying a node, its dimensions may not be measured yet.
+Use the `waitForMeasurements` transaction option to ensure accurate centering:
+```typescript
+await this.ngDiagramService.transaction(() => {
+  this.modelService.addNodes([newNode]);
+}, { waitForMeasurements: true });
+this.viewportService.centerOnNode(newNode.id); // Now centers correctly
+```
 
 ***
 
@@ -261,6 +273,17 @@ Padding around the content (default: 50). Supports CSS-like syntax:
 #### Returns
 
 `void`
+
+#### Remarks
+
+When calling `zoomToFit()` immediately after adding or modifying nodes/edges, their dimensions may not be measured yet.
+Use the `waitForMeasurements` transaction option to ensure accurate results:
+```typescript
+await this.ngDiagramService.transaction(() => {
+  this.modelService.addNodes([newNode]);
+}, { waitForMeasurements: true });
+this.viewportService.zoomToFit(); // Now includes new node dimensions
+```
 
 #### Example
 

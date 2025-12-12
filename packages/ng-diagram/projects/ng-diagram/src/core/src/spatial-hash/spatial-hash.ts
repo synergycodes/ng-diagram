@@ -2,6 +2,20 @@ import { Node, Rect, RectWithId } from '../types';
 import { doesRectsIntersect, isSameRect } from '../utils';
 import { getNodeMeasuredBounds } from '../utils/dimensions';
 
+const SPATIAL_HASH_REMOVE_ERROR = (cell: string, nodeId: string) =>
+  `[ngDiagram] Spatial hash error: Attempted to remove from non-existent cell "${cell}".
+
+Node ID: ${nodeId}
+
+This may indicate a state synchronization issue.`;
+
+const SPATIAL_HASH_UPDATE_ERROR = (cell: string, nodeId: string) =>
+  `[ngDiagram] Spatial hash error: Attempted to update non-existent cell "${cell}".
+
+Node ID: ${nodeId}
+
+This may indicate a state synchronization issue.`;
+
 export class SpatialHash {
   private readonly cellSize = 100;
   private readonly grid = new Map<string, RectWithId[]>();
@@ -79,12 +93,22 @@ export class SpatialHash {
   }
 
   private removeFromCell(cell: string, id: string) {
-    const newCells = this.grid.get(cell)!.filter((rect) => rect.id !== id);
+    const cellData = this.grid.get(cell);
+    if (!cellData) {
+      console.error(SPATIAL_HASH_REMOVE_ERROR(cell, id));
+      return;
+    }
+    const newCells = cellData.filter((rect) => rect.id !== id);
     this.grid.set(cell, newCells);
   }
 
   private updateInCell(cell: string, rect: RectWithId) {
-    const newCells = this.grid.get(cell)!.filter(({ id }) => id !== rect.id);
+    const cellData = this.grid.get(cell);
+    if (!cellData) {
+      console.error(SPATIAL_HASH_UPDATE_ERROR(cell, rect.id));
+      return;
+    }
+    const newCells = cellData.filter(({ id }) => id !== rect.id);
     this.grid.set(cell, [...newCells, rect]);
   }
 
@@ -124,7 +148,8 @@ export class SpatialHash {
     }
     for (const cell of cells) {
       this.removeFromCell(cell, id);
-      if (this.grid.get(cell)!.length === 0) {
+      const cellData = this.grid.get(cell);
+      if (cellData && cellData.length === 0) {
         this.grid.delete(cell);
       }
     }

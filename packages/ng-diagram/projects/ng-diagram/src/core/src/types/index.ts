@@ -22,7 +22,12 @@ export * from './environment.interface';
 export * from './utils';
 
 // Transaction types
-export * from './transaction.interface';
+export type {
+  TransactionCallback,
+  TransactionContext,
+  TransactionOptions,
+  TransactionResult,
+} from './transaction.interface';
 
 // Action state types
 export * from './action-state.interface';

@@ -6,6 +6,7 @@ import {
   NgDiagramComponent,
   NgDiagramNodeTemplateMap,
   provideNgDiagram,
+  type Edge,
   type NgDiagramConfig,
 } from 'ng-diagram';
 
@@ -46,6 +47,21 @@ export class DiagramComponent {
         padding: 70,
       },
     },
+    edgeRouting: {
+      defaultRouting: 'orthogonal',
+      orthogonal: {
+        maxCornerRadius: 0,
+      },
+    },
+    linking: {
+      finalEdgeDataBuilder: (edge: Edge) => ({
+        ...edge,
+        targetArrowhead: undefined,
+      }),
+    },
+    zIndex: {
+      edgesAboveConnectedNodes: true,
+    },
   } satisfies NgDiagramConfig;
 
   model = initializeModel({
@@ -54,6 +70,8 @@ export class DiagramComponent {
         id: '1',
         position: { x: 80, y: 100 },
         type: 'customNodeType',
+        autoSize: false,
+        size: { width: 300, height: 250 },
         data: {
           name: 'Node 1',
           description: 'This is Tailwind Node 1',

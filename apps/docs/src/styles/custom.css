@@ -2,6 +2,7 @@
 @layer reset, starlight;
 @import 'ng-diagram/styles.css';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import 'uplot/dist/uPlot.min.css';
 @import './content-tiles.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -59,11 +60,11 @@ ng-diagram-canvas {
   }
 }
 
-/* 
+.sl-markdown-content {
+  /* 
   * TODO - move this to wrapper stylesheet when created
   * Style diagram buttons inside markdown content 
   */
-.sl-markdown-content {
   button {
     border: 1px solid var(--ngd-pt-stroke-primary-default);
     padding: 1px 6px;
@@ -77,5 +78,16 @@ ng-diagram-canvas {
 
   button:active {
     background-color: var(--ngd-node-stroke-primary-default);
+  }
+
+  /* Restore list styles removed by Tailwind preflight */
+  ul:not([role='tablist']),
+  ol {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+  }
+
+  ol {
+    list-style-type: decimal;
   }
 }

@@ -1,6 +1,8 @@
 /**
  * Interface representing size in the flow diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Geometry
  */
 export interface Size {
@@ -17,6 +19,8 @@ export interface Size {
 /**
  * Interface representing a point in the flow diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Geometry
  */
 export interface Point {
@@ -33,6 +37,8 @@ export interface Point {
 /**
  * Interface representing a port side on a node in the diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export type PortSide = 'top' | 'right' | 'bottom' | 'left';
@@ -40,6 +46,8 @@ export type PortSide = 'top' | 'right' | 'bottom' | 'left';
 /**
  * Interface representing a rect in the flow diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Geometry
  */
 export interface Rect {
@@ -66,17 +74,20 @@ export interface RectWithId extends Rect {
 }
 
 export interface Bounds {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
 }
 
-export type Direction = 'top' | 'bottom' | 'left' | 'right';
+export const DIRECTIONS = ['top', 'bottom', 'left', 'right'] as const;
+export type Direction = (typeof DIRECTIONS)[number];
 
 /**
  * Interface representing the location of a port on a node
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export type PortLocation = {

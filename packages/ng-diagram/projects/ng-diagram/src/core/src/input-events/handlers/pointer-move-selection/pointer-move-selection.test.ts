@@ -115,8 +115,7 @@ describe('PointerMoveSelectionEventHandler', () => {
 
       handler.handle(event);
 
-      // Verify dragging state is set with modifiers
-      expect(mockActionStateManager.dragging).toEqual({
+      expect(mockActionStateManager.dragging).toMatchObject({
         modifiers: {
           primary: false,
           secondary: false,
@@ -124,6 +123,7 @@ describe('PointerMoveSelectionEventHandler', () => {
           meta: false,
         },
       });
+      expect(mockActionStateManager.dragging?.accumulatedDeltas).toBeInstanceOf(Map);
     });
 
     it('should not pan during start phase even with screen edge', () => {
@@ -172,7 +172,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
       });
 
-      it('should continue moving after threshold is exceeded', () => {
+      it('should continue moving after threshold is exceeded with incremental delta', () => {
         // First move beyond threshold
         handler.handle(
           getSamplePointerMoveSelectionEvent({
@@ -183,7 +183,7 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         mockEmit.mockClear();
 
-        // Subsequent small move
+        // Subsequent move to the same position - delta should be 0 (incremental)
         handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
@@ -191,8 +191,39 @@ describe('PointerMoveSelectionEventHandler', () => {
           })
         );
 
+        // Since position didn't change, incremental delta is 0
         expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
-          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          delta: { x: 0, y: 0 },
+          nodes: [mockNode],
+        });
+      });
+
+      it('should send incremental deltas on subsequent moves', () => {
+        // First move beyond threshold
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
+
+        mockEmit.mockClear();
+
+        // Move by additional 5px from current position
+        const nextPosition = {
+          x: lastInputPointOverThreshold.x + 5,
+          y: lastInputPointOverThreshold.y + 5,
+        };
+        handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: nextPosition,
+          })
+        );
+
+        // Incremental delta should be just 5, not cumulative from start
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 5, y: 5 },
           nodes: [mockNode],
         });
       });

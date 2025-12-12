@@ -9,17 +9,17 @@ import { getEdgePoints } from './get-edge-points';
  */
 export const checkIfShouldRouteEdges = ({
   helpers,
-  modelActionType,
+  modelActionTypes,
   actionStateManager,
 }: MiddlewareContext): boolean => {
   // Skip edge routing during resize - ports will be updated separately and trigger routing then
   // This prevents visual lag where edges are drawn with old port positions
-  if (modelActionType === 'resizeNode' && actionStateManager.isResizing()) {
+  if (modelActionTypes.includes('resizeNode') && actionStateManager.isResizing()) {
     return false;
   }
 
   return (
-    modelActionType === 'init' ||
+    modelActionTypes.includes('init') ||
     helpers.anyEdgesAdded() ||
     helpers.checkIfAnyNodePropsChanged(['position', 'size', 'angle', 'measuredPorts']) ||
     helpers.checkIfAnyEdgePropsChanged([
@@ -42,7 +42,7 @@ export const checkIfShouldRouteEdges = ({
 export const shouldRouteEdge = (
   edge: Edge,
   helpers: MiddlewareContext['helpers'],
-  modelActionType: MiddlewareContext['modelActionType']
+  modelActionTypes: MiddlewareContext['modelActionTypes']
 ): boolean => {
   const isEdgeOrNodesChanged =
     helpers.checkIfEdgeAdded(edge.id) ||
@@ -50,7 +50,7 @@ export const shouldRouteEdge = (
     helpers.checkIfNodeChanged(edge.source) ||
     helpers.checkIfNodeChanged(edge.target);
 
-  return isEdgeOrNodesChanged || modelActionType === 'init';
+  return isEdgeOrNodesChanged || modelActionTypes.includes('init');
 };
 
 /**
@@ -129,12 +129,12 @@ export const processEdgesForRouting = (
   nodesMap: Map<string, Node>,
   routingManager: EdgeRoutingManager,
   helpers: MiddlewareContext['helpers'],
-  modelActionType: MiddlewareContext['modelActionType']
+  modelActionTypes: MiddlewareContext['modelActionTypes']
 ): NonNullable<FlowStateUpdate['edgesToUpdate']> => {
   const edgesToUpdate: NonNullable<FlowStateUpdate['edgesToUpdate']> = [];
 
   edges.forEach((edge) => {
-    if (!shouldRouteEdge(edge, helpers, modelActionType)) {
+    if (!shouldRouteEdge(edge, helpers, modelActionTypes)) {
       return;
     }
 
@@ -188,7 +188,7 @@ export const edgesRoutingMiddleware: Middleware = {
       edgeRoutingManager,
       actionStateManager,
       helpers,
-      modelActionType,
+      modelActionTypes,
       config: { zIndex },
     } = context;
 
@@ -203,7 +203,7 @@ export const edgesRoutingMiddleware: Middleware = {
     }
 
     const edgesToUpdate = shouldRouteEdges
-      ? processEdgesForRouting(edges, nodesMap, edgeRoutingManager, helpers, modelActionType)
+      ? processEdgesForRouting(edges, nodesMap, edgeRoutingManager, helpers, modelActionTypes)
       : [];
 
     const newTemporaryEdge = temporaryEdge

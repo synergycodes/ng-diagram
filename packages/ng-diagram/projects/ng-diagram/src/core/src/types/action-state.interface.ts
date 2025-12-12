@@ -1,10 +1,13 @@
 import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
+import type { Point } from './utils';
 
 /**
  * State tracking a node resize operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface ResizeActionState {
@@ -27,6 +30,8 @@ export interface ResizeActionState {
 /**
  * State tracking an edge creation operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface LinkingActionState {
@@ -41,6 +46,8 @@ export interface LinkingActionState {
 /**
  * State containing copied nodes and edges for paste operations.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface CopyPasteActionState {
@@ -53,6 +60,8 @@ export interface CopyPasteActionState {
 /**
  * State tracking which group is currently highlighted.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface HighlightGroupActionState {
@@ -63,6 +72,8 @@ export interface HighlightGroupActionState {
 /**
  * State tracking a node rotation operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface RotationActionState {
@@ -77,11 +88,18 @@ export interface RotationActionState {
 /**
  * State tracking a drag operation in progress.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface DraggingActionState {
   /** Input modifiers (e.g., Ctrl, Shift) active during the drag. */
   modifiers: InputModifiers;
+  /**
+   * Accumulated deltas per node that haven't yet resulted in a snap movement.
+   * Key is node ID, value is the accumulated delta that hasn't been applied due to snapping.
+   */
+  accumulatedDeltas: Map<string, Point>;
 }
 
 /**
@@ -91,6 +109,8 @@ export interface DraggingActionState {
  * information about active operations such as resizing, linking, dragging, and other
  * user interactions. Use this to observe the current state, not to modify it.
  *
+ * @public
+ * @since 0.8.0
  * @category Internals
  */
 export interface ActionState {

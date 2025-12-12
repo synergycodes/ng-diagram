@@ -23,7 +23,7 @@ import { ArcRouting } from './arc-routing';
         [model]="model"
         [config]="config"
         (diagramInit)="onDiagramInit($event)"
-      />
+      >
         <ng-diagram-background />
       </ng-diagram>
     </div>

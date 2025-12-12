@@ -1,9 +1,12 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
 title: "InputModifiers"
 ---
+
+Interface representing keyboard and modifier keys state during an input event.
 
 ## Properties
 

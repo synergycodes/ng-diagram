@@ -1,11 +1,12 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
 title: "NgDiagramComponent"
 ---
 
-Diagram component
+Main diagram component for rendering flow diagrams with nodes and edges.
 
 ## Implements
 
@@ -178,6 +179,14 @@ Event emitted when the viewport changes through panning or zooming.
 
 This event fires during pan and zoom operations, including mouse wheel zoom,
 and programmatic viewport changes.
+
+***
+
+### viewportPannable
+
+> `readonly` **viewportPannable**: `WritableSignal`\<`boolean`\>
+
+Whether panning is enabled in the diagram.
 
 ## Methods
 

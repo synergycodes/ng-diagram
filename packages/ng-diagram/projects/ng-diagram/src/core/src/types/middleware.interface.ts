@@ -5,22 +5,40 @@ import { EnvironmentInfo } from './environment.interface';
 import { FlowConfig } from './flow-config.interface';
 import type { Metadata } from './metadata.interface';
 import type { Node } from './node.interface';
+import type { LooseAutocomplete } from './utils';
 
 /**
- * Model action types that can trigger middleware execution.
- * These represent all possible operations that modify the diagram state.
+ * Array of model action types, used to track all actions in a transaction or a single action.
+ * Supports both known action types with autocomplete and custom string action types.
  *
  * @example
  * ```typescript
  * const middleware: Middleware = {
  *   name: 'logger',
  *   execute: (context, next) => {
- *     console.log('Action type:', context.modelActionType);
+ *     console.log('Action types:', context.modelActionTypes.join(', '));
  *     next();
  *   }
  * };
  * ```
  *
+ * @public
+ * @since 0.9.0
+ * @category Types/Middleware
+ */
+export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
+
+/**
+ * Individual model action type that can trigger middleware execution.
+ * These represent all possible operations that modify the diagram state.
+ *
+ * @example
+ * ```typescript
+ * const blockedActions: ModelActionType[] = ['addNodes', 'deleteNodes', 'updateNode'];
+ * ```
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export type ModelActionType =
@@ -56,6 +74,8 @@ export type ModelActionType =
  * The complete state of the flow diagram.
  * Represents the current state of all nodes, edges, and metadata.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface FlowState {
@@ -85,6 +105,8 @@ export interface FlowState {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface MiddlewareHistoryUpdate {
@@ -117,6 +139,8 @@ export interface MiddlewareHistoryUpdate {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface FlowStateUpdate {
@@ -147,6 +171,8 @@ export type MiddlewareArray = readonly Middleware[];
  * Helper functions for checking what changed during middleware execution.
  * These helpers track all cumulative changes from the initial state update and all previous middlewares.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface MiddlewareHelpers {
@@ -288,8 +314,8 @@ export interface MiddlewareHelpers {
  *     // Access configuration
  *     console.log('Cell size:', context.config.background.cellSize);
  *
- *     // Check what action triggered this
- *     if (context.modelActionType === 'addNodes') {
+ *     // Check what actions triggered this (supports transactions with multiple actions)
+ *     if (context.modelActionTypes.includes('addNodes')) {
  *       // Validate new nodes
  *       const isValid = validateNodes(context.state.nodes);
  *       if (!isValid) {
@@ -303,6 +329,8 @@ export interface MiddlewareHelpers {
  * };
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface MiddlewareContext {
@@ -334,8 +362,30 @@ export interface MiddlewareContext {
    * Common usage: Access removed edge instances that no longer exist in `edgesMap`.
    */
   initialEdgesMap: Map<string, Edge>;
-  /** The action that triggered the middleware execution */
+  /**
+   * The action that triggered the middleware execution.
+   * @deprecated Use `modelActionTypes` instead, which supports multiple actions from transactions.
+   * For single actions, this returns the first (and only) action type.
+   */
   modelActionType: ModelActionType;
+  /**
+   * All action types that triggered the middleware execution.
+   * For transactions, this contains the transaction name followed by all action types
+   * from commands executed within the transaction.
+   * For single commands outside transactions, this is a single-element array.
+   *
+   * @example
+   * ```typescript
+   * // For a transaction named 'batchUpdate' with addNodes and moveViewport commands:
+   * // modelActionTypes = ['batchUpdate', 'addNodes', 'moveViewport']
+   *
+   * // For a single command outside a transaction:
+   * // modelActionTypes = ['addNodes']
+   * ```
+   *
+   * @since 0.9.0
+   */
+  modelActionTypes: ModelActionTypes;
   /** Helper functions to check what changed (tracks all cumulative changes from the initial action and all previous middlewares) */
   helpers: MiddlewareHelpers;
   /** All state updates from previous middlewares in the chain */
@@ -374,7 +424,7 @@ export interface MiddlewareContext {
  *   name: 'read-only',
  *   execute: (context, next, cancel) => {
  *     const blockedActions = ['addNodes', 'deleteNodes', 'updateNode'];
- *     if (blockedActions.includes(context.modelActionType)) {
+ *     if (context.modelActionTypes.some((action) => blockedActions.includes(action))) {
  *       console.warn('Action blocked in read-only mode');
  *       cancel();
  *       return;
@@ -409,6 +459,8 @@ export interface MiddlewareContext {
  * ngDiagramService.registerMiddleware(snapMiddleware);
  * ```
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export interface Middleware<TName extends string = string> {
@@ -431,6 +483,8 @@ export interface Middleware<TName extends string = string> {
 /**
  * An array of middlewares that will be executed in sequence.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Middleware
  */
 export type MiddlewareChain = Middleware[];

@@ -1,0 +1,83 @@
+@use '../mixins' as *;
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.group-node {
+  backdrop-filter: blur(0.3125rem);
+  background: var(--ngdlp-component-bg-glass);
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  @include glow-gradient;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1rem;
+    padding: 0.125rem;
+    background: linear-gradient(
+      135deg,
+      var(--ngdlp-purple-400-100),
+      var(--ngdlp-purple-100-80),
+      var(--ngdlp-purple-500-80),
+      var(--ngdlp-purple-700-90)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        var(--ngdlp-purple-400-60),
+        var(--ngdlp-purple-100-40),
+        var(--ngdlp-purple-500-50),
+        var(--ngdlp-purple-700-60)
+      );
+    }
+  }
+
+  &__title {
+    color: var(--ngdlp-text-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__content {
+    padding: 1.25rem;
+  }
+}

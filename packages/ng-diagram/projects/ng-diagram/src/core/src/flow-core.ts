@@ -5,6 +5,7 @@ import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
+import { MeasurementTracker } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -30,13 +31,19 @@ import type {
   Middleware,
   MiddlewareChain,
   ModelActionType,
+  ModelActionTypes,
   ModelAdapter,
   Node,
   Point,
   Port,
   Renderer,
 } from './types';
-import { TransactionCallback, TransactionResult } from './types/transaction.interface';
+import {
+  InternalTransactionOptions,
+  TransactionCallback,
+  TransactionOptions,
+  TransactionResult,
+} from './types/transaction.interface';
 import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
@@ -61,6 +68,7 @@ export class FlowCore {
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
   readonly shortcutManager: ShortcutManager;
+  readonly measurementTracker: MeasurementTracker;
 
   readonly getFlowOffset: () => Point;
 
@@ -87,6 +95,7 @@ export class FlowCore {
     this.actionStateManager = new ActionStateManager(this.eventManager);
     this.portBatchProcessor = new PortBatchProcessor();
     this.labelBatchProcessor = new LabelBatchProcessor();
+    this.measurementTracker = new MeasurementTracker();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
@@ -222,26 +231,60 @@ export class FlowCore {
    *     tx.rollbackTo('afterStep1');
    *   }
    * });
+   *
+   * // Wait for measurements to complete before continuing
+   * await flowCore.transaction(async (tx) => {
+   *   await tx.emit('addNodes', { nodes: [newNode] });
+   * }, { waitForMeasurements: true });
+   * // Now safe to call zoomToFit() - node dimensions are measured
+   * await viewportService.zoomToFit();
    */
   async transaction(callback: TransactionCallback): Promise<TransactionResult>;
-  async transaction(name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(callback: TransactionCallback, options: TransactionOptions): Promise<TransactionResult>;
   async transaction(
-    nameOrCallback: ModelActionType | TransactionCallback,
-    callback?: TransactionCallback
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback
+  ): Promise<TransactionResult>;
+  async transaction(
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback,
+    options: TransactionOptions
+  ): Promise<TransactionResult>;
+  async transaction(
+    nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
   ): Promise<TransactionResult> {
     let results: TransactionResult;
+    let transactionOptions: TransactionOptions | undefined;
 
     if (typeof nameOrCallback === 'function') {
-      results = await this.transactionManager.transaction(nameOrCallback);
+      transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+      results = await this.transactionManager.transaction(nameOrCallback, transactionOptions ?? {});
     } else {
+      const callback = callbackOrOptions as TransactionCallback | undefined;
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
       }
-      results = await this.transactionManager.transaction(nameOrCallback, callback);
+      transactionOptions = options;
+      results = await this.transactionManager.transaction(nameOrCallback, callback, transactionOptions ?? {});
     }
 
     if (results.commandsCount > 0) {
-      await this.applyUpdate(results.results, nameOrCallback as ModelActionType);
+      if (transactionOptions?.waitForMeasurements) {
+        const internalOptions = transactionOptions as InternalTransactionOptions;
+        this.measurementTracker.trackStateUpdate(
+          results.results,
+          internalOptions._measurementDebounceTimeout,
+          internalOptions._measurementInitialTimeout
+        );
+      }
+
+      await this.applyUpdate(results.results, results.actionTypes);
+    }
+
+    if (transactionOptions?.waitForMeasurements) {
+      await this.measurementTracker.waitForMeasurements();
     }
 
     return results;
@@ -250,11 +293,16 @@ export class FlowCore {
   /**
    * Applies an update to the flow state
    * @param stateUpdate Partial state to apply
-   * @param modelActionType Type of model action to apply
+   * @param modelActionTypes Action type(s) that triggered this update. Can be a single type or an array of types (from transactions).
    */
-  async applyUpdate(stateUpdate: FlowStateUpdate, modelActionType: LooseAutocomplete<ModelActionType>): Promise<void> {
+  async applyUpdate(
+    stateUpdate: FlowStateUpdate,
+    modelActionTypes: LooseAutocomplete<ModelActionType> | ModelActionTypes
+  ): Promise<void> {
+    const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
+
     if (this.transactionManager.isActive()) {
-      this.transactionManager.queueUpdate(stateUpdate, modelActionType);
+      this.transactionManager.queueUpdate(stateUpdate, actionTypesArray);
       return;
     }
 
@@ -264,7 +312,7 @@ export class FlowCore {
     try {
       // Get the current state - guaranteed to be fresh since we hold the lock
       const currentState = this.getState();
-      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, modelActionType);
+      const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
 
       if (finalState) {
         this.setState(finalState);
@@ -448,8 +496,17 @@ export class FlowCore {
    * @param nodeId - The ID of the node to check for collisions
    * @returns An array of Nodes that overlap with the specified node
    */
-  getOverlappingNodes(nodeId: string): Node[] {
-    return getOverlappingNodes(this, nodeId);
+  getOverlappingNodes(nodeId: string): Node[];
+  /**
+   * Detects collision with other nodes by finding all nodes whose rectangles intersect
+   * with the specified node's bounding rectangle.
+   *
+   * @param node - The node to check for collisions
+   * @returns An array of Nodes that overlap with the specified node
+   */
+  getOverlappingNodes(node: Node): Node[];
+  getOverlappingNodes(nodeOrId: Node | string): Node[] {
+    return getOverlappingNodes(this, nodeOrId as Node & string);
   }
 
   /**

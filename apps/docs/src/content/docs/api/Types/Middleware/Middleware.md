@@ -1,4 +1,5 @@
 ---
+version: "since v0.8.0"
 editUrl: false
 next: false
 prev: false
@@ -21,7 +22,7 @@ const readOnlyMiddleware: Middleware<'read-only'> = {
   name: 'read-only',
   execute: (context, next, cancel) => {
     const blockedActions = ['addNodes', 'deleteNodes', 'updateNode'];
-    if (blockedActions.includes(context.modelActionType)) {
+    if (context.modelActionTypes.some((action) => blockedActions.includes(action))) {
       console.warn('Action blocked in read-only mode');
       cancel();
       return;

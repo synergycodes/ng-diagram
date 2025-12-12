@@ -18,6 +18,9 @@
  *   }
  * }
  * ```
+ *
+ * @public
+ * @since 0.8.0
  * @category Types/Events
  */
 export interface PointerInputEvent extends PointerEvent {

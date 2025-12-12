@@ -1,18 +1,17 @@
 import { FlowCore } from '../flow-core';
-import type {
-  FlowState,
-  FlowStateUpdate,
-  LooseAutocomplete,
-  Middleware,
-  MiddlewareChain,
-  ModelActionType,
-} from '../types';
+import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionTypes } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { createEventEmitterMiddleware } from './middlewares/event-emitter';
+import {
+  createEventEmitterMiddleware,
+  createMeasurementTrackingMiddleware,
+  loggerMiddleware,
+  measuredBoundsMiddleware,
+} from './middlewares';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
   private eventEmitterMiddleware: Middleware | null = null;
+  private measurementTrackingMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -58,23 +57,37 @@ export class MiddlewareManager {
    * Executes all registered middlewares in sequence
    * @param initialState Initial state to be transformed
    * @param stateUpdate State update to be applied
-   * @param modelActionType Model action type which triggers the middleware
+   * @param modelActionTypes Model action types which trigger the middleware (array for transactions, single-element for direct calls)
    * @returns State after all middlewares have been applied
    */
   async execute(
     initialState: FlowState,
     stateUpdate: FlowStateUpdate,
-    modelActionType: LooseAutocomplete<ModelActionType>
+    modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
     if (!this.eventEmitterMiddleware && this.flowCore.eventManager) {
       this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
     }
 
-    const chainWithEventEmitter = this.eventEmitterMiddleware
-      ? [...this.middlewareChain, this.eventEmitterMiddleware]
-      : this.middlewareChain;
+    if (!this.measurementTrackingMiddleware && this.flowCore.measurementTracker) {
+      this.measurementTrackingMiddleware = createMeasurementTrackingMiddleware(this.flowCore.measurementTracker);
+    }
 
-    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, chainWithEventEmitter);
-    return await middlewareExecutor.run(initialState, stateUpdate, modelActionType as ModelActionType);
+    // Middleware execution order:
+    // 1. User and default middlewares - custom processing
+    // 2. measuredBoundsMiddleware - compute node bounds after all position/size changes
+    // 3. loggerMiddleware - log final state for debugging
+    // 4. measurementTrackingMiddleware - signal measurement activity
+    // 5. eventEmitterMiddleware - emit events with final state
+    const finalChain = [
+      ...this.middlewareChain,
+      measuredBoundsMiddleware,
+      loggerMiddleware,
+      ...(this.measurementTrackingMiddleware ? [this.measurementTrackingMiddleware] : []),
+      ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
+    ];
+
+    const middlewareExecutor = new MiddlewareExecutor(this.flowCore, finalChain);
+    return await middlewareExecutor.run(initialState, stateUpdate, modelActionTypes);
   }
 }

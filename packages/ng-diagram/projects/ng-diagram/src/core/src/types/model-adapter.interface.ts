@@ -9,6 +9,8 @@ import type { Node } from './node.interface';
  * It contains the complete current state of nodes, edges, and metadata.
  * Typically received in `onChange` callbacks to observe model updates.
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface ModelChanges {
@@ -23,6 +25,8 @@ export interface ModelChanges {
 /**
  * Interface for model adapters that handle the data management of a flow diagram
  *
+ * @public
+ * @since 0.8.0
  * @category Types/Model
  */
 export interface ModelAdapter {

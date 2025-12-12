@@ -16,3 +16,4 @@ pnpm-lock.yaml
 **/dist
 
 **/src/content/docs/api/**/*.md
+**/api-report/*.md

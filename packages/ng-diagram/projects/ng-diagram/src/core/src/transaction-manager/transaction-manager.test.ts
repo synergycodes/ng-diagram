@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import type { FlowCore } from '../flow-core';
 import { mockEdge, mockNode } from '../test-utils';
 import type { ModelActionType } from '../types';
-import { TransactionCallback } from '../types/transaction.interface';
+import { TransactionCallback, TransactionOptions } from '../types/transaction.interface';
 import { TransactionManager } from './transaction-manager';
 
 describe('TransactionManager', () => {
@@ -29,8 +30,9 @@ describe('TransactionManager', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (mockFlowCore as any).transactionManager = transactionManager;
 
-    mockApplyUpdate.mockImplementation(async (update, actionType) => {
-      transactionManager.queueUpdate(update, actionType);
+    mockApplyUpdate.mockImplementation(async (update, actionTypes) => {
+      const actionTypesArray = Array.isArray(actionTypes) ? actionTypes : [actionTypes];
+      transactionManager.queueUpdate(update, actionTypesArray);
     });
 
     // Setup emitInternal to simulate actual command emission behavior
@@ -80,6 +82,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.any(Object),
         commandsCount: 1,
+        actionTypes: expect.any(Array),
       });
     });
 
@@ -117,6 +120,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode] }),
         commandsCount: 1,
+        actionTypes: expect.any(Array),
       });
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ nodesToAdd: [mockNode] }),
@@ -224,13 +228,13 @@ describe('TransactionManager', () => {
   describe('queueUpdate', () => {
     it('should queue update when transaction is active', async () => {
       await transactionManager.transaction(async () => {
-        transactionManager.queueUpdate({ nodesToAdd: [] }, 'testAction' as ModelActionType);
+        transactionManager.queueUpdate({ nodesToAdd: [] }, ['testAction' as ModelActionType]);
         expect(transactionManager.isActive()).toBe(true);
       });
     });
 
     it('should throw error when no transaction is active', () => {
-      expect(() => transactionManager.queueUpdate({ nodesToAdd: [] }, 'testAction' as ModelActionType)).toThrow(
+      expect(() => transactionManager.queueUpdate({ nodesToAdd: [] }, ['testAction' as ModelActionType])).toThrow(
         'No active transaction. Cannot queue update.'
       );
     });
@@ -268,7 +272,7 @@ describe('TransactionManager', () => {
 
     it('should return default name when using callback-only form', async () => {
       await transactionManager.transaction(async () => {
-        expect(transactionManager.getTransactionName()).toBe('Transaction');
+        expect(transactionManager.getTransactionName()).toBe('transaction');
       });
     });
   });
@@ -304,6 +308,7 @@ describe('TransactionManager', () => {
       expect(result).toEqual({
         results: expect.objectContaining({ nodesToAdd: [mockNode], edgesToAdd: [mockEdge] }),
         commandsCount: 2,
+        actionTypes: expect.any(Array),
       });
     });
   });
@@ -329,6 +334,123 @@ describe('TransactionManager', () => {
       expect(hasChanges).toBe(false);
       expect(isDirty).toBe(false);
       expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('transaction with options', () => {
+    it('should accept options with callback only', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      const result = await transactionManager.transaction(async (tx) => {
+        await tx.emit('addNodes', { nodes: [mockNode] });
+      }, options);
+
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: 1,
+        actionTypes: expect.any(Array),
+      });
+    });
+
+    it('should accept options with name and callback', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      const result = await transactionManager.transaction(
+        'customAction',
+        async (tx) => {
+          await tx.emit('addNodes', { nodes: [mockNode] });
+        },
+        options
+      );
+
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: 1,
+        actionTypes: expect.any(Array),
+      });
+    });
+
+    it('should store options for root transaction', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+      let capturedOptions: TransactionOptions | null = null;
+
+      await transactionManager.transaction(async () => {
+        capturedOptions = transactionManager.getCurrentOptions();
+      }, options);
+
+      expect(capturedOptions).toEqual(options);
+    });
+
+    it('should clear options after transaction completes', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      await transactionManager.transaction(async () => {}, options);
+
+      expect(transactionManager.getCurrentOptions()).toBeNull();
+    });
+
+    it('should clear options after transaction fails', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      await expect(
+        transactionManager.transaction(async () => {
+          throw new Error('Test error');
+        }, options)
+      ).rejects.toThrow('Test error');
+
+      expect(transactionManager.getCurrentOptions()).toBeNull();
+    });
+
+    it('should not override options in nested transactions', async () => {
+      const parentOptions: TransactionOptions = { waitForMeasurements: true };
+      let nestedCapturedOptions: TransactionOptions | null = null;
+
+      await transactionManager.transaction(
+        'parent',
+        async (parentTx) => {
+          await parentTx.transaction('child', async () => {
+            nestedCapturedOptions = transactionManager.getCurrentOptions();
+          });
+        },
+        parentOptions
+      );
+
+      expect(nestedCapturedOptions).toEqual(parentOptions);
+    });
+  });
+
+  describe('getCurrentOptions', () => {
+    it('should return null when no transaction is active', () => {
+      expect(transactionManager.getCurrentOptions()).toBeNull();
+    });
+
+    it('should return null when transaction has no options', async () => {
+      let capturedOptions: TransactionOptions | null = { waitForMeasurements: true };
+
+      await transactionManager.transaction(async () => {
+        capturedOptions = transactionManager.getCurrentOptions();
+      });
+
+      expect(capturedOptions).toBeNull();
+    });
+
+    it('should return options during transaction execution', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+      let capturedOptions: TransactionOptions | null = null;
+
+      await transactionManager.transaction(async () => {
+        capturedOptions = transactionManager.getCurrentOptions();
+      }, options);
+
+      expect(capturedOptions).toEqual(options);
+    });
+
+    it('should return null after transaction completes', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      await transactionManager.transaction(async () => {}, options);
+
+      expect(transactionManager.getCurrentOptions()).toBeNull();
     });
   });
 });

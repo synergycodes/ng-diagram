@@ -1,0 +1,20 @@
+@mixin glow-gradient {
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 120px;
+    background: radial-gradient(
+      ellipse at center top,
+      var(--ngdlp-purple-500-30) 0%,
+      var(--ngdlp-purple-900-15) 40%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(20px);
+  }
+}

@@ -8,6 +8,11 @@ import { snapAngle } from './snap-angle/snap-angle';
 import { snapNumber } from './snap-number/snap-number';
 import { snapPoint } from './snap-point/snap-point';
 
+/**
+ * Collection of mathematical utility functions for diagram calculations.
+ *
+ * @internal
+ */
 export const NgDiagramMath = {
   angleBetweenPoints,
   angleToSide,

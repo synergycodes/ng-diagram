@@ -24,6 +24,7 @@ describe('DiagramInitEmitter', () => {
 
     context = {
       modelActionType: 'init',
+      modelActionTypes: ['init'],
       nodesMap: new Map<string, Node>(),
       edgesMap: new Map<string, Edge>(),
       state: {
@@ -43,7 +44,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -62,7 +63,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined, // Unmeasured
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -82,7 +83,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', measuredNode);
       context.nodesMap.set('node2', unmeasuredNode);
 
@@ -91,7 +92,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Now simulate updateNode to provide measurements
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node2', size: { width: 100, height: 50 } }],
       };
@@ -122,7 +123,7 @@ describe('DiagramInitEmitter', () => {
         measuredPorts: [unmeasuredPort],
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -130,7 +131,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Now simulate updateNode to provide port measurements
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [
           {
@@ -175,7 +176,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
       context.edgesMap.set('edge1', edge);
 
@@ -184,7 +185,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Now simulate updateEdge to provide label measurements
-      context.modelActionType = 'updateEdge';
+      context.modelActionTypes = ['updateEdge'];
       context.initialUpdate = {
         edgesToUpdate: [
           {
@@ -216,7 +217,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 0, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', nodeWithZeroWidth);
 
       emitter.emit(context, eventManager);
@@ -225,7 +226,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update with valid width
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
       };
@@ -253,7 +254,7 @@ describe('DiagramInitEmitter', () => {
         measuredPorts: [portWithZeroSize],
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -279,7 +280,7 @@ describe('DiagramInitEmitter', () => {
         measuredPorts: [portAtOrigin],
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -308,7 +309,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
       context.edgesMap.set('edge1', edge);
 
@@ -338,7 +339,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
       context.edgesMap.set('edge1', edge);
 
@@ -362,7 +363,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node1);
       context.nodesMap.set('node2', node2);
 
@@ -371,7 +372,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update first node
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
       };
@@ -400,7 +401,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: undefined as any, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -408,7 +409,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update with only width
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: undefined as any } }],
@@ -455,7 +456,7 @@ describe('DiagramInitEmitter', () => {
         measuredPorts: [port1, port2],
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -463,7 +464,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update both ports
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [
           {
@@ -522,7 +523,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
       context.edgesMap.set('edge1', edge);
 
@@ -531,7 +532,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update both labels
-      context.modelActionType = 'updateEdge';
+      context.modelActionTypes = ['updateEdge'];
       context.initialUpdate = {
         edgesToUpdate: [
           {
@@ -564,7 +565,7 @@ describe('DiagramInitEmitter', () => {
   describe('edge cases', () => {
     it('should not emit before initialization', () => {
       // Don't call init first
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
       };
@@ -581,26 +582,26 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
 
       // First updateNode should trigger the event
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       emitter.emit(context, eventManager);
 
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Subsequent updates should not trigger the event
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       emitter.emit(context, eventManager);
 
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
 
     it('should handle empty diagram', () => {
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       // No nodes or edges
 
       emitter.emit(context, eventManager);
@@ -626,7 +627,7 @@ describe('DiagramInitEmitter', () => {
         measuredLabels: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
       context.edgesMap.set('edge1', edge);
 
@@ -643,7 +644,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -652,7 +653,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Update with non-existent node
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'non-existent', size: { width: 100, height: 50 } }],
       };
@@ -670,7 +671,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -679,7 +680,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).toHaveBeenCalledOnce();
 
       // Update with non-existent edge
-      context.modelActionType = 'updateEdge';
+      context.modelActionTypes = ['updateEdge'];
       context.initialUpdate = {
         edgesToUpdate: [
           {
@@ -743,7 +744,7 @@ describe('DiagramInitEmitter', () => {
         ],
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', measuredNode);
       context.nodesMap.set('node2', unmeasuredNode);
       context.nodesMap.set('node3', nodeWithUnmeasuredPort);
@@ -754,7 +755,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update node2
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node2', size: { width: 150, height: 75 } }],
       };
@@ -783,7 +784,7 @@ describe('DiagramInitEmitter', () => {
       expect(deferredEmitSpy).not.toHaveBeenCalled();
 
       // Update label1
-      context.modelActionType = 'updateEdge';
+      context.modelActionTypes = ['updateEdge'];
       context.initialUpdate = {
         edgesToUpdate: [
           {
@@ -825,7 +826,7 @@ describe('DiagramInitEmitter', () => {
         size: { width: 100, height: 50 },
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -850,7 +851,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -877,7 +878,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -890,7 +891,7 @@ describe('DiagramInitEmitter', () => {
       vi.advanceTimersByTime(1000);
 
       // Update node to complete measurements
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
       };
@@ -922,7 +923,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node1);
       context.nodesMap.set('node2', node2);
 
@@ -936,7 +937,7 @@ describe('DiagramInitEmitter', () => {
       vi.advanceTimersByTime(1500);
 
       // Update first node - this should reset the timeout
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
       };
@@ -1003,7 +1004,7 @@ describe('DiagramInitEmitter', () => {
         ],
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', unmeasuredNode);
       context.nodesMap.set('node2', nodeWithUnmeasuredPort);
       context.edgesMap.set('edge1', edgeWithUnmeasuredLabel);
@@ -1030,7 +1031,7 @@ describe('DiagramInitEmitter', () => {
         size: undefined,
       };
 
-      context.modelActionType = 'init';
+      context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
@@ -1038,7 +1039,7 @@ describe('DiagramInitEmitter', () => {
       // Update node before timeout
       vi.advanceTimersByTime(1000);
 
-      context.modelActionType = 'updateNode';
+      context.modelActionTypes = ['updateNode'];
       context.initialUpdate = {
         nodesToUpdate: [{ id: 'node1', size: { width: 100, height: 50 } }],
       };

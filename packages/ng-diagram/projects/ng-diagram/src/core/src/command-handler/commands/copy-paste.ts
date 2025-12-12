@@ -90,13 +90,19 @@ const createPastedNodes = (
   offset: Point,
   nodeIdMap: Map<string, string>
 ): Node[] => {
-  return copiedNodes.map((node) => {
+  copiedNodes.forEach((node) => {
     const newNodeId = config.computeNodeId();
     nodeIdMap.set(node.id, newNodeId);
+  });
+
+  return copiedNodes.map((node) => {
+    const newNodeId = nodeIdMap.get(node.id)!;
+    const newGroupId = node.groupId ? nodeIdMap.get(node.groupId) : undefined;
 
     let newNode: Node = {
       ...node,
       id: newNodeId,
+      groupId: newGroupId,
       position: {
         x: node.position.x + offset.x,
         y: node.position.y + offset.y,
