@@ -36,6 +36,7 @@ export class FlowCoreProviderService {
       getFlowOffset,
       config
     );
+
     this._isInitialized.set(true);
   }
 

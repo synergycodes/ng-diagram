@@ -34,9 +34,39 @@ export class InternalUpdater implements Updater {
    * @param port Port
    */
   addPort(nodeId: string, port: Port): void {
-    this.flowCore.portBatchProcessor.processAdd(nodeId, port, (nodeId, ports) => {
-      this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
-    });
+    if (this.flowCore.config.virtualization.enabled) {
+      // VIRTUALIZATION MODE: skip if port already has measurements (node re-entered viewport)
+      const node = this.flowCore.getNodeById(nodeId);
+      const existingPort = node?.measuredPorts?.find((p) => p.id === port.id);
+      if (existingPort?.size && existingPort?.position) {
+        return; // Port already measured, skip redundant add
+      }
+      // Port not measured yet, proceed with batched add for performance
+      this.flowCore.portBatchProcessor.processAddBatched(nodeId, port, (allAdditions) => {
+        this.flowCore.commandHandler.emit('addPortsBulk', { additions: allAdditions });
+      });
+    } else {
+      // STANDARD MODE: original behavior - per-node batching within same tick
+      this.flowCore.portBatchProcessor.processAdd(nodeId, port, (nodeId, ports) => {
+        this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
+      });
+    }
+  }
+
+  /**
+   * @internal
+   * Internal method to delete a port from the flow
+   * @param nodeId Node id
+   * @param portId Port id
+   */
+  deletePort(nodeId: string, portId: string): void {
+    if (this.flowCore.config.virtualization.enabled) {
+      // VIRTUALIZATION MODE: skip delete - ports persist in model, only DOM unmounts
+      return;
+    } else {
+      // STANDARD MODE: original behavior - single command per port
+      this.flowCore.commandHandler.emit('deletePorts', { nodeId, portIds: [portId] });
+    }
   }
 
   /**
@@ -54,15 +84,33 @@ export class InternalUpdater implements Updater {
 
     const portsToUpdate = this.getPortsToUpdate(node, ports);
 
-    portsToUpdate.forEach(({ id, size, position }) => {
-      this.flowCore.portBatchProcessor.processUpdate(
-        nodeId,
-        { portId: id, portChanges: { size, position } },
-        (nodeId, portUpdates) => {
-          this.flowCore.commandHandler.emit('updatePorts', { nodeId, ports: portUpdates });
-        }
-      );
-    });
+    if (portsToUpdate.length === 0) {
+      return;
+    }
+
+    if (this.flowCore.config.virtualization.enabled) {
+      // VIRTUALIZATION MODE: batched updates for performance
+      portsToUpdate.forEach(({ id, size, position }) => {
+        this.flowCore.portBatchProcessor.processUpdateBatched(
+          nodeId,
+          { portId: id, portChanges: { size, position } },
+          (allUpdates) => {
+            this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
+          }
+        );
+      });
+    } else {
+      // STANDARD MODE: original behavior - per-node batching within same tick
+      portsToUpdate.forEach(({ id, size, position }) => {
+        this.flowCore.portBatchProcessor.processUpdate(
+          nodeId,
+          { portId: id, portChanges: { size, position } },
+          (nodeId, portUpdates) => {
+            this.flowCore.commandHandler.emit('updatePorts', { nodeId, ports: portUpdates });
+          }
+        );
+      });
+    }
   }
 
   /**

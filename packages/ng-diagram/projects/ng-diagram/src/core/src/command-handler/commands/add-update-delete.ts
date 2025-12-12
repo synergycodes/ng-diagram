@@ -144,6 +144,41 @@ export const addPorts = async (commandHandler: CommandHandler, command: AddPorts
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, measuredPorts: newPorts }] }, 'updateNode');
 };
 
+/**
+ * Bulk add ports for multiple nodes in a single middleware execution.
+ * This is optimized for virtualization scenarios where many nodes need port additions simultaneously.
+ */
+export interface AddPortsBulkCommand {
+  name: 'addPortsBulk';
+  additions: Map<string, Port[]>;
+}
+
+export const addPortsBulk = async (commandHandler: CommandHandler, command: AddPortsBulkCommand) => {
+  const { additions } = command;
+  const nodesToUpdate: { id: string; measuredPorts: Port[] }[] = [];
+
+  additions.forEach((ports, nodeId) => {
+    const node = commandHandler.flowCore.getNodeById(nodeId);
+    if (!node) {
+      return;
+    }
+
+    // Same logic as addPorts - update existing ports with matching IDs
+    const newPortIds = new Set(ports.map((port) => port.id));
+    const existingPortsToKeep = (node.measuredPorts ?? []).filter((port) => !newPortIds.has(port.id));
+    const newPorts = [...existingPortsToKeep, ...ports];
+
+    nodesToUpdate.push({ id: nodeId, measuredPorts: newPorts });
+  });
+
+  if (nodesToUpdate.length === 0) {
+    return;
+  }
+
+  // Single middleware execution for all nodes
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'addPortsBulk');
+};
+
 export interface UpdatePortsCommand {
   name: 'updatePorts';
   nodeId: string;
@@ -175,6 +210,47 @@ export const updatePorts = async (commandHandler: CommandHandler, command: Updat
   );
 };
 
+/**
+ * Bulk update ports for multiple nodes in a single middleware execution.
+ * This is optimized for virtualization scenarios where many nodes need port updates simultaneously.
+ */
+export interface UpdatePortsBulkCommand {
+  name: 'updatePortsBulk';
+  updates: Map<string, { portId: string; portChanges: Partial<Port> }[]>;
+}
+
+export const updatePortsBulk = async (commandHandler: CommandHandler, command: UpdatePortsBulkCommand) => {
+  const { updates } = command;
+  const nodesToUpdate: { id: string; measuredPorts: Port[] }[] = [];
+
+  updates.forEach((portUpdates, nodeId) => {
+    const node = commandHandler.flowCore.getNodeById(nodeId);
+    if (!node || !node.measuredPorts) {
+      return;
+    }
+
+    const updatedPorts = node.measuredPorts.map((port) => {
+      const portChanges = portUpdates.find(({ portId }) => portId === port.id)?.portChanges;
+      if (!portChanges) {
+        return port;
+      }
+      return {
+        ...port,
+        ...portChanges,
+      };
+    });
+
+    nodesToUpdate.push({ id: nodeId, measuredPorts: updatedPorts });
+  });
+
+  if (nodesToUpdate.length === 0) {
+    return;
+  }
+
+  // Single middleware execution for all nodes
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'updatePortsBulk');
+};
+
 export interface DeletePortsCommand {
   name: 'deletePorts';
   nodeId: string;
@@ -192,6 +268,39 @@ export const deletePorts = async (commandHandler: CommandHandler, command: Delet
     { nodesToUpdate: [{ id: nodeId, measuredPorts: leftPorts }] },
     'updateNode'
   );
+};
+
+/**
+ * Bulk delete ports for multiple nodes in a single middleware execution.
+ * This is optimized for virtualization scenarios where many nodes are destroyed simultaneously.
+ */
+export interface DeletePortsBulkCommand {
+  name: 'deletePortsBulk';
+  deletions: Map<string, string[]>;
+}
+
+export const deletePortsBulk = async (commandHandler: CommandHandler, command: DeletePortsBulkCommand) => {
+  const { deletions } = command;
+  const nodesToUpdate: { id: string; measuredPorts: Port[] }[] = [];
+
+  deletions.forEach((portIds, nodeId) => {
+    const node = commandHandler.flowCore.getNodeById(nodeId);
+    if (!node) {
+      return;
+    }
+
+    const portIdsSet = new Set(portIds);
+    const remainingPorts = (node.measuredPorts ?? []).filter((port) => !portIdsSet.has(port.id));
+
+    nodesToUpdate.push({ id: nodeId, measuredPorts: remainingPorts });
+  });
+
+  if (nodesToUpdate.length === 0) {
+    return;
+  }
+
+  // Single middleware execution for all nodes
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'deletePortsBulk');
 };
 
 export interface AddEdgeLabelsCommand {

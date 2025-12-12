@@ -43,9 +43,6 @@ export class FlowResizeBatchProcessorService {
    * Main batch processor - handles all resize events in one go
    */
   private processAllResizes(entries: ResizeObserverEntry[]): void {
-    console.log(`[PERF] processAllResizes called with ${entries.length} entries`);
-    console.time(`[PERF] processAllResizes TOTAL`);
-
     // Ensure service is initialized
     if (!this.isInitialized) {
       console.warn('FlowResizeBatchProcessorService not initialized yet, skipping resize processing');
@@ -77,31 +74,19 @@ export class FlowResizeBatchProcessorService {
       }
     }
 
-    console.log(
-      `[PERF] Categorized: ${nodeEntries.length} nodes, ${portEntries.length} ports, ${edgeLabelEntries.length} labels`
-    );
-
     // Process all ports together
     if (portEntries.length > 0) {
-      console.time(`[PERF] processPortBatch`);
       this.processPortBatch(portEntries);
-      console.timeEnd(`[PERF] processPortBatch`);
     }
 
     // Process all edge labels together
     if (edgeLabelEntries.length > 0) {
-      console.time(`[PERF] processEdgeLabelBatch`);
       this.processEdgeLabelBatch(edgeLabelEntries);
-      console.timeEnd(`[PERF] processEdgeLabelBatch`);
     }
 
     if (nodeEntries.length > 0) {
-      console.time(`[PERF] processNodeBatch`);
       this.processNodeBatch(nodeEntries);
-      console.timeEnd(`[PERF] processNodeBatch`);
     }
-
-    console.timeEnd(`[PERF] processAllResizes TOTAL`);
   }
 
   /**
@@ -164,8 +149,9 @@ export class FlowResizeBatchProcessorService {
    */
   private processNodeBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-    let appliedCount = 0;
-    let skippedCount = 0;
+
+    // Collect nodes that need initial size (no size property yet)
+    const nodesNeedingInitialSize: { id: string; size: Size }[] = [];
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'node') continue;
@@ -173,13 +159,21 @@ export class FlowResizeBatchProcessorService {
       const size = this.getBorderBoxSize(entry);
       if (!size) continue;
 
-      const currentSize = flowCore.getNodeById(metadata.nodeId)?.size;
-      if (currentSize && !this.isSizeChanged(currentSize, size)) {
-        skippedCount++;
+      const node = flowCore.getNodeById(metadata.nodeId);
+      if (!node) continue;
+
+      const currentSize = node.size;
+
+      // Nodes without initial size - collect for batch update
+      if (!currentSize) {
+        nodesNeedingInitialSize.push({ id: metadata.nodeId, size });
         continue;
       }
 
-      appliedCount++;
+      if (!this.isSizeChanged(currentSize, size)) {
+        continue;
+      }
+
       flowCore.updater.applyNodeSize(metadata.nodeId, size);
 
       // Skip port measurement during active resize performed by user to avoid redundant updates
@@ -190,7 +184,20 @@ export class FlowResizeBatchProcessorService {
       }
     }
 
-    console.log(`[PERF] processNodeBatch: ${appliedCount} applied, ${skippedCount} skipped (size unchanged)`);
+    // Batch update nodes without initial size
+    if (nodesNeedingInitialSize.length > 0) {
+      if (flowCore.isInitialized) {
+        // After init: batch update directly for performance
+        flowCore.commandHandler.emit('updateNodes', {
+          nodes: nodesNeedingInitialSize,
+        });
+      } else {
+        // During init: use updater so InitUpdater can track measurements
+        for (const { id, size } of nodesNeedingInitialSize) {
+          flowCore.updater.applyNodeSize(id, size);
+        }
+      }
+    }
   }
 
   /**

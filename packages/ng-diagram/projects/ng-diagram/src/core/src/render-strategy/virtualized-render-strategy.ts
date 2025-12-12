@@ -67,6 +67,33 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     this.lastEdgesLength = 0;
   }
 
+  /**
+   * Process with expanded buffer padding - used during pan idle to preload more nodes.
+   * Uses expandedPadding from config instead of normal padding.
+   */
+  processWithExpandedBuffer(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult {
+    const config = this.flowCore.config.virtualization;
+
+    if (this.shouldBypass(nodes, viewport, config)) {
+      return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
+    }
+
+    // Use expanded padding for buffer fill
+    const viewportRect = this.getViewportRect(viewport!, config.expandedPadding);
+
+    // Force fresh computation with expanded buffer
+    const result = this.computeVisibleElements(viewportRect);
+
+    // Update cache with expanded buffer results
+    this.cachedNodeIds = result.nodeIds;
+    this.cachedEdgeIds = result.edgeIds;
+    this.lastViewportRect = viewportRect;
+    this.lastNodesLength = nodes.length;
+    this.lastEdgesLength = edges.length;
+
+    return result;
+  }
+
   private shouldBypass(nodes: Node[], viewport: Viewport | undefined, config: VirtualizationConfig): boolean {
     // Note: config.enabled check is handled by strategy selection in FlowCore
     return !viewport || nodes.length < config.nodeCountThreshold;

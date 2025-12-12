@@ -9,7 +9,7 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
-import { DirectRenderStrategy, RenderStrategy, VirtualizedRenderStrategy } from './render-strategy';
+import { BufferFillManager, DirectRenderStrategy, RenderStrategy, VirtualizedRenderStrategy } from './render-strategy';
 import { ShortcutManager } from './shortcut-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import {
@@ -66,6 +66,7 @@ export class FlowCore {
 
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
+  private bufferFillManager: BufferFillManager | null = null;
 
   readonly getFlowOffset: () => Point;
 
@@ -102,12 +103,18 @@ export class FlowCore {
 
     this.shortcutManager = new ShortcutManager(this);
 
+    // Initialize buffer fill manager if virtualization and buffer fill are enabled
+    if (this.config.virtualization.enabled && this.config.virtualization.bufferFill.enabled) {
+      this.bufferFillManager = new BufferFillManager(this, this.config.virtualization.bufferFill.idleThreshold);
+    }
+
     this.inputEventsRouter.registerDefaultCallbacks(this);
 
     this.init();
   }
 
   destroy() {
+    this.bufferFillManager?.destroy();
     this.eventManager.offAll();
     this.model.destroy();
   }
@@ -121,8 +128,10 @@ export class FlowCore {
     // this.render();
 
     this.model.onChange((state) => {
+      const nodesChanged = state.nodes !== this.lastNodesRef;
+
       // Only update spatial hash when nodes actually changed (skip during panning/zooming)
-      if (state.nodes !== this.lastNodesRef) {
+      if (nodesChanged) {
         this.spatialHash.process(state.nodes);
         this.modelLookup.desynchronize();
         this.lastNodesRef = state.nodes;
@@ -305,28 +314,15 @@ export class FlowCore {
     await this.updateSemaphore.acquire();
 
     try {
-      // ===== PERF LOGGING - only for resize-related actions =====
-      const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
-      const shouldLog = logActions.includes(modelActionTypes as string);
-
-      if (shouldLog) console.time(`[PERF] applyUpdate TOTAL (${modelActionTypes})`);
-
       const currentState = this.getState();
-
-      if (shouldLog) console.time(`[PERF] middleware.execute (${modelActionTypes})`);
       const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
-      if (shouldLog) console.timeEnd(`[PERF] middleware.execute (${modelActionTypes})`);
 
       if (finalState) {
-        if (shouldLog) console.time(`[PERF] setState`);
         this.setState(finalState);
-        if (shouldLog) console.timeEnd(`[PERF] setState`);
         this.eventManager.flushDeferredEmits();
       } else {
         this.eventManager.clearDeferredEmits();
       }
-
-      if (shouldLog) console.timeEnd(`[PERF] applyUpdate TOTAL (${modelActionTypes})`);
     } finally {
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();
@@ -374,8 +370,6 @@ export class FlowCore {
     };
   }
 
-  private lastRenderedNodeCount = 0;
-
   /**
    * Renders the flow
    */
@@ -386,14 +380,32 @@ export class FlowCore {
     // Apply render strategy (virtualization or direct)
     const { nodes: visibleNodes, edges: visibleEdges } = this.renderStrategy.process(nodes, edges, metadata.viewport);
 
-    // Log when node count changes (new nodes rendered)
-    const diff = visibleNodes.length - this.lastRenderedNodeCount;
-    if (diff > 0) {
-      console.log(`[PERF] render: ${diff} NEW nodes (${this.lastRenderedNodeCount} -> ${visibleNodes.length})`);
+    const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
+
+    this.renderer.draw(visibleNodes, finalEdges, metadata.viewport);
+  }
+
+  /**
+   * Renders with expanded buffer padding - called during pan idle to preload more nodes.
+   * Only effective when virtualization is enabled.
+   */
+  renderWithExpandedBuffer(): void {
+    if (!this.config.virtualization.enabled) {
+      return;
     }
-    this.lastRenderedNodeCount = visibleNodes.length;
+
+    const { nodes, edges, metadata } = this.getState();
+    const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
+
+    // Use expanded buffer for preloading
+    const { nodes: visibleNodes, edges: visibleEdges } = this.virtualizedRenderStrategy.processWithExpandedBuffer(
+      nodes,
+      edges,
+      metadata.viewport
+    );
 
     const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
+
     this.renderer.draw(visibleNodes, finalEdges, metadata.viewport);
   }
 
@@ -545,6 +557,13 @@ export class FlowCore {
 
   get updater(): Updater {
     return this.initUpdater.isInitialized ? this.internalUpdater : this.initUpdater;
+  }
+
+  /**
+   * Returns true if the diagram has completed its initialization phase.
+   */
+  get isInitialized(): boolean {
+    return this.initUpdater.isInitialized;
   }
 
   setDebugMode(debugMode: boolean): void {

@@ -23,6 +23,11 @@ describe('VirtualizedRenderStrategy', () => {
     enabled: true,
     padding: 100,
     nodeCountThreshold: 2,
+    expandedPadding: 1500,
+    bufferFill: {
+      enabled: true,
+      idleThreshold: 100,
+    },
   };
 
   beforeEach(() => {

@@ -17,6 +17,22 @@ export interface InternalDiagramEventMap extends DiagramEventMap {
    * @internal - For internal use only. Use the `actionState` signal on NgDiagramService instead.
    */
   actionStateChanged: ActionStateChangedEvent;
+
+  /**
+   * Event emitted when panning starts (mouse down on canvas for pan).
+   * Used internally by BufferFillManager to cancel pending buffer fills.
+   *
+   * @internal
+   */
+  panStarted: PanStartedEvent;
+
+  /**
+   * Event emitted when panning ends (mouse up after pan).
+   * Used internally by BufferFillManager to schedule buffer fill.
+   *
+   * @internal
+   */
+  panEnded: PanEndedEvent;
 }
 
 /**
@@ -30,4 +46,22 @@ export interface InternalDiagramEventMap extends DiagramEventMap {
 export interface ActionStateChangedEvent {
   /** The current action state */
   actionState: Readonly<ActionState>;
+}
+
+/**
+ * Event payload emitted when panning starts.
+ * @internal
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PanStartedEvent {
+  // Empty payload - just signals pan started
+}
+
+/**
+ * Event payload emitted when panning ends.
+ * @internal
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PanEndedEvent {
+  // Empty payload - just signals pan ended
 }

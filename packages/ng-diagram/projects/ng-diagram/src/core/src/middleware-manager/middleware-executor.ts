@@ -45,32 +45,44 @@ export class MiddlewareExecutor {
     stateUpdate: FlowStateUpdate,
     modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
-    const logActions = ['resizeNode', 'updatePorts', 'updateEdgeLabels', 'addPorts', 'addEdgeLabels'];
-    const shouldLog = modelActionTypes.some((type) => logActions.includes(type));
-
-    if (shouldLog) console.time(`[PERF] executor.run setup (${modelActionTypes})`);
-
     this.initialState = initialState;
     this.modelActionTypes = modelActionTypes;
     this.metadata = initialState.metadata;
 
-    if (shouldLog) console.time(`[PERF] map copies`);
-    this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
-    this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
-    this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
-    this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
-    if (shouldLog) console.timeEnd(`[PERF] map copies`);
+    // Optimization: Skip map copies for metadata-only updates (viewport changes)
+    // Middlewares for viewport changes early-exit without modifying nodes/edges
+    const isMetadataOnly = this.isMetadataOnlyUpdate(stateUpdate);
+
+    if (isMetadataOnly) {
+      // Use direct references (read-only) - no copy needed
+      this.nodesMap = this.flowCore.modelLookup.nodesMap;
+      this.edgesMap = this.flowCore.modelLookup.edgesMap;
+      this.initialNodesMap = this.nodesMap;
+      this.initialEdgesMap = this.edgesMap;
+    } else {
+      // Full copy for node/edge changes
+      this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
+      this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+      this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
+      this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+    }
 
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
 
-    if (shouldLog) console.timeEnd(`[PERF] executor.run setup (${modelActionTypes})`);
+    return await this.resolveMiddlewares();
+  }
 
-    if (shouldLog) console.time(`[PERF] resolveMiddlewares (${modelActionTypes})`);
-    const result = await this.resolveMiddlewares();
-    if (shouldLog) console.timeEnd(`[PERF] resolveMiddlewares (${modelActionTypes})`);
-
-    return result;
+  private isMetadataOnlyUpdate(stateUpdate: FlowStateUpdate): boolean {
+    return (
+      !stateUpdate.nodesToAdd?.length &&
+      !stateUpdate.nodesToUpdate?.length &&
+      !stateUpdate.nodesToRemove?.length &&
+      !stateUpdate.edgesToAdd?.length &&
+      !stateUpdate.edgesToUpdate?.length &&
+      !stateUpdate.edgesToRemove?.length &&
+      !!stateUpdate.metadataUpdate
+    );
   }
 
   helpers = () => ({
@@ -106,11 +118,20 @@ export class MiddlewareExecutor {
         .filter((edge): edge is Edge => edge !== undefined),
   });
 
-  private getState = (): FlowState => ({
-    nodes: Array.from(this.nodesMap.values()),
-    edges: Array.from(this.edgesMap.values()),
-    metadata: this.metadata,
-  });
+  private getState = (): FlowState => {
+    // Only create new arrays if nodes/edges were actually modified
+    // This preserves reference equality for viewport-only changes (panning, zooming)
+    const nodesChanged =
+      this.addedNodesIds.size > 0 || this.removedNodesIds.size > 0 || this.updatedNodeIdsToProps.size > 0;
+    const edgesChanged =
+      this.addedEdgesIds.size > 0 || this.removedEdgesIds.size > 0 || this.updatedEdgeIdsToProps.size > 0;
+
+    return {
+      nodes: nodesChanged ? Array.from(this.nodesMap.values()) : this.initialState.nodes,
+      edges: edgesChanged ? Array.from(this.edgesMap.values()) : this.initialState.edges,
+      metadata: this.metadata,
+    };
+  };
 
   private getContext = (): MiddlewareContext => ({
     state: this.getState(),

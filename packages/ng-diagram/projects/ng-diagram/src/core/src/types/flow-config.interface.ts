@@ -420,6 +420,26 @@ export interface BoxSelectionConfig {
 }
 
 /**
+ * Configuration for buffer fill behavior during pan idle.
+ *
+ * @category Types/Configuration/Features
+ */
+export interface BufferFillConfig {
+  /**
+   * Whether buffer fill is enabled.
+   * When enabled, the diagram will fill an expanded buffer during pan idle time.
+   * @default true
+   */
+  enabled: boolean;
+
+  /**
+   * Time in milliseconds to wait after panning stops before filling the buffer.
+   * @default 100
+   */
+  idleThreshold: number;
+}
+
+/**
  * Configuration for viewport virtualization behavior.
  * When enabled, only nodes and edges visible in the viewport (plus padding) are rendered,
  * significantly improving performance for large diagrams.
@@ -437,9 +457,16 @@ export interface VirtualizationConfig {
   /**
    * Padding in flow coordinates around the viewport.
    * Nodes within this padding area are pre-rendered for smoother scrolling.
-   * @default 200
+   * @default 300
    */
   padding: number;
+
+  /**
+   * Expanded padding used when filling buffer during pan idle.
+   * This larger padding is applied after panning stops to preload more nodes.
+   * @default 1500
+   */
+  expandedPadding: number;
 
   /**
    * Maximum number of nodes below which virtualization is skipped.
@@ -447,6 +474,11 @@ export interface VirtualizationConfig {
    * @default 500
    */
   nodeCountThreshold: number;
+
+  /**
+   * Configuration for buffer fill during pan idle.
+   */
+  bufferFill: BufferFillConfig;
 }
 
 /**

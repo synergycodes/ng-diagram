@@ -7,6 +7,7 @@ import { Updater } from '../updater.interface';
  */
 export type LateArrival =
   | { method: 'addPort'; args: [nodeId: string, port: Port] }
+  | { method: 'deletePort'; args: [nodeId: string, portId: string] }
   | { method: 'addEdgeLabel'; args: [edgeId: string, label: EdgeLabel] }
   | { method: 'applyNodeSize'; args: [nodeId: string, size: NonNullable<Node['size']>] }
   | {
@@ -79,6 +80,9 @@ export class LateArrivalQueue {
       switch (lateArrival.method) {
         case 'addPort':
           updater.addPort(...lateArrival.args);
+          break;
+        case 'deletePort':
+          updater.deletePort(...lateArrival.args);
           break;
         case 'addEdgeLabel':
           updater.addEdgeLabel(...lateArrival.args);

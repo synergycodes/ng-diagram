@@ -16,10 +16,8 @@ import {
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
-  SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
-  ViewportChangedEvent,
   type Edge,
   type EdgeLabel,
   type Node,
@@ -114,19 +112,6 @@ export class AppComponent {
     });
   }
 
-  onSelectionMoved(event: SelectionMovedEvent): void {
-    console.log('Selection Moved:', {
-      nodes: event.nodes.map((n: Node) => n.id),
-    });
-  }
-
-  onViewportChanged(event: ViewportChangedEvent): void {
-    console.log('Viewport Changed:', {
-      current: event.viewport,
-      previous: event.previousViewport,
-    });
-  }
-
   onEdgeDrawn(event: EdgeDrawnEvent): void {
     console.log('Edge Drawn:', {
       edge: event.edge.id,
@@ -194,7 +179,7 @@ export class AppComponent {
   }
 
   // Generate 20k nodes in a grid pattern for virtualization testing
-  model = initializeModel(this.generateLargeModel(5000));
+  model = initializeModel(this.generateLargeModel(20000));
 
   private generateLargeModel(nodeCount: number): { nodes: Node[]; edges: Edge[] } {
     const nodes: Node[] = [];
