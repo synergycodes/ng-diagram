@@ -80,3 +80,14 @@ ng-diagram-canvas {
     background-color: var(--ngd-node-stroke-primary-default);
   }
 }
+
+/* Restore list styles removed by Tailwind preflight */
+.sl-markdown-content ul:not([role='tablist']) {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+.sl-markdown-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+}
