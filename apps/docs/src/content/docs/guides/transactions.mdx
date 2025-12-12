@@ -46,7 +46,7 @@ Transactions accept an optional second parameter for additional configuration.
 
 When adding nodes or edges, the diagram needs to measure their dimensions before they're fully rendered. By default, the transaction resolves immediately after the state update, before measurements complete.
 
-Use `waitForMeasurements: true` when you need to perform operations that depend on measured values, such as zooming to fit new nodes:
+Use [`waitForMeasurements: true`](/docs/api/types/middleware/transactionoptions/#waitformeasurements) when you need to perform operations that depend on measured values, such as zooming to fit new nodes:
 
 ```typescript
 // Add nodes and wait for their dimensions to be measured
@@ -62,8 +62,9 @@ this.ngDiagramViewportService.zoomToFit();
 ```
 
 <Aside type="caution">
-  Without `waitForMeasurements`, operations like `zoomToFit()` might not account for newly added elements because their
-  dimensions haven't been measured yet.
+  Without [`waitForMeasurements`](/docs/api/types/middleware/transactionoptions/#waitformeasurements), operations like
+  [`zoomToFit()`](/docs/api/services/ngdiagramviewportservice/#zoomtofit) might not account for newly added elements
+  because their dimensions haven't been measured yet.
 </Aside>
 
 This works with both sync and async transactions:
