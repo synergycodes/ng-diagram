@@ -1006,7 +1006,10 @@ export class NgDiagramService extends NgDiagramBaseService {
     setDefaultRouting(name: string): void;
     setEventsEnabled(enabled: boolean): void;
     startLinking(node: Node_2, portId?: string): void;
+    transaction(callback: () => Promise<void>): Promise<TransactionResult>;
+    transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
     transaction(callback: () => void): void;
+    transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
     unregisterMiddleware(name: string): void;
     unregisterRouting(name: string): void;
     updateConfig(config: Partial<NgDiagramConfig>): void;
@@ -1317,6 +1320,11 @@ export interface SnappingConfig {
     defaultResizeSnap: Size;
     shouldSnapDragForNode: (node: Node_2) => boolean;
     shouldSnapResizeForNode: (node: Node_2) => boolean;
+}
+
+// @public
+export interface TransactionOptions {
+    waitForMeasurements?: boolean;
 }
 
 // @public

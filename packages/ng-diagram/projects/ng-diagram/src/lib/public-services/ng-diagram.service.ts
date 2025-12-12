@@ -8,6 +8,8 @@ import {
   Middleware,
   Node,
   TransactionCallback,
+  TransactionOptions,
+  TransactionResult,
   UnsubscribeFn,
 } from '../../core/src';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
@@ -313,20 +315,87 @@ export class NgDiagramService extends NgDiagramBaseService {
   // ==============================
 
   /**
+   * @since 0.9.0
+   *
+   * Executes an async function within a transaction context.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The async function to execute within the transaction.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Async transaction with data fetching
+   * await this.ngDiagramService.transaction(async () => {
+   *   const nodes = await fetchNodesFromServer();
+   *   this.ngDiagramModelService.addNodes(node);
+   * });
+   */
+  transaction(callback: () => Promise<void>): Promise<TransactionResult>;
+  /**
+   * @since 0.9.0
+   *
+   * Executes an async function within a transaction context with options.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The async function to execute within the transaction.
+   * @param options Transaction options.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Async transaction that waits for measurements
+   * await this.ngDiagramService.transaction(async () => {
+   *   const nodes = await fetchNodesFromServer();
+   *   this.ngDiagramModelService.addNodes(nodes);
+   * }, { waitForMeasurements: true });
+   */
+  transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
+  /**
    * Executes a function within a transaction context.
    * All state updates within the callback are batched and applied atomically.
    *
-   * @example
+   * @param callback The function to execute within the transaction.
    *
+   * @example
    * this.ngDiagramService.transaction(() => {
-   *  this.ngDiagramModelService.addNodes([node1, node2]);
-   *  this.ngDiagramModelService.addEdges([edge1]);
+   *   this.ngDiagramModelService.addNodes([node1, node2]);
+   *   this.ngDiagramModelService.addEdges([edge1]);
    * });
-   **/
-  transaction(callback: () => void): void {
-    const transactionCallback: TransactionCallback = () => {
-      return callback();
+   */
+  transaction(callback: () => void): void;
+  /**
+   * @since 0.9.0
+   *
+   * Executes a function within a transaction context with options.
+   * All state updates within the callback are batched and applied atomically.
+   *
+   * @param callback The function to execute within the transaction.
+   * @param options Transaction options.
+   * @returns A promise that resolves with the transaction result.
+   *
+   * @example
+   * // Transaction that waits for measurements to complete
+   * await this.ngDiagramService.transaction(() => {
+   *   this.ngDiagramModelService.addNodes([node1, node2]);
+   * }, { waitForMeasurements: true });
+   */
+  transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
+  transaction(
+    callback: (() => void) | (() => Promise<void>),
+    options?: TransactionOptions
+  ): void | Promise<TransactionResult> {
+    let isAsync = false;
+    const wrappedCallback: TransactionCallback = () => {
+      const result = callback();
+      if (result instanceof Promise) {
+        isAsync = true;
+      }
+      return result;
     };
-    this.flowCore.transaction(transactionCallback);
+
+    const promise = this.flowCore.transaction(wrappedCallback, options ?? {});
+
+    if (options || isAsync) {
+      return promise;
+    }
   }
 }

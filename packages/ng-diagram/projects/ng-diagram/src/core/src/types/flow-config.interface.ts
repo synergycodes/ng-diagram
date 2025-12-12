@@ -153,7 +153,7 @@ export interface ZoomToFitConfig {
 export interface ZoomConfig {
   /**
    * The minimum allowed zoom level.
-   * @default 0.1
+   * @default 0.01
    */
   min: number;
   /**
@@ -511,12 +511,16 @@ export interface FlowConfig {
   debugMode: boolean;
 
   /**
+   * @since 0.9.0
+   *
    * Hides the ngDiagram watermark when set to true.
    * @default undefined
    */
   hideWatermark?: boolean;
 
   /**
+   * @since 0.9.0
+   *
    * Enables or disables panning on the diagram.
    * When set to false, user is not able to move the viewport by panning.
    * @default true

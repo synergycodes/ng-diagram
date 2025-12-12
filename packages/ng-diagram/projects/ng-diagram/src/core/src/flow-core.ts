@@ -5,6 +5,7 @@ import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
+import { MeasurementTracker } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -37,7 +38,12 @@ import type {
   Port,
   Renderer,
 } from './types';
-import { TransactionCallback, TransactionResult } from './types/transaction.interface';
+import {
+  InternalTransactionOptions,
+  TransactionCallback,
+  TransactionOptions,
+  TransactionResult,
+} from './types/transaction.interface';
 import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
@@ -62,6 +68,7 @@ export class FlowCore {
   readonly edgeRoutingManager: EdgeRoutingManager;
   readonly eventManager: EventManager;
   readonly shortcutManager: ShortcutManager;
+  readonly measurementTracker: MeasurementTracker;
 
   readonly getFlowOffset: () => Point;
 
@@ -88,6 +95,7 @@ export class FlowCore {
     this.actionStateManager = new ActionStateManager(this.eventManager);
     this.portBatchProcessor = new PortBatchProcessor();
     this.labelBatchProcessor = new LabelBatchProcessor();
+    this.measurementTracker = new MeasurementTracker();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
@@ -223,26 +231,60 @@ export class FlowCore {
    *     tx.rollbackTo('afterStep1');
    *   }
    * });
+   *
+   * // Wait for measurements to complete before continuing
+   * await flowCore.transaction(async (tx) => {
+   *   await tx.emit('addNodes', { nodes: [newNode] });
+   * }, { waitForMeasurements: true });
+   * // Now safe to call zoomToFit() - node dimensions are measured
+   * await viewportService.zoomToFit();
    */
   async transaction(callback: TransactionCallback): Promise<TransactionResult>;
-  async transaction(name: ModelActionType, callback: TransactionCallback): Promise<TransactionResult>;
+  async transaction(callback: TransactionCallback, options: TransactionOptions): Promise<TransactionResult>;
   async transaction(
-    nameOrCallback: ModelActionType | TransactionCallback,
-    callback?: TransactionCallback
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback
+  ): Promise<TransactionResult>;
+  async transaction(
+    name: LooseAutocomplete<ModelActionType>,
+    callback: TransactionCallback,
+    options: TransactionOptions
+  ): Promise<TransactionResult>;
+  async transaction(
+    nameOrCallback: LooseAutocomplete<ModelActionType> | TransactionCallback,
+    callbackOrOptions?: TransactionCallback | TransactionOptions,
+    options?: TransactionOptions
   ): Promise<TransactionResult> {
     let results: TransactionResult;
+    let transactionOptions: TransactionOptions | undefined;
 
     if (typeof nameOrCallback === 'function') {
-      results = await this.transactionManager.transaction(nameOrCallback);
+      transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+      results = await this.transactionManager.transaction(nameOrCallback, transactionOptions ?? {});
     } else {
+      const callback = callbackOrOptions as TransactionCallback | undefined;
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
       }
-      results = await this.transactionManager.transaction(nameOrCallback, callback);
+      transactionOptions = options;
+      results = await this.transactionManager.transaction(nameOrCallback, callback, transactionOptions ?? {});
     }
 
     if (results.commandsCount > 0) {
+      if (transactionOptions?.waitForMeasurements) {
+        const internalOptions = transactionOptions as InternalTransactionOptions;
+        this.measurementTracker.trackStateUpdate(
+          results.results,
+          internalOptions._measurementDebounceTimeout,
+          internalOptions._measurementInitialTimeout
+        );
+      }
+
       await this.applyUpdate(results.results, results.actionTypes);
+    }
+
+    if (transactionOptions?.waitForMeasurements) {
+      await this.measurementTracker.waitForMeasurements();
     }
 
     return results;

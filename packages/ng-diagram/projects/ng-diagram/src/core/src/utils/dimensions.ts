@@ -27,7 +27,12 @@ export const getEdgeMeasuredBounds = (edge: Edge): Rect => {
 
   const labelRects = labels
     .filter((label) => label.position && label.size)
-    .map((label) => getRect({ position: label.position, size: label.size }));
+    .map((label) => ({
+      x: label.position!.x - label.size!.width / 2,
+      y: label.position!.y - label.size!.height / 2,
+      width: label.size!.width,
+      height: label.size!.height,
+    }));
 
   return unionRect([pointsBounds, ...labelRects]);
 };

@@ -1,11 +1,17 @@
 import { FlowCore } from '../flow-core';
 import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActionTypes } from '../types';
 import { MiddlewareExecutor } from './middleware-executor';
-import { createEventEmitterMiddleware, loggerMiddleware, measuredBoundsMiddleware } from './middlewares';
+import {
+  createEventEmitterMiddleware,
+  createMeasurementTrackingMiddleware,
+  loggerMiddleware,
+  measuredBoundsMiddleware,
+} from './middlewares';
 
 export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
   private eventEmitterMiddleware: Middleware | null = null;
+  private measurementTrackingMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -63,13 +69,21 @@ export class MiddlewareManager {
       this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
     }
 
-    // measuredBoundsMiddleware runs after all user middlewares to ensure bounds are computed
-    // after all position/size changes. loggerMiddleware runs after measuredBounds to log final state.
-    // eventEmitterMiddleware runs last to emit events with final state.
+    if (!this.measurementTrackingMiddleware && this.flowCore.measurementTracker) {
+      this.measurementTrackingMiddleware = createMeasurementTrackingMiddleware(this.flowCore.measurementTracker);
+    }
+
+    // Middleware execution order:
+    // 1. User and default middlewares - custom processing
+    // 2. measuredBoundsMiddleware - compute node bounds after all position/size changes
+    // 3. loggerMiddleware - log final state for debugging
+    // 4. measurementTrackingMiddleware - signal measurement activity
+    // 5. eventEmitterMiddleware - emit events with final state
     const finalChain = [
       ...this.middlewareChain,
       measuredBoundsMiddleware,
       loggerMiddleware,
+      ...(this.measurementTrackingMiddleware ? [this.measurementTrackingMiddleware] : []),
       ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),
     ];
 
