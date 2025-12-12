@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed incorrectly computed measuredBounds for nodes ([#486]https://github.com/synergycodes/ng-diagram/pull/486)
 - Fixed missing edge arrowheads in Safari. Safari doesn't support `context-stroke` in SVG markers, so a fallback using inline markers with `currentColor` substitution is now used for Safari compatibility ([#487](https://github.com/synergycodes/ng-diagram/pull/487))
 - Fixed copy-paste retaining `groupId` when pasting nodes outside their group. Now `groupId` is only preserved when the group is also copied, with the reference updated to the new group's ID ([#491](https://github.com/synergycodes/ng-diagram/pull/491))
+- Fixed bullet points styles in the documentation
 
 ### Deprecated
 
