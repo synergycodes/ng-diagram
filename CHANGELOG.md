@@ -27,9 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed misleading error when destroying `NgDiagramModelService` after engine is already destroyed. The error incorrectly reported "Library engine not initialized yet". Now the service checks if engine is available and skips listener cleanup if already destroyed. ([#466](https://github.com/synergycodes/ng-diagram/issues/466) - thanks for finding this [@Filipstrozik](https://github.com/Filipstrozik) 💪)
 - Fixed drag-snapping issues with different snapping configurations. The issue still occurred when dragging multiple nodes at the same hierarchy level (i.e., nodes without groups) ([#470](https://github.com/synergycodes/ng-diagram/pull/470))
-- Fixed incorrectly computed measuredBounds for nodes ([#486]https://github.com/synergycodes/ng-diagram/pull/486)
+- Fixed incorrectly computed measuredBounds for nodes ([#486](https://github.com/synergycodes/ng-diagram/pull/486))
 - Fixed missing edge arrowheads in Safari. Safari doesn't support `context-stroke` in SVG markers, so a fallback using inline markers with `currentColor` substitution is now used for Safari compatibility ([#487](https://github.com/synergycodes/ng-diagram/pull/487))
 - Fixed copy-paste retaining `groupId` when pasting nodes outside their group. Now `groupId` is only preserved when the group is also copied, with the reference updated to the new group's ID ([#491](https://github.com/synergycodes/ng-diagram/pull/491))
+- Fixed bullet points styles in the documentation([#494](https://github.com/synergycodes/ng-diagram/pull/494))
 
 ### Deprecated
 
