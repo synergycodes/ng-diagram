@@ -129,9 +129,9 @@ describe('dimensions', () => {
 
       expect(result).toEqual({
         x: 10,
-        y: -20,
+        y: -30,
         width: 90,
-        height: 30,
+        height: 40,
       });
     });
 
@@ -164,10 +164,10 @@ describe('dimensions', () => {
       const result = getEdgeMeasuredBounds(edge);
 
       expect(result).toEqual({
-        x: 20,
-        y: 30,
-        width: 120,
-        height: 60,
+        x: -10,
+        y: 10,
+        width: 125,
+        height: 65,
       });
     });
 

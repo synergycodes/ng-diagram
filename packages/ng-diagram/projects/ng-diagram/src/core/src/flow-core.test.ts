@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
@@ -11,6 +12,7 @@ import type { Middleware } from './types/middleware.interface';
 import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
+import type { TransactionOptions } from './types/transaction.interface';
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
@@ -414,6 +416,144 @@ describe('FlowCore', () => {
       const node = flowCore.getNodeById('non-existent');
       expect(node).toBeNull();
       expect(mockModelLookup.getNodeById).toHaveBeenCalledWith('non-existent');
+    });
+  });
+
+  describe('transaction', () => {
+    it('should execute transaction with callback only', async () => {
+      const result = await flowCore.transaction(async () => {});
+
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: expect.any(Number),
+        actionTypes: expect.any(Array),
+      });
+    });
+
+    it('should execute transaction with name and callback', async () => {
+      const result = await flowCore.transaction('testAction', async () => {});
+
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: expect.any(Number),
+        actionTypes: expect.any(Array),
+      });
+    });
+
+    it('should throw error when callback is not provided with name', async () => {
+      await expect(flowCore.transaction('testAction', undefined as never)).rejects.toThrow();
+    });
+
+    it('should accept options with callback', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      const result = await flowCore.transaction(async () => {}, options);
+
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: expect.any(Number),
+        actionTypes: expect.any(Array),
+      });
+    });
+
+    it('should accept options with name and callback', async () => {
+      const options: TransactionOptions = { waitForMeasurements: true };
+
+      const result = await flowCore.transaction('testAction', async () => {}, options);
+
+      expect(result).toEqual({
+        results: expect.any(Object),
+        commandsCount: expect.any(Number),
+        actionTypes: expect.any(Array),
+      });
+    });
+
+    it('should track state update when waitForMeasurements is true and has commands', async () => {
+      const trackSpy = vi.spyOn(flowCore.measurementTracker, 'trackStateUpdate');
+      const waitSpy = vi.spyOn(flowCore.measurementTracker, 'waitForMeasurements').mockResolvedValue();
+
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: { nodesToAdd: [mockNode] },
+        commandsCount: 1,
+        actionTypes: ['addNodes'],
+      });
+
+      mockMiddlewareManager.execute.mockResolvedValue({
+        nodes: [mockNode],
+        edges: [],
+        metadata: mockMetadata,
+      });
+
+      await flowCore.transaction(async () => {}, { waitForMeasurements: true });
+
+      expect(trackSpy).toHaveBeenCalledWith({ nodesToAdd: [mockNode] }, undefined, undefined);
+      expect(waitSpy).toHaveBeenCalled();
+    });
+
+    it('should not track state update when waitForMeasurements is false', async () => {
+      const trackSpy = vi.spyOn(flowCore.measurementTracker, 'trackStateUpdate');
+
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: { nodesToAdd: [mockNode] },
+        commandsCount: 1,
+        actionTypes: ['addNodes'],
+      });
+
+      mockMiddlewareManager.execute.mockResolvedValue({
+        nodes: [mockNode],
+        edges: [],
+        metadata: mockMetadata,
+      });
+
+      await flowCore.transaction(async () => {});
+
+      expect(trackSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not track state update when commandsCount is 0', async () => {
+      const trackSpy = vi.spyOn(flowCore.measurementTracker, 'trackStateUpdate');
+
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: {},
+        commandsCount: 0,
+        actionTypes: [],
+      });
+
+      await flowCore.transaction(async () => {}, { waitForMeasurements: true });
+
+      expect(trackSpy).not.toHaveBeenCalled();
+    });
+
+    it('should apply update when transaction has commands', async () => {
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: { nodesToAdd: [mockNode] },
+        commandsCount: 1,
+        actionTypes: ['addNodes'],
+      });
+
+      mockMiddlewareManager.execute.mockResolvedValue({
+        nodes: [mockNode],
+        edges: [],
+        metadata: mockMetadata,
+      });
+
+      await flowCore.transaction(async () => {});
+
+      expect(mockMiddlewareManager.execute).toHaveBeenCalledWith(expect.any(Object), { nodesToAdd: [mockNode] }, [
+        'addNodes',
+      ]);
+    });
+
+    it('should not apply update when transaction has no commands', async () => {
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: {},
+        commandsCount: 0,
+        actionTypes: [],
+      });
+
+      await flowCore.transaction(async () => {});
+
+      expect(mockMiddlewareManager.execute).not.toHaveBeenCalled();
     });
   });
 });

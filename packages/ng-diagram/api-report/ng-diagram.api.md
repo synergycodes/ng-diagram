@@ -301,6 +301,7 @@ export interface FlowConfig {
     selectionMoving: SelectionMovingConfig;
     shortcuts: ShortcutDefinition[];
     snapping: SnappingConfig;
+    viewportPanningEnabled: boolean;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -700,6 +701,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     // (undocumented)
     readonly viewport: WritableSignal<Viewport>;
     viewportChanged: EventEmitter<ViewportChangedEvent>;
+    readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.ZoomingPointerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
@@ -1004,7 +1006,10 @@ export class NgDiagramService extends NgDiagramBaseService {
     setDefaultRouting(name: string): void;
     setEventsEnabled(enabled: boolean): void;
     startLinking(node: Node_2, portId?: string): void;
+    transaction(callback: () => Promise<void>): Promise<TransactionResult>;
+    transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
     transaction(callback: () => void): void;
+    transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
     unregisterMiddleware(name: string): void;
     unregisterRouting(name: string): void;
     updateConfig(config: Partial<NgDiagramConfig>): void;
@@ -1315,6 +1320,11 @@ export interface SnappingConfig {
     defaultResizeSnap: Size;
     shouldSnapDragForNode: (node: Node_2) => boolean;
     shouldSnapResizeForNode: (node: Node_2) => boolean;
+}
+
+// @public
+export interface TransactionOptions {
+    waitForMeasurements?: boolean;
 }
 
 // @public

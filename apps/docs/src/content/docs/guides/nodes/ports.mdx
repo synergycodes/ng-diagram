@@ -1,9 +1,11 @@
 ---
 title: Ports
 description: Understanding how ports work in ngDiagram
+sidebar:
+  badge: New
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Badge } from '@astrojs/starlight/components';
 import Ports from '@components/angular/nodes/ports/ports.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -27,7 +29,7 @@ Each node has a [`measuredPorts`](/docs/api/types/model/simplenode/#measuredport
 Ports are rendered using the [`<ng-diagram-port>`](/docs/api/components/ngdiagramportcomponent) component.
 You can customize their appearance by overriding CSS variables, adding inline styles, custom classes, **or by providing custom content directly inside the port**.
 
-### Custom Content
+### Custom Content <Badge text="since v0.9.0" variant="tip" />
 
 You can render any content inside a port, such as text, images, SVGs, or any icons.
 
@@ -42,9 +44,9 @@ You can render any content inside a port, such as text, images, SVGs, or any ico
 
 Custom content automatically disables the default circular style and allows full control over the port's appearance.
 
-### Port positioning with Origin Point
+### Port positioning with Origin Point <Badge text="since v0.9.0" variant="tip" />
 
-You can use the [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input to precisely control the transform origin of each port.  
+You can use the [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input to precisely control the transform origin of each port.
 Supported values: `topLeft`, `centerLeft`, `bottomLeft`, `topCenter`, `center`, `bottomCenter`, `topRight`, `centerRight`, `bottomRight`.
 
 Example usage:

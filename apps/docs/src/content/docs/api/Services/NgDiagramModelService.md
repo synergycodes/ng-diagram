@@ -94,8 +94,6 @@ Array of nodes to add.
 
 > **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
 
-Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
-
 #### Parameters
 
 ##### nodes
@@ -115,6 +113,12 @@ Array of edges
 [`Rect`](/docs/api/types/geometry/rect/)
 
 Bounding rectangle containing all nodes and edges
+
+#### Since
+
+0.9.0
+
+Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
 
 ***
 
@@ -436,9 +440,6 @@ An array of Nodes that overlap with the specified node
 
 > **getOverlappingNodes**(`node`): [`Node`](/docs/api/types/model/node/)[]
 
-Detects collision with other nodes by finding all nodes whose rectangles intersect
-with the specified node's bounding rectangle.
-
 ##### Parameters
 
 ###### node
@@ -452,6 +453,13 @@ The node to check for collisions
 [`Node`](/docs/api/types/model/node/)[]
 
 An array of Nodes that overlap with the specified node
+
+##### Since
+
+0.9.0
+
+Detects collision with other nodes by finding all nodes whose rectangles intersect
+with the specified node's bounding rectangle.
 
 ***
 

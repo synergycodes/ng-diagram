@@ -33,7 +33,7 @@ The minimum allowed zoom level.
 #### Default
 
 ```ts
-0.1
+0.01
 ```
 
 ***

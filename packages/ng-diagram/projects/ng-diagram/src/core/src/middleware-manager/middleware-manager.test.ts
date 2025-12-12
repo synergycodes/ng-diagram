@@ -4,7 +4,6 @@ import { mockMetadata, mockNode } from '../test-utils';
 import type { FlowState, FlowStateUpdate, Middleware, ModelAdapter } from '../types';
 import { MiddlewareManager } from './middleware-manager';
 
-// Define all mocks at the top level
 vi.mock('./middlewares/edges-routing', () => ({
   edgesRoutingMiddleware: {
     name: 'edges-routing',
@@ -22,8 +21,14 @@ const mockLoggerMiddleware = vi.hoisted(() => ({
   execute: vi.fn(),
 }));
 
+const mockMeasurementTrackingMiddleware = vi.hoisted(() => ({
+  name: 'measurement-tracking',
+  execute: vi.fn(),
+}));
+
 vi.mock('./middlewares', () => ({
   createEventEmitterMiddleware: vi.fn(),
+  createMeasurementTrackingMiddleware: vi.fn().mockReturnValue(mockMeasurementTrackingMiddleware),
   measuredBoundsMiddleware: mockMeasuredBoundsMiddleware,
   loggerMiddleware: mockLoggerMiddleware,
 }));
@@ -85,6 +90,11 @@ describe('MiddlewareManager', () => {
       updateMetadata: vi.fn(),
       applyUpdate: vi.fn(),
       model: mockModel,
+      measurementTracker: {
+        hasPendingMeasurements: vi.fn().mockReturnValue(false),
+        signalNodeMeasurement: vi.fn(),
+        signalEdgeMeasurement: vi.fn(),
+      },
     } as unknown as FlowCore;
     middlewareManager = new MiddlewareManager(flowCore);
 
@@ -127,6 +137,7 @@ describe('MiddlewareManager', () => {
         mockMiddleware1,
         mockMeasuredBoundsMiddleware,
         mockLoggerMiddleware,
+        mockMeasurementTrackingMiddleware,
       ]);
     });
   });
@@ -148,13 +159,10 @@ describe('MiddlewareManager', () => {
     it('should return a function that unregisters the middleware when called', () => {
       const unregister = middlewareManager.register(mockMiddleware1);
 
-      // Verify middleware is registered
       expect(middlewareManager['middlewareChain']).toContain(mockMiddleware1);
 
-      // Call the unregister function
       unregister();
 
-      // Verify middleware is no longer registered
       expect(middlewareManager['middlewareChain']).not.toContain(mockMiddleware1);
     });
   });
@@ -211,13 +219,10 @@ describe('MiddlewareManager', () => {
         execute: vi.fn(),
       };
 
-      // Register middleware
       const unregister = middlewareManager.register(middlewareWithMetadata);
 
-      // Unregister middleware
       unregister();
 
-      // Verify middleware is removed from chain
       expect(middlewareManager['middlewareChain']).not.toContain(middlewareWithMetadata);
     });
 
@@ -227,21 +232,18 @@ describe('MiddlewareManager', () => {
         execute: vi.fn(),
       };
 
-      // Register middlewares in order
       middlewareManager.register(mockMiddleware1);
       middlewareManager.register(mockMiddleware2);
       middlewareManager.register(middleware3);
 
       expect(middlewareManager['middlewareChain']).toEqual([mockMiddleware1, mockMiddleware2, middleware3]);
 
-      // Unregister middle middleware
       middlewareManager.unregister(mockMiddleware2.name);
 
       expect(middlewareManager['middlewareChain']).toEqual([mockMiddleware1, middleware3]);
     });
 
     it('should handle execute with no registered middlewares gracefully', () => {
-      // Ensure no middlewares are registered
       expect(middlewareManager['middlewareChain']).toHaveLength(0);
 
       middlewareManager.execute(initialState, stateUpdate, ['changeSelection']);

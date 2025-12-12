@@ -8,6 +8,7 @@ export class RendererService implements Renderer {
   }
 
   isInitialized = signal<boolean>(false);
+  viewportPannable = signal<boolean>(true);
 
   nodes = signal<Node[]>([]);
   edges = signal<Edge[]>([]);

@@ -65,7 +65,7 @@ const defaultZoomToFitConfig: ZoomToFitConfig = {
 };
 
 const defaultZoomConfig: ZoomConfig = {
-  min: 0.1,
+  min: 0.01,
   max: 10.0,
   step: 0.03,
   zoomToFit: defaultZoomToFitConfig,
@@ -170,6 +170,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       virtualization: defaultVirtualizationConfig,
       shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
+      viewportPanningEnabled: true,
     },
     config
   );

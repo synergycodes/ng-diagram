@@ -1,9 +1,11 @@
 ---
 title: Transactions
 description: Understanding how transactions work in ngDiagram
+sidebar:
+  badge: New
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Badge } from '@astrojs/starlight/components';
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
 
 Transactions in ngDiagram provide a mechanism for batching multiple state changes into atomic operation.
@@ -18,6 +20,77 @@ this.ngDiagramService.transaction(() => {
   this.ngDiagramModelService.addNodes([node1, node2]);
   this.ngDiagramModelService.addEdges([edge1]);
 });
+```
+
+## Async Transactions <Badge text="since v0.9.0" variant="tip" />
+
+Transactions support async callbacks, allowing you to perform asynchronous operations like fetching data from a server before modifying the diagram state.
+
+```typescript
+await this.ngDiagramService.transaction(async () => {
+  // Fetch data from server
+  const nodes = await this.nodeService.fetchNodes();
+
+  // Add nodes after data is fetched
+  this.ngDiagramModelService.addNodes(nodes);
+});
+
+console.log('Transaction complete - all nodes added');
+```
+
+The transaction promise resolves after all operations inside the callback are complete and the state has been updated.
+
+## Transaction Options <Badge text="since v0.9.0" variant="tip" />
+
+Transactions accept an optional second parameter for additional configuration.
+
+### waitForMeasurements
+
+When adding nodes or edges, the diagram needs to measure their dimensions before they're fully rendered. By default, the transaction resolves immediately after the state update, before measurements complete.
+
+Use [`waitForMeasurements: true`](/docs/api/types/middleware/transactionoptions/#waitformeasurements) when you need to perform operations that depend on measured values, such as zooming to fit new nodes:
+
+```typescript
+// Add nodes and wait for their dimensions to be measured
+await this.ngDiagramService.transaction(
+  () => {
+    this.ngDiagramModelService.addNodes([newNode]);
+  },
+  { waitForMeasurements: true }
+);
+
+// Now safe to zoom - node dimensions are known
+this.ngDiagramViewportService.zoomToFit();
+```
+
+<Aside type="caution">
+  Without [`waitForMeasurements`](/docs/api/types/middleware/transactionoptions/#waitformeasurements), operations like
+  [`zoomToFit()`](/docs/api/services/ngdiagramviewportservice/#zoomtofit) might not account for newly added elements
+  because their dimensions haven't been measured yet.
+</Aside>
+
+This works with both sync and async transactions:
+
+```typescript
+// Async transaction with measurements
+await this.ngDiagramService.transaction(
+  async () => {
+    const data = await fetchNodeDataFromServer();
+
+    const newNode: Node = {
+      id: 'fetched-node',
+      type: 'default',
+      position: { x: 1000, y: 1000 },
+      data,
+    };
+
+    this.ngDiagramModelService.addNodes([newNode]);
+  },
+  { waitForMeasurements: true }
+);
+
+// Zoom to include the new node with correct dimensions
+this.ngDiagramViewportService.zoomToFit();
 ```
 
 ## How Transactions Work
@@ -72,6 +145,7 @@ Use transactions for:
 - **Complex multi-step operations** - Creating multiple related nodes and edges
 - **Bulk operations** - Adding or updating many elements at once
 - **Performance optimization** - Reducing the number of state updates
+- **Operations requiring measurements** - When you need to zoom to fit or center on newly added elements
 
 ## Best Practices
 

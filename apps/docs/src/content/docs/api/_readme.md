@@ -113,6 +113,7 @@ title: "ng-diagram"
 - [MiddlewareContext](/docs/api/types/middleware/middlewarecontext/)
 - [MiddlewareHelpers](/docs/api/types/middleware/middlewarehelpers/)
 - [MiddlewareHistoryUpdate](/docs/api/types/middleware/middlewarehistoryupdate/)
+- [TransactionOptions](/docs/api/types/middleware/transactionoptions/)
 - [TransactionResult](/docs/api/types/middleware/transactionresult/)
 - [MiddlewareChain](/docs/api/types/middleware/middlewarechain/)
 - [ModelActionType](/docs/api/types/middleware/modelactiontype/)

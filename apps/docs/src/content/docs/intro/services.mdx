@@ -62,6 +62,14 @@ Handles all model-related operations including node and edge updates, spatial qu
 - Access nodes, edges, and metadata as reactive signals
 - Find elements by ID
 
+<Aside type="tip" title="Waiting for measurements">
+  When you need to perform viewport operations (like
+  [`zoomToFit()`](/docs/api/services/ngdiagramviewportservice/#zoomtofit) or
+  [`centerOnNode()`](/docs/api/services/ngdiagramviewportservice/#centeronnode)) immediately after adding or modifying
+  elements, use the [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure
+  the elements are measured before the viewport adjusts.
+</Aside>
+
 **Usage Example:**
 
 ```typescript
