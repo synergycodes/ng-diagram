@@ -104,6 +104,6 @@ export class MobilePanningDirective {
     if (!viewportPanningEnabled || shouldDiscardEvent(event, 'pan')) {
       return false;
     }
-    return !event.zoomingHandled;
+    return !(event.zoomingHandled || event.boxSelectionHandled);
   }
 }

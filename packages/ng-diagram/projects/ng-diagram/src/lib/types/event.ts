@@ -43,4 +43,5 @@ export interface PointerInputEvent extends PointerEvent {
  */
 export interface TouchInputEvent extends TouchEvent {
   zoomingHandled?: boolean;
+  boxSelectionHandled?: boolean;
 }

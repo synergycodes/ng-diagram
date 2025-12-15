@@ -31,6 +31,7 @@ import type {
   ViewportChangedEvent,
 } from '../../../core/src';
 
+import { MobileBoxSelectionDirective } from '../../../public-api';
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
@@ -83,6 +84,7 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
   hostDirectives: [
     NgDiagramServicesAvailabilityCheckerDirective,
     BoxSelectionDirective,
+    MobileBoxSelectionDirective,
     CursorPositionTrackerDirective,
     ZoomingPointerDirective,
     ZoomingWheelDirective,
