@@ -36,6 +36,8 @@ import { CursorPositionTrackerDirective } from '../../directives/cursor-position
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
+import { MobilePanningDirective } from '../../directives/input-events/panning/mobile-panning.directive';
+import { PanningWheelDirective } from '../../directives/input-events/panning/panning-wheel.directive';
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
 import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
@@ -86,6 +88,8 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
     ZoomingPointerDirective,
     ZoomingWheelDirective,
     PanningDirective,
+    PanningWheelDirective,
+    MobilePanningDirective,
     KeyboardInputsDirective,
     PaletteDropDirective,
     DiagramSelectionDirective,

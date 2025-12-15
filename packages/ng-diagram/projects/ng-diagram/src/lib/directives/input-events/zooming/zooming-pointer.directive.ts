@@ -19,6 +19,7 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
 
   private touchCache: Touch[] = [];
   private lastDistance?: number;
+  private ZOOM_THRESHOLD = 100; // Minimum distance in pixels to consider as a zoom gesture
 
   ngOnInit(): void {
     this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
@@ -77,13 +78,16 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
 
     this.lastDistance = currentDistance;
 
-    const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
-    this.inputEventsRouterService.emit({
-      ...baseEvent,
-      name: 'zoom',
-      centerPoint: { x: centerX, y: centerY },
-      zoomFactor: zoomFactor,
-    });
+    if (currentDistance > this.ZOOM_THRESHOLD) {
+      console.log('OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO zoooooommm');
+      const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
+      this.inputEventsRouterService.emit({
+        ...baseEvent,
+        name: 'zoom',
+        centerPoint: { x: centerX, y: centerY },
+        zoomFactor: zoomFactor,
+      });
+    }
   }
 
   private removeTouchFromCache(touch: Touch) {

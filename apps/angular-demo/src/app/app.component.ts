@@ -53,6 +53,7 @@ export class AppComponent {
   ]);
 
   config = {
+    // viewportPanningEnabled: false,
     zoom: {
       max: 2,
       zoomToFit: {

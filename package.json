@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs",
+    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs -- --host 0.0.0.0 --port 6011",
     "docs:dev": "cross-env NODE_ENV=development turbo watch docs:dev",
     "docs:build": "turbo run build --filter=docs",
     "lint:check": "turbo run lint:check",

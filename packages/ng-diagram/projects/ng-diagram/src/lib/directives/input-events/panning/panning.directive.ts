@@ -22,6 +22,10 @@ export class PanningDirective implements OnDestroy {
   }
 
   onPointerDown(event: PointerInputEvent): void {
+    // ignore on mobile touch devices
+    if (event.pointerType === 'touch') {
+      return;
+    }
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event) || !this.shouldHandle(event)) {
       return;
     }
