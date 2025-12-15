@@ -18,7 +18,7 @@
     "@analogjs/astro-angular": "^1.19.4",
     "@angular-devkit/build-angular": "^19.2.7",
     "@angular/animations": "^19.2.7",
-    "@angular/common": "^19.2.7",
+    "@angular/common": "^21.0.5",
     "@angular/compiler": "^19.2.7",
     "@angular/compiler-cli": "^19.2.7",
     "@angular/core": "^19.2.7",
