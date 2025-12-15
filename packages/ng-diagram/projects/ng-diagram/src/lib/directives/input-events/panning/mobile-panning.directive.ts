@@ -18,7 +18,14 @@ export class MobilePanningDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly diagramService = inject(NgDiagramService);
 
+  /**
+   * Indicates whether a panning gesture is currently active.
+   */
   private isPanning = false;
+  /**
+   * Stores the last touch point during a panning gesture.
+   * Used to emit the last input point on touch end.
+   */
   private lastTouch: { x: number; y: number } | null = null;
 
   onTouchStart(event: TouchInputEvent): void {

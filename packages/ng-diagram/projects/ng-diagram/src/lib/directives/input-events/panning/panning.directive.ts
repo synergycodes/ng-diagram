@@ -47,7 +47,6 @@ export class PanningDirective implements OnDestroy {
         y: event.clientY,
       },
     });
-    console.log('panning.directive.ts: onPointerDown - start panning');
 
     document.addEventListener('pointermove', this.onMouseMove);
     document.addEventListener('pointerup', this.onPointerUp);
@@ -61,7 +60,6 @@ export class PanningDirective implements OnDestroy {
 
     event.preventDefault();
     event.stopPropagation();
-    console.log('panning.directive.ts: onPointerUp - end panning');
 
     this.finishPanning(event);
   };
@@ -81,22 +79,12 @@ export class PanningDirective implements OnDestroy {
     const direction =
       Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'left' : 'right') : deltaY > 0 ? 'top' : 'bottom';
 
-    console.log('panning.directive.ts: onWheel - panning via wheel');
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'keyboardPanning',
       direction,
     });
-  }
-
-  private shouldHandleWheel(event: WheelEvent): boolean {
-    const { viewportPanningEnabled } = this.diagramService.config();
-    return (
-      !!viewportPanningEnabled &&
-      !shouldDiscardEvent(event, 'pan') &&
-      !this.inputEventsRouter.eventGuards.withPrimaryModifier(event)
-    );
   }
 
   private onMouseMove = (event: PointerInputEvent) => {
@@ -151,8 +139,16 @@ export class PanningDirective implements OnDestroy {
       event.zoomingHandled ||
       event.linkingHandled ||
       event.rotateHandled ||
-      event.boxSelectionHandled ||
-      event.zoomingHandled
+      event.boxSelectionHandled
+    );
+  }
+
+  private shouldHandleWheel(event: WheelEvent): boolean {
+    const { viewportPanningEnabled } = this.diagramService.config();
+    return (
+      !!viewportPanningEnabled &&
+      !shouldDiscardEvent(event, 'pan') &&
+      !this.inputEventsRouter.eventGuards.withPrimaryModifier(event)
     );
   }
 

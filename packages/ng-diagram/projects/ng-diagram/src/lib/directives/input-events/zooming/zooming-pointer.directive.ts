@@ -19,9 +19,24 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
   private readonly inputEventsRouterService = inject(InputEventsRouterService);
 
   private touchCache: Touch[] = [];
+
+  /**
+   * Stores the last distance between two touch points during a pinch gesture.
+   * Used to calculate the zoom factor smoothly on each move event.
+   */
   private lastDistance?: number;
+
+  /**
+   * Stores the initial distance between two touch points at the start of a pinch gesture.
+   * Used to determine if the gesture should be recognized as a zoom (pinch) based on a threshold.
+   */
   private initialDistance?: number;
-  private readonly ZOOM_TRIGGER_DELTA = 30; // minimal change in distance to trigger zoom (30 px)
+
+  /**
+   * Minimal change in distance (in pixels) between two touch points required to trigger zoom.
+   * Prevents accidental zooming on small finger movements.
+   */
+  private readonly ZOOM_TRIGGER_DELTA = 30;
 
   ngOnInit(): void {
     this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerEventCapture, { capture: true });

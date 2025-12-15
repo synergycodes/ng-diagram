@@ -20,9 +20,17 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly elementRef = inject(ElementRef);
 
+  /**
+   * Stores the initial touch point when box selection starts.
+   * Used to calculate the bounding box during selection.
+   */
   private touchStartPoint: { x: number; y: number } | null = null;
   private isBoxSelectionActive = false;
-  private longPressTimer: any = null;
+  /**
+   * Timer identifier for detecting long-press gesture on touch devices.
+   * Used to initiate box selection after a delay.
+   */
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly LONG_PRESS_DELAY = 400; // ms
 
   ngOnInit() {
