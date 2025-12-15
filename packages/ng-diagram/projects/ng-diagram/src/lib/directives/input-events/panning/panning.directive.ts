@@ -9,6 +9,7 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
   standalone: true,
   host: {
     '(pointerdown)': 'onPointerDown($event)',
+    '(wheel)': 'onWheel($event)',
   },
 })
 export class PanningDirective implements OnDestroy {
@@ -62,6 +63,38 @@ export class PanningDirective implements OnDestroy {
 
     this.finishPanning(event);
   };
+
+  onWheel(event: WheelEvent): void {
+    if (!this.shouldHandleWheel(event)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Calculate deltas for panning direction
+    const deltaX = event.shiftKey ? event.deltaY : event.deltaX;
+    const deltaY = event.shiftKey ? 0 : event.deltaY;
+
+    const direction =
+      Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'left' : 'right') : deltaY > 0 ? 'top' : 'bottom';
+
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'keyboardPanning',
+      direction,
+    });
+  }
+
+  private shouldHandleWheel(event: WheelEvent): boolean {
+    const { viewportPanningEnabled } = this.diagramService.config();
+    return (
+      !!viewportPanningEnabled &&
+      !shouldDiscardEvent(event, 'pan') &&
+      !this.inputEventsRouter.eventGuards.withPrimaryModifier(event)
+    );
+  }
 
   private onMouseMove = (event: PointerInputEvent) => {
     if (event.zoomingHandled) {

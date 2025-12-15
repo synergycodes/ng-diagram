@@ -30,7 +30,6 @@ export {
 } from './lib/directives/input-events/object-selection/object-selection.directive';
 export { PaletteDropDirective } from './lib/directives/input-events/palette-drop/palette-drop.directive';
 export { MobilePanningDirective } from './lib/directives/input-events/panning/mobile-panning.directive';
-export { PanningWheelDirective } from './lib/directives/input-events/panning/panning-wheel.directive';
 export { PanningDirective } from './lib/directives/input-events/panning/panning.directive';
 export { ZoomingPointerDirective } from './lib/directives/input-events/zooming/zooming-pointer.directive';
 export { ZoomingWheelDirective } from './lib/directives/input-events/zooming/zooming-wheel.directive';
