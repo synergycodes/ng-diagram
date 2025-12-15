@@ -31,3 +31,18 @@ export interface PointerInputEvent extends PointerEvent {
   selectHandled?: boolean;
   boxSelectionHandled?: boolean;
 }
+
+/**
+ * Enum representing the different types of pointer/touch events in ng-diagram.
+ *
+ * @internal
+ */
+export enum DiagramEventName {
+  Rotate = 'rotate',
+  Resize = 'resize',
+  Move = 'move',
+  BoxSelection = 'box-selection',
+  Linking = 'linking',
+  Panning = 'panning',
+  Zooming = 'zooming',
+}

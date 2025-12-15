@@ -21,6 +21,7 @@ export { NgDiagramPortComponent } from './lib/components/port/ng-diagram-port.co
 // Private directives (used via hostDirectives in exported components)
 export { CursorPositionTrackerDirective } from './lib/directives/cursor-position-tracker/cursor-position-tracker.directive';
 export { BoxSelectionDirective } from './lib/directives/input-events/box-selection/box-selection.directive';
+export { MobileBoxSelectionDirective } from './lib/directives/input-events/box-selection/mobile-box-selection.directive';
 export { KeyboardInputsDirective } from './lib/directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 export { LinkingInputDirective } from './lib/directives/input-events/linking/linking.directive';
 export {
@@ -29,8 +30,9 @@ export {
   NodeSelectionDirective,
 } from './lib/directives/input-events/object-selection/object-selection.directive';
 export { PaletteDropDirective } from './lib/directives/input-events/palette-drop/palette-drop.directive';
+export { MobilePanningDirective } from './lib/directives/input-events/panning/mobile-panning.directive';
 export { PanningDirective } from './lib/directives/input-events/panning/panning.directive';
-export { ZoomingPointerDirective } from './lib/directives/input-events/zooming/zooming-pointer.directive';
+export { MobileZoomingDirective } from './lib/directives/input-events/zooming/mobile-zooming.directive';
 export { ZoomingWheelDirective } from './lib/directives/input-events/zooming/zooming-wheel.directive';
 export { NodePositionDirective } from './lib/directives/node-position/node-position.directive';
 export { NodeSizeDirective } from './lib/directives/node-size/node-size.directive';

@@ -2,7 +2,8 @@ import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
 import { FPS_60, NgDiagramMath, Node, Point } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
-import { PointerInputEvent } from '../../../types';
+import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
+import { DiagramEventName, PointerInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramLinkingInput]',
@@ -15,6 +16,7 @@ import { PointerInputEvent } from '../../../types';
 export class LinkingInputDirective implements OnDestroy {
   private readonly linkingEventService = inject(LinkingEventService);
   private readonly flowCoreProviderService = inject(FlowCoreProviderService);
+  private readonly touchEventsStateService = inject(TouchEventsStateService);
 
   private target = signal<Node | undefined>(undefined);
   private edgePanningInterval: number | null = null;
@@ -35,6 +37,7 @@ export class LinkingInputDirective implements OnDestroy {
     }
 
     $event.linkingHandled = true;
+    this.touchEventsStateService.currentEvent.set(DiagramEventName.Linking);
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
@@ -43,6 +46,11 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
+    if (this.touchEventsStateService.panningHandled() || this.touchEventsStateService.zoomingHandled()) {
+      this.onPointerUp($event);
+      return;
+    }
+
     const { edgePanningThreshold, edgePanningEnabled, edgePanningForce } =
       this.flowCoreProviderService.provide().config.linking;
     const flowCore = this.flowCoreProviderService.provide();
@@ -79,10 +87,15 @@ export class LinkingInputDirective implements OnDestroy {
       return false;
     }
 
-    return !event.boxSelectionHandled;
+    return !(
+      event.boxSelectionHandled ||
+      this.touchEventsStateService.panningHandled() ||
+      this.touchEventsStateService.zoomingHandled()
+    );
   }
 
   private cleanup() {
+    this.touchEventsStateService.clearCurrentEvent();
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();

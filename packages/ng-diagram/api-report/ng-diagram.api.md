@@ -506,6 +506,48 @@ export interface MiddlewareHistoryUpdate {
     stateUpdate: FlowStateUpdate;
 }
 
+// @public (undocumented)
+export class MobileBoxSelectionDirective {
+    // (undocumented)
+    onTouchEnd(event: TouchEvent): void;
+    // (undocumented)
+    onTouchMove(event: TouchEvent): void;
+    // (undocumented)
+    onTouchStart(event: TouchEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<MobileBoxSelectionDirective, "[ngDiagramMobileBoxSelection]", never, {}, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<MobileBoxSelectionDirective, never>;
+}
+
+// @public (undocumented)
+export class MobilePanningDirective {
+    // (undocumented)
+    onTouchEnd(event: TouchEvent): void;
+    // (undocumented)
+    onTouchMove(event: TouchEvent): void;
+    // (undocumented)
+    onTouchStart(event: TouchEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<MobilePanningDirective, "[ngDiagramPanning]", never, {}, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<MobilePanningDirective, never>;
+}
+
+// @public (undocumented)
+export class MobileZoomingDirective {
+    // (undocumented)
+    onTouchEnd(event: TouchEvent): void;
+    // (undocumented)
+    onTouchMove(event: TouchEvent): void;
+    // (undocumented)
+    onTouchStart(event: TouchEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<MobileZoomingDirective, "[ngDiagramZoomingPointer]", never, {}, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<MobileZoomingDirective, never>;
+}
+
 // @public
 export interface Model {
     edges: Edge[];
@@ -602,7 +644,7 @@ export class NgDiagramBaseEdgeComponent {
     readonly temporary: Signal<boolean | undefined>;
     readonly useInlineMarkers: boolean;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeComponent, "ng-diagram-base-edge", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "routing": { "alias": "routing"; "required": false; "isSignal": true; }; "stroke": { "alias": "stroke"; "required": false; "isSignal": true; }; "sourceArrowhead": { "alias": "sourceArrowhead"; "required": false; "isSignal": true; }; "targetArrowhead": { "alias": "targetArrowhead"; "required": false; "isSignal": true; }; "strokeOpacity": { "alias": "strokeOpacity"; "required": false; "isSignal": true; }; "strokeWidth": { "alias": "strokeWidth"; "required": false; "isSignal": true; }; "strokeDasharray": { "alias": "strokeDasharray"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_2.ZIndexDirective; inputs: { "data": "edge"; }; outputs: {}; }, { directive: typeof i9.EdgeSelectionDirective; inputs: { "targetData": "edge"; }; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeComponent, "ng-diagram-base-edge", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "routing": { "alias": "routing"; "required": false; "isSignal": true; }; "stroke": { "alias": "stroke"; "required": false; "isSignal": true; }; "sourceArrowhead": { "alias": "sourceArrowhead"; "required": false; "isSignal": true; }; "targetArrowhead": { "alias": "targetArrowhead"; "required": false; "isSignal": true; }; "strokeOpacity": { "alias": "strokeOpacity"; "required": false; "isSignal": true; }; "strokeWidth": { "alias": "strokeWidth"; "required": false; "isSignal": true; }; "strokeDasharray": { "alias": "strokeDasharray"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_2.ZIndexDirective; inputs: { "data": "edge"; }; outputs: {}; }, { directive: typeof i11.EdgeSelectionDirective; inputs: { "targetData": "edge"; }; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramBaseEdgeComponent, never>;
 }
@@ -703,7 +745,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.ZoomingPointerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
@@ -911,6 +953,8 @@ export class NgDiagramPaletteItemComponent {
     onDragStart(event: DragEvent): void;
     // @internal (undocumented)
     onMouseDown(): void;
+    // @internal (undocumented)
+    onTouchStart(event: TouchEvent): void;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPaletteItemComponent, "ng-diagram-palette-item", never, { "item": { "alias": "item"; "required": true; "isSignal": true; }; }, {}, ["paletteItemPreviewComponent"], ["*"], true, never>;
     // (undocumented)
@@ -1123,7 +1167,11 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
 export type OriginPoint = 'topLeft' | 'topCenter' | 'topRight' | 'centerLeft' | 'center' | 'centerRight' | 'bottomLeft' | 'bottomCenter' | 'bottomRight';
 
 // @public (undocumented)
-export class PaletteDropDirective {
+export class PaletteDropDirective implements OnInit, OnDestroy {
+    // (undocumented)
+    ngOnDestroy(): void;
+    // (undocumented)
+    ngOnInit(): void;
     // (undocumented)
     onDragOver(event: DragEvent): void;
     // (undocumented)
@@ -1148,6 +1196,8 @@ export class PanningDirective implements OnDestroy {
     onPointerDown(event: PointerInputEvent): void;
     // (undocumented)
     onPointerUp: (event: PointerEvent) => void;
+    // (undocumented)
+    onWheel(event: WheelEvent): void;
     // (undocumented)
     static ɵdir: i0.ɵɵDirectiveDeclaration<PanningDirective, "[ngDiagramPanning]", never, {}, {}, never, never, true, never>;
     // (undocumented)
@@ -1391,29 +1441,11 @@ export interface ZoomConfig {
 }
 
 // @public (undocumented)
-export class ZoomingPointerDirective implements OnInit, OnDestroy {
-    // (undocumented)
-    ngOnDestroy(): void;
-    // (undocumented)
-    ngOnInit(): void;
-    // (undocumented)
-    onTouchEnd(event: TouchEvent): void;
-    // (undocumented)
-    onTouchMove(event: TouchEvent): void;
-    // (undocumented)
-    onTouchStart(event: TouchEvent): void;
-    // (undocumented)
-    static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingPointerDirective, "[ngDiagramZoomingPointer]", never, {}, {}, never, never, true, never>;
-    // (undocumented)
-    static ɵfac: i0.ɵɵFactoryDeclaration<ZoomingPointerDirective, never>;
-}
-
-// @public (undocumented)
 export class ZoomingWheelDirective {
     // (undocumented)
     onWheel(event: WheelEvent): void;
     // (undocumented)
-    static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingWheelDirective, "[ngDiagramZooming]", never, {}, {}, never, never, true, never>;
+    static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingWheelDirective, "[ngDiagramZoomingWheel]", never, {}, {}, never, never, true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<ZoomingWheelDirective, never>;
 }

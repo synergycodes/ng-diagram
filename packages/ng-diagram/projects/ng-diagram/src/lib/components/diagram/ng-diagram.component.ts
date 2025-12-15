@@ -31,13 +31,15 @@ import type {
   ViewportChangedEvent,
 } from '../../../core/src';
 
+import { MobileBoxSelectionDirective } from '../../../public-api';
 import { DiagramSelectionDirective } from '../../directives';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 import { PaletteDropDirective } from '../../directives/input-events/palette-drop/palette-drop.directive';
+import { MobilePanningDirective } from '../../directives/input-events/panning/mobile-panning.directive';
 import { PanningDirective } from '../../directives/input-events/panning/panning.directive';
-import { ZoomingPointerDirective } from '../../directives/input-events/zooming/zooming-pointer.directive';
+import { MobileZoomingDirective } from '../../directives/input-events/zooming/mobile-zooming.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { NgDiagramServicesAvailabilityCheckerDirective } from '../../directives/services-availability-checker/ng-diagram-services-availability-checker.directive';
 import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
@@ -82,10 +84,12 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
   hostDirectives: [
     NgDiagramServicesAvailabilityCheckerDirective,
     BoxSelectionDirective,
+    MobileBoxSelectionDirective,
     CursorPositionTrackerDirective,
-    ZoomingPointerDirective,
     ZoomingWheelDirective,
     PanningDirective,
+    MobilePanningDirective,
+    MobileZoomingDirective,
     KeyboardInputsDirective,
     PaletteDropDirective,
     DiagramSelectionDirective,
