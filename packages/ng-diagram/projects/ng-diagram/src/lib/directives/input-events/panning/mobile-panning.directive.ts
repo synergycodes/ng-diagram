@@ -1,6 +1,7 @@
-import { Directive, ElementRef, inject } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { TouchInputEvent } from '../../../types';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
@@ -15,21 +16,17 @@ import { shouldDiscardEvent } from '../utils/should-discard-event';
 })
 export class MobilePanningDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-  private readonly elementRef = inject(ElementRef);
   private readonly diagramService = inject(NgDiagramService);
 
   private isPanning = false;
   private lastTouch: { x: number; y: number } | null = null;
-  // PAN_THRESHOLD property should be consistent with the one in zooming-pointer.directive.ts
-  private PAN_THRESHOLD = 100; // Minimum distance in pixels to consider as a pan gesture
 
-  onTouchStart(event: TouchEvent): void {
+  onTouchStart(event: TouchInputEvent): void {
     if (event.touches.length !== 2 || !this.shouldHandle(event)) {
       this.isPanning = false;
       return;
     }
     this.isPanning = true;
-    this.toggleGrabbingCursor(true);
 
     event.preventDefault();
     event.stopPropagation();
@@ -48,11 +45,8 @@ export class MobilePanningDirective {
     });
   }
 
-  onTouchMove(event: TouchEvent): void {
-    if (!this.isPanning || event.touches.length !== 2) {
-      return;
-    }
-    if ((event as any).zoomingHandled) {
+  onTouchMove(event: TouchInputEvent): void {
+    if (!this.isPanning || event.touches.length !== 2 || event.zoomingHandled) {
       return;
     }
 
@@ -61,19 +55,16 @@ export class MobilePanningDirective {
 
     const { x, y } = this.getMidpoint(event.touches);
     this.lastTouch = { x, y };
-    const distance = this.getTouchesDistance(event.touches);
-    if (distance <= this.PAN_THRESHOLD) {
-      const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-      console.log('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII pannnnn continue');
-      this.inputEventsRouter.emit({
-        ...baseEvent,
-        name: 'panning',
-        phase: 'continue',
-        target: undefined,
-        targetType: 'diagram',
-        lastInputPoint: { x, y },
-      });
-    }
+
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'panning',
+      phase: 'continue',
+      target: undefined,
+      targetType: 'diagram',
+      lastInputPoint: { x, y },
+    });
   }
 
   onTouchEnd(event: TouchEvent): void {
@@ -81,7 +72,6 @@ export class MobilePanningDirective {
       return;
     }
     this.isPanning = false;
-    this.toggleGrabbingCursor(false);
 
     event.preventDefault();
     event.stopPropagation();
@@ -109,23 +99,11 @@ export class MobilePanningDirective {
     return { x, y };
   }
 
-  private getTouchesDistance(touches: TouchList): number {
-    if (touches.length < 2) return 0;
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.hypot(dx, dy);
-  }
-
-  private shouldHandle(event: TouchEvent): boolean {
+  private shouldHandle(event: TouchInputEvent): boolean {
     const { viewportPanningEnabled } = this.diagramService.config();
     if (!viewportPanningEnabled || shouldDiscardEvent(event, 'pan')) {
       return false;
     }
-    return true;
-  }
-
-  private toggleGrabbingCursor(isGrabbing: boolean): void {
-    const diagramElement = this.elementRef.nativeElement;
-    diagramElement.classList.toggle('panning', isGrabbing);
+    return !event.zoomingHandled;
   }
 }

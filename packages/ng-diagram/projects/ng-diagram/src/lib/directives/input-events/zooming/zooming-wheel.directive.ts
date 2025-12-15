@@ -17,6 +17,7 @@ export class ZoomingWheelDirective {
     if (!this.shouldHandle(event)) {
       return;
     }
+    console.log('zooming-wheel.directive.ts: onWheel');
 
     event.stopPropagation();
     event.preventDefault();

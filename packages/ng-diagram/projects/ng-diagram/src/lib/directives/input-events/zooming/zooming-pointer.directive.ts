@@ -1,7 +1,7 @@
 import { Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types';
+import { PointerInputEvent, TouchInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramZoomingPointer]',
@@ -10,6 +10,7 @@ import { PointerInputEvent } from '../../../types';
     '(touchstart)': 'onTouchStart($event)',
     '(touchend)': 'onTouchEnd($event)',
     '(touchmove)': 'onTouchMove($event)',
+    '(touchcancel)': 'onTouchEnd($event)',
   },
 })
 export class ZoomingPointerDirective implements OnInit, OnDestroy {
@@ -19,7 +20,8 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
 
   private touchCache: Touch[] = [];
   private lastDistance?: number;
-  private ZOOM_THRESHOLD = 100; // Minimum distance in pixels to consider as a zoom gesture
+  private initialDistance?: number;
+  private readonly ZOOM_TRIGGER_DELTA = 30; // minimal change in distance to trigger zoom (30 px)
 
   ngOnInit(): void {
     this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
@@ -41,9 +43,9 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
     for (const touch of event.changedTouches) {
       this.touchCache.push(touch);
     }
-
     if (this.touchCache.length === 2) {
       this.lastDistance = this.computeDistance();
+      this.initialDistance = this.lastDistance;
     }
   }
 
@@ -51,35 +53,35 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
     for (const touch of event.changedTouches) {
       this.removeTouchFromCache(touch);
     }
-
     if (this.touchCache.length < 2) {
       this.lastDistance = undefined;
+      this.initialDistance = undefined;
       this.touchCache = [];
     }
   }
 
-  onTouchMove(event: TouchEvent) {
+  onTouchMove(event: TouchInputEvent) {
     for (const touch of event.changedTouches) {
       this.updateTouchInCache(touch);
     }
-
-    if (this.touchCache.length !== 2 || this.lastDistance === undefined) {
+    if (this.touchCache.length !== 2 || this.lastDistance === undefined || this.initialDistance === undefined) {
       return;
     }
 
-    const flow = this.flowCoreProvider.provide();
-
-    const centerX = (this.touchCache[0].clientX + this.touchCache[1].clientX) / 2;
-    const centerY = (this.touchCache[0].clientY + this.touchCache[1].clientY) / 2;
     const currentDistance = this.computeDistance();
+    const delta = Math.abs(currentDistance - this.initialDistance);
 
-    const distanceRatio = currentDistance / this.lastDistance;
-    const zoomFactor = Math.min(Math.max(1 - flow.config.zoom.step, distanceRatio), 1 + flow.config.zoom.step);
+    if (delta > this.ZOOM_TRIGGER_DELTA) {
+      event.zoomingHandled = true;
 
-    this.lastDistance = currentDistance;
+      const flow = this.flowCoreProvider.provide();
+      const centerX = (this.touchCache[0].clientX + this.touchCache[1].clientX) / 2;
+      const centerY = (this.touchCache[0].clientY + this.touchCache[1].clientY) / 2;
+      const distanceRatio = currentDistance / this.lastDistance;
+      const zoomFactor = Math.min(Math.max(1 - flow.config.zoom.step, distanceRatio), 1 + flow.config.zoom.step);
 
-    if (currentDistance > this.ZOOM_THRESHOLD) {
-      console.log('OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO zoooooommm');
+      this.lastDistance = currentDistance;
+
       const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
       this.inputEventsRouterService.emit({
         ...baseEvent,

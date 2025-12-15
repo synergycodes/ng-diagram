@@ -31,3 +31,16 @@ export interface PointerInputEvent extends PointerEvent {
   selectHandled?: boolean;
   boxSelectionHandled?: boolean;
 }
+
+/**
+ * Defines a custom event type for touch input events used in the ngDiagram library.
+ * This type extends the native `TouchEvent` with an additional flag
+ * to indicate whether zooming has already been handled for the event.
+ *
+ * @public
+ * @since TODO: add version
+ * @category Types/Events
+ */
+export interface TouchInputEvent extends TouchEvent {
+  zoomingHandled?: boolean;
+}
