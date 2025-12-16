@@ -10,4 +10,5 @@ export interface RenderStrategyResult {
 export interface RenderStrategy {
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult;
   invalidateCache?(): void;
+  destroy?(): void;
 }

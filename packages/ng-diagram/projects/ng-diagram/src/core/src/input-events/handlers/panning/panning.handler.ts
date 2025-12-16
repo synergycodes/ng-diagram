@@ -27,6 +27,7 @@ export class PanningEventHandler extends EventHandler<PanningEvent> {
         this.isPanning = true;
         this.accumulatedDelta = { x: 0, y: 0 };
         this.accumulatedEventCount = 0;
+        this.flow.actionStateManager.panning = { active: true };
         this.flow.eventManager.emit('panStarted', {});
         break;
       }
@@ -54,6 +55,7 @@ export class PanningEventHandler extends EventHandler<PanningEvent> {
         this.lastPoint = undefined;
         this.isPanning = false;
         this.rafScheduled = false;
+        this.flow.actionStateManager.clearPanning();
         this.flow.eventManager.emit('panEnded', {});
         break;
     }

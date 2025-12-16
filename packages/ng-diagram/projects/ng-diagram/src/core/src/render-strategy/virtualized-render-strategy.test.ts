@@ -47,6 +47,9 @@ describe('VirtualizedRenderStrategy', () => {
         getConnectedEdges: vi.fn().mockReturnValue([]),
         getAllDescendantIds: vi.fn().mockReturnValue([]),
       },
+      actionStateManager: {
+        isPanning: vi.fn().mockReturnValue(false),
+      },
       renderWithExpandedBuffer: vi.fn(),
     } as unknown as FlowCore;
 

@@ -52,8 +52,9 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
 
     this.lastScale = currentScale;
 
-    // During active zooming, use cached result if available to avoid jank
-    if (this.isZooming && this.cachedNodeIds && this.cachedEdgeIds) {
+    // During active zooming or panning, use cached result if available to avoid jank
+    const isPanning = this.flowCore.actionStateManager.isPanning();
+    if ((this.isZooming || isPanning) && this.cachedNodeIds && this.cachedEdgeIds) {
       return this.buildResultFromCachedIds(nodes, edges);
     }
 
@@ -108,6 +109,12 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     this.lastViewportRect = null;
     this.lastNodesLength = 0;
     this.lastEdgesLength = 0;
+  }
+
+  destroy(): void {
+    if (this.zoomIdleTimeout) {
+      clearTimeout(this.zoomIdleTimeout);
+    }
   }
 
   /**
