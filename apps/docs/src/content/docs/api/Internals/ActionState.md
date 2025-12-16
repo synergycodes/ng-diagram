@@ -46,6 +46,14 @@ State related to linking nodes
 
 ***
 
+### panning?
+
+> `optional` **panning**: `PanningActionState`
+
+State related to panning the viewport
+
+***
+
 ### resize?
 
 > `optional` **resize**: [`ResizeActionState`](/docs/api/internals/resizeactionstate/)

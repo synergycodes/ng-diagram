@@ -11,7 +11,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
   name: 'z-index',
   execute: (context, next) => {
     const {
-      state: { edges, nodes },
+      state: { edges },
       nodesMap,
       edgesMap,
       helpers,
@@ -45,28 +45,31 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
     const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
     let nodesWithZIndex: Node[] = [];
+    const nodesWithZIndexMap = new Map<string, Node>();
     const processedNodeIds = new Set<string>();
     let edgesWithZIndex: Edge[] = [];
 
     if (isInit) {
       nodesWithZIndex = initializeZIndex(nodesMap);
-      nodesWithZIndex.forEach((node) => processedNodeIds.add(node.id));
+      nodesWithZIndex.forEach((node) => {
+        processedNodeIds.add(node.id);
+        nodesWithZIndexMap.set(node.id, node);
+      });
     }
 
     if (isNodeAdded) {
-      nodesWithZIndex = [
-        ...nodesWithZIndex,
-        ...initializeZIndex(
-          helpers.getAddedNodes().reduce((map, node) => map.set(node.id, node), new Map<string, Node>())
-        ),
-      ];
+      const addedNodesWithZIndex = initializeZIndex(
+        helpers.getAddedNodes().reduce((map, node) => map.set(node.id, node), new Map<string, Node>())
+      );
+      nodesWithZIndex = [...nodesWithZIndex, ...addedNodesWithZIndex];
+      addedNodesWithZIndex.forEach((node) => nodesWithZIndexMap.set(node.id, node));
     }
 
     const selectedZIndex = zIndexConfig.selectedZIndex;
 
     const getGroupCurrentZIndex = (node: Node): number => {
       return node.groupId
-        ? ((nodesWithZIndex.find((n) => n.id === node.groupId) ?? nodesMap.get(node.groupId))?.computedZIndex ?? -1)
+        ? ((nodesWithZIndexMap.get(node.groupId) ?? nodesMap.get(node.groupId))?.computedZIndex ?? -1)
         : -1;
     };
 
@@ -109,7 +112,10 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
           node.selected && zIndexConfig.elevateOnSelection
         );
         nodesWithZIndex.push(...assignedNodes);
-        assignedNodes.forEach((n) => processedNodeIds.add(n.id));
+        assignedNodes.forEach((n) => {
+          processedNodeIds.add(n.id);
+          nodesWithZIndexMap.set(n.id, n);
+        });
       }
     } else if (shouldSnapGroupIdNode) {
       for (const nodeId of helpers.getAffectedNodeIds(['groupId']).sort(sortWithGroupBefore)) {
@@ -122,7 +128,10 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         const baseZIndex = node.groupId ? getGroupCurrentZIndex(node) + 1 : 0;
         const assignedNodes = assignNodeZIndex(node, nodesMap, baseZIndex, node.selected);
         nodesWithZIndex.push(...assignedNodes);
-        assignedNodes.forEach((n) => processedNodeIds.add(n.id));
+        assignedNodes.forEach((n) => {
+          processedNodeIds.add(n.id);
+          nodesWithZIndexMap.set(n.id, n);
+        });
       }
     }
 
@@ -130,13 +139,15 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
       for (const nodeId of helpers.getAffectedNodeIds(['zOrder']).sort(sortWithGroupBefore)) {
         const node = nodesMap.get(nodeId);
         if (!node) continue;
-        nodesWithZIndex.push({ ...node, computedZIndex: node.zOrder });
+        const nodeWithZIndex = { ...node, computedZIndex: node.zOrder };
+        nodesWithZIndex.push(nodeWithZIndex);
+        nodesWithZIndexMap.set(node.id, nodeWithZIndex);
         processedNodeIds.add(node.id);
       }
     }
 
     for (const node of nodesWithZIndex) {
-      const currentNode = nodes.find((nodeData) => nodeData.id === node.id);
+      const currentNode = nodesMap.get(node.id);
       if (!currentNode || node.computedZIndex === currentNode.computedZIndex) {
         continue;
       }
@@ -172,7 +183,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     } else edgesWithZIndex = assignEdgesZIndex(edges, nodesWithZIndex, nodesMap, zIndexConfig.edgesAboveConnectedNodes);
 
     for (const edge of edgesWithZIndex) {
-      const currentEdge = edges.find((edgeData) => edgeData.id === edge.id);
+      const currentEdge = edgesMap.get(edge.id);
       if (!currentEdge || edge.computedZIndex === currentEdge.computedZIndex) {
         continue;
       }
