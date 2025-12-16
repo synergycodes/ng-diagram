@@ -43,6 +43,7 @@ describe('PanningEventHandler', () => {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
+      eventManager: { emit: vi.fn() },
       environment: mockEnvironment,
     } as unknown as FlowCore;
 

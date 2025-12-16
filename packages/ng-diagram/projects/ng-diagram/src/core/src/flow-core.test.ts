@@ -154,10 +154,11 @@ describe('FlowCore', () => {
       // Wait for the initialization callback to be executed
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // Now init command should have been emitted with rendered node/edge IDs
+      // Now init command should have been emitted
+      // When virtualization is disabled, renderedNodeIds/renderedEdgeIds are undefined (meaning "all rendered")
       expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {
-        renderedNodeIds: expect.any(Array),
-        renderedEdgeIds: expect.any(Array),
+        renderedNodeIds: undefined,
+        renderedEdgeIds: undefined,
       });
     });
 

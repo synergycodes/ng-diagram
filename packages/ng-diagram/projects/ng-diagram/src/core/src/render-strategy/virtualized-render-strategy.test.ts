@@ -21,9 +21,9 @@ describe('VirtualizedRenderStrategy', () => {
 
   const defaultConfig: VirtualizationConfig = {
     enabled: true,
-    padding: 100,
+    padding: 0.1, // 10% of viewport size as padding
     nodeCountThreshold: 2,
-    expandedPadding: 1500,
+    expandedPadding: 0.5, // 50% of viewport size for expanded buffer
     bufferFill: {
       enabled: true,
       idleThreshold: 100,
@@ -47,6 +47,7 @@ describe('VirtualizedRenderStrategy', () => {
         getConnectedEdges: vi.fn().mockReturnValue([]),
         getAllDescendantIds: vi.fn().mockReturnValue([]),
       },
+      renderWithExpandedBuffer: vi.fn(),
     } as unknown as FlowCore;
 
     strategy = new VirtualizedRenderStrategy(mockFlowCore);
@@ -110,7 +111,7 @@ describe('VirtualizedRenderStrategy', () => {
     });
 
     it('should include nodes within padding area', () => {
-      config.padding = 200;
+      config.padding = 0.25; // 25% of viewport size as padding
       const nodes: Node[] = [
         { ...mockNode, id: '1', position: { x: 100, y: 100 }, size: { width: 50, height: 50 } },
         { ...mockNode, id: '2', position: { x: -150, y: 100 }, size: { width: 50, height: 50 } },
