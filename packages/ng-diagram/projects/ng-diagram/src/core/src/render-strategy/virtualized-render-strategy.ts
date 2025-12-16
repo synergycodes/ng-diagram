@@ -9,6 +9,9 @@ const DEFAULT_VIEWPORT_HEIGHT = 1080;
 // Percentage of viewport dimensions that triggers recomputation
 const RECOMPUTE_THRESHOLD = 0.25;
 
+// Delay before recomputing after zoom stops (ms)
+const ZOOM_IDLE_DELAY = 150;
+
 // Reusable empty set for bypass results (avoids allocation on every call)
 const EMPTY_SET = new Set<string>();
 
@@ -24,6 +27,11 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
   private cachedNodeIds: Set<string> | null = null;
   private cachedEdgeIds: Set<string> | null = null;
 
+  // Zoom tracking for deferred recomputation
+  private lastScale: number | null = null;
+  private zoomIdleTimeout: ReturnType<typeof setTimeout> | null = null;
+  private isZooming = false;
+
   constructor(private readonly flowCore: FlowCore) {}
 
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult {
@@ -31,6 +39,22 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
 
     if (this.shouldBypass(nodes, viewport, config)) {
       return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
+    }
+
+    // Detect zoom changes and defer recomputation during active zooming
+    const currentScale = viewport!.scale;
+    const scaleChanged = this.lastScale !== null && this.lastScale !== currentScale;
+
+    if (scaleChanged) {
+      this.isZooming = true;
+      this.scheduleZoomIdle();
+    }
+
+    this.lastScale = currentScale;
+
+    // During active zooming, use cached result if available to avoid jank
+    if (this.isZooming && this.cachedNodeIds && this.cachedEdgeIds) {
+      return this.buildResultFromCachedIds(nodes, edges);
     }
 
     const viewportRect = this.getViewportRect(viewport!, config.padding);
@@ -50,6 +74,25 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     this.lastEdgesLength = edges.length;
 
     return result;
+  }
+
+  /**
+   * Schedules a callback to mark zooming as complete after idle period.
+   * Resets the timer on each call to debounce rapid zoom events.
+   */
+  private scheduleZoomIdle(): void {
+    if (this.zoomIdleTimeout) {
+      clearTimeout(this.zoomIdleTimeout);
+    }
+
+    this.zoomIdleTimeout = setTimeout(() => {
+      this.isZooming = false;
+      this.zoomIdleTimeout = null;
+      // Invalidate cache to force recomputation on next render
+      this.lastViewportRect = null;
+      // Trigger a render to update with new zoom level
+      this.flowCore.renderWithExpandedBuffer();
+    }, ZOOM_IDLE_DELAY);
   }
 
   private buildResultFromCachedIds(nodes: Node[], edges: Edge[]): RenderStrategyResult {
