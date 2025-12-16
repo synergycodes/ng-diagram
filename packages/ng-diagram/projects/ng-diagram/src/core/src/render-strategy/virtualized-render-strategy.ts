@@ -12,6 +12,9 @@ const RECOMPUTE_THRESHOLD = 0.25;
 // Delay before recomputing after zoom stops (ms)
 const ZOOM_IDLE_DELAY = 150;
 
+// Distance threshold (as fraction of viewport) that triggers recompute during panning
+const PAN_DISTANCE_THRESHOLD = 0.5;
+
 // Reusable empty set for bypass results (avoids allocation on every call)
 const EMPTY_SET = new Set<string>();
 
@@ -52,13 +55,23 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
 
     this.lastScale = currentScale;
 
-    // During active zooming or panning, use cached result if available to avoid jank
+    const viewportRect = this.getViewportRect(viewport!, config.padding);
+
+    // During active zooming or panning, use cached result to avoid lag
     const isPanning = this.flowCore.actionStateManager.isPanning();
-    if ((this.isZooming || isPanning) && this.cachedNodeIds && this.cachedEdgeIds) {
+    const hasCache = this.cachedNodeIds && this.cachedEdgeIds;
+
+    if (this.isZooming && hasCache) {
       return this.buildResultFromCachedIds(nodes, edges);
     }
 
-    const viewportRect = this.getViewportRect(viewport!, config.padding);
+    if (isPanning && hasCache) {
+      // During panning, use cache unless we've moved too far from last recompute
+      if (this.lastViewportRect && !this.hasMovedTooFar(viewportRect, this.lastViewportRect)) {
+        return this.buildResultFromCachedIds(nodes, edges);
+      }
+      // Moved too far - fall through to recompute
+    }
 
     if (this.canUseCachedResult(nodes.length, edges.length, viewportRect)) {
       // Use cached IDs but look up fresh objects from input arrays
@@ -195,6 +208,17 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
       Math.abs(prev.width - current.width) < 10 &&
       Math.abs(prev.height - current.height) < 10
     );
+  }
+
+  /**
+   * Checks if viewport has moved too far from the cached position.
+   * Used during panning to trigger recompute when accumulated distance is large.
+   */
+  private hasMovedTooFar(current: Rect, cached: Rect): boolean {
+    const xThreshold = cached.width * PAN_DISTANCE_THRESHOLD;
+    const yThreshold = cached.height * PAN_DISTANCE_THRESHOLD;
+
+    return Math.abs(current.x - cached.x) > xThreshold || Math.abs(current.y - cached.y) > yThreshold;
   }
 
   private computeVisibleElements(viewportRect: Rect): RenderStrategyResult {

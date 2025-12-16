@@ -142,8 +142,8 @@ const defaultBufferFillConfig: BufferFillConfig = {
 
 const defaultVirtualizationConfig: VirtualizationConfig = {
   enabled: false, // Disabled by default - users must explicitly enable for large diagrams
-  padding: 0.3, // 0.3x viewport size padding (~1.6x viewport area total)
-  expandedPadding: 0.7, // 0.7x viewport size buffer during idle (~2.4x viewport area)
+  padding: 0.5, // 0.5x viewport size padding (~2x viewport area total)
+  expandedPadding: 1.0, // 1.0x viewport size buffer during idle (~3x viewport area)
   nodeCountThreshold: 500,
   bufferFill: defaultBufferFillConfig,
 };
