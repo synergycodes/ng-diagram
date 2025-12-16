@@ -455,16 +455,18 @@ export interface VirtualizationConfig {
   enabled: boolean;
 
   /**
-   * Padding in flow coordinates around the viewport.
-   * Nodes within this padding area are pre-rendered for smoother scrolling.
-   * @default 300
+   * Padding multiplier relative to viewport size.
+   * The actual padding is calculated as: max(viewportWidth, viewportHeight) * padding
+   * For example, 0.3 means 30% of the viewport size as padding in each direction.
+   * @default 0.3
    */
   padding: number;
 
   /**
-   * Expanded padding used when filling buffer during pan idle.
+   * Expanded padding multiplier used when filling buffer during pan idle.
    * This larger padding is applied after panning stops to preload more nodes.
-   * @default 1500
+   * Calculated as: max(viewportWidth, viewportHeight) * expandedPadding
+   * @default 0.7
    */
   expandedPadding: number;
 

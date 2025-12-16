@@ -142,8 +142,8 @@ const defaultBufferFillConfig: BufferFillConfig = {
 
 const defaultVirtualizationConfig: VirtualizationConfig = {
   enabled: false, // Disabled by default - users must explicitly enable for large diagrams
-  padding: 300, // Smaller padding during active pan for better performance
-  expandedPadding: 1500, // Large buffer filled during idle time after panning stops
+  padding: 0.3, // 0.3x viewport size padding (~1.6x viewport area total)
+  expandedPadding: 0.7, // 0.7x viewport size buffer during idle (~2.4x viewport area)
   nodeCountThreshold: 500,
   bufferFill: defaultBufferFillConfig,
 };

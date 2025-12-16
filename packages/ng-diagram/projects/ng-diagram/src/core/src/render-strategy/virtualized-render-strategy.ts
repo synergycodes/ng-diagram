@@ -99,7 +99,7 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     return !viewport || nodes.length < config.nodeCountThreshold;
   }
 
-  private getViewportRect(viewport: Viewport, padding: number): Rect {
+  private getViewportRect(viewport: Viewport, paddingMultiplier: number): Rect {
     const { x, y, scale, width, height } = viewport;
 
     const effectiveWidth = width || DEFAULT_VIEWPORT_WIDTH;
@@ -109,6 +109,10 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     const flowY = -y / scale;
     const flowWidth = effectiveWidth / scale;
     const flowHeight = effectiveHeight / scale;
+
+    // Calculate padding as a multiple of the largest viewport dimension (in flow coordinates)
+    const maxFlowDimension = Math.max(flowWidth, flowHeight);
+    const padding = maxFlowDimension * paddingMultiplier;
 
     return {
       x: flowX - padding,
