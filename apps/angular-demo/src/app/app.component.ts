@@ -179,7 +179,7 @@ export class AppComponent {
   }
 
   // Generate 20k nodes in a grid pattern for virtualization testing
-  model = initializeModel(this.generateLargeModel(20000));
+  model = initializeModel(this.generateLargeModel(5000));
 
   private generateLargeModel(nodeCount: number): { nodes: Node[]; edges: Edge[] } {
     const nodes: Node[] = [];

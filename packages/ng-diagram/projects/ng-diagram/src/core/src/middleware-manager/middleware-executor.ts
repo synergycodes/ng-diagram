@@ -118,20 +118,11 @@ export class MiddlewareExecutor {
         .filter((edge): edge is Edge => edge !== undefined),
   });
 
-  private getState = (): FlowState => {
-    // Only create new arrays if nodes/edges were actually modified
-    // This preserves reference equality for viewport-only changes (panning, zooming)
-    const nodesChanged =
-      this.addedNodesIds.size > 0 || this.removedNodesIds.size > 0 || this.updatedNodeIdsToProps.size > 0;
-    const edgesChanged =
-      this.addedEdgesIds.size > 0 || this.removedEdgesIds.size > 0 || this.updatedEdgeIdsToProps.size > 0;
-
-    return {
-      nodes: nodesChanged ? Array.from(this.nodesMap.values()) : this.initialState.nodes,
-      edges: edgesChanged ? Array.from(this.edgesMap.values()) : this.initialState.edges,
-      metadata: this.metadata,
-    };
-  };
+  private getState = (): FlowState => ({
+    nodes: Array.from(this.nodesMap.values()),
+    edges: Array.from(this.edgesMap.values()),
+    metadata: this.metadata,
+  });
 
   private getContext = (): MiddlewareContext => ({
     state: this.getState(),
