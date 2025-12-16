@@ -4,6 +4,8 @@ import { BoxSelectionProviderService } from '../../../services/box-selection-pro
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchInputEvent } from '../../../types';
 
+type TouchStartPoint = { x: number; y: number } | null;
+
 @Directive({
   selector: '[ngDiagramMobileBoxSelection]',
   standalone: true,
@@ -20,16 +22,8 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly elementRef = inject(ElementRef);
 
-  /**
-   * Stores the initial touch point when box selection starts.
-   * Used to calculate the bounding box during selection.
-   */
-  private touchStartPoint: { x: number; y: number } | null = null;
+  private touchStartPoint: TouchStartPoint = null;
   private isBoxSelectionActive = false;
-  /**
-   * Timer identifier for detecting long-press gesture on touch devices.
-   * Used to initiate box selection after a delay.
-   */
   private longPressTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly LONG_PRESS_DELAY = 400; // ms
 
@@ -44,14 +38,14 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
   }
 
   private onTouchStartCapture = (event: TouchInputEvent): void => {
-    if (event.touches.length !== 1 || !this.shouldHandle(event)) {
+    if (!this.isSingleTouch(event) || !this.shouldHandle(event)) {
       return;
     }
     event.boxSelectionHandled = true;
   };
 
   onTouchStart(event: TouchInputEvent): void {
-    if (event.touches.length !== 1) {
+    if (!this.isSingleTouch(event)) {
       this.isBoxSelectionActive = false;
       this.clearLongPressTimer();
       return;
@@ -63,16 +57,11 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
     this.longPressTimer = setTimeout(() => {
       this.isBoxSelectionActive = true;
       const touch = event.touches[0] || this.touchStartPoint;
-      if (!touch) return;
-      const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-      this.inputEventsRouter.emit({
-        ...baseEvent,
-        name: 'boxSelection',
-        phase: 'start',
-        target: undefined,
-        targetType: 'diagram',
-        lastInputPoint: { x: touch.clientX, y: touch.clientY },
-      });
+      if (!touch) {
+        return;
+      }
+
+      this.emitBoxSelectionEvent('start', event, touch);
     }, this.LONG_PRESS_DELAY);
 
     event.preventDefault();
@@ -80,48 +69,19 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
   }
 
   onTouchMove(event: TouchInputEvent): void {
-    // Jeśli użytkownik ruszył palcem przed longpress, anuluj
-    if (!this.isBoxSelectionActive && this.longPressTimer && event.touches.length === 1 && this.touchStartPoint) {
-      const touch = event.touches[0];
-      if (
-        Math.abs(touch.clientX - this.touchStartPoint.x) > 10 ||
-        Math.abs(touch.clientY - this.touchStartPoint.y) > 10
-      ) {
-        this.clearLongPressTimer();
-        this.touchStartPoint = null;
-      }
+    if (this.shouldCancelBoxSelection(event)) {
+      this.clearLongPressTimer();
+      this.touchStartPoint = null;
       return;
     }
 
-    if (!this.isBoxSelectionActive || event.touches.length !== 1 || !this.touchStartPoint) {
+    if (!this.shouldContinueBoxSelection(event)) {
       return;
     }
+
     const touch = event.touches[0];
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'boxSelection',
-      phase: 'continue',
-      target: undefined,
-      targetType: 'diagram',
-      lastInputPoint: { x: touch.clientX, y: touch.clientY },
-    });
-
-    const flowCore = this.flowCoreProvider.provide();
-    const { x: startX, y: startY } = flowCore.clientToFlowViewportPosition(this.touchStartPoint);
-    const { x: endX, y: endY } = flowCore.clientToFlowViewportPosition({ x: touch.clientX, y: touch.clientY });
-
-    const x = Math.min(startX, endX);
-    const y = Math.min(startY, endY);
-    const width = Math.abs(endX - startX);
-    const height = Math.abs(endY - startY);
-    this.boxSelectionProvider.boundingBox.set({
-      x,
-      y,
-      width,
-      height,
-    });
+    this.emitBoxSelectionEvent('continue', event, touch);
+    this.updateBoundingBox(touch);
 
     event.preventDefault();
     event.stopPropagation();
@@ -137,24 +97,19 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
     this.isBoxSelectionActive = false;
 
     const touch = event.changedTouches[0] || event.touches[0] || this.touchStartPoint;
-    if (!touch) return;
+    if (!touch) {
+      return;
+    }
 
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'boxSelection',
-      phase: 'end',
-      target: undefined,
-      targetType: 'diagram',
-      lastInputPoint: { x: touch.clientX, y: touch.clientY },
-    });
-
+    this.emitBoxSelectionEvent('end', event, touch);
     this.touchStartPoint = null;
     this.boxSelectionProvider.boundingBox.set(null);
 
     event.preventDefault();
     event.stopPropagation();
   }
+
+  // --- Private helpers ---
 
   private clearLongPressTimer() {
     if (this.longPressTimer) {
@@ -166,7 +121,58 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
   private shouldHandle(event: TouchInputEvent): boolean {
     const flowCore = this.flowCoreProvider.provide();
     const modifiers = this.inputEventsRouter.getBaseEvent(event).modifiers;
-
     return flowCore.shortcutManager.matchesAction('boxSelection', { modifiers });
+  }
+
+  private isSingleTouch(event: TouchInputEvent): boolean {
+    return event.touches.length === 1;
+  }
+
+  private shouldCancelBoxSelection(event: TouchInputEvent): boolean {
+    if (!this.isBoxSelectionActive && this.longPressTimer && this.isSingleTouch(event) && this.touchStartPoint) {
+      const touch = event.touches[0];
+      return (
+        Math.abs(touch.clientX - this.touchStartPoint.x) > 10 || Math.abs(touch.clientY - this.touchStartPoint.y) > 10
+      );
+    }
+    return false;
+  }
+
+  private shouldContinueBoxSelection(event: TouchInputEvent): boolean {
+    return this.isBoxSelectionActive && this.isSingleTouch(event) && !!this.touchStartPoint;
+  }
+
+  private emitBoxSelectionEvent(
+    phase: 'start' | 'continue' | 'end',
+    event: TouchInputEvent,
+    touch: Touch | TouchStartPoint
+  ): void {
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    if (!touch) {
+      return;
+    }
+
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'boxSelection',
+      phase,
+      target: undefined,
+      targetType: 'diagram',
+      lastInputPoint: {
+        x: (touch as Touch).clientX ?? (touch as TouchStartPoint)?.x,
+        y: (touch as Touch).clientY ?? (touch as TouchStartPoint)?.y,
+      },
+    });
+  }
+
+  private updateBoundingBox(touch: Touch): void {
+    const flowCore = this.flowCoreProvider.provide();
+    const { x: startX, y: startY } = flowCore.clientToFlowViewportPosition(this.touchStartPoint!);
+    const { x: endX, y: endY } = flowCore.clientToFlowViewportPosition({ x: touch.clientX, y: touch.clientY });
+    const x = Math.min(startX, endX);
+    const y = Math.min(startY, endY);
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
+    this.boxSelectionProvider.boundingBox.set({ x, y, width, height });
   }
 }

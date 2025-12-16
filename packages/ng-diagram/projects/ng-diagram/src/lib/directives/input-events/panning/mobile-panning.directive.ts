@@ -18,9 +18,6 @@ export class MobilePanningDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly diagramService = inject(NgDiagramService);
 
-  /**
-   * Indicates whether a panning gesture is currently active.
-   */
   private isPanning = false;
   /**
    * Stores the last touch point during a panning gesture.
@@ -29,49 +26,27 @@ export class MobilePanningDirective {
   private lastTouch: { x: number; y: number } | null = null;
 
   onTouchStart(event: TouchInputEvent): void {
-    if (event.touches.length !== 2 || !this.shouldHandle(event)) {
+    if (!this.isTwoFingerTouch(event) || !this.shouldHandle(event)) {
       this.isPanning = false;
       return;
     }
     this.isPanning = true;
 
-    event.preventDefault();
-    event.stopPropagation();
-
-    const { x, y } = this.getMidpoint(event.touches);
-    this.lastTouch = { x, y };
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'panning',
-      phase: 'start',
-      target: undefined,
-      targetType: 'diagram',
-      lastInputPoint: { x, y },
-    });
+    const midpoint = this.getMidpoint(event.touches);
+    this.lastTouch = midpoint;
+    this.emitPanningEvent('start', event, midpoint);
+    this.preventDefaultAndStop(event);
   }
 
   onTouchMove(event: TouchInputEvent): void {
-    if (!this.isPanning || event.touches.length !== 2 || event.zoomingHandled) {
+    if (!this.shouldContinuePanning(event)) {
       return;
     }
 
-    event.preventDefault();
-    event.stopPropagation();
-
-    const { x, y } = this.getMidpoint(event.touches);
-    this.lastTouch = { x, y };
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'panning',
-      phase: 'continue',
-      target: undefined,
-      targetType: 'diagram',
-      lastInputPoint: { x, y },
-    });
+    const midpoint = this.getMidpoint(event.touches);
+    this.lastTouch = midpoint;
+    this.emitPanningEvent('continue', event, midpoint);
+    this.preventDefaultAndStop(event);
   }
 
   onTouchEnd(event: TouchEvent): void {
@@ -80,22 +55,13 @@ export class MobilePanningDirective {
     }
     this.isPanning = false;
 
-    event.preventDefault();
-    event.stopPropagation();
-
-    const { x, y } = this.lastTouch || this.getMidpoint(event.touches);
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'panning',
-      phase: 'end',
-      target: undefined,
-      targetType: 'diagram',
-      lastInputPoint: { x, y },
-    });
+    const lastPoint = this.lastTouch || this.getMidpoint(event.touches);
+    this.emitPanningEvent('end', event, lastPoint);
     this.lastTouch = null;
+    this.preventDefaultAndStop(event);
   }
+
+  // --- Private helpers ---
 
   private getMidpoint(touches: TouchList): { x: number; y: number } {
     if (touches.length < 2) {
@@ -112,5 +78,34 @@ export class MobilePanningDirective {
       return false;
     }
     return !(event.zoomingHandled || event.boxSelectionHandled);
+  }
+
+  private isTwoFingerTouch(event: TouchInputEvent): boolean {
+    return event.touches.length === 2;
+  }
+
+  private shouldContinuePanning(event: TouchInputEvent): boolean {
+    return this.isPanning && this.isTwoFingerTouch(event) && !event.zoomingHandled;
+  }
+
+  private emitPanningEvent(
+    phase: 'start' | 'continue' | 'end',
+    event: TouchEvent,
+    lastInputPoint: { x: number; y: number }
+  ): void {
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'panning',
+      phase,
+      target: undefined,
+      targetType: 'diagram',
+      lastInputPoint,
+    });
+  }
+
+  private preventDefaultAndStop(event: TouchEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
   }
 }
