@@ -1,4 +1,5 @@
 import { Bounds, GroupNode, Node, Rect } from '../types';
+import { getNodeMeasuredBounds } from './dimensions';
 import { getBoundsFromRect, getRect, getRectFromBounds } from './rects-points-sizes';
 
 interface CalculateGroupRectOptions {
@@ -32,7 +33,10 @@ export const calculateGroupBounds = (
         throw new Error(`calculateGroupBounds: child node ${node.id} does not have both width and height defined`);
       }
 
-      const nodeBounds = getBoundsFromRect(getRect(node));
+      // Use measuredBounds if available (accounts for rotation), otherwise compute it
+      const nodeBounds = node.measuredBounds
+        ? getBoundsFromRect(node.measuredBounds)
+        : getBoundsFromRect(getNodeMeasuredBounds(node));
 
       acc.left = Math.min(acc.left, nodeBounds.left);
       acc.top = Math.min(acc.top, nodeBounds.top);
