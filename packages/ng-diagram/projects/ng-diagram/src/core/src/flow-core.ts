@@ -10,7 +10,7 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
-import { BufferFillManager, DirectRenderStrategy, RenderStrategy, VirtualizedRenderStrategy } from './render-strategy';
+import { DirectRenderStrategy, RenderStrategy, VirtualizedRenderStrategy } from './render-strategy';
 import { ShortcutManager } from './shortcut-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import {
@@ -54,7 +54,7 @@ export class FlowCore {
   private _model: ModelAdapter;
   private _config: FlowConfig;
 
-  private readonly initUpdater: InitUpdater;
+  readonly initUpdater: InitUpdater;
   readonly internalUpdater: InternalUpdater;
   private readonly updateSemaphore = new Semaphore(1);
 
@@ -73,7 +73,6 @@ export class FlowCore {
 
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
-  private bufferFillManager: BufferFillManager | null = null;
 
   readonly getFlowOffset: () => Point;
 
@@ -94,12 +93,12 @@ export class FlowCore {
     this.initUpdater = new InitUpdater(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
-    this.directRenderStrategy = new DirectRenderStrategy();
+    this.eventManager = new EventManager();
+    this.actionStateManager = new ActionStateManager(this.eventManager);
+    this.directRenderStrategy = new DirectRenderStrategy(this);
     this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
-    this.eventManager = new EventManager();
-    this.actionStateManager = new ActionStateManager(this.eventManager);
     this.portBatchProcessor = new PortBatchProcessor();
     this.labelBatchProcessor = new LabelBatchProcessor();
     this.measurementTracker = new MeasurementTracker();
@@ -111,51 +110,19 @@ export class FlowCore {
 
     this.shortcutManager = new ShortcutManager(this);
 
-    // Initialize buffer fill manager if virtualization and buffer fill are enabled
-    if (this.config.virtualization.enabled && this.config.virtualization.bufferFill.enabled) {
-      this.bufferFillManager = new BufferFillManager(this, this.config.virtualization.bufferFill.idleThreshold);
-    }
-
     this.inputEventsRouter.registerDefaultCallbacks(this);
 
     this.init();
   }
 
   destroy() {
-    this.bufferFillManager?.destroy();
+    this.virtualizedRenderStrategy.destroy();
     this.eventManager.offAll();
     this.model.destroy();
   }
 
-  private lastNodesRef: Node[] | null = null;
-
   private init() {
-    this.spatialHash.process(this.model.getNodes());
-    this.lastNodesRef = this.model.getNodes();
-
-    // this.render();
-
-    this.model.onChange((state) => {
-      const nodesChanged = state.nodes !== this.lastNodesRef;
-
-      // Only update spatial hash when nodes actually changed (skip during panning/zooming)
-      if (nodesChanged) {
-        this.spatialHash.process(state.nodes);
-        this.modelLookup.desynchronize();
-        this.lastNodesRef = state.nodes;
-      }
-      this.render();
-    });
-
-    this.initUpdater.start(async () => {
-      const { nodes, edges } = this.getRenderedModel();
-      // Only pass rendered IDs when virtualization is active (undefined = all rendered)
-      const virtualized = this.config.virtualization.enabled;
-      await this.commandHandler.emit('init', {
-        renderedNodeIds: virtualized ? nodes.map((n) => n.id) : undefined,
-        renderedEdgeIds: virtualized ? edges.map((e) => e.id) : undefined,
-      });
-    });
+    this.renderStrategy.init();
   }
 
   /**
@@ -224,16 +191,6 @@ export class FlowCore {
    */
   get renderStrategy(): RenderStrategy {
     return this.config.virtualization.enabled ? this.virtualizedRenderStrategy : this.directRenderStrategy;
-  }
-
-  /**
-   * Gets nodes and edges after applying the active render strategy.
-   * When virtualization is enabled, returns only the subset visible in the viewport.
-   * When disabled, returns all nodes and edges.
-   */
-  getRenderedModel(): { nodes: Node[]; edges: Edge[] } {
-    const { nodes, edges, metadata } = this.getState();
-    return this.renderStrategy.process(nodes, edges, metadata.viewport);
   }
 
   /**
@@ -413,38 +370,14 @@ export class FlowCore {
   }
 
   /**
-   * Renders the flow
+   * Renders the flow by applying the render strategy and drawing visible elements.
    */
-  private render(): void {
+  render(): void {
     const { nodes, edges, metadata } = this.getState();
     const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
 
     // Apply render strategy (virtualization or direct)
     const { nodes: visibleNodes, edges: visibleEdges } = this.renderStrategy.process(nodes, edges, metadata.viewport);
-
-    const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
-
-    this.renderer.draw(visibleNodes, finalEdges, metadata.viewport);
-  }
-
-  /**
-   * Renders with expanded buffer padding - called during pan idle to preload more nodes.
-   * Only effective when virtualization is enabled.
-   */
-  renderWithExpandedBuffer(): void {
-    if (!this.config.virtualization.enabled) {
-      return;
-    }
-
-    const { nodes, edges, metadata } = this.getState();
-    const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
-
-    // Use expanded buffer for preloading
-    const { nodes: visibleNodes, edges: visibleEdges } = this.virtualizedRenderStrategy.processWithExpandedBuffer(
-      nodes,
-      edges,
-      metadata.viewport
-    );
 
     const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
 

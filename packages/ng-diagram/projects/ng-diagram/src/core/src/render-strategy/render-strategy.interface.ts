@@ -8,6 +8,10 @@ export interface RenderStrategyResult {
 }
 
 export interface RenderStrategy {
+  /**
+   * Initializes the strategy. Sets up model change handlers and starts the init process.
+   */
+  init(): void;
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult;
   invalidateCache?(): void;
   destroy?(): void;

@@ -8,7 +8,7 @@ import { KeyboardMoveSelectionEventHandler } from './handlers/keyboard-move-sele
 import { KeyboardPanningEventHandler } from './handlers/keyboard-panning/keyboard-panning.handler';
 import { LinkingEventHandler } from './handlers/linking/linking.handler';
 import { PaletteDropEventHandler } from './handlers/palette-drop/palette-drop.handler';
-import { PanningEventHandler } from './handlers/panning/panning.handler';
+import { panningHandlerFactory } from './handlers/panning/panning-handler-factory';
 import { PasteEventHandler } from './handlers/paste/paste.handler';
 import { PointerMoveSelectionEventHandler } from './handlers/pointer-move-selection/pointer-move-selection.handler';
 import { RedoEventHandler } from './handlers/redo/redo.handler';
@@ -41,7 +41,7 @@ export abstract class InputEventsRouter {
     this.register('copy', new CopyEventHandler(flow));
     this.register('select', new SelectEventHandler(flow));
     this.register('selectAll', new SelectAllEventHandler(flow));
-    this.register('panning', new PanningEventHandler(flow));
+    this.register('panning', panningHandlerFactory(flow));
     this.register('keyboardPanning', new KeyboardPanningEventHandler(flow));
     this.register('pointerMoveSelection', new PointerMoveSelectionEventHandler(flow));
     this.register('keyboardMoveSelection', new KeyboardMoveSelectionEventHandler(flow));

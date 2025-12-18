@@ -16,10 +16,10 @@ import type { TransactionOptions } from './types/transaction.interface';
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
-    start: vi.fn((callback) => {
+    start: vi.fn((_nodes, _edges, onComplete) => {
       // Simulate async initialization
-      if (callback) {
-        setTimeout(callback, 0);
+      if (onComplete) {
+        setTimeout(onComplete, 0);
       }
     }),
     isInitialized: false,
@@ -155,11 +155,8 @@ describe('FlowCore', () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Now init command should have been emitted
-      // When virtualization is disabled, renderedNodeIds/renderedEdgeIds are undefined (meaning "all rendered")
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {
-        renderedNodeIds: undefined,
-        renderedEdgeIds: undefined,
-      });
+      // When virtualization is disabled, init is called with empty object (all nodes/edges rendered)
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {});
     });
 
     it('should initialize with default getFlowOffset when not provided', () => {

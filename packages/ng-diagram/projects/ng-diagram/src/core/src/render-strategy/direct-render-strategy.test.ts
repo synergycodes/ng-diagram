@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import type { FlowCore } from '../flow-core';
 import { mockEdge, mockNode } from '../test-utils';
 import type { Edge, Node } from '../types';
 import { DirectRenderStrategy } from './direct-render-strategy';
 
 describe('DirectRenderStrategy', () => {
-  const strategy = new DirectRenderStrategy();
+  const mockFlowCore = {} as FlowCore;
+  const strategy = new DirectRenderStrategy(mockFlowCore);
 
   it('should return all nodes and edges unchanged', () => {
     const nodes: Node[] = [

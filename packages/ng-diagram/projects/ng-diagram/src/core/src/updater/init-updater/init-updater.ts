@@ -1,5 +1,5 @@
 import { FlowCore } from '../../flow-core';
-import { EdgeLabel, Node, Port, Size } from '../../types';
+import { Edge, EdgeLabel, Node, Port, Size } from '../../types';
 import { Updater } from '../updater.interface';
 import { InitState } from './init-state';
 import { LateArrivalQueue } from './late-arrival-queue';
@@ -68,6 +68,9 @@ export class InitUpdater implements Updater {
   /** Callback to execute when initialization completes */
   private onCompleteCallback?: () => void | Promise<void>;
 
+  /** Number of rendered nodes (captured at start for measurement tracking) */
+  private renderedNodeCount = 0;
+
   /** Safety timeout to prevent indefinite waiting for measurements */
   private measurementTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -85,12 +88,13 @@ export class InitUpdater implements Updater {
    * Starts the initialization process.
    * Collects pre-existing measurements and waits for entity additions to stabilize.
    *
+   * @param nodes - Rendered nodes to track for initialization
+   * @param edges - Rendered edges to track for initialization
    * @param onComplete - Optional callback to execute after initialization completes
    */
-  start(onComplete?: () => void | Promise<void>) {
+  start(nodes: Node[], edges: Edge[], onComplete?: () => void | Promise<void>) {
+    this.renderedNodeCount = nodes.length;
     this.onCompleteCallback = onComplete;
-
-    const { nodes, edges } = this.flowCore.getRenderedModel();
 
     const hasNodes = nodes.length > 0;
     const hasEdges = edges.length > 0;
@@ -233,8 +237,7 @@ export class InitUpdater implements Updater {
       return;
     }
 
-    const { nodes } = this.flowCore.getRenderedModel();
-    if (this.initState.allEntitiesHaveMeasurements(nodes.length)) {
+    if (this.initState.allEntitiesHaveMeasurements(this.renderedNodeCount)) {
       this.finish();
     }
   }
@@ -274,8 +277,7 @@ export class InitUpdater implements Updater {
   private startMeasurementTimeout(): void {
     this.measurementTimeout = setTimeout(() => {
       if (!this.isInitialized) {
-        const { nodes } = this.flowCore.getRenderedModel();
-        const nodeCount = nodes.length;
+        const nodeCount = this.getNodeCount();
         const expectedPorts = this.initState.portsToMeasure.size;
         const measuredPorts = this.initState.measuredPorts.size;
         const expectedLabels = this.initState.labelsToMeasure.size;
@@ -304,5 +306,11 @@ export class InitUpdater implements Updater {
       clearTimeout(this.measurementTimeout);
       this.measurementTimeout = null;
     }
+  }
+
+  private getNodeCount() {
+    const { nodes, edges, metadata } = this.flowCore.getState();
+    const result = this.flowCore.renderStrategy.process(nodes, edges, metadata.viewport);
+    return result.nodes.length;
   }
 }

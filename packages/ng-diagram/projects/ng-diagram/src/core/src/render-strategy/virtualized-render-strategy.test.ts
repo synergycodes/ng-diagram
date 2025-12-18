@@ -50,7 +50,11 @@ describe('VirtualizedRenderStrategy', () => {
       actionStateManager: {
         isPanning: vi.fn().mockReturnValue(false),
       },
-      renderWithExpandedBuffer: vi.fn(),
+      eventManager: {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        on: vi.fn().mockReturnValue(() => {}), // Returns unsubscribe function
+      },
+      render: vi.fn(),
     } as unknown as FlowCore;
 
     strategy = new VirtualizedRenderStrategy(mockFlowCore);

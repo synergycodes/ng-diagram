@@ -8,7 +8,9 @@ describe('InitUpdater', () => {
   let mockFlowCore: {
     getState: Mock;
     setState: Mock;
-    getRenderedModel: Mock;
+    renderStrategy: {
+      process: Mock;
+    };
     internalUpdater: {
       addPort: Mock;
       addEdgeLabel: Mock;
@@ -17,6 +19,7 @@ describe('InitUpdater', () => {
       applyEdgeLabelSize: Mock;
     };
   };
+  let mockRenderedModel: { nodes: Node[]; edges: Edge[] };
 
   const createMockNode = (id: string, withPorts = false): Node => ({
     id,
@@ -75,7 +78,9 @@ describe('InitUpdater', () => {
     mockFlowCore = {
       getState: vi.fn(),
       setState: vi.fn(),
-      getRenderedModel: vi.fn(),
+      renderStrategy: {
+        process: vi.fn().mockReturnValue({ nodes: [], edges: [] }),
+      },
       internalUpdater: {
         addPort: vi.fn(),
         addEdgeLabel: vi.fn(),
@@ -84,6 +89,15 @@ describe('InitUpdater', () => {
         applyEdgeLabelSize: vi.fn(),
       },
     };
+
+    mockRenderedModel = { nodes: [], edges: [] };
+
+    // Default getState mock - tests will override as needed
+    mockFlowCore.getState.mockReturnValue({
+      nodes: [],
+      edges: [],
+      metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+    });
   });
 
   afterEach(() => {
@@ -92,30 +106,18 @@ describe('InitUpdater', () => {
 
   describe('constructor', () => {
     it('should initialize with isInitialized=false when no nodes or edges', () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [] });
-
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       expect(initUpdater.isInitialized).toBe(false);
     });
 
     it('should initialize with isInitialized=false when nodes exist', () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({
-        nodes: [createMockNode('node1')],
-        edges: [],
-      });
-
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       expect(initUpdater.isInitialized).toBe(false);
     });
 
     it('should initialize with isInitialized=false when edges exist', () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({
-        nodes: [],
-        edges: [createMockEdge('edge1')],
-      });
-
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       expect(initUpdater.isInitialized).toBe(false);
@@ -124,11 +126,15 @@ describe('InitUpdater', () => {
 
   describe('start', () => {
     it('should mark as initialized immediately with no entities', async () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       // Should resolve immediately without waiting for stability delay
       await vi.runAllTimersAsync();
@@ -137,12 +143,16 @@ describe('InitUpdater', () => {
     });
 
     it('should call onComplete callback after initialization', async () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       const onComplete = vi.fn();
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -152,11 +162,15 @@ describe('InitUpdater', () => {
 
     it('should wait for node measurements before finishing', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       // Advance only stability delay, not the measurement timeout
       vi.advanceTimersByTime(STABILITY_DELAY);
@@ -186,11 +200,15 @@ describe('InitUpdater', () => {
           },
         ],
       };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       // Advance only stability delay, not the measurement timeout
       vi.advanceTimersByTime(STABILITY_DELAY);
@@ -218,11 +236,15 @@ describe('InitUpdater', () => {
           },
         ],
       };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [edge] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       // Advance only stability delay, not the measurement timeout
       vi.advanceTimersByTime(STABILITY_DELAY);
@@ -238,12 +260,16 @@ describe('InitUpdater', () => {
     });
 
     it('should handle async onComplete callback', async () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       const onComplete = vi.fn().mockResolvedValue(undefined);
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -256,11 +282,15 @@ describe('InitUpdater', () => {
   describe('applyNodeSize', () => {
     it('should record node size measurement and apply on finish', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
@@ -277,8 +307,12 @@ describe('InitUpdater', () => {
 
     it('should queue measurement if finishing', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       const onComplete = vi.fn(() => {
@@ -286,7 +320,7 @@ describe('InitUpdater', () => {
         initUpdater.applyNodeSize('node2', { width: 200, height: 200 });
       });
 
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -307,13 +341,17 @@ describe('InitUpdater', () => {
   describe('addPort', () => {
     beforeEach(() => {
       const node = createMockNode('node1');
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
     });
 
     it('should add port and delay stabilization', async () => {
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       const port = createMockPort('port1');
       initUpdater.addPort('node1', port);
@@ -326,7 +364,7 @@ describe('InitUpdater', () => {
     });
 
     it('should reset stability timer on multiple port additions', async () => {
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       initUpdater.addPort('node1', createMockPort('port1'));
 
@@ -363,11 +401,15 @@ describe('InitUpdater', () => {
           },
         ],
       };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -396,11 +438,15 @@ describe('InitUpdater', () => {
           },
         ],
       };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
@@ -419,13 +465,17 @@ describe('InitUpdater', () => {
   describe('addEdgeLabel', () => {
     beforeEach(() => {
       const edge = createMockEdge('edge1');
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [edge] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
     });
 
     it('should add label and delay stabilization', async () => {
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       const label = createMockEdgeLabel('label1');
       initUpdater.addEdgeLabel('edge1', label);
@@ -438,7 +488,7 @@ describe('InitUpdater', () => {
     });
 
     it('should reset stability timer on multiple label additions', async () => {
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
 
@@ -462,13 +512,17 @@ describe('InitUpdater', () => {
   describe('applyEdgeLabelSize', () => {
     beforeEach(() => {
       const edge = createMockEdge('edge1', true);
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [edge] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
     });
 
     it('should record label size measurement', async () => {
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -484,8 +538,12 @@ describe('InitUpdater', () => {
   describe('late arrival queueing', () => {
     it('should queue port additions that arrive during finish', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       let finishCallbackExecuted = false;
@@ -495,7 +553,7 @@ describe('InitUpdater', () => {
         finishCallbackExecuted = true;
       });
 
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -512,8 +570,12 @@ describe('InitUpdater', () => {
 
     it('should queue measurements that arrive during finish', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       let finishCallbackExecuted = false;
@@ -523,7 +585,7 @@ describe('InitUpdater', () => {
         finishCallbackExecuted = true;
       });
 
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -542,8 +604,12 @@ describe('InitUpdater', () => {
     });
 
     it('should queue edge label additions that arrive during finish', async () => {
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [] });
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       let finishCallbackExecuted = false;
@@ -553,7 +619,7 @@ describe('InitUpdater', () => {
         finishCallbackExecuted = true;
       });
 
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
@@ -567,11 +633,15 @@ describe('InitUpdater', () => {
   describe('state application', () => {
     it('should apply all collected data on finish', async () => {
       const node = createMockNode('node1');
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
       initUpdater.applyNodeSize('node1', { width: 150, height: 150 });
 
       vi.advanceTimersByTime(STABILITY_DELAY);
@@ -584,11 +654,15 @@ describe('InitUpdater', () => {
 
     it('should merge new ports with existing ports', async () => {
       const node = createMockNode('node1', true);
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       const newPort = createMockPort('port2');
       initUpdater.addPort('node1', newPort);
@@ -609,11 +683,15 @@ describe('InitUpdater', () => {
 
     it('should merge new labels with existing labels', async () => {
       const edge = createMockEdge('edge1', true);
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [], edges: [edge] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [], edges: [edge] });
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       const newLabel = createMockEdgeLabel('label2');
       initUpdater.addEdgeLabel('edge1', newLabel);
@@ -633,11 +711,15 @@ describe('InitUpdater', () => {
   describe('safety timeout', () => {
     it('should force finish after measurement timeout when measurements never arrive', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
-      mockFlowCore.getRenderedModel.mockReturnValue({ nodes: [node], edges: [] });
-      mockFlowCore.getState.mockReturnValue({ nodes: [node], edges: [] });
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
-      initUpdater.start();
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
 
       // Advance stability delay
       vi.advanceTimersByTime(STABILITY_DELAY);
@@ -673,19 +755,20 @@ describe('InitUpdater', () => {
         ],
       };
       const edge1 = createMockEdge('edge1');
-      mockFlowCore.getRenderedModel.mockReturnValue({
+      mockRenderedModel = {
         nodes: [node1, node2],
         edges: [edge1],
-      });
+      };
       mockFlowCore.getState.mockReturnValue({
         nodes: [node1, node2],
         edges: [edge1],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
       });
 
       initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
 
       const onComplete = vi.fn();
-      initUpdater.start(onComplete);
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
 
       // Add new entities
       initUpdater.addPort('node1', createMockPort('port1'));

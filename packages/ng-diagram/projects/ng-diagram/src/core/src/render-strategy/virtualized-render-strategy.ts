@@ -1,3 +1,4 @@
+import type { EventManager } from '../event-manager/event-manager';
 import { FlowCore } from '../flow-core';
 import type { Edge, Node, Rect, Viewport, VirtualizationConfig } from '../types';
 import { isGroup } from '../utils';
@@ -21,6 +22,10 @@ const EMPTY_SET = new Set<string>();
 /**
  * Virtualized render strategy - returns only nodes and edges visible in the viewport.
  * Used when virtualization is enabled for large diagrams.
+ *
+ * Handles idle management for both panning and zooming:
+ * - During active panning/zooming: uses cached results for performance
+ * - After idle period: renders with expanded buffer to preload more nodes
  */
 export class VirtualizedRenderStrategy implements RenderStrategy {
   private lastViewportRect: Rect | null = null;
@@ -35,13 +40,77 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
   private zoomIdleTimeout: ReturnType<typeof setTimeout> | null = null;
   private isZooming = false;
 
-  constructor(private readonly flowCore: FlowCore) {}
+  // Pan idle tracking
+  private panIdleTimeout: ReturnType<typeof setTimeout> | null = null;
+  private wasPanning = false;
+  private unsubscribeActionState: (() => void) | null = null;
+
+  // Flag to use expanded buffer on next process() call
+  private pendingExpandedBuffer = false;
+
+  // Track nodes reference for optimization (skip spatialHash update during panning/zooming)
+  private lastNodesRef: Node[] | null = null;
+
+  constructor(private readonly flowCore: FlowCore) {
+    this.subscribeToActionState(flowCore.eventManager);
+  }
+
+  init(): void {
+    this.flowCore.spatialHash.process(this.flowCore.model.getNodes());
+
+    this.flowCore.model.onChange((state) => {
+      // Optimization: skip spatialHash update during panning/zooming (nodes reference stays the same)
+      if (state.nodes !== this.lastNodesRef) {
+        this.flowCore.spatialHash.process(state.nodes);
+        this.flowCore.modelLookup.desynchronize();
+        this.lastNodesRef = state.nodes;
+      }
+      this.flowCore.render();
+    });
+
+    // Trigger initial render to ensure consistent visible nodes
+    this.flowCore.render();
+
+    const { nodes, edges, metadata } = this.flowCore.getState();
+    const result = this.process(nodes, edges, metadata.viewport);
+    this.flowCore.initUpdater.start(result.nodes, result.edges, async () => {
+      await this.flowCore.commandHandler.emit('init', {
+        renderedNodeIds: result.nodes.map((n) => n.id),
+        renderedEdgeIds: result.edges.map((e) => e.id),
+      });
+    });
+  }
+
+  /**
+   * Subscribes to actionStateChanged to detect pan start/end.
+   */
+  private subscribeToActionState(eventManager: EventManager): void {
+    this.unsubscribeActionState = eventManager.on('actionStateChanged', ({ actionState }) => {
+      const isPanning = !!actionState.panning?.active;
+
+      if (this.wasPanning && !isPanning) {
+        // Panning ended - schedule idle fill
+        this.schedulePanIdle();
+      } else if (!this.wasPanning && isPanning) {
+        // Panning started - cancel any pending fill
+        this.cancelPanIdle();
+      }
+
+      this.wasPanning = isPanning;
+    });
+  }
 
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult {
     const config = this.flowCore.config.virtualization;
 
     if (this.shouldBypass(nodes, viewport, config)) {
       return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
+    }
+
+    // Check if we should use expanded buffer (set by idle callbacks)
+    const useExpandedBuffer = this.pendingExpandedBuffer;
+    if (useExpandedBuffer) {
+      this.pendingExpandedBuffer = false;
     }
 
     // Detect zoom changes and defer recomputation during active zooming
@@ -55,27 +124,31 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
 
     this.lastScale = currentScale;
 
-    const viewportRect = this.getViewportRect(viewport!, config.padding);
+    const paddingMultiplier = useExpandedBuffer ? config.expandedPadding : config.padding;
+    const viewportRect = this.getViewportRect(viewport!, paddingMultiplier);
 
     // During active zooming or panning, use cached result to avoid lag
     const isPanning = this.flowCore.actionStateManager.isPanning();
     const hasCache = this.cachedNodeIds && this.cachedEdgeIds;
 
-    if (this.isZooming && hasCache) {
-      return this.buildResultFromCachedIds(nodes, edges);
-    }
-
-    if (isPanning && hasCache) {
-      // During panning, use cache unless we've moved too far from last recompute
-      if (this.lastViewportRect && !this.hasMovedTooFar(viewportRect, this.lastViewportRect)) {
+    // Skip caching when using expanded buffer - we want fresh computation
+    if (!useExpandedBuffer) {
+      if (this.isZooming && hasCache) {
         return this.buildResultFromCachedIds(nodes, edges);
       }
-      // Moved too far - fall through to recompute
-    }
 
-    if (this.canUseCachedResult(nodes.length, edges.length, viewportRect)) {
-      // Use cached IDs but look up fresh objects from input arrays
-      return this.buildResultFromCachedIds(nodes, edges);
+      if (isPanning && hasCache) {
+        // During panning, use cache unless we've moved too far from last recompute
+        if (this.lastViewportRect && !this.hasMovedTooFar(viewportRect, this.lastViewportRect)) {
+          return this.buildResultFromCachedIds(nodes, edges);
+        }
+        // Moved too far - fall through to recompute
+      }
+
+      if (this.canUseCachedResult(nodes.length, edges.length, viewportRect)) {
+        // Use cached IDs but look up fresh objects from input arrays
+        return this.buildResultFromCachedIds(nodes, edges);
+      }
     }
 
     const result = this.computeVisibleElements(viewportRect);
@@ -102,11 +175,46 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     this.zoomIdleTimeout = setTimeout(() => {
       this.isZooming = false;
       this.zoomIdleTimeout = null;
-      // Invalidate cache to force recomputation on next render
-      this.lastViewportRect = null;
-      // Trigger a render to update with new zoom level
-      this.flowCore.renderWithExpandedBuffer();
+      this.triggerExpandedBufferRender();
     }, ZOOM_IDLE_DELAY);
+  }
+
+  /**
+   * Schedules pan idle fill after panning ends.
+   * Uses the configured idle threshold from virtualization config.
+   */
+  private schedulePanIdle(): void {
+    if (!this.flowCore.config.virtualization.bufferFill.enabled) {
+      return;
+    }
+
+    this.cancelPanIdle();
+    const idleThreshold = this.flowCore.config.virtualization.bufferFill.idleThreshold;
+
+    this.panIdleTimeout = setTimeout(() => {
+      this.panIdleTimeout = null;
+      this.triggerExpandedBufferRender();
+    }, idleThreshold);
+  }
+
+  /**
+   * Cancels any pending pan idle fill.
+   */
+  private cancelPanIdle(): void {
+    if (this.panIdleTimeout !== null) {
+      clearTimeout(this.panIdleTimeout);
+      this.panIdleTimeout = null;
+    }
+  }
+
+  /**
+   * Triggers a render with expanded buffer by setting the flag and requesting render.
+   */
+  private triggerExpandedBufferRender(): void {
+    // Invalidate cache to force recomputation
+    this.lastViewportRect = null;
+    this.pendingExpandedBuffer = true;
+    this.flowCore.render();
   }
 
   private buildResultFromCachedIds(nodes: Node[], edges: Edge[]): RenderStrategyResult {
@@ -127,34 +235,11 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
   destroy(): void {
     if (this.zoomIdleTimeout) {
       clearTimeout(this.zoomIdleTimeout);
+      this.zoomIdleTimeout = null;
     }
-  }
-
-  /**
-   * Process with expanded buffer padding - used during pan idle to preload more nodes.
-   * Uses expandedPadding from config instead of normal padding.
-   */
-  processWithExpandedBuffer(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult {
-    const config = this.flowCore.config.virtualization;
-
-    if (this.shouldBypass(nodes, viewport, config)) {
-      return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
-    }
-
-    // Use expanded padding for buffer fill
-    const viewportRect = this.getViewportRect(viewport!, config.expandedPadding);
-
-    // Force fresh computation with expanded buffer
-    const result = this.computeVisibleElements(viewportRect);
-
-    // Update cache with expanded buffer results
-    this.cachedNodeIds = result.nodeIds;
-    this.cachedEdgeIds = result.edgeIds;
-    this.lastViewportRect = viewportRect;
-    this.lastNodesLength = nodes.length;
-    this.lastEdgesLength = edges.length;
-
-    return result;
+    this.cancelPanIdle();
+    this.unsubscribeActionState?.();
+    this.unsubscribeActionState = null;
   }
 
   private shouldBypass(nodes: Node[], viewport: Viewport | undefined, config: VirtualizationConfig): boolean {
