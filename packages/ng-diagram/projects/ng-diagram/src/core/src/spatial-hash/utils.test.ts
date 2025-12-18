@@ -31,9 +31,7 @@ describe('SpatialHash utils', () => {
 
   describe('getNodesInRange', () => {
     it('should call queryIds with the correct parameters', () => {
-      mockGetState.mockReturnValue({
-        nodes: [],
-      });
+      mockQueryIds.mockReturnValue([]);
 
       getNodesInRange(flowCore, { x: 0, y: 0 }, 10);
 
@@ -42,8 +40,11 @@ describe('SpatialHash utils', () => {
 
     it('should return nodes found by spatial hash and which exists in state', () => {
       const node = { ...mockNode, id: '1', size: { width: 100, height: 100 } };
-      mockGetState.mockReturnValue({
-        nodes: [node, { ...mockNode, id: '3', size: { width: 100, height: 100 } }],
+      const node3 = { ...mockNode, id: '3', size: { width: 100, height: 100 } };
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node;
+        if (id === '3') return node3;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2']);
 
@@ -81,8 +82,11 @@ describe('SpatialHash utils', () => {
       const node2 = { ...mockNode, id: '2', position: { x: 10, y: 10 }, size: { width: 5, height: 5 } };
       const node3 = { ...mockNode, id: '3', position: { x: 20, y: 20 }, size: { width: 5, height: 5 } };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2, node3],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        if (id === '3') return node3;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2', '3']);
 
@@ -130,8 +134,11 @@ describe('SpatialHash utils', () => {
         measuredPorts: [{ id: '3', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } }],
       };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2, node3],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        if (id === '3') return node3;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2', '3']);
 
@@ -158,8 +165,11 @@ describe('SpatialHash utils', () => {
       const node2 = { ...mockNode, id: '2', position: { x: 20, y: 20 }, size: { width: 10, height: 10 } };
       const node3 = { ...mockNode, id: '3', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2, node3],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        if (id === '3') return node3;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2']);
 
@@ -184,8 +194,11 @@ describe('SpatialHash utils', () => {
       const node2 = { ...mockNode, id: '2', position: { x: 15, y: 15 }, size: { width: 10, height: 10 } };
       const node3 = { ...mockNode, id: '3', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2, node3],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        if (id === '3') return node3;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2', '3']);
 
@@ -198,8 +211,10 @@ describe('SpatialHash utils', () => {
       const node1 = { ...mockNode, id: '1', position: { x: 0, y: 0 }, size: { width: 10, height: 10 } };
       const node2 = { ...mockNode, id: '2', position: { x: 15, y: 15 }, size: { width: 10, height: 10 } };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2']);
 
@@ -213,8 +228,11 @@ describe('SpatialHash utils', () => {
       const node2 = { ...mockNode, id: '2', position: { x: 25, y: 25 }, size: { width: 10, height: 10 } };
       const node3 = { ...mockNode, id: '3', position: { x: 50, y: 50 }, size: { width: 10, height: 10 } };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2, node3],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        if (id === '3') return node3;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2', '3']);
 
@@ -227,8 +245,10 @@ describe('SpatialHash utils', () => {
       const node1 = { ...mockNode, id: '1', position: { x: 0, y: 0 }, size: { width: 20, height: 20 } };
       const node2 = { ...mockNode, id: '2', position: { x: 15, y: 15 }, size: { width: 20, height: 20 } };
 
-      mockGetState.mockReturnValue({
-        nodes: [node1, node2],
+      mockGetNodeById.mockImplementation((id: string) => {
+        if (id === '1') return node1;
+        if (id === '2') return node2;
+        return null;
       });
       mockQueryIds.mockReturnValue(['1', '2']);
 
