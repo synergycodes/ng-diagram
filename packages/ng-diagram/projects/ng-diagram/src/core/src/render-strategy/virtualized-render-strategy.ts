@@ -1,8 +1,9 @@
 import type { EventManager } from '../event-manager/event-manager';
-import { FlowCore } from '../flow-core';
+import type { FlowCore } from '../flow-core';
 import type { Edge, Node, Rect, Viewport, VirtualizationConfig } from '../types';
 import { isGroup } from '../utils';
-import type { RenderStrategy, RenderStrategyResult } from './render-strategy.interface';
+import { BaseRenderStrategy } from './base-render-strategy';
+import type { RenderStrategyResult } from './render-strategy.interface';
 
 const DEFAULT_VIEWPORT_WIDTH = 1920;
 const DEFAULT_VIEWPORT_HEIGHT = 1080;
@@ -27,7 +28,7 @@ const EMPTY_SET = new Set<string>();
  * - During active panning/zooming: uses cached results for performance
  * - After idle period: renders with expanded buffer to preload more nodes
  */
-export class VirtualizedRenderStrategy implements RenderStrategy {
+export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   private lastViewportRect: Rect | null = null;
   private lastNodesLength = 0;
   private lastEdgesLength = 0;
@@ -51,7 +52,8 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
   // Track nodes reference for optimization (skip spatialHash update during panning/zooming)
   private lastNodesRef: Node[] | null = null;
 
-  constructor(private readonly flowCore: FlowCore) {
+  constructor(flowCore: FlowCore) {
+    super(flowCore);
     this.subscribeToActionState(flowCore.eventManager);
   }
 
@@ -65,11 +67,11 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
         this.flowCore.modelLookup.desynchronize();
         this.lastNodesRef = state.nodes;
       }
-      this.flowCore.render();
+      this.render();
     });
 
     // Trigger initial render to ensure consistent visible nodes
-    this.flowCore.render();
+    this.render();
 
     const { nodes, edges, metadata } = this.flowCore.getState();
     const result = this.process(nodes, edges, metadata.viewport);
@@ -214,7 +216,7 @@ export class VirtualizedRenderStrategy implements RenderStrategy {
     // Invalidate cache to force recomputation
     this.lastViewportRect = null;
     this.pendingExpandedBuffer = true;
-    this.flowCore.render();
+    this.render();
   }
 
   private buildResultFromCachedIds(nodes: Node[], edges: Edge[]): RenderStrategyResult {

@@ -1,6 +1,7 @@
 import type { FlowCore } from '../flow-core';
 import type { Edge, Node } from '../types';
-import type { RenderStrategy, RenderStrategyResult } from './render-strategy.interface';
+import { BaseRenderStrategy } from './base-render-strategy';
+import type { RenderStrategyResult } from './render-strategy.interface';
 
 // Reusable empty set for direct rendering (avoids allocation on every call)
 const EMPTY_SET = new Set<string>();
@@ -9,16 +10,18 @@ const EMPTY_SET = new Set<string>();
  * Direct render strategy - returns all nodes and edges without virtualization.
  * Used when virtualization is disabled.
  */
-export class DirectRenderStrategy implements RenderStrategy {
-  constructor(private readonly flowCore: FlowCore) {}
+export class DirectRenderStrategy extends BaseRenderStrategy {
+  constructor(flowCore: FlowCore) {
+    super(flowCore);
+  }
 
   init(): void {
-    this.flowCore.render();
+    this.render();
 
     this.flowCore.model.onChange((state) => {
       this.flowCore.spatialHash.process(state.nodes);
       this.flowCore.modelLookup.desynchronize();
-      this.flowCore.render();
+      this.render();
     });
 
     const nodes = this.flowCore.model.getNodes();

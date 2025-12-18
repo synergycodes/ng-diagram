@@ -78,9 +78,9 @@ export class FlowCore {
 
   constructor(
     modelAdapter: ModelAdapter,
-    private readonly renderer: Renderer,
-    public readonly inputEventsRouter: InputEventsRouter,
-    public readonly environment: EnvironmentInfo,
+    readonly renderer: Renderer,
+    readonly inputEventsRouter: InputEventsRouter,
+    readonly environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
     getFlowOffset?: () => Point,
     config: DeepPartial<FlowConfig> = {}
@@ -367,21 +367,6 @@ export class FlowCore {
       x: clientPosition.x - flowOffsetX,
       y: clientPosition.y - flowOffsetY,
     };
-  }
-
-  /**
-   * Renders the flow by applying the render strategy and drawing visible elements.
-   */
-  render(): void {
-    const { nodes, edges, metadata } = this.getState();
-    const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
-
-    // Apply render strategy (virtualization or direct)
-    const { nodes: visibleNodes, edges: visibleEdges } = this.renderStrategy.process(nodes, edges, metadata.viewport);
-
-    const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
-
-    this.renderer.draw(visibleNodes, finalEdges, metadata.viewport);
   }
 
   /**
