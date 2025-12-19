@@ -38,9 +38,13 @@ export class DiagramInitEmitter implements EventEmitter {
 
     const { nodesMap, edgesMap, initialUpdate } = context;
 
-    // With virtualization, only track rendered nodes/edges for measurement
-    // Non-rendered nodes won't be measured until they enter the viewport
-    this.collectUnmeasuredItems(nodesMap, edgesMap, initialUpdate.renderedNodeIds, initialUpdate.renderedEdgeIds);
+    // Strategies provide explicit IDs; fallback to all nodes/edges for safety
+    this.collectUnmeasuredItems(
+      nodesMap,
+      edgesMap,
+      initialUpdate.renderedNodeIds ?? Array.from(nodesMap.keys()),
+      initialUpdate.renderedEdgeIds ?? Array.from(edgesMap.keys())
+    );
 
     if (this.areAllMeasured()) {
       this.emitInitEvent(context, eventManager);
@@ -79,18 +83,14 @@ export class DiagramInitEmitter implements EventEmitter {
   private collectUnmeasuredItems(
     nodesMap: Map<string, Node>,
     edgesMap: Map<string, Edge>,
-    renderedNodeIds?: string[],
-    renderedEdgeIds?: string[]
+    renderedNodeIds: string[],
+    renderedEdgeIds: string[]
   ): void {
     this.unmeasuredNodes.clear();
     this.unmeasuredNodePorts.clear();
     this.unmeasuredEdgeLabels.clear();
 
-    // If renderedNodeIds provided (virtualization), only track those nodes
-    // Otherwise track all nodes (no virtualization or fallback)
-    const nodeIdsToTrack = renderedNodeIds ?? Array.from(nodesMap.keys());
-
-    for (const nodeId of nodeIdsToTrack) {
+    for (const nodeId of renderedNodeIds) {
       const node = nodesMap.get(nodeId);
       if (!node) continue;
 
@@ -105,11 +105,7 @@ export class DiagramInitEmitter implements EventEmitter {
       }
     }
 
-    // If renderedEdgeIds provided (virtualization), only track those edges
-    // Otherwise track all edges (no virtualization or fallback)
-    const edgeIdsToTrack = renderedEdgeIds ?? Array.from(edgesMap.keys());
-
-    for (const edgeId of edgeIdsToTrack) {
+    for (const edgeId of renderedEdgeIds) {
       const edge = edgesMap.get(edgeId);
       if (!edge) continue;
 
@@ -177,15 +173,14 @@ export class DiagramInitEmitter implements EventEmitter {
     this.clearSafetyHatchTimeout();
 
     const { nodesMap, edgesMap, initialUpdate } = context;
+
+    // Strategies provide explicit IDs; fallback to all nodes/edges for safety
+    const renderedNodeIds = new Set(initialUpdate.renderedNodeIds ?? nodesMap.keys());
+    const renderedEdgeIds = new Set(initialUpdate.renderedEdgeIds ?? edgesMap.keys());
+
     const event: DiagramInitEvent = {
-      // undefined means all nodes/edges are rendered (DirectRenderStrategy)
-      // string[] means only those specific IDs are rendered (VirtualizedRenderStrategy)
-      nodes: initialUpdate.renderedNodeIds
-        ? Array.from(nodesMap.values()).filter((x) => initialUpdate.renderedNodeIds!.includes(x.id))
-        : Array.from(nodesMap.values()),
-      edges: initialUpdate.renderedEdgeIds
-        ? Array.from(edgesMap.values()).filter((x) => initialUpdate.renderedEdgeIds!.includes(x.id))
-        : Array.from(edgesMap.values()),
+      nodes: Array.from(nodesMap.values()).filter((x) => renderedNodeIds.has(x.id)),
+      edges: Array.from(edgesMap.values()).filter((x) => renderedEdgeIds.has(x.id)),
       viewport: context.state.metadata.viewport,
     };
 

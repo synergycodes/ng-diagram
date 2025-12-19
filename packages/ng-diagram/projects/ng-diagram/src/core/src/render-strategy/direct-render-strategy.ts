@@ -27,7 +27,10 @@ export class DirectRenderStrategy extends BaseRenderStrategy {
     const nodes = this.flowCore.model.getNodes();
     const edges = this.flowCore.model.getEdges();
     this.flowCore.initUpdater.start(nodes, edges, async () => {
-      await this.flowCore.commandHandler.emit('init', {});
+      await this.flowCore.commandHandler.emit('init', {
+        renderedNodeIds: nodes.map((n) => n.id),
+        renderedEdgeIds: edges.map((e) => e.id),
+      });
     });
   }
 

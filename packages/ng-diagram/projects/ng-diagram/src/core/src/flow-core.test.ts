@@ -155,8 +155,11 @@ describe('FlowCore', () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Now init command should have been emitted
-      // When virtualization is disabled, init is called with empty object (all nodes/edges rendered)
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {});
+      // Both strategies provide explicit renderedNodeIds/renderedEdgeIds (empty arrays when no nodes/edges)
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {
+        renderedNodeIds: [],
+        renderedEdgeIds: [],
+      });
     });
 
     it('should initialize with default getFlowOffset when not provided', () => {

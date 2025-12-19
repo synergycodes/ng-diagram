@@ -3,12 +3,17 @@ import type { Node, Port } from '../../types';
 import { EdgeLabel } from '../../types';
 import { getRect, isSameRect } from '../../utils';
 import { Updater } from '../updater.interface';
+import { DirectPortUpdateStrategy } from './direct-port-update-strategy';
+import type { PortUpdateStrategy } from './port-update-strategy.interface';
+import { VirtualizedPortUpdateStrategy } from './virtualized-port-update-strategy';
 
 export class InternalUpdater implements Updater {
-  constructor(private readonly flowCore: FlowCore) {}
+  private readonly portUpdateStrategy: PortUpdateStrategy;
 
-  private get isVirtualizationEnabled(): boolean {
-    return this.flowCore.config.virtualization.enabled;
+  constructor(private readonly flowCore: FlowCore) {
+    this.portUpdateStrategy = this.flowCore.config.virtualization.enabled
+      ? new VirtualizedPortUpdateStrategy(flowCore)
+      : new DirectPortUpdateStrategy(flowCore);
   }
 
   /**
@@ -38,33 +43,7 @@ export class InternalUpdater implements Updater {
    * Internal method to add a new port to the flow
    */
   addPort(nodeId: string, port: Port): void {
-    if (this.isVirtualizationEnabled) {
-      this.addPortVirtualized(nodeId, port);
-    } else {
-      this.addPortStandard(nodeId, port);
-    }
-  }
-
-  private addPortVirtualized(nodeId: string, port: Port): void {
-    if (this.isPortAlreadyMeasured(nodeId, port.id)) {
-      return;
-    }
-
-    this.flowCore.portBatchProcessor.processAddBatched(nodeId, port, (allAdditions) => {
-      this.flowCore.commandHandler.emit('addPortsBulk', { additions: allAdditions });
-    });
-  }
-
-  private addPortStandard(nodeId: string, port: Port): void {
-    this.flowCore.portBatchProcessor.processAdd(nodeId, port, (nodeId, ports) => {
-      this.flowCore.commandHandler.emit('addPorts', { nodeId, ports });
-    });
-  }
-
-  private isPortAlreadyMeasured(nodeId: string, portId: string): boolean {
-    const node = this.flowCore.getNodeById(nodeId);
-    const existingPort = node?.measuredPorts?.find((p) => p.id === portId);
-    return !!(existingPort?.size && existingPort?.position);
+    this.portUpdateStrategy.addPort(nodeId, port);
   }
 
   /**
@@ -73,11 +52,7 @@ export class InternalUpdater implements Updater {
    * In virtualization mode, ports persist in model (only DOM unmounts).
    */
   deletePort(nodeId: string, portId: string): void {
-    if (this.isVirtualizationEnabled) {
-      return;
-    }
-
-    this.flowCore.commandHandler.emit('deletePorts', { nodeId, portIds: [portId] });
+    this.portUpdateStrategy.deletePort?.(nodeId, portId);
   }
 
   /**
@@ -95,35 +70,7 @@ export class InternalUpdater implements Updater {
       return;
     }
 
-    if (this.isVirtualizationEnabled) {
-      this.updatePortsVirtualized(nodeId, portsToUpdate);
-    } else {
-      this.updatePortsStandard(nodeId, portsToUpdate);
-    }
-  }
-
-  private updatePortsVirtualized(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void {
-    for (const { id, size, position } of ports) {
-      this.flowCore.portBatchProcessor.processUpdateBatched(
-        nodeId,
-        { portId: id, portChanges: { size, position } },
-        (allUpdates) => {
-          this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
-        }
-      );
-    }
-  }
-
-  private updatePortsStandard(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void {
-    for (const { id, size, position } of ports) {
-      this.flowCore.portBatchProcessor.processUpdate(
-        nodeId,
-        { portId: id, portChanges: { size, position } },
-        (nodeId, portUpdates) => {
-          this.flowCore.commandHandler.emit('updatePorts', { nodeId, ports: portUpdates });
-        }
-      );
-    }
+    this.portUpdateStrategy.updatePorts(nodeId, portsToUpdate);
   }
 
   /**
