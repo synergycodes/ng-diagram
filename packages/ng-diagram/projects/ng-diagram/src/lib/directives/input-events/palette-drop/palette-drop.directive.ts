@@ -1,4 +1,4 @@
-import { Directive, inject } from '@angular/core';
+import { Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { PaletteService } from '../../../services/palette/palette.service';
 
@@ -29,9 +29,23 @@ Documentation: https://www.ngdiagram.dev/docs/guides/palette/
     '(dragover)': 'onDragOver($event)',
   },
 })
-export class PaletteDropDirective {
+export class PaletteDropDirective implements OnInit, OnDestroy {
   private readonly inputEventsRouterService = inject(InputEventsRouterService);
   private readonly paletteService = inject(PaletteService);
+  private readonly el = inject(ElementRef<HTMLElement>);
+
+  private touchMoveListener = (event: TouchEvent) => this.onGlobalTouchMove(event);
+  private touchEndListener = (event: TouchEvent) => this.onGlobalTouchEnd(event);
+
+  ngOnInit(): void {
+    document.addEventListener('touchmove', this.touchMoveListener, { passive: false });
+    document.addEventListener('touchend', this.touchEndListener, { passive: false });
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('touchmove', this.touchMoveListener);
+    document.removeEventListener('touchend', this.touchEndListener);
+  }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
@@ -58,9 +72,49 @@ export class PaletteDropDirective {
     });
 
     this.paletteService.draggedNode.set(null);
+    this.paletteService.previewId.set(null);
   }
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
+  }
+
+  private onGlobalTouchMove(event: TouchEvent) {
+    if (this.paletteService.draggedNode()) {
+      event.preventDefault();
+    }
+  }
+
+  private onGlobalTouchEnd(event: TouchEvent) {
+    const dragged = this.paletteService.draggedNode();
+    if (!dragged) return;
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+
+    const dropElement = this.el.nativeElement;
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!target || !dropElement.contains(target)) {
+      // Not dropped on this area, just clear drag
+      this.paletteService.draggedNode.set(null);
+      this.paletteService.previewId.set(null);
+      return;
+    }
+
+    const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
+    this.inputEventsRouterService.emit({
+      ...baseEvent,
+      name: 'paletteDrop',
+      data: dragged,
+      lastInputPoint: {
+        x: touch.clientX,
+        y: touch.clientY,
+      },
+    });
+
+    this.paletteService.draggedNode.set(null);
+    this.paletteService.previewId.set(null);
+
+    event.preventDefault();
+    event.stopPropagation();
   }
 }
