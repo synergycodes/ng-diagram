@@ -28,24 +28,18 @@ export class MobileBoxSelectionDirective {
 
   onTouchStart(event: TouchInputEvent): void {
     if (!this.isSingleTouch(event)) {
-      this.isBoxSelectionActive = false;
-      this.touchStartPoint = null;
-      this.boxSelectionProvider.boundingBox.set(null);
-      this.clearLongPressTimer();
+      this.cancelBoxSelection();
       return;
     }
-    this.isBoxSelectionActive = false;
+
     this.touchStartPoint = { x: event.touches[0].clientX, y: event.touches[0].clientY };
 
-    this.clearLongPressTimer();
     this.longPressTimer = setTimeout(() => {
       this.isBoxSelectionActive = true;
       const touch = event.touches[0] || this.touchStartPoint;
-      if (!touch) {
-        return;
+      if (touch) {
+        this.emitBoxSelectionEvent('start', event, touch);
       }
-
-      this.emitBoxSelectionEvent('start', event, touch);
     }, this.LONG_PRESS_DELAY);
 
     event.preventDefault();
@@ -53,15 +47,12 @@ export class MobileBoxSelectionDirective {
   }
 
   onTouchMove(event: TouchInputEvent): void {
-    if (this.shouldCancelBoxSelection(event)) {
-      this.isBoxSelectionActive = false;
-      this.touchStartPoint = null;
-      this.boxSelectionProvider.boundingBox.set(null);
-      this.clearLongPressTimer();
+    if (!this.isSingleTouch(event) || this.shouldCancelDuringLongPress(event)) {
+      this.cancelBoxSelection();
       return;
     }
 
-    if (!this.shouldContinueBoxSelection(event)) {
+    if (!this.isBoxSelectionActive || !this.touchStartPoint) {
       return;
     }
 
@@ -80,22 +71,25 @@ export class MobileBoxSelectionDirective {
       this.touchStartPoint = null;
       return;
     }
-    this.isBoxSelectionActive = false;
 
     const touch = event.changedTouches[0] || event.touches[0] || this.touchStartPoint;
-    if (!touch) {
-      return;
+    if (touch) {
+      this.emitBoxSelectionEvent('end', event, touch);
     }
 
-    this.emitBoxSelectionEvent('end', event, touch);
-    this.touchStartPoint = null;
-    this.boxSelectionProvider.boundingBox.set(null);
-
+    this.cancelBoxSelection();
     event.preventDefault();
     event.stopPropagation();
   }
 
-  private clearLongPressTimer() {
+  private cancelBoxSelection(): void {
+    this.isBoxSelectionActive = false;
+    this.touchStartPoint = null;
+    this.boxSelectionProvider.boundingBox.set(null);
+    this.clearLongPressTimer();
+  }
+
+  private clearLongPressTimer(): void {
     if (this.longPressTimer) {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
@@ -106,22 +100,17 @@ export class MobileBoxSelectionDirective {
     return event.touches.length === 1;
   }
 
-  private shouldCancelBoxSelection(event: TouchInputEvent): boolean {
-    if (!this.isSingleTouch(event)) {
-      return true;
+  private shouldCancelDuringLongPress(event: TouchInputEvent): boolean {
+    if (!this.longPressTimer || !this.touchStartPoint || this.isBoxSelectionActive) {
+      return false;
     }
 
-    if (!this.isBoxSelectionActive && this.longPressTimer && this.touchStartPoint) {
-      const touch = event.touches[0];
-      return (
-        Math.abs(touch.clientX - this.touchStartPoint.x) > 10 || Math.abs(touch.clientY - this.touchStartPoint.y) > 10
-      );
-    }
-    return false;
-  }
-
-  private shouldContinueBoxSelection(event: TouchInputEvent): boolean {
-    return this.isBoxSelectionActive && this.isSingleTouch(event) && !!this.touchStartPoint;
+    const touch = event.touches[0];
+    const movedDistance = Math.max(
+      Math.abs(touch.clientX - this.touchStartPoint.x),
+      Math.abs(touch.clientY - this.touchStartPoint.y)
+    );
+    return movedDistance > 10;
   }
 
   private emitBoxSelectionEvent(
@@ -129,10 +118,13 @@ export class MobileBoxSelectionDirective {
     event: TouchInputEvent,
     touch: Touch | TouchStartPoint
   ): void {
-    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     if (!touch) {
       return;
     }
+
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event);
+    const clientX = 'clientX' in touch ? touch.clientX : touch.x;
+    const clientY = 'clientY' in touch ? touch.clientY : touch.y;
 
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -140,10 +132,7 @@ export class MobileBoxSelectionDirective {
       phase,
       target: undefined,
       targetType: 'diagram',
-      lastInputPoint: {
-        x: (touch as Touch).clientX ?? (touch as TouchStartPoint)?.x,
-        y: (touch as Touch).clientY ?? (touch as TouchStartPoint)?.y,
-      },
+      lastInputPoint: { x: clientX, y: clientY },
     });
   }
 
@@ -155,6 +144,7 @@ export class MobileBoxSelectionDirective {
     const y = Math.min(startY, endY);
     const width = Math.abs(endX - startX);
     const height = Math.abs(endY - startY);
+
     this.boxSelectionProvider.boundingBox.set({ x, y, width, height });
   }
 }

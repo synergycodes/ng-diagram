@@ -507,11 +507,7 @@ export interface MiddlewareHistoryUpdate {
 }
 
 // @public (undocumented)
-export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
-    // (undocumented)
-    ngOnDestroy(): void;
-    // (undocumented)
-    ngOnInit(): void;
+export class MobileBoxSelectionDirective {
     // (undocumented)
     onTouchEnd(event: TouchInputEvent): void;
     // (undocumented)
@@ -943,6 +939,8 @@ export class NgDiagramPaletteItemComponent {
     onDragStart(event: DragEvent): void;
     // @internal (undocumented)
     onMouseDown(): void;
+    // @internal (undocumented)
+    onTouchStart(event: TouchEvent): void;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPaletteItemComponent, "ng-diagram-palette-item", never, { "item": { "alias": "item"; "required": true; "isSignal": true; }; }, {}, ["paletteItemPreviewComponent"], ["*"], true, never>;
     // (undocumented)
@@ -1155,7 +1153,11 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
 export type OriginPoint = 'topLeft' | 'topCenter' | 'topRight' | 'centerLeft' | 'center' | 'centerRight' | 'bottomLeft' | 'bottomCenter' | 'bottomRight';
 
 // @public (undocumented)
-export class PaletteDropDirective {
+export class PaletteDropDirective implements OnInit, OnDestroy {
+    // (undocumented)
+    ngOnDestroy(): void;
+    // (undocumented)
+    ngOnInit(): void;
     // (undocumented)
     onDragOver(event: DragEvent): void;
     // (undocumented)
