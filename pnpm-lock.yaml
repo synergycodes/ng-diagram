@@ -202,8 +202,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2(@astrojs/starlight@0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)))
       starlight-typedoc:
-        specifier: ^0.21.3
-        version: 0.21.3(@astrojs/starlight@0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)))(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.8.3)))(typedoc@0.28.13(typescript@5.8.3))
+        specifier: ^0.21.5
+        version: 0.21.5(@astrojs/starlight@0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)))(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.8.3)))(typedoc@0.28.13(typescript@5.8.3))
       tailwindcss:
         specifier: ^4.1.16
         version: 4.1.16
@@ -7206,6 +7206,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   slash@5.1.0:
@@ -7311,8 +7312,8 @@ packages:
     peerDependencies:
       '@astrojs/starlight': '>=0.32.0'
 
-  starlight-typedoc@0.21.3:
-    resolution: {integrity: sha512-xqJlZ9Vd2bIWu61gvkHHiDQrwE9zHZGkf4sIr1LqY3FGv9g0IkDwn8/Falay0xOJoSf5XKs2J3BpFfhodLVGIg==}
+  starlight-typedoc@0.21.5:
+    resolution: {integrity: sha512-7JGaPHrP+HgX0sYGnafZcPuzMm+3OmHx7kqE0DWTrsuBfoQS02lJ6/PtJF9y0KCDcfsBynyo0G/1ttHcBq5Vww==}
     engines: {node: '>=18.17.1'}
     peerDependencies:
       '@astrojs/starlight': '>=0.32.0'
@@ -17452,7 +17453,7 @@ snapshots:
       '@astrojs/starlight': 0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1))
       github-slugger: 2.0.0
 
-  starlight-typedoc@0.21.3(@astrojs/starlight@0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)))(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.8.3)))(typedoc@0.28.13(typescript@5.8.3)):
+  starlight-typedoc@0.21.5(@astrojs/starlight@0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1)))(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.8.3)))(typedoc@0.28.13(typescript@5.8.3)):
     dependencies:
       '@astrojs/starlight': 0.35.3(astro@5.14.1(@types/node@24.6.2)(db0@0.3.4)(encoding@0.1.13)(ioredis@5.8.0)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(rollup@4.52.3)(sass@1.93.2)(terser@5.44.0)(typescript@5.8.3)(yaml@2.8.1))
       github-slugger: 2.0.0
