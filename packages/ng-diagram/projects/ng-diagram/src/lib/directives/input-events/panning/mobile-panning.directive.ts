@@ -61,8 +61,6 @@ export class MobilePanningDirective {
     this.preventDefaultAndStop(event);
   }
 
-  // --- Private helpers ---
-
   private getMidpoint(touches: TouchList): { x: number; y: number } {
     if (touches.length < 2) {
       return { x: 0, y: 0 };
@@ -77,7 +75,7 @@ export class MobilePanningDirective {
     if (!viewportPanningEnabled || shouldDiscardEvent(event, 'pan')) {
       return false;
     }
-    return !(event.zoomingHandled || event.boxSelectionHandled);
+    return !event.zoomingHandled;
   }
 
   private isTwoFingerTouch(event: TouchInputEvent): boolean {

@@ -1,4 +1,4 @@
-import { Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services';
 import { BoxSelectionProviderService } from '../../../services/box-selection-provider/box-selection-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -16,37 +16,21 @@ type TouchStartPoint = { x: number; y: number } | null;
     '(touchcancel)': 'onTouchEnd($event)',
   },
 })
-export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
+export class MobileBoxSelectionDirective {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly boxSelectionProvider = inject(BoxSelectionProviderService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly elementRef = inject(ElementRef);
 
   private touchStartPoint: TouchStartPoint = null;
   private isBoxSelectionActive = false;
   private longPressTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly LONG_PRESS_DELAY = 400; // ms
 
-  ngOnInit() {
-    this.elementRef.nativeElement.addEventListener('touchstart', this.onTouchStartCapture, { capture: true });
-  }
-
-  ngOnDestroy(): void {
-    this.elementRef.nativeElement.removeEventListener('touchstart', this.onTouchStartCapture, { capture: true });
-    this.boxSelectionProvider.boundingBox.set(null);
-    this.clearLongPressTimer();
-  }
-
-  private onTouchStartCapture = (event: TouchInputEvent): void => {
-    if (!this.isSingleTouch(event) || !this.shouldHandle(event)) {
-      return;
-    }
-    event.boxSelectionHandled = true;
-  };
-
   onTouchStart(event: TouchInputEvent): void {
     if (!this.isSingleTouch(event)) {
       this.isBoxSelectionActive = false;
+      this.touchStartPoint = null;
+      this.boxSelectionProvider.boundingBox.set(null);
       this.clearLongPressTimer();
       return;
     }
@@ -70,8 +54,10 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
 
   onTouchMove(event: TouchInputEvent): void {
     if (this.shouldCancelBoxSelection(event)) {
-      this.clearLongPressTimer();
+      this.isBoxSelectionActive = false;
       this.touchStartPoint = null;
+      this.boxSelectionProvider.boundingBox.set(null);
+      this.clearLongPressTimer();
       return;
     }
 
@@ -109,8 +95,6 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
     event.stopPropagation();
   }
 
-  // --- Private helpers ---
-
   private clearLongPressTimer() {
     if (this.longPressTimer) {
       clearTimeout(this.longPressTimer);
@@ -118,18 +102,16 @@ export class MobileBoxSelectionDirective implements OnDestroy, OnInit {
     }
   }
 
-  private shouldHandle(event: TouchInputEvent): boolean {
-    const flowCore = this.flowCoreProvider.provide();
-    const modifiers = this.inputEventsRouter.getBaseEvent(event).modifiers;
-    return flowCore.shortcutManager.matchesAction('boxSelection', { modifiers });
-  }
-
   private isSingleTouch(event: TouchInputEvent): boolean {
     return event.touches.length === 1;
   }
 
   private shouldCancelBoxSelection(event: TouchInputEvent): boolean {
-    if (!this.isBoxSelectionActive && this.longPressTimer && this.isSingleTouch(event) && this.touchStartPoint) {
+    if (!this.isSingleTouch(event)) {
+      return true;
+    }
+
+    if (!this.isBoxSelectionActive && this.longPressTimer && this.touchStartPoint) {
       const touch = event.touches[0];
       return (
         Math.abs(touch.clientX - this.touchStartPoint.x) > 10 || Math.abs(touch.clientY - this.touchStartPoint.y) > 10
