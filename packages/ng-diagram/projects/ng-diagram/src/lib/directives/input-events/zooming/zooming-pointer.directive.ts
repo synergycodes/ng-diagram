@@ -36,7 +36,7 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
    * Minimal change in distance (in pixels) between two touch points required to trigger zoom.
    * Prevents accidental zooming on small finger movements.
    */
-  private readonly ZOOM_TRIGGER_DELTA = 30;
+  private readonly ZOOM_TRIGGER_DELTA = 80;
 
   ngOnInit(): void {
     this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
@@ -86,7 +86,7 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
     const currentDistance = this.computeDistance();
     const delta = Math.abs(currentDistance - this.initialDistance);
 
-    if (delta > this.ZOOM_TRIGGER_DELTA) {
+    if (delta > this.ZOOM_TRIGGER_DELTA && event.panningHandled !== true) {
       event.zoomingHandled = true;
 
       const flow = this.flowCoreProvider.provide();

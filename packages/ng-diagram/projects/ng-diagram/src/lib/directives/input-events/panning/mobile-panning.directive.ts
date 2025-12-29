@@ -45,6 +45,7 @@ export class MobilePanningDirective {
 
     const midpoint = this.getMidpoint(event.touches);
     this.lastTouch = midpoint;
+    event.panningHandled = true;
     this.emitPanningEvent('continue', event, midpoint);
     this.preventDefaultAndStop(event);
   }
