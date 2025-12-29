@@ -43,7 +43,7 @@ export class PaletteDropDirective {
       try {
         parsedData = JSON.parse(dataString);
       } catch (error) {
-        console.error(PALETTE_DROP_JSON_PARSE_ERROR(dataString, error));
+        return console.error(PALETTE_DROP_JSON_PARSE_ERROR(dataString, error));
       }
     }
 
