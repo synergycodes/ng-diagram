@@ -33,7 +33,6 @@ export const calculateGroupBounds = (
         throw new Error(`calculateGroupBounds: child node ${node.id} does not have both width and height defined`);
       }
 
-      // Use measuredBounds if available (accounts for rotation), otherwise compute it
       const nodeBounds = node.measuredBounds
         ? getBoundsFromRect(node.measuredBounds)
         : getBoundsFromRect(getNodeMeasuredBounds(node));
