@@ -11,7 +11,7 @@ export enum NodeTemplateType {
   Image = 'image',
   Resizable = 'resizable',
   CustomizedDefault = 'customized-default',
-  Group = 'group',
+  Group = 'custom-group',
   Chip = 'chip',
 }
 

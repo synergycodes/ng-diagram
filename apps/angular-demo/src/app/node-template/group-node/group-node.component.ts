@@ -4,12 +4,18 @@ import {
   NgDiagramGroupHighlightedDirective,
   NgDiagramGroupNodeTemplate,
   NgDiagramNodeResizeAdornmentComponent,
+  NgDiagramNodeRotateAdornmentComponent,
   NgDiagramNodeSelectedDirective,
 } from 'ng-diagram';
 
 @Component({
   selector: 'app-group-node',
-  imports: [NgDiagramNodeResizeAdornmentComponent, NgDiagramNodeSelectedDirective, NgDiagramGroupHighlightedDirective],
+  imports: [
+    NgDiagramNodeResizeAdornmentComponent,
+    NgDiagramNodeSelectedDirective,
+    NgDiagramGroupHighlightedDirective,
+    NgDiagramNodeRotateAdornmentComponent,
+  ],
   templateUrl: './group-node.component.html',
   styleUrls: ['./group-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
