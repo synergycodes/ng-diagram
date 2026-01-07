@@ -10,9 +10,6 @@ import type { RenderStrategyResult } from '../render-strategy.interface';
 export class VisibleElementsResolver {
   constructor(private readonly flowCore: FlowCore) {}
 
-  /**
-   * Resolves visible elements for the given viewport rect.
-   */
   resolve(viewportRect: Rect): RenderStrategyResult {
     const primaryVisibleIds = this.getPrimaryVisibleIds(viewportRect);
     const { edges, edgeIds, externalNodeIds } = this.collectVisibleEdges(primaryVisibleIds);
@@ -21,9 +18,6 @@ export class VisibleElementsResolver {
     return { nodes, edges, nodeIds, edgeIds };
   }
 
-  /**
-   * Gets node IDs visible in viewport, including descendants of visible groups.
-   */
   private getPrimaryVisibleIds(viewportRect: Rect): Set<string> {
     const primaryVisibleIds = new Set(this.flowCore.spatialHash.queryIds(viewportRect));
 
@@ -32,9 +26,6 @@ export class VisibleElementsResolver {
     return primaryVisibleIds;
   }
 
-  /**
-   * Expands the set to include all descendants of visible group nodes.
-   */
   private addGroupDescendants(nodeIds: Set<string>): void {
     const nodesMap = this.flowCore.modelLookup.nodesMap;
 
@@ -66,23 +57,27 @@ export class VisibleElementsResolver {
 
     for (const nodeId of primaryVisibleIds) {
       for (const edge of this.flowCore.modelLookup.getConnectedEdges(nodeId)) {
-        if (edgeIds.has(edge.id)) continue;
+        if (edgeIds.has(edge.id)) {
+          continue;
+        }
 
         edges.push(edge);
         edgeIds.add(edge.id);
 
         // Add external nodes (endpoints not in primary visible set)
-        if (!primaryVisibleIds.has(edge.source)) externalNodeIds.add(edge.source);
-        if (!primaryVisibleIds.has(edge.target)) externalNodeIds.add(edge.target);
+        if (!primaryVisibleIds.has(edge.source)) {
+          externalNodeIds.add(edge.source);
+        }
+
+        if (!primaryVisibleIds.has(edge.target)) {
+          externalNodeIds.add(edge.target);
+        }
       }
     }
 
     return { edges, edgeIds, externalNodeIds };
   }
 
-  /**
-   * Builds the final node list from primary visible and external node IDs.
-   */
   private buildNodeList(
     primaryVisibleIds: Set<string>,
     externalNodeIds: Set<string>
@@ -95,7 +90,6 @@ export class VisibleElementsResolver {
       nodeIds.add(id);
     }
 
-    // Single iteration to build nodes array
     const nodes: Node[] = [];
     for (const id of nodeIds) {
       const node = nodesMap.get(id);
