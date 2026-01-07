@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { FlowCore } from '../flow-core';
-import { mockEdge, mockNode } from '../test-utils';
-import type { Edge, Node } from '../types';
+import type { FlowCore } from '../../flow-core';
+import { mockEdge, mockNode } from '../../test-utils';
+import type { Edge, Node } from '../../types';
 import { DirectRenderStrategy } from './direct-render-strategy';
 
 describe('DirectRenderStrategy', () => {

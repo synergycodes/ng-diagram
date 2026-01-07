@@ -1,4 +1,4 @@
-export * from './render-strategy.interface';
 export * from './base-render-strategy';
-export * from './direct-render-strategy';
-export * from './virtualized-render-strategy';
+export * from './direct/direct-render-strategy';
+export * from './render-strategy.interface';
+export * from './virtualized/virtualized-render-strategy';

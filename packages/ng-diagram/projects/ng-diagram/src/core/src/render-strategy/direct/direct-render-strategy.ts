@@ -1,7 +1,7 @@
-import type { FlowCore } from '../flow-core';
-import type { Edge, Node } from '../types';
-import { BaseRenderStrategy } from './base-render-strategy';
-import type { RenderStrategyResult } from './render-strategy.interface';
+import type { FlowCore } from '../../flow-core';
+import type { Edge, Node } from '../../types';
+import { BaseRenderStrategy } from '../base-render-strategy';
+import type { RenderStrategyResult } from '../render-strategy.interface';
 
 // Reusable empty set for direct rendering (avoids allocation on every call)
 const EMPTY_SET = new Set<string>();

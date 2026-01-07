@@ -54,13 +54,11 @@ export class MiddlewareExecutor {
     const isMetadataOnly = this.isMetadataOnlyUpdate(stateUpdate);
 
     if (isMetadataOnly) {
-      // Use direct references (read-only) - no copy needed
       this.nodesMap = this.flowCore.modelLookup.nodesMap;
       this.edgesMap = this.flowCore.modelLookup.edgesMap;
       this.initialNodesMap = this.nodesMap;
       this.initialEdgesMap = this.edgesMap;
     } else {
-      // Full copy for node/edge changes
       this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
       this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
       this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);

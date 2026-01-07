@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { FlowCore } from '../flow-core';
-import { SpatialHash } from '../spatial-hash/spatial-hash';
-import { mockEdge, mockGroupNode, mockNode } from '../test-utils';
-import type { Edge, Node, Viewport, VirtualizationConfig } from '../types';
+import type { FlowCore } from '../../flow-core';
+import { SpatialHash } from '../../spatial-hash/spatial-hash';
+import { mockEdge, mockGroupNode, mockNode } from '../../test-utils';
+import type { Edge, Node, Viewport, VirtualizationConfig } from '../../types';
 import { VirtualizedRenderStrategy } from './virtualized-render-strategy';
 
 describe('VirtualizedRenderStrategy', () => {

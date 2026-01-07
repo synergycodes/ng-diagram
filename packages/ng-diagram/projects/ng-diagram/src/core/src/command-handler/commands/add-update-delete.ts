@@ -1,5 +1,29 @@
 import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
 
+const computeAddedPorts = (node: Node, ports: Port[]): Port[] => {
+  const newPortIds = new Set(ports.map((port) => port.id));
+  const existingPortsToKeep = (node.measuredPorts ?? []).filter((port) => !newPortIds.has(port.id));
+  return [...existingPortsToKeep, ...ports];
+};
+
+const computeUpdatedPorts = (
+  measuredPorts: Port[],
+  portUpdates: { portId: string; portChanges: Partial<Port> }[]
+): Port[] => {
+  return measuredPorts.map((port) => {
+    const portChanges = portUpdates.find(({ portId }) => portId === port.id)?.portChanges;
+    if (!portChanges) {
+      return port;
+    }
+    return { ...port, ...portChanges };
+  });
+};
+
+const computeRemainingPorts = (measuredPorts: Port[] | undefined, portIds: string[]): Port[] => {
+  const portIdsSet = new Set(portIds);
+  return (measuredPorts ?? []).filter((port) => !portIdsSet.has(port.id));
+};
+
 export interface AddNodesCommand {
   name: 'addNodes';
   nodes: Node[];
@@ -137,9 +161,7 @@ export const addPorts = async (commandHandler: CommandHandler, command: AddPorts
   // Even though we have a separate method to update ports, this method also updates existing ports with matching IDs
   // instead of skipping them. This ensures the adapter stays synchronized with the core.
   // The front-end is considered the source of truth in this context.
-  const newPortIds = new Set(ports.map((port) => port.id));
-  const existingPortsToKeep = (node.measuredPorts ?? []).filter((port) => !newPortIds.has(port.id));
-  const newPorts = [...existingPortsToKeep, ...ports];
+  const newPorts = computeAddedPorts(node, ports);
 
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, measuredPorts: newPorts }] }, 'updateNode');
 };
@@ -163,19 +185,13 @@ export const addPortsBulk = async (commandHandler: CommandHandler, command: AddP
       return;
     }
 
-    // Same logic as addPorts - update existing ports with matching IDs
-    const newPortIds = new Set(ports.map((port) => port.id));
-    const existingPortsToKeep = (node.measuredPorts ?? []).filter((port) => !newPortIds.has(port.id));
-    const newPorts = [...existingPortsToKeep, ...ports];
-
-    nodesToUpdate.push({ id: nodeId, measuredPorts: newPorts });
+    nodesToUpdate.push({ id: nodeId, measuredPorts: computeAddedPorts(node, ports) });
   });
 
   if (nodesToUpdate.length === 0) {
     return;
   }
 
-  // Single middleware execution for all nodes
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'addPortsBulk');
 };
 
@@ -188,22 +204,10 @@ export interface UpdatePortsCommand {
 export const updatePorts = async (commandHandler: CommandHandler, command: UpdatePortsCommand) => {
   const { nodeId, ports } = command;
   const node = commandHandler.flowCore.getNodeById(nodeId);
-  if (!node) {
+  if (!node || !node.measuredPorts) {
     return;
   }
-  const portsToUpdate = node.measuredPorts?.map((port) => {
-    const portChanges = ports.find(({ portId }) => portId === port.id)?.portChanges;
-    if (!portChanges) {
-      return port;
-    }
-    return {
-      ...port,
-      ...portChanges,
-    };
-  });
-  if (!portsToUpdate) {
-    return;
-  }
+  const portsToUpdate = computeUpdatedPorts(node.measuredPorts, ports);
   await commandHandler.flowCore.applyUpdate(
     { nodesToUpdate: [{ id: nodeId, measuredPorts: portsToUpdate }] },
     'updateNode'
@@ -229,25 +233,13 @@ export const updatePortsBulk = async (commandHandler: CommandHandler, command: U
       return;
     }
 
-    const updatedPorts = node.measuredPorts.map((port) => {
-      const portChanges = portUpdates.find(({ portId }) => portId === port.id)?.portChanges;
-      if (!portChanges) {
-        return port;
-      }
-      return {
-        ...port,
-        ...portChanges,
-      };
-    });
-
-    nodesToUpdate.push({ id: nodeId, measuredPorts: updatedPorts });
+    nodesToUpdate.push({ id: nodeId, measuredPorts: computeUpdatedPorts(node.measuredPorts, portUpdates) });
   });
 
   if (nodesToUpdate.length === 0) {
     return;
   }
 
-  // Single middleware execution for all nodes
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'updatePortsBulk');
 };
 
@@ -263,7 +255,7 @@ export const deletePorts = async (commandHandler: CommandHandler, command: Delet
   if (!node) {
     return;
   }
-  const leftPorts = node.measuredPorts?.filter((port) => !portIds.includes(port.id));
+  const leftPorts = computeRemainingPorts(node.measuredPorts, portIds);
   await commandHandler.flowCore.applyUpdate(
     { nodesToUpdate: [{ id: nodeId, measuredPorts: leftPorts }] },
     'updateNode'
@@ -289,17 +281,13 @@ export const deletePortsBulk = async (commandHandler: CommandHandler, command: D
       return;
     }
 
-    const portIdsSet = new Set(portIds);
-    const remainingPorts = (node.measuredPorts ?? []).filter((port) => !portIdsSet.has(port.id));
-
-    nodesToUpdate.push({ id: nodeId, measuredPorts: remainingPorts });
+    nodesToUpdate.push({ id: nodeId, measuredPorts: computeRemainingPorts(node.measuredPorts, portIds) });
   });
 
   if (nodesToUpdate.length === 0) {
     return;
   }
 
-  // Single middleware execution for all nodes
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'deletePortsBulk');
 };
 
