@@ -68,9 +68,6 @@ export class InitUpdater implements Updater {
   /** Callback to execute when initialization completes */
   private onCompleteCallback?: () => void | Promise<void>;
 
-  /** Number of rendered nodes (captured at start for measurement tracking) */
-  private renderedNodeCount = 0;
-
   /** Safety timeout to prevent indefinite waiting for measurements */
   private measurementTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -93,7 +90,6 @@ export class InitUpdater implements Updater {
    * @param onComplete - Optional callback to execute after initialization completes
    */
   start(nodes: Node[], edges: Edge[], onComplete?: () => void | Promise<void>) {
-    this.renderedNodeCount = nodes.length;
     this.onCompleteCallback = onComplete;
 
     const hasNodes = nodes.length > 0;
@@ -237,7 +233,7 @@ export class InitUpdater implements Updater {
       return;
     }
 
-    if (this.initState.allEntitiesHaveMeasurements(this.renderedNodeCount)) {
+    if (this.initState.allEntitiesHaveMeasurements()) {
       this.finish();
     }
   }
@@ -277,17 +273,17 @@ export class InitUpdater implements Updater {
   private startMeasurementTimeout(): void {
     this.measurementTimeout = setTimeout(() => {
       if (!this.isInitialized) {
-        const nodeCount = this.getNodeCount();
+        const expectedNodes = this.initState.nodesToMeasure.size;
+        const measuredNodes = this.initState.measuredNodes.size;
         const expectedPorts = this.initState.portsToMeasure.size;
         const measuredPorts = this.initState.measuredPorts.size;
         const expectedLabels = this.initState.labelsToMeasure.size;
         const measuredLabels = this.initState.measuredLabels.size;
-        const measuredNodes = this.initState.measuredNodes.size;
 
         console.warn(
           '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).',
           {
-            nodes: { expected: nodeCount, measured: measuredNodes },
+            nodes: { expected: expectedNodes, measured: measuredNodes },
             ports: { expected: expectedPorts, measured: measuredPorts },
             labels: { expected: expectedLabels, measured: measuredLabels },
           }
@@ -306,11 +302,5 @@ export class InitUpdater implements Updater {
       clearTimeout(this.measurementTimeout);
       this.measurementTimeout = null;
     }
-  }
-
-  private getNodeCount() {
-    const { nodes, edges, metadata } = this.flowCore.getState();
-    const result = this.flowCore.renderStrategy.process(nodes, edges, metadata.viewport);
-    return result.nodes.length;
   }
 }
