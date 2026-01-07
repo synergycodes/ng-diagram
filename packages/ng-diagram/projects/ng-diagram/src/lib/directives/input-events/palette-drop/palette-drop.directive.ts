@@ -52,14 +52,14 @@ export class PaletteDropDirective {
     const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
     let parsedData = {};
 
-    if (!this.paletteService.draggedNode()) {
-      return console.error(PALETTE_DROP_NOT_NODE_ERROR());
-    }
     if (dataString) {
       try {
         parsedData = JSON.parse(dataString);
       } catch (error) {
-        return console.warn(PALETTE_DROP_JSON_PARSE_ERROR(dataString, error));
+        if (!this.paletteService.draggedNode()) {
+          return console.warn(PALETTE_DROP_NOT_NODE_ERROR());
+        }
+        return console.error(PALETTE_DROP_JSON_PARSE_ERROR(dataString, error));
       }
     }
 
