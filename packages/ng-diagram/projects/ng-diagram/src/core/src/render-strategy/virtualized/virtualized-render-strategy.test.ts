@@ -23,11 +23,6 @@ describe('VirtualizedRenderStrategy', () => {
     enabled: true,
     padding: 0.1, // 10% of viewport size as padding
     nodeCountThreshold: 2,
-    expandedPadding: 0.5, // 50% of viewport size for expanded buffer
-    bufferFill: {
-      enabled: true,
-      idleThreshold: 100,
-    },
   };
 
   beforeEach(() => {
@@ -353,25 +348,6 @@ describe('VirtualizedRenderStrategy', () => {
 
       // New Sets should be created when node count changes
       expect(result1.nodeIds).not.toBe(result2.nodeIds);
-    });
-
-    it('should create new ID Sets after manual cache invalidation', () => {
-      const nodes: Node[] = [
-        { ...mockNode, id: '1', position: { x: 100, y: 100 }, size: { width: 50, height: 50 } },
-        { ...mockNode, id: '2', position: { x: 200, y: 200 }, size: { width: 50, height: 50 } },
-        { ...mockNode, id: '3', position: { x: 300, y: 300 }, size: { width: 50, height: 50 } },
-      ];
-      const edges: Edge[] = [];
-      spatialHash.process(nodes);
-      updateNodesMap(nodes);
-
-      const result1 = strategy.process(nodes, edges, defaultViewport);
-      strategy.invalidateCache();
-      const result2 = strategy.process(nodes, edges, defaultViewport);
-
-      // New Sets should be created after invalidation
-      expect(result1.nodeIds).not.toBe(result2.nodeIds);
-      expect(result1.edgeIds).not.toBe(result2.edgeIds);
     });
   });
 });

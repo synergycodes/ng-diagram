@@ -7,10 +7,11 @@ const DEFAULT_VIEWPORT_HEIGHT = 1080;
 const RECOMPUTE_THRESHOLD = 0.25;
 
 // Distance threshold (as fraction of viewport) that triggers recompute during panning
-const PAN_DISTANCE_THRESHOLD = 0.5;
+const PAN_DISTANCE_THRESHOLD = 0.4;
 
-// Tolerance for viewport dimension changes (pixels) before recomputation
-const DIMENSION_CHANGE_TOLERANCE = 10;
+// Tolerance for viewport dimension changes (as fraction of dimensions) before recomputation
+// Using percentage instead of fixed pixels to handle zoom changes properly
+const DIMENSION_CHANGE_TOLERANCE = 0.1;
 
 /**
  * Checks if virtualization should be bypassed (too few nodes or no viewport).
@@ -57,11 +58,15 @@ export function isViewportSimilar(prev: Rect, current: Rect): boolean {
   const xThreshold = prev.width * RECOMPUTE_THRESHOLD;
   const yThreshold = prev.height * RECOMPUTE_THRESHOLD;
 
+  // Use percentage-based tolerance for dimensions (handles zoom better than fixed pixels)
+  const widthTolerance = prev.width * DIMENSION_CHANGE_TOLERANCE;
+  const heightTolerance = prev.height * DIMENSION_CHANGE_TOLERANCE;
+
   return (
     Math.abs(prev.x - current.x) < xThreshold &&
     Math.abs(prev.y - current.y) < yThreshold &&
-    Math.abs(prev.width - current.width) < DIMENSION_CHANGE_TOLERANCE &&
-    Math.abs(prev.height - current.height) < DIMENSION_CHANGE_TOLERANCE
+    Math.abs(prev.width - current.width) < widthTolerance &&
+    Math.abs(prev.height - current.height) < heightTolerance
   );
 }
 

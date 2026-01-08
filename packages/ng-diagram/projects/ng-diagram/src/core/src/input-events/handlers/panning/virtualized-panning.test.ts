@@ -52,7 +52,6 @@ describe('VirtualizedPanningEventHandler', () => {
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
       actionStateManager: mockActionStateManager,
-      bufferFillManager: { cancelFill: vi.fn(), scheduleFill: vi.fn() },
       environment: mockEnvironment,
     } as unknown as FlowCore;
 

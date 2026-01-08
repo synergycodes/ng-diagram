@@ -21,28 +21,25 @@ export class RendererService implements Renderer {
   private lastNodeCount = 0;
 
   draw(nodes: Node[], edges: Edge[], viewport: Viewport): void {
-    const nodeCountDiff = nodes.length - this.lastNodeCount;
+    const prevCount = this.lastNodeCount;
+    const currentCount = nodes.length;
+    const nodeCountDiff = currentCount - prevCount;
+
+    this.nodes.set(nodes);
+    this.edges.set(edges);
+    this.viewport.set(viewport);
+    this.lastNodeCount = currentCount;
 
     if (nodeCountDiff > 0) {
       const startTime = performance.now();
 
-      this.nodes.set(nodes);
-      this.edges.set(edges);
-      this.viewport.set(viewport);
-
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           console.log(
-            `[PERF] Render +${nodeCountDiff} nodes (${this.lastNodeCount} -> ${nodes.length}): ${(performance.now() - startTime).toFixed(2)}ms`
+            `[PERF] Render +${nodeCountDiff} nodes (${prevCount} -> ${currentCount}): ${(performance.now() - startTime).toFixed(2)}ms`
           );
         });
       });
-    } else {
-      this.nodes.set(nodes);
-      this.edges.set(edges);
-      this.viewport.set(viewport);
     }
-
-    this.lastNodeCount = nodes.length;
   }
 }

@@ -4,7 +4,6 @@ import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
   BoxSelectionConfig,
-  BufferFillConfig,
   EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
@@ -135,17 +134,10 @@ const defaultBoxSelectionConfig: BoxSelectionConfig = {
   realtime: true,
 };
 
-const defaultBufferFillConfig: BufferFillConfig = {
-  enabled: true,
-  idleThreshold: 100, // ms to wait after pan stops before filling buffer
-};
-
 const defaultVirtualizationConfig: VirtualizationConfig = {
   enabled: false, // Disabled by default - users must explicitly enable for large diagrams
-  padding: 0.5, // 0.5x viewport size padding (~2x viewport area total)
-  expandedPadding: 1.0, // 1.0x viewport size buffer during idle (~3x viewport area)
+  padding: 0.8, // 0.8x viewport size padding for smooth panning
   nodeCountThreshold: 500,
-  bufferFill: defaultBufferFillConfig,
 };
 
 /**

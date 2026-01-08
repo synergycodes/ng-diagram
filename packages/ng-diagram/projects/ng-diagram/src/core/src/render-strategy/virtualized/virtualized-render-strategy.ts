@@ -2,10 +2,10 @@ import type { FlowCore } from '../../flow-core';
 import type { Edge, Node, Viewport } from '../../types';
 import { BaseRenderStrategy } from '../base-render-strategy';
 import type { RenderStrategyResult } from '../render-strategy.interface';
-import { IdleManager } from './idle-manager';
 import { ResultCache } from './result-cache';
 import { getViewportRect, shouldBypassVirtualization } from './viewport-utils';
 import { VisibleElementsResolver } from './visible-elements-resolver';
+import { ZoomTracker } from './zoom-tracker';
 
 // Reusable empty set for bypass results (avoids allocation on every call)
 const EMPTY_SET = new Set<string>();
@@ -13,29 +13,22 @@ const EMPTY_SET = new Set<string>();
 /**
  * Virtualized render strategy - returns only nodes and edges visible in the viewport.
  * Used when virtualization is enabled for large diagrams.
- *
- * Handles idle management for both panning and zooming:
- * - During active panning/zooming: uses cached results for performance
- * - After idle period: renders with expanded buffer to preload more nodes
  */
 export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   private readonly cache = new ResultCache();
   private readonly visibleElementsResolver: VisibleElementsResolver;
-  private readonly idleManager: IdleManager;
+  private readonly zoomTracker: ZoomTracker;
 
   // Track nodes reference for optimization (skip spatialHash update during panning/zooming)
   private lastNodesRef: Node[] | null = null;
 
   constructor(flowCore: FlowCore) {
     super(flowCore);
-
     this.visibleElementsResolver = new VisibleElementsResolver(flowCore);
-    this.idleManager = new IdleManager(flowCore.config.virtualization, () => {
+    this.zoomTracker = new ZoomTracker(() => {
       this.cache.invalidateViewport();
       this.render();
     });
-
-    this.idleManager.subscribeToActionState(flowCore.eventManager);
   }
 
   init(): void {
@@ -71,51 +64,35 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
       return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
     }
 
-    // Check if we should use expanded buffer (set by idle callbacks)
-    const useExpandedBuffer = this.idleManager.consumePendingExpandedBuffer();
+    this.zoomTracker.handleScaleChange(viewport!.scale);
 
-    // Handle zoom tracking
-    this.idleManager.handleScaleChange(viewport!.scale);
-
-    const paddingMultiplier = useExpandedBuffer ? config.expandedPadding : config.padding;
-    const viewportRect = getViewportRect(viewport!, paddingMultiplier);
-
-    // During active zooming or panning, use cached result to avoid lag
+    const viewportRect = getViewportRect(viewport!, config.padding);
     const isPanning = this.flowCore.actionStateManager.isPanning();
     const hasCache = this.cache.hasCache();
 
-    // Skip caching when using expanded buffer - we want fresh computation
-    if (!useExpandedBuffer) {
-      if (this.idleManager.getIsZooming() && hasCache) {
-        return this.cache.get(nodes, edges);
-      }
+    // During active zooming, use cached result to avoid lag
+    if (this.zoomTracker.getIsZooming() && hasCache) {
+      return this.cache.get(nodes, edges);
+    }
 
-      if (isPanning && hasCache) {
-        // During panning, use cache unless we've moved too far from last recompute
-        if (!this.cache.hasMovedTooFar(viewportRect)) {
-          return this.cache.get(nodes, edges);
-        }
-        // Moved too far - fall through to recompute
-      }
-
-      if (this.cache.canUse(nodes.length, edges.length, viewportRect)) {
+    // During panning, use cache unless we've moved too far
+    if (isPanning && hasCache) {
+      if (!this.cache.hasMovedTooFar(viewportRect)) {
         return this.cache.get(nodes, edges);
       }
     }
 
-    const result = this.visibleElementsResolver.resolve(viewportRect);
+    if (this.cache.canUse(nodes.length, edges.length, viewportRect)) {
+      return this.cache.get(nodes, edges);
+    }
 
-    // Cache the full result
+    const result = this.visibleElementsResolver.resolve(viewportRect);
     this.cache.set(result, nodes, edges, viewportRect);
 
     return result;
   }
 
-  invalidateCache(): void {
-    this.cache.invalidate();
-  }
-
   destroy(): void {
-    this.idleManager.destroy();
+    this.zoomTracker.destroy();
   }
 }
