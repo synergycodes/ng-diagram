@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed resizing group with rotated child nodes ([#504](https://github.com/synergycodes/ng-diagram/pull/504))
+- Fixed error on drag&drop HTML object (not palette node) to the diagram ([#510](https://github.com/synergycodes/ng-diagram/pull/510))
+
 ## [0.9.0] - 2025-12-12
 
 ### Added
@@ -39,7 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed copy-paste retaining `groupId` when pasting nodes outside their group. Now `groupId` is only preserved when the group is also copied, with the reference updated to the new group's ID ([#491](https://github.com/synergycodes/ng-diagram/pull/491))
 - Fixed zoom to fit not working correctly on diagram initialization ([#492](https://github.com/synergycodes/ng-diagram/pull/492))
 - Fixed bullet points styles in the documentation ([#494](https://github.com/synergycodes/ng-diagram/pull/494))
-- Fixed error on drag&drop HTML object (not palette node) to the diagram ([#510](https://github.com/synergycodes/ng-diagram/pull/510))
 
 ### Deprecated
 
