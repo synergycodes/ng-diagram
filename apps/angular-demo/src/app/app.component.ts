@@ -60,6 +60,9 @@ export class AppComponent {
         padding: [50, 50, 100, 350],
       },
     },
+    resize: {
+      allowResizeBelowChildrenBounds: false,
+    },
     background: {
       cellSize: { width: 10, height: 10 },
     },
@@ -281,6 +284,16 @@ export class AppComponent {
         type: 'chip',
         autoSize: false,
         size: { width: 200, height: 300 },
+      },
+      {
+        id: '15',
+        position: { x: -200, y: 500 },
+        data: {},
+        size: { width: 300, height: 200 },
+        autoSize: false,
+        type: 'custom-group',
+        isGroup: true,
+        rotatable: true,
       },
     ],
     edges: [
