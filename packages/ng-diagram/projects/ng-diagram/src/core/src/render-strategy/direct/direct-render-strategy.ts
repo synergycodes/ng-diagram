@@ -11,6 +11,10 @@ const EMPTY_SET = new Set<string>();
  * Used when virtualization is disabled.
  */
 export class DirectRenderStrategy extends BaseRenderStrategy {
+  // Track last references for change detection
+  private lastNodesRef: Node[] = [];
+  private lastEdgesRef: Edge[] = [];
+
   constructor(flowCore: FlowCore) {
     super(flowCore);
   }
@@ -18,9 +22,22 @@ export class DirectRenderStrategy extends BaseRenderStrategy {
   init(): void {
     this.render();
 
+    // Initialize reference tracking
+    this.lastNodesRef = this.flowCore.model.getNodes();
+    this.lastEdgesRef = this.flowCore.model.getEdges();
+
     this.flowCore.model.onChange((state) => {
-      this.flowCore.spatialHash.process(state.nodes);
-      this.flowCore.modelLookup.desynchronize();
+      const nodesChanged = state.nodes !== this.lastNodesRef;
+      const edgesChanged = state.edges !== this.lastEdgesRef;
+
+      // Only process spatial hash and model lookup if nodes/edges actually changed
+      if (nodesChanged || edgesChanged) {
+        this.flowCore.spatialHash.process(state.nodes);
+        this.flowCore.modelLookup.desynchronize();
+        this.lastNodesRef = state.nodes;
+        this.lastEdgesRef = state.edges;
+      }
+
       this.render();
     });
 

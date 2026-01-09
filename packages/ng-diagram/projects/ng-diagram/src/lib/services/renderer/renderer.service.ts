@@ -18,6 +18,9 @@ export class RendererService implements Renderer {
     scale: 1,
   });
 
+  // Track last references for change detection
+  private lastNodes: Node[] = [];
+  private lastEdges: Edge[] = [];
   private lastNodeCount = 0;
 
   draw(nodes: Node[], edges: Edge[], viewport: Viewport): void {
@@ -25,8 +28,17 @@ export class RendererService implements Renderer {
     const currentCount = nodes.length;
     const nodeCountDiff = currentCount - prevCount;
 
-    this.nodes.set(nodes);
-    this.edges.set(edges);
+    // Only update signals if data actually changed (reference check)
+    if (nodes !== this.lastNodes) {
+      this.nodes.set(nodes);
+      this.lastNodes = nodes;
+    }
+
+    if (edges !== this.lastEdges) {
+      this.edges.set(edges);
+      this.lastEdges = edges;
+    }
+
     this.viewport.set(viewport);
     this.lastNodeCount = currentCount;
 
@@ -41,5 +53,13 @@ export class RendererService implements Renderer {
         });
       });
     }
+  }
+
+  /**
+   * Fast-path: Updates only the viewport signal.
+   * Used during panning/zooming when nodes/edges don't change.
+   */
+  drawViewportOnly(viewport: Viewport): void {
+    this.viewport.set(viewport);
   }
 }

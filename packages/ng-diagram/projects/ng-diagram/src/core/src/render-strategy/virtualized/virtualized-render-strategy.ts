@@ -22,6 +22,11 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   // Track nodes reference for optimization (skip spatialHash update during panning/zooming)
   private lastNodesRef: Node[] | null = null;
 
+  // Pan-stop detection for expanded buffer rendering
+  private wasPanning = false;
+  private idleTimeout: ReturnType<typeof setTimeout> | null = null;
+  private unsubscribeActionState: (() => void) | null = null;
+
   constructor(flowCore: FlowCore) {
     super(flowCore);
     this.visibleElementsResolver = new VisibleElementsResolver(flowCore);
@@ -44,6 +49,22 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
       this.render();
     });
 
+    // Subscribe to action state changes to detect pan stop
+    this.unsubscribeActionState = this.flowCore.eventManager.on('actionStateChanged', ({ actionState }) => {
+      const isPanning = !!actionState.panning?.active;
+
+      if (this.wasPanning && !isPanning) {
+        // Pan just stopped - schedule expanded buffer render
+        this.scheduleIdleRender();
+      } else if (isPanning && this.idleTimeout) {
+        // Panning started again - cancel pending idle render
+        clearTimeout(this.idleTimeout);
+        this.idleTimeout = null;
+      }
+
+      this.wasPanning = isPanning;
+    });
+
     // Trigger initial render to ensure consistent visible nodes
     this.render();
 
@@ -57,6 +78,23 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
     });
   }
 
+  /**
+   * Schedules an expanded buffer render after panning stops.
+   * Uses idleDelay config to wait before rendering with expandedPadding.
+   */
+  private scheduleIdleRender(): void {
+    if (this.idleTimeout) {
+      clearTimeout(this.idleTimeout);
+    }
+
+    const delay = this.flowCore.config.virtualization.idleDelay ?? 100;
+    this.idleTimeout = setTimeout(() => {
+      this.cache.invalidateViewport();
+      this.render();
+      this.idleTimeout = null;
+    }, delay);
+  }
+
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult {
     const config = this.flowCore.config.virtualization;
 
@@ -66,8 +104,10 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
 
     this.zoomTracker.handleScaleChange(viewport!.scale);
 
-    const viewportRect = getViewportRect(viewport!, config.padding);
+    // Use smaller padding during panning, larger padding when idle
     const isPanning = this.flowCore.actionStateManager.isPanning();
+    const padding = isPanning ? config.padding : (config.expandedPadding ?? config.padding);
+    const viewportRect = getViewportRect(viewport!, padding);
     const hasCache = this.cache.hasCache();
 
     // During active zooming, use cached result to avoid lag
@@ -94,5 +134,13 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
 
   destroy(): void {
     this.zoomTracker.destroy();
+    if (this.idleTimeout) {
+      clearTimeout(this.idleTimeout);
+      this.idleTimeout = null;
+    }
+    if (this.unsubscribeActionState) {
+      this.unsubscribeActionState();
+      this.unsubscribeActionState = null;
+    }
   }
 }

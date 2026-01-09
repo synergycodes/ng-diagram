@@ -435,12 +435,25 @@ export interface VirtualizationConfig {
   enabled: boolean;
 
   /**
-   * Padding multiplier relative to viewport size.
+   * Padding multiplier relative to viewport size used during active panning.
    * The actual padding is calculated as: max(viewportWidth, viewportHeight) * padding
-   * For example, 0.8 means 80% of the viewport size as padding in each direction.
-   * @default 0.8
+   * For example, 0.4 means 40% of the viewport size as padding in each direction.
+   * @default 0.4
    */
   padding: number;
+
+  /**
+   * Expanded padding multiplier used when idle (after panning stops).
+   * This larger padding preloads more nodes for smoother subsequent panning.
+   * @default 0.8
+   */
+  expandedPadding?: number;
+
+  /**
+   * Delay in milliseconds after panning stops before rendering with expanded padding.
+   * @default 100
+   */
+  idleDelay?: number;
 
   /**
    * Maximum number of nodes below which virtualization is skipped.

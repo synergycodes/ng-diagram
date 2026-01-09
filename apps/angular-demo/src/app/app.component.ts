@@ -62,6 +62,7 @@ export class AppComponent {
     },
     virtualization: {
       enabled: true,
+      padding: 0.4,
     },
     shortcuts: configureShortcuts([
       {
