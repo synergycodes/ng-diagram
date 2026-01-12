@@ -26,6 +26,7 @@ export function shouldBypassVirtualization(
 
 /**
  * Converts screen viewport to flow coordinates with padding.
+ * Padding is scaled down at low zoom levels to prevent excessive rendering.
  */
 export function getViewportRect(viewport: Viewport, paddingMultiplier: number): Rect {
   const { x, y, scale, width, height } = viewport;
@@ -38,9 +39,13 @@ export function getViewportRect(viewport: Viewport, paddingMultiplier: number): 
   const flowWidth = effectiveWidth / scale;
   const flowHeight = effectiveHeight / scale;
 
-  // Calculate padding as a multiple of the largest viewport dimension (in flow coordinates)
-  const maxFlowDimension = Math.max(flowWidth, flowHeight);
-  const padding = maxFlowDimension * paddingMultiplier;
+  // Scale down padding at low zoom to prevent excessive rendering
+  // At scale < 1, reduce padding proportionally so we don't render too many nodes
+  const scaleAdjustedMultiplier = paddingMultiplier * Math.min(1, scale);
+
+  // Use screen dimensions for padding calculation (constant screen-space buffer)
+  const maxScreenDimension = Math.max(effectiveWidth, effectiveHeight);
+  const padding = (maxScreenDimension * scaleAdjustedMultiplier) / scale;
 
   return {
     x: flowX - padding,

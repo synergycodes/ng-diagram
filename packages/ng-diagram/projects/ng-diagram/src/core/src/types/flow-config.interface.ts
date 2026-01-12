@@ -437,10 +437,16 @@ export interface VirtualizationConfig {
   /**
    * Padding multiplier relative to viewport size.
    * The actual padding is calculated as: max(viewportWidth, viewportHeight) * padding
-   * For example, 0.8 means 80% of the viewport size as padding in each direction.
-   * @default 0.8
+   * For example, 0.5 means 50% of the viewport size as padding in each direction.
+   * @default 0.5
    */
   padding: number;
+
+  /**
+   * Delay in milliseconds after panning stops before re-rendering visible nodes.
+   * @default 100
+   */
+  idleDelay?: number;
 
   /**
    * Maximum number of nodes below which virtualization is skipped.

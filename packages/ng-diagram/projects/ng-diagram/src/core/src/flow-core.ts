@@ -38,6 +38,7 @@ import type {
   Point,
   Port,
   Renderer,
+  Viewport,
 } from './types';
 import {
   InternalTransactionOptions,
@@ -326,6 +327,38 @@ export class FlowCore {
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();
     }
+  }
+
+  /**
+   * Fast-path for viewport-only updates (panning/zooming).
+   * Bypasses middleware chain and only updates viewport metadata.
+   * Use this for high-frequency viewport changes where middleware processing is unnecessary.
+   */
+  applyViewportOnlyUpdate(viewportUpdate: Partial<Viewport>): void {
+    const currentMetadata = this.model.getMetadata();
+    const currentViewport = currentMetadata.viewport;
+    const newViewport = { ...currentViewport, ...viewportUpdate };
+
+    // Skip if no actual change
+    if (
+      newViewport.x === currentViewport.x &&
+      newViewport.y === currentViewport.y &&
+      newViewport.scale === currentViewport.scale
+    ) {
+      return;
+    }
+
+    // Update model directly (bypasses middleware)
+    this.model.updateMetadata({
+      ...currentMetadata,
+      viewport: newViewport,
+    });
+
+    // Emit viewport changed event directly
+    this.eventManager.emit('viewportChanged', {
+      viewport: newViewport,
+      previousViewport: currentViewport,
+    });
   }
 
   /**

@@ -2,6 +2,7 @@ import type { FlowCore } from '../../flow-core';
 import type { Edge, Node, Viewport } from '../../types';
 import { BaseRenderStrategy } from '../base-render-strategy';
 import type { RenderStrategyResult } from '../render-strategy.interface';
+import { IdleRenderScheduler } from './idle-render-scheduler';
 import { ResultCache } from './result-cache';
 import { getViewportRect, shouldBypassVirtualization } from './viewport-utils';
 import { VisibleElementsResolver } from './visible-elements-resolver';
@@ -18,6 +19,7 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   private readonly cache = new ResultCache();
   private readonly visibleElementsResolver: VisibleElementsResolver;
   private readonly zoomTracker: ZoomTracker;
+  private readonly idleRenderScheduler: IdleRenderScheduler;
 
   // Track nodes reference for optimization (skip spatialHash update during panning/zooming)
   private lastNodesRef: Node[] | null = null;
@@ -25,10 +27,8 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   constructor(flowCore: FlowCore) {
     super(flowCore);
     this.visibleElementsResolver = new VisibleElementsResolver(flowCore);
-    this.zoomTracker = new ZoomTracker(() => {
-      this.cache.invalidateViewport();
-      this.render();
-    });
+    this.zoomTracker = new ZoomTracker(() => this.invalidateAndRender());
+    this.idleRenderScheduler = new IdleRenderScheduler(flowCore, () => this.invalidateAndRender());
   }
 
   init(): void {
@@ -43,6 +43,8 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
       }
       this.render();
     });
+
+    this.idleRenderScheduler.init();
 
     // Trigger initial render to ensure consistent visible nodes
     this.render();
@@ -66,8 +68,8 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
 
     this.zoomTracker.handleScaleChange(viewport!.scale);
 
-    const viewportRect = getViewportRect(viewport!, config.padding);
-    const isPanning = this.flowCore.actionStateManager.isPanning();
+    const padding = config.padding;
+    const viewportRect = getViewportRect(viewport!, padding);
     const hasCache = this.cache.hasCache();
 
     // During active zooming, use cached result to avoid lag
@@ -75,11 +77,8 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
       return this.cache.get(nodes, edges);
     }
 
-    // During panning, use cache unless we've moved too far
-    if (isPanning && hasCache) {
-      if (!this.cache.hasMovedTooFar(viewportRect)) {
-        return this.cache.get(nodes, edges);
-      }
+    if (this.flowCore.actionStateManager.isPanning() && hasCache) {
+      return this.cache.get(nodes, edges);
     }
 
     if (this.cache.canUse(nodes.length, edges.length, viewportRect)) {
@@ -94,5 +93,11 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
 
   destroy(): void {
     this.zoomTracker.destroy();
+    this.idleRenderScheduler.destroy();
+  }
+
+  private invalidateAndRender(): void {
+    this.cache.invalidateViewport();
+    this.render();
   }
 }

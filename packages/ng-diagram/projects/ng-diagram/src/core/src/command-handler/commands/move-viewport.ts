@@ -14,6 +14,15 @@ export const moveViewportBy = async (commandHandler: CommandHandler, { x, y }: M
     return;
   }
 
+  // Use fast-path for viewport-only updates during panning (bypasses middleware chain)
+  if (commandHandler.flowCore.actionStateManager.isPanning()) {
+    commandHandler.flowCore.applyViewportOnlyUpdate({
+      x: metadata.viewport.x + x,
+      y: metadata.viewport.y + y,
+    });
+    return;
+  }
+
   await commandHandler.flowCore.applyUpdate(
     {
       metadataUpdate: {
