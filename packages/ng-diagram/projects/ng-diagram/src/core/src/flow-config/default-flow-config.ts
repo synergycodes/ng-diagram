@@ -135,10 +135,9 @@ const defaultBoxSelectionConfig: BoxSelectionConfig = {
 };
 
 const defaultVirtualizationConfig: VirtualizationConfig = {
-  enabled: false, // Disabled by default - users must explicitly enable for large diagrams
-  padding: 0.2, // 0.4x viewport size padding during active panning
-  expandedPadding: 0.4, // 0.8x viewport size padding when idle (after panning stops)
-  idleDelay: 100, // ms to wait after panning stops before expanding buffer
+  enabled: false,
+  padding: 0.5,
+  idleDelay: 100,
   nodeCountThreshold: 500,
 };
 

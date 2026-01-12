@@ -13,12 +13,4 @@ export interface Renderer {
    * @param viewport Viewport to render
    */
   draw(nodes: Node[], edges: Edge[], viewport: Viewport): void;
-
-  /**
-   * Fast-path for viewport-only updates.
-   * Only updates viewport without touching nodes/edges.
-   * Optional - implementations may not support this optimization.
-   * @param viewport Viewport to render
-   */
-  drawViewportOnly?(viewport: Viewport): void;
 }
