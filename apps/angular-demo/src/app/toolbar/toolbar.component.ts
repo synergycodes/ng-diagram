@@ -8,6 +8,7 @@ import {
   Node,
 } from 'ng-diagram';
 import { nodeTemplateMap, NodeTemplateType } from '../data/node-template';
+import { UndoRedoService } from '../undo-redo/undo-redo.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -20,6 +21,7 @@ export class ToolbarComponent {
   private readonly ngDiagramSelectionService = inject(NgDiagramSelectionService);
   private readonly ngDiagramViewportService = inject(NgDiagramViewportService);
   private readonly ngDiagramModelService = inject(NgDiagramModelService);
+  private readonly undoRedoService = inject(UndoRedoService);
 
   private readonly nodeTypes = Array.from(nodeTemplateMap.keys()) as NodeTemplateType[];
 
@@ -28,6 +30,22 @@ export class ToolbarComponent {
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 
   isDebugModeEnabled = computed(() => this.ngDiagramService.config().debugMode || false);
+
+  onUndoClick(): void {
+    this.undoRedoService.undo();
+  }
+
+  onRedoClick(): void {
+    this.undoRedoService.redo();
+  }
+
+  canUndo(): boolean {
+    return this.undoRedoService.canUndo();
+  }
+
+  canRedo(): boolean {
+    return this.undoRedoService.canRedo();
+  }
 
   onToggleDebugModeClick(): void {
     this.ngDiagramService.updateConfig({ debugMode: !this.isDebugModeEnabled() });

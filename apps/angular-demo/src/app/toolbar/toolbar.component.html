@@ -1,4 +1,6 @@
 <div>
+  <button [disabled]="!canUndo()" (click)="onUndoClick()">Undo</button>
+  <button [disabled]="!canRedo()" (click)="onRedoClick()">Redo</button>
   <button (click)="onToggleDebugModeClick()">{{ `${isDebugModeEnabled() ? 'Disable' : 'Enable'}` }} debug mode</button>
   <button (click)="onLinkCreationClick()">Start Link Creation</button>
   <button [disabled]="!isNodeSelected()" (click)="onCenterOnClick()">Center on selected node</button>
