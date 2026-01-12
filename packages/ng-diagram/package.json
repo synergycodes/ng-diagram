@@ -28,7 +28,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@angular/common": "^19.2.7",
+    "@angular/common": "^21.0.8",
     "@angular/compiler": "^19.2.7",
     "@angular/core": "^19.2.7",
     "@angular/forms": "^19.2.10",
