@@ -21,6 +21,19 @@ The palette drop event will continue with empty data object.
 Documentation: https://www.ngdiagram.dev/docs/guides/palette/
 `;
 
+const PALETTE_DROP_NOT_NODE_ERROR = () =>
+  `[ngDiagram] Invalid drop data: expected type "NgDiagramPaletteItem".
+
+Received data: "UNKNOWN"
+
+To fix this error:
+  • Ensure the dragged data is of type "NgDiagramPaletteItem" and is dragged from a valid palette item.
+
+The palette drop event will continue with empty data object.
+
+Documentation: https://www.ngdiagram.dev/docs/guides/palette/
+`;
+
 @Directive({
   selector: '[ngDiagramPaletteDrop]',
   standalone: true,
@@ -37,13 +50,16 @@ export class PaletteDropDirective {
     event.preventDefault();
     const dataString = event.dataTransfer?.getData('text/plain');
     const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
-
     let parsedData = {};
+
     if (dataString) {
       try {
         parsedData = JSON.parse(dataString);
       } catch (error) {
-        console.error(PALETTE_DROP_JSON_PARSE_ERROR(dataString, error));
+        if (!this.paletteService.draggedNode()) {
+          return console.warn(PALETTE_DROP_NOT_NODE_ERROR());
+        }
+        return console.error(PALETTE_DROP_JSON_PARSE_ERROR(dataString, error));
       }
     }
 
