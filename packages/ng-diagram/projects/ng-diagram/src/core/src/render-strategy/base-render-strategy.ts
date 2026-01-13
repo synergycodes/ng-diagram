@@ -1,9 +1,14 @@
 import type { FlowCore } from '../flow-core';
 import type { Edge, Node, Viewport } from '../types';
+import { RenderPerformanceLogger } from './render-performance-logger';
 import type { RenderStrategy, RenderStrategyResult } from './render-strategy.interface';
 
 export abstract class BaseRenderStrategy implements RenderStrategy {
-  constructor(protected readonly flowCore: FlowCore) {}
+  private readonly performanceLogger: RenderPerformanceLogger;
+
+  constructor(protected readonly flowCore: FlowCore) {
+    this.performanceLogger = new RenderPerformanceLogger();
+  }
 
   abstract init(): void;
 
@@ -17,6 +22,10 @@ export abstract class BaseRenderStrategy implements RenderStrategy {
 
     const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
 
-    this.flowCore.renderer.draw(visibleNodes, finalEdges, metadata.viewport);
+    this.performanceLogger.withPerformanceLogging(
+      () => this.flowCore.renderer.draw(visibleNodes, finalEdges, metadata.viewport),
+      visibleNodes,
+      this.flowCore.config.debugMode
+    );
   }
 }

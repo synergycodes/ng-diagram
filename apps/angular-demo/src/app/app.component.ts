@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injector } from '@angular/core';
 import {
   ClipboardPastedEvent,
   configureShortcuts,
@@ -23,8 +23,11 @@ import {
   type Node,
   type Port,
 } from 'ng-diagram';
+import { defaultModel } from './data/default-model';
+import { generateModel } from './data/generate-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
+import { virtualizationConfigOverrides, virtualizationTestConfig } from './data/virtualization-test.config';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
@@ -41,6 +44,8 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
+  private readonly injector = inject(Injector);
+
   paletteModel: NgDiagramPaletteItem[] = paletteModel;
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
   edgeTemplateMap = new NgDiagramEdgeTemplateMap([
@@ -50,18 +55,22 @@ export class AppComponent {
     ['dashed-edge', DashedEdgeComponent],
   ]);
 
-  config = {
+  config: NgDiagramConfig = {
     zoom: {
       max: 2,
+      zoomToFit: {
+        onInit: true,
+        padding: [50, 50, 100, 350],
+      },
+    },
+    resize: {
+      allowResizeBelowChildrenBounds: false,
     },
     background: {
       cellSize: { width: 10, height: 10 },
     },
     snapping: {
       shouldSnapDragForNode: () => true,
-    },
-    virtualization: {
-      enabled: true,
     },
     shortcuts: configureShortcuts([
       {
@@ -81,7 +90,21 @@ export class AppComponent {
         bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
       },
     ]),
-  } satisfies NgDiagramConfig;
+  };
+
+  model = initializeModel(defaultModel);
+
+  enableVirtualizationTest(): void {
+    this.config = {
+      ...this.config,
+      ...virtualizationConfigOverrides,
+      zoom: {
+        ...this.config.zoom,
+        zoomToFit: undefined,
+      },
+    };
+    this.model = initializeModel(generateModel(virtualizationTestConfig.nodeCount), this.injector);
+  }
 
   onDiagramInit(event: DiagramInitEvent): void {
     console.log('INIT');
@@ -176,63 +199,5 @@ export class AppComponent {
       angle: event.angle,
       previousAngle: event.previousAngle,
     });
-  }
-
-  // Generate 20k nodes in a grid pattern for virtualization testing
-  model = initializeModel(this.generateLargeModel(5000));
-
-  private generateLargeModel(nodeCount: number): { nodes: Node[]; edges: Edge[] } {
-    const nodes: Node[] = [];
-    const edges: Edge[] = [];
-
-    // Calculate grid dimensions (roughly square)
-    const cols = Math.ceil(Math.sqrt(nodeCount));
-    const rows = Math.ceil(nodeCount / cols);
-
-    // Node spacing
-    const spacingX = 200;
-    const spacingY = 150;
-
-    // Generate nodes in a grid
-    for (let i = 0; i < nodeCount; i++) {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
-
-      nodes.push({
-        id: `node-${i}`,
-        position: {
-          x: col * spacingX,
-          y: row * spacingY,
-        },
-        data: { label: `Node ${i}` },
-      });
-
-      // Create horizontal edge (to the right neighbor)
-      if (col < cols - 1 && i + 1 < nodeCount) {
-        edges.push({
-          id: `edge-h-${i}`,
-          source: `node-${i}`,
-          target: `node-${i + 1}`,
-          sourcePort: 'port-right',
-          targetPort: 'port-left',
-          data: {},
-        });
-      }
-
-      // Create vertical edge (to the bottom neighbor) - only every 5th row to reduce edge count
-      if (row < rows - 1 && i + cols < nodeCount && col % 5 === 0) {
-        edges.push({
-          id: `edge-v-${i}`,
-          source: `node-${i}`,
-          target: `node-${i + cols}`,
-          sourcePort: 'port-right',
-          targetPort: 'port-left',
-          data: {},
-        });
-      }
-    }
-
-    console.log(`Generated ${nodes.length} nodes and ${edges.length} edges`);
-    return { nodes, edges };
   }
 }
