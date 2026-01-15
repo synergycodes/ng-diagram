@@ -2,7 +2,8 @@ import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node, ResizeDirection } from '../../../../core/src';
 
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import type { PointerInputEvent } from '../../../types/event';
+import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
+import { DiagramEventName, type PointerInputEvent } from '../../../types/event';
 
 @Directive({
   selector: '[ngDiagramResize]',
@@ -13,7 +14,7 @@ import type { PointerInputEvent } from '../../../types/event';
 })
 export class ResizeDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
-
+  private readonly touchEventsStateService = inject(TouchEventsStateService);
   direction = input.required<ResizeDirection>();
   targetData = input.required<Node>();
 
@@ -25,6 +26,8 @@ export class ResizeDirective implements OnDestroy {
     if (!this.shouldHandle(event)) {
       return;
     }
+
+    this.touchEventsStateService.currentEvent.set(DiagramEventName.Resize);
 
     event.preventDefault();
     event.stopPropagation();
@@ -51,6 +54,8 @@ export class ResizeDirective implements OnDestroy {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
 
+    this.touchEventsStateService.clearCurrentEvent();
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -67,6 +72,11 @@ export class ResizeDirective implements OnDestroy {
   };
 
   onPointerMove = (event: PointerEvent): void => {
+    if (this.touchEventsStateService.panningHandled() || this.touchEventsStateService.zoomingHandled()) {
+      this.onPointerUp(event);
+      return;
+    }
+
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -83,6 +93,10 @@ export class ResizeDirective implements OnDestroy {
   };
 
   private shouldHandle(event: PointerInputEvent) {
-    return !event.boxSelectionHandled;
+    return !(
+      event.boxSelectionHandled ||
+      this.touchEventsStateService.panningHandled() ||
+      this.touchEventsStateService.zoomingHandled()
+    );
   }
 }
