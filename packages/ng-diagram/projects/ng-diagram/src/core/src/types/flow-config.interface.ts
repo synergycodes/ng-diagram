@@ -424,6 +424,8 @@ export interface BoxSelectionConfig {
  * When enabled, only nodes and edges visible in the viewport (plus padding) are rendered,
  * significantly improving performance for large diagrams.
  *
+ * @public
+ * @since 0.9.1
  * @category Types/Configuration/Features
  */
 export interface VirtualizationConfig {

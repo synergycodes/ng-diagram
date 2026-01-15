@@ -176,7 +176,7 @@ true
 
 ### virtualization
 
-> **virtualization**: `VirtualizationConfig`
+> **virtualization**: [`VirtualizationConfig`](/docs/api/types/configuration/features/virtualizationconfig/)
 
 Configuration for viewport virtualization.
 Improves performance for large diagrams by only rendering visible elements.
