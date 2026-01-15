@@ -3,7 +3,7 @@ import { FlowCoreProviderService } from '../../../services/flow-core-provider/fl
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 
 @Directive({
-  selector: '[ngDiagramZooming]',
+  selector: '[ngDiagramZoomingWheel]',
   standalone: true,
   host: {
     '(wheel)': 'onWheel($event)',
@@ -14,6 +14,10 @@ export class ZoomingWheelDirective {
   private readonly inputEventsRouterService = inject(InputEventsRouterService);
 
   onWheel(event: WheelEvent) {
+    if (!this.shouldHandle(event)) {
+      return;
+    }
+
     event.stopPropagation();
     event.preventDefault();
 
@@ -31,5 +35,10 @@ export class ZoomingWheelDirective {
       },
       zoomFactor: zoomFactor,
     });
+  }
+
+  private shouldHandle(event: WheelEvent): boolean {
+    // Zoom only when primary modifier is pressed
+    return this.inputEventsRouterService.eventGuards.withPrimaryModifier(event);
   }
 }

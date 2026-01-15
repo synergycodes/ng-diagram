@@ -52,4 +52,10 @@ export class NgDiagramPaletteItemComponent {
   onMouseDown() {
     this.paletteService.onMouseDown(this.item(), this.paletteItemPreviewComponent()?.id || '');
   }
+
+  /** @internal */
+  onTouchStart(event: TouchEvent) {
+    event.preventDefault();
+    this.paletteService.onMouseDown(this.item(), this.paletteItemPreviewComponent()?.id || '');
+  }
 }
