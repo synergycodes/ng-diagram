@@ -15,10 +15,6 @@ export class DirectPortUpdateStrategy implements PortUpdateStrategy {
     });
   }
 
-  deletePort(nodeId: string, portId: string): void {
-    this.flowCore.commandHandler.emit('deletePorts', { nodeId, portIds: [portId] });
-  }
-
   updatePorts(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void {
     for (const { id, size, position } of ports) {
       this.flowCore.portBatchProcessor.processUpdate(

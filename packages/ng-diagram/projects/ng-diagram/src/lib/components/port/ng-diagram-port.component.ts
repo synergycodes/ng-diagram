@@ -177,10 +177,32 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
-    // Always call deletePort - InternalUpdater handles virtualization logic
-    this.flowCoreProvider.provide().updater.deletePort(nodeData.id, this.id());
+    const flowCore = this.flowCoreProvider.provide();
+
+    // Skip cleanup if FlowCore is still initializing
+    // (handles case where old components from previous render are destroyed
+    // while new FlowCore is initializing after model reinitialization)
+    if (!flowCore.isInitialized) {
+      return;
+    }
 
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+
+    // Skip if node was deleted - ports are removed with the node
+    const nodeStillExists = flowCore.getNodeById(nodeData.id);
+    if (!nodeStillExists) {
+      return;
+    }
+
+    // In virtualization mode, skip if node is just virtualized (scrolled out of view)
+    if (flowCore.config.virtualization.enabled && !flowCore.isNodeCurrentlyRendered(nodeData.id)) {
+      return;
+    }
+
+    flowCore.commandHandler.emit('deletePorts', {
+      nodeId: nodeData.id,
+      portIds: [this.id()],
+    });
   }
 
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');

@@ -16,6 +16,10 @@ export class ResultCache {
     return this.cachedResult !== null;
   }
 
+  isNodeInCache(nodeId: string): boolean {
+    return this.cachedResult?.nodeIds.has(nodeId) ?? false;
+  }
+
   /**
    * Returns cached result by filtering from current arrays using cached IDs.
    * Always creates fresh filtered arrays to ensure consistency with rendered content.

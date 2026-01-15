@@ -147,24 +147,6 @@ export class InitUpdater implements Updater {
   }
 
   /**
-   * Deletes a port during initialization.
-   * Queues if finishing, otherwise delegates to internal updater since deletions
-   * during initialization are rare and don't need to be batched in init state.
-   *
-   * @param nodeId - The node ID the port belongs to
-   * @param portId - The port ID to delete
-   */
-  deletePort(nodeId: string, portId: string): void {
-    if (this.lateArrivalQueue.isFinishing) {
-      this.lateArrivalQueue.enqueue({ method: 'deletePort', args: [nodeId, portId] });
-      return;
-    }
-
-    // During initialization, deletions are rare - delegate directly to internal updater
-    this.flowCore.internalUpdater.deletePort(nodeId, portId);
-  }
-
-  /**
    * Records port measurements (sizes and positions).
    * Queues if finishing, otherwise records all measurements and attempts to finish.
    *

@@ -11,13 +11,6 @@ export interface PortUpdateStrategy {
   addPort(nodeId: string, port: Port): void;
 
   /**
-   * Delete a port from a node.
-   * Optional because virtualization mode doesn't delete ports on DOM unmount -
-   * ports persist in the model and are restored when the node scrolls back into view.
-   */
-  deletePort?(nodeId: string, portId: string): void;
-
-  /**
    * Update port sizes and positions
    */
   updatePorts(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void;

@@ -13,4 +13,10 @@ export interface RenderStrategy {
    */
   init(): void;
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult;
+
+  /**
+   * Checks if a node is currently rendered (visible in viewport).
+   * In direct mode, always returns true. In virtualized mode, checks the cached visible nodes.
+   */
+  isNodeRendered(nodeId: string): boolean;
 }

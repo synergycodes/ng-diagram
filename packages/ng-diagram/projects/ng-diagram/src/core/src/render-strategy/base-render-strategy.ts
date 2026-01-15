@@ -14,6 +14,8 @@ export abstract class BaseRenderStrategy implements RenderStrategy {
 
   abstract process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult;
 
+  abstract isNodeRendered(nodeId: string): boolean;
+
   protected render(): void {
     const { nodes, edges, metadata } = this.flowCore.getState();
     const temporaryEdge = this.flowCore.actionStateManager.linking?.temporaryEdge;

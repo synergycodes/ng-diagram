@@ -555,6 +555,18 @@ export class FlowCore {
   }
 
   /**
+   * Checks if a node is currently rendered (visible in viewport).
+   * In direct mode, always returns true. In virtualized mode, checks if the node
+   * is in the current set of visible nodes.
+   *
+   * @param nodeId Node id to check
+   * @returns True if the node is currently rendered
+   */
+  isNodeCurrentlyRendered(nodeId: string): boolean {
+    return this.renderStrategy.isNodeRendered(nodeId);
+  }
+
+  /**
    * Returns the current zoom scale
    */
   getScale() {

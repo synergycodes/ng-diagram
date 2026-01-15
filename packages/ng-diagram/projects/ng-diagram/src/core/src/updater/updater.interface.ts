@@ -12,11 +12,6 @@ export interface Updater {
   addPort(nodeId: string, port: Port): void;
 
   /**
-   * Delete a port from a node
-   */
-  deletePort(nodeId: string, portId: string): void;
-
-  /**
    * Apply port size and position updates
    */
   applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void;

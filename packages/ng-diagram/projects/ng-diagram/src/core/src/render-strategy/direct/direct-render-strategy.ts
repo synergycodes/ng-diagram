@@ -37,4 +37,9 @@ export class DirectRenderStrategy extends BaseRenderStrategy {
   process(nodes: Node[], edges: Edge[]): RenderStrategyResult {
     return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isNodeRendered(_nodeId: string): boolean {
+    return true; // All nodes are always rendered in direct mode
+  }
 }

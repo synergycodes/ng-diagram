@@ -96,6 +96,10 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
     this.idleRenderScheduler.destroy();
   }
 
+  isNodeRendered(nodeId: string): boolean {
+    return this.cache.isNodeInCache(nodeId);
+  }
+
   private invalidateAndRender(): void {
     this.cache.invalidateViewport();
     this.render();

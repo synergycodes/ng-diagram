@@ -48,15 +48,6 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Internal method to delete a port from the flow.
-   * In virtualization mode, ports persist in model (only DOM unmounts).
-   */
-  deletePort(nodeId: string, portId: string): void {
-    this.portUpdateStrategy.deletePort?.(nodeId, portId);
-  }
-
-  /**
-   * @internal
    * Internal method to apply a port size and position
    */
   applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void {

@@ -275,6 +275,8 @@ export const deletePortsBulk = async (commandHandler: CommandHandler, command: D
   const { deletions } = command;
   const nodesToUpdate: { id: string; measuredPorts: Port[] }[] = [];
 
+  console.log('deletePortsBulk', deletions);
+
   deletions.forEach((portIds, nodeId) => {
     const node = commandHandler.flowCore.getNodeById(nodeId);
     if (!node) {
