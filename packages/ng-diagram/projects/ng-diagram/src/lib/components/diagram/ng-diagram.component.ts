@@ -239,7 +239,13 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
           this.renderer.isInitialized.set(false);
           this.renderer.viewportPannable.set(this.config()?.viewportPanningEnabled ?? true);
           this.flowCoreProvider.destroy();
-          this.flowCoreProvider.init(model, this.middlewares(), this.getFlowOffset, this.config());
+          this.flowCoreProvider.init(
+            model,
+            this.middlewares(),
+            this.getFlowOffset,
+            this.getViewportSize,
+            this.config()
+          );
         });
 
         this.initializedModel = model;
@@ -327,6 +333,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   private getFlowOffset = () => {
     const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
     return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
+  };
+
+  private getViewportSize = () => {
+    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
+    return clientRect ? { width: clientRect.width, height: clientRect.height } : { width: 0, height: 0 };
   };
 
   private setupViewportSizeTracking(): void {
