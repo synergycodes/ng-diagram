@@ -1422,6 +1422,14 @@ export class ViewportDirective {
 }
 
 // @public
+export interface VirtualizationConfig {
+    enabled: boolean;
+    idleDelay?: number;
+    nodeCountThreshold: number;
+    padding: number;
+}
+
+// @public
 export interface ZIndexConfig {
     edgesAboveConnectedNodes: boolean;
     elevateOnSelection: boolean;
