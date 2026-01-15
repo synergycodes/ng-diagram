@@ -1,0 +1,95 @@
+---
+version: 'since v0.9.1'
+title: Virtualization
+description: Optimizing performance for large diagrams with viewport virtualization
+---
+
+Virtualization is a performance optimization technique that renders only the nodes and edges visible within the current viewport. For diagrams with hundreds or thousands of elements, this dramatically improves rendering performance and responsiveness.
+
+## How It Works
+
+When virtualization is enabled, ngDiagram calculates which elements are visible in the current viewport (plus a configurable padding area) and only renders those elements. As you pan or zoom around the diagram, elements are dynamically added and removed from the DOM.
+
+**What to expect:**
+
+- Nodes and edges outside the viewport are not rendered until you pan to them
+- During fast panning, you may briefly see empty areas before elements appear
+- Elements are rendered after a short idle delay once panning stops
+- The virtual viewport (rendering area) extends beyond the visible viewport by a configurable padding
+
+## Enabling Virtualization
+
+To enable virtualization, set the `enabled` property in your diagram configuration:
+
+```typescript
+import { NgDiagramConfig } from 'ng-diagram';
+
+const config: NgDiagramConfig = {
+  virtualization: {
+    enabled: true,
+  },
+};
+```
+
+## Configuration Options
+
+The virtualization behavior can be fine-tuned with the following options:
+
+### enabled
+
+Whether viewport virtualization is active.
+
+```typescript
+virtualization: {
+  enabled: true, // default: false
+}
+```
+
+### padding
+
+Controls the size of the virtual viewport beyond the visible area. This is a multiplier relative to viewport size. For example, `0.5` means the rendering area extends by 50% of the viewport size in each direction.
+
+```typescript
+virtualization: {
+  enabled: true,
+  padding: 0.5, // default: 0.5
+}
+```
+
+A larger padding value means more elements are pre-rendered outside the visible area, reducing the chance of seeing empty spaces during panning. However, this comes at the cost of rendering more elements, which may impact performance.
+
+### nodeCountThreshold
+
+The minimum number of nodes required for virtualization to activate. If your diagram has fewer nodes than this threshold, all nodes are rendered regardless of the virtualization setting.
+
+```typescript
+virtualization: {
+  enabled: true,
+  nodeCountThreshold: 500, // default: 500
+}
+```
+
+This prevents the overhead of virtualization calculations for smaller diagrams where it provides no benefit.
+
+### idleDelay
+
+The delay in milliseconds after panning stops before re-rendering visible nodes.
+
+```typescript
+virtualization: {
+  enabled: true,
+  idleDelay: 100, // default: 100
+}
+```
+
+## Performance Considerations
+
+When configuring virtualization, consider these trade-offs:
+
+| Setting              | Higher Value                                                      | Lower Value                                                      |
+| -------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `padding`            | More pre-rendered elements, smoother panning, higher memory usage | Fewer elements rendered, may see empty areas during fast panning |
+| `nodeCountThreshold` | Virtualization activates only for very large diagrams             | Virtualization activates for smaller diagrams                    |
+| `idleDelay`          | Longer wait before rendering, fewer intermediate renders          | Faster visual feedback, more frequent renders                    |
+
+For most use cases, the default values provide a good balance between performance and visual smoothness.
