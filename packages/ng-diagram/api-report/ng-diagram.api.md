@@ -24,6 +24,7 @@ export interface ActionState {
     dragging?: DraggingActionState;
     highlightGroup?: HighlightGroupActionState;
     linking?: LinkingActionState;
+    panning?: PanningActionState;
     resize?: ResizeActionState;
     rotation?: RotationActionState;
 }
@@ -35,6 +36,7 @@ export class ActionStateManager {
     clearDragging(): void;
     clearHighlightGroup(): void;
     clearLinking(): void;
+    clearPanning(): void;
     clearResize(): void;
     clearRotation(): void;
     get copyPaste(): CopyPasteActionState | undefined;
@@ -46,10 +48,13 @@ export class ActionStateManager {
     set highlightGroup(value: HighlightGroupActionState | undefined);
     isDragging(): boolean;
     isLinking(): boolean;
+    isPanning(): boolean;
     isResizing(): boolean;
     isRotating(): boolean;
     get linking(): LinkingActionState | undefined;
     set linking(value: LinkingActionState | undefined);
+    get panning(): PanningActionState | undefined;
+    set panning(value: PanningActionState | undefined);
     get resize(): ResizeActionState | undefined;
     set resize(value: ResizeActionState | undefined);
     get rotation(): RotationActionState | undefined;
@@ -156,7 +161,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -267,7 +272,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -302,6 +307,7 @@ export interface FlowConfig {
     shortcuts: ShortcutDefinition[];
     snapping: SnappingConfig;
     viewportPanningEnabled: boolean;
+    virtualization: VirtualizationConfig;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -326,6 +332,10 @@ export interface FlowStateUpdate {
     nodesToUpdate?: (Partial<Node_2> & {
         id: Node_2['id'];
     })[];
+    // @internal
+    renderedEdgeIds?: string[];
+    // @internal
+    renderedNodeIds?: string[];
 }
 
 // @public
@@ -1082,7 +1092,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1373,7 +1383,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)
