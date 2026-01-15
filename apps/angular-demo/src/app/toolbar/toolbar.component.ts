@@ -23,7 +23,7 @@ export class ToolbarComponent {
 
   private readonly nodeTypes = Array.from(nodeTemplateMap.keys()) as NodeTemplateType[];
 
-  toggleDebugModeClick = output<void>();
+  reinitializeModelClick = output<void>();
 
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 

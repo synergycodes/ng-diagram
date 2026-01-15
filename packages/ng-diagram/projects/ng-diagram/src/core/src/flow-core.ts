@@ -71,6 +71,7 @@ export class FlowCore {
   readonly measurementTracker: MeasurementTracker;
 
   readonly getFlowOffset: () => Point;
+  readonly getViewportSize: () => { width: number; height: number };
 
   constructor(
     modelAdapter: ModelAdapter,
@@ -79,6 +80,7 @@ export class FlowCore {
     public readonly environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
     getFlowOffset?: () => Point,
+    getViewportSize?: () => { width: number; height: number },
     config: DeepPartial<FlowConfig> = {}
   ) {
     this._model = modelAdapter;
@@ -101,6 +103,7 @@ export class FlowCore {
       () => this.config.edgeRouting || {}
     );
     this.getFlowOffset = getFlowOffset || (() => ({ x: 0, y: 0 }));
+    this.getViewportSize = getViewportSize || (() => ({ width: 0, height: 0 }));
 
     this.shortcutManager = new ShortcutManager(this);
 
@@ -118,6 +121,7 @@ export class FlowCore {
    * Starts listening to model changes and emits init command
    */
   private init() {
+    this.initializeViewportSize();
     this.render();
 
     this.model.onChange((state) => {
@@ -132,12 +136,28 @@ export class FlowCore {
   }
 
   /**
-   * Sets the new model and runs the init process
-   * @param model Model
+   * Sets initial viewport size from element dimensions.
+   *
+   * This must be called BEFORE renderStrategy.init() for two reasons:
+   * 1. The viewport size is needed for features like zoomToFit on init
+   * 2. At this point, no onChange callbacks are registered yet, so updateMetadata won't trigger events
+   *
+   * Without this, the ResizeObserver might not fire on reinitialization,
+   * leaving viewport.width/height as undefined.
    */
-  private set model(model: ModelAdapter) {
-    this._model = model;
-    this.init();
+  private initializeViewportSize(): void {
+    const { width, height } = this.getViewportSize();
+    if (width > 0 && height > 0) {
+      const currentMetadata = this.model.getMetadata();
+      this.model.updateMetadata({
+        ...currentMetadata,
+        viewport: {
+          ...currentMetadata.viewport,
+          width,
+          height,
+        },
+      });
+    }
   }
 
   /**
