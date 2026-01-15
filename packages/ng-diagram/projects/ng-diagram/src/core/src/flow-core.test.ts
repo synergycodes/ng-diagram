@@ -211,6 +211,7 @@ describe('FlowCore', () => {
         mockEnvironment,
         undefined,
         undefined,
+        undefined,
         customConfig
       );
 

@@ -200,4 +200,8 @@ export class AppComponent {
       previousAngle: event.previousAngle,
     });
   }
+
+  onReinitializeModel(): void {
+    this.model = initializeModel(defaultModel, this.injector);
+  }
 }

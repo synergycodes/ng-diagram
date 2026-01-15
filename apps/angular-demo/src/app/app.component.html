@@ -16,6 +16,6 @@
   >
     <ng-diagram-background type="grid"></ng-diagram-background>
   </ng-diagram>
-  <app-toolbar (testVirtualizationClick)="enableVirtualizationTest()" />
+  <app-toolbar (testVirtualizationClick)="enableVirtualizationTest()" (reinitializeModelClick)="onReinitializeModel()" />
   <app-palette [model]="paletteModel" />
 </div>

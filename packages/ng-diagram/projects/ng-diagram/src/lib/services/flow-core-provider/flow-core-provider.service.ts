@@ -25,6 +25,7 @@ export class FlowCoreProviderService {
     model: ModelAdapter,
     middlewares: MiddlewareChain,
     getFlowOffset: () => Point,
+    getViewportSize: () => { width: number; height: number },
     config?: DeepPartial<FlowConfig>
   ): void {
     this.flowCore = new FlowCore(
@@ -34,6 +35,7 @@ export class FlowCoreProviderService {
       this.environment,
       middlewares,
       getFlowOffset,
+      getViewportSize,
       config
     );
 

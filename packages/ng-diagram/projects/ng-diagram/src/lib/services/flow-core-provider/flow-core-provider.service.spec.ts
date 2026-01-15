@@ -11,6 +11,7 @@ vi.mock('../../utils/detect-environment');
 describe('FlowCoreProviderService', () => {
   const mockMiddlewares: [Middleware<'test'>] = [{ name: 'test', execute: vi.fn() }] as unknown as [Middleware<'test'>];
   const mockOffset = () => ({ x: 0, y: 0 });
+  const mockViewportSize = () => ({ width: 800, height: 600 });
   let service: FlowCoreProviderService;
 
   const mockModelAdapter: ModelAdapter = {
@@ -44,13 +45,13 @@ describe('FlowCoreProviderService', () => {
 
   describe('init', () => {
     it('should create new FlowCore instance', () => {
-      service.init(mockModelAdapter, [], mockOffset);
+      service.init(mockModelAdapter, [], mockOffset, mockViewportSize);
 
       expect(service.provide()).toBeInstanceOf(FlowCore);
     });
 
     it('should initialize FlowCore with provided middlewares', () => {
-      service.init(mockModelAdapter, mockMiddlewares, mockOffset);
+      service.init(mockModelAdapter, mockMiddlewares, mockOffset, mockViewportSize);
 
       // Verify that FlowCore was created successfully with middlewares
       const flowCore = service.provide();
@@ -64,7 +65,7 @@ describe('FlowCoreProviderService', () => {
     });
 
     it('should return FlowCore instance when initialized', () => {
-      service.init(mockModelAdapter, [], mockOffset);
+      service.init(mockModelAdapter, [], mockOffset, mockViewportSize);
 
       const flowCore = service.provide();
 
