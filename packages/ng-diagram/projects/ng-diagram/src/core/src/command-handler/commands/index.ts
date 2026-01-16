@@ -5,11 +5,13 @@ import {
   addEdges,
   addNodes,
   addPorts,
+  addPortsBulk,
   clearModel,
   deleteEdgeLabels,
   deleteEdges,
   deleteNodes,
   deletePorts,
+  deletePortsBulk,
   paletteDropNode,
   updateEdge,
   updateEdgeLabels,
@@ -17,6 +19,7 @@ import {
   updateNode,
   updateNodes,
   updatePorts,
+  updatePortsBulk,
 } from './add-update-delete';
 import { centerOnNode, centerOnRect } from './centering';
 import { copy, paste } from './copy-paste';
@@ -80,8 +83,11 @@ export const commands: CommandMap = {
   resizeNode,
   zoom,
   addPorts,
+  addPortsBulk,
   updatePorts,
+  updatePortsBulk,
   deletePorts,
+  deletePortsBulk,
   bringToFront,
   sendToBack,
   addEdgeLabels,

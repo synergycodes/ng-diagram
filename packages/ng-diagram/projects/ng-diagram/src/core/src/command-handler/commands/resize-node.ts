@@ -188,7 +188,9 @@ const handleSingleNodeResize = async (commandHandler: CommandHandler, command: R
 };
 
 /**
- * Handles missing initial size in case of dropping from the palette
+ * Handles missing initial size in case of dropping from the palette.
+ * Note: For bulk initial size updates (e.g., virtualization), prefer using
+ * processNodeBatch in FlowResizeBatchProcessorService which batches these updates.
  */
 const handleMissingInitialSize = async (commandHandler: CommandHandler, command: ResizeNodeCommand): Promise<void> => {
   const node = commandHandler.flowCore.getNodeById(command.id);

@@ -14,6 +14,9 @@ describe('Move Viewport Commands', () => {
     flowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
+      actionStateManager: {
+        isPanning: vi.fn().mockReturnValue(false),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });

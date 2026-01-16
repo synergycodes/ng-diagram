@@ -55,9 +55,32 @@ export class NgDiagramNodeComponent {
   }
 
   private setupPortSyncEffect(): void {
+    let isFirstRun = true;
+    let prevSize: { width?: number; height?: number } | undefined;
+    let prevRotate: string | undefined;
+
     effect(() => {
-      this.size();
-      this.rotate();
+      const size = this.size();
+      const rotate = this.rotate();
+
+      // Skip initial run - ports aren't measured yet, ResizeObserver will handle initial sync
+      if (isFirstRun) {
+        isFirstRun = false;
+        prevSize = size;
+        prevRotate = rotate;
+        return;
+      }
+
+      // Skip if size and rotate haven't actually changed (just object reference change)
+      const sizeChanged = size?.width !== prevSize?.width || size?.height !== prevSize?.height;
+      const rotateChanged = rotate !== prevRotate;
+
+      if (!sizeChanged && !rotateChanged) {
+        return;
+      }
+
+      prevSize = size;
+      prevRotate = rotate;
       this.syncPorts();
     });
   }

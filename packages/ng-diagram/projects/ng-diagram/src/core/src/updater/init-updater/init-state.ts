@@ -38,6 +38,9 @@ export class InitState {
   /** All labels that need measurement (both pre-existing and newly added), keyed by compound ID */
   readonly labelsToMeasure = new Set<string>();
 
+  /** All nodes that need measurement (rendered nodes at init time), keyed by nodeId */
+  readonly nodesToMeasure = new Set<string>();
+
   /** Nodes that have valid measurements, keyed by nodeId */
   readonly measuredNodes = new Set<string>();
 
@@ -129,6 +132,8 @@ export class InitState {
    */
   collectAlreadyMeasuredItems(nodes: Node[], edges: Edge[]): void {
     for (const node of nodes) {
+      this.nodesToMeasure.add(node.id);
+
       if (isValidSize(node.size)) {
         this.measuredNodes.add(node.id);
       }
@@ -157,13 +162,12 @@ export class InitState {
 
   /**
    * Checks if all entities have received valid measurements.
-   * Compares the count of measured entities against expected counts.
+   * Verifies that all tracked nodes, ports, and labels have been measured.
    *
-   * @param nodeCount - Expected number of nodes
    * @returns True if all nodes, ports, and labels have valid measurements
    */
-  allEntitiesHaveMeasurements(nodeCount: number): boolean {
-    const allNodesMeasured = this.measuredNodes.size === nodeCount;
+  allEntitiesHaveMeasurements(): boolean {
+    const allNodesMeasured = [...this.nodesToMeasure].every((id) => this.measuredNodes.has(id));
     const allPortsMeasured = this.measuredPorts.size === this.portsToMeasure.size;
     const allLabelsMeasured = this.measuredLabels.size === this.labelsToMeasure.size;
 
