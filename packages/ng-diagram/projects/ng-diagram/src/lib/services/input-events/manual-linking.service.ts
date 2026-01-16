@@ -26,10 +26,42 @@ export class ManualLinkingService {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('click', this.onDocumentClick, true);
+    document.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    document.addEventListener('touchend', this.onTouchEnd, { passive: false });
   }
 
   private onPointerMove = (event: PointerEvent) => {
+    if (event.pointerType === 'touch') {
+      return;
+    }
     this.linkingEventService.emitContinue(event as PointerInputEvent);
+  };
+
+  private onTouchMove = (event: TouchEvent) => {
+    if (event.touches.length !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    const touch = event.touches[0];
+    const mockEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    } as PointerInputEvent;
+
+    this.linkingEventService.emitContinue(mockEvent);
+  };
+
+  private onTouchEnd = (event: TouchEvent) => {
+    event.preventDefault();
+    const touch = event.changedTouches[0];
+    const mockEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    } as PointerInputEvent;
+
+    this.cleanup();
+    this.linkingEventService.emitEnd(mockEvent, this.node, this.portId);
   };
 
   private onDocumentClick = (event: MouseEvent) => {
@@ -40,5 +72,7 @@ export class ManualLinkingService {
   private cleanup() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('click', this.onDocumentClick, true);
+    document.removeEventListener('touchmove', this.onTouchMove);
+    document.removeEventListener('touchend', this.onTouchEnd);
   }
 }
