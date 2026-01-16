@@ -17,6 +17,10 @@ When virtualization is enabled, ngDiagram calculates which elements are visible 
 - Elements are rendered after a short idle delay once panning stops
 - The virtual viewport (rendering area) extends beyond the visible viewport by a configurable padding
 
+:::note
+The `zoomToFit` command is disabled when virtualization is enabled, as it requires all elements to calculate bounds.
+:::
+
 ## Enabling Virtualization
 
 To enable virtualization, set the `enabled` property in your diagram configuration:
@@ -29,6 +33,19 @@ const config: NgDiagramConfig = {
     enabled: true,
   },
 };
+```
+
+## Changing Virtualization at Runtime
+
+The virtualization setting is applied during diagram initialization. To change the virtualization mode at runtime, you must update the config and reinitialize the model:
+
+```typescript
+// Update config and reinitialize model
+this.config = {
+  ...this.config,
+  virtualization: { enabled: true },
+};
+this.model = initializeModel(getModel(), this.injector);
 ```
 
 ## Configuration Options
@@ -60,19 +77,6 @@ virtualization: {
 
 A larger padding value means more elements are pre-rendered outside the visible area, reducing the chance of seeing empty spaces during panning. However, this comes at the cost of rendering more elements, which may impact performance.
 
-### nodeCountThreshold
-
-The minimum number of nodes required for virtualization to activate. If your diagram has fewer nodes than this threshold, all nodes are rendered regardless of the virtualization setting.
-
-```typescript
-virtualization: {
-  enabled: true,
-  nodeCountThreshold: 500, // default: 500
-}
-```
-
-This prevents the overhead of virtualization calculations for smaller diagrams where it provides no benefit.
-
 ### idleDelay
 
 The delay in milliseconds after panning stops before re-rendering visible nodes.
@@ -88,10 +92,9 @@ virtualization: {
 
 When configuring virtualization, consider these trade-offs:
 
-| Setting              | Higher Value                                                      | Lower Value                                                      |
-| -------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `padding`            | More pre-rendered elements, smoother panning, higher memory usage | Fewer elements rendered, may see empty areas during fast panning |
-| `nodeCountThreshold` | Virtualization activates only for very large diagrams             | Virtualization activates for smaller diagrams                    |
-| `idleDelay`          | Longer wait before rendering, fewer intermediate renders          | Faster visual feedback, more frequent renders                    |
+| Setting       | Higher Value                                                      | Lower Value                                                      |
+| ------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `padding`     | More pre-rendered elements, smoother panning, higher memory usage | Fewer elements rendered, may see empty areas during fast panning |
+| `idleDelay`   | Longer wait before rendering, fewer intermediate renders          | Faster visual feedback, more frequent renders                    |
 
 For most use cases, the default values provide a good balance between performance and visual smoothness.

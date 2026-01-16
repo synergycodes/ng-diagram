@@ -109,7 +109,7 @@ const isValidViewport = (viewport: { width?: number; height?: number }): boolean
  * Calculates optimal viewport position and scale to fit specified content
  */
 export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeIds, padding }: ZoomToFitCommand) => {
-  if (commandHandler.flowCore.config.virtualization.enabled) {
+  if (commandHandler.flowCore.isVirtualizationActive) {
     console.warn(VIRTUALIZATION_WARNING);
     return;
   }

@@ -4,7 +4,7 @@ import { BaseRenderStrategy } from '../base-render-strategy';
 import type { RenderStrategyResult } from '../render-strategy.interface';
 import { IdleRenderScheduler } from './idle-render-scheduler';
 import { ResultCache } from './result-cache';
-import { getViewportRect, shouldBypassVirtualization } from './viewport-utils';
+import { getViewportRect, isViewportValid } from './viewport-utils';
 import { VisibleElementsResolver } from './visible-elements-resolver';
 import { ZoomTracker } from './zoom-tracker';
 
@@ -62,7 +62,7 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   process(nodes: Node[], edges: Edge[], viewport: Viewport | undefined): RenderStrategyResult {
     const config = this.flowCore.config.virtualization;
 
-    if (shouldBypassVirtualization(nodes, viewport, config)) {
+    if (!isViewportValid(viewport)) {
       return { nodes, edges, nodeIds: EMPTY_SET, edgeIds: EMPTY_SET };
     }
 
@@ -97,6 +97,11 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   }
 
   isNodeRendered(nodeId: string): boolean {
+    // When viewport is invalid, all nodes are rendered
+    const viewport = this.flowCore.model.getMetadata().viewport;
+    if (!isViewportValid(viewport)) {
+      return true;
+    }
     return this.cache.isNodeInCache(nodeId);
   }
 

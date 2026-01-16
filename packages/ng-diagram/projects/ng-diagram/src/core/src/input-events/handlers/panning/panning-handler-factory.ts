@@ -11,5 +11,5 @@ import { VirtualizedPanningEventHandler } from './virtualized-panning.handler';
  * - Virtualized mode: Uses RAF throttling and buffer fill management for better performance
  */
 export function panningHandlerFactory(flow: FlowCore): EventHandler<PanningEvent> {
-  return flow.config.virtualization.enabled ? new VirtualizedPanningEventHandler(flow) : new PanningEventHandler(flow);
+  return flow.isVirtualizationActive ? new VirtualizedPanningEventHandler(flow) : new PanningEventHandler(flow);
 }

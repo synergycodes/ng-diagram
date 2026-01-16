@@ -22,7 +22,6 @@ describe('VirtualizedRenderStrategy', () => {
   const defaultConfig: VirtualizationConfig = {
     enabled: true,
     padding: 0.1, // 10% of viewport size as padding
-    nodeCountThreshold: 2,
   };
 
   beforeEach(() => {
@@ -65,20 +64,6 @@ describe('VirtualizedRenderStrategy', () => {
   }
 
   describe('bypass conditions', () => {
-    it('should return all nodes when node count is below threshold', () => {
-      config.nodeCountThreshold = 10;
-      const nodes: Node[] = [
-        { ...mockNode, id: '1', position: { x: 0, y: 0 }, size: { width: 50, height: 50 } },
-        { ...mockNode, id: '2', position: { x: 1000, y: 1000 }, size: { width: 50, height: 50 } },
-      ];
-      const edges: Edge[] = [];
-      spatialHash.process(nodes);
-
-      const result = strategy.process(nodes, edges, defaultViewport);
-
-      expect(result.nodes).toEqual(nodes);
-    });
-
     it('should return all nodes when viewport is undefined', () => {
       const nodes: Node[] = [
         { ...mockNode, id: '1', position: { x: 0, y: 0 }, size: { width: 50, height: 50 } },

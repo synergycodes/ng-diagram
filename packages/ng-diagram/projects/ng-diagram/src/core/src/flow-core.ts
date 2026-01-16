@@ -211,7 +211,7 @@ export class FlowCore {
    * When disabled, uses DirectRenderStrategy.
    */
   get renderStrategy(): RenderStrategy {
-    return this.config.virtualization.enabled ? this.virtualizedRenderStrategy : this.directRenderStrategy;
+    return this.isVirtualizationActive ? this.virtualizedRenderStrategy : this.directRenderStrategy;
   }
 
   /**
@@ -589,6 +589,13 @@ export class FlowCore {
    */
   get isInitialized(): boolean {
     return this.initUpdater.isInitialized;
+  }
+
+  /**
+   * Returns true if virtualization is enabled.
+   */
+  get isVirtualizationActive(): boolean {
+    return this.config.virtualization.enabled;
   }
 
   setDebugMode(debugMode: boolean): void {

@@ -11,7 +11,7 @@ export class InternalUpdater implements Updater {
   private readonly portUpdateStrategy: PortUpdateStrategy;
 
   constructor(private readonly flowCore: FlowCore) {
-    this.portUpdateStrategy = this.flowCore.config.virtualization.enabled
+    this.portUpdateStrategy = this.flowCore.isVirtualizationActive
       ? new VirtualizedPortUpdateStrategy(flowCore)
       : new DirectPortUpdateStrategy(flowCore);
   }

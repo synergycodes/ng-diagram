@@ -1425,7 +1425,6 @@ export class ViewportDirective {
 export interface VirtualizationConfig {
     enabled: boolean;
     idleDelay?: number;
-    nodeCountThreshold: number;
     padding: number;
 }
 

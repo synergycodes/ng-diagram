@@ -1,4 +1,4 @@
-import type { Node, Rect, Viewport, VirtualizationConfig } from '../../types';
+import type { Rect, Viewport } from '../../types';
 
 const DEFAULT_VIEWPORT_WIDTH = 1920;
 const DEFAULT_VIEWPORT_HEIGHT = 1080;
@@ -14,14 +14,10 @@ const PAN_DISTANCE_THRESHOLD = 0.4;
 const DIMENSION_CHANGE_TOLERANCE = 0.1;
 
 /**
- * Checks if virtualization should be bypassed (too few nodes or no viewport).
+ * Checks if viewport is valid for virtualization.
  */
-export function shouldBypassVirtualization(
-  nodes: Node[],
-  viewport: Viewport | undefined,
-  config: VirtualizationConfig
-): boolean {
-  return !viewport || nodes.length < config.nodeCountThreshold;
+export function isViewportValid(viewport: Viewport | undefined): boolean {
+  return !!viewport;
 }
 
 /**

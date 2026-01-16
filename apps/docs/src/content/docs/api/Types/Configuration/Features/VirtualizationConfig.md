@@ -41,21 +41,6 @@ Delay in milliseconds after panning stops before re-rendering visible nodes.
 
 ***
 
-### nodeCountThreshold
-
-> **nodeCountThreshold**: `number`
-
-Maximum number of nodes below which virtualization is skipped.
-If fewer nodes exist than this threshold, render all nodes.
-
-#### Default
-
-```ts
-500
-```
-
-***
-
 ### padding
 
 > **padding**: `number`

@@ -195,7 +195,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     }
 
     // In virtualization mode, skip if node is just virtualized (scrolled out of view)
-    if (flowCore.config.virtualization.enabled && !flowCore.isNodeCurrentlyRendered(nodeData.id)) {
+    if (flowCore.isVirtualizationActive && !flowCore.isNodeCurrentlyRendered(nodeData.id)) {
       return;
     }
 

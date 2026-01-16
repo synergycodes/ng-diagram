@@ -138,7 +138,6 @@ const defaultVirtualizationConfig: VirtualizationConfig = {
   enabled: false,
   padding: 0.5,
   idleDelay: 100,
-  nodeCountThreshold: 500,
 };
 
 /**

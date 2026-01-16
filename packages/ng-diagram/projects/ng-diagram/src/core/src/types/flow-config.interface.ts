@@ -449,13 +449,6 @@ export interface VirtualizationConfig {
    * @default 100
    */
   idleDelay?: number;
-
-  /**
-   * Maximum number of nodes below which virtualization is skipped.
-   * If fewer nodes exist than this threshold, render all nodes.
-   * @default 500
-   */
-  nodeCountThreshold: number;
 }
 
 /**
