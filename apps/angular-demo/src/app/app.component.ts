@@ -98,10 +98,6 @@ export class AppComponent {
     this.config = {
       ...this.config,
       ...virtualizationConfigOverrides,
-      zoom: {
-        ...this.config.zoom,
-        zoomToFit: undefined,
-      },
     };
     this.model = initializeModel(generateModel(virtualizationTestConfig.nodeCount), this.injector);
   }
@@ -202,6 +198,12 @@ export class AppComponent {
   }
 
   onReinitializeModel(): void {
+    this.config = {
+      ...this.config,
+      virtualization: {
+        enabled: false,
+      },
+    };
     this.model = initializeModel(defaultModel, this.injector);
   }
 }

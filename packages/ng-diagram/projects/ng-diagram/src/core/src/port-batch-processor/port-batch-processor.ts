@@ -6,6 +6,73 @@ export interface PortUpdate {
 }
 
 /**
+ * Generic batcher that supports both per-node and global batching patterns.
+ */
+class OperationBatcher<T> {
+  private readonly pending = new Map<string, T[]>();
+  private readonly scheduledPerNode = new Set<string>();
+  private globalFlushScheduled = false;
+
+  /**
+   * Per-node batching: schedules a separate flush for each node.
+   */
+  addPerNode(nodeId: string, item: T, onFlush: (nodeId: string, items: T[]) => void): void {
+    this.getOrCreateArray(nodeId).push(item);
+
+    if (!this.scheduledPerNode.has(nodeId)) {
+      this.scheduledPerNode.add(nodeId);
+      queueMicrotask(() => this.flushPerNode(nodeId, onFlush));
+    }
+  }
+
+  /**
+   * Global batching: schedules a single flush for all nodes.
+   */
+  addGlobal(nodeId: string, item: T, onBatchFlush: (all: Map<string, T[]>) => void): void {
+    this.getOrCreateArray(nodeId).push(item);
+
+    if (!this.globalFlushScheduled) {
+      this.globalFlushScheduled = true;
+      queueMicrotask(() => this.flushGlobal(onBatchFlush));
+    }
+  }
+
+  private getOrCreateArray(nodeId: string): T[] {
+    if (!this.pending.has(nodeId)) {
+      this.pending.set(nodeId, []);
+    }
+    return this.pending.get(nodeId)!;
+  }
+
+  private flushPerNode(nodeId: string, onFlush: (nodeId: string, items: T[]) => void): void {
+    const items = this.pending.get(nodeId);
+    if (!items || items.length === 0) {
+      return;
+    }
+
+    onFlush(nodeId, items);
+
+    this.pending.delete(nodeId);
+    this.scheduledPerNode.delete(nodeId);
+  }
+
+  private flushGlobal(onBatchFlush: (all: Map<string, T[]>) => void): void {
+    if (this.pending.size === 0) {
+      this.globalFlushScheduled = false;
+      return;
+    }
+
+    const all = new Map(this.pending);
+
+    this.pending.clear();
+    this.scheduledPerNode.clear();
+    this.globalFlushScheduled = false;
+
+    onBatchFlush(all);
+  }
+}
+
+/**
  * Processes and batches port operations for nodes to prevent race conditions when multiple ports
  * are added or updated simultaneously (e.g., during node initialization or virtualization).
  *
@@ -13,25 +80,16 @@ export interface PortUpdate {
  * processes them together in a single batch, ensuring all ports are properly
  * persisted to the state.
  *
- * Standard mode: Uses per-node batching (processAdd, processUpdate)
+ * Standard mode: Uses per-node batching (processAdd, processUpdate, processDelete)
  * Virtualization mode: Uses global batching (processAddBatched, processUpdateBatched, processDeleteBatched)
  */
 export class PortBatchProcessor {
-  // ===== STANDARD MODE: Per-node batching =====
-  private readonly pendingPortAdditions = new Map<string, Port[]>();
-  private readonly scheduledAdditionFlushes = new Set<string>();
-
-  private readonly pendingPortUpdates = new Map<string, PortUpdate[]>();
-  private readonly scheduledUpdateFlushes = new Set<string>();
-
-  // ===== VIRTUALIZATION MODE: Global batching =====
-  private globalAdditionFlushScheduled = false;
-  private globalUpdateFlushScheduled = false;
-  private readonly pendingPortDeletions = new Map<string, string[]>();
-  private globalDeletionFlushScheduled = false;
+  private readonly additionBatcher = new OperationBatcher<Port>();
+  private readonly updateBatcher = new OperationBatcher<PortUpdate>();
+  private readonly deletionBatcher = new OperationBatcher<string>();
 
   // =============================================
-  // STANDARD MODE METHODS (original behavior)
+  // STANDARD MODE METHODS (per-node batching)
   // =============================================
 
   /**
@@ -44,19 +102,7 @@ export class PortBatchProcessor {
    * @param onFlush - Callback function to execute with all batched ports
    */
   processAdd(nodeId: string, port: Port, onFlush: (nodeId: string, ports: Port[]) => void): void {
-    if (!this.pendingPortAdditions.has(nodeId)) {
-      this.pendingPortAdditions.set(nodeId, []);
-    }
-
-    this.pendingPortAdditions.get(nodeId)!.push(port);
-
-    if (!this.scheduledAdditionFlushes.has(nodeId)) {
-      this.scheduledAdditionFlushes.add(nodeId);
-
-      queueMicrotask(() => {
-        this.flushPortAdditions(nodeId, onFlush);
-      });
-    }
+    this.additionBatcher.addPerNode(nodeId, port, onFlush);
   }
 
   /**
@@ -73,43 +119,20 @@ export class PortBatchProcessor {
     portUpdate: PortUpdate,
     onFlush: (nodeId: string, portUpdates: PortUpdate[]) => void
   ): void {
-    if (!this.pendingPortUpdates.has(nodeId)) {
-      this.pendingPortUpdates.set(nodeId, []);
-    }
-
-    this.pendingPortUpdates.get(nodeId)!.push(portUpdate);
-
-    if (!this.scheduledUpdateFlushes.has(nodeId)) {
-      this.scheduledUpdateFlushes.add(nodeId);
-
-      queueMicrotask(() => {
-        this.flushPortUpdates(nodeId, onFlush);
-      });
-    }
+    this.updateBatcher.addPerNode(nodeId, portUpdate, onFlush);
   }
 
-  private flushPortAdditions(nodeId: string, onFlush: (nodeId: string, ports: Port[]) => void): void {
-    const ports = this.pendingPortAdditions.get(nodeId);
-    if (!ports || ports.length === 0) {
-      return;
-    }
-
-    onFlush(nodeId, ports);
-
-    this.pendingPortAdditions.delete(nodeId);
-    this.scheduledAdditionFlushes.delete(nodeId);
-  }
-
-  private flushPortUpdates(nodeId: string, onFlush: (nodeId: string, portUpdates: PortUpdate[]) => void): void {
-    const portUpdates = this.pendingPortUpdates.get(nodeId);
-    if (!portUpdates || portUpdates.length === 0) {
-      return;
-    }
-
-    onFlush(nodeId, portUpdates);
-
-    this.pendingPortUpdates.delete(nodeId);
-    this.scheduledUpdateFlushes.delete(nodeId);
+  /**
+   * Processes a port deletion for batching with the specified node.
+   * If this is the first port deletion for the node in the current tick,
+   * schedules a flush to process all collected deletions.
+   *
+   * @param nodeId - The ID of the node containing the port
+   * @param portId - The ID of the port to delete
+   * @param onFlush - Callback function to execute with all batched port IDs
+   */
+  processDelete(nodeId: string, portId: string, onFlush: (nodeId: string, portIds: string[]) => void): void {
+    this.deletionBatcher.addPerNode(nodeId, portId, onFlush);
   }
 
   // =============================================
@@ -126,19 +149,7 @@ export class PortBatchProcessor {
    * @param onBatchFlush - Callback that receives ALL pending additions across all nodes
    */
   processAddBatched(nodeId: string, port: Port, onBatchFlush: (additions: Map<string, Port[]>) => void): void {
-    if (!this.pendingPortAdditions.has(nodeId)) {
-      this.pendingPortAdditions.set(nodeId, []);
-    }
-
-    this.pendingPortAdditions.get(nodeId)!.push(port);
-
-    if (!this.globalAdditionFlushScheduled) {
-      this.globalAdditionFlushScheduled = true;
-
-      queueMicrotask(() => {
-        this.flushAllPortAdditionsBatched(onBatchFlush);
-      });
-    }
+    this.additionBatcher.addGlobal(nodeId, port, onBatchFlush);
   }
 
   /**
@@ -155,19 +166,7 @@ export class PortBatchProcessor {
     portUpdate: PortUpdate,
     onBatchFlush: (updates: Map<string, PortUpdate[]>) => void
   ): void {
-    if (!this.pendingPortUpdates.has(nodeId)) {
-      this.pendingPortUpdates.set(nodeId, []);
-    }
-
-    this.pendingPortUpdates.get(nodeId)!.push(portUpdate);
-
-    if (!this.globalUpdateFlushScheduled) {
-      this.globalUpdateFlushScheduled = true;
-
-      queueMicrotask(() => {
-        this.flushAllPortUpdatesBatched(onBatchFlush);
-      });
-    }
+    this.updateBatcher.addGlobal(nodeId, portUpdate, onBatchFlush);
   }
 
   /**
@@ -179,71 +178,6 @@ export class PortBatchProcessor {
    * @param onBatchFlush - Callback that receives ALL pending deletions across all nodes
    */
   processDeleteBatched(nodeId: string, portId: string, onBatchFlush: (deletions: Map<string, string[]>) => void): void {
-    if (!this.pendingPortDeletions.has(nodeId)) {
-      this.pendingPortDeletions.set(nodeId, []);
-    }
-
-    this.pendingPortDeletions.get(nodeId)!.push(portId);
-
-    if (!this.globalDeletionFlushScheduled) {
-      this.globalDeletionFlushScheduled = true;
-
-      queueMicrotask(() => {
-        this.flushAllPortDeletionsBatched(onBatchFlush);
-      });
-    }
-  }
-
-  private flushAllPortAdditionsBatched(onBatchFlush: (additions: Map<string, Port[]>) => void): void {
-    if (this.pendingPortAdditions.size === 0) {
-      this.globalAdditionFlushScheduled = false;
-      return;
-    }
-
-    // Copy the pending additions before clearing
-    const additions = new Map(this.pendingPortAdditions);
-
-    // Clear state first to allow new batches to accumulate
-    this.pendingPortAdditions.clear();
-    this.scheduledAdditionFlushes.clear();
-    this.globalAdditionFlushScheduled = false;
-
-    // Execute the batch callback with all additions at once
-    onBatchFlush(additions);
-  }
-
-  private flushAllPortUpdatesBatched(onBatchFlush: (updates: Map<string, PortUpdate[]>) => void): void {
-    if (this.pendingPortUpdates.size === 0) {
-      this.globalUpdateFlushScheduled = false;
-      return;
-    }
-
-    // Copy the pending updates before clearing
-    const updates = new Map(this.pendingPortUpdates);
-
-    // Clear state first to allow new batches to accumulate
-    this.pendingPortUpdates.clear();
-    this.scheduledUpdateFlushes.clear();
-    this.globalUpdateFlushScheduled = false;
-
-    // Execute the batch callback with all updates at once
-    onBatchFlush(updates);
-  }
-
-  private flushAllPortDeletionsBatched(onBatchFlush: (deletions: Map<string, string[]>) => void): void {
-    if (this.pendingPortDeletions.size === 0) {
-      this.globalDeletionFlushScheduled = false;
-      return;
-    }
-
-    // Copy the pending deletions before clearing
-    const deletions = new Map(this.pendingPortDeletions);
-
-    // Clear state first to allow new batches to accumulate
-    this.pendingPortDeletions.clear();
-    this.globalDeletionFlushScheduled = false;
-
-    // Execute the batch callback with all deletions at once
-    onBatchFlush(deletions);
+    this.deletionBatcher.addGlobal(nodeId, portId, onBatchFlush);
   }
 }

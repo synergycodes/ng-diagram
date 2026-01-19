@@ -31,6 +31,12 @@ export class VirtualizedPortUpdateStrategy implements PortUpdateStrategy {
     }
   }
 
+  deletePort(nodeId: string, portId: string): void {
+    this.flowCore.portBatchProcessor.processDeleteBatched(nodeId, portId, (allDeletions) => {
+      this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: allDeletions });
+    });
+  }
+
   private isPortAlreadyMeasured(nodeId: string, portId: string): boolean {
     const node = this.flowCore.getNodeById(nodeId);
     const existingPort = node?.measuredPorts?.find((p) => p.id === portId);

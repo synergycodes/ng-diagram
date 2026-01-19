@@ -172,6 +172,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
   /** @internal */
   ngOnDestroy(): void {
+    const portId = this.id();
     const nodeData = this.nodeData();
     if (!nodeData) {
       return;
@@ -199,10 +200,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
-    flowCore.commandHandler.emit('deletePorts', {
-      nodeId: nodeData.id,
-      portIds: [this.id()],
-    });
+    flowCore.internalUpdater.deletePort(nodeData.id, portId);
   }
 
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');

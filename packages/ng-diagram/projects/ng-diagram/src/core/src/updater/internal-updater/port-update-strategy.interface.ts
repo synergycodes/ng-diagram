@@ -14,4 +14,9 @@ export interface PortUpdateStrategy {
    * Update port sizes and positions
    */
   updatePorts(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void;
+
+  /**
+   * Delete a port from a node
+   */
+  deletePort(nodeId: string, portId: string): void;
 }

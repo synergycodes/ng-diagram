@@ -103,6 +103,12 @@ export const defaultModel: DiagramModel = {
       isGroup: true,
       rotatable: true,
     },
+    {
+      id: 'port-toggle-test',
+      type: 'port-toggle',
+      position: { x: 100, y: 850 },
+      data: { text: 'Port Toggle Test' },
+    },
   ],
   edges: [
     {
