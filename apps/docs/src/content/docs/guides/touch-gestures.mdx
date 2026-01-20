@@ -1,0 +1,60 @@
+---
+title: Touch Gestures
+description: Using ngDiagram on touch devices with native gesture support
+---
+
+ngDiagram supports touch devices out of the box, making it easy to build diagram applications for tablets, phones, and other touch-enabled screens.
+
+## Gestures
+
+ngDiagram recognizes the following touch gestures for navigation and interaction.
+
+### Pinch to Zoom
+
+Use two fingers to pinch in or out anywhere on the canvas to zoom the diagram. This works the same as zooming with a scroll wheel on desktop.
+
+### Two-Finger Panning
+
+Place two fingers on the canvas and move them together to pan the view. This allows you to navigate large diagrams without changing the zoom level.
+
+### Long Press for Box Selection
+
+Press and hold on an empty area of the canvas, then drag to create a selection box. Any nodes within the box will be selected when you release your finger.
+
+### Standard Touch Interactions
+
+Many interactions work just like on desktop, using a single finger instead of a mouse:
+
+- **Select a node** — Tap on a node to select it
+- **Clear selection** — Tap on an empty area of the canvas to deselect all nodes
+- **Drag nodes** — Touch and drag a node to move it on the canvas
+- **Drag from palette** — Touch and drag items from the palette onto the canvas
+- **Resize and rotate** — Touch and drag the resize or rotation handles on a selected node
+- **Create connections** — Touch a port and drag to another port to create an edge
+
+## Gesture Priorities
+
+When gestures could overlap, ngDiagram uses the following priority order to determine which action takes effect:
+
+1. Pinch zoom
+2. Two-finger panning
+3. Resize/rotate/link
+4. Drag node
+5. Box selection
+
+This ensures that common viewport gestures (zoom and pan) always work, while node manipulation and selection remain accessible.
+
+## Linking Mode
+
+In addition to creating connections by dragging from port to port, you can trigger the linking mode programmatically — for example, via a button in your UI. Once activated, the connection line follows the user's finger as they drag across the canvas. Lifting the finger over a compatible port completes the connection. If the finger is released elsewhere on the canvas, the linking action is cancelled without creating an edge.
+
+## Actions Without Touch Gestures
+
+The following common editing actions are best handled through on-screen buttons or menus in your application:
+
+- Copy
+- Paste
+- Cut
+- Delete
+- Undo
+- Redo
