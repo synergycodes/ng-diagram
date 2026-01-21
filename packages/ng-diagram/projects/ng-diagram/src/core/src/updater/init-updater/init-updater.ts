@@ -1,5 +1,5 @@
 import { FlowCore } from '../../flow-core';
-import { EdgeLabel, Node, Port, Size } from '../../types';
+import { Edge, EdgeLabel, Node, Port, Size } from '../../types';
 import { Updater } from '../updater.interface';
 import { InitState } from './init-state';
 import { LateArrivalQueue } from './late-arrival-queue';
@@ -38,10 +38,13 @@ Documentation: https://www.ngdiagram.dev/docs/guides/model-initialization/
  * Strategy:
  * 1. Wait for entity creation to stabilize (addPort, addEdgeLabel) using StabilityDetectors
  * 2. Immediately collect measurements (applyNodeSize, applyPortsSizesAndPositions, applyEdgeLabelSize)
- * 3. Finish when: entities stabilized AND all entities have measurements
+ * 3. Finish when: entities stabilized AND all rendered entities have measurements
  * 4. Apply everything in one setState
  * 5. Queue late arrivals to prevent data loss during finish transition
  * 6. Safety timeout: If measurements don't arrive within MEASUREMENT_TIMEOUT, force finish
+ *
+ * Note: With virtualization, only rendered nodes/edges are tracked for initialization.
+ * Non-rendered elements will be initialized when they become visible.
  */
 export class InitUpdater implements Updater {
   /** Flag indicating whether initialization has completed */
@@ -51,10 +54,10 @@ export class InitUpdater implements Updater {
   private entitiesStabilized = false;
 
   /** Detects when port additions have stabilized */
-  private portStabilityDetector: StabilityDetector;
+  private portStabilityDetector!: StabilityDetector;
 
   /** Detects when label additions have stabilized */
-  private labelStabilityDetector: StabilityDetector;
+  private labelStabilityDetector!: StabilityDetector;
 
   /** Collects all initialization data and applies it to diagram state */
   private initState: InitState;
@@ -70,18 +73,10 @@ export class InitUpdater implements Updater {
 
   /**
    * Creates a new InitUpdater.
-   * Initializes stability detectors based on whether nodes/edges exist.
    *
    * @param flowCore - The FlowCore instance to update
    */
   constructor(private flowCore: FlowCore) {
-    const state = flowCore.getState();
-    const hasNodes = state.nodes.length > 0;
-    const hasEdges = state.edges.length > 0;
-
-    this.portStabilityDetector = new StabilityDetector(hasNodes, STABILITY_DELAY);
-    this.labelStabilityDetector = new StabilityDetector(hasEdges, STABILITY_DELAY);
-
     this.initState = new InitState();
     this.lateArrivalQueue = new LateArrivalQueue();
   }
@@ -90,13 +85,20 @@ export class InitUpdater implements Updater {
    * Starts the initialization process.
    * Collects pre-existing measurements and waits for entity additions to stabilize.
    *
+   * @param nodes - Rendered nodes to track for initialization
+   * @param edges - Rendered edges to track for initialization
    * @param onComplete - Optional callback to execute after initialization completes
    */
-  start(onComplete?: () => void | Promise<void>) {
+  start(nodes: Node[], edges: Edge[], onComplete?: () => void | Promise<void>) {
     this.onCompleteCallback = onComplete;
 
-    const state = this.flowCore.getState();
-    this.initState.collectAlreadyMeasuredItems(state.nodes, state.edges);
+    const hasNodes = nodes.length > 0;
+    const hasEdges = edges.length > 0;
+
+    this.portStabilityDetector = new StabilityDetector(hasNodes, STABILITY_DELAY);
+    this.labelStabilityDetector = new StabilityDetector(hasEdges, STABILITY_DELAY);
+
+    this.initState.collectAlreadyMeasuredItems(nodes, edges);
 
     Promise.all([this.portStabilityDetector.waitForStability(), this.labelStabilityDetector.waitForStability()])
       .then(() => {
@@ -202,7 +204,7 @@ export class InitUpdater implements Updater {
 
   /**
    * Attempts to finish initialization if conditions are met.
-   * Conditions: not already finishing, not initialized, entities stabilized, all entities measured.
+   * Conditions: not already finishing, not initialized, entities stabilized, all rendered entities measured.
    */
   private tryFinish() {
     if (this.lateArrivalQueue.isFinishing || this.isInitialized) {
@@ -213,8 +215,7 @@ export class InitUpdater implements Updater {
       return;
     }
 
-    const state = this.flowCore.getState();
-    if (this.initState.allEntitiesHaveMeasurements(state.nodes.length)) {
+    if (this.initState.allEntitiesHaveMeasurements()) {
       this.finish();
     }
   }
@@ -254,18 +255,17 @@ export class InitUpdater implements Updater {
   private startMeasurementTimeout(): void {
     this.measurementTimeout = setTimeout(() => {
       if (!this.isInitialized) {
-        const state = this.flowCore.getState();
-        const nodeCount = state.nodes.length;
+        const expectedNodes = this.initState.nodesToMeasure.size;
+        const measuredNodes = this.initState.measuredNodes.size;
         const expectedPorts = this.initState.portsToMeasure.size;
         const measuredPorts = this.initState.measuredPorts.size;
         const expectedLabels = this.initState.labelsToMeasure.size;
         const measuredLabels = this.initState.measuredLabels.size;
-        const measuredNodes = this.initState.measuredNodes.size;
 
         console.warn(
           '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).',
           {
-            nodes: { expected: nodeCount, measured: measuredNodes },
+            nodes: { expected: expectedNodes, measured: measuredNodes },
             ports: { expected: expectedPorts, measured: measuredPorts },
             labels: { expected: expectedLabels, measured: measuredLabels },
           }

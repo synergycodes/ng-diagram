@@ -1,0 +1,18 @@
+<label class="port-toggle-label">
+  <input
+    class="port-toggle-checkbox"
+    type="checkbox"
+    [checked]="showPorts()"
+    (change)="togglePorts()"
+    (keydown)="$event.stopPropagation()"
+    (keypress)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+  />
+  Render Ports
+</label>
+<div>
+  @if (showPorts()) {
+    <ng-diagram-port id="port-left" type="both" side="left" />
+    <ng-diagram-port id="port-right" type="both" side="right" />
+  }
+</div>

@@ -12,6 +12,12 @@ export const checkIfShouldRouteEdges = ({
   modelActionTypes,
   actionStateManager,
 }: MiddlewareContext): boolean => {
+  // Skip edge routing during viewport-only operations (zoom/pan)
+  // Node positions don't change, only the viewport transform changes
+  if (modelActionTypes.includes('zoom') || modelActionTypes.includes('moveViewport')) {
+    return false;
+  }
+
   // Skip edge routing during resize - ports will be updated separately and trigger routing then
   // This prevents visual lag where edges are drawn with old port positions
   if (modelActionTypes.includes('resizeNode') && actionStateManager.isResizing()) {

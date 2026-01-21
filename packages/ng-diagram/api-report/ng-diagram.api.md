@@ -24,6 +24,7 @@ export interface ActionState {
     dragging?: DraggingActionState;
     highlightGroup?: HighlightGroupActionState;
     linking?: LinkingActionState;
+    panning?: PanningActionState;
     resize?: ResizeActionState;
     rotation?: RotationActionState;
 }
@@ -35,6 +36,7 @@ export class ActionStateManager {
     clearDragging(): void;
     clearHighlightGroup(): void;
     clearLinking(): void;
+    clearPanning(): void;
     clearResize(): void;
     clearRotation(): void;
     get copyPaste(): CopyPasteActionState | undefined;
@@ -46,10 +48,13 @@ export class ActionStateManager {
     set highlightGroup(value: HighlightGroupActionState | undefined);
     isDragging(): boolean;
     isLinking(): boolean;
+    isPanning(): boolean;
     isResizing(): boolean;
     isRotating(): boolean;
     get linking(): LinkingActionState | undefined;
     set linking(value: LinkingActionState | undefined);
+    get panning(): PanningActionState | undefined;
+    set panning(value: PanningActionState | undefined);
     get resize(): ResizeActionState | undefined;
     set resize(value: ResizeActionState | undefined);
     get rotation(): RotationActionState | undefined;
@@ -302,6 +307,7 @@ export interface FlowConfig {
     shortcuts: ShortcutDefinition[];
     snapping: SnappingConfig;
     viewportPanningEnabled: boolean;
+    virtualization: VirtualizationConfig;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -326,6 +332,10 @@ export interface FlowStateUpdate {
     nodesToUpdate?: (Partial<Node_2> & {
         id: Node_2['id'];
     })[];
+    // @internal
+    renderedEdgeIds?: string[];
+    // @internal
+    renderedNodeIds?: string[];
 }
 
 // @public
@@ -1409,6 +1419,13 @@ export class ViewportDirective {
     static ɵdir: i0.ɵɵDirectiveDeclaration<ViewportDirective, "[ngDiagramViewport]", never, { "viewport": { "alias": "viewport"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<ViewportDirective, never>;
+}
+
+// @public
+export interface VirtualizationConfig {
+    enabled: boolean;
+    idleDelay?: number;
+    padding: number;
 }
 
 // @public

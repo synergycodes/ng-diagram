@@ -3,11 +3,13 @@ import {
   AddEdgeLabelsCommand,
   AddEdgesCommand,
   AddNodesCommand,
+  AddPortsBulkCommand,
   AddPortsCommand,
   ClearModelCommand,
   DeleteEdgeLabelsCommand,
   DeleteEdgesCommand,
   DeleteNodesCommand,
+  DeletePortsBulkCommand,
   DeletePortsCommand,
   PaletteDropNodeCommand,
   UpdateEdgeCommand,
@@ -15,6 +17,7 @@ import {
   UpdateEdgesCommand,
   UpdateNodeCommand,
   UpdateNodesCommand,
+  UpdatePortsBulkCommand,
   UpdatePortsCommand,
 } from '../command-handler/commands/add-update-delete';
 import { CenterOnNodeCommand, CenterOnRectCommand } from '../command-handler/commands/centering';
@@ -79,8 +82,11 @@ export type Command =
   | ResizeNodeCommand
   | ZoomCommand
   | AddPortsCommand
+  | AddPortsBulkCommand
   | UpdatePortsCommand
+  | UpdatePortsBulkCommand
   | DeletePortsCommand
+  | DeletePortsBulkCommand
   | BringToFrontCommand
   | SendToBackCommand
   | AddEdgeLabelsCommand

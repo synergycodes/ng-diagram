@@ -91,9 +91,9 @@ export class StabilityDetector {
       clearTimeout(this.stabilityTimeout);
     }
 
-    this.stabilityTimeout = window.setTimeout(() => {
+    this.stabilityTimeout = setTimeout(() => {
       this.resolveStability();
       this.stabilityTimeout = null;
-    }, this.stabilityDelay);
+    }, this.stabilityDelay) as unknown as number;
   }
 }

@@ -38,6 +38,7 @@ export class FlowCoreProviderService {
       getViewportSize,
       config
     );
+
     this._isInitialized.set(true);
   }
 

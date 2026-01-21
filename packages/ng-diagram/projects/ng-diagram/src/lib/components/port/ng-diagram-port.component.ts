@@ -105,11 +105,14 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     super();
     effect(() => {
       const nodeData = this.nodeData();
-      if (this.isInitialized() && nodeData && this.lastSide() !== this.side()) {
-        this.lastSide.set(this.side());
+      const initialized = this.isInitialized();
+      const lastSide = this.lastSide();
+      const currentSide = this.side();
+      if (initialized && nodeData && lastSide !== currentSide) {
+        this.lastSide.set(currentSide);
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges: { side: this.side() } }],
+          ports: [{ portId: this.id(), portChanges: { side: currentSide } }],
         });
       }
     });
@@ -126,14 +129,17 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
     effect(() => {
       const nodeData = this.nodeData();
-      if (this.isInitialized() && this.lastType() !== this.type() && nodeData) {
+      const initialized = this.isInitialized();
+      const lastType = this.lastType();
+      const currentType = this.type();
+      if (initialized && lastType !== currentType && nodeData) {
         // Angular 18 backward compatibility
         untracked(() => {
-          this.lastType.set(this.type());
+          this.lastType.set(currentType);
         });
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges: { type: this.type() } }],
+          ports: [{ portId: this.id(), portChanges: { type: currentType } }],
         });
       }
     });
@@ -148,6 +154,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
+    // Always call addPort - InternalUpdater handles virtualization logic
     this.flowCoreProvider.provide().updater.addPort(nodeData.id, {
       id: this.id(),
       type: this.type(),
@@ -165,17 +172,35 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
   /** @internal */
   ngOnDestroy(): void {
+    const portId = this.id();
     const nodeData = this.nodeData();
     if (!nodeData) {
       return;
     }
 
-    this.flowCoreProvider.provide().commandHandler.emit('deletePorts', {
-      nodeId: nodeData.id,
-      portIds: [this.id()],
-    });
+    const flowCore = this.flowCoreProvider.provide();
+
+    // Skip cleanup if FlowCore is still initializing
+    // (handles case where old components from previous render are destroyed
+    // while new FlowCore is initializing after model reinitialization)
+    if (!flowCore.isInitialized) {
+      return;
+    }
 
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+
+    // Skip if node was deleted - ports are removed with the node
+    const nodeStillExists = flowCore.getNodeById(nodeData.id);
+    if (!nodeStillExists) {
+      return;
+    }
+
+    // In virtualization mode, skip if node is just virtualized (scrolled out of view)
+    if (flowCore.isVirtualizationActive && !flowCore.isNodeCurrentlyRendered(nodeData.id)) {
+      return;
+    }
+
+    flowCore.internalUpdater.deletePort(nodeData.id, portId);
   }
 
   private readonly custom = viewChild<ElementRef<HTMLElement>>('contentProjection');

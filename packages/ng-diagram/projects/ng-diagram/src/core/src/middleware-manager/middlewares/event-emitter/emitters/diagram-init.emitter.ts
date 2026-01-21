@@ -34,10 +34,17 @@ export class DiagramInitEmitter implements EventEmitter {
   }
 
   private handleInit(context: MiddlewareContext, eventManager: EventManager): void {
-    const { nodesMap, edgesMap } = context;
-
-    this.collectUnmeasuredItems(nodesMap, edgesMap);
     this.initialized = true;
+
+    const { nodesMap, edgesMap, initialUpdate } = context;
+
+    // Strategies provide explicit IDs; fallback to all nodes/edges for safety
+    this.collectUnmeasuredItems(
+      nodesMap,
+      edgesMap,
+      initialUpdate.renderedNodeIds ?? Array.from(nodesMap.keys()),
+      initialUpdate.renderedEdgeIds ?? Array.from(edgesMap.keys())
+    );
 
     if (this.areAllMeasured()) {
       this.emitInitEvent(context, eventManager);
@@ -73,12 +80,20 @@ export class DiagramInitEmitter implements EventEmitter {
     }
   }
 
-  private collectUnmeasuredItems(nodesMap: Map<string, Node>, edgesMap: Map<string, Edge>): void {
+  private collectUnmeasuredItems(
+    nodesMap: Map<string, Node>,
+    edgesMap: Map<string, Edge>,
+    renderedNodeIds: string[],
+    renderedEdgeIds: string[]
+  ): void {
     this.unmeasuredNodes.clear();
     this.unmeasuredNodePorts.clear();
     this.unmeasuredEdgeLabels.clear();
 
-    for (const [nodeId, node] of nodesMap) {
+    for (const nodeId of renderedNodeIds) {
+      const node = nodesMap.get(nodeId);
+      if (!node) continue;
+
       if (!isValidSize(node.size)) {
         this.unmeasuredNodes.add(nodeId);
       }
@@ -90,7 +105,10 @@ export class DiagramInitEmitter implements EventEmitter {
       }
     }
 
-    for (const [edgeId, edge] of edgesMap) {
+    for (const edgeId of renderedEdgeIds) {
+      const edge = edgesMap.get(edgeId);
+      if (!edge) continue;
+
       for (const label of edge.measuredLabels ?? []) {
         if (!isValidSize(label.size) || !isValidPosition(label.position)) {
           this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
@@ -154,10 +172,15 @@ export class DiagramInitEmitter implements EventEmitter {
   private emitInitEvent(context: MiddlewareContext, eventManager: EventManager, useDeferred = true): void {
     this.clearSafetyHatchTimeout();
 
-    const { nodesMap, edgesMap } = context;
+    const { nodesMap, edgesMap, initialUpdate } = context;
+
+    // Strategies provide explicit IDs; fallback to all nodes/edges for safety
+    const renderedNodeIds = new Set(initialUpdate.renderedNodeIds ?? nodesMap.keys());
+    const renderedEdgeIds = new Set(initialUpdate.renderedEdgeIds ?? edgesMap.keys());
+
     const event: DiagramInitEvent = {
-      nodes: Array.from(nodesMap.values()),
-      edges: Array.from(edgesMap.values()),
+      nodes: Array.from(nodesMap.values()).filter((x) => renderedNodeIds.has(x.id)),
+      edges: Array.from(edgesMap.values()).filter((x) => renderedEdgeIds.has(x.id)),
       viewport: context.state.metadata.viewport,
     };
 

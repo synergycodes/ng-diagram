@@ -169,6 +169,40 @@ The linking state to set, or undefined to clear
 
 ***
 
+### panning
+
+#### Get Signature
+
+> **get** **panning**(): `undefined` \| `PanningActionState`
+
+Gets the current panning action state.
+
+##### Returns
+
+`undefined` \| `PanningActionState`
+
+The panning state if viewport is being panned, undefined otherwise
+
+#### Set Signature
+
+> **set** **panning**(`value`): `void`
+
+Sets the panning action state.
+
+##### Parameters
+
+###### value
+
+The panning state to set, or undefined to clear
+
+`undefined` | `PanningActionState`
+
+##### Returns
+
+`void`
+
+***
+
 ### resize
 
 #### Get Signature
@@ -285,6 +319,18 @@ Clears the linking action state.
 
 ***
 
+### clearPanning()
+
+> **clearPanning**(): `void`
+
+Clears the panning action state.
+
+#### Returns
+
+`void`
+
+***
+
 ### clearResize()
 
 > **clearResize**(): `void`
@@ -340,6 +386,18 @@ Checks if a dragging operation is currently in progress.
 > **isLinking**(): `boolean`
 
 Checks if a linking operation is currently in progress.
+
+#### Returns
+
+`boolean`
+
+***
+
+### isPanning()
+
+> **isPanning**(): `boolean`
+
+Checks if a panning operation is currently in progress.
 
 #### Returns
 
