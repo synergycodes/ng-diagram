@@ -1,0 +1,56 @@
+:host {
+  display: block;
+  position: absolute;
+  pointer-events: auto;
+  z-index: 10;
+
+  &.bottom-right {
+    bottom: var(--ngd-minimap-margin);
+    right: var(--ngd-minimap-margin);
+  }
+
+  &.bottom-left {
+    bottom: var(--ngd-minimap-margin);
+    left: var(--ngd-minimap-margin);
+  }
+
+  &.top-right {
+    top: var(--ngd-minimap-margin);
+    right: var(--ngd-minimap-margin);
+  }
+
+  &.top-left {
+    top: var(--ngd-minimap-margin);
+    left: var(--ngd-minimap-margin);
+  }
+}
+
+.minimap-container {
+  overflow: hidden;
+  border-radius: var(--ngd-minimap-border-radius);
+  padding: var(--ngd-minimap-padding);
+  background-color: var(--ngd-minimap-background);
+  box-shadow: 0 8px 16px -4px var(--ngd-minimap-shadow-color);
+  border: 1px solid var(--ngd-minimap-border-color);
+}
+
+.minimap-svg {
+  display: block;
+  cursor: pointer;
+}
+
+.minimap-background {
+  fill: transparent;
+}
+
+.minimap-node {
+  fill: var(--ngd-minimap-node-color);
+  opacity: var(--ngd-minimap-node-opacity);
+}
+
+.minimap-viewport {
+  stroke: var(--ngd-minimap-viewport-stroke-color);
+  stroke-width: var(--ngd-minimap-viewport-stroke-width);
+  fill: transparent;
+  pointer-events: none;
+}

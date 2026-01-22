@@ -64,6 +64,19 @@
   --ngd-background-line-major-width: 1;
   --ngd-background-line-minor-opacity: 0.5;
   --ngd-background-line-major-opacity: 0.6;
+
+  --ngd-minimap-background: var(--ngd-minimap-bg-primary-default);
+  --ngd-minimap-border-color: var(--ngd-minimap-stroke-primary-default);
+  --ngd-minimap-shadow-color: var(--ngd-shadow);
+  --ngd-minimap-border-radius: 1rem;
+  --ngd-minimap-padding: 0.5rem;
+  --ngd-minimap-margin: 1rem;
+
+  --ngd-minimap-node-color: var(--ngd-colors-gray-400);
+  --ngd-minimap-node-opacity: 0.8;
+
+  --ngd-minimap-viewport-stroke-color: var(--ngd-colors-gray-400);
+  --ngd-minimap-viewport-stroke-width: 1;
 }
 
 .ng-diagram-port-hoverable .ng-diagram-port:hover,

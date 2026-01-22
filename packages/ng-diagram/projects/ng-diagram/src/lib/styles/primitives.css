@@ -13,6 +13,8 @@
   --ngd-colors-gray-650: #383a40;
   --ngd-colors-gray-700: #27282b;
   --ngd-colors-gray-800: #151516;
+  --ngd-colors-gray-900-20: rgba(7, 7, 8, 0.2);
+  --ngd-colors-gray-900-50: rgba(7, 7, 8, 0.5);
   --ngd-colors-acc1-400: #a977ff;
   --ngd-colors-acc1-500: #9140ff;
   --ngd-colors-acc1-500-40: rgba(145, 64, 255, 0.4);

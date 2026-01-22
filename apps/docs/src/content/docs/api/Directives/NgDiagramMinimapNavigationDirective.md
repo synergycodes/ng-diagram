@@ -1,0 +1,31 @@
+---
+version: "since v0.9.1"
+editUrl: false
+next: false
+prev: false
+title: "NgDiagramMinimapNavigationDirective"
+---
+
+Directive that enables drag navigation on the minimap.
+Users can drag on the minimap to move the diagram viewport.
+
+## Implements
+
+- `OnDestroy`
+
+## Methods
+
+### ngOnDestroy()
+
+> **ngOnDestroy**(): `void`
+
+A callback method that performs custom clean-up, invoked immediately
+before a directive, pipe, or service instance is destroyed.
+
+#### Returns
+
+`void`
+
+#### Implementation of
+
+`OnDestroy.ngOnDestroy`

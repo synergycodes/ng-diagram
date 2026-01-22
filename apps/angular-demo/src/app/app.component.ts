@@ -10,6 +10,7 @@ import {
   NgDiagramComponent,
   NgDiagramConfig,
   NgDiagramEdgeTemplateMap,
+  NgDiagramMinimapComponent,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
   NodeResizedEvent,
@@ -39,7 +40,13 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ToolbarComponent, PaletteComponent, NgDiagramComponent, NgDiagramBackgroundComponent],
+  imports: [
+    ToolbarComponent,
+    PaletteComponent,
+    NgDiagramComponent,
+    NgDiagramBackgroundComponent,
+    NgDiagramMinimapComponent,
+  ],
   providers: [provideNgDiagram()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
