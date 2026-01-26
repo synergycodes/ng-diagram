@@ -30,7 +30,7 @@
     "@angular/platform-server": "^19.2.7",
     "@astrojs/starlight": "^0.35.2",
     "@expressive-code/plugin-collapsible-sections": "^0.41.3",
-    "@expressive-code/plugin-line-numbers": "^0.41.3",
+    "@expressive-code/plugin-line-numbers": "^0.41.6",
     "@tailwindcss/vite": "^4.1.16",
     "@yeskunall/astro-umami": "~0.0.7",
     "astro": "^5.6.1",
