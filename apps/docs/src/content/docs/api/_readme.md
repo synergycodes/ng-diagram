@@ -125,6 +125,14 @@ title: "ng-diagram"
 - [ModelActionType](/docs/api/types/middleware/modelactiontype/)
 - [ModelActionTypes](/docs/api/types/middleware/modelactiontypes/)
 
+## Types/Minimap
+
+- [NgDiagramMinimapNodeTemplateMap](/docs/api/types/minimap/ngdiagramminimapnodetemplatemap/)
+- [MinimapNodeStyle](/docs/api/types/minimap/minimapnodestyle/)
+- [NgDiagramMinimapNodeTemplate](/docs/api/types/minimap/ngdiagramminimapnodetemplate/)
+- [MinimapNodeShape](/docs/api/types/minimap/minimapnodeshape/)
+- [MinimapNodeStyleFn](/docs/api/types/minimap/minimapnodestylefn/)
+
 ## Types/Model
 
 - [Edge](/docs/api/types/model/edge/)

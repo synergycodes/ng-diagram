@@ -8,7 +8,7 @@ import { MinimapTransform } from './ng-diagram-minimap.types';
  * Users can drag on the minimap to move the diagram viewport.
  *
  * @public
- * @since 0.9.1
+ * @since 1.0.0
  * @category Directives
  */
 @Directive({

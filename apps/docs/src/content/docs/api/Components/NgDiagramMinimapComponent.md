@@ -1,5 +1,5 @@
 ---
-version: "since v0.9.1"
+version: "since v1.0.0"
 editUrl: false
 next: false
 prev: false
@@ -17,6 +17,7 @@ the diagram viewport to different areas.
 
 ## Implements
 
+- `AfterViewInit`
 - `OnDestroy`
 
 ## Properties
@@ -26,6 +27,45 @@ the diagram viewport to different areas.
 > **height**: `InputSignal`\<`number`\>
 
 Height of the minimap in pixels.
+
+***
+
+### minimapNodeTemplateMap
+
+> **minimapNodeTemplateMap**: `InputSignal`\<[`NgDiagramMinimapNodeTemplateMap`](/docs/api/types/minimap/ngdiagramminimapnodetemplatemap/)\>
+
+Optional template map for complete control over node rendering per node type.
+Components registered in the map should render SVG elements.
+
+#### Example
+
+```typescript
+const minimapTemplateMap = new NgDiagramMinimapNodeTemplateMap([
+  ['database', DatabaseMinimapNodeComponent],
+  ['api', ApiMinimapNodeComponent],
+]);
+
+// Usage:
+<ng-diagram-minimap [minimapNodeTemplateMap]="minimapTemplateMap" />
+```
+
+***
+
+### nodeStyle
+
+> **nodeStyle**: `InputSignal`\<`undefined` \| [`MinimapNodeStyleFn`](/docs/api/types/minimap/minimapnodestylefn/)\>
+
+Optional callback function to customize node styling.
+Return style properties to override defaults, or null/undefined to use CSS defaults.
+
+#### Example
+
+```typescript
+nodeStyle = (node: Node) => ({
+  fill: node.type === 'database' ? '#4CAF50' : '#9E9E9E',
+  opacity: node.selected ? 1 : 0.6,
+});
+```
 
 ***
 

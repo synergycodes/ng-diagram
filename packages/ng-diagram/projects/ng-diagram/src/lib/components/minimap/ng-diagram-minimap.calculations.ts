@@ -1,5 +1,5 @@
 import { Node, Rect, unionRect } from '../../../core/src';
-import { MinimapNode, MinimapTransform, MinimapViewportRect } from './ng-diagram-minimap.types';
+import { MinimapBounds, MinimapTransform, MinimapViewportRect } from './ng-diagram-minimap.types';
 
 /**
  * Converts viewport position and scale to a bounding rectangle in diagram coordinate space.
@@ -85,19 +85,36 @@ export const calculateMinimapTransform = (
   return { scale, offsetX, offsetY };
 };
 
+/** Default node size when not specified. */
+const DEFAULT_NODE_SIZE = { width: 100, height: 50 };
+
 /**
- * Transforms a diagram node to minimap coordinate space.
+ * Extracts node bounds in diagram coordinate space.
+ * Used with SVG group transform - the group applies scale/offset,
+ * so individual nodes stay in their original diagram coordinates.
+ *
+ * @param node - The diagram node
+ * @param defaultSize - Optional default size for nodes without explicit size
  */
-export const transformNodeToMinimapSpace = (node: Node, transform: MinimapTransform): MinimapNode => {
-  const size = node.size ?? { width: 100, height: 50 };
+export const extractNodeBounds = (
+  node: Node,
+  defaultSize: { width: number; height: number } = DEFAULT_NODE_SIZE
+): MinimapBounds => {
+  const size = node.size ?? defaultSize;
+  const angle = node.angle ?? 0;
+
+  // Calculate rotation center in diagram space
+  const centerX = node.position.x + size.width / 2;
+  const centerY = node.position.y + size.height / 2;
 
   return {
     id: node.id,
-    x: node.position.x * transform.scale + transform.offsetX,
-    y: node.position.y * transform.scale + transform.offsetY,
-    width: size.width * transform.scale,
-    height: size.height * transform.scale,
-    angle: node.angle ?? 0,
+    x: node.position.x,
+    y: node.position.y,
+    width: size.width,
+    height: size.height,
+    angle,
+    transform: `rotate(${angle} ${centerX} ${centerY})`,
   };
 };
 

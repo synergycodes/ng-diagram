@@ -6,11 +6,13 @@ import {
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
   initializeModel,
+  MinimapNodeStyle,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramConfig,
   NgDiagramEdgeTemplateMap,
   NgDiagramMinimapComponent,
+  NgDiagramMinimapNodeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
   NodeResizedEvent,
@@ -33,6 +35,7 @@ import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.com
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
+import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -61,6 +64,8 @@ export class AppComponent {
     ['labelled-edge', LabelledEdgeComponent],
     ['dashed-edge', DashedEdgeComponent],
   ]);
+
+  minimapNodeTemplateMap = new NgDiagramMinimapNodeTemplateMap([['image', ImageMinimapNodeComponent]]);
 
   config = {
     zoom: {
@@ -212,4 +217,19 @@ export class AppComponent {
   }
 
   model = initializeModel(defaultModel);
+
+  nodeStyle(node: Node): MinimapNodeStyle {
+    const style: MinimapNodeStyle = {};
+
+    if (node.id == '13') {
+      style.shape = 'circle';
+    }
+
+    if (node.selected) {
+      style.stroke = 'var(--ngd-node-stroke-primary-hover)';
+      style.strokeWidth = 5;
+    }
+
+    return style;
+  }
 }

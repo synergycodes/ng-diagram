@@ -43,11 +43,6 @@
   fill: transparent;
 }
 
-.minimap-node {
-  fill: var(--ngd-minimap-node-color);
-  opacity: var(--ngd-minimap-node-opacity);
-}
-
 .minimap-viewport {
   stroke: var(--ngd-minimap-viewport-stroke-color);
   stroke-width: var(--ngd-minimap-viewport-stroke-width);

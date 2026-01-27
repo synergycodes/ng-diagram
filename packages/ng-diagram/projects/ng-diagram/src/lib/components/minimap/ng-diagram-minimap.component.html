@@ -10,18 +10,23 @@
   >
     <rect class="minimap-background" x="0" y="0" [attr.width]="width()" [attr.height]="height()" />
     @if (isDiagramInitialized()) {
-      @for (node of minimapNodes(); track node.id) {
-        <rect
-          class="minimap-node"
-          [attr.x]="node.x"
-          [attr.y]="node.y"
-          [attr.width]="node.width"
-          [attr.height]="node.height"
-          [attr.transform]="
-            'rotate(' + node.angle + ' ' + (node.x + node.width / 2) + ' ' + (node.y + node.height / 2) + ')'
-          "
-        />
-      }
+      <g [attr.transform]="nodesGroupTransform()">
+        @for (item of minimapNodes(); track item.bounds.id) {
+          @if (item.template) {
+            <svg:foreignObject
+              [attr.x]="item.bounds.x"
+              [attr.y]="item.bounds.y"
+              [attr.width]="item.bounds.width"
+              [attr.height]="item.bounds.height"
+              [attr.transform]="item.bounds.transform"
+            >
+              <ng-container *ngComponentOutlet="item.template; inputs: { node: item.diagramNode, nodeStyle: item.nodeStyle }" />
+            </svg:foreignObject>
+          } @else {
+            <svg:g ng-diagram-default-minimap-node [bounds]="item.bounds" [nodeStyle]="item.nodeStyle" />
+          }
+        }
+      </g>
       @if (hasValidViewport()) {
         <rect
           class="minimap-viewport"
