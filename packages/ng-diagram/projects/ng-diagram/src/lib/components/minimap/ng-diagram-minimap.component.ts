@@ -7,13 +7,13 @@ import {
   ElementRef,
   inject,
   input,
-  OnDestroy,
   signal,
 } from '@angular/core';
 import { NgDiagramModelService } from '../../public-services/ng-diagram-model.service';
-import { MinimapProviderService } from '../../services/minimap-provider/minimap-provider.service';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { NgDiagramPanelPosition } from '../../types/panel-position';
+import { NgDiagramPanelComponent } from '../panel/ng-diagram-panel.component';
+import { NgDiagramZoomControlsComponent } from '../zoom-controls/ng-diagram-zoom-controls.component';
 import { NgDiagramDefaultMinimapNodeComponent } from './default-node/ng-diagram-default-minimap-node.component';
 import { NgDiagramMinimapNavigationDirective } from './ng-diagram-minimap-navigation.directive';
 import {
@@ -42,7 +42,19 @@ import { MinimapNodeData, MinimapNodeStyleFn, NgDiagramMinimapNodeTemplateMap } 
 @Component({
   selector: 'ng-diagram-minimap',
   standalone: true,
-  imports: [NgDiagramMinimapNavigationDirective, CommonModule, NgDiagramDefaultMinimapNodeComponent],
+  imports: [
+    NgDiagramMinimapNavigationDirective,
+    CommonModule,
+    NgDiagramDefaultMinimapNodeComponent,
+    NgDiagramZoomControlsComponent,
+    NgDiagramPanelComponent,
+
+    NgDiagramMinimapNavigationDirective,
+    CommonModule,
+    NgDiagramDefaultMinimapNodeComponent,
+    NgDiagramZoomControlsComponent,
+    NgDiagramPanelComponent,
+  ],
   templateUrl: './ng-diagram-minimap.component.html',
   styleUrls: ['./ng-diagram-minimap.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,13 +62,12 @@ import { MinimapNodeData, MinimapNodeStyleFn, NgDiagramMinimapNodeTemplateMap } 
     '[class]': 'position()',
   },
 })
-export class NgDiagramMinimapComponent implements AfterViewInit, OnDestroy {
+export class NgDiagramMinimapComponent implements AfterViewInit {
   private readonly VIEWPORT_STROKE_WIDTH_CSS_VAR = '--ngd-minimap-viewport-stroke-width';
 
   private readonly modelService = inject(NgDiagramModelService);
   private readonly renderer = inject(RendererService);
   private readonly elementRef = inject(ElementRef);
-  private readonly minimapProviderService = inject(MinimapProviderService);
 
   /** Cached stroke padding to avoid layout thrashing from repeated getComputedStyle calls. */
   private strokePadding = signal<number>(1);
@@ -69,6 +80,9 @@ export class NgDiagramMinimapComponent implements AfterViewInit, OnDestroy {
 
   /** Height of the minimap in pixels. */
   height = input<number>(150);
+
+  /** Whether to show zoom controls in the minimap footer. */
+  showZoomControls = input<boolean>(true);
 
   /**
    * Optional callback function to customize node styling.
@@ -101,19 +115,10 @@ export class NgDiagramMinimapComponent implements AfterViewInit, OnDestroy {
    */
   minimapNodeTemplateMap = input<NgDiagramMinimapNodeTemplateMap>(new NgDiagramMinimapNodeTemplateMap());
 
-  constructor() {
-    this.minimapProviderService.register(this);
-  }
-
   /** @ignore */
   ngAfterViewInit(): void {
     // Cache stroke padding after view init to avoid layout thrashing
     this.strokePadding.set(this.getStrokePaddingFromCss());
-  }
-
-  /** @ignore */
-  ngOnDestroy(): void {
-    this.minimapProviderService.unregister();
   }
 
   isDiagramInitialized = this.renderer.isInitialized;

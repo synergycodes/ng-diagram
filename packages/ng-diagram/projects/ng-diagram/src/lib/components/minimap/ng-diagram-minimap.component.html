@@ -1,4 +1,4 @@
-<div class="minimap-container" [style.width.px]="width()" [style.height.px]="height()">
+<ng-diagram-panel [position]="position()">
   <svg
     ngDiagramMinimapNavigation
     [transform]="transform()"
@@ -20,7 +20,9 @@
               [attr.height]="item.bounds.height"
               [attr.transform]="item.bounds.transform"
             >
-              <ng-container *ngComponentOutlet="item.template; inputs: { node: item.diagramNode, nodeStyle: item.nodeStyle }" />
+              <ng-container
+                *ngComponentOutlet="item.template; inputs: { node: item.diagramNode, nodeStyle: item.nodeStyle }"
+              />
             </svg:foreignObject>
           } @else {
             <svg:g ng-diagram-default-minimap-node [bounds]="item.bounds" [nodeStyle]="item.nodeStyle" />
@@ -38,4 +40,7 @@
       }
     }
   </svg>
-</div>
+  @if (showZoomControls()) {
+    <ng-diagram-zoom-controls />
+  }
+</ng-diagram-panel>

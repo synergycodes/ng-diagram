@@ -25,15 +25,6 @@
   }
 }
 
-.minimap-container {
-  overflow: hidden;
-  border-radius: var(--ngd-minimap-border-radius);
-  padding: var(--ngd-minimap-padding);
-  background-color: var(--ngd-minimap-background);
-  box-shadow: 0 8px 16px -4px var(--ngd-minimap-shadow-color);
-  border: 1px solid var(--ngd-minimap-border-color);
-}
-
 .minimap-svg {
   display: block;
   cursor: pointer;
@@ -48,4 +39,10 @@
   stroke-width: var(--ngd-minimap-viewport-stroke-width);
   fill: transparent;
   pointer-events: none;
+}
+
+.minimap-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
