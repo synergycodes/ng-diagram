@@ -1,6 +1,8 @@
 ---
 title: Touch Gestures
 description: Using ngDiagram on touch devices with native gesture support
+sidebar:
+  badge: New
 ---
 
 ngDiagram supports touch devices out of the box, making it easy to build diagram applications for tablets, phones, and other touch-enabled screens.
@@ -46,7 +48,10 @@ This ensures that common viewport gestures (zoom and pan) always work, while nod
 
 ## Linking Mode
 
-In addition to creating connections by dragging from port to port, you can trigger the linking mode programmatically — for example, via a button in your UI. Once activated, the connection line follows the user's finger as they drag across the canvas. Lifting the finger over a compatible port completes the connection. If the finger is released elsewhere on the canvas, the linking action is cancelled without creating an edge.
+In addition to creating connections by dragging from port to port, you can trigger the linking mode programmatically using the [`startLinking`](/docs/api/services/ngdiagramservice/#startlinking) method — for example,
+via a button in your UI. Once activated, the connection line follows the user's finger as they drag across the canvas. Lifting the
+finger over a compatible port completes the connection. If the finger is released elsewhere on the canvas, the linking action is
+cancelled without creating an edge.
 
 ## Actions Without Touch Gestures
 
