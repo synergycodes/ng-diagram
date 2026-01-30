@@ -14,7 +14,6 @@ const changeSelection = (
   const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
   const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
 
-  // Convert to Sets for O(1) lookups instead of O(n) array.includes()
   const selectedNodeIdSet = new Set(selectedNodeIds);
   const selectedEdgeIdSet = new Set(selectedEdgeIds);
 

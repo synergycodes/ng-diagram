@@ -425,7 +425,7 @@ export interface BoxSelectionConfig {
  * significantly improving performance for large diagrams.
  *
  * @public
- * @since 0.9.1
+ * @since 1.0.0
  * @category Types/Configuration/Features
  */
 export interface VirtualizationConfig {
