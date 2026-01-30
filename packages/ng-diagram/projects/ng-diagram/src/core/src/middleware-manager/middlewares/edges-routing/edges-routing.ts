@@ -12,9 +12,9 @@ export const checkIfShouldRouteEdges = ({
   modelActionTypes,
   actionStateManager,
 }: MiddlewareContext): boolean => {
-  // Skip edge routing during viewport-only operations (zoom/pan)
+  // Skip edge routing during viewport-only operation (zoom)
   // Node positions don't change, only the viewport transform changes
-  if (modelActionTypes.includes('zoom') || modelActionTypes.includes('moveViewport')) {
+  if (modelActionTypes.includes('zoom')) {
     return false;
   }
 
