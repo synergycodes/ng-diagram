@@ -145,11 +145,10 @@ Returns an object containing an array of search results:
 ```typescript
 {
   results: Array<{
-    path: string; // Relative file path from docs root
     title: string; // Document title from frontmatter or filename
     description?: string; // Document description from frontmatter (if available)
     excerpt: string; // Text snippet showing match context
-    url: string; // Documentation URL path
+    url: string; // Full documentation URL
   }>;
 }
 ```

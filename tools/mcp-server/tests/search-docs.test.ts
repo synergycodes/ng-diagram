@@ -126,7 +126,6 @@ describe('search_docs tool', () => {
 
       expect(output.results).toHaveLength(1);
       const result = output.results[0];
-      expect(result).toHaveProperty('path');
       expect(result).toHaveProperty('title');
       expect(result).toHaveProperty('description');
       expect(result).toHaveProperty('excerpt');

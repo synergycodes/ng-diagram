@@ -275,7 +275,6 @@ export class SearchEngine {
       matchLocation === 'content' ? this.extractExcerpt(document.content, query, EXCERPT_CONTEXT_LENGTH) : '';
 
     return {
-      path: document.path,
       title: document.title,
       description: document.description,
       excerpt,

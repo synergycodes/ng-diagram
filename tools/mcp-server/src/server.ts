@@ -36,6 +36,7 @@ export class NgDiagramMCPServer {
     this.indexer = new DocumentationIndexer({
       docsPath: config.docsPath,
       extensions: ['.md', '.mdx'],
+      baseUrl: config.baseUrl,
     });
 
     this.server.onerror = (error) => {

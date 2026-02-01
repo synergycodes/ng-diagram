@@ -10,6 +10,8 @@ export interface IndexerConfig {
   docsPath: string;
   /** File extensions to index (e.g., ['.md', '.mdx']) */
   extensions: string[];
+  /** Base URL for the documentation site (e.g., 'https://www.ngdiagram.dev') */
+  baseUrl: string;
 }
 
 /**
@@ -22,4 +24,6 @@ export interface MCPServerConfig {
   version: string;
   /** Path to the documentation directory */
   docsPath: string;
+  /** Base URL for the documentation site */
+  baseUrl: string;
 }

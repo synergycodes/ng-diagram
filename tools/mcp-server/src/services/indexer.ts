@@ -117,7 +117,7 @@ export class DocumentationIndexer {
   /**
    * Generate documentation URL from file path
    * @param filePath Relative file path from docs root
-   * @returns Documentation URL path
+   * @returns Full documentation URL
    */
   private generateUrl(filePath: string): string {
     // Remove file extension
@@ -131,8 +131,9 @@ export class DocumentationIndexer {
       urlPath = urlPath.replace(/\/index$/, '').replace(/^index$/, '');
     }
 
-    // Prepend /docs prefix
-    return urlPath ? `/docs/${urlPath}` : '/docs';
+    // Build full URL with base URL
+    const path = urlPath ? `/docs/${urlPath}` : '/docs';
+    return `${this.config.baseUrl}${path}`;
   }
 
   /**

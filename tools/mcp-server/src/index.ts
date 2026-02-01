@@ -25,6 +25,7 @@ async function main(): Promise<void> {
       name: 'ng-diagram-docs',
       version: '0.1.0',
       docsPath,
+      baseUrl: 'https://www.ngdiagram.dev',
     });
 
     await server.start();

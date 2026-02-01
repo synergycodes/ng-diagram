@@ -59,7 +59,6 @@ describe('SearchEngine', () => {
       // Should find the exact match first (highest score)
       expect(results.length).toBeGreaterThanOrEqual(1);
       expect(results[0].title).toBe('Palette Guide');
-      expect(results[0].path).toBe('guides/palette.md');
     });
 
     it('should find document with partial title match', () => {
@@ -406,7 +405,6 @@ describe('SearchEngine', () => {
       const results = searchEngine.search({ query: 'Palette' });
 
       expect(results).toHaveLength(1);
-      expect(results[0]).toHaveProperty('path');
       expect(results[0]).toHaveProperty('title');
       expect(results[0]).toHaveProperty('description');
       expect(results[0]).toHaveProperty('excerpt');
@@ -426,7 +424,6 @@ describe('SearchEngine', () => {
     it('should preserve original document data', () => {
       const results = searchEngine.search({ query: 'Quick Start' });
 
-      expect(results[0].path).toBe('intro/quick-start.md');
       expect(results[0].title).toBe('Quick Start');
       expect(results[0].url).toBe('/docs/intro/quick-start');
     });

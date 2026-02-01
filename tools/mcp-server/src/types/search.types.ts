@@ -18,15 +18,13 @@ export interface SearchQuery {
  * Search result returned to the user
  */
 export interface SearchResult {
-  /** Relative file path from docs root */
-  path: string;
   /** Document title */
   title: string;
   /** Document description (if available) */
   description?: string;
   /** Text snippet showing match context */
   excerpt: string;
-  /** Documentation URL path */
+  /** Full documentation URL */
   url: string;
 }
 
