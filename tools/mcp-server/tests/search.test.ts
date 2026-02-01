@@ -3,7 +3,7 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { SearchEngine } from '../src/search.js';
+import { SearchEngine } from '../src/services/search.js';
 import type { DocumentMetadata } from '../src/types/index.js';
 
 describe('SearchEngine', () => {

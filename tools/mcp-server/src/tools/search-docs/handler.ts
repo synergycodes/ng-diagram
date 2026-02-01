@@ -2,7 +2,7 @@
  * Handler for search_docs tool
  */
 
-import type { SearchEngine } from '../../search.js';
+import type { SearchEngine } from '../../services/search.js';
 import type { SearchQuery } from '../../types/index.js';
 import type { SearchDocsInput, SearchDocsOutput } from './tool.types.js';
 import { validateInput } from './tool.validator.js';

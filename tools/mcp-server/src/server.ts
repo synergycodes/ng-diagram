@@ -10,8 +10,8 @@ import {
   type CallToolRequest,
   type ListToolsRequest,
 } from '@modelcontextprotocol/sdk/types.js';
-import { DocumentationIndexer } from './indexer.js';
-import { SearchEngine } from './search.js';
+import { DocumentationIndexer } from './services/indexer.js';
+import { SearchEngine } from './services/search.js';
 import { SEARCH_DOCS_TOOL, createSearchDocsHandler, type SearchDocsInput } from './tools/search-docs/index.js';
 import type { MCPServerConfig } from './types/index.js';
 

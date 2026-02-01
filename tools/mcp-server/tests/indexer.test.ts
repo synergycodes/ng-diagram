@@ -5,7 +5,7 @@
 import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DocumentationIndexer } from '../src/indexer.js';
+import { DocumentationIndexer } from '../src/services/indexer.js';
 import type { IndexerConfig } from '../src/types/index.js';
 
 describe('DocumentationIndexer', () => {

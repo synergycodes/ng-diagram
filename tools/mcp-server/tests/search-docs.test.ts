@@ -3,7 +3,7 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { SearchEngine } from '../src/search.js';
+import { SearchEngine } from '../src/services/search.js';
 import { createSearchDocsHandler, SEARCH_DOCS_TOOL } from '../src/tools/search-docs/index.js';
 import type { SearchDocsInput } from '../src/tools/search-docs/tool.types.js';
 import type { DocumentMetadata } from '../src/types/index.js';

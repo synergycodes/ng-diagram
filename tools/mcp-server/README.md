@@ -281,8 +281,9 @@ tools/mcp-server/
 ├── src/
 │   ├── index.ts              # Entry point
 │   ├── server.ts             # MCP server implementation
-│   ├── indexer.ts            # Documentation indexer
-│   ├── search.ts             # Search engine
+│   ├── services/             # Core business logic services
+│   │   ├── indexer.ts        # Documentation indexer
+│   │   └── search.ts         # Search engine
 │   ├── tools/
 │   │   └── search-docs/      # Search tool implementation
 │   │       ├── handler.ts
@@ -358,13 +359,13 @@ The server consists of several key components working together:
    - Manages server lifecycle (startup, shutdown)
    - Registers and coordinates tools
 
-2. **Documentation Indexer (`indexer.ts`)**
+2. **Documentation Indexer (`services/indexer.ts`)**
    - Scans `apps/docs/src/content/docs` directory recursively
    - Processes `.md` and `.mdx` files
    - Extracts frontmatter metadata (title, description)
    - Builds in-memory search index on startup
 
-3. **Search Engine (`search.ts`)**
+3. **Search Engine (`services/search.ts`)**
    - Performs case-insensitive text matching
    - Searches across paths, titles, descriptions, and content
    - Ranks results by relevance (title > description > content)

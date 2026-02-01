@@ -2,7 +2,7 @@
  * Search engine for documentation content
  */
 
-import type { DocumentMetadata, SearchMatch, SearchQuery, SearchResult } from './types/index.js';
+import type { DocumentMetadata, SearchMatch, SearchQuery, SearchResult } from '../types/index.js';
 
 /**
  * Scoring weights for different match locations
