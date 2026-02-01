@@ -34,7 +34,35 @@ export class SearchEngine {
 
   private matchDocument(doc: DocumentMetadata, query: string): SearchMatch | null {
     const lowerQuery = query.toLowerCase();
+    const queryWords = lowerQuery.split(/\s+/).filter((word) => word.length > 0);
 
+    // Try exact phrase match first (highest priority)
+    const exactMatch = this.matchExactPhrase(doc, lowerQuery);
+    if (exactMatch) {
+      return exactMatch;
+    }
+
+    // Try multi-word match (match all words, but not necessarily as a phrase)
+    if (queryWords.length > 1) {
+      const multiWordMatch = this.matchMultipleWords(doc, queryWords);
+      if (multiWordMatch) {
+        return multiWordMatch;
+      }
+    }
+
+    // Try single word match (any word matches)
+    const singleWordMatch = this.matchAnyWord(doc, queryWords);
+    if (singleWordMatch) {
+      return singleWordMatch;
+    }
+
+    return null;
+  }
+
+  /**
+   * Match exact phrase in document
+   */
+  private matchExactPhrase(doc: DocumentMetadata, lowerQuery: string): SearchMatch | null {
     if (doc.title.toLowerCase().includes(lowerQuery)) {
       return {
         document: doc,
@@ -70,6 +98,122 @@ export class SearchEngine {
     return null;
   }
 
+  /**
+   * Match all query words (but not necessarily as a phrase)
+   * Scores based on how many words match and where they match
+   */
+  private matchMultipleWords(doc: DocumentMetadata, queryWords: string[]): SearchMatch | null {
+    const lowerTitle = doc.title.toLowerCase();
+    const lowerDescription = doc.description?.toLowerCase() || '';
+    const lowerPath = doc.path.toLowerCase();
+    const lowerContent = doc.content.toLowerCase();
+
+    let titleMatches = 0;
+    let descriptionMatches = 0;
+    let pathMatches = 0;
+    let contentMatches = 0;
+
+    for (const word of queryWords) {
+      if (lowerTitle.includes(word)) titleMatches++;
+      if (lowerDescription.includes(word)) descriptionMatches++;
+      if (lowerPath.includes(word)) pathMatches++;
+      if (lowerContent.includes(word)) contentMatches++;
+    }
+
+    const totalWords = queryWords.length;
+
+    // Require at least 50% of words to match
+    const minMatches = Math.ceil(totalWords * 0.5);
+
+    if (titleMatches >= minMatches) {
+      const matchRatio = titleMatches / totalWords;
+      return {
+        document: doc,
+        score: SCORE_WEIGHTS.title * matchRatio * 0.8, // 80% of exact match score
+        matchLocation: 'title',
+      };
+    }
+
+    if (descriptionMatches >= minMatches) {
+      const matchRatio = descriptionMatches / totalWords;
+      return {
+        document: doc,
+        score: SCORE_WEIGHTS.description * matchRatio * 0.8,
+        matchLocation: 'description',
+      };
+    }
+
+    if (pathMatches >= minMatches) {
+      const matchRatio = pathMatches / totalWords;
+      return {
+        document: doc,
+        score: SCORE_WEIGHTS.path * matchRatio * 0.8,
+        matchLocation: 'path',
+      };
+    }
+
+    if (contentMatches >= minMatches) {
+      const matchRatio = contentMatches / totalWords;
+      return {
+        document: doc,
+        score: SCORE_WEIGHTS.content * matchRatio * 0.8,
+        matchLocation: 'content',
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Match any single word from the query
+   * Lowest priority, but ensures we return something relevant
+   */
+  private matchAnyWord(doc: DocumentMetadata, queryWords: string[]): SearchMatch | null {
+    const lowerTitle = doc.title.toLowerCase();
+    const lowerDescription = doc.description?.toLowerCase() || '';
+    const lowerPath = doc.path.toLowerCase();
+    const lowerContent = doc.content.toLowerCase();
+
+    for (const word of queryWords) {
+      // Skip very short words (less than 3 characters) to avoid noise
+      if (word.length < 3) continue;
+
+      if (lowerTitle.includes(word)) {
+        return {
+          document: doc,
+          score: SCORE_WEIGHTS.title * 0.5, // 50% of exact match score
+          matchLocation: 'title',
+        };
+      }
+
+      if (lowerDescription.includes(word)) {
+        return {
+          document: doc,
+          score: SCORE_WEIGHTS.description * 0.5,
+          matchLocation: 'description',
+        };
+      }
+
+      if (lowerPath.includes(word)) {
+        return {
+          document: doc,
+          score: SCORE_WEIGHTS.path * 0.5,
+          matchLocation: 'path',
+        };
+      }
+
+      if (lowerContent.includes(word)) {
+        return {
+          document: doc,
+          score: SCORE_WEIGHTS.content * 0.5,
+          matchLocation: 'content',
+        };
+      }
+    }
+
+    return null;
+  }
+
   private rankResults(matches: SearchMatch[]): SearchMatch[] {
     return matches.sort((a, b) => {
       if (a.score !== b.score) {
@@ -82,7 +226,18 @@ export class SearchEngine {
   private extractExcerpt(content: string, query: string, contextLength: number): string {
     const lowerContent = content.toLowerCase();
     const lowerQuery = query.toLowerCase();
-    const matchIndex = lowerContent.indexOf(lowerQuery);
+
+    // Try to find the exact query first
+    let matchIndex = lowerContent.indexOf(lowerQuery);
+
+    // If exact query not found, try to find the first word from the query
+    if (matchIndex === -1) {
+      const queryWords = lowerQuery.split(/\s+/).filter((word) => word.length > 2);
+      for (const word of queryWords) {
+        matchIndex = lowerContent.indexOf(word);
+        if (matchIndex !== -1) break;
+      }
+    }
 
     if (matchIndex === -1) {
       return '';
