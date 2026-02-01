@@ -182,18 +182,16 @@ Returns an object containing an array of search results:
 {
   "results": [
     {
-      "path": "guides/palette.mdx",
       "title": "Palette",
       "description": "Learn how to use the palette component for drag-and-drop node creation",
       "excerpt": "...The palette component provides a drag-and-drop interface for adding nodes to your diagram...",
-      "url": "/docs/guides/palette"
+      "url": "https://www.ngdiagram.dev/docs/guides/palette"
     },
     {
-      "path": "examples/palette.mdx",
       "title": "Palette Example",
       "description": "Interactive example demonstrating palette usage",
       "excerpt": "...This example shows how to configure a palette with custom node templates...",
-      "url": "/docs/examples/palette"
+      "url": "https://www.ngdiagram.dev/docs/examples/palette"
     }
   ]
 }
@@ -216,18 +214,16 @@ Returns an object containing an array of search results:
 {
   "results": [
     {
-      "path": "guides/nodes/rotation.mdx",
       "title": "Node Rotation",
       "description": "How to enable and configure node rotation",
       "excerpt": "...Nodes can be rotated by enabling the rotation feature. Use the rotation handle to rotate nodes interactively...",
-      "url": "/docs/guides/nodes/rotation"
+      "url": "https://www.ngdiagram.dev/docs/guides/nodes/rotation"
     },
     {
-      "path": "api/Types/NodeModel.md",
       "title": "NodeModel",
       "description": "Node model interface definition",
       "excerpt": "...rotation?: number - The rotation angle of the node in degrees...",
-      "url": "/docs/api/Types/NodeModel"
+      "url": "https://www.ngdiagram.dev/docs/api/Types/NodeModel"
     }
   ]
 }

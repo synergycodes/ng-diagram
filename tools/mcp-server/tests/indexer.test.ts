@@ -26,7 +26,7 @@ describe('DocumentationIndexer', () => {
     it('should extract title and description from valid YAML frontmatter', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md', '.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -50,7 +50,7 @@ description: This is a test description
     it('should fallback to filename when frontmatter is missing', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md', '.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -69,7 +69,7 @@ description: This is a test description
     it('should handle malformed YAML frontmatter gracefully', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md', '.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -95,7 +95,7 @@ description: [invalid yaml: {
     it('should generate URL from simple file path', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -110,7 +110,7 @@ description: [invalid yaml: {
     it('should generate URL from nested file path', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -127,7 +127,7 @@ description: [invalid yaml: {
     it('should handle index.md files correctly', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -142,7 +142,7 @@ description: [invalid yaml: {
     it('should handle nested index.md files correctly', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -159,7 +159,7 @@ description: [invalid yaml: {
     it('should handle .mdx extension correctly', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -176,7 +176,7 @@ description: [invalid yaml: {
     it('should only index .md files when configured', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -194,7 +194,7 @@ description: [invalid yaml: {
     it('should only index .mdx files when configured', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -212,7 +212,7 @@ description: [invalid yaml: {
     it('should index both .md and .mdx files when configured', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md', '.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -231,7 +231,7 @@ description: [invalid yaml: {
     it('should not index files with other extensions', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md', '.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -250,7 +250,7 @@ description: [invalid yaml: {
     it('should handle missing documentation directory', async () => {
       const config: IndexerConfig = {
         docsPath: join(testDir, 'non-existent'),
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md', '.mdx'],
       };
       indexer = new DocumentationIndexer(config);
@@ -263,7 +263,7 @@ description: [invalid yaml: {
     it('should skip unreadable files and continue indexing', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -280,7 +280,7 @@ description: [invalid yaml: {
     it('should handle empty files', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -299,7 +299,7 @@ description: [invalid yaml: {
     it('should preserve full document content', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
@@ -334,7 +334,7 @@ const code = 'example';
     it('should scan nested directories recursively', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
-        baseUrl: "https://www.ngdiagram.dev",
+        baseUrl: 'https://www.ngdiagram.dev',
         extensions: ['.md'],
       };
       indexer = new DocumentationIndexer(config);
