@@ -1,269 +1,169 @@
 # ng-diagram MCP Server
 
-An MCP (Model Context Protocol) server that provides documentation search capabilities for the ng-diagram library.
+> **MCP server that enables AI assistants to search ng-diagram documentation**
 
-## Overview
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that provides intelligent documentation search for the ng-diagram library. Connect it to AI assistants like Claude, Cursor, or any MCP-compatible tool to get instant access to ng-diagram documentation.
 
-This server exposes a `search_docs` tool that allows MCP-compatible clients (like Claude) to search through the ng-diagram documentation. The server indexes documentation files on startup and provides fast, relevant search results.
+## What is This?
 
-### Purpose
+This server allows AI assistants to search through ng-diagram's documentation and return relevant results with direct links. Instead of manually browsing docs, you can ask your AI assistant questions like:
 
-The ng-diagram MCP server enables AI assistants and other MCP-compatible tools to:
+- "How do I create custom nodes in ng-diagram?"
+- "Show me examples of node rotation"
+- "How does the palette component work?"
 
-- Search through ng-diagram documentation efficiently
-- Find relevant guides, API references, and examples
-- Access documentation context without manual browsing
-- Integrate documentation search into AI-assisted workflows
+The AI will search the documentation and provide you with relevant pages and direct links.
 
-This is a proof-of-concept implementation demonstrating core MCP server functionality with a simple, maintainable design suitable for local development and testing.
+## How It Works
 
-## Features
+```mermaid
+graph LR
+    A[AI Assistant] -->|Search Query| B[MCP Server]
+    B -->|Indexes| C[ng-diagram Docs]
+    B -->|Returns Results| A
+    A -->|Provides Links| D[User]
+    D -->|Clicks Link| E[Official Docs]
+```
 
-- **Documentation Search**: Search across titles, descriptions, and content
-- **Relevance Ranking**: Results ranked by match location (title > description > content)
-- **Context Excerpts**: Relevant text snippets showing match context
-- **MCP Protocol**: Standard MCP protocol via stdio transport
-- **Fast Indexing**: In-memory index built on startup for quick searches
-- **Error Handling**: Graceful handling of missing files and parsing errors
+**Flow:**
 
-## Installation
+1. AI assistant sends a search query to the MCP server
+2. Server searches indexed ng-diagram documentation
+3. Returns relevant results with titles, descriptions, and URLs
+4. AI provides you with clickable links to official documentation
 
-### Prerequisites
+## Current Usage (Internal)
 
-- Node.js 18 or higher
-- pnpm (recommended) or npm
+**Who can use it now:** ng-diagram maintainers and contributors
 
-### Install Dependencies
+This server is currently configured to run locally for the ng-diagram development team. It indexes the documentation from the monorepo and provides search capabilities during development.
 
-From the repository root:
+### Setup for Development
+
+1. **Install dependencies:**
+
+   ```bash
+   cd tools/mcp-server
+   pnpm install
+   ```
+
+2. **Build the server:**
+
+   ```bash
+   pnpm build
+   ```
+
+3. **Configure your MCP client** (e.g., Claude Desktop, Cursor, Kiro):
+
+   Add to your MCP configuration file:
+
+   ```json
+   {
+     "mcpServers": {
+       "ng-diagram-docs": {
+         "command": "node",
+         "args": ["/absolute/path/to/ng-diagram/tools/mcp-server/dist/index.js"],
+         "cwd": "/absolute/path/to/ng-diagram"
+       }
+     }
+   }
+   ```
+
+4. **Restart your AI assistant** to load the server
+
+5. **Test it:** Ask your AI assistant to search ng-diagram documentation!
+
+## Future Vision (Public Release)
+
+### For Library Consumers
+
+In the future, ng-diagram users will be able to install and use this MCP server without cloning the repository:
 
 ```bash
-cd tools/mcp-server
-pnpm install
+# Future: Install via npm
+npm install -g @ng-diagram/mcp-server
+
+# Or use with npx
+npx @ng-diagram/mcp-server
 ```
 
-Or using npm:
+Then configure it in your AI assistant to get instant documentation access while building your Angular diagrams.
 
-```bash
-cd tools/mcp-server
-npm install
-```
+## Roadmap
 
-## Usage
+### Phase 1: MVP (Current) ✅
 
-### Running the Server
+- [x] Basic documentation search
+- [x] Multi-word query support
+- [x] Full URL generation to official docs
+- [x] Integration with MCP-compatible tools
 
-#### Development Mode
+### Phase 2: Enhanced Search
 
-For development with auto-reload using tsx:
+- [ ] Synonym support (e.g., "setup" → "installation")
+- [ ] Better ranking with TF-IDF
+- [ ] Search analytics to improve results
+- [ ] Fuzzy matching for typos
 
-```bash
-pnpm dev
-```
+### Phase 3: Public Distribution
 
-This will start the server and automatically restart when source files change.
+- [ ] Publish to npm as standalone package
+- [ ] Configuration options for custom doc sites
+- [ ] Support for multiple documentation versions
+- [ ] HTTP transport option (in addition to stdio)
 
-#### Production Mode
+### Phase 4: Advanced Features
 
-First build the TypeScript code:
+- [ ] Semantic search with embeddings (RAG)
+- [ ] Code example extraction
+- [ ] Interactive API explorer
+- [ ] Integration with GitHub Copilot
 
-```bash
-pnpm build
-```
+## API Reference
 
-Then run the compiled JavaScript:
+### Tool: `search_docs`
 
-```bash
-node dist/index.js
-```
+Search through ng-diagram documentation.
 
-### MCP Client Configuration
+**Parameters:**
 
-To use this server with an MCP-compatible client, add it to your client's configuration file.
+- `query` (string, required): Search query
+- `limit` (number, optional): Max results to return (default: 10)
 
-#### Claude Desktop Configuration
-
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or equivalent:
-
-**Using built version (recommended for production):**
-
-```json
-{
-  "mcpServers": {
-    "ng-diagram-docs": {
-      "command": "node",
-      "args": ["/absolute/path/to/ng-diagram/tools/mcp-server/dist/index.js"],
-      "cwd": "/absolute/path/to/ng-diagram"
-    }
-  }
-}
-```
-
-**Using development mode:**
-
-```json
-{
-  "mcpServers": {
-    "ng-diagram-docs": {
-      "command": "pnpm",
-      "args": ["--dir", "tools/mcp-server", "dev"],
-      "cwd": "/absolute/path/to/ng-diagram"
-    }
-  }
-}
-```
-
-**Note:** Replace `/absolute/path/to/ng-diagram` with the actual path to your ng-diagram repository.
-
-#### Other MCP Clients
-
-For other MCP-compatible clients, configure them to run:
-
-```bash
-node /path/to/tools/mcp-server/dist/index.js
-```
-
-with the working directory set to the ng-diagram repository root.
-
-## MCP Tools Documentation
-
-### search_docs
-
-Search through ng-diagram documentation to find relevant guides, API references, and examples.
-
-#### Parameters
-
-| Parameter | Type   | Required | Default | Description                                 |
-| --------- | ------ | -------- | ------- | ------------------------------------------- |
-| `query`   | string | Yes      | -       | Search query to find relevant documentation |
-| `limit`   | number | No       | 10      | Maximum number of results to return (1-100) |
-
-#### Response Format
-
-Returns an object containing an array of search results:
+**Response:**
 
 ```typescript
 {
   results: Array<{
-    title: string; // Document title from frontmatter or filename
-    description?: string; // Document description from frontmatter (if available)
-    excerpt: string; // Text snippet showing match context
-    url: string; // Full documentation URL
+    title: string; // Document title
+    description?: string; // Document description
+    excerpt: string; // Relevant text snippet
+    url: string; // Full URL to documentation
   }>;
 }
 ```
 
-#### Search Behavior
-
-- **Case-insensitive**: Searches are not case-sensitive
-- **Multi-field**: Searches across file paths, titles, descriptions, and content
-- **Relevance ranking**: Results are ranked by match location:
-  1. Title matches (highest priority)
-  2. Description matches
-  3. Content matches (lowest priority)
-- **Context excerpts**: Each result includes a text snippet showing where the match occurred
-
-#### Example Queries and Responses
-
-##### Example 1: Basic Search
-
-**Request:**
+**Example:**
 
 ```json
 {
-  "query": "palette",
+  "query": "custom nodes",
   "limit": 3
 }
 ```
 
-**Response:**
+Returns:
 
 ```json
 {
   "results": [
     {
-      "title": "Palette",
-      "description": "Learn how to use the palette component for drag-and-drop node creation",
-      "excerpt": "...The palette component provides a drag-and-drop interface for adding nodes to your diagram...",
-      "url": "https://www.ngdiagram.dev/docs/guides/palette"
-    },
-    {
-      "title": "Palette Example",
-      "description": "Interactive example demonstrating palette usage",
-      "excerpt": "...This example shows how to configure a palette with custom node templates...",
-      "url": "https://www.ngdiagram.dev/docs/examples/palette"
+      "title": "Custom Nodes",
+      "description": "How to create and implement custom nodes in ngDiagram",
+      "excerpt": "...create custom node components with any Angular template...",
+      "url": "https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes"
     }
   ]
-}
-```
-
-##### Example 2: API Search
-
-**Request:**
-
-```json
-{
-  "query": "node rotation",
-  "limit": 5
-}
-```
-
-**Response:**
-
-```json
-{
-  "results": [
-    {
-      "title": "Node Rotation",
-      "description": "How to enable and configure node rotation",
-      "excerpt": "...Nodes can be rotated by enabling the rotation feature. Use the rotation handle to rotate nodes interactively...",
-      "url": "https://www.ngdiagram.dev/docs/guides/nodes/rotation"
-    },
-    {
-      "title": "NodeModel",
-      "description": "Node model interface definition",
-      "excerpt": "...rotation?: number - The rotation angle of the node in degrees...",
-      "url": "https://www.ngdiagram.dev/docs/api/Types/NodeModel"
-    }
-  ]
-}
-```
-
-##### Example 3: No Results
-
-**Request:**
-
-```json
-{
-  "query": "nonexistent feature",
-  "limit": 10
-}
-```
-
-**Response:**
-
-```json
-{
-  "results": []
-}
-```
-
-##### Example 4: Error - Empty Query
-
-**Request:**
-
-```json
-{
-  "query": "",
-  "limit": 10
-}
-```
-
-**Response:**
-
-```json
-{
-  "error": "Query parameter cannot be empty"
 }
 ```
 
@@ -274,174 +174,69 @@ Returns an object containing an array of search results:
 ```
 tools/mcp-server/
 ├── src/
-│   ├── index.ts              # Entry point
-│   ├── server.ts             # MCP server implementation
-│   ├── services/             # Core business logic services
-│   │   ├── indexer.ts        # Documentation indexer
-│   │   └── search.ts         # Search engine
-│   ├── tools/
-│   │   └── search-docs/      # Search tool implementation
-│   │       ├── handler.ts
-│   │       ├── tool.config.ts
-│   │       ├── tool.types.ts
-│   │       └── tool.validator.ts
-│   └── types/                # Shared type definitions
-│       ├── config.types.ts
-│       ├── document.types.ts
-│       ├── search.types.ts
-│       └── index.ts
-├── tests/                    # Test files
-├── dist/                     # Build output (generated)
-├── package.json
-├── tsconfig.json
-└── README.md
+│   ├── services/          # Core business logic
+│   │   ├── indexer.ts     # Documentation indexing
+│   │   └── search.ts      # Search engine
+│   ├── tools/             # MCP tool implementations
+│   │   └── search-docs/   # Search tool handler
+│   ├── types/             # TypeScript definitions
+│   ├── server.ts          # MCP server
+│   └── index.ts           # Entry point
+├── tests/                 # Test files
+└── dist/                  # Build output
 ```
 
-### Running Tests
-
-Run all tests:
+### Commands
 
 ```bash
-pnpm test
+# Development
+pnpm dev              # Run with auto-reload
+
+# Testing
+pnpm test             # Run all tests
+pnpm test:coverage    # Run with coverage
+
+# Building
+pnpm build            # Compile TypeScript
 ```
 
-Run tests in watch mode (for development):
+### Architecture
 
-```bash
-pnpm test:watch
+```mermaid
+graph TD
+    A[MCP Client] -->|stdio| B[MCP Server]
+    B --> C[Documentation Indexer]
+    B --> D[Search Engine]
+    C -->|Scans| E[Markdown Files]
+    C -->|Extracts| F[Frontmatter]
+    C -->|Builds| G[In-Memory Index]
+    D -->|Queries| G
+    D -->|Ranks| H[Search Results]
+    H -->|Returns| B
 ```
 
-### Building
+**Components:**
 
-Build the TypeScript code to JavaScript:
+- **MCP Server**: Handles protocol communication via stdio
+- **Documentation Indexer**: Scans `.md`/`.mdx` files, extracts metadata
+- **Search Engine**: Multi-tier matching (exact phrase → multi-word → single word)
+- **Tool Handler**: Validates input, formats output
 
-```bash
-pnpm build
-```
+## Contributing
 
-The compiled output will be in the `dist/` directory.
+This is part of the ng-diagram monorepo. Contributions are welcome!
 
-### Code Quality
-
-The project follows the ng-diagram monorepo standards:
-
-- **TypeScript**: Strict mode enabled
-- **Linting**: ESLint with TypeScript rules
-- **Formatting**: Prettier (120 char width, single quotes)
-
-### Making Changes
-
-1. Make your changes in the `src/` directory
-2. Run tests to ensure nothing breaks: `pnpm test`
-3. Build to verify TypeScript compilation: `pnpm build`
-4. Test manually by running the server: `pnpm dev`
-
-## Architecture
-
-The server consists of several key components working together:
-
-### Components
-
-1. **MCP Server (`server.ts`)**
-   - Handles MCP protocol communication via stdio transport
-   - Manages server lifecycle (startup, shutdown)
-   - Registers and coordinates tools
-
-2. **Documentation Indexer (`services/indexer.ts`)**
-   - Scans `apps/docs/src/content/docs` directory recursively
-   - Processes `.md` and `.mdx` files
-   - Extracts frontmatter metadata (title, description)
-   - Builds in-memory search index on startup
-
-3. **Search Engine (`services/search.ts`)**
-   - Performs case-insensitive text matching
-   - Searches across paths, titles, descriptions, and content
-   - Ranks results by relevance (title > description > content)
-   - Extracts context excerpts around matches
-
-4. **Tool Handler (`tools/search-docs/`)**
-   - Implements the `search_docs` MCP tool interface
-   - Validates input parameters
-   - Formats results for MCP response
-   - Handles errors gracefully
-
-### Data Flow
-
-```
-Client Request
-    ↓
-MCP Server (stdio)
-    ↓
-Tool Handler (validation)
-    ↓
-Search Engine (query processing)
-    ↓
-Search Index (in-memory)
-    ↓
-Ranked Results
-    ↓
-MCP Response
-```
-
-### Indexing Process
-
-On server startup:
-
-1. Scan documentation directory recursively
-2. Filter for `.md` and `.mdx` files
-3. Read file content
-4. Parse YAML frontmatter (title, description)
-5. Generate documentation URL from file path
-6. Store in in-memory index
-
-### Search Process
-
-On search request:
-
-1. Validate query parameters
-2. Perform case-insensitive matching across all fields
-3. Calculate relevance scores based on match location
-4. Sort results by score (descending)
-5. Extract context excerpts
-6. Apply limit and return results
-
-## Requirements
-
-- **Node.js**: 18 or higher
-- **pnpm**: 10.8.1+ (recommended) or npm
-- **Documentation**: ng-diagram docs must be present at `apps/docs/src/content/docs`
-
-## Troubleshooting
-
-### Server won't start
-
-- Ensure Node.js 18+ is installed: `node --version`
-- Verify dependencies are installed: `pnpm install`
-- Check that you're running from the repository root or `tools/mcp-server`
-
-### No search results
-
-- Verify documentation exists at `apps/docs/src/content/docs`
-- Check server logs for indexing errors
-- Try a broader search query
-
-### MCP client can't connect
-
-- Verify the server path in your MCP client configuration is absolute
-- Ensure the working directory (`cwd`) is set to the repository root
-- Check that the server process starts without errors
-
-## Future Enhancements
-
-This is a proof-of-concept implementation. Potential future improvements:
-
-- HTTP transport support for remote access
-- Fuzzy matching and advanced search algorithms
-- Persistent caching for faster startup
-- Additional tools (get document content, list categories)
-- Search filters by category or document type
-- Syntax highlighting in excerpts
+1. Make changes in `tools/mcp-server/`
+2. Run tests: `pnpm test`
+3. Build: `pnpm build`
+4. Test with your AI assistant
 
 ## License
 
-MIT
+PoC implemented by [Pawel Kubiak](https://pawelkubiak.dev/about)
+
+MIT - Part of the [ng-diagram](https://github.com/synergycodes/ng-diagram) project
+
+---
+
+**Built with ❤️ by the Synergy Codes team**
