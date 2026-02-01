@@ -2,20 +2,25 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
+  ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  ReadResourceRequestSchema,
   type CallToolRequest,
+  type ListResourcesRequest,
   type ListToolsRequest,
+  type ReadResourceRequest,
 } from '@modelcontextprotocol/sdk/types.js';
 import { DocumentationIndexer } from './services/indexer.js';
 import { SearchEngine } from './services/search.js';
 import { SEARCH_DOCS_TOOL, createSearchDocsHandler, type SearchDocsInput } from './tools/search-docs/index.js';
-import type { MCPServerConfig } from './types/index.js';
+import type { DocumentMetadata, MCPServerConfig } from './types/index.js';
 
 export class NgDiagramMCPServer {
   private config: MCPServerConfig;
   private server: Server;
   private indexer: DocumentationIndexer;
   private searchEngine: SearchEngine | null = null;
+  private documents: DocumentMetadata[] = [];
   private isRunning = false;
 
   constructor(config: MCPServerConfig) {
@@ -29,6 +34,7 @@ export class NgDiagramMCPServer {
       {
         capabilities: {
           tools: {},
+          resources: {},
         },
       }
     );
@@ -62,14 +68,15 @@ export class NgDiagramMCPServer {
 
       // Build documentation index
       console.log(`[MCP Server] Indexing documentation from: ${this.config.docsPath}`);
-      const documents = await this.indexer.buildIndex();
-      console.log(`[MCP Server] Indexed ${documents.length} documents`);
+      this.documents = await this.indexer.buildIndex();
+      console.log(`[MCP Server] Indexed ${this.documents.length} documents`);
 
       // Initialize search engine
-      this.searchEngine = new SearchEngine(documents);
+      this.searchEngine = new SearchEngine(this.documents);
 
-      // Register tools
+      // Register tools and resources
       this.registerTools();
+      this.registerResources();
 
       // Start server with stdio transport
       const transport = new StdioServerTransport();
@@ -133,6 +140,44 @@ export class NgDiagramMCPServer {
     });
 
     console.log('[MCP Server] Registered tool: search_docs');
+  }
+
+  private registerResources(): void {
+    // List all available documentation resources
+    this.server.setRequestHandler(ListResourcesRequestSchema, async (_request: ListResourcesRequest) => {
+      return {
+        resources: this.documents.map((doc) => ({
+          uri: doc.url,
+          name: doc.title,
+          description: doc.description,
+          mimeType: 'text/plain',
+        })),
+      };
+    });
+
+    // Read a specific documentation resource
+    this.server.setRequestHandler(ReadResourceRequestSchema, async (request: ReadResourceRequest) => {
+      const { uri } = request.params;
+
+      // Find the document by URL
+      const document = this.documents.find((doc) => doc.url === uri);
+
+      if (!document) {
+        throw new Error(`Resource not found: ${uri}`);
+      }
+
+      return {
+        contents: [
+          {
+            uri: document.url,
+            mimeType: 'text/plain',
+            text: document.content,
+          },
+        ],
+      };
+    });
+
+    console.log(`[MCP Server] Registered ${this.documents.length} documentation resources`);
   }
 
   private shutdown(): void {

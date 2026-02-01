@@ -18,19 +18,22 @@ The AI will search the documentation and provide you with relevant pages and dir
 
 ```mermaid
 graph LR
-    A[AI Assistant] -->|Search Query| B[MCP Server]
-    B -->|Indexes| C[ng-diagram Docs]
-    B -->|Returns Results| A
-    A -->|Provides Links| D[User]
-    D -->|Clicks Link| E[Official Docs]
+    A[AI Assistant] -->|1. Search Query| B[MCP Server]
+    B -->|2. Returns URLs| A
+    A -->|3. Read Resource| B
+    B -->|4. Returns Content| A
+    A -->|5. Answers with Context| D[User]
 ```
 
 **Flow:**
 
-1. AI assistant sends a search query to the MCP server
-2. Server searches indexed ng-diagram documentation
-3. Returns relevant results with titles, descriptions, and URLs
-4. AI provides you with clickable links to official documentation
+1. AI assistant searches documentation using `search_docs` tool
+2. Server returns relevant results with titles, descriptions, and URLs
+3. AI requests to read specific documentation pages using Resources
+4. Server returns the full content of those pages
+5. AI uses the content to provide detailed, accurate answers
+
+**Key Benefit:** The AI can now read the actual documentation content, not just see URLs!
 
 ## Current Usage (Internal)
 
@@ -166,6 +169,99 @@ Returns:
   ]
 }
 ```
+
+### Resources API
+
+The server exposes all indexed documentation as MCP Resources, allowing AI assistants to read the full content of documentation pages.
+
+#### List Resources: `resources/list`
+
+Lists all available documentation resources.
+
+**Response:**
+
+```typescript
+{
+  resources: Array<{
+    uri: string; // Full URL to the documentation page
+    name: string; // Document title
+    description: string; // Document description
+    mimeType: string; // Always "text/plain"
+  }>;
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "resources": [
+    {
+      "uri": "https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes",
+      "name": "Custom Nodes",
+      "description": "How to create and implement custom nodes in ngDiagram",
+      "mimeType": "text/plain"
+    },
+    {
+      "uri": "https://www.ngdiagram.dev/docs/intro/quick-start",
+      "name": "Quick Start",
+      "description": "Get started with ng-diagram in minutes",
+      "mimeType": "text/plain"
+    }
+  ]
+}
+```
+
+#### Read Resource: `resources/read`
+
+Reads the full content of a specific documentation page.
+
+**Parameters:**
+
+- `uri` (string, required): The full URL of the documentation page
+
+**Response:**
+
+```typescript
+{
+  contents: Array<{
+    uri: string; // The requested URL
+    mimeType: string; // Always "text/plain"
+    text: string; // Full markdown content of the page
+  }>;
+}
+```
+
+**Example Request:**
+
+```json
+{
+  "uri": "https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes"
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "contents": [
+    {
+      "uri": "https://www.ngdiagram.dev/docs/guides/nodes/custom-nodes",
+      "mimeType": "text/plain",
+      "text": "# Custom Nodes\n\nYou can create custom node components..."
+    }
+  ]
+}
+```
+
+**Usage Pattern:**
+
+1. AI searches for relevant docs using `search_docs` tool
+2. AI receives URLs in search results
+3. AI reads specific pages using `resources/read` with the URL
+4. AI uses the full content to provide detailed answers
+
+This two-step approach ensures the AI has access to complete documentation context when answering questions.
 
 ## Development
 
