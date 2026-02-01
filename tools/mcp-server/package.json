@@ -9,7 +9,6 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "test": "vitest --run",
-    "test:coverage": "vitest --run --coverage",
     "test:watch": "vitest"
   },
   "keywords": [

@@ -310,12 +310,6 @@ Run all tests:
 pnpm test
 ```
 
-Run tests with coverage:
-
-```bash
-pnpm test:coverage
-```
-
 Run tests in watch mode (for development):
 
 ```bash
@@ -339,7 +333,6 @@ The project follows the ng-diagram monorepo standards:
 - **TypeScript**: Strict mode enabled
 - **Linting**: ESLint with TypeScript rules
 - **Formatting**: Prettier (120 char width, single quotes)
-- **Testing**: Vitest with 80%+ coverage target
 
 ### Making Changes
 
