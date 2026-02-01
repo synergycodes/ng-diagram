@@ -9,7 +9,6 @@ import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { NgDiagramMCPServer } from './server.js';
 
-// Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -22,17 +21,14 @@ async function main(): Promise<void> {
     // From tools/mcp-server/src -> ../../../apps/docs/src/content/docs
     const docsPath = resolve(__dirname, '../../../apps/docs/src/content/docs');
 
-    // Create and configure the MCP server
     const server = new NgDiagramMCPServer({
       name: 'ng-diagram-docs',
       version: '0.1.0',
       docsPath,
     });
 
-    // Start the server
     await server.start();
   } catch (error) {
-    // Handle startup failures
     console.error('[MCP Server] Fatal error during startup:');
     if (error instanceof Error) {
       console.error(`  Error: ${error.message}`);
@@ -43,10 +39,8 @@ async function main(): Promise<void> {
       console.error(`  Unknown error: ${error}`);
     }
 
-    // Exit with error code
     process.exit(1);
   }
 }
 
-// Run the main function
 main();

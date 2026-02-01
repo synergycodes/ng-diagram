@@ -1,15 +1,8 @@
-/**
- * Documentation indexer for scanning and processing documentation files
- */
-
 import { readdir, readFile } from 'fs/promises';
 import matter from 'gray-matter';
 import { basename, extname, join, relative } from 'path';
 import type { DocumentMetadata, IndexerConfig } from '../types/index.js';
 
-/**
- * Documentation indexer that scans and indexes markdown files
- */
 export class DocumentationIndexer {
   private config: IndexerConfig;
 

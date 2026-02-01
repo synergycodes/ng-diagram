@@ -1,7 +1,3 @@
-/**
- * MCP Server implementation for ng-diagram documentation
- */
-
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -15,9 +11,6 @@ import { SearchEngine } from './services/search.js';
 import { SEARCH_DOCS_TOOL, createSearchDocsHandler, type SearchDocsInput } from './tools/search-docs/index.js';
 import type { MCPServerConfig } from './types/index.js';
 
-/**
- * MCP Server for ng-diagram documentation search
- */
 export class NgDiagramMCPServer {
   private config: MCPServerConfig;
   private server: Server;
@@ -25,14 +18,9 @@ export class NgDiagramMCPServer {
   private searchEngine: SearchEngine | null = null;
   private isRunning = false;
 
-  /**
-   * Creates a new NgDiagramMCPServer instance
-   * @param config - Server configuration
-   */
   constructor(config: MCPServerConfig) {
     this.config = config;
 
-    // Initialize MCP server
     this.server = new Server(
       {
         name: config.name,
@@ -45,13 +33,11 @@ export class NgDiagramMCPServer {
       }
     );
 
-    // Initialize indexer
     this.indexer = new DocumentationIndexer({
       docsPath: config.docsPath,
       extensions: ['.md', '.mdx'],
     });
 
-    // Set up error handlers
     this.server.onerror = (error) => {
       console.error('[MCP Server Error]:', error);
     };
@@ -96,25 +82,19 @@ export class NgDiagramMCPServer {
     }
   }
 
-  /**
-   * Registers MCP tools with the server
-   */
   private registerTools(): void {
     if (!this.searchEngine) {
       throw new Error('Search engine not initialized. Call start() first.');
     }
 
-    // Create search tool handler
     const searchHandler = createSearchDocsHandler(this.searchEngine);
 
-    // Register list tools handler
     this.server.setRequestHandler(ListToolsRequestSchema, async (_request: ListToolsRequest) => {
       return {
         tools: [SEARCH_DOCS_TOOL],
       };
     });
 
-    // Register call tool handler
     this.server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
       const { name, arguments: args } = request.params;
 
@@ -154,9 +134,6 @@ export class NgDiagramMCPServer {
     console.log('[MCP Server] Registered tool: search_docs');
   }
 
-  /**
-   * Shuts down the MCP server gracefully
-   */
   private shutdown(): void {
     if (!this.isRunning) {
       return;
@@ -165,17 +142,12 @@ export class NgDiagramMCPServer {
     console.log('[MCP Server] Shutting down...');
     this.isRunning = false;
 
-    // Close server
     this.server.close();
 
     console.log('[MCP Server] Server stopped');
     process.exit(0);
   }
 
-  /**
-   * Gets the current running status of the server
-   * @returns True if server is running, false otherwise
-   */
   isServerRunning(): boolean {
     return this.isRunning;
   }

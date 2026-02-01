@@ -1,10 +1,3 @@
-/**
- * MCP tool configuration for search_docs
- */
-
-/**
- * MCP tool definition for search_docs
- */
 export const SEARCH_DOCS_TOOL = {
   name: 'search_docs',
   description: 'Search through ng-diagram documentation',

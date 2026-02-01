@@ -1,7 +1,3 @@
-/**
- * Type definitions for search_docs tool
- */
-
 import type { SearchResult } from '../../types/index.js';
 
 /**
