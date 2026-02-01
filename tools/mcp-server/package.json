@@ -1,0 +1,34 @@
+{
+  "name": "@ng-diagram/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for ng-diagram documentation search",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "vitest --run",
+    "test:coverage": "vitest --run --coverage",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "documentation",
+    "search"
+  ],
+  "author": "Paweł Kubiak",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "latest",
+    "fast-check": "^3.0.0",
+    "tsx": "^4.0.0"
+  }
+}
