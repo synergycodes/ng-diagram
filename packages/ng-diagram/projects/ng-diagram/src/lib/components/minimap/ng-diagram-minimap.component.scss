@@ -28,6 +28,7 @@
 .minimap-svg {
   display: block;
   cursor: pointer;
+  touch-action: none;
 }
 
 .minimap-background {

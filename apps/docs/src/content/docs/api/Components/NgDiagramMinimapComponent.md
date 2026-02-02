@@ -18,7 +18,6 @@ the diagram viewport to different areas.
 ## Implements
 
 - `AfterViewInit`
-- `OnDestroy`
 
 ## Properties
 
@@ -74,6 +73,14 @@ nodeStyle = (node: Node) => ({
 > **position**: `InputSignal`\<[`NgDiagramPanelPosition`](/docs/api/types/ngdiagrampanelposition/)\>
 
 Position of the minimap panel within the diagram container.
+
+***
+
+### showZoomControls
+
+> **showZoomControls**: `InputSignal`\<`boolean`\>
+
+Whether to show zoom controls in the minimap footer.
 
 ***
 

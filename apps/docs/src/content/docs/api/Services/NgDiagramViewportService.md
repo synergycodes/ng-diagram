@@ -25,6 +25,22 @@ this.viewportService.zoom(1.2);
 
 ## Properties
 
+### canZoomIn
+
+> **canZoomIn**: `Signal`\<`boolean`\>
+
+Returns true if the current zoom level is below the maximum and can be increased.
+
+***
+
+### canZoomOut
+
+> **canZoomOut**: `Signal`\<`boolean`\>
+
+Returns true if the current zoom level is above the minimum and can be decreased.
+
+***
+
 ### scale
 
 > **scale**: `Signal`\<`number`\>
@@ -38,6 +54,34 @@ Returns a computed signal for the scale that safely handles uninitialized state.
 > **viewport**: `Signal`\<[`Viewport`](/docs/api/types/model/viewport/)\>
 
 Returns a computed signal for the viewport that safely handles uninitialized state.
+
+## Accessors
+
+### maxZoom
+
+#### Get Signature
+
+> **get** **maxZoom**(): `number`
+
+Returns the maximum zoom scale from the diagram configuration.
+
+##### Returns
+
+`number`
+
+***
+
+### minZoom
+
+#### Get Signature
+
+> **get** **minZoom**(): `number`
+
+Returns the minimum zoom scale from the diagram configuration.
+
+##### Returns
+
+`number`
 
 ## Methods
 
@@ -222,7 +266,7 @@ Zooms the viewport by the specified factor.
 
 `number`
 
-The factor to zoom by.
+The factor to zoom by (e.g., 1.1 for 10% zoom in, 0.9 for 10% zoom out).
 
 ##### center?
 

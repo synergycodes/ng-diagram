@@ -9,6 +9,9 @@ title: "NgDiagramMinimapNavigationDirective"
 Directive that enables drag navigation on the minimap.
 Users can drag on the minimap to move the diagram viewport.
 
+Supports both mouse and touch input.
+Uses pointer capture for reliable touch tracking on mobile devices.
+
 ## Implements
 
 - `OnDestroy`
