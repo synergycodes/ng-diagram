@@ -153,7 +153,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {
-    if (shouldDiscardEvent(event, 'drag')) {
+    if (!this.flowCoreProvider.provide().config.nodeDraggingEnabled || shouldDiscardEvent(event, 'drag')) {
       return false;
     }
 

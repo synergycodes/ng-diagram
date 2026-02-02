@@ -155,6 +155,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       shortcuts: DEFAULT_SHORTCUTS,
       debugMode: false,
       viewportPanningEnabled: true,
+      nodeDraggingEnabled: true,
     },
     config
   );

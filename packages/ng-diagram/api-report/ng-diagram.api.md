@@ -156,7 +156,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -267,7 +267,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -296,6 +296,7 @@ export interface FlowConfig {
     grouping: GroupingConfig;
     hideWatermark?: boolean;
     linking: LinkingConfig;
+    nodeDraggingEnabled: boolean;
     nodeRotation: NodeRotationConfig;
     resize: ResizeConfig;
     selectionMoving: SelectionMovingConfig;
@@ -994,7 +995,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     protected readonly lastSide: WritableSignal<PortSide | undefined>;
     // (undocumented)
-    protected readonly lastType: WritableSignal<"source" | "target" | "both" | undefined>;
+    protected readonly lastType: WritableSignal<"target" | "source" | "both" | undefined>;
     // @internal (undocumented)
     ngAfterContentInit(): void;
     // @internal (undocumented)
@@ -1007,7 +1008,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     get portClass(): string;
     side: InputSignal<PortSide>;
-    type: InputSignal<"source" | "target" | "both">;
+    type: InputSignal<"target" | "source" | "both">;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
     // (undocumented)
@@ -1126,7 +1127,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1423,7 +1424,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)

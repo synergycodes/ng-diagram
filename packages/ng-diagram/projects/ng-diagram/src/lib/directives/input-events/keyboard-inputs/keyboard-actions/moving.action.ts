@@ -17,7 +17,9 @@ import type { KeyboardAction } from './keyboard-action.interface';
 export class MovingAction implements KeyboardAction {
   canHandle(shortcut: ShortcutDefinition, flowCore: FlowCore): boolean {
     return (
-      shortcut.actionName.startsWith('keyboardMoveSelection') && flowCore.modelLookup.getSelectedNodes().length > 0
+      flowCore.config.nodeDraggingEnabled &&
+      shortcut.actionName.startsWith('keyboardMoveSelection') &&
+      flowCore.modelLookup.getSelectedNodes().length > 0
     );
   }
 
