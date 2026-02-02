@@ -138,12 +138,12 @@ describe('Edges Routing Middleware', () => {
       expect(nextMock).toHaveBeenCalledWith();
     });
 
-    it('should skip edge routing during pan (moveViewport)', () => {
+    it('should allow edge routing during pan (moveViewport)', () => {
       context.modelActionTypes = ['moveViewport'];
 
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
-      expect(nextMock).toHaveBeenCalledWith();
+      expect(nextMock).toHaveBeenCalled();
     });
 
     it('should proceed when edges need routing on init', () => {
