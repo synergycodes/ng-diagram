@@ -506,6 +506,22 @@ export interface MiddlewareHistoryUpdate {
     stateUpdate: FlowStateUpdate;
 }
 
+// @public
+export type MinimapNodeShape = 'rect' | 'circle' | 'ellipse';
+
+// @public
+export interface MinimapNodeStyle {
+    cssClass?: string;
+    fill?: string;
+    opacity?: number;
+    shape?: MinimapNodeShape;
+    stroke?: string;
+    strokeWidth?: number;
+}
+
+// @public
+export type MinimapNodeStyleFn = (node: Node_2) => MinimapNodeStyle | null | undefined;
+
 // @public (undocumented)
 export class MobileBoxSelectionDirective {
     // (undocumented)
@@ -822,6 +838,64 @@ export const NgDiagramMath: {
 };
 
 // @public
+export class NgDiagramMinimapComponent implements AfterViewInit {
+    // (undocumented)
+    hasValidViewport: Signal<boolean>;
+    height: InputSignal<number>;
+    // (undocumented)
+    isDiagramInitialized: WritableSignal<boolean>;
+    // @internal
+    protected minimapNodes: Signal<MinimapNodeData[]>;
+    minimapNodeTemplateMap: InputSignal<NgDiagramMinimapNodeTemplateMap>;
+    // (undocumented)
+    ngAfterViewInit(): void;
+    // (undocumented)
+    nodes: WritableSignal<Node_2[]>;
+    // @internal
+    protected nodesGroupTransform: Signal<string>;
+    nodeStyle: InputSignal<MinimapNodeStyleFn | undefined>;
+    position: InputSignal<NgDiagramPanelPosition>;
+    showZoomControls: InputSignal<boolean>;
+    // @internal
+    protected transform: Signal<MinimapTransform>;
+    // (undocumented)
+    viewport: WritableSignal<Viewport>;
+    // (undocumented)
+    viewportRect: Signal<MinimapViewportRect>;
+    width: InputSignal<number>;
+    // (undocumented)
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMinimapComponent, "ng-diagram-minimap", never, { "position": { "alias": "position"; "required": false; "isSignal": true; }; "width": { "alias": "width"; "required": false; "isSignal": true; }; "height": { "alias": "height"; "required": false; "isSignal": true; }; "showZoomControls": { "alias": "showZoomControls"; "required": false; "isSignal": true; }; "nodeStyle": { "alias": "nodeStyle"; "required": false; "isSignal": true; }; "minimapNodeTemplateMap": { "alias": "minimapNodeTemplateMap"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMinimapComponent, never>;
+}
+
+// @public
+export class NgDiagramMinimapNavigationDirective implements OnDestroy {
+    // (undocumented)
+    ngOnDestroy(): void;
+    // (undocumented)
+    onPointerDown(event: PointerEvent): void;
+    // (undocumented)
+    transform: InputSignal<MinimapTransform>;
+    // (undocumented)
+    viewport: InputSignal<Viewport>;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<NgDiagramMinimapNavigationDirective, "[ngDiagramMinimapNavigation]", never, { "transform": { "alias": "transform"; "required": true; "isSignal": true; }; "viewport": { "alias": "viewport"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMinimapNavigationDirective, never>;
+}
+
+// @public
+export interface NgDiagramMinimapNodeTemplate {
+    node: InputSignal<Node_2>;
+    nodeStyle: InputSignal<MinimapNodeStyle | undefined>;
+}
+
+// @public
+export class NgDiagramMinimapNodeTemplateMap extends Map<string, Type<NgDiagramMinimapNodeTemplate>> {
+}
+
+// @public
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
     constructor();
     addEdges(edges: Edge[]): void;
@@ -984,6 +1058,9 @@ export class NgDiagramPaletteItemPreviewComponent {
 }
 
 // @public
+export type NgDiagramPanelPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+// @public
 export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy, AfterContentInit {
     constructor();
     // (undocumented)
@@ -1074,11 +1151,15 @@ export class NgDiagramServicesAvailabilityCheckerDirective {
 
 // @public
 export class NgDiagramViewportService extends NgDiagramBaseService {
+    canZoomIn: Signal<boolean>;
+    canZoomOut: Signal<boolean>;
     centerOnNode(nodeOrId: string | Node_2): void;
     centerOnRect(rect: Rect): void;
     clientToFlowPosition(clientPosition: Point): Point;
     clientToFlowViewportPosition(clientPosition: Point): Point;
     flowToClientPosition(flowPosition: Point): Point;
+    get maxZoom(): number;
+    get minZoom(): number;
     moveViewport(x: number, y: number): void;
     moveViewportBy(dx: number, dy: number): void;
     scale: Signal<number>;

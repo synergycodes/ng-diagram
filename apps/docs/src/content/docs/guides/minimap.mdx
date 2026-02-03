@@ -1,0 +1,241 @@
+---
+version: 'since v1.0.0'
+title: Minimap
+description: How to use and customize the minimap component in ngDiagram
+sidebar:
+  label: Minimap
+  badge: New
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import Minimap from '../../../components/angular/minimap/minimap.astro';
+
+The [`<ng-diagram-minimap>`](/docs/api/components/ngdiagramminimapcomponent/) component provides a bird's-eye view of your diagram, showing all nodes and the current viewport position.
+It supports click-and-drag navigation to quickly pan to different areas of your diagram.
+
+:::note
+The minimap displays only nodes. Edges are not rendered in the minimap view.
+:::
+
+## Basic Usage
+
+Add the [`<ng-diagram-minimap>`](/docs/api/components/ngdiagramminimapcomponent/) component inside your diagram container:
+
+```html
+<div class="diagram-container">
+  <ng-diagram [model]="model" [config]="config">
+    <!-- other components -->
+  </ng-diagram>
+  <ng-diagram-minimap />
+</div>
+```
+
+:::note[Service Access]
+The minimap can be placed anywhere in your template, but it requires access to ngDiagram services.
+Make sure the component is within a context where [`provideNgDiagram()`](/docs/api/utilities/providengdiagram/) has been provided.
+:::
+
+:::note[Container Positioning]
+The minimap uses `position: absolute` for corner placement via the `position` input.
+Ensure the parent container has `position: relative` for proper positioning:
+
+```css
+.diagram-container {
+  position: relative;
+}
+```
+
+:::
+
+## Configuration
+
+### Position and Size
+
+The minimap can be positioned in any corner using the [`position`](/docs/api/components/ngdiagramminimapcomponent/#position) input and sized with [`width`](/docs/api/components/ngdiagramminimapcomponent/#width) and [`height`](/docs/api/components/ngdiagramminimapcomponent/#height):
+
+```html
+<ng-diagram-minimap position="bottom-right" [width]="200" [height]="150" />
+```
+
+See [`NgDiagramPanelPosition`](/docs/api/types/ngdiagrampanelposition/) for available position values.
+
+### Zoom Controls
+
+By default, zoom controls are displayed below the minimap. To hide them:
+
+```html
+<ng-diagram-minimap [showZoomControls]="false" />
+```
+
+## Customization via CSS Variables
+
+:::tip[Theming]
+Some CSS variables reference design tokens to support light/dark themes.
+For proper multi-theme customization, see the [Styling guide](/docs/intro/styling/) to understand how tokens and primitives work.
+:::
+
+### General Appearance
+
+You can customize the minimap container appearance using CSS variables:
+
+```css
+:root {
+  /* Container styling */
+  --ngd-minimap-background: ...;
+  --ngd-minimap-border-color: ...;
+  --ngd-minimap-border-radius: 1rem;
+  --ngd-minimap-padding: 0.5rem;
+  --ngd-minimap-margin: 1rem;
+  --ngd-minimap-shadow-color: ...;
+
+  /* Viewport indicator */
+  --ngd-minimap-viewport-stroke-color: ...;
+  --ngd-minimap-viewport-stroke-width: 1;
+}
+```
+
+### Node Styling
+
+Default node appearance in the minimap can be controlled via CSS variables:
+
+```css
+:root {
+  --ngd-minimap-node-color: ...;
+  --ngd-minimap-node-opacity: 0.8;
+}
+```
+
+### Zoom Controls
+
+The zoom controls appearance can be customized with these CSS variables:
+
+```css
+:root {
+  /* Zoom controls text */
+  --ngd-zoom-controls-font-size: 0.8125rem;
+  --ngd-zoom-controls-font-weight: 500;
+  --ngd-zoom-controls-color: ...;
+
+  /* Navigation buttons (zoom in/out) */
+  --ngd-nav-button-color: ...;
+  --ngd-nav-button-size: 1.25rem;
+  --ngd-nav-button-border-radius: 0.5rem;
+  --ngd-nav-button-padding: 0.6875rem;
+  --ngd-nav-button-background-color-hover: ...;
+  --ngd-nav-button-color-active: ...;
+  --ngd-nav-button-color-disabled: ...;
+}
+```
+
+## Customization via Style Function
+
+For dynamic node styling based on [`Node`](/docs/api/types/model/node/) properties, use the [`nodeStyle`](/docs/api/components/ngdiagramminimapcomponent/#nodestyle) input.
+This accepts a [`MinimapNodeStyleFn`](/docs/api/types/minimap/minimapnodestylefn/) callback:
+
+```typescript
+import { MinimapNodeStyle, Node } from 'ng-diagram';
+
+nodeStyle = (node: Node): MinimapNodeStyle => {
+  const style: MinimapNodeStyle = {};
+
+  // Different shape for specific nodes
+  if (node.type === 'database') {
+    style.shape = 'circle';
+  }
+
+  // Highlight selected nodes
+  if (node.selected) {
+    style.stroke = '#2196F3';
+    style.strokeWidth = 2;
+  }
+
+  // Custom fill based on node data
+  if (node.data?.status === 'error') {
+    style.fill = '#f44336';
+  }
+
+  return style;
+};
+```
+
+```html
+<ng-diagram-minimap [nodeStyle]="nodeStyle" />
+```
+
+See [`MinimapNodeStyle`](/docs/api/types/minimap/minimapnodestyle/) for all available style properties.
+
+## Customization via Templates
+
+For complete control over node rendering, you can provide custom Angular components per node type using [`minimapNodeTemplateMap`](/docs/api/components/ngdiagramminimapcomponent/#minimapnodetemplatemap).
+This is useful when you need to display icons, images, or complex visuals in the minimap.
+
+:::caution[Performance Consideration]
+Custom templates use `foreignObject` and Angular components, which can impact performance with large diagrams.
+Use templates sparingly and only for node types that truly require custom rendering.
+For simple styling changes, prefer the `nodeStyle` function or CSS variables.
+:::
+
+### Creating a Custom Template
+
+Your component must implement the [`NgDiagramMinimapNodeTemplate`](/docs/api/types/minimap/ngdiagramminimapnodetemplate/) interface:
+
+```typescript
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { MinimapNodeStyle, NgDiagramMinimapNodeTemplate, Node } from 'ng-diagram';
+
+@Component({
+  selector: 'app-image-minimap-node',
+  standalone: true,
+  template: `<img [src]="imageUrl" alt="" />`,
+  styles: [
+    `
+      :host {
+        display: contents;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ImageMinimapNodeComponent implements NgDiagramMinimapNodeTemplate {
+  node = input.required<Node>();
+  nodeStyle = input<MinimapNodeStyle>();
+
+  get imageUrl(): string {
+    const data = this.node().data as { imageUrl?: string };
+    return data?.imageUrl ?? 'placeholder.png';
+  }
+}
+```
+
+### Registering Templates
+
+Create a [`NgDiagramMinimapNodeTemplateMap`](/docs/api/types/minimap/ngdiagramminimapnodetemplatemap/) and pass it to the minimap:
+
+```typescript
+import { NgDiagramMinimapNodeTemplateMap } from 'ng-diagram';
+
+minimapNodeTemplateMap = new NgDiagramMinimapNodeTemplateMap([
+  ['image', ImageMinimapNodeComponent],
+  ['custom-type', CustomMinimapNodeComponent],
+]);
+```
+
+```html
+<ng-diagram-minimap [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
+```
+
+Nodes with types not in the map will use the default rectangle rendering.
+
+## Example
+
+<Minimap />
+<CodeViewer dirName="minimap" />
+
+---

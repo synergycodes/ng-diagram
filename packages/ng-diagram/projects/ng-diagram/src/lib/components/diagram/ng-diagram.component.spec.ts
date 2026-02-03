@@ -13,6 +13,7 @@ import {
 import { CursorPositionTrackerService } from '../../services/cursor-position-tracker/cursor-position-tracker.service';
 import { InputEventsRouterService } from '../../services/input-events/input-events-router.service';
 import { MarkerRegistryService } from '../../services/marker-registry/marker-registry.service';
+import { PanelRegistryService } from '../../services/panel-registry/panel-registry.service';
 import { TemplateProviderService } from '../../services/template-provider/template-provider.service';
 import { NgDiagramComponent } from './ng-diagram.component';
 
@@ -112,6 +113,7 @@ describe('AngularAdapterDiagramComponent', () => {
         CursorPositionTrackerService,
         InputEventsRouterService,
         MarkerRegistryService,
+        PanelRegistryService,
       ],
     }).compileComponents();
 

@@ -18,6 +18,7 @@
   >
     <ng-diagram-background type="grid"></ng-diagram-background>
   </ng-diagram>
+  <ng-diagram-minimap [nodeStyle]="nodeStyle" [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
   <app-toolbar (reinitializeModelClick)="onReinitializeModel()" />
   <app-palette [model]="paletteModel" />
 </div>

@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  position: absolute;
+  pointer-events: auto;
+  z-index: 10;
+
+  &.bottom-right {
+    bottom: var(--ngd-minimap-margin);
+    right: var(--ngd-minimap-margin);
+  }
+
+  &.bottom-left {
+    bottom: var(--ngd-minimap-margin);
+    left: var(--ngd-minimap-margin);
+  }
+
+  &.top-right {
+    top: var(--ngd-minimap-margin);
+    right: var(--ngd-minimap-margin);
+  }
+
+  &.top-left {
+    top: var(--ngd-minimap-margin);
+    left: var(--ngd-minimap-margin);
+  }
+}
+
+.minimap-svg {
+  display: block;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.minimap-background {
+  fill: transparent;
+}
+
+.minimap-viewport {
+  stroke: var(--ngd-minimap-viewport-stroke-color);
+  stroke-width: var(--ngd-minimap-viewport-stroke-width);
+  fill: transparent;
+  pointer-events: none;
+}
+
+.minimap-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
