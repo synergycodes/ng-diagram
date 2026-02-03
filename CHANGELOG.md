@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig/#nodedraggingenabled) config option to disable node dragging via mouse and keyboard ([#539](https://github.com/synergycodes/ng-diagram/pull/539) - thanks for raising this [@advayumare](https://github.com/advayumare) 💪)
+- [`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig/#nodedraggingenabled) config option and per-node [`draggable`](/docs/api/types/model/simplenode/#draggable) property to disable node dragging via mouse and keyboard ([#539](https://github.com/synergycodes/ng-diagram/pull/539) - thanks for raising this [@advayumare](https://github.com/advayumare) 💪)
 
 ### Fixed
 

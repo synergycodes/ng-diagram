@@ -153,7 +153,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {
-    if (!this.flowCoreProvider.provide().config.nodeDraggingEnabled || shouldDiscardEvent(event, 'drag')) {
+    const isDraggable =
+      this.flowCoreProvider.provide().config.nodeDraggingEnabled && (this.targetData()?.draggable ?? true);
+    if (!isDraggable || shouldDiscardEvent(event, 'drag')) {
       return false;
     }
 
