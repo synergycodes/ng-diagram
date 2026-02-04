@@ -564,4 +564,13 @@ export interface FlowConfig {
    * @default true
    */
   viewportPanningEnabled: boolean;
+
+  /**
+   * @since 1.0.0
+   *
+   * Enables or disables node dragging on the diagram.
+   * When set to false, users cannot move nodes via mouse dragging or keyboard arrow keys.
+   * @default true
+   */
+  nodeDraggingEnabled: boolean;
 }

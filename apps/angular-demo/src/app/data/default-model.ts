@@ -104,7 +104,13 @@ export const defaultModel: DiagramModel = {
       rotatable: true,
     },
     {
-      id: 'port-toggle-test',
+      id: '16',
+      position: { x: -200, y: 100 },
+      data: { label: 'not draggable' },
+      draggable: false,
+    },
+    {
+      id: '17',
       type: 'port-toggle',
       position: { x: 100, y: 850 },
       data: { text: 'Port Toggle Test' },

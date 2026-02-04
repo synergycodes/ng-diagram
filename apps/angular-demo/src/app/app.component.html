@@ -16,6 +16,7 @@
   >
     <ng-diagram-background type="grid"></ng-diagram-background>
   </ng-diagram>
+  <ng-diagram-minimap [nodeStyle]="nodeStyle" [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
   <app-toolbar
     (testVirtualizationClick)="enableVirtualizationTest()"
     (reinitializeModelClick)="onReinitializeModel()"

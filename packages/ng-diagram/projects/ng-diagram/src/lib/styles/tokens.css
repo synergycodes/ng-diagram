@@ -2,7 +2,12 @@
 
 /* DEFAULT LIGHT THEME */
 :root {
+  --ngd-shadow: var(--ngd-colors-gray-900-20);
   --ngd-txt-primary-default: var(--ngd-colors-gray-800);
+  --ngd-nav-button-primary-default: var(--ngd-colors-gray-600);
+  --ngd-nav-button-primary-pressed: var(--ngd-colors-acc1-600);
+  --ngd-nav-button-primary-hover: var(--ngd-colors-gray-900-5);
+  --ngd-nav-button-primary-disabled: var(--ngd-colors-gray-450);
   --ngd-diagram-background-color: var(--ngd-colors-gray-200);
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-100);
   --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-200);
@@ -24,11 +29,18 @@
   --ngd-background-line-minor-color: var(--ngd-colors-gray-450);
   --ngd-background-line-major-color: var(--ngd-colors-gray-500);
   --ngd-ui-border-color: var(--ngd-colors-gray-300);
+  --ngd-minimap-bg-primary-default: var(--ngd-colors-gray-100);
+  --ngd-minimap-stroke-primary-default: var(--ngd-colors-gray-400);
 }
 
 /* OPTIONAL DARK THEME */
 html[data-theme='dark'] {
+  --ngd-shadow: var(--ngd-colors-gray-900-50);
   --ngd-txt-primary-default: var(--ngd-colors-gray-100);
+  --ngd-nav-button-primary-default: var(--ngd-colors-gray-400);
+  --ngd-nav-button-primary-pressed: var(--ngd-colors-acc1-500);
+  --ngd-nav-button-primary-hover: var(--ngd-colors-gray-900-5);
+  --ngd-nav-button-primary-disabled: var(--ngd-colors-gray-600);
   --ngd-diagram-background-color: var(--ngd-colors-gray-800);
   --ngd-ui-bg-primary-default: var(--ngd-colors-gray-700);
   --ngd-ui-bg-tertiary-default: var(--ngd-colors-gray-800);
@@ -50,4 +62,6 @@ html[data-theme='dark'] {
   --ngd-background-line-minor-color: var(--ngd-colors-gray-700);
   --ngd-background-line-major-color: var(--ngd-colors-gray-600);
   --ngd-ui-border-color: var(--ngd-colors-gray-700);
+  --ngd-minimap-bg-primary-default: var(--ngd-colors-gray-700);
+  --ngd-minimap-stroke-primary-default: var(--ngd-colors-gray-600);
 }

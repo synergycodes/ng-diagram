@@ -1,0 +1,12 @@
+:host {
+  position: relative;
+  display: flex;
+}
+
+.diagram {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
+}

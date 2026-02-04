@@ -13,6 +13,7 @@ title: "ng-diagram"
 - [NgDiagramBaseNodeTemplateComponent](/docs/api/components/ngdiagrambasenodetemplatecomponent/)
 - [NgDiagramComponent](/docs/api/components/ngdiagramcomponent/)
 - [NgDiagramMarkerComponent](/docs/api/components/ngdiagrammarkercomponent/)
+- [NgDiagramMinimapComponent](/docs/api/components/ngdiagramminimapcomponent/)
 - [NgDiagramNodeResizeAdornmentComponent](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/)
 - [NgDiagramNodeRotateAdornmentComponent](/docs/api/components/ngdiagramnoderotateadornmentcomponent/)
 - [NgDiagramPaletteItemComponent](/docs/api/components/ngdiagrampaletteitemcomponent/)
@@ -22,6 +23,7 @@ title: "ng-diagram"
 ## Directives
 
 - [NgDiagramGroupHighlightedDirective](/docs/api/directives/ngdiagramgrouphighlighteddirective/)
+- [NgDiagramMinimapNavigationDirective](/docs/api/directives/ngdiagramminimapnavigationdirective/)
 - [NgDiagramNodeSelectedDirective](/docs/api/directives/ngdiagramnodeselecteddirective/)
 
 ## Internals
@@ -50,6 +52,10 @@ title: "ng-diagram"
 - [NgDiagramSelectionService](/docs/api/services/ngdiagramselectionservice/)
 - [NgDiagramService](/docs/api/services/ngdiagramservice/)
 - [NgDiagramViewportService](/docs/api/services/ngdiagramviewportservice/)
+
+## Types
+
+- [NgDiagramPanelPosition](/docs/api/types/ngdiagrampanelposition/)
 
 ## Types/Configuration
 
@@ -119,6 +125,14 @@ title: "ng-diagram"
 - [MiddlewareChain](/docs/api/types/middleware/middlewarechain/)
 - [ModelActionType](/docs/api/types/middleware/modelactiontype/)
 - [ModelActionTypes](/docs/api/types/middleware/modelactiontypes/)
+
+## Types/Minimap
+
+- [NgDiagramMinimapNodeTemplateMap](/docs/api/types/minimap/ngdiagramminimapnodetemplatemap/)
+- [MinimapNodeStyle](/docs/api/types/minimap/minimapnodestyle/)
+- [NgDiagramMinimapNodeTemplate](/docs/api/types/minimap/ngdiagramminimapnodetemplate/)
+- [MinimapNodeShape](/docs/api/types/minimap/minimapnodeshape/)
+- [MinimapNodeStyleFn](/docs/api/types/minimap/minimapnodestylefn/)
 
 ## Types/Model
 

@@ -11,6 +11,7 @@ export {
 } from './lib/components/edge-label/base-edge-label/base-edge-label.component';
 export { NgDiagramBaseEdgeComponent } from './lib/components/edge/base-edge/base-edge.component';
 export { NgDiagramMarkerComponent } from './lib/components/marker/ng-diagram-marker.component';
+export { NgDiagramMinimapComponent } from './lib/components/minimap/ng-diagram-minimap.component';
 export { NgDiagramBaseNodeTemplateComponent } from './lib/components/node/base-node-template/ng-diagram-base-node-template.component';
 export { NgDiagramNodeResizeAdornmentComponent } from './lib/components/node/resize/ng-diagram-node-resize-adornment.component';
 export { NgDiagramNodeRotateAdornmentComponent } from './lib/components/node/rotate/ng-diagram-node-rotate-adornment.component';
@@ -41,6 +42,7 @@ export { ViewportDirective } from './lib/directives/viewport/viewport.directive'
 export { ZIndexDirective } from './lib/directives/z-index/z-index.directive';
 
 // Public directives
+export { NgDiagramMinimapNavigationDirective } from './lib/components/minimap/ng-diagram-minimap-navigation.directive';
 export { NgDiagramGroupHighlightedDirective } from './lib/directives/group-highlighted/ng-diagram-group-highlighted.directive';
 export { NgDiagramNodeSelectedDirective } from './lib/directives/node-selected/ng-diagram-node-selected.directive';
 
@@ -55,6 +57,7 @@ export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
 export { configureShortcuts } from './core/src';
+export { NgDiagramMinimapNodeTemplateMap } from './lib/components/minimap/ng-diagram-minimap.types';
 export { initializeModel } from './lib/model/initialize-model';
 export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
@@ -62,11 +65,18 @@ export { NgDiagramNodeTemplateMap } from './lib/types/node-template-map';
 export { createMiddlewares } from './lib/utils/create-middlewares';
 
 // Types
+export type {
+  MinimapNodeShape,
+  MinimapNodeStyle,
+  MinimapNodeStyleFn,
+  NgDiagramMinimapNodeTemplate,
+} from './lib/components/minimap/ng-diagram-minimap.types';
 export type { NgDiagramConfig } from './lib/types/config';
 export type { NgDiagramEdgeTemplate } from './lib/types/edge-template-map';
 export type { PointerInputEvent } from './lib/types/event';
 export type { NgDiagramGroupNodeTemplate, NgDiagramNodeTemplate } from './lib/types/node-template-map';
 export type { BasePaletteItemData, GroupNodeData, NgDiagramPaletteItem, SimpleNodeData } from './lib/types/palette';
+export type { NgDiagramPanelPosition } from './lib/types/panel-position';
 export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
