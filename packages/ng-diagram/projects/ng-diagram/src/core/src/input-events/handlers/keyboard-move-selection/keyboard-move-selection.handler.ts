@@ -26,7 +26,7 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
   handle(event: KeyboardMoveSelectionEvent): void {
     const nodesToMove = this.flow.modelLookup
       .getSelectedNodesWithChildren({ directOnly: false })
-      .filter((node) => this.flow.config.nodeDraggingEnabled && (node.draggable ?? true));
+      .filter((node) => node.draggable ?? true);
     if (nodesToMove.length === 0) {
       return;
     }

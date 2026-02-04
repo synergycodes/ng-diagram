@@ -365,6 +365,67 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       });
     });
 
+    describe('draggable filtering', () => {
+      it('should not move node with draggable set to false', () => {
+        const nonDraggableNode = { ...mockNode, draggable: false };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          nonDraggableNode,
+        ]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      });
+
+      it('should move node without draggable property (defaults to true)', () => {
+        // mockNode has no draggable property set
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [mockNode],
+          delta: { x: 10, y: 0 },
+        });
+      });
+
+      it('should only move draggable nodes in mixed selection', () => {
+        const draggableNode = { ...mockNode, id: 'draggable', draggable: true };
+        const nonDraggableNode = { ...mockNode, id: 'nonDraggable', draggable: false };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          draggableNode,
+          nonDraggableNode,
+        ]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [draggableNode],
+          delta: { x: 10, y: 0 },
+        });
+      });
+
+      it('should filter out non-draggable child in a group', () => {
+        const parentNode = { ...mockNode, id: 'parent', draggable: true };
+        const draggableChild = { ...mockNode, id: 'child1', groupId: 'parent', draggable: true };
+        const nonDraggableChild = { ...mockNode, id: 'child2', groupId: 'parent', draggable: false };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          parentNode,
+          draggableChild,
+          nonDraggableChild,
+        ]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [parentNode, draggableChild],
+          delta: { x: 10, y: 0 },
+        });
+      });
+    });
+
     describe('root nodes and groups', () => {
       it('should not emit command if no nodes are selected', () => {
         (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
