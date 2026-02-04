@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig/#nodedraggingenabled) config option and per-node [`draggable`](/docs/api/types/model/simplenode/#draggable) property to disable node dragging via mouse and keyboard ([#539](https://github.com/synergycodes/ng-diagram/pull/539) - thanks for raising this [@advayumare](https://github.com/advayumare) 💪)
+
 ### Fixed
 
 - Fixed model reinitialization issues: viewport dimensions being undefined (causing `zoomToFit` and linking failures) and missing `_internalId` for nodes (causing Angular tracking issues) ([#523](https://github.com/synergycodes/ng-diagram/pull/523))

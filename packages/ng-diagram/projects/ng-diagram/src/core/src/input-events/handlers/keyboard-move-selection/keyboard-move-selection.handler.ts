@@ -24,7 +24,9 @@ const DIRECTION_VECTORS: Record<Direction, Point> = {
 
 export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMoveSelectionEvent> {
   handle(event: KeyboardMoveSelectionEvent): void {
-    const nodesToMove = this.flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
+    const nodesToMove = this.flow.modelLookup
+      .getSelectedNodesWithChildren({ directOnly: false })
+      .filter((node) => node.draggable ?? true);
     if (nodesToMove.length === 0) {
       return;
     }

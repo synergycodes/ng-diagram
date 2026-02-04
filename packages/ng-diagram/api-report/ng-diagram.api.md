@@ -296,6 +296,7 @@ export interface FlowConfig {
     grouping: GroupingConfig;
     hideWatermark?: boolean;
     linking: LinkingConfig;
+    nodeDraggingEnabled: boolean;
     nodeRotation: NodeRotationConfig;
     resize: ResizeConfig;
     selectionMoving: SelectionMovingConfig;
@@ -1419,6 +1420,7 @@ export interface SimpleNode<T extends DataObject = DataObject> {
     // (undocumented)
     readonly computedZIndex?: number;
     data: T;
+    draggable?: boolean;
     groupId?: Node_2<T>['id'];
     id: string;
     // (undocumented)

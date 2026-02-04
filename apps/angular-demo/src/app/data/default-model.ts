@@ -103,6 +103,12 @@ export const defaultModel: DiagramModel = {
       isGroup: true,
       rotatable: true,
     },
+    {
+      id: '16',
+      position: { x: -200, y: 100 },
+      data: { label: 'not draggable' },
+      draggable: false,
+    },
   ],
   edges: [
     {
