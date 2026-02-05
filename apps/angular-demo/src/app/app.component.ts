@@ -19,18 +19,18 @@ import {
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
-  SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
-  ViewportChangedEvent,
   type Edge,
   type EdgeLabel,
   type Node,
   type Port,
 } from 'ng-diagram';
 import { defaultModel } from './data/default-model';
+import { generateModel } from './data/generate-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
+import { virtualizationConfigOverrides, virtualizationTestConfig } from './data/virtualization-test.config';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
@@ -67,7 +67,7 @@ export class AppComponent {
 
   minimapNodeTemplateMap = new NgDiagramMinimapNodeTemplateMap([['image', ImageMinimapNodeComponent]]);
 
-  config = {
+  config: NgDiagramConfig = {
     zoom: {
       max: 2,
       zoomToFit: {
@@ -102,7 +102,17 @@ export class AppComponent {
         bindings: [{ key: 'd' }, { key: 'ArrowRight' }],
       },
     ]),
-  } satisfies NgDiagramConfig;
+  };
+
+  model = initializeModel(defaultModel);
+
+  enableVirtualizationTest(): void {
+    this.config = {
+      ...this.config,
+      ...virtualizationConfigOverrides,
+    };
+    this.model = initializeModel(generateModel(virtualizationTestConfig.nodeCount), this.injector);
+  }
 
   onDiagramInit(event: DiagramInitEvent): void {
     console.log('INIT');
@@ -130,19 +140,6 @@ export class AppComponent {
       edges: event.selectedEdges.map((e: Edge) => e.id),
       previousNodes: event.previousNodes.map((n: Node) => n.id),
       previousEdges: event.previousEdges.map((e: Edge) => e.id),
-    });
-  }
-
-  onSelectionMoved(event: SelectionMovedEvent): void {
-    console.log('Selection Moved:', {
-      nodes: event.nodes.map((n: Node) => n.id),
-    });
-  }
-
-  onViewportChanged(event: ViewportChangedEvent): void {
-    console.log('Viewport Changed:', {
-      current: event.viewport,
-      previous: event.previousViewport,
     });
   }
 
@@ -213,10 +210,14 @@ export class AppComponent {
   }
 
   onReinitializeModel(): void {
+    this.config = {
+      ...this.config,
+      virtualization: {
+        enabled: false,
+      },
+    };
     this.model = initializeModel(defaultModel, this.injector);
   }
-
-  model = initializeModel(defaultModel);
 
   nodeStyle(node: Node): MinimapNodeStyle {
     const style: MinimapNodeStyle = {};

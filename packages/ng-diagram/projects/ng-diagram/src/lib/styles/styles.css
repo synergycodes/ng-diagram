@@ -75,6 +75,9 @@
   --ngd-minimap-node-color: var(--ngd-colors-gray-400);
   --ngd-minimap-node-opacity: 0.8;
 
+  --ngd-minimap-diagram-bounds-opacity: 0.3;
+  --ngd-minimap-diagram-bounds-color: var(--ngd-colors-gray-400);
+
   --ngd-minimap-viewport-stroke-color: var(--ngd-colors-gray-400);
   --ngd-minimap-viewport-stroke-width: 1;
 

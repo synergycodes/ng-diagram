@@ -9,21 +9,28 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { NgDiagramModelService } from '../../public-services/ng-diagram-model.service';
+import { FlowCoreProviderService } from '../../services';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { NgDiagramPanelPosition } from '../../types/panel-position';
 import { NgDiagramPanelComponent } from '../panel/ng-diagram-panel.component';
 import { NgDiagramZoomControlsComponent } from '../zoom-controls/ng-diagram-zoom-controls.component';
 import { NgDiagramDefaultMinimapNodeComponent } from './default-node/ng-diagram-default-minimap-node.component';
+import { NgDiagramMinimapDiagramBoundsComponent } from './diagram-bounds/ng-diagram-minimap-diagram-bounds.component';
 import { NgDiagramMinimapNavigationDirective } from './ng-diagram-minimap-navigation.directive';
 import {
   calculateMinimapTransform,
   combineDiagramAndViewportBounds,
   convertViewportToDiagramBounds,
-  extractNodeBounds,
   transformViewportToMinimapSpace,
 } from './ng-diagram-minimap.calculations';
-import { MinimapNodeData, MinimapNodeStyleFn, NgDiagramMinimapNodeTemplateMap } from './ng-diagram-minimap.types';
+import {
+  MinimapNodeData,
+  MinimapNodeStyleFn,
+  MinimapStrategy,
+  NgDiagramMinimapNodeTemplateMap,
+} from './ng-diagram-minimap.types';
+import { DirectMinimapStrategy } from './strategy/direct-minimap-strategy';
+import { VirtualizedMinimapStrategy } from './strategy/virtualized-minimap-strategy';
 
 /**
  * A minimap component that displays a bird's-eye view of the diagram.
@@ -46,18 +53,14 @@ import { MinimapNodeData, MinimapNodeStyleFn, NgDiagramMinimapNodeTemplateMap } 
     NgDiagramMinimapNavigationDirective,
     CommonModule,
     NgDiagramDefaultMinimapNodeComponent,
-    NgDiagramZoomControlsComponent,
-    NgDiagramPanelComponent,
-
-    NgDiagramMinimapNavigationDirective,
-    CommonModule,
-    NgDiagramDefaultMinimapNodeComponent,
+    NgDiagramMinimapDiagramBoundsComponent,
     NgDiagramZoomControlsComponent,
     NgDiagramPanelComponent,
   ],
   templateUrl: './ng-diagram-minimap.component.html',
   styleUrls: ['./ng-diagram-minimap.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [DirectMinimapStrategy, VirtualizedMinimapStrategy],
   host: {
     '[class]': 'position()',
   },
@@ -65,9 +68,11 @@ import { MinimapNodeData, MinimapNodeStyleFn, NgDiagramMinimapNodeTemplateMap } 
 export class NgDiagramMinimapComponent implements AfterViewInit {
   private readonly VIEWPORT_STROKE_WIDTH_CSS_VAR = '--ngd-minimap-viewport-stroke-width';
 
-  private readonly modelService = inject(NgDiagramModelService);
   private readonly renderer = inject(RendererService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly elementRef = inject(ElementRef);
+  private readonly directStrategy = inject(DirectMinimapStrategy);
+  private readonly virtualizedStrategy = inject(VirtualizedMinimapStrategy);
 
   /** Cached stroke padding to avoid layout thrashing from repeated getComputedStyle calls. */
   private strokePadding = signal<number>(1);
@@ -122,7 +127,6 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
   }
 
   isDiagramInitialized = this.renderer.isInitialized;
-  nodes = this.renderer.nodes;
   viewport = this.renderer.viewport;
 
   hasValidViewport = computed(() => {
@@ -131,6 +135,22 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
   });
 
   viewportRect = computed(() => transformViewportToMinimapSpace(this.viewport(), this.transform()));
+
+  /**
+   * @internal
+   * Active minimap strategy based on virtualization mode.
+   * Delegates mode-specific logic (node rendering, bounds) to the strategy.
+   *
+   * Note: isVirtualizationActive is a plain getter (not a signal).
+   * This works because switching virtualization mode requires model recreation,
+   * which triggers a full diagram re-init cycle (isInitialized: true → false → true).
+   */
+  private strategy = computed((): MinimapStrategy => {
+    if (!this.isDiagramInitialized()) {
+      return this.directStrategy;
+    }
+    return this.flowCoreProvider.provide().isVirtualizationActive ? this.virtualizedStrategy : this.directStrategy;
+  });
 
   /**
    * @internal
@@ -157,23 +177,20 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
    * The SVG group transform handles the coordinate conversion, so nodes only recalculate
    * when diagram content changes, NOT during pan/zoom.
    */
-  protected minimapNodes = computed((): MinimapNodeData[] => {
-    const nodes = this.nodes();
-    const styleFn = this.nodeStyle();
-    const templateMap = this.minimapNodeTemplateMap();
+  protected minimapNodes = computed((): MinimapNodeData[] =>
+    this.strategy().computeMinimapNodes(this.nodeStyle(), this.minimapNodeTemplateMap())
+  );
 
-    return nodes.map((node) => ({
-      bounds: extractNodeBounds(node),
-      diagramNode: node,
-      nodeStyle: styleFn?.(node) ?? {},
-      template: node.type ? (templateMap.get(node.type) ?? null) : null,
-    }));
-  });
+  /**
+   * @internal
+   * Whether the diagram bounds outline should be shown on the minimap.
+   * Diagram bounds are shown in virtualized mode to indicate the full diagram extent.
+   */
+  protected showDiagramBounds = computed(
+    () => this.isDiagramInitialized() && this.flowCoreProvider.provide().isVirtualizationActive
+  );
 
-  private diagramBounds = computed(() => {
-    const nodes = this.nodes();
-    return this.modelService.computePartsBounds(nodes, []);
-  });
+  protected diagramBounds = computed(() => this.strategy().computeDiagramBounds());
 
   private viewportBoundsInDiagramSpace = computed(() => convertViewportToDiagramBounds(this.viewport()));
 

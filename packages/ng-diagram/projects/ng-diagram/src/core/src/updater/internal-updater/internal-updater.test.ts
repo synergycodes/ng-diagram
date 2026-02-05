@@ -38,6 +38,7 @@ describe('InternalUpdater', () => {
       portBatchProcessor,
       labelBatchProcessor,
       actionStateManager,
+      config: { virtualization: { enabled: false } },
     } as unknown as FlowCore;
     internalUpdater = new InternalUpdater(flowCore);
   });

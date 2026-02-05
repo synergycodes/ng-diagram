@@ -278,24 +278,34 @@ describe('InitState', () => {
   });
 
   describe('allEntitiesHaveMeasurements', () => {
-    it('should return true when all nodes are measured', () => {
+    it('should return true when all tracked nodes are measured', () => {
+      // Track nodes via collectAlreadyMeasuredItems
+      const node1 = createMockNode('node1', false);
+      const node2 = createMockNode('node2', false);
+      initState.collectAlreadyMeasuredItems([node1, node2], []);
+
       initState.trackNodeMeasurement('node1', createValidSize());
       initState.trackNodeMeasurement('node2', createValidSize());
 
-      expect(initState.allEntitiesHaveMeasurements(2)).toBe(true);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(true);
     });
 
-    it('should return false when not all nodes are measured', () => {
+    it('should return false when not all tracked nodes are measured', () => {
+      // Track 2 nodes but only measure 1
+      const node1 = createMockNode('node1', false);
+      const node2 = createMockNode('node2', false);
+      initState.collectAlreadyMeasuredItems([node1, node2], []);
+
       initState.trackNodeMeasurement('node1', createValidSize());
 
-      expect(initState.allEntitiesHaveMeasurements(2)).toBe(false);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(false);
     });
 
     it('should return true when all ports are measured', () => {
       initState.addPort('node1', createMockPort('port1', 'node1'));
       initState.trackPortMeasurement('node1', 'port1', createValidSize(), createValidPosition());
 
-      expect(initState.allEntitiesHaveMeasurements(0)).toBe(true);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(true);
     });
 
     it('should return false when not all ports are measured', () => {
@@ -303,14 +313,14 @@ describe('InitState', () => {
       initState.addPort('node1', createMockPort('port2', 'node1'));
       initState.trackPortMeasurement('node1', 'port1', createValidSize(), createValidPosition());
 
-      expect(initState.allEntitiesHaveMeasurements(0)).toBe(false);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(false);
     });
 
     it('should return true when all labels are measured', () => {
       initState.addLabel('edge1', createMockEdgeLabel('label1'));
       initState.trackLabelMeasurement('edge1', 'label1', createValidSize());
 
-      expect(initState.allEntitiesHaveMeasurements(0)).toBe(true);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(true);
     });
 
     it('should return false when not all labels are measured', () => {
@@ -318,24 +328,42 @@ describe('InitState', () => {
       initState.addLabel('edge1', createMockEdgeLabel('label2'));
       initState.trackLabelMeasurement('edge1', 'label1', createValidSize());
 
-      expect(initState.allEntitiesHaveMeasurements(0)).toBe(false);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(false);
     });
 
     it('should return true when all entities (nodes, ports, labels) are measured', () => {
+      const node1 = createMockNode('node1', false);
+      initState.collectAlreadyMeasuredItems([node1], []);
+
       initState.trackNodeMeasurement('node1', createValidSize());
       initState.addPort('node1', createMockPort('port1', 'node1'));
       initState.trackPortMeasurement('node1', 'port1', createValidSize(), createValidPosition());
       initState.addLabel('edge1', createMockEdgeLabel('label1'));
       initState.trackLabelMeasurement('edge1', 'label1', createValidSize());
 
-      expect(initState.allEntitiesHaveMeasurements(1)).toBe(true);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(true);
     });
 
     it('should return false when any entity is not measured', () => {
+      const node1 = createMockNode('node1', false);
+      initState.collectAlreadyMeasuredItems([node1], []);
+
       initState.trackNodeMeasurement('node1', createValidSize());
       initState.addPort('node1', createMockPort('port1', 'node1'));
 
-      expect(initState.allEntitiesHaveMeasurements(1)).toBe(false);
+      expect(initState.allEntitiesHaveMeasurements()).toBe(false);
+    });
+
+    it('should ignore measurements for nodes not in nodesToMeasure', () => {
+      // Only track node1, but measure both node1 and node2
+      const node1 = createMockNode('node1', false);
+      initState.collectAlreadyMeasuredItems([node1], []);
+
+      initState.trackNodeMeasurement('node1', createValidSize());
+      initState.trackNodeMeasurement('node2', createValidSize()); // Not tracked
+
+      // Should still pass because node1 (the only tracked node) is measured
+      expect(initState.allEntitiesHaveMeasurements()).toBe(true);
     });
   });
 

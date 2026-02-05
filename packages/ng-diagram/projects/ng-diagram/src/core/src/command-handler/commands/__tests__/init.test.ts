@@ -4,7 +4,7 @@ import { FlowCore } from '../../../flow-core';
 import { mockMetadata } from '../../../test-utils';
 import { FlowState } from '../../../types';
 import { CommandHandler } from '../../command-handler';
-import { init } from '../init';
+import { init, InitCommand } from '../init';
 
 describe('init command', () => {
   let flowCore: FlowCore;
@@ -21,9 +21,27 @@ describe('init command', () => {
     commandHandler = new CommandHandler(flowCore);
   });
 
-  it('should execute init command on middlewares', () => {
-    init(commandHandler);
+  it('should execute init command on middlewares', async () => {
+    const command: InitCommand = { name: 'init' };
+    await init(commandHandler, command);
 
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith({}, 'init');
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { renderedNodeIds: undefined, renderedEdgeIds: undefined },
+      'init'
+    );
+  });
+
+  it('should pass rendered IDs when provided', async () => {
+    const command: InitCommand = {
+      name: 'init',
+      renderedNodeIds: ['node1', 'node2'],
+      renderedEdgeIds: ['edge1'],
+    };
+    await init(commandHandler, command);
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { renderedNodeIds: ['node1', 'node2'], renderedEdgeIds: ['edge1'] },
+      'init'
+    );
   });
 });

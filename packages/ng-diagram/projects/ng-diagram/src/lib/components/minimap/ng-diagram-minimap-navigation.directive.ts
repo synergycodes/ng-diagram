@@ -1,6 +1,7 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Viewport } from '../../../core/src';
 import { NgDiagramViewportService } from '../../public-services/ng-diagram-viewport.service';
+import { FlowCoreProviderService } from '../../services';
 import { MinimapTransform } from './ng-diagram-minimap.types';
 
 interface Point {
@@ -34,6 +35,7 @@ interface DragState {
 })
 export class NgDiagramMinimapNavigationDirective implements OnDestroy {
   private readonly viewportService = inject(NgDiagramViewportService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   transform = input.required<MinimapTransform>();
   viewport = input.required<Viewport>();
@@ -58,6 +60,7 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     this.capturePointer(event);
     this.dragState.isDragging = true;
     this.dragState.lastPosition = { x: event.clientX, y: event.clientY };
+    this.setPanningState(true);
     this.attachDocumentListeners();
   }
 
@@ -75,6 +78,7 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
 
   private onPointerUp = (event: PointerEvent): void => {
     this.dragState.isDragging = false;
+    this.setPanningState(false);
     this.releasePointer(event);
     this.removeDocumentListeners();
   };
@@ -107,6 +111,15 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     document.removeEventListener('pointercancel', this.onPointerUp);
+  }
+
+  private setPanningState(active: boolean): void {
+    const actionStateManager = this.flowCoreProvider.provide().actionStateManager;
+    if (active) {
+      actionStateManager.panning = { active: true };
+    } else {
+      actionStateManager.clearPanning();
+    }
   }
 
   private calculateClientDelta(event: PointerEvent): Point {

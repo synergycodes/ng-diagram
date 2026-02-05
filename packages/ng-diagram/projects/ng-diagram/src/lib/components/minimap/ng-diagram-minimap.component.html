@@ -29,6 +29,13 @@
           }
         }
       </g>
+      @if (showDiagramBounds()) {
+        <svg:rect
+          ng-diagram-minimap-diagram-bounds
+          [diagramBounds]="diagramBounds()"
+          [minimapTransform]="transform()"
+        />
+      }
       @if (hasValidViewport()) {
         <rect
           class="minimap-viewport"

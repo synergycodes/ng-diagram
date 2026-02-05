@@ -158,6 +158,7 @@ export type {
   TransactionResult,
   Viewport,
   ViewportChangedEvent,
+  VirtualizationConfig,
   ZIndexConfig,
   ZoomConfig,
 } from './core/src';

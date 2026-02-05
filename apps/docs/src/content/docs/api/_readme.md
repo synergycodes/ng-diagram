@@ -73,6 +73,7 @@ title: "ng-diagram"
 - [ResizeConfig](/docs/api/types/configuration/features/resizeconfig/)
 - [SelectionMovingConfig](/docs/api/types/configuration/features/selectionmovingconfig/)
 - [SnappingConfig](/docs/api/types/configuration/features/snappingconfig/)
+- [VirtualizationConfig](/docs/api/types/configuration/features/virtualizationconfig/)
 - [ZIndexConfig](/docs/api/types/configuration/features/zindexconfig/)
 - [ZoomConfig](/docs/api/types/configuration/features/zoomconfig/)
 
