@@ -1,4 +1,4 @@
-import { Node, Rect, unionRect } from '../../../core/src';
+import { Node, Rect, unionRect, getRotatedBoundingRect } from '../../../core/src';
 import { MinimapBounds, MinimapTransform, MinimapViewportRect } from './ng-diagram-minimap.types';
 
 /**
@@ -116,6 +116,34 @@ export const extractNodeBounds = (
     angle,
     transform: `rotate(${angle} ${centerX} ${centerY})`,
   };
+};
+
+/**
+ * Calculates bounding rectangle from node positions and sizes.
+ * Works without measuredBounds - suitable for virtualized mode
+ * where non-rendered nodes have no measurement data.
+ * Accounts for node rotation by using axis-aligned bounding boxes.
+ */
+export const calculateBoundsFromPositions = (
+  nodes: Node[],
+  defaultSize: { width: number; height: number } = DEFAULT_NODE_SIZE
+): Rect => {
+  if (nodes.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+
+  const rects = nodes.map((node) => {
+    const size = node.size ?? defaultSize;
+    const baseRect: Rect = {
+      x: node.position.x,
+      y: node.position.y,
+      width: size.width,
+      height: size.height,
+    };
+    return getRotatedBoundingRect(baseRect, node.angle ?? 0);
+  });
+
+  return unionRect(rects);
 };
 
 /**

@@ -1,5 +1,5 @@
 import { InputSignal, Type } from '@angular/core';
-import { Node } from '../../../core/src';
+import { Node, Rect } from '../../../core/src';
 
 /**
  * Represents the calculated transform data for minimap rendering.
@@ -155,3 +155,24 @@ export interface NgDiagramMinimapNodeTemplate {
  * ```
  */
 export class NgDiagramMinimapNodeTemplateMap extends Map<string, Type<NgDiagramMinimapNodeTemplate>> {}
+
+/**
+ * Strategy interface for minimap rendering behavior.
+ * Different implementations handle direct vs. virtualized rendering modes.
+ *
+ * @internal
+ */
+export interface MinimapStrategy {
+  /**
+   * Returns the minimap node data to render.
+   */
+  computeMinimapNodes(
+    styleFn: MinimapNodeStyleFn | undefined,
+    templateMap: NgDiagramMinimapNodeTemplateMap
+  ): MinimapNodeData[];
+
+  /**
+   * Computes the bounding rectangle of the entire diagram.
+   */
+  computeDiagramBounds(): Rect;
+}

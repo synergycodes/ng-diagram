@@ -47,6 +47,11 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.flowCore.model.onChange(this.modelListener);
+        this.modelListener({
+          nodes: this.flowCore.model.getNodes(),
+          edges: this.flowCore.model.getEdges(),
+          metadata: this.flowCore.model.getMetadata(),
+        });
       }
     });
   }
