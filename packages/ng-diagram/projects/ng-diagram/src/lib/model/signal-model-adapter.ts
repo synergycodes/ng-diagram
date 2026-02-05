@@ -91,7 +91,9 @@ export class SignalModelAdapter implements ModelAdapter {
     return JSON.stringify({
       /* eslint-disable @typescript-eslint/no-unused-vars */
       nodes: this.nodes().map(({ selected, measuredPorts, measuredBounds, computedZIndex, ...rest }) => rest),
-      edges: this.edges().map(({ points, sourcePosition, targetPosition, ...rest }) => rest),
+      edges: this.edges().map(
+        ({ points, sourcePosition, targetPosition, measuredLabels, computedZIndex, ...rest }) => rest
+      ),
       metadata,
       /* eslint-enable @typescript-eslint/no-unused-vars */
     });
