@@ -140,6 +140,10 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
    * @internal
    * Active minimap strategy based on virtualization mode.
    * Delegates mode-specific logic (node rendering, bounds) to the strategy.
+   *
+   * Note: isVirtualizationActive is a plain getter (not a signal).
+   * This works because switching virtualization mode requires model recreation,
+   * which triggers a full diagram re-init cycle (isInitialized: true → false → true).
    */
   private strategy = computed((): MinimapStrategy => {
     if (!this.isDiagramInitialized()) {

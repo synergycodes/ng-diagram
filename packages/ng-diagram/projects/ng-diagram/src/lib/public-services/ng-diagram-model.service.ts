@@ -1,4 +1,4 @@
-import { effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { effect, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { Edge, GroupNode, Metadata, Node, Point, Port, Rect } from '../../core/src';
 import { calculatePartsBounds } from '../../core/src/utils/dimensions';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
@@ -47,11 +47,13 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     effect(() => {
       if (this.diagramService.isInitialized()) {
         this.flowCore.model.onChange(this.modelListener);
-        this.modelListener({
-          nodes: this.flowCore.model.getNodes(),
-          edges: this.flowCore.model.getEdges(),
-          metadata: this.flowCore.model.getMetadata(),
-        });
+        untracked(() =>
+          this.modelListener({
+            nodes: this.flowCore.model.getNodes(),
+            edges: this.flowCore.model.getEdges(),
+            metadata: this.flowCore.model.getMetadata(),
+          })
+        );
       }
     });
   }
