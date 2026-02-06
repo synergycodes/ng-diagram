@@ -35,3 +35,6 @@ yarn-error.log*
 *.pem
 
 __tmp__*
+
+# Kiro
+.kiro
