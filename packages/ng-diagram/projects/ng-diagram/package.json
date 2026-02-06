@@ -1,6 +1,6 @@
 {
   "name": "ng-diagram",
-  "version": "0.9.1",
+  "version": "1.0.0",
   "description": "A robust Angular library for building interactive diagrams, node-based editors, and visual programming interfaces",
   "keywords": [
     "angular",
