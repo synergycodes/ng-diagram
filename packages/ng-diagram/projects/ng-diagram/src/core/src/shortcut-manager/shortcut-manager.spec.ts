@@ -412,7 +412,7 @@ describe('ShortcutManager', () => {
       expect(matches).toEqual([]);
     });
 
-    it('should handle case-sensitive key matching', () => {
+    it('should handle case-insensitive key matching for single letters (CapsLock support)', () => {
       mockFlowCore.config.shortcuts = [
         {
           actionName: 'keyboardPanLeft',
@@ -443,8 +443,83 @@ describe('ShortcutManager', () => {
       const matchesLower = shortcutManager.match(inputLower);
       const matchesUpper = shortcutManager.match(inputUpper);
 
+      // Both should match - shortcuts work regardless of CapsLock state
       expect(matchesLower.length).toBe(1);
-      expect(matchesUpper.length).toBe(0);
+      expect(matchesUpper.length).toBe(1);
+      expect(matchesUpper[0].actionName).toBe('keyboardPanLeft');
+    });
+
+    it('should match Ctrl+C with CapsLock on (uppercase C)', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'copy',
+          bindings: [{ key: 'c', modifiers: { primary: true } }],
+        },
+      ];
+
+      // CapsLock ON: event.key returns 'C' instead of 'c'
+      const input: NormalizedKeyboardInput = {
+        key: 'C',
+        modifiers: {
+          primary: true,
+          secondary: false,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches.length).toBe(1);
+      expect(matches[0].actionName).toBe('copy');
+    });
+
+    it('should match shortcuts with uppercase binding when lowercase is pressed', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'paste',
+          bindings: [{ key: 'V', modifiers: { primary: true } }],
+        },
+      ];
+
+      // User presses lowercase 'v' (CapsLock OFF)
+      const input: NormalizedKeyboardInput = {
+        key: 'v',
+        modifiers: {
+          primary: true,
+          secondary: false,
+          shift: false,
+          meta: false,
+        },
+      };
+
+      const matches = shortcutManager.match(input);
+
+      expect(matches.length).toBe(1);
+      expect(matches[0].actionName).toBe('paste');
+    });
+
+    it('should still match special keys exactly (not case-insensitive)', () => {
+      mockFlowCore.config.shortcuts = [
+        {
+          actionName: 'deleteSelection',
+          bindings: [{ key: 'Delete' }],
+        },
+      ];
+
+      // Exact match should work
+      const inputExact: NormalizedKeyboardInput = {
+        key: 'Delete',
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+      };
+      expect(shortcutManager.match(inputExact).length).toBe(1);
+
+      // Wrong case should NOT match for special keys
+      const inputWrongCase: NormalizedKeyboardInput = {
+        key: 'delete',
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+      };
+      expect(shortcutManager.match(inputWrongCase).length).toBe(0);
     });
 
     it('should return the same shortcut only once even if it matches', () => {

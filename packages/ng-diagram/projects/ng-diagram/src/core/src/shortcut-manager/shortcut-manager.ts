@@ -139,11 +139,11 @@ export class ShortcutManager {
    * Check if a normalized keyboard input matches a shortcut binding
    *
    * Compares:
-   * - Key values (if specified in binding)
+   * - Key values (if specified in binding) - case-insensitive for single letters
    * - Modifier states
    *
    * Matching rules:
-   * - If binding has a key: input must have the same key
+   * - If binding has a key: input must have the same key (case-insensitive for letters)
    * - If binding has no key (modifier-only): input must also have no key
    *   (modifier-only shortcuts are for pointer events, not keyboard events)
    *
@@ -152,8 +152,8 @@ export class ShortcutManager {
    * @returns true if the input matches the binding
    */
   private matchBinding(input: NormalizedKeyboardInput, binding: ShortcutBinding): boolean {
-    // If binding specifies a key, input must match that key
-    if (binding.key !== undefined && input.key !== binding.key) {
+    // If binding specifies a key, input must match that key (case-insensitive for single letters)
+    if (binding.key !== undefined && !this.keysMatch(input.key, binding.key)) {
       return false;
     }
 
@@ -205,5 +205,27 @@ export class ShortcutManager {
     }
 
     return true;
+  }
+
+  /**
+   * Check if two keys match, using case-insensitive comparison for single letters
+   *
+   * This ensures shortcuts work regardless of CapsLock state.
+   * Special keys like "Delete", "ArrowUp", etc. are compared as-is.
+   *
+   * @param inputKey - The key from the keyboard input
+   * @param bindingKey - The key defined in the shortcut binding
+   * @returns true if the keys match
+   */
+  private keysMatch(inputKey: string | undefined, bindingKey: string): boolean {
+    if (inputKey === undefined) {
+      return false;
+    }
+
+    if (inputKey.length === 1 && bindingKey.length === 1) {
+      return inputKey.toLowerCase() === bindingKey.toLowerCase();
+    }
+
+    return inputKey === bindingKey;
   }
 }
