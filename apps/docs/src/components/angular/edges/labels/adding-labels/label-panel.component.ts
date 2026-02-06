@@ -10,10 +10,10 @@ import { NgDiagramModelService } from 'ng-diagram';
     <!-- @mark-start -->
     @if (isEdgeSelected()) {
       <input [(ngModel)]="label" />
+      <button (click)="onSetLabel()">Set Label</button>
     } @else {
       Select an edge
     }
-    <button (click)="onSetLabel()">Set Label</button>
     <!-- @mark-end -->
   `,
   // @collapse-start
@@ -35,6 +35,10 @@ import { NgDiagramModelService } from 'ng-diagram';
 
       input {
         width: calc(100% - 2rem);
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: var(--ngd-node-bg-primary-default);
+        border: 1px solid var(--ngd-node-stroke-primary-default);
       }
     }
   `,
@@ -47,7 +51,7 @@ export class LabelPanel {
 
   selectedEdge = computed(() => this.edges().find((edge) => edge.selected));
   isEdgeSelected = computed(() => !!this.selectedEdge());
-  label = '';
+  label = 'Text';
 
   // @collapse-end
   // @mark-start
