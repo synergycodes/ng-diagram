@@ -71,7 +71,6 @@ export class DiagramComponent {
         position: { x: 80, y: 100 },
         type: 'customNodeType',
         autoSize: false,
-        size: { width: 300, height: 250 },
         data: {
           name: 'Node 1',
           description: 'This is Tailwind Node 1',
