@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed keyboard shortcuts not working when CapsLock is enabled. Letter key shortcuts (e.g., Ctrl+C, Ctrl+V, Ctrl+A) now match case-insensitively
+- Fixed keyboard shortcuts not working when CapsLock is enabled. Letter key shortcuts (e.g., Ctrl+C, Ctrl+V, Ctrl+A) now match case-insensitively ([#546](https://github.com/synergycodes/ng-diagram/pull/546))
 - Fixed model reinitialization issues: viewport dimensions being undefined (causing `zoomToFit` and linking failures) and missing `_internalId` for nodes (causing Angular tracking issues) ([#523](https://github.com/synergycodes/ng-diagram/pull/523))
 - `toJSON()` now strips readonly computed fields (`measuredPorts`, `measuredBounds`, `computedZIndex`) from serialized nodes and (`measuredLabels`, `computedZIndex`) from serialized edges. These are system-computed values that should be re-derived from the DOM on load, not persisted ([#545](https://github.com/synergycodes/ng-diagram/pull/545))
 
