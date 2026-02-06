@@ -35,8 +35,8 @@ import { NgDiagramModelService } from 'ng-diagram';
 
       input {
         width: calc(100% - 2rem);
-        padding: 8px 12px;
-        border-radius: 6px;
+        padding: var(--ngd-input-padding);
+        border-radius: var(--ngd-input-border-radius);
         background: var(--ngd-node-bg-primary-default);
         border: 1px solid var(--ngd-node-stroke-primary-default);
       }
