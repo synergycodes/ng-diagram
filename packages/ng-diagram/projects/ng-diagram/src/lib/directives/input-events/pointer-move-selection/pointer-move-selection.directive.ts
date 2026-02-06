@@ -3,7 +3,8 @@ import { FPS_60, NgDiagramMath, type Node, Point } from '../../../../core/src';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import type { PointerInputEvent } from '../../../types/event';
+import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
+import { DiagramEventName, type PointerInputEvent } from '../../../types/event';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
@@ -17,6 +18,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly diagramComponent = inject(NgDiagramComponent);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly touchEventsStateService = inject(TouchEventsStateService);
 
   targetData = input<Node>();
 
@@ -42,6 +44,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
+    this.touchEventsStateService.currentEvent.set(DiagramEventName.Move);
     event.moveSelectionHandled = true;
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
@@ -71,7 +74,12 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   };
 
   private onPointerMove = (event: PointerInputEvent) => {
-    if (event.zoomingHandled) {
+    if (
+      event.zoomingHandled ||
+      this.touchEventsStateService.boxSelectionHandled() ||
+      this.touchEventsStateService.panningHandled() ||
+      this.touchEventsStateService.zoomingHandled()
+    ) {
       this.finishDragging(event);
       return;
     }
@@ -140,10 +148,14 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       },
       currentDiagramEdge: null,
     });
+
+    this.touchEventsStateService.clearCurrentEvent();
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {
-    if (shouldDiscardEvent(event, 'drag')) {
+    const isDraggable =
+      this.flowCoreProvider.provide().config.nodeDraggingEnabled && (this.targetData()?.draggable ?? true);
+    if (!isDraggable || shouldDiscardEvent(event, 'drag')) {
       return false;
     }
 
@@ -152,7 +164,8 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       event.linkingHandled ||
       event.rotateHandled ||
       event.boxSelectionHandled ||
-      event.zoomingHandled
+      this.touchEventsStateService.panningHandled() ||
+      this.touchEventsStateService.zoomingHandled()
     );
   }
 

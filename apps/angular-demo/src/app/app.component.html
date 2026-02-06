@@ -6,10 +6,8 @@
     [config]="config"
     (diagramInit)="onDiagramInit($event)"
     (selectionChanged)="onSelectionChanged($event)"
-    (selectionMoved)="onSelectionMoved($event)"
     (groupMembershipChanged)="onGroupMembershipChanged($event)"
     (selectionRotated)="onSelectionRotated($event)"
-    (viewportChanged)="onViewportChanged($event)"
     (edgeDrawn)="onEdgeDrawn($event)"
     (clipboardPasted)="onClipboardPasted($event)"
     (nodeResized)="onNodeResized($event)"
@@ -18,6 +16,10 @@
   >
     <ng-diagram-background type="grid"></ng-diagram-background>
   </ng-diagram>
-  <app-toolbar />
+  <ng-diagram-minimap [nodeStyle]="nodeStyle" [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
+  <app-toolbar
+    (testVirtualizationClick)="enableVirtualizationTest()"
+    (reinitializeModelClick)="onReinitializeModel()"
+  />
   <app-palette [model]="paletteModel" />
 </div>

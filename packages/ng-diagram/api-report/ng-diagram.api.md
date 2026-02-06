@@ -24,6 +24,7 @@ export interface ActionState {
     dragging?: DraggingActionState;
     highlightGroup?: HighlightGroupActionState;
     linking?: LinkingActionState;
+    panning?: PanningActionState;
     resize?: ResizeActionState;
     rotation?: RotationActionState;
 }
@@ -35,6 +36,7 @@ export class ActionStateManager {
     clearDragging(): void;
     clearHighlightGroup(): void;
     clearLinking(): void;
+    clearPanning(): void;
     clearResize(): void;
     clearRotation(): void;
     get copyPaste(): CopyPasteActionState | undefined;
@@ -46,10 +48,13 @@ export class ActionStateManager {
     set highlightGroup(value: HighlightGroupActionState | undefined);
     isDragging(): boolean;
     isLinking(): boolean;
+    isPanning(): boolean;
     isResizing(): boolean;
     isRotating(): boolean;
     get linking(): LinkingActionState | undefined;
     set linking(value: LinkingActionState | undefined);
+    get panning(): PanningActionState | undefined;
+    set panning(value: PanningActionState | undefined);
     get resize(): ResizeActionState | undefined;
     set resize(value: ResizeActionState | undefined);
     get rotation(): RotationActionState | undefined;
@@ -296,12 +301,14 @@ export interface FlowConfig {
     grouping: GroupingConfig;
     hideWatermark?: boolean;
     linking: LinkingConfig;
+    nodeDraggingEnabled: boolean;
     nodeRotation: NodeRotationConfig;
     resize: ResizeConfig;
     selectionMoving: SelectionMovingConfig;
     shortcuts: ShortcutDefinition[];
     snapping: SnappingConfig;
     viewportPanningEnabled: boolean;
+    virtualization: VirtualizationConfig;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -326,6 +333,10 @@ export interface FlowStateUpdate {
     nodesToUpdate?: (Partial<Node_2> & {
         id: Node_2['id'];
     })[];
+    // @internal
+    renderedEdgeIds?: string[];
+    // @internal
+    renderedNodeIds?: string[];
 }
 
 // @public
@@ -507,6 +518,64 @@ export interface MiddlewareHistoryUpdate {
 }
 
 // @public
+export type MinimapNodeShape = 'rect' | 'circle' | 'ellipse';
+
+// @public
+export interface MinimapNodeStyle {
+    cssClass?: string;
+    fill?: string;
+    opacity?: number;
+    shape?: MinimapNodeShape;
+    stroke?: string;
+    strokeWidth?: number;
+}
+
+// @public
+export type MinimapNodeStyleFn = (node: Node_2) => MinimapNodeStyle | null | undefined;
+
+// @public (undocumented)
+export class MobileBoxSelectionDirective {
+    // (undocumented)
+    onTouchEnd(event: TouchEvent): void;
+    // (undocumented)
+    onTouchMove(event: TouchEvent): void;
+    // (undocumented)
+    onTouchStart(event: TouchEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<MobileBoxSelectionDirective, "[ngDiagramMobileBoxSelection]", never, {}, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<MobileBoxSelectionDirective, never>;
+}
+
+// @public (undocumented)
+export class MobilePanningDirective {
+    // (undocumented)
+    onTouchEnd(event: TouchEvent): void;
+    // (undocumented)
+    onTouchMove(event: TouchEvent): void;
+    // (undocumented)
+    onTouchStart(event: TouchEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<MobilePanningDirective, "[ngDiagramPanning]", never, {}, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<MobilePanningDirective, never>;
+}
+
+// @public (undocumented)
+export class MobileZoomingDirective {
+    // (undocumented)
+    onTouchEnd(event: TouchEvent): void;
+    // (undocumented)
+    onTouchMove(event: TouchEvent): void;
+    // (undocumented)
+    onTouchStart(event: TouchEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<MobileZoomingDirective, "[ngDiagramZoomingPointer]", never, {}, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<MobileZoomingDirective, never>;
+}
+
+// @public
 export interface Model {
     edges: Edge[];
     metadata: Partial<Metadata>;
@@ -602,7 +671,7 @@ export class NgDiagramBaseEdgeComponent {
     readonly temporary: Signal<boolean | undefined>;
     readonly useInlineMarkers: boolean;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeComponent, "ng-diagram-base-edge", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "routing": { "alias": "routing"; "required": false; "isSignal": true; }; "stroke": { "alias": "stroke"; "required": false; "isSignal": true; }; "sourceArrowhead": { "alias": "sourceArrowhead"; "required": false; "isSignal": true; }; "targetArrowhead": { "alias": "targetArrowhead"; "required": false; "isSignal": true; }; "strokeOpacity": { "alias": "strokeOpacity"; "required": false; "isSignal": true; }; "strokeWidth": { "alias": "strokeWidth"; "required": false; "isSignal": true; }; "strokeDasharray": { "alias": "strokeDasharray"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_2.ZIndexDirective; inputs: { "data": "edge"; }; outputs: {}; }, { directive: typeof i9.EdgeSelectionDirective; inputs: { "targetData": "edge"; }; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeComponent, "ng-diagram-base-edge", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "routing": { "alias": "routing"; "required": false; "isSignal": true; }; "stroke": { "alias": "stroke"; "required": false; "isSignal": true; }; "sourceArrowhead": { "alias": "sourceArrowhead"; "required": false; "isSignal": true; }; "targetArrowhead": { "alias": "targetArrowhead"; "required": false; "isSignal": true; }; "strokeOpacity": { "alias": "strokeOpacity"; "required": false; "isSignal": true; }; "strokeWidth": { "alias": "strokeWidth"; "required": false; "isSignal": true; }; "strokeDasharray": { "alias": "strokeDasharray"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_2.ZIndexDirective; inputs: { "data": "edge"; }; outputs: {}; }, { directive: typeof i11.EdgeSelectionDirective; inputs: { "targetData": "edge"; }; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramBaseEdgeComponent, never>;
 }
@@ -703,7 +772,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.ZoomingPointerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
@@ -778,6 +847,66 @@ export const NgDiagramMath: {
     };
     calculateEdgePanningForce: (containerBox: Rect, clientPosition: Point, detectionThreshold: number, forceMultiplier: number) => Point | null;
 };
+
+// @public
+export class NgDiagramMinimapComponent implements AfterViewInit {
+    // (undocumented)
+    protected diagramBounds: Signal<Rect>;
+    // (undocumented)
+    hasValidViewport: Signal<boolean>;
+    height: InputSignal<number>;
+    // (undocumented)
+    isDiagramInitialized: WritableSignal<boolean>;
+    // @internal
+    protected minimapNodes: Signal<MinimapNodeData[]>;
+    minimapNodeTemplateMap: InputSignal<NgDiagramMinimapNodeTemplateMap>;
+    // (undocumented)
+    ngAfterViewInit(): void;
+    // @internal
+    protected nodesGroupTransform: Signal<string>;
+    nodeStyle: InputSignal<MinimapNodeStyleFn | undefined>;
+    position: InputSignal<NgDiagramPanelPosition>;
+    // @internal
+    protected showDiagramBounds: Signal<boolean>;
+    showZoomControls: InputSignal<boolean>;
+    // @internal
+    protected transform: Signal<MinimapTransform>;
+    // (undocumented)
+    viewport: WritableSignal<Viewport>;
+    // (undocumented)
+    viewportRect: Signal<MinimapViewportRect>;
+    width: InputSignal<number>;
+    // (undocumented)
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMinimapComponent, "ng-diagram-minimap", never, { "position": { "alias": "position"; "required": false; "isSignal": true; }; "width": { "alias": "width"; "required": false; "isSignal": true; }; "height": { "alias": "height"; "required": false; "isSignal": true; }; "showZoomControls": { "alias": "showZoomControls"; "required": false; "isSignal": true; }; "nodeStyle": { "alias": "nodeStyle"; "required": false; "isSignal": true; }; "minimapNodeTemplateMap": { "alias": "minimapNodeTemplateMap"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMinimapComponent, never>;
+}
+
+// @public
+export class NgDiagramMinimapNavigationDirective implements OnDestroy {
+    // (undocumented)
+    ngOnDestroy(): void;
+    // (undocumented)
+    onPointerDown(event: PointerEvent): void;
+    // (undocumented)
+    transform: InputSignal<MinimapTransform>;
+    // (undocumented)
+    viewport: InputSignal<Viewport>;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<NgDiagramMinimapNavigationDirective, "[ngDiagramMinimapNavigation]", never, { "transform": { "alias": "transform"; "required": true; "isSignal": true; }; "viewport": { "alias": "viewport"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMinimapNavigationDirective, never>;
+}
+
+// @public
+export interface NgDiagramMinimapNodeTemplate {
+    node: InputSignal<Node_2>;
+    nodeStyle: InputSignal<MinimapNodeStyle | undefined>;
+}
+
+// @public
+export class NgDiagramMinimapNodeTemplateMap extends Map<string, Type<NgDiagramMinimapNodeTemplate>> {
+}
 
 // @public
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
@@ -911,6 +1040,8 @@ export class NgDiagramPaletteItemComponent {
     onDragStart(event: DragEvent): void;
     // @internal (undocumented)
     onMouseDown(): void;
+    // @internal (undocumented)
+    onTouchStart(event: TouchEvent): void;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPaletteItemComponent, "ng-diagram-palette-item", never, { "item": { "alias": "item"; "required": true; "isSignal": true; }; }, {}, ["paletteItemPreviewComponent"], ["*"], true, never>;
     // (undocumented)
@@ -938,6 +1069,9 @@ export class NgDiagramPaletteItemPreviewComponent {
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramPaletteItemPreviewComponent, never>;
 }
+
+// @public
+export type NgDiagramPanelPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 // @public
 export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy, AfterContentInit {
@@ -1030,11 +1164,15 @@ export class NgDiagramServicesAvailabilityCheckerDirective {
 
 // @public
 export class NgDiagramViewportService extends NgDiagramBaseService {
+    canZoomIn: Signal<boolean>;
+    canZoomOut: Signal<boolean>;
     centerOnNode(nodeOrId: string | Node_2): void;
     centerOnRect(rect: Rect): void;
     clientToFlowPosition(clientPosition: Point): Point;
     clientToFlowViewportPosition(clientPosition: Point): Point;
     flowToClientPosition(flowPosition: Point): Point;
+    get maxZoom(): number;
+    get minZoom(): number;
     moveViewport(x: number, y: number): void;
     moveViewportBy(dx: number, dy: number): void;
     scale: Signal<number>;
@@ -1123,7 +1261,11 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
 export type OriginPoint = 'topLeft' | 'topCenter' | 'topRight' | 'centerLeft' | 'center' | 'centerRight' | 'bottomLeft' | 'bottomCenter' | 'bottomRight';
 
 // @public (undocumented)
-export class PaletteDropDirective {
+export class PaletteDropDirective implements OnInit, OnDestroy {
+    // (undocumented)
+    ngOnDestroy(): void;
+    // (undocumented)
+    ngOnInit(): void;
     // (undocumented)
     onDragOver(event: DragEvent): void;
     // (undocumented)
@@ -1148,6 +1290,8 @@ export class PanningDirective implements OnDestroy {
     onPointerDown(event: PointerInputEvent): void;
     // (undocumented)
     onPointerUp: (event: PointerEvent) => void;
+    // (undocumented)
+    onWheel(event: WheelEvent): void;
     // (undocumented)
     static ɵdir: i0.ɵɵDirectiveDeclaration<PanningDirective, "[ngDiagramPanning]", never, {}, {}, never, never, true, never>;
     // (undocumented)
@@ -1288,6 +1432,7 @@ export interface SimpleNode<T extends DataObject = DataObject> {
     // (undocumented)
     readonly computedZIndex?: number;
     data: T;
+    draggable?: boolean;
     groupId?: Node_2<T>['id'];
     id: string;
     // (undocumented)
@@ -1362,6 +1507,13 @@ export class ViewportDirective {
 }
 
 // @public
+export interface VirtualizationConfig {
+    enabled: boolean;
+    idleDelay?: number;
+    padding: number;
+}
+
+// @public
 export interface ZIndexConfig {
     edgesAboveConnectedNodes: boolean;
     elevateOnSelection: boolean;
@@ -1391,29 +1543,11 @@ export interface ZoomConfig {
 }
 
 // @public (undocumented)
-export class ZoomingPointerDirective implements OnInit, OnDestroy {
-    // (undocumented)
-    ngOnDestroy(): void;
-    // (undocumented)
-    ngOnInit(): void;
-    // (undocumented)
-    onTouchEnd(event: TouchEvent): void;
-    // (undocumented)
-    onTouchMove(event: TouchEvent): void;
-    // (undocumented)
-    onTouchStart(event: TouchEvent): void;
-    // (undocumented)
-    static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingPointerDirective, "[ngDiagramZoomingPointer]", never, {}, {}, never, never, true, never>;
-    // (undocumented)
-    static ɵfac: i0.ɵɵFactoryDeclaration<ZoomingPointerDirective, never>;
-}
-
-// @public (undocumented)
 export class ZoomingWheelDirective {
     // (undocumented)
     onWheel(event: WheelEvent): void;
     // (undocumented)
-    static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingWheelDirective, "[ngDiagramZooming]", never, {}, {}, never, never, true, never>;
+    static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingWheelDirective, "[ngDiagramZoomingWheel]", never, {}, {}, never, never, true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<ZoomingWheelDirective, never>;
 }

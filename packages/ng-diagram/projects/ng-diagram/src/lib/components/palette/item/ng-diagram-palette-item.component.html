@@ -1,3 +1,9 @@
-<div class="draggable" draggable="true" (dragstart)="onDragStart($event)" (mousedown)="onMouseDown()">
+<div
+  class="draggable"
+  draggable="true"
+  (dragstart)="onDragStart($event)"
+  (mousedown)="onMouseDown()"
+  (touchstart)="onTouchStart($event)"
+>
   <ng-content></ng-content>
 </div>

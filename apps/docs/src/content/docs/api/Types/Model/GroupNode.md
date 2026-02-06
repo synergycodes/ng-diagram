@@ -71,6 +71,18 @@ The data associated with the node.
 
 ***
 
+### draggable?
+
+> `optional` **draggable**: `boolean`
+
+Whether the node is draggable.
+
+#### Inherited from
+
+[`SimpleNode`](/docs/api/types/model/simplenode/).[`draggable`](/docs/api/types/model/simplenode/#draggable)
+
+***
+
 ### groupId?
 
 > `optional` **groupId**: `string`

@@ -1,5 +1,6 @@
-import { Injector, runInInjectionContext } from '@angular/core';
-import type { Model } from '../../core/src';
+import { inject, Injector, runInInjectionContext } from '@angular/core';
+import { assignInternalId, type Model } from '../../core/src';
+import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { SignalModelAdapter } from './signal-model-adapter';
 
 /**
@@ -20,8 +21,12 @@ import { SignalModelAdapter } from './signal-model-adapter';
  */
 export function initializeModel(model: Partial<Model> = {}, injector?: Injector) {
   const create = () => {
+    const environment = inject(EnvironmentProviderService);
+
     const adapter = new SignalModelAdapter();
-    adapter.updateNodes(model.nodes || []);
+    const generateId = () => environment.generateId();
+
+    adapter.updateNodes((model.nodes || []).map((node) => assignInternalId(node, generateId)));
     adapter.updateEdges(model.edges || []);
     adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
 

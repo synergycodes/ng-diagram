@@ -150,14 +150,27 @@ export class FlowResizeBatchProcessorService {
   private processNodeBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
 
+    // Collect nodes that need initial size (no size property yet)
+    const nodesNeedingInitialSize: { id: string; size: Size }[] = [];
+
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'node') continue;
 
       const size = this.getBorderBoxSize(entry);
       if (!size) continue;
 
-      const currentSize = flowCore.getNodeById(metadata.nodeId)?.size;
-      if (currentSize && !this.isSizeChanged(currentSize, size)) {
+      const node = flowCore.getNodeById(metadata.nodeId);
+      if (!node) continue;
+
+      const currentSize = node.size;
+
+      // Nodes without initial size - collect for batch update
+      if (!currentSize) {
+        nodesNeedingInitialSize.push({ id: metadata.nodeId, size });
+        continue;
+      }
+
+      if (!this.isSizeChanged(currentSize, size)) {
         continue;
       }
 
@@ -168,6 +181,21 @@ export class FlowResizeBatchProcessorService {
       if (!flowCore.actionStateManager.isResizing()) {
         const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
         flowCore.updater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
+      }
+    }
+
+    // Batch update nodes without initial size
+    if (nodesNeedingInitialSize.length > 0) {
+      if (flowCore.isInitialized) {
+        // After init: batch update directly for performance
+        flowCore.commandHandler.emit('updateNodes', {
+          nodes: nodesNeedingInitialSize,
+        });
+      } else {
+        // During init: use updater so InitUpdater can track measurements
+        for (const { id, size } of nodesNeedingInitialSize) {
+          flowCore.updater.applyNodeSize(id, size);
+        }
       }
     }
   }

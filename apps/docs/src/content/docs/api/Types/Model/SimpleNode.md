@@ -55,6 +55,14 @@ The data associated with the node.
 
 ***
 
+### draggable?
+
+> `optional` **draggable**: `boolean`
+
+Whether the node is draggable.
+
+***
+
 ### groupId?
 
 > `optional` **groupId**: `string`

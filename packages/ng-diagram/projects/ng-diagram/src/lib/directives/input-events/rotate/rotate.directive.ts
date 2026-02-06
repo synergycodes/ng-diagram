@@ -1,7 +1,8 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types';
+import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
+import { DiagramEventName, PointerInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramRotateHandle]',
@@ -12,6 +13,7 @@ import { PointerInputEvent } from '../../../types';
 })
 export class RotateHandleDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly touchEventsStateService = inject(TouchEventsStateService);
 
   targetData = input<Node>();
 
@@ -25,6 +27,7 @@ export class RotateHandleDirective implements OnDestroy {
     }
 
     $event.rotateHandled = true;
+    this.touchEventsStateService.currentEvent.set(DiagramEventName.Rotate);
 
     const targetData = this.targetData();
     if (!targetData) {
@@ -50,6 +53,11 @@ export class RotateHandleDirective implements OnDestroy {
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
+    if (this.touchEventsStateService.panningHandled() || this.touchEventsStateService.zoomingHandled()) {
+      this.onPointerUp($event);
+      return;
+    }
+
     $event.rotateHandled = true;
 
     const targetData = this.targetData();
@@ -114,10 +122,15 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   private shouldHandle(event: PointerInputEvent) {
-    return !event.boxSelectionHandled;
+    return !(
+      event.boxSelectionHandled ||
+      this.touchEventsStateService.panningHandled() ||
+      this.touchEventsStateService.zoomingHandled()
+    );
   }
 
   private cleanup() {
+    this.touchEventsStateService.clearCurrentEvent();
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     document.removeEventListener('pointercancel', this.onPointerCancel);

@@ -16,10 +16,10 @@ import type { TransactionOptions } from './types/transaction.interface';
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
-    start: vi.fn((callback) => {
+    start: vi.fn((_nodes, _edges, onComplete) => {
       // Simulate async initialization
-      if (callback) {
-        setTimeout(callback, 0);
+      if (onComplete) {
+        setTimeout(onComplete, 0);
       }
     }),
     isInitialized: false,
@@ -149,13 +149,17 @@ describe('FlowCore', () => {
 
     it('should emit init command after initialization completes', async () => {
       // Initially, init command should not be called yet
-      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('init');
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('init', expect.anything());
 
       // Wait for the initialization callback to be executed
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Now init command should have been emitted
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init');
+      // Both strategies provide explicit renderedNodeIds/renderedEdgeIds (empty arrays when no nodes/edges)
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('init', {
+        renderedNodeIds: [],
+        renderedEdgeIds: [],
+      });
     });
 
     it('should initialize with default getFlowOffset when not provided', () => {
@@ -205,6 +209,7 @@ describe('FlowCore', () => {
         mockRenderer,
         mockEventRouter,
         mockEnvironment,
+        undefined,
         undefined,
         undefined,
         customConfig

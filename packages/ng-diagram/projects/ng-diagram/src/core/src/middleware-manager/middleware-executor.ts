@@ -48,13 +48,39 @@ export class MiddlewareExecutor {
     this.initialState = initialState;
     this.modelActionTypes = modelActionTypes;
     this.metadata = initialState.metadata;
-    this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
-    this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
-    this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
-    this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+
+    // Optimization: Skip map copies for metadata-only updates (viewport changes)
+    // Middlewares for viewport changes early-exit without modifying nodes/edges
+    const isMetadataOnly = this.isMetadataOnlyUpdate(stateUpdate);
+
+    if (isMetadataOnly) {
+      this.nodesMap = this.flowCore.modelLookup.nodesMap;
+      this.edgesMap = this.flowCore.modelLookup.edgesMap;
+      this.initialNodesMap = this.nodesMap;
+      this.initialEdgesMap = this.edgesMap;
+    } else {
+      this.nodesMap = new Map(this.flowCore.modelLookup.nodesMap);
+      this.edgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+      this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
+      this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
+    }
+
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
-    return this.resolveMiddlewares();
+
+    return await this.resolveMiddlewares();
+  }
+
+  private isMetadataOnlyUpdate(stateUpdate: FlowStateUpdate): boolean {
+    return (
+      !stateUpdate.nodesToAdd?.length &&
+      !stateUpdate.nodesToUpdate?.length &&
+      !stateUpdate.nodesToRemove?.length &&
+      !stateUpdate.edgesToAdd?.length &&
+      !stateUpdate.edgesToUpdate?.length &&
+      !stateUpdate.edgesToRemove?.length &&
+      !!stateUpdate.metadataUpdate
+    );
   }
 
   helpers = () => ({

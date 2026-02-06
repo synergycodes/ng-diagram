@@ -420,6 +420,38 @@ export interface BoxSelectionConfig {
 }
 
 /**
+ * Configuration for viewport virtualization behavior.
+ * When enabled, only nodes and edges visible in the viewport (plus padding) are rendered,
+ * significantly improving performance for large diagrams.
+ *
+ * @public
+ * @since 1.0.0
+ * @category Types/Configuration/Features
+ */
+export interface VirtualizationConfig {
+  /**
+   * Whether viewport virtualization is enabled.
+   * When disabled, all nodes/edges are rendered regardless of viewport.
+   * @default false
+   */
+  enabled: boolean;
+
+  /**
+   * Padding multiplier relative to viewport size.
+   * The actual padding is calculated as: max(viewportWidth, viewportHeight) * padding
+   * For example, 0.5 means 50% of the viewport size as padding in each direction.
+   * @default 0.5
+   */
+  padding: number;
+
+  /**
+   * Delay in milliseconds after panning stops before re-rendering visible nodes.
+   * @default 100
+   */
+  idleDelay?: number;
+}
+
+/**
  * The main configuration interface for the flow system.
  *
  * This type defines all available configuration options for the diagram engine.
@@ -499,6 +531,12 @@ export interface FlowConfig {
   boxSelection: BoxSelectionConfig;
 
   /**
+   * Configuration for viewport virtualization.
+   * Improves performance for large diagrams by only rendering visible elements.
+   */
+  virtualization: VirtualizationConfig;
+
+  /**
    * Configuration for keyboard shortcuts.
    */
   shortcuts: ShortcutDefinition[];
@@ -526,4 +564,13 @@ export interface FlowConfig {
    * @default true
    */
   viewportPanningEnabled: boolean;
+
+  /**
+   * @since 1.0.0
+   *
+   * Enables or disables node dragging on the diagram.
+   * When set to false, users cannot move nodes via mouse dragging or keyboard arrow keys.
+   * @default true
+   */
+  nodeDraggingEnabled: boolean;
 }

@@ -16,4 +16,20 @@
     display: flex;
     height: 100%;
   }
+
+  @media (max-width: 1024px) {
+    width: 200px;
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 768px) {
+    width: 150px;
+    padding: 8px;
+    font-size: 0.65rem;
+
+    & .palette {
+      gap: 8px;
+    }
+  }
 }

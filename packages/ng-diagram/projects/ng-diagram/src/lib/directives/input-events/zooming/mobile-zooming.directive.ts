@@ -1,7 +1,8 @@
-import { Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, inject } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import { PointerInputEvent } from '../../../types';
+import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
+import { DiagramEventName } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramZoomingPointer]',
@@ -10,39 +11,49 @@ import { PointerInputEvent } from '../../../types';
     '(touchstart)': 'onTouchStart($event)',
     '(touchend)': 'onTouchEnd($event)',
     '(touchmove)': 'onTouchMove($event)',
+    '(touchcancel)': 'onTouchEnd($event)',
   },
 })
-export class ZoomingPointerDirective implements OnInit, OnDestroy {
+export class MobileZoomingDirective {
   private readonly elementRef = inject(ElementRef);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouterService = inject(InputEventsRouterService);
+  private readonly touchEventsStateService = inject(TouchEventsStateService);
 
   private touchCache: Touch[] = [];
+
+  /**
+   * Stores the last distance between two touch points during a pinch gesture.
+   * Used to calculate the zoom factor smoothly on each move event.
+   */
   private lastDistance?: number;
 
-  ngOnInit(): void {
-    this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
-    this.elementRef.nativeElement.addEventListener('pointermove', this.onPointerEventCapture, { capture: true });
-  }
+  /**
+   * Stores the initial distance between two touch points at the start of a pinch gesture.
+   * Used to determine if the gesture should be recognized as a zoom (pinch) based on a threshold.
+   */
+  private initialDistance?: number;
 
-  ngOnDestroy(): void {
-    this.elementRef.nativeElement.removeEventListener('pointerdown', this.onPointerEventCapture, { capture: true });
-    this.elementRef.nativeElement.removeEventListener('pointermove', this.onPointerEventCapture, { capture: true });
-  }
+  /**
+   * Flag indicating if zooming gesture is currently active.
+   * Once set to true, it remains true until all fingers are lifted.
+   */
+  private isZoomingActive = false;
 
-  private onPointerEventCapture = (event: PointerInputEvent): void => {
-    if (this.touchCache.length >= 2) {
-      event.zoomingHandled = true;
-    }
-  };
+  /**
+   * Minimal change in distance (in pixels) between two touch points required to trigger zoom.
+   * Prevents accidental zooming on small finger movements.
+   */
+  private readonly ZOOM_TRIGGER_DELTA = 40;
 
   onTouchStart(event: TouchEvent) {
     for (const touch of event.changedTouches) {
       this.touchCache.push(touch);
     }
-
     if (this.touchCache.length === 2) {
       this.lastDistance = this.computeDistance();
+      this.initialDistance = this.lastDistance;
+      this.isZoomingActive = false; // Reset flag when starting new two-finger gesture
     }
   }
 
@@ -50,10 +61,12 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
     for (const touch of event.changedTouches) {
       this.removeTouchFromCache(touch);
     }
-
     if (this.touchCache.length < 2) {
       this.lastDistance = undefined;
+      this.initialDistance = undefined;
+      this.isZoomingActive = false;
       this.touchCache = [];
+      this.touchEventsStateService.clearCurrentEvent();
     }
   }
 
@@ -61,17 +74,30 @@ export class ZoomingPointerDirective implements OnInit, OnDestroy {
     for (const touch of event.changedTouches) {
       this.updateTouchInCache(touch);
     }
-
-    if (this.touchCache.length !== 2 || this.lastDistance === undefined) {
+    if (this.touchCache.length !== 2 || this.lastDistance === undefined || this.initialDistance === undefined) {
       return;
     }
 
-    const flow = this.flowCoreProvider.provide();
+    const currentDistance = this.computeDistance();
+    const delta = Math.abs(currentDistance - this.initialDistance);
 
+    /**
+     * Once zooming is active, keep it active until fingers are lifted
+     * Check if the distance change indicates a pinch gesture (zooming)
+     * Not enough distance change yet, don't interfere with panning
+     */
+    if (!this.isZoomingActive) {
+      if (delta > this.ZOOM_TRIGGER_DELTA) {
+        this.isZoomingActive = true;
+        this.touchEventsStateService.currentEvent.set(DiagramEventName.Zooming);
+      } else {
+        return;
+      }
+    }
+
+    const flow = this.flowCoreProvider.provide();
     const centerX = (this.touchCache[0].clientX + this.touchCache[1].clientX) / 2;
     const centerY = (this.touchCache[0].clientY + this.touchCache[1].clientY) / 2;
-    const currentDistance = this.computeDistance();
-
     const distanceRatio = currentDistance / this.lastDistance;
     const zoomFactor = Math.min(Math.max(1 - flow.config.zoom.step, distanceRatio), 1 + flow.config.zoom.step);
 

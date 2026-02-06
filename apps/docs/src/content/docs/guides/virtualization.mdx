@@ -1,0 +1,102 @@
+---
+version: 'since v1.0.0'
+title: Virtualization
+description: Optimizing performance for large diagrams with viewport virtualization
+sidebar:
+  badge: New
+---
+
+Virtualization is a performance optimization technique that renders only the nodes and edges visible within the current viewport. For diagrams with hundreds or thousands of elements, this dramatically improves rendering performance and responsiveness.
+
+## How It Works
+
+When virtualization is enabled, ngDiagram calculates which elements are visible in the current viewport (plus a configurable padding area) and only renders those elements. As you pan or zoom around the diagram, elements are dynamically added and removed from the DOM.
+
+**What to expect:**
+
+- Nodes and edges outside the viewport are not rendered until you pan to them
+- During fast panning, you may briefly see empty areas before elements appear
+- Elements are rendered after a short idle delay once panning stops
+- The virtual viewport (rendering area) extends beyond the visible viewport by a configurable padding
+
+:::note
+The `zoomToFit` command is disabled when virtualization is enabled, as it requires all elements to calculate bounds.
+:::
+
+## Enabling Virtualization
+
+To enable virtualization, set the `enabled` property in your diagram configuration:
+
+```typescript
+import { NgDiagramConfig } from 'ng-diagram';
+
+const config: NgDiagramConfig = {
+  virtualization: {
+    enabled: true,
+  },
+};
+```
+
+## Changing Virtualization at Runtime
+
+The virtualization setting is applied during diagram initialization. To change the virtualization mode at runtime, you must update the config and reinitialize the model:
+
+```typescript
+// Update config and reinitialize model
+this.config = {
+  ...this.config,
+  virtualization: { enabled: true },
+};
+this.model = initializeModel(getModel(), this.injector);
+```
+
+## Configuration Options
+
+Virtualization behavior can be configured via the [`virtualization`](/docs/api/types/configuration/flowconfig/#virtualization) property in your diagram config.
+
+The following options are available:
+
+### enabled
+
+Whether viewport virtualization is active.
+
+```typescript
+virtualization: {
+  enabled: true, // default: false
+}
+```
+
+### padding
+
+Controls the size of the virtual viewport beyond the visible area. This is a multiplier relative to viewport size. For example, `0.5` means the rendering area extends by 50% of the viewport size in each direction.
+
+```typescript
+virtualization: {
+  enabled: true,
+  padding: 0.5, // default: 0.5
+}
+```
+
+A larger padding value means more elements are pre-rendered outside the visible area, reducing the chance of seeing empty spaces during panning. However, this comes at the cost of rendering more elements, which may impact performance.
+
+### idleDelay
+
+The delay in milliseconds after panning stops before re-rendering visible nodes.
+
+```typescript
+virtualization: {
+  enabled: true,
+  idleDelay: 100, // default: 100
+}
+```
+
+## Performance Considerations
+
+When configuring virtualization, consider these trade-offs:
+
+| Setting     | Higher Value                                                      | Lower Value                                                      |
+| ----------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `padding`   | More pre-rendered elements, smoother panning, higher memory usage | Fewer elements rendered, may see empty areas during fast panning |
+| `idleDelay` | Longer wait before rendering, fewer intermediate renders          | Faster visual feedback, more frequent renders                    |
+
+For most use cases, the default values provide a good balance between performance and visual smoothness.
