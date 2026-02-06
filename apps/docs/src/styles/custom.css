@@ -15,6 +15,9 @@ html {
 
   --ng-diagram-height: 30rem;
   --ng-diagram-border: 1px solid var(--ngd-ui-border-color);
+
+  --ngd-input-padding: 0.5rem 0.75rem;
+  --ngd-input-border-radius: 0.375rem;
 }
 @media (min-width: 80rem) {
   html {
