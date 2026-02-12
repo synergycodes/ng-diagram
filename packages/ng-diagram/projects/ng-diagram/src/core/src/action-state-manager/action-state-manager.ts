@@ -5,6 +5,7 @@ import type {
   DraggingActionState,
   HighlightGroupActionState,
   LinkingActionState,
+  PanningActionState,
   ResizeActionState,
   RotationActionState,
 } from '../types/action-state.interface';
@@ -179,6 +180,24 @@ export class ActionStateManager {
   }
 
   /**
+   * Gets the current panning action state.
+   *
+   * @returns The panning state if viewport is being panned, undefined otherwise
+   */
+  get panning(): PanningActionState | undefined {
+    return this.state.panning;
+  }
+
+  /**
+   * Sets the panning action state.
+   *
+   * @param value - The panning state to set, or undefined to clear
+   */
+  set panning(value: PanningActionState | undefined) {
+    this.state.panning = value;
+  }
+
+  /**
    * Clears the resize action state.
    */
   clearResize() {
@@ -246,5 +265,19 @@ export class ActionStateManager {
    */
   isDragging(): boolean {
     return !!this.state.dragging;
+  }
+
+  /**
+   * Clears the panning action state.
+   */
+  clearPanning() {
+    this.state.panning = undefined;
+  }
+
+  /**
+   * Checks if a panning operation is currently in progress.
+   */
+  isPanning(): boolean {
+    return !!this.state.panning?.active;
   }
 }

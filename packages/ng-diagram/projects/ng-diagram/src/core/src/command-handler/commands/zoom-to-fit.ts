@@ -8,6 +8,14 @@ Scale must be a positive finite number.
 
 Documentation: https://www.ngdiagram.dev/docs/intro/coordinate-system/#viewport-and-scaling`;
 
+const VIRTUALIZATION_WARNING = `[ngDiagram] zoomToFit is disabled when virtualization is enabled.
+
+When virtualization is active, only visible nodes and edges are rendered for performance reasons.
+Zoom to fit requires all elements to be available for calculating bounds, which conflicts with virtualization.
+
+To use zoomToFit, disable virtualization in your config:
+  virtualization: { enabled: false }`;
+
 export interface ZoomToFitCommand {
   name: 'zoomToFit';
   nodeIds?: string[];
@@ -101,6 +109,11 @@ const isValidViewport = (viewport: { width?: number; height?: number }): boolean
  * Calculates optimal viewport position and scale to fit specified content
  */
 export const zoomToFit = async (commandHandler: CommandHandler, { nodeIds, edgeIds, padding }: ZoomToFitCommand) => {
+  if (commandHandler.flowCore.isVirtualizationActive) {
+    console.warn(VIRTUALIZATION_WARNING);
+    return;
+  }
+
   const { nodes, edges, metadata } = commandHandler.flowCore.getState();
   const { viewport } = metadata;
 

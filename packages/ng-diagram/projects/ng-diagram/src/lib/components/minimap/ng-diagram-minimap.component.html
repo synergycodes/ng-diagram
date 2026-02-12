@@ -1,0 +1,53 @@
+<ng-diagram-panel [position]="position()">
+  <svg
+    ngDiagramMinimapNavigation
+    [transform]="transform()"
+    [viewport]="viewport()"
+    class="minimap-svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    [attr.width]="width()"
+    [attr.height]="height()"
+  >
+    <rect class="minimap-background" x="0" y="0" [attr.width]="width()" [attr.height]="height()" />
+    @if (isDiagramInitialized()) {
+      <g [attr.transform]="nodesGroupTransform()">
+        @for (item of minimapNodes(); track item.bounds.id) {
+          @if (item.template) {
+            <svg:foreignObject
+              [attr.x]="item.bounds.x"
+              [attr.y]="item.bounds.y"
+              [attr.width]="item.bounds.width"
+              [attr.height]="item.bounds.height"
+              [attr.transform]="item.bounds.transform"
+            >
+              <ng-container
+                *ngComponentOutlet="item.template; inputs: { node: item.diagramNode, nodeStyle: item.nodeStyle }"
+              />
+            </svg:foreignObject>
+          } @else {
+            <svg:g ng-diagram-default-minimap-node [bounds]="item.bounds" [nodeStyle]="item.nodeStyle" />
+          }
+        }
+      </g>
+      @if (showDiagramBounds()) {
+        <svg:rect
+          ng-diagram-minimap-diagram-bounds
+          [diagramBounds]="diagramBounds()"
+          [minimapTransform]="transform()"
+        />
+      }
+      @if (hasValidViewport()) {
+        <rect
+          class="minimap-viewport"
+          [attr.x]="viewportRect().x"
+          [attr.y]="viewportRect().y"
+          [attr.width]="viewportRect().width"
+          [attr.height]="viewportRect().height"
+        />
+      }
+    }
+  </svg>
+  @if (showZoomControls()) {
+    <ng-diagram-zoom-controls />
+  }
+</ng-diagram-panel>

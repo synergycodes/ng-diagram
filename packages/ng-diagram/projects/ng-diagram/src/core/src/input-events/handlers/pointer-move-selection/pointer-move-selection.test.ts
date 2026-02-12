@@ -253,6 +253,74 @@ describe('PointerMoveSelectionEventHandler', () => {
       });
     });
 
+    describe('draggable filtering', () => {
+      it('should not move node with draggable set to false', async () => {
+        const nonDraggableNode = { ...mockNode, draggable: false };
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([nonDraggableNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      });
+
+      it('should move node without draggable property (defaults to true)', async () => {
+        // mockNode has no draggable property set
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          nodes: [mockNode],
+        });
+      });
+
+      it('should only move draggable nodes in mixed selection', async () => {
+        const draggableNode = { ...mockNode, id: 'draggable', draggable: true };
+        const nonDraggableNode = { ...mockNode, id: 'nonDraggable', draggable: false };
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([draggableNode, nonDraggableNode]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          nodes: [draggableNode],
+        });
+      });
+
+      it('should filter out non-draggable child in a group', async () => {
+        const parentNode = { ...mockNode, id: 'parent', draggable: true };
+        const draggableChild = { ...mockNode, id: 'child1', groupId: 'parent', draggable: true };
+        const nonDraggableChild = { ...mockNode, id: 'child2', groupId: 'parent', draggable: false };
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([parentNode, draggableChild, nonDraggableChild]);
+
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          nodes: [parentNode, draggableChild],
+        });
+      });
+    });
+
     describe('separate node lists', () => {
       it('should use selectedNodesWithChildren for moving and selectedNodes for highlighting', async () => {
         const childNode = { ...mockNode, id: 'child', groupId: 'parent' };

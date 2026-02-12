@@ -46,6 +46,7 @@ describe('DiagramInitEmitter', () => {
 
       context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
+      // undefined renderedNodeIds means "all rendered" (DirectRenderStrategy)
 
       emitter.emit(context, eventManager);
 
@@ -65,6 +66,7 @@ describe('DiagramInitEmitter', () => {
 
       context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', node);
+      // undefined renderedNodeIds means "all rendered" (DirectRenderStrategy)
 
       emitter.emit(context, eventManager);
 
@@ -86,6 +88,7 @@ describe('DiagramInitEmitter', () => {
       context.modelActionTypes = ['init'];
       context.nodesMap.set('node1', measuredNode);
       context.nodesMap.set('node2', unmeasuredNode);
+      // undefined renderedNodeIds means "all rendered" (DirectRenderStrategy)
 
       emitter.emit(context, eventManager);
 
@@ -749,6 +752,7 @@ describe('DiagramInitEmitter', () => {
       context.nodesMap.set('node2', unmeasuredNode);
       context.nodesMap.set('node3', nodeWithUnmeasuredPort);
       context.edgesMap.set('edge1', edgeWithUnmeasuredLabel);
+      // undefined renderedNodeIds/renderedEdgeIds means "all rendered" (DirectRenderStrategy)
 
       emitter.emit(context, eventManager);
 

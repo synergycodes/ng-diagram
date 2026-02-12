@@ -1,8 +1,26 @@
 :host {
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
   width: var(--watermark-size);
+
+  &.bottom-right {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  &.top-right {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  &.bottom-left {
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  &.top-left {
+    top: 1rem;
+    left: 1rem;
+  }
 
   svg {
     opacity: 0.7;

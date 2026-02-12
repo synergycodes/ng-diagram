@@ -91,6 +91,10 @@ export interface SimpleNode<T extends DataObject = DataObject> {
    */
   rotatable?: boolean;
   /**
+   * Whether the node is draggable.
+   */
+  draggable?: boolean;
+  /**
    * The angle of the node from 0 to 360.
    */
   angle?: number;

@@ -1,0 +1,40 @@
+.zoom-controls-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .label {
+    text-align: center;
+    font-size: var(--ngd-zoom-controls-font-size);
+    font-weight: var(--ngd-zoom-controls-font-weight);
+    color: var(--ngd-zoom-controls-color);
+    user-select: none;
+  }
+}
+
+.nav-button {
+  width: var(--ngd-nav-button-size);
+  height: var(--ngd-nav-button-size);
+  color: var(--ngd-nav-button-color);
+  border-radius: var(--ngd-nav-button-border-radius);
+  padding: var(--ngd-nav-button-padding);
+  border: none;
+  background: none;
+  box-sizing: content-box;
+  cursor: pointer;
+  font-size: var(--ngd-nav-button-size);
+  line-height: var(--ngd-nav-button-size);
+
+  &:hover:not(:disabled) {
+    background-color: var(--ngd-nav-button-background-color-hover);
+  }
+
+  &:active {
+    color: var(--ngd-nav-button-color-active);
+  }
+
+  &:disabled {
+    color: var(--ngd-nav-button-color-disabled);
+    cursor: default;
+  }
+}

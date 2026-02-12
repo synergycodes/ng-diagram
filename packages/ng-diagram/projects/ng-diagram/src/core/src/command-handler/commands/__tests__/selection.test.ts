@@ -1,31 +1,35 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { Edge, Node } from '../../../types';
 import { FlowCore } from '../../../flow-core';
-import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
+import { mockEdge, mockNode } from '../../../test-utils';
 import { CommandHandler } from '../../command-handler';
 import { deselect, deselectAll, select, selectAll } from '../selection';
 
+/**
+ * Creates a mock modelLookup from nodes and edges arrays.
+ */
+const createMockModelLookup = (nodes: Node[], edges: Edge[]) => ({
+  nodesMap: new Map(nodes.map((n) => [n.id, n])),
+  edgesMap: new Map(edges.map((e) => [e.id, e])),
+});
+
+/**
+ * Creates a mock command handler with the given nodes and edges.
+ */
+const createCommandHandler = (nodes: Node[], edges: Edge[]): CommandHandler =>
+  ({
+    flowCore: {
+      applyUpdate: vi.fn(),
+      modelLookup: createMockModelLookup(nodes, edges),
+    } as unknown as FlowCore,
+  }) as unknown as CommandHandler;
+
 describe('Selection Commands', () => {
-  let commandHandler: CommandHandler;
-
-  beforeEach(() => {
-    commandHandler = {
-      flowCore: {
-        getState: vi.fn(),
-        applyUpdate: vi.fn(),
-      } as unknown as FlowCore,
-    } as unknown as CommandHandler;
-  });
-
   describe('select', () => {
     it('should select single node', () => {
       const nodes = [mockNode, { ...mockNode, id: 'node2' }];
       const edges = [mockEdge];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       select(commandHandler, { name: 'select', nodeIds: ['node1'] });
 
@@ -41,12 +45,7 @@ describe('Selection Commands', () => {
     it('should select single edge', () => {
       const nodes = [mockNode];
       const edges = [mockEdge, { ...mockEdge, id: 'edge2' }];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       select(commandHandler, { name: 'select', edgeIds: ['edge1'] });
 
@@ -69,12 +68,7 @@ describe('Selection Commands', () => {
         { ...mockEdge, selected: true },
         { ...mockEdge, id: 'edge2' },
       ];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       select(commandHandler, {
         name: 'select',
@@ -94,12 +88,7 @@ describe('Selection Commands', () => {
     it('should not update state if selection has not changed', () => {
       const nodes = [{ ...mockNode, selected: true }];
       const edges = [{ ...mockEdge, selected: true }];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       select(commandHandler, {
         name: 'select',
@@ -118,12 +107,7 @@ describe('Selection Commands', () => {
         { ...mockNode, id: 'node2', selected: true },
       ];
       const edges = [mockEdge];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       deselect(commandHandler, { name: 'deselect', nodeIds: ['node1'] });
 
@@ -142,12 +126,7 @@ describe('Selection Commands', () => {
         { ...mockEdge, selected: true },
         { ...mockEdge, id: 'edge2', selected: true },
       ];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       deselect(commandHandler, { name: 'deselect', edgeIds: ['edge1'] });
 
@@ -163,12 +142,7 @@ describe('Selection Commands', () => {
     it('should not update state if no elements are selected', () => {
       const nodes = [mockNode];
       const edges = [mockEdge];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       deselect(commandHandler, { name: 'deselect', nodeIds: ['node1'] });
 
@@ -186,12 +160,7 @@ describe('Selection Commands', () => {
         { ...mockEdge, selected: true },
         { ...mockEdge, id: 'edge2', selected: true },
       ];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       deselectAll(commandHandler);
 
@@ -213,12 +182,7 @@ describe('Selection Commands', () => {
     it('should not update state if no elements are selected', () => {
       const nodes = [mockNode];
       const edges = [mockEdge];
-
-      vi.spyOn(commandHandler.flowCore, 'getState').mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       deselectAll(commandHandler);
 
@@ -236,12 +200,7 @@ describe('Selection Commands', () => {
         { ...mockEdge, id: 'e1', selected: false },
         { ...mockEdge, id: 'e2', selected: false },
       ];
-
-      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       selectAll(commandHandler);
 
@@ -269,12 +228,7 @@ describe('Selection Commands', () => {
         { ...mockEdge, id: 'e1', selected: true },
         { ...mockEdge, id: 'e2', selected: true },
       ];
-
-      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       selectAll(commandHandler);
 
@@ -290,12 +244,7 @@ describe('Selection Commands', () => {
         { ...mockEdge, id: 'e1', selected: false },
         { ...mockEdge, id: 'e2', selected: true },
       ];
-
-      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        nodes,
-        edges,
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler(nodes, edges);
 
       selectAll(commandHandler);
 
@@ -309,11 +258,7 @@ describe('Selection Commands', () => {
     });
 
     it('should handle empty diagram', () => {
-      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-        nodes: [],
-        edges: [],
-        metadata: mockMetadata,
-      });
+      const commandHandler = createCommandHandler([], []);
 
       selectAll(commandHandler);
 

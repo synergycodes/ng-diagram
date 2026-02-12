@@ -6,13 +6,14 @@ import { checkCollision } from './collision-detection';
 
 export const getNodesInRange = (flowCore: FlowCore, point: Point, range: number): Node[] => {
   const rangeRect = getPointRangeRect(point, range);
-  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(rangeRect));
+  const candidateIds = flowCore.spatialHash.queryIds(rangeRect);
   const foundNodes: Node[] = [];
-  flowCore.getState().nodes.forEach((node) => {
-    if (foundNodesIds.has(node.id) && checkCollision(rangeRect, node)) {
+  for (const nodeId of candidateIds) {
+    const node = flowCore.modelLookup.getNodeById(nodeId);
+    if (node && checkCollision(rangeRect, node)) {
       foundNodes.push(node);
     }
-  });
+  }
   return foundNodes;
 };
 
@@ -56,15 +57,15 @@ export const getNearestPortInRange = (flowCore: FlowCore, point: Point, range: n
 };
 
 export const getNodesInRect = (flowCore: FlowCore, rect: Rect, partialInclusion = true): Node[] => {
-  const foundNodesIds = new Set(flowCore.spatialHash.queryIds(rect));
+  const candidateIds = flowCore.spatialHash.queryIds(rect);
   const foundNodes: Node[] = [];
-  const nodes = flowCore.getState().nodes;
 
-  nodes.forEach((node) => {
-    if (foundNodesIds.has(node.id) && checkCollision(rect, node)) {
+  for (const nodeId of candidateIds) {
+    const node = flowCore.modelLookup.getNodeById(nodeId);
+    if (node && checkCollision(rect, node)) {
       foundNodes.push(node);
     }
-  });
+  }
 
   if (partialInclusion) {
     return foundNodes;

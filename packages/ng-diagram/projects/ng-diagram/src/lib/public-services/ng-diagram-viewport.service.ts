@@ -38,6 +38,30 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    */
   scale = computed(() => this.renderer.viewport().scale || 1);
 
+  /**
+   * Returns the minimum zoom scale from the diagram configuration.
+   */
+  get minZoom(): number {
+    return this.flowCore.config.zoom.min;
+  }
+
+  /**
+   * Returns the maximum zoom scale from the diagram configuration.
+   */
+  get maxZoom(): number {
+    return this.flowCore.config.zoom.max;
+  }
+
+  /**
+   * Returns true if the current zoom level is below the maximum and can be increased.
+   */
+  canZoomIn = computed(() => this.scale() < this.maxZoom);
+
+  /**
+   * Returns true if the current zoom level is above the minimum and can be decreased.
+   */
+  canZoomOut = computed(() => this.scale() > this.minZoom);
+
   // ===================
   // POSITION CONVERSION METHODS
   // ===================
@@ -97,13 +121,15 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
 
   /**
    * Zooms the viewport by the specified factor.
-   * @param factor The factor to zoom by.
+   * @param factor The factor to zoom by (e.g., 1.1 for 10% zoom in, 0.9 for 10% zoom out).
    * @param center The center point to zoom towards.
    */
   zoom(factor: number, center?: Point | undefined) {
-    const x = center?.x || this.viewport().x;
-    const y = center?.y || this.viewport().y;
-    this.flowCore.commandHandler.emit('zoom', { scale: factor, x, y });
+    const currentScale = this.scale();
+    const newScale = currentScale * factor;
+    const x = center?.x ?? this.viewport().x;
+    const y = center?.y ?? this.viewport().y;
+    this.flowCore.commandHandler.emit('zoom', { scale: newScale, x, y });
   }
 
   /**

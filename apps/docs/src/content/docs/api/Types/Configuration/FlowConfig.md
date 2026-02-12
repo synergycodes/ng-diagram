@@ -115,6 +115,25 @@ Configuration for linking (edge creation).
 
 ***
 
+### nodeDraggingEnabled
+
+> **nodeDraggingEnabled**: `boolean`
+
+#### Since
+
+1.0.0
+
+Enables or disables node dragging on the diagram.
+When set to false, users cannot move nodes via mouse dragging or keyboard arrow keys.
+
+#### Default
+
+```ts
+true
+```
+
+***
+
 ### nodeRotation
 
 > **nodeRotation**: [`NodeRotationConfig`](/docs/api/types/configuration/features/noderotationconfig/)
@@ -171,6 +190,15 @@ When set to false, user is not able to move the viewport by panning.
 ```ts
 true
 ```
+
+***
+
+### virtualization
+
+> **virtualization**: [`VirtualizationConfig`](/docs/api/types/configuration/features/virtualizationconfig/)
+
+Configuration for viewport virtualization.
+Improves performance for large diagrams by only rendering visible elements.
 
 ***
 

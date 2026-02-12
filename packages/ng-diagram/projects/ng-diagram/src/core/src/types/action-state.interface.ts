@@ -103,6 +103,18 @@ export interface DraggingActionState {
 }
 
 /**
+ * State tracking a panning operation in progress.
+ *
+ * @public
+ * @since 1.0.0
+ * @category Internals
+ */
+export interface PanningActionState {
+  /** Whether panning is currently active. */
+  active: boolean;
+}
+
+/**
  * Interface representing the current state of various user interactions in the diagram.
  *
  * This state is read-only and automatically managed by the library. It provides
@@ -138,4 +150,8 @@ export interface ActionState {
    * State related to dragging elements
    */
   dragging?: DraggingActionState;
+  /**
+   * State related to panning the viewport
+   */
+  panning?: PanningActionState;
 }

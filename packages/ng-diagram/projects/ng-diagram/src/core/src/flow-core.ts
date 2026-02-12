@@ -10,6 +10,7 @@ import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
 import { PortBatchProcessor } from './port-batch-processor/port-batch-processor';
+import { DirectRenderStrategy, RenderStrategy, VirtualizedRenderStrategy } from './render-strategy';
 import { ShortcutManager } from './shortcut-manager';
 import { SpatialHash } from './spatial-hash/spatial-hash';
 import {
@@ -37,6 +38,7 @@ import type {
   Point,
   Port,
   Renderer,
+  Viewport,
 } from './types';
 import {
   InternalTransactionOptions,
@@ -53,7 +55,7 @@ export class FlowCore {
   private _model: ModelAdapter;
   private _config: FlowConfig;
 
-  private readonly initUpdater: InitUpdater;
+  readonly initUpdater: InitUpdater;
   readonly internalUpdater: InternalUpdater;
   private readonly updateSemaphore = new Semaphore(1);
 
@@ -70,14 +72,17 @@ export class FlowCore {
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
 
+  private readonly directRenderStrategy: DirectRenderStrategy;
+  private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
+
   readonly getFlowOffset: () => Point;
   readonly getViewportSize: () => { width: number; height: number };
 
   constructor(
     modelAdapter: ModelAdapter,
-    private readonly renderer: Renderer,
-    public readonly inputEventsRouter: InputEventsRouter,
-    public readonly environment: EnvironmentInfo,
+    readonly renderer: Renderer,
+    readonly inputEventsRouter: InputEventsRouter,
+    readonly environment: EnvironmentInfo,
     middlewares?: MiddlewareChain,
     getFlowOffset?: () => Point,
     getViewportSize?: () => { width: number; height: number },
@@ -91,10 +96,12 @@ export class FlowCore {
     this.initUpdater = new InitUpdater(this);
     this.internalUpdater = new InternalUpdater(this);
     this.modelLookup = new ModelLookup(this);
-    this.middlewareManager = new MiddlewareManager(this, middlewares);
-    this.transactionManager = new TransactionManager(this);
     this.eventManager = new EventManager();
     this.actionStateManager = new ActionStateManager(this.eventManager);
+    this.directRenderStrategy = new DirectRenderStrategy(this);
+    this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
+    this.middlewareManager = new MiddlewareManager(this, middlewares);
+    this.transactionManager = new TransactionManager(this);
     this.portBatchProcessor = new PortBatchProcessor();
     this.labelBatchProcessor = new LabelBatchProcessor();
     this.measurementTracker = new MeasurementTracker();
@@ -113,26 +120,14 @@ export class FlowCore {
   }
 
   destroy() {
+    this.virtualizedRenderStrategy.destroy();
     this.eventManager.offAll();
     this.model.destroy();
   }
 
-  /**
-   * Starts listening to model changes and emits init command
-   */
   private init() {
     this.initializeViewportSize();
-    this.render();
-
-    this.model.onChange((state) => {
-      this.spatialHash.process(state.nodes);
-      this.modelLookup.desynchronize();
-      this.render();
-    });
-
-    this.initUpdater.start(async () => {
-      await this.commandHandler.emit('init');
-    });
+    this.renderStrategy.init();
   }
 
   /**
@@ -208,6 +203,15 @@ export class FlowCore {
       edges: this.model.getEdges(),
       metadata: this.model.getMetadata(),
     };
+  }
+
+  /**
+   * Gets the active render strategy based on virtualization config.
+   * When virtualization is enabled, uses VirtualizedRenderStrategy.
+   * When disabled, uses DirectRenderStrategy.
+   */
+  get renderStrategy(): RenderStrategy {
+    return this.isVirtualizationActive ? this.virtualizedRenderStrategy : this.directRenderStrategy;
   }
 
   /**
@@ -330,7 +334,6 @@ export class FlowCore {
     await this.updateSemaphore.acquire();
 
     try {
-      // Get the current state - guaranteed to be fresh since we hold the lock
       const currentState = this.getState();
       const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
 
@@ -344,6 +347,38 @@ export class FlowCore {
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();
     }
+  }
+
+  /**
+   * Fast-path for viewport-only updates (panning/zooming).
+   * Bypasses middleware chain and only updates viewport metadata.
+   * Use this for high-frequency viewport changes where middleware processing is unnecessary.
+   */
+  applyViewportOnlyUpdate(viewportUpdate: Partial<Viewport>): void {
+    const currentMetadata = this.model.getMetadata();
+    const currentViewport = currentMetadata.viewport;
+    const newViewport = { ...currentViewport, ...viewportUpdate };
+
+    // Skip if no actual change
+    if (
+      newViewport.x === currentViewport.x &&
+      newViewport.y === currentViewport.y &&
+      newViewport.scale === currentViewport.scale
+    ) {
+      return;
+    }
+
+    // Update model directly (bypasses middleware)
+    this.model.updateMetadata({
+      ...currentMetadata,
+      viewport: newViewport,
+    });
+
+    // Emit viewport changed event directly
+    this.eventManager.emit('viewportChanged', {
+      viewport: newViewport,
+      previousViewport: currentViewport,
+    });
   }
 
   /**
@@ -385,16 +420,6 @@ export class FlowCore {
       x: clientPosition.x - flowOffsetX,
       y: clientPosition.y - flowOffsetY,
     };
-  }
-
-  /**
-   * Renders the flow
-   */
-  private render(): void {
-    const { nodes, edges, metadata } = this.getState();
-    const temporaryEdge = this.actionStateManager.linking?.temporaryEdge;
-    const finalEdges = temporaryEdge && temporaryEdge.temporary ? [...edges, temporaryEdge] : edges;
-    this.renderer.draw(nodes, finalEdges, metadata.viewport);
   }
 
   /**
@@ -530,6 +555,18 @@ export class FlowCore {
   }
 
   /**
+   * Checks if a node is currently rendered (visible in viewport).
+   * In direct mode, always returns true. In virtualized mode, checks if the node
+   * is in the current set of visible nodes.
+   *
+   * @param nodeId Node id to check
+   * @returns True if the node is currently rendered
+   */
+  isNodeCurrentlyRendered(nodeId: string): boolean {
+    return this.renderStrategy.isNodeRendered(nodeId);
+  }
+
+  /**
    * Returns the current zoom scale
    */
   getScale() {
@@ -545,6 +582,20 @@ export class FlowCore {
 
   get updater(): Updater {
     return this.initUpdater.isInitialized ? this.internalUpdater : this.initUpdater;
+  }
+
+  /**
+   * Returns true if the diagram has completed its initialization phase.
+   */
+  get isInitialized(): boolean {
+    return this.initUpdater.isInitialized;
+  }
+
+  /**
+   * Returns true if virtualization is enabled.
+   */
+  get isVirtualizationActive(): boolean {
+    return this.config.virtualization.enabled;
   }
 
   setDebugMode(debugMode: boolean): void {

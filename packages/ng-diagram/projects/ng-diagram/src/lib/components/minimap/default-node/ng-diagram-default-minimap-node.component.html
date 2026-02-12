@@ -1,0 +1,16 @@
+@switch (shape()) {
+  @case ('circle') {
+    <svg:circle [attr.cx]="cx()" [attr.cy]="cy()" [attr.r]="radius()" />
+  }
+  @case ('ellipse') {
+    <svg:ellipse [attr.cx]="cx()" [attr.cy]="cy()" [attr.rx]="rx()" [attr.ry]="ry()" />
+  }
+  @default {
+    <svg:rect
+      [attr.x]="bounds().x"
+      [attr.y]="bounds().y"
+      [attr.width]="bounds().width"
+      [attr.height]="bounds().height"
+    />
+  }
+}

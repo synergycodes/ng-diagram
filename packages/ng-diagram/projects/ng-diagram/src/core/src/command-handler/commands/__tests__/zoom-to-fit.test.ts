@@ -15,6 +15,7 @@ describe('zoomToFit command', () => {
         applyUpdate: mockApplyUpdate,
         config: {
           zoom: { min: 0.1, max: 2, step: 0.1, zoomToFit: { padding: 20 } },
+          virtualization: { enabled: false },
         },
       },
     } as unknown as CommandHandler;

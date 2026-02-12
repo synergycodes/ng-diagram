@@ -86,6 +86,10 @@ describe('BoxSelectionEventHandler', () => {
     getEdges: vi.fn(),
   };
 
+  const mockModelLookup = {
+    getNodeById: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -105,10 +109,15 @@ describe('BoxSelectionEventHandler', () => {
       },
       spatialHash: mockSpatialHash,
       model: mockModel,
+      modelLookup: mockModelLookup,
       clientToFlowPosition: vi.fn((point) => point),
     } as unknown as FlowCore;
 
     mockModel.getEdges.mockReturnValue([edge1, edge2, edge3]);
+    mockModelLookup.getNodeById.mockImplementation((id: string) => {
+      const nodes = [node1, node2, node3, node4, node5];
+      return nodes.find((n) => n.id === id) ?? null;
+    });
 
     instance = new BoxSelectionEventHandler(mockFlowCore);
   });

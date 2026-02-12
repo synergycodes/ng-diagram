@@ -35,3 +35,6 @@ export * from './action-state.interface';
 // Shortcuts and Actions
 export * from './shortcut-action.interface';
 export * from './shortcut.interface';
+
+// Render strategy types
+export * from '../render-strategy/render-strategy.interface';

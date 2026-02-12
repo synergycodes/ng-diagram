@@ -8,7 +8,7 @@ import {
 @Component({
   imports: [NgDiagramBaseNodeTemplateComponent],
   template: `
-    <ng-diagram-base-node-template [node]="node">
+    <ng-diagram-base-node-template [node]="node()">
       <input
         type="text"
         [placeholder]="'Enter text'"

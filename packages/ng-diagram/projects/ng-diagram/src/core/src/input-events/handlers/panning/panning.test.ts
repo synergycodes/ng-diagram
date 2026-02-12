@@ -31,10 +31,19 @@ describe('PanningEventHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    const mockActionStateManager = {
+      panning: undefined as { active: boolean } | undefined,
+      clearPanning: vi.fn(() => {
+        mockActionStateManager.panning = undefined;
+      }),
+      isPanning: vi.fn(() => !!mockActionStateManager.panning?.active),
+    };
+
     mockFlowCore = {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
+      actionStateManager: mockActionStateManager,
       environment: mockEnvironment,
     } as unknown as FlowCore;
 
@@ -51,21 +60,12 @@ describe('PanningEventHandler', () => {
 
         instance.handle(event);
 
-        // Verify internal state by testing subsequent continue phase
-        const continueEvent = getSamplePanningEvent({
-          phase: 'continue',
-          lastInputPoint: { x: 110, y: 110 },
-        });
-
-        instance.handle(continueEvent);
-
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 10 });
+        expect(mockFlowCore.actionStateManager.panning).toEqual({ active: true });
       });
     });
 
     describe('continue phase', () => {
       beforeEach(() => {
-        // Start panning first
         const startEvent = getSamplePanningEvent({
           phase: 'start',
           lastInputPoint: { x: 100, y: 100 },
@@ -74,7 +74,7 @@ describe('PanningEventHandler', () => {
         vi.clearAllMocks();
       });
 
-      it('should emit moveViewportBy with correct delta', () => {
+      it('should emit moveViewportBy immediately on each move', () => {
         const event = getSamplePanningEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 120 },
@@ -82,30 +82,29 @@ describe('PanningEventHandler', () => {
 
         instance.handle(event);
 
+        // Should emit immediately (no RAF throttling)
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 20 });
       });
 
-      it('should calculate movement relative to last position after multiple moves', () => {
-        // First move
+      it('should emit on every move event', () => {
         const firstEvent = getSamplePanningEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },
         });
         instance.handle(firstEvent);
 
-        // Second move
         const secondEvent = getSamplePanningEvent({
           phase: 'continue',
           lastInputPoint: { x: 120, y: 125 },
         });
         instance.handle(secondEvent);
 
-        // Should calculate delta from previous position (110,110) to new position (120,125)
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: 10, y: 15 });
+        expect(mockCommandHandler.emit).toHaveBeenCalledTimes(2);
+        expect(mockCommandHandler.emit).toHaveBeenNthCalledWith(1, 'moveViewportBy', { x: 10, y: 10 });
+        expect(mockCommandHandler.emit).toHaveBeenNthCalledWith(2, 'moveViewportBy', { x: 10, y: 15 });
       });
 
       it('should not emit when not panning', () => {
-        // Create a fresh instance (not panning)
         const freshInstance = new PanningEventHandler(mockFlowCore);
 
         const event = getSamplePanningEvent({
@@ -121,7 +120,6 @@ describe('PanningEventHandler', () => {
 
     describe('end phase', () => {
       beforeEach(() => {
-        // Start panning first
         const startEvent = getSamplePanningEvent({
           phase: 'start',
           lastInputPoint: { x: 100, y: 100 },
@@ -130,14 +128,23 @@ describe('PanningEventHandler', () => {
         vi.clearAllMocks();
       });
 
-      it('should stop panning and clear state', () => {
+      it('should clear panning state', () => {
         const endEvent = getSamplePanningEvent({
           phase: 'end',
         });
 
         instance.handle(endEvent);
 
-        // Verify panning stopped by trying to continue
+        expect(mockFlowCore.actionStateManager.clearPanning).toHaveBeenCalled();
+      });
+
+      it('should stop panning after end', () => {
+        const endEvent = getSamplePanningEvent({
+          phase: 'end',
+        });
+
+        instance.handle(endEvent);
+
         const continueEvent = getSamplePanningEvent({
           phase: 'continue',
           lastInputPoint: { x: 110, y: 110 },

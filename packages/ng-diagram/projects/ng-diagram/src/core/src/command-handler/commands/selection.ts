@@ -1,8 +1,12 @@
-import type { CommandHandler, Edge, FlowStateUpdate, Node } from '../../types';
+import type { ModelLookup } from '../../model-lookup/model-lookup';
+import type { CommandHandler, FlowStateUpdate } from '../../types';
 
+/**
+ * Computes selection changes using modelLookup for O(1) lookups.
+ * Converts selection arrays to Sets to avoid O(n²) complexity.
+ */
 const changeSelection = (
-  nodes: Node[],
-  edges: Edge[],
+  modelLookup: ModelLookup,
   selectedNodeIds: string[],
   selectedEdgeIds: string[],
   multiSelection = false
@@ -10,20 +14,25 @@ const changeSelection = (
   const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = [];
   const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = [];
 
-  nodes.forEach((node) => {
-    const isSelected = selectedNodeIds.includes(node.id);
+  const selectedNodeIdSet = new Set(selectedNodeIds);
+  const selectedEdgeIdSet = new Set(selectedEdgeIds);
+
+  for (const node of modelLookup.nodesMap.values()) {
+    const isSelected = selectedNodeIdSet.has(node.id);
     if (!!node.selected === isSelected || (multiSelection && !!node.selected)) {
-      return;
+      continue;
     }
     nodesToUpdate.push({ id: node.id, selected: isSelected });
-  });
-  edges.forEach((edge) => {
-    const isSelected = selectedEdgeIds.includes(edge.id);
+  }
+
+  for (const edge of modelLookup.edgesMap.values()) {
+    const isSelected = selectedEdgeIdSet.has(edge.id);
     if (!!edge.selected === isSelected || (multiSelection && !!edge.selected)) {
-      return;
+      continue;
     }
     edgesToUpdate.push({ id: edge.id, selected: isSelected });
-  });
+  }
+
   return { nodesToUpdate, edgesToUpdate };
 };
 
@@ -38,8 +47,8 @@ export const select = async (
   commandHandler: CommandHandler,
   { nodeIds, edgeIds, multiSelection = false }: SelectCommand
 ) => {
-  const { nodes, edges } = commandHandler.flowCore.getState();
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, nodeIds ?? [], edgeIds ?? [], multiSelection);
+  const { modelLookup } = commandHandler.flowCore;
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, nodeIds ?? [], edgeIds ?? [], multiSelection);
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
@@ -53,19 +62,26 @@ export interface DeselectCommand {
 }
 
 export const deselect = async (commandHandler: CommandHandler, { nodeIds, edgeIds }: DeselectCommand) => {
-  const { nodes, edges } = commandHandler.flowCore.getState();
+  const { modelLookup } = commandHandler.flowCore;
   const nodeIdSet = new Set<string>(nodeIds);
   const edgeIdSet = new Set<string>(edgeIds);
 
-  const nodesToLeftSelected = nodes.filter(({ id, selected }) => !nodeIdSet.has(id) && !!selected).map(({ id }) => id);
+  // Find nodes/edges that should remain selected (not in the deselect list)
+  const nodesToLeftSelected: string[] = [];
+  for (const node of modelLookup.nodesMap.values()) {
+    if (!nodeIdSet.has(node.id) && !!node.selected) {
+      nodesToLeftSelected.push(node.id);
+    }
+  }
 
-  const edgesToLeftSelected = edges.filter(({ id, selected }) => !edgeIdSet.has(id) && !!selected).map(({ id }) => id);
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(
-    nodes,
-    edges,
-    nodesToLeftSelected ?? [],
-    edgesToLeftSelected ?? []
-  );
+  const edgesToLeftSelected: string[] = [];
+  for (const edge of modelLookup.edgesMap.values()) {
+    if (!edgeIdSet.has(edge.id) && !!edge.selected) {
+      edgesToLeftSelected.push(edge.id);
+    }
+  }
+
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, nodesToLeftSelected, edgesToLeftSelected);
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
@@ -77,8 +93,8 @@ export interface DeselectAllCommand {
 }
 
 export const deselectAll = async (commandHandler: CommandHandler) => {
-  const { nodes, edges } = commandHandler.flowCore.getState();
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, [], []);
+  const { modelLookup } = commandHandler.flowCore;
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, [], []);
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
@@ -90,10 +106,10 @@ export interface SelectAllCommand {
 }
 
 export const selectAll = async (commandHandler: CommandHandler) => {
-  const { nodes, edges } = commandHandler.flowCore.getState();
-  const allNodeIds = nodes.map((node) => node.id);
-  const allEdgeIds = edges.map((edge) => edge.id);
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(nodes, edges, allNodeIds, allEdgeIds);
+  const { modelLookup } = commandHandler.flowCore;
+  const allNodeIds = Array.from(modelLookup.nodesMap.keys());
+  const allEdgeIds = Array.from(modelLookup.edgesMap.keys());
+  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, allNodeIds, allEdgeIds);
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }

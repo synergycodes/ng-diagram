@@ -29,7 +29,9 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         break;
       }
       case 'continue': {
-        const selectedNodesWithChildren = this.flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
+        const selectedNodesWithChildren = this.flow.modelLookup
+          .getSelectedNodesWithChildren({ directOnly: false })
+          .filter((node) => node.draggable ?? true);
         const selectedNodes = this.flow.modelLookup.getSelectedNodes();
         if (selectedNodesWithChildren.length === 0 || !this.isMoving || !this.lastPointerPosition || !this.startPoint) {
           return;
