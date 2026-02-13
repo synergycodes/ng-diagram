@@ -1,7 +1,7 @@
 export const SEARCH_DOCS_TOOL = {
   name: 'search_docs',
   description:
-    'Search through ng-diagram documentation. Supports exact phrases, multi-word queries, and individual keywords. Best results with specific terms like "palette", "node rotation", "custom edge", "quick start", etc.',
+    'Search through ng-diagram documentation sections. Returns full section content split by ## headings. Supports exact phrases, multi-word queries, and individual keywords. Best results with specific terms like "palette", "node rotation", "custom edge", "quick start", etc.',
   inputSchema: {
     type: 'object',
     properties: {

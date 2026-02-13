@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "tools/mcp-server/dist/index.js"
+      ],
+      "env": {}
+    }
+  }
+}
