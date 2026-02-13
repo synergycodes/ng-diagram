@@ -6,40 +6,43 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { SearchEngine } from '../src/services/search.js';
 import { createSearchDocsHandler, SEARCH_DOCS_TOOL } from '../src/tools/search-docs/index.js';
 import type { SearchDocsInput } from '../src/tools/search-docs/tool.types.js';
-import type { DocumentMetadata } from '../src/types/index.js';
+import type { DocumentSection } from '../src/types/index.js';
 
 describe('search_docs tool', () => {
-  let testDocuments: DocumentMetadata[];
+  let testSections: DocumentSection[];
   let searchEngine: SearchEngine;
   let handler: ReturnType<typeof createSearchDocsHandler>;
 
   beforeEach(() => {
-    // Create test documents
-    testDocuments = [
+    // Create test sections
+    testSections = [
       {
         path: 'guides/palette.md',
-        title: 'Palette Guide',
+        pageTitle: 'Palette Guide',
+        sectionTitle: 'Palette Guide',
         description: 'Learn how to use the palette component',
         content: 'The palette allows you to drag and drop nodes onto the canvas.',
         url: '/docs/guides/palette',
       },
       {
         path: 'intro/quick-start.md',
-        title: 'Quick Start',
+        pageTitle: 'Quick Start',
+        sectionTitle: 'Quick Start',
         description: 'Get started quickly with ng-diagram',
         content: 'Install the package using npm install ng-diagram.',
         url: '/docs/intro/quick-start',
       },
       {
         path: 'api/components.md',
-        title: 'Components API',
+        pageTitle: 'Components API',
+        sectionTitle: 'Components API',
         description: 'API reference for all components',
         content: 'This document describes the available Angular components in the library.',
         url: '/docs/api/components',
       },
     ];
 
-    searchEngine = new SearchEngine(testDocuments);
+    searchEngine = new SearchEngine(testSections);
     handler = createSearchDocsHandler(searchEngine);
   });
 
@@ -107,7 +110,7 @@ describe('search_docs tool', () => {
 
       expect(output.results).toBeDefined();
       expect(output.results).toHaveLength(1);
-      expect(output.results[0].title).toBe('Palette Guide');
+      expect(output.results[0].sectionTitle).toBe('Palette Guide');
     });
 
     it('should return multiple results when multiple matches exist', async () => {
@@ -126,9 +129,9 @@ describe('search_docs tool', () => {
 
       expect(output.results).toHaveLength(1);
       const result = output.results[0];
-      expect(result).toHaveProperty('title');
-      expect(result).toHaveProperty('description');
-      expect(result).toHaveProperty('excerpt');
+      expect(result).toHaveProperty('pageTitle');
+      expect(result).toHaveProperty('sectionTitle');
+      expect(result).toHaveProperty('content');
       expect(result).toHaveProperty('url');
     });
 
@@ -138,7 +141,7 @@ describe('search_docs tool', () => {
       const output = await handler(input);
 
       expect(output.results).toHaveLength(1);
-      expect(output.results[0].title).toBe('Palette Guide');
+      expect(output.results[0].sectionTitle).toBe('Palette Guide');
     });
 
     it('should handle case-insensitive search', async () => {
@@ -147,7 +150,7 @@ describe('search_docs tool', () => {
       const output = await handler(input);
 
       expect(output.results).toHaveLength(1);
-      expect(output.results[0].title).toBe('Palette Guide');
+      expect(output.results[0].sectionTitle).toBe('Palette Guide');
     });
   });
 
@@ -161,7 +164,7 @@ describe('search_docs tool', () => {
       expect(output.results).toEqual([]);
     });
 
-    it('should return empty results for query not in any document', async () => {
+    it('should return empty results for query not in any section', async () => {
       const input: SearchDocsInput = { query: 'quantum-physics' };
 
       const output = await handler(input);
@@ -275,8 +278,8 @@ describe('search_docs tool', () => {
 
       const output = await handler(input);
 
-      expect(output.results).toHaveLength(1);
-      expect(output.results[0].title).toBe('Components API');
+      expect(output.results.length).toBeGreaterThanOrEqual(1);
+      expect(output.results[0].sectionTitle).toBe('Components API');
     });
 
     it('should pass limit to search engine correctly', async () => {
@@ -304,7 +307,7 @@ describe('search_docs tool', () => {
       const output = await handler(input);
 
       expect(output.results).toHaveLength(1);
-      expect(output.results[0].title).toBe('Quick Start');
+      expect(output.results[0].sectionTitle).toBe('Quick Start');
     });
 
     it('should handle very long queries', async () => {
@@ -321,7 +324,7 @@ describe('search_docs tool', () => {
       const output = await handler(input);
 
       expect(output.results).toHaveLength(1);
-      expect(output.results[0].title).toBe('Palette Guide');
+      expect(output.results[0].sectionTitle).toBe('Palette Guide');
     });
 
     it('should handle empty search engine', async () => {

@@ -21,11 +21,15 @@ async function main(): Promise<void> {
     // From tools/mcp-server/src -> ../../../apps/docs/src/content/docs
     const docsPath = resolve(__dirname, '../../../apps/docs/src/content/docs');
 
+    // Resolve API report path relative to the repository root
+    const apiReportPath = resolve(__dirname, '../../../packages/ng-diagram/api-report/ng-diagram.api.md');
+
     const server = new NgDiagramMCPServer({
       name: 'ng-diagram-docs',
       version: '0.1.0',
       docsPath,
       baseUrl: 'https://www.ngdiagram.dev',
+      apiReportPath,
     });
 
     await server.start();

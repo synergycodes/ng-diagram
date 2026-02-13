@@ -26,4 +26,6 @@ export interface MCPServerConfig {
   docsPath: string;
   /** Base URL for the documentation site */
   baseUrl: string;
+  /** Path to the API Extractor report file (.api.md) */
+  apiReportPath?: string;
 }

@@ -2,25 +2,31 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
-  ListResourcesRequestSchema,
   ListToolsRequestSchema,
-  ReadResourceRequestSchema,
   type CallToolRequest,
-  type ListResourcesRequest,
   type ListToolsRequest,
-  type ReadResourceRequest,
 } from '@modelcontextprotocol/sdk/types.js';
+import { ApiReportIndexer } from './services/api-indexer.js';
 import { DocumentationIndexer } from './services/indexer.js';
 import { SearchEngine } from './services/search.js';
+import { SymbolSearchEngine } from './services/symbol-search.js';
+import { GET_DOC_TOOL, createGetDocHandler, type GetDocInput } from './tools/get-doc/index.js';
 import { SEARCH_DOCS_TOOL, createSearchDocsHandler, type SearchDocsInput } from './tools/search-docs/index.js';
-import type { DocumentMetadata, MCPServerConfig } from './types/index.js';
+import { GET_SYMBOL_TOOL, createGetSymbolHandler, type GetSymbolInput } from './tools/get-symbol/index.js';
+import {
+  SEARCH_SYMBOLS_TOOL,
+  createSearchSymbolsHandler,
+  type SearchSymbolsInput,
+} from './tools/search-symbols/index.js';
+import type { MCPServerConfig } from './types/index.js';
 
 export class NgDiagramMCPServer {
   private config: MCPServerConfig;
   private server: Server;
   private indexer: DocumentationIndexer;
+  private apiIndexer: ApiReportIndexer | null = null;
   private searchEngine: SearchEngine | null = null;
-  private documents: DocumentMetadata[] = [];
+  private symbolSearch: SymbolSearchEngine | null = null;
   private isRunning = false;
 
   constructor(config: MCPServerConfig) {
@@ -34,7 +40,6 @@ export class NgDiagramMCPServer {
       {
         capabilities: {
           tools: {},
-          resources: {},
         },
       }
     );
@@ -68,15 +73,23 @@ export class NgDiagramMCPServer {
 
       // Build documentation index
       console.log(`[MCP Server] Indexing documentation from: ${this.config.docsPath}`);
-      this.documents = await this.indexer.buildIndex();
-      console.log(`[MCP Server] Indexed ${this.documents.length} documents`);
+      const sections = await this.indexer.buildIndex();
+      console.log(`[MCP Server] Indexed ${sections.length} sections`);
+
+      // Build API report index
+      if (this.config.apiReportPath) {
+        this.apiIndexer = new ApiReportIndexer(this.config.apiReportPath);
+        const apiSymbols = await this.apiIndexer.buildIndex();
+        console.log(`[MCP Server] Indexed ${apiSymbols.length} API symbols`);
+
+        this.symbolSearch = new SymbolSearchEngine(apiSymbols);
+      }
 
       // Initialize search engine
-      this.searchEngine = new SearchEngine(this.documents);
+      this.searchEngine = new SearchEngine(sections);
 
-      // Register tools and resources
+      // Register tools
       this.registerTools();
-      this.registerResources();
 
       // Start server with stdio transport
       const transport = new StdioServerTransport();
@@ -96,11 +109,19 @@ export class NgDiagramMCPServer {
     }
 
     const searchHandler = createSearchDocsHandler(this.searchEngine);
+    const getDocHandler = createGetDocHandler(this.indexer);
+    const searchSymbolsHandler = this.symbolSearch ? createSearchSymbolsHandler(this.symbolSearch) : null;
+    const getSymbolHandler = this.apiIndexer ? createGetSymbolHandler(this.apiIndexer) : null;
 
     this.server.setRequestHandler(ListToolsRequestSchema, async (_request: ListToolsRequest) => {
-      return {
-        tools: [SEARCH_DOCS_TOOL],
-      };
+      const tools: object[] = [SEARCH_DOCS_TOOL, GET_DOC_TOOL];
+      if (searchSymbolsHandler) {
+        tools.push(SEARCH_SYMBOLS_TOOL);
+      }
+      if (getSymbolHandler) {
+        tools.push(GET_SYMBOL_TOOL);
+      }
+      return { tools };
     });
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
@@ -136,48 +157,107 @@ export class NgDiagramMCPServer {
         }
       }
 
+      if (name === 'search_symbols' && searchSymbolsHandler) {
+        try {
+          const result = await searchSymbolsHandler(args as unknown as SearchSymbolsInput);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        } catch (error) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    error: error instanceof Error ? error.message : 'Unknown error occurred',
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+            isError: true,
+          };
+        }
+      }
+
+      if (name === 'get_symbol' && getSymbolHandler) {
+        try {
+          const result = await getSymbolHandler(args as unknown as GetSymbolInput);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        } catch (error) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    error: error instanceof Error ? error.message : 'Unknown error occurred',
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+            isError: true,
+          };
+        }
+      }
+
+      if (name === 'get_doc') {
+        try {
+          const result = await getDocHandler(args as unknown as GetDocInput);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        } catch (error) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    error: error instanceof Error ? error.message : 'Unknown error occurred',
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+            isError: true,
+          };
+        }
+      }
+
       throw new Error(`Unknown tool: ${name}`);
     });
 
-    console.log('[MCP Server] Registered tool: search_docs');
-  }
-
-  private registerResources(): void {
-    // List all available documentation resources
-    this.server.setRequestHandler(ListResourcesRequestSchema, async (_request: ListResourcesRequest) => {
-      return {
-        resources: this.documents.map((doc) => ({
-          uri: doc.url,
-          name: doc.title,
-          description: doc.description,
-          mimeType: 'text/plain',
-        })),
-      };
-    });
-
-    // Read a specific documentation resource
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request: ReadResourceRequest) => {
-      const { uri } = request.params;
-
-      // Find the document by URL
-      const document = this.documents.find((doc) => doc.url === uri);
-
-      if (!document) {
-        throw new Error(`Resource not found: ${uri}`);
-      }
-
-      return {
-        contents: [
-          {
-            uri: document.url,
-            mimeType: 'text/plain',
-            text: document.content,
-          },
-        ],
-      };
-    });
-
-    console.log(`[MCP Server] Registered ${this.documents.length} documentation resources`);
+    const toolNames = ['search_docs', 'get_doc'];
+    if (searchSymbolsHandler) {
+      toolNames.push('search_symbols');
+    }
+    if (getSymbolHandler) {
+      toolNames.push('get_symbol');
+    }
+    console.log(`[MCP Server] Registered tools: ${toolNames.join(', ')}`);
   }
 
   private shutdown(): void {
