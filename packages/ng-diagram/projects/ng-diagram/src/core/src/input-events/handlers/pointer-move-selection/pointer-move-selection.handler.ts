@@ -42,6 +42,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           if (distance >= MOVE_THRESHOLD) {
             this.hasMoved = true;
             this.flow.actionStateManager.dragging = {
+              nodeIds: selectedNodesWithChildren.map((n) => n.id),
               modifiers: { ...event.modifiers },
               accumulatedDeltas: new Map(),
             };
@@ -75,7 +76,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
         if (this.hasMoved) {
           await this.handleDrop(pointer);
-          this.flow.commandHandler.emit('moveNodesStop');
+          await this.flow.commandHandler.emit('moveNodesStop');
         }
 
         this.flow.actionStateManager.clearDragging();

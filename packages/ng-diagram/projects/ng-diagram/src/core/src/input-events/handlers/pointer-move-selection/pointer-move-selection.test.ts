@@ -172,6 +172,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         handler.handle(event);
 
         expect(mockActionStateManager.dragging).toMatchObject({
+          nodeIds: [mockNode.id],
           modifiers: {
             primary: false,
             secondary: false,
@@ -687,6 +688,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       );
 
       const moveNodesStartCount = mockEmit.mock.calls.filter((call: unknown[]) => call[0] === 'moveNodesStart').length;
+      expect(moveNodesStartCount).toBe(1);
 
       handler.handle(
         getSamplePointerMoveSelectionEvent({
@@ -699,7 +701,6 @@ describe('PointerMoveSelectionEventHandler', () => {
         (call: unknown[]) => call[0] === 'moveNodesStart'
       ).length;
 
-      expect(moveNodesStartCount).toBe(1);
       expect(moveNodesStartCountAfter).toBe(1);
     });
 

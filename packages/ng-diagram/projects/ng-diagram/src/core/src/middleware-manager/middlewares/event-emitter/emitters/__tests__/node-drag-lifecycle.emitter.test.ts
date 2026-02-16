@@ -1,14 +1,36 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { EventManager } from '../../../../../event-manager/event-manager';
 import { mockNode } from '../../../../../test-utils';
-import type { MiddlewareContext, Node } from '../../../../../types';
+import type { DraggingActionState, MiddlewareContext, Node } from '../../../../../types';
 import { NodeDragEndedEmitter, NodeDragStartedEmitter } from '../node-drag-lifecycle.emitter';
+
+interface MockActionStateManager {
+  dragging: Pick<DraggingActionState, 'nodeIds'> | undefined;
+}
+
+function createContext(
+  overrides: Partial<Omit<MiddlewareContext, 'actionStateManager'>> & {
+    actionStateManager?: MockActionStateManager;
+  } = {}
+): MiddlewareContext {
+  return {
+    modelActionTypes: ['moveNodesStart'],
+    nodesMap: new Map<string, Node>(),
+    initialUpdate: {},
+    history: [],
+    actionStateManager: {
+      dragging: undefined,
+    },
+    ...overrides,
+  } as unknown as MiddlewareContext;
+}
 
 describe('NodeDragStartedEmitter', () => {
   let emitter: NodeDragStartedEmitter;
   let eventManager: EventManager;
   let emitSpy: ReturnType<typeof vi.fn>;
   let context: MiddlewareContext;
+  let mockActionStateManager: MockActionStateManager;
 
   beforeEach(() => {
     emitter = new NodeDragStartedEmitter();
@@ -17,21 +39,21 @@ describe('NodeDragStartedEmitter', () => {
       deferredEmit: emitSpy,
     } as unknown as EventManager;
 
-    context = {
-      modelActionType: 'moveNodesStart',
+    mockActionStateManager = {
+      dragging: { nodeIds: ['node1'] },
+    };
+
+    const node: Node = { ...mockNode, id: 'node1' };
+    context = createContext({
       modelActionTypes: ['moveNodesStart'],
-      nodesMap: new Map<string, Node>(),
-      initialUpdate: {},
-      history: [],
-    } as unknown as MiddlewareContext;
+      nodesMap: new Map([['node1', node]]),
+      actionStateManager: mockActionStateManager,
+    });
   });
 
   describe('action type filtering', () => {
     it('should not emit when action type is not moveNodesStart', () => {
       context.modelActionTypes = ['moveNodesBy'];
-
-      const node: Node = { ...mockNode, id: 'node1', selected: true };
-      context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
 
@@ -39,120 +61,58 @@ describe('NodeDragStartedEmitter', () => {
     });
 
     it('should emit for moveNodesStart action', () => {
-      context.modelActionTypes = ['moveNodesStart'];
-
-      const node: Node = { ...mockNode, id: 'node1', selected: true };
-      context.nodesMap.set('node1', node);
-
       emitter.emit(context, eventManager);
 
+      const node = context.nodesMap.get('node1')!;
       expect(emitSpy).toHaveBeenCalledOnce();
       expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [node] });
     });
   });
 
-  describe('node resolution', () => {
-    it('should include only selected nodes', () => {
-      const selectedNode: Node = { ...mockNode, id: 'node1', selected: true };
-      const unselectedNode: Node = { ...mockNode, id: 'node2', selected: false };
-      context.nodesMap.set('node1', selectedNode);
-      context.nodesMap.set('node2', unselectedNode);
+  describe('node resolution from actionState', () => {
+    it('should resolve nodes from nodeIds in actionState', () => {
+      const node1: Node = { ...mockNode, id: 'node1' };
+      const node2: Node = { ...mockNode, id: 'node2' };
+      context.nodesMap = new Map([
+        ['node1', node1],
+        ['node2', node2],
+      ]);
+      mockActionStateManager.dragging = { nodeIds: ['node1', 'node2'] };
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [selectedNode] });
+      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [node1, node2] });
     });
 
-    it('should not emit when no selected nodes exist', () => {
-      const node: Node = { ...mockNode, id: 'node1', selected: false };
-      context.nodesMap.set('node1', node);
+    it('should not emit when dragging state is undefined', () => {
+      mockActionStateManager.dragging = undefined;
 
       emitter.emit(context, eventManager);
 
       expect(emitSpy).not.toHaveBeenCalled();
     });
 
-    it('should include multiple selected nodes', () => {
-      const node1: Node = { ...mockNode, id: 'node1', selected: true };
-      const node2: Node = { ...mockNode, id: 'node2', selected: true };
-      context.nodesMap.set('node1', node1);
-      context.nodesMap.set('node2', node2);
+    it('should not emit when nodeIds is empty', () => {
+      mockActionStateManager.dragging = { nodeIds: [] };
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [node1, node2] });
+      expect(emitSpy).not.toHaveBeenCalled();
     });
-  });
 
-  describe('children of selected groups', () => {
-    it('should include children of a selected group', () => {
-      const group: Node = { ...mockNode, id: 'group1', selected: true };
-      const child: Node = { ...mockNode, id: 'child1', selected: false, groupId: 'group1' };
-      context.nodesMap.set('group1', group);
-      context.nodesMap.set('child1', child);
+    it('should skip nodeIds that do not exist in nodesMap', () => {
+      const node1: Node = { ...mockNode, id: 'node1' };
+      context.nodesMap = new Map([['node1', node1]]);
+      mockActionStateManager.dragging = { nodeIds: ['node1', 'nonexistent'] };
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [group, child] });
+      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [node1] });
     });
 
-    it('should include deeply nested children', () => {
-      const group: Node = { ...mockNode, id: 'group1', selected: true };
-      const child: Node = { ...mockNode, id: 'child1', selected: false, groupId: 'group1' };
-      const grandchild: Node = { ...mockNode, id: 'grandchild1', selected: false, groupId: 'child1' };
-      context.nodesMap.set('group1', group);
-      context.nodesMap.set('child1', child);
-      context.nodesMap.set('grandchild1', grandchild);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [group, child, grandchild] });
-    });
-
-    it('should exclude non-draggable children of a selected group', () => {
-      const group: Node = { ...mockNode, id: 'group1', selected: true };
-      const draggableChild: Node = { ...mockNode, id: 'child1', selected: false, groupId: 'group1' };
-      const nonDraggableChild: Node = {
-        ...mockNode,
-        id: 'child2',
-        selected: false,
-        groupId: 'group1',
-        draggable: false,
-      };
-      context.nodesMap.set('group1', group);
-      context.nodesMap.set('child1', draggableChild);
-      context.nodesMap.set('child2', nonDraggableChild);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [group, draggableChild] });
-    });
-  });
-
-  describe('draggable filtering', () => {
-    it('should exclude nodes with draggable set to false', () => {
-      const draggableNode: Node = { ...mockNode, id: 'node1', selected: true, draggable: true };
-      const nonDraggableNode: Node = { ...mockNode, id: 'node2', selected: true, draggable: false };
-      context.nodesMap.set('node1', draggableNode);
-      context.nodesMap.set('node2', nonDraggableNode);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [draggableNode] });
-    });
-
-    it('should include nodes without draggable property (defaults to true)', () => {
-      const node: Node = { ...mockNode, id: 'node1', selected: true };
-      context.nodesMap.set('node1', node);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragStarted', { nodes: [node] });
-    });
-
-    it('should not emit when all selected nodes are non-draggable', () => {
-      const node: Node = { ...mockNode, id: 'node1', selected: true, draggable: false };
-      context.nodesMap.set('node1', node);
+    it('should not emit when all nodeIds are missing from nodesMap', () => {
+      context.nodesMap = new Map();
+      mockActionStateManager.dragging = { nodeIds: ['nonexistent'] };
 
       emitter.emit(context, eventManager);
 
@@ -166,6 +126,7 @@ describe('NodeDragEndedEmitter', () => {
   let eventManager: EventManager;
   let emitSpy: ReturnType<typeof vi.fn>;
   let context: MiddlewareContext;
+  let mockActionStateManager: MockActionStateManager;
 
   beforeEach(() => {
     emitter = new NodeDragEndedEmitter();
@@ -174,21 +135,21 @@ describe('NodeDragEndedEmitter', () => {
       deferredEmit: emitSpy,
     } as unknown as EventManager;
 
-    context = {
-      modelActionType: 'moveNodesStop',
+    mockActionStateManager = {
+      dragging: { nodeIds: ['node1'] },
+    };
+
+    const node: Node = { ...mockNode, id: 'node1' };
+    context = createContext({
       modelActionTypes: ['moveNodesStop'],
-      nodesMap: new Map<string, Node>(),
-      initialUpdate: {},
-      history: [],
-    } as unknown as MiddlewareContext;
+      nodesMap: new Map([['node1', node]]),
+      actionStateManager: mockActionStateManager,
+    });
   });
 
   describe('action type filtering', () => {
     it('should not emit when action type is not moveNodesStop', () => {
       context.modelActionTypes = ['moveNodesBy'];
-
-      const node: Node = { ...mockNode, id: 'node1', selected: true };
-      context.nodesMap.set('node1', node);
 
       emitter.emit(context, eventManager);
 
@@ -196,120 +157,58 @@ describe('NodeDragEndedEmitter', () => {
     });
 
     it('should emit for moveNodesStop action', () => {
-      context.modelActionTypes = ['moveNodesStop'];
-
-      const node: Node = { ...mockNode, id: 'node1', selected: true };
-      context.nodesMap.set('node1', node);
-
       emitter.emit(context, eventManager);
 
+      const node = context.nodesMap.get('node1')!;
       expect(emitSpy).toHaveBeenCalledOnce();
       expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node] });
     });
   });
 
-  describe('node resolution', () => {
-    it('should include only selected nodes', () => {
-      const selectedNode: Node = { ...mockNode, id: 'node1', selected: true };
-      const unselectedNode: Node = { ...mockNode, id: 'node2', selected: false };
-      context.nodesMap.set('node1', selectedNode);
-      context.nodesMap.set('node2', unselectedNode);
+  describe('node resolution from actionState', () => {
+    it('should resolve nodes from nodeIds in actionState', () => {
+      const node1: Node = { ...mockNode, id: 'node1' };
+      const node2: Node = { ...mockNode, id: 'node2' };
+      context.nodesMap = new Map([
+        ['node1', node1],
+        ['node2', node2],
+      ]);
+      mockActionStateManager.dragging = { nodeIds: ['node1', 'node2'] };
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [selectedNode] });
+      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node1, node2] });
     });
 
-    it('should not emit when no selected nodes exist', () => {
-      const node: Node = { ...mockNode, id: 'node1', selected: false };
-      context.nodesMap.set('node1', node);
+    it('should not emit when dragging state is undefined', () => {
+      mockActionStateManager.dragging = undefined;
 
       emitter.emit(context, eventManager);
 
       expect(emitSpy).not.toHaveBeenCalled();
     });
 
-    it('should include multiple selected nodes', () => {
-      const node1: Node = { ...mockNode, id: 'node1', selected: true };
-      const node2: Node = { ...mockNode, id: 'node2', selected: true };
-      context.nodesMap.set('node1', node1);
-      context.nodesMap.set('node2', node2);
+    it('should not emit when nodeIds is empty', () => {
+      mockActionStateManager.dragging = { nodeIds: [] };
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node1, node2] });
+      expect(emitSpy).not.toHaveBeenCalled();
     });
-  });
 
-  describe('children of selected groups', () => {
-    it('should include children of a selected group', () => {
-      const group: Node = { ...mockNode, id: 'group1', selected: true };
-      const child: Node = { ...mockNode, id: 'child1', selected: false, groupId: 'group1' };
-      context.nodesMap.set('group1', group);
-      context.nodesMap.set('child1', child);
+    it('should skip nodeIds that do not exist in nodesMap', () => {
+      const node1: Node = { ...mockNode, id: 'node1' };
+      context.nodesMap = new Map([['node1', node1]]);
+      mockActionStateManager.dragging = { nodeIds: ['node1', 'nonexistent'] };
 
       emitter.emit(context, eventManager);
 
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [group, child] });
+      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node1] });
     });
 
-    it('should include deeply nested children', () => {
-      const group: Node = { ...mockNode, id: 'group1', selected: true };
-      const child: Node = { ...mockNode, id: 'child1', selected: false, groupId: 'group1' };
-      const grandchild: Node = { ...mockNode, id: 'grandchild1', selected: false, groupId: 'child1' };
-      context.nodesMap.set('group1', group);
-      context.nodesMap.set('child1', child);
-      context.nodesMap.set('grandchild1', grandchild);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [group, child, grandchild] });
-    });
-
-    it('should exclude non-draggable children of a selected group', () => {
-      const group: Node = { ...mockNode, id: 'group1', selected: true };
-      const draggableChild: Node = { ...mockNode, id: 'child1', selected: false, groupId: 'group1' };
-      const nonDraggableChild: Node = {
-        ...mockNode,
-        id: 'child2',
-        selected: false,
-        groupId: 'group1',
-        draggable: false,
-      };
-      context.nodesMap.set('group1', group);
-      context.nodesMap.set('child1', draggableChild);
-      context.nodesMap.set('child2', nonDraggableChild);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [group, draggableChild] });
-    });
-  });
-
-  describe('draggable filtering', () => {
-    it('should exclude nodes with draggable set to false', () => {
-      const draggableNode: Node = { ...mockNode, id: 'node1', selected: true, draggable: true };
-      const nonDraggableNode: Node = { ...mockNode, id: 'node2', selected: true, draggable: false };
-      context.nodesMap.set('node1', draggableNode);
-      context.nodesMap.set('node2', nonDraggableNode);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [draggableNode] });
-    });
-
-    it('should include nodes without draggable property (defaults to true)', () => {
-      const node: Node = { ...mockNode, id: 'node1', selected: true };
-      context.nodesMap.set('node1', node);
-
-      emitter.emit(context, eventManager);
-
-      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node] });
-    });
-
-    it('should not emit when all selected nodes are non-draggable', () => {
-      const node: Node = { ...mockNode, id: 'node1', selected: true, draggable: false };
-      context.nodesMap.set('node1', node);
+    it('should not emit when all nodeIds are missing from nodesMap', () => {
+      context.nodesMap = new Map();
+      mockActionStateManager.dragging = { nodeIds: ['nonexistent'] };
 
       emitter.emit(context, eventManager);
 

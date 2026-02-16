@@ -1,14 +1,16 @@
 import type { EventManager } from '../../../../event-manager/event-manager';
 import type { MiddlewareContext, Node } from '../../../../types';
-import { getNodesWithChildren } from '../../../utils/get-nodes-with-children';
 import type { EventEmitter } from './event-emitter.interface';
 
-const isDraggable = (node: Node) => node.draggable ?? true;
-
-function getSelectedDraggableNodesWithChildren(nodesMap: Map<string, Node>): Node[] {
-  const selectedNodeIds = [...nodesMap.values()].filter((n) => n.selected).map((n) => n.id);
-
-  return getNodesWithChildren(selectedNodeIds, nodesMap).filter(isDraggable);
+function resolveNodes(nodeIds: string[], nodesMap: Map<string, Node>): Node[] {
+  const nodes: Node[] = [];
+  for (const id of nodeIds) {
+    const node = nodesMap.get(id);
+    if (node) {
+      nodes.push(node);
+    }
+  }
+  return nodes;
 }
 
 export class NodeDragStartedEmitter implements EventEmitter {
@@ -19,8 +21,12 @@ export class NodeDragStartedEmitter implements EventEmitter {
       return;
     }
 
-    const nodes = getSelectedDraggableNodesWithChildren(context.nodesMap);
+    const nodeIds = context.actionStateManager.dragging?.nodeIds;
+    if (!nodeIds || nodeIds.length === 0) {
+      return;
+    }
 
+    const nodes = resolveNodes(nodeIds, context.nodesMap);
     if (nodes.length === 0) {
       return;
     }
@@ -37,8 +43,12 @@ export class NodeDragEndedEmitter implements EventEmitter {
       return;
     }
 
-    const nodes = getSelectedDraggableNodesWithChildren(context.nodesMap);
+    const nodeIds = context.actionStateManager.dragging?.nodeIds;
+    if (!nodeIds || nodeIds.length === 0) {
+      return;
+    }
 
+    const nodes = resolveNodes(nodeIds, context.nodesMap);
     if (nodes.length === 0) {
       return;
     }
