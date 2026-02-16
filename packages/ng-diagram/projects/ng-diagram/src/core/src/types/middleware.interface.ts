@@ -68,6 +68,7 @@ export type ModelActionType =
   | 'highlightGroup'
   | 'highlightGroupClear'
   | 'moveNodes'
+  | 'moveNodesStart'
   | 'moveNodesStop';
 
 /**

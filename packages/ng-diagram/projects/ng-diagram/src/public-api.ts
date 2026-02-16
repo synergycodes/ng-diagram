@@ -129,6 +129,8 @@ export type {
   ModifierOnlyShortcutBinding,
   NgDiagramMath,
   Node,
+  NodeDragEndedEvent,
+  NodeDragStartedEvent,
   NodeResizedEvent,
   NodeRotationConfig,
   OriginPoint,

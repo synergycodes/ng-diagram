@@ -34,6 +34,7 @@ import {
   StartLinkingFromPositionCommand,
 } from '../command-handler/commands/linking';
 import { MoveNodesByCommand } from '../command-handler/commands/move';
+import { MoveNodesStartCommand, MoveNodesStopCommand } from '../command-handler/commands/move-nodes-lifecycle';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { RemoveFromGroupCommand } from '../command-handler/commands/remove-from-group';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
@@ -59,6 +60,8 @@ export type Command =
   | DeselectCommand
   | DeselectAllCommand
   | MoveNodesByCommand
+  | MoveNodesStartCommand
+  | MoveNodesStopCommand
   | DeleteSelectionCommand
   | AddNodesCommand
   | UpdateNodeCommand

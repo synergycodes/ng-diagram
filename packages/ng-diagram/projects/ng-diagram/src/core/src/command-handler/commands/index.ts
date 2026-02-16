@@ -35,6 +35,7 @@ import {
   startLinkingFromPosition,
 } from './linking/';
 import { moveNodesBy } from './move';
+import { moveNodesStart, moveNodesStop } from './move-nodes-lifecycle';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { removeFromGroup } from './remove-from-group';
 import { resizeNode } from './resize-node';
@@ -60,6 +61,8 @@ export const commands: CommandMap = {
   deselect,
   deselectAll,
   moveNodesBy,
+  moveNodesStart,
+  moveNodesStop,
   deleteSelection,
   addNodes,
   updateNode,

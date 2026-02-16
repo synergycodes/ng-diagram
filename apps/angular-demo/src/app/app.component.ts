@@ -15,6 +15,8 @@ import {
   NgDiagramMinimapNodeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  NodeDragEndedEvent,
+  NodeDragStartedEvent,
   NodeResizedEvent,
   PaletteItemDroppedEvent,
   provideNgDiagram,
@@ -206,6 +208,18 @@ export class AppComponent {
       nodeId: event.node.id,
       angle: event.angle,
       previousAngle: event.previousAngle,
+    });
+  }
+
+  onNodeDragStarted(event: NodeDragStartedEvent): void {
+    console.log('Node Drag Started:', {
+      nodes: event.nodes.map((n: Node) => n.id),
+    });
+  }
+
+  onNodeDragEnded(event: NodeDragEndedEvent): void {
+    console.log('Node Drag Ended:', {
+      nodes: event.nodes.map((n: Node) => ({ id: n.id, position: n.position })),
     });
   }
 

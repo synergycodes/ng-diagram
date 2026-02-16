@@ -22,6 +22,8 @@ import type {
   GroupNode,
   MiddlewareChain,
   ModelAdapter,
+  NodeDragEndedEvent,
+  NodeDragStartedEvent,
   NodeResizedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
@@ -234,6 +236,22 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    */
   @Output() paletteItemDropped = new EventEmitter<PaletteItemDroppedEvent>();
 
+  /**
+   * Event emitted when a node drag operation begins.
+   *
+   * This event fires once when the drag threshold is crossed, signaling the
+   * start of a drag operation.
+   */
+  @Output() nodeDragStarted = new EventEmitter<NodeDragStartedEvent>();
+
+  /**
+   * Event emitted when a node drag operation ends.
+   *
+   * This event fires when the user releases the pointer after dragging nodes.
+   * Nodes will have their final positions when this event is received.
+   */
+  @Output() nodeDragEnded = new EventEmitter<NodeDragEndedEvent>();
+
   constructor() {
     effect(() => {
       const model = this.model();
@@ -420,5 +438,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));
     eventManager.on('paletteItemDropped', (event) => this.paletteItemDropped.emit(event));
+    eventManager.on('nodeDragStarted', (event) => this.nodeDragStarted.emit(event));
+    eventManager.on('nodeDragEnded', (event) => this.nodeDragEnded.emit(event));
   }
 }

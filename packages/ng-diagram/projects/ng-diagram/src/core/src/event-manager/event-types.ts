@@ -85,6 +85,20 @@ export interface DiagramEventMap {
    * onto the canvas to create new nodes.
    */
   paletteItemDropped: PaletteItemDroppedEvent;
+  /**
+   * Event emitted when a node drag operation begins.
+   *
+   * This event fires once when the drag threshold is crossed, signaling the
+   * start of a drag operation.
+   */
+  nodeDragStarted: NodeDragStartedEvent;
+  /**
+   * Event emitted when a node drag operation ends.
+   *
+   * This event fires when the user releases the pointer after dragging nodes.
+   * Nodes will have their final positions when this event is received.
+   */
+  nodeDragEnded: NodeDragEndedEvent;
 }
 
 /**
@@ -284,6 +298,36 @@ export interface SelectionRotatedEvent {
   angle: number;
   /** The previous angle of the node in degrees */
   previousAngle: number;
+}
+
+/**
+ * Event payload emitted when a node drag operation begins.
+ *
+ * This event fires once when the drag threshold is crossed, signaling the
+ * start of a drag operation.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeDragStartedEvent {
+  /** Nodes being dragged */
+  nodes: Node[];
+}
+
+/**
+ * Event payload emitted when a node drag operation ends.
+ *
+ * This event fires when the user releases the pointer after dragging nodes.
+ * Nodes will have their final positions when this event is received.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeDragEndedEvent {
+  /** Nodes that were dragged, with their final positions */
+  nodes: Node[];
 }
 
 /**

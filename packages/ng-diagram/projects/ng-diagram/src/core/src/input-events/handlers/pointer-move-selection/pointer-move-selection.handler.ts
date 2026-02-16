@@ -45,6 +45,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
               modifiers: { ...event.modifiers },
               accumulatedDeltas: new Map(),
             };
+            this.flow.commandHandler.emit('moveNodesStart');
           }
         }
 
@@ -74,6 +75,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
         if (this.hasMoved) {
           await this.handleDrop(pointer);
+          this.flow.commandHandler.emit('moveNodesStop');
         }
 
         this.flow.actionStateManager.clearDragging();

@@ -75,7 +75,6 @@ describe('PointerMoveSelectionEventHandler', () => {
 
     mockFlowCore = {
       getState: mockGetState,
-      applyUpdate: vi.fn(),
       commandHandler: { emit: mockEmit },
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
@@ -555,7 +554,7 @@ describe('PointerMoveSelectionEventHandler', () => {
           groupId: 'existingGroup',
           nodeIds: ['node1'],
         });
-        expect(mockEmit).toHaveBeenCalledTimes(1);
+        expect(mockEmit).not.toHaveBeenCalledWith('removeFromGroup', expect.objectContaining({ nodeIds: ['node2'] }));
       });
 
       it('should handle nodes with null groupId correctly', async () => {
@@ -647,6 +646,101 @@ describe('PointerMoveSelectionEventHandler', () => {
       await handler.handle(event);
 
       expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+    });
+  });
+
+  describe('nodeDragStarted and nodeDragEnded events', () => {
+    it('should emit moveNodesStart command when threshold is crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStart');
+    });
+
+    it('should not emit moveNodesStart command when threshold is not crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        })
+      );
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStart');
+    });
+
+    it('should emit moveNodesStart command only once across multiple continue events', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      const moveNodesStartCount = mockEmit.mock.calls.filter((call: unknown[]) => call[0] === 'moveNodesStart').length;
+
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: lastInputPointOverThreshold.x + 10, y: lastInputPointOverThreshold.y + 10 },
+        })
+      );
+
+      const moveNodesStartCountAfter = mockEmit.mock.calls.filter(
+        (call: unknown[]) => call[0] === 'moveNodesStart'
+      ).length;
+
+      expect(moveNodesStartCount).toBe(1);
+      expect(moveNodesStartCountAfter).toBe(1);
+    });
+
+    it('should emit moveNodesStop command on end phase after drag', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStop');
+    });
+
+    it('should not emit moveNodesStop command when threshold was not crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        })
+      );
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointBelowThreshold,
+        })
+      );
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStop');
     });
   });
 });

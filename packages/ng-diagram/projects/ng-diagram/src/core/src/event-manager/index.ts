@@ -6,6 +6,8 @@ export type {
   EdgeDrawnEvent,
   EventListener,
   GroupMembershipChangedEvent,
+  NodeDragEndedEvent,
+  NodeDragStartedEvent,
   NodeResizedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
