@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockGroupNode, mockNode } from '../../../test-utils';
+import { DraggingActionState, HighlightGroupActionState } from '../../../types';
 import { sortNodesByZIndex } from '../../../utils';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 import { MOVE_THRESHOLD, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
@@ -44,10 +45,8 @@ describe('PointerMoveSelectionEventHandler', () => {
   };
   let mockGetNodesInRange: ReturnType<typeof vi.fn>;
   let mockActionStateManager: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dragging: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    highlightGroup: any;
+    dragging: DraggingActionState | undefined;
+    highlightGroup: HighlightGroupActionState | undefined;
     clearDragging: ReturnType<typeof vi.fn>;
   };
   let mockGetState: ReturnType<typeof vi.fn>;
@@ -102,7 +101,7 @@ describe('PointerMoveSelectionEventHandler', () => {
   });
 
   describe('start phase', () => {
-    it('should initialize move state and dragging action state', () => {
+    it('should initialize move state', () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'start',
         modifiers: {
@@ -115,15 +114,7 @@ describe('PointerMoveSelectionEventHandler', () => {
 
       handler.handle(event);
 
-      expect(mockActionStateManager.dragging).toMatchObject({
-        modifiers: {
-          primary: false,
-          secondary: false,
-          shift: true,
-          meta: false,
-        },
-      });
-      expect(mockActionStateManager.dragging?.accumulatedDeltas).toBeInstanceOf(Map);
+      expect(mockActionStateManager.dragging).toBeUndefined();
     });
 
     it('should not pan during start phase even with screen edge', () => {
@@ -169,6 +160,25 @@ describe('PointerMoveSelectionEventHandler', () => {
         expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
           delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
           nodes: [mockNode],
+        });
+      });
+
+      it('should start dragging nodes once threshold is exceeded', () => {
+        // Move beyond threshold
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        handler.handle(event);
+
+        expect(mockActionStateManager.dragging).toMatchObject({
+          modifiers: {
+            primary: false,
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
         });
       });
 
@@ -243,8 +253,8 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
 
         handler.handle(event);
-
-        expect(mockActionStateManager.dragging.modifiers).toEqual({
+        expect(mockActionStateManager.dragging).not.toBeUndefined();
+        expect(mockActionStateManager.dragging!.modifiers).toEqual({
           primary: true,
           secondary: false,
           shift: true,
