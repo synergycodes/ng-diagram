@@ -32,7 +32,7 @@ With ng-diagram, you can create:
 
 ## 🎮 Try the Demo
 
-See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)**
+See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)** | **[Source Code](https://github.com/synergycodes/ng-diagram-demo)**
 
 ## 🚀 Quick Start
 
