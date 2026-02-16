@@ -21,10 +21,6 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.lastPointerPosition = flowPosition;
         this.startPoint = flowPosition;
         this.isMoving = true;
-        this.flow.actionStateManager.dragging = {
-          modifiers: { ...event.modifiers },
-          accumulatedDeltas: new Map(),
-        };
 
         break;
       }
@@ -45,6 +41,10 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           const distance = Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY);
           if (distance >= MOVE_THRESHOLD) {
             this.hasMoved = true;
+            this.flow.actionStateManager.dragging = {
+              modifiers: { ...event.modifiers },
+              accumulatedDeltas: new Map(),
+            };
           }
         }
 
