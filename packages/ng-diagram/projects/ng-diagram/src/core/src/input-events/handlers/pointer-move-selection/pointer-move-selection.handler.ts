@@ -24,7 +24,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.flow.actionStateManager.dragging = {
           modifiers: { ...event.modifiers },
           accumulatedDeltas: new Map(),
-          moved: false,
+          movementStarted: false,
         };
 
         break;
@@ -47,7 +47,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           if (distance >= MOVE_THRESHOLD) {
             this.hasMoved = true;
             if (this.flow.actionStateManager.dragging) {
-              this.flow.actionStateManager.dragging.moved = true;
+              this.flow.actionStateManager.dragging.movementStarted = true;
             }
           }
         }

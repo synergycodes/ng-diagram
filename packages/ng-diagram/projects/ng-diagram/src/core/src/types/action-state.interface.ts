@@ -104,7 +104,7 @@ export interface DraggingActionState {
    * Whether the pointer has moved beyond the move threshold, indicating an actual drag.
    * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
    */
-  moved: boolean;
+  movementStarted: boolean;
 }
 
 /**
