@@ -30,6 +30,10 @@ With ng-diagram, you can create:
 - **Circuit Diagrams**: Electronic schematics and technical drawings
 - **Custom Visualizations**: Any diagram type with custom node and edge templates
 
+## 🎮 Try the Demo
+
+See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)**
+
 ## 🚀 Quick Start
 
 ### Installation
@@ -205,11 +209,13 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](https:
 - **Documentation**: [https://www.ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
 - **GitHub**: [https://github.com/synergycodes/ng-diagram](https://github.com/synergycodes/ng-diagram)
 - **NPM**: [https://www.npmjs.com/package/ng-diagram](https://www.npmjs.com/package/ng-diagram)
+- **Website**: [https://www.ngdiagram.dev](https://www.ngdiagram.dev)
 
 ## 🆘 Support
 
 - **Issues**: [GitHub Issues](https://github.com/synergycodes/ng-diagram/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/synergycodes/ng-diagram/discussions)
+- **Discussions**: [GitHub Discussions](https://github.com/synergycodes/ng-diagram/discussions), [Discord](https://discord.gg/FDMjRuarFb)
+- **Project consulting**: [Contact](https://www.ngdiagram.dev/contact)
 - **Documentation**: [https://www.ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
 
 ---
