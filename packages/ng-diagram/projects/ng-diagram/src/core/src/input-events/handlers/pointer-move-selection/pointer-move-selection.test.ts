@@ -101,7 +101,7 @@ describe('PointerMoveSelectionEventHandler', () => {
   });
 
   describe('start phase', () => {
-    it('should initialize move state', () => {
+    it('should initialize move state and dragging action state with moved=false', () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'start',
         modifiers: {
@@ -114,7 +114,16 @@ describe('PointerMoveSelectionEventHandler', () => {
 
       handler.handle(event);
 
-      expect(mockActionStateManager.dragging).toBeUndefined();
+      expect(mockActionStateManager.dragging).toMatchObject({
+        moved: false,
+        modifiers: {
+          primary: false,
+          secondary: false,
+          shift: true,
+          meta: false,
+        },
+      });
+      expect(mockActionStateManager.dragging?.accumulatedDeltas).toBeInstanceOf(Map);
     });
 
     it('should not pan during start phase even with screen edge', () => {
@@ -163,7 +172,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
       });
 
-      it('should start dragging nodes once threshold is exceeded', () => {
+      it('should set moved=true once threshold is exceeded', () => {
         // Move beyond threshold
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
@@ -173,6 +182,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         handler.handle(event);
 
         expect(mockActionStateManager.dragging).toMatchObject({
+          moved: true,
           modifiers: {
             primary: false,
             secondary: false,
@@ -180,6 +190,17 @@ describe('PointerMoveSelectionEventHandler', () => {
             meta: false,
           },
         });
+      });
+
+      it('should keep moved=false when below threshold', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        });
+
+        handler.handle(event);
+
+        expect(mockActionStateManager.dragging?.moved).toBe(false);
       });
 
       it('should continue moving after threshold is exceeded with incremental delta', () => {

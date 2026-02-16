@@ -155,6 +155,7 @@ describe('ActionStateManager', () => {
       const draggingState = {
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
+        moved: false,
       };
       actionStateManager.dragging = draggingState;
 
@@ -166,6 +167,7 @@ describe('ActionStateManager', () => {
       const draggingState = {
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
+        moved: false,
       };
       actionStateManager.dragging = draggingState;
 
@@ -178,6 +180,7 @@ describe('ActionStateManager', () => {
       actionStateManager.dragging = {
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
+        moved: false,
       };
       actionStateManager.clearDragging();
 
