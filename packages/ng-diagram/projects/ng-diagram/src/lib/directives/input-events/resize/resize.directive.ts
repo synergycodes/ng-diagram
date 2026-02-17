@@ -3,7 +3,7 @@ import { Node, ResizeDirection } from '../../../../core/src';
 
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
-import { DiagramEventName, type PointerInputEvent } from '../../../types/event';
+import { DiagramEventName, type PointerInputEvent } from '../../../types/pointer-event';
 
 @Directive({
   selector: '[ngDiagramResize]',

@@ -1,5 +1,5 @@
 import type { InputModifiers } from '../input-events/input-events.interface';
-import type { KeyboardActionName, PointerOnlyActionName } from './shortcut-action.interface';
+import type { KeyboardActionName, PointerOnlyActionName, WheelOnlyActionName } from './shortcut-action.interface';
 
 /**
  * Normalized keyboard input for shortcut matching
@@ -79,14 +79,32 @@ export interface PointerOnlyShortcutDefinition {
 }
 
 /**
+ * Pointer-only shortcut definition with modifier-only bindings
+ *
+ * @public
+ * @since 1.0.1
+ * @category Types/Configuration/Shortcuts
+ */
+export interface WheelOnlyShortcutDefinition {
+  /** Action name for wheel events */
+  actionName: WheelOnlyActionName;
+  /** Modifier-only bindings (keys are not allowed) */
+  bindings: ModifierOnlyShortcutBinding[];
+}
+
+/**
  * Shortcut definition for registering keyboard and pointer shortcuts
  *
  * This is a discriminated union that enforces:
  * - Pointer-only actions (multiSelection, boxSelection) can only have modifier-only bindings
+ * - Wheel-only actions (zoom)
  * - Keyboard actions must have at least one key-based binding
  *
  * @public
  * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
-export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition;
+export type ShortcutDefinition =
+  | KeyboardShortcutDefinition
+  | PointerOnlyShortcutDefinition
+  | WheelOnlyShortcutDefinition;

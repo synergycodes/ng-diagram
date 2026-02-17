@@ -33,6 +33,16 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
 export type PointerOnlyActionName = 'multiSelection' | 'boxSelection';
 
 /**
+ * Wheel-only action names that can only be triggered by wheel events with modifiers
+ * (e.g., Shift+Click, Ctrl+Click)
+ *
+ * @public
+ * @since 1.0.1
+ * @category Types/Configuration/Shortcuts
+ */
+export type WheelOnlyActionName = 'zoom';
+
+/**
  * Keyboard action names that can be triggered by keyboard events
  *
  * @public
@@ -50,9 +60,10 @@ export type KeyboardActionName =
  * Includes:
  * - Keyboard actions (e.g., 'keyboardMoveSelectionUp', 'copy', 'selectAll')
  * - Pointer-only actions (e.g., 'multiSelection', 'boxSelection')
+ * - Wheel-only actions (e.g. 'zoom')
  *
  * @public
  * @since 0.8.0
  * @category Types/Configuration/Shortcuts
  */
-export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName;
+export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName | WheelOnlyActionName;
