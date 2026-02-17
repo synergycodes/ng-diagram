@@ -94,7 +94,11 @@ A node's position can be set manually through the [`position`](/docs/api/types/m
 
 The position is defined in **diagram coordinates**. If you want to learn more about how the coordinate system works, see the [Coordinate system](/docs/intro/coordinate-system)
 
-The position also updates automatically when a user **moves the node** by dragging it in the diagram.
+The position also updates automatically when a user **moves the node** by dragging it in the diagram. You can listen for drag lifecycle events via [`nodeDragStarted`](/docs/api/types/events/nodedragstartedevent), [`selectionMoved`](/docs/api/types/events/selectionmovedevent), and [`nodeDragEnded`](/docs/api/types/events/nodedragendedevent).
+
+### Disabling Dragging
+
+Node dragging is enabled by default. You can disable it per node with [`draggable: false`](/docs/api/types/model/simplenode#draggable) or globally with [`nodeDraggingEnabled: false`](/docs/api/types/configuration/flowconfig#nodedraggingenabled) in the diagram configuration. The per-node [`draggable`](/docs/api/types/model/simplenode#draggable) property takes priority over the global setting.
 
 ## Size
 

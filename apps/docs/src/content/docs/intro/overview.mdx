@@ -167,6 +167,7 @@ Nodes can be configured for different interaction modes. Enable resizing to allo
 
 **Interaction options:**
 
+- **Draggable**: Node dragging is enabled by default. Disable globally with [`nodeDraggingEnabled: false`](/docs/api/types/configuration/flowconfig#nodedraggingenabled) or per node with [`draggable: false`](/docs/api/types/model/simplenode#draggable)
 - **Resizable**: Enable resize handles on nodes by setting [`resizable: true`](/docs/api/types/model/simplenode#resizable)
 - **Rotatable**: Enable rotation handle on nodes by setting [`rotatable: true`](/docs/api/types/model/simplenode#rotatable)
 - **Selection**: Click to select nodes and edges
@@ -238,13 +239,19 @@ The diagram emits events for user interactions and state changes. Subscribe to t
 - [`diagramInit`](/docs/api/types/events/diagraminitevent) - Fired when diagram is fully initialized with all nodes and edges measured
 - [`edgeDrawn`](/docs/api/types/events/edgedrawnevent) - Fired when user manually creates an edge by dragging between nodes
 - [`selectionChanged`](/docs/api/types/events/selectionchangedevent) - Fired when nodes/edges are selected or deselected
-- [`selectionMoved`](/docs/api/types/events/selectionmovedevent) - Fired when selected nodes are moved (dragged)
+- [`selectionMoved`](/docs/api/types/events/selectionmovedevent) - Fired continuously on each position change while selected nodes are being dragged
 - [`selectionRemoved`](/docs/api/types/events/selectionremovedevent) - Fired when selected nodes/edges are removed from the diagram
-- [`selectionRotated`](/docs/api/types/events/selectionrotatedevent) - Fired when selected nodes are rotated
+- [`selectionRotated`](/docs/api/types/events/selectionrotatedevent) - Fired continuously on each angle change while selected nodes are being rotated
 - [`groupMembershipChanged`](/docs/api/types/events/groupmembershipchangedevent) - Fired when nodes are grouped or ungrouped
 - [`viewportChanged`](/docs/api/types/events/viewportchangedevent) - Fired when viewport is panned or zoomed
 - [`clipboardPasted`](/docs/api/types/events/clipboardpastedevent) - Fired when elements are pasted from clipboard
-- [`nodeResized`](/docs/api/types/events/noderesizedevent) - Fired when a node is resized
+- [`nodeResized`](/docs/api/types/events/noderesizedevent) - Fired continuously on each size change while a node is being resized
+- [`nodeResizeStarted`](/docs/api/types/events/noderesizestartedevent) - Fired when a node resize operation begins
+- [`nodeResizeEnded`](/docs/api/types/events/noderesizeendedevent) - Fired when a node resize operation ends
+- [`nodeRotateStarted`](/docs/api/types/events/noderotatestartedevent) - Fired when a node rotation operation begins
+- [`nodeRotateEnded`](/docs/api/types/events/noderotateendedevent) - Fired when a node rotation operation ends
+- [`nodeDragStarted`](/docs/api/types/events/nodedragstartedevent) - Fired when a node drag operation begins
+- [`nodeDragEnded`](/docs/api/types/events/nodedragendedevent) - Fired when a node drag operation ends
 - [`paletteItemDropped`](/docs/api/types/events/paletteitemdroppedevent) - Fired when a palette item is dropped onto the diagram
 
 Events can be subscribed to via `@Output` bindings on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component or programmatically through [`NgDiagramService.addEventListener()`](/docs/api/services/ngdiagramservice#addeventlistener).
