@@ -27,6 +27,8 @@ import type {
   NodeResizeEndedEvent,
   NodeResizedEvent,
   NodeResizeStartedEvent,
+  NodeRotateEndedEvent,
+  NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
@@ -205,6 +207,22 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * or programmatically using the `NgDiagramNodeService` rotation methods.
    */
   @Output() selectionRotated = new EventEmitter<SelectionRotatedEvent>();
+
+  /**
+   * Event emitted when a node rotation operation begins.
+   *
+   * This event fires once when the user starts rotating a node by dragging
+   * the rotation handle.
+   */
+  @Output() nodeRotateStarted = new EventEmitter<NodeRotateStartedEvent>();
+
+  /**
+   * Event emitted when a node rotation operation ends.
+   *
+   * This event fires when the user releases the pointer after rotating a node.
+   * The node will have its final angle when this event is received.
+   */
+  @Output() nodeRotateEnded = new EventEmitter<NodeRotateEndedEvent>();
 
   /**
    * Event emitted when the viewport changes through panning or zooming.
@@ -452,6 +470,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('selectionRemoved', (event) => this.selectionRemoved.emit(event));
     eventManager.on('groupMembershipChanged', (event) => this.groupMembershipChanged.emit(event));
     eventManager.on('selectionRotated', (event) => this.selectionRotated.emit(event));
+    eventManager.on('nodeRotateStarted', (event) => this.nodeRotateStarted.emit(event));
+    eventManager.on('nodeRotateEnded', (event) => this.nodeRotateEnded.emit(event));
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));

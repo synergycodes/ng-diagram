@@ -100,6 +100,20 @@ export interface DiagramEventMap {
    */
   nodeResizeEnded: NodeResizeEndedEvent;
   /**
+   * Event emitted when a node rotation operation begins.
+   *
+   * This event fires once when the user starts rotating a node by dragging
+   * the rotation handle.
+   */
+  nodeRotateStarted: NodeRotateStartedEvent;
+  /**
+   * Event emitted when a node rotation operation ends.
+   *
+   * This event fires when the user releases the pointer after rotating a node.
+   * The node will have its final angle when this event is received.
+   */
+  nodeRotateEnded: NodeRotateEndedEvent;
+  /**
    * Event emitted when a node drag operation begins.
    *
    * This event fires once when the drag threshold is crossed, signaling the
@@ -341,6 +355,36 @@ export interface NodeResizeStartedEvent {
  */
 export interface NodeResizeEndedEvent {
   /** The node that was resized, with its final size */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node rotation operation begins.
+ *
+ * This event fires once when the user starts rotating a node by dragging
+ * the rotation handle.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeRotateStartedEvent {
+  /** The node being rotated */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node rotation operation ends.
+ *
+ * This event fires when the user releases the pointer after rotating a node.
+ * The node will have its final angle when this event is received.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeRotateEndedEvent {
+  /** The node that was rotated, with its final angle */
   node: Node;
 }
 

@@ -11,6 +11,8 @@ export type {
   NodeResizeEndedEvent,
   NodeResizedEvent,
   NodeResizeStartedEvent,
+  NodeRotateEndedEvent,
+  NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,

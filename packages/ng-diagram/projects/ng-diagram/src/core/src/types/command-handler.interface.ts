@@ -40,6 +40,7 @@ import { RemoveFromGroupCommand } from '../command-handler/commands/remove-from-
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
 import { ResizeNodeStartCommand, ResizeNodeStopCommand } from '../command-handler/commands/resize-node-lifecycle';
 import { RotateNodeToCommand } from '../command-handler/commands/rotate-node';
+import { RotateNodeStartCommand, RotateNodeStopCommand } from '../command-handler/commands/rotate-node-lifecycle';
 import {
   DeselectAllCommand,
   DeselectCommand,
@@ -99,6 +100,8 @@ export type Command =
   | UpdateEdgeLabelsCommand
   | DeleteEdgeLabelsCommand
   | RotateNodeToCommand
+  | RotateNodeStartCommand
+  | RotateNodeStopCommand
   | HighlightGroupCommand
   | HighlightGroupClearCommand
   | AddToGroupCommand

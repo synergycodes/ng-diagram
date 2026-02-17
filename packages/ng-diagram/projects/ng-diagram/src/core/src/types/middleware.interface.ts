@@ -67,6 +67,8 @@ export type ModelActionType =
   | 'zoom'
   | 'changeZOrder'
   | 'rotateNodeTo'
+  | 'rotateNodeStart'
+  | 'rotateNodeStop'
   | 'highlightGroup'
   | 'highlightGroupClear'
   | 'moveNodes'

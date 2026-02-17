@@ -134,6 +134,8 @@ export type {
   NodeResizeEndedEvent,
   NodeResizedEvent,
   NodeResizeStartedEvent,
+  NodeRotateEndedEvent,
+  NodeRotateStartedEvent,
   NodeRotationConfig,
   OriginPoint,
   PaletteItemDroppedEvent,

@@ -4,6 +4,7 @@ export { EdgeDrawnEmitter } from './edge-drawn.emitter';
 export { type EventEmitter } from './event-emitter.interface';
 export { NodeDragEndedEmitter, NodeDragStartedEmitter } from './node-drag-lifecycle.emitter';
 export { NodeResizeEndedEmitter, NodeResizeStartedEmitter } from './node-resize-lifecycle.emitter';
+export { NodeRotateEndedEmitter, NodeRotateStartedEmitter } from './node-rotate-lifecycle.emitter';
 export { PaletteItemDroppedEmitter } from './palette-item-dropped.emitter';
 export { SelectionChangedEmitter } from './selection-changed.emitter';
 export { GroupMembershipChangedEmitter } from './group-membership-changed.emitter';

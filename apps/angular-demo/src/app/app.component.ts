@@ -20,6 +20,8 @@ import {
   NodeResizedEvent,
   NodeResizeEndedEvent,
   NodeResizeStartedEvent,
+  NodeRotateEndedEvent,
+  NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
@@ -222,6 +224,18 @@ export class AppComponent {
       nodeId: event.node.id,
       angle: event.angle,
       previousAngle: event.previousAngle,
+    });
+  }
+
+  onNodeRotateStarted(event: NodeRotateStartedEvent): void {
+    console.log('Node Rotate Started:', {
+      node: event.node.id,
+    });
+  }
+
+  onNodeRotateEnded(event: NodeRotateEndedEvent): void {
+    console.log('Node Rotate Ended:', {
+      node: { id: event.node.id, angle: event.node.angle },
     });
   }
 
