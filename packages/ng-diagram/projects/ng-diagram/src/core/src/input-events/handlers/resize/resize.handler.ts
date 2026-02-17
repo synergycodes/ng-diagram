@@ -36,7 +36,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
             resizingNode: node,
           };
 
-          this.flow.commandHandler.emit('resizeNodeStart');
+          await this.flow.commandHandler.emit('resizeNodeStart');
         }
 
         break;

@@ -46,7 +46,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
               modifiers: { ...event.modifiers },
               accumulatedDeltas: new Map(),
             };
-            this.flow.commandHandler.emit('moveNodesStart');
+            await this.flow.commandHandler.emit('moveNodesStart');
           }
         }
 

@@ -43,7 +43,7 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
           nodeId,
         };
 
-        this.flow.commandHandler.emit('rotateNodeStart');
+        await this.flow.commandHandler.emit('rotateNodeStart');
         break;
       }
 
