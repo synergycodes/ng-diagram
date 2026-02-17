@@ -142,7 +142,13 @@ export interface DiagramEventMap {
     diagramInit: DiagramInitEvent;
     edgeDrawn: EdgeDrawnEvent;
     groupMembershipChanged: GroupMembershipChangedEvent;
+    nodeDragEnded: NodeDragEndedEvent;
+    nodeDragStarted: NodeDragStartedEvent;
     nodeResized: NodeResizedEvent;
+    nodeResizeEnded: NodeResizeEndedEvent;
+    nodeResizeStarted: NodeResizeStartedEvent;
+    nodeRotateEnded: NodeRotateEndedEvent;
+    nodeRotateStarted: NodeRotateStartedEvent;
     paletteItemDropped: PaletteItemDroppedEvent;
     selectionChanged: SelectionChangedEvent;
     selectionMoved: SelectionMovedEvent;
@@ -174,6 +180,7 @@ export class DiagramSelectionDirective extends ObjectSelectionDirective {
 export interface DraggingActionState {
     accumulatedDeltas: Map<string, Point>;
     modifiers: InputModifiers;
+    nodeIds: string[];
 }
 
 // @public
@@ -583,7 +590,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'paste' | 'moveViewport' | 'resizeNode' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStop';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
@@ -756,7 +763,13 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void;
     // (undocumented)
     ngOnInit(): void;
+    nodeDragEnded: EventEmitter<NodeDragEndedEvent>;
+    nodeDragStarted: EventEmitter<NodeDragStartedEvent>;
     nodeResized: EventEmitter<NodeResizedEvent>;
+    nodeResizeEnded: EventEmitter<NodeResizeEndedEvent>;
+    nodeResizeStarted: EventEmitter<NodeResizeStartedEvent>;
+    nodeRotateEnded: EventEmitter<NodeRotateEndedEvent>;
+    nodeRotateStarted: EventEmitter<NodeRotateStartedEvent>;
     // (undocumented)
     readonly nodes: WritableSignal<Node_2[]>;
     nodeTemplateMap: InputSignal<NgDiagramNodeTemplateMap>;
@@ -772,7 +785,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "paletteItemDropped": "paletteItemDropped"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
@@ -1189,6 +1202,16 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
 type Node_2<T extends DataObject = DataObject> = SimpleNode<T> | GroupNode<T>;
 export { Node_2 as Node }
 
+// @public
+export interface NodeDragEndedEvent {
+    nodes: Node_2[];
+}
+
+// @public
+export interface NodeDragStartedEvent {
+    nodes: Node_2[];
+}
+
 // @public (undocumented)
 export class NodePositionDirective {
     // (undocumented)
@@ -1207,6 +1230,26 @@ export class NodePositionDirective {
 export interface NodeResizedEvent {
     node: Node_2;
     previousSize: Size;
+}
+
+// @public
+export interface NodeResizeEndedEvent {
+    node: Node_2;
+}
+
+// @public
+export interface NodeResizeStartedEvent {
+    node: Node_2;
+}
+
+// @public
+export interface NodeRotateEndedEvent {
+    node: Node_2;
+}
+
+// @public
+export interface NodeRotateStartedEvent {
+    node: Node_2;
 }
 
 // @public

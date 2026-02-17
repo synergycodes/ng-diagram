@@ -24,3 +24,11 @@ Key is node ID, value is the accumulated delta that hasn't been applied due to s
 > **modifiers**: [`InputModifiers`](/docs/api/types/configuration/shortcuts/inputmodifiers/)
 
 Input modifiers (e.g., Ctrl, Shift) active during the drag.
+
+***
+
+### nodeIds
+
+> **nodeIds**: `string`[]
+
+IDs of all nodes participating in the drag (selected + children, filtered by draggable).
