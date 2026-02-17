@@ -18,6 +18,8 @@ import {
   NodeDragEndedEvent,
   NodeDragStartedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
+  NodeResizeStartedEvent,
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
@@ -169,6 +171,18 @@ export class AppComponent {
         size: event.node.size,
         previousSize: event.previousSize,
       },
+    });
+  }
+
+  onNodeResizeStarted(event: NodeResizeStartedEvent): void {
+    console.log('Node Resize Started:', {
+      node: event.node.id,
+    });
+  }
+
+  onNodeResizeEnded(event: NodeResizeEndedEvent): void {
+    console.log('Node Resize Ended:', {
+      node: { id: event.node.id, size: event.node.size },
     });
   }
 

@@ -39,6 +39,7 @@ import { moveNodesStart, moveNodesStop } from './move-nodes-lifecycle';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { removeFromGroup } from './remove-from-group';
 import { resizeNode } from './resize-node';
+import { resizeNodeStart, resizeNodeStop } from './resize-node-lifecycle';
 import { rotateNodeTo } from './rotate-node';
 import { deselect, deselectAll, select, selectAll } from './selection';
 import { bringToFront, sendToBack } from './z-order';
@@ -84,6 +85,8 @@ export const commands: CommandMap = {
   finishLinkingToPosition,
   startLinkingFromPosition,
   resizeNode,
+  resizeNodeStart,
+  resizeNodeStop,
   zoom,
   addPorts,
   addPortsBulk,

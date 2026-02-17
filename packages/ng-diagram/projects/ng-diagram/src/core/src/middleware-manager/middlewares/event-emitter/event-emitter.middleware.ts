@@ -8,7 +8,9 @@ import {
   GroupMembershipChangedEmitter,
   NodeDragEndedEmitter,
   NodeDragStartedEmitter,
+  NodeResizeEndedEmitter,
   NodeResizedEmitter,
+  NodeResizeStartedEmitter,
   PaletteItemDroppedEmitter,
   SelectionChangedEmitter,
   SelectionMovedEmitter,
@@ -44,6 +46,8 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new ClipboardPastedEmitter(),
     new NodeResizedEmitter(),
     new PaletteItemDroppedEmitter(),
+    new NodeResizeStartedEmitter(),
+    new NodeResizeEndedEmitter(),
     new NodeDragStartedEmitter(),
     new NodeDragEndedEmitter(),
   ];

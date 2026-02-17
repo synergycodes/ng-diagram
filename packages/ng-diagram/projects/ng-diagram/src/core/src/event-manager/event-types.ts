@@ -86,6 +86,20 @@ export interface DiagramEventMap {
    */
   paletteItemDropped: PaletteItemDroppedEvent;
   /**
+   * Event emitted when a node resize operation begins.
+   *
+   * This event fires once when the user starts resizing a node by dragging
+   * a resize handle.
+   */
+  nodeResizeStarted: NodeResizeStartedEvent;
+  /**
+   * Event emitted when a node resize operation ends.
+   *
+   * This event fires when the user releases the pointer after resizing a node.
+   * The node will have its final size when this event is received.
+   */
+  nodeResizeEnded: NodeResizeEndedEvent;
+  /**
    * Event emitted when a node drag operation begins.
    *
    * This event fires once when the drag threshold is crossed, signaling the
@@ -298,6 +312,36 @@ export interface SelectionRotatedEvent {
   angle: number;
   /** The previous angle of the node in degrees */
   previousAngle: number;
+}
+
+/**
+ * Event payload emitted when a node resize operation begins.
+ *
+ * This event fires once when the user starts resizing a node by dragging
+ * a resize handle.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeResizeStartedEvent {
+  /** The node being resized */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node resize operation ends.
+ *
+ * This event fires when the user releases the pointer after resizing a node.
+ * The node will have its final size when this event is received.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeResizeEndedEvent {
+  /** The node that was resized, with its final size */
+  node: Node;
 }
 
 /**

@@ -59,6 +59,8 @@ export type ModelActionType =
   | 'paste'
   | 'moveViewport'
   | 'resizeNode'
+  | 'resizeNodeStart'
+  | 'resizeNodeStop'
   | 'startLinking'
   | 'moveTemporaryEdge'
   | 'finishLinking'

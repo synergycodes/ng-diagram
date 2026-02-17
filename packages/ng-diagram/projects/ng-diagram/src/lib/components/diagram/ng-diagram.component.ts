@@ -24,7 +24,9 @@ import type {
   ModelAdapter,
   NodeDragEndedEvent,
   NodeDragStartedEvent,
+  NodeResizeEndedEvent,
   NodeResizedEvent,
+  NodeResizeStartedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
   SelectionMovedEvent,
@@ -227,6 +229,22 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * or programmatically using resize methods.
    */
   @Output() nodeResized = new EventEmitter<NodeResizedEvent>();
+
+  /**
+   * Event emitted when a node resize operation begins.
+   *
+   * This event fires once when the user starts resizing a node by dragging
+   * a resize handle.
+   */
+  @Output() nodeResizeStarted = new EventEmitter<NodeResizeStartedEvent>();
+
+  /**
+   * Event emitted when a node resize operation ends.
+   *
+   * This event fires when the user releases the pointer after resizing a node.
+   * The node will have its final size when this event is received.
+   */
+  @Output() nodeResizeEnded = new EventEmitter<NodeResizeEndedEvent>();
 
   /**
    * Event emitted when a palette item is dropped onto the diagram.
@@ -437,6 +455,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('viewportChanged', (event) => this.viewportChanged.emit(event));
     eventManager.on('clipboardPasted', (event) => this.clipboardPasted.emit(event));
     eventManager.on('nodeResized', (event) => this.nodeResized.emit(event));
+    eventManager.on('nodeResizeStarted', (event) => this.nodeResizeStarted.emit(event));
+    eventManager.on('nodeResizeEnded', (event) => this.nodeResizeEnded.emit(event));
     eventManager.on('paletteItemDropped', (event) => this.paletteItemDropped.emit(event));
     eventManager.on('nodeDragStarted', (event) => this.nodeDragStarted.emit(event));
     eventManager.on('nodeDragEnded', (event) => this.nodeDragEnded.emit(event));
