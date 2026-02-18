@@ -156,6 +156,7 @@ describe('ActionStateManager', () => {
         nodeIds: ['n1'],
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
+        movementStarted: false,
       };
       actionStateManager.dragging = draggingState;
 
@@ -168,6 +169,7 @@ describe('ActionStateManager', () => {
         nodeIds: ['n1'],
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
+        movementStarted: false,
       };
       actionStateManager.dragging = draggingState;
 
@@ -181,6 +183,7 @@ describe('ActionStateManager', () => {
         nodeIds: ['n1'],
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
+        movementStarted: false,
       };
       actionStateManager.clearDragging();
 

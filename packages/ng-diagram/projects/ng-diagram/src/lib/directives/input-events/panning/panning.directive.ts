@@ -1,7 +1,7 @@
 import { Directive, ElementRef, inject, type OnDestroy } from '@angular/core';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import type { PointerInputEvent } from '../../../types/event';
+import type { PointerInputEvent, WheelInputEvent } from '../../../types';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
 
 @Directive({
@@ -64,7 +64,7 @@ export class PanningDirective implements OnDestroy {
     this.finishPanning(event);
   };
 
-  onWheel(event: WheelEvent): void {
+  onWheel(event: WheelInputEvent): void {
     if (!this.shouldHandleWheel(event)) {
       return;
     }
@@ -143,10 +143,11 @@ export class PanningDirective implements OnDestroy {
     );
   }
 
-  private shouldHandleWheel(event: WheelEvent): boolean {
+  private shouldHandleWheel(event: WheelInputEvent): boolean {
     const { viewportPanningEnabled } = this.diagramService.config();
     return (
       !!viewportPanningEnabled &&
+      !event.zoomingHandled &&
       !shouldDiscardEvent(event, 'pan') &&
       !this.inputEventsRouter.eventGuards.withPrimaryModifier(event)
     );

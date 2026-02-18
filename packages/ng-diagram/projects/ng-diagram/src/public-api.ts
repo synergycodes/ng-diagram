@@ -73,7 +73,6 @@ export type {
 } from './lib/components/minimap/ng-diagram-minimap.types';
 export type { NgDiagramConfig } from './lib/types/config';
 export type { NgDiagramEdgeTemplate } from './lib/types/edge-template-map';
-export type { PointerInputEvent } from './lib/types/event';
 export type { NgDiagramGroupNodeTemplate, NgDiagramNodeTemplate } from './lib/types/node-template-map';
 export type { BasePaletteItemData, GroupNodeData, NgDiagramPaletteItem, SimpleNodeData } from './lib/types/palette';
 export type { NgDiagramPanelPosition } from './lib/types/panel-position';
@@ -112,6 +111,7 @@ export type {
   KeyboardPanAction,
   KeyboardShortcutBinding,
   KeyboardShortcutDefinition,
+  KeyboardZoomAction,
   LinkingActionState,
   LinkingConfig,
   loggerMiddleware,
@@ -165,6 +165,8 @@ export type {
   Viewport,
   ViewportChangedEvent,
   VirtualizationConfig,
+  WheelOnlyActionName,
+  WheelOnlyShortcutDefinition,
   ZIndexConfig,
   ZoomConfig,
 } from './core/src';

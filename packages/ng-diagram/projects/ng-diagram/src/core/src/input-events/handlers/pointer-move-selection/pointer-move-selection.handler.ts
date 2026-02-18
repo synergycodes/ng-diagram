@@ -21,6 +21,12 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.lastPointerPosition = flowPosition;
         this.startPoint = flowPosition;
         this.isMoving = true;
+        this.flow.actionStateManager.dragging = {
+          nodeIds: [],
+          modifiers: { ...event.modifiers },
+          accumulatedDeltas: new Map(),
+          movementStarted: false,
+        };
 
         break;
       }
@@ -44,6 +50,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
             this.flow.actionStateManager.dragging = {
               nodeIds: selectedNodesWithChildren.map((n) => n.id),
               modifiers: { ...event.modifiers },
+              movementStarted: true,
               accumulatedDeltas: new Map(),
             };
             await this.flow.commandHandler.emit('moveNodesStart');
