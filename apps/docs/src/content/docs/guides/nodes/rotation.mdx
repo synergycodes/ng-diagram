@@ -126,6 +126,14 @@ This establishes the fallback behavior for all nodes unless overridden by a temp
 
 [Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
+## Events
+
+The diagram emits several events related to rotation that you can subscribe to via `@Output` bindings on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component or programmatically through [`NgDiagramService.addEventListener()`](/docs/api/services/ngdiagramservice#addeventlistener):
+
+- [`nodeRotateStarted`](/docs/api/types/events/noderotatestartedevent) - Fired once when the user starts rotating a node by dragging the rotation handle.
+- [`selectionRotated`](/docs/api/types/events/selectionrotatedevent) - Fired continuously on each angle change while the user is rotating nodes.
+- [`nodeRotateEnded`](/docs/api/types/events/noderotateendedevent) - Fired when the user releases the pointer after rotating a node. The node will have its final angle when this event is received.
+
 ## Further Reading
 
 [Nodes →](/docs/guides/nodes/nodes) | [Custom Nodes →](/docs/guides/nodes/custom-nodes)

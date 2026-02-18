@@ -73,7 +73,6 @@ describe('RotateEventHandler', () => {
           initialNodeAngle: 30,
           nodeId: 'test-node',
         });
-        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
     });
 
@@ -111,12 +110,57 @@ describe('RotateEventHandler', () => {
     });
 
     describe('end phase', () => {
-      it('should clear rotation state', () => {
+      it('should clear rotation state', async () => {
         const event = getSampleRotateEvent({ target: node, phase: 'end' });
 
-        instance.handle(event);
+        await instance.handle(event);
 
         expect(mockActionStateManager.clearRotation).toHaveBeenCalled();
+      });
+    });
+
+    describe('rotateNodeStart and rotateNodeStop lifecycle events', () => {
+      it('should emit rotateNodeStart command on start phase when node exists', async () => {
+        vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(45);
+        const event = getSampleRotateEvent({ target: node, phase: 'start' });
+
+        await instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStart');
+      });
+
+      it('should NOT emit rotateNodeStart when node does not exist', async () => {
+        vi.mocked(flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+        const event = getSampleRotateEvent({ target: node, phase: 'start' });
+
+        await instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('rotateNodeStart');
+      });
+
+      it('should emit rotateNodeStop command on end phase', async () => {
+        const event = getSampleRotateEvent({ target: node, phase: 'end' });
+
+        await instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStop');
+      });
+
+      it('should emit rotateNodeStop before clearRotation is called', async () => {
+        const callOrder: string[] = [];
+        mockCommandHandler.emit.mockImplementation((command: string) => {
+          callOrder.push(command);
+          return Promise.resolve();
+        });
+        mockActionStateManager.clearRotation.mockImplementation(() => {
+          callOrder.push('clearRotation');
+        });
+
+        const event = getSampleRotateEvent({ target: node, phase: 'end' });
+
+        await instance.handle(event);
+
+        expect(callOrder).toEqual(['rotateNodeStop', 'clearRotation']);
       });
     });
   });

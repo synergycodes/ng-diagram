@@ -93,6 +93,8 @@ export interface RotationActionState {
  * @category Internals
  */
 export interface DraggingActionState {
+  /** IDs of all nodes participating in the drag (selected + children, filtered by draggable). */
+  nodeIds: string[];
   /** Input modifiers (e.g., Ctrl, Shift) active during the drag. */
   modifiers: InputModifiers;
   /**

@@ -16,7 +16,7 @@ This indicates a programming error. Resize events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/resizing/`;
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
-  handle(event: ResizeEvent): void {
+  async handle(event: ResizeEvent): Promise<void> {
     if (!event.target) {
       throw new Error(RESIZE_MISSING_TARGET_ERROR(event));
     }
@@ -35,6 +35,8 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
             startNodePositionY: node.position.y,
             resizingNode: node,
           };
+
+          await this.flow.commandHandler.emit('resizeNodeStart');
         }
 
         break;
@@ -118,6 +120,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
         break;
       }
       case 'end': {
+        await this.flow.commandHandler.emit('resizeNodeStop');
         this.flow.actionStateManager.clearResize();
         break;
       }

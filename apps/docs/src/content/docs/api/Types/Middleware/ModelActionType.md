@@ -6,7 +6,7 @@ prev: false
 title: "ModelActionType"
 ---
 
-> **ModelActionType** = `"init"` \| `"changeSelection"` \| `"moveNodesBy"` \| `"deleteSelection"` \| `"addNodes"` \| `"updateNode"` \| `"updateNodes"` \| `"deleteNodes"` \| `"clearModel"` \| `"paletteDropNode"` \| `"addEdges"` \| `"updateEdge"` \| `"deleteEdges"` \| `"deleteElements"` \| `"paste"` \| `"moveViewport"` \| `"resizeNode"` \| `"startLinking"` \| `"moveTemporaryEdge"` \| `"finishLinking"` \| `"zoom"` \| `"changeZOrder"` \| `"rotateNodeTo"` \| `"highlightGroup"` \| `"highlightGroupClear"` \| `"moveNodes"` \| `"moveNodesStop"`
+> **ModelActionType** = `"init"` \| `"changeSelection"` \| `"moveNodesBy"` \| `"deleteSelection"` \| `"addNodes"` \| `"updateNode"` \| `"updateNodes"` \| `"deleteNodes"` \| `"clearModel"` \| `"paletteDropNode"` \| `"addEdges"` \| `"updateEdge"` \| `"deleteEdges"` \| `"deleteElements"` \| `"paste"` \| `"moveViewport"` \| `"resizeNode"` \| `"resizeNodeStart"` \| `"resizeNodeStop"` \| `"startLinking"` \| `"moveTemporaryEdge"` \| `"finishLinking"` \| `"zoom"` \| `"changeZOrder"` \| `"rotateNodeTo"` \| `"rotateNodeStart"` \| `"rotateNodeStop"` \| `"highlightGroup"` \| `"highlightGroupClear"` \| `"moveNodes"` \| `"moveNodesStart"` \| `"moveNodesStop"`
 
 Individual model action type that can trigger middleware execution.
 These represent all possible operations that modify the diagram state.

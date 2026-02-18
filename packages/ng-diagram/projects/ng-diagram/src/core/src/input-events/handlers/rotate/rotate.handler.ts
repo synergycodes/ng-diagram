@@ -18,7 +18,7 @@ This indicates a programming error. Rotation events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
 
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
-  handle(event: RotateInputEvent): void {
+  async handle(event: RotateInputEvent): Promise<void> {
     const { center, lastInputPoint, target, phase } = event;
     if (!target) {
       throw new Error(ROTATE_MISSING_TARGET_ERROR(event));
@@ -42,6 +42,8 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
           initialNodeAngle: node.angle ?? 0,
           nodeId,
         };
+
+        await this.flow.commandHandler.emit('rotateNodeStart');
         break;
       }
 
@@ -74,6 +76,7 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
       }
 
       case 'end': {
+        await this.flow.commandHandler.emit('rotateNodeStop');
         this.flow.actionStateManager.clearRotation();
         break;
       }

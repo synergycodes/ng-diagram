@@ -33,3 +33,11 @@ Input modifiers (e.g., Ctrl, Shift) active during the drag.
 
 Whether the pointer has moved beyond the move threshold, indicating an actual drag.
 `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
+
+***
+
+### nodeIds
+
+> **nodeIds**: `string`[]
+
+IDs of all nodes participating in the drag (selected + children, filtered by draggable).

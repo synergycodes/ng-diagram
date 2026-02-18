@@ -153,6 +153,7 @@ describe('ActionStateManager', () => {
   describe('dragging state', () => {
     it('should set and get dragging state', () => {
       const draggingState = {
+        nodeIds: ['n1'],
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
         movementStarted: false,
@@ -165,6 +166,7 @@ describe('ActionStateManager', () => {
 
     it('should emit actionStateChanged when dragging is set', () => {
       const draggingState = {
+        nodeIds: ['n1'],
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
         movementStarted: false,
@@ -178,6 +180,7 @@ describe('ActionStateManager', () => {
 
     it('should clear dragging state', () => {
       actionStateManager.dragging = {
+        nodeIds: ['n1'],
         modifiers: { primary: false, secondary: false, shift: false, meta: false },
         accumulatedDeltas: new Map(),
         movementStarted: false,

@@ -34,10 +34,13 @@ import {
   StartLinkingFromPositionCommand,
 } from '../command-handler/commands/linking';
 import { MoveNodesByCommand } from '../command-handler/commands/move';
+import { MoveNodesStartCommand, MoveNodesStopCommand } from '../command-handler/commands/move-nodes-lifecycle';
 import { MoveViewportByCommand, MoveViewportCommand } from '../command-handler/commands/move-viewport';
 import { RemoveFromGroupCommand } from '../command-handler/commands/remove-from-group';
 import { ResizeNodeCommand } from '../command-handler/commands/resize-node';
+import { ResizeNodeStartCommand, ResizeNodeStopCommand } from '../command-handler/commands/resize-node-lifecycle';
 import { RotateNodeToCommand } from '../command-handler/commands/rotate-node';
+import { RotateNodeStartCommand, RotateNodeStopCommand } from '../command-handler/commands/rotate-node-lifecycle';
 import {
   DeselectAllCommand,
   DeselectCommand,
@@ -59,6 +62,8 @@ export type Command =
   | DeselectCommand
   | DeselectAllCommand
   | MoveNodesByCommand
+  | MoveNodesStartCommand
+  | MoveNodesStopCommand
   | DeleteSelectionCommand
   | AddNodesCommand
   | UpdateNodeCommand
@@ -80,6 +85,8 @@ export type Command =
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
   | ResizeNodeCommand
+  | ResizeNodeStartCommand
+  | ResizeNodeStopCommand
   | ZoomCommand
   | AddPortsCommand
   | AddPortsBulkCommand
@@ -93,6 +100,8 @@ export type Command =
   | UpdateEdgeLabelsCommand
   | DeleteEdgeLabelsCommand
   | RotateNodeToCommand
+  | RotateNodeStartCommand
+  | RotateNodeStopCommand
   | HighlightGroupCommand
   | HighlightGroupClearCommand
   | AddToGroupCommand

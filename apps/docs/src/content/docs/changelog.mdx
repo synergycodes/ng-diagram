@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [`movementStarted`](/docs/api/types/action-state/draggingactionstate/#movementstarted) property on `DraggingActionState` that indicates whether pointer movement exceeded the drag threshold before entering the dragging state ([#569](https://github.com/synergycodes/ng-diagram/pull/569))
+- Zoom support in [Shortcut Manager](/docs/guides/shortcut-manager/) — configurable keyboard shortcuts (`keyboardZoomIn`, `keyboardZoomOut`) and wheel-based zoom with modifier keys (`zoom`) via new `WheelOnlyShortcutDefinition` ([#571](https://github.com/synergycodes/ng-diagram/pull/571))
+- Start and end lifecycle events for node interactions: [`nodeDragStarted`](/docs/api/components/ngdiagramcomponent/#nodedragstarted)/[`nodeDragEnded`](/docs/api/components/ngdiagramcomponent/#nodedragended), [`nodeResizeStarted`](/docs/api/components/ngdiagramcomponent/#noderesizestarted)/[`nodeResizeEnded`](/docs/api/components/ngdiagramcomponent/#noderesizeended), [`nodeRotateStarted`](/docs/api/components/ngdiagramcomponent/#noderotatestarted)/[`nodeRotateEnded`](/docs/api/components/ngdiagramcomponent/#noderotateended) ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
+- [`nodeIds`](/docs/api/types/action-state/draggingactionstate/#nodeids) property on `DraggingActionState` containing IDs of all nodes participating in the drag operation ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
+
 ### Fixed
 
 - Added explicit `ModelAdapter` return type to `initializeModel()` to prevent TypeScript errors when building with `declaration: true` (thanks [@MeMeMax](https://github.com/MeMeMax) for reporting this 💪)

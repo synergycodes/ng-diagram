@@ -15,7 +15,13 @@ import {
   NgDiagramMinimapNodeTemplateMap,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  NodeDragEndedEvent,
+  NodeDragStartedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
+  NodeResizeStartedEvent,
+  NodeRotateEndedEvent,
+  NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
@@ -170,6 +176,18 @@ export class AppComponent {
     });
   }
 
+  onNodeResizeStarted(event: NodeResizeStartedEvent): void {
+    console.log('Node Resize Started:', {
+      node: event.node.id,
+    });
+  }
+
+  onNodeResizeEnded(event: NodeResizeEndedEvent): void {
+    console.log('Node Resize Ended:', {
+      node: { id: event.node.id, size: event.node.size },
+    });
+  }
+
   onPaletteItemDropped(event: PaletteItemDroppedEvent): void {
     console.log('Palette Item Dropped:', {
       node: event.node.id,
@@ -206,6 +224,30 @@ export class AppComponent {
       nodeId: event.node.id,
       angle: event.angle,
       previousAngle: event.previousAngle,
+    });
+  }
+
+  onNodeRotateStarted(event: NodeRotateStartedEvent): void {
+    console.log('Node Rotate Started:', {
+      node: event.node.id,
+    });
+  }
+
+  onNodeRotateEnded(event: NodeRotateEndedEvent): void {
+    console.log('Node Rotate Ended:', {
+      node: { id: event.node.id, angle: event.node.angle },
+    });
+  }
+
+  onNodeDragStarted(event: NodeDragStartedEvent): void {
+    console.log('Node Drag Started:', {
+      nodes: event.nodes.map((n: Node) => n.id),
+    });
+  }
+
+  onNodeDragEnded(event: NodeDragEndedEvent): void {
+    console.log('Node Drag Ended:', {
+      nodes: event.nodes.map((n: Node) => ({ id: n.id, position: n.position })),
     });
   }
 
