@@ -84,12 +84,15 @@ title: "ng-diagram"
 - [KeyboardShortcutDefinition](/docs/api/types/configuration/shortcuts/keyboardshortcutdefinition/)
 - [ModifierOnlyShortcutBinding](/docs/api/types/configuration/shortcuts/modifieronlyshortcutbinding/)
 - [PointerOnlyShortcutDefinition](/docs/api/types/configuration/shortcuts/pointeronlyshortcutdefinition/)
+- [WheelOnlyShortcutDefinition](/docs/api/types/configuration/shortcuts/wheelonlyshortcutdefinition/)
 - [KeyboardActionName](/docs/api/types/configuration/shortcuts/keyboardactionname/)
 - [KeyboardMoveSelectionAction](/docs/api/types/configuration/shortcuts/keyboardmoveselectionaction/)
 - [KeyboardPanAction](/docs/api/types/configuration/shortcuts/keyboardpanaction/)
+- [KeyboardZoomAction](/docs/api/types/configuration/shortcuts/keyboardzoomaction/)
 - [PointerOnlyActionName](/docs/api/types/configuration/shortcuts/pointeronlyactionname/)
 - [ShortcutActionName](/docs/api/types/configuration/shortcuts/shortcutactionname/)
 - [ShortcutDefinition](/docs/api/types/configuration/shortcuts/shortcutdefinition/)
+- [WheelOnlyActionName](/docs/api/types/configuration/shortcuts/wheelonlyactionname/)
 
 ## Types/Events
 
@@ -100,7 +103,6 @@ title: "ng-diagram"
 - [GroupMembershipChangedEvent](/docs/api/types/events/groupmembershipchangedevent/)
 - [NodeResizedEvent](/docs/api/types/events/noderesizedevent/)
 - [PaletteItemDroppedEvent](/docs/api/types/events/paletteitemdroppedevent/)
-- [PointerInputEvent](/docs/api/types/events/pointerinputevent/)
 - [SelectionChangedEvent](/docs/api/types/events/selectionchangedevent/)
 - [SelectionMovedEvent](/docs/api/types/events/selectionmovedevent/)
 - [SelectionRemovedEvent](/docs/api/types/events/selectionremovedevent/)

@@ -379,7 +379,7 @@ export interface InputModifiers {
 }
 
 // @public
-export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
+export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
 
 // @public (undocumented)
 export class KeyboardInputsDirective {
@@ -410,6 +410,9 @@ export interface KeyboardShortcutDefinition {
     actionName: KeyboardActionName;
     bindings: (KeyboardShortcutBinding | ModifierOnlyShortcutBinding)[];
 }
+
+// @public
+export type KeyboardZoomAction = 'keyboardZoomIn' | 'keyboardZoomOut';
 
 // @public
 export interface LinkingActionState {
@@ -1291,7 +1294,7 @@ export class PanningDirective implements OnDestroy {
     // (undocumented)
     onPointerUp: (event: PointerEvent) => void;
     // (undocumented)
-    onWheel(event: WheelEvent): void;
+    onWheel(event: WheelInputEvent): void;
     // (undocumented)
     static ɵdir: i0.ɵɵDirectiveDeclaration<PanningDirective, "[ngDiagramPanning]", never, {}, {}, never, never, true, never>;
     // (undocumented)
@@ -1302,22 +1305,6 @@ export class PanningDirective implements OnDestroy {
 export interface Point {
     x: number;
     y: number;
-}
-
-// @public
-export interface PointerInputEvent extends PointerEvent {
-    // (undocumented)
-    boxSelectionHandled?: boolean;
-    // (undocumented)
-    linkingHandled?: boolean;
-    // (undocumented)
-    moveSelectionHandled?: boolean;
-    // (undocumented)
-    rotateHandled?: boolean;
-    // (undocumented)
-    selectHandled?: boolean;
-    // (undocumented)
-    zoomingHandled?: boolean;
 }
 
 // @public
@@ -1420,10 +1407,10 @@ export interface SelectionRotatedEvent {
 }
 
 // @public
-export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName;
+export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName | WheelOnlyActionName;
 
 // @public
-export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition;
+export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition | WheelOnlyShortcutDefinition;
 
 // @public
 export interface SimpleNode<T extends DataObject = DataObject> {
@@ -1514,6 +1501,15 @@ export interface VirtualizationConfig {
 }
 
 // @public
+export type WheelOnlyActionName = 'zoom';
+
+// @public
+export interface WheelOnlyShortcutDefinition {
+    actionName: WheelOnlyActionName;
+    bindings: ModifierOnlyShortcutBinding[];
+}
+
+// @public
 export interface ZIndexConfig {
     edgesAboveConnectedNodes: boolean;
     elevateOnSelection: boolean;
@@ -1545,7 +1541,7 @@ export interface ZoomConfig {
 // @public (undocumented)
 export class ZoomingWheelDirective {
     // (undocumented)
-    onWheel(event: WheelEvent): void;
+    onWheel(event: WheelInputEvent): void;
     // (undocumented)
     static ɵdir: i0.ɵɵDirectiveDeclaration<ZoomingWheelDirective, "[ngDiagramZoomingWheel]", never, {}, {}, never, never, true, never>;
     // (undocumented)

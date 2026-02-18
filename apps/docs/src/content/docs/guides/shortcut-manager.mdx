@@ -30,6 +30,9 @@ All available shortcut actions with their default key bindings. See [`ShortcutAc
 | `keyboardPanDown`            | <kbd>↓</kbd>                              | Pan viewport down                                                           |
 | `keyboardPanLeft`            | <kbd>←</kbd>                              | Pan viewport left                                                           |
 | `keyboardPanRight`           | <kbd>→</kbd>                              | Pan viewport right                                                          |
+| `zoom`                       | <kbd>Ctrl/Cmd + Wheel</kbd>               | Increase or decrease diagram viewport scale                                 |
+| `keyboardZoomIn`             | <kbd>=</kbd>                              | Increase diagram viewport scale                                             |
+| `keyboardZoomOut`            | <kbd>-</kbd>                              | Decrease diagram viewport scale                                             |
 | `undo`                       | <kbd>Ctrl/Cmd + Z</kbd>                   | Undo last action (not implemented by default; requires custom model)        |
 | `redo`                       | <kbd>Ctrl/Cmd + Y</kbd>                   | Redo last undone action (not implemented by default; requires custom model) |
 
@@ -129,7 +132,7 @@ See [MDN KeyboardEvent.key documentation](https://developer.mozilla.org/en-US/do
 ### Modifier-Only Shortcuts
 
 Modifier-only shortcuts (bindings without a `key`) are used for pointer-based interactions,
-such as holding <kbd>Shift</kbd> for box selection.
+such as holding <kbd>Shift</kbd> for box selection or holding <kbd>Ctrl/Cmd</kbd> and using mouse wheel for zoom in and zoom out.
 
 ```typescript
 {

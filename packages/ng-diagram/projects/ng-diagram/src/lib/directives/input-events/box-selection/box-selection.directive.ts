@@ -2,7 +2,7 @@ import { Directive, ElementRef, inject, type OnDestroy, type OnInit } from '@ang
 import { FlowCoreProviderService } from '../../../services';
 import { BoxSelectionProviderService } from '../../../services/box-selection-provider/box-selection-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
-import type { PointerInputEvent } from '../../../types/event';
+import type { PointerInputEvent } from '../../../types/pointer-event';
 
 @Directive({
   selector: '[ngDiagramBoxSelection]',
