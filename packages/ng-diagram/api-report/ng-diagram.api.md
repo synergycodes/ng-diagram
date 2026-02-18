@@ -368,7 +368,7 @@ export interface HighlightGroupActionState {
 }
 
 // @public
-export function initializeModel(model?: Partial<Model>, injector?: Injector): SignalModelAdapter;
+export function initializeModel(model?: Partial<Model>, injector?: Injector): ModelAdapter;
 
 // @public
 export interface InputModifiers {
