@@ -145,6 +145,7 @@ export default defineConfig({
         }),
       ],
       components: {
+        SiteTitle: './src/components/site-title/site-title.astro',
         SocialIcons: './src/components/social-icons/social-icons.astro',
         PageTitle: './src/components/page-title/page-title.astro',
         ThemeProvider: './src/components/ForceDarkTheme.astro',
