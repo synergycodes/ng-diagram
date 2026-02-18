@@ -18,10 +18,6 @@
  *   }
  * }
  * ```
- *
- * @public
- * @since 1.1.0
- * @category Types/Events
  */
 export interface WheelInputEvent extends WheelEvent {
   zoomingHandled?: boolean;

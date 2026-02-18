@@ -103,13 +103,11 @@ title: "ng-diagram"
 - [GroupMembershipChangedEvent](/docs/api/types/events/groupmembershipchangedevent/)
 - [NodeResizedEvent](/docs/api/types/events/noderesizedevent/)
 - [PaletteItemDroppedEvent](/docs/api/types/events/paletteitemdroppedevent/)
-- [PointerInputEvent](/docs/api/types/events/pointerinputevent/)
 - [SelectionChangedEvent](/docs/api/types/events/selectionchangedevent/)
 - [SelectionMovedEvent](/docs/api/types/events/selectionmovedevent/)
 - [SelectionRemovedEvent](/docs/api/types/events/selectionremovedevent/)
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
 - [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
-- [WheelInputEvent](/docs/api/types/events/wheelinputevent/)
 
 ## Types/Geometry
 

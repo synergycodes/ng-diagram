@@ -1308,22 +1308,6 @@ export interface Point {
 }
 
 // @public
-export interface PointerInputEvent extends PointerEvent {
-    // (undocumented)
-    boxSelectionHandled?: boolean;
-    // (undocumented)
-    linkingHandled?: boolean;
-    // (undocumented)
-    moveSelectionHandled?: boolean;
-    // (undocumented)
-    rotateHandled?: boolean;
-    // (undocumented)
-    selectHandled?: boolean;
-    // (undocumented)
-    zoomingHandled?: boolean;
-}
-
-// @public
 export type PointerOnlyActionName = 'multiSelection' | 'boxSelection';
 
 // @public
@@ -1514,12 +1498,6 @@ export interface VirtualizationConfig {
     enabled: boolean;
     idleDelay?: number;
     padding: number;
-}
-
-// @public
-export interface WheelInputEvent extends WheelEvent {
-    // (undocumented)
-    zoomingHandled?: boolean;
 }
 
 // @public

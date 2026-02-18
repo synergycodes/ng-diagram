@@ -76,8 +76,6 @@ export type { NgDiagramEdgeTemplate } from './lib/types/edge-template-map';
 export type { NgDiagramGroupNodeTemplate, NgDiagramNodeTemplate } from './lib/types/node-template-map';
 export type { BasePaletteItemData, GroupNodeData, NgDiagramPaletteItem, SimpleNodeData } from './lib/types/palette';
 export type { NgDiagramPanelPosition } from './lib/types/panel-position';
-export type { PointerInputEvent } from './lib/types/pointer-event';
-export type { WheelInputEvent } from './lib/types/wheel-event';
 export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
