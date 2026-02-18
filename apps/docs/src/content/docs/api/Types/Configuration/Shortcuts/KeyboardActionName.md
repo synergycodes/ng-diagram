@@ -6,6 +6,6 @@ prev: false
 title: "KeyboardActionName"
 ---
 
-> **KeyboardActionName** = [`KeyboardMoveSelectionAction`](/docs/api/types/configuration/shortcuts/keyboardmoveselectionaction/) \| [`KeyboardPanAction`](/docs/api/types/configuration/shortcuts/keyboardpanaction/) \| `Extract`\<`InputEventName`, `"cut"` \| `"paste"` \| `"copy"` \| `"deleteSelection"` \| `"undo"` \| `"redo"` \| `"selectAll"`\>
+> **KeyboardActionName** = [`KeyboardMoveSelectionAction`](/docs/api/types/configuration/shortcuts/keyboardmoveselectionaction/) \| [`KeyboardPanAction`](/docs/api/types/configuration/shortcuts/keyboardpanaction/) \| [`KeyboardZoomAction`](/docs/api/types/configuration/shortcuts/keyboardzoomaction/) \| `Extract`\<`InputEventName`, `"cut"` \| `"paste"` \| `"copy"` \| `"deleteSelection"` \| `"undo"` \| `"redo"` \| `"selectAll"`\>
 
 Keyboard action names that can be triggered by keyboard events
