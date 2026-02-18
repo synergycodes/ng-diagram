@@ -1,5 +1,5 @@
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { assignInternalId, type Model } from '../../core/src';
+import { assignInternalId, type Model, type ModelAdapter } from '../../core/src';
 import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { SignalModelAdapter } from './signal-model-adapter';
 
@@ -19,7 +19,7 @@ import { SignalModelAdapter } from './signal-model-adapter';
  * @since 0.8.0
  * @category Utilities
  */
-export function initializeModel(model: Partial<Model> = {}, injector?: Injector) {
+export function initializeModel(model: Partial<Model> = {}, injector?: Injector): ModelAdapter {
   const create = () => {
     const environment = inject(EnvironmentProviderService);
 
