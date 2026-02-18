@@ -100,6 +100,11 @@ export interface DraggingActionState {
    * Key is node ID, value is the accumulated delta that hasn't been applied due to snapping.
    */
   accumulatedDeltas: Map<string, Point>;
+  /**
+   * Whether the pointer has moved beyond the move threshold, indicating an actual drag.
+   * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
+   */
+  movementStarted: boolean;
 }
 
 /**

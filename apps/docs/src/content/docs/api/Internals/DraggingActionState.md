@@ -24,3 +24,12 @@ Key is node ID, value is the accumulated delta that hasn't been applied due to s
 > **modifiers**: [`InputModifiers`](/docs/api/types/configuration/shortcuts/inputmodifiers/)
 
 Input modifiers (e.g., Ctrl, Shift) active during the drag.
+
+***
+
+### movementStarted
+
+> **movementStarted**: `boolean`
+
+Whether the pointer has moved beyond the move threshold, indicating an actual drag.
+`false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
