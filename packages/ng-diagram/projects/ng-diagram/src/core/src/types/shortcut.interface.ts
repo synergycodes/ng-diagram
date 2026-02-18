@@ -79,10 +79,10 @@ export interface PointerOnlyShortcutDefinition {
 }
 
 /**
- * Pointer-only shortcut definition with modifier-only bindings
+ * Wheel-only shortcut definition with modifier-only bindings
  *
  * @public
- * @since 1.0.1
+ * @since 1.1.0
  * @category Types/Configuration/Shortcuts
  */
 export interface WheelOnlyShortcutDefinition {
@@ -97,7 +97,7 @@ export interface WheelOnlyShortcutDefinition {
  *
  * This is a discriminated union that enforces:
  * - Pointer-only actions (multiSelection, boxSelection) can only have modifier-only bindings
- * - Wheel-only actions (zoom)
+ * - Wheel-only actions (zoom) can only have modifier-only bindings
  * - Keyboard actions must have at least one key-based binding
  *
  * @public

@@ -113,6 +113,7 @@ export type {
   KeyboardPanAction,
   KeyboardShortcutBinding,
   KeyboardShortcutDefinition,
+  KeyboardZoomAction,
   LinkingActionState,
   LinkingConfig,
   loggerMiddleware,
@@ -160,6 +161,8 @@ export type {
   Viewport,
   ViewportChangedEvent,
   VirtualizationConfig,
+  WheelOnlyActionName,
+  WheelOnlyShortcutDefinition,
   ZIndexConfig,
   ZoomConfig,
 } from './core/src';

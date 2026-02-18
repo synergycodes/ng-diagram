@@ -26,10 +26,10 @@ export type KeyboardPanAction = 'keyboardPanUp' | 'keyboardPanDown' | 'keyboardP
  * Keyboard zooming actions
  *
  * @public
- * @since 1.0.1
+ * @since 1.1.0
  * @category Types/Configuration/Shortcuts
  */
-export type KeyboardZoomAction = 'zoomIn' | 'zoomOut';
+export type KeyboardZoomAction = 'keyboardZoomIn' | 'keyboardZoomOut';
 
 /**
  * Pointer-only action names that can only be triggered by pointer events with modifiers
@@ -43,10 +43,10 @@ export type PointerOnlyActionName = 'multiSelection' | 'boxSelection';
 
 /**
  * Wheel-only action names that can only be triggered by wheel events with modifiers
- * (e.g., Shift+Click, Ctrl+Click)
+ * (e.g., Shift+Wheel, Ctrl+Wheel)
  *
  * @public
- * @since 1.0.1
+ * @since 1.1.0
  * @category Types/Configuration/Shortcuts
  */
 export type WheelOnlyActionName = 'zoom';

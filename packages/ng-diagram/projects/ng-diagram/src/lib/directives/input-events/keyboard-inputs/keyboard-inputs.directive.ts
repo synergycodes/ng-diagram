@@ -57,7 +57,7 @@ export class KeyboardInputsDirective {
 
     for (const shortcut of shortcuts) {
       const matchingAction = this.keyboardActions.find((action) => action.canHandle(shortcut, flowCore));
-      const event = matchingAction && matchingAction.createEvent(shortcut, baseEvent);
+      const event = matchingAction && matchingAction.createEvent(shortcut, baseEvent, flowCore);
 
       if (event) {
         this.inputEventsRouter.emit(event);

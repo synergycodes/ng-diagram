@@ -96,11 +96,11 @@ export const DEFAULT_SHORTCUTS = [
 
   // Zoom In/Out with keyboard
   {
-    actionName: 'zoomIn',
+    actionName: 'keyboardZoomIn',
     bindings: [{ key: '=' }],
   },
   {
-    actionName: 'zoomOut',
+    actionName: 'keyboardZoomOut',
     bindings: [{ key: '-' }],
   },
 ] satisfies ShortcutDefinition[];

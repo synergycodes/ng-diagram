@@ -64,7 +64,7 @@ export class PanningDirective implements OnDestroy {
     this.finishPanning(event);
   };
 
-  onWheel(event: WheelEvent): void {
+  onWheel(event: WheelInputEvent): void {
     if (!this.shouldHandleWheel(event)) {
       return;
     }
