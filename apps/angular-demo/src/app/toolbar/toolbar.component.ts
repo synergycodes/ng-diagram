@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, output } from '@angular/core';
 import {
+  Edge,
+  EdgeLabelPosition,
   NgDiagramModelService,
   NgDiagramSelectionService,
   NgDiagramService,
@@ -28,7 +30,29 @@ export class ToolbarComponent {
 
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 
+  selectedLabelledEdge = computed(() => {
+    const edges = this.ngDiagramSelectionService.selection().edges;
+    return edges.find((edge: Edge) => edge.type === 'labelled-edge') ?? null;
+  });
+
+  isLabelAbsolute = computed(() => {
+    const edge = this.selectedLabelledEdge();
+    if (!edge) return false;
+    const pos = (edge.data as { labelPosition?: EdgeLabelPosition }).labelPosition;
+    return typeof pos === 'string';
+  });
+
   isDebugModeEnabled = computed(() => this.ngDiagramService.config().debugMode || false);
+
+  onToggleLabelPositionClick(): void {
+    const edge = this.selectedLabelledEdge();
+    if (!edge) return;
+
+    const currentPos = (edge.data as { labelPosition?: EdgeLabelPosition }).labelPosition ?? 0.5;
+    const newPos: EdgeLabelPosition = typeof currentPos === 'string' ? 0.5 : '50px';
+
+    this.ngDiagramModelService.updateEdgeData(edge.id, { ...edge.data, labelPosition: newPos });
+  }
 
   onToggleDebugModeClick(): void {
     this.ngDiagramService.updateConfig({ debugMode: !this.isDebugModeEnabled() });
