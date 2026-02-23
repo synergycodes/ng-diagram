@@ -7,8 +7,8 @@ describe('computeOrthogonalPointAtDistance', () => {
       expect(computeOrthogonalPointAtDistance([], 50)).toEqual({ x: 0, y: 0 });
     });
 
-    it('should return { x: 0, y: 0 } for single point path', () => {
-      expect(computeOrthogonalPointAtDistance([{ x: 42, y: 24 }], 50)).toEqual({ x: 0, y: 0 });
+    it('should return the single point for single point path', () => {
+      expect(computeOrthogonalPointAtDistance([{ x: 42, y: 24 }], 50)).toEqual({ x: 42, y: 24 });
     });
   });
 

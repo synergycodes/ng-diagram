@@ -3,6 +3,8 @@ import { BezierRouting } from './routings/bezier/bezier-routing';
 import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
 import { PolylineRouting } from './routings/polyline/polyline-routing';
 import { EdgeRouting, EdgeRoutingContext, EdgeRoutingName } from './types';
+import { computeLinearSegmentLengths, interpolateAlongLinearSegments } from './utils/linear-segment-utils';
+import { normalizeDistance } from './utils/normalize-distance';
 
 const ROUTING_MUST_HAVE_NAME_WARNING = `[ngDiagram] Routing must have a non-empty name property. Registration skipped.
 
@@ -325,29 +327,8 @@ export class EdgeRoutingManager {
 const computeFallbackPointAtDistance = (points: Point[], distancePx: number): Point => {
   if (points.length < 2) return points[0] || { x: 0, y: 0 };
 
-  const lengths: number[] = [];
-  let totalLength = 0;
-  for (let i = 0; i < points.length - 1; i++) {
-    const length = Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
-    lengths.push(length);
-    totalLength += length;
-  }
+  const { lengths, totalLength } = computeLinearSegmentLengths(points);
+  const targetLength = normalizeDistance(distancePx, totalLength);
 
-  let targetLength = distancePx >= 0 && !Object.is(distancePx, -0) ? distancePx : totalLength + distancePx;
-  targetLength = Math.max(0, Math.min(targetLength, totalLength));
-
-  let accumulated = 0;
-  for (let i = 0; i < lengths.length; i++) {
-    if (accumulated + lengths[i] >= targetLength) {
-      const remaining = targetLength - accumulated;
-      const segmentPercent = lengths[i] > 0 ? remaining / lengths[i] : 0;
-      return {
-        x: points[i].x + (points[i + 1].x - points[i].x) * segmentPercent,
-        y: points[i].y + (points[i + 1].y - points[i].y) * segmentPercent,
-      };
-    }
-    accumulated += lengths[i];
-  }
-
-  return points[points.length - 1];
+  return interpolateAlongLinearSegments(points, lengths, targetLength);
 };

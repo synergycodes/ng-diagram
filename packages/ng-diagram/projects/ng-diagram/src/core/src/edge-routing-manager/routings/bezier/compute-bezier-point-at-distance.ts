@@ -1,4 +1,5 @@
 import { Point } from '../../../types';
+import { normalizeDistance } from '../../utils/normalize-distance';
 import { computeBezierPointOnPath } from './compute-bezier-point-on-path';
 
 const NUM_SAMPLES = 100;
@@ -34,8 +35,7 @@ export const computeBezierPointAtDistance = (points: Point[], distancePx: number
   }
 
   // 2. Resolve negative distance (from target end)
-  let targetLength = distancePx >= 0 && !Object.is(distancePx, -0) ? distancePx : totalLength + distancePx;
-  targetLength = Math.max(0, Math.min(targetLength, totalLength));
+  const targetLength = normalizeDistance(distancePx, totalLength);
 
   // 3. Find t for target distance via binary search
   let lo = 0;
