@@ -19,6 +19,9 @@ import { Type } from '@angular/core';
 import { WritableSignal } from '@angular/core';
 
 // @public
+export type AbsoluteEdgeLabelPosition = `${number}px`;
+
+// @public
 export interface ActionState {
     copyPaste?: CopyPasteActionState;
     dragging?: DraggingActionState;
@@ -222,12 +225,16 @@ export interface EdgeDrawnEvent {
 export interface EdgeLabel {
     id: string;
     position?: Point;
-    positionOnEdge: number;
+    positionOnEdge: EdgeLabelPosition;
     size?: Size;
 }
 
 // @public
+export type EdgeLabelPosition = number | AbsoluteEdgeLabelPosition;
+
+// @public
 export interface EdgeRouting {
+    computePointAtDistance?(points: Point[], distancePx: number): Point;
     computePointOnPath?(points: Point[], percentage: number): Point;
     computePoints(context: EdgeRoutingContext, config?: EdgeRoutingConfig): Point[];
     computeSvgPath(points: Point[], config?: EdgeRoutingConfig): string;
@@ -263,6 +270,7 @@ export class EdgeRoutingManager {
     // @internal
     constructor(defaultEdgeRouting: EdgeRoutingName, getRoutingConfiguration: () => EdgeRoutingConfig);
     computePath(routingName: EdgeRoutingName | undefined, points: Point[]): string;
+    computePointAtDistance(routingName: EdgeRoutingName | undefined, points: Point[], distancePx: number): Point;
     computePointOnPath(routingName: EdgeRoutingName | undefined, points: Point[], percentage: number): Point;
     computePoints(routingName: EdgeRoutingName | undefined, context: EdgeRoutingContext): Point[];
     getDefaultRouting(): EdgeRoutingName;
@@ -705,7 +713,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     readonly points: Signal<Point[] | undefined>;
     // (undocumented)
     readonly position: Signal<Point>;
-    positionOnEdge: InputSignal<number>;
+    positionOnEdge: InputSignal<EdgeLabelPosition>;
     // (undocumented)
     get transform(): string;
     // (undocumented)

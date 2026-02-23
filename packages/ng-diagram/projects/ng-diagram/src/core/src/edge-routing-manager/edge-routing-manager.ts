@@ -333,7 +333,7 @@ const computeFallbackPointAtDistance = (points: Point[], distancePx: number): Po
     totalLength += length;
   }
 
-  let targetLength = distancePx >= 0 ? distancePx : totalLength + distancePx;
+  let targetLength = distancePx >= 0 && !Object.is(distancePx, -0) ? distancePx : totalLength + distancePx;
   targetLength = Math.max(0, Math.min(targetLength, totalLength));
 
   let accumulated = 0;

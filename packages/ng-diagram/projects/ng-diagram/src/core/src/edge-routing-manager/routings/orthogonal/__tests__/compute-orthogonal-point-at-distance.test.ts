@@ -50,8 +50,8 @@ describe('computeOrthogonalPointAtDistance', () => {
     });
 
     it('should return end point at -0', () => {
-      // -0 treated as >= 0 path, so it's 0px from start
-      expect(computeOrthogonalPointAtDistance(path, -0)).toEqual({ x: 0, y: 0 });
+      // -0 is treated as "from target end", so totalLength + (-0) = totalLength
+      expect(computeOrthogonalPointAtDistance(path, -0)).toEqual({ x: 100, y: 0 });
     });
   });
 

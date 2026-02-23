@@ -25,7 +25,7 @@ export const computeOrthogonalPointAtDistance = (points: Point[], distancePx: nu
   }
 
   // Handle negative values (from target end)
-  let targetLength = distancePx >= 0 ? distancePx : totalLength + distancePx;
+  let targetLength = distancePx >= 0 && !Object.is(distancePx, -0) ? distancePx : totalLength + distancePx;
 
   // Clamp to [0, totalLength]
   targetLength = Math.max(0, Math.min(targetLength, totalLength));

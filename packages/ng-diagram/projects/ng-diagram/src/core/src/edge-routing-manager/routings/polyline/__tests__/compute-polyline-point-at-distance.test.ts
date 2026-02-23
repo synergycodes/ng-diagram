@@ -49,8 +49,9 @@ describe('computePolylinePointAtDistance', () => {
       expect(computePolylinePointAtDistance(path, -20)).toEqual({ x: 80, y: 0 });
     });
 
-    it('should handle -0 as 0 from start', () => {
-      expect(computePolylinePointAtDistance(path, -0)).toEqual({ x: 0, y: 0 });
+    it('should treat -0 as end of path', () => {
+      // -0 is treated as "from target end", so totalLength + (-0) = totalLength
+      expect(computePolylinePointAtDistance(path, -0)).toEqual({ x: 100, y: 0 });
     });
   });
 
