@@ -76,11 +76,11 @@ importers:
         specifier: ^1.16.0
         version: 1.21.1(4e1cfceabe4441216fa8caeb750315bf)
       '@analogjs/vite-plugin-angular':
-        specifier: ^1.15.1
-        version: 1.21.1(ca2412d8d54a48024b26274b1afb4262)
+        specifier: ^2.2.3
+        version: 2.2.3(ca2412d8d54a48024b26274b1afb4262)
       '@analogjs/vitest-angular':
         specifier: ^1.19.1
-        version: 1.21.1(@analogjs/vite-plugin-angular@1.21.1(ca2412d8d54a48024b26274b1afb4262))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.1))
+        version: 1.21.1(@analogjs/vite-plugin-angular@2.2.3(ca2412d8d54a48024b26274b1afb4262))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.1))
       '@angular-devkit/build-angular':
         specifier: ^19.2.7
         version: 19.2.17(dd76d4b60b356817648b2bd05786fa69)
@@ -315,11 +315,11 @@ importers:
         specifier: ^1.16.0
         version: 1.21.1(8a4b224be30e938949e9ddb5f7c1ffb9)
       '@analogjs/vite-plugin-angular':
-        specifier: ^1.15.1
-        version: 1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3)
+        specifier: ^2.2.3
+        version: 2.2.3(0f5bcb90d62e89bf2bf9cb779b4e25d3)
       '@analogjs/vitest-angular':
         specifier: ^1.19.1
-        version: 1.21.1(@analogjs/vite-plugin-angular@1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1))
+        version: 1.21.1(@analogjs/vite-plugin-angular@2.2.3(0f5bcb90d62e89bf2bf9cb779b4e25d3))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1))
       '@angular-devkit/build-angular':
         specifier: ^19.2.8
         version: 19.2.17(3cf9bc6a7ac3c58cbd9aecf92abcce28)
@@ -456,11 +456,22 @@ packages:
       shiki:
         optional: true
 
-  '@analogjs/vite-plugin-angular@1.21.1':
-    resolution: {integrity: sha512-rXDmhZz29y8HbUG11cgJ/c2gafL1sV4u0Z7IhG6X4rZ+MzRWyjAQdv9ZwPEvfkxDCJFKHNOjMG81Br8+iDcBew==}
+  '@analogjs/vite-plugin-angular@1.22.5':
+    resolution: {integrity: sha512-N1BQD6HQSp2Imbb1fThymskWFSLq0ZF+d2fe3DgErwlBFf6SzRp++iFltddQc3wIzenTXE+5brS4fAPXO8UT9g==}
     peerDependencies:
       '@angular-devkit/build-angular': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0
       '@angular/build': ^18.0.0 || ^19.0.0 || ^20.0.0
+    peerDependenciesMeta:
+      '@angular-devkit/build-angular':
+        optional: true
+      '@angular/build':
+        optional: true
+
+  '@analogjs/vite-plugin-angular@2.2.3':
+    resolution: {integrity: sha512-OqVfiJsaHdHMxzvK0heVvp8MenSXh+xib6/p+v3d44kJ3J7ooD4gRx/jKC350zkgRKwcZc3a0ybGUnG6LEF7mg==}
+    peerDependencies:
+      '@angular-devkit/build-angular': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0
+      '@angular/build': ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0
     peerDependenciesMeta:
       '@angular-devkit/build-angular':
         optional: true
@@ -4022,6 +4033,10 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
+  balanced-match@4.0.4:
+    resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
+    engines: {node: 18 || 20 || >=22}
+
   bare-events@2.7.0:
     resolution: {integrity: sha512-b3N5eTW1g7vXkw+0CXh/HazGTcO5KYuu/RCNaJbDMPI6LHDi+7qe8EmxKUVe1sUbY2KZOVZFyj62x0OEz9qyAA==}
 
@@ -4083,6 +4098,10 @@ packages:
 
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
+
+  brace-expansion@5.0.3:
+    resolution: {integrity: sha512-fy6KJm2RawA5RcHkLa1z/ScpBeA762UF9KmZQxwIbDtRJrgLzM10depAiEQ+CXYcoiqW1/m96OAAoke2nE9EeA==}
+    engines: {node: 18 || 20 || >=22}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -5200,11 +5219,13 @@ packages:
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@11.0.3:
     resolution: {integrity: sha512-2Nim7dha1KVkaiF4q6Dj+ngPPMdfvLJEOpZk/jKiUAkqKebpGAWQXAq9z1xu9HKu5lWfqw/FASuccEjyznjPaA==}
     engines: {node: 20 || >=22}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globals@14.0.0:
@@ -6336,12 +6357,20 @@ packages:
     resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
     engines: {node: '>=10'}
 
+  minimatch@5.1.7:
+    resolution: {integrity: sha512-FjiwU9HaHW6YB3H4a1sFudnv93lvydNjz2lmyUXR6IwKhGI+bgL3SOZrBGn6kvvX2pJvhEkGSGjyTHN47O4rqA==}
+    engines: {node: '>=10'}
+
   minimatch@9.0.3:
     resolution: {integrity: sha512-RHiac9mvaRw0x3AYRgDC1CxAP7HTcNrrECeA8YYJeWnpo+2Q5CegtZjaotWTWxDG3UeGA1coE05iH1mPjT/2mg==}
     engines: {node: '>=16 || 14 >=14.17'}
 
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
+  minimatch@9.0.6:
+    resolution: {integrity: sha512-kQAVowdR33euIqeA0+VZTDqU+qo1IeVY+hrKYtZMio3Pg0P0vuh/kwRylLUddJhB6pf3q/botcOvRtx4IN1wqQ==}
     engines: {node: '>=16 || 14 >=14.17'}
 
   minimist@1.2.8:
@@ -7477,6 +7506,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   slash@5.1.0:
@@ -7723,10 +7753,12 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   tar@7.5.1:
     resolution: {integrity: sha512-nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   terser-webpack-plugin@5.3.14:
     resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
@@ -8541,6 +8573,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -8730,7 +8763,7 @@ snapshots:
 
   '@analogjs/astro-angular@1.21.1(8340524aa471727c3a62c90fd01bfc19)':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3)
+      '@analogjs/vite-plugin-angular': 1.22.5(0f5bcb90d62e89bf2bf9cb779b4e25d3)
       '@angular-devkit/build-angular': 19.2.17(3cf9bc6a7ac3c58cbd9aecf92abcce28)
       '@angular/animations': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
       '@angular/common': 19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
@@ -8749,7 +8782,7 @@ snapshots:
 
   '@analogjs/platform@1.21.1(4e1cfceabe4441216fa8caeb750315bf)':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(ca2412d8d54a48024b26274b1afb4262)
+      '@analogjs/vite-plugin-angular': 1.22.5(ca2412d8d54a48024b26274b1afb4262)
       '@analogjs/vite-plugin-nitro': 1.21.1(encoding@0.1.13)
       marked: 15.0.12
       marked-gfm-heading-id: 4.1.2(marked@15.0.12)
@@ -8794,7 +8827,7 @@ snapshots:
 
   '@analogjs/platform@1.21.1(8a4b224be30e938949e9ddb5f7c1ffb9)':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3)
+      '@analogjs/vite-plugin-angular': 1.22.5(0f5bcb90d62e89bf2bf9cb779b4e25d3)
       '@analogjs/vite-plugin-nitro': 1.21.1(encoding@0.1.13)
       marked: 15.0.12
       marked-gfm-heading-id: 4.1.2(marked@15.0.12)
@@ -8837,7 +8870,7 @@ snapshots:
       - uploadthing
       - xml2js
 
-  '@analogjs/vite-plugin-angular@1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3)':
+  '@analogjs/vite-plugin-angular@1.22.5(0f5bcb90d62e89bf2bf9cb779b4e25d3)':
     dependencies:
       ts-morph: 21.0.1
       vfile: 6.0.3
@@ -8845,10 +8878,24 @@ snapshots:
       '@angular-devkit/build-angular': 19.2.17(3cf9bc6a7ac3c58cbd9aecf92abcce28)
       '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.6)(tailwindcss@4.1.16)(terser@5.44.0)(tsx@4.21.0)(typescript@5.8.3)(yaml@2.8.1)
 
-  '@analogjs/vite-plugin-angular@1.21.1(ca2412d8d54a48024b26274b1afb4262)':
+  '@analogjs/vite-plugin-angular@1.22.5(ca2412d8d54a48024b26274b1afb4262)':
     dependencies:
       ts-morph: 21.0.1
       vfile: 6.0.3
+    optionalDependencies:
+      '@angular-devkit/build-angular': 19.2.17(dd76d4b60b356817648b2bd05786fa69)
+      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.16)(terser@5.39.0)(tsx@4.21.0)(typescript@5.8.3)(yaml@2.8.1)
+
+  '@analogjs/vite-plugin-angular@2.2.3(0f5bcb90d62e89bf2bf9cb779b4e25d3)':
+    dependencies:
+      ts-morph: 21.0.1
+    optionalDependencies:
+      '@angular-devkit/build-angular': 19.2.17(3cf9bc6a7ac3c58cbd9aecf92abcce28)
+      '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.4.1)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.6)(tailwindcss@4.1.16)(terser@5.44.0)(tsx@4.21.0)(typescript@5.8.3)(yaml@2.8.1)
+
+  '@analogjs/vite-plugin-angular@2.2.3(ca2412d8d54a48024b26274b1afb4262)':
+    dependencies:
+      ts-morph: 21.0.1
     optionalDependencies:
       '@angular-devkit/build-angular': 19.2.17(dd76d4b60b356817648b2bd05786fa69)
       '@angular/build': 19.2.17(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(@angular/compiler@19.2.15)(@angular/platform-server@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(@types/node@24.6.2)(chokidar@4.0.3)(jiti@2.6.1)(less@4.2.2)(lightningcss@1.30.2)(ng-packagr@19.2.2(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3))(tailwindcss@4.1.16)(tslib@2.8.1)(typescript@5.8.3))(postcss@8.5.2)(tailwindcss@4.1.16)(terser@5.39.0)(tsx@4.21.0)(typescript@5.8.3)(yaml@2.8.1)
@@ -8890,15 +8937,15 @@ snapshots:
       - uploadthing
       - xml2js
 
-  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1))':
+  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@2.2.3(0f5bcb90d62e89bf2bf9cb779b4e25d3))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3)
+      '@analogjs/vite-plugin-angular': 2.2.3(0f5bcb90d62e89bf2bf9cb779b4e25d3)
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
       vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.1)(lightningcss@1.30.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1)
 
-  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@1.21.1(ca2412d8d54a48024b26274b1afb4262))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.1))':
+  '@analogjs/vitest-angular@1.21.1(@analogjs/vite-plugin-angular@2.2.3(ca2412d8d54a48024b26274b1afb4262))(@angular-devkit/architect@0.1902.17(chokidar@4.0.3))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.21.1(ca2412d8d54a48024b26274b1afb4262)
+      '@analogjs/vite-plugin-angular': 2.2.3(ca2412d8d54a48024b26274b1afb4262)
       '@angular-devkit/architect': 0.1902.17(chokidar@4.0.3)
       vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.6.2)(jiti@2.6.1)(jsdom@26.1.0)(less@4.2.2)(lightningcss@1.30.2)(sass@1.85.0)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.1)
 
@@ -12550,7 +12597,7 @@ snapshots:
   '@ts-morph/common@0.22.0':
     dependencies:
       fast-glob: 3.3.3
-      minimatch: 9.0.5
+      minimatch: 9.0.6
       mkdirp: 3.0.1
       path-browserify: 1.0.1
 
@@ -12559,7 +12606,7 @@ snapshots:
   '@tufjs/models@3.0.1':
     dependencies:
       '@tufjs/canonical-json': 2.0.0
-      minimatch: 9.0.5
+      minimatch: 9.0.6
 
   '@tybys/wasm-util@0.9.0':
     dependencies:
@@ -13564,6 +13611,8 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
+  balanced-match@4.0.4: {}
+
   bare-events@2.7.0: {}
 
   base-64@1.0.0: {}
@@ -13652,6 +13701,10 @@ snapshots:
   brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
+
+  brace-expansion@5.0.3:
+    dependencies:
+      balanced-match: 4.0.4
 
   braces@3.0.3:
     dependencies:
@@ -14647,7 +14700,7 @@ snapshots:
 
   filelist@1.0.4:
     dependencies:
-      minimatch: 5.1.6
+      minimatch: 5.1.7
 
   fill-range@7.1.1:
     dependencies:
@@ -15239,7 +15292,7 @@ snapshots:
 
   ignore-walk@7.0.0:
     dependencies:
-      minimatch: 9.0.5
+      minimatch: 9.0.6
 
   ignore@5.3.2: {}
 
@@ -16379,6 +16432,10 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.2
 
+  minimatch@5.1.7:
+    dependencies:
+      brace-expansion: 2.0.2
+
   minimatch@9.0.3:
     dependencies:
       brace-expansion: 2.0.2
@@ -16386,6 +16443,10 @@ snapshots:
   minimatch@9.0.5:
     dependencies:
       brace-expansion: 2.0.2
+
+  minimatch@9.0.6:
+    dependencies:
+      brace-expansion: 5.0.3
 
   minimist@1.2.8: {}
 
