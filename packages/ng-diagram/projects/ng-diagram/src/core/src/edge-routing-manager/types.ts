@@ -106,4 +106,14 @@ export interface EdgeRouting {
    * @returns The point at the given percentage along the path.
    */
   computePointOnPath?(points: Point[], percentage: number): Point;
+
+  /**
+   * Gets a point on the path at a given pixel distance from the start.
+   * Negative values measure from the end of the path.
+   *
+   * @param points - The points defining the path.
+   * @param distancePx - Distance in pixels (positive = from start, negative = from end).
+   * @returns The point at the given distance along the path.
+   */
+  computePointAtDistance?(points: Point[], distancePx: number): Point;
 }

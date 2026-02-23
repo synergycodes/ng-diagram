@@ -139,7 +139,7 @@ export const defaultModel: DiagramModel = {
       id: '3',
       source: '5',
       target: '6',
-      data: { labelPosition: '0.45' },
+      data: { labelPosition: 0.45 },
       sourcePort: 'port-right',
       targetPort: 'port-left',
       type: 'labelled-edge',

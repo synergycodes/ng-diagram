@@ -1,6 +1,7 @@
 import { EdgeRoutingConfig, Point } from '../../../types';
 import { EdgeRouting, EdgeRoutingContext } from '../../types';
 import { computeBezierPath } from './compute-bezier-path';
+import { computeBezierPointAtDistance } from './compute-bezier-point-at-distance';
 import { computeBezierPointOnPath } from './compute-bezier-point-on-path';
 import { computeBezierPoints } from './compute-bezier-points';
 
@@ -68,5 +69,17 @@ export class BezierRouting implements EdgeRouting {
    */
   computePointOnPath(points: Point[], percentage: number): Point {
     return computeBezierPointOnPath(points, percentage);
+  }
+
+  /**
+   * Gets a point on the Bézier curve at a given pixel distance from the start,
+   * using arc-length parameterization.
+   *
+   * @param points - The Bézier points (start, control1, control2, end).
+   * @param distancePx - Distance in pixels (positive = from start, negative = from end).
+   * @returns The {@link Point} at the given distance along the curve.
+   */
+  computePointAtDistance(points: Point[], distancePx: number): Point {
+    return computeBezierPointAtDistance(points, distancePx);
   }
 }

@@ -1,6 +1,7 @@
 import { EdgeRoutingConfig, Point } from '../../../types';
 import { EdgeRouting, EdgeRoutingContext } from '../../types';
 import { computeOrthogonalPath } from './compute-orthogonal-path';
+import { computeOrthogonalPointAtDistance } from './compute-orthogonal-point-at-distance';
 import { computeOrthogonalPointOnPath } from './compute-orthogonal-point-on-path';
 import { computeOrthogonalPoints } from './compute-orthogonal-points';
 
@@ -67,5 +68,16 @@ export class OrthogonalRouting implements EdgeRouting {
    */
   computePointOnPath(points: Point[], percentage: number): Point {
     return computeOrthogonalPointOnPath(points, percentage);
+  }
+
+  /**
+   * Gets a point on the orthogonal path at a given pixel distance from the start.
+   *
+   * @param points - The orthogonal polyline points.
+   * @param distancePx - Distance in pixels (positive = from start, negative = from end).
+   * @returns The {@link Point} at the given distance along the path.
+   */
+  computePointAtDistance(points: Point[], distancePx: number): Point {
+    return computeOrthogonalPointAtDistance(points, distancePx);
   }
 }

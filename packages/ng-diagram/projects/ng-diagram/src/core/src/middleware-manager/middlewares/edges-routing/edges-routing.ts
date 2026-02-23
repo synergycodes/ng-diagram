@@ -1,4 +1,4 @@
-import { EdgeRoutingManager } from '../../../edge-routing-manager';
+import { EdgeRoutingManager, resolveLabelPosition } from '../../../edge-routing-manager';
 import { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point } from '../../../types';
 import { isSamePoint } from '../../../utils';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
@@ -74,7 +74,7 @@ export const havePointsChanged = (oldPoints: Point[] | undefined, newPoints: Poi
 export const updateLabelPositions = (edge: Edge, points: Point[], routingManager: EdgeRoutingManager) => {
   return edge.measuredLabels?.map((label) => ({
     ...label,
-    position: routingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
+    position: resolveLabelPosition(label.positionOnEdge, edge.routing, points, routingManager),
   }));
 };
 

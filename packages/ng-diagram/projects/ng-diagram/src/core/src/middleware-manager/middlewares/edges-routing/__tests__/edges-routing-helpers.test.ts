@@ -43,6 +43,7 @@ describe('Edge Routing Helper Functions', () => {
 
     mockRoutingManager = {
       computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+      computePointAtDistance: vi.fn().mockReturnValue({ x: 30, y: 0 }),
       hasRouting: vi.fn().mockReturnValue(true),
       getDefaultRouting: vi.fn().mockReturnValue('polyline'),
     };
@@ -318,6 +319,76 @@ describe('Edge Routing Helper Functions', () => {
       const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
 
       expect(result).toEqual([]);
+    });
+
+    it('should use computePointAtDistance for absolute (px) label positions', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        routing: 'polyline',
+        measuredLabels: [{ id: 'label-abs', positionOnEdge: '30px' }],
+      };
+      const points = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ];
+
+      mockRoutingManager.computePointAtDistance = vi.fn().mockReturnValue({ x: 30, y: 0 });
+
+      const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
+
+      expect(result).toHaveLength(1);
+      expect(result![0]).toEqual({
+        id: 'label-abs',
+        positionOnEdge: '30px',
+        position: { x: 30, y: 0 },
+      });
+      expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith('polyline', points, 30);
+      expect(mockRoutingManager.computePointOnPath).not.toHaveBeenCalled();
+    });
+
+    it('should handle negative absolute positions (from target)', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        routing: 'polyline',
+        measuredLabels: [{ id: 'label-neg', positionOnEdge: '-20px' }],
+      };
+      const points = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ];
+
+      mockRoutingManager.computePointAtDistance = vi.fn().mockReturnValue({ x: 80, y: 0 });
+
+      const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
+
+      expect(result![0].position).toEqual({ x: 80, y: 0 });
+      expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith('polyline', points, -20);
+    });
+
+    it('should handle mixed relative and absolute label positions', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        routing: 'polyline',
+        measuredLabels: [
+          { id: 'label-rel', positionOnEdge: 0.5 },
+          { id: 'label-abs', positionOnEdge: '20px' },
+        ],
+      };
+      const points = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ];
+
+      mockRoutingManager.computePointOnPath = vi.fn().mockReturnValue({ x: 50, y: 0 });
+      mockRoutingManager.computePointAtDistance = vi.fn().mockReturnValue({ x: 20, y: 0 });
+
+      const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
+
+      expect(result).toHaveLength(2);
+      expect(result![0].position).toEqual({ x: 50, y: 0 });
+      expect(result![1].position).toEqual({ x: 20, y: 0 });
+      expect(mockRoutingManager.computePointOnPath).toHaveBeenCalledWith('polyline', points, 0.5);
+      expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith('polyline', points, 20);
     });
   });
 
