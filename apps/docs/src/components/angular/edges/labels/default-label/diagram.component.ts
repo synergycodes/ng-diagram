@@ -60,7 +60,7 @@ export class DiagramComponent {
         targetPort: 'port-left',
         target: '2',
         // @mark-start
-        data: { label: 'Label' },
+        data: { label: 'Label', positionOnEdge: 0.3 },
         // @mark-end
       },
     ],
