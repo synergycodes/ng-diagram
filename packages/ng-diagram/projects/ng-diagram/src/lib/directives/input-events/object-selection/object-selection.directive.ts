@@ -1,16 +1,18 @@
-import { Directive, HostListener, inject, input } from '@angular/core';
+import { Directive, HostListener, inject, input, type OnDestroy } from '@angular/core';
 import type { BasePointerInputEvent, Edge, Node } from '../../../../core/src';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types';
 
 @Directive()
-abstract class ObjectSelectionDirective {
+abstract class ObjectSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
 
   targetData = input.required<Node | Edge | undefined>();
   abstract targetType: BasePointerInputEvent['targetType'];
 
-  private pointerUpHandler: ((e: PointerEvent) => void) | null = null;
+  ngOnDestroy(): void {
+    document.removeEventListener('pointerup', this.onPointerUp);
+  }
 
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
@@ -33,31 +35,25 @@ abstract class ObjectSelectionDirective {
       },
     });
 
-    this.removePointerUpHandler();
-    this.pointerUpHandler = (e: PointerEvent) => {
-      this.removePointerUpHandler();
-      const upBaseEvent = this.inputEventsRouter.getBaseEvent(e as PointerInputEvent);
-      this.inputEventsRouter.emit({
-        ...upBaseEvent,
-        name: 'select',
-        phase: 'end',
-        target: this.targetData(),
-        targetType: this.targetType,
-        lastInputPoint: {
-          x: e.clientX,
-          y: e.clientY,
-        },
-      });
-    };
-    document.addEventListener('pointerup', this.pointerUpHandler, { once: true });
+    document.addEventListener('pointerup', this.onPointerUp);
   }
 
-  private removePointerUpHandler(): void {
-    if (this.pointerUpHandler) {
-      document.removeEventListener('pointerup', this.pointerUpHandler);
-      this.pointerUpHandler = null;
-    }
-  }
+  onPointerUp = (event: PointerEvent): void => {
+    document.removeEventListener('pointerup', this.onPointerUp);
+
+    const baseEvent = this.inputEventsRouter.getBaseEvent(event as PointerInputEvent);
+    this.inputEventsRouter.emit({
+      ...baseEvent,
+      name: 'select',
+      phase: 'end',
+      target: this.targetData(),
+      targetType: this.targetType,
+      lastInputPoint: {
+        x: event.clientX,
+        y: event.clientY,
+      },
+    });
+  };
 
   private shouldHandle(event: PointerInputEvent) {
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {

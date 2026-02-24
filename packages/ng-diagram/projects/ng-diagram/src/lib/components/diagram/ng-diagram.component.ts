@@ -24,8 +24,8 @@ import type {
   ModelAdapter,
   NodeDragEndedEvent,
   NodeDragStartedEvent,
-  NodeResizeEndedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
   NodeResizeStartedEvent,
   NodeRotateEndedEvent,
   NodeRotateStartedEvent,
@@ -190,8 +190,6 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    *
    * This event fires on pointerup after a selection operation completes —
    * whether from clicking a node/edge, box selection, or select-all.
-   * Use this to trigger actions after the user finishes selecting,
-   * such as showing toolbars, updating panels, or making API calls.
    */
   @Output() selectionGestureEnded = new EventEmitter<SelectionGestureEndedEvent>();
 

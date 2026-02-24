@@ -22,12 +22,17 @@ export class BoxSelectionEventHandler extends EventHandler<BoxSelectionEvent> {
         this.boxSelect(event);
         break;
       }
-      case 'end':
+      case 'end': {
+        if (!this.isBoxSelecting) {
+          break;
+        }
+
         this.boxSelect(event);
         this.flow.commandHandler.emit('selectEnd');
         this.startPoint = undefined;
         this.isBoxSelecting = false;
         break;
+      }
     }
   }
 

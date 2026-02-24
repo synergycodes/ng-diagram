@@ -352,15 +352,14 @@ describe('BoxSelectionEventHandler', () => {
         });
       });
 
-      it('should not emit select command if end is called without start, but still emit selectEnd', () => {
+      it('should not emit any commands if end is called without start', () => {
         const endEvent = getSampleBoxSelectionEvent({
           phase: 'end',
           lastInputPoint: { x: 450, y: 250 },
         });
         instance.handle(endEvent);
 
-        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('select', expect.anything());
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('selectEnd');
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
 
       it('should reset state after end phase', () => {
@@ -378,14 +377,15 @@ describe('BoxSelectionEventHandler', () => {
         });
         instance.handle(endEvent);
 
+        mockCommandHandler.emit.mockClear();
+
         const continueEvent = getSampleBoxSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 300, y: 300 },
         });
         instance.handle(continueEvent);
 
-        // select + selectEnd from end phase, no extra calls from continue
-        expect(mockCommandHandler.emit).toHaveBeenCalledTimes(2);
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
     });
 

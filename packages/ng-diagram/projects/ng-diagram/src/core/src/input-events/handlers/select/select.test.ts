@@ -26,251 +26,223 @@ describe('SelectEventHandler', () => {
   const mockCommandHandler = { emit: vi.fn() };
   const mockShortcutManager = { matchesAction: vi.fn() };
   let mockFlowCore: FlowCore;
-  let instance: SelectEventHandler;
+  let handler: SelectEventHandler;
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     mockFlowCore = {
-      getState: vi.fn(),
-      applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
       environment: mockEnvironment,
       shortcutManager: mockShortcutManager,
     } as unknown as FlowCore;
 
-    instance = new SelectEventHandler(mockFlowCore);
+    mockShortcutManager.matchesAction.mockReturnValue(false);
+
+    handler = new SelectEventHandler(mockFlowCore);
   });
 
-  describe('handle', () => {
-    describe('when clicking outside of elements', () => {
-      it('should emit deselectAll command', () => {
-        const event = getSampleSelectEvent({ targetType: 'diagram' });
-        mockShortcutManager.matchesAction.mockReturnValue(false);
+  describe('phase: end', () => {
+    it('should emit selectEnd command', () => {
+      const event = getSampleSelectEvent({ phase: 'end' });
 
-        instance.handle(event);
+      handler.handle(event);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('selectEnd');
+      expect(mockCommandHandler.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not run selection logic when target is present', () => {
+      const node = { ...mockNode, id: 'node1', selected: false };
+      const event = getSampleSelectEvent({
+        phase: 'end',
+        target: node,
+        targetType: 'node',
+      });
+
+      handler.handle(event);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('selectEnd');
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('select', expect.anything());
+    });
+  });
+
+  describe('phase: start (or undefined)', () => {
+    it('should run selection logic when phase is undefined (backward compat)', () => {
+      const node = { ...mockNode, id: 'node1', selected: false };
+      const event = getSampleSelectEvent({
+        target: node,
+        targetType: 'node',
+      });
+
+      handler.handle(event);
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+        nodeIds: ['node1'],
+        edgeIds: undefined,
+        multiSelection: false,
+      });
+    });
+
+    describe('when clicking on diagram background', () => {
+      it('should emit deselectAll when no modifier is pressed', () => {
+        const event = getSampleSelectEvent({
+          phase: 'start',
+          targetType: 'diagram',
+        });
+
+        handler.handle(event);
+
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('deselectAll');
+      });
+
+      it('should not emit any command when modifier is pressed', () => {
+        mockShortcutManager.matchesAction.mockReturnValue(true);
+        const event = getSampleSelectEvent({
+          phase: 'start',
+          targetType: 'diagram',
+        });
+
+        handler.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
     });
 
     describe('when clicking on a node', () => {
-      beforeEach(() => {
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [mockNode],
-          edges: [],
-        });
-      });
-
       it('should select node when clicking on unselected node without modifier', () => {
         const event = getSampleSelectEvent({
+          phase: 'start',
           target: mockNode,
           targetType: 'node',
-          modifiers: {
-            primary: false,
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
         });
-        mockShortcutManager.matchesAction.mockReturnValue(false);
 
-        instance.handle(event);
+        handler.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: [mockNode.id],
           edgeIds: undefined,
           multiSelection: false,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
+      });
+
+      it('should select node with multiSelection when modifier is pressed', () => {
+        mockShortcutManager.matchesAction.mockReturnValue(true);
+        const event = getSampleSelectEvent({
+          phase: 'start',
+          target: mockNode,
+          targetType: 'node',
+        });
+
+        handler.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+          nodeIds: [mockNode.id],
+          edgeIds: undefined,
+          multiSelection: true,
         });
       });
 
       it('should preserve selection when clicking on already selected node without modifier', () => {
         const selectedNode = { ...mockNode, selected: true };
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [selectedNode],
-          edges: [],
-        });
-
         const event = getSampleSelectEvent({
+          phase: 'start',
           target: selectedNode,
           targetType: 'node',
-          modifiers: {
-            primary: false,
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
         });
-        mockShortcutManager.matchesAction.mockReturnValue(false);
 
-        instance.handle(event);
+        handler.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: [selectedNode.id],
           edgeIds: undefined,
           multiSelection: true,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
-        });
       });
 
       it('should deselect node when clicking on selected node with modifier', () => {
+        mockShortcutManager.matchesAction.mockReturnValue(true);
         const selectedNode = { ...mockNode, selected: true };
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [selectedNode],
-          edges: [],
-        });
-
         const event = getSampleSelectEvent({
+          phase: 'start',
           target: selectedNode,
           targetType: 'node',
-          modifiers: {
-            primary: true,
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
         });
-        mockShortcutManager.matchesAction.mockReturnValue(true);
 
-        instance.handle(event);
+        handler.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('deselect', {
           nodeIds: [selectedNode.id],
           edgeIds: undefined,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
-        });
       });
     });
 
     describe('when clicking on an edge', () => {
-      beforeEach(() => {
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [],
-          edges: [mockEdge],
-        });
-      });
-
       it('should select edge when clicking on unselected edge without modifier', () => {
         const event = getSampleSelectEvent({
+          phase: 'start',
           target: mockEdge,
           targetType: 'edge',
-          modifiers: {
-            primary: false,
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
         });
-        mockShortcutManager.matchesAction.mockReturnValue(false);
 
-        instance.handle(event);
+        handler.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: undefined,
           edgeIds: [mockEdge.id],
           multiSelection: false,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
+      });
+
+      it('should select edge with multiSelection when modifier is pressed', () => {
+        mockShortcutManager.matchesAction.mockReturnValue(true);
+        const event = getSampleSelectEvent({
+          phase: 'start',
+          target: mockEdge,
+          targetType: 'edge',
+        });
+
+        handler.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+          nodeIds: undefined,
+          edgeIds: [mockEdge.id],
+          multiSelection: true,
         });
       });
 
       it('should preserve selection when clicking on already selected edge without modifier', () => {
         const selectedEdge = { ...mockEdge, selected: true };
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [],
-          edges: [selectedEdge],
-        });
-
         const event = getSampleSelectEvent({
+          phase: 'start',
           target: selectedEdge,
           targetType: 'edge',
-          modifiers: {
-            primary: false,
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
         });
-        mockShortcutManager.matchesAction.mockReturnValue(false);
 
-        instance.handle(event);
+        handler.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
           nodeIds: undefined,
           edgeIds: [selectedEdge.id],
           multiSelection: true,
         });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
-        });
       });
 
       it('should deselect edge when clicking on selected edge with modifier', () => {
+        mockShortcutManager.matchesAction.mockReturnValue(true);
         const selectedEdge = { ...mockEdge, selected: true };
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [],
-          edges: [selectedEdge],
-        });
-
         const event = getSampleSelectEvent({
+          phase: 'start',
           target: selectedEdge,
           targetType: 'edge',
-          modifiers: {
-            primary: true,
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
         });
-        mockShortcutManager.matchesAction.mockReturnValue(true);
 
-        instance.handle(event);
+        handler.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('deselect', {
           nodeIds: undefined,
           edgeIds: [selectedEdge.id],
-        });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
-        });
-      });
-    });
-
-    describe('platform specific behavior', () => {
-      it('should use primary modifier (abstracted from platform specifics)', () => {
-        const selectedNode = { ...mockNode, selected: true };
-        (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
-          nodes: [selectedNode],
-          edges: [],
-        });
-
-        const event = getSampleSelectEvent({
-          target: selectedNode,
-          targetType: 'node',
-          modifiers: {
-            primary: true, // This represents metaKey on MacOS or ctrlKey on other platforms
-            secondary: false,
-            shift: false,
-            meta: false,
-          },
-        });
-        mockShortcutManager.matchesAction.mockReturnValue(true);
-
-        instance.handle(event);
-
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('deselect', {
-          nodeIds: [selectedNode.id],
-          edgeIds: undefined,
-        });
-        expect(mockShortcutManager.matchesAction).toHaveBeenCalledWith('multiSelection', {
-          modifiers: event.modifiers,
         });
       });
     });
