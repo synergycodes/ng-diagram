@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zoom support in [Shortcut Manager](/docs/guides/shortcut-manager/) — configurable keyboard shortcuts (`keyboardZoomIn`, `keyboardZoomOut`) and wheel-based zoom with modifier keys (`zoom`) via new `WheelOnlyShortcutDefinition` ([#571](https://github.com/synergycodes/ng-diagram/pull/571))
 - Start and end lifecycle events for node interactions: [`nodeDragStarted`](/docs/api/components/ngdiagramcomponent/#nodedragstarted)/[`nodeDragEnded`](/docs/api/components/ngdiagramcomponent/#nodedragended), [`nodeResizeStarted`](/docs/api/components/ngdiagramcomponent/#noderesizestarted)/[`nodeResizeEnded`](/docs/api/components/ngdiagramcomponent/#noderesizeended), [`nodeRotateStarted`](/docs/api/components/ngdiagramcomponent/#noderotatestarted)/[`nodeRotateEnded`](/docs/api/components/ngdiagramcomponent/#noderotateended) ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
 - [`nodeIds`](/docs/api/types/action-state/draggingactionstate/#nodeids) property on `DraggingActionState` containing IDs of all nodes participating in the drag operation ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
+- [Absolute edge label positioning](/docs/guides/edges/labels/#absolute-positioning) — `positionOnEdge` now accepts pixel-based strings (`'30px'`, `'-20px'`) in addition to relative numbers (0–1). Negative pixel values measure from the target end ([#580](https://github.com/synergycodes/ng-diagram/pull/580))
 
 ### Fixed
 

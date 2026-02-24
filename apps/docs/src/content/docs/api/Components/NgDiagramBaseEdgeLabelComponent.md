@@ -35,6 +35,6 @@ The unique identifier for the edge label.
 
 ### positionOnEdge
 
-> **positionOnEdge**: `InputSignal`\<`number`\>
+> **positionOnEdge**: `InputSignal`\<[`EdgeLabelPosition`](/docs/api/types/model/edgelabelposition/)\>
 
 The relative position of the label along the edge (from 0 to 1).

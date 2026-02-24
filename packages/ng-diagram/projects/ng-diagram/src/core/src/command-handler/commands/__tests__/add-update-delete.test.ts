@@ -22,6 +22,9 @@ describe('Add Update Delete Command', () => {
           if (percentage === 1) return { x: 100, y: 100 };
           return { x: 50, y: 50 };
         }),
+        computePointAtDistance: vi.fn().mockImplementation((_routing, _points, distancePx) => {
+          return { x: Math.abs(distancePx), y: 0 };
+        }),
       },
       transactionManager: {
         isActive: vi.fn().mockReturnValue(false),
@@ -227,6 +230,67 @@ describe('Add Update Delete Command', () => {
       {
         edgesToUpdate: [
           { id: mockEdge.id, measuredLabels: [{ ...mockEdgeLabel1, positionOnEdge: 0, position: { x: 0, y: 0 } }] },
+        ],
+      },
+      'updateEdge'
+    );
+  });
+
+  it('should add edge labels with absolute position', () => {
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
+
+    const absoluteLabel = { ...mockEdgeLabel, id: 'abs-label', positionOnEdge: '30px' as const };
+    commandHandler.emit('addEdgeLabels', {
+      edgeId: mockEdge.id,
+      labels: [absoluteLabel],
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [{ ...absoluteLabel, position: { x: 30, y: 0 } }] }],
+      },
+      'updateEdge'
+    );
+  });
+
+  it('should update an edge label to absolute position', () => {
+    const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
+
+    commandHandler.emit('updateEdgeLabels', {
+      edgeId: mockEdge.id,
+      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: '20px' as const } }],
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [
+          {
+            id: mockEdge.id,
+            measuredLabels: [{ ...mockEdgeLabel1, positionOnEdge: '20px', position: { x: 20, y: 0 } }],
+          },
+        ],
+      },
+      'updateEdge'
+    );
+  });
+
+  it('should update an edge label with negative absolute position', () => {
+    const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
+
+    commandHandler.emit('updateEdgeLabels', {
+      edgeId: mockEdge.id,
+      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: '-20px' as const } }],
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [
+          {
+            id: mockEdge.id,
+            measuredLabels: [{ ...mockEdgeLabel1, positionOnEdge: '-20px', position: { x: 20, y: 0 } }],
+          },
         ],
       },
       'updateEdge'

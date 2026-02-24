@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
-import { Edge, NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent, NgDiagramEdgeTemplate } from 'ng-diagram';
+import {
+  Edge,
+  EdgeLabelPosition,
+  NgDiagramBaseEdgeComponent,
+  NgDiagramBaseEdgeLabelComponent,
+  NgDiagramEdgeTemplate,
+} from 'ng-diagram';
 
 /**
  * Simple edge with a single label at the center.
@@ -21,5 +27,5 @@ export class LabelledEdgeComponent implements NgDiagramEdgeTemplate {
 }
 
 interface Data {
-  labelPosition?: number;
+  labelPosition?: EdgeLabelPosition;
 }

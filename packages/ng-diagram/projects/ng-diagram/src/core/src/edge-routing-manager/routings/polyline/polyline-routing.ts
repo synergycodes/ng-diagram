@@ -1,5 +1,6 @@
 import { Point } from '../../../types';
 import { EdgeRouting, EdgeRoutingContext } from '../../types';
+import { computePolylinePointAtDistance } from './compute-polyline-point-at-distance';
 import { computePolylinePointOnPath } from './compute-polyline-point-on-path';
 
 /**
@@ -79,5 +80,16 @@ export class PolylineRouting implements EdgeRouting {
    */
   computePointOnPath(points: Point[], percentage: number): Point {
     return computePolylinePointOnPath(points, percentage);
+  }
+
+  /**
+   * Gets a point on the polyline at a given pixel distance from the start.
+   *
+   * @param points - The polyline points.
+   * @param distancePx - Distance in pixels (positive = from start, negative = from end).
+   * @returns The {@link Point} at the given distance along the path.
+   */
+  computePointAtDistance(points: Point[], distancePx: number): Point {
+    return computePolylinePointAtDistance(points, distancePx);
   }
 }

@@ -155,6 +155,8 @@ title: "ng-diagram"
 - [Port](/docs/api/types/model/port/)
 - [SimpleNode](/docs/api/types/model/simplenode/)
 - [Viewport](/docs/api/types/model/viewport/)
+- [AbsoluteEdgeLabelPosition](/docs/api/types/model/absoluteedgelabelposition/)
+- [EdgeLabelPosition](/docs/api/types/model/edgelabelposition/)
 - [Node](/docs/api/types/model/node/)
 - [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)

@@ -69,6 +69,46 @@ const path = routingManager.computePath('polyline', points);
 
 ***
 
+### computePointAtDistance()
+
+> **computePointAtDistance**(`routingName`, `points`, `distancePx`): [`Point`](/docs/api/types/geometry/point/)
+
+Computes a point along the path at a given pixel distance from the start.
+
+#### Parameters
+
+##### routingName
+
+The routing to use. If omitted, the default routing is used.
+
+`undefined` | [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+
+##### points
+
+[`Point`](/docs/api/types/geometry/point/)[]
+
+The path points
+
+##### distancePx
+
+`number`
+
+Distance in pixels (positive = from start, negative = from end)
+
+#### Returns
+
+[`Point`](/docs/api/types/geometry/point/)
+
+The point on the path at the given distance
+
+#### Remarks
+
+If the selected routing implements `computePointAtDistance`, it will be used.
+Otherwise, falls back to segment-based distance traversal along the points array.
+Negative values measure from the end of the path.
+
+***
+
 ### computePointOnPath()
 
 > **computePointOnPath**(`routingName`, `points`, `percentage`): [`Point`](/docs/api/types/geometry/point/)
