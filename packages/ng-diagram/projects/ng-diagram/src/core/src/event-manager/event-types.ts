@@ -114,6 +114,15 @@ export interface DiagramEventMap {
    */
   nodeRotateEnded: NodeRotateEndedEvent;
   /**
+   * Event emitted when a selection gesture is complete.
+   *
+   * This event fires on pointerup after a selection operation completes —
+   * whether from clicking a node/edge, box selection, or select-all.
+   * Use this to trigger actions after the user finishes selecting,
+   * such as showing toolbars, updating panels, or making API calls.
+   */
+  selectionGestureEnded: SelectionGestureEndedEvent;
+  /**
    * Event emitted when a node drag operation begins.
    *
    * This event fires once when the drag threshold is crossed, signaling the
@@ -182,6 +191,25 @@ export interface SelectionChangedEvent {
   previousNodes: Node[];
   /** Previously selected edges before the change */
   previousEdges: Edge[];
+}
+
+/**
+ * Event payload emitted when a selection gesture is complete.
+ *
+ * This event fires on pointerup after a selection operation completes —
+ * whether from clicking a node/edge, box selection, or select-all.
+ * Use this to trigger actions after the user finishes selecting,
+ * such as showing toolbars, updating panels, or making API calls.
+ *
+ * @public
+ * @since 1.2.0
+ * @category Types/Events
+ */
+export interface SelectionGestureEndedEvent {
+  /** Currently selected nodes after the selection gesture */
+  nodes: Node[];
+  /** Currently selected edges after the selection gesture */
+  edges: Edge[];
 }
 
 /**

@@ -10,6 +10,8 @@ abstract class ObjectSelectionDirective {
   targetData = input.required<Node | Edge | undefined>();
   abstract targetType: BasePointerInputEvent['targetType'];
 
+  private pointerUpHandler: ((e: PointerEvent) => void) | null = null;
+
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerInputEvent) {
     if (!this.shouldHandle(event)) {
@@ -22,6 +24,7 @@ abstract class ObjectSelectionDirective {
     this.inputEventsRouter.emit({
       ...baseEvent,
       name: 'select',
+      phase: 'start',
       target: this.targetData(),
       targetType: this.targetType,
       lastInputPoint: {
@@ -29,6 +32,31 @@ abstract class ObjectSelectionDirective {
         y: event.clientY,
       },
     });
+
+    this.removePointerUpHandler();
+    this.pointerUpHandler = (e: PointerEvent) => {
+      this.removePointerUpHandler();
+      const upBaseEvent = this.inputEventsRouter.getBaseEvent(e as PointerInputEvent);
+      this.inputEventsRouter.emit({
+        ...upBaseEvent,
+        name: 'select',
+        phase: 'end',
+        target: this.targetData(),
+        targetType: this.targetType,
+        lastInputPoint: {
+          x: e.clientX,
+          y: e.clientY,
+        },
+      });
+    };
+    document.addEventListener('pointerup', this.pointerUpHandler, { once: true });
+  }
+
+  private removePointerUpHandler(): void {
+    if (this.pointerUpHandler) {
+      document.removeEventListener('pointerup', this.pointerUpHandler);
+      this.pointerUpHandler = null;
+    }
   }
 
   private shouldHandle(event: PointerInputEvent) {

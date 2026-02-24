@@ -7,6 +7,7 @@ export { NodeResizeEndedEmitter, NodeResizeStartedEmitter } from './node-resize-
 export { NodeRotateEndedEmitter, NodeRotateStartedEmitter } from './node-rotate-lifecycle.emitter';
 export { PaletteItemDroppedEmitter } from './palette-item-dropped.emitter';
 export { SelectionChangedEmitter } from './selection-changed.emitter';
+export { SelectionGestureEndedEmitter } from './selection-gesture-ended.emitter';
 export { GroupMembershipChangedEmitter } from './group-membership-changed.emitter';
 export { SelectionMovedEmitter } from './selection-moved.emitter';
 export { SelectionRemovedEmitter } from './selection-removed.emitter';

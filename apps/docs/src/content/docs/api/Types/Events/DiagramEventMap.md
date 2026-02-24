@@ -153,6 +153,19 @@ clicking or programmatically using the diagram selection service.
 
 ***
 
+### selectionGestureEnded
+
+> **selectionGestureEnded**: [`SelectionGestureEndedEvent`](/docs/api/types/events/selectiongestureendedevent/)
+
+Event emitted when a selection gesture is complete.
+
+This event fires on pointerup after a selection operation completes —
+whether from clicking a node/edge, box selection, or select-all.
+Use this to trigger actions after the user finishes selecting,
+such as showing toolbars, updating panels, or making API calls.
+
+***
+
 ### selectionMoved
 
 > **selectionMoved**: [`SelectionMovedEvent`](/docs/api/types/events/selectionmovedevent/)

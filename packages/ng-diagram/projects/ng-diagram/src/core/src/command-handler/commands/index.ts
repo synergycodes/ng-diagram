@@ -42,7 +42,7 @@ import { resizeNode } from './resize-node';
 import { resizeNodeStart, resizeNodeStop } from './resize-node-lifecycle';
 import { rotateNodeTo } from './rotate-node';
 import { rotateNodeStart, rotateNodeStop } from './rotate-node-lifecycle';
-import { deselect, deselectAll, select, selectAll } from './selection';
+import { deselect, deselectAll, select, selectAll, selectEnd } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
 import { zoomToFit } from './zoom-to-fit';
@@ -60,6 +60,7 @@ export const commands: CommandMap = {
   init,
   select,
   selectAll,
+  selectEnd,
   deselect,
   deselectAll,
   moveNodesBy,

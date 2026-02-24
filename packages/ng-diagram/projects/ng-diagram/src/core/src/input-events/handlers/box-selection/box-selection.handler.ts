@@ -24,6 +24,7 @@ export class BoxSelectionEventHandler extends EventHandler<BoxSelectionEvent> {
       }
       case 'end':
         this.boxSelect(event);
+        this.flow.commandHandler.emit('selectEnd');
         this.startPoint = undefined;
         this.isBoxSelecting = false;
         break;

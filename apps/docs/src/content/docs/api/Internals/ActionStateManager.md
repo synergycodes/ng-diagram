@@ -269,6 +269,40 @@ The rotation state to set, or undefined to clear
 
 `void`
 
+***
+
+### selection
+
+#### Get Signature
+
+> **get** **selection**(): `undefined` \| `SelectionActionState`
+
+Gets the current selection action state.
+
+##### Returns
+
+`undefined` \| `SelectionActionState`
+
+The selection state if set, undefined otherwise
+
+#### Set Signature
+
+> **set** **selection**(`value`): `void`
+
+Sets the selection action state.
+
+##### Parameters
+
+###### value
+
+The selection state to set, or undefined to clear
+
+`undefined` | `SelectionActionState`
+
+##### Returns
+
+`void`
+
 ## Methods
 
 ### clearCopyPaste()
@@ -348,6 +382,18 @@ Clears the resize action state.
 > **clearRotation**(): `void`
 
 Clears the rotation action state.
+
+#### Returns
+
+`void`
+
+***
+
+### clearSelection()
+
+> **clearSelection**(): `void`
+
+Clears the selection action state.
 
 #### Returns
 

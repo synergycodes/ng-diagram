@@ -52,6 +52,7 @@ export const select = async (
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
+  commandHandler.flowCore.actionStateManager.selection = { selectionChanged: true };
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
@@ -85,6 +86,7 @@ export const deselect = async (commandHandler: CommandHandler, { nodeIds, edgeId
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
+  commandHandler.flowCore.actionStateManager.selection = { selectionChanged: true };
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };
 
@@ -98,7 +100,16 @@ export const deselectAll = async (commandHandler: CommandHandler) => {
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
+  commandHandler.flowCore.actionStateManager.selection = { selectionChanged: true };
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+};
+
+export interface SelectEndCommand {
+  name: 'selectEnd';
+}
+
+export const selectEnd = async (commandHandler: CommandHandler) => {
+  await commandHandler.flowCore.applyUpdate({}, 'selectEnd');
 };
 
 export interface SelectAllCommand {
@@ -113,5 +124,6 @@ export const selectAll = async (commandHandler: CommandHandler) => {
   if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
     return;
   }
+  commandHandler.flowCore.actionStateManager.selection = { selectionChanged: true };
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
 };

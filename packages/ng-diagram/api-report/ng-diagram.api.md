@@ -30,6 +30,7 @@ export interface ActionState {
     panning?: PanningActionState;
     resize?: ResizeActionState;
     rotation?: RotationActionState;
+    selection?: SelectionActionState;
 }
 
 // @public
@@ -42,6 +43,7 @@ export class ActionStateManager {
     clearPanning(): void;
     clearResize(): void;
     clearRotation(): void;
+    clearSelection(): void;
     get copyPaste(): CopyPasteActionState | undefined;
     set copyPaste(value: CopyPasteActionState | undefined);
     get dragging(): DraggingActionState | undefined;
@@ -62,6 +64,8 @@ export class ActionStateManager {
     set resize(value: ResizeActionState | undefined);
     get rotation(): RotationActionState | undefined;
     set rotation(value: RotationActionState | undefined);
+    get selection(): SelectionActionState | undefined;
+    set selection(value: SelectionActionState | undefined);
 }
 
 // Warning: (ae-internal-missing-underscore) The name "AppMiddlewares" should be prefixed with an underscore because the declaration is marked as @internal
@@ -154,6 +158,7 @@ export interface DiagramEventMap {
     nodeRotateStarted: NodeRotateStartedEvent;
     paletteItemDropped: PaletteItemDroppedEvent;
     selectionChanged: SelectionChangedEvent;
+    selectionGestureEnded: SelectionGestureEndedEvent;
     selectionMoved: SelectionMovedEvent;
     selectionRemoved: SelectionRemovedEvent;
     selectionRotated: SelectionRotatedEvent;
@@ -602,7 +607,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'selectEnd';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
@@ -787,6 +792,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     nodeTemplateMap: InputSignal<NgDiagramNodeTemplateMap>;
     paletteItemDropped: EventEmitter<PaletteItemDroppedEvent>;
     selectionChanged: EventEmitter<SelectionChangedEvent>;
+    selectionGestureEnded: EventEmitter<SelectionGestureEndedEvent>;
     selectionMoved: EventEmitter<SelectionMovedEvent>;
     selectionRemoved: EventEmitter<SelectionRemovedEvent>;
     selectionRotated: EventEmitter<SelectionRotatedEvent>;
@@ -797,7 +803,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
@@ -1431,6 +1437,12 @@ export interface SelectionChangedEvent {
     previousNodes: Node_2[];
     selectedEdges: Edge[];
     selectedNodes: Node_2[];
+}
+
+// @public
+export interface SelectionGestureEndedEvent {
+    edges: Edge[];
+    nodes: Node_2[];
 }
 
 // @public

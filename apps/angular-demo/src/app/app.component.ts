@@ -25,6 +25,7 @@ import {
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
+  SelectionGestureEndedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
   type Edge,
@@ -146,6 +147,13 @@ export class AppComponent {
       edges: event.selectedEdges.map((e: Edge) => e.id),
       previousNodes: event.previousNodes.map((n: Node) => n.id),
       previousEdges: event.previousEdges.map((e: Edge) => e.id),
+    });
+  }
+
+  onSelectionGestureEnded(event: SelectionGestureEndedEvent): void {
+    console.log('Selection Gesture Ended:', {
+      nodes: event.nodes.map((n: Node) => n.id),
+      edges: event.edges.map((e: Edge) => e.id),
     });
   }
 
