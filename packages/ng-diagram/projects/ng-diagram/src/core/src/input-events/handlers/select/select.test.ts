@@ -68,7 +68,7 @@ describe('SelectEventHandler', () => {
   });
 
   describe('phase: start (or undefined)', () => {
-    it('should run selection logic when phase is undefined (backward compat)', () => {
+    it('should run selection logic when phase is undefined', () => {
       const node = { ...mockNode, id: 'node1', selected: false };
       const event = getSampleSelectEvent({
         target: node,
