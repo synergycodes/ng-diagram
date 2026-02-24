@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Start and end lifecycle events for node interactions: [`nodeDragStarted`](/docs/api/components/ngdiagramcomponent/#nodedragstarted)/[`nodeDragEnded`](/docs/api/components/ngdiagramcomponent/#nodedragended), [`nodeResizeStarted`](/docs/api/components/ngdiagramcomponent/#noderesizestarted)/[`nodeResizeEnded`](/docs/api/components/ngdiagramcomponent/#noderesizeended), [`nodeRotateStarted`](/docs/api/components/ngdiagramcomponent/#noderotatestarted)/[`nodeRotateEnded`](/docs/api/components/ngdiagramcomponent/#noderotateended) ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
 - [`nodeIds`](/docs/api/types/action-state/draggingactionstate/#nodeids) property on `DraggingActionState` containing IDs of all nodes participating in the drag operation ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
 - [Absolute edge label positioning](/docs/guides/edges/labels/#absolute-positioning) — `positionOnEdge` now accepts pixel-based strings (`'30px'`, `'-20px'`) in addition to relative numbers (0–1). Negative pixel values measure from the target end ([#580](https://github.com/synergycodes/ng-diagram/pull/580))
-- Default edge now supports `positionOnEdge` data property to control [label positioning](/docs/guides/edges/labels/#using-labels-in-default-edges) (defaults to `0.5`) ([#TODO](https://github.com/synergycodes/ng-diagram/pull/TODO))
+- Default edge now supports `positionOnEdge` data property to control [label positioning](/docs/guides/edges/labels/#using-labels-in-default-edges) (defaults to `0.5`) ([#581](https://github.com/synergycodes/ng-diagram/pull/581))
 
 ### Fixed
 
