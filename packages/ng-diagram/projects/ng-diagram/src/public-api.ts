@@ -153,6 +153,7 @@ export type {
   RotationActionState,
   RoutingMode,
   SelectionChangedEvent,
+  SelectionGestureEndedEvent,
   SelectionMovedEvent,
   SelectionMovingConfig,
   SelectionRemovedEvent,

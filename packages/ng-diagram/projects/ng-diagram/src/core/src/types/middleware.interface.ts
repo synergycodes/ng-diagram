@@ -73,7 +73,8 @@ export type ModelActionType =
   | 'highlightGroupClear'
   | 'moveNodes'
   | 'moveNodesStart'
-  | 'moveNodesStop';
+  | 'moveNodesStop'
+  | 'selectEnd';
 
 /**
  * The complete state of the flow diagram.

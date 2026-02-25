@@ -204,6 +204,17 @@ clicking or programmatically using the `NgDiagramSelectionService`.
 
 ***
 
+### selectionGestureEnded
+
+> **selectionGestureEnded**: `EventEmitter`\<[`SelectionGestureEndedEvent`](/docs/api/types/events/selectiongestureendedevent/)\>
+
+Event emitted when a selection gesture is complete.
+
+This event fires on pointerup after a selection operation completes —
+whether from clicking a node/edge, box selection, or select-all.
+
+***
+
 ### selectionMoved
 
 > **selectionMoved**: `EventEmitter`\<[`SelectionMovedEvent`](/docs/api/types/events/selectionmovedevent/)\>

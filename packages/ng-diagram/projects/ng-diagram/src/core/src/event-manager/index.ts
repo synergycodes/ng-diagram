@@ -15,6 +15,7 @@ export type {
   NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
+  SelectionGestureEndedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,

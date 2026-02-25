@@ -122,6 +122,21 @@ export interface PanningActionState {
 }
 
 /**
+ * State tracking whether a selection gesture has changed the selection.
+ *
+ * Set by selection commands when they apply changes, cleared when
+ * the `selectionGestureEnded` event is emitted on `selectEnd`.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Internals
+ */
+export interface SelectionActionState {
+  /** Whether selection has changed since the gesture started. */
+  selectionChanged: boolean;
+}
+
+/**
  * Interface representing the current state of various user interactions in the diagram.
  *
  * This state is read-only and automatically managed by the library. It provides
@@ -161,4 +176,8 @@ export interface ActionState {
    * State related to panning the viewport
    */
   panning?: PanningActionState;
+  /**
+   * State related to selection gestures
+   */
+  selection?: SelectionActionState;
 }

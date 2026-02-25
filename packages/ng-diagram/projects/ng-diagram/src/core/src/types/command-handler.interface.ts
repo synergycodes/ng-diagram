@@ -46,6 +46,7 @@ import {
   DeselectCommand,
   SelectAllCommand,
   SelectCommand,
+  SelectEndCommand,
 } from '../command-handler/commands/selection';
 import { BringToFrontCommand, SendToBackCommand } from '../command-handler/commands/z-order';
 import { ZoomCommand } from '../command-handler/commands/zoom';
@@ -59,6 +60,7 @@ export type Command =
   | InitCommand
   | SelectCommand
   | SelectAllCommand
+  | SelectEndCommand
   | DeselectCommand
   | DeselectAllCommand
   | MoveNodesByCommand

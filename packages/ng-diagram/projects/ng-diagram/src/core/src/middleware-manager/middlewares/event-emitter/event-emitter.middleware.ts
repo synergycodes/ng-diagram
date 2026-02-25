@@ -15,6 +15,7 @@ import {
   NodeRotateStartedEmitter,
   PaletteItemDroppedEmitter,
   SelectionChangedEmitter,
+  SelectionGestureEndedEmitter,
   SelectionMovedEmitter,
   SelectionRemovedEmitter,
   SelectionRotatedEmitter,
@@ -39,6 +40,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
   const emitters: EventEmitter[] = [
     new DiagramInitEmitter(),
     new SelectionChangedEmitter(),
+    new SelectionGestureEndedEmitter(),
     new SelectionMovedEmitter(),
     new SelectionRemovedEmitter(),
     new GroupMembershipChangedEmitter(),

@@ -110,6 +110,7 @@ title: "ng-diagram"
 - [NodeRotateStartedEvent](/docs/api/types/events/noderotatestartedevent/)
 - [PaletteItemDroppedEvent](/docs/api/types/events/paletteitemdroppedevent/)
 - [SelectionChangedEvent](/docs/api/types/events/selectionchangedevent/)
+- [SelectionGestureEndedEvent](/docs/api/types/events/selectiongestureendedevent/)
 - [SelectionMovedEvent](/docs/api/types/events/selectionmovedevent/)
 - [SelectionRemovedEvent](/docs/api/types/events/selectionremovedevent/)
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)

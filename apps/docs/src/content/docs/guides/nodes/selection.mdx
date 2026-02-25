@@ -59,6 +59,13 @@ Here is a CSS variable you can use to style the selection highlight:
 
 You can override this variable in your styles to customize the appearance of selected nodes.
 
+## Events
+
+The diagram emits several events related to selection that you can subscribe to via `@Output` bindings on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component or programmatically through [`NgDiagramService.addEventListener()`](/docs/api/services/ngdiagramservice#addeventlistener):
+
+- [`selectionChanged`](/docs/api/types/events/selectionchangedevent) - Fired when the selection state changes (nodes or edges are selected or deselected). This fires on pointerdown when clicking elements.
+- [`selectionGestureEnded`](/docs/api/types/events/selectiongestureendedevent) - Fired when a selection gesture completes (on pointerup after clicking a node/edge, box selection, or select-all). Use this to trigger actions after the user finishes selecting, such as showing toolbars or updating panels.
+
 ## Further Reading
 
 [Nodes →](/docs/guides/nodes/nodes) | [Custom Nodes →](/docs/guides/nodes/custom-nodes)

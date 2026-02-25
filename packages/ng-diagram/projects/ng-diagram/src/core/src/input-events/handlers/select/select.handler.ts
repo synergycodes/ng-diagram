@@ -3,6 +3,11 @@ import { SelectEvent } from './select.event';
 
 export class SelectEventHandler extends EventHandler<SelectEvent> {
   handle(event: SelectEvent): void {
+    if (event.phase === 'end') {
+      this.flow.commandHandler.emit('selectEnd');
+      return;
+    }
+
     const targetElements = this.getTargetElements(event);
     const isModifierPressed = this.flow.shortcutManager.matchesAction('multiSelection', {
       modifiers: event.modifiers,

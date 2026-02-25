@@ -24,13 +24,14 @@ import type {
   ModelAdapter,
   NodeDragEndedEvent,
   NodeDragStartedEvent,
-  NodeResizeEndedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
   NodeResizeStartedEvent,
   NodeRotateEndedEvent,
   NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   SelectionChangedEvent,
+  SelectionGestureEndedEvent,
   SelectionMovedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
@@ -183,6 +184,14 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * clicking or programmatically using the `NgDiagramSelectionService`.
    */
   @Output() selectionChanged = new EventEmitter<SelectionChangedEvent>();
+
+  /**
+   * Event emitted when a selection gesture is complete.
+   *
+   * This event fires on pointerup after a selection operation completes —
+   * whether from clicking a node/edge, box selection, or select-all.
+   */
+  @Output() selectionGestureEnded = new EventEmitter<SelectionGestureEndedEvent>();
 
   /**
    * Event emitted when selected elements are deleted from the diagram.
@@ -467,6 +476,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
+    eventManager.on('selectionGestureEnded', (event) => this.selectionGestureEnded.emit(event));
     eventManager.on('selectionRemoved', (event) => this.selectionRemoved.emit(event));
     eventManager.on('groupMembershipChanged', (event) => this.groupMembershipChanged.emit(event));
     eventManager.on('selectionRotated', (event) => this.selectionRotated.emit(event));
