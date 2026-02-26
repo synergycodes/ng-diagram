@@ -58,7 +58,7 @@ export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 // Configuration helpers
 export { configureShortcuts } from './core/src';
 export { NgDiagramMinimapNodeTemplateMap } from './lib/components/minimap/ng-diagram-minimap.types';
-export { initializeModel } from './lib/model/initialize-model';
+export { initializeModel, initializeModelAdapter } from './lib/model/initialize-model';
 export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
 export { NgDiagramNodeTemplateMap } from './lib/types/node-template-map';

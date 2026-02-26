@@ -2,6 +2,7 @@ import { inject, Injector, runInInjectionContext } from '@angular/core';
 import { assignInternalId, type Model, type ModelAdapter } from '../../core/src';
 import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { SignalModelAdapter } from './signal-model-adapter';
+import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-runtime-properties';
 
 /**
  * Creates a model adapter with initial nodes, edges, and metadata.
@@ -26,12 +27,48 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
     const adapter = new SignalModelAdapter();
     const generateId = () => environment.generateId();
 
-    adapter.updateNodes((model.nodes || []).map((node) => assignInternalId(node, generateId)));
-    adapter.updateEdges((model.edges || []).map((edge) => assignInternalId(edge, generateId)));
+    adapter.updateNodes(
+      (model.nodes || []).map((node) => assignInternalId(stripNodeRuntimeProperties(node), generateId))
+    );
+    adapter.updateEdges(
+      (model.edges || []).map((edge) => assignInternalId(stripEdgeRuntimeProperties(edge), generateId))
+    );
     adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
 
     return adapter;
   };
 
   return injector ? runInInjectionContext(injector, create) : create();
+}
+
+/**
+ * Initializes an existing model adapter for use in ng-diagram.
+ *
+ * Strips stale runtime-computed properties and assigns fresh internal IDs
+ * to all nodes and edges in the adapter. Use this when providing a custom
+ * {@link ModelAdapter} implementation.
+ *
+ * @param adapter An existing ModelAdapter to initialize.
+ * @param injector Optional Angular `Injector` if not running inside an injection context.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Utilities
+ */
+export function initializeModelAdapter(adapter: ModelAdapter, injector?: Injector): ModelAdapter {
+  const init = () => {
+    const environment = inject(EnvironmentProviderService);
+    const generateId = () => environment.generateId();
+
+    adapter.updateNodes(
+      adapter.getNodes().map((node) => assignInternalId(stripNodeRuntimeProperties(node), generateId))
+    );
+    adapter.updateEdges(
+      adapter.getEdges().map((edge) => assignInternalId(stripEdgeRuntimeProperties(edge), generateId))
+    );
+
+    return adapter;
+  };
+
+  return injector ? runInInjectionContext(injector, init) : init();
 }

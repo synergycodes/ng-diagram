@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import type { NgDiagramConfig, Node } from 'ng-diagram';
 import {
-  NgDiagramNodeTemplateMap,
+  initializeModelAdapter,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
+  NgDiagramNodeTemplateMap,
 } from 'ng-diagram';
 import { LocalStorageModelAdapter } from './local-storage-model-adapter';
 import { NodeComponent } from './node/node.component';
@@ -31,14 +32,16 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: 180,
+        padding: 20,
       },
     },
   };
 
-  modelAdapter: LocalStorageModelAdapter = new LocalStorageModelAdapter(
-    'ng-diagram-custom-demo',
-    this.getDefaultDiagram()
+  model = initializeModelAdapter(
+    new LocalStorageModelAdapter(
+      'ng-diagram-custom-demo',
+      this.getDefaultDiagram()
+    )
   );
 
   addNode() {
