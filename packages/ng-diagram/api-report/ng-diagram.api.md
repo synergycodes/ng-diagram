@@ -797,6 +797,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     selectionRemoved: EventEmitter<SelectionRemovedEvent>;
     selectionRotated: EventEmitter<SelectionRotatedEvent>;
     // (undocumented)
+    trackEdge: (_index: number, edge: Edge) => any;
+    // (undocumented)
     trackNode: (_index: number, node: Node_2) => any;
     // (undocumented)
     readonly viewport: WritableSignal<Viewport>;
