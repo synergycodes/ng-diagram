@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Point } from '../../types';
+import { EdgeLabelPosition, Point } from '../../types';
 import { EdgeRoutingManager } from '../edge-routing-manager';
 import { resolveLabelPosition } from '../resolve-label-position';
 
@@ -63,5 +63,23 @@ describe('resolveLabelPosition', () => {
     resolveLabelPosition('50px', undefined, points, mockRoutingManager);
 
     expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith(undefined, points, 50);
+  });
+
+  it('should treat string without px as relative position', () => {
+    resolveLabelPosition('0.5' as unknown as EdgeLabelPosition, routing, points, mockRoutingManager);
+
+    expect(mockRoutingManager.computePointOnPath).toHaveBeenCalledWith(routing, points, 0.5);
+  });
+
+  it('should trim whitespace from string position', () => {
+    resolveLabelPosition('  0.5  ' as unknown as EdgeLabelPosition, routing, points, mockRoutingManager);
+
+    expect(mockRoutingManager.computePointOnPath).toHaveBeenCalledWith(routing, points, 0.5);
+  });
+
+  it('should trim whitespace from absolute position', () => {
+    resolveLabelPosition('  30px  ' as unknown as EdgeLabelPosition, routing, points, mockRoutingManager);
+
+    expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith(routing, points, 30);
   });
 });
