@@ -19,8 +19,12 @@ export const resolveLabelPosition = (
   routingManager: EdgeRoutingManager
 ): Point => {
   if (typeof positionOnEdge === 'string') {
-    const px = parseFloat(positionOnEdge);
-    return routingManager.computePointAtDistance(edgeRouting, points, px);
+    const normalizedPosition = positionOnEdge.trim();
+    if (normalizedPosition.endsWith('px')) {
+      const px = parseFloat(normalizedPosition);
+      return routingManager.computePointAtDistance(edgeRouting, points, px);
+    }
+    return routingManager.computePointOnPath(edgeRouting, points, parseFloat(normalizedPosition));
   }
   return routingManager.computePointOnPath(edgeRouting, points, positionOnEdge);
 };
