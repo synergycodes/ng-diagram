@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Added explicit `ModelAdapter` return type to `initializeModel()` to prevent TypeScript errors when building with `declaration: true` (thanks [@MeMeMax](https://github.com/MeMeMax) for reporting this 💪)
+- Edge labels vanishing permanently after model reinitialization ([#XXX](https://github.com/synergycodes/ng-diagram/pull/XXX))
 
 ## [1.0.0] - 2026-02-06
 

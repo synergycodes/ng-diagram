@@ -27,7 +27,7 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
     const generateId = () => environment.generateId();
 
     adapter.updateNodes((model.nodes || []).map((node) => assignInternalId(node, generateId)));
-    adapter.updateEdges(model.edges || []);
+    adapter.updateEdges((model.edges || []).map((edge) => assignInternalId(edge, generateId)));
     adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
 
     return adapter;
