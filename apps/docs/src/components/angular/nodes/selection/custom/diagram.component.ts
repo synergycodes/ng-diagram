@@ -4,9 +4,9 @@ import {
   initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
+  NgDiagramNodeTemplateMap,
   provideNgDiagram,
   type NgDiagramConfig,
-  type NgDiagramNodeTemplateMap,
 } from 'ng-diagram';
 
 import { CustomNodeComponent } from './node/node.component';
@@ -28,7 +28,7 @@ import { CustomNodeComponent } from './node/node.component';
   styleUrls: ['./diagram.component.scss'],
 })
 export class DiagramComponent {
-  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
+  nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['myType', CustomNodeComponent],
   ]);
 
