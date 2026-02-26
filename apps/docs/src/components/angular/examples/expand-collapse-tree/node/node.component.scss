@@ -1,0 +1,41 @@
+:host {
+  .tree-node-content {
+    min-width: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .node-label {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .toggle-btn {
+    width: 1.375rem;
+    height: 1.375rem;
+    min-width: 1.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ngd-node-stroke-primary-default);
+    border-radius: 0.25rem;
+    background: var(--ngd-node-bg-primary-default);
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    top: -0.625rem;
+    right: -0.625rem;
+    z-index: 2;
+
+    &:hover {
+      border-color: var(--ngd-node-border-color-hover);
+      color: var(--ngd-node-border-color-hover);
+    }
+  }
+}

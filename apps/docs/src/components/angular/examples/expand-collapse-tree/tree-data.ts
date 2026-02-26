@@ -1,0 +1,251 @@
+import { type Edge, type Node } from 'ng-diagram';
+import { type TreeEdgeData, type TreeNodeData } from './types';
+
+export const diagramModel: {
+  nodes: Node<TreeNodeData>[];
+  edges: Edge<TreeEdgeData>[];
+} = {
+  nodes: [
+    {
+      id: 'root',
+      position: { x: 0, y: 0 },
+      data: { label: 'Application', hasChildren: true },
+      type: 'treeNode',
+    },
+
+    {
+      id: 'frontend',
+      position: { x: 0, y: 0 },
+      data: { label: 'Frontend', hasChildren: true },
+      type: 'treeNode',
+    },
+    {
+      id: 'components',
+      position: { x: 0, y: 0 },
+      data: { label: 'Components', hasChildren: true },
+      type: 'treeNode',
+    },
+    {
+      id: 'buttons',
+      position: { x: 0, y: 0 },
+      data: { label: 'Buttons' },
+      type: 'treeNode',
+    },
+    {
+      id: 'forms',
+      position: { x: 0, y: 0 },
+      data: { label: 'Forms' },
+      type: 'treeNode',
+    },
+    {
+      id: 'services',
+      position: { x: 0, y: 0 },
+      data: { label: 'Services' },
+      type: 'treeNode',
+    },
+    {
+      id: 'routing',
+      position: { x: 0, y: 0 },
+      data: { label: 'Routing' },
+      type: 'treeNode',
+    },
+
+    {
+      id: 'backend',
+      position: { x: 0, y: 0 },
+      data: { label: 'Backend', hasChildren: true },
+      type: 'treeNode',
+    },
+    {
+      id: 'api',
+      position: { x: 0, y: 0 },
+      data: { label: 'API', hasChildren: true },
+      type: 'treeNode',
+    },
+    {
+      id: 'rest',
+      position: { x: 0, y: 0 },
+      data: { label: 'REST' },
+      type: 'treeNode',
+    },
+    {
+      id: 'graphql',
+      position: { x: 0, y: 0 },
+      data: { label: 'GraphQL' },
+      type: 'treeNode',
+    },
+    {
+      id: 'database',
+      position: { x: 0, y: 0 },
+      data: { label: 'Database' },
+      type: 'treeNode',
+    },
+    {
+      id: 'auth',
+      position: { x: 0, y: 0 },
+      data: { label: 'Auth' },
+      type: 'treeNode',
+    },
+
+    {
+      id: 'devops',
+      position: { x: 0, y: 0 },
+      data: { label: 'DevOps', hasChildren: true },
+      type: 'treeNode',
+    },
+    {
+      id: 'ci',
+      position: { x: 0, y: 0 },
+      data: { label: 'CI/CD' },
+      type: 'treeNode',
+    },
+    {
+      id: 'monitoring',
+      position: { x: 0, y: 0 },
+      data: { label: 'Monitoring' },
+      type: 'treeNode',
+    },
+  ],
+  edges: [
+    {
+      id: 'e-root-frontend',
+      source: 'root',
+      sourcePort: 'port-bottom',
+      target: 'frontend',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-root-backend',
+      source: 'root',
+      sourcePort: 'port-bottom',
+      target: 'backend',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-root-devops',
+      source: 'root',
+      sourcePort: 'port-bottom',
+      target: 'devops',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+
+    {
+      id: 'e-frontend-components',
+      source: 'frontend',
+      sourcePort: 'port-bottom',
+      target: 'components',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-frontend-services',
+      source: 'frontend',
+      sourcePort: 'port-bottom',
+      target: 'services',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-frontend-routing',
+      source: 'frontend',
+      sourcePort: 'port-bottom',
+      target: 'routing',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+
+    {
+      id: 'e-components-buttons',
+      source: 'components',
+      sourcePort: 'port-bottom',
+      target: 'buttons',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-components-forms',
+      source: 'components',
+      sourcePort: 'port-bottom',
+      target: 'forms',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+
+    {
+      id: 'e-backend-api',
+      source: 'backend',
+      sourcePort: 'port-bottom',
+      target: 'api',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-backend-database',
+      source: 'backend',
+      sourcePort: 'port-bottom',
+      target: 'database',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-backend-auth',
+      source: 'backend',
+      sourcePort: 'port-bottom',
+      target: 'auth',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+
+    {
+      id: 'e-api-rest',
+      source: 'api',
+      sourcePort: 'port-bottom',
+      target: 'rest',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-api-graphql',
+      source: 'api',
+      sourcePort: 'port-bottom',
+      target: 'graphql',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+
+    {
+      id: 'e-devops-ci',
+      source: 'devops',
+      sourcePort: 'port-bottom',
+      target: 'ci',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+    {
+      id: 'e-devops-monitoring',
+      source: 'devops',
+      sourcePort: 'port-bottom',
+      target: 'monitoring',
+      targetPort: 'port-top',
+      type: 'treeEdge',
+      data: {},
+    },
+  ],
+};

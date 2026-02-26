@@ -1,0 +1,12 @@
+.diagram {
+  position: relative;
+  display: flex;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
+  margin-top: 0;
+  visibility: hidden;
+
+  &.ready {
+    visibility: visible;
+  }
+}

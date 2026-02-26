@@ -1,0 +1,27 @@
+---
+title: Expand/Collapse Tree Example
+description: Example of how to build an expand/collapse tree layout using ELK.js in ngDiagram
+sidebar:
+  order: 10
+  label: Expand/Collapse Tree
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ExpandCollapseTree from '@examples/expand-collapse-tree/expand-collapse-tree.astro';
+
+This example demonstrates how to build an interactive tree diagram with expand/collapse functionality using ELK.js `layered` layout algorithm.
+
+<br />
+
+<ExpandCollapseTree />
+<CodeViewer dirName="examples/expand-collapse-tree" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Flat Static Model:** All nodes and edges are defined upfront and always remain in the model. Collapsed subtrees are hidden via CSS `visibility: hidden` rather than being added or removed.
+- **State-Driven Visibility:** A set of collapsed node IDs drives visibility. On toggle, hidden node IDs are recomputed from the edge graph, then `isHidden` flags are updated on both nodes and edges.
+- **ELK.js Layered Algorithm:** The `layered` layout algorithm with `DOWN` direction positions nodes top-to-bottom. Layout runs only on visible nodes and edges, so collapsed branches don't affect positioning.
+- **Root Position Anchoring:** After each layout pass, all positions are offset to keep the root node pinned, preventing the tree from shifting when branches expand or collapse.
+- **Batch Updates:** [`updateNodes`](/docs/api/types/model/modeladapter/#updatenodes) and [`updateEdges`](/docs/api/types/model/modeladapter/#updateedges) apply visibility flags and layout positions efficiently.

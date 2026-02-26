@@ -1,0 +1,12 @@
+<ng-diagram-base-node-template [node]="node">
+  <div class="tree-node-content">
+    <span class="node-label">{{ node().data.label }}</span>
+  </div>
+</ng-diagram-base-node-template>
+@if (node().data.hasChildren) {
+  <button class="toggle-btn" (pointerdown)="$event.stopPropagation()" (click)="onToggle($event)">
+    {{ node().data.collapsed ? '+' : '−' }}
+  </button>
+}
+<ng-diagram-port id="port-bottom" type="both" side="bottom" />
+<ng-diagram-port id="port-top" type="both" side="top" />
