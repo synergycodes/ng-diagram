@@ -4,7 +4,11 @@
   </div>
 </ng-diagram-base-node-template>
 @if (node().data.hasChildren) {
-  <button class="toggle-btn" (pointerdown)="$event.stopPropagation()" (click)="onToggle($event)">
+  <button
+    class="toggle-btn"
+    (pointerdown)="$event.stopPropagation()"
+    (click)="onToggle($event)"
+  >
     {{ node().data.collapsed ? '+' : '−' }}
   </button>
 }
