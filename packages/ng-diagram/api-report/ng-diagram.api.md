@@ -392,6 +392,9 @@ export interface HighlightGroupActionState {
 export function initializeModel(model?: Partial<Model>, injector?: Injector): ModelAdapter;
 
 // @public
+export function initializeModelAdapter(adapter: ModelAdapter, model?: Partial<Model>, injector?: Injector): ModelAdapter;
+
+// @public
 export interface InputModifiers {
     meta: boolean;
     primary: boolean;

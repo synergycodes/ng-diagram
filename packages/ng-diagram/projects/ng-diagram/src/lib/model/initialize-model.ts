@@ -13,6 +13,21 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  * ⚠️ This is only for creating the initial model. Any changes to the model or
  * access to current data should be done via {@link NgDiagramModelService}.
  *
+ * @example
+ * ```typescript
+ * // Create an empty model
+ * model = initializeModel();
+ *
+ * // Create a model with initial data
+ * model = initializeModel({
+ *   nodes: [{ id: '1', position: { x: 0, y: 0 }, data: { label: 'Node 1' } }],
+ *   edges: [],
+ * });
+ *
+ * // With an explicit injector (outside injection context)
+ * model = initializeModel({ nodes: [...], edges: [...] }, this.injector);
+ * ```
+ *
  * @param model Initial model data (nodes, edges, metadata).
  * @param injector Optional Angular `Injector` if not running inside an injection context.
  *
@@ -21,24 +36,9 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  * @category Utilities
  */
 export function initializeModel(model: Partial<Model> = {}, injector?: Injector): ModelAdapter {
-  const create = () => {
-    const environment = inject(EnvironmentProviderService);
+  const init = () => initializeModelAdapter(new SignalModelAdapter(), model);
 
-    const adapter = new SignalModelAdapter();
-    const generateId = () => environment.generateId();
-
-    adapter.updateNodes(
-      (model.nodes || []).map((node) => assignInternalId(stripNodeRuntimeProperties(node), generateId))
-    );
-    adapter.updateEdges(
-      (model.edges || []).map((edge) => assignInternalId(stripEdgeRuntimeProperties(edge), generateId))
-    );
-    adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
-
-    return adapter;
-  };
-
-  return injector ? runInInjectionContext(injector, create) : create();
+  return injector ? runInInjectionContext(injector, init) : init();
 }
 
 /**
@@ -48,17 +48,43 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
  * to all nodes and edges in the adapter. Use this when providing a custom
  * {@link ModelAdapter} implementation.
  *
+ * @example
+ * ```typescript
+ * // Basic usage with a custom adapter
+ * model = initializeModelAdapter(new NgRxModelAdapter(this.store));
+ *
+ * // With initial model data to seed the adapter
+ * model = initializeModelAdapter(new NgRxModelAdapter(this.store), {
+ *   nodes: [{ id: '1', position: { x: 0, y: 0 }, data: { label: 'Node 1' } }],
+ *   edges: [],
+ * });
+ *
+ * // With an explicit injector (outside injection context)
+ * model = initializeModelAdapter(new NgRxModelAdapter(this.store), undefined, this.injector);
+ * ```
+ *
  * @param adapter An existing ModelAdapter to initialize.
+ * @param model Optional initial model data to seed the adapter with before stripping and ID assignment.
  * @param injector Optional Angular `Injector` if not running inside an injection context.
  *
  * @public
  * @since 1.1.0
  * @category Utilities
  */
-export function initializeModelAdapter(adapter: ModelAdapter, injector?: Injector): ModelAdapter {
+export function initializeModelAdapter(
+  adapter: ModelAdapter,
+  model?: Partial<Model>,
+  injector?: Injector
+): ModelAdapter {
   const init = () => {
     const environment = inject(EnvironmentProviderService);
     const generateId = () => environment.generateId();
+
+    if (model) {
+      adapter.updateNodes(model.nodes || []);
+      adapter.updateEdges(model.edges || []);
+      adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
+    }
 
     adapter.updateNodes(
       adapter.getNodes().map((node) => assignInternalId(stripNodeRuntimeProperties(node), generateId))

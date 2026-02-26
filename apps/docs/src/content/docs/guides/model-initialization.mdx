@@ -56,6 +56,31 @@ const model = initializeModel({
 });
 ```
 
+### Custom Model Adapter
+
+If you have a custom [`ModelAdapter`](/docs/api/types/model/modeladapter/) implementation (e.g., backed by localStorage, NgRx, or an external store), use [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter) instead. It strips stale runtime properties and assigns fresh internal IDs to all nodes and edges in the adapter.
+
+```typescript
+import { initializeModelAdapter } from 'ng-diagram';
+
+// Initialize a custom adapter
+model = initializeModelAdapter(new MyCustomModelAdapter());
+
+// Optionally seed the adapter with initial data
+model = initializeModelAdapter(new MyCustomModelAdapter(), {
+  nodes: [
+    {
+      id: '1',
+      position: { x: 100, y: 150 },
+      data: { label: 'Node 1' },
+    },
+  ],
+  edges: [],
+});
+```
+
+For a complete example, see the [Custom Model example](/docs/examples/custom-model/).
+
 ## Model Reinitialization
 
 Sometimes you need to replace the entire model with new data. This commonly happens when:

@@ -1,12 +1,17 @@
-import type { Edge, Metadata, ModelAdapter, Node } from 'ng-diagram';
+import type {
+  Edge,
+  Metadata,
+  Model,
+  ModelAdapter,
+  ModelChanges,
+  Node,
+} from 'ng-diagram';
 
 export class LocalStorageModelAdapter implements ModelAdapter {
-  private callbacks: Array<
-    (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => void
-  > = [];
+  private callbacks: Array<(data: ModelChanges) => void> = [];
   constructor(
     private readonly storageKey: string = 'ng-diagram-data',
-    initialData?: { nodes?: Node[]; edges?: Edge[]; metadata?: Metadata }
+    initialData?: Partial<Model>
   ) {
     // Initialize storage if it doesn't exist
     if (!localStorage.getItem(this.storageKey)) {
@@ -61,23 +66,11 @@ export class LocalStorageModelAdapter implements ModelAdapter {
   }
 
   // Change notification system
-  onChange(
-    callback: (data: {
-      nodes: Node[];
-      edges: Edge[];
-      metadata: Metadata;
-    }) => void
-  ): void {
+  onChange(callback: (data: ModelChanges) => void): void {
     this.callbacks.push(callback);
   }
 
-  unregisterOnChange(
-    callback: (data: {
-      nodes: Node[];
-      edges: Edge[];
-      metadata: Metadata;
-    }) => void
-  ): void {
+  unregisterOnChange(callback: (data: ModelChanges) => void): void {
     this.callbacks = this.callbacks.filter((cb) => cb !== callback);
   }
 
@@ -101,11 +94,7 @@ export class LocalStorageModelAdapter implements ModelAdapter {
   }
 
   // Private storage methods
-  private getStorageData(): {
-    nodes: Node[];
-    edges: Edge[];
-    metadata: Metadata;
-  } {
+  private getStorageData(): ModelChanges {
     try {
       const stored = localStorage.getItem(this.storageKey);
       return stored
@@ -125,9 +114,7 @@ export class LocalStorageModelAdapter implements ModelAdapter {
     }
   }
 
-  private updateStorageData(
-    updates: Partial<{ nodes: Node[]; edges: Edge[]; metadata: Metadata }>
-  ): void {
+  private updateStorageData(updates: Partial<ModelChanges>): void {
     try {
       const currentData = this.getStorageData();
       const newData = { ...currentData, ...updates };

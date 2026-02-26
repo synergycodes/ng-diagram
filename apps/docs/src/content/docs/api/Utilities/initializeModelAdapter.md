@@ -6,7 +6,7 @@ prev: false
 title: "initializeModelAdapter"
 ---
 
-> **initializeModelAdapter**(`adapter`, `injector?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+> **initializeModelAdapter**(`adapter`, `model?`, `injector?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 Initializes an existing model adapter for use in ng-diagram.
 
@@ -22,6 +22,12 @@ to all nodes and edges in the adapter. Use this when providing a custom
 
 An existing ModelAdapter to initialize.
 
+### model?
+
+`Partial`\<[`Model`](/docs/api/types/model/model/)\>
+
+Optional initial model data to seed the adapter with before stripping and ID assignment.
+
 ### injector?
 
 `Injector`
@@ -31,3 +37,19 @@ Optional Angular `Injector` if not running inside an injection context.
 ## Returns
 
 [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+
+## Example
+
+```typescript
+// Basic usage with a custom adapter
+model = initializeModelAdapter(new NgRxModelAdapter(this.store));
+
+// With initial model data to seed the adapter
+model = initializeModelAdapter(new NgRxModelAdapter(this.store), {
+  nodes: [{ id: '1', position: { x: 0, y: 0 }, data: { label: 'Node 1' } }],
+  edges: [],
+});
+
+// With an explicit injector (outside injection context)
+model = initializeModelAdapter(new NgRxModelAdapter(this.store), undefined, this.injector);
+```

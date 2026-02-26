@@ -482,7 +482,7 @@ describe('initializeModelAdapter', () => {
     const customAdapter = createMockModelAdapter(mockNodes);
     const injector = TestBed.inject(Injector);
 
-    const result = initializeModelAdapter(customAdapter, injector);
+    const result = initializeModelAdapter(customAdapter, undefined, injector);
 
     expect(result).toBe(customAdapter);
     expect((customAdapter.getNodes()[0] as any)._internalId).toMatch(INTERNAL_ID_PATTERN('node1'));

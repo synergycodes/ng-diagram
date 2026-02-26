@@ -1,32 +1,26 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import type { NgDiagramConfig, Node } from 'ng-diagram';
+import type { Model, NgDiagramConfig, Node } from 'ng-diagram';
 import {
   initializeModelAdapter,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
-  NgDiagramNodeTemplateMap,
+  NgDiagramService,
+  NgDiagramViewportService,
 } from 'ng-diagram';
 import { LocalStorageModelAdapter } from './local-storage-model-adapter';
-import { NodeComponent } from './node/node.component';
-
-enum NodeTemplateType {
-  CustomNodeType = 'customNodeType',
-}
 
 @Component({
   selector: 'diagram',
-  imports: [CommonModule, NgDiagramComponent, NgDiagramBackgroundComponent],
+  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
   templateUrl: './diagram.component.html',
   styleUrl: './diagram.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiagramComponent {
-  nodeTemplateMap = new NgDiagramNodeTemplateMap([
-    [NodeTemplateType.CustomNodeType, NodeComponent],
-  ]);
   private modelService = inject(NgDiagramModelService);
+  private diagramService = inject(NgDiagramService);
+  private viewportService = inject(NgDiagramViewportService);
 
   config: NgDiagramConfig = {
     zoom: {
@@ -40,13 +34,13 @@ export class DiagramComponent {
   model = initializeModelAdapter(
     new LocalStorageModelAdapter(
       'ng-diagram-custom-demo',
-      this.getDefaultDiagram()
+      this.getDefaultModel()
     )
   );
 
-  addNode() {
+  async addNode() {
     const existingNodes = this.modelService.nodes();
-    const newId = `node-${crypto.randomUUID()}`;
+    const newId = this.generateId();
     const randomX = Math.floor(Math.random() * 400) + 50;
     const randomY = Math.floor(Math.random() * 300) + 50;
 
@@ -54,10 +48,15 @@ export class DiagramComponent {
       id: newId,
       position: { x: randomX, y: randomY },
       data: { label: `Custom Node ${existingNodes.length + 1}` },
-      type: NodeTemplateType.CustomNodeType,
     };
 
-    this.modelService.addNodes([newNode]);
+    await this.diagramService.transaction(
+      () => {
+        this.modelService.addNodes([newNode]);
+      },
+      { waitForMeasurements: true }
+    );
+    this.viewportService.zoomToFit();
   }
 
   reset() {
@@ -66,43 +65,59 @@ export class DiagramComponent {
     }
   }
 
-  private resetDiagramToDefault() {
+  private async resetDiagramToDefault() {
     const nodeIds = this.modelService.nodes().map((node) => node.id);
     const edgeIds = this.modelService.edges().map((edge) => edge.id);
-    this.modelService.deleteNodes(nodeIds);
-    this.modelService.deleteEdges(edgeIds);
+    const defaultModel = this.getDefaultModel();
 
-    const defaultDiagram = this.getDefaultDiagram();
-    this.modelService.addNodes(defaultDiagram.nodes);
-    this.modelService.addEdges(defaultDiagram.edges);
+    // This works because default model IDs are unique (generated via crypto.randomUUID).
+    // Be aware of ID collision pitfalls when mixing delete + add in a single transaction:
+    // https://www.ngdiagram.dev/docs/guides/transactions/#how-transactions-work
+    await this.diagramService.transaction(
+      () => {
+        this.modelService.deleteNodes(nodeIds);
+        this.modelService.deleteEdges(edgeIds);
+
+        this.modelService.addNodes(defaultModel.nodes);
+        this.modelService.addEdges(defaultModel.edges);
+      },
+      { waitForMeasurements: true }
+    );
+    this.viewportService.zoomToFit();
   }
 
-  private getDefaultDiagram() {
+  private generateId(): string {
+    return crypto.randomUUID();
+  }
+
+  private getDefaultModel(): Model {
+    const nodeId1 = this.generateId();
+    const nodeId2 = this.generateId();
+
     return {
       nodes: [
         {
-          id: '1',
+          id: nodeId1,
           position: { x: 0, y: 0 },
           data: { label: 'Node 1' },
-          type: NodeTemplateType.CustomNodeType,
         },
         {
-          id: '2',
+          id: nodeId2,
           position: { x: 420, y: 0 },
           data: { label: 'Node 2' },
-          type: NodeTemplateType.CustomNodeType,
         },
       ],
       edges: [
         {
-          id: 'edge-1',
-          source: '1',
-          target: '2',
-          sourcePort: 'port-bottom',
-          targetPort: 'port-top',
+          id: this.generateId(),
+          source: nodeId1,
+          target: nodeId2,
+          sourcePort: 'port-right',
+          targetPort: 'port-left',
           data: {},
         },
       ],
+      metadata: {},
     };
   }
 }
