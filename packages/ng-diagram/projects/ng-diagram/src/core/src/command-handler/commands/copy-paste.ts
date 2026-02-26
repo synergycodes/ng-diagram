@@ -195,8 +195,12 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   // Create deselect updates
   const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);
 
+  commandHandler.flowCore.actionStateManager.selection = { selectionChanged: true };
+
   await commandHandler.flowCore.applyUpdate(
     { nodesToAdd: newNodes, edgesToAdd: newEdges, nodesToUpdate, edgesToUpdate },
     'paste'
   );
+
+  await commandHandler.flowCore.applyUpdate({}, 'selectEnd');
 };

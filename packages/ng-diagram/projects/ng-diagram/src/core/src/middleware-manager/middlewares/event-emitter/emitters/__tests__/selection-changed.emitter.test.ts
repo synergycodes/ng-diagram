@@ -28,8 +28,16 @@ describe('SelectionChangedEmitter', () => {
     } as unknown as MiddlewareContext;
   });
 
-  it('should not emit event when modelActionType is not changeSelection', () => {
+  it('should not emit event when no selection-related changes detected', () => {
     context.modelActionTypes = ['updateNode'];
+    context.helpers = {
+      checkIfAnyNodePropsChanged: vi.fn().mockReturnValue(false),
+      checkIfAnyEdgePropsChanged: vi.fn().mockReturnValue(false),
+      anyNodesAdded: vi.fn().mockReturnValue(false),
+      anyEdgesAdded: vi.fn().mockReturnValue(false),
+      anyNodesRemoved: vi.fn().mockReturnValue(false),
+      anyEdgesRemoved: vi.fn().mockReturnValue(false),
+    } as unknown as MiddlewareContext['helpers'];
 
     const node: Node = { ...mockNode, id: 'node1', selected: true };
     context.nodesMap.set('node1', node);
@@ -338,5 +346,156 @@ describe('SelectionChangedEmitter', () => {
 
     expect(emitSpy).toHaveBeenCalledOnce();
     expect(emitSpy).toHaveBeenCalledWith('selectionChanged', expectedEvent);
+  });
+
+  describe('helpers-based detection', () => {
+    const createHelpers = (
+      overrides: Partial<Record<keyof MiddlewareContext['helpers'], ReturnType<typeof vi.fn>>> = {}
+    ) =>
+      ({
+        checkIfAnyNodePropsChanged: vi.fn().mockReturnValue(false),
+        checkIfAnyEdgePropsChanged: vi.fn().mockReturnValue(false),
+        anyNodesAdded: vi.fn().mockReturnValue(false),
+        anyEdgesAdded: vi.fn().mockReturnValue(false),
+        anyNodesRemoved: vi.fn().mockReturnValue(false),
+        anyEdgesRemoved: vi.fn().mockReturnValue(false),
+        ...overrides,
+      }) as unknown as MiddlewareContext['helpers'];
+
+    beforeEach(() => {
+      context.modelActionTypes = ['paste'];
+    });
+
+    it('should emit event when nodes are added with selection (paste scenario)', () => {
+      context.helpers = createHelpers({ anyNodesAdded: vi.fn().mockReturnValue(true) });
+
+      const existingNode: Node = { ...mockNode, id: 'node1', selected: true };
+      const existingNodeDeselected: Node = { ...mockNode, id: 'node1', selected: false };
+      const pastedNode: Node = { ...mockNode, id: 'node2', selected: true };
+
+      context.initialNodesMap.set('node1', existingNode);
+      context.nodesMap.set('node1', existingNodeDeselected);
+      context.nodesMap.set('node2', pastedNode);
+
+      emitter.emit(context, eventManager);
+
+      const expectedEvent: SelectionChangedEvent = {
+        selectedNodes: [pastedNode],
+        selectedEdges: [],
+        previousNodes: [existingNode],
+        previousEdges: [],
+      };
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).toHaveBeenCalledWith('selectionChanged', expectedEvent);
+    });
+
+    it('should emit event when edges are added with selection (paste scenario)', () => {
+      context.helpers = createHelpers({ anyEdgesAdded: vi.fn().mockReturnValue(true) });
+
+      const existingEdge: Edge = { ...mockEdge, id: 'edge1', selected: true };
+      const existingEdgeDeselected: Edge = { ...mockEdge, id: 'edge1', selected: false };
+      const pastedEdge: Edge = { ...mockEdge, id: 'edge2', selected: true };
+
+      context.initialEdgesMap.set('edge1', existingEdge);
+      context.edgesMap.set('edge1', existingEdgeDeselected);
+      context.edgesMap.set('edge2', pastedEdge);
+
+      emitter.emit(context, eventManager);
+
+      const expectedEvent: SelectionChangedEvent = {
+        selectedNodes: [],
+        selectedEdges: [pastedEdge],
+        previousNodes: [],
+        previousEdges: [existingEdge],
+      };
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).toHaveBeenCalledWith('selectionChanged', expectedEvent);
+    });
+
+    it('should emit event when selected node is removed', () => {
+      context.helpers = createHelpers({ anyNodesRemoved: vi.fn().mockReturnValue(true) });
+
+      const selectedNode: Node = { ...mockNode, id: 'node1', selected: true };
+
+      context.initialNodesMap.set('node1', selectedNode);
+      // node1 removed from nodesMap
+
+      emitter.emit(context, eventManager);
+
+      const expectedEvent: SelectionChangedEvent = {
+        selectedNodes: [],
+        selectedEdges: [],
+        previousNodes: [selectedNode],
+        previousEdges: [],
+      };
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).toHaveBeenCalledWith('selectionChanged', expectedEvent);
+    });
+
+    it('should emit event when selected edge is removed', () => {
+      context.helpers = createHelpers({ anyEdgesRemoved: vi.fn().mockReturnValue(true) });
+
+      const selectedEdge: Edge = { ...mockEdge, id: 'edge1', selected: true };
+
+      context.initialEdgesMap.set('edge1', selectedEdge);
+      // edge1 removed from edgesMap
+
+      emitter.emit(context, eventManager);
+
+      const expectedEvent: SelectionChangedEvent = {
+        selectedNodes: [],
+        selectedEdges: [],
+        previousNodes: [],
+        previousEdges: [selectedEdge],
+      };
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).toHaveBeenCalledWith('selectionChanged', expectedEvent);
+    });
+
+    it('should emit event when node selected prop changes without changeSelection action', () => {
+      context.helpers = createHelpers({ checkIfAnyNodePropsChanged: vi.fn().mockReturnValue(true) });
+
+      const node: Node = { ...mockNode, id: 'node1', selected: false };
+      const nodeSelected: Node = { ...mockNode, id: 'node1', selected: true };
+
+      context.initialNodesMap.set('node1', node);
+      context.nodesMap.set('node1', nodeSelected);
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(context.helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(['selected']);
+    });
+
+    it('should emit event when edge selected prop changes without changeSelection action', () => {
+      context.helpers = createHelpers({ checkIfAnyEdgePropsChanged: vi.fn().mockReturnValue(true) });
+
+      const edge: Edge = { ...mockEdge, id: 'edge1', selected: false };
+      const edgeSelected: Edge = { ...mockEdge, id: 'edge1', selected: true };
+
+      context.initialEdgesMap.set('edge1', edge);
+      context.edgesMap.set('edge1', edgeSelected);
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(context.helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(['selected']);
+    });
+
+    it('should not emit event when nodes are added but selection did not change', () => {
+      context.helpers = createHelpers({ anyNodesAdded: vi.fn().mockReturnValue(true) });
+
+      const addedNode: Node = { ...mockNode, id: 'node1', selected: false };
+
+      context.nodesMap.set('node1', addedNode);
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).not.toHaveBeenCalled();
+    });
   });
 });
