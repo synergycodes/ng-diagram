@@ -12,7 +12,7 @@ import {
     [edge]="edge()"
     stroke="var(--ngd-default-edge-stroke)"
   >
-    <ng-diagram-base-edge-label id="routing-label" positionOnEdge="0.5">
+    <ng-diagram-base-edge-label id="routing-label" [positionOnEdge]="0.5">
       <div class="routing-label">
         {{ getRoutingName() }}
       </div>
