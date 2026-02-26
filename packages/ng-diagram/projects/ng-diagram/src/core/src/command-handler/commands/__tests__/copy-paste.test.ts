@@ -398,6 +398,24 @@ describe('Copy-Paste Commands', () => {
       });
     });
 
+    describe('selection events', () => {
+      it('should set selectionChanged action state', async () => {
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        expect(commandHandler.flowCore.actionStateManager.selection).toEqual({ selectionChanged: true });
+      });
+
+      it('should emit selectEnd after paste update', async () => {
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        expect(updateCall).toHaveBeenCalledTimes(2);
+        expect(updateCall.mock.calls[1]).toEqual([{}, 'selectEnd']);
+      });
+    });
+
     describe('edge handling', () => {
       it('should update edge references to new node IDs', async () => {
         commandHandler.flowCore.getState = () => ({
