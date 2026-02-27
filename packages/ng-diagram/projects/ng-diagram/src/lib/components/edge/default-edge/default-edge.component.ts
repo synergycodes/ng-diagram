@@ -6,6 +6,7 @@ import { DefaultEdgeLabelComponent } from '../../edge-label/default-edge-label/d
 import { NgDiagramBaseEdgeComponent } from '../base-edge/base-edge.component';
 
 @Component({
+  standalone: true,
   selector: 'ng-diagram-default-edge',
   templateUrl: './default-edge.component.html',
   styleUrls: ['./default-edge.component.scss'],

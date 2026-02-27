@@ -47,7 +47,7 @@
       }
     }
   </svg>
-  @if (showZoomControls()) {
+  @if (showZoomControls() && isDiagramInitialized()) {
     <ng-diagram-zoom-controls />
   }
 </ng-diagram-panel>
