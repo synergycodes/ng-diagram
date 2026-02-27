@@ -190,4 +190,5 @@ title: "ng-diagram"
 - [configureShortcuts](/docs/api/utilities/configureshortcuts/)
 - [createMiddlewares](/docs/api/utilities/createmiddlewares/)
 - [initializeModel](/docs/api/utilities/initializemodel/)
+- [initializeModelAdapter](/docs/api/utilities/initializemodeladapter/)
 - [provideNgDiagram](/docs/api/utilities/providengdiagram/)

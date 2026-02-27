@@ -218,7 +218,8 @@ export class DiagramInitEmitter implements EventEmitter {
     const totalUnmeasured = this.countUnmeasuredItems();
 
     console.warn(
-      `[DiagramInitEmitter] Measurement timeout reached from last measurement. Emitting diagramInit event anyway.`
+      `[DiagramInitEmitter] Measurement timeout reached from last measurement. Emitting diagramInit event anyway.` +
+        ` Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).`
     );
     console.warn(`Total unmeasured elements: ${totalUnmeasured}`);
 

@@ -1,5 +1,6 @@
 import { EffectRef, Injectable, effect, signal, untracked } from '@angular/core';
 import type { Edge, Metadata, ModelAdapter, ModelChanges, Node } from '../../core/src';
+import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-runtime-properties';
 
 /**
  * An implementation of ModelAdapter using Angular signals to manage the state of nodes, edges, and metadata.
@@ -89,13 +90,9 @@ export class SignalModelAdapter implements ModelAdapter {
   toJSON(): string {
     const metadata = this.metadata();
     return JSON.stringify({
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      nodes: this.nodes().map(({ selected, measuredPorts, measuredBounds, computedZIndex, ...rest }) => rest),
-      edges: this.edges().map(
-        ({ points, sourcePosition, targetPosition, measuredLabels, computedZIndex, ...rest }) => rest
-      ),
+      nodes: this.nodes().map(stripNodeRuntimeProperties),
+      edges: this.edges().map(stripEdgeRuntimeProperties),
       metadata,
-      /* eslint-enable @typescript-eslint/no-unused-vars */
     });
   }
 }

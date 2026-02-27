@@ -27,7 +27,7 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 - Custom properties can be stored in the `data` field of [`nodes`](/docs/api/types/model/simplenode/#data) and [`edges`](/docs/api/types/model/edge/#data)
 - Use [`metadata`](/docs/api/types/model/metadata) for diagram-level custom information
 
-You can also implement custom model adapters to connect to external data sources like databases or real-time services.
+You can also implement custom model adapters to connect to external data sources like databases or real-time services. Use [`initializeModelAdapter()`](/docs/api/utilities/initializemodeladapter) to wire up a custom [`ModelAdapter`](/docs/api/types/model/modeladapter/) for use with ngDiagram.
 
 [State Management →](/docs/guides/state-management) | [Custom Model Example →](/docs/examples/custom-model) | [Model initialization →](/docs/guides/model-initialization/)
 

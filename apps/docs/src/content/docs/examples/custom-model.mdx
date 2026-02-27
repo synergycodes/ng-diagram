@@ -22,6 +22,7 @@ This example demonstrates how to create a custom [`model`](/docs/api/types/model
 
 The [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) accepts any object, via the [`model`](/docs/api/components/ngdiagramcomponent/#model) input property (e.g. `[model]="customModelAdapter"`), that implements the [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface.
 This means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by [`initializeModel`](/docs/api/utilities/initializemodel/).
+Use [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter/) to prepare a custom adapter for use with ng-diagram.
 This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
 
 #### Key Features

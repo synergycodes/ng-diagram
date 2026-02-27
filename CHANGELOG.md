@@ -16,11 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default edge now supports `positionOnEdge` data property to control [label positioning](/docs/guides/edges/labels/#using-labels-in-default-edges) (defaults to `0.5`) ([#581](https://github.com/synergycodes/ng-diagram/pull/581))
 - [`nodeIds`](/docs/api/types/action-state/draggingactionstate/#nodeids) property on `DraggingActionState` containing IDs of all nodes participating in the drag operation ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
 - [`movementStarted`](/docs/api/types/action-state/draggingactionstate/#movementstarted) property on `DraggingActionState` that indicates whether pointer movement exceeded the drag threshold before entering the dragging state ([#569](https://github.com/synergycodes/ng-diagram/pull/569))
+- [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter) function for initializing custom [`ModelAdapter`](/docs/api/types/model/modeladapter/) implementations. Use this when providing a custom adapter (e.g., backed by localStorage, NgRx, or an external store). The function prepares the adapter for use with ng-diagram. `initializeModel` continues to create the default `SignalModelAdapter` from `Partial<Model>` data. ([#586](https://github.com/synergycodes/ng-diagram/pull/586))
+
+### Updated
+
+- [Custom Model example](/docs/examples/custom-model) now uses `initializeModelAdapter` and improved `LocalStorageModelAdapter` with `Partial<Model>` and `ModelChanges` types ([#586](https://github.com/synergycodes/ng-diagram/pull/586))
 
 ### Fixed
 
 - Added explicit `ModelAdapter` return type to `initializeModel()` to prevent TypeScript errors when building with `declaration: true` ([#573](https://github.com/synergycodes/ng-diagram/pull/573)) (thanks [@MeMeMax](https://github.com/MeMeMax) for reporting this 💪)
 - Edge labels vanishing permanently after model reinitialization ([#585](https://github.com/synergycodes/ng-diagram/pull/585))
+- Edge labels not being measured when loading a model with pre-existing edge points (e.g., from localStorage) ([#586](https://github.com/synergycodes/ng-diagram/pull/586))
 
 ## [1.0.0] - 2026-02-06
 
