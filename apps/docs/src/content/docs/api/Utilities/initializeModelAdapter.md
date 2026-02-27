@@ -26,7 +26,7 @@ An existing ModelAdapter to initialize.
 
 `Partial`\<[`Model`](/docs/api/types/model/model/)\>
 
-Optional initial model data to seed the adapter with before stripping and ID assignment.
+Optional initial model data to seed the adapter with.
 
 ### injector?
 

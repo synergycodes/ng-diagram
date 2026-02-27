@@ -64,7 +64,7 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
  * ```
  *
  * @param adapter An existing ModelAdapter to initialize.
- * @param model Optional initial model data to seed the adapter with before stripping and ID assignment.
+ * @param model Optional initial model data to seed the adapter with.
  * @param injector Optional Angular `Injector` if not running inside an injection context.
  *
  * @public

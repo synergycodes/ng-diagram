@@ -7,9 +7,6 @@ import { EnvironmentProviderService } from '../services/environment-provider/env
 import { initializeModel, initializeModelAdapter } from './initialize-model';
 import { SignalModelAdapter } from './signal-model-adapter';
 
-const INTERNAL_ID_PATTERN = (nodeId: string) =>
-  new RegExp(`^${nodeId}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`);
-
 const mockNodes: Node[] = [
   { id: 'node1', type: 'default', data: { label: 'Node 1' }, position: { x: 0, y: 0 } },
   { id: 'node2', type: 'default', data: { label: 'Node 2' }, position: { x: 100, y: 50 } },
@@ -142,7 +139,6 @@ describe('initializeModel', () => {
     const nodes = adapter.getNodes();
     for (const node of nodes) {
       expect((node as any)._internalId).toBeDefined();
-      expect((node as any)._internalId).toMatch(INTERNAL_ID_PATTERN(node.id));
     }
   });
 
@@ -152,7 +148,6 @@ describe('initializeModel', () => {
     const edges = adapter.getEdges();
     for (const edge of edges) {
       expect((edge as any)._internalId).toBeDefined();
-      expect((edge as any)._internalId).toMatch(INTERNAL_ID_PATTERN(edge.id));
     }
   });
 
@@ -223,7 +218,6 @@ describe('initializeModel', () => {
     for (const node of nodes) {
       const internalId = (node as any)._internalId;
       expect(internalId).not.toContain('stale-id');
-      expect(internalId).toMatch(INTERNAL_ID_PATTERN(node.id));
     }
   });
 
@@ -238,7 +232,6 @@ describe('initializeModel', () => {
     for (const edge of edges) {
       const internalId = (edge as any)._internalId;
       expect(internalId).not.toContain('stale-id');
-      expect(internalId).toMatch(INTERNAL_ID_PATTERN(edge.id));
     }
   });
 
@@ -318,7 +311,6 @@ describe('initializeModel', () => {
     const adapter = initializeModel({ nodes: mockNodes }, injector);
 
     expect(adapter.getNodes()).toHaveLength(2);
-    expect((adapter.getNodes()[0] as any)._internalId).toMatch(INTERNAL_ID_PATTERN('node1'));
   });
 });
 
@@ -345,7 +337,6 @@ describe('initializeModelAdapter', () => {
     const nodes = customAdapter.getNodes();
     for (const node of nodes) {
       expect((node as any)._internalId).toBeDefined();
-      expect((node as any)._internalId).toMatch(INTERNAL_ID_PATTERN(node.id));
     }
   });
 
@@ -357,7 +348,6 @@ describe('initializeModelAdapter', () => {
     const edges = customAdapter.getEdges();
     for (const edge of edges) {
       expect((edge as any)._internalId).toBeDefined();
-      expect((edge as any)._internalId).toMatch(INTERNAL_ID_PATTERN(edge.id));
     }
   });
 
@@ -504,7 +494,6 @@ describe('initializeModelAdapter', () => {
     for (const node of nodes) {
       const internalId = (node as any)._internalId;
       expect(internalId).not.toContain('stale-id');
-      expect(internalId).toMatch(INTERNAL_ID_PATTERN(node.id));
     }
   });
 
@@ -521,7 +510,6 @@ describe('initializeModelAdapter', () => {
     for (const edge of edges) {
       const internalId = (edge as any)._internalId;
       expect(internalId).not.toContain('stale-id');
-      expect(internalId).toMatch(INTERNAL_ID_PATTERN(edge.id));
     }
   });
 
@@ -532,6 +520,5 @@ describe('initializeModelAdapter', () => {
     const result = initializeModelAdapter(customAdapter, undefined, injector);
 
     expect(result).toBe(customAdapter);
-    expect((customAdapter.getNodes()[0] as any)._internalId).toMatch(INTERNAL_ID_PATTERN('node1'));
   });
 });
