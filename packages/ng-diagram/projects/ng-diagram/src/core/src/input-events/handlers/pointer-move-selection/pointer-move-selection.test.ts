@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FlowCore } from '../../../flow-core';
 import { mockEnvironment, mockGroupNode, mockNode } from '../../../test-utils';
+import { DraggingActionState, HighlightGroupActionState } from '../../../types';
 import { sortNodesByZIndex } from '../../../utils';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 import { MOVE_THRESHOLD, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
@@ -44,10 +45,8 @@ describe('PointerMoveSelectionEventHandler', () => {
   };
   let mockGetNodesInRange: ReturnType<typeof vi.fn>;
   let mockActionStateManager: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dragging: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    highlightGroup: any;
+    dragging: DraggingActionState | undefined;
+    highlightGroup: HighlightGroupActionState | undefined;
     clearDragging: ReturnType<typeof vi.fn>;
   };
   let mockGetState: ReturnType<typeof vi.fn>;
@@ -76,7 +75,6 @@ describe('PointerMoveSelectionEventHandler', () => {
 
     mockFlowCore = {
       getState: mockGetState,
-      applyUpdate: vi.fn(),
       commandHandler: { emit: mockEmit },
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
@@ -102,7 +100,7 @@ describe('PointerMoveSelectionEventHandler', () => {
   });
 
   describe('start phase', () => {
-    it('should initialize move state and dragging action state', () => {
+    it('should initialize move state and dragging action state with movementStarted=false', () => {
       const event = getSamplePointerMoveSelectionEvent({
         phase: 'start',
         modifiers: {
@@ -116,6 +114,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       handler.handle(event);
 
       expect(mockActionStateManager.dragging).toMatchObject({
+        movementStarted: false,
         modifiers: {
           primary: false,
           secondary: false,
@@ -145,26 +144,26 @@ describe('PointerMoveSelectionEventHandler', () => {
     });
 
     describe('movement threshold', () => {
-      it('should not move nodes until threshold is exceeded', () => {
+      it('should not move nodes until threshold is exceeded', async () => {
         // Move just below threshold
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointBelowThreshold,
         });
 
-        handler.handle(event);
+        await handler.handle(event);
 
         expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
       });
 
-      it('should start moving nodes once threshold is exceeded', () => {
+      it('should start moving nodes once threshold is exceeded', async () => {
         // Move beyond threshold
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointOverThreshold,
         });
 
-        handler.handle(event);
+        await handler.handle(event);
 
         expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
           delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
@@ -172,9 +171,41 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
       });
 
-      it('should continue moving after threshold is exceeded with incremental delta', () => {
+      it('should set movementStarted=true once threshold is exceeded', async () => {
+        // Move beyond threshold
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        });
+
+        await handler.handle(event);
+
+        expect(mockActionStateManager.dragging).toMatchObject({
+          nodeIds: [mockNode.id],
+          movementStarted: true,
+          modifiers: {
+            primary: false,
+            secondary: false,
+            shift: false,
+            meta: false,
+          },
+        });
+      });
+
+      it('should keep movementStarted=false when below threshold', () => {
+        const event = getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        });
+
+        handler.handle(event);
+
+        expect(mockActionStateManager.dragging?.movementStarted).toBe(false);
+      });
+
+      it('should continue moving after threshold is exceeded with incremental delta', async () => {
         // First move beyond threshold
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: lastInputPointOverThreshold,
@@ -184,7 +215,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         mockEmit.mockClear();
 
         // Subsequent move to the same position - delta should be 0 (incremental)
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: lastInputPointOverThreshold,
@@ -198,9 +229,9 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
       });
 
-      it('should send incremental deltas on subsequent moves', () => {
+      it('should send incremental deltas on subsequent moves', async () => {
         // First move beyond threshold
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: lastInputPointOverThreshold,
@@ -214,7 +245,7 @@ describe('PointerMoveSelectionEventHandler', () => {
           x: lastInputPointOverThreshold.x + 5,
           y: lastInputPointOverThreshold.y + 5,
         };
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: nextPosition,
@@ -230,7 +261,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     });
 
     describe('modifier updates', () => {
-      it('should update dragging modifiers during continue phase', () => {
+      it('should update dragging modifiers during continue phase', async () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointOverThreshold,
@@ -242,9 +273,9 @@ describe('PointerMoveSelectionEventHandler', () => {
           },
         });
 
-        handler.handle(event);
-
-        expect(mockActionStateManager.dragging.modifiers).toEqual({
+        await handler.handle(event);
+        expect(mockActionStateManager.dragging).not.toBeUndefined();
+        expect(mockActionStateManager.dragging!.modifiers).toEqual({
           primary: true,
           secondary: false,
           shift: true,
@@ -353,9 +384,9 @@ describe('PointerMoveSelectionEventHandler', () => {
     });
 
     describe('group highlighting during drag', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         // Ensure we're past the movement threshold
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: lastInputPointOverThreshold,
@@ -426,9 +457,9 @@ describe('PointerMoveSelectionEventHandler', () => {
     });
 
     describe('screen edge panning', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         // Ensure we're past the movement threshold
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: lastInputPointOverThreshold,
@@ -437,7 +468,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         mockEmit.mockClear();
       });
 
-      it('should only pan after movement threshold is exceeded', () => {
+      it('should only pan after movement threshold is exceeded', async () => {
         // Reset handler
         handler = new PointerMoveSelectionEventHandler(mockFlowCore);
         handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
@@ -449,19 +480,19 @@ describe('PointerMoveSelectionEventHandler', () => {
           panningForce: { x: 8, y: 0 },
         });
 
-        handler.handle(event);
+        await handler.handle(event);
 
         expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
       });
 
-      it('should pan once movement threshold is exceeded', () => {
+      it('should pan once movement threshold is exceeded', async () => {
         const event = getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointOverThreshold,
           panningForce: { x: 12, y: 3 },
         });
 
-        handler.handle(event);
+        await handler.handle(event);
 
         expect(mockEmit).toHaveBeenCalledWith('moveViewportBy', { x: 12, y: 3 });
       });
@@ -469,11 +500,11 @@ describe('PointerMoveSelectionEventHandler', () => {
   });
 
   describe('end phase', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       // Start the movement
       handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
       // Move beyond threshold
-      handler.handle(
+      await handler.handle(
         getSamplePointerMoveSelectionEvent({
           phase: 'continue',
           lastInputPoint: lastInputPointOverThreshold,
@@ -489,7 +520,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
 
         // Move below threshold
-        handler.handle(
+        await handler.handle(
           getSamplePointerMoveSelectionEvent({
             phase: 'continue',
             lastInputPoint: lastInputPointBelowThreshold,
@@ -545,7 +576,7 @@ describe('PointerMoveSelectionEventHandler', () => {
           groupId: 'existingGroup',
           nodeIds: ['node1'],
         });
-        expect(mockEmit).toHaveBeenCalledTimes(1);
+        expect(mockEmit).not.toHaveBeenCalledWith('removeFromGroup', expect.objectContaining({ nodeIds: ['node2'] }));
       });
 
       it('should handle nodes with null groupId correctly', async () => {
@@ -637,6 +668,101 @@ describe('PointerMoveSelectionEventHandler', () => {
       await handler.handle(event);
 
       expect(mockEmit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+    });
+  });
+
+  describe('nodeDragStarted and nodeDragEnded events', () => {
+    it('should emit moveNodesStart command when threshold is crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStart');
+    });
+
+    it('should not emit moveNodesStart command when threshold is not crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        })
+      );
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStart');
+    });
+
+    it('should emit moveNodesStart command only once across multiple continue events', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      const moveNodesStartCount = mockEmit.mock.calls.filter((call: unknown[]) => call[0] === 'moveNodesStart').length;
+      expect(moveNodesStartCount).toBe(1);
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: { x: lastInputPointOverThreshold.x + 10, y: lastInputPointOverThreshold.y + 10 },
+        })
+      );
+
+      const moveNodesStartCountAfter = mockEmit.mock.calls.filter(
+        (call: unknown[]) => call[0] === 'moveNodesStart'
+      ).length;
+
+      expect(moveNodesStartCountAfter).toBe(1);
+    });
+
+    it('should emit moveNodesStop command on end phase after drag', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointOverThreshold,
+        })
+      );
+
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStop');
+    });
+
+    it('should not emit moveNodesStop command when threshold was not crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'continue',
+          lastInputPoint: lastInputPointBelowThreshold,
+        })
+      );
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({
+          phase: 'end',
+          lastInputPoint: lastInputPointBelowThreshold,
+        })
+      );
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStop');
     });
   });
 });

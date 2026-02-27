@@ -36,6 +36,17 @@ const changeSelection = (
   return { nodesToUpdate, edgesToUpdate };
 };
 
+const applySelectionUpdate = async (
+  commandHandler: CommandHandler,
+  { nodesToUpdate, edgesToUpdate }: Pick<FlowStateUpdate, 'nodesToUpdate' | 'edgesToUpdate'>
+) => {
+  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
+    return;
+  }
+  commandHandler.flowCore.actionStateManager.selection = { selectionChanged: true };
+  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+};
+
 export interface SelectCommand {
   name: 'select';
   nodeIds?: string[];
@@ -48,11 +59,8 @@ export const select = async (
   { nodeIds, edgeIds, multiSelection = false }: SelectCommand
 ) => {
   const { modelLookup } = commandHandler.flowCore;
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, nodeIds ?? [], edgeIds ?? [], multiSelection);
-  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
-    return;
-  }
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  const update = changeSelection(modelLookup, nodeIds ?? [], edgeIds ?? [], multiSelection);
+  await applySelectionUpdate(commandHandler, update);
 };
 
 export interface DeselectCommand {
@@ -81,11 +89,8 @@ export const deselect = async (commandHandler: CommandHandler, { nodeIds, edgeId
     }
   }
 
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, nodesToLeftSelected, edgesToLeftSelected);
-  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
-    return;
-  }
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  const update = changeSelection(modelLookup, nodesToLeftSelected, edgesToLeftSelected);
+  await applySelectionUpdate(commandHandler, update);
 };
 
 export interface DeselectAllCommand {
@@ -94,11 +99,16 @@ export interface DeselectAllCommand {
 
 export const deselectAll = async (commandHandler: CommandHandler) => {
   const { modelLookup } = commandHandler.flowCore;
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, [], []);
-  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
-    return;
-  }
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  const update = changeSelection(modelLookup, [], []);
+  await applySelectionUpdate(commandHandler, update);
+};
+
+export interface SelectEndCommand {
+  name: 'selectEnd';
+}
+
+export const selectEnd = async (commandHandler: CommandHandler) => {
+  await commandHandler.flowCore.applyUpdate({}, 'selectEnd');
 };
 
 export interface SelectAllCommand {
@@ -109,9 +119,6 @@ export const selectAll = async (commandHandler: CommandHandler) => {
   const { modelLookup } = commandHandler.flowCore;
   const allNodeIds = Array.from(modelLookup.nodesMap.keys());
   const allEdgeIds = Array.from(modelLookup.edgesMap.keys());
-  const { nodesToUpdate, edgesToUpdate } = changeSelection(modelLookup, allNodeIds, allEdgeIds);
-  if (nodesToUpdate?.length === 0 && edgesToUpdate?.length === 0) {
-    return;
-  }
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate, edgesToUpdate }, 'changeSelection');
+  const update = changeSelection(modelLookup, allNodeIds, allEdgeIds);
+  await applySelectionUpdate(commandHandler, update);
 };

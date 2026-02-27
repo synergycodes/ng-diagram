@@ -128,7 +128,16 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
 
   /** @internal */
   ngOnDestroy(): void {
-    this.flowCoreProvider.provide().commandHandler.emit('deleteEdgeLabels', {
+    const flowCore = this.flowCoreProvider.provide();
+
+    // Skip cleanup if FlowCore is still initializing
+    // (handles case where old components from previous render are destroyed
+    // while new FlowCore is initializing after model reinitialization)
+    if (!flowCore.isInitialized) {
+      return;
+    }
+
+    flowCore.commandHandler.emit('deleteEdgeLabels', {
       edgeId: this.edgeId(),
       labelIds: [this.id()],
     });

@@ -368,7 +368,8 @@ The state management system provides a robust foundation for building dynamic di
 
 ## Custom Models
 
-The [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) accepts any object that implements the [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface, which means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by [`initializeModel`](/docs/api/utilities/initializemodel).\
+The [`NgDiagramComponent`](/docs/api/components/ngdiagramcomponent) accepts any object that implements the [`ModelAdapter`](/docs/api/types/model/modeladapter/) interface, which means you can create your own custom model implementations beyond the default `SignalModelAdapter` provided by [`initializeModel`](/docs/api/utilities/initializemodel).
+Use [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter) to prepare a custom adapter for use with ngDiagram.\
 This allows for advanced use cases like connecting to external data sources, implementing custom persistence layers, or integrating with existing state management solutions.
 
 ### ModelAdapter Interface
@@ -405,6 +406,9 @@ class NgRxModelAdapter implements ModelAdapter {
     this.store.select(selectDiagramData).subscribe(callback);
   }
 }
+
+// Wire up the custom adapter with initializeModelAdapter
+model = initializeModelAdapter(new NgRxModelAdapter(this.store));
 ```
 
 Custom model implementations provide the flexibility to integrate NgDiagram with any data architecture while maintaining full compatibility with all diagram features and the model service API.

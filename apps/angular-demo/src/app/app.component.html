@@ -6,13 +6,20 @@
     [config]="config"
     (diagramInit)="onDiagramInit($event)"
     (selectionChanged)="onSelectionChanged($event)"
+    (selectionGestureEnded)="onSelectionGestureEnded($event)"
     (groupMembershipChanged)="onGroupMembershipChanged($event)"
     (selectionRotated)="onSelectionRotated($event)"
+    (nodeRotateStarted)="onNodeRotateStarted($event)"
+    (nodeRotateEnded)="onNodeRotateEnded($event)"
     (edgeDrawn)="onEdgeDrawn($event)"
     (clipboardPasted)="onClipboardPasted($event)"
     (nodeResized)="onNodeResized($event)"
+    (nodeResizeStarted)="onNodeResizeStarted($event)"
+    (nodeResizeEnded)="onNodeResizeEnded($event)"
     (paletteItemDropped)="onPaletteItemDropped($event)"
     (selectionRemoved)="onSelectionRemoved($event)"
+    (nodeDragStarted)="onNodeDragStarted($event)"
+    (nodeDragEnded)="onNodeDragEnded($event)"
   >
     <ng-diagram-background type="grid"></ng-diagram-background>
   </ng-diagram>
@@ -20,6 +27,8 @@
   <app-toolbar
     (testVirtualizationClick)="enableVirtualizationTest()"
     (reinitializeModelClick)="onReinitializeModel()"
+    (saveModelClick)="onSaveModel()"
+    (loadModelClick)="onLoadModel()"
   />
   <app-palette [model]="paletteModel" />
 </div>

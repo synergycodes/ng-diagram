@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EdgeRoutingManager } from '../../../../edge-routing-manager';
 import { mockEdge } from '../../../../test-utils';
-import type { Edge, Point } from '../../../../types';
+import type { Edge } from '../../../../types';
 
-vi.mock('../../../../utils', () => ({
-  isSamePoint: (point1: Point, point2: Point) => point1.x === point2.x && point1.y === point2.y,
+vi.mock('../../../../utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../../utils')>()),
 }));
 
 vi.mock('../get-edge-points', () => ({
@@ -43,6 +43,7 @@ describe('Edge Routing Helper Functions', () => {
 
     mockRoutingManager = {
       computePointOnPath: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+      computePointAtDistance: vi.fn().mockReturnValue({ x: 30, y: 0 }),
       hasRouting: vi.fn().mockReturnValue(true),
       getDefaultRouting: vi.fn().mockReturnValue('polyline'),
     };
@@ -319,6 +320,76 @@ describe('Edge Routing Helper Functions', () => {
 
       expect(result).toEqual([]);
     });
+
+    it('should use computePointAtDistance for absolute (px) label positions', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        routing: 'polyline',
+        measuredLabels: [{ id: 'label-abs', positionOnEdge: '30px' }],
+      };
+      const points = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ];
+
+      mockRoutingManager.computePointAtDistance = vi.fn().mockReturnValue({ x: 30, y: 0 });
+
+      const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
+
+      expect(result).toHaveLength(1);
+      expect(result![0]).toEqual({
+        id: 'label-abs',
+        positionOnEdge: '30px',
+        position: { x: 30, y: 0 },
+      });
+      expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith('polyline', points, 30);
+      expect(mockRoutingManager.computePointOnPath).not.toHaveBeenCalled();
+    });
+
+    it('should handle negative absolute positions (from target)', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        routing: 'polyline',
+        measuredLabels: [{ id: 'label-neg', positionOnEdge: '-20px' }],
+      };
+      const points = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ];
+
+      mockRoutingManager.computePointAtDistance = vi.fn().mockReturnValue({ x: 80, y: 0 });
+
+      const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
+
+      expect(result![0].position).toEqual({ x: 80, y: 0 });
+      expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith('polyline', points, -20);
+    });
+
+    it('should handle mixed relative and absolute label positions', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        routing: 'polyline',
+        measuredLabels: [
+          { id: 'label-rel', positionOnEdge: 0.5 },
+          { id: 'label-abs', positionOnEdge: '20px' },
+        ],
+      };
+      const points = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ];
+
+      mockRoutingManager.computePointOnPath = vi.fn().mockReturnValue({ x: 50, y: 0 });
+      mockRoutingManager.computePointAtDistance = vi.fn().mockReturnValue({ x: 20, y: 0 });
+
+      const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
+
+      expect(result).toHaveLength(2);
+      expect(result![0].position).toEqual({ x: 50, y: 0 });
+      expect(result![1].position).toEqual({ x: 20, y: 0 });
+      expect(mockRoutingManager.computePointOnPath).toHaveBeenCalledWith('polyline', points, 0.5);
+      expect(mockRoutingManager.computePointAtDistance).toHaveBeenCalledWith('polyline', points, 20);
+    });
   });
 
   describe('processManualModeEdge', () => {
@@ -422,7 +493,30 @@ describe('Edge Routing Helper Functions', () => {
       });
     });
 
-    it('should return null when points have not changed', () => {
+    it('should return null when points have not changed and all labels are positioned', () => {
+      const points = [
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+      ];
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge-1',
+        points: points,
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
+      };
+
+      const result = processAutoModeEdge(
+        edge,
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+        points,
+        mockRoutingManager as EdgeRoutingManager
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null when points have not changed and edge has no labels', () => {
       const points = [
         { x: 10, y: 10 },
         { x: 90, y: 90 },
@@ -473,6 +567,90 @@ describe('Edge Routing Helper Functions', () => {
         targetPosition: { x: 100, y: 100 },
         measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
       });
+    });
+
+    it('should update labels with undefined position even when points have not changed', () => {
+      const points = [
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+      ];
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge-1',
+        points: points,
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5 }],
+      };
+
+      mockRoutingManager.computePointOnPath = vi.fn().mockReturnValue({ x: 50, y: 50 });
+
+      const result = processAutoModeEdge(
+        edge,
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+        points,
+        mockRoutingManager as EdgeRoutingManager
+      );
+
+      expect(result).toEqual({
+        id: 'edge-1',
+        sourcePosition: { x: 10, y: 10 },
+        targetPosition: { x: 90, y: 90 },
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }],
+      });
+      expect(result!.points).toBeUndefined();
+    });
+
+    it('should update labels with NaN position even when points have not changed', () => {
+      const points = [
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+      ];
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge-1',
+        points: points,
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: NaN, y: 0 } }],
+      };
+
+      mockRoutingManager.computePointOnPath = vi.fn().mockReturnValue({ x: 50, y: 50 });
+
+      const result = processAutoModeEdge(
+        edge,
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+        points,
+        mockRoutingManager as EdgeRoutingManager
+      );
+
+      expect(result).not.toBeNull();
+      expect(result!.measuredLabels![0].position).toEqual({ x: 50, y: 50 });
+    });
+
+    it('should update labels with null position even when points have not changed', () => {
+      const points = [
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+      ];
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge-1',
+        points: points,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: null as any }],
+      };
+
+      mockRoutingManager.computePointOnPath = vi.fn().mockReturnValue({ x: 50, y: 50 });
+
+      const result = processAutoModeEdge(
+        edge,
+        { x: 10, y: 10 },
+        { x: 90, y: 90 },
+        points,
+        mockRoutingManager as EdgeRoutingManager
+      );
+
+      expect(result).not.toBeNull();
+      expect(result!.measuredLabels![0].position).toEqual({ x: 50, y: 50 });
     });
   });
 

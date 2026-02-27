@@ -18,6 +18,35 @@ Name identifier for the routing.
 
 ## Methods
 
+### computePointAtDistance()?
+
+> `optional` **computePointAtDistance**(`points`, `distancePx`): [`Point`](/docs/api/types/geometry/point/)
+
+Gets a point on the path at a given pixel distance from the start.
+Negative values measure from the end of the path.
+
+#### Parameters
+
+##### points
+
+[`Point`](/docs/api/types/geometry/point/)[]
+
+The points defining the path.
+
+##### distancePx
+
+`number`
+
+Distance in pixels (positive = from start, negative = from end).
+
+#### Returns
+
+[`Point`](/docs/api/types/geometry/point/)
+
+The point at the given distance along the path.
+
+***
+
 ### computePointOnPath()?
 
 > `optional` **computePointOnPath**(`points`, `percentage`): [`Point`](/docs/api/types/geometry/point/)

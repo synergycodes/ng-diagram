@@ -43,6 +43,23 @@ class MockRoutingWithoutPointOnPath implements EdgeRouting {
   computeSvgPath = vi.fn((): string => 'M 0,0 L 100,100');
 }
 
+// Mock routing with computePointAtDistance
+class MockRoutingWithPointAtDistance implements EdgeRouting {
+  constructor(public name: string) {}
+
+  computePoints = vi.fn((): Point[] => [
+    { x: 0, y: 0 },
+    { x: 100, y: 0 },
+  ]);
+
+  computeSvgPath = vi.fn((): string => 'M 0,0 L 100,0');
+
+  computePointAtDistance = vi.fn((points: Point[], distancePx: number): Point => {
+    if (points.length < 2) return points[0] || { x: 0, y: 0 };
+    return { x: Math.min(distancePx, 100), y: 0 };
+  });
+}
+
 describe('EdgeRoutingManager', () => {
   let manager: EdgeRoutingManager;
   let mockConfig: EdgeRoutingConfig;
@@ -356,6 +373,97 @@ describe('EdgeRoutingManager', () => {
 
       // Percentage at 1
       expect(manager.computePointOnPath('mock', points, 1)).toEqual({ x: 100, y: 100 });
+    });
+  });
+
+  describe('computePointAtDistance', () => {
+    const points: Point[] = [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+    ];
+
+    it('should compute point using routing implementation when available', () => {
+      const mockRouting = new MockRoutingWithPointAtDistance('mock');
+      manager.registerRouting(mockRouting);
+
+      const point = manager.computePointAtDistance('mock', points, 30);
+
+      expect(mockRouting.computePointAtDistance).toHaveBeenCalledWith(points, 30);
+      expect(point).toEqual({ x: 30, y: 0 });
+    });
+
+    it('should use segment-based fallback when routing lacks computePointAtDistance', () => {
+      const mockRouting = new MockRoutingWithoutPointOnPath('mock');
+      manager.registerRouting(mockRouting);
+
+      const point = manager.computePointAtDistance('mock', points, 50);
+      expect(point.x).toBeCloseTo(50);
+      expect(point.y).toBeCloseTo(0);
+    });
+
+    it('should use default routing when none specified', () => {
+      const point = manager.computePointAtDistance(undefined, points, 50);
+      expect(point).toBeDefined();
+      expect(point.x).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should warn and fall back to default routing for non-existent routing', () => {
+      const point = manager.computePointAtDistance('non-existent', points, 50);
+
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(point).toBeDefined();
+    });
+
+    it('should handle negative distance (from end) in fallback', () => {
+      const mockRouting = new MockRoutingWithoutPointOnPath('mock');
+      manager.registerRouting(mockRouting);
+
+      const point = manager.computePointAtDistance('mock', points, -20);
+      expect(point.x).toBeCloseTo(80);
+      expect(point.y).toBeCloseTo(0);
+    });
+
+    it('should clamp to path bounds in fallback', () => {
+      const mockRouting = new MockRoutingWithoutPointOnPath('mock');
+      manager.registerRouting(mockRouting);
+
+      // Beyond end
+      const endPoint = manager.computePointAtDistance('mock', points, 500);
+      expect(endPoint).toEqual({ x: 100, y: 0 });
+
+      // Beyond start (negative beyond length)
+      const startPoint = manager.computePointAtDistance('mock', points, -500);
+      expect(startPoint).toEqual({ x: 0, y: 0 });
+    });
+
+    it('should handle edge cases in fallback', () => {
+      const mockRouting = new MockRoutingWithoutPointOnPath('mock');
+      manager.registerRouting(mockRouting);
+
+      // Single point
+      expect(manager.computePointAtDistance('mock', [{ x: 50, y: 50 }], 10)).toEqual({ x: 50, y: 50 });
+
+      // Empty array
+      expect(manager.computePointAtDistance('mock', [], 10)).toEqual({ x: 0, y: 0 });
+    });
+
+    it('should work with all built-in routings', () => {
+      const context = createMockContext();
+
+      // Test with orthogonal
+      const orthPts = manager.computePoints('orthogonal', context);
+      const orthPoint = manager.computePointAtDistance('orthogonal', orthPts, 20);
+      expect(orthPoint).toBeDefined();
+
+      // Test with bezier
+      const bezPts = manager.computePoints('bezier', context);
+      const bezPoint = manager.computePointAtDistance('bezier', bezPts, 20);
+      expect(bezPoint).toBeDefined();
+
+      // Test with polyline
+      const polyPts = manager.computePoints('polyline', context);
+      const polyPoint = manager.computePointAtDistance('polyline', polyPts, 20);
+      expect(polyPoint).toBeDefined();
     });
   });
 

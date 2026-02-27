@@ -22,8 +22,10 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.startPoint = flowPosition;
         this.isMoving = true;
         this.flow.actionStateManager.dragging = {
+          nodeIds: [],
           modifiers: { ...event.modifiers },
           accumulatedDeltas: new Map(),
+          movementStarted: false,
         };
 
         break;
@@ -45,6 +47,13 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           const distance = Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY);
           if (distance >= MOVE_THRESHOLD) {
             this.hasMoved = true;
+            this.flow.actionStateManager.dragging = {
+              nodeIds: selectedNodesWithChildren.map((n) => n.id),
+              modifiers: { ...event.modifiers },
+              movementStarted: true,
+              accumulatedDeltas: new Map(),
+            };
+            await this.flow.commandHandler.emit('moveNodesStart');
           }
         }
 
@@ -74,6 +83,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
         if (this.hasMoved) {
           await this.handleDrop(pointer);
+          await this.flow.commandHandler.emit('moveNodesStop');
         }
 
         this.flow.actionStateManager.clearDragging();

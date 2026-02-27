@@ -103,6 +103,30 @@ export interface Edge<T extends DataObject = DataObject> {
 }
 
 /**
+ * Type representing an absolute edge label position in pixels.
+ * Positive values measure from the source, negative from the target.
+ *
+ * @example `'30px'` — 30px from source, `'-20px'` — 20px from target
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Model
+ */
+export type AbsoluteEdgeLabelPosition = `${number}px`;
+
+/**
+ * Type representing edge label position — either relative (0-1) or absolute (`'Npx'`).
+ *
+ * - **Relative** (`number`, 0-1): percentage along the path. Clamped to [0, 1].
+ * - **Absolute** (`string`, `'Npx'`): pixel distance from source (positive) or target (negative). Clamped to path length.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Model
+ */
+export type EdgeLabelPosition = number | AbsoluteEdgeLabelPosition;
+
+/**
  * Interface representing a label of an edge.
  *
  * @public
@@ -115,9 +139,19 @@ export interface EdgeLabel {
    */
   id: string;
   /**
-   * The position of the label from 0 to 1 where 0 is the source position of edge and 1 is the target position of edge.
+   * The position of the label on the edge.
+   *
+   * - **Relative** (`number`, 0-1): 0 is the source, 1 is the target, 0.5 is the midpoint.
+   * - **Absolute** (`'Npx'`): pixel distance from source (positive) or target (negative).
+   *
+   * @example
+   * ```ts
+   * positionOnEdge: 0.5      // midpoint (relative)
+   * positionOnEdge: '30px'   // 30px from source (absolute)
+   * positionOnEdge: '-20px'  // 20px from target (absolute)
+   * ```
    */
-  positionOnEdge: number;
+  positionOnEdge: EdgeLabelPosition;
   /**
    * The position of the label on flow.
    */

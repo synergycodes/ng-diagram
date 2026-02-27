@@ -48,8 +48,9 @@ describe('InternalIdMiddleware', () => {
     vi.restoreAllMocks();
   });
 
-  it('should not modify state when no nodes are added', async () => {
+  it('should not modify state when no nodes or edges are added', async () => {
     context.helpers.anyNodesAdded = vi.fn().mockReturnValue(false);
+    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(false);
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
@@ -146,6 +147,7 @@ describe('InternalIdMiddleware', () => {
     const mockNodes = [{ id: 'node1', position: { x: 0, y: 0 }, data: {} }];
 
     context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
     context.initialUpdate = {
       nodesToAdd: mockNodes,
       edgesToAdd: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
@@ -158,7 +160,11 @@ describe('InternalIdMiddleware', () => {
     const stateUpdate = nextMock.mock.calls[0][0];
 
     expect(stateUpdate.nodesToAdd).toBeDefined();
-    expect(stateUpdate.edgesToAdd).toEqual(context.initialUpdate.edgesToAdd);
+    expect(stateUpdate.edgesToAdd).toBeDefined();
+    expect(stateUpdate.edgesToAdd![0].id).toBe('edge1');
+    expect(stateUpdate.edgesToAdd![0]._internalId).toMatch(
+      /^edge1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
     expect(stateUpdate.metadataUpdate).toEqual(context.initialUpdate.metadataUpdate);
   });
 
@@ -251,6 +257,75 @@ describe('InternalIdMiddleware', () => {
     expect(stateUpdate.nodesToAdd![0].type).toBe('custom');
     expect(stateUpdate.nodesToAdd![0].selected).toBe(true);
     expect(stateUpdate.nodesToAdd![0].size).toEqual({ width: 100, height: 50 });
+  });
+
+  it('should generate _internalId for edges when edges are added', async () => {
+    const mockEdges = [
+      { id: 'edge1', source: 'node1', target: 'node2', data: {} },
+      { id: 'edge2', source: 'node2', target: 'node3', data: {} },
+    ];
+
+    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+    context.initialUpdate = { edgesToAdd: mockEdges };
+
+    await internalIdMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledTimes(1);
+    const stateUpdate = nextMock.mock.calls[0][0];
+
+    expect(stateUpdate.edgesToAdd).toHaveLength(2);
+    expect(stateUpdate.edgesToAdd![0]._internalId).toMatch(
+      /^edge1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+    expect(stateUpdate.edgesToAdd![1]._internalId).toMatch(
+      /^edge2-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+
+    expect(stateUpdate.edgesToAdd![0].id).toBe('edge1');
+    expect(stateUpdate.edgesToAdd![0].source).toBe('node1');
+    expect(stateUpdate.edgesToAdd![0].target).toBe('node2');
+  });
+
+  it('should always generate new _internalId for edges even if already present', async () => {
+    const mockEdges = [
+      {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        data: {},
+        _internalId: 'existing-internal-id',
+      },
+    ];
+
+    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+    context.initialUpdate = { edgesToAdd: mockEdges };
+
+    await internalIdMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledTimes(1);
+    const stateUpdate = nextMock.mock.calls[0][0];
+
+    expect(stateUpdate.edgesToAdd![0]._internalId).not.toBe('existing-internal-id');
+    expect(stateUpdate.edgesToAdd![0]._internalId).toMatch(
+      /^edge1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+  });
+
+  it('should handle edges added without nodes', async () => {
+    const mockEdges = [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }];
+
+    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(false);
+    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+    context.initialUpdate = { edgesToAdd: mockEdges };
+
+    await internalIdMiddleware.execute(context, nextMock, () => null);
+
+    expect(nextMock).toHaveBeenCalledTimes(1);
+    const stateUpdate = nextMock.mock.calls[0][0];
+
+    expect(stateUpdate.edgesToAdd).toHaveLength(1);
+    expect(stateUpdate.edgesToAdd![0]._internalId).toBeDefined();
+    expect(stateUpdate.nodesToAdd).toBeUndefined();
   });
 
   it('should always generate new _internalId for all nodes', async () => {

@@ -93,6 +93,8 @@ export interface RotationActionState {
  * @category Internals
  */
 export interface DraggingActionState {
+  /** IDs of all nodes participating in the drag (selected + children, filtered by draggable). */
+  nodeIds: string[];
   /** Input modifiers (e.g., Ctrl, Shift) active during the drag. */
   modifiers: InputModifiers;
   /**
@@ -100,6 +102,11 @@ export interface DraggingActionState {
    * Key is node ID, value is the accumulated delta that hasn't been applied due to snapping.
    */
   accumulatedDeltas: Map<string, Point>;
+  /**
+   * Whether the pointer has moved beyond the move threshold, indicating an actual drag.
+   * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
+   */
+  movementStarted: boolean;
 }
 
 /**
@@ -112,6 +119,21 @@ export interface DraggingActionState {
 export interface PanningActionState {
   /** Whether panning is currently active. */
   active: boolean;
+}
+
+/**
+ * State tracking whether a selection gesture has changed the selection.
+ *
+ * Set by selection commands when they apply changes, cleared when
+ * the `selectionGestureEnded` event is emitted on `selectEnd`.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Internals
+ */
+export interface SelectionActionState {
+  /** Whether selection has changed since the gesture started. */
+  selectionChanged: boolean;
 }
 
 /**
@@ -154,4 +176,8 @@ export interface ActionState {
    * State related to panning the viewport
    */
   panning?: PanningActionState;
+  /**
+   * State related to selection gestures
+   */
+  selection?: SelectionActionState;
 }

@@ -7,7 +7,16 @@ export class SelectionChangedEmitter implements EventEmitter {
   name = 'SelectionChangedEmitter';
 
   emit(context: MiddlewareContext, eventManager: EventManager): void {
-    if (!context.modelActionTypes.includes('changeSelection')) {
+    const selectionMayHaveChanged =
+      context.modelActionTypes.includes('changeSelection') ||
+      context.helpers.checkIfAnyNodePropsChanged(['selected']) ||
+      context.helpers.checkIfAnyEdgePropsChanged(['selected']) ||
+      context.helpers.anyNodesAdded() ||
+      context.helpers.anyEdgesAdded() ||
+      context.helpers.anyNodesRemoved() ||
+      context.helpers.anyEdgesRemoved();
+
+    if (!selectionMayHaveChanged) {
       return;
     }
 

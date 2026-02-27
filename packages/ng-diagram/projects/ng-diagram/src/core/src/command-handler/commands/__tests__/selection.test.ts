@@ -21,6 +21,7 @@ const createCommandHandler = (nodes: Node[], edges: Edge[]): CommandHandler =>
     flowCore: {
       applyUpdate: vi.fn(),
       modelLookup: createMockModelLookup(nodes, edges),
+      actionStateManager: { selection: undefined },
     } as unknown as FlowCore,
   }) as unknown as CommandHandler;
 

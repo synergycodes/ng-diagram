@@ -67,3 +67,11 @@ State related to node resizing action
 > `optional` **rotation**: [`RotationActionState`](/docs/api/internals/rotationactionstate/)
 
 State related to node rotation
+
+***
+
+### selection?
+
+> `optional` **selection**: `SelectionActionState`
+
+State related to selection gestures

@@ -14,7 +14,7 @@ This property is read-only and should not be modified.
 
 ## Using Labels in Default Edges
 
-To display a label on a **default edge**, you can add a `label` property to the edge's [`data`](/docs/api/types/model/edge/#data).
+To display a label on a **default edge**, add a `label` property to the edge's [`data`](/docs/api/types/model/edge/#data). You can also control the label position by setting the `positionOnEdge` data property (defaults to `0.5` — centered).
 
 <br />
 
@@ -84,7 +84,46 @@ import CustomLabel from '@components/angular/edges/labels/custom-label/custom-la
 
 ## Label Positioning
 
-The [`positionOnEdge`](/docs/api/types/model/edgelabel/#positiononedge) property determines where the label appears along the edge path. It can be set to any value from `0` to `1`, where `0.5` is the center of the edge. Labels automatically follow the edge path, regardless of the used [routing algorithm](/docs/guides/edges/routing).
+The [`positionOnEdge`](/docs/api/types/model/edgelabel/#positiononedge) property determines where the label appears along the edge path. Labels automatically follow the edge path, regardless of the used [routing algorithm](/docs/guides/edges/routing).
+
+### Relative Positioning
+
+A number between `0` and `1` places the label at a percentage along the path. `0` is the source, `1` is the target, and `0.5` is the midpoint.
+
+```html
+<!-- At the midpoint of the edge -->
+<ng-diagram-base-edge-label [id]="'mid'" [positionOnEdge]="0.5">
+  <span>Midpoint</span>
+</ng-diagram-base-edge-label>
+```
+
+### Absolute Positioning
+
+A string with a `px` suffix places the label at a fixed pixel distance along the path. Positive values measure from the source, negative values measure from the target.
+
+```html
+<!-- 30px from the source -->
+<ng-diagram-base-edge-label [id]="'src'" [positionOnEdge]="'30px'">
+  <span>Near Source</span>
+</ng-diagram-base-edge-label>
+
+<!-- 20px from the target -->
+<ng-diagram-base-edge-label [id]="'tgt'" [positionOnEdge]="'-20px'">
+  <span>Near Target</span>
+</ng-diagram-base-edge-label>
+```
+
+Absolute values are clamped to the path length — `'500px'` on a 300px edge resolves to the target end, and `'-500px'` resolves to the source end.
+
+| Value     | Mode     | Meaning                             |
+| --------- | -------- | ----------------------------------- |
+| `0.5`     | Relative | 50% along the path (midpoint)       |
+| `0`       | Relative | At the source                       |
+| `1`       | Relative | At the target                       |
+| `'30px'`  | Absolute | 30px from the source along the path |
+| `'-20px'` | Absolute | 20px from the target along the path |
+| `'0px'`   | Absolute | At the source                       |
+| `'-0px'`  | Absolute | At the target                       |
 
 ## Adding labels
 

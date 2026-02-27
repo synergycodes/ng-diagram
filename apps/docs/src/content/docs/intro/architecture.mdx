@@ -60,13 +60,20 @@ Events are emitted by the [`NgDiagramComponent`](/docs/api/components/ngdiagramc
 - [**DiagramInitEvent**](/docs/api/types/events/diagraminitevent): Fired when the diagram is fully initialized and all nodes, edges, and their internal parts are measured and positioned.
 - [**EdgeDrawnEvent**](/docs/api/types/events/edgedrawnevent): Fired when a user manually creates an edge by dragging between nodes.
 - [**SelectionChangedEvent**](/docs/api/types/events/selectionchangedevent): Fired when nodes or edges are selected or deselected.
-- [**SelectionMovedEvent**](/docs/api/types/events/selectionmovedevent): Fired when selected nodes are moved (dragged) on the canvas.
+- [**SelectionGestureEndedEvent**](/docs/api/types/events/selectiongestureendedevent): Fired when a selection gesture completes (on pointerup after clicking a node/edge, box selection, or select-all).
+- [**SelectionMovedEvent**](/docs/api/types/events/selectionmovedevent): Fired continuously on each position change while selected nodes are being dragged on the canvas.
 - [**SelectionRemovedEvent**](/docs/api/types/events/selectionremovedevent): Fired when selected nodes or edges are removed from the diagram.
-- [**SelectionRotatedEvent**](/docs/api/types/events/selectionrotatedevent): Fired when selected nodes are rotated.
+- [**SelectionRotatedEvent**](/docs/api/types/events/selectionrotatedevent): Fired continuously on each angle change while selected nodes are being rotated.
 - [**GroupMembershipChangedEvent**](/docs/api/types/events/groupmembershipchangedevent): Fired when nodes are grouped or ungrouped, changing their group membership.
 - [**ViewportChangedEvent**](/docs/api/types/events/viewportchangedevent): Fired when the viewport changes due to panning or zooming.
 - [**ClipboardPastedEvent**](/docs/api/types/events/clipboardpastedevent): Fired when nodes and edges are added via paste operations (keyboard shortcut or programmatic paste).
-- [**NodeResizedEvent**](/docs/api/types/events/noderesizedevent): Fired when a node or group is resized manually or programmatically.
+- [**NodeResizedEvent**](/docs/api/types/events/noderesizedevent): Fired continuously on each size change while a node or group is being resized.
+- [**NodeResizeStartedEvent**](/docs/api/types/events/noderesizestartedevent): Fired when a node resize operation begins.
+- [**NodeResizeEndedEvent**](/docs/api/types/events/noderesizeendedevent): Fired when a node resize operation ends.
+- [**NodeRotateStartedEvent**](/docs/api/types/events/noderotatestartedevent): Fired when a node rotation operation begins.
+- [**NodeRotateEndedEvent**](/docs/api/types/events/noderotateendedevent): Fired when a node rotation operation ends.
+- [**NodeDragStartedEvent**](/docs/api/types/events/nodedragstartedevent): Fired when a node drag operation begins.
+- [**NodeDragEndedEvent**](/docs/api/types/events/nodedragendedevent): Fired when a node drag operation ends.
 - [**PaletteItemDroppedEvent**](/docs/api/types/events/paletteitemdroppedevent): Fired when a palette item is dropped onto the diagram to create a new node.
 
 Each event provides a strongly-typed payload with relevant details. You can subscribe to these events using Angular outputs (e.g. `(selectionChanged)="..."`) on the [`<ng-diagram>`](/docs/api/components/ngdiagramcomponent) component.

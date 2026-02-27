@@ -1,4 +1,5 @@
 import type { FlowCore } from '../flow-core';
+import { LooseAutocomplete } from '../types';
 import { NormalizedKeyboardInput, ShortcutBinding, ShortcutDefinition } from '../types/shortcut.interface';
 import { DEFAULT_SHORTCUTS } from './default-shortcuts';
 
@@ -119,11 +120,14 @@ export class ShortcutManager {
    *
    * @example
    * // Check if current modifiers match box selection shortcut
-   * if (shortcutManager.matchesAction('boxSelection', event.modifiers)) {
+   * if (shortcutManager.matchesAction('boxSelection', { modifiers: event.modifiers })) {
    *   // Start box selection
    * }
    */
-  matchesAction(actionName: string, input: NormalizedKeyboardInput): boolean {
+  matchesAction(
+    actionName: LooseAutocomplete<ShortcutDefinition['actionName']>,
+    input: NormalizedKeyboardInput
+  ): boolean {
     const { shortcuts } = this.flowCore.config;
     const shortcut = shortcuts.find((s) => s.actionName === actionName);
 

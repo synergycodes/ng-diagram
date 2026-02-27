@@ -35,11 +35,14 @@ import {
   startLinkingFromPosition,
 } from './linking/';
 import { moveNodesBy } from './move';
+import { moveNodesStart, moveNodesStop } from './move-nodes-lifecycle';
 import { moveViewport, moveViewportBy } from './move-viewport';
 import { removeFromGroup } from './remove-from-group';
 import { resizeNode } from './resize-node';
+import { resizeNodeStart, resizeNodeStop } from './resize-node-lifecycle';
 import { rotateNodeTo } from './rotate-node';
-import { deselect, deselectAll, select, selectAll } from './selection';
+import { rotateNodeStart, rotateNodeStop } from './rotate-node-lifecycle';
+import { deselect, deselectAll, select, selectAll, selectEnd } from './selection';
 import { bringToFront, sendToBack } from './z-order';
 import { zoom } from './zoom';
 import { zoomToFit } from './zoom-to-fit';
@@ -57,9 +60,12 @@ export const commands: CommandMap = {
   init,
   select,
   selectAll,
+  selectEnd,
   deselect,
   deselectAll,
   moveNodesBy,
+  moveNodesStart,
+  moveNodesStop,
   deleteSelection,
   addNodes,
   updateNode,
@@ -81,6 +87,8 @@ export const commands: CommandMap = {
   finishLinkingToPosition,
   startLinkingFromPosition,
   resizeNode,
+  resizeNodeStart,
+  resizeNodeStop,
   zoom,
   addPorts,
   addPortsBulk,
@@ -94,6 +102,8 @@ export const commands: CommandMap = {
   updateEdgeLabels,
   deleteEdgeLabels,
   rotateNodeTo,
+  rotateNodeStart,
+  rotateNodeStop,
   highlightGroup,
   highlightGroupClear,
   addToGroup,

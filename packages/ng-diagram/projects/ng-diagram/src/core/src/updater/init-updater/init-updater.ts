@@ -23,6 +23,7 @@ This may result in:
   • Incorrect initial edge routing
 
 This usually indicates:
+  • Model provided to ng-diagram was not created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter)
   • Resize observers not functioning properly
   • Port/label elements not rendering
   • Very slow initial render (> ${STABILITY_DELAY}ms between additions)
@@ -263,7 +264,8 @@ export class InitUpdater implements Updater {
         const measuredLabels = this.initState.measuredLabels.size;
 
         console.warn(
-          '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).',
+          '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).' +
+            ' Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).',
           {
             nodes: { expected: expectedNodes, measured: measuredNodes },
             ports: { expected: expectedPorts, measured: measuredPorts },

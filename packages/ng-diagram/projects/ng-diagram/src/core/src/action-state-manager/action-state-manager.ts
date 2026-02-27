@@ -8,6 +8,7 @@ import type {
   PanningActionState,
   ResizeActionState,
   RotationActionState,
+  SelectionActionState,
 } from '../types/action-state.interface';
 
 /**
@@ -279,5 +280,30 @@ export class ActionStateManager {
    */
   isPanning(): boolean {
     return !!this.state.panning?.active;
+  }
+
+  /**
+   * Gets the current selection action state.
+   *
+   * @returns The selection state if set, undefined otherwise
+   */
+  get selection(): SelectionActionState | undefined {
+    return this.state.selection;
+  }
+
+  /**
+   * Sets the selection action state.
+   *
+   * @param value - The selection state to set, or undefined to clear
+   */
+  set selection(value: SelectionActionState | undefined) {
+    this.state.selection = value;
+  }
+
+  /**
+   * Clears the selection action state.
+   */
+  clearSelection() {
+    this.state.selection = undefined;
   }
 }

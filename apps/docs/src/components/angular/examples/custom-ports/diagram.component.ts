@@ -5,10 +5,10 @@ import {
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
+  NgDiagramNodeTemplateMap,
   provideNgDiagram,
   type Edge,
   type NgDiagramConfig,
-  type NgDiagramNodeTemplateMap,
 } from 'ng-diagram';
 import { HeaderNodeComponent } from './header-node/header-node.component';
 import { SocketNodeComponent } from './socket-node/socket-node.component';
@@ -30,7 +30,7 @@ import { SocketNodeComponent } from './socket-node/socket-node.component';
   styleUrl: './diagram.component.scss',
 })
 export class DiagramComponent {
-  nodeTemplateMap: NgDiagramNodeTemplateMap = new Map([
+  nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['headerNodeType', HeaderNodeComponent],
     ['socketNodeType', SocketNodeComponent],
   ]);

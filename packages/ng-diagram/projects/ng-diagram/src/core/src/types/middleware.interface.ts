@@ -59,16 +59,22 @@ export type ModelActionType =
   | 'paste'
   | 'moveViewport'
   | 'resizeNode'
+  | 'resizeNodeStart'
+  | 'resizeNodeStop'
   | 'startLinking'
   | 'moveTemporaryEdge'
   | 'finishLinking'
   | 'zoom'
   | 'changeZOrder'
   | 'rotateNodeTo'
+  | 'rotateNodeStart'
+  | 'rotateNodeStop'
   | 'highlightGroup'
   | 'highlightGroupClear'
   | 'moveNodes'
-  | 'moveNodesStop';
+  | 'moveNodesStart'
+  | 'moveNodesStop'
+  | 'selectEnd';
 
 /**
  * The complete state of the flow diagram.

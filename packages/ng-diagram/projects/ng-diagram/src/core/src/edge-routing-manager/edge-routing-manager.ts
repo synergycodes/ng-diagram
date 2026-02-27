@@ -3,6 +3,8 @@ import { BezierRouting } from './routings/bezier/bezier-routing';
 import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
 import { PolylineRouting } from './routings/polyline/polyline-routing';
 import { EdgeRouting, EdgeRoutingContext, EdgeRoutingName } from './types';
+import { computeLinearSegmentLengths, interpolateAlongLinearSegments } from './utils/linear-segment-utils';
+import { normalizeDistance } from './utils/normalize-distance';
 
 const ROUTING_MUST_HAVE_NAME_WARNING = `[ngDiagram] Routing must have a non-empty name property. Registration skipped.
 
@@ -266,6 +268,36 @@ export class EdgeRoutingManager {
   }
 
   /**
+   * Computes a point along the path at a given pixel distance from the start.
+   *
+   * @remarks
+   * If the selected routing implements `computePointAtDistance`, it will be used.
+   * Otherwise, falls back to segment-based distance traversal along the points array.
+   * Negative values measure from the end of the path.
+   *
+   * @param routingName - The routing to use. If omitted, the default routing is used.
+   * @param points - The path points
+   * @param distancePx - Distance in pixels (positive = from start, negative = from end)
+   * @returns The point on the path at the given distance
+   */
+  computePointAtDistance(routingName: EdgeRoutingName | undefined, points: Point[], distancePx: number): Point {
+    const name = routingName || this.defaultRouting;
+    let routing = this.routings.get(name);
+
+    if (!routing) {
+      const fallback = this.defaultRouting;
+      console.warn(ROUTING_NOT_FOUND_WARNING(name, this.getRegisteredRoutings(), fallback));
+      routing = this.routings.get(fallback);
+    }
+
+    if (routing?.computePointAtDistance) {
+      return routing.computePointAtDistance(points, distancePx);
+    }
+
+    return computeFallbackPointAtDistance(points, distancePx);
+  }
+
+  /**
    * Sets the default routing to use for all edges when no specific routing is specified.
    *
    * @param name - The routing name to set as default
@@ -287,3 +319,16 @@ export class EdgeRoutingManager {
     return this.defaultRouting;
   }
 }
+
+/**
+ * Segment-based fallback for computing a point at a given pixel distance.
+ * Works for any routing that produces a points array.
+ */
+const computeFallbackPointAtDistance = (points: Point[], distancePx: number): Point => {
+  if (points.length < 2) return points[0] || { x: 0, y: 0 };
+
+  const { lengths, totalLength } = computeLinearSegmentLengths(points);
+  const targetLength = normalizeDistance(distancePx, totalLength);
+
+  return interpolateAlongLinearSegments(points, lengths, targetLength);
+};

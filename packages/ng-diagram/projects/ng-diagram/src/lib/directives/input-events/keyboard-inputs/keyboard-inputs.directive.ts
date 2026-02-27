@@ -7,11 +7,12 @@ import { KeyboardAction } from './keyboard-actions/keyboard-action.interface';
 import { MovingAction } from './keyboard-actions/moving.action';
 import { PanningAction } from './keyboard-actions/panning.action';
 import { PasteAction } from './keyboard-actions/paste.action';
+import { ZoomAction } from './keyboard-actions/zoom.action';
 
 @Directive({
   selector: '[ngDiagramKeyboardInputs]',
   standalone: true,
-  providers: [PanningAction, MovingAction, PasteAction],
+  providers: [PanningAction, MovingAction, PasteAction, ZoomAction],
   host: {
     '(document:keydown)': 'onKeyDown($event)',
     '(pointerdown)': 'onPointerDown()',
@@ -25,6 +26,7 @@ export class KeyboardInputsDirective {
     inject(PanningAction),
     inject(MovingAction),
     inject(PasteAction),
+    inject(ZoomAction),
   ];
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -55,7 +57,7 @@ export class KeyboardInputsDirective {
 
     for (const shortcut of shortcuts) {
       const matchingAction = this.keyboardActions.find((action) => action.canHandle(shortcut, flowCore));
-      const event = matchingAction && matchingAction.createEvent(shortcut, baseEvent);
+      const event = matchingAction && matchingAction.createEvent(shortcut, baseEvent, flowCore);
 
       if (event) {
         this.inputEventsRouter.emit(event);

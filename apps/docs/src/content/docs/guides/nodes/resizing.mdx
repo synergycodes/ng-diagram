@@ -121,6 +121,14 @@ This establishes the fallback behavior for all nodes unless overridden by a temp
 
 [Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
+## Events
+
+The diagram emits several events related to resizing that you can subscribe to via `@Output` bindings on the [`ng-diagram`](/docs/api/components/ngdiagramcomponent) component or programmatically through [`NgDiagramService.addEventListener()`](/docs/api/services/ngdiagramservice#addeventlistener):
+
+- [`nodeResizeStarted`](/docs/api/types/events/noderesizestartedevent) - Fired once when the user starts resizing a node by dragging a resize handle.
+- [`nodeResized`](/docs/api/types/events/noderesizedevent) - Fired continuously on each size change while the user is resizing a node.
+- [`nodeResizeEnded`](/docs/api/types/events/noderesizeendedevent) - Fired when the user releases the pointer after resizing a node. The node will have its final size when this event is received.
+
 ## Further Reading
 
 [Nodes →](/docs/guides/nodes/nodes) | [Custom Nodes →](/docs/guides/nodes/custom-nodes)

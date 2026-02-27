@@ -6,9 +6,16 @@ import {
   EdgeDrawnEmitter,
   EventEmitter,
   GroupMembershipChangedEmitter,
+  NodeDragEndedEmitter,
+  NodeDragStartedEmitter,
+  NodeResizeEndedEmitter,
   NodeResizedEmitter,
+  NodeResizeStartedEmitter,
+  NodeRotateEndedEmitter,
+  NodeRotateStartedEmitter,
   PaletteItemDroppedEmitter,
   SelectionChangedEmitter,
+  SelectionGestureEndedEmitter,
   SelectionMovedEmitter,
   SelectionRemovedEmitter,
   SelectionRotatedEmitter,
@@ -33,6 +40,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
   const emitters: EventEmitter[] = [
     new DiagramInitEmitter(),
     new SelectionChangedEmitter(),
+    new SelectionGestureEndedEmitter(),
     new SelectionMovedEmitter(),
     new SelectionRemovedEmitter(),
     new GroupMembershipChangedEmitter(),
@@ -42,6 +50,12 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new ClipboardPastedEmitter(),
     new NodeResizedEmitter(),
     new PaletteItemDroppedEmitter(),
+    new NodeResizeStartedEmitter(),
+    new NodeResizeEndedEmitter(),
+    new NodeRotateStartedEmitter(),
+    new NodeRotateEndedEmitter(),
+    new NodeDragStartedEmitter(),
+    new NodeDragEndedEmitter(),
   ];
 
   return {

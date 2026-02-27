@@ -85,6 +85,55 @@ export interface DiagramEventMap {
    * onto the canvas to create new nodes.
    */
   paletteItemDropped: PaletteItemDroppedEvent;
+  /**
+   * Event emitted when a node resize operation begins.
+   *
+   * This event fires once when the user starts resizing a node by dragging
+   * a resize handle.
+   */
+  nodeResizeStarted: NodeResizeStartedEvent;
+  /**
+   * Event emitted when a node resize operation ends.
+   *
+   * This event fires when the user releases the pointer after resizing a node.
+   * The node will have its final size when this event is received.
+   */
+  nodeResizeEnded: NodeResizeEndedEvent;
+  /**
+   * Event emitted when a node rotation operation begins.
+   *
+   * This event fires once when the user starts rotating a node by dragging
+   * the rotation handle.
+   */
+  nodeRotateStarted: NodeRotateStartedEvent;
+  /**
+   * Event emitted when a node rotation operation ends.
+   *
+   * This event fires when the user releases the pointer after rotating a node.
+   * The node will have its final angle when this event is received.
+   */
+  nodeRotateEnded: NodeRotateEndedEvent;
+  /**
+   * Event emitted when a selection gesture is complete.
+   *
+   * This event fires on pointerup after a selection operation completes -
+   * whether from clicking a node/edge, box selection, or select-all.
+   */
+  selectionGestureEnded: SelectionGestureEndedEvent;
+  /**
+   * Event emitted when a node drag operation begins.
+   *
+   * This event fires once when the drag threshold is crossed, signaling the
+   * start of a drag operation.
+   */
+  nodeDragStarted: NodeDragStartedEvent;
+  /**
+   * Event emitted when a node drag operation ends.
+   *
+   * This event fires when the user releases the pointer after dragging nodes.
+   * Nodes will have their final positions when this event is received.
+   */
+  nodeDragEnded: NodeDragEndedEvent;
 }
 
 /**
@@ -140,6 +189,23 @@ export interface SelectionChangedEvent {
   previousNodes: Node[];
   /** Previously selected edges before the change */
   previousEdges: Edge[];
+}
+
+/**
+ * Event payload emitted when a selection gesture is complete.
+ *
+ * This event fires on pointerup after a selection operation completes —
+ * whether from clicking a node/edge, box selection, or select-all.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface SelectionGestureEndedEvent {
+  /** Currently selected nodes after the selection gesture */
+  nodes: Node[];
+  /** Currently selected edges after the selection gesture */
+  edges: Edge[];
 }
 
 /**
@@ -284,6 +350,96 @@ export interface SelectionRotatedEvent {
   angle: number;
   /** The previous angle of the node in degrees */
   previousAngle: number;
+}
+
+/**
+ * Event payload emitted when a node resize operation begins.
+ *
+ * This event fires once when the user starts resizing a node by dragging
+ * a resize handle.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeResizeStartedEvent {
+  /** The node being resized */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node resize operation ends.
+ *
+ * This event fires when the user releases the pointer after resizing a node.
+ * The node will have its final size when this event is received.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeResizeEndedEvent {
+  /** The node that was resized, with its final size */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node rotation operation begins.
+ *
+ * This event fires once when the user starts rotating a node by dragging
+ * the rotation handle.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeRotateStartedEvent {
+  /** The node being rotated */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node rotation operation ends.
+ *
+ * This event fires when the user releases the pointer after rotating a node.
+ * The node will have its final angle when this event is received.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeRotateEndedEvent {
+  /** The node that was rotated, with its final angle */
+  node: Node;
+}
+
+/**
+ * Event payload emitted when a node drag operation begins.
+ *
+ * This event fires once when the drag threshold is crossed, signaling the
+ * start of a drag operation.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeDragStartedEvent {
+  /** Nodes being dragged */
+  nodes: Node[];
+}
+
+/**
+ * Event payload emitted when a node drag operation ends.
+ *
+ * This event fires when the user releases the pointer after dragging nodes.
+ * Nodes will have their final positions when this event is received.
+ *
+ * @public
+ * @since 1.1.0
+ * @category Types/Events
+ */
+export interface NodeDragEndedEvent {
+  /** Nodes that were dragged, with their final positions */
+  nodes: Node[];
 }
 
 /**

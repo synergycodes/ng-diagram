@@ -87,4 +87,20 @@ export const DEFAULT_SHORTCUTS = [
     actionName: 'redo',
     bindings: [{ key: 'y', modifiers: { primary: true } }],
   },
+
+  // Zoom In/Out (modifier-only shortcut)
+  {
+    actionName: 'zoom',
+    bindings: [{ modifiers: { primary: true } }],
+  },
+
+  // Zoom In/Out with keyboard
+  {
+    actionName: 'keyboardZoomIn',
+    bindings: [{ key: '=' }],
+  },
+  {
+    actionName: 'keyboardZoomOut',
+    bindings: [{ key: '-' }],
+  },
 ] satisfies ShortcutDefinition[];

@@ -202,6 +202,24 @@ describe('BoxSelectionEventHandler', () => {
         });
       });
 
+      it('should emit selectEnd after box selection ends', () => {
+        mockSpatialHash.queryIds.mockReturnValue(new Set(['node1']));
+
+        const startEvent = getSampleBoxSelectionEvent({
+          phase: 'start',
+          lastInputPoint: { x: 50, y: 50 },
+        });
+        instance.handle(startEvent);
+
+        const endEvent = getSampleBoxSelectionEvent({
+          phase: 'end',
+          lastInputPoint: { x: 250, y: 250 },
+        });
+        instance.handle(endEvent);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('selectEnd');
+      });
+
       it('should select nodes when dragging from bottom-right to top-left', () => {
         mockSpatialHash.queryIds.mockReturnValue(new Set(['node3', 'node4']));
 
@@ -334,7 +352,7 @@ describe('BoxSelectionEventHandler', () => {
         });
       });
 
-      it('should not emit selection command if end is called without start', () => {
+      it('should not emit any commands if end is called without start', () => {
         const endEvent = getSampleBoxSelectionEvent({
           phase: 'end',
           lastInputPoint: { x: 450, y: 250 },
@@ -359,13 +377,15 @@ describe('BoxSelectionEventHandler', () => {
         });
         instance.handle(endEvent);
 
+        mockCommandHandler.emit.mockClear();
+
         const continueEvent = getSampleBoxSelectionEvent({
           phase: 'continue',
           lastInputPoint: { x: 300, y: 300 },
         });
         instance.handle(continueEvent);
 
-        expect(mockCommandHandler.emit).toHaveBeenCalledTimes(1);
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
     });
 

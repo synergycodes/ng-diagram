@@ -13,12 +13,20 @@ import {
   NgDiagramEdgeTemplateMap,
   NgDiagramMinimapComponent,
   NgDiagramMinimapNodeTemplateMap,
+  NgDiagramModelService,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  NodeDragEndedEvent,
+  NodeDragStartedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
+  NodeResizeStartedEvent,
+  NodeRotateEndedEvent,
+  NodeRotateStartedEvent,
   PaletteItemDroppedEvent,
   provideNgDiagram,
   SelectionChangedEvent,
+  SelectionGestureEndedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
   type Edge,
@@ -39,6 +47,8 @@ import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
+const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -55,6 +65,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 })
 export class AppComponent {
   private readonly injector = inject(Injector);
+  private readonly modelService = inject(NgDiagramModelService);
 
   paletteModel: NgDiagramPaletteItem[] = paletteModel;
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
@@ -143,6 +154,13 @@ export class AppComponent {
     });
   }
 
+  onSelectionGestureEnded(event: SelectionGestureEndedEvent): void {
+    console.log('Selection Gesture Ended:', {
+      nodes: event.nodes.map((n: Node) => n.id),
+      edges: event.edges.map((e: Edge) => e.id),
+    });
+  }
+
   onEdgeDrawn(event: EdgeDrawnEvent): void {
     console.log('Edge Drawn:', {
       edge: event.edge.id,
@@ -167,6 +185,18 @@ export class AppComponent {
         size: event.node.size,
         previousSize: event.previousSize,
       },
+    });
+  }
+
+  onNodeResizeStarted(event: NodeResizeStartedEvent): void {
+    console.log('Node Resize Started:', {
+      node: event.node.id,
+    });
+  }
+
+  onNodeResizeEnded(event: NodeResizeEndedEvent): void {
+    console.log('Node Resize Ended:', {
+      node: { id: event.node.id, size: event.node.size },
     });
   }
 
@@ -207,6 +237,42 @@ export class AppComponent {
       angle: event.angle,
       previousAngle: event.previousAngle,
     });
+  }
+
+  onNodeRotateStarted(event: NodeRotateStartedEvent): void {
+    console.log('Node Rotate Started:', {
+      node: event.node.id,
+    });
+  }
+
+  onNodeRotateEnded(event: NodeRotateEndedEvent): void {
+    console.log('Node Rotate Ended:', {
+      node: { id: event.node.id, angle: event.node.angle },
+    });
+  }
+
+  onNodeDragStarted(event: NodeDragStartedEvent): void {
+    console.log('Node Drag Started:', {
+      nodes: event.nodes.map((n: Node) => n.id),
+    });
+  }
+
+  onNodeDragEnded(event: NodeDragEndedEvent): void {
+    console.log('Node Drag Ended:', {
+      nodes: event.nodes.map((n: Node) => ({ id: n.id, position: n.position })),
+    });
+  }
+
+  onSaveModel(): void {
+    localStorage.setItem(LOCAL_STORAGE_KEY, this.modelService.toJSON());
+  }
+
+  onLoadModel(): void {
+    const json = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!json) return;
+
+    const data = JSON.parse(json);
+    this.model = initializeModel(data, this.injector);
   }
 
   onReinitializeModel(): void {

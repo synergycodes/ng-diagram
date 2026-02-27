@@ -1,6 +1,7 @@
 import { Directive, inject } from '@angular/core';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { WheelInputEvent } from '../../../types';
 
 @Directive({
   selector: '[ngDiagramZoomingWheel]',
@@ -13,13 +14,14 @@ export class ZoomingWheelDirective {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouterService = inject(InputEventsRouterService);
 
-  onWheel(event: WheelEvent) {
+  onWheel(event: WheelInputEvent) {
     if (!this.shouldHandle(event)) {
       return;
     }
 
     event.stopPropagation();
     event.preventDefault();
+    event.zoomingHandled = true;
 
     const flow = this.flowCoreProvider.provide();
 
@@ -37,8 +39,10 @@ export class ZoomingWheelDirective {
     });
   }
 
-  private shouldHandle(event: WheelEvent): boolean {
-    // Zoom only when primary modifier is pressed
-    return this.inputEventsRouterService.eventGuards.withPrimaryModifier(event);
+  private shouldHandle(event: WheelInputEvent): boolean {
+    const flowCore = this.flowCoreProvider.provide();
+    const modifiers = this.inputEventsRouterService.getBaseEvent(event).modifiers;
+
+    return !event.zoomingHandled && flowCore.shortcutManager.matchesAction('zoom', { modifiers });
   }
 }

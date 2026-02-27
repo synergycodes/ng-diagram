@@ -1,3 +1,4 @@
+import { resolveLabelPosition } from '../../edge-routing-manager';
 import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
 
 const computeAddedPorts = (node: Node, ports: Port[]): Port[] => {
@@ -309,7 +310,7 @@ export const addEdgeLabels = async (commandHandler: CommandHandler, command: Add
     ...(edge.measuredLabels ?? []),
     ...labels.map((label) => ({
       ...label,
-      position: edgeRoutingManager.computePointOnPath(edge.routing, points, label.positionOnEdge),
+      position: resolveLabelPosition(label.positionOnEdge, edge.routing, points, edgeRoutingManager),
     })),
   ];
   await commandHandler.flowCore.applyUpdate(
@@ -345,12 +346,12 @@ export const updateEdgeLabels = async (commandHandler: CommandHandler, command: 
   const newLabels = edge.measuredLabels?.map((label) => {
     const updates = updatesMap.get(label.id);
     if (!updates) {
-      const position = edgeRoutingManager.computePointOnPath(edge.routing, points, label.positionOnEdge);
+      const position = resolveLabelPosition(label.positionOnEdge, edge.routing, points, edgeRoutingManager);
       return { ...label, position };
     }
 
     const positionOnEdge = updates.positionOnEdge ?? label.positionOnEdge;
-    const position = edgeRoutingManager.computePointOnPath(edge.routing, points, positionOnEdge);
+    const position = resolveLabelPosition(positionOnEdge, edge.routing, points, edgeRoutingManager);
     return { ...label, ...updates, position };
   });
 

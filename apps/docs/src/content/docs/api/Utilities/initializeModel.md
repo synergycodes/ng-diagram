@@ -6,7 +6,7 @@ prev: false
 title: "initializeModel"
 ---
 
-> **initializeModel**(`model`, `injector?`): `SignalModelAdapter`
+> **initializeModel**(`model`, `injector?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 Creates a model adapter with initial nodes, edges, and metadata.
 
@@ -32,4 +32,20 @@ Optional Angular `Injector` if not running inside an injection context.
 
 ## Returns
 
-`SignalModelAdapter`
+[`ModelAdapter`](/docs/api/types/model/modeladapter/)
+
+## Example
+
+```typescript
+// Create an empty model
+model = initializeModel();
+
+// Create a model with initial data
+model = initializeModel({
+  nodes: [{ id: '1', position: { x: 0, y: 0 }, data: { label: 'Node 1' } }],
+  edges: [],
+});
+
+// With an explicit injector (outside injection context)
+model = initializeModel({ nodes: [...], edges: [...] }, this.injector);
+```
