@@ -8,6 +8,8 @@
   </button>
   <button (click)="onZoomToFitClick()">Zoom to fit</button>
   <button (click)="onAsyncTransactionWithMeasurementsDemo()">Async + Measurements + Zoom</button>
+  <button (click)="saveModelClick.emit()">Save to localStorage</button>
+  <button (click)="loadModelClick.emit()">Load from localStorage</button>
   <button (click)="testVirtualizationClick.emit()">Test Virtualization</button>
   <button (click)="reinitializeModelClick.emit()">Reinitialize Model</button>
 </div>

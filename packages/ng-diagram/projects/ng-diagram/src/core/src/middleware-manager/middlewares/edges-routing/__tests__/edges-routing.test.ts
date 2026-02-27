@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EdgeRoutingManager } from '../../../../edge-routing-manager';
 import { mockEdge, mockMetadata, mockNode } from '../../../../test-utils';
-import type { Edge, FlowState, MiddlewareContext, Point } from '../../../../types';
+import type { Edge, FlowState, MiddlewareContext } from '../../../../types';
 import { DEFAULT_SELECTED_Z_INDEX } from '../../z-index-assignment/constants';
 import { edgesRoutingMiddleware } from '../edges-routing';
 
@@ -16,8 +16,8 @@ vi.mock('../get-edge-points', () => ({
   }),
 }));
 
-vi.mock('../../../../utils', () => ({
-  isSamePoint: (point1: Point, point2: Point) => point1.x === point2.x && point1.y === point2.y,
+vi.mock('../../../../utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../../utils')>()),
 }));
 
 describe('Edges Routing Middleware', () => {

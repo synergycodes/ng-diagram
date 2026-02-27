@@ -212,6 +212,36 @@ describe('initializeModel', () => {
     }
   });
 
+  it('should strip stale _internalId from nodes', () => {
+    const nodesWithStaleId = mockNodes.map((node) => ({
+      ...node,
+      _internalId: `${node.id}-stale-id`,
+    })) as any;
+    const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: nodesWithStaleId }));
+
+    const nodes = adapter.getNodes();
+    for (const node of nodes) {
+      const internalId = (node as any)._internalId;
+      expect(internalId).not.toContain('stale-id');
+      expect(internalId).toMatch(INTERNAL_ID_PATTERN(node.id));
+    }
+  });
+
+  it('should strip stale _internalId from edges', () => {
+    const edgesWithStaleId = mockEdges.map((edge) => ({
+      ...edge,
+      _internalId: `${edge.id}-stale-id`,
+    })) as any;
+    const adapter = TestBed.runInInjectionContext(() => initializeModel({ edges: edgesWithStaleId }));
+
+    const edges = adapter.getEdges();
+    for (const edge of edges) {
+      const internalId = (edge as any)._internalId;
+      expect(internalId).not.toContain('stale-id');
+      expect(internalId).toMatch(INTERNAL_ID_PATTERN(edge.id));
+    }
+  });
+
   it('should strip sourcePosition from edges', () => {
     const edgesWithComputed = createEdgesWithComputedProperties();
     const adapter = TestBed.runInInjectionContext(() => initializeModel({ edges: edgesWithComputed }));
@@ -475,6 +505,23 @@ describe('initializeModelAdapter', () => {
       const internalId = (node as any)._internalId;
       expect(internalId).not.toContain('stale-id');
       expect(internalId).toMatch(INTERNAL_ID_PATTERN(node.id));
+    }
+  });
+
+  it('should generate fresh _internalId even if edges already have one', () => {
+    const edgesWithStaleId: Edge[] = mockEdges.map((edge) => ({
+      ...edge,
+      _internalId: `${edge.id}-stale-id`,
+    })) as any;
+    const customAdapter = createMockModelAdapter(mockNodes, edgesWithStaleId);
+
+    TestBed.runInInjectionContext(() => initializeModelAdapter(customAdapter));
+
+    const edges = customAdapter.getEdges();
+    for (const edge of edges) {
+      const internalId = (edge as any)._internalId;
+      expect(internalId).not.toContain('stale-id');
+      expect(internalId).toMatch(INTERNAL_ID_PATTERN(edge.id));
     }
   });
 

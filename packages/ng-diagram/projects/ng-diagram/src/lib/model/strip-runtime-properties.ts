@@ -10,7 +10,9 @@ import type { Edge, Node } from '../../core/src';
  */
 export function stripNodeRuntimeProperties(node: Node): Node {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { selected, measuredPorts, measuredBounds, computedZIndex, ...rest } = node;
+  const { selected, measuredPorts, measuredBounds, computedZIndex, _internalId, ...rest } = node as Node & {
+    _internalId?: unknown;
+  };
   return rest;
 }
 
@@ -24,6 +26,8 @@ export function stripNodeRuntimeProperties(node: Node): Node {
  */
 export function stripEdgeRuntimeProperties(edge: Edge): Edge {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { sourcePosition, targetPosition, measuredLabels, computedZIndex, ...rest } = edge;
+  const { sourcePosition, targetPosition, measuredLabels, computedZIndex, _internalId, ...rest } = edge as Edge & {
+    _internalId?: unknown;
+  };
   return rest;
 }

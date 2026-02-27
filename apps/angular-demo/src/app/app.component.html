@@ -27,6 +27,8 @@
   <app-toolbar
     (testVirtualizationClick)="enableVirtualizationTest()"
     (reinitializeModelClick)="onReinitializeModel()"
+    (saveModelClick)="onSaveModel()"
+    (loadModelClick)="onLoadModel()"
   />
   <app-palette [model]="paletteModel" />
 </div>

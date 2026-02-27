@@ -10,8 +10,8 @@ title: "initializeModelAdapter"
 
 Initializes an existing model adapter for use in ng-diagram.
 
-Strips stale runtime-computed properties and assigns fresh internal IDs
-to all nodes and edges in the adapter. Use this when providing a custom
+Prepares all nodes and edges in the adapter so they are ready for
+rendering by ng-diagram. Use this when providing a custom
 [ModelAdapter](/docs/api/types/model/modeladapter/) implementation.
 
 ## Parameters

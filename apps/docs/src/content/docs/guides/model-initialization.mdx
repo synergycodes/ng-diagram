@@ -58,7 +58,7 @@ const model = initializeModel({
 
 ### Custom Model Adapter
 
-If you have a custom [`ModelAdapter`](/docs/api/types/model/modeladapter/) implementation (e.g., backed by localStorage, NgRx, or an external store), use [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter) instead. It strips stale runtime properties and assigns fresh internal IDs to all nodes and edges in the adapter.
+If you have a custom [`ModelAdapter`](/docs/api/types/model/modeladapter/) implementation (e.g., backed by localStorage, NgRx, or an external store), use [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter) instead. It prepares all nodes and edges in the adapter for use with ng-diagram.
 
 ```typescript
 import { initializeModelAdapter } from 'ng-diagram';

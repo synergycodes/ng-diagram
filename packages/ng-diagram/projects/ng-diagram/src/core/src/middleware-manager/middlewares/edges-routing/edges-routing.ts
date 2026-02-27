@@ -1,6 +1,6 @@
 import { EdgeRoutingManager, resolveLabelPosition } from '../../../edge-routing-manager';
 import { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point } from '../../../types';
-import { isSamePoint } from '../../../utils';
+import { isSamePoint, isValidPosition } from '../../../utils';
 import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getEdgePoints } from './get-edge-points';
 
@@ -111,8 +111,11 @@ export const processAutoModeEdge = (
   points: Point[],
   routingManager: EdgeRoutingManager
 ): (Partial<Edge> & { id: string }) | null => {
-  // Skip if points haven't changed
-  if (!havePointsChanged(edge.points, points)) {
+  const pointsChanged = havePointsChanged(edge.points, points);
+  const hasUnpositionedLabels = edge.measuredLabels?.some((label) => !isValidPosition(label.position));
+
+  // Skip if points haven't changed and all labels already have positions
+  if (!pointsChanged && !hasUnpositionedLabels) {
     return null;
   }
 
@@ -120,7 +123,7 @@ export const processAutoModeEdge = (
 
   return {
     id: edge.id,
-    points,
+    ...(pointsChanged ? { points } : {}),
     sourcePosition: sourcePoint,
     targetPosition: targetPoint,
     measuredLabels: updatedLabels,
