@@ -5,3 +5,4 @@
 export { createGetSymbolHandler } from './handler.js';
 export { GET_SYMBOL_TOOL } from './tool.config.js';
 export type { GetSymbolInput, GetSymbolOutput } from './tool.types.js';
+export { GetSymbolInputSchema } from './tool.validator.js';

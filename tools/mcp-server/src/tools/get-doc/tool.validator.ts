@@ -1,26 +1,16 @@
-import type { GetDocInput } from './tool.types.js';
+import { z } from 'zod';
 
-export function validateInput(input: GetDocInput): void {
-  if (!input.path) {
-    throw new Error('Path parameter is required');
-  }
+export const GetDocInputSchema = z.object({
+  path: z
+    .string({ required_error: 'Path parameter is required' })
+    .min(1, 'Path parameter is required')
+    .max(500, 'Path parameter is too long (max 500 characters)')
+    .refine((v) => v.trim().length > 0, 'Path parameter cannot be empty')
+    .refine((v) => !v.includes('\0'), 'Path contains invalid characters')
+    .refine((v) => {
+      const normalized = v.replace(/\\/g, '/');
+      return !normalized.includes('..') && !normalized.startsWith('/');
+    }, 'Path must be a relative path within the docs directory'),
+});
 
-  if (input.path.trim().length === 0) {
-    throw new Error('Path parameter cannot be empty');
-  }
-
-  if (input.path.length > 500) {
-    throw new Error('Path parameter is too long (max 500 characters)');
-  }
-
-  // Reject path traversal attempts
-  const normalized = input.path.replace(/\\/g, '/');
-  if (normalized.includes('..') || normalized.startsWith('/')) {
-    throw new Error('Path must be a relative path within the docs directory');
-  }
-
-  // Reject null bytes
-  if (input.path.includes('\0')) {
-    throw new Error('Path contains invalid characters');
-  }
-}
+export type GetDocInput = z.infer<typeof GetDocInputSchema>;

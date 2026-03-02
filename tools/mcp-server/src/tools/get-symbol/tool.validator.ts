@@ -1,15 +1,11 @@
-import type { GetSymbolInput } from './tool.types.js';
+import { z } from 'zod';
 
-export function validateInput(input: GetSymbolInput): void {
-  if (!input.name) {
-    throw new Error('Name parameter is required');
-  }
+export const GetSymbolInputSchema = z.object({
+  name: z
+    .string({ required_error: 'Name parameter is required' })
+    .min(1, 'Name parameter is required')
+    .max(200, 'Name parameter is too long (max 200 characters)')
+    .refine((v) => v.trim().length > 0, 'Name parameter cannot be empty'),
+});
 
-  if (input.name.trim().length === 0) {
-    throw new Error('Name parameter cannot be empty');
-  }
-
-  if (input.name.length > 200) {
-    throw new Error('Name parameter is too long (max 200 characters)');
-  }
-}
+export type GetSymbolInput = z.infer<typeof GetSymbolInputSchema>;

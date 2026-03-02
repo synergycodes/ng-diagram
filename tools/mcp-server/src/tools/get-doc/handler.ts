@@ -1,16 +1,16 @@
 import type { DocumentationIndexer } from '../../services/indexer.js';
-import type { GetDocInput, GetDocOutput } from './tool.types.js';
-import { validateInput } from './tool.validator.js';
+import type { GetDocOutput } from './tool.types.js';
+import { GetDocInputSchema } from './tool.validator.js';
 
 export function createGetDocHandler(indexer: DocumentationIndexer) {
-  return async (input: GetDocInput): Promise<GetDocOutput> => {
+  return async (input: unknown): Promise<GetDocOutput> => {
     try {
-      validateInput(input);
+      const parsed = GetDocInputSchema.parse(input);
 
-      const page = indexer.getPage(input.path);
+      const page = indexer.getPage(parsed.path);
 
       if (!page) {
-        throw new Error(`Document not found: ${input.path}`);
+        throw new Error(`Document not found: ${parsed.path}`);
       }
 
       return {

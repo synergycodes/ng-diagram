@@ -5,3 +5,4 @@
 export { createGetDocHandler } from './handler.js';
 export { GET_DOC_TOOL } from './tool.config.js';
 export type { GetDocInput, GetDocOutput } from './tool.types.js';
+export { GetDocInputSchema } from './tool.validator.js';

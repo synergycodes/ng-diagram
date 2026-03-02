@@ -1,26 +1,18 @@
-import type { SearchDocsInput } from './tool.types.js';
+import { z } from 'zod';
 
-export function validateInput(input: SearchDocsInput): void {
-  if (!input.query) {
-    throw new Error('Query parameter is required');
-  }
+export const SearchDocsInputSchema = z.object({
+  query: z
+    .string({ required_error: 'Query parameter is required' })
+    .min(1, 'Query parameter is required')
+    .max(1000, 'Query parameter is too long (max 1000 characters)')
+    .refine((v) => v.trim().length > 0, 'Query parameter cannot be empty'),
+  limit: z
+    .number({ invalid_type_error: 'Limit parameter must be a non-negative number' })
+    .finite('Limit parameter must be a non-negative number')
+    .int('Limit parameter must be a non-negative number')
+    .min(0, 'Limit parameter must be a non-negative number')
+    .max(100, 'Limit parameter must not exceed 100')
+    .optional(),
+});
 
-  if (input.query.trim().length === 0) {
-    throw new Error('Query parameter cannot be empty');
-  }
-
-  if (input.query.length > 1000) {
-    throw new Error('Query parameter is too long (max 1000 characters)');
-  }
-
-  if (
-    input.limit !== undefined &&
-    (typeof input.limit !== 'number' || !Number.isFinite(input.limit) || input.limit < 0)
-  ) {
-    throw new Error('Limit parameter must be a non-negative number');
-  }
-
-  if (input.limit !== undefined && input.limit > 100) {
-    throw new Error('Limit parameter must not exceed 100');
-  }
-}
+export type SearchDocsInput = z.infer<typeof SearchDocsInputSchema>;

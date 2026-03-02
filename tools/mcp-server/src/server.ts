@@ -10,14 +10,10 @@ import { ApiReportIndexer } from './services/api-indexer.js';
 import { DocumentationIndexer } from './services/indexer.js';
 import { SearchEngine } from './services/search.js';
 import { SymbolSearchEngine } from './services/symbol-search.js';
-import { GET_DOC_TOOL, createGetDocHandler, type GetDocInput } from './tools/get-doc/index.js';
-import { SEARCH_DOCS_TOOL, createSearchDocsHandler, type SearchDocsInput } from './tools/search-docs/index.js';
-import { GET_SYMBOL_TOOL, createGetSymbolHandler, type GetSymbolInput } from './tools/get-symbol/index.js';
-import {
-  SEARCH_SYMBOLS_TOOL,
-  createSearchSymbolsHandler,
-  type SearchSymbolsInput,
-} from './tools/search-symbols/index.js';
+import { GET_DOC_TOOL, createGetDocHandler } from './tools/get-doc/index.js';
+import { SEARCH_DOCS_TOOL, createSearchDocsHandler } from './tools/search-docs/index.js';
+import { GET_SYMBOL_TOOL, createGetSymbolHandler } from './tools/get-symbol/index.js';
+import { SEARCH_SYMBOLS_TOOL, createSearchSymbolsHandler } from './tools/search-symbols/index.js';
 import type { MCPServerConfig } from './types/index.js';
 
 async function callTool(handler: (args: unknown) => Promise<unknown>, args: unknown) {
@@ -136,15 +132,15 @@ export class NgDiagramMCPServer {
     const searchSymbolsHandler = this.symbolSearch ? createSearchSymbolsHandler(this.symbolSearch) : null;
     const getSymbolHandler = this.apiIndexer ? createGetSymbolHandler(this.apiIndexer) : null;
 
-    // Map tool names to their handlers
+    // Map tool names to their handlers (all accept unknown and validate via Zod internally)
     const toolHandlers = new Map<string, (args: unknown) => Promise<unknown>>();
-    toolHandlers.set('search_docs', (args) => searchHandler(args as SearchDocsInput));
-    toolHandlers.set('get_doc', (args) => getDocHandler(args as GetDocInput));
+    toolHandlers.set('search_docs', searchHandler);
+    toolHandlers.set('get_doc', getDocHandler);
     if (searchSymbolsHandler) {
-      toolHandlers.set('search_symbols', (args) => searchSymbolsHandler(args as SearchSymbolsInput));
+      toolHandlers.set('search_symbols', searchSymbolsHandler);
     }
     if (getSymbolHandler) {
-      toolHandlers.set('get_symbol', (args) => getSymbolHandler(args as GetSymbolInput));
+      toolHandlers.set('get_symbol', getSymbolHandler);
     }
 
     const toolDefinitions: object[] = [SEARCH_DOCS_TOOL, GET_DOC_TOOL];
@@ -164,7 +160,7 @@ export class NgDiagramMCPServer {
 
       const handler = toolHandlers.get(name);
       if (!handler) {
-        throw new Error(`Unknown tool: ${name}`);
+        return callTool(() => Promise.reject(new Error(`Unknown tool: ${name}`)), args);
       }
 
       return callTool(handler, args);
@@ -173,7 +169,7 @@ export class NgDiagramMCPServer {
     console.error(`[MCP Server] Registered tools: ${[...toolHandlers.keys()].join(', ')}`);
   }
 
-  private async shutdown(): Promise<void> {
+  async shutdown(): Promise<void> {
     if (!this.isRunning) {
       return;
     }
@@ -191,7 +187,6 @@ export class NgDiagramMCPServer {
     }
 
     console.error('[MCP Server] Server stopped');
-    process.exit(0);
   }
 
   isServerRunning(): boolean {

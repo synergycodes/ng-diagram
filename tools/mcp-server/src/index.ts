@@ -35,6 +35,14 @@ async function main(): Promise<void> {
       apiReportPath,
     });
 
+    // Handle signals at the entry point level
+    const handleExit = async () => {
+      await server.shutdown();
+      process.exit(0);
+    };
+    process.on('SIGINT', handleExit);
+    process.on('SIGTERM', handleExit);
+
     await server.start();
   } catch (error) {
     console.error('[MCP Server] Fatal error during startup:');

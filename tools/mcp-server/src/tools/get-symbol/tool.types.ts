@@ -1,10 +1,4 @@
-/**
- * Input schema for the get_symbol tool
- */
-export interface GetSymbolInput {
-  /** Exact symbol name (case-sensitive) */
-  name: string;
-}
+export type { GetSymbolInput } from './tool.validator.js';
 
 /**
  * Output schema for the get_symbol tool

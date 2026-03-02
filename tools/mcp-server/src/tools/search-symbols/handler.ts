@@ -1,14 +1,14 @@
 import type { SymbolSearchEngine } from '../../services/symbol-search.js';
-import type { SearchSymbolsInput, SearchSymbolsOutput } from './tool.types.js';
-import { validateInput } from './tool.validator.js';
+import type { SearchSymbolsOutput } from './tool.types.js';
+import { SearchSymbolsInputSchema } from './tool.validator.js';
 
 export function createSearchSymbolsHandler(symbolSearch: SymbolSearchEngine) {
-  return async (input: SearchSymbolsInput): Promise<SearchSymbolsOutput> => {
+  return async (input: unknown): Promise<SearchSymbolsOutput> => {
     try {
-      validateInput(input);
+      const parsed = SearchSymbolsInputSchema.parse(input);
 
       return {
-        results: symbolSearch.search(input.query, input.kind, input.limit ?? 10),
+        results: symbolSearch.search(parsed.query, parsed.kind, parsed.limit ?? 10),
       };
     } catch (error) {
       if (error instanceof Error) {

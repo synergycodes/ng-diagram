@@ -1,16 +1,16 @@
 import type { ApiReportIndexer } from '../../services/api-indexer.js';
-import type { GetSymbolInput, GetSymbolOutput } from './tool.types.js';
-import { validateInput } from './tool.validator.js';
+import type { GetSymbolOutput } from './tool.types.js';
+import { GetSymbolInputSchema } from './tool.validator.js';
 
 export function createGetSymbolHandler(apiIndexer: ApiReportIndexer) {
-  return async (input: GetSymbolInput): Promise<GetSymbolOutput> => {
+  return async (input: unknown): Promise<GetSymbolOutput> => {
     try {
-      validateInput(input);
+      const parsed = GetSymbolInputSchema.parse(input);
 
-      const symbol = apiIndexer.getSymbol(input.name);
+      const symbol = apiIndexer.getSymbol(parsed.name);
 
       if (!symbol) {
-        throw new Error(`Symbol not found: ${input.name}`);
+        throw new Error(`Symbol not found: ${parsed.name}`);
       }
 
       const output: GetSymbolOutput = {
