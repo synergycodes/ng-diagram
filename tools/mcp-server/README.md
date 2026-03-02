@@ -107,12 +107,12 @@ Search through ng-diagram documentation sections. Returns full section content s
 ```typescript
 {
   results: Array<{
-    pageTitle: string;      // Title of the parent page
-    sectionTitle: string;   // Title of the matched section
-    content: string;        // Full markdown content of the section
-    description?: string;   // Document description (first section only)
-    path: string;           // Relative file path (use with get_doc)
-    url: string;            // Full documentation URL with anchor
+    pageTitle: string; // Title of the parent page
+    sectionTitle: string; // Title of the matched section
+    content: string; // Full markdown content of the section
+    description?: string; // Document description (first section only)
+    path: string; // Relative file path (use with get_doc)
+    url: string; // Full documentation URL with anchor
   }>;
 }
 ```
@@ -129,9 +129,9 @@ Retrieve the full content of a documentation page by its path. Returns the compl
 
 ```typescript
 {
-  title: string;   // Document title
-  body: string;    // Full markdown body (frontmatter stripped)
-  url: string;     // Base page URL
+  title: string; // Document title
+  body: string; // Full markdown body (frontmatter stripped)
+  url: string; // Base page URL
 }
 ```
 
@@ -150,10 +150,10 @@ Search through ng-diagram public API symbols (classes, functions, interfaces, ty
 ```typescript
 {
   results: Array<{
-    name: string;        // Symbol name
-    kind: string;        // Symbol kind
-    signature: string;   // Symbol signature
-    importPath: string;  // Import path
+    name: string; // Symbol name
+    kind: string; // Symbol kind
+    signature: string; // Symbol signature
+    importPath: string; // Import path
   }>;
 }
 ```
