@@ -8,7 +8,9 @@ export const SearchSymbolsInputSchema = z.object({
     .min(1, 'Query parameter is required')
     .max(1000, 'Query parameter is too long (max 1000 characters)')
     .refine((v) => v.trim().length > 0, 'Query parameter cannot be empty'),
-  kind: z.enum(VALID_KINDS, { message: `Invalid kind parameter. Must be one of: ${VALID_KINDS.join(', ')}` }).optional(),
+  kind: z
+    .enum(VALID_KINDS, { message: `Invalid kind parameter. Must be one of: ${VALID_KINDS.join(', ')}` })
+    .optional(),
   limit: z
     .number({ invalid_type_error: 'Limit parameter must be a non-negative number' })
     .finite('Limit parameter must be a non-negative number')
