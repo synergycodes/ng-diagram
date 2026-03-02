@@ -16,6 +16,16 @@ import { GET_SYMBOL_TOOL, createGetSymbolHandler } from './tools/get-symbol/inde
 import { SEARCH_SYMBOLS_TOOL, createSearchSymbolsHandler } from './tools/search-symbols/index.js';
 import type { MCPServerConfig } from './types/index.js';
 
+/**
+ * Execute a tool handler and wrap the result in the MCP response format.
+ *
+ * On success, returns `{ content: [{ type: "text", text: <JSON> }] }`.
+ * On failure (including invalid args), returns the same shape with `isError: true`.
+ * This ensures all tool errors are surfaced uniformly to the MCP client.
+ *
+ * @param handler The tool handler to invoke (validates its own input via Zod)
+ * @param args Raw arguments from the MCP CallToolRequest
+ */
 async function callTool(handler: (args: unknown) => Promise<unknown>, args: unknown) {
   try {
     if (args === undefined || args === null || typeof args !== 'object') {
@@ -38,6 +48,19 @@ async function callTool(handler: (args: unknown) => Promise<unknown>, args: unkn
   }
 }
 
+/**
+ * MCP server for ng-diagram documentation and API symbol search.
+ *
+ * On {@link start}, the server:
+ * 1. Indexes documentation files into searchable sections
+ * 2. Optionally parses an API Extractor report into searchable symbols
+ * 3. Registers four MCP tools (`search_docs`, `get_doc`, `search_symbols`, `get_symbol`)
+ * 4. Connects via stdio transport
+ *
+ * The server listens for SIGINT/SIGTERM and cleans up via {@link shutdown}.
+ * Process exit is **not** performed by this class — the caller (entry point)
+ * is responsible for calling `process.exit()` after shutdown if needed.
+ */
 export class NgDiagramMCPServer {
   private config: MCPServerConfig;
   private server: Server;
@@ -49,6 +72,11 @@ export class NgDiagramMCPServer {
   private readonly onSigInt = () => void this.shutdown();
   private readonly onSigTerm = () => void this.shutdown();
 
+  /**
+   * Create the server instance and wire up signal handlers.
+   * Does not start listening — call {@link start} for that.
+   * @param config Server name, version, docs path, base URL, and optional API report path
+   */
   constructor(config: MCPServerConfig) {
     this.config = config;
 
@@ -79,8 +107,8 @@ export class NgDiagramMCPServer {
   }
 
   /**
-   * Starts the MCP server
-   * Initializes the documentation index and starts listening for requests
+   * Build indexes, register tools, and start listening on stdio.
+   * Throws if the server is already running or if indexing/connection fails.
    */
   async start(): Promise<void> {
     if (this.isRunning) {
@@ -122,6 +150,13 @@ export class NgDiagramMCPServer {
     }
   }
 
+  /**
+   * Create tool handlers and register MCP request handlers for
+   * `ListTools` and `CallTool`. API symbol tools (`search_symbols`,
+   * `get_symbol`) are only registered when an API report was configured.
+   *
+   * Must be called after the search engines are initialized.
+   */
   private registerTools(): void {
     if (!this.searchEngine) {
       throw new Error('Search engine not initialized. Call start() first.');
@@ -169,6 +204,11 @@ export class NgDiagramMCPServer {
     console.error(`[MCP Server] Registered tools: ${[...toolHandlers.keys()].join(', ')}`);
   }
 
+  /**
+   * Gracefully shut down the server.
+   * Removes signal listeners, closes the MCP connection, and marks the
+   * server as stopped. Safe to call multiple times (no-op if already stopped).
+   */
   async shutdown(): Promise<void> {
     if (!this.isRunning) {
       return;
@@ -189,6 +229,7 @@ export class NgDiagramMCPServer {
     console.error('[MCP Server] Server stopped');
   }
 
+  /** @returns `true` if the server has been started and not yet shut down */
   isServerRunning(): boolean {
     return this.isRunning;
   }

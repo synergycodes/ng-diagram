@@ -1,9 +1,24 @@
 import MiniSearch from 'minisearch';
 import type { DocumentSection, SearchQuery, SearchResult } from '../types/index.js';
 
+/**
+ * Full-text search engine for documentation sections, backed by MiniSearch.
+ *
+ * Supports prefix matching, fuzzy matching (edit distance 0.2), and field
+ * boosting so that matches in section titles rank highest, followed by page
+ * titles, descriptions, and body content.
+ *
+ * The index is immutable after construction — create a new instance to
+ * re-index.
+ */
 export class SearchEngine {
   private index: MiniSearch;
 
+  /**
+   * Build a MiniSearch index from the given sections.
+   * Each section is assigned a numeric id based on its array position.
+   * @param sections Flat array of document sections to index
+   */
   constructor(sections: DocumentSection[]) {
     this.index = new MiniSearch({
       fields: ['pageTitle', 'sectionTitle', 'content', 'description'],
@@ -18,6 +33,12 @@ export class SearchEngine {
     this.index.addAll(sections.map((section, i) => ({ id: i, ...section })));
   }
 
+  /**
+   * Search the index and return matching sections ranked by relevance.
+   * Whitespace-only queries return an empty array without hitting MiniSearch.
+   * @param query Search query string and optional result limit (default 10)
+   * @returns Matching sections, truncated to the requested limit
+   */
   search(query: SearchQuery): SearchResult[] {
     const { query: searchQuery, limit = 10 } = query;
 

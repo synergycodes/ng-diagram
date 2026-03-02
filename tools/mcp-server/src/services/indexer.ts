@@ -3,17 +3,31 @@ import matter from 'gray-matter';
 import { basename, extname, join, relative } from 'path';
 import type { DocumentPage, DocumentSection, IndexerConfig } from '../types/index.js';
 
+/**
+ * Scans a documentation directory for markdown files (.md/.mdx), extracts
+ * YAML frontmatter (title, description) via gray-matter, and splits each
+ * file into sections on `##` headings.
+ *
+ * Produces two outputs:
+ * - A flat list of {@link DocumentSection} objects for full-text search indexing
+ * - An internal page map (keyed by relative path) for full-page retrieval via {@link getPage}
+ *
+ * Symbolic links are skipped during directory scanning. Files that fail to
+ * read or parse are logged and skipped without aborting the rest of the index.
+ */
 export class DocumentationIndexer {
   private config: IndexerConfig;
   private pages: Map<string, DocumentPage> = new Map();
 
+  /** @param config Indexer configuration (docs path, file extensions, base URL) */
   constructor(config: IndexerConfig) {
     this.config = config;
   }
 
   /**
-   * Build the documentation index by scanning and processing all files
-   * @returns Array of indexed document sections
+   * Scan the docs directory, parse all matching files, and build the section index.
+   * Safe to call multiple times — replaces the previous index on each call.
+   * @returns Flat array of all sections across all pages (empty on failure)
    */
   async buildIndex(): Promise<DocumentSection[]> {
     try {
@@ -41,9 +55,10 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Get full page data by relative path
-   * @param path Relative path from docs root (forward slashes)
-   * @returns Page data or undefined if not found
+   * Retrieve full page data by its relative path.
+   * Backslashes are normalized to forward slashes before lookup.
+   * @param path Relative path from docs root (e.g. `"guides/palette.mdx"`)
+   * @returns Page data, or `undefined` if the path was not indexed
    */
   getPage(path: string): DocumentPage | undefined {
     const normalizedPath = path.replace(/\\/g, '/');
@@ -51,9 +66,11 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Recursively scan directory for documentation files
-   * @param dir Directory to scan
-   * @returns Array of file paths matching configured extensions
+   * Recursively scan a directory for documentation files.
+   * Symbolic links are skipped to prevent cycles. Only regular files whose
+   * extension matches {@link IndexerConfig.extensions} are collected.
+   * @param dir Absolute directory path to scan
+   * @returns Absolute file paths matching the configured extensions
    */
   private async scanDirectory(dir: string): Promise<string[]> {
     const files: string[] = [];
@@ -86,9 +103,13 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Process a single documentation file into sections
-   * @param filePath Absolute path to the file
-   * @returns Array of document sections
+   * Read a single documentation file, extract frontmatter, store full-page
+   * data in the page map, and split the body into sections.
+   *
+   * If frontmatter parsing fails (malformed YAML), the raw content is used
+   * as the body and the filename is used as the title.
+   * @param filePath Absolute path to the markdown file
+   * @returns Sections produced from this file (empty on read failure)
    */
   private async processFile(filePath: string): Promise<DocumentSection[]> {
     try {
@@ -127,7 +148,19 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Split markdown body into sections based on ## headings
+   * Split a markdown body into sections on `##` headings.
+   *
+   * - Pages with no `##` headings produce a single section (sectionTitle = pageTitle).
+   * - Content before the first `##` becomes an "Introduction" section (if non-empty).
+   * - `###` and deeper headings are kept within their parent `##` section.
+   * - The `description` is attached only to the first section of the page.
+   *
+   * @param body Markdown body with frontmatter already stripped
+   * @param pageTitle Title of the parent page
+   * @param description Page description from frontmatter (may be undefined)
+   * @param path Relative path from docs root (forward slashes)
+   * @param baseUrl Full page URL without anchor
+   * @returns One or more sections for this page
    */
   private splitIntoSections(
     body: string,
@@ -195,8 +228,16 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Generate a URL-friendly anchor slug from a heading
-   * lowercase → strip non-alphanumeric (keep spaces/hyphens) → spaces to hyphens → collapse consecutive hyphens
+   * Generate a URL-friendly anchor slug from a heading title.
+   *
+   * Transformation pipeline:
+   * 1. Lowercase
+   * 2. Strip non-alphanumeric characters (keep spaces and hyphens)
+   * 3. Replace spaces with hyphens
+   * 4. Collapse consecutive hyphens
+   * 5. Trim leading/trailing hyphens
+   *
+   * @example generateAnchor("Heading with Special Characters!@#") → "heading-with-special-characters"
    */
   private generateAnchor(heading: string): string {
     return heading
@@ -208,9 +249,13 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Generate documentation URL from file path
-   * @param filePath Relative file path from docs root
-   * @returns Full documentation URL
+   * Generate a full documentation URL from a relative file path.
+   *
+   * Strips the `.md`/`.mdx` extension, normalizes backslashes to forward
+   * slashes, and handles `index` files (e.g. `guides/index.md` → `/docs/guides`).
+   *
+   * @param filePath Relative file path from docs root (e.g. `"guides/palette.mdx"`)
+   * @returns Full URL (e.g. `"https://www.ngdiagram.dev/docs/guides/palette"`)
    */
   private generateUrl(filePath: string): string {
     // Remove file extension
@@ -230,9 +275,11 @@ export class DocumentationIndexer {
   }
 
   /**
-   * Get filename without extension as fallback title
-   * @param filePath File path
-   * @returns Filename without extension
+   * Derive a human-readable title from a filename when frontmatter has no title.
+   * Converts kebab-case and snake_case to Title Case.
+   * @example getFilenameAsTitle("/docs/my-cool-doc.md") → "My Cool Doc"
+   * @param filePath Absolute or relative file path
+   * @returns Title-cased filename without extension
    */
   private getFilenameAsTitle(filePath: string): string {
     const filename = basename(filePath, extname(filePath));

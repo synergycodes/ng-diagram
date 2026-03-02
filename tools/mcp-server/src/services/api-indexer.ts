@@ -3,15 +3,29 @@ import type { ApiSymbol } from '../types/index.js';
 
 const IMPORT_PATH = 'ng-diagram';
 
+/**
+ * Parses API Extractor report files (.api.md) and extracts public TypeScript symbols.
+ *
+ * Reads the ```ts code block from an API report, identifies exported declarations
+ * (interfaces, classes, functions, types, consts, enums), and builds a lookup index.
+ * Handles visibility tags (@public, @internal, @deprecated), re-export aliases
+ * (`export { X as Y }`), and cleans Angular compiler artifacts from signatures.
+ */
 export class ApiReportIndexer {
   private apiReportPath: string;
   private symbols: ApiSymbol[] = [];
   private symbolMap: Map<string, ApiSymbol> = new Map();
 
+  /** @param apiReportPath Absolute path to the .api.md report file */
   constructor(apiReportPath: string) {
     this.apiReportPath = apiReportPath;
   }
 
+  /**
+   * Read and parse the API report, building the symbol index.
+   * Safe to call multiple times — replaces the previous index.
+   * @returns Array of parsed public API symbols (empty on read/parse failure)
+   */
   async buildIndex(): Promise<ApiSymbol[]> {
     let content: string;
     try {
@@ -40,19 +54,36 @@ export class ApiReportIndexer {
     return this.symbols;
   }
 
+  /** @returns All indexed symbols (empty before {@link buildIndex} is called) */
   getSymbols(): ApiSymbol[] {
     return this.symbols;
   }
 
+  /**
+   * Look up a symbol by exact name.
+   * @param name Case-sensitive symbol name (e.g. `"NgDiagramComponent"`)
+   * @returns The symbol, or `undefined` if not found
+   */
   getSymbol(name: string): ApiSymbol | undefined {
     return this.symbolMap.get(name);
   }
 
+  /**
+   * Extract the first ```ts ... ``` fenced code block from the report markdown.
+   * @returns The code block contents, or `null` if none found
+   */
   private extractCodeBlock(content: string): string | null {
     const match = content.match(/```ts\n([\s\S]*?)```/);
     return match ? match[1] : null;
   }
 
+  /**
+   * Walk through the code block line-by-line, tracking visibility tags
+   * (`// @public`, `// @internal`, etc.) and collecting exported declarations.
+   *
+   * Also handles the API Extractor re-export pattern where an internal name
+   * (e.g. `Node_2`) is later aliased via `export { Node_2 as Node }`.
+   */
   private parseCodeBlock(code: string): { symbols: ApiSymbol[]; symbolMap: Map<string, ApiSymbol> } {
     const lines = code.split('\n');
     const symbols: ApiSymbol[] = [];
@@ -171,6 +202,11 @@ export class ApiReportIndexer {
     return { symbols, symbolMap };
   }
 
+  /**
+   * Try to parse the start of an exported declaration from a single line.
+   * Matches patterns like `export interface Foo`, `export class Bar`, etc.
+   * @returns Parsed declaration info, or `null` if the line is not a declaration start
+   */
   private parseDeclarationStart(
     line: string
   ): { name: string; kind: ApiSymbol['kind']; isBraceDelimited: boolean } | null {
@@ -201,10 +237,15 @@ export class ApiReportIndexer {
     return null;
   }
 
+  /**
+   * Try to parse the start of a non-exported declaration (e.g. `type Node_2 = ...`).
+   * These appear in API reports when the public name is aliased via
+   * `export { Node_2 as Node }`.
+   * @returns Parsed declaration info, or `null` if the line is not a declaration start
+   */
   private parseNonExportedDeclaration(
     line: string
   ): { name: string; kind: ApiSymbol['kind']; isBraceDelimited: boolean } | null {
-    // Non-exported declarations (used with re-export pattern like `export { X as Y }`)
     let match = line.match(/^interface (\w+)/);
     if (match) return { name: match[1], kind: 'interface', isBraceDelimited: true };
 
@@ -220,6 +261,22 @@ export class ApiReportIndexer {
     return null;
   }
 
+  /**
+   * Find the line index where a declaration ends.
+   *
+   * For brace-delimited declarations (interfaces, classes, enums), counts
+   * `{` / `}` to find the matching closing brace. For semicolon-terminated
+   * declarations (functions, types, consts), scans forward for a line ending
+   * with `;`.
+   *
+   * Note: brace counting does not account for braces inside string literals
+   * or comments — this is safe for API Extractor output but not general TS.
+   *
+   * @param lines All lines of the code block
+   * @param startIndex Line index where the declaration starts
+   * @param isBraceDelimited Whether the declaration uses `{ }` (true) or `;` (false)
+   * @returns Line index of the last line of the declaration
+   */
   private collectDeclarationEnd(lines: string[], startIndex: number, isBraceDelimited: boolean): number {
     if (isBraceDelimited) {
       let braceDepth = 0;
@@ -255,6 +312,14 @@ export class ApiReportIndexer {
     return startIndex;
   }
 
+  /**
+   * Clean a raw declaration signature for public consumption.
+   *
+   * - Strips the `export ` keyword prefix
+   * - Removes Angular compiler artifacts (`static ɵcmp`, `static ɵfac`, etc.)
+   * - Removes `// (undocumented)` and `// @internal` comment lines
+   * - Collapses consecutive blank lines
+   */
   private cleanSignature(raw: string): string {
     let lines = raw.split('\n');
 

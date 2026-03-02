@@ -1,9 +1,24 @@
 import MiniSearch from 'minisearch';
 import type { ApiSymbol, SearchSymbolResult } from '../types/index.js';
 
+/**
+ * Full-text search engine for API symbols, backed by MiniSearch.
+ *
+ * Indexes the symbol `name` and `signature` fields with prefix and fuzzy
+ * matching (edit distance 0.2). Name matches are boosted 10x over signature
+ * matches so that exact or partial name queries rank highest.
+ *
+ * Results can optionally be filtered by symbol kind (class, function, etc.)
+ * after the search. The index is immutable after construction.
+ */
 export class SymbolSearchEngine {
   private index: MiniSearch;
 
+  /**
+   * Build a MiniSearch index from the given API symbols.
+   * Each symbol is assigned a numeric id based on its array position.
+   * @param symbols Array of API symbols to index
+   */
   constructor(symbols: ApiSymbol[]) {
     this.index = new MiniSearch({
       fields: ['name', 'signature'],
@@ -18,6 +33,14 @@ export class SymbolSearchEngine {
     this.index.addAll(symbols.map((symbol, i) => ({ id: i, ...symbol })));
   }
 
+  /**
+   * Search the index for symbols matching the query, with optional kind filtering.
+   * Whitespace-only queries return an empty array without hitting MiniSearch.
+   * @param query Search string (matched against name and signature)
+   * @param kind Optional symbol kind filter (e.g. `"class"`, `"function"`) — applied post-search
+   * @param limit Maximum number of results to return (default 10)
+   * @returns Matching symbols ranked by relevance, truncated to the limit
+   */
   search(query: string, kind?: string, limit = 10): SearchSymbolResult[] {
     const trimmed = query.trim();
     if (!trimmed) {
