@@ -15,7 +15,10 @@ export function validateInput(input: SearchSymbolsInput): void {
     throw new Error(`Invalid kind parameter. Must be one of: ${VALID_KINDS.join(', ')}`);
   }
 
-  if (input.limit !== undefined && (typeof input.limit !== 'number' || !Number.isFinite(input.limit) || input.limit < 0)) {
+  if (
+    input.limit !== undefined &&
+    (typeof input.limit !== 'number' || !Number.isFinite(input.limit) || input.limit < 0)
+  ) {
     throw new Error('Limit parameter must be a non-negative number');
   }
 }

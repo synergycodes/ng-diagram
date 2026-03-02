@@ -31,11 +31,7 @@ async function callTool(handler: (args: unknown) => Promise<unknown>, args: unkn
       content: [
         {
           type: 'text',
-          text: JSON.stringify(
-            { error: error instanceof Error ? error.message : 'Unknown error occurred' },
-            null,
-            2
-          ),
+          text: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error occurred' }, null, 2),
         },
       ],
       isError: true,
