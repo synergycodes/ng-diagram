@@ -86,6 +86,11 @@ describe('get_doc tool', () => {
       const input: GetDocInput = { path: '/etc/passwd' };
       await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
     });
+
+    it('should reject path with null bytes', async () => {
+      const input: GetDocInput = { path: 'test\0.md' };
+      await expect(handler(input)).rejects.toThrow('Path contains invalid characters');
+    });
   });
 
   describe('successful retrieval', () => {

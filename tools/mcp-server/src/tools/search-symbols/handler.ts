@@ -8,7 +8,7 @@ export function createSearchSymbolsHandler(symbolSearch: SymbolSearchEngine) {
       validateInput(input);
 
       return {
-        results: symbolSearch.search(input.query.trim(), input.kind, input.limit ?? 10),
+        results: symbolSearch.search(input.query, input.kind, input.limit ?? 10),
       };
     } catch (error) {
       if (error instanceof Error) {

@@ -9,9 +9,18 @@ export function validateInput(input: GetDocInput): void {
     throw new Error('Path parameter cannot be empty');
   }
 
+  if (input.path.length > 500) {
+    throw new Error('Path parameter is too long (max 500 characters)');
+  }
+
   // Reject path traversal attempts
   const normalized = input.path.replace(/\\/g, '/');
   if (normalized.includes('..') || normalized.startsWith('/')) {
     throw new Error('Path must be a relative path within the docs directory');
+  }
+
+  // Reject null bytes
+  if (input.path.includes('\0')) {
+    throw new Error('Path contains invalid characters');
   }
 }

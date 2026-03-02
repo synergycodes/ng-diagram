@@ -9,7 +9,7 @@ export function createSearchDocsHandler(searchEngine: SearchEngine) {
       validateInput(input);
 
       const searchQuery: SearchQuery = {
-        query: input.query.trim(),
+        query: input.query,
         limit: input.limit ?? 10,
       };
 

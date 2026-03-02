@@ -20,9 +20,10 @@
   "author": "Synergy Codes",
   "license": "Apache-2.0",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "gray-matter": "^4.0.3",
-    "minisearch": "^7.2.0"
+    "minisearch": "^7.2.0",
+    "zod": "^3.25"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",

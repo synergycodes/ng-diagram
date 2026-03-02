@@ -62,6 +62,10 @@ export class DocumentationIndexer {
       const entries = await readdir(dir, { withFileTypes: true });
 
       for (const entry of entries) {
+        if (entry.isSymbolicLink()) {
+          continue;
+        }
+
         const fullPath = join(dir, entry.name);
 
         if (entry.isDirectory()) {

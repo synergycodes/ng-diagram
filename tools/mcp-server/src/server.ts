@@ -22,6 +22,9 @@ import type { MCPServerConfig } from './types/index.js';
 
 async function callTool(handler: (args: unknown) => Promise<unknown>, args: unknown) {
   try {
+    if (args === undefined || args === null || typeof args !== 'object') {
+      throw new Error('Invalid arguments: expected an object');
+    }
     const result = await handler(args);
     return {
       content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
@@ -47,8 +50,8 @@ export class NgDiagramMCPServer {
   private searchEngine: SearchEngine | null = null;
   private symbolSearch: SymbolSearchEngine | null = null;
   private isRunning = false;
-  private readonly onSigInt = () => this.shutdown();
-  private readonly onSigTerm = () => this.shutdown();
+  private readonly onSigInt = () => void this.shutdown();
+  private readonly onSigTerm = () => void this.shutdown();
 
   constructor(config: MCPServerConfig) {
     this.config = config;
@@ -84,19 +87,23 @@ export class NgDiagramMCPServer {
    * Initializes the documentation index and starts listening for requests
    */
   async start(): Promise<void> {
+    if (this.isRunning) {
+      throw new Error('Server is already running');
+    }
+
     try {
-      console.log(`[MCP Server] Starting ${this.config.name} v${this.config.version}...`);
+      console.error(`[MCP Server] Starting ${this.config.name} v${this.config.version}...`);
 
       // Build documentation index
-      console.log(`[MCP Server] Indexing documentation from: ${this.config.docsPath}`);
+      console.error(`[MCP Server] Indexing documentation from: ${this.config.docsPath}`);
       const sections = await this.indexer.buildIndex();
-      console.log(`[MCP Server] Indexed ${sections.length} sections`);
+      console.error(`[MCP Server] Indexed ${sections.length} sections`);
 
       // Build API report index
       if (this.config.apiReportPath) {
         this.apiIndexer = new ApiReportIndexer(this.config.apiReportPath);
         const apiSymbols = await this.apiIndexer.buildIndex();
-        console.log(`[MCP Server] Indexed ${apiSymbols.length} API symbols`);
+        console.error(`[MCP Server] Indexed ${apiSymbols.length} API symbols`);
 
         this.symbolSearch = new SymbolSearchEngine(apiSymbols);
       }
@@ -112,7 +119,7 @@ export class NgDiagramMCPServer {
       await this.server.connect(transport);
 
       this.isRunning = true;
-      console.log('[MCP Server] Server started successfully');
+      console.error('[MCP Server] Server started successfully');
     } catch (error) {
       console.error('[MCP Server] Failed to start server:', error instanceof Error ? error.message : error);
       throw error;
@@ -163,23 +170,27 @@ export class NgDiagramMCPServer {
       return callTool(handler, args);
     });
 
-    console.log(`[MCP Server] Registered tools: ${[...toolHandlers.keys()].join(', ')}`);
+    console.error(`[MCP Server] Registered tools: ${[...toolHandlers.keys()].join(', ')}`);
   }
 
-  private shutdown(): void {
+  private async shutdown(): Promise<void> {
     if (!this.isRunning) {
       return;
     }
 
-    console.log('[MCP Server] Shutting down...');
+    console.error('[MCP Server] Shutting down...');
     this.isRunning = false;
 
     process.removeListener('SIGINT', this.onSigInt);
     process.removeListener('SIGTERM', this.onSigTerm);
 
-    this.server.close();
+    try {
+      await this.server.close();
+    } catch {
+      // Ignore close errors during shutdown
+    }
 
-    console.log('[MCP Server] Server stopped');
+    console.error('[MCP Server] Server stopped');
     process.exit(0);
   }
 

@@ -8,4 +8,8 @@ export function validateInput(input: GetSymbolInput): void {
   if (input.name.trim().length === 0) {
     throw new Error('Name parameter cannot be empty');
   }
+
+  if (input.name.length > 200) {
+    throw new Error('Name parameter is too long (max 200 characters)');
+  }
 }

@@ -204,9 +204,18 @@ export class ApiReportIndexer {
   private parseNonExportedDeclaration(
     line: string
   ): { name: string; kind: ApiSymbol['kind']; isBraceDelimited: boolean } | null {
-    // type Node_2<T> = ... (non-exported, used with re-export pattern)
-    const match = line.match(/^type (\w+)/);
+    // Non-exported declarations (used with re-export pattern like `export { X as Y }`)
+    let match = line.match(/^interface (\w+)/);
+    if (match) return { name: match[1], kind: 'interface', isBraceDelimited: true };
+
+    match = line.match(/^class (\w+)/);
+    if (match) return { name: match[1], kind: 'class', isBraceDelimited: true };
+
+    match = line.match(/^type (\w+)/);
     if (match) return { name: match[1], kind: 'type', isBraceDelimited: false };
+
+    match = line.match(/^enum (\w+)/);
+    if (match) return { name: match[1], kind: 'enum', isBraceDelimited: true };
 
     return null;
   }

@@ -5,12 +5,15 @@
  * Initializes and starts the MCP server with documentation search capabilities
  */
 
+import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { NgDiagramMCPServer } from './server.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+const pkg = JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf-8'));
 
 /**
  * Main function to start the MCP server
@@ -26,7 +29,7 @@ async function main(): Promise<void> {
 
     const server = new NgDiagramMCPServer({
       name: 'ng-diagram-docs',
-      version: '0.7.0',
+      version: pkg.version,
       docsPath,
       baseUrl: 'https://www.ngdiagram.dev',
       apiReportPath,
