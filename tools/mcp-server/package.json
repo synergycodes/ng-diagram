@@ -1,6 +1,6 @@
 {
   "name": "@ng-diagram/mcp-server",
-  "version": "0.1.0",
+  "version": "0.7.0",
   "description": "MCP server for ng-diagram documentation search",
   "type": "module",
   "main": "dist/index.js",
@@ -26,9 +26,8 @@
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
-    "fast-check": "^3.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.8.3",
-    "vitest": "latest"
+    "vitest": "^4.0.0"
   }
 }

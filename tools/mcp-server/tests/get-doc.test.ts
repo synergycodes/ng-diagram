@@ -71,6 +71,21 @@ describe('get_doc tool', () => {
       const input: GetDocInput = { path: '\t  \t  ' };
       await expect(handler(input)).rejects.toThrow('Path parameter cannot be empty');
     });
+
+    it('should reject path traversal with ../', async () => {
+      const input: GetDocInput = { path: '../../etc/passwd' };
+      await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
+    });
+
+    it('should reject path traversal with backslashes', async () => {
+      const input: GetDocInput = { path: '..\\..\\etc\\passwd' };
+      await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
+    });
+
+    it('should reject absolute paths', async () => {
+      const input: GetDocInput = { path: '/etc/passwd' };
+      await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
+    });
   });
 
   describe('successful retrieval', () => {

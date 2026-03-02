@@ -6,6 +6,7 @@ const IMPORT_PATH = 'ng-diagram';
 export class ApiReportIndexer {
   private apiReportPath: string;
   private symbols: ApiSymbol[] = [];
+  private symbolMap: Map<string, ApiSymbol> = new Map();
 
   constructor(apiReportPath: string) {
     this.apiReportPath = apiReportPath;
@@ -21,6 +22,7 @@ export class ApiReportIndexer {
         error instanceof Error ? error.message : error
       );
       this.symbols = [];
+      this.symbolMap = new Map();
       return [];
     }
 
@@ -28,10 +30,13 @@ export class ApiReportIndexer {
     if (!codeBlock) {
       console.warn('[ApiReportIndexer] No TypeScript code block found in API report');
       this.symbols = [];
+      this.symbolMap = new Map();
       return [];
     }
 
-    this.symbols = this.parseCodeBlock(codeBlock);
+    const { symbols, symbolMap } = this.parseCodeBlock(codeBlock);
+    this.symbols = symbols;
+    this.symbolMap = symbolMap;
     return this.symbols;
   }
 
@@ -40,7 +45,7 @@ export class ApiReportIndexer {
   }
 
   getSymbol(name: string): ApiSymbol | undefined {
-    return this.symbols.find((s) => s.name === name);
+    return this.symbolMap.get(name);
   }
 
   private extractCodeBlock(content: string): string | null {
@@ -48,7 +53,7 @@ export class ApiReportIndexer {
     return match ? match[1] : null;
   }
 
-  private parseCodeBlock(code: string): ApiSymbol[] {
+  private parseCodeBlock(code: string): { symbols: ApiSymbol[]; symbolMap: Map<string, ApiSymbol> } {
     const lines = code.split('\n');
     const symbols: ApiSymbol[] = [];
     const symbolMap = new Map<string, ApiSymbol>();
@@ -60,7 +65,7 @@ export class ApiReportIndexer {
       const line = lines[i];
 
       // Skip import lines
-      if (line.startsWith('import ') || line.startsWith('import *')) {
+      if (line.startsWith('import ')) {
         i++;
         continue;
       }
@@ -118,7 +123,7 @@ export class ApiReportIndexer {
         // Also check for non-exported type declarations (for re-export pattern like `type Node_2`)
         const nonExportedType = this.parseNonExportedDeclaration(line);
         if (nonExportedType) {
-          const { name, kind, endIndex } = this.collectDeclaration(lines, i, nonExportedType.isBraceDelimited);
+          const endIndex = this.collectDeclarationEnd(lines, i, nonExportedType.isBraceDelimited);
           const rawSignature = lines.slice(i, endIndex + 1).join('\n');
           const signature = this.cleanSignature(rawSignature);
           const symbol: ApiSymbol = {
@@ -142,7 +147,7 @@ export class ApiReportIndexer {
         continue;
       }
 
-      const { endIndex } = this.collectDeclaration(lines, i, declInfo.isBraceDelimited);
+      const endIndex = this.collectDeclarationEnd(lines, i, declInfo.isBraceDelimited);
       const rawSignature = lines.slice(i, endIndex + 1).join('\n');
       const signature = this.cleanSignature(rawSignature);
 
@@ -163,7 +168,7 @@ export class ApiReportIndexer {
       isDeprecated = false;
     }
 
-    return symbols;
+    return { symbols, symbolMap };
   }
 
   private parseDeclarationStart(
@@ -206,11 +211,7 @@ export class ApiReportIndexer {
     return null;
   }
 
-  private collectDeclaration(
-    lines: string[],
-    startIndex: number,
-    isBraceDelimited: boolean
-  ): { name: string; kind: string; endIndex: number } {
+  private collectDeclarationEnd(lines: string[], startIndex: number, isBraceDelimited: boolean): number {
     if (isBraceDelimited) {
       let braceDepth = 0;
       let foundOpen = false;
@@ -226,23 +227,23 @@ export class ApiReportIndexer {
           }
         }
         if (foundOpen && braceDepth === 0) {
-          return { name: '', kind: '', endIndex: j };
+          return j;
         }
       }
 
       // Fallback: unterminated block, return to end
-      return { name: '', kind: '', endIndex: lines.length - 1 };
+      return lines.length - 1;
     }
 
     // Single-line or multi-line ending with ;
     for (let j = startIndex; j < lines.length; j++) {
       if (lines[j].trimEnd().endsWith(';')) {
-        return { name: '', kind: '', endIndex: j };
+        return j;
       }
     }
 
     // Fallback
-    return { name: '', kind: '', endIndex: startIndex };
+    return startIndex;
   }
 
   private cleanSignature(raw: string): string {
@@ -259,7 +260,6 @@ export class ApiReportIndexer {
 
       // Remove Angular compiler artifact lines (static ɵ...)
       if (trimmed.match(/^(\/\/ \(undocumented\)\s*)?static ɵ/)) return false;
-      if (trimmed.match(/^static ɵ/)) return false;
 
       // Remove // (undocumented) comments
       if (trimmed === '// (undocumented)') return false;

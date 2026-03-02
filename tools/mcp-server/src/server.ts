@@ -20,6 +20,29 @@ import {
 } from './tools/search-symbols/index.js';
 import type { MCPServerConfig } from './types/index.js';
 
+async function callTool(handler: (args: unknown) => Promise<unknown>, args: unknown) {
+  try {
+    const result = await handler(args);
+    return {
+      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+    };
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            { error: error instanceof Error ? error.message : 'Unknown error occurred' },
+            null,
+            2
+          ),
+        },
+      ],
+      isError: true,
+    };
+  }
+}
+
 export class NgDiagramMCPServer {
   private config: MCPServerConfig;
   private server: Server;
@@ -28,6 +51,8 @@ export class NgDiagramMCPServer {
   private searchEngine: SearchEngine | null = null;
   private symbolSearch: SymbolSearchEngine | null = null;
   private isRunning = false;
+  private readonly onSigInt = () => this.shutdown();
+  private readonly onSigTerm = () => this.shutdown();
 
   constructor(config: MCPServerConfig) {
     this.config = config;
@@ -54,13 +79,8 @@ export class NgDiagramMCPServer {
       console.error('[MCP Server Error]:', error);
     };
 
-    process.on('SIGINT', () => {
-      this.shutdown();
-    });
-
-    process.on('SIGTERM', () => {
-      this.shutdown();
-    });
+    process.on('SIGINT', this.onSigInt);
+    process.on('SIGTERM', this.onSigTerm);
   }
 
   /**
@@ -113,151 +133,41 @@ export class NgDiagramMCPServer {
     const searchSymbolsHandler = this.symbolSearch ? createSearchSymbolsHandler(this.symbolSearch) : null;
     const getSymbolHandler = this.apiIndexer ? createGetSymbolHandler(this.apiIndexer) : null;
 
+    // Map tool names to their handlers
+    const toolHandlers = new Map<string, (args: unknown) => Promise<unknown>>();
+    toolHandlers.set('search_docs', (args) => searchHandler(args as SearchDocsInput));
+    toolHandlers.set('get_doc', (args) => getDocHandler(args as GetDocInput));
+    if (searchSymbolsHandler) {
+      toolHandlers.set('search_symbols', (args) => searchSymbolsHandler(args as SearchSymbolsInput));
+    }
+    if (getSymbolHandler) {
+      toolHandlers.set('get_symbol', (args) => getSymbolHandler(args as GetSymbolInput));
+    }
+
+    const toolDefinitions: object[] = [SEARCH_DOCS_TOOL, GET_DOC_TOOL];
+    if (searchSymbolsHandler) {
+      toolDefinitions.push(SEARCH_SYMBOLS_TOOL);
+    }
+    if (getSymbolHandler) {
+      toolDefinitions.push(GET_SYMBOL_TOOL);
+    }
+
     this.server.setRequestHandler(ListToolsRequestSchema, async (_request: ListToolsRequest) => {
-      const tools: object[] = [SEARCH_DOCS_TOOL, GET_DOC_TOOL];
-      if (searchSymbolsHandler) {
-        tools.push(SEARCH_SYMBOLS_TOOL);
-      }
-      if (getSymbolHandler) {
-        tools.push(GET_SYMBOL_TOOL);
-      }
-      return { tools };
+      return { tools: toolDefinitions };
     });
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
       const { name, arguments: args } = request.params;
 
-      if (name === 'search_docs') {
-        try {
-          const result = await searchHandler(args as unknown as SearchDocsInput);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(
-                  {
-                    error: error instanceof Error ? error.message : 'Unknown error occurred',
-                  },
-                  null,
-                  2
-                ),
-              },
-            ],
-            isError: true,
-          };
-        }
+      const handler = toolHandlers.get(name);
+      if (!handler) {
+        throw new Error(`Unknown tool: ${name}`);
       }
 
-      if (name === 'search_symbols' && searchSymbolsHandler) {
-        try {
-          const result = await searchSymbolsHandler(args as unknown as SearchSymbolsInput);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(
-                  {
-                    error: error instanceof Error ? error.message : 'Unknown error occurred',
-                  },
-                  null,
-                  2
-                ),
-              },
-            ],
-            isError: true,
-          };
-        }
-      }
-
-      if (name === 'get_symbol' && getSymbolHandler) {
-        try {
-          const result = await getSymbolHandler(args as unknown as GetSymbolInput);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(
-                  {
-                    error: error instanceof Error ? error.message : 'Unknown error occurred',
-                  },
-                  null,
-                  2
-                ),
-              },
-            ],
-            isError: true,
-          };
-        }
-      }
-
-      if (name === 'get_doc') {
-        try {
-          const result = await getDocHandler(args as unknown as GetDocInput);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(
-                  {
-                    error: error instanceof Error ? error.message : 'Unknown error occurred',
-                  },
-                  null,
-                  2
-                ),
-              },
-            ],
-            isError: true,
-          };
-        }
-      }
-
-      throw new Error(`Unknown tool: ${name}`);
+      return callTool(handler, args);
     });
 
-    const toolNames = ['search_docs', 'get_doc'];
-    if (searchSymbolsHandler) {
-      toolNames.push('search_symbols');
-    }
-    if (getSymbolHandler) {
-      toolNames.push('get_symbol');
-    }
-    console.log(`[MCP Server] Registered tools: ${toolNames.join(', ')}`);
+    console.log(`[MCP Server] Registered tools: ${[...toolHandlers.keys()].join(', ')}`);
   }
 
   private shutdown(): void {
@@ -267,6 +177,9 @@ export class NgDiagramMCPServer {
 
     console.log('[MCP Server] Shutting down...');
     this.isRunning = false;
+
+    process.removeListener('SIGINT', this.onSigInt);
+    process.removeListener('SIGTERM', this.onSigTerm);
 
     this.server.close();
 

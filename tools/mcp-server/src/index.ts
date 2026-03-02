@@ -26,7 +26,7 @@ async function main(): Promise<void> {
 
     const server = new NgDiagramMCPServer({
       name: 'ng-diagram-docs',
-      version: '0.1.0',
+      version: '0.7.0',
       docsPath,
       baseUrl: 'https://www.ngdiagram.dev',
       apiReportPath,
