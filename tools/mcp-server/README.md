@@ -2,7 +2,7 @@
 
 > **MCP server that enables AI assistants to search ng-diagram documentation and public API**
 
-An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that provides intelligent documentation search and API symbol lookup for the ng-diagram library. Connect it to AI assistants like Claude, Cursor, or any MCP-compatible tool to get instant access to ng-diagram documentation and API reference.
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that provides intelligent documentation search and API symbol lookup for the **ng-diagram** library. Connect it to AI assistants like Claude, Cursor, or any MCP-compatible tool to get instant access to ng-diagram documentation and API reference.
 
 ## What is This?
 
@@ -34,62 +34,56 @@ graph LR
 4. Server returns the complete documentation body or symbol signature
 5. AI uses the content to provide detailed, accurate answers
 
-## Current Usage (Internal)
+## Quick Start
 
-**Who can use it now:** ng-diagram maintainers and contributors
+Add the server to your MCP client config — no installation or monorepo checkout required:
 
-This server is currently configured to run locally for the ng-diagram development team. It indexes the documentation from the monorepo and the public API report, providing search capabilities during development.
-
-### Setup for Development
-
-1. **Install dependencies:**
-
-   ```bash
-   cd tools/mcp-server
-   pnpm install
-   ```
-
-2. **Build the server:**
-
-   ```bash
-   pnpm build
-   ```
-
-3. **Configure your MCP client** (e.g., Claude Desktop, Cursor, Kiro):
-
-   Add to your MCP configuration file:
-
-   ```json
-   {
-     "mcpServers": {
-       "ng-diagram-docs": {
-         "command": "node",
-         "args": ["/absolute/path/to/ng-diagram/tools/mcp-server/dist/index.js"],
-         "cwd": "/absolute/path/to/ng-diagram"
-       }
-     }
-   }
-   ```
-
-4. **Restart your AI assistant** to load the server
-
-5. **Test it:** Ask your AI assistant to search ng-diagram documentation!
-
-## Future Vision (Public Release)
-
-### For Library Consumers
-
-In the future, ng-diagram users will be able to install and use this MCP server without cloning the repository:
-
-```bash
-# Future: Install via npm
-npm install -g @ng-diagram/mcp-server
-
-# Or use with npx
-npx @ng-diagram/mcp-server
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "npx",
+      "args": ["-y", "@ng-diagram/mcp-server"]
+    }
+  }
+}
 ```
 
-Then configure it in your AI assistant to get instant documentation access while building your Angular diagrams.
+The package includes all documentation and API data bundled in. Restart your AI assistant after updating the config, then ask something like _"Search the ng-diagram docs for palette"_ to verify.
+
+### MCP client config file locations
+
+| Client         | Config file                           |
+| -------------- | ------------------------------------- |
+| Claude Code    | `.mcp.json` in project root           |
+| Claude Desktop | `claude_desktop_config.json`          |
+| Cursor         | `.cursor/mcp.json`                    |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json` |
+
+### Local development (monorepo)
+
+If you're working within the ng-diagram monorepo:
+
+```bash
+cd tools/mcp-server
+pnpm install
+pnpm build
+```
+
+Then configure with the local path:
+
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "node",
+      "args": ["/absolute/path/to/ng-diagram/tools/mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+When bundled data is present in `dist/data/`, it takes priority. Otherwise the server falls back to monorepo paths — so `pnpm dev` (which runs from `src/`) works without bundling.
 
 ## API Reference
 
@@ -198,22 +192,24 @@ tools/mcp-server/
 │   ├── types/                 # TypeScript definitions
 │   ├── server.ts              # MCP server
 │   └── index.ts               # Entry point
+├── scripts/
+│   └── bundle-data.js         # Copies docs + API report into dist/data/
 ├── tests/                     # Test files
-└── dist/                      # Build output
+└── dist/                      # Build output (includes bundled data/)
 ```
 
 ### Commands
 
 ```bash
 # Development
-pnpm dev              # Run with auto-reload
+pnpm dev              # Run with auto-reload (uses monorepo paths)
 
 # Testing
 pnpm test             # Run all tests
 pnpm test:watch       # Run in watch mode
 
 # Building
-pnpm build            # Compile TypeScript
+pnpm build            # Compile TypeScript + bundle docs & API report into dist/data/
 ```
 
 ### Architecture

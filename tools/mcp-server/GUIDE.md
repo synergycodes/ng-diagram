@@ -30,13 +30,34 @@ Currently powers **ng-diagram** — can be adapted to any library that uses the 
 
 This server connects your AI assistant (Claude, Cursor, Windsurf, or any MCP client) to your library's documentation. Instead of switching to a browser and searching docs manually, you ask your AI assistant directly:
 
-- *"How do I create custom nodes?"*
-- *"What's the signature of `DiagramComponent`?"*
-- *"Show me the palette guide"*
+- _"How do I create custom nodes?"_
+- _"What's the signature of `DiagramComponent`?"_
+- _"Show me the palette guide"_
 
 The AI searches the docs behind the scenes and answers with the actual documentation content.
 
 ### Setup
+
+#### Option A: npx (recommended)
+
+No installation needed — just add the server to your MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "npx",
+      "args": ["-y", "@ng-diagram/mcp-server"]
+    }
+  }
+}
+```
+
+This downloads and runs the latest version automatically. The package includes all documentation and API data — no monorepo checkout required.
+
+#### Option B: Local development (monorepo)
+
+If you're working within the ng-diagram monorepo:
 
 **1. Install and build:**
 
@@ -47,17 +68,6 @@ pnpm build
 ```
 
 **2. Configure your MCP client:**
-
-Add the server to your client's MCP configuration. The exact file depends on your client:
-
-| Client | Config file |
-|--------|-------------|
-| Claude Code | `.mcp.json` in project root |
-| Claude Desktop | `claude_desktop_config.json` |
-| Cursor | `.cursor/mcp.json` |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
-
-Configuration entry:
 
 ```json
 {
@@ -71,9 +81,16 @@ Configuration entry:
 }
 ```
 
-**3. Restart your AI assistant** to pick up the new server.
+#### MCP client config file locations
 
-**4. Verify** by asking: *"Search the ng-diagram docs for palette"*
+| Client         | Config file                           |
+| -------------- | ------------------------------------- |
+| Claude Code    | `.mcp.json` in project root           |
+| Claude Desktop | `claude_desktop_config.json`          |
+| Cursor         | `.cursor/mcp.json`                    |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json` |
+
+**Restart your AI assistant** after updating the config, then verify by asking: _"Search the ng-diagram docs for palette"_
 
 ### Available Tools
 
@@ -83,45 +100,47 @@ The server exposes four tools to the AI assistant:
 
 Searches documentation sections by keyword. Returns matching sections with titles, content, paths, and URLs.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `query` | string | yes | Search keywords (e.g., `"palette"`, `"custom edge"`) |
-| `limit` | number | no | Max results (default: 10, max: 100) |
+| Parameter | Type   | Required | Description                                          |
+| --------- | ------ | -------- | ---------------------------------------------------- |
+| `query`   | string | yes      | Search keywords (e.g., `"palette"`, `"custom edge"`) |
+| `limit`   | number | no       | Max results (default: 10, max: 100)                  |
 
 #### `get_doc`
 
 Retrieves the full content of a documentation page by its path (returned from `search_docs`).
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `path` | string | yes | Relative path from docs root (e.g., `"guides/palette.mdx"`) |
+| Parameter | Type   | Required | Description                                                 |
+| --------- | ------ | -------- | ----------------------------------------------------------- |
+| `path`    | string | yes      | Relative path from docs root (e.g., `"guides/palette.mdx"`) |
 
 #### `search_symbols`
 
 Searches public API symbols (classes, interfaces, functions, types, constants, enums).
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `query` | string | yes | Symbol name or partial name (e.g., `"Diagram"`, `"Edge"`) |
-| `kind` | string | no | Filter: `class`, `function`, `interface`, `type`, `const`, `enum` |
-| `limit` | number | no | Max results (default: 10, max: 100) |
+| Parameter | Type   | Required | Description                                                       |
+| --------- | ------ | -------- | ----------------------------------------------------------------- |
+| `query`   | string | yes      | Symbol name or partial name (e.g., `"Diagram"`, `"Edge"`)         |
+| `kind`    | string | no       | Filter: `class`, `function`, `interface`, `type`, `const`, `enum` |
+| `limit`   | number | no       | Max results (default: 10, max: 100)                               |
 
 #### `get_symbol`
 
 Retrieves full details for a specific API symbol by exact name (returned from `search_symbols`).
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `name` | string | yes | Exact, case-sensitive symbol name |
+| Parameter | Type   | Required | Description                       |
+| --------- | ------ | -------- | --------------------------------- |
+| `name`    | string | yes      | Exact, case-sensitive symbol name |
 
 ### Example Workflows
 
 **Discover → Read:**
+
 1. AI calls `search_docs("palette")` → gets matching sections with `path` values
 2. AI calls `get_doc("guides/palette.mdx")` → gets the full page content
 3. AI synthesizes the answer for you
 
 **API Lookup:**
+
 1. AI calls `search_symbols("Component", kind: "class")` → gets matching class names
 2. AI calls `get_symbol("NgDiagramComponent")` → gets full signature and import statement
 3. AI provides the exact type information you need
@@ -248,11 +267,11 @@ const apiReportPath = resolve(__dirname, '../path/to/your-lib.api.md');
 
 // 3. Update server config
 const server = new NgDiagramMCPServer({
-  name: 'your-lib-docs',          // Server name shown to MCP clients
+  name: 'your-lib-docs', // Server name shown to MCP clients
   version: pkg.version,
   docsPath,
-  baseUrl: 'https://your-docs-site.dev',  // Your documentation site URL
-  apiReportPath,                   // Remove this line if no API report
+  baseUrl: 'https://your-docs-site.dev', // Your documentation site URL
+  apiReportPath, // Remove this line if no API report
 });
 ```
 
@@ -286,6 +305,7 @@ These descriptions are what AI clients see when deciding which tool to call, so 
 Remove `apiReportPath` from the config in `index.ts`. The server automatically skips API symbol tools when no report path is configured — no other changes needed.
 
 If you want to remove the API code entirely, delete:
+
 - `src/services/api-indexer.ts`
 - `src/services/symbol-search.ts`
 - `src/tools/search-symbols/`
@@ -336,11 +356,13 @@ pnpm build   # Compile TypeScript
 Both search engines use [MiniSearch](https://lucaong.github.io/minisearch/), a lightweight in-memory full-text search library.
 
 **Documentation search:**
+
 - Fields indexed: `pageTitle`, `sectionTitle`, `content`, `description`
 - Boosting: section title (10x) > page title (5x) > description (2x) > content (1x)
 - Features: prefix matching, fuzzy matching (edit distance 0.2)
 
 **Symbol search:**
+
 - Fields indexed: `name`, `signature`
 - Boosting: name (10x) > signature (1x)
 - Post-search filtering by symbol `kind`
@@ -369,16 +391,16 @@ pnpm test           # Run all tests
 pnpm test:watch     # Watch mode
 ```
 
-| Test file | What it covers |
-|-----------|---------------|
-| `indexer.test.ts` | File scanning, frontmatter parsing, section splitting, URL generation |
-| `search.test.ts` | Full-text search, fuzzy matching, boosting, empty queries |
-| `api-indexer.test.ts` | API report parsing, re-exports, visibility tags, signature cleaning |
-| `search-symbols.test.ts` | Symbol search, kind filtering, empty queries |
-| `search-docs.test.ts` | search_docs handler, Zod validation, error handling |
-| `get-doc.test.ts` | get_doc handler, path validation, not-found errors |
-| `get-symbol.test.ts` | get_symbol handler, import statement generation |
-| `server.integration.test.ts` | Full pipeline: startup → indexing → tool registration → query |
+| Test file                    | What it covers                                                        |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `indexer.test.ts`            | File scanning, frontmatter parsing, section splitting, URL generation |
+| `search.test.ts`             | Full-text search, fuzzy matching, boosting, empty queries             |
+| `api-indexer.test.ts`        | API report parsing, re-exports, visibility tags, signature cleaning   |
+| `search-symbols.test.ts`     | Symbol search, kind filtering, empty queries                          |
+| `search-docs.test.ts`        | search_docs handler, Zod validation, error handling                   |
+| `get-doc.test.ts`            | get_doc handler, path validation, not-found errors                    |
+| `get-symbol.test.ts`         | get_symbol handler, import statement generation                       |
+| `server.integration.test.ts` | Full pipeline: startup → indexing → tool registration → query         |
 
 Tests create ephemeral fixture files in `beforeEach` and clean up in `afterEach` — no stale fixtures to maintain.
 
@@ -388,13 +410,13 @@ When adapting, update the integration test paths and fixture content to match yo
 
 ## Quick Reference — What to Change
 
-| What | File | Change |
-|------|------|--------|
-| Docs path | `src/index.ts` | Point `docsPath` to your docs directory |
-| API report path | `src/index.ts` | Point `apiReportPath` to your `.api.md` or remove it |
-| Base URL | `src/index.ts` | Set `baseUrl` to your documentation site URL |
-| Server name | `src/index.ts` | Change `name` to your library name |
-| Tool descriptions | `src/tools/*/tool.config.ts` | Reference your library name and typical queries |
-| Package name | `package.json` | Change `name` to `@your-lib/mcp-server` |
-| MCP config | `.mcp.json` | Update server name and path |
+| What                  | File                          | Change                                                                 |
+| --------------------- | ----------------------------- | ---------------------------------------------------------------------- |
+| Docs path             | `src/index.ts`                | Point `docsPath` to your docs directory                                |
+| API report path       | `src/index.ts`                | Point `apiReportPath` to your `.api.md` or remove it                   |
+| Base URL              | `src/index.ts`                | Set `baseUrl` to your documentation site URL                           |
+| Server name           | `src/index.ts`                | Change `name` to your library name                                     |
+| Tool descriptions     | `src/tools/*/tool.config.ts`  | Reference your library name and typical queries                        |
+| Package name          | `package.json`                | Change `name` to `@your-lib/mcp-server`                                |
+| MCP config            | `.mcp.json`                   | Update server name and path                                            |
 | Import path (symbols) | `src/services/api-indexer.ts` | Change `IMPORT_PATH` constant from `'ng-diagram'` to your package name |

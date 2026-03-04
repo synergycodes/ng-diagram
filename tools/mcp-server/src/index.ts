@@ -5,7 +5,7 @@
  * Initializes and starts the MCP server with documentation search capabilities
  */
 
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { NgDiagramMCPServer } from './server.js';
@@ -20,12 +20,17 @@ const pkg = JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf-
  */
 async function main(): Promise<void> {
   try {
-    // Resolve documentation path relative to the repository root
-    // From tools/mcp-server/src -> ../../../apps/docs/src/content/docs
-    const docsPath = resolve(__dirname, '../../../apps/docs/src/content/docs');
+    // Bundled data (npm package) takes priority over monorepo paths (local dev)
+    const bundledDocsPath = resolve(__dirname, 'data/docs');
+    const bundledApiReportPath = resolve(__dirname, 'data/ng-diagram.api.md');
 
-    // Resolve API report path relative to the repository root
-    const apiReportPath = resolve(__dirname, '../../../packages/ng-diagram/api-report/ng-diagram.api.md');
+    const docsPath = existsSync(bundledDocsPath)
+      ? bundledDocsPath
+      : resolve(__dirname, '../../../apps/docs/src/content/docs');
+
+    const apiReportPath = existsSync(bundledApiReportPath)
+      ? bundledApiReportPath
+      : resolve(__dirname, '../../../packages/ng-diagram/api-report/ng-diagram.api.md');
 
     const server = new NgDiagramMCPServer({
       name: 'ng-diagram-docs',
