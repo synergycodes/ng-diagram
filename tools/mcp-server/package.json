@@ -16,7 +16,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "prebuild": "node -e \"import('fs').then(f=>f.rmSync('dist',{recursive:true,force:true}))\"",
+    "prebuild": "node scripts/clean.js",
     "build": "tsc && node scripts/bundle-data.js",
     "test": "vitest --run",
     "test:watch": "vitest"
