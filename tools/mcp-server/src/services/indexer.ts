@@ -17,7 +17,7 @@ import type { DocumentPage, DocumentSection, IndexerConfig } from '../types/inde
  */
 export class DocumentationIndexer {
   private config: IndexerConfig;
-  private pages: Map<string, DocumentPage> = new Map();
+  private pages = new Map<string, DocumentPage>();
 
   /** @param config Indexer configuration (docs path, file extensions, base URL) */
   constructor(config: IndexerConfig) {

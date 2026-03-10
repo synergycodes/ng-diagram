@@ -4,7 +4,6 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   type CallToolRequest,
-  type ListToolsRequest,
 } from '@modelcontextprotocol/sdk/types.js';
 import { ApiReportIndexer } from './services/api-indexer.js';
 import { DocumentationIndexer } from './services/indexer.js';
@@ -186,7 +185,7 @@ export class NgDiagramMCPServer {
       toolDefinitions.push(GET_SYMBOL_TOOL);
     }
 
-    this.server.setRequestHandler(ListToolsRequestSchema, async (_request: ListToolsRequest) => {
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return { tools: toolDefinitions };
     });
 

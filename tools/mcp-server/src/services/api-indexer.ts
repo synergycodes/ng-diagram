@@ -14,7 +14,7 @@ const IMPORT_PATH = 'ng-diagram';
 export class ApiReportIndexer {
   private apiReportPath: string;
   private symbols: ApiSymbol[] = [];
-  private symbolMap: Map<string, ApiSymbol> = new Map();
+  private symbolMap = new Map<string, ApiSymbol>();
 
   /** @param apiReportPath Absolute path to the .api.md report file */
   constructor(apiReportPath: string) {

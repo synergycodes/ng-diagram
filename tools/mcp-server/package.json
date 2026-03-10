@@ -18,6 +18,8 @@
     "dev": "tsx src/index.ts",
     "prebuild": "node scripts/clean.js",
     "build": "tsc && node scripts/bundle-data.js",
+    "lint:check": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "vitest --run",
     "test:watch": "vitest"
   },
@@ -36,9 +38,14 @@
     "zod": "^3.25"
   },
   "devDependencies": {
+    "@eslint/js": "^9.25.1",
     "@types/node": "^18.0.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
     "tsx": "^4.0.0",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.57.0",
     "vitest": "^4.0.0"
   }
 }

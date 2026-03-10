@@ -70,6 +70,15 @@ jobs:
         with:
           run_install: true
 
+      - name: Run lint
+        run: pnpm run lint:check --filter=@ng-diagram/mcp
+
+      - name: Run format check
+        run: pnpm run format:check
+
+      - name: Run tests
+        run: pnpm run test --filter=@ng-diagram/mcp
+
       - name: Sync version from tag
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
