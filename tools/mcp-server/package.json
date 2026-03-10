@@ -1,5 +1,5 @@
 {
-  "name": "@ng-diagram/mcp-server",
+  "name": "@ng-diagram/mcp",
   "version": "0.7.0",
   "description": "MCP server for ng-diagram documentation search",
   "type": "module",

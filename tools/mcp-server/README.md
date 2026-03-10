@@ -9,9 +9,8 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that p
 This server allows AI assistants to search through ng-diagram's documentation and public API symbols. Instead of manually browsing docs, you can ask your AI assistant questions like:
 
 - "How do I create custom nodes in ng-diagram?"
-- "Show me examples of node rotation"
 - "What's the signature of the `DiagramComponent` class?"
-- "Which interfaces does ng-diagram export?"
+- "What config options does ng-diagram support?"
 
 The AI will search the documentation and API reference, then provide you with relevant answers.
 
@@ -43,7 +42,7 @@ Add the server to your MCP client config — no installation or monorepo checkou
   "mcpServers": {
     "ng-diagram-docs": {
       "command": "npx",
-      "args": ["-y", "@ng-diagram/mcp-server"]
+      "args": ["-y", "@ng-diagram/mcp"]
     }
   }
 }
@@ -53,12 +52,12 @@ The package includes all documentation and API data bundled in. Restart your AI 
 
 ### MCP client config file locations
 
-| Client         | Config file                           |
-| -------------- | ------------------------------------- |
-| Claude Code    | `.mcp.json` in project root           |
-| Claude Desktop | `claude_desktop_config.json`          |
-| Cursor         | `.cursor/mcp.json`                    |
-| Windsurf       | `~/.codeium/windsurf/mcp_config.json` |
+| Client | Config file |
+| --- | --- |
+| Claude Code | `.mcp.json` in project root |
+| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) |
+| Cursor | `.cursor/mcp.json` in project root |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
 
 ### Local development (monorepo)
 
@@ -236,15 +235,6 @@ graph TD
 - **API Report Indexer**: Parses API Extractor `.api.md` report, extracts symbol signatures
 - **Search Engines**: MiniSearch-powered full-text search for both docs and API symbols
 - **Tool Handlers**: Validate input, format output per tool schema
-
-## Contributing
-
-This is part of the ng-diagram monorepo. Contributions are welcome!
-
-1. Make changes in `tools/mcp-server/`
-2. Run tests: `pnpm test`
-3. Build: `pnpm build`
-4. Test with your AI assistant
 
 ## License
 

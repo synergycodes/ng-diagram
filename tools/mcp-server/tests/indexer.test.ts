@@ -156,6 +156,23 @@ description: [invalid yaml: {
       expect(sections[0].url).toBe('https://www.ngdiagram.dev/docs/guides');
     });
 
+    it('should lowercase URL path for mixed-case file paths', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.md'],
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const nestedDir = join(testDir, 'api', 'Components');
+      await mkdir(nestedDir, { recursive: true });
+      await writeFile(join(nestedDir, 'DiagramComponent.md'), '# DiagramComponent', 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections[0].url).toBe('https://www.ngdiagram.dev/docs/api/components/diagramcomponent');
+    });
+
     it('should handle .mdx extension correctly', async () => {
       const config: IndexerConfig = {
         docsPath: testDir,
@@ -226,6 +243,25 @@ description: [invalid yaml: {
       expect(sections).toHaveLength(2);
       const paths = sections.map((s) => s.path).sort();
       expect(paths).toEqual(['doc1.md', 'doc2.mdx']);
+    });
+
+    it('should skip files starting with underscore', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.md', '.mdx'],
+      };
+      indexer = new DocumentationIndexer(config);
+
+      await writeFile(join(testDir, '_meta.yml'), 'order: 1', 'utf-8');
+      await writeFile(join(testDir, '_readme.md'), '# Readme', 'utf-8');
+      await writeFile(join(testDir, '_overview.mdx'), '# Overview', 'utf-8');
+      await writeFile(join(testDir, 'visible.md'), '# Visible', 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections).toHaveLength(1);
+      expect(sections[0].path).toBe('visible.md');
     });
 
     it('should not index files with other extensions', async () => {

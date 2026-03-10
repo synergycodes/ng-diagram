@@ -2,8 +2,6 @@
 
 An MCP (Model Context Protocol) server that gives AI assistants instant access to your library's documentation and public API. Built for [Astro Starlight](https://starlight.astro.build/) docs and [API Extractor](https://api-extractor.com/) reports.
 
-Currently powers **ng-diagram** — can be adapted to any library that uses the same docs stack.
-
 ---
 
 ## Table of Contents
@@ -47,7 +45,7 @@ No installation needed — just add the server to your MCP client config:
   "mcpServers": {
     "ng-diagram-docs": {
       "command": "npx",
-      "args": ["-y", "@ng-diagram/mcp-server"]
+      "args": ["-y", "@ng-diagram/mcp"]
     }
   }
 }
@@ -149,25 +147,13 @@ Retrieves full details for a specific API symbol by exact name (returned from `s
 
 ## For Developers — Adapting to Your Library
 
-This server is designed to be reusable. If your library uses **Astro Starlight** for docs (or any markdown-based docs with YAML frontmatter) and optionally **API Extractor** for API reports, you can adapt this server with minimal changes.
+If your library uses **Astro Starlight** for docs (or any markdown-based docs with YAML frontmatter) and optionally **API Extractor** for API reports, you can adapt this server with minimal changes.
 
 ### Prerequisites
 
-Your documentation must follow this structure:
+The indexer recursively scans any directory for `.md`/`.mdx` files — no specific folder structure is required. Organize your docs however you like.
 
-```
-your-docs-directory/
-├── index.mdx              # Each file has YAML frontmatter
-├── guides/
-│   ├── getting-started.mdx
-│   └── advanced.mdx
-├── api/
-│   └── ...
-└── examples/
-    └── ...
-```
-
-Each file should have YAML frontmatter:
+Files optionally have YAML frontmatter for `title` and `description`. If frontmatter is missing, the filename is used as the title (e.g. `getting-started.mdx` → "Getting Started").
 
 ```yaml
 ---
@@ -186,7 +172,7 @@ Content under first heading...
 Content under second heading...
 ```
 
-The indexer splits pages on `##` headings to create searchable sections. `###` and deeper headings stay within their parent section.
+The indexer splits pages on `##` headings to create searchable sections. `###` and deeper headings stay within their parent section. Files starting with `_` (e.g. `_meta.yml`) are skipped.
 
 For API symbol search, you need an [API Extractor](https://api-extractor.com/) report (`.api.md` file). This is optional — the server works without it, just without the `search_symbols` and `get_symbol` tools.
 
@@ -365,9 +351,10 @@ Both search engines use [MiniSearch](https://lucaong.github.io/minisearch/), a l
 
 - Fields indexed: `name`, `signature`
 - Boosting: name (10x) > signature (1x)
+- Custom tokenizer splits camelCase/PascalCase boundaries so that searching "Component" matches "DiagramComponent". The full original token is kept alongside the parts so exact matches still rank highest.
 - Post-search filtering by symbol `kind`
 
-Both engines handle empty/whitespace queries gracefully (return empty results).
+Both engines handle empty/whitespace queries gracefully (return empty results). All string inputs are trimmed before processing.
 
 ### Security Model
 
@@ -384,23 +371,10 @@ The server is **read-only** and designed to be safe:
 
 ### Testing
 
-The test suite covers 222 tests across 8 files:
-
 ```bash
 pnpm test           # Run all tests
 pnpm test:watch     # Watch mode
 ```
-
-| Test file                    | What it covers                                                        |
-| ---------------------------- | --------------------------------------------------------------------- |
-| `indexer.test.ts`            | File scanning, frontmatter parsing, section splitting, URL generation |
-| `search.test.ts`             | Full-text search, fuzzy matching, boosting, empty queries             |
-| `api-indexer.test.ts`        | API report parsing, re-exports, visibility tags, signature cleaning   |
-| `search-symbols.test.ts`     | Symbol search, kind filtering, empty queries                          |
-| `search-docs.test.ts`        | search_docs handler, Zod validation, error handling                   |
-| `get-doc.test.ts`            | get_doc handler, path validation, not-found errors                    |
-| `get-symbol.test.ts`         | get_symbol handler, import statement generation                       |
-| `server.integration.test.ts` | Full pipeline: startup → indexing → tool registration → query         |
 
 Tests create ephemeral fixture files in `beforeEach` and clean up in `afterEach` — no stale fixtures to maintain.
 

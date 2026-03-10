@@ -89,6 +89,10 @@ export class DocumentationIndexer {
           const subFiles = await this.scanDirectory(fullPath);
           files.push(...subFiles);
         } else if (entry.isFile()) {
+          // Skip files starting with underscore (e.g. _meta.yml, _readme.md)
+          if (entry.name.startsWith('_')) {
+            continue;
+          }
           const ext = extname(entry.name);
           if (this.config.extensions.includes(ext)) {
             files.push(fullPath);
@@ -268,6 +272,9 @@ export class DocumentationIndexer {
     if (urlPath.endsWith('/index') || urlPath === 'index') {
       urlPath = urlPath.replace(/\/index$/, '').replace(/^index$/, '');
     }
+
+    // Lowercase the URL path for consistent routing
+    urlPath = urlPath.toLowerCase();
 
     // Build full URL with base URL
     const path = urlPath ? `/docs/${urlPath}` : '/docs';

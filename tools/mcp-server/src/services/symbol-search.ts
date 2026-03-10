@@ -2,11 +2,41 @@ import MiniSearch from 'minisearch';
 import type { ApiSymbol, SearchSymbolResult } from '../types/index.js';
 
 /**
+ * Tokenize a string by splitting on non-alphanumeric boundaries and
+ * camelCase/PascalCase boundaries. The full original token is kept so
+ * that exact matches still rank highest.
+ *
+ * @example tokenize("DiagramComponent") → ["DiagramComponent", "Diagram", "Component"]
+ * @example tokenize("DEFAULT_CONFIG")   → ["DEFAULT", "CONFIG"]
+ * @example tokenize("ngDiagramMath")    → ["ngDiagramMath", "ng", "Diagram", "Math"]
+ */
+export function tokenize(text: string): string[] {
+  // Split on non-alphanumeric characters (default MiniSearch behavior)
+  const baseTokens = text.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+
+  const allTokens: string[] = [];
+  for (const token of baseTokens) {
+    // Split camelCase/PascalCase: "DiagramComponent" → ["Diagram", "Component"]
+    const parts = token.split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/).filter(Boolean);
+
+    allTokens.push(token);
+    if (parts.length > 1) {
+      allTokens.push(...parts);
+    }
+  }
+
+  return allTokens;
+}
+
+/**
  * Full-text search engine for API symbols, backed by MiniSearch.
  *
  * Indexes the symbol `name` and `signature` fields with prefix and fuzzy
  * matching (edit distance 0.2). Name matches are boosted 10x over signature
  * matches so that exact or partial name queries rank highest.
+ *
+ * Uses a custom tokenizer that splits camelCase/PascalCase boundaries so
+ * that searching "Component" matches "DiagramComponent".
  *
  * Results can optionally be filtered by symbol kind (class, function, etc.)
  * after the search. The index is immutable after construction.
@@ -23,10 +53,12 @@ export class SymbolSearchEngine {
     this.index = new MiniSearch({
       fields: ['name', 'signature'],
       storeFields: ['name', 'kind', 'signature', 'importPath'],
+      tokenize,
       searchOptions: {
         prefix: true,
         fuzzy: 0.2,
         boost: { name: 10, signature: 1 },
+        tokenize,
       },
     });
 

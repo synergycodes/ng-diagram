@@ -8,7 +8,7 @@ const IMPORT_PATH = 'ng-diagram';
  *
  * Reads the ```ts code block from an API report, identifies exported declarations
  * (interfaces, classes, functions, types, consts, enums), and builds a lookup index.
- * Handles visibility tags (@public, @internal, @deprecated), re-export aliases
+ * Handles visibility tags (@public, @internal, deprecated), re-export aliases
  * (`export { X as Y }`), and cleans Angular compiler artifacts from signatures.
  */
 export class ApiReportIndexer {

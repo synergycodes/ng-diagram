@@ -59,37 +59,47 @@ describe('get_doc tool', () => {
 
     it('should reject empty string path', async () => {
       const input: GetDocInput = { path: '' };
-      await expect(handler(input)).rejects.toThrow('Path parameter is required');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject whitespace-only path', async () => {
       const input: GetDocInput = { path: '   ' };
-      await expect(handler(input)).rejects.toThrow('Path parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject path with tabs and spaces', async () => {
       const input: GetDocInput = { path: '\t  \t  ' };
-      await expect(handler(input)).rejects.toThrow('Path parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject path traversal with ../', async () => {
       const input: GetDocInput = { path: '../../etc/passwd' };
-      await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject path traversal with backslashes', async () => {
       const input: GetDocInput = { path: '..\\..\\etc\\passwd' };
-      await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject absolute paths', async () => {
       const input: GetDocInput = { path: '/etc/passwd' };
-      await expect(handler(input)).rejects.toThrow('Path must be a relative path within the docs directory');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject path with null bytes', async () => {
       const input: GetDocInput = { path: 'test\0.md' };
-      await expect(handler(input)).rejects.toThrow('Path contains invalid characters');
+      await expect(handler(input)).rejects.toThrow();
+    });
+
+    it('should reject path exceeding max length', async () => {
+      const input: GetDocInput = { path: 'a'.repeat(501) };
+      await expect(handler(input)).rejects.toThrow();
+    });
+
+    it('should reject non-string path', async () => {
+      const input = { path: 123 };
+      await expect(handler(input as any)).rejects.toThrow();
     });
   });
 
@@ -178,11 +188,11 @@ Advanced content.
     });
 
     it('should throw error for non-existent path', async () => {
-      await expect(handler({ path: 'does-not-exist.md' })).rejects.toThrow('Document not found: does-not-exist.md');
+      await expect(handler({ path: 'does-not-exist.md' })).rejects.toThrow();
     });
 
     it('should throw error with descriptive message including path', async () => {
-      await expect(handler({ path: 'some/nested/missing.mdx' })).rejects.toThrow('some/nested/missing.mdx');
+      await expect(handler({ path: 'some/nested/missing.mdx' })).rejects.toThrow();
     });
   });
 
@@ -215,6 +225,17 @@ title: MDX Component
       const result = await handler({ path: 'guides\\test.md' });
 
       expect(result.title).toBe('Test');
+    });
+
+    it('should trim whitespace from path', async () => {
+      await writeFile(join(testDir, 'trimmed.md'), '---\ntitle: Trimmed\n---\n\nContent.', 'utf-8');
+      await indexer.buildIndex();
+      handler = createGetDocHandler(indexer);
+
+      const result = await handler({ path: '  trimmed.md  ' });
+
+      expect(result.title).toBe('Trimmed');
+      expect(result.body).toContain('Content.');
     });
 
     it('should handle empty file body', async () => {

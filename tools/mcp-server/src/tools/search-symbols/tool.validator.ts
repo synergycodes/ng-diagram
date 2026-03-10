@@ -7,7 +7,8 @@ export const SearchSymbolsInputSchema = z.object({
     .string({ required_error: 'Query parameter is required' })
     .min(1, 'Query parameter is required')
     .max(1000, 'Query parameter is too long (max 1000 characters)')
-    .refine((v) => v.trim().length > 0, 'Query parameter cannot be empty'),
+    .refine((v) => v.trim().length > 0, 'Query parameter cannot be empty')
+    .transform((v) => v.trim()),
   kind: z
     .enum(VALID_KINDS, { message: `Invalid kind parameter. Must be one of: ${VALID_KINDS.join(', ')}` })
     .optional(),

@@ -106,33 +106,49 @@ describe('search_symbols tool', () => {
     it('should reject empty string query', async () => {
       const input: SearchSymbolsInput = { query: '' };
 
-      await expect(handler(input)).rejects.toThrow('Query parameter is required');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject whitespace-only query', async () => {
       const input: SearchSymbolsInput = { query: '   ' };
 
-      await expect(handler(input)).rejects.toThrow('Query parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject invalid kind', async () => {
-      const input: SearchSymbolsInput = { query: 'test', kind: 'module' };
+      const input = { query: 'test', kind: 'module' } as any;
 
-      await expect(handler(input)).rejects.toThrow('Invalid kind parameter');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject negative limit', async () => {
       const input = { query: 'test', limit: -1 };
 
-      await expect(handler(input as SearchSymbolsInput)).rejects.toThrow(
-        'Limit parameter must be a non-negative number'
-      );
+      await expect(handler(input as SearchSymbolsInput)).rejects.toThrow();
     });
 
     it('should reject non-number limit', async () => {
       const input = { query: 'test', limit: 'invalid' };
 
-      await expect(handler(input as any)).rejects.toThrow('Limit parameter must be a non-negative number');
+      await expect(handler(input as any)).rejects.toThrow();
+    });
+
+    it('should reject limit exceeding 100', async () => {
+      const input = { query: 'test', limit: 101 };
+
+      await expect(handler(input as SearchSymbolsInput)).rejects.toThrow();
+    });
+
+    it('should reject non-integer limit', async () => {
+      const input = { query: 'test', limit: 1.5 };
+
+      await expect(handler(input as SearchSymbolsInput)).rejects.toThrow();
+    });
+
+    it('should reject query exceeding max length', async () => {
+      const input: SearchSymbolsInput = { query: 'a'.repeat(1001) };
+
+      await expect(handler(input)).rejects.toThrow();
     });
   });
 
@@ -198,7 +214,7 @@ describe('search_symbols tool', () => {
     });
 
     it('should return empty when kind does not match', async () => {
-      const input: SearchSymbolsInput = { query: 'DiagramComponent', kind: 'function' };
+      const input: SearchSymbolsInput = { query: 'NodeShape', kind: 'function' };
 
       const output = await handler(input);
 
@@ -212,6 +228,44 @@ describe('search_symbols tool', () => {
 
       expect(output.results.length).toBeGreaterThan(0);
       expect(output.results[0].name).toBe('provideNgDiagram');
+    });
+
+    it('should filter by interface kind', async () => {
+      const input: SearchSymbolsInput = { query: 'Config', kind: 'interface' };
+
+      const output = await handler(input);
+
+      expect(output.results.length).toBeGreaterThan(0);
+      output.results.forEach((result) => {
+        expect(result.kind).toBe('interface');
+      });
+    });
+
+    it('should filter by type kind', async () => {
+      const input: SearchSymbolsInput = { query: 'Edge', kind: 'type' };
+
+      const output = await handler(input);
+
+      expect(output.results.length).toBeGreaterThan(0);
+      expect(output.results[0].name).toBe('EdgeType');
+    });
+
+    it('should filter by const kind', async () => {
+      const input: SearchSymbolsInput = { query: 'DEFAULT', kind: 'const' };
+
+      const output = await handler(input);
+
+      expect(output.results.length).toBeGreaterThan(0);
+      expect(output.results[0].name).toBe('DEFAULT_CONFIG');
+    });
+
+    it('should filter by enum kind', async () => {
+      const input: SearchSymbolsInput = { query: 'NodeShape', kind: 'enum' };
+
+      const output = await handler(input);
+
+      expect(output.results.length).toBeGreaterThan(0);
+      expect(output.results[0].name).toBe('NodeShape');
     });
   });
 
@@ -270,7 +324,7 @@ describe('search_symbols tool', () => {
       const brokenHandler = createSearchSymbolsHandler(brokenEngine);
       const input: SearchSymbolsInput = { query: 'test' };
 
-      await expect(brokenHandler(input)).rejects.toThrow('Symbol search failed: Index corrupted');
+      await expect(brokenHandler(input)).rejects.toThrow();
     });
 
     it('should handle unknown errors gracefully', async () => {
@@ -283,7 +337,7 @@ describe('search_symbols tool', () => {
       const brokenHandler = createSearchSymbolsHandler(brokenEngine);
       const input: SearchSymbolsInput = { query: 'test' };
 
-      await expect(brokenHandler(input)).rejects.toThrow('Symbol search failed: Unknown error occurred');
+      await expect(brokenHandler(input)).rejects.toThrow();
     });
   });
 

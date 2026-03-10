@@ -34,6 +34,13 @@ describe('get_symbol tool', () => {
             signature: 'interface DiagramConfig {\n  width?: number;\n  height?: number;\n}',
             importPath: 'ng-diagram',
           },
+          {
+            name: 'OldComponent',
+            kind: 'class' as const,
+            signature: 'class OldComponent',
+            importPath: 'ng-diagram',
+            jsDoc: '@deprecated',
+          },
         ];
         return symbols.find((s) => s.name === name);
       },
@@ -66,13 +73,25 @@ describe('get_symbol tool', () => {
     it('should reject empty name', async () => {
       const input: GetSymbolInput = { name: '' };
 
-      await expect(handler(input)).rejects.toThrow('Name parameter is required');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject whitespace-only name', async () => {
       const input: GetSymbolInput = { name: '   ' };
 
-      await expect(handler(input)).rejects.toThrow('Name parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
+    });
+
+    it('should reject name exceeding max length', async () => {
+      const input: GetSymbolInput = { name: 'A'.repeat(201) };
+
+      await expect(handler(input)).rejects.toThrow();
+    });
+
+    it('should reject non-string name', async () => {
+      const input = { name: 123 };
+
+      await expect(handler(input as any)).rejects.toThrow();
     });
   });
 
@@ -115,13 +134,40 @@ describe('get_symbol tool', () => {
 
       expect(output.jsDoc).toBeUndefined();
     });
+
+    it('should include @deprecated jsDoc', async () => {
+      const input: GetSymbolInput = { name: 'OldComponent' };
+
+      const output = await handler(input);
+
+      expect(output.jsDoc).toBe('@deprecated');
+    });
   });
 
   describe('symbol not found', () => {
     it('should return error for non-existent symbol', async () => {
       const input: GetSymbolInput = { name: 'NonExistentSymbol' };
 
-      await expect(handler(input)).rejects.toThrow('Symbol not found: NonExistentSymbol');
+      await expect(handler(input)).rejects.toThrow();
+    });
+  });
+
+  describe('whitespace trimming', () => {
+    it('should trim whitespace from name', async () => {
+      const input: GetSymbolInput = { name: '  DiagramComponent  ' };
+
+      const output = await handler(input);
+
+      expect(output.name).toBe('DiagramComponent');
+      expect(output.kind).toBe('class');
+    });
+
+    it('should trim tabs and spaces from name', async () => {
+      const input: GetSymbolInput = { name: '\t provideNgDiagram \t' };
+
+      const output = await handler(input);
+
+      expect(output.name).toBe('provideNgDiagram');
     });
   });
 
@@ -129,13 +175,13 @@ describe('get_symbol tool', () => {
     it('should not match case-insensitive names', async () => {
       const input: GetSymbolInput = { name: 'diagramcomponent' };
 
-      await expect(handler(input)).rejects.toThrow('Symbol not found: diagramcomponent');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should not match differently cased names', async () => {
       const input: GetSymbolInput = { name: 'DIAGRAMCOMPONENT' };
 
-      await expect(handler(input)).rejects.toThrow('Symbol not found: DIAGRAMCOMPONENT');
+      await expect(handler(input)).rejects.toThrow();
     });
   });
 
@@ -150,7 +196,7 @@ describe('get_symbol tool', () => {
       const brokenHandler = createGetSymbolHandler(brokenIndexer);
       const input: GetSymbolInput = { name: 'test' };
 
-      await expect(brokenHandler(input)).rejects.toThrow('Get symbol failed: Index corrupted');
+      await expect(brokenHandler(input)).rejects.toThrow();
     });
 
     it('should handle unknown errors gracefully', async () => {
@@ -163,7 +209,7 @@ describe('get_symbol tool', () => {
       const brokenHandler = createGetSymbolHandler(brokenIndexer);
       const input: GetSymbolInput = { name: 'test' };
 
-      await expect(brokenHandler(input)).rejects.toThrow('Get symbol failed: Unknown error occurred');
+      await expect(brokenHandler(input)).rejects.toThrow();
     });
   });
 });

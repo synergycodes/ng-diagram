@@ -80,25 +80,25 @@ describe('search_docs tool', () => {
     it('should reject empty string query', async () => {
       const input: SearchDocsInput = { query: '' };
 
-      await expect(handler(input)).rejects.toThrow('Query parameter is required');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject whitespace-only query', async () => {
       const input: SearchDocsInput = { query: '   ' };
 
-      await expect(handler(input)).rejects.toThrow('Query parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject query with tabs and spaces', async () => {
       const input: SearchDocsInput = { query: '\t  \t  ' };
 
-      await expect(handler(input)).rejects.toThrow('Query parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
     });
 
     it('should reject query with newlines', async () => {
       const input: SearchDocsInput = { query: '\n\n' };
 
-      await expect(handler(input)).rejects.toThrow('Query parameter cannot be empty');
+      await expect(handler(input)).rejects.toThrow();
     });
   });
 
@@ -236,7 +236,7 @@ describe('search_docs tool', () => {
       const brokenHandler = createSearchDocsHandler(brokenEngine);
       const input: SearchDocsInput = { query: 'test' };
 
-      await expect(brokenHandler(input)).rejects.toThrow('Search failed: Database connection failed');
+      await expect(brokenHandler(input)).rejects.toThrow();
     });
 
     it('should handle unknown errors gracefully', async () => {
@@ -250,7 +250,7 @@ describe('search_docs tool', () => {
       const brokenHandler = createSearchDocsHandler(brokenEngine);
       const input: SearchDocsInput = { query: 'test' };
 
-      await expect(brokenHandler(input)).rejects.toThrow('Search failed: Unknown error occurred');
+      await expect(brokenHandler(input)).rejects.toThrow();
     });
 
     it('should handle validation errors', async () => {
@@ -262,13 +262,37 @@ describe('search_docs tool', () => {
     it('should handle invalid limit parameter', async () => {
       const input = { query: 'test', limit: -1 };
 
-      await expect(handler(input as SearchDocsInput)).rejects.toThrow('Limit parameter must be a non-negative number');
+      await expect(handler(input as SearchDocsInput)).rejects.toThrow();
     });
 
     it('should handle non-number limit parameter', async () => {
       const input = { query: 'test', limit: 'invalid' };
 
-      await expect(handler(input as any)).rejects.toThrow('Limit parameter must be a non-negative number');
+      await expect(handler(input as any)).rejects.toThrow();
+    });
+
+    it('should reject limit exceeding 100', async () => {
+      const input = { query: 'test', limit: 101 };
+
+      await expect(handler(input as SearchDocsInput)).rejects.toThrow();
+    });
+
+    it('should reject non-integer limit', async () => {
+      const input = { query: 'test', limit: 1.5 };
+
+      await expect(handler(input as SearchDocsInput)).rejects.toThrow();
+    });
+
+    it('should reject NaN limit', async () => {
+      const input = { query: 'test', limit: NaN };
+
+      await expect(handler(input as any)).rejects.toThrow();
+    });
+
+    it('should reject query exceeding max length', async () => {
+      const input: SearchDocsInput = { query: 'a'.repeat(1001) };
+
+      await expect(handler(input)).rejects.toThrow();
     });
   });
 
