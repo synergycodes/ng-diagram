@@ -52,12 +52,12 @@ The package includes all documentation and API data bundled in. Restart your AI 
 
 ### MCP client config file locations
 
-| Client | Config file |
-| --- | --- |
-| Claude Code | `.mcp.json` in project root |
+| Client         | Config file                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Claude Code    | `.mcp.json` in project root                                                                                                          |
 | Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) |
-| Cursor | `.cursor/mcp.json` in project root |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+| Cursor         | `.cursor/mcp.json` in project root                                                                                                   |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json`                                                                                                |
 
 ### Local development (monorepo)
 
