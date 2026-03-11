@@ -1,13 +1,25 @@
 {
-  "name": "@ng-diagram/mcp-server",
-  "version": "0.1.0",
+  "name": "@ng-diagram/mcp",
+  "version": "0.7.0",
   "description": "MCP server for ng-diagram documentation search",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "ng-diagram-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc",
+    "prebuild": "node scripts/clean.js",
+    "build": "tsc && node scripts/bundle-data.js",
+    "lint:check": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "vitest --run",
     "test:watch": "vitest"
   },
@@ -17,17 +29,23 @@
     "documentation",
     "search"
   ],
-  "author": "Paweł Kubiak",
-  "license": "MIT",
+  "author": "Synergy Codes",
+  "license": "Apache-2.0",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.5.0",
-    "gray-matter": "^4.0.3"
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "gray-matter": "^4.0.3",
+    "minisearch": "^7.2.0",
+    "zod": "^3.25"
   },
   "devDependencies": {
+    "@eslint/js": "^9.25.1",
     "@types/node": "^18.0.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "tsx": "^4.0.0",
     "typescript": "^5.8.3",
-    "vitest": "latest",
-    "fast-check": "^3.0.0",
-    "tsx": "^4.0.0"
+    "typescript-eslint": "^8.57.0",
+    "vitest": "^4.0.0"
   }
 }

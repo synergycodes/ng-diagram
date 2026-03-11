@@ -1,14 +1,6 @@
 import type { SearchResult } from '../../types/index.js';
 
-/**
- * Input schema for the search_docs tool
- */
-export interface SearchDocsInput {
-  /** Search query string */
-  query: string;
-  /** Maximum number of results to return (default: 10) */
-  limit?: number;
-}
+export type { SearchDocsInput } from './tool.validator.js';
 
 /**
  * Output schema for the search_docs tool
