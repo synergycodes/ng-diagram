@@ -46,3 +46,48 @@ jobs:
       - name: Publish to npm
         run: npm publish
         working-directory: packages/ng-diagram/dist/ng-diagram
+
+  publish-mcp-server:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Run lint
+        run: pnpm run lint:check --filter=@ng-diagram/mcp
+
+      - name: Run format check
+        run: pnpm run format:check
+
+      - name: Run tests
+        run: pnpm run test --filter=@ng-diagram/mcp
+
+      - name: Sync version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cd tools/mcp-server
+          npm version "$VERSION" --no-git-tag-version
+
+      - name: Build MCP server
+        run: cd tools/mcp-server && pnpm build
+
+      - name: Publish MCP server to npm
+        run: npm publish
+        working-directory: tools/mcp-server

@@ -2,8 +2,6 @@
  * Search-related type definitions
  */
 
-import type { DocumentMetadata } from './document.types.js';
-
 /**
  * Search query parameters
  */
@@ -15,27 +13,33 @@ export interface SearchQuery {
 }
 
 /**
- * Search result returned to the user
+ * Symbol search result returned to the user (compact, without jsDoc)
  */
-export interface SearchResult {
-  /** Document title */
-  title: string;
-  /** Document description (if available) */
-  description?: string;
-  /** Text snippet showing match context */
-  excerpt: string;
-  /** Full documentation URL */
-  url: string;
+export interface SearchSymbolResult {
+  /** Symbol name */
+  name: string;
+  /** Symbol kind (class, function, interface, etc.) */
+  kind: string;
+  /** Symbol signature */
+  signature: string;
+  /** Import path for the symbol */
+  importPath: string;
 }
 
 /**
- * Internal search match with scoring information
+ * Search result returned to the user
  */
-export interface SearchMatch {
-  /** The matched document */
-  document: DocumentMetadata;
-  /** Relevance score for ranking */
-  score: number;
-  /** Location where the match was found */
-  matchLocation: 'title' | 'description' | 'content' | 'path';
+export interface SearchResult {
+  /** Title of the parent page */
+  pageTitle: string;
+  /** Title of the matched section */
+  sectionTitle: string;
+  /** Full markdown content of the matched section */
+  content: string;
+  /** Document description (if available, only on first section) */
+  description?: string;
+  /** Relative file path from docs root (use with get_doc) */
+  path: string;
+  /** Full documentation URL with anchor */
+  url: string;
 }

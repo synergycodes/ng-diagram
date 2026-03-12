@@ -11,8 +11,6 @@
 html {
   --sl-content-width: 50rem;
   --sl-sidebar-width: 20rem;
-  --sl-content-pad-x: 3.5rem;
-
   --ng-diagram-height: 30rem;
   --ng-diagram-border: 1px solid var(--ngd-ui-border-color);
 
@@ -23,6 +21,7 @@ html {
   html {
     --sl-content-width: 60rem;
     --sl-sidebar-width: 24.75rem;
+    --sl-content-pad-x: 3.5rem;
   }
 }
 
@@ -60,6 +59,22 @@ ng-diagram-canvas {
 
   code {
     border-top: var(--ec-brdWd) solid var(--ec-brdCol);
+  }
+}
+
+/* Mobile: tighten code blocks */
+@media (max-width: 50em) {
+  .expressive-code {
+    font-size: 0.8125rem;
+  }
+
+  .expressive-code .gutter {
+    display: none;
+  }
+
+  .expressive-code pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
