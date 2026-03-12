@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-03-12
+
+### Added
+
+- New MCP server for enhanced AI-assisted development with MiniSearch indexing and API symbol search ([#590](https://github.com/synergycodes/ng-diagram/pull/590))
+
 ### Fixed
 
 - Fixed documentation pages being difficult to read on mobile devices due to excessive margins ([#605](https://github.com/synergycodes/ng-diagram/pull/605) - thanks [@martinboue](https://github.com/martinboue) for reporting this 💪)
@@ -168,7 +174,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/synergycodes/ng-diagram/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/synergycodes/ng-diagram/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/synergycodes/ng-diagram/compare/v0.9.1...v1.0.0
 [0.9.1]: https://github.com/synergycodes/ng-diagram/compare/v0.9.0...v0.9.1
