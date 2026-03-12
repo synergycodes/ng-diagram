@@ -60,3 +60,14 @@
   gap: 1.5rem;
   margin: 2rem 0;
 }
+
+@media (max-width: 30em) {
+  .content-tile-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .content-tile-content {
+    padding: 1rem;
+  }
+}
