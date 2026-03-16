@@ -31,7 +31,7 @@ Deprecation timeline may be shortened or skipped for:
 
 1. **Security Issues**: Security vulnerabilities require immediate fixes
 2. **Critical Bugs**: Bugs that cause data loss or severe functionality issues
-3. **Beta/Experimental APIs**: APIs marked with `@beta` or `@experimental` (see [API Stability Policy](./api-stability))
+3. **Beta/Experimental APIs**: APIs marked with `@beta` or `@experimental` (see [API Stability Policy](/docs/policies/api-stability/))
 4. **Pre-1.0 Releases**: During 0.x.x versions, breaking changes may occur more frequently
 
 In these cases, the reason will be clearly communicated in release notes.
@@ -58,5 +58,5 @@ For each deprecated API, we provide:
 
 If you have questions about a specific deprecation:
 
-1. Check the [Changelog](../changelog) for details
-2. Open a [GitHub Discussion](https://github.com/angular-diagrams/ng-diagram/discussions)
+1. Check the [Changelog](/docs/changelog/) for details
+2. Open a [GitHub Discussion](https://github.com/synergycodes/ng-diagram/discussions)

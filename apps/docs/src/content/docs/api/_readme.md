@@ -36,8 +36,10 @@ title: "ng-diagram"
 - [EnvironmentInfo](/docs/api/internals/environmentinfo/)
 - [HighlightGroupActionState](/docs/api/internals/highlightgroupactionstate/)
 - [LinkingActionState](/docs/api/internals/linkingactionstate/)
+- [PanningActionState](/docs/api/internals/panningactionstate/)
 - [ResizeActionState](/docs/api/internals/resizeactionstate/)
 - [RotationActionState](/docs/api/internals/rotationactionstate/)
+- [SelectionActionState](/docs/api/internals/selectionactionstate/)
 
 ## Other
 
