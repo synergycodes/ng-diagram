@@ -1,5 +1,5 @@
 ---
-version: "since v1.1.0"
+version: "since v1.1.2"
 editUrl: false
 next: false
 prev: false
