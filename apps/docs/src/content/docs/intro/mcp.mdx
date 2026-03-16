@@ -1,0 +1,79 @@
+---
+title: MCP Server
+description: Connect AI assistants to ng-diagram documentation and API reference using the Model Context Protocol
+sidebar:
+  order: 6
+---
+
+The [ng-diagram MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) connects AI assistants to ng-diagram's documentation and public API. Instead of switching to a browser to look things up, you can ask your AI assistant directly:
+
+- _"How do I create custom nodes?"_
+- _"What's the signature of `DiagramComponent`?"_
+- _"Show me the palette guide"_
+
+The AI searches the docs and API reference behind the scenes and answers with actual documentation content.
+
+## What is MCP?
+
+[MCP](https://modelcontextprotocol.io) is an open standard that lets AI assistants access external data sources. The ng-diagram MCP server exposes four tools:
+
+- **`search_docs`** - search documentation sections by keyword
+- **`get_doc`** - retrieve a full documentation page
+- **`search_symbols`** - search public API symbols (classes, interfaces, functions, types)
+- **`get_symbol`** - get full details for a specific API symbol
+
+## Setup
+
+Add the server to your MCP client config - no installation required:
+
+**macOS / Linux:**
+
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "npx",
+      "args": ["-y", "@ng-diagram/mcp"]
+    }
+  }
+}
+```
+
+**Windows:**
+
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@ng-diagram/mcp"]
+    }
+  }
+}
+```
+
+Restart your AI assistant after updating the config, then verify by asking i.e.: _"Search the ng-diagram docs for palette"_.
+
+### Config file locations
+
+| Client         | Config file                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude Code    | `.mcp.json` in project root (project) or `~/.claude.json` (user)                                                                                                                                  |
+| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%APPDATA%\Claude\claude_desktop_config.json` (Windows), `~/.config/claude-desktop/claude_desktop_config.json` (Linux) |
+| Cursor         | `.cursor/mcp.json` in project root (project) or `~/.cursor/mcp.json` (global)                                                                                                                     |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json`                                                                                                                                                             |
+
+## How It Works
+
+The AI assistant uses a two-step pattern - **search**, then **retrieve**:
+
+1. AI calls `search_docs("palette")` or `search_symbols("Component")` to find matches
+2. AI calls `get_doc("guides/palette.mdx")` or `get_symbol("NgDiagramComponent")` to get full content
+3. AI synthesizes the answer for you
+
+All documentation and API data is bundled into the npm package - no network calls are made at query time.
+
+## Learn More
+
+- [**@ng-diagram/mcp** on npm](https://www.npmjs.com/package/@ng-diagram/mcp) - full API reference and setup details
+- [**Source code**](https://github.com/synergycodes/ng-diagram/tree/main/tools/mcp-server) - implementation and developer guide

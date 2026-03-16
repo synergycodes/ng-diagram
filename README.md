@@ -5,7 +5,7 @@
 
 A robust Angular library for building interactive diagrams, node-based editors, and visual programming interfaces. Designed with Angular and TypeScript, it offers a complete toolkit to create sophisticated, customizable, and high-performance diagramming applications.
 
-Unlike generic diagramming libraries, **ng-diagram** is Angular-first — built on Angular signals and templates for seamless integration and performance.
+Unlike generic diagramming libraries, **ng-diagram** is Angular-first - built on Angular signals and templates for seamless integration and performance.
 
 ## ✨ Features
 
@@ -174,11 +174,11 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
 
 ## 👩‍💻 About the Creators
 
-ng-diagram is built and maintained by [**Synergy Codes**](https://www.synergycodes.com) — a team of developers who’ve spent **over a decade designing and delivering diagramming solutions** for clients worldwide.
+ng-diagram is built and maintained by [**Synergy Codes**](https://www.synergycodes.com) - a team of developers who’ve spent **over a decade designing and delivering diagramming solutions** for clients worldwide.
 
 We are continuously distilling everything we know about building interactive diagrams, editors, and visual tools into this library. Our goal is simple: to empower Angular developers to create diagramming applications faster, easier, and with confidence.
 
-When you use this library, you can be sure you’re in **good hands** — backed by a team that knows diagrams inside out.
+When you use this library, you can be sure you’re in **good hands** - backed by a team that knows diagrams inside out.
 
 ## 📖 Documentation
 
