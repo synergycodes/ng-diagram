@@ -35,7 +35,7 @@
     "@yeskunall/astro-umami": "~0.0.7",
     "astro": "^5.6.1",
     "elkjs": "^0.10.0",
-    "html-to-image": "1.11.11",
+    "html-to-image": "1.11.13",
     "ng-diagram": "workspace:*",
     "rxjs": "~7.8.2",
     "sharp": "^0.34.2",
