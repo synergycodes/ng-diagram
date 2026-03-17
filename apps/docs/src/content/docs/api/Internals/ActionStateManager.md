@@ -173,13 +173,13 @@ The linking state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **panning**(): `undefined` \| `PanningActionState`
+> **get** **panning**(): `undefined` \| [`PanningActionState`](/docs/api/internals/panningactionstate/)
 
 Gets the current panning action state.
 
 ##### Returns
 
-`undefined` \| `PanningActionState`
+`undefined` \| [`PanningActionState`](/docs/api/internals/panningactionstate/)
 
 The panning state if viewport is being panned, undefined otherwise
 
@@ -195,7 +195,7 @@ Sets the panning action state.
 
 The panning state to set, or undefined to clear
 
-`undefined` | `PanningActionState`
+`undefined` | [`PanningActionState`](/docs/api/internals/panningactionstate/)
 
 ##### Returns
 
@@ -275,13 +275,13 @@ The rotation state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **selection**(): `undefined` \| `SelectionActionState`
+> **get** **selection**(): `undefined` \| [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
 
 Gets the current selection action state.
 
 ##### Returns
 
-`undefined` \| `SelectionActionState`
+`undefined` \| [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
 
 The selection state if set, undefined otherwise
 
@@ -297,7 +297,7 @@ Sets the selection action state.
 
 The selection state to set, or undefined to clear
 
-`undefined` | `SelectionActionState`
+`undefined` | [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
 
 ##### Returns
 

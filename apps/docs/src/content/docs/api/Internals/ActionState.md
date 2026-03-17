@@ -48,7 +48,7 @@ State related to linking nodes
 
 ### panning?
 
-> `optional` **panning**: `PanningActionState`
+> `optional` **panning**: [`PanningActionState`](/docs/api/internals/panningactionstate/)
 
 State related to panning the viewport
 
@@ -72,6 +72,6 @@ State related to node rotation
 
 ### selection?
 
-> `optional` **selection**: `SelectionActionState`
+> `optional` **selection**: [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
 
 State related to selection gestures

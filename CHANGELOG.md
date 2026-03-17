@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-03-17
+
+### Changed
+
+- Updated MCP server README with ASCII diagrams, Windows setup instructions, and streamlined documentation ([#610](https://github.com/synergycodes/ng-diagram/pull/610))
+- Added MCP Server documentation page and updated roadmap status ([#610](https://github.com/synergycodes/ng-diagram/pull/610))
+
+### Fixed
+
+- Fixed broken internal documentation URLs in Configuration, Edges, Changelog, and Policies pages ([#610](https://github.com/synergycodes/ng-diagram/pull/610))
+- Exported missing `PanningActionState` and `SelectionActionState` types from public API ([#610](https://github.com/synergycodes/ng-diagram/pull/610))
+
 ## [1.1.1] - 2026-03-12
 
 ### Added
@@ -26,8 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [`selectionGestureEnded`](/docs/api/types/events/selectiongestureendedevent) event - fires on pointerup after a selection gesture completes (object click, box selection, or select-all), providing the currently selected nodes and edges. Use this for actions that should run after selection is done, such as showing toolbars or updating panels ([#582](https://github.com/synergycodes/ng-diagram/pull/582))
 - [Absolute edge label positioning](/docs/guides/edges/labels/#absolute-positioning) - `positionOnEdge` now accepts pixel-based strings (`'30px'`, `'-20px'`) in addition to relative numbers (0–1). Negative pixel values measure from the target end ([#580](https://github.com/synergycodes/ng-diagram/pull/580))
 - Default edge now supports `positionOnEdge` data property to control [label positioning](/docs/guides/edges/labels/#using-labels-in-default-edges) (defaults to `0.5`) ([#581](https://github.com/synergycodes/ng-diagram/pull/581))
-- [`nodeIds`](/docs/api/types/action-state/draggingactionstate/#nodeids) property on `DraggingActionState` containing IDs of all nodes participating in the drag operation ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
-- [`movementStarted`](/docs/api/types/action-state/draggingactionstate/#movementstarted) property on `DraggingActionState` that indicates whether pointer movement exceeded the drag threshold before entering the dragging state ([#569](https://github.com/synergycodes/ng-diagram/pull/569))
+- [`nodeIds`](/docs/api/internals/draggingactionstate/#nodeids) property on `DraggingActionState` containing IDs of all nodes participating in the drag operation ([#572](https://github.com/synergycodes/ng-diagram/pull/572))
+- [`movementStarted`](/docs/api/internals/draggingactionstate/#movementstarted) property on `DraggingActionState` that indicates whether pointer movement exceeded the drag threshold before entering the dragging state ([#569](https://github.com/synergycodes/ng-diagram/pull/569))
 - [`initializeModelAdapter`](/docs/api/utilities/initializemodeladapter) function for initializing custom [`ModelAdapter`](/docs/api/types/model/modeladapter/) implementations. Use this when providing a custom adapter (e.g., backed by localStorage, NgRx, or an external store). The function prepares the adapter for use with ng-diagram. `initializeModel` continues to create the default `SignalModelAdapter` from `Partial<Model>` data. ([#586](https://github.com/synergycodes/ng-diagram/pull/586))
 
 ### Changed
@@ -174,7 +186,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.1.1...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/synergycodes/ng-diagram/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/synergycodes/ng-diagram/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/synergycodes/ng-diagram/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/synergycodes/ng-diagram/compare/v0.9.1...v1.0.0

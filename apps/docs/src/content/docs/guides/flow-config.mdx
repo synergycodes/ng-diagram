@@ -24,7 +24,7 @@ By leveraging the configuration, you gain full control over the diagram's capabi
 
 ## How to Initialize the Configuration
 
-To initialize the configuration, define a [`config`](/docs/api/types/configuration/flowconfig/) object in your Angular component using the [NgDiagramConfig](/docs/api/types/ngdiagramconfig/) type.\
+To initialize the configuration, define a [`config`](/docs/api/types/configuration/flowconfig/) object in your Angular component using the [NgDiagramConfig](/docs/api/types/configuration/ngdiagramconfig/) type.\
 Only specify the properties you wish to override; all others will use sensible defaults.
 
 ```typescript
@@ -44,7 +44,7 @@ Assign the configuration to the [`<ng-diagram>`](/docs/api/components/ngdiagramc
 
 ## Configuration Type
 
-ngDiagram uses the [NgDiagramConfig](/docs/api/types/ngdiagramconfig/) type, which is a `DeepPartial` of [FlowConfig](/docs/api/types/flowconfig/).
+ngDiagram uses the [NgDiagramConfig](/docs/api/types/configuration/ngdiagramconfig/) type, which is a `DeepPartial` of [FlowConfig](/docs/api/types/configuration/flowconfig/).
 
 This means every property is optional, and you can override only what you need.
 
@@ -87,7 +87,7 @@ The most important categories include:
 - [`zIndex`](/docs/api/types/configuration/features/zindexconfig): Manages layering and stacking order of diagram elements.
 - [`zoom`](/docs/api/types/configuration/features/zoomconfig): Controls zooming behavior, limits, and zoom-to-fit options.
 
-For detailed options and advanced usage, refer to the documentation for each category in [FlowConfig](/docs/api/types/flowconfig/).
+For detailed options and advanced usage, refer to the documentation for each category in [FlowConfig](/docs/api/types/configuration/flowconfig/).
 
 ## Example
 
@@ -114,6 +114,6 @@ const config: NgDiagramConfig = {
 
 ## Further Reading
 
-[NgDiagramConfig →](/docs/api/types/ngdiagramconfig/) | [FlowConfig →](/docs/api/types/flowconfig/) | [NgDiagramService →](/docs/api/services/ngdiagramservice/) | [NgDiagramComponent →](/docs/api/components/ngdiagramcomponent/)
+[NgDiagramConfig →](/docs/api/types/configuration/ngdiagramconfig/) | [FlowConfig →](/docs/api/types/configuration/flowconfig/) | [NgDiagramService →](/docs/api/services/ngdiagramservice/) | [NgDiagramComponent →](/docs/api/components/ngdiagramcomponent/)
 
 ---

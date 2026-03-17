@@ -113,7 +113,7 @@ export interface DraggingActionState {
  * State tracking a panning operation in progress.
  *
  * @public
- * @since 1.0.0
+ * @since 1.1.2
  * @category Internals
  */
 export interface PanningActionState {
@@ -128,7 +128,7 @@ export interface PanningActionState {
  * the `selectionGestureEnded` event is emitted on `selectEnd`.
  *
  * @public
- * @since 1.1.0
+ * @since 1.1.2
  * @category Internals
  */
 export interface SelectionActionState {

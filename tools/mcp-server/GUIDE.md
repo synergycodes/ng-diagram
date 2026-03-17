@@ -1,4 +1,4 @@
-# MCP Documentation Server — User & Developer Guide
+# MCP Documentation Server - User & Developer Guide
 
 An MCP (Model Context Protocol) server that gives AI assistants instant access to your library's documentation and public API. Built for [Astro Starlight](https://starlight.astro.build/) docs and [API Extractor](https://api-extractor.com/) reports.
 
@@ -11,7 +11,7 @@ An MCP (Model Context Protocol) server that gives AI assistants instant access t
   - [Setup](#setup)
   - [Available Tools](#available-tools)
   - [Example Workflows](#example-workflows)
-- [For Developers — Adapting to Your Library](#for-developers--adapting-to-your-library)
+- [For Developers - Adapting to Your Library](#for-developers--adapting-to-your-library)
   - [Prerequisites](#prerequisites)
   - [Architecture Overview](#architecture-overview)
   - [Step-by-Step Adaptation Guide](#step-by-step-adaptation-guide)
@@ -38,7 +38,9 @@ The AI searches the docs behind the scenes and answers with the actual documenta
 
 #### Option A: npx (recommended)
 
-No installation needed — just add the server to your MCP client config:
+No installation needed - just add the server to your MCP client config:
+
+**macOS / Linux:**
 
 ```json
 {
@@ -51,7 +53,20 @@ No installation needed — just add the server to your MCP client config:
 }
 ```
 
-This downloads and runs the latest version automatically. The package includes all documentation and API data — no monorepo checkout required.
+**Windows:**
+
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@ng-diagram/mcp"]
+    }
+  }
+}
+```
+
+This downloads and runs the latest version automatically. The package includes all documentation and API data - no monorepo checkout required.
 
 #### Option B: Local development (monorepo)
 
@@ -81,12 +96,12 @@ pnpm build
 
 #### MCP client config file locations
 
-| Client         | Config file                           |
-| -------------- | ------------------------------------- |
-| Claude Code    | `.mcp.json` in project root           |
-| Claude Desktop | `claude_desktop_config.json`          |
-| Cursor         | `.cursor/mcp.json`                    |
-| Windsurf       | `~/.codeium/windsurf/mcp_config.json` |
+| Client         | Config file                                                                                                                                                                                               |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude Code    | `.mcp.json` in project root (project) or `~/.claude.json` (user)                                                                                                                                          |
+| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%APPDATA%\Roaming\Claude\claude_desktop_config.json` (Windows), `~/.config/claude-desktop/claude_desktop_config.json` (Linux) |
+| Cursor         | `.cursor/mcp.json` in project root (project) or `~/.cursor/mcp.json` (global)                                                                                                                             |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json`                                                                                                                                                                     |
 
 **Restart your AI assistant** after updating the config, then verify by asking: _"Search the ng-diagram docs for palette"_
 
@@ -145,13 +160,13 @@ Retrieves full details for a specific API symbol by exact name (returned from `s
 
 ---
 
-## For Developers — Adapting to Your Library
+## For Developers - Adapting to Your Library
 
 If your library uses **Astro Starlight** for docs (or any markdown-based docs with YAML frontmatter) and optionally **API Extractor** for API reports, you can adapt this server with minimal changes.
 
 ### Prerequisites
 
-The indexer recursively scans any directory for `.md`/`.mdx` files — no specific folder structure is required. Organize your docs however you like.
+The indexer recursively scans any directory for `.md`/`.mdx` files - no specific folder structure is required. Organize your docs however you like.
 
 Files optionally have YAML frontmatter for `title` and `description`. If frontmatter is missing, the filename is used as the title (e.g. `getting-started.mdx` → "Getting Started").
 
@@ -174,14 +189,14 @@ Content under second heading...
 
 The indexer splits pages on `##` headings to create searchable sections. `###` and deeper headings stay within their parent section. Files starting with `_` (e.g. `_meta.yml`) are skipped.
 
-For API symbol search, you need an [API Extractor](https://api-extractor.com/) report (`.api.md` file). This is optional — the server works without it, just without the `search_symbols` and `get_symbol` tools.
+For API symbol search, you need an [API Extractor](https://api-extractor.com/) report (`.api.md` file). This is optional - the server works without it, just without the `search_symbols` and `get_symbol` tools.
 
 ### Architecture Overview
 
 ```
 src/
-├── index.ts                  # Entry point — resolve paths, start server
-├── server.ts                 # MCP protocol wiring — tool registration, stdio transport
+├── index.ts                  # Entry point - resolve paths, start server
+├── server.ts                 # MCP protocol wiring - tool registration, stdio transport
 ├── services/
 │   ├── indexer.ts            # Scans docs directory, parses frontmatter, splits sections
 │   ├── search.ts             # MiniSearch index over documentation sections
@@ -240,7 +255,7 @@ Change the package name and description:
 }
 ```
 
-#### 3. Update `src/index.ts` — paths and config
+#### 3. Update `src/index.ts` - paths and config
 
 This is the main file you need to change. Update three things:
 
@@ -265,10 +280,10 @@ const server = new NgDiagramMCPServer({
 
 Each tool has a `tool.config.ts` with a `description` string. Update these to reference your library name:
 
-- `tools/search-docs/tool.config.ts` — mention your library and typical search terms
-- `tools/get-doc/tool.config.ts` — mention your docs structure
-- `tools/search-symbols/tool.config.ts` — mention your library's API
-- `tools/get-symbol/tool.config.ts` — mention your library name
+- `tools/search-docs/tool.config.ts` - mention your library and typical search terms
+- `tools/get-doc/tool.config.ts` - mention your docs structure
+- `tools/search-symbols/tool.config.ts` - mention your library's API
+- `tools/get-symbol/tool.config.ts` - mention your library name
 
 These descriptions are what AI clients see when deciding which tool to call, so make them specific and helpful.
 
@@ -288,7 +303,7 @@ These descriptions are what AI clients see when deciding which tool to call, so 
 
 #### 6. If you don't use API Extractor
 
-Remove `apiReportPath` from the config in `index.ts`. The server automatically skips API symbol tools when no report path is configured — no other changes needed.
+Remove `apiReportPath` from the config in `index.ts`. The server automatically skips API symbol tools when no report path is configured - no other changes needed.
 
 If you want to remove the API code entirely, delete:
 
@@ -334,7 +349,7 @@ pnpm build   # Compile TypeScript
 3. **Walks** line-by-line, tracking visibility tags (`// @public`, `// @internal`, `// @deprecated`)
 4. **Collects** exported declarations: `interface`, `class`, `function`, `type`, `const`, `enum`
 5. **Handles** re-export aliases (`export { Node_2 as Node }`)
-6. **Cleans** Angular compiler artifacts (`static ɵcmp`, `static ɵfac`) — if your library isn't Angular, these are simply no-ops
+6. **Cleans** Angular compiler artifacts (`static ɵcmp`, `static ɵfac`) - if your library isn't Angular, these are simply no-ops
 7. **Stores** symbols in both an array (for search) and a Map (for exact-name lookup)
 
 ### How Search Works
@@ -360,14 +375,14 @@ Both engines handle empty/whitespace queries gracefully (return empty results). 
 
 The server is **read-only** and designed to be safe:
 
-- **No arbitrary file access** — `get_doc` only returns pages from the pre-built index, not files from disk
-- **Path traversal protection** — Zod validation rejects `..`, absolute paths, and null bytes in `get_doc` path input
-- **Input length limits** — all string inputs are capped (query: 1000 chars, path: 500 chars, name: 200 chars)
-- **Result limits** — search results capped at 100 per request
-- **No network calls** — everything is local file I/O at startup, then in-memory at query time
-- **Symbolic links skipped** — prevents following links outside the docs directory
-- **stdio transport** — no HTTP server, no exposed ports, no authentication needed
-- **Logging to stderr** — stdout is reserved for the MCP protocol; log messages never leak into responses
+- **No arbitrary file access** - `get_doc` only returns pages from the pre-built index, not files from disk
+- **Path traversal protection** - Zod validation rejects `..`, absolute paths, and null bytes in `get_doc` path input
+- **Input length limits** - all string inputs are capped (query: 1000 chars, path: 500 chars, name: 200 chars)
+- **Result limits** - search results capped at 100 per request
+- **No network calls** - everything is local file I/O at startup, then in-memory at query time
+- **Symbolic links skipped** - prevents following links outside the docs directory
+- **stdio transport** - no HTTP server, no exposed ports, no authentication needed
+- **Logging to stderr** - stdout is reserved for the MCP protocol; log messages never leak into responses
 
 ### Testing
 
@@ -376,13 +391,13 @@ pnpm test           # Run all tests
 pnpm test:watch     # Watch mode
 ```
 
-Tests create ephemeral fixture files in `beforeEach` and clean up in `afterEach` — no stale fixtures to maintain.
+Tests create ephemeral fixture files in `beforeEach` and clean up in `afterEach` - no stale fixtures to maintain.
 
 When adapting, update the integration test paths and fixture content to match your library's docs structure.
 
 ---
 
-## Quick Reference — What to Change
+## Quick Reference - What to Change
 
 | What                  | File                          | Change                                                                 |
 | --------------------- | ----------------------------- | ---------------------------------------------------------------------- |

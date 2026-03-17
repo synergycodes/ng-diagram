@@ -1348,6 +1348,11 @@ export interface PaletteItemDroppedEvent {
     node: Node_2;
 }
 
+// @public
+export interface PanningActionState {
+    active: boolean;
+}
+
 // @public (undocumented)
 export class PanningDirective implements OnDestroy {
     // (undocumented)
@@ -1435,6 +1440,11 @@ export interface RotationActionState {
 
 // @public
 export type RoutingMode = 'manual' | 'auto';
+
+// @public
+export interface SelectionActionState {
+    selectionChanged: boolean;
+}
 
 // @public
 export interface SelectionChangedEvent {

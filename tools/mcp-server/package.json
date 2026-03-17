@@ -30,6 +30,11 @@
     "search"
   ],
   "author": "Synergy Codes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/synergycodes/ng-diagram.git",
+    "directory": "tools/mcp-server"
+  },
   "license": "Apache-2.0",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
