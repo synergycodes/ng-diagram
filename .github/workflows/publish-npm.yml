@@ -43,7 +43,18 @@ jobs:
       - name: Build package for production
         run: cd packages/ng-diagram && pnpm build:prod
 
+      - name: Check if version already published
+        id: check-version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if npm view ng-diagram@"$VERSION" version 2>/dev/null; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
+        if: steps.check-version.outputs.already_published == 'false'
         run: npm publish
         working-directory: packages/ng-diagram/dist/ng-diagram
 
