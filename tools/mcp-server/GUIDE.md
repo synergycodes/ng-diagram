@@ -96,12 +96,12 @@ pnpm build
 
 #### MCP client config file locations
 
-| Client         | Config file                                                                                                                                                                                       |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Claude Code    | `.mcp.json` in project root (project) or `~/.claude.json` (user)                                                                                                                                  |
-| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%APPDATA%\Claude\claude_desktop_config.json` (Windows), `~/.config/claude-desktop/claude_desktop_config.json` (Linux) |
-| Cursor         | `.cursor/mcp.json` in project root (project) or `~/.cursor/mcp.json` (global)                                                                                                                     |
-| Windsurf       | `~/.codeium/windsurf/mcp_config.json`                                                                                                                                                             |
+| Client         | Config file                                                                                                                                                                                               |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude Code    | `.mcp.json` in project root (project) or `~/.claude.json` (user)                                                                                                                                          |
+| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS), `%APPDATA%\Roaming\Claude\claude_desktop_config.json` (Windows), `~/.config/claude-desktop/claude_desktop_config.json` (Linux) |
+| Cursor         | `.cursor/mcp.json` in project root (project) or `~/.cursor/mcp.json` (global)                                                                                                                             |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json`                                                                                                                                                                     |
 
 **Restart your AI assistant** after updating the config, then verify by asking: _"Search the ng-diagram docs for palette"_
 
