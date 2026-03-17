@@ -61,4 +61,4 @@ ngDiagram follows [semver](https://semver.org/):
 - **Minor (X.Y.0)**: New features, backward-compatible
 - **Patch (X.Y.Z)**: Bug fixes only
 
-See [Deprecation Policy](./deprecation) for breaking change process.
+See [Deprecation Policy](/docs/policies/deprecation-policy/) for breaking change process.
