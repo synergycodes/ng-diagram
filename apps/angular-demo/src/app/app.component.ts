@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Injector } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Injector, signal } from '@angular/core';
 import {
   ClipboardPastedEvent,
   configureShortcuts,
@@ -35,6 +35,7 @@ import {
   type Port,
 } from 'ng-diagram';
 import { defaultModel } from './data/default-model';
+import { downloadedModel } from './data/downloaded-model';
 import { generateModel } from './data/generate-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
@@ -115,14 +116,25 @@ export class AppComponent {
     ]),
   };
 
-  model = initializeModel(defaultModel);
+  modelData = signal<Partial<{ nodes: Node[]; edges: Edge[] }>>(defaultModel);
+  model = computed(() => initializeModel(this.modelData(), this.injector));
+
+  onSimulateModelDownload(): void {
+    console.log('Simulating model download...');
+
+    // Simulate an async download that returns a new model
+    setTimeout(() => {
+      this.modelData.set({ ...downloadedModel });
+      console.log('Model download complete');
+    }, 2000);
+  }
 
   enableVirtualizationTest(): void {
     this.config = {
       ...this.config,
       ...virtualizationConfigOverrides,
     };
-    this.model = initializeModel(generateModel(virtualizationTestConfig.nodeCount), this.injector);
+    this.modelData.set(generateModel(virtualizationTestConfig.nodeCount));
   }
 
   onDiagramInit(event: DiagramInitEvent): void {
@@ -272,7 +284,7 @@ export class AppComponent {
     if (!json) return;
 
     const data = JSON.parse(json);
-    this.model = initializeModel(data, this.injector);
+    this.modelData.set(data);
   }
 
   onReinitializeModel(): void {
@@ -282,7 +294,7 @@ export class AppComponent {
         enabled: false,
       },
     };
-    this.model = initializeModel(defaultModel, this.injector);
+    this.modelData.set({ ...defaultModel });
   }
 
   nodeStyle(node: Node): MinimapNodeStyle {
