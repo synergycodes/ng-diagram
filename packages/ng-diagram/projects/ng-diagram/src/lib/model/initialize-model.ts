@@ -1,4 +1,4 @@
-import { inject, Injector, runInInjectionContext } from '@angular/core';
+import { inject, Injector, runInInjectionContext, untracked } from '@angular/core';
 import { assignInternalId, type Model, type ModelAdapter } from '../../core/src';
 import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { SignalModelAdapter } from './signal-model-adapter';
@@ -36,9 +36,11 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  * @category Utilities
  */
 export function initializeModel(model: Partial<Model> = {}, injector?: Injector): ModelAdapter {
-  const init = () => initializeModelAdapter(new SignalModelAdapter(), model);
+  return untracked(() => {
+    const init = () => initializeModelAdapter(new SignalModelAdapter(), model);
 
-  return injector ? runInInjectionContext(injector, init) : init();
+    return injector ? runInInjectionContext(injector, init) : init();
+  });
 }
 
 /**
