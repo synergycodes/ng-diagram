@@ -123,9 +123,7 @@ export class MyComponent {
 
 ## Using in Reactive Contexts
 
-<Aside type="tip">
-  Available since **v1.2.0**.
-</Aside>
+<Aside type="tip">Available since **v1.2.0**.</Aside>
 
 `initializeModel` can be safely called inside reactive contexts such as `computed`, `effect`, or `linkedSignal`. This allows you to derive the diagram model reactively from a signal source, automating the reinitialization shown above:
 
@@ -147,11 +145,13 @@ export class MyComponent {
 ```
 
 <Aside type="note">
-  When using `initializeModel` inside a reactive context, you must pass the `injector` parameter explicitly since reactive contexts do not provide an Angular injection context.
+  When using `initializeModel` inside a reactive context, you must pass the `injector` parameter explicitly since
+  reactive contexts do not provide an Angular injection context.
 </Aside>
 
 <Aside type="caution">
-  Each signal change triggers a full [reinitialization cycle](#initialization-process) (measurement, layout, event emission). Keep this in mind for frequently changing data sources.
+  Each signal change triggers a full [reinitialization cycle](#initialization-process) (measurement, layout, event
+  emission). Keep this in mind for frequently changing data sources.
 </Aside>
 
 ## Timing and Events
@@ -307,7 +307,8 @@ export class MemoryConsciousComponent {
 ```
 
 <Aside type="tip">
-  When using the [reactive approach](#using-in-reactive-contexts), `computed` handles this automatically — if the signal value is the same reference, the model won't reinitialize.
+  When using the [reactive approach](#using-in-reactive-contexts), `computed` handles this automatically — if the signal
+  value is the same reference, the model won't reinitialize.
 </Aside>
 
 ## Troubleshooting
