@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `initializeModel` can now be safely called inside reactive contexts (`computed`, `effect`, `linkedSignal`) without throwing NG0602 ([#608](https://github.com/synergycodes/ng-diagram/issues/608), [#622](https://github.com/synergycodes/ng-diagram/pull/622))
+
 ## [1.1.2] - 2026-03-17
 
 ### Changed

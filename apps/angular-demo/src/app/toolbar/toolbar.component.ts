@@ -29,6 +29,7 @@ export class ToolbarComponent {
   testVirtualizationClick = output<void>();
   saveModelClick = output<void>();
   loadModelClick = output<void>();
+  simulateModelDownloadClick = output<void>();
 
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 
