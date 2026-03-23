@@ -41,10 +41,7 @@ export class NgDiagramPaletteItemComponent {
 
   /** @internal */
   onDragStart(event: DragEvent) {
-    const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();
-    if (previewHtmlElement && previewHtmlElement.nativeElement) {
-      event.dataTransfer?.setDragImage(previewHtmlElement.nativeElement, 0, 0);
-    }
+    this.setDragPreviewImage(event);
     this.paletteService.onDragStartFromPalette(event, this.item());
   }
 
@@ -57,5 +54,28 @@ export class NgDiagramPaletteItemComponent {
   onTouchStart(event: TouchEvent) {
     event.preventDefault();
     this.paletteService.onMouseDown(this.item(), this.paletteItemPreviewComponent()?.id || '');
+  }
+
+  /**
+   * Clones the preview element and appends it to document.body so that setDragImage
+   * is immune to ancestor overflow:hidden clipping. The clone is removed on the next frame.
+   */
+  private setDragPreviewImage(event: DragEvent) {
+    const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();
+    if (!previewHtmlElement?.nativeElement || !event.dataTransfer) {
+      return;
+    }
+
+    const clone = previewHtmlElement.nativeElement.cloneNode(true) as HTMLElement;
+    clone.style.position = 'fixed';
+    clone.style.top = '0';
+
+    document.body.appendChild(clone);
+
+    event.dataTransfer.setDragImage(clone, 0, 0);
+
+    // Clean up the temporary clone. This is safe because setDragImage captures the bitmap
+    // synchronously during dragstart — the browser already has the image before the next frame.
+    requestAnimationFrame(() => clone.remove());
   }
 }
