@@ -2,7 +2,7 @@
   <ng-diagram
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
-    [model]="model"
+    [model]="model()"
     [config]="config"
     (diagramInit)="onDiagramInit($event)"
     (selectionChanged)="onSelectionChanged($event)"
@@ -29,6 +29,7 @@
     (reinitializeModelClick)="onReinitializeModel()"
     (saveModelClick)="onSaveModel()"
     (loadModelClick)="onLoadModel()"
+    (simulateModelDownloadClick)="onSimulateModelDownload()"
   />
   <app-palette [model]="paletteModel" />
 </div>
