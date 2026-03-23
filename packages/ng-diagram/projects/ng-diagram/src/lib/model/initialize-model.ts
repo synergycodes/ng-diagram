@@ -26,7 +26,17 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  *
  * // With an explicit injector (outside injection context)
  * model = initializeModel({ nodes: [...], edges: [...] }, this.injector);
+ *
+ * // Safe to use inside reactive contexts (computed, effect, linkedSignal)
+ * model = computed(() => initializeModel(this.myModel(), this.injector));
  * ```
+ *
+ * ## Version History
+ *
+ * | Version | Changes |
+ * |---------|---------|
+ * | v0.8.0  | Introduced |
+ * | v1.2.0  | Can now be safely used inside reactive contexts (`computed`, `effect`, `linkedSignal`) |
  *
  * @param model Initial model data (nodes, edges, metadata).
  * @param injector Optional Angular `Injector` if not running inside an injection context.

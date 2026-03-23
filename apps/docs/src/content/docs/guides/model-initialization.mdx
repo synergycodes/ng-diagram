@@ -121,6 +121,39 @@ export class MyComponent {
   **Important**: When you reinitialize a model, all previous model references become invalid.
 </Aside>
 
+## Using in Reactive Contexts
+
+<Aside type="tip">
+  Available since **v1.2.0**.
+</Aside>
+
+`initializeModel` can be safely called inside reactive contexts such as `computed`, `effect`, or `linkedSignal`. This allows you to derive the diagram model reactively from a signal source, automating the reinitialization shown above:
+
+```typescript
+export class MyComponent {
+  private readonly injector = inject(Injector);
+
+  // Source data — could come from an API, route params, etc.
+  diagramData = signal<Partial<Model>>({});
+
+  // Model re-initializes automatically when diagramData changes
+  model = computed(() => initializeModel(this.diagramData(), this.injector));
+
+  async loadFromAPI(id: string) {
+    const data = await this.api.getDiagram(id);
+    this.diagramData.set(data);
+  }
+}
+```
+
+<Aside type="note">
+  When using `initializeModel` inside a reactive context, you must pass the `injector` parameter explicitly since reactive contexts do not provide an Angular injection context.
+</Aside>
+
+<Aside type="caution">
+  Each signal change triggers a full [reinitialization cycle](#initialization-process) (measurement, layout, event emission). Keep this in mind for frequently changing data sources.
+</Aside>
+
 ## Timing and Events
 
 When a model is reinitialized, the diagram goes through a complete initialization process. All nodes and edges need to be measured and positioned before the diagram is fully ready.
@@ -272,6 +305,10 @@ export class MemoryConsciousComponent {
   }
 }
 ```
+
+<Aside type="tip">
+  When using the [reactive approach](#using-in-reactive-contexts), `computed` handles this automatically — if the signal value is the same reference, the model won't reinitialize.
+</Aside>
 
 ## Troubleshooting
 
