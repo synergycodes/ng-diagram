@@ -67,8 +67,8 @@ export class NgDiagramPaletteItemComponent {
     }
 
     const clone = previewHtmlElement.nativeElement.cloneNode(true) as HTMLElement;
+    clone.classList.add('dragged-node');
     clone.style.position = 'fixed';
-    clone.style.top = '0';
 
     document.body.appendChild(clone);
 
