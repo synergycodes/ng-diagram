@@ -7,6 +7,7 @@
   background: var(--ngd-ui-bg-primary-default);
   padding: 16px;
   box-sizing: border-box;
+  overflow: hidden;
 
   & .palette {
     flex-direction: column;
