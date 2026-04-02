@@ -10,7 +10,7 @@ import { PortSideService } from '../../services/port-side.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{ directive: NgDiagramNodeSelectedDirective, inputs: ['node'] }],
   host: {
-    '[class.ng-diagram-port-hoverable]': 'true',
+    '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
 export class PortSideNodeComponent implements NgDiagramNodeTemplate<{ text: string }> {
