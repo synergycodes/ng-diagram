@@ -1,0 +1,6 @@
+<div class="port-side-node">
+  <span class="label">{{ text() }}</span>
+  <span class="side-indicator">Ports: {{ portSide() }}</span>
+</div>
+<ng-diagram-port id="port-left" type="both" side="left" />
+<ng-diagram-port id="port-dynamic" type="both" [side]="portSide()" />

@@ -13,4 +13,5 @@
   <button (click)="testVirtualizationClick.emit()">Test Virtualization</button>
   <button (click)="reinitializeModelClick.emit()">Reinitialize Model</button>
   <button (click)="simulateModelDownloadClick.emit()">Simulate Model Download</button>
+  <button (click)="onTogglePortSideClick()">Port Side: {{ portSide() === 'bottom' ? 'Bottom → Right' : 'Right → Bottom' }}</button>
 </div>
