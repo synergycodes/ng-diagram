@@ -264,5 +264,31 @@ export const defaultModel: DiagramModel = {
       targetPort: 'port-right-1',
       targetArrowhead: 'ng-diagram-arrow',
     },
+    {
+      id: '20',
+      source: '5',
+      target: '5',
+      data: { labelPosition: 0.5 },
+      type: 'labelled-edge',
+    },
+    {
+      id: '21',
+      source: '11',
+      target: '11',
+      data: {},
+    },
+    {
+      id: '22',
+      source: '11',
+      target: '11',
+      data: {},
+    },
+    {
+      id: '23',
+      source: '11',
+      target: '11',
+      data: {},
+      routing: 'self-loop',
+    },
   ],
 };

@@ -127,6 +127,12 @@ const defaultEdgeRoutingConfig: EdgeRoutingConfig = {
     maxCornerRadius: 15,
     firstLastSegmentLength: 20,
   },
+  selfLoop: {
+    loopSize: 50,
+    loopSpread: 30,
+    defaultSide: 'top',
+    sizeIncrement: 25,
+  },
 };
 
 const defaultBoxSelectionConfig: BoxSelectionConfig = {
