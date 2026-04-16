@@ -10,7 +10,6 @@ import {
   Node,
 } from 'ng-diagram';
 import { nodeTemplateMap, NodeTemplateType } from '../data/node-template';
-import { PortSideService } from '../services/port-side.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -23,8 +22,6 @@ export class ToolbarComponent {
   private readonly ngDiagramSelectionService = inject(NgDiagramSelectionService);
   private readonly ngDiagramViewportService = inject(NgDiagramViewportService);
   private readonly ngDiagramModelService = inject(NgDiagramModelService);
-  private readonly portSideService = inject(PortSideService);
-
   private readonly nodeTypes = Array.from(nodeTemplateMap.keys()) as NodeTemplateType[];
 
   reinitializeModelClick = output<void>();
@@ -49,8 +46,6 @@ export class ToolbarComponent {
 
   isDebugModeEnabled = computed(() => this.ngDiagramService.config().debugMode || false);
 
-  portSide = this.portSideService.portSide;
-
   onToggleLabelPositionClick(): void {
     const edge = this.selectedLabelledEdge();
     if (!edge) return;
@@ -59,10 +54,6 @@ export class ToolbarComponent {
     const newPos: EdgeLabelPosition = typeof currentPos === 'string' ? 0.5 : '50px';
 
     this.ngDiagramModelService.updateEdgeData(edge.id, { ...edge.data, labelPosition: newPos });
-  }
-
-  onTogglePortSideClick(): void {
-    this.portSideService.toggle();
   }
 
   onToggleDebugModeClick(): void {

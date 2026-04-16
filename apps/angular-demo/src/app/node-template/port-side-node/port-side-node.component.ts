@@ -1,6 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { NgDiagramNodeSelectedDirective, NgDiagramNodeTemplate, NgDiagramPortComponent, Node } from 'ng-diagram';
-import { PortSideService } from '../../services/port-side.service';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import {
+  NgDiagramNodeSelectedDirective,
+  NgDiagramNodeTemplate,
+  NgDiagramPortComponent,
+  Node,
+  type PortSide,
+} from 'ng-diagram';
 
 @Component({
   selector: 'app-port-side-node',
@@ -16,8 +21,10 @@ import { PortSideService } from '../../services/port-side.service';
 export class PortSideNodeComponent implements NgDiagramNodeTemplate<{ text: string }> {
   node = input.required<Node<{ text: string }>>();
 
-  private readonly portSideService = inject(PortSideService);
-
-  portSide = this.portSideService.portSide;
+  portSide = signal<PortSide>('bottom');
   text = computed(() => this.node()?.data?.text || 'Port Side Node');
+
+  onTogglePortSide(): void {
+    this.portSide.update((side) => (side === 'bottom' ? 'right' : 'bottom'));
+  }
 }
