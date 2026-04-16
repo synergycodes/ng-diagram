@@ -470,8 +470,8 @@ describe('FlowCore', () => {
       });
     });
 
-    it('should track state update when waitForMeasurements is true and has commands', async () => {
-      const trackSpy = vi.spyOn(flowCore.measurementTracker, 'trackStateUpdate');
+    it('should set tracking config when waitForMeasurements is true and has commands', async () => {
+      const configSpy = vi.spyOn(flowCore.measurementTracker, 'setNextTrackingConfig');
       const waitSpy = vi.spyOn(flowCore.measurementTracker, 'waitForMeasurements').mockResolvedValue();
 
       vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
@@ -488,12 +488,12 @@ describe('FlowCore', () => {
 
       await flowCore.transaction(async () => {}, { waitForMeasurements: true });
 
-      expect(trackSpy).toHaveBeenCalledWith({ nodesToAdd: [mockNode] }, undefined, undefined);
+      expect(configSpy).toHaveBeenCalledWith(undefined, undefined);
       expect(waitSpy).toHaveBeenCalled();
     });
 
-    it('should not track state update when waitForMeasurements is false', async () => {
-      const trackSpy = vi.spyOn(flowCore.measurementTracker, 'trackStateUpdate');
+    it('should not set tracking config when waitForMeasurements is false', async () => {
+      const configSpy = vi.spyOn(flowCore.measurementTracker, 'setNextTrackingConfig');
 
       vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
         results: { nodesToAdd: [mockNode] },
@@ -509,11 +509,11 @@ describe('FlowCore', () => {
 
       await flowCore.transaction(async () => {});
 
-      expect(trackSpy).not.toHaveBeenCalled();
+      expect(configSpy).not.toHaveBeenCalled();
     });
 
-    it('should not track state update when commandsCount is 0', async () => {
-      const trackSpy = vi.spyOn(flowCore.measurementTracker, 'trackStateUpdate');
+    it('should not set tracking config when commandsCount is 0', async () => {
+      const configSpy = vi.spyOn(flowCore.measurementTracker, 'setNextTrackingConfig');
 
       vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
         results: {},
@@ -523,7 +523,7 @@ describe('FlowCore', () => {
 
       await flowCore.transaction(async () => {}, { waitForMeasurements: true });
 
-      expect(trackSpy).not.toHaveBeenCalled();
+      expect(configSpy).not.toHaveBeenCalled();
     });
 
     it('should apply update when transaction has commands', async () => {
