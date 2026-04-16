@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `deferNodeUpdates` input on `NgDiagramMinimapComponent` — freezes minimap node positions during drag, resize, and rotation operations, updating only when the interaction ends. Use this to eliminate minimap overhead in large diagrams ([#638](https://github.com/synergycodes/ng-diagram/pull/638))
+
+### Changed
+
+- Minimap now caches `MinimapNodeData` by `Node` object reference, reusing cached data for unchanged nodes and reducing per-frame computation during interactions ([#638](https://github.com/synergycodes/ng-diagram/pull/638))
+
 ### Fixed
 
 - `initializeModel` can now be safely called inside reactive contexts (`computed`, `effect`, `linkedSignal`) without throwing NG0602 ([#608](https://github.com/synergycodes/ng-diagram/issues/608), [#622](https://github.com/synergycodes/ng-diagram/pull/622))

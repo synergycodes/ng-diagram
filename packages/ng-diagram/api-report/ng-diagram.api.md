@@ -886,6 +886,7 @@ export const NgDiagramMath: {
 
 // @public
 export class NgDiagramMinimapComponent implements AfterViewInit {
+    deferNodeUpdates: InputSignal<boolean>;
     // (undocumented)
     protected diagramBounds: Signal<Rect>;
     // (undocumented)
@@ -913,7 +914,7 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
     viewportRect: Signal<MinimapViewportRect>;
     width: InputSignal<number>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMinimapComponent, "ng-diagram-minimap", never, { "position": { "alias": "position"; "required": false; "isSignal": true; }; "width": { "alias": "width"; "required": false; "isSignal": true; }; "height": { "alias": "height"; "required": false; "isSignal": true; }; "showZoomControls": { "alias": "showZoomControls"; "required": false; "isSignal": true; }; "nodeStyle": { "alias": "nodeStyle"; "required": false; "isSignal": true; }; "minimapNodeTemplateMap": { "alias": "minimapNodeTemplateMap"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMinimapComponent, "ng-diagram-minimap", never, { "position": { "alias": "position"; "required": false; "isSignal": true; }; "width": { "alias": "width"; "required": false; "isSignal": true; }; "height": { "alias": "height"; "required": false; "isSignal": true; }; "showZoomControls": { "alias": "showZoomControls"; "required": false; "isSignal": true; }; "nodeStyle": { "alias": "nodeStyle"; "required": false; "isSignal": true; }; "minimapNodeTemplateMap": { "alias": "minimapNodeTemplateMap"; "required": false; "isSignal": true; }; "deferNodeUpdates": { "alias": "deferNodeUpdates"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMinimapComponent, never>;
 }
