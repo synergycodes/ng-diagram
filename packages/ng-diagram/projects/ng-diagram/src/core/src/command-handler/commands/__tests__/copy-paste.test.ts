@@ -35,6 +35,11 @@ describe('Copy-Paste Commands', () => {
         config: {
           computeNodeId: mockComputeNodeId,
           computeEdgeId: mockComputeEdgeId,
+          snapping: {
+            shouldSnapDragForNode: () => false,
+            computeSnapForNodeDrag: () => null,
+            defaultDragSnap: { width: 10, height: 10 },
+          },
         },
         actionStateManager: mockActionStateManager,
       } as unknown as FlowCore,
@@ -359,6 +364,97 @@ describe('Copy-Paste Commands', () => {
         expect(update.edgesToAdd).toHaveLength(1);
         const pastedEdge = update.edgesToAdd[0];
         expect(pastedEdge.measuredLabels).toBeUndefined();
+      });
+    });
+
+    describe('snapping', () => {
+      it('should snap pasted node positions when snapping is enabled', async () => {
+        commandHandler.flowCore.config.snapping.shouldSnapDragForNode = () => true;
+        commandHandler.flowCore.config.snapping.computeSnapForNodeDrag = () => null;
+        commandHandler.flowCore.config.snapping.defaultDragSnap = { width: 20, height: 20 };
+
+        commandHandler.flowCore.getState = () => ({
+          nodes: [{ ...mockNode, id: 'node1', position: { x: 10, y: 20 }, selected: true }],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        const pastedNode = update.nodesToAdd[0];
+        // 10 + 20 offset = 30, snapped to 40; 20 + 20 offset = 40, already snapped
+        expect(pastedNode.position.x).toBe(40);
+        expect(pastedNode.position.y).toBe(40);
+      });
+
+      it('should use computeSnapForNodeDrag when provided for paste', async () => {
+        commandHandler.flowCore.config.snapping.shouldSnapDragForNode = () => true;
+        commandHandler.flowCore.config.snapping.computeSnapForNodeDrag = () => ({ width: 50, height: 50 });
+        commandHandler.flowCore.config.snapping.defaultDragSnap = { width: 10, height: 10 };
+
+        commandHandler.flowCore.getState = () => ({
+          nodes: [{ ...mockNode, id: 'node1', position: { x: 10, y: 20 }, selected: true }],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        const pastedNode = update.nodesToAdd[0];
+        // 10 + 20 offset = 30, snapped to 50; 20 + 20 offset = 40, snapped to 50
+        expect(pastedNode.position.x).toBe(50);
+        expect(pastedNode.position.y).toBe(50);
+      });
+
+      it('should not snap pasted node positions when snapping is disabled', async () => {
+        commandHandler.flowCore.getState = () => ({
+          nodes: [{ ...mockNode, id: 'node1', position: { x: 13, y: 27 }, selected: true }],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste' });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        const pastedNode = update.nodesToAdd[0];
+        expect(pastedNode.position.x).toBe(13 + OFFSET);
+        expect(pastedNode.position.y).toBe(27 + OFFSET);
+      });
+
+      it('should snap position-based paste when snapping is enabled', async () => {
+        commandHandler.flowCore.config.snapping.shouldSnapDragForNode = () => true;
+        commandHandler.flowCore.config.snapping.computeSnapForNodeDrag = () => null;
+        commandHandler.flowCore.config.snapping.defaultDragSnap = { width: 20, height: 20 };
+
+        commandHandler.flowCore.getState = () => ({
+          nodes: [
+            { ...mockNode, id: 'node1', position: { x: 10, y: 20 }, size: { width: 100, height: 50 }, selected: true },
+          ],
+          edges: [],
+          metadata: mockMetadata,
+        });
+
+        await copy(commandHandler);
+        await paste(commandHandler, { name: 'paste', position: { x: 203, y: 307 } });
+
+        const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+        const [update] = updateCall.mock.calls[0];
+
+        const pastedNode = update.nodesToAdd[0];
+        // cursor 203 - width/2 50 = 153, snapped to 160; cursor 307 - height/2 25 = 282, snapped to 280
+        expect(pastedNode.position.x).toBe(160);
+        expect(pastedNode.position.y).toBe(280);
       });
     });
 

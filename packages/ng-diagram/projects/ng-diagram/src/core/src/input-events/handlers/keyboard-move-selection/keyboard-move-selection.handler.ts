@@ -1,6 +1,5 @@
-import { NgDiagramMath } from '../../../math';
 import { Bounds, Direction, DIRECTIONS, Node, Point } from '../../../types';
-import { getRotatedBoundingRect } from '../../../utils';
+import { getRotatedBoundingRect, snapNodePosition } from '../../../utils';
 import { EventHandler } from '../event-handler';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
@@ -136,14 +135,8 @@ export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMove
   }
 
   private getSnappedPosition(node: Node, delta: Point): Point {
-    const { shouldSnapDragForNode, computeSnapForNodeDrag, defaultDragSnap } = this.flow.config.snapping;
     const newPosition = { x: node.position.x + delta.x, y: node.position.y + delta.y };
-
-    if (!shouldSnapDragForNode(node)) {
-      return newPosition;
-    }
-
-    return NgDiagramMath.snapPoint(newPosition, computeSnapForNodeDrag(node) ?? defaultDragSnap);
+    return snapNodePosition(this.flow.config, node, newPosition);
   }
 
   private emitViewportPan(direction: Direction, amount: number): void {

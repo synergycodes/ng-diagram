@@ -581,6 +581,56 @@ describe('KeyboardMoveSelectionEventHandler', () => {
         });
       });
 
+      it('should not snap position for edge panning calculation when snapping is disabled', () => {
+        mockFlowCore.config.snapping.shouldSnapDragForNode = vi.fn().mockReturnValue(false);
+        mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 50, height: 50 });
+
+        // Node near right edge. Delta will be 50 (from computeSnapForNodeDrag).
+        // Position after move: 640+50=690. Without snapping in getSnappedPosition,
+        // node right edge = 690+100=790 = viewport right (800-10=790), no overflow.
+        const nodeNearRightEdge = {
+          ...mockNode,
+          position: { x: 640, y: 100 },
+          size: { width: 100, height: 50 },
+        };
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeNearRightEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [nodeNearRightEdge],
+          delta: { x: 50, y: 0 },
+        });
+        // No panning because unsnapped position stays within bounds
+        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveViewportBy', expect.any(Object));
+      });
+
+      it('should use unsnapped position for panning when snapping is disabled and node overflows', () => {
+        mockFlowCore.config.snapping.shouldSnapDragForNode = vi.fn().mockReturnValue(false);
+        mockFlowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 50, height: 50 });
+
+        // Position after move: 660+50=710. Unsnapped right edge = 710+100=810.
+        // Viewport right = 800-10=790. Overflow = 810-790=20.
+        const nodeNearRightEdge = {
+          ...mockNode,
+          position: { x: 660, y: 100 },
+          size: { width: 100, height: 50 },
+        };
+
+        mockFlowCore.modelLookup.getSelectedNodesWithChildren = vi.fn().mockReturnValue([nodeNearRightEdge]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [nodeNearRightEdge],
+          delta: { x: 50, y: 0 },
+        });
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveViewportBy', { x: -20, y: 0 });
+      });
+
       it('should throw error for unknown direction', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const event = getSampleKeyboardMoveEvent({ direction: 'unknown' as any });
