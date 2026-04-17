@@ -22,7 +22,6 @@ export class ToolbarComponent {
   private readonly ngDiagramSelectionService = inject(NgDiagramSelectionService);
   private readonly ngDiagramViewportService = inject(NgDiagramViewportService);
   private readonly ngDiagramModelService = inject(NgDiagramModelService);
-
   private readonly nodeTypes = Array.from(nodeTemplateMap.keys()) as NodeTemplateType[];
 
   reinitializeModelClick = output<void>();

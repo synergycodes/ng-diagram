@@ -115,6 +115,12 @@ export const defaultModel: DiagramModel = {
       position: { x: 100, y: 850 },
       data: { text: 'Port Toggle Test' },
     },
+    {
+      id: '18',
+      type: 'port-side',
+      position: { x: 400, y: 850 },
+      data: { text: 'Port Side Test' },
+    },
   ],
   edges: [
     {

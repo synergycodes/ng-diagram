@@ -4,6 +4,7 @@ import { CustomizedDefaultNodeComponent } from '../node-template/customized-defa
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
 import { InputFieldNodeComponent } from '../node-template/input-field-node/input-field-node.component';
+import { PortSideNodeComponent } from '../node-template/port-side-node/port-side-node.component';
 import { PortToggleNodeComponent } from '../node-template/port-toggle-node/port-toggle-node.component';
 import { ResizableNodeComponent } from '../node-template/resizable-node/resizable-node.component';
 
@@ -15,6 +16,7 @@ export enum NodeTemplateType {
   Group = 'custom-group',
   Chip = 'chip',
   PortToggle = 'port-toggle',
+  PortSide = 'port-side',
 }
 
 export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
@@ -25,4 +27,5 @@ export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
   [NodeTemplateType.CustomizedDefault, CustomizedDefaultNodeComponent],
   [NodeTemplateType.Chip, ChipNodeComponent],
   [NodeTemplateType.PortToggle, PortToggleNodeComponent],
+  [NodeTemplateType.PortSide, PortSideNodeComponent],
 ]);

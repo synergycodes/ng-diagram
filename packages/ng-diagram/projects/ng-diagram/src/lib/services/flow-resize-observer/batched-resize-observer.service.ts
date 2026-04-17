@@ -86,6 +86,18 @@ export class BatchResizeObserverService implements OnDestroy {
   }
 
   /**
+   * Force ResizeObserver to re-deliver an observation for the element.
+   * Useful when an element's position changed without a size change,
+   * since ResizeObserver only detects size changes.
+   */
+  invalidate(element: Element): void {
+    const metadata = this.observedElements.get(element);
+    if (!metadata) return;
+    this.observer?.unobserve(element);
+    this.observer?.observe(element);
+  }
+
+  /**
    * Get metadata for an element
    */
   getMetadata(element: Element): ObservedElementMetadata | undefined {
