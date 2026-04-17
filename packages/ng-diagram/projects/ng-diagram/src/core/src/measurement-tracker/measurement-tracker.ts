@@ -1,6 +1,4 @@
-import type { FlowStateUpdate } from '../types';
-
-export const DEFAULT_INITIAL_TIMEOUT = 2000;
+export const DEFAULT_SAFETY_TIMEOUT = 2000;
 export const DEFAULT_DEBOUNCE_TIMEOUT = 50;
 
 /**
@@ -11,25 +9,26 @@ export const DEFAULT_DEBOUNCE_TIMEOUT = 50;
  *
  * ## Timing Model
  *
- * 1. **When tracking starts**: An `initialTimeout` window begins. This is the maximum time
- *    to wait for the first measurement activity to arrive.
+ * 1. **`trackEntities()` is called**: Entities are registered and activity is signaled immediately
+ *    (because the middleware already detected actual changes). A debounce timer starts, along with
+ *    a safety timeout.
  *
- * 2. **If no activity arrives before initialTimeout**: The measurement completes (nothing changed).
+ * 2. **Subsequent DOM measurement signals arrive**: Each signal resets the debounce timer.
  *
- * 3. **When first activity arrives**: The `initialTimeout` is cancelled, and a `debounceTimeout`
- *    starts. This debounce ensures we wait for the DOM to settle.
+ * 3. **Debounce expires** (no signals for `debounceMs`): Measurements complete normally.
  *
- * 4. **On subsequent activity**: The `debounceTimeout` resets.
- *
- * 5. **When debounceTimeout expires**: The measurement completes (DOM has settled).
+ * 4. **Safety timeout fires** (total time exceeds `safetyTimeoutMs`): Measurements are
+ *    force-completed with a warning. This catches genuine rendering stalls.
  *
  * @example
  * ```typescript
- * // Track entities from a state update
- * tracker.trackStateUpdate(stateUpdate);
+ * // Stage config and track entities that actually changed
+ * tracker.setNextTrackingConfig(debounceMs, safetyTimeoutMs);
+ * // ... middleware detects actual changes ...
+ * tracker.trackEntities(['node:abc', 'edge:xyz']); // signals immediately, starts debounce
  *
- * // Middleware signals activity when size changes
- * tracker.signalNodeActivity(nodeId); // Cancels initialTimeout, starts debounce
+ * // Subsequent DOM measurement signals reset the debounce
+ * tracker.signalNodeMeasurement(nodeId);
  *
  * // Wait for all measurements to settle
  * await tracker.waitForMeasurements();
@@ -39,51 +38,71 @@ export const DEFAULT_DEBOUNCE_TIMEOUT = 50;
  */
 export class MeasurementTracker {
   private trackedIds = new Set<string>();
-  private initialTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private debounceTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  private hasReceivedActivity = false;
+  private safetyTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private waitingPromise: Promise<void> | null = null;
   private waitingResolve: (() => void) | null = null;
 
   private debounceMs = DEFAULT_DEBOUNCE_TIMEOUT;
-  private initialTimeoutMs = DEFAULT_INITIAL_TIMEOUT;
+  private safetyTimeoutMs = DEFAULT_SAFETY_TIMEOUT;
+
+  private pendingConfig: { debounceMs: number; safetyTimeoutMs: number } | null = null;
 
   /**
-   * Tracks all entities from a state update for measurement completion.
+   * Stages timeout configuration for the next middleware-driven tracking pass.
    *
-   * @param stateUpdate - The state update containing entities to track
-   * @param debounceMs - Debounce duration in milliseconds (default: 50)
-   * @param initialTimeoutMs - Initial timeout in milliseconds to wait for first activity (default: 2000)
+   * @param debounceMs - Debounce duration in milliseconds
+   * @param safetyTimeoutMs - Maximum time to wait before force-completing with a warning
    */
-  trackStateUpdate(stateUpdate: FlowStateUpdate, debounceMs?: number, initialTimeoutMs?: number): void {
-    this.debounceMs = debounceMs ?? DEFAULT_DEBOUNCE_TIMEOUT;
-    this.initialTimeoutMs = initialTimeoutMs ?? DEFAULT_INITIAL_TIMEOUT;
+  setNextTrackingConfig(debounceMs?: number, safetyTimeoutMs?: number): void {
+    this.pendingConfig = {
+      debounceMs: debounceMs ?? DEFAULT_DEBOUNCE_TIMEOUT,
+      safetyTimeoutMs: safetyTimeoutMs ?? DEFAULT_SAFETY_TIMEOUT,
+    };
+  }
 
-    if (stateUpdate.nodesToAdd) {
-      for (const node of stateUpdate.nodesToAdd) {
-        this.trackedIds.add(`node:${node.id}`);
-      }
-    }
-    if (stateUpdate.nodesToUpdate) {
-      for (const update of stateUpdate.nodesToUpdate) {
-        this.trackedIds.add(`node:${update.id}`);
-      }
-    }
-    if (stateUpdate.edgesToAdd) {
-      for (const edge of stateUpdate.edgesToAdd) {
-        this.trackedIds.add(`edge:${edge.id}`);
-      }
-    }
-    if (stateUpdate.edgesToUpdate) {
-      for (const update of stateUpdate.edgesToUpdate) {
-        this.trackedIds.add(`edge:${update.id}`);
-      }
+  /**
+   * Returns true if tracking has been requested via setNextTrackingConfig().
+   * Used by the measurement-tracking middleware to decide whether to track entities.
+   */
+  isTrackingRequested(): boolean {
+    return this.pendingConfig !== null;
+  }
+
+  /**
+   * Tracks entities detected by the middleware as actually changed.
+   * Consumes the pending config from setNextTrackingConfig().
+   *
+   * If entityIds is empty (full no-op), just clears the pending config.
+   * Otherwise, adds IDs to trackedIds and immediately signals activity for each
+   * (because the changes already happened in the middleware). This starts the
+   * debounce timer. Subsequent DOM measurement signals will reset the debounce as needed.
+   *
+   * @param entityIds - Prefixed entity IDs (e.g. 'node:abc', 'edge:xyz')
+   */
+  trackEntities(entityIds: string[]): void {
+    const config = this.pendingConfig;
+    this.pendingConfig = null;
+
+    if (entityIds.length === 0) return;
+
+    if (config) {
+      this.debounceMs = config.debounceMs;
+      this.safetyTimeoutMs = config.safetyTimeoutMs;
     }
 
-    if (!this.initialTimeoutId && !this.hasReceivedActivity) {
-      this.initialTimeoutId = setTimeout(() => {
-        this.onInitialTimeout();
-      }, this.initialTimeoutMs);
+    for (const id of entityIds) {
+      this.trackedIds.add(id);
+    }
+
+    if (!this.safetyTimeoutId) {
+      this.safetyTimeoutId = setTimeout(() => {
+        this.onSafetyTimeout();
+      }, this.safetyTimeoutMs);
+    }
+
+    for (const id of entityIds) {
+      this.signalActivity(id);
     }
   }
 
@@ -125,25 +144,18 @@ export class MeasurementTracker {
     return this.trackedIds.size > 0;
   }
 
-  private onInitialTimeout(): void {
+  private onSafetyTimeout(): void {
+    this.safetyTimeoutId = null;
     const pendingIds = [...this.trackedIds];
-    console.warn('[MeasurementTracker] Initial timeout reached. No measurement activity received.', {
+    console.warn('[MeasurementTracker] Safety timeout reached. Measurements may not have completed.', {
       pendingEntities: pendingIds,
-      timeoutMs: this.initialTimeoutMs,
+      timeoutMs: this.safetyTimeoutMs,
     });
     this.clear();
   }
 
   private signalActivity(id: string): void {
     if (!this.trackedIds.has(id)) return;
-
-    if (!this.hasReceivedActivity) {
-      this.hasReceivedActivity = true;
-      if (this.initialTimeoutId) {
-        clearTimeout(this.initialTimeoutId);
-        this.initialTimeoutId = null;
-      }
-    }
 
     if (this.debounceTimeoutId) {
       clearTimeout(this.debounceTimeoutId);
@@ -155,9 +167,9 @@ export class MeasurementTracker {
   }
 
   private clear(): void {
-    if (this.initialTimeoutId) {
-      clearTimeout(this.initialTimeoutId);
-      this.initialTimeoutId = null;
+    if (this.safetyTimeoutId) {
+      clearTimeout(this.safetyTimeoutId);
+      this.safetyTimeoutId = null;
     }
     if (this.debounceTimeoutId) {
       clearTimeout(this.debounceTimeoutId);
@@ -165,7 +177,6 @@ export class MeasurementTracker {
     }
 
     this.trackedIds.clear();
-    this.hasReceivedActivity = false;
 
     if (this.waitingResolve) {
       this.waitingResolve();

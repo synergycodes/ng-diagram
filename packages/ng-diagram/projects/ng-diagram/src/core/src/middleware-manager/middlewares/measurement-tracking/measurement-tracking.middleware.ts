@@ -2,7 +2,13 @@ import { MeasurementTracker } from '../../../measurement-tracker/measurement-tra
 import { Middleware } from '../../../types';
 
 /**
- * Signals DOM measurement activity to enable `waitForMeasurements` transaction option.
+ * Tracks and signals DOM measurement activity to enable `waitForMeasurements` transaction option.
+ *
+ * Operates in two modes:
+ * - **First pass** (tracking requested via `setNextTrackingConfig`): registers only actually-changed
+ *   entities via `trackEntities()`, avoiding the no-op tracking problem.
+ * - **Subsequent passes** (pending measurements exist): signals individual entities to reset the
+ *   debounce timer as DOM measurements flow back through `applyUpdate()`.
  *
  * @internal
  */
@@ -11,37 +17,50 @@ export const createMeasurementTrackingMiddleware = (
 ): Middleware<'measurement-tracking'> => ({
   name: 'measurement-tracking',
   execute: (context, next) => {
-    if (!measurementTracker.hasPendingMeasurements()) {
+    const isFirstPass = measurementTracker.isTrackingRequested();
+    const hasPending = measurementTracker.hasPendingMeasurements();
+
+    if (!isFirstPass && !hasPending) {
       next();
       return;
     }
 
     const { helpers } = context;
+    const nodeIds: string[] = [];
+    const edgeIds: string[] = [];
 
     if (helpers.anyNodesAdded()) {
-      const addedNodes = helpers.getAddedNodes();
-      for (const node of addedNodes) {
-        measurementTracker.signalNodeMeasurement(node.id);
+      for (const node of helpers.getAddedNodes()) {
+        nodeIds.push(node.id);
       }
     }
 
     if (helpers.anyEdgesAdded()) {
-      const addedEdges = helpers.getAddedEdges();
-      for (const edge of addedEdges) {
-        measurementTracker.signalEdgeMeasurement(edge.id);
+      for (const edge of helpers.getAddedEdges()) {
+        edgeIds.push(edge.id);
       }
     }
 
     if (helpers.checkIfAnyNodePropsChanged(['size', 'position', 'measuredPorts'])) {
-      const affectedNodeIds = helpers.getAffectedNodeIds(['size', 'position', 'measuredPorts']);
-      for (const id of affectedNodeIds) {
-        measurementTracker.signalNodeMeasurement(id);
+      for (const id of helpers.getAffectedNodeIds(['size', 'position', 'measuredPorts'])) {
+        nodeIds.push(id);
       }
     }
 
     if (helpers.checkIfAnyEdgePropsChanged(['points', 'measuredLabels'])) {
-      const affectedEdgeIds = helpers.getAffectedEdgeIds(['points', 'measuredLabels']);
-      for (const id of affectedEdgeIds) {
+      for (const id of helpers.getAffectedEdgeIds(['points', 'measuredLabels'])) {
+        edgeIds.push(id);
+      }
+    }
+
+    if (isFirstPass) {
+      const entityIds = [...nodeIds.map((id) => `node:${id}`), ...edgeIds.map((id) => `edge:${id}`)];
+      measurementTracker.trackEntities(entityIds);
+    } else {
+      for (const id of nodeIds) {
+        measurementTracker.signalNodeMeasurement(id);
+      }
+      for (const id of edgeIds) {
         measurementTracker.signalEdgeMeasurement(id);
       }
     }

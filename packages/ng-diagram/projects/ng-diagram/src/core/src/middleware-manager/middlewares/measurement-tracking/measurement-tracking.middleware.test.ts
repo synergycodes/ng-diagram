@@ -51,7 +51,7 @@ describe('MeasurementTrackingMiddleware', () => {
   });
 
   describe('execute()', () => {
-    it('should call next and skip processing when no pending measurements', () => {
+    it('should call next and skip processing when no tracking requested and no pending measurements', () => {
       const middleware = createMeasurementTrackingMiddleware(measurementTracker);
 
       middleware.execute(context, nextMock, () => null);
@@ -61,10 +61,8 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(context.helpers.anyEdgesAdded).not.toHaveBeenCalled();
     });
 
-    it('should process when there are pending measurements', () => {
-      measurementTracker.trackStateUpdate({
-        nodesToAdd: [{ id: 'node1', position: { x: 0, y: 0 }, data: {} }],
-      });
+    it('should process when tracking is requested (first pass)', () => {
+      measurementTracker.setNextTrackingConfig();
 
       const middleware = createMeasurementTrackingMiddleware(measurementTracker);
 
@@ -74,16 +72,182 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(context.helpers.anyNodesAdded).toHaveBeenCalled();
       expect(context.helpers.anyEdgesAdded).toHaveBeenCalled();
     });
-  });
 
-  describe('node tracking', () => {
-    beforeEach(() => {
-      measurementTracker.trackStateUpdate({
-        nodesToAdd: [{ id: 'node1', position: { x: 0, y: 0 }, data: {} }],
-      });
+    it('should process when there are pending measurements (subsequent pass)', () => {
+      measurementTracker.setNextTrackingConfig();
+      measurementTracker.trackEntities(['node:node1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+
+      middleware.execute(context, nextMock, () => null);
+
+      expect(nextMock).toHaveBeenCalledTimes(1);
+      expect(context.helpers.anyNodesAdded).toHaveBeenCalled();
+      expect(context.helpers.anyEdgesAdded).toHaveBeenCalled();
     });
 
-    it('should signal measurement for added nodes', () => {
+    it('should always call next even when changes are detected', () => {
+      measurementTracker.setNextTrackingConfig();
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
+      context.helpers.getAddedEdges = vi.fn().mockReturnValue([{ id: 'edge1', source: 'n1', target: 'n2', data: {} }]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(nextMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('first pass (tracking requested)', () => {
+    beforeEach(() => {
+      measurementTracker.setNextTrackingConfig();
+    });
+
+    it('should call trackEntities with added node IDs', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([
+        { id: 'node1', position: { x: 0, y: 0 }, data: {} },
+        { id: 'node2', position: { x: 100, y: 100 }, data: {} },
+      ]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith(['node:node1', 'node:node2']);
+    });
+
+    it('should call trackEntities with added edge IDs', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedEdges = vi.fn().mockReturnValue([{ id: 'edge1', source: 'n1', target: 'n2', data: {} }]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith(['edge:edge1']);
+    });
+
+    it('should call trackEntities with changed node prop IDs', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockReturnValue(true);
+      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith(['node:node1']);
+    });
+
+    it('should call trackEntities with changed edge prop IDs', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.checkIfAnyEdgePropsChanged = vi.fn().mockReturnValue(true);
+      context.helpers.getAffectedEdgeIds = vi.fn().mockReturnValue(['edge1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith(['edge:edge1']);
+    });
+
+    it('should call trackEntities with combined node and edge IDs', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
+      context.helpers.getAddedEdges = vi.fn().mockReturnValue([{ id: 'edge1', source: 'n1', target: 'n2', data: {} }]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith(['node:node1', 'edge:edge1']);
+    });
+
+    it('should call trackEntities with empty array when no changes detected (no-op)', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith([]);
+      expect(measurementTracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not call signalNodeMeasurement or signalEdgeMeasurement', () => {
+      const nodeSignalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
+      const edgeSignalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(nodeSignalSpy).not.toHaveBeenCalled();
+      expect(edgeSignalSpy).not.toHaveBeenCalled();
+    });
+
+    it('should check correct node props', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
+        return props.includes('size');
+      });
+      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(context.helpers.checkIfAnyNodePropsChanged).toHaveBeenCalledWith(['size', 'position', 'measuredPorts']);
+      expect(trackSpy).toHaveBeenCalledWith(['node:node1']);
+    });
+
+    it('should check correct edge props', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.checkIfAnyEdgePropsChanged = vi.fn().mockImplementation((props: string[]) => {
+        return props.includes('points');
+      });
+      context.helpers.getAffectedEdgeIds = vi.fn().mockReturnValue(['edge1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(context.helpers.checkIfAnyEdgePropsChanged).toHaveBeenCalledWith(['points', 'measuredLabels']);
+      expect(trackSpy).toHaveBeenCalledWith(['edge:edge1']);
+    });
+
+    it('should include both added entities and changed props', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
+      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockReturnValue(true);
+      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node2']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).toHaveBeenCalledWith(['node:node1', 'node:node2']);
+    });
+  });
+
+  describe('subsequent pass (pending measurements)', () => {
+    beforeEach(() => {
+      // Simulate entities already tracked from a previous first-pass
+      measurementTracker.setNextTrackingConfig();
+      measurementTracker.trackEntities(['node:node1', 'edge:edge1']);
+    });
+
+    it('should call signalNodeMeasurement for added nodes', () => {
       const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
 
       context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
@@ -100,67 +264,7 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(signalSpy).toHaveBeenCalledTimes(2);
     });
 
-    it('should signal measurement for nodes with changed size', () => {
-      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
-
-      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
-        return props.includes('size');
-      });
-      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
-
-      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
-      middleware.execute(context, nextMock, () => null);
-
-      expect(context.helpers.checkIfAnyNodePropsChanged).toHaveBeenCalledWith(['size', 'position', 'measuredPorts']);
-      expect(signalSpy).toHaveBeenCalledWith('node1');
-    });
-
-    it('should signal measurement for nodes with changed position', () => {
-      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
-
-      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
-        return props.includes('position');
-      });
-      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
-
-      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
-      middleware.execute(context, nextMock, () => null);
-
-      expect(signalSpy).toHaveBeenCalledWith('node1');
-    });
-
-    it('should signal measurement for nodes with changed measuredPorts', () => {
-      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
-
-      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
-        return props.includes('measuredPorts');
-      });
-      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
-
-      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
-      middleware.execute(context, nextMock, () => null);
-
-      expect(signalSpy).toHaveBeenCalledWith('node1');
-    });
-
-    it('should not signal when no nodes added and no node props changed', () => {
-      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
-
-      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
-      middleware.execute(context, nextMock, () => null);
-
-      expect(signalSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('edge tracking', () => {
-    beforeEach(() => {
-      measurementTracker.trackStateUpdate({
-        edgesToAdd: [{ id: 'edge1', source: 'n1', target: 'n2', data: {} }],
-      });
-    });
-
-    it('should signal measurement for added edges', () => {
+    it('should call signalEdgeMeasurement for added edges', () => {
       const signalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
 
       context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
@@ -177,7 +281,50 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(signalSpy).toHaveBeenCalledTimes(2);
     });
 
-    it('should signal measurement for edges with changed points', () => {
+    it('should call signalNodeMeasurement for nodes with changed size', () => {
+      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
+
+      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
+        return props.includes('size');
+      });
+      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(context.helpers.checkIfAnyNodePropsChanged).toHaveBeenCalledWith(['size', 'position', 'measuredPorts']);
+      expect(signalSpy).toHaveBeenCalledWith('node1');
+    });
+
+    it('should call signalNodeMeasurement for nodes with changed position', () => {
+      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
+
+      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
+        return props.includes('position');
+      });
+      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(signalSpy).toHaveBeenCalledWith('node1');
+    });
+
+    it('should call signalNodeMeasurement for nodes with changed measuredPorts', () => {
+      const signalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
+
+      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockImplementation((props: string[]) => {
+        return props.includes('measuredPorts');
+      });
+      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node1']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(signalSpy).toHaveBeenCalledWith('node1');
+    });
+
+    it('should call signalEdgeMeasurement for edges with changed points', () => {
       const signalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
 
       context.helpers.checkIfAnyEdgePropsChanged = vi.fn().mockImplementation((props: string[]) => {
@@ -192,7 +339,7 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(signalSpy).toHaveBeenCalledWith('edge1');
     });
 
-    it('should signal measurement for edges with changed measuredLabels', () => {
+    it('should call signalEdgeMeasurement for edges with changed measuredLabels', () => {
       const signalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
 
       context.helpers.checkIfAnyEdgePropsChanged = vi.fn().mockImplementation((props: string[]) => {
@@ -206,25 +353,30 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(signalSpy).toHaveBeenCalledWith('edge1');
     });
 
-    it('should not signal when no edges added and no edge props changed', () => {
-      const signalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
+    it('should not signal when no changes detected', () => {
+      const nodeSignalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
+      const edgeSignalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
 
       const middleware = createMeasurementTrackingMiddleware(measurementTracker);
       middleware.execute(context, nextMock, () => null);
 
-      expect(signalSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('combined tracking', () => {
-    beforeEach(() => {
-      measurementTracker.trackStateUpdate({
-        nodesToAdd: [{ id: 'node1', position: { x: 0, y: 0 }, data: {} }],
-        edgesToAdd: [{ id: 'edge1', source: 'n1', target: 'n2', data: {} }],
-      });
+      expect(nodeSignalSpy).not.toHaveBeenCalled();
+      expect(edgeSignalSpy).not.toHaveBeenCalled();
     });
 
-    it('should signal measurements for both nodes and edges', () => {
+    it('should not call trackEntities', () => {
+      const trackSpy = vi.spyOn(measurementTracker, 'trackEntities');
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(trackSpy).not.toHaveBeenCalled();
+    });
+
+    it('should signal both nodes and edges', () => {
       const nodeSignalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
       const edgeSignalSpy = vi.spyOn(measurementTracker, 'signalEdgeMeasurement');
 
@@ -238,34 +390,6 @@ describe('MeasurementTrackingMiddleware', () => {
 
       expect(nodeSignalSpy).toHaveBeenCalledWith('node1');
       expect(edgeSignalSpy).toHaveBeenCalledWith('edge1');
-    });
-
-    it('should signal for both added entities and changed props', () => {
-      const nodeSignalSpy = vi.spyOn(measurementTracker, 'signalNodeMeasurement');
-
-      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
-      context.helpers.checkIfAnyNodePropsChanged = vi.fn().mockReturnValue(true);
-      context.helpers.getAffectedNodeIds = vi.fn().mockReturnValue(['node2']);
-
-      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
-      middleware.execute(context, nextMock, () => null);
-
-      expect(nodeSignalSpy).toHaveBeenCalledWith('node1');
-      expect(nodeSignalSpy).toHaveBeenCalledWith('node2');
-      expect(nodeSignalSpy).toHaveBeenCalledTimes(2);
-    });
-
-    it('should always call next', () => {
-      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-      context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
-      context.helpers.getAddedNodes = vi.fn().mockReturnValue([{ id: 'node1', position: { x: 0, y: 0 }, data: {} }]);
-      context.helpers.getAddedEdges = vi.fn().mockReturnValue([{ id: 'edge1', source: 'n1', target: 'n2', data: {} }]);
-
-      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
-      middleware.execute(context, nextMock, () => null);
-
-      expect(nextMock).toHaveBeenCalledTimes(1);
     });
   });
 });
