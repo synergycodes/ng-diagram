@@ -254,6 +254,59 @@ The amount to move the viewport in the y-direction.
 
 ***
 
+### setViewport()
+
+> **setViewport**(`x`, `y`, `scale`): `void`
+
+Sets the viewport to an absolute position and scale.
+
+This low-level method gives full control over viewport state, enabling use cases
+like custom-anchor `zoomToFit` implementations:
+
+#### Parameters
+
+##### x
+
+`number`
+
+The absolute x-coordinate for the viewport.
+
+##### y
+
+`number`
+
+The absolute y-coordinate for the viewport.
+
+##### scale
+
+`number`
+
+The absolute zoom scale (clamped to configured min/max).
+
+#### Returns
+
+`void`
+
+#### Example
+
+```typescript
+// Custom zoomToFit implementation with anchor positioning
+// anchor: (0,0) = top-left, (0.5,0.5) = center, (1,1) = bottom-right
+const anchor = { x: 0.5, y: 0.5 };
+const { width, height } = this.modelService.metadata().viewport;
+const bounds = this.modelService.computePartsBounds(nodes, edges);
+const scale = Math.min(width / bounds.width, height / bounds.height);
+const x = width * anchor.x - (bounds.x + bounds.width * anchor.x) * scale;
+const y = height * anchor.y - (bounds.y + bounds.height * anchor.y) * scale;
+this.viewportService.setViewport(x, y, scale);
+```
+
+#### Since
+
+1.1.3
+
+***
+
 ### zoom()
 
 > **zoom**(`factor`, `center?`): `void`

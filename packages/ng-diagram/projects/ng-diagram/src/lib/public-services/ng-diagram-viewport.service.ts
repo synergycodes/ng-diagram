@@ -115,6 +115,42 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
     this.flowCore.commandHandler.emit('moveViewportBy', { x: dx, y: dy });
   }
 
+  /**
+   * Sets the viewport to an absolute position and scale.
+   *
+   * This low-level method gives full control over viewport state, enabling use cases
+   * like custom-anchor `zoomToFit` implementations:
+   *
+   * @example
+   * ```typescript
+   * // Custom zoomToFit implementation with anchor positioning
+   * // anchor: (0,0) = top-left, (0.5,0.5) = center, (1,1) = bottom-right
+   * const anchor = { x: 0.5, y: 0.5 };
+   * const { width, height } = this.modelService.metadata().viewport;
+   * const bounds = this.modelService.computePartsBounds(nodes, edges);
+   * const scale = Math.min(width / bounds.width, height / bounds.height);
+   * const x = width * anchor.x - (bounds.x + bounds.width * anchor.x) * scale;
+   * const y = height * anchor.y - (bounds.y + bounds.height * anchor.y) * scale;
+   * this.viewportService.setViewport(x, y, scale);
+   * ```
+   *
+   * @param x The absolute x-coordinate for the viewport.
+   * @param y The absolute y-coordinate for the viewport.
+   * @param scale The absolute zoom scale (clamped to configured min/max).
+   *
+   * @since 1.1.3
+   */
+  setViewport(x: number, y: number, scale: number) {
+    const { min, max } = this.flowCore.config.zoom;
+    if (scale < min || scale > max) {
+      console.warn(
+        `[ngDiagram] setViewport: scale ${scale} is outside configured bounds [${min}, ${max}] and will be clamped.`
+      );
+    }
+    const clampedScale = Math.max(min, Math.min(max, scale));
+    this.flowCore.commandHandler.emit('zoom', { scale: clampedScale, x, y });
+  }
+
   // ===================
   // ZOOM METHODS
   // ===================
