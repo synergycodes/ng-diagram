@@ -26,6 +26,6 @@
 </ng-diagram-canvas>
 
 @if (!config()?.hideWatermark) {
-  <ng-diagram-watermark />
+  <ng-diagram-watermark [preferredPosition]="config()?.watermarkPosition" />
 }
 <ng-diagram-box-selection />
