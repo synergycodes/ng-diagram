@@ -11,6 +11,7 @@ import tailwindcss from '@tailwindcss/vite';
 const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 
 export default defineConfig({
+  site: 'https://ngdiagram.dev',
   base: '/docs',
   redirects: {
     '/': '/docs/intro/quick-start/',
@@ -39,6 +40,24 @@ export default defineConfig({
         dark: './src/assets/ng-diagram-logo-white.svg',
       },
       customCss: ['./src/styles/custom.css'],
+      head: [
+        {
+          tag: 'script',
+          attrs: { type: 'application/ld+json' },
+          content: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareSourceCode',
+            name: 'ngDiagram',
+            description:
+              'A powerful Angular library for creating interactive diagrams, node-based editors, and visual programming interfaces.',
+            codeRepository: 'https://github.com/synergycodes/ng-diagram',
+            programmingLanguage: ['TypeScript', 'Angular'],
+            license: 'https://www.apache.org/licenses/LICENSE-2.0',
+            runtimePlatform: 'Angular',
+            url: 'https://ngdiagram.dev',
+          }),
+        },
+      ],
       social: [
         {
           icon: 'github',

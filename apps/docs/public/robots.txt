@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ngdiagram.dev/docs/sitemap-index.xml
