@@ -164,7 +164,7 @@ function generateLlmsTxt() {
     '## Optional',
     '',
     `- [llms-full.txt](${BASE_URL}/llms-full.txt): Full documentation content inlined for LLM context windows`,
-    '',
+    ''
   );
 
   return lines.join('\n');
