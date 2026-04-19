@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `deferNodeUpdates` input on `NgDiagramMinimapComponent` — freezes minimap node positions during drag, resize, and rotation operations, updating only when the interaction ends. Use this to eliminate minimap overhead in large diagrams ([#638](https://github.com/synergycodes/ng-diagram/pull/638))
 - `watermarkPosition` property on `FlowConfig` — allows configuring the watermark corner position via `NgDiagramPanelPosition`, with automatic collision avoidance when a panel occupies the same corner ([#621](https://github.com/synergycodes/ng-diagram/issues/621), [#652](https://github.com/synergycodes/ng-diagram/pull/652)) — thanks [@jimmeryn](https://github.com/jimmeryn) for the issue submission! 🙏
 - `setViewport(x, y, scale)` method on `NgDiagramViewportService` — sets absolute viewport position and scale in a single call, enabling custom-anchor `zoomToFit` implementations ([#591](https://github.com/synergycodes/ng-diagram/discussions/591), [#653](https://github.com/synergycodes/ng-diagram/pull/653)) — thanks [@MeMeMax](https://github.com/MeMeMax) for the discussion that led to this! 🙏
+- Generic type parameters on `NgDiagramModelService` getter methods (`getNodeById`, `getEdgeById`, `getConnectedNodes`, `getConnectedEdges`, `getChildren`, `getChildrenNested`, `getParentHierarchy`, `getOverlappingNodes`, `getNodesInRange`, `getNearestNodeInRange`, `getNodeEnds`) — eliminates the need for `as` casts when accessing typed `node.data` or `edge.data` ([#654](https://github.com/synergycodes/ng-diagram/pull/654))
+- Exported `DataObject` type from public API ([#654](https://github.com/synergycodes/ng-diagram/pull/654))
+
+### Fixed
+
+- `updateNodeData` and `updateEdgeData` now accept interfaces and union types — relaxed generic constraint from `Record<string, unknown> | undefined` to `DataObject` ([#654](https://github.com/synergycodes/ng-diagram/pull/654))
 
 ### Changed
 
