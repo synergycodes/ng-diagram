@@ -257,11 +257,11 @@ Find and retrieve specific elements:
 
 ```typescript
 // Get element by ID
-const node = this.modelService.getNodeById('node-1');
-const edge = this.modelService.getEdgeById('edge-1');
+const node = this.modelService.getNodeById<NodeData>('node-1');
+const edge = this.modelService.getEdgeById<EdgeData>('edge-1');
 
 // Find nearest node to a point
-const nearestNode = this.modelService.getNearestNodeInRange(
+const nearestNode = this.modelService.getNearestNodeInRange<NodeData>(
   { x: 150, y: 150 },
   50 // range in pixels
 );
@@ -270,7 +270,7 @@ const nearestNode = this.modelService.getNearestNodeInRange(
 const nearestPort = this.modelService.getNearestPortInRange({ x: 150, y: 150 }, 30);
 
 // Get all nodes in a range
-const nodesInRange = this.modelService.getNodesInRange({ x: 150, y: 150 }, 100);
+const nodesInRange = this.modelService.getNodesInRange<NodeData>({ x: 150, y: 150 }, 100);
 ```
 
 ### Model Serialization
