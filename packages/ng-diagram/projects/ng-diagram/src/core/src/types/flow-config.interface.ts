@@ -100,6 +100,14 @@ export interface LinkingConfig {
    * @default 30
    */
   edgePanningThreshold: number;
+  /**
+   * Whether to select a node when the user presses a port to start linking.
+   * When true (default), pressing a port also triggers node selection events.
+   * When false, port press only initiates the linking gesture without selecting the node.
+   *
+   * @default true
+   */
+  selectNodeOnPortPress: boolean;
 }
 
 /**
