@@ -86,6 +86,7 @@ export type {
   BoxSelectionConfig,
   ClipboardPastedEvent,
   CopyPasteActionState,
+  DataObject,
   DiagramEventMap,
   DiagramInitEvent,
   DraggingActionState,
