@@ -131,6 +131,7 @@ function generateLlmsTxt() {
     `- Docs: ${BASE_URL}/`,
     '- GitHub: https://github.com/synergycodes/ng-diagram',
     '- NPM: https://www.npmjs.com/package/ng-diagram',
+    '- MCP: `npx -y @ng-diagram/mcp` (interactive docs & API search, stdio transport)',
     '',
   ];
 
