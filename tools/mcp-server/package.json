@@ -40,7 +40,7 @@
     "@modelcontextprotocol/sdk": "^1.27.1",
     "gray-matter": "^4.0.3",
     "minisearch": "^7.2.0",
-    "zod": "^3.25"
+    "zod": "^4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",
