@@ -3,6 +3,7 @@ import {
   ClipboardPastedEvent,
   configureShortcuts,
   DiagramInitEvent,
+  EdgeDrawEndedEvent,
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
   initializeModel,
@@ -96,6 +97,9 @@ export class AppComponent {
     snapping: {
       shouldSnapDragForNode: () => true,
     },
+    linking: {
+      selectNodeOnPortPress: false,
+    },
     shortcuts: configureShortcuts([
       {
         actionName: 'keyboardMoveSelectionUp',
@@ -181,6 +185,25 @@ export class AppComponent {
       sourcePort: event.sourcePort,
       targetPort: event.targetPort,
     });
+  }
+
+  onEdgeDrawEnded(event: EdgeDrawEndedEvent): void {
+    if (event.success) {
+      console.log('Edge Draw Ended (success):', {
+        edge: event.edge!.id,
+        source: event.source.id,
+        target: event.target?.id,
+        sourcePort: event.sourcePort,
+        targetPort: event.targetPort,
+      });
+    } else {
+      console.log('Edge Draw Ended (cancelled):', {
+        source: event.source.id,
+        sourcePort: event.sourcePort,
+        reason: event.reason,
+        dropPosition: event.dropPosition,
+      });
+    }
   }
 
   onClipboardPasted(event: ClipboardPastedEvent): void {

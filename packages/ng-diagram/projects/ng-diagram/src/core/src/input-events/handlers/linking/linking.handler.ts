@@ -59,7 +59,6 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
         this.flow.commandHandler.emit('finishLinking', { position: flowPosition });
-        this.flow.actionStateManager.clearLinking();
 
         break;
       }

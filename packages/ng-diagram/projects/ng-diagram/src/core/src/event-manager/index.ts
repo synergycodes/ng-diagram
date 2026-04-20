@@ -3,6 +3,8 @@ export type {
   ClipboardPastedEvent,
   DiagramEventMap,
   DiagramInitEvent,
+  EdgeDrawCancelReason,
+  EdgeDrawEndedEvent,
   EdgeDrawnEvent,
   EventListener,
   GroupMembershipChangedEvent,

@@ -92,6 +92,8 @@ export type {
   DraggingActionState,
   AbsoluteEdgeLabelPosition,
   Edge,
+  EdgeDrawCancelReason,
+  EdgeDrawEndedEvent,
   EdgeDrawnEvent,
   EdgeLabel,
   EdgeLabelPosition,

@@ -102,6 +102,27 @@ describe('finishLinkingToPosition', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
+  it('should set dropPosition on linking state before applyUpdate', async () => {
+    const position = { x: 300, y: 400 };
+    const finalEdge = { id: 'final-edge', source: 'source-node', target: '', data: {} };
+
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockCreateFinalEdge.mockReturnValue(finalEdge);
+
+    const command: FinishLinkingToPositionCommand = {
+      name: 'finishLinkingToPosition',
+      position,
+    };
+
+    await finishLinkingToPosition(mockCommandHandler, command);
+
+    expect(mockFlowCore.actionStateManager.linking!.dropPosition).toEqual(position);
+  });
+
   it('should always create edge with empty target and targetPort', async () => {
     const position = { x: 300, y: 400 };
     const finalEdge = { id: 'final-edge', source: 'source-node', target: '', data: {} };
