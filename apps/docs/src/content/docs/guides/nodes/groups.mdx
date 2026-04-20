@@ -72,7 +72,10 @@ For more details, see the [Group Resizing via diagram config](/docs/guides/nodes
 
 ### Resizing Configuration
 
-You can control resizing behavior globally via the [`resize`](/docs/api/types/configuration/features/resizeconfig) config in [`NgDiagramConfig`](/docs/api/types/configuration/ngdiagramconfig), such as setting minimum group size.
+You can control resizing behavior globally via the [`resize`](/docs/api/types/configuration/features/resizeconfig) config in [`NgDiagramConfig`](/docs/api/types/configuration/ngdiagramconfig).
+
+- **Minimum size:** Use [`getMinNodeSize`](/docs/api/types/configuration/features/resizeconfig#getminnodesize) to set minimum dimensions for groups (and nodes).
+- **Prevent resizing below children:** By default, groups can be resized smaller than their children's bounding box, which means child nodes can visually overflow outside the group. Set [`allowResizeBelowChildrenBounds`](/docs/api/types/configuration/features/resizeconfig/#allowresizebelowchildrenbounds) to `false` to prevent the group from being resized smaller than its children.
 
 The [`grouping`](/docs/api/types/configuration/features/groupingconfig) configuration in [`NgDiagramConfig`](/docs/api/types/configuration/ngdiagramconfig) lets you control advanced grouping behavior:
 
@@ -80,9 +83,10 @@ The [`grouping`](/docs/api/types/configuration/features/groupingconfig) configur
   Use the [`canGroup`](/docs/api/types/configuration/features/groupingconfig#cangroup) function to control which nodes can be grouped together.
   This callback receives the group node and the candidate child node, and should return `true` if grouping is allowed.
 
-```typescript {3,6}
+```typescript {3-4,7}
 config = {
   resize: {
+    allowResizeBelowChildrenBounds: false,
     getMinNodeSize: (node: Node) => (node.isGroup ? { width: 200, height: 120 } : { width: 80, height: 40 }),
   },
   grouping: {

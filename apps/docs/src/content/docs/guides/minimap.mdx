@@ -66,6 +66,16 @@ By default, zoom controls are displayed below the minimap. To hide them:
 <ng-diagram-minimap [showZoomControls]="false" />
 ```
 
+### Deferred Node Updates
+
+For large diagrams, minimap updates during drag, resize, and rotation operations can add overhead. Enable [`deferNodeUpdates`](/docs/api/components/ngdiagramminimapcomponent/#defernodeupdates) to freeze minimap node positions while the user is interacting, updating them only when the operation ends:
+
+```html
+<ng-diagram-minimap [deferNodeUpdates]="true" />
+```
+
+The viewport indicator rectangle always updates in real-time, so users still see their current position in the diagram.
+
 ## Customization via CSS Variables
 
 :::tip[Theming]

@@ -17,14 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `edgeDrawEnded` event — fires on every linking gesture completion (success and cancel), with source, drop position, and cancel reason (`noTarget`, `invalidConnection`, `invalidTarget`) ([#637](https://github.com/synergycodes/ng-diagram/issues/637), [#655](https://github.com/synergycodes/ng-diagram/pull/655)) — thanks [@ninjapiratica](https://github.com/ninjapiratica) for the inspiration! 🙏
 - `selectNodeOnPortPress` option on `LinkingConfig` — when `false`, port press only initiates linking without selecting the parent node. Default `true` preserves existing behavior ([#637](https://github.com/synergycodes/ng-diagram/issues/637), [#655](https://github.com/synergycodes/ng-diagram/pull/655)) — thanks [@ninjapiratica](https://github.com/ninjapiratica) for the issue submission! 🙏
 
-### Fixed
-
-- `updateNodeData` and `updateEdgeData` now accept interfaces and union types — relaxed generic constraint from `Record<string, unknown> | undefined` to `DataObject` ([#654](https://github.com/synergycodes/ng-diagram/pull/654))
-
-### Deprecated
-
-- `edgeDrawn` event — use `edgeDrawEnded` instead, which fires for both successful and cancelled draws. `edgeDrawn` continues to fire for backward compatibility ([#655](https://github.com/synergycodes/ng-diagram/pull/655))
-
 ### Changed
 
 - Minimap now caches `MinimapNodeData` by `Node` object reference, reusing cached data for unchanged nodes and reducing per-frame computation during interactions ([#638](https://github.com/synergycodes/ng-diagram/pull/638))
@@ -33,10 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `initializeModel` can now be safely called inside reactive contexts (`computed`, `effect`, `linkedSignal`) without throwing NG0602 ([#608](https://github.com/synergycodes/ng-diagram/issues/608), [#622](https://github.com/synergycodes/ng-diagram/pull/622))
 - Fixed palette drag preview not rendering when an ancestor element has `overflow: hidden` ([#624](https://github.com/synergycodes/ng-diagram/pull/624))
-- Fixed port position not updating when `side` or `originPoint` input changes at runtime ([#647](https://github.com/synergycodes/ng-diagram/pull/647))
+- Fixed port position not updating when `side` or `originPoint` input changes at runtime ([#647](https://github.com/synergycodes/ng-diagram/pull/647)) — thanks [@ninjapiratica](https://github.com/ninjapiratica) for the issue submission! 🙏
 - Fixed `waitForMeasurements` incurring a 2-second timeout when a transaction includes no-op updates ([#648](https://github.com/synergycodes/ng-diagram/pull/648))
 - Fixed node position not being snapped when node snapping is enabled and node is dropped from palette or pasted onto the canvas ([#649](https://github.com/synergycodes/ng-diagram/pull/649))
 - Fixed port hitbox (`::before` pseudo-element) not being centered on the port ([#650](https://github.com/synergycodes/ng-diagram/pull/650))
+- `updateNodeData` and `updateEdgeData` now accept interfaces and union types — relaxed generic constraint from `Record<string, unknown> | undefined` to `DataObject` ([#654](https://github.com/synergycodes/ng-diagram/pull/654))
+
+### Deprecated
+
+- `edgeDrawn` event — use `edgeDrawEnded` instead, which fires for both successful and cancelled draws. `edgeDrawn` continues to fire for backward compatibility ([#655](https://github.com/synergycodes/ng-diagram/pull/655))
 
 ## [1.1.2] - 2026-03-17
 
