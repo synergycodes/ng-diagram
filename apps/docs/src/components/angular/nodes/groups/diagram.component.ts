@@ -23,6 +23,9 @@ import {
 })
 export class DiagramComponent {
   config = {
+    resize: {
+      allowResizeBelowChildrenBounds: false,
+    },
     zoom: {
       zoomToFit: {
         onInit: true,
