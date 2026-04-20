@@ -42,6 +42,10 @@ Fires on every linking completion — both successful and cancelled.
 For successful draws, includes the created edge and target.
 For cancelled draws, includes the cancellation reason.
 
+#### Since
+
+1.2.0
+
 ***
 
 ### ~~edgeDrawn~~

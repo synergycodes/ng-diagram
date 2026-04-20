@@ -130,6 +130,7 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
    * The viewport indicator rectangle always updates in real-time.
    *
    * @default false
+   * @since 1.2.0
    */
   deferNodeUpdates = input<boolean>(false);
 

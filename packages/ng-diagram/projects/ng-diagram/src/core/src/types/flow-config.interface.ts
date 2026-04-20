@@ -106,6 +106,7 @@ export interface LinkingConfig {
    * When false, port press only initiates the linking gesture without selecting the node.
    *
    * @default true
+   * @since 1.2.0
    */
   selectNodeOnPortPress: boolean;
 }
