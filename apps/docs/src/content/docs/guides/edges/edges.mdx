@@ -189,7 +189,9 @@ This allows you to:
 - Apply specific routing algorithms
 - Control the visual appearance and behavior
 
-### Events
+[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
+
+## Edge Draw Events
 
 Use the [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent) event to react to edge draw completions. It fires for both successful and cancelled draws:
 
@@ -207,7 +209,7 @@ onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
 }
 ```
 
-### Selection behavior
+## Selection During Linking
 
 By default, pressing a port to start linking also selects the parent node. To decouple selection from linking gestures, set [`selectNodeOnPortPress`](/docs/api/types/configuration/features/linkingconfig/#selectnodeonportpress) to `false`:
 
@@ -218,8 +220,6 @@ config: NgDiagramConfig = {
   },
 };
 ```
-
-[Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
 ## Further reading
 
