@@ -260,9 +260,6 @@ The amount to move the viewport in the y-direction.
 
 Sets the viewport to an absolute position and scale.
 
-This low-level method gives full control over viewport state, enabling use cases
-like custom-anchor `zoomToFit` implementations:
-
 #### Parameters
 
 ##### x
@@ -290,15 +287,8 @@ The absolute zoom scale (clamped to configured min/max).
 #### Example
 
 ```typescript
-// Custom zoomToFit implementation with anchor positioning
-// anchor: (0,0) = top-left, (0.5,0.5) = center, (1,1) = bottom-right
-const anchor = { x: 0.5, y: 0.5 };
-const { width, height } = this.modelService.metadata().viewport;
-const bounds = this.modelService.computePartsBounds(nodes, edges);
-const scale = Math.min(width / bounds.width, height / bounds.height);
-const x = width * anchor.x - (bounds.x + bounds.width * anchor.x) * scale;
-const y = height * anchor.y - (bounds.y + bounds.height * anchor.y) * scale;
-this.viewportService.setViewport(x, y, scale);
+// Reset to origin at 50% zoom
+this.viewportService.setViewport(0, 0, 0.5);
 ```
 
 #### Since
@@ -396,4 +386,14 @@ this.viewportService.zoomToFit({ padding: [50, 100, 50, 100] });
 
 // Fit only specific nodes
 this.viewportService.zoomToFit({ nodeIds: ['node1', 'node2'] });
+
+// Custom zoomToFit with anchor positioning using setViewport
+// anchor: (0,0) = top-left, (0.5,0.5) = center, (1,1) = bottom-right
+const anchor = { x: 0.5, y: 0.5 };
+const { width, height } = this.modelService.metadata().viewport;
+const bounds = this.modelService.computePartsBounds(nodes, edges);
+const scale = Math.min(width / bounds.width, height / bounds.height);
+const x = width * anchor.x - (bounds.x + bounds.width * anchor.x) * scale;
+const y = height * anchor.y - (bounds.y + bounds.height * anchor.y) * scale;
+this.viewportService.setViewport(x, y, scale);
 ```
