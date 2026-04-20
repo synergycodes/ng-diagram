@@ -128,7 +128,7 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * @param y The absolute y-coordinate for the viewport.
    * @param scale The absolute zoom scale (clamped to configured min/max).
    *
-   * @since 1.1.3
+   * @since 1.2.0
    */
   setViewport(x: number, y: number, scale: number) {
     const { min, max } = this.flowCore.config.zoom;
