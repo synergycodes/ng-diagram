@@ -23,7 +23,7 @@ ngDiagram uses a reactive model to manage diagram state. You initialize the mode
 
 - Initialize model with [`initializeModel()`](/docs/api/utilities/initializemodel)
 - Nodes require: [`id`](/docs/api/types/model/simplenode#id), [`position`](/docs/api/types/model/simplenode#position), [`data`](/docs/api/types/model/simplenode#data)
-- Edges require: [`id`](/docs/api/types/model/edge#id), [`source`](/docs/api/types/model/edge#source), [`target`](/docs/api/types/model/edge#target), [`sourcePort`](/docs/api/types/model/edge#sourceport), [`targetPort`](/docs/api/types/model/edge#targetport), [`data`](/docs/api/types/model/edge#data)
+- Edges require: [`id`](/docs/api/types/model/edge#id), [`source`](/docs/api/types/model/edge#source), [`target`](/docs/api/types/model/edge#target), [`data`](/docs/api/types/model/edge#data). Optionally specify [`sourcePort`](/docs/api/types/model/edge#sourceport) and [`targetPort`](/docs/api/types/model/edge#targetport) -omitting them creates [floating edges](/docs/guides/edges/floating-edges) that connect to node borders instead
 - Custom properties can be stored in the `data` field of [`nodes`](/docs/api/types/model/simplenode/#data) and [`edges`](/docs/api/types/model/edge/#data)
 - Use [`metadata`](/docs/api/types/model/metadata) for diagram-level custom information
 
@@ -106,6 +106,7 @@ Edges connect nodes through ports. Default edges automatically calculate paths b
 - Custom arrowheads (customizable using SVG markers)
 - Custom edge templates
 - Selection and hover states
+- [Floating edges](/docs/guides/edges/floating-edges) - edges that connect to node borders instead of fixed ports
 
 [Edges Documentation →](/docs/guides/edges/edges) | [Custom Edges →](/docs/guides/edges/custom-edges)
 
@@ -148,6 +149,21 @@ The diagram background can display visual patterns to help with alignment and sp
 
 [Background Documentation →](/docs/guides/background)
 
+## Minimap
+
+The [`<ng-diagram-minimap>`](/docs/api/components/ngdiagramminimapcomponent/) component provides a bird's-eye view of the diagram, showing all nodes and the current viewport position. It supports click-and-drag navigation to quickly pan to different areas.
+
+**Minimap features:**
+
+- Configurable position and size
+- Click-and-drag viewport navigation
+- Built-in zoom controls
+- Custom node styling via callback function or CSS variables
+- Custom node templates per node type
+- [`deferNodeUpdates`](/docs/api/components/ngdiagramminimapcomponent/#defernodeupdates) option to reduce overhead in large diagrams
+
+[Minimap Documentation →](/docs/guides/minimap)
+
 ## Labels and Arrowheads
 
 Custom edges can display labels for showing information along connections. You can add multiple labels with different positions in your custom edge templates. Arrowheads are customizable using SVG markers.
@@ -175,11 +191,14 @@ Nodes can be configured for different interaction modes. Enable resizing to allo
   - Custom nodes: Use [`NgDiagramNodeSelectedDirective`](/docs/api/directives/ngdiagramnodeselecteddirective) as hostDirective for selection styles
   - Custom edges: Use [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) or implement selection styles manually
   - Default templates have selection styles built-in
+- **Box Selection**: Hold Shift and drag to select multiple nodes and edges within a rectangle
+  - Configurable [`partialInclusion`](/docs/api/types/configuration/features/boxselectionconfig/#partialinclusion) and [`realtime`](/docs/api/types/configuration/features/boxselectionconfig/#realtime) behavior
+  - Customizable appearance via CSS variables
 - **Copy/Paste**: Copy, cut, and paste diagram elements
-  - Keyboard shortcuts can be updated via [`configureShortcuts()`](/docs/api/utilities/configureshortcuts), defaults are: Ctrl/Cmd+C (copy), Ctrl/Cmd+X (cut), Ctrl/Cmd+V (paste)
   - Programmatic access via [`NgDiagramClipboardService`](/docs/api/services/ngdiagramclipboardservice)
+- **Keyboard Shortcuts**: All common actions have default keyboard bindings (copy, paste, delete, select all, arrow key movement, zoom, and more). Customize or disable shortcuts via [`configureShortcuts()`](/docs/api/utilities/configureshortcuts) with platform-aware modifier handling (Ctrl/Cmd)
 
-[Selection →](/docs/guides/nodes/selection) | [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation) | [Keyboard Shortcuts →](/docs/api/utilities/configureshortcuts)
+[Selection →](/docs/guides/nodes/selection) | [Box Selection →](/docs/guides/box-selection) | [Resizing →](/docs/guides/nodes/resizing) | [Rotation →](/docs/guides/nodes/rotation) | [Keyboard Shortcuts →](/docs/guides/shortcut-manager)
 
 ## Configuration
 
@@ -230,6 +249,19 @@ ngDiagram provides injectable services for all diagram operations. Services are 
 Services use Angular signals for reactive state management, making it easy to build reactive UI components.
 
 [Services Documentation →](/docs/intro/services)
+
+## Transactions
+
+Transactions batch multiple state changes into a single atomic operation, improving performance and ensuring consistency. Wrap operations in a transaction to apply all changes at once instead of triggering individual updates.
+
+**Transaction capabilities:**
+
+- Batch multiple add, remove, and update operations
+- Async transactions for server-fetched data
+- [`waitForMeasurements`](/docs/api/types/middleware/transactionoptions/#waitformeasurements) option to wait for element dimensions before proceeding (e.g., before calling `zoomToFit()`)
+- Deterministic operation order - additions before removals, edges removed before their nodes
+
+[Transactions Documentation →](/docs/guides/transactions)
 
 ## Events
 
@@ -314,6 +346,31 @@ ngDiagram uses a middleware system that allows you to intercept and modify any s
 </Aside>
 
 [Middleware Documentation →](/docs/guides/middlewares)
+
+## Virtualization
+
+For diagrams with hundreds or thousands of elements, virtualization renders only the nodes and edges visible within the current viewport. Elements are dynamically added and removed from the DOM as you pan and zoom.
+
+**Virtualization features:**
+
+- Configurable viewport padding and idle delay
+- Dramatically improved rendering performance for large diagrams
+- Seamless panning and zooming experience
+
+[Virtualization Documentation →](/docs/guides/virtualization)
+
+## Touch Gestures
+
+ngDiagram supports touch devices out of the box, with gestures for all common interactions.
+
+**Supported gestures:**
+
+- **Pinch to zoom** - Two-finger pinch to scale the diagram
+- **Two-finger panning** - Move two fingers together to pan the view
+- **Long press for box selection** - Press and hold, then drag to select multiple elements
+- Standard tap, drag, resize, rotate, and linking interactions via single finger
+
+[Touch Gestures Documentation →](/docs/guides/touch-gestures)
 
 ## Styling System
 
