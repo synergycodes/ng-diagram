@@ -208,7 +208,7 @@ Improves performance for large diagrams by only rendering visible elements.
 
 #### Since
 
-1.1.3
+1.2.0
 
 Sets the preferred position for the ngDiagram watermark.
 If the chosen position collides with a registered panel (e.g., minimap),

@@ -558,7 +558,7 @@ export interface FlowConfig {
   hideWatermark?: boolean;
 
   /**
-   * @since 1.1.3
+   * @since 1.2.0
    *
    * Sets the preferred position for the ngDiagram watermark.
    * If the chosen position collides with a registered panel (e.g., minimap),
