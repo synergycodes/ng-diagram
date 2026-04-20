@@ -36,6 +36,10 @@ The viewport indicator rectangle always updates in real-time.
 false
 ```
 
+#### Since
+
+1.2.0
+
 ***
 
 ### height

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-20
+
 ### Added
 
 - `deferNodeUpdates` input on `NgDiagramMinimapComponent` — freezes minimap node positions during drag, resize, and rotation operations, updating only when the interaction ends. Use this to eliminate minimap overhead in large diagrams ([#638](https://github.com/synergycodes/ng-diagram/pull/638))
@@ -214,7 +216,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.1.2...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/synergycodes/ng-diagram/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/synergycodes/ng-diagram/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/synergycodes/ng-diagram/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/synergycodes/ng-diagram/compare/v1.0.0...v1.1.0

@@ -111,6 +111,10 @@ When false, port press only initiates the linking gesture without selecting the 
 true
 ```
 
+#### Since
+
+1.2.0
+
 ***
 
 ### temporaryEdgeDataBuilder()
