@@ -4,6 +4,10 @@ tmp-dist/
 # generated types
 .astro/
 
+# generated LLM discoverability files
+public/llms.txt
+public/llms-full.txt
+
 # dependencies
 node_modules/
 
