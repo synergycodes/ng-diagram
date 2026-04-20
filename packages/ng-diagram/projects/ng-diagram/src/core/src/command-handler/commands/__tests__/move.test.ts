@@ -118,6 +118,88 @@ describe('Move Selection Commands', () => {
   });
 
   describe('snapping behavior', () => {
+    it('should move node without snapping when shouldSnapDragForNode returns false', () => {
+      flowCore.config.snapping.shouldSnapDragForNode = vi.fn().mockReturnValue(false);
+      flowCore.config.snapping.computeSnapForNodeDrag = vi.fn().mockReturnValue({ width: 10, height: 10 });
+
+      const mockNode = {
+        id: '1',
+        position: { x: 0, y: 0 },
+        selected: true,
+        data: {},
+        type: 'node',
+      };
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: [mockNode],
+      });
+
+      moveNodesBy(commandHandler, {
+        name: 'moveNodesBy',
+        delta: { x: 13, y: 27 },
+        nodes: [mockNode],
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [{ id: '1', position: { x: 13, y: 27 } }],
+        },
+        'moveNodesBy'
+      );
+    });
+
+    it('should not accumulate deltas when snapping is disabled', () => {
+      const accumulatedDeltas = new Map<string, { x: number; y: number }>();
+      const mockFlowCore = {
+        getState: vi.fn(),
+        applyUpdate: vi.fn(),
+        modelLookup: {
+          getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+          getAllDescendants: vi.fn().mockReturnValue([]),
+        },
+        actionStateManager: {
+          dragging: {
+            modifiers: {},
+            accumulatedDeltas,
+          },
+        },
+        config: {
+          snapping: {
+            shouldSnapDragForNode: vi.fn().mockReturnValue(false),
+            shouldSnapResizeForNode: vi.fn().mockReturnValue(false),
+            computeSnapForNodeDrag: vi.fn().mockReturnValue({ width: 100, height: 100 }),
+            computeSnapForNodeSize: vi.fn().mockReturnValue(null),
+            defaultDragSnap: { width: 1, height: 1 },
+            defaultResizeSnap: { width: 1, height: 1 },
+          },
+        },
+      } as unknown as FlowCore;
+      const mockCommandHandler = new CommandHandler(mockFlowCore);
+
+      const mockNode = {
+        id: '1',
+        position: { x: 0, y: 0 },
+        selected: true,
+        data: {},
+        type: 'node',
+      };
+
+      moveNodesBy(mockCommandHandler, {
+        name: 'moveNodesBy',
+        delta: { x: 13, y: 27 },
+        nodes: [mockNode],
+      });
+
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [{ id: '1', position: { x: 13, y: 27 } }],
+        },
+        'moveNodesBy'
+      );
+
+      expect(accumulatedDeltas.get('1')).toEqual({ x: 0, y: 0 });
+    });
+
     it('should apply snapping to root nodes', () => {
       const shouldSnapMock = vi.fn().mockReturnValue(true);
       flowCore.config.snapping.shouldSnapDragForNode = shouldSnapMock;

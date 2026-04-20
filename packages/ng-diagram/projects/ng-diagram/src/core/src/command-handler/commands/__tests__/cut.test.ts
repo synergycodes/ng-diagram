@@ -16,6 +16,11 @@ describe('Cut Command', () => {
     const mockConfig = {
       computeNodeId: vi.fn().mockImplementation(() => `new-node-id`),
       computeEdgeId: vi.fn().mockImplementation(() => `new-edge-id`),
+      snapping: {
+        shouldSnapDragForNode: () => false,
+        computeSnapForNodeDrag: () => null,
+        defaultDragSnap: { width: 10, height: 10 },
+      },
     };
 
     const mockActionStateManager = {

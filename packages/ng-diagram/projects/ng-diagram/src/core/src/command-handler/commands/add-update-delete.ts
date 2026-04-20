@@ -1,5 +1,6 @@
 import { resolveLabelPosition } from '../../edge-routing-manager';
 import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
+import { snapNodePosition } from '../../utils';
 
 const computeAddedPorts = (node: Node, ports: Port[]): Port[] => {
   const newPortIds = new Set(ports.map((port) => port.id));
@@ -42,7 +43,9 @@ export interface PaletteDropNodeCommand {
 
 export const paletteDropNode = async (commandHandler: CommandHandler, command: PaletteDropNodeCommand) => {
   const { node } = command;
-  await commandHandler.flowCore.applyUpdate({ nodesToAdd: [node] }, 'paletteDropNode');
+  const position = snapNodePosition(commandHandler.flowCore.config, node, node.position);
+
+  await commandHandler.flowCore.applyUpdate({ nodesToAdd: [{ ...node, position }] }, 'paletteDropNode');
 };
 
 export interface UpdateNodeCommand {

@@ -1,6 +1,5 @@
-import { NgDiagramMath } from '../../math';
 import type { CommandHandler, Node, Point } from '../../types';
-import { isSamePoint } from '../../utils';
+import { isSamePoint, snapNodePosition } from '../../utils';
 
 export interface MoveNodesByCommand {
   name: 'moveNodesBy';
@@ -123,30 +122,17 @@ const applySnappingWithAccumulation = (
   delta: Point,
   accumulatedDeltas: Map<string, Point> | undefined
 ): { snappedPosition: Point; newAccumulated: Point } => {
-  const { shouldSnapDragForNode, computeSnapForNodeDrag, defaultDragSnap } = commandHandler.flowCore.config.snapping;
-
   const accumulated = accumulatedDeltas?.get(node.id) ?? { x: 0, y: 0 };
   const totalDelta = {
     x: accumulated.x + delta.x,
     y: accumulated.y + delta.y,
   };
 
-  if (!shouldSnapDragForNode(node)) {
-    return {
-      snappedPosition: {
-        x: node.position.x + totalDelta.x,
-        y: node.position.y + totalDelta.y,
-      },
-      newAccumulated: { x: 0, y: 0 },
-    };
-  }
-
-  const snap = computeSnapForNodeDrag(node) ?? defaultDragSnap;
   const targetPosition = {
     x: node.position.x + totalDelta.x,
     y: node.position.y + totalDelta.y,
   };
-  const snappedPosition = NgDiagramMath.snapPoint(targetPosition, snap);
+  const snappedPosition = snapNodePosition(commandHandler.flowCore.config, node, targetPosition);
 
   const actualMovement = {
     x: snappedPosition.x - node.position.x,

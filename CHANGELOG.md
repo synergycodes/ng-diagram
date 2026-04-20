@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed palette drag preview not rendering when an ancestor element has `overflow: hidden` ([#624](https://github.com/synergycodes/ng-diagram/pull/624))
 - Fixed port position not updating when `side` or `originPoint` input changes at runtime ([#647](https://github.com/synergycodes/ng-diagram/pull/647))
 - Fixed `waitForMeasurements` incurring a 2-second timeout when a transaction includes no-op updates ([#648](https://github.com/synergycodes/ng-diagram/pull/648))
+- Fixed node position not being snapped when node snapping is enabled and node is dropped from palette or pasted onto the canvas ([#649](https://github.com/synergycodes/ng-diagram/pull/649))
 
 ## [1.1.2] - 2026-03-17
 

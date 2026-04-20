@@ -8,4 +8,5 @@ export * from './is-group';
 export * from './measurement-validation';
 export * from './rects-points-sizes';
 export * from './semaphore';
+export * from './snap-node-position';
 export * from './sort-nodes-by-z-index';
