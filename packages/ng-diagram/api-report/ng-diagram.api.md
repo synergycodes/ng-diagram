@@ -143,10 +143,15 @@ export class CursorPositionTrackerDirective {
     static ɵfac: i0.ɵɵFactoryDeclaration<CursorPositionTrackerDirective, never>;
 }
 
+// @public (undocumented)
+export type DataObject = object;
+
 // @public
 export interface DiagramEventMap {
     clipboardPasted: ClipboardPastedEvent;
     diagramInit: DiagramInitEvent;
+    edgeDrawEnded: EdgeDrawEndedEvent;
+    // @deprecated
     edgeDrawn: EdgeDrawnEvent;
     groupMembershipChanged: GroupMembershipChangedEvent;
     nodeDragEnded: NodeDragEndedEvent;
@@ -218,6 +223,21 @@ export interface Edge<T extends DataObject = DataObject> {
 }
 
 // @public
+export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget';
+
+// @public
+export interface EdgeDrawEndedEvent {
+    dropPosition: Point;
+    edge?: Edge;
+    reason?: EdgeDrawCancelReason;
+    source: Node_2;
+    sourcePort?: string;
+    success: boolean;
+    target?: Node_2;
+    targetPort?: string;
+}
+
+// @public @deprecated
 export interface EdgeDrawnEvent {
     edge: Edge;
     source: Node_2;
@@ -330,6 +350,7 @@ export interface FlowConfig {
     snapping: SnappingConfig;
     viewportPanningEnabled: boolean;
     virtualization: VirtualizationConfig;
+    watermarkPosition?: NgDiagramPanelPosition;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }
@@ -440,6 +461,8 @@ export type KeyboardZoomAction = 'keyboardZoomIn' | 'keyboardZoomOut';
 
 // @public
 export interface LinkingActionState {
+    cancelReason?: EdgeDrawCancelReason;
+    dropPosition?: Point;
     sourceNodeId: string;
     sourcePortId: string;
     temporaryEdge: Edge | null;
@@ -452,6 +475,7 @@ export interface LinkingConfig {
     edgePanningThreshold: number;
     finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
     portSnapDistance: number;
+    selectNodeOnPortPress: boolean;
     temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
     validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null) => boolean;
 }
@@ -765,6 +789,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     clipboardPasted: EventEmitter<ClipboardPastedEvent>;
     config: InputSignal<DeepPartial<FlowConfig> | undefined>;
     diagramInit: EventEmitter<DiagramInitEvent>;
+    edgeDrawEnded: EventEmitter<EdgeDrawEndedEvent>;
+    // @deprecated
     edgeDrawn: EventEmitter<EdgeDrawnEvent>;
     // (undocumented)
     readonly edges: WritableSignal<Edge<object>[]>;
@@ -808,7 +834,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "edgeDrawEnded": "edgeDrawEnded"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
@@ -886,6 +912,7 @@ export const NgDiagramMath: {
 
 // @public
 export class NgDiagramMinimapComponent implements AfterViewInit {
+    deferNodeUpdates: InputSignal<boolean>;
     // (undocumented)
     protected diagramBounds: Signal<Rect>;
     // (undocumented)
@@ -913,7 +940,7 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
     viewportRect: Signal<MinimapViewportRect>;
     width: InputSignal<number>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMinimapComponent, "ng-diagram-minimap", never, { "position": { "alias": "position"; "required": false; "isSignal": true; }; "width": { "alias": "width"; "required": false; "isSignal": true; }; "height": { "alias": "height"; "required": false; "isSignal": true; }; "showZoomControls": { "alias": "showZoomControls"; "required": false; "isSignal": true; }; "nodeStyle": { "alias": "nodeStyle"; "required": false; "isSignal": true; }; "minimapNodeTemplateMap": { "alias": "minimapNodeTemplateMap"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramMinimapComponent, "ng-diagram-minimap", never, { "position": { "alias": "position"; "required": false; "isSignal": true; }; "width": { "alias": "width"; "required": false; "isSignal": true; }; "height": { "alias": "height"; "required": false; "isSignal": true; }; "showZoomControls": { "alias": "showZoomControls"; "required": false; "isSignal": true; }; "nodeStyle": { "alias": "nodeStyle"; "required": false; "isSignal": true; }; "minimapNodeTemplateMap": { "alias": "minimapNodeTemplateMap"; "required": false; "isSignal": true; }; "deferNodeUpdates": { "alias": "deferNodeUpdates"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramMinimapComponent, never>;
 }
@@ -953,23 +980,23 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     deleteEdges(ids: string[]): void;
     deleteNodes(ids: string[]): void;
     readonly edges: Signal<Edge<object>[]>;
-    getChildren(groupId: string): Node_2[];
-    getChildrenNested(groupId: string): Node_2[];
-    getConnectedEdges(nodeId: string): Edge[];
-    getConnectedNodes(nodeId: string): Node_2[];
-    getEdgeById(edgeId: string): Edge | null;
+    getChildren<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
+    getChildrenNested<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
+    getConnectedEdges<T extends DataObject = DataObject>(nodeId: string): Edge<T>[];
+    getConnectedNodes<T extends DataObject = DataObject>(nodeId: string): Node_2<T>[];
+    getEdgeById<T extends DataObject = DataObject>(edgeId: string): Edge<T> | null;
     getModel(): ModelAdapter;
-    getNearestNodeInRange(point: Point, range: number): Node_2 | null;
+    getNearestNodeInRange<T extends DataObject = DataObject>(point: Point, range: number): Node_2<T> | null;
     getNearestPortInRange(point: Point, range: number): Port | null;
-    getNodeById(nodeId: string): Node_2 | null;
-    getNodeEnds(edgeId: string): {
-        source: Node_2;
-        target: Node_2;
+    getNodeById<T extends DataObject = DataObject>(nodeId: string): Node_2<T> | null;
+    getNodeEnds<S extends DataObject = DataObject, T extends DataObject = DataObject>(edgeId: string): {
+        source: Node_2<S>;
+        target: Node_2<T>;
     } | null;
-    getNodesInRange(point: Point, range: number): Node_2[];
-    getOverlappingNodes(nodeId: string): Node_2[];
-    getOverlappingNodes(node: Node_2): Node_2[];
-    getParentHierarchy(nodeId: string): GroupNode[];
+    getNodesInRange<T extends DataObject = DataObject>(point: Point, range: number): Node_2<T>[];
+    getOverlappingNodes<T extends DataObject = DataObject>(nodeId: string): Node_2<T>[];
+    getOverlappingNodes<T extends DataObject = DataObject>(node: Node_2<T>): Node_2<T>[];
+    getParentHierarchy<T extends DataObject = DataObject>(nodeId: string): GroupNode<T>[];
     isNestedChild(nodeId: string, groupId: string): boolean;
     readonly metadata: Signal<Metadata<object>>;
     // @internal
@@ -977,10 +1004,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     readonly nodes: Signal<Node_2[]>;
     toJSON(): string;
     updateEdge(edgeId: string, edge: Partial<Edge>): void;
-    updateEdgeData<T extends Record<string, unknown> | undefined>(edgeId: string, data: T): void;
+    updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T): void;
     updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]): void;
     updateNode(nodeId: string, node: Partial<Node_2>): void;
-    updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T): void;
+    updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T): void;
     updateNodes(nodes: (Pick<Node_2, 'id'> & Partial<Node_2>)[]): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramModelService, never>;
@@ -1212,6 +1239,7 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
     moveViewport(x: number, y: number): void;
     moveViewportBy(dx: number, dy: number): void;
     scale: Signal<number>;
+    setViewport(x: number, y: number, scale: number): void;
     viewport: Signal<Viewport>;
     zoom(factor: number, center?: Point | undefined): void;
     zoomToFit(options?: {

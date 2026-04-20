@@ -152,7 +152,7 @@ describe('LinkingEventHandler', () => {
         mockActionStateManager.isLinking.mockReturnValue(true);
       });
 
-      it('should emit finishLinking command with converted position and call clearLinking', () => {
+      it('should emit finishLinking command with converted position', () => {
         const clientPosition = { x: 200, y: 200 };
         const flowPosition = { x: 250, y: 250 };
         mockClientToFlowPosition.mockReturnValue(flowPosition);
@@ -168,7 +168,6 @@ describe('LinkingEventHandler', () => {
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('finishLinking', {
           position: flowPosition,
         });
-        expect(mockActionStateManager.clearLinking).toHaveBeenCalled();
       });
 
       it('should not emit when not linking', () => {

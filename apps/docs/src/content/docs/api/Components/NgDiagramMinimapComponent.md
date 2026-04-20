@@ -21,6 +21,27 @@ the diagram viewport to different areas.
 
 ## Properties
 
+### deferNodeUpdates
+
+> **deferNodeUpdates**: `InputSignal`\<`boolean`\>
+
+When enabled, minimap node positions are frozen during drag, resize, and
+rotation operations — updated only when the operation ends.
+
+The viewport indicator rectangle always updates in real-time.
+
+#### Default
+
+```ts
+false
+```
+
+#### Since
+
+1.2.0
+
+***
+
 ### height
 
 > **height**: `InputSignal`\<`number`\>

@@ -1,3 +1,4 @@
+import type { EdgeDrawCancelReason } from '../event-manager/event-types';
 import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
@@ -41,6 +42,10 @@ export interface LinkingActionState {
   sourcePortId: string;
   /** Temporary edge displayed while creating the connection. */
   temporaryEdge: Edge | null;
+  /** Position where the pointer was released. */
+  dropPosition?: Point;
+  /** Reason the linking gesture was cancelled (set by finishLinking on failure paths). */
+  cancelReason?: EdgeDrawCancelReason;
 }
 
 /**

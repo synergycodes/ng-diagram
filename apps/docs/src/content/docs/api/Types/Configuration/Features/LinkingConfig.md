@@ -97,6 +97,26 @@ The maximum distance (in pixels) at temporary edge will snap to target port.
 
 ***
 
+### selectNodeOnPortPress
+
+> **selectNodeOnPortPress**: `boolean`
+
+Whether to select a node when the user presses a port to start linking.
+When true (default), pressing a port also triggers node selection events.
+When false, port press only initiates the linking gesture without selecting the node.
+
+#### Default
+
+```ts
+true
+```
+
+#### Since
+
+1.2.0
+
+***
+
 ### temporaryEdgeDataBuilder()
 
 > **temporaryEdgeDataBuilder**: (`defaultTemporaryEdgeData`) => [`Edge`](/docs/api/types/model/edge/)

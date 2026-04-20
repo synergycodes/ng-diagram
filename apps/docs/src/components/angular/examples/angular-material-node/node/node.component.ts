@@ -4,7 +4,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import {
   NgDiagramModelService,
   NgDiagramNodeRotateAdornmentComponent,
@@ -48,8 +48,8 @@ export class NodeComponent implements NgDiagramNodeTemplate<NodeData> {
         : 'orange'
   );
 
-  onColorChange({ value }: any) {
-    this.modelService.updateNodeData(this.node().id, {
+  onColorChange({ value }: MatSelectChange) {
+    this.modelService.updateNodeData<NodeData>(this.node().id, {
       ...this.node().data,
       status: value,
     });

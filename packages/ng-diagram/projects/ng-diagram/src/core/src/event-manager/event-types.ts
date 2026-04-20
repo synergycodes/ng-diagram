@@ -62,8 +62,20 @@ export interface DiagramEventMap {
    *
    * This event only fires for user-initiated edge creation through the UI,
    * but not for programmatically added edges.
+   *
+   * @deprecated Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws.
    */
   edgeDrawn: EdgeDrawnEvent;
+  /**
+   * Event emitted when an edge draw gesture ends, regardless of outcome.
+   *
+   * Fires on every linking completion — both successful and cancelled.
+   * For successful draws, includes the created edge and target.
+   * For cancelled draws, includes the cancellation reason.
+   *
+   * @since 1.2.0
+   */
+  edgeDrawEnded: EdgeDrawEndedEvent;
   /**
    * Event emitted when clipboard content is pasted into the diagram.
    *
@@ -231,6 +243,7 @@ export interface ViewportChangedEvent {
  * This event only fires for user-initiated edge creation through the UI,
  * but not for programmatically added edges.
  *
+ * @deprecated Use {@link EdgeDrawEndedEvent} instead, which fires for both successful and cancelled draws.
  * @public
  * @since 0.8.0
  * @category Types/Events
@@ -246,6 +259,49 @@ export interface EdgeDrawnEvent {
   sourcePort?: string;
   /** Target port identifier if connected to a specific port */
   targetPort?: string;
+}
+
+/**
+ * Reason an edge draw gesture was cancelled.
+ *
+ * - `noTarget` — the user released on empty space (no target node/port snapped)
+ * - `invalidConnection` — `validateConnection()` returned false
+ * - `invalidTarget` — the target node doesn't exist or the target port has wrong type
+ *
+ * @public
+ * @since 1.2.0
+ * @category Types/Events
+ */
+export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget';
+
+/**
+ * Event payload emitted when an edge draw gesture ends, regardless of outcome.
+ *
+ * Fires on every linking completion — both successful and cancelled.
+ * For successful completions, `edge`, `target`, and `targetPort` are populated.
+ * For cancellations, `reason` indicates why the gesture was cancelled.
+ *
+ * @public
+ * @since 1.2.0
+ * @category Types/Events
+ */
+export interface EdgeDrawEndedEvent {
+  /** The source node from which the edge was drawn */
+  source: Node;
+  /** Source port identifier if connected to a specific port */
+  sourcePort?: string;
+  /** The position where the pointer was released */
+  dropPosition: Point;
+  /** Whether the edge was successfully created */
+  success: boolean;
+  /** The created edge (only present on success) */
+  edge?: Edge;
+  /** The target node (only present on success) */
+  target?: Node;
+  /** Target port identifier (only present on success) */
+  targetPort?: string;
+  /** The reason the draw was cancelled (only present on cancel) */
+  reason?: EdgeDrawCancelReason;
 }
 
 /**

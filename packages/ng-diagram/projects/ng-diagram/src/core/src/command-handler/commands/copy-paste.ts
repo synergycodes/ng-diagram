@@ -1,4 +1,5 @@
 import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node, Point } from '../../types';
+import { snapNodePosition } from '../../utils';
 
 const OFFSET = 20;
 
@@ -175,6 +176,12 @@ export const copy = async (commandHandler: CommandHandler) => {
   };
 };
 
+const applySnappingToNodes = (nodes: Node[], config: FlowConfig): void => {
+  for (const node of nodes) {
+    node.position = snapNodePosition(config, node, node.position);
+  }
+};
+
 export const paste = async (commandHandler: CommandHandler, command: PasteCommand) => {
   const copyPasteState = commandHandler.flowCore.actionStateManager.copyPaste;
 
@@ -190,6 +197,7 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
 
   // Create new nodes and edges
   const newNodes = createPastedNodes(commandHandler.flowCore.config, copyPasteState.copiedNodes, offset, nodeIdMap);
+  applySnappingToNodes(newNodes, commandHandler.flowCore.config);
   const newEdges = createPastedEdges(commandHandler.flowCore.config, copyPasteState.copiedEdges, nodeIdMap);
 
   // Create deselect updates

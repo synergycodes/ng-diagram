@@ -238,4 +238,4 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](https:
 
 ---
 
-Built with ❤️ by the Synergy Codes team
+Built with ❤️ by the [Synergy Codes](https://www.synergycodes.com/) team

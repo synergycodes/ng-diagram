@@ -21,6 +21,23 @@ After registering the custom edge, you can use it in your diagram model by speci
 
 <CodeSnippet relativePath="edges/custom-edges/diagram.component.ts" />
 
+:::tip[Using Custom Edges for User-Created Edges]
+By default, edges created via linking use the default edge template and routing. To use your custom edge type for edges created by users, set the `type` property in [`finalEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#finaledgedatabuilder) (and optionally [`temporaryEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#temporaryedgedatabuilder) for the preview edge):
+
+```typescript
+config: NgDiagramConfig = {
+  linking: {
+    finalEdgeDataBuilder: (defaultEdge) => ({
+      ...defaultEdge,
+      type: 'custom', // use the custom edge template registered above
+    }),
+  },
+};
+```
+
+[Read more about customizing user-created edges →](/docs/guides/edges/edges/#user-created-edges)
+:::
+
 ## Styling Custom Edges
 
 Custom edges can be styled using CSS variables that the [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) exposes.

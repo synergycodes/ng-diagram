@@ -194,6 +194,23 @@ The documentation includes:
 - Best practices
 - Advanced use cases
 
+## 🤖 MCP Server
+
+Use AI assistants like Claude, Cursor, or Windsurf to search ng-diagram docs and API directly from your editor. No browser needed.
+
+```json
+{
+  "mcpServers": {
+    "ng-diagram-docs": {
+      "command": "npx",
+      "args": ["-y", "@ng-diagram/mcp"]
+    }
+  }
+}
+```
+
+See [@ng-diagram/mcp](https://www.npmjs.com/package/@ng-diagram/mcp) for setup details and Windows configuration.
+
 ## 🔧 Requirements
 
 - **Angular**: 18.0.0 or higher
@@ -220,4 +237,4 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](https:
 
 ---
 
-Built with ❤️ by the Synergy Codes team
+Built with ❤️ by the [Synergy Codes](https://www.synergycodes.com/) team

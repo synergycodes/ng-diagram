@@ -1,4 +1,4 @@
-import { inject, Injector, runInInjectionContext } from '@angular/core';
+import { inject, Injector, runInInjectionContext, untracked } from '@angular/core';
 import { assignInternalId, type Model, type ModelAdapter } from '../../core/src';
 import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { SignalModelAdapter } from './signal-model-adapter';
@@ -26,7 +26,17 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  *
  * // With an explicit injector (outside injection context)
  * model = initializeModel({ nodes: [...], edges: [...] }, this.injector);
+ *
+ * // Safe to use inside reactive contexts (computed, effect, linkedSignal)
+ * model = computed(() => initializeModel(this.myModel(), this.injector));
  * ```
+ *
+ * ## Version History
+ *
+ * | Version | Changes |
+ * |---------|---------|
+ * | v0.8.0  | Introduced |
+ * | v1.2.0  | Can now be safely used inside reactive contexts (`computed`, `effect`, `linkedSignal`) |
  *
  * @param model Initial model data (nodes, edges, metadata).
  * @param injector Optional Angular `Injector` if not running inside an injection context.
@@ -36,9 +46,11 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  * @category Utilities
  */
 export function initializeModel(model: Partial<Model> = {}, injector?: Injector): ModelAdapter {
-  const init = () => initializeModelAdapter(new SignalModelAdapter(), model);
+  return untracked(() => {
+    const init = () => initializeModelAdapter(new SignalModelAdapter(), model);
 
-  return injector ? runInInjectionContext(injector, init) : init();
+    return injector ? runInInjectionContext(injector, init) : init();
+  });
 }
 
 /**

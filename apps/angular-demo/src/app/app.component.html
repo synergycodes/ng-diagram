@@ -2,7 +2,7 @@
   <ng-diagram
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
-    [model]="model"
+    [model]="model()"
     [config]="config"
     (diagramInit)="onDiagramInit($event)"
     (selectionChanged)="onSelectionChanged($event)"
@@ -12,6 +12,7 @@
     (nodeRotateStarted)="onNodeRotateStarted($event)"
     (nodeRotateEnded)="onNodeRotateEnded($event)"
     (edgeDrawn)="onEdgeDrawn($event)"
+    (edgeDrawEnded)="onEdgeDrawEnded($event)"
     (clipboardPasted)="onClipboardPasted($event)"
     (nodeResized)="onNodeResized($event)"
     (nodeResizeStarted)="onNodeResizeStarted($event)"
@@ -29,6 +30,7 @@
     (reinitializeModelClick)="onReinitializeModel()"
     (saveModelClick)="onSaveModel()"
     (loadModelClick)="onLoadModel()"
+    (simulateModelDownloadClick)="onSimulateModelDownload()"
   />
   <app-palette [model]="paletteModel" />
 </div>

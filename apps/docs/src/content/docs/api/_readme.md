@@ -101,7 +101,8 @@ title: "ng-diagram"
 - [ClipboardPastedEvent](/docs/api/types/events/clipboardpastedevent/)
 - [DiagramEventMap](/docs/api/types/events/diagrameventmap/)
 - [DiagramInitEvent](/docs/api/types/events/diagraminitevent/)
-- [EdgeDrawnEvent](/docs/api/types/events/edgedrawnevent/)
+- [EdgeDrawEndedEvent](/docs/api/types/events/edgedrawendedevent/)
+- [~~EdgeDrawnEvent~~](/docs/api/types/events/edgedrawnevent/)
 - [GroupMembershipChangedEvent](/docs/api/types/events/groupmembershipchangedevent/)
 - [NodeDragEndedEvent](/docs/api/types/events/nodedragendedevent/)
 - [NodeDragStartedEvent](/docs/api/types/events/nodedragstartedevent/)
@@ -117,6 +118,7 @@ title: "ng-diagram"
 - [SelectionRemovedEvent](/docs/api/types/events/selectionremovedevent/)
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
 - [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
+- [EdgeDrawCancelReason](/docs/api/types/events/edgedrawcancelreason/)
 
 ## Types/Geometry
 

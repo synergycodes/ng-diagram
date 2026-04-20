@@ -164,9 +164,17 @@ Array of node IDs to delete.
 
 ### getChildren()
 
-> **getChildren**(`groupId`): [`Node`](/docs/api/types/model/node/)[]
+> **getChildren**\<`T`\>(`groupId`): [`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Gets all children nodes for a given group node id
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the nodes' `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -178,7 +186,7 @@ group node id
 
 #### Returns
 
-[`Node`](/docs/api/types/model/node/)[]
+[`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Array of child nodes
 
@@ -186,9 +194,17 @@ Array of child nodes
 
 ### getChildrenNested()
 
-> **getChildrenNested**(`groupId`): [`Node`](/docs/api/types/model/node/)[]
+> **getChildrenNested**\<`T`\>(`groupId`): [`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Gets all nested children (descendants) of a group node
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the nodes' `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -200,7 +216,7 @@ Group node id
 
 #### Returns
 
-[`Node`](/docs/api/types/model/node/)[]
+[`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Array of all descendant nodes (children, grandchildren, etc.)
 
@@ -208,9 +224,17 @@ Array of all descendant nodes (children, grandchildren, etc.)
 
 ### getConnectedEdges()
 
-> **getConnectedEdges**(`nodeId`): [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
+> **getConnectedEdges**\<`T`\>(`nodeId`): [`Edge`](/docs/api/types/model/edge/)\<`T`\>[]
 
 Gets all edges connected to a node
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the edges' `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -222,7 +246,7 @@ Node id
 
 #### Returns
 
-[`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
+[`Edge`](/docs/api/types/model/edge/)\<`T`\>[]
 
 Array of edges where the node is either source or target
 
@@ -230,9 +254,17 @@ Array of edges where the node is either source or target
 
 ### getConnectedNodes()
 
-> **getConnectedNodes**(`nodeId`): [`Node`](/docs/api/types/model/node/)[]
+> **getConnectedNodes**\<`T`\>(`nodeId`): [`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Gets all nodes connected to a node via edges
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the nodes' `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -244,7 +276,7 @@ Node id
 
 #### Returns
 
-[`Node`](/docs/api/types/model/node/)[]
+[`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Array of nodes connected to the given node
 
@@ -252,9 +284,17 @@ Array of nodes connected to the given node
 
 ### getEdgeById()
 
-> **getEdgeById**(`edgeId`): `null` \| [`Edge`](/docs/api/types/model/edge/)\<`object`\>
+> **getEdgeById**\<`T`\>(`edgeId`): `null` \| [`Edge`](/docs/api/types/model/edge/)\<`T`\>
 
 Gets an edge by id.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the edge's `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -266,7 +306,7 @@ Edge id.
 
 #### Returns
 
-`null` \| [`Edge`](/docs/api/types/model/edge/)\<`object`\>
+`null` \| [`Edge`](/docs/api/types/model/edge/)\<`T`\>
 
 Edge or null if not found.
 
@@ -287,9 +327,17 @@ Returns null if flowCore is not initialized.
 
 ### getNearestNodeInRange()
 
-> **getNearestNodeInRange**(`point`, `range`): `null` \| [`Node`](/docs/api/types/model/node/)
+> **getNearestNodeInRange**\<`T`\>(`point`, `range`): `null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
 
 Gets the nearest node in a range from a point.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the node's `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -307,7 +355,7 @@ Range to check in.
 
 #### Returns
 
-`null` \| [`Node`](/docs/api/types/model/node/)
+`null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
 
 Nearest node in range or null.
 
@@ -343,9 +391,17 @@ Nearest port in range or null.
 
 ### getNodeById()
 
-> **getNodeById**(`nodeId`): `null` \| [`Node`](/docs/api/types/model/node/)
+> **getNodeById**\<`T`\>(`nodeId`): `null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
 
 Gets a node by id.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the node's `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -357,7 +413,7 @@ Node id.
 
 #### Returns
 
-`null` \| [`Node`](/docs/api/types/model/node/)
+`null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
 
 Node or null if not found.
 
@@ -365,9 +421,23 @@ Node or null if not found.
 
 ### getNodeEnds()
 
-> **getNodeEnds**(`edgeId`): `null` \| \{ `source`: [`Node`](/docs/api/types/model/node/); `target`: [`Node`](/docs/api/types/model/node/); \}
+> **getNodeEnds**\<`S`, `T`\>(`edgeId`): `null` \| \{ `source`: [`Node`](/docs/api/types/model/node/)\<`S`\>; `target`: [`Node`](/docs/api/types/model/node/)\<`T`\>; \}
 
 Gets the source and target nodes of an edge
+
+#### Type Parameters
+
+##### S
+
+`S` *extends* `object` = `object`
+
+The type of the source node's `data` property. Defaults to `DataObject`.
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the target node's `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -379,7 +449,7 @@ Edge id
 
 #### Returns
 
-`null` \| \{ `source`: [`Node`](/docs/api/types/model/node/); `target`: [`Node`](/docs/api/types/model/node/); \}
+`null` \| \{ `source`: [`Node`](/docs/api/types/model/node/)\<`S`\>; `target`: [`Node`](/docs/api/types/model/node/)\<`T`\>; \}
 
 Object containing source and target nodes, or null if edge doesn't exist
 
@@ -387,9 +457,17 @@ Object containing source and target nodes, or null if edge doesn't exist
 
 ### getNodesInRange()
 
-> **getNodesInRange**(`point`, `range`): [`Node`](/docs/api/types/model/node/)[]
+> **getNodesInRange**\<`T`\>(`point`, `range`): [`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Gets all nodes in a range from a point.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the nodes' `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -407,7 +485,7 @@ Range to check in.
 
 #### Returns
 
-[`Node`](/docs/api/types/model/node/)[]
+[`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Array of nodes in range.
 
@@ -417,10 +495,18 @@ Array of nodes in range.
 
 #### Call Signature
 
-> **getOverlappingNodes**(`nodeId`): [`Node`](/docs/api/types/model/node/)[]
+> **getOverlappingNodes**\<`T`\>(`nodeId`): [`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 Detects collision with other nodes by finding all nodes whose rectangles intersect
 with the specified node's bounding rectangle.
+
+##### Type Parameters
+
+###### T
+
+`T` *extends* `object` = `object`
+
+The type of the nodes' `data` property. Defaults to `DataObject`.
 
 ##### Parameters
 
@@ -432,25 +518,33 @@ The ID of the node to check for collisions
 
 ##### Returns
 
-[`Node`](/docs/api/types/model/node/)[]
+[`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 An array of Nodes that overlap with the specified node
 
 #### Call Signature
 
-> **getOverlappingNodes**(`node`): [`Node`](/docs/api/types/model/node/)[]
+> **getOverlappingNodes**\<`T`\>(`node`): [`Node`](/docs/api/types/model/node/)\<`T`\>[]
+
+##### Type Parameters
+
+###### T
+
+`T` *extends* `object` = `object`
+
+The type of the nodes' `data` property. Defaults to `DataObject`.
 
 ##### Parameters
 
 ###### node
 
-[`Node`](/docs/api/types/model/node/)
+[`Node`](/docs/api/types/model/node/)\<`T`\>
 
 The node to check for collisions
 
 ##### Returns
 
-[`Node`](/docs/api/types/model/node/)[]
+[`Node`](/docs/api/types/model/node/)\<`T`\>[]
 
 An array of Nodes that overlap with the specified node
 
@@ -465,9 +559,17 @@ with the specified node's bounding rectangle.
 
 ### getParentHierarchy()
 
-> **getParentHierarchy**(`nodeId`): [`GroupNode`](/docs/api/types/model/groupnode/)\<`object`\>[]
+> **getParentHierarchy**\<`T`\>(`nodeId`): [`GroupNode`](/docs/api/types/model/groupnode/)\<`T`\>[]
 
 Gets the full chain of parent group Nodes for a given nodeId.
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `object` = `object`
+
+The type of the group nodes' `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -479,7 +581,7 @@ Node id
 
 #### Returns
 
-[`GroupNode`](/docs/api/types/model/groupnode/)\<`object`\>[]
+[`GroupNode`](/docs/api/types/model/groupnode/)\<`T`\>[]
 
 Array of parent group Node objects, from closest parent to farthest ancestor
 
@@ -563,7 +665,9 @@ Updates the data of an edge.
 
 ##### T
 
-`T` *extends* `undefined` \| `Record`\<`string`, `unknown`\>
+`T` *extends* `object` = `object`
+
+The type of the edge's `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -577,7 +681,7 @@ Edge id.
 
 `T`
 
-New data to set for the edge (can be strongly typed).
+New data to set for the edge.
 
 #### Returns
 
@@ -641,7 +745,9 @@ Updates the data of a node.
 
 ##### T
 
-`T` *extends* `undefined` \| `Record`\<`string`, `unknown`\>
+`T` *extends* `object` = `object`
+
+The type of the node's `data` property. Defaults to `DataObject`.
 
 #### Parameters
 
@@ -655,7 +761,7 @@ Node id.
 
 `T`
 
-New data to set for the node (can be strongly typed).
+New data to set for the node.
 
 #### Returns
 

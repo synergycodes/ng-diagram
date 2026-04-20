@@ -1,11 +1,13 @@
 import { Directive, HostListener, inject, input, type OnDestroy } from '@angular/core';
 import type { BasePointerInputEvent, Edge, Node } from '../../../../core/src';
+import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent } from '../../../types';
 
 @Directive()
 abstract class ObjectSelectionDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   targetData = input.required<Node | Edge | undefined>();
   abstract targetType: BasePointerInputEvent['targetType'];
@@ -59,8 +61,13 @@ abstract class ObjectSelectionDirective implements OnDestroy {
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return false;
     }
-    // event.selectHandled - Prevent duplicate select events — without this, selection can toggle unintentionally.
-    return !(event.boxSelectionHandled || event.selectHandled);
+    if (event.boxSelectionHandled || event.selectHandled) {
+      return false;
+    }
+    if (event.linkingHandled && !this.flowCoreProvider.provide().config.linking.selectNodeOnPortPress) {
+      return false;
+    }
+    return true;
   }
 }
 

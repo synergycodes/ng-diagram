@@ -297,10 +297,9 @@ export class FlowCore {
     if (results.commandsCount > 0) {
       if (transactionOptions?.waitForMeasurements) {
         const internalOptions = transactionOptions as InternalTransactionOptions;
-        this.measurementTracker.trackStateUpdate(
-          results.results,
+        this.measurementTracker.setNextTrackingConfig(
           internalOptions._measurementDebounceTimeout,
-          internalOptions._measurementInitialTimeout
+          internalOptions._measurementSafetyTimeout
         );
       }
 

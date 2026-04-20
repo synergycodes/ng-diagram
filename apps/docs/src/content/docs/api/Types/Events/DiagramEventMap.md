@@ -32,7 +32,23 @@ This event fires after all nodes and edges including their internal parts
 
 ***
 
-### edgeDrawn
+### edgeDrawEnded
+
+> **edgeDrawEnded**: [`EdgeDrawEndedEvent`](/docs/api/types/events/edgedrawendedevent/)
+
+Event emitted when an edge draw gesture ends, regardless of outcome.
+
+Fires on every linking completion — both successful and cancelled.
+For successful draws, includes the created edge and target.
+For cancelled draws, includes the cancellation reason.
+
+#### Since
+
+1.2.0
+
+***
+
+### ~~edgeDrawn~~
 
 > **edgeDrawn**: [`EdgeDrawnEvent`](/docs/api/types/events/edgedrawnevent/)
 
@@ -40,6 +56,10 @@ Event emitted when a user manually draws an edge between two nodes.
 
 This event only fires for user-initiated edge creation through the UI,
 but not for programmatically added edges.
+
+:::caution[Deprecated]
+Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws.
+:::
 
 ***
 

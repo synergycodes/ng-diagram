@@ -15,6 +15,13 @@ describe('Add Update Delete Command', () => {
       applyUpdate: vi.fn(),
       getNodeById: getNodeByIdMock,
       getEdgeById: getEdgeByIdMock,
+      config: {
+        snapping: {
+          shouldSnapDragForNode: () => false,
+          computeSnapForNodeDrag: () => null,
+          defaultDragSnap: { width: 10, height: 10 },
+        },
+      },
       edgeRoutingManager: {
         computePointOnPath: vi.fn().mockImplementation((_routing, _points, percentage) => {
           // Simple mock implementation for testing
@@ -63,6 +70,36 @@ describe('Add Update Delete Command', () => {
     commandHandler.emit('paletteDropNode', { node });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToAdd: [node] }, 'paletteDropNode');
+  });
+
+  it('should snap palette drop position when snapping is enabled', () => {
+    flowCore.config.snapping.shouldSnapDragForNode = () => true;
+    flowCore.config.snapping.computeSnapForNodeDrag = () => null;
+    flowCore.config.snapping.defaultDragSnap = { width: 20, height: 20 };
+
+    const node = { ...mockNode, id: 'snap-1', position: { x: 153, y: 207 } };
+
+    commandHandler.emit('paletteDropNode', { node });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToAdd: [{ ...node, position: { x: 160, y: 200 } }] },
+      'paletteDropNode'
+    );
+  });
+
+  it('should use computeSnapForNodeDrag when provided for palette drop', () => {
+    flowCore.config.snapping.shouldSnapDragForNode = () => true;
+    flowCore.config.snapping.computeSnapForNodeDrag = () => ({ width: 50, height: 50 });
+    flowCore.config.snapping.defaultDragSnap = { width: 10, height: 10 };
+
+    const node = { ...mockNode, id: 'snap-2', position: { x: 123, y: 167 } };
+
+    commandHandler.emit('paletteDropNode', { node });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToAdd: [{ ...node, position: { x: 100, y: 150 } }] },
+      'paletteDropNode'
+    );
   });
 
   it('should update a node', () => {

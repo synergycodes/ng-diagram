@@ -154,4 +154,4 @@ Apache-2.0 - Part of the [ng-diagram](https://github.com/synergycodes/ng-diagram
 
 Initial PoC by [Pawel Kubiak](https://pawelkubiak.dev/about)
 
-**Finished and built with ❤️ by the Synergy Codes team**
+**Finished and built with ❤️ by the [Synergy Codes](https://www.synergycodes.com/) team**

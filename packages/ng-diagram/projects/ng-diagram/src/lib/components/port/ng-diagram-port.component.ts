@@ -72,6 +72,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   protected readonly isInitialized = signal(false);
   protected readonly lastSide = signal<Port['side'] | undefined>(undefined);
   protected readonly lastType = signal<Port['type'] | undefined>(undefined);
+  private lastOriginPoint: OriginPoint | undefined;
   protected readonly nodeData = computed(() => this.nodeComponent?.node());
 
   /**
@@ -106,14 +107,41 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     effect(() => {
       const nodeData = this.nodeData();
       const initialized = this.isInitialized();
-      const lastSide = this.lastSide();
       const currentSide = this.side();
-      if (initialized && nodeData && lastSide !== currentSide) {
+      const currentType = this.type();
+      const currentOriginPoint = this.originPoint();
+
+      if (!initialized || !nodeData) return;
+
+      const portChanges: Partial<Port> = {};
+
+      if (this.lastSide() !== currentSide) {
         this.lastSide.set(currentSide);
+        portChanges.side = currentSide;
+      }
+
+      if (this.lastType() !== currentType) {
+        this.lastType.set(currentType);
+        portChanges.type = currentType;
+      }
+
+      const originPointChanged = this.lastOriginPoint !== currentOriginPoint;
+      if (originPointChanged) {
+        this.lastOriginPoint = currentOriginPoint;
+      }
+
+      if (Object.keys(portChanges).length > 0) {
         this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
           nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges: { side: currentSide } }],
+          ports: [{ portId: this.id(), portChanges }],
         });
+      }
+
+      // ResizeObserver doesn't fire on position-only changes.
+      // When side or originPoint changes, CSS moves the port but doesn't resize it.
+      // Force re-observation after DOM updates to pick up the new position.
+      if (portChanges.side || originPointChanged) {
+        this.batchResizeObserver.invalidate(this.hostElement.nativeElement);
       }
     });
 
@@ -126,29 +154,13 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
         });
       }
     });
-
-    effect(() => {
-      const nodeData = this.nodeData();
-      const initialized = this.isInitialized();
-      const lastType = this.lastType();
-      const currentType = this.type();
-      if (initialized && lastType !== currentType && nodeData) {
-        // Angular 18 backward compatibility
-        untracked(() => {
-          this.lastType.set(currentType);
-        });
-        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-          nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges: { type: currentType } }],
-        });
-      }
-    });
   }
 
   /** @internal */
   ngOnInit(): void {
     this.lastSide.set(this.side());
     this.lastType.set(this.type());
+    this.lastOriginPoint = this.originPoint();
     const nodeData = this.nodeData();
     if (!nodeData) {
       return;

@@ -9,6 +9,7 @@ import {
   MinimapStrategy,
   NgDiagramMinimapNodeTemplateMap,
 } from '../ng-diagram-minimap.types';
+import { MinimapNodeCache } from './minimap-node-cache';
 
 /**
  * Minimap strategy for direct (non-virtualized) rendering mode.
@@ -18,21 +19,38 @@ import {
 @Injectable()
 export class DirectMinimapStrategy implements MinimapStrategy {
   private readonly renderer = inject(RendererService);
+  private readonly cache = new MinimapNodeCache();
+  private lastStyleFn: MinimapNodeStyleFn | undefined;
+  private lastTemplateMap: NgDiagramMinimapNodeTemplateMap | undefined;
 
   computeMinimapNodes(
     styleFn: MinimapNodeStyleFn | undefined,
     templateMap: NgDiagramMinimapNodeTemplateMap
   ): MinimapNodeData[] {
-    const nodes = this.renderer.nodes();
-    return nodes.map((node) => ({
-      bounds: extractNodeBounds(node),
-      diagramNode: node,
-      nodeStyle: styleFn?.(node) ?? {},
-      template: node.type ? (templateMap.get(node.type) ?? null) : null,
-    }));
+    this.invalidateCacheIfNeeded(styleFn, templateMap);
+
+    return this.renderer.nodes().map((node) =>
+      this.cache.getOrCompute(node, () => ({
+        bounds: extractNodeBounds(node),
+        diagramNode: node,
+        nodeStyle: styleFn?.(node) ?? {},
+        template: node.type ? (templateMap.get(node.type) ?? null) : null,
+      }))
+    );
   }
 
   computeDiagramBounds(): Rect {
     return calculatePartsBounds(this.renderer.nodes(), []);
+  }
+
+  private invalidateCacheIfNeeded(
+    styleFn: MinimapNodeStyleFn | undefined,
+    templateMap: NgDiagramMinimapNodeTemplateMap
+  ): void {
+    if (styleFn !== this.lastStyleFn || templateMap !== this.lastTemplateMap) {
+      this.cache.clear();
+      this.lastStyleFn = styleFn;
+      this.lastTemplateMap = templateMap;
+    }
   }
 }

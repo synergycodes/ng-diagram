@@ -44,8 +44,8 @@ export interface TransactionOptions {
 export interface InternalTransactionOptions extends TransactionOptions {
   /** Debounce timeout in ms after last measurement activity before completing. @default 50 */
   _measurementDebounceTimeout?: number;
-  /** Initial timeout in ms to wait for first measurement activity. @default 2000 */
-  _measurementInitialTimeout?: number;
+  /** Safety timeout in ms — max time before force-completing with a warning. @default 2000 */
+  _measurementSafetyTimeout?: number;
 }
 
 export interface TransactionContext {

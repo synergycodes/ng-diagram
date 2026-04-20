@@ -9,6 +9,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { Rect } from '../../../core/src';
 import { FlowCoreProviderService } from '../../services';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { NgDiagramPanelPosition } from '../../types/panel-position';
@@ -16,6 +17,7 @@ import { NgDiagramPanelComponent } from '../panel/ng-diagram-panel.component';
 import { NgDiagramZoomControlsComponent } from '../zoom-controls/ng-diagram-zoom-controls.component';
 import { NgDiagramDefaultMinimapNodeComponent } from './default-node/ng-diagram-default-minimap-node.component';
 import { NgDiagramMinimapDiagramBoundsComponent } from './diagram-bounds/ng-diagram-minimap-diagram-bounds.component';
+import { MinimapInteractionTracker } from './minimap-interaction-tracker';
 import { NgDiagramMinimapNavigationDirective } from './ng-diagram-minimap-navigation.directive';
 import {
   calculateMinimapTransform,
@@ -60,7 +62,7 @@ import { VirtualizedMinimapStrategy } from './strategy/virtualized-minimap-strat
   templateUrl: './ng-diagram-minimap.component.html',
   styleUrls: ['./ng-diagram-minimap.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DirectMinimapStrategy, VirtualizedMinimapStrategy],
+  providers: [DirectMinimapStrategy, VirtualizedMinimapStrategy, MinimapInteractionTracker],
   host: {
     '[class]': 'position()',
   },
@@ -70,6 +72,7 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
 
   private readonly renderer = inject(RendererService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private readonly interactionTracker = inject(MinimapInteractionTracker);
   private readonly elementRef = inject(ElementRef);
   private readonly directStrategy = inject(DirectMinimapStrategy);
   private readonly virtualizedStrategy = inject(VirtualizedMinimapStrategy);
@@ -119,6 +122,17 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
    * ```
    */
   minimapNodeTemplateMap = input<NgDiagramMinimapNodeTemplateMap>(new NgDiagramMinimapNodeTemplateMap());
+
+  /**
+   * When enabled, minimap node positions are frozen during drag, resize, and
+   * rotation operations — updated only when the operation ends.
+   *
+   * The viewport indicator rectangle always updates in real-time.
+   *
+   * @default false
+   * @since 1.2.0
+   */
+  deferNodeUpdates = input<boolean>(false);
 
   /** @ignore */
   ngAfterViewInit(): void {
@@ -171,15 +185,29 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
     return `translate(${t.offsetX}, ${t.offsetY}) scale(${t.scale})`;
   });
 
+  private isDeferringUpdates = computed(() => this.deferNodeUpdates() && this.interactionTracker.isInteracting());
+
+  private cachedMinimapNodes: MinimapNodeData[] = [];
+  private cachedDiagramBounds: Rect = { x: 0, y: 0, width: 0, height: 0 };
+
   /**
    * @internal
    * Pre-computed minimap node data in DIAGRAM coordinates (not minimap coordinates).
    * The SVG group transform handles the coordinate conversion, so nodes only recalculate
    * when diagram content changes, NOT during pan/zoom.
+   *
+   * When deferNodeUpdates is enabled, returns frozen data during interactions.
+   * Angular's conditional signal tracking ensures renderer.nodes() is not subscribed
+   * while deferring, avoiding per-frame recomputation entirely.
    */
-  protected minimapNodes = computed((): MinimapNodeData[] =>
-    this.strategy().computeMinimapNodes(this.nodeStyle(), this.minimapNodeTemplateMap())
-  );
+  protected minimapNodes = computed((): MinimapNodeData[] => {
+    if (this.isDeferringUpdates()) {
+      return this.cachedMinimapNodes;
+    }
+    const nodes = this.strategy().computeMinimapNodes(this.nodeStyle(), this.minimapNodeTemplateMap());
+    this.cachedMinimapNodes = nodes;
+    return nodes;
+  });
 
   /**
    * @internal
@@ -190,7 +218,14 @@ export class NgDiagramMinimapComponent implements AfterViewInit {
     () => this.isDiagramInitialized() && this.flowCoreProvider.provide().isVirtualizationActive
   );
 
-  protected diagramBounds = computed(() => this.strategy().computeDiagramBounds());
+  protected diagramBounds = computed(() => {
+    if (this.isDeferringUpdates()) {
+      return this.cachedDiagramBounds;
+    }
+    const bounds = this.strategy().computeDiagramBounds();
+    this.cachedDiagramBounds = bounds;
+    return bounds;
+  });
 
   private viewportBoundsInDiagramSpace = computed(() => convertViewportToDiagramBounds(this.viewport()));
 

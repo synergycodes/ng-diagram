@@ -166,6 +166,29 @@ describe('BatchResizeObserverService', () => {
     });
   });
 
+  describe('invalidate', () => {
+    it('should re-observe a previously observed element', () => {
+      const el = document.createElement('div');
+      const metadata: ObservedElementMetadata = { type: 'port', nodeId: 'n1', portId: 'p1' };
+
+      service.observe(el, metadata);
+      mockResizeObserver.observe.mockClear();
+
+      service.invalidate(el);
+
+      expect(mockResizeObserver.observe).toHaveBeenCalledWith(el);
+    });
+
+    it('should be a no-op for an element that was never observed', () => {
+      const el = document.createElement('div');
+
+      service.invalidate(el);
+
+      expect(mockResizeObserver.unobserve).not.toHaveBeenCalled();
+      expect(mockResizeObserver.observe).not.toHaveBeenCalled();
+    });
+  });
+
   describe('observer initialization', () => {
     it('should create ResizeObserver instance', () => {
       expect(global.ResizeObserver).toHaveBeenCalledTimes(1);

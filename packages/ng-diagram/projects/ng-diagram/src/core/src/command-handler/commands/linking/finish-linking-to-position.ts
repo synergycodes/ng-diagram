@@ -10,12 +10,15 @@ export const finishLinkingToPosition = async (
   commandHandler: CommandHandler,
   command: FinishLinkingToPositionCommand
 ) => {
-  const temporaryEdge = commandHandler.flowCore.actionStateManager.linking?.temporaryEdge;
+  const linking = commandHandler.flowCore.actionStateManager.linking;
+  const temporaryEdge = linking?.temporaryEdge;
   const { position } = command;
 
-  if (!temporaryEdge) {
+  if (!temporaryEdge || !linking) {
     return;
   }
+
+  linking.dropPosition = position;
 
   await commandHandler.flowCore.applyUpdate(
     {

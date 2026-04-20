@@ -1,4 +1,5 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
+import type { NgDiagramPanelPosition } from './panel-position.type';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
 import type { ShortcutDefinition } from './shortcut.interface';
@@ -99,6 +100,15 @@ export interface LinkingConfig {
    * @default 30
    */
   edgePanningThreshold: number;
+  /**
+   * Whether to select a node when the user presses a port to start linking.
+   * When true (default), pressing a port also triggers node selection events.
+   * When false, port press only initiates the linking gesture without selecting the node.
+   *
+   * @default true
+   * @since 1.2.0
+   */
+  selectNodeOnPortPress: boolean;
 }
 
 /**
@@ -555,6 +565,16 @@ export interface FlowConfig {
    * @default undefined
    */
   hideWatermark?: boolean;
+
+  /**
+   * @since 1.2.0
+   *
+   * Sets the preferred position for the ngDiagram watermark.
+   * If the chosen position collides with a registered panel (e.g., minimap),
+   * the watermark shifts to the nearest available corner.
+   * @default 'bottom-right'
+   */
+  watermarkPosition?: NgDiagramPanelPosition;
 
   /**
    * @since 0.9.0
