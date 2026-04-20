@@ -1214,6 +1214,7 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
     moveViewport(x: number, y: number): void;
     moveViewportBy(dx: number, dy: number): void;
     scale: Signal<number>;
+    setViewport(x: number, y: number, scale: number): void;
     viewport: Signal<Viewport>;
     zoom(factor: number, center?: Point | undefined): void;
     zoomToFit(options?: {
