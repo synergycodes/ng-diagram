@@ -293,7 +293,7 @@ this.viewportService.setViewport(0, 0, 0.5);
 
 #### Since
 
-1.1.3
+1.2.0
 
 ***
 
