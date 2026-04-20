@@ -29,6 +29,9 @@ export type {
   TransactionResult,
 } from './transaction.interface';
 
+// Panel position type
+export * from './panel-position.type';
+
 // Action state types
 export * from './action-state.interface';
 

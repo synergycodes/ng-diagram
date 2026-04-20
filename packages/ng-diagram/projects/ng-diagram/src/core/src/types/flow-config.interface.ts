@@ -1,4 +1,5 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
+import type { NgDiagramPanelPosition } from './panel-position.type';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
 import type { ShortcutDefinition } from './shortcut.interface';
@@ -555,6 +556,16 @@ export interface FlowConfig {
    * @default undefined
    */
   hideWatermark?: boolean;
+
+  /**
+   * @since 1.2.0
+   *
+   * Sets the preferred position for the ngDiagram watermark.
+   * If the chosen position collides with a registered panel (e.g., minimap),
+   * the watermark shifts to the nearest available corner.
+   * @default 'bottom-right'
+   */
+  watermarkPosition?: NgDiagramPanelPosition;
 
   /**
    * @since 0.9.0

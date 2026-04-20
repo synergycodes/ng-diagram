@@ -330,6 +330,7 @@ export interface FlowConfig {
     snapping: SnappingConfig;
     viewportPanningEnabled: boolean;
     virtualization: VirtualizationConfig;
+    watermarkPosition?: NgDiagramPanelPosition;
     zIndex: ZIndexConfig;
     zoom: ZoomConfig;
 }

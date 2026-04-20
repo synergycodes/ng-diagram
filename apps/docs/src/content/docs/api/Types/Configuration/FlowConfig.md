@@ -202,6 +202,26 @@ Improves performance for large diagrams by only rendering visible elements.
 
 ***
 
+### watermarkPosition?
+
+> `optional` **watermarkPosition**: [`NgDiagramPanelPosition`](/docs/api/types/ngdiagrampanelposition/)
+
+#### Since
+
+1.2.0
+
+Sets the preferred position for the ngDiagram watermark.
+If the chosen position collides with a registered panel (e.g., minimap),
+the watermark shifts to the nearest available corner.
+
+#### Default
+
+```ts
+'bottom-right'
+```
+
+***
+
 ### zIndex
 
 > **zIndex**: [`ZIndexConfig`](/docs/api/types/configuration/features/zindexconfig/)
