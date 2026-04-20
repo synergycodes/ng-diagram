@@ -238,7 +238,8 @@ The diagram emits events for user interactions and state changes. Subscribe to t
 **Available events:**
 
 - [`diagramInit`](/docs/api/types/events/diagraminitevent) - Fired when diagram is fully initialized with all nodes and edges measured
-- [`edgeDrawn`](/docs/api/types/events/edgedrawnevent) - Fired when user manually creates an edge by dragging between nodes
+- [`edgeDrawEnded`](/docs/api/types/events/edgadrawendedevent) - Fired when an edge draw gesture ends (success or cancel)
+- ~~[`edgeDrawn`](/docs/api/types/events/edgedrawnevent)~~ - Deprecated, use `edgeDrawEnded` instead
 - [`selectionChanged`](/docs/api/types/events/selectionchangedevent) - Fired when nodes/edges are selected or deselected
 - [`selectionGestureEnded`](/docs/api/types/events/selectiongestureendedevent) - Fired when a selection gesture completes (on pointerup after clicking, box selection, or select-all)
 - [`selectionMoved`](/docs/api/types/events/selectionmovedevent) - Fired continuously on each position change while selected nodes are being dragged
