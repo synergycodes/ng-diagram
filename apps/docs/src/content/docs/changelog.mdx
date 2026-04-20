@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed linking state not being cleared when edge drawing fails before creating a temporary edge (e.g., starting from a target port), which permanently blocked all subsequent edge drawing ([#666](https://github.com/synergycodes/ng-diagram/pull/666))
+
 ## [1.2.0] - 2026-04-20
 
 ### Added
