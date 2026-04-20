@@ -1,5 +1,6 @@
 export { ClipboardPastedEmitter } from './clipboard-paste.emitter';
 export { DiagramInitEmitter } from './diagram-init.emitter';
+export { EdgeDrawEndedEmitter } from './edge-draw-ended.emitter';
 export { EdgeDrawnEmitter } from './edge-drawn.emitter';
 export { type EventEmitter } from './event-emitter.interface';
 export { NodeDragEndedEmitter, NodeDragStartedEmitter } from './node-drag-lifecycle.emitter';

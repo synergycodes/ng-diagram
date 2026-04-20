@@ -4,11 +4,12 @@ import { createFinalEdge, validateConnection } from './utils';
 
 export interface FinishLinkingCommand {
   name: 'finishLinking';
+  position?: Point;
 }
 
 const clearTemporaryEdge = async (commandHandler: CommandHandler): Promise<void> => {
-  commandHandler.flowCore.actionStateManager.clearLinking();
   await commandHandler.flowCore.applyUpdate({}, 'finishLinking');
+  commandHandler.flowCore.actionStateManager.clearLinking();
 };
 
 const validateTarget = (
@@ -36,18 +37,28 @@ const validateTarget = (
   return { isValid: true, targetNode, targetPosition };
 };
 
-export const finishLinking = async (commandHandler: CommandHandler): Promise<void> => {
-  const temporaryEdge = commandHandler.flowCore.actionStateManager.linking?.temporaryEdge;
+export const finishLinking = async (commandHandler: CommandHandler, command: FinishLinkingCommand): Promise<void> => {
+  const linking = commandHandler.flowCore.actionStateManager.linking;
+  const temporaryEdge = linking?.temporaryEdge;
 
-  if (!temporaryEdge) {
+  if (!temporaryEdge || !linking) {
     return;
   }
+
+  linking.dropPosition = command.position ?? { x: 0, y: 0 };
 
   const { source, sourcePort, target, targetPort } = temporaryEdge;
   const targetNodeId = target || undefined;
   const targetPortId = targetPort || undefined;
 
+  if (!targetNodeId) {
+    linking.cancelReason = 'noTarget';
+    await clearTemporaryEdge(commandHandler);
+    return;
+  }
+
   if (!validateConnection(commandHandler.flowCore, source, sourcePort, targetNodeId, targetPortId, true)) {
+    linking.cancelReason = 'invalidConnection';
     await clearTemporaryEdge(commandHandler);
     return;
   }
@@ -55,6 +66,7 @@ export const finishLinking = async (commandHandler: CommandHandler): Promise<voi
   const { isValid, targetPosition } = validateTarget(commandHandler, targetNodeId, targetPortId);
 
   if (!isValid) {
+    linking.cancelReason = 'invalidTarget';
     await clearTemporaryEdge(commandHandler);
     return;
   }

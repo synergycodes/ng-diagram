@@ -3,6 +3,7 @@ import type { Middleware, MiddlewareContext } from '../../../types';
 import {
   ClipboardPastedEmitter,
   DiagramInitEmitter,
+  EdgeDrawEndedEmitter,
   EdgeDrawnEmitter,
   EventEmitter,
   GroupMembershipChangedEmitter,
@@ -47,6 +48,7 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new SelectionRotatedEmitter(),
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
+    new EdgeDrawEndedEmitter(),
     new ClipboardPastedEmitter(),
     new NodeResizedEmitter(),
     new PaletteItemDroppedEmitter(),

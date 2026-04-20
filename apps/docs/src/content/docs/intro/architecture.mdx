@@ -58,7 +58,8 @@ Events are emitted by the [`NgDiagramComponent`](/docs/api/components/ngdiagramc
 **Available events:**
 
 - [**DiagramInitEvent**](/docs/api/types/events/diagraminitevent): Fired when the diagram is fully initialized and all nodes, edges, and their internal parts are measured and positioned.
-- [**EdgeDrawnEvent**](/docs/api/types/events/edgedrawnevent): Fired when a user manually creates an edge by dragging between nodes.
+- [**EdgeDrawEndedEvent**](/docs/api/types/events/edgedrawendedevent): Fired when an edge draw gesture ends, whether successful or cancelled.
+- ~~[**EdgeDrawnEvent**](/docs/api/types/events/edgedrawnevent)~~: Deprecated, use `EdgeDrawEndedEvent` instead.
 - [**SelectionChangedEvent**](/docs/api/types/events/selectionchangedevent): Fired when nodes or edges are selected or deselected.
 - [**SelectionGestureEndedEvent**](/docs/api/types/events/selectiongestureendedevent): Fired when a selection gesture completes (on pointerup after clicking a node/edge, box selection, or select-all).
 - [**SelectionMovedEvent**](/docs/api/types/events/selectionmovedevent): Fired continuously on each position change while selected nodes are being dragged on the canvas.

@@ -11,9 +11,13 @@ Event payload emitted when a user manually draws an edge between two nodes.
 This event only fires for user-initiated edge creation through the UI,
 but not for programmatically added edges.
 
+:::caution[Deprecated]
+Use [EdgeDrawEndedEvent](/docs/api/types/events/edgedrawendedevent/) instead, which fires for both successful and cancelled draws.
+:::
+
 ## Properties
 
-### edge
+### ~~edge~~
 
 > **edge**: [`Edge`](/docs/api/types/model/edge/)
 
@@ -21,7 +25,7 @@ The newly created edge object
 
 ***
 
-### source
+### ~~source~~
 
 > **source**: [`Node`](/docs/api/types/model/node/)
 
@@ -29,7 +33,7 @@ The source node from which the edge originates
 
 ***
 
-### sourcePort?
+### ~~sourcePort?~~
 
 > `optional` **sourcePort**: `string`
 
@@ -37,7 +41,7 @@ Source port identifier if connected to a specific port
 
 ***
 
-### target
+### ~~target~~
 
 > **target**: [`Node`](/docs/api/types/model/node/)
 
@@ -45,7 +49,7 @@ The target node to which the edge connects
 
 ***
 
-### targetPort?
+### ~~targetPort?~~
 
 > `optional` **targetPort**: `string`
 

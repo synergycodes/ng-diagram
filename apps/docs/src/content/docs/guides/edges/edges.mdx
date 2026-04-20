@@ -191,6 +191,36 @@ This allows you to:
 
 [Read more about global configuration in ngDiagram →](/docs/guides/configuration/)
 
+## Edge Draw Events
+
+Use the [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent) event to react to edge draw completions. It fires for both successful and cancelled draws:
+
+```html
+<ng-diagram (edgeDrawEnded)="onEdgeDrawEnded($event)" />
+```
+
+```typescript
+onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
+  if (event.success) {
+    console.log('Edge created:', event.edge!.id);
+  } else {
+    console.log('Edge draw cancelled:', event.reason);
+  }
+}
+```
+
+## Selection During Linking
+
+By default, pressing a port to start linking also selects the parent node. To decouple selection from linking gestures, set [`selectNodeOnPortPress`](/docs/api/types/configuration/features/linkingconfig/#selectnodeonportpress) to `false`:
+
+```typescript
+config: NgDiagramConfig = {
+  linking: {
+    selectNodeOnPortPress: false,
+  },
+};
+```
+
 ## Further reading
 
 [Labels →](/docs/guides/edges/labels)

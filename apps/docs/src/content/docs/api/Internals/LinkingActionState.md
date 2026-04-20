@@ -10,6 +10,22 @@ State tracking an edge creation operation in progress.
 
 ## Properties
 
+### cancelReason?
+
+> `optional` **cancelReason**: [`EdgeDrawCancelReason`](/docs/api/types/events/edgedrawcancelreason/)
+
+Reason the linking gesture was cancelled (set by finishLinking on failure paths).
+
+***
+
+### dropPosition?
+
+> `optional` **dropPosition**: [`Point`](/docs/api/types/geometry/point/)
+
+Position where the pointer was released.
+
+***
+
 ### sourceNodeId
 
 > **sourceNodeId**: `string`

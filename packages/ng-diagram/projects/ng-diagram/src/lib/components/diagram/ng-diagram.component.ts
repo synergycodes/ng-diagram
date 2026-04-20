@@ -17,6 +17,7 @@ import { Edge, Node } from '../../../core/src';
 import type {
   ClipboardPastedEvent,
   DiagramInitEvent,
+  EdgeDrawEndedEvent,
   EdgeDrawnEvent,
   GroupMembershipChangedEvent,
   GroupNode,
@@ -166,8 +167,19 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    *
    * This event only fires for user-initiated edge creation through the UI,
    * but not for programmatically added edges.
+   *
+   * @deprecated Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws.
    */
   @Output() edgeDrawn = new EventEmitter<EdgeDrawnEvent>();
+
+  /**
+   * Event emitted when an edge draw gesture ends, regardless of outcome.
+   *
+   * Fires on every linking completion — both successful and cancelled.
+   * For successful draws, includes the created edge and target.
+   * For cancelled draws, includes the cancellation reason.
+   */
+  @Output() edgeDrawEnded = new EventEmitter<EdgeDrawEndedEvent>();
 
   /**
    * Event emitted when selected nodes are moved within the diagram.
@@ -476,6 +488,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     });
 
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
+    eventManager.on('edgeDrawEnded', (event) => this.edgeDrawEnded.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('selectionGestureEnded', (event) => this.selectionGestureEnded.emit(event));
