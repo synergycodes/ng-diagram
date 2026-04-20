@@ -143,6 +143,9 @@ export class CursorPositionTrackerDirective {
     static ɵfac: i0.ɵɵFactoryDeclaration<CursorPositionTrackerDirective, never>;
 }
 
+// @public (undocumented)
+export type DataObject = object;
+
 // @public
 export interface DiagramEventMap {
     clipboardPasted: ClipboardPastedEvent;
@@ -955,23 +958,23 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     deleteEdges(ids: string[]): void;
     deleteNodes(ids: string[]): void;
     readonly edges: Signal<Edge<object>[]>;
-    getChildren(groupId: string): Node_2[];
-    getChildrenNested(groupId: string): Node_2[];
-    getConnectedEdges(nodeId: string): Edge[];
-    getConnectedNodes(nodeId: string): Node_2[];
-    getEdgeById(edgeId: string): Edge | null;
+    getChildren<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
+    getChildrenNested<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
+    getConnectedEdges<T extends DataObject = DataObject>(nodeId: string): Edge<T>[];
+    getConnectedNodes<T extends DataObject = DataObject>(nodeId: string): Node_2<T>[];
+    getEdgeById<T extends DataObject = DataObject>(edgeId: string): Edge<T> | null;
     getModel(): ModelAdapter;
-    getNearestNodeInRange(point: Point, range: number): Node_2 | null;
+    getNearestNodeInRange<T extends DataObject = DataObject>(point: Point, range: number): Node_2<T> | null;
     getNearestPortInRange(point: Point, range: number): Port | null;
-    getNodeById(nodeId: string): Node_2 | null;
-    getNodeEnds(edgeId: string): {
-        source: Node_2;
-        target: Node_2;
+    getNodeById<T extends DataObject = DataObject>(nodeId: string): Node_2<T> | null;
+    getNodeEnds<S extends DataObject = DataObject, T extends DataObject = DataObject>(edgeId: string): {
+        source: Node_2<S>;
+        target: Node_2<T>;
     } | null;
-    getNodesInRange(point: Point, range: number): Node_2[];
-    getOverlappingNodes(nodeId: string): Node_2[];
-    getOverlappingNodes(node: Node_2): Node_2[];
-    getParentHierarchy(nodeId: string): GroupNode[];
+    getNodesInRange<T extends DataObject = DataObject>(point: Point, range: number): Node_2<T>[];
+    getOverlappingNodes<T extends DataObject = DataObject>(nodeId: string): Node_2<T>[];
+    getOverlappingNodes<T extends DataObject = DataObject>(node: Node_2<T>): Node_2<T>[];
+    getParentHierarchy<T extends DataObject = DataObject>(nodeId: string): GroupNode<T>[];
     isNestedChild(nodeId: string, groupId: string): boolean;
     readonly metadata: Signal<Metadata<object>>;
     // @internal
@@ -979,10 +982,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     readonly nodes: Signal<Node_2[]>;
     toJSON(): string;
     updateEdge(edgeId: string, edge: Partial<Edge>): void;
-    updateEdgeData<T extends Record<string, unknown> | undefined>(edgeId: string, data: T): void;
+    updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T): void;
     updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]): void;
     updateNode(nodeId: string, node: Partial<Node_2>): void;
-    updateNodeData<T extends Record<string, unknown> | undefined>(nodeId: string, data: T): void;
+    updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T): void;
     updateNodes(nodes: (Pick<Node_2, 'id'> & Partial<Node_2>)[]): void;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramModelService, never>;
