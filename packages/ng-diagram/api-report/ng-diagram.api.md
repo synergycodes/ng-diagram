@@ -150,6 +150,8 @@ export type DataObject = object;
 export interface DiagramEventMap {
     clipboardPasted: ClipboardPastedEvent;
     diagramInit: DiagramInitEvent;
+    edgeDrawEnded: EdgeDrawEndedEvent;
+    // @deprecated
     edgeDrawn: EdgeDrawnEvent;
     groupMembershipChanged: GroupMembershipChangedEvent;
     nodeDragEnded: NodeDragEndedEvent;
@@ -221,6 +223,21 @@ export interface Edge<T extends DataObject = DataObject> {
 }
 
 // @public
+export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget';
+
+// @public
+export interface EdgeDrawEndedEvent {
+    dropPosition: Point;
+    edge?: Edge;
+    reason?: EdgeDrawCancelReason;
+    source: Node_2;
+    sourcePort?: string;
+    success: boolean;
+    target?: Node_2;
+    targetPort?: string;
+}
+
+// @public @deprecated
 export interface EdgeDrawnEvent {
     edge: Edge;
     source: Node_2;
@@ -444,6 +461,8 @@ export type KeyboardZoomAction = 'keyboardZoomIn' | 'keyboardZoomOut';
 
 // @public
 export interface LinkingActionState {
+    cancelReason?: EdgeDrawCancelReason;
+    dropPosition?: Point;
     sourceNodeId: string;
     sourcePortId: string;
     temporaryEdge: Edge | null;
@@ -456,6 +475,7 @@ export interface LinkingConfig {
     edgePanningThreshold: number;
     finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
     portSnapDistance: number;
+    selectNodeOnPortPress: boolean;
     temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
     validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null) => boolean;
 }
@@ -769,6 +789,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     clipboardPasted: EventEmitter<ClipboardPastedEvent>;
     config: InputSignal<DeepPartial<FlowConfig> | undefined>;
     diagramInit: EventEmitter<DiagramInitEvent>;
+    edgeDrawEnded: EventEmitter<EdgeDrawEndedEvent>;
+    // @deprecated
     edgeDrawn: EventEmitter<EdgeDrawnEvent>;
     // (undocumented)
     readonly edges: WritableSignal<Edge<object>[]>;
@@ -812,7 +834,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "edgeDrawEnded": "edgeDrawEnded"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
