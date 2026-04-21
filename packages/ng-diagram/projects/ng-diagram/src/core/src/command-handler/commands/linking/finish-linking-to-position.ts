@@ -14,7 +14,12 @@ export const finishLinkingToPosition = async (
   const temporaryEdge = linking?.temporaryEdge;
   const { position } = command;
 
-  if (!temporaryEdge || !linking) {
+  if (!linking) {
+    return;
+  }
+
+  if (!temporaryEdge) {
+    commandHandler.flowCore.actionStateManager.clearLinking();
     return;
   }
 
