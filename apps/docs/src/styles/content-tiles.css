@@ -44,6 +44,13 @@
   margin: 0;
 }
 
+.content-tile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: auto;
+}
+
 .content-tile-link {
   display: inline-flex;
   align-items: center;
@@ -51,7 +58,11 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--sl-color-text-accent);
-  margin-top: auto;
+  text-decoration: none;
+}
+
+.content-tile-link:hover {
+  text-decoration: underline;
 }
 
 .content-tile-grid {

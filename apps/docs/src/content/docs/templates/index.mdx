@@ -1,0 +1,24 @@
+---
+title: Templates
+description: Production-ready starter kits curated and built by the ngDiagram team
+---
+
+import ContentTile from '../../../components/content-tile/content-tile.astro';
+import { templates } from './templates.ts';
+
+Curated starter kits built and maintained by the ngDiagram team. Each template is a production-grade reference implementation you can clone, extend, and ship. Complete with architecture, logic and opinionated defaults.
+
+<div class="content-tile-grid">
+  {templates.map((template) => (
+    <ContentTile
+      title={template.title}
+      description={template.description}
+      href={template.href}
+      codeHref={template.codeHref}
+      navigationTitle={'View Template'}
+      image={template.image}
+      imageAlt={template.imageAlt}
+      openInNewTab={true}
+    />
+  ))}
+</div>
