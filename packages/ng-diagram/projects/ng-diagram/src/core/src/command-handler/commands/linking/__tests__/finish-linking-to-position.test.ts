@@ -64,6 +64,24 @@ describe('finishLinkingToPosition', () => {
     expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
   });
 
+  it('should clear linking state when linking exists but temporaryEdge is null', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: null,
+    };
+
+    const command: FinishLinkingToPositionCommand = {
+      name: 'finishLinkingToPosition',
+      position: { x: 100, y: 200 },
+    };
+
+    await finishLinkingToPosition(mockCommandHandler, command);
+
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
   it('should create final edge to position when temporary edge exists', async () => {
     const position = { x: 150, y: 250 };
     const finalEdge = {

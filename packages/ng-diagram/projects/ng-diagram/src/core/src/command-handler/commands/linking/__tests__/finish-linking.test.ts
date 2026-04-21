@@ -87,6 +87,19 @@ describe('finishLinking', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
   });
 
+  it('should clear linking state when linking exists but temporaryEdge is null', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: null,
+    };
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
   it('should clear linking with noTarget reason when temporary edge has no target', async () => {
     const temporaryEdgeNoTarget: Edge = {
       ...mockTemporaryEdge,

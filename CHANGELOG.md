@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-04-21
+
+### Added
+
+- New [Templates](/docs/templates/) section — we're excited to introduce a dedicated space for production-grade starter kits curated and built by the ngDiagram team. Kicking it off with an interactive [Org Chart](https://github.com/synergycodes/ng-diagram-orgchart) starter kit featuring drag-and-drop reordering, expand/collapse subtrees, sidebar node editing, dynamic layouts, dark/light theme, minimap, and automatic tree layout powered by ELK.js. Clone it, explore the code, and use it as a launchpad for your own app! 🚀 ([#667](https://github.com/synergycodes/ng-diagram/pull/667))
+
+### Fixed
+
+- Fixed linking state not being cleared when edge drawing fails before creating a temporary edge (e.g., starting from a target port), which permanently blocked all subsequent edge drawing ([#666](https://github.com/synergycodes/ng-diagram/pull/666))
+
 ## [1.2.0] - 2026-04-20
 
 ### Added
@@ -216,7 +226,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/synergycodes/ng-diagram/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/synergycodes/ng-diagram/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/synergycodes/ng-diagram/compare/v1.1.0...v1.1.1

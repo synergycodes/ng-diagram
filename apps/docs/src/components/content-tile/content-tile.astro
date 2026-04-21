@@ -7,24 +7,32 @@ export type Props = {
   image: string;
   imageAlt?: string;
   openInNewTab?: boolean;
+  codeHref?: string;
 }
 
 export type ContentTile = Omit<Props, 'openInNewTab' | 'navigationTitle'>;
 
-const { title, description, href, navigationTitle, image, imageAlt = title, openInNewTab = false } = Astro.props;
+const { title, description, href, navigationTitle, image, imageAlt = title, openInNewTab = false, codeHref } = Astro.props;
 const targetAttr = openInNewTab ? '_blank' : undefined;
 const relAttr = openInNewTab ? 'noopener noreferrer' : undefined;
 ---
 
-<a href={href} class="content-tile" target={targetAttr} rel={relAttr}>
+<article class="content-tile">
   <div class="content-tile-image">
     <img src={image} alt={imageAlt} />
   </div>
   <div class="content-tile-content">
     <h4>{title}</h4>
     <p class="content-tile-description">{description}</p>
-    <span class="content-tile-link">
-      {`${navigationTitle} →`}
-    </span>
+    <div class="content-tile-actions">
+      <a href={href} class="content-tile-link" target={targetAttr} rel={relAttr}>
+        {`${navigationTitle} →`}
+      </a>
+      {codeHref && (
+        <a href={codeHref} class="content-tile-link" target={targetAttr} rel={relAttr}>
+          View code →
+        </a>
+      )}
+    </div>
   </div>
-</a>
+</article>
