@@ -30,9 +30,19 @@ With ng-diagram, you can create:
 - **Circuit Diagrams**: Electronic schematics and technical drawings
 - **Custom Visualizations**: Any diagram type with custom node and edge templates
 
+See our [Templates](#-templates) for production-ready examples you can fork and customize.
+
 ## 🎮 Try the Demo
 
 See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)** | **[Source Code](https://github.com/synergycodes/ng-diagram-demo)**
+
+## 🧩 Templates
+
+Production-ready starter kits built with ng-diagram. Fork, customize, ship.
+
+| Template      | Description                                                                                                               | Demo                                                             | Source                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Org Chart** | Interactive organizational chart with drag-and-drop reordering, expand/collapse, ELK.js layout, dark/light theme, minimap | [Live Demo](https://synergycodes.github.io/ng-diagram-orgchart/) | [Source](https://github.com/synergycodes/ng-diagram-orgchart) |
 
 ## 🚀 Quick Start
 

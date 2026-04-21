@@ -5,8 +5,8 @@ import starlightAutoSidebar from 'starlight-auto-sidebar';
 import starlightTypeDoc from 'starlight-typedoc';
 
 import angular from '@analogjs/astro-angular';
-import umami from '@yeskunall/astro-umami';
 import tailwindcss from '@tailwindcss/vite';
+import umami from '@yeskunall/astro-umami';
 
 const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 
@@ -80,11 +80,11 @@ export default defineConfig({
           autogenerate: { directory: 'examples' },
           collapsed: true,
         },
-        // TODO: Enable this section after deploying yjs demo app
-        // {
-        //   label: 'Demos',
-        //   link: '/demos/',
-        // },
+        {
+          label: 'Templates',
+          link: '/templates/',
+          badge: { text: 'New', variant: 'tip' },
+        },
         {
           label: 'API',
           collapsed: true,
