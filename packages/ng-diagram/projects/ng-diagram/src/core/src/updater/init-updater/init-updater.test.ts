@@ -14,6 +14,7 @@ describe('InitUpdater', () => {
     internalUpdater: {
       addPort: Mock;
       addEdgeLabel: Mock;
+      deleteEdgeLabel: Mock;
       applyNodeSize: Mock;
       applyPortChanges: Mock;
       applyEdgeLabelChanges: Mock;
@@ -87,6 +88,7 @@ describe('InitUpdater', () => {
         applyNodeSize: vi.fn(),
         applyPortChanges: vi.fn(),
         applyEdgeLabelChanges: vi.fn(),
+        deleteEdgeLabel: vi.fn(),
       },
     };
 
@@ -653,6 +655,30 @@ describe('InitUpdater', () => {
       expect(mockFlowCore.internalUpdater.applyEdgeLabelChanges).toHaveBeenCalledWith('edge1', [
         { labelId: 'label1', labelChanges: { positionOnEdge: 0.75 } },
       ]);
+    });
+  });
+
+  describe('deleteEdgeLabel', () => {
+    it('should always queue for replay after init', async () => {
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      const onComplete = vi.fn(() => {
+        initUpdater.deleteEdgeLabel('edge1', 'label1');
+      });
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.deleteEdgeLabel).toHaveBeenCalledWith('edge1', 'label1');
     });
   });
 

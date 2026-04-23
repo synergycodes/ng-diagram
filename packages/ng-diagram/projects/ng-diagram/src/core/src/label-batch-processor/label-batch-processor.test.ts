@@ -28,10 +28,12 @@ describe('LabelBatchProcessor', () => {
 
       // Should have called flushCallback once with all three labels
       expect(flushCallback).toHaveBeenCalledTimes(1);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [label1, label2, label3]);
+
+      const additions = flushCallback.mock.calls[0][0] as Map<string, EdgeLabel[]>;
+      expect(additions.get(edgeId)).toEqual([label1, label2, label3]);
     });
 
-    it('should handle labels for different edges separately', async () => {
+    it('should handle labels for different edges in a single callback', async () => {
       const edge1Id = 'edge-1';
       const edge2Id = 'edge-2';
       const label1: EdgeLabel = { id: 'label-1', positionOnEdge: 0.25 };
@@ -44,10 +46,12 @@ describe('LabelBatchProcessor', () => {
       // Wait for microtask to execute
       await new Promise<void>((resolve) => queueMicrotask(resolve));
 
-      // Should have called flushCallback twice, once for each edge
-      expect(flushCallback).toHaveBeenCalledTimes(2);
-      expect(flushCallback).toHaveBeenCalledWith(edge1Id, [label1]);
-      expect(flushCallback).toHaveBeenCalledWith(edge2Id, [label2]);
+      // Should have called flushCallback once with a map containing both edges
+      expect(flushCallback).toHaveBeenCalledTimes(1);
+
+      const additions = flushCallback.mock.calls[0][0] as Map<string, EdgeLabel[]>;
+      expect(additions.get(edge1Id)).toEqual([label1]);
+      expect(additions.get(edge2Id)).toEqual([label2]);
     });
 
     it('should handle multiple batches for the same edge across different ticks', async () => {
@@ -69,8 +73,12 @@ describe('LabelBatchProcessor', () => {
 
       // Should have called flushCallback twice, once for each batch
       expect(flushCallback).toHaveBeenCalledTimes(2);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [label1]);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [label2]);
+
+      const firstAdditions = flushCallback.mock.calls[0][0] as Map<string, EdgeLabel[]>;
+      expect(firstAdditions.get(edgeId)).toEqual([label1]);
+
+      const secondAdditions = flushCallback.mock.calls[1][0] as Map<string, EdgeLabel[]>;
+      expect(secondAdditions.get(edgeId)).toEqual([label2]);
     });
   });
 
@@ -100,10 +108,12 @@ describe('LabelBatchProcessor', () => {
 
       // Should have called flushCallback once with all three updates
       expect(flushCallback).toHaveBeenCalledTimes(1);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [update1, update2, update3]);
+
+      const updates = flushCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(updates.get(edgeId)).toEqual([update1, update2, update3]);
     });
 
-    it('should handle label updates for different edges separately', async () => {
+    it('should handle label updates for different edges in a single callback', async () => {
       const edge1Id = 'edge-1';
       const edge2Id = 'edge-2';
       const update1: LabelUpdate = {
@@ -122,10 +132,12 @@ describe('LabelBatchProcessor', () => {
       // Wait for microtask to execute
       await new Promise<void>((resolve) => queueMicrotask(resolve));
 
-      // Should have called flushCallback twice, once for each edge
-      expect(flushCallback).toHaveBeenCalledTimes(2);
-      expect(flushCallback).toHaveBeenCalledWith(edge1Id, [update1]);
-      expect(flushCallback).toHaveBeenCalledWith(edge2Id, [update2]);
+      // Should have called flushCallback once with a map containing both edges
+      expect(flushCallback).toHaveBeenCalledTimes(1);
+
+      const updates = flushCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(updates.get(edge1Id)).toEqual([update1]);
+      expect(updates.get(edge2Id)).toEqual([update2]);
     });
 
     it('should handle multiple update batches for the same edge across different ticks', async () => {
@@ -153,8 +165,12 @@ describe('LabelBatchProcessor', () => {
 
       // Should have called flushCallback twice, once for each batch
       expect(flushCallback).toHaveBeenCalledTimes(2);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [update1]);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [update2]);
+
+      const firstUpdates = flushCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(firstUpdates.get(edgeId)).toEqual([update1]);
+
+      const secondUpdates = flushCallback.mock.calls[1][0] as Map<string, LabelUpdate[]>;
+      expect(secondUpdates.get(edgeId)).toEqual([update2]);
     });
 
     it('should handle updates to the same label in a batch', async () => {
@@ -177,7 +193,9 @@ describe('LabelBatchProcessor', () => {
 
       // Should have called flushCallback once with both updates
       expect(flushCallback).toHaveBeenCalledTimes(1);
-      expect(flushCallback).toHaveBeenCalledWith(edgeId, [update1, update2]);
+
+      const updates = flushCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(updates.get(edgeId)).toEqual([update1, update2]);
     });
   });
 
@@ -201,9 +219,12 @@ describe('LabelBatchProcessor', () => {
 
       // Should have called each callback once
       expect(addCallback).toHaveBeenCalledTimes(1);
-      expect(addCallback).toHaveBeenCalledWith(edgeId, [label]);
+      const additions = addCallback.mock.calls[0][0] as Map<string, EdgeLabel[]>;
+      expect(additions.get(edgeId)).toEqual([label]);
+
       expect(updateCallback).toHaveBeenCalledTimes(1);
-      expect(updateCallback).toHaveBeenCalledWith(edgeId, [update]);
+      const updates = updateCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(updates.get(edgeId)).toEqual([update]);
     });
 
     it('should batch additions and updates separately even for same edge', async () => {
@@ -232,9 +253,12 @@ describe('LabelBatchProcessor', () => {
 
       // Should batch additions and updates separately
       expect(addCallback).toHaveBeenCalledTimes(1);
-      expect(addCallback).toHaveBeenCalledWith(edgeId, [label1, label2]);
+      const additions = addCallback.mock.calls[0][0] as Map<string, EdgeLabel[]>;
+      expect(additions.get(edgeId)).toEqual([label1, label2]);
+
       expect(updateCallback).toHaveBeenCalledTimes(1);
-      expect(updateCallback).toHaveBeenCalledWith(edgeId, [update1, update2]);
+      const updates = updateCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(updates.get(edgeId)).toEqual([update1, update2]);
     });
 
     it('should handle mixed operations for multiple edges', async () => {
@@ -262,13 +286,16 @@ describe('LabelBatchProcessor', () => {
       // Wait for microtask to execute
       await new Promise<void>((resolve) => queueMicrotask(resolve));
 
-      // Should have called callbacks for each operation type and edge
-      expect(addCallback).toHaveBeenCalledTimes(2);
-      expect(addCallback).toHaveBeenCalledWith(edge1Id, [label1]);
-      expect(addCallback).toHaveBeenCalledWith(edge2Id, [label2]);
-      expect(updateCallback).toHaveBeenCalledTimes(2);
-      expect(updateCallback).toHaveBeenCalledWith(edge1Id, [update1]);
-      expect(updateCallback).toHaveBeenCalledWith(edge2Id, [update2]);
+      // Should have called each callback once with a map containing all edges
+      expect(addCallback).toHaveBeenCalledTimes(1);
+      const additions = addCallback.mock.calls[0][0] as Map<string, EdgeLabel[]>;
+      expect(additions.get(edge1Id)).toEqual([label1]);
+      expect(additions.get(edge2Id)).toEqual([label2]);
+
+      expect(updateCallback).toHaveBeenCalledTimes(1);
+      const updates = updateCallback.mock.calls[0][0] as Map<string, LabelUpdate[]>;
+      expect(updates.get(edge1Id)).toEqual([update1]);
+      expect(updates.get(edge2Id)).toEqual([update2]);
     });
   });
 });

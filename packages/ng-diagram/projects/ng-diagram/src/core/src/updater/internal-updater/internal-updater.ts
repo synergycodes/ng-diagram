@@ -80,8 +80,18 @@ export class InternalUpdater implements Updater {
    * Internal method to add a new edge label to the flow
    */
   addEdgeLabel(edgeId: string, label: EdgeLabel): void {
-    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, (edgeId, labels) => {
-      this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels });
+    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, (allAdditions) => {
+      return this.flowCore.commandHandler.emit('addEdgeLabelsBulk', { additions: allAdditions });
+    });
+  }
+
+  /**
+   * @internal
+   * Internal method to delete an edge label from the flow
+   */
+  deleteEdgeLabel(edgeId: string, labelId: string): void {
+    this.flowCore.labelBatchProcessor.processDelete(edgeId, labelId, (allDeletions) => {
+      return this.flowCore.commandHandler.emit('deleteEdgeLabelsBulk', { deletions: allDeletions });
     });
   }
 
@@ -97,8 +107,8 @@ export class InternalUpdater implements Updater {
     }
 
     for (const labelUpdate of filteredUpdates) {
-      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, (edgeId, batchedUpdates) => {
-        this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates: batchedUpdates });
+      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, (allUpdates) => {
+        return this.flowCore.commandHandler.emit('updateEdgeLabelsBulk', { updates: allUpdates });
       });
     }
   }

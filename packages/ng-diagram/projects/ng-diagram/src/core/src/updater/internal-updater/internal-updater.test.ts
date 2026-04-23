@@ -90,7 +90,8 @@ describe('InternalUpdater', () => {
   describe('addPort', () => {
     it('should process port through portBatchProcessor', () => {
       portBatchProcessor.processAdd = vi.fn().mockImplementation((nodeId, port, callback) => {
-        callback(nodeId, [port]);
+        const allAdditions = new Map([[nodeId, [port]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addPort('node-1', mockPort);
@@ -98,16 +99,17 @@ describe('InternalUpdater', () => {
       expect(portBatchProcessor.processAdd).toHaveBeenCalledWith('node-1', mockPort, expect.any(Function));
     });
 
-    it('should emit addPorts when portBatchProcessor calls callback', () => {
+    it('should emit addPortsBulk when portBatchProcessor calls callback', () => {
       portBatchProcessor.processAdd = vi.fn().mockImplementation((nodeId, port, callback) => {
-        callback(nodeId, [port]);
+        const allAdditions = new Map([[nodeId, [port]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addPort('node-1', mockPort);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('addPorts', {
-        nodeId: 'node-1',
-        ports: [mockPort],
+      const expectedAdditions = new Map([['node-1', [mockPort]]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('addPortsBulk', {
+        additions: expectedAdditions,
       });
     });
   });
@@ -145,7 +147,8 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, portUpdate, callback) => {
-        callback(nodeId, [portUpdate]);
+        const allUpdates = new Map([[nodeId, [portUpdate]]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyPortChanges('node-1', [
@@ -167,7 +170,7 @@ describe('InternalUpdater', () => {
       );
     });
 
-    it('should emit updatePorts when portBatchProcessor calls callback', () => {
+    it('should emit updatePortsBulk when portBatchProcessor calls callback', () => {
       const node = {
         ...mockNode,
         measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } }],
@@ -178,16 +181,17 @@ describe('InternalUpdater', () => {
         { portId: 'port-1', portChanges: { size: { width: 50, height: 100 }, position: { x: 100, y: 100 } } },
       ];
       portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, _, callback) => {
-        callback(nodeId, portUpdates);
+        const allUpdates = new Map([[nodeId, portUpdates]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyPortChanges('node-1', [
         { portId: 'port-1', portChanges: { size: { width: 50, height: 100 }, position: { x: 100, y: 100 } } },
       ]);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('updatePorts', {
-        nodeId: 'node-1',
-        ports: portUpdates,
+      const expectedUpdates = new Map([['node-1', portUpdates]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('updatePortsBulk', {
+        updates: expectedUpdates,
       });
     });
 
@@ -217,7 +221,8 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, portUpdate, callback) => {
-        callback(nodeId, [portUpdate]);
+        const allUpdates = new Map([[nodeId, [portUpdate]]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { side: 'bottom' } }]);
@@ -245,7 +250,8 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, portUpdate, callback) => {
-        callback(nodeId, [portUpdate]);
+        const allUpdates = new Map([[nodeId, [portUpdate]]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { type: 'target' } }]);
@@ -391,7 +397,8 @@ describe('InternalUpdater', () => {
   describe('addEdgeLabel', () => {
     it('should process label through labelBatchProcessor', () => {
       labelBatchProcessor.processAdd = vi.fn().mockImplementation((edgeId, label, callback) => {
-        callback(edgeId, [label]);
+        const allAdditions = new Map([[edgeId, [label]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
@@ -399,16 +406,41 @@ describe('InternalUpdater', () => {
       expect(labelBatchProcessor.processAdd).toHaveBeenCalledWith('edge-1', mockEdgeLabel, expect.any(Function));
     });
 
-    it('should emit addEdgeLabels when labelBatchProcessor calls callback', () => {
+    it('should emit addEdgeLabelsBulk when labelBatchProcessor calls callback', () => {
       labelBatchProcessor.processAdd = vi.fn().mockImplementation((edgeId, label, callback) => {
-        callback(edgeId, [label]);
+        const allAdditions = new Map([[edgeId, [label]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('addEdgeLabels', {
-        edgeId: 'edge-1',
-        labels: [mockEdgeLabel],
+      const expectedAdditions = new Map([['edge-1', [mockEdgeLabel]]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('addEdgeLabelsBulk', {
+        additions: expectedAdditions,
+      });
+    });
+  });
+
+  describe('deleteEdgeLabel', () => {
+    it('should process deletion through labelBatchProcessor', () => {
+      labelBatchProcessor.processDelete = vi.fn();
+
+      internalUpdater.deleteEdgeLabel('edge-1', 'label-1');
+
+      expect(labelBatchProcessor.processDelete).toHaveBeenCalledWith('edge-1', 'label-1', expect.any(Function));
+    });
+
+    it('should emit deleteEdgeLabelsBulk when labelBatchProcessor calls callback', () => {
+      labelBatchProcessor.processDelete = vi.fn().mockImplementation((edgeId, labelId, callback) => {
+        const allDeletions = new Map([[edgeId, [labelId]]]);
+        callback(allDeletions);
+      });
+
+      internalUpdater.deleteEdgeLabel('edge-1', 'label-1');
+
+      const expectedDeletions = new Map([['edge-1', ['label-1']]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('deleteEdgeLabelsBulk', {
+        deletions: expectedDeletions,
       });
     });
   });
@@ -436,7 +468,8 @@ describe('InternalUpdater', () => {
       getEdgeByIdMock.mockReturnValue(edge);
 
       labelBatchProcessor.processUpdate = vi.fn().mockImplementation((edgeId, labelUpdate, callback) => {
-        callback(edgeId, [labelUpdate]);
+        const allUpdates = new Map([[edgeId, [labelUpdate]]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyEdgeLabelChanges(edge.id, [
@@ -450,7 +483,7 @@ describe('InternalUpdater', () => {
       );
     });
 
-    it('should emit updateEdgeLabels when labelBatchProcessor calls callback', () => {
+    it('should emit updateEdgeLabelsBulk when labelBatchProcessor calls callback', () => {
       const edge = {
         ...mockEdge,
         measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
@@ -459,16 +492,17 @@ describe('InternalUpdater', () => {
 
       const labelUpdates = [{ labelId: mockEdgeLabel.id, labelChanges: { size: { width: 50, height: 100 } } }];
       labelBatchProcessor.processUpdate = vi.fn().mockImplementation((edgeId, _, callback) => {
-        callback(edgeId, labelUpdates);
+        const allUpdates = new Map([[edgeId, labelUpdates]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyEdgeLabelChanges(edge.id, [
         { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 50, height: 100 } } },
       ]);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('updateEdgeLabels', {
-        edgeId: edge.id,
-        labelUpdates: labelUpdates,
+      const expectedUpdates = new Map([[edge.id, labelUpdates]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateEdgeLabelsBulk', {
+        updates: expectedUpdates,
       });
     });
 
@@ -504,7 +538,8 @@ describe('InternalUpdater', () => {
       getEdgeByIdMock.mockReturnValue(edge);
 
       labelBatchProcessor.processUpdate = vi.fn().mockImplementation((edgeId, labelUpdate, callback) => {
-        callback(edgeId, [labelUpdate]);
+        const allUpdates = new Map([[edgeId, [labelUpdate]]]);
+        callback(allUpdates);
       });
 
       internalUpdater.applyEdgeLabelChanges(edge.id, [

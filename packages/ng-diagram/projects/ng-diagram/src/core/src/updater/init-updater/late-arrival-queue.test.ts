@@ -11,6 +11,7 @@ describe('LateArrivalQueue', () => {
     applyNodeSize: Mock;
     applyPortChanges: Mock;
     applyEdgeLabelChanges: Mock;
+    deleteEdgeLabel: Mock;
   } & Updater;
 
   const createMockPort = (id: string): Port => ({
@@ -35,6 +36,7 @@ describe('LateArrivalQueue', () => {
       applyNodeSize: vi.fn(),
       applyPortChanges: vi.fn(),
       applyEdgeLabelChanges: vi.fn(),
+      deleteEdgeLabel: vi.fn(),
     } as typeof mockUpdater;
   });
 
@@ -169,6 +171,15 @@ describe('LateArrivalQueue', () => {
 
       expect(mockUpdater.applyEdgeLabelChanges).toHaveBeenCalledWith('edge1', labelUpdates);
       expect(mockUpdater.applyEdgeLabelChanges).toHaveBeenCalledTimes(1);
+    });
+
+    it('should process deleteEdgeLabel arrival', () => {
+      queue.enqueue({ method: 'deleteEdgeLabel', args: ['edge1', 'label1'] });
+
+      queue.processAll(mockUpdater);
+
+      expect(mockUpdater.deleteEdgeLabel).toHaveBeenCalledWith('edge1', 'label1');
+      expect(mockUpdater.deleteEdgeLabel).toHaveBeenCalledTimes(1);
     });
 
     it('should process multiple arrivals in order', () => {

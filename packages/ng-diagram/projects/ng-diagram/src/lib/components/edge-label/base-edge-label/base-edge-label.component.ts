@@ -138,10 +138,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    flowCore.commandHandler.emit('deleteEdgeLabels', {
-      edgeId: this.edgeId(),
-      labelIds: [this.id()],
-    });
+    flowCore.updater.deleteEdgeLabel(this.edgeId(), this.id());
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }

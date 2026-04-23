@@ -12,7 +12,8 @@ export type LateArrival =
   | { method: 'addEdgeLabel'; args: [edgeId: string, label: EdgeLabel] }
   | { method: 'applyNodeSize'; args: [nodeId: string, size: NonNullable<Node['size']>] }
   | { method: 'applyPortChanges'; args: [nodeId: string, portUpdates: PortUpdate[]] }
-  | { method: 'applyEdgeLabelChanges'; args: [edgeId: string, labelUpdates: LabelUpdate[]] };
+  | { method: 'applyEdgeLabelChanges'; args: [edgeId: string, labelUpdates: LabelUpdate[]] }
+  | { method: 'deleteEdgeLabel'; args: [edgeId: string, labelId: string] };
 
 /**
  * Queues late arrivals during initialization finish to prevent data loss.
@@ -90,6 +91,9 @@ export class LateArrivalQueue {
           break;
         case 'applyEdgeLabelChanges':
           updater.applyEdgeLabelChanges(...lateArrival.args);
+          break;
+        case 'deleteEdgeLabel':
+          updater.deleteEdgeLabel(...lateArrival.args);
           break;
       }
     }

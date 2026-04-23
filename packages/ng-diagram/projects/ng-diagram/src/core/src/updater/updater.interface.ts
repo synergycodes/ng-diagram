@@ -27,4 +27,9 @@ export interface Updater {
    * Apply edge label changes (size, positionOnEdge, etc.)
    */
   applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void;
+
+  /**
+   * Delete an edge label
+   */
+  deleteEdgeLabel(edgeId: string, labelId: string): void;
 }

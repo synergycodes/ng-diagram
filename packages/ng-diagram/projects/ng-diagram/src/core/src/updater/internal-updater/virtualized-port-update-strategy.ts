@@ -4,8 +4,8 @@ import type { Port } from '../../types';
 import type { PortUpdateStrategy } from './port-update-strategy.interface';
 
 /**
- * Virtualized port update strategy - uses global batching.
- * Used when virtualization is enabled for better performance with many nodes.
+ * Virtualized port update strategy - used when virtualization is enabled.
+ * Skips adding ports that are already measured (re-entering viewport).
  */
 export class VirtualizedPortUpdateStrategy implements PortUpdateStrategy {
   constructor(private readonly flowCore: FlowCore) {}
@@ -15,22 +15,22 @@ export class VirtualizedPortUpdateStrategy implements PortUpdateStrategy {
       return;
     }
 
-    this.flowCore.portBatchProcessor.processAddBatched(nodeId, port, (allAdditions) => {
-      this.flowCore.commandHandler.emit('addPortsBulk', { additions: allAdditions });
+    this.flowCore.portBatchProcessor.processAdd(nodeId, port, (allAdditions) => {
+      return this.flowCore.commandHandler.emit('addPortsBulk', { additions: allAdditions });
     });
   }
 
   updatePorts(nodeId: string, portUpdates: PortUpdate[]): void {
     for (const portUpdate of portUpdates) {
-      this.flowCore.portBatchProcessor.processUpdateBatched(nodeId, portUpdate, (allUpdates) => {
-        this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
+      this.flowCore.portBatchProcessor.processUpdate(nodeId, portUpdate, (allUpdates) => {
+        return this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
       });
     }
   }
 
   deletePort(nodeId: string, portId: string): void {
-    this.flowCore.portBatchProcessor.processDeleteBatched(nodeId, portId, (allDeletions) => {
-      this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: allDeletions });
+    this.flowCore.portBatchProcessor.processDelete(nodeId, portId, (allDeletions) => {
+      return this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: allDeletions });
     });
   }
 

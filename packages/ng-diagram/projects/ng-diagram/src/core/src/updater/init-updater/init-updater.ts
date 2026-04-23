@@ -190,6 +190,13 @@ export class InitUpdater implements Updater {
   }
 
   /**
+   * Deletes an edge label. During initialization, queues for replay after init completes.
+   */
+  deleteEdgeLabel(edgeId: string, labelId: string): void {
+    this.lateArrivalQueue.enqueue({ method: 'deleteEdgeLabel', args: [edgeId, labelId] });
+  }
+
+  /**
    * Applies edge label changes (size, positionOnEdge, etc.).
    * During initialization, only size measurements are tracked for init completion.
    * Non-size changes (positionOnEdge) are ignored since labels are being created with initial values.

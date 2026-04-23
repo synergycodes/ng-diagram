@@ -5,96 +5,90 @@ export interface LabelUpdate {
   labelChanges: Partial<EdgeLabel>;
 }
 
+type FlushCallback<T> = (all: Map<string, T[]>) => void | Promise<void>;
+
 /**
- * Processes and batches edge label operations to prevent race conditions when multiple labels
- * are added or updated simultaneously (e.g., during edge initialization or rapid measurements).
- *
- * This class collects label operations that occur in the same JavaScript tick and
- * processes them together in a single batch, ensuring all labels are properly
- * persisted to the state without overwriting each other.
+ * Batches edge label operations (add, update, delete) that occur in the same JavaScript tick
+ * and flushes them together. Operations are flushed sequentially in order:
+ * deletes → updates → adds. Each operation is awaited before the next begins,
+ * ensuring that later operations read fresh state left by earlier ones.
  */
 export class LabelBatchProcessor {
-  private readonly pendingLabelAdditions = new Map<string, EdgeLabel[]>();
-  private readonly scheduledAdditionFlushes = new Set<string>();
+  private readonly pendingAdds = new Map<string, EdgeLabel[]>();
+  private readonly pendingUpdates = new Map<string, LabelUpdate[]>();
+  private readonly pendingDeletes = new Map<string, string[]>();
 
-  private readonly pendingLabelUpdates = new Map<string, LabelUpdate[]>();
-  private readonly scheduledUpdateFlushes = new Set<string>();
+  private addCallback: FlushCallback<EdgeLabel> | null = null;
+  private updateCallback: FlushCallback<LabelUpdate> | null = null;
+  private deleteCallback: FlushCallback<string> | null = null;
 
-  /**
-   * Processes a label addition for batching with the specified edge.
-   * If this is the first label addition for the edge in the current tick,
-   * schedules a flush to process all collected labels.
-   *
-   * @param edgeId - The ID of the edge to add the label to
-   * @param label - The label to add
-   * @param onFlush - Callback function to execute with all batched labels
-   */
-  processAdd(edgeId: string, label: EdgeLabel, onFlush: (edgeId: string, labels: EdgeLabel[]) => void): void {
-    if (!this.pendingLabelAdditions.has(edgeId)) {
-      this.pendingLabelAdditions.set(edgeId, []);
-    }
+  private flushScheduled = false;
 
-    this.pendingLabelAdditions.get(edgeId)!.push(label);
+  processAdd(edgeId: string, label: EdgeLabel, onFlush: FlushCallback<EdgeLabel>): void {
+    this.getOrCreate(this.pendingAdds, edgeId).push(label);
+    this.addCallback = onFlush;
+    this.scheduleFlush();
+  }
 
-    if (!this.scheduledAdditionFlushes.has(edgeId)) {
-      this.scheduledAdditionFlushes.add(edgeId);
+  processUpdate(edgeId: string, labelUpdate: LabelUpdate, onFlush: FlushCallback<LabelUpdate>): void {
+    this.getOrCreate(this.pendingUpdates, edgeId).push(labelUpdate);
+    this.updateCallback = onFlush;
+    this.scheduleFlush();
+  }
 
-      queueMicrotask(() => {
-        this.flushLabelAdditions(edgeId, onFlush);
-      });
+  processDelete(edgeId: string, labelId: string, onFlush: FlushCallback<string>): void {
+    this.getOrCreate(this.pendingDeletes, edgeId).push(labelId);
+    this.deleteCallback = onFlush;
+    this.scheduleFlush();
+  }
+
+  private scheduleFlush(): void {
+    if (!this.flushScheduled) {
+      this.flushScheduled = true;
+      queueMicrotask(() => void this.flush());
     }
   }
 
   /**
-   * Processes a label update for batching with the specified edge.
-   * If this is the first label update for the edge in the current tick,
-   * schedules a flush to process all collected label updates.
-   *
-   * @param edgeId - The ID of the edge containing the label
-   * @param labelUpdate - The label update containing ID and changes
-   * @param onFlush - Callback function to execute with all batched label updates
+   * Flushes all pending operations across all edges.
+   * Executes sequentially: deletes → updates → adds.
+   * Each callback is awaited before the next to prevent read-modify-write races.
    */
-  processUpdate(
-    edgeId: string,
-    labelUpdate: LabelUpdate,
-    onFlush: (edgeId: string, labelUpdates: LabelUpdate[]) => void
-  ): void {
-    if (!this.pendingLabelUpdates.has(edgeId)) {
-      this.pendingLabelUpdates.set(edgeId, []);
+  private async flush(): Promise<void> {
+    const allDeletes = this.takeAll(this.pendingDeletes);
+    const allUpdates = this.takeAll(this.pendingUpdates);
+    const allAdds = this.takeAll(this.pendingAdds);
+
+    const deleteCallback = this.deleteCallback;
+    const updateCallback = this.updateCallback;
+    const addCallback = this.addCallback;
+
+    this.deleteCallback = null;
+    this.updateCallback = null;
+    this.addCallback = null;
+    this.flushScheduled = false;
+
+    if (allDeletes.size > 0 && deleteCallback) {
+      await deleteCallback(allDeletes);
     }
-
-    this.pendingLabelUpdates.get(edgeId)!.push(labelUpdate);
-
-    if (!this.scheduledUpdateFlushes.has(edgeId)) {
-      this.scheduledUpdateFlushes.add(edgeId);
-
-      queueMicrotask(() => {
-        this.flushLabelUpdates(edgeId, onFlush);
-      });
+    if (allUpdates.size > 0 && updateCallback) {
+      await updateCallback(allUpdates);
+    }
+    if (allAdds.size > 0 && addCallback) {
+      await addCallback(allAdds);
     }
   }
 
-  private flushLabelAdditions(edgeId: string, onFlush: (edgeId: string, labels: EdgeLabel[]) => void): void {
-    const labels = this.pendingLabelAdditions.get(edgeId);
-    if (!labels || labels.length === 0) {
-      return;
+  private getOrCreate<T>(map: Map<string, T[]>, key: string): T[] {
+    if (!map.has(key)) {
+      map.set(key, []);
     }
-
-    onFlush(edgeId, labels);
-
-    this.pendingLabelAdditions.delete(edgeId);
-    this.scheduledAdditionFlushes.delete(edgeId);
+    return map.get(key)!;
   }
 
-  private flushLabelUpdates(edgeId: string, onFlush: (edgeId: string, labelUpdates: LabelUpdate[]) => void): void {
-    const labelUpdates = this.pendingLabelUpdates.get(edgeId);
-    if (!labelUpdates || labelUpdates.length === 0) {
-      return;
-    }
-
-    onFlush(edgeId, labelUpdates);
-
-    this.pendingLabelUpdates.delete(edgeId);
-    this.scheduledUpdateFlushes.delete(edgeId);
+  private takeAll<T>(map: Map<string, T[]>): Map<string, T[]> {
+    const all = new Map(map);
+    map.clear();
+    return all;
   }
 }
