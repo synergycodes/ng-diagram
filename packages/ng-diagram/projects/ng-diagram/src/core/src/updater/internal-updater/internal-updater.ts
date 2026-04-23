@@ -1,4 +1,6 @@
 import { FlowCore } from '../../flow-core';
+import type { LabelUpdate } from '../../label-batch-processor/label-batch-processor';
+import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import type { Node, Port } from '../../types';
 import { EdgeLabel } from '../../types';
 import { getRect, isSameRect } from '../../utils';
@@ -56,20 +58,21 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Internal method to apply a port size and position
+   * Apply port changes (size, position, side, type, etc.) through the batch processor.
+   * Filters out updates where no property actually differs from current state.
    */
-  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void {
+  applyPortChanges(nodeId: string, portUpdates: PortUpdate[]): void {
     const node = this.flowCore.getNodeById(nodeId);
     if (!node) {
       return;
     }
 
-    const portsToUpdate = this.getPortsToUpdate(node, ports);
-    if (portsToUpdate.length === 0) {
+    const filteredUpdates = this.filterUnchangedPortUpdates(node, portUpdates);
+    if (filteredUpdates.length === 0) {
       return;
     }
 
-    this.portUpdateStrategy.updatePorts(nodeId, portsToUpdate);
+    this.portUpdateStrategy.updatePorts(nodeId, filteredUpdates);
   }
 
   /**
@@ -84,62 +87,90 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Internal method to apply an edge label size
+   * Apply edge label changes (size, positionOnEdge, etc.) through the batch processor.
+   * Filters out updates where no property actually differs from current state.
    */
-  applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>): void {
-    const label = this.findEdgeLabel(edgeId, labelId);
-
-    if (!label || this.hasSameLabelSize(label, size)) {
+  applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void {
+    const filteredUpdates = this.filterUnchangedLabelUpdates(edgeId, labelUpdates);
+    if (filteredUpdates.length === 0) {
       return;
     }
 
-    this.flowCore.labelBatchProcessor.processUpdate(
-      edgeId,
-      { labelId, labelChanges: { size } },
-      (edgeId, labelUpdates) => {
-        this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates });
+    for (const labelUpdate of filteredUpdates) {
+      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, (edgeId, batchedUpdates) => {
+        this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates: batchedUpdates });
+      });
+    }
+  }
+
+  /**
+   * Filters out port updates where none of the changed properties actually differ from current state.
+   * Uses 1px threshold for size/position, exact equality for side/type.
+   */
+  private filterUnchangedPortUpdates(node: Node, portUpdates: PortUpdate[]): PortUpdate[] {
+    const measuredPortsMap = new Map((node.measuredPorts ?? []).map((port) => [port.id, port]));
+
+    return portUpdates.filter(({ portId, portChanges }) => {
+      const measuredPort = measuredPortsMap.get(portId);
+      if (!measuredPort) {
+        return false;
       }
-    );
-  }
 
-  private findEdgeLabel(edgeId: string, labelId: string): EdgeLabel | undefined {
-    const edge = this.flowCore.getEdgeById(edgeId);
-    return edge?.measuredLabels?.find((label) => label.id === labelId);
-  }
+      if ('side' in portChanges && portChanges.side !== measuredPort.side) {
+        return true;
+      }
 
-  private hasSameLabelSize(label: EdgeLabel, size: NonNullable<EdgeLabel['size']>): boolean {
-    return isSameRect(getRect({ size: label.size }), getRect({ size }));
-  }
+      if ('type' in portChanges && portChanges.type !== measuredPort.type) {
+        return true;
+      }
 
-  private getPortsToUpdate(
-    node: Node,
-    ports: Pick<Port, 'id' | 'size' | 'position'>[]
-  ): Pick<Port, 'id' | 'size' | 'position'>[] {
-    const measuredPortsMap = this.buildMeasuredPortsMap(node);
+      const hasGeometricChanges = 'size' in portChanges || 'position' in portChanges;
+      if (hasGeometricChanges) {
+        const newSize = portChanges.size ?? measuredPort.size;
+        const newPosition = portChanges.position ?? measuredPort.position;
 
-    return ports.filter((port) => this.hasPortChanged(port, measuredPortsMap));
-  }
+        if (!isSameRect(getRect(measuredPort), getRect({ size: newSize, position: newPosition }))) {
+          return true;
+        }
+      }
 
-  private buildMeasuredPortsMap(node: Node): Map<string, { size: Port['size']; position: Port['position'] }> {
-    const map = new Map<string, { size: Port['size']; position: Port['position'] }>();
-
-    for (const { id, size, position } of node.measuredPorts ?? []) {
-      map.set(id, { size, position });
-    }
-
-    return map;
-  }
-
-  private hasPortChanged(
-    port: Pick<Port, 'id' | 'size' | 'position'>,
-    measuredPortsMap: Map<string, { size: Port['size']; position: Port['position'] }>
-  ): boolean {
-    const measuredPort = measuredPortsMap.get(port.id);
-
-    if (!measuredPort) {
       return false;
+    });
+  }
+
+  /**
+   * Filters out label updates where none of the changed properties actually differ from current state.
+   * Uses 1px threshold for size, exact equality for positionOnEdge.
+   */
+  private filterUnchangedLabelUpdates(edgeId: string, labelUpdates: LabelUpdate[]): LabelUpdate[] {
+    const edge = this.flowCore.getEdgeById(edgeId);
+    if (!edge) {
+      return [];
     }
 
-    return !isSameRect(getRect(measuredPort), getRect({ size: port.size, position: port.position }));
+    const measuredLabelsMap = new Map((edge.measuredLabels ?? []).map((label) => [label.id, label]));
+
+    return labelUpdates.filter(({ labelId, labelChanges }) => {
+      const label = measuredLabelsMap.get(labelId);
+      if (!label) {
+        return false;
+      }
+
+      if ('positionOnEdge' in labelChanges && labelChanges.positionOnEdge !== label.positionOnEdge) {
+        return true;
+      }
+
+      if ('size' in labelChanges) {
+        if (!label.size || !labelChanges.size) {
+          return true;
+        }
+
+        if (!isSameRect(getRect({ size: label.size }), getRect({ size: labelChanges.size }))) {
+          return true;
+        }
+      }
+
+      return false;
+    });
   }
 }

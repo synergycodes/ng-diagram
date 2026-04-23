@@ -103,10 +103,11 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
         untracked(() => {
           this.lastPositionOnEdge.set(newPositionOnEdge);
         });
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
-          edgeId: this.edgeId(),
-          labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
-        });
+        this.flowCoreProvider
+          .provide()
+          .updater.applyEdgeLabelChanges(this.edgeId(), [
+            { labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } },
+          ]);
       }
     });
   }

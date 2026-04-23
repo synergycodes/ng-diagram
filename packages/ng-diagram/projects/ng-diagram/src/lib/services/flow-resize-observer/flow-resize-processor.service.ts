@@ -140,7 +140,10 @@ export class FlowResizeBatchProcessorService {
     }
 
     updatesByNode.forEach((ports, nodeId) => {
-      flowCore.updater.applyPortsSizesAndPositions(nodeId, ports);
+      flowCore.updater.applyPortChanges(
+        nodeId,
+        ports.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
+      );
     });
   }
 
@@ -180,7 +183,10 @@ export class FlowResizeBatchProcessorService {
       // NgDiagramNodeComponent.syncPorts() handles it
       if (!flowCore.actionStateManager.isResizing()) {
         const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
-        flowCore.updater.applyPortsSizesAndPositions(metadata.nodeId, portsData);
+        flowCore.updater.applyPortChanges(
+          metadata.nodeId,
+          portsData.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
+        );
       }
     }
 
@@ -239,9 +245,10 @@ export class FlowResizeBatchProcessorService {
     }
 
     updatesByEdge.forEach((labels, edgeId) => {
-      labels.forEach(({ labelId, size }) => {
-        flowCore.updater.applyEdgeLabelSize(edgeId, labelId, size);
-      });
+      flowCore.updater.applyEdgeLabelChanges(
+        edgeId,
+        labels.map(({ labelId, size }) => ({ labelId, labelChanges: { size } }))
+      );
     });
   }
 

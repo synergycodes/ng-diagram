@@ -1,4 +1,6 @@
 import type { EdgeLabel, Node, Port } from '../types';
+import type { PortUpdate } from '../port-batch-processor/port-batch-processor';
+import type { LabelUpdate } from '../label-batch-processor/label-batch-processor';
 
 export interface Updater {
   /**
@@ -12,9 +14,9 @@ export interface Updater {
   addPort(nodeId: string, port: Port): void;
 
   /**
-   * Apply port size and position updates
+   * Apply port changes (size, position, side, type, etc.)
    */
-  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void;
+  applyPortChanges(nodeId: string, portUpdates: PortUpdate[]): void;
 
   /**
    * Add an edge label
@@ -22,7 +24,7 @@ export interface Updater {
   addEdgeLabel(edgeId: string, label: EdgeLabel): void;
 
   /**
-   * Apply edge label size changes
+   * Apply edge label changes (size, positionOnEdge, etc.)
    */
-  applyEdgeLabelSize(edgeId: string, labelId: string, size: NonNullable<EdgeLabel['size']>): void;
+  applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void;
 }

@@ -1,5 +1,7 @@
 import { FlowCore } from '../../flow-core';
-import { Edge, EdgeLabel, Node, Port, Size } from '../../types';
+import type { LabelUpdate } from '../../label-batch-processor/label-batch-processor';
+import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
+import { Edge, EdgeLabel, Node, Port } from '../../types';
 import { Updater } from '../updater.interface';
 import { InitState } from './init-state';
 import { LateArrivalQueue } from './late-arrival-queue';
@@ -38,7 +40,7 @@ Documentation: https://www.ngdiagram.dev/docs/guides/model-initialization/
  *
  * Strategy:
  * 1. Wait for entity creation to stabilize (addPort, addEdgeLabel) using StabilityDetectors
- * 2. Immediately collect measurements (applyNodeSize, applyPortsSizesAndPositions, applyEdgeLabelSize)
+ * 2. Immediately collect measurements (applyNodeSize, applyPortChanges, applyEdgeLabelChanges)
  * 3. Finish when: entities stabilized AND all rendered entities have measurements
  * 4. Apply everything in one setState
  * 5. Queue late arrivals to prevent data loss during finish transition
@@ -148,21 +150,23 @@ export class InitUpdater implements Updater {
   }
 
   /**
-   * Records port measurements (sizes and positions).
-   * Queues if finishing, otherwise records all measurements and attempts to finish.
+   * Applies port changes (size, position, side, type, etc.).
+   * During initialization, only size/position measurements are tracked for init completion.
+   * Non-geometric changes (side, type) are ignored since ports are being created with initial values.
    *
    * @param nodeId - The node ID the ports belong to
-   * @param ports - Array of port measurements
+   * @param portUpdates - Array of port updates
    */
-  applyPortsSizesAndPositions(nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]): void {
+  applyPortChanges(nodeId: string, portUpdates: PortUpdate[]): void {
     if (this.lateArrivalQueue.isFinishing) {
-      this.lateArrivalQueue.enqueue({ method: 'applyPortsSizesAndPositions', args: [nodeId, ports] });
+      this.lateArrivalQueue.enqueue({ method: 'applyPortChanges', args: [nodeId, portUpdates] });
       return;
     }
 
-    for (const { id, size, position } of ports) {
-      if (!size || !position) continue;
-      this.initState.trackPortMeasurement(nodeId, id, size, position);
+    for (const { portId, portChanges } of portUpdates) {
+      if (portChanges.size && portChanges.position) {
+        this.initState.trackPortMeasurement(nodeId, portId, portChanges.size, portChanges.position);
+      }
     }
 
     this.tryFinish();
@@ -186,20 +190,25 @@ export class InitUpdater implements Updater {
   }
 
   /**
-   * Records an edge label size measurement.
-   * Queues if finishing, otherwise records measurement and attempts to finish.
+   * Applies edge label changes (size, positionOnEdge, etc.).
+   * During initialization, only size measurements are tracked for init completion.
+   * Non-size changes (positionOnEdge) are ignored since labels are being created with initial values.
    *
-   * @param edgeId - The edge ID the label belongs to
-   * @param labelId - The label ID
-   * @param size - The measured size
+   * @param edgeId - The edge ID the labels belong to
+   * @param labelUpdates - Array of label updates
    */
-  applyEdgeLabelSize(edgeId: string, labelId: string, size: Size): void {
+  applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void {
     if (this.lateArrivalQueue.isFinishing) {
-      this.lateArrivalQueue.enqueue({ method: 'applyEdgeLabelSize', args: [edgeId, labelId, size] });
+      this.lateArrivalQueue.enqueue({ method: 'applyEdgeLabelChanges', args: [edgeId, labelUpdates] });
       return;
     }
 
-    this.initState.trackLabelMeasurement(edgeId, labelId, size);
+    for (const { labelId, labelChanges } of labelUpdates) {
+      if (labelChanges.size) {
+        this.initState.trackLabelMeasurement(edgeId, labelId, labelChanges.size);
+      }
+    }
+
     this.tryFinish();
   }
 

@@ -1,4 +1,5 @@
 import type { FlowCore } from '../../flow-core';
+import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import type { Port } from '../../types';
 import type { PortUpdateStrategy } from './port-update-strategy.interface';
 
@@ -19,15 +20,11 @@ export class VirtualizedPortUpdateStrategy implements PortUpdateStrategy {
     });
   }
 
-  updatePorts(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void {
-    for (const { id, size, position } of ports) {
-      this.flowCore.portBatchProcessor.processUpdateBatched(
-        nodeId,
-        { portId: id, portChanges: { size, position } },
-        (allUpdates) => {
-          this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
-        }
-      );
+  updatePorts(nodeId: string, portUpdates: PortUpdate[]): void {
+    for (const portUpdate of portUpdates) {
+      this.flowCore.portBatchProcessor.processUpdateBatched(nodeId, portUpdate, (allUpdates) => {
+        this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
+      });
     }
   }
 

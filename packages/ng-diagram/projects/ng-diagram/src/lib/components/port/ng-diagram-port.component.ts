@@ -131,10 +131,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       }
 
       if (Object.keys(portChanges).length > 0) {
-        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-          nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges }],
-        });
+        this.flowCoreProvider.provide().updater.applyPortChanges(nodeData.id, [{ portId: this.id(), portChanges }]);
       }
 
       // ResizeObserver doesn't fire on position-only changes.

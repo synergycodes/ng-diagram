@@ -14,9 +14,9 @@ interface MockedFlowResizeBatchProcessorService {
 describe('FlowResizeBatchProcessorService', () => {
   let service: FlowResizeBatchProcessorService;
   let mockInternalUpdater: {
-    applyPortsSizesAndPositions: ReturnType<typeof vi.fn>;
+    applyPortChanges: ReturnType<typeof vi.fn>;
     applyNodeSize: ReturnType<typeof vi.fn>;
-    applyEdgeLabelSize: ReturnType<typeof vi.fn>;
+    applyEdgeLabelChanges: ReturnType<typeof vi.fn>;
   };
   let mockFlowCore: {
     updater: typeof mockInternalUpdater;
@@ -39,9 +39,9 @@ describe('FlowResizeBatchProcessorService', () => {
 
   beforeEach(() => {
     mockInternalUpdater = {
-      applyPortsSizesAndPositions: vi.fn(),
+      applyPortChanges: vi.fn(),
       applyNodeSize: vi.fn(),
-      applyEdgeLabelSize: vi.fn(),
+      applyEdgeLabelChanges: vi.fn(),
     };
     mockFlowCore = {
       updater: mockInternalUpdater,
@@ -104,7 +104,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyPortsSizesAndPositions).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortChanges).toHaveBeenCalled();
   });
 
   it('should process node batch', () => {
@@ -122,7 +122,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['processAllResizes']([entry]);
 
     expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
-    expect(mockInternalUpdater.applyPortsSizesAndPositions).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortChanges).toHaveBeenCalled();
   });
 
   it('should skip port measurement during active resize', () => {
@@ -141,7 +141,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['processAllResizes']([entry]);
 
     expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
-    expect(mockInternalUpdater.applyPortsSizesAndPositions).not.toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortChanges).not.toHaveBeenCalled();
   });
 
   it('should process edge label batch', () => {
@@ -162,7 +162,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyEdgeLabelSize).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyEdgeLabelChanges).toHaveBeenCalled();
   });
 
   it('should handle unknown metadata type', () => {

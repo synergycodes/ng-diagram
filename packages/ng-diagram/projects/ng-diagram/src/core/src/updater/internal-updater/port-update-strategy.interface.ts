@@ -1,4 +1,5 @@
 import type { Port } from '../../types';
+import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 
 /**
  * Strategy interface for port update operations.
@@ -11,9 +12,9 @@ export interface PortUpdateStrategy {
   addPort(nodeId: string, port: Port): void;
 
   /**
-   * Update port sizes and positions
+   * Update port properties (size, position, side, type, etc.)
    */
-  updatePorts(nodeId: string, ports: Pick<Port, 'id' | 'size' | 'position'>[]): void;
+  updatePorts(nodeId: string, portUpdates: PortUpdate[]): void;
 
   /**
    * Delete a port from a node

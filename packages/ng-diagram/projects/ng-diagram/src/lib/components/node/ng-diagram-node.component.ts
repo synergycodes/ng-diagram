@@ -44,12 +44,18 @@ export class NgDiagramNodeComponent {
       // For resizing we don't have to wait for transforms to compute and removing the "wait"
       // helps to minimize visual lag between new port positions and edge routing applied afterwards the ports are measured
       const portsData = this.portsService.getNodePortsData(id);
-      flowCore.updater.applyPortsSizesAndPositions(id, portsData);
+      flowCore.updater.applyPortChanges(
+        id,
+        portsData.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
+      );
     } else {
       // Async for rotation and other cases - wait for browser to apply transforms
       queueMicrotask(() => {
         const portsData = this.portsService.getNodePortsData(id);
-        flowCore.updater.applyPortsSizesAndPositions(id, portsData);
+        flowCore.updater.applyPortChanges(
+          id,
+          portsData.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
+        );
       });
     }
   }

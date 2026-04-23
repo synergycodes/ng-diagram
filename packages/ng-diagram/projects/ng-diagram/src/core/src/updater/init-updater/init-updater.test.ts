@@ -15,8 +15,8 @@ describe('InitUpdater', () => {
       addPort: Mock;
       addEdgeLabel: Mock;
       applyNodeSize: Mock;
-      applyPortsSizesAndPositions: Mock;
-      applyEdgeLabelSize: Mock;
+      applyPortChanges: Mock;
+      applyEdgeLabelChanges: Mock;
     };
   };
   let mockRenderedModel: { nodes: Node[]; edges: Edge[] };
@@ -85,8 +85,8 @@ describe('InitUpdater', () => {
         addPort: vi.fn(),
         addEdgeLabel: vi.fn(),
         applyNodeSize: vi.fn(),
-        applyPortsSizesAndPositions: vi.fn(),
-        applyEdgeLabelSize: vi.fn(),
+        applyPortChanges: vi.fn(),
+        applyEdgeLabelChanges: vi.fn(),
       },
     };
 
@@ -216,8 +216,8 @@ describe('InitUpdater', () => {
 
       expect(initUpdater.isInitialized).toBe(false);
 
-      initUpdater.applyPortsSizesAndPositions('node1', [
-        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      initUpdater.applyPortChanges('node1', [
+        { portId: 'port1', portChanges: { size: { width: 10, height: 10 }, position: { x: 5, y: 0 } } },
       ]);
 
       await Promise.resolve();
@@ -252,7 +252,9 @@ describe('InitUpdater', () => {
 
       expect(initUpdater.isInitialized).toBe(false);
 
-      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+      initUpdater.applyEdgeLabelChanges('edge1', [
+        { labelId: 'label1', labelChanges: { size: { width: 50, height: 20 } } },
+      ]);
 
       await Promise.resolve();
 
@@ -385,7 +387,7 @@ describe('InitUpdater', () => {
     });
   });
 
-  describe('applyPortsSizesAndPositions', () => {
+  describe('applyPortChanges', () => {
     it('should record port measurements', async () => {
       const node = {
         ...createMockNode('node1'),
@@ -414,8 +416,8 @@ describe('InitUpdater', () => {
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
-      initUpdater.applyPortsSizesAndPositions('node1', [
-        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      initUpdater.applyPortChanges('node1', [
+        { portId: 'port1', portChanges: { size: { width: 10, height: 10 }, position: { x: 5, y: 0 } } },
       ]);
 
       await Promise.resolve();
@@ -451,8 +453,8 @@ describe('InitUpdater', () => {
       vi.advanceTimersByTime(STABILITY_DELAY);
       await Promise.resolve();
 
-      initUpdater.applyPortsSizesAndPositions('node1', [
-        { id: 'port1', size: undefined as unknown as Size, position: { x: 5, y: 0 } },
+      initUpdater.applyPortChanges('node1', [
+        { portId: 'port1', portChanges: { size: undefined as unknown as Size, position: { x: 5, y: 0 } } },
       ]);
 
       await Promise.resolve();
@@ -509,7 +511,69 @@ describe('InitUpdater', () => {
     });
   });
 
-  describe('applyEdgeLabelSize', () => {
+  describe('applyPortChanges with non-geometric properties', () => {
+    it('should not track side-only changes as measurements', async () => {
+      const node = {
+        ...createMockNode('node1'),
+        size: { width: 100, height: 100 },
+        measuredPorts: [
+          {
+            id: 'port1',
+            type: 'source' as const,
+            nodeId: 'node1',
+            side: 'top' as const,
+            size: undefined,
+            position: undefined,
+          },
+        ],
+      };
+      mockRenderedModel = { nodes: [node], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [node],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await Promise.resolve();
+
+      // Side-only change should not complete init (port still needs size/position measurement)
+      initUpdater.applyPortChanges('node1', [{ portId: 'port1', portChanges: { side: 'bottom' } }]);
+
+      await Promise.resolve();
+
+      expect(initUpdater.isInitialized).toBe(false);
+    });
+
+    it('should queue side changes during finish for replay on InternalUpdater', async () => {
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      const onComplete = vi.fn(() => {
+        initUpdater.applyPortChanges('node1', [{ portId: 'port1', portChanges: { side: 'left' } }]);
+      });
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.applyPortChanges).toHaveBeenCalledWith('node1', [
+        { portId: 'port1', portChanges: { side: 'left' } },
+      ]);
+    });
+  });
+
+  describe('applyEdgeLabelChanges', () => {
     beforeEach(() => {
       const edge = createMockEdge('edge1', true);
       mockRenderedModel = { nodes: [], edges: [edge] };
@@ -527,11 +591,68 @@ describe('InitUpdater', () => {
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
-      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+      initUpdater.applyEdgeLabelChanges('edge1', [
+        { labelId: 'label1', labelChanges: { size: { width: 50, height: 20 } } },
+      ]);
 
       await Promise.resolve();
 
       expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should not track positionOnEdge-only changes as measurements', async () => {
+      // Override beforeEach — edge with label that has NO size (needs measurement)
+      const edge: Edge = {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        type: 'default',
+        data: {},
+        measuredLabels: [{ id: 'label1', positionOnEdge: 0.5, size: undefined }],
+      };
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await Promise.resolve();
+
+      // positionOnEdge-only change should not complete init (label still needs size measurement)
+      initUpdater.applyEdgeLabelChanges('edge1', [{ labelId: 'label1', labelChanges: { positionOnEdge: 0.75 } }]);
+
+      await Promise.resolve();
+
+      expect(initUpdater.isInitialized).toBe(false);
+    });
+
+    it('should queue positionOnEdge changes during finish for replay on InternalUpdater', async () => {
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      const onComplete = vi.fn(() => {
+        initUpdater.applyEdgeLabelChanges('edge1', [{ labelId: 'label1', labelChanges: { positionOnEdge: 0.75 } }]);
+      });
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(mockFlowCore.internalUpdater.applyEdgeLabelChanges).toHaveBeenCalledWith('edge1', [
+        { labelId: 'label1', labelChanges: { positionOnEdge: 0.75 } },
+      ]);
     });
   });
 
@@ -671,9 +792,9 @@ describe('InitUpdater', () => {
       await vi.runAllTimersAsync();
 
       initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
-      initUpdater.applyPortsSizesAndPositions('node1', [
-        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
-        { id: 'port2', size: { width: 15, height: 15 }, position: { x: 10, y: 0 } },
+      initUpdater.applyPortChanges('node1', [
+        { portId: 'port1', portChanges: { size: { width: 10, height: 10 }, position: { x: 5, y: 0 } } },
+        { portId: 'port2', portChanges: { size: { width: 15, height: 15 }, position: { x: 10, y: 0 } } },
       ]);
 
       expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
@@ -699,8 +820,12 @@ describe('InitUpdater', () => {
       vi.advanceTimersByTime(STABILITY_DELAY);
       await vi.runAllTimersAsync();
 
-      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
-      initUpdater.applyEdgeLabelSize('edge1', 'label2', { width: 60, height: 25 });
+      initUpdater.applyEdgeLabelChanges('edge1', [
+        { labelId: 'label1', labelChanges: { size: { width: 50, height: 20 } } },
+      ]);
+      initUpdater.applyEdgeLabelChanges('edge1', [
+        { labelId: 'label2', labelChanges: { size: { width: 60, height: 25 } } },
+      ]);
 
       expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
       const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
@@ -780,13 +905,15 @@ describe('InitUpdater', () => {
       // Apply measurements
       initUpdater.applyNodeSize('node1', { width: 100, height: 100 });
       initUpdater.applyNodeSize('node2', { width: 150, height: 150 });
-      initUpdater.applyPortsSizesAndPositions('node1', [
-        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      initUpdater.applyPortChanges('node1', [
+        { portId: 'port1', portChanges: { size: { width: 10, height: 10 }, position: { x: 5, y: 0 } } },
       ]);
-      initUpdater.applyPortsSizesAndPositions('node2', [
-        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 5, y: 0 } },
+      initUpdater.applyPortChanges('node2', [
+        { portId: 'port1', portChanges: { size: { width: 10, height: 10 }, position: { x: 5, y: 0 } } },
       ]);
-      initUpdater.applyEdgeLabelSize('edge1', 'label1', { width: 50, height: 20 });
+      initUpdater.applyEdgeLabelChanges('edge1', [
+        { labelId: 'label1', labelChanges: { size: { width: 50, height: 20 } } },
+      ]);
 
       await vi.runAllTimersAsync();
 
