@@ -16,7 +16,7 @@ import {
 import { OriginPoint, Port } from '../../../core/src';
 import { LinkingInputDirective } from '../../directives/input-events/linking/linking.directive';
 import { FlowCoreProviderService } from '../../services';
-import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
+import { BatchDomObserverService } from '../../services/flow-resize-observer/batch-dom-observer.service';
 import { NodeContextGuardBase } from '../../utils/node-context-guard.base';
 
 /**
@@ -67,7 +67,7 @@ const originPointClassMap: Record<OriginPoint, string> = {
 export class NgDiagramPortComponent extends NodeContextGuardBase implements OnInit, OnDestroy, AfterContentInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly batchResizeObserver = inject(BatchResizeObserverService);
+  private readonly batchDomObserver = inject(BatchDomObserverService);
   private readonly linkingInputDirective = inject(LinkingInputDirective);
   protected readonly isInitialized = signal(false);
   protected readonly lastSide = signal<Port['side'] | undefined>(undefined);
@@ -138,7 +138,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       // When side or originPoint changes, CSS moves the port but doesn't resize it.
       // Force re-observation after DOM updates to pick up the new position.
       if (portChanges.side || originPointChanged) {
-        this.batchResizeObserver.invalidate(this.hostElement.nativeElement);
+        this.batchDomObserver.invalidate(this.hostElement.nativeElement);
       }
     });
 
@@ -171,11 +171,13 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       side: this.side(),
     });
 
-    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
+    this.batchDomObserver.observe(this.hostElement.nativeElement, {
       type: 'port',
       nodeId: nodeData.id,
       portId: this.id(),
     });
+    this.batchDomObserver.observeStyle(this.hostElement.nativeElement);
+
     this.isInitialized.set(true);
   }
 
@@ -196,7 +198,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
-    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+    this.batchDomObserver.unobserve(this.hostElement.nativeElement);
 
     // Skip if node was deleted - ports are removed with the node
     const nodeStillExists = flowCore.getNodeById(nodeData.id);
