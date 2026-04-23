@@ -150,9 +150,8 @@ export class FlowResizeBatchProcessorService {
    */
   private processNodeBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-
-    // Collect nodes that need initial size (no size property yet)
-    const nodesNeedingInitialSize: { id: string; size: Size }[] = [];
+    const isResizing = flowCore.actionStateManager.isResizing();
+    const nodeSizeUpdates: { id: string; size: Size }[] = [];
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'node') continue;
@@ -163,38 +162,26 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
-      const currentSize = node.size;
-
-      // Nodes without initial size - collect for batch update
-      if (!currentSize) {
-        nodesNeedingInitialSize.push({ id: metadata.nodeId, size });
+      if (node.size && !this.isSizeChanged(node.size, size)) {
         continue;
       }
 
-      if (!this.isSizeChanged(currentSize, size)) {
-        continue;
-      }
+      nodeSizeUpdates.push({ id: metadata.nodeId, size });
 
-      flowCore.updater.applyNodeSize(metadata.nodeId, size);
-
-      // Skip port measurement during active resize performed by user to avoid redundant updates
-      // NgDiagramNodeComponent.syncPorts() handles it
-      if (!flowCore.actionStateManager.isResizing()) {
+      // Skip port measurement during active resize — NgDiagramNodeComponent.syncPorts() handles it
+      if (!isResizing) {
         const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
         flowCore.updater.applyPortChanges(metadata.nodeId, toPortUpdates(portsData));
       }
     }
 
-    // Batch update nodes without initial size
-    if (nodesNeedingInitialSize.length > 0) {
+    if (nodeSizeUpdates.length > 0) {
       if (flowCore.isInitialized) {
-        // After init: batch update directly for performance
-        flowCore.commandHandler.emit('updateNodes', {
-          nodes: nodesNeedingInitialSize,
-        });
+        // After init: single batch update for all nodes
+        flowCore.commandHandler.emit('updateNodes', { nodes: nodeSizeUpdates });
       } else {
         // During init: use updater so InitUpdater can track measurements
-        for (const { id, size } of nodesNeedingInitialSize) {
+        for (const { id, size } of nodeSizeUpdates) {
           flowCore.updater.applyNodeSize(id, size);
         }
       }
