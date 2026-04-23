@@ -6,7 +6,7 @@ import { NgDiagramNodeService } from '../public-services/ng-diagram-node.service
 import { NgDiagramSelectionService } from '../public-services/ng-diagram-selection.service';
 import { NgDiagramViewportService } from '../public-services/ng-diagram-viewport.service';
 import { NgDiagramService } from '../public-services/ng-diagram.service';
-import { BatchResizeObserverService } from '../services';
+import { BatchDomObserverService } from '../services';
 import { CursorPositionTrackerService } from '../services/cursor-position-tracker/cursor-position-tracker.service';
 import { FlowCoreProviderService } from '../services/flow-core-provider/flow-core-provider.service';
 import { FlowResizeBatchProcessorService } from '../services/flow-resize-observer/flow-resize-processor.service';
@@ -59,7 +59,7 @@ export function provideNgDiagram(): Provider[] {
     FlowResizeBatchProcessorService,
     NgDiagramService,
     CursorPositionTrackerService,
-    BatchResizeObserverService,
+    BatchDomObserverService,
     NgDiagramViewportService,
     NgDiagramModelService,
     NgDiagramSelectionService,

@@ -12,7 +12,7 @@ import {
   untracked,
 } from '@angular/core';
 import { EdgeLabel } from '../../../../core/src';
-import { BatchResizeObserverService, FlowCoreProviderService } from '../../../services';
+import { BatchDomObserverService, FlowCoreProviderService } from '../../../services';
 import { NgDiagramBaseEdgeComponent } from '../../edge/base-edge/base-edge.component';
 
 /**
@@ -47,7 +47,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly edgeComponent = inject(NgDiagramBaseEdgeComponent);
-  private readonly batchResizeObserver = inject(BatchResizeObserverService);
+  private readonly batchDomObserver = inject(BatchDomObserverService);
 
   /**
    * The unique identifier for the edge label.
@@ -120,11 +120,12 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       positionOnEdge: this.positionOnEdge(),
     });
 
-    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
+    this.batchDomObserver.observe(this.hostElement.nativeElement, {
       type: 'edge-label',
       edgeId: this.edgeId(),
       labelId: this.id(),
     });
+    this.batchDomObserver.observeStyle(this.hostElement.nativeElement);
   }
 
   /** @internal */
@@ -139,7 +140,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     }
 
     flowCore.updater.deleteEdgeLabel(this.edgeId(), this.id());
-    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+    this.batchDomObserver.unobserve(this.hostElement.nativeElement);
   }
 }
 

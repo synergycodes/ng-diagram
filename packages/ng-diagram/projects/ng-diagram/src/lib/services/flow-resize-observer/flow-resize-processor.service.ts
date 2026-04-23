@@ -3,7 +3,7 @@ import { Point, Port, Size } from '../../../core/src';
 import { toPortUpdates } from '../../../core/src/port-batch-processor/port-batch-processor';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
-import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
+import { BatchDomObserverService, type ObservedElementMetadata } from './batch-dom-observer.service';
 
 const UNKNOWN_ELEMENT_TYPE_ERROR = (elementType: string) =>
   `[ngDiagram] Unknown element type: "${elementType}"
@@ -22,7 +22,7 @@ interface ProcessedEntry {
 export class FlowResizeBatchProcessorService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly updatePortsService = inject(UpdatePortsService);
-  private readonly batchResizeObserver = inject(BatchResizeObserverService);
+  private readonly batchDomObserver = inject(BatchDomObserverService);
 
   private isInitialized = false;
 
@@ -33,7 +33,7 @@ export class FlowResizeBatchProcessorService {
     if (this.isInitialized) return;
 
     // Register this service as the batch processor
-    this.batchResizeObserver.setBatchProcessor((entries) => {
+    this.batchDomObserver.setBatchProcessor((entries) => {
       this.processAllResizes(entries);
     });
 
@@ -56,7 +56,7 @@ export class FlowResizeBatchProcessorService {
 
     // Categorize entries by type
     for (const entry of entries) {
-      const metadata = this.batchResizeObserver.getMetadata(entry.target);
+      const metadata = this.batchDomObserver.getMetadata(entry.target);
 
       if (!metadata) continue;
 

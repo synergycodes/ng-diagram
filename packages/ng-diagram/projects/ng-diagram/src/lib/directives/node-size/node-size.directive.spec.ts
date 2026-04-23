@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { type Node } from '../../../core/src';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
-import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
+import { BatchDomObserverService } from '../../services/flow-resize-observer/batch-dom-observer.service';
 import { DEFAULT_GROUP_SIZE, DEFAULT_NODE_SIZE, NodeSizeDirective } from './node-size.directive';
 
 @Component({
@@ -21,7 +21,7 @@ describe('NodeSizeDirective', () => {
   let component: TestComponent;
   let element: HTMLElement;
 
-  let mockBatchResizeObserver: {
+  let mockBatchDomObserver: {
     observe: ReturnType<typeof vi.fn>;
     unobserve: ReturnType<typeof vi.fn>;
   };
@@ -32,7 +32,7 @@ describe('NodeSizeDirective', () => {
   };
 
   beforeEach(async () => {
-    mockBatchResizeObserver = {
+    mockBatchDomObserver = {
       observe: vi.fn(),
       unobserve: vi.fn(),
     };
@@ -52,7 +52,7 @@ describe('NodeSizeDirective', () => {
     await TestBed.configureTestingModule({
       imports: [TestComponent],
       providers: [
-        { provide: BatchResizeObserverService, useValue: mockBatchResizeObserver },
+        { provide: BatchDomObserverService, useValue: mockBatchDomObserver },
         { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
       ],
     }).compileComponents();
@@ -177,7 +177,7 @@ describe('NodeSizeDirective', () => {
 
   describe('Lifecycle', () => {
     it('should connect resize observer on init', () => {
-      expect(mockBatchResizeObserver.observe).toHaveBeenCalledWith(element, {
+      expect(mockBatchDomObserver.observe).toHaveBeenCalledWith(element, {
         type: 'node',
         nodeId: 'test-node',
       });
@@ -185,7 +185,7 @@ describe('NodeSizeDirective', () => {
 
     it('should disconnect resize observer on destroy', () => {
       fixture.destroy();
-      expect(mockBatchResizeObserver.unobserve).toHaveBeenCalledWith(element);
+      expect(mockBatchDomObserver.unobserve).toHaveBeenCalledWith(element);
     });
   });
 

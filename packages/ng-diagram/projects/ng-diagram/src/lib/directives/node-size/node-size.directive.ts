@@ -1,7 +1,7 @@
 import { computed, Directive, effect, ElementRef, inject, input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { DEFAULT_NODE_MIN_SIZE, isGroup, type Node } from '../../../core/src';
 import { FlowCoreProviderService } from '../../services/flow-core-provider/flow-core-provider.service';
-import { BatchResizeObserverService } from '../../services/flow-resize-observer/batched-resize-observer.service';
+import { BatchDomObserverService } from '../../services/flow-resize-observer/batch-dom-observer.service';
 
 export const DEFAULT_NODE_SIZE = { width: '11.25rem', height: '2rem' };
 export const DEFAULT_GROUP_SIZE = { width: '9.0625rem', height: '9.0625rem' };
@@ -26,7 +26,7 @@ export const DEFAULT_GROUP_SIZE = { width: '9.0625rem', height: '9.0625rem' };
 export class NodeSizeDirective implements OnDestroy, OnInit {
   private readonly hostElement = inject(ElementRef<HTMLElement>);
   private readonly renderer = inject(Renderer2);
-  private readonly batchResizeObserver = inject(BatchResizeObserverService);
+  private readonly batchDomObserver = inject(BatchDomObserverService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   node = input.required<Node>();
@@ -170,13 +170,13 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
    * size-dependent features when nodes resize.
    */
   private connectResizeObserver() {
-    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
+    this.batchDomObserver.observe(this.hostElement.nativeElement, {
       type: 'node',
       nodeId: this.id(),
     });
   }
 
   private disconnectResizeObserver() {
-    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+    this.batchDomObserver.unobserve(this.hostElement.nativeElement);
   }
 }
