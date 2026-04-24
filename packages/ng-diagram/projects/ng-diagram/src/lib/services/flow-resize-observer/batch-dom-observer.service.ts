@@ -25,6 +25,7 @@ export class BatchDomObserverService implements OnDestroy {
   private observer: ResizeObserver | null = null;
   private styleObserver: MutationObserver | null = null;
   private observedElements = new WeakMap<Element, ObservedElementMetadata>();
+  private styleObservedElements = new Set<Element>();
   private batchProcessor?: BatchProcessor;
   private rafId: number | null = null;
   private pendingEntries: ResizeObserverEntry[] = [];
@@ -64,7 +65,10 @@ export class BatchDomObserverService implements OnDestroy {
       // Detects CSS-driven position changes (e.g., style.top binding) that don't trigger ResizeObserver.
       this.styleObserver = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
-          this.invalidate(mutation.target as Element);
+          const element = mutation.target as Element;
+          if (this.styleObservedElements.has(element)) {
+            this.invalidate(element);
+          }
         }
       });
     });
@@ -78,17 +82,17 @@ export class BatchDomObserverService implements OnDestroy {
   }
 
   /**
-   * Observe an element with metadata
+   * Observe an element's size with metadata via ResizeObserver.
    */
-  observe(element: Element, metadata: ObservedElementMetadata): void {
+  observeResize(element: Element, metadata: ObservedElementMetadata): void {
     this.observedElements.set(element, metadata);
     this.observer?.observe(element);
   }
 
   /**
-   * Stop observing an element
+   * Stop observing an element's size via ResizeObserver.
    */
-  unobserve(element: Element): void {
+  unobserveResize(element: Element): void {
     this.observer?.unobserve(element);
     // WeakMap automatically handles cleanup
   }
@@ -99,7 +103,12 @@ export class BatchDomObserverService implements OnDestroy {
    * to trigger a position re-measurement via ResizeObserver.
    */
   observeStyle(element: Element): void {
+    this.styleObservedElements.add(element);
     this.styleObserver?.observe(element, { attributes: true, attributeFilter: ['style'] });
+  }
+
+  unobserveStyle(element: Element): void {
+    this.styleObservedElements.delete(element);
   }
 
   /**
