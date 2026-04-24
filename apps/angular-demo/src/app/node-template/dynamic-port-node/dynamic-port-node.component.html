@@ -1,0 +1,9 @@
+<div class="dynamic-port-node" [class.large]="contentSize() === 'large'">
+  <span class="label">{{ text() }}</span>
+  @if (contentSize() === 'large') {
+    <span class="extra-content">Extra content to force resize</span>
+  }
+</div>
+@for (port of ports(); track port.id) {
+  <ng-diagram-port [id]="port.id" type="both" [side]="port.side" [originPoint]="port.originPoint" [style.top]="port.top" [style.left]="port.left" />
+}

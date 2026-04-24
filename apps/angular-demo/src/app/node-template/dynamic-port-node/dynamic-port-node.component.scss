@@ -8,22 +8,23 @@
   border: var(--ngd-node-border-size) solid var(--ngd-node-border-color);
   color: var(--ngd-txt-primary-default);
   border-radius: var(--ngd-node-border-radius);
-  min-width: 150px;
+  min-width: 100px;
 
-  .port-side-node {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-
+  .dynamic-port-node {
     .label {
       font-weight: 600;
+      font-size: 0.75em;
     }
 
-    .toggle-btn {
-      margin-top: 0.25rem;
-      padding: 0.2rem 0.4rem;
-      font-size: 0.75em;
-      cursor: pointer;
+    &.large {
+      min-width: 160px;
+      padding: 0.5rem;
+
+      .extra-content {
+        font-size: 0.65em;
+        color: #666;
+        margin-top: 0.25rem;
+      }
     }
   }
 }

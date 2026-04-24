@@ -26,6 +26,19 @@
   </ng-diagram>
   <ng-diagram-minimap [nodeStyle]="nodeStyle" [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
   <app-toolbar
+    [dynamicPortsLabelsTestMode]="dynamicPortsLabelsTestMode()"
+    (dpTestEnter)="enterDpTest()"
+    (dpTestExit)="exitDpTest()"
+    (dpTestTogglePortSides)="dpTestTogglePortSides()"
+    (dpTestTogglePortOrigins)="dpTestTogglePortOrigins()"
+    (dpTestBatchAddPort)="dpTestBatchAddPort()"
+    (dpTestBatchRemovePort)="dpTestBatchRemovePort()"
+    (dpTestBatchToggleSide)="dpTestBatchToggleSide()"
+    (dpTestToggleNodeType)="dpTestToggleNodeType()"
+    (dpTestToggleLabelPosition)="dpTestToggleLabelPosition()"
+    (dpTestBatchToggleLabel)="dpTestBatchToggleLabel()"
+    (dpTestResizeAllNodes)="dpTestResizeAllNodes()"
+    (dpTestRepositionPorts)="dpTestRepositionPorts()"
     (testVirtualizationClick)="enableVirtualizationTest()"
     (reinitializeModelClick)="onReinitializeModel()"
     (saveModelClick)="onSaveModel()"

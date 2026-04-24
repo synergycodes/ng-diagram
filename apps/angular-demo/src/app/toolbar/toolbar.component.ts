@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import {
   Edge,
   EdgeLabelPosition,
@@ -24,11 +24,29 @@ export class ToolbarComponent {
   private readonly ngDiagramModelService = inject(NgDiagramModelService);
   private readonly nodeTypes = Array.from(nodeTemplateMap.keys()) as NodeTemplateType[];
 
+  // Mode input
+  dynamicPortsLabelsTestMode = input(false);
+
+  // Standard outputs
   reinitializeModelClick = output<void>();
   testVirtualizationClick = output<void>();
   saveModelClick = output<void>();
   loadModelClick = output<void>();
   simulateModelDownloadClick = output<void>();
+
+  // Dynamic ports & labels test outputs
+  dpTestEnter = output<void>();
+  dpTestExit = output<void>();
+  dpTestTogglePortSides = output<void>();
+  dpTestTogglePortOrigins = output<void>();
+  dpTestBatchAddPort = output<void>();
+  dpTestBatchRemovePort = output<void>();
+  dpTestBatchToggleSide = output<void>();
+  dpTestToggleNodeType = output<void>();
+  dpTestToggleLabelPosition = output<void>();
+  dpTestBatchToggleLabel = output<void>();
+  dpTestResizeAllNodes = output<void>();
+  dpTestRepositionPorts = output<void>();
 
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 

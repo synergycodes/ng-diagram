@@ -32,11 +32,15 @@ import {
   SelectionRotatedEvent,
   type Edge,
   type EdgeLabel,
+  type EdgeLabelPosition,
   type Node,
+  type OriginPoint,
   type Port,
+  type PortSide,
 } from 'ng-diagram';
 import { defaultModel } from './data/default-model';
 import { downloadedModel } from './data/downloaded-model';
+import { generateDynamicPortsTestModel } from './data/dynamic-ports-test-model';
 import { generateModel } from './data/generate-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
@@ -46,6 +50,7 @@ import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edg
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
+import { type DynamicPortData } from './node-template/dynamic-port-node/dynamic-port-node.component';
 import { PaletteComponent } from './palette/palette.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
@@ -123,10 +128,176 @@ export class AppComponent {
   modelData = signal<Partial<{ nodes: Node[]; edges: Edge[] }>>(defaultModel);
   model = computed(() => initializeModel(this.modelData(), this.injector));
 
+  // =============================================
+  // Dynamic Ports & Labels Test Mode
+  // =============================================
+
+  dynamicPortsLabelsTestMode = signal(false);
+  private savedModelData: Partial<{ nodes: Node[]; edges: Edge[] }> | null = null;
+  private dpTestPortCounter = 1;
+
+  enterDpTest(): void {
+    this.savedModelData = this.modelData();
+    this.dynamicPortsLabelsTestMode.set(true);
+    this.dpTestPortCounter = 1;
+    this.modelData.set(generateDynamicPortsTestModel());
+  }
+
+  exitDpTest(): void {
+    this.dynamicPortsLabelsTestMode.set(false);
+    if (this.savedModelData) {
+      this.modelData.set(this.savedModelData);
+      this.savedModelData = null;
+    }
+  }
+
+  dpTestTogglePortSides(): void {
+    const node = this.modelService
+      .getModel()
+      .getNodes()
+      .find((n) => n.id === 'dp-focus');
+    if (!node) return;
+    const data = node.data as DynamicPortData;
+    this.modelService.updateNodes([
+      {
+        id: 'dp-focus',
+        data: { ...data, ports: data.ports.map((p) => ({ ...p, side: this.toggleSide(p.side) })) },
+      },
+    ]);
+  }
+
+  dpTestTogglePortOrigins(): void {
+    const node = this.modelService
+      .getModel()
+      .getNodes()
+      .find((n) => n.id === 'dp-focus');
+    if (!node) return;
+    const data = node.data as DynamicPortData;
+    this.modelService.updateNodes([
+      {
+        id: 'dp-focus',
+        data: {
+          ...data,
+          ports: data.ports.map((p) => ({
+            ...p,
+            originPoint: (p.originPoint === 'topLeft' ? 'bottomRight' : 'topLeft') as OriginPoint,
+          })),
+        },
+      },
+    ]);
+  }
+
+  dpTestBatchAddPort(): void {
+    const nodes = this.modelService.getModel().getNodes();
+    const index = this.dpTestPortCounter++;
+    const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
+    this.modelService.updateNodes(
+      nodes
+        .filter((n) => n.id.startsWith('dp-grid-'))
+        .map((node) => {
+          const data = node.data as DynamicPortData;
+          return { id: node.id, data: { ...data, ports: [...data.ports, { id: `port-added-${index}`, side }] } };
+        })
+    );
+  }
+
+  dpTestBatchRemovePort(): void {
+    const nodes = this.modelService.getModel().getNodes();
+    this.modelService.updateNodes(
+      nodes
+        .filter((n) => n.id.startsWith('dp-grid-'))
+        .filter((n) => ((n.data as DynamicPortData).ports ?? []).length > 3)
+        .map((node) => {
+          const data = node.data as DynamicPortData;
+          return { id: node.id, data: { ...data, ports: data.ports.slice(0, -1) } };
+        })
+    );
+  }
+
+  dpTestBatchToggleSide(): void {
+    const nodes = this.modelService.getModel().getNodes();
+    this.modelService.updateNodes(
+      nodes
+        .filter((n) => n.id.startsWith('dp-grid-'))
+        .map((node) => {
+          const data = node.data as DynamicPortData;
+          return {
+            id: node.id,
+            data: { ...data, ports: data.ports.map((p) => ({ ...p, side: this.toggleSide(p.side) })) },
+          };
+        })
+    );
+  }
+
+  dpTestToggleNodeType(): void {
+    const nodes = this.modelService.getModel().getNodes();
+    const gridNodes = nodes.filter((n) => n.id.startsWith('dp-grid-'));
+    if (gridNodes.length === 0) return;
+    const targetType = gridNodes[0].type === 'dynamic-port' ? 'default' : 'dynamic-port';
+    this.modelService.updateNodes(gridNodes.map((node) => ({ id: node.id, type: targetType })));
+  }
+
+  dpTestToggleLabelPosition(): void {
+    const edge = this.modelService
+      .getModel()
+      .getEdges()
+      .find((e) => e.id === 'dp-focus-edge');
+    if (!edge) return;
+    const data = edge.data as { labelPosition?: EdgeLabelPosition };
+    const current = data.labelPosition ?? 0.5;
+    const newPos: EdgeLabelPosition = typeof current === 'number' ? '50px' : 0.5;
+    this.modelService.updateEdgeData(edge.id, { ...edge.data, labelPosition: newPos });
+  }
+
+  dpTestBatchToggleLabel(): void {
+    const edges = this.modelService.getModel().getEdges();
+    this.modelService.updateEdges(
+      edges
+        .filter((e) => e.id.startsWith('dp-edge-'))
+        .map((edge) => {
+          const data = edge.data as { labelPosition?: EdgeLabelPosition };
+          const current = data.labelPosition ?? 0.5;
+          const newPos: EdgeLabelPosition = typeof current === 'number' ? '50px' : 0.5;
+          return { id: edge.id, data: { ...edge.data, labelPosition: newPos } };
+        })
+    );
+  }
+
+  dpTestResizeAllNodes(): void {
+    const nodes = this.modelService.getModel().getNodes();
+    this.modelService.updateNodes(
+      nodes
+        .filter((n) => n.id.startsWith('dp-grid-'))
+        .map((node) => {
+          const data = node.data as DynamicPortData;
+          return { id: node.id, data: { ...data, contentSize: data.contentSize === 'large' ? 'small' : 'large' } };
+        })
+    );
+  }
+
+  dpTestRepositionPorts(): void {
+    const nodes = this.modelService.getModel().getNodes();
+    this.modelService.updateNodes(
+      nodes
+        .filter((n) => n.id.startsWith('dp-grid-'))
+        .map((node) => {
+          const data = node.data as DynamicPortData;
+          return { id: node.id, data: { ...data, ports: [...data.ports].reverse() } };
+        })
+    );
+  }
+
+  private toggleSide(side: PortSide): PortSide {
+    const map: Record<PortSide, PortSide> = { left: 'top', right: 'bottom', top: 'left', bottom: 'right' };
+    return map[side];
+  }
+
+  // =============================================
+  // Other modes
+  // =============================================
+
   onSimulateModelDownload(): void {
     console.log('Simulating model download...');
-
-    // Simulate an async download that returns a new model
     setTimeout(() => {
       this.modelData.set({ ...downloadedModel });
       console.log('Model download complete');

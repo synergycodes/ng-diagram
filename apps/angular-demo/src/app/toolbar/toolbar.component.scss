@@ -6,9 +6,24 @@
 
   & > div {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
     padding: 8px;
     background: #ffffff;
     border-radius: 4px;
+
+    .separator {
+      color: #ccc;
+      margin: 0 -2px;
+      user-select: none;
+    }
+
+    .group-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      white-space: nowrap;
+    }
   }
 }
