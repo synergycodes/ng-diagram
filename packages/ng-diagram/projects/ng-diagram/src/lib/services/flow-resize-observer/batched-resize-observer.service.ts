@@ -72,7 +72,7 @@ export class BatchResizeObserverService implements OnDestroy {
   /**
    * Observe an element's size with metadata via ResizeObserver.
    */
-  observeResize(element: Element, metadata: ObservedElementMetadata): void {
+  observe(element: Element, metadata: ObservedElementMetadata): void {
     this.observedElements.set(element, metadata);
     this.observer?.observe(element);
   }
@@ -80,7 +80,7 @@ export class BatchResizeObserverService implements OnDestroy {
   /**
    * Stop observing an element's size via ResizeObserver.
    */
-  unobserveResize(element: Element): void {
+  unobserve(element: Element): void {
     this.observer?.unobserve(element);
     // WeakMap automatically handles cleanup
   }

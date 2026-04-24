@@ -38,23 +38,23 @@ describe('BatchResizeObserverService', () => {
     vi.restoreAllMocks();
   });
 
-  describe('observeResize', () => {
+  describe('observe', () => {
     it('should observe an element with metadata', () => {
       const el = document.createElement('div');
       const metadata: ObservedElementMetadata = { type: 'node', nodeId: 'n1' };
 
-      service.observeResize(el, metadata);
+      service.observe(el, metadata);
 
       expect(mockResizeObserver.observe).toHaveBeenCalledWith(el);
       expect(service.getMetadata(el)).toEqual(metadata);
     });
   });
 
-  describe('unobserveResize', () => {
+  describe('unobserve', () => {
     it('should unobserve an element', () => {
       const el = document.createElement('div');
 
-      service.unobserveResize(el);
+      service.unobserve(el);
 
       expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el);
     });
@@ -161,7 +161,7 @@ describe('BatchResizeObserverService', () => {
         labelId: 'l1',
       };
 
-      service.observeResize(el, metadata);
+      service.observe(el, metadata);
 
       expect(service.getMetadata(el)).toEqual(metadata);
     });
@@ -172,7 +172,7 @@ describe('BatchResizeObserverService', () => {
       const el = document.createElement('div');
       const metadata: ObservedElementMetadata = { type: 'port', nodeId: 'n1', portId: 'p1' };
 
-      service.observeResize(el, metadata);
+      service.observe(el, metadata);
       mockResizeObserver.observe.mockClear();
 
       service.invalidate(el);

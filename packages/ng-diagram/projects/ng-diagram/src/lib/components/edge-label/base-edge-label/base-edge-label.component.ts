@@ -120,7 +120,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       positionOnEdge: this.positionOnEdge(),
     });
 
-    this.batchResizeObserver.observeResize(this.hostElement.nativeElement, {
+    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
       type: 'edge-label',
       edgeId: this.edgeId(),
       labelId: this.id(),
@@ -139,7 +139,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     }
 
     flowCore.updater.deleteEdgeLabel(this.edgeId(), this.id());
-    this.batchResizeObserver.unobserveResize(this.hostElement.nativeElement);
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }
 

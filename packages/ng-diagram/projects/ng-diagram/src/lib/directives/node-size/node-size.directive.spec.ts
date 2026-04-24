@@ -22,8 +22,8 @@ describe('NodeSizeDirective', () => {
   let element: HTMLElement;
 
   let mockBatchResizeObserver: {
-    observeResize: ReturnType<typeof vi.fn>;
-    unobserveResize: ReturnType<typeof vi.fn>;
+    observe: ReturnType<typeof vi.fn>;
+    unobserve: ReturnType<typeof vi.fn>;
   };
 
   let mockFlowCore: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -33,8 +33,8 @@ describe('NodeSizeDirective', () => {
 
   beforeEach(async () => {
     mockBatchResizeObserver = {
-      observeResize: vi.fn(),
-      unobserveResize: vi.fn(),
+      observe: vi.fn(),
+      unobserve: vi.fn(),
     };
 
     mockFlowCore = {
@@ -177,7 +177,7 @@ describe('NodeSizeDirective', () => {
 
   describe('Lifecycle', () => {
     it('should connect resize observer on init', () => {
-      expect(mockBatchResizeObserver.observeResize).toHaveBeenCalledWith(element, {
+      expect(mockBatchResizeObserver.observe).toHaveBeenCalledWith(element, {
         type: 'node',
         nodeId: 'test-node',
       });
@@ -185,7 +185,7 @@ describe('NodeSizeDirective', () => {
 
     it('should disconnect resize observer on destroy', () => {
       fixture.destroy();
-      expect(mockBatchResizeObserver.unobserveResize).toHaveBeenCalledWith(element);
+      expect(mockBatchResizeObserver.unobserve).toHaveBeenCalledWith(element);
     });
   });
 

@@ -171,7 +171,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       side: this.side(),
     });
 
-    this.batchResizeObserver.observeResize(this.hostElement.nativeElement, {
+    this.batchResizeObserver.observe(this.hostElement.nativeElement, {
       type: 'port',
       nodeId: nodeData.id,
       portId: this.id(),
@@ -197,7 +197,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
-    this.batchResizeObserver.unobserveResize(this.hostElement.nativeElement);
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
 
     // Skip if node was deleted - ports are removed with the node
     const nodeStillExists = flowCore.getNodeById(nodeData.id);
