@@ -1,4 +1,4 @@
-import { Injectable, NgZone, OnDestroy, inject } from '@angular/core';
+import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 
 export type BatchProcessor = (entries: ResizeObserverEntry[]) => void;
 
@@ -19,19 +19,17 @@ export type ObservedElementMetadata =
     };
 
 @Injectable()
-export class BatchDomObserverService implements OnDestroy {
+export class BatchResizeObserverService implements OnDestroy {
   private readonly ngZone = inject(NgZone);
 
   private observer: ResizeObserver | null = null;
-  private styleObserver: MutationObserver | null = null;
   private observedElements = new WeakMap<Element, ObservedElementMetadata>();
-  private styleObservedElements = new Set<Element>();
   private batchProcessor?: BatchProcessor;
   private rafId: number | null = null;
   private pendingEntries: ResizeObserverEntry[] = [];
 
   constructor() {
-    // Create observers outside Angular zone for performance
+    // Create observer outside Angular zone for performance
     this.ngZone.runOutsideAngular(() => {
       this.observer = new ResizeObserver((entries) => {
         // Collect all entries
@@ -61,16 +59,6 @@ export class BatchDomObserverService implements OnDestroy {
           });
         }
       });
-
-      // Detects CSS-driven position changes (e.g., style.top binding) that don't trigger ResizeObserver.
-      this.styleObserver = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          const element = mutation.target as Element;
-          if (this.styleObservedElements.has(element)) {
-            this.invalidate(element);
-          }
-        }
-      });
     });
   }
 
@@ -95,20 +83,6 @@ export class BatchDomObserverService implements OnDestroy {
   unobserveResize(element: Element): void {
     this.observer?.unobserve(element);
     // WeakMap automatically handles cleanup
-  }
-
-  /**
-   * Observe an element's style attribute for changes.
-   * When the style changes, the element is automatically invalidated
-   * to trigger a position re-measurement via ResizeObserver.
-   */
-  observeStyle(element: Element): void {
-    this.styleObservedElements.add(element);
-    this.styleObserver?.observe(element, { attributes: true, attributeFilter: ['style'] });
-  }
-
-  unobserveStyle(element: Element): void {
-    this.styleObservedElements.delete(element);
   }
 
   /**
@@ -148,6 +122,5 @@ export class BatchDomObserverService implements OnDestroy {
       cancelAnimationFrame(this.rafId);
     }
     this.observer?.disconnect();
-    this.styleObserver?.disconnect();
   }
 }

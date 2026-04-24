@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
-import { BatchDomObserverService, type ObservedElementMetadata } from './batch-dom-observer.service';
+import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
 
-describe('BatchDomObserverService', () => {
-  let service: BatchDomObserverService;
+describe('BatchResizeObserverService', () => {
+  let service: BatchResizeObserverService;
   let mockResizeObserver: {
     observe: ReturnType<typeof vi.fn>;
     unobserve: ReturnType<typeof vi.fn>;
@@ -27,10 +27,10 @@ describe('BatchDomObserverService', () => {
     global.cancelAnimationFrame = mockCancelAnimationFrame;
 
     TestBed.configureTestingModule({
-      providers: [BatchDomObserverService],
+      providers: [BatchResizeObserverService],
     });
 
-    service = TestBed.inject(BatchDomObserverService);
+    service = TestBed.inject(BatchResizeObserverService);
   });
 
   afterEach(() => {
@@ -118,6 +118,7 @@ describe('BatchDomObserverService', () => {
       const resizeObserverCallback = (global.ResizeObserver as Mock).mock.calls[0][0];
 
       service['rafId'] = 456;
+      mockRequestAnimationFrame.mockClear();
 
       resizeObserverCallback(mockEntries);
 
