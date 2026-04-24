@@ -170,13 +170,13 @@ export class NodeSizeDirective implements OnDestroy, OnInit {
    * size-dependent features when nodes resize.
    */
   private connectResizeObserver() {
-    this.batchDomObserver.observe(this.hostElement.nativeElement, {
+    this.batchDomObserver.observeResize(this.hostElement.nativeElement, {
       type: 'node',
       nodeId: this.id(),
     });
   }
 
   private disconnectResizeObserver() {
-    this.batchDomObserver.unobserve(this.hostElement.nativeElement);
+    this.batchDomObserver.unobserveResize(this.hostElement.nativeElement);
   }
 }
