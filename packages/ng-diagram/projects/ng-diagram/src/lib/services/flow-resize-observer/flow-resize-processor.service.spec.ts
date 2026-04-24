@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
-import { BatchDomObserverService, type ObservedElementMetadata } from './batch-dom-observer.service';
+import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
 import { FlowResizeBatchProcessorService } from './flow-resize-processor.service';
 
 interface MockedFlowResizeBatchProcessorService {
@@ -34,7 +34,7 @@ describe('FlowResizeBatchProcessorService', () => {
     getPortData: ReturnType<typeof vi.fn>;
     getNodePortsData: ReturnType<typeof vi.fn>;
   };
-  let mockBatchDomObserver: {
+  let mockBatchResizeObserver: {
     setBatchProcessor: ReturnType<typeof vi.fn>;
     getMetadata: ReturnType<typeof vi.fn>;
   };
@@ -63,7 +63,7 @@ describe('FlowResizeBatchProcessorService', () => {
         .fn()
         .mockReturnValue([{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }]),
     };
-    mockBatchDomObserver = {
+    mockBatchResizeObserver = {
       setBatchProcessor: vi.fn(),
       getMetadata: vi.fn(),
     };
@@ -74,8 +74,8 @@ describe('FlowResizeBatchProcessorService', () => {
         { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
         { provide: UpdatePortsService, useValue: mockUpdatePortsService },
         {
-          provide: BatchDomObserverService,
-          useValue: mockBatchDomObserver,
+          provide: BatchResizeObserverService,
+          useValue: mockBatchResizeObserver,
         },
       ],
     });
@@ -96,7 +96,7 @@ describe('FlowResizeBatchProcessorService', () => {
       portId: 'p1',
     };
 
-    mockBatchDomObserver.getMetadata.mockReturnValue(metadata);
+    mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     mockFlowCore.getNodeById.mockReturnValue({
       measuredPorts: [{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }],
     });
@@ -115,7 +115,7 @@ describe('FlowResizeBatchProcessorService', () => {
     const entry = { target: {} } as ResizeObserverEntry;
     const metadata: ObservedElementMetadata = { type: 'node', nodeId: 'n1' };
 
-    mockBatchDomObserver.getMetadata.mockReturnValue(metadata);
+    mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     mockFlowCore.getNodeById.mockReturnValue({ size: { width: 1, height: 2 } });
 
     vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
@@ -133,7 +133,7 @@ describe('FlowResizeBatchProcessorService', () => {
     const entry = { target: {} } as ResizeObserverEntry;
     const metadata: ObservedElementMetadata = { type: 'node', nodeId: 'n1' };
 
-    mockBatchDomObserver.getMetadata.mockReturnValue(metadata);
+    mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     mockFlowCore.getNodeById.mockReturnValue({ size: { width: 1, height: 2 } });
     mockFlowCore.actionStateManager.isResizing.mockReturnValue(true);
 
@@ -153,7 +153,7 @@ describe('FlowResizeBatchProcessorService', () => {
     const entry2 = { target: { id: 't2' } } as unknown as ResizeObserverEntry;
 
     mockFlowCore.isInitialized = true;
-    mockBatchDomObserver.getMetadata
+    mockBatchResizeObserver.getMetadata
       .mockReturnValueOnce({ type: 'node', nodeId: 'n1' } as ObservedElementMetadata)
       .mockReturnValueOnce({ type: 'node', nodeId: 'n2' } as ObservedElementMetadata);
     mockFlowCore.getNodeById
@@ -182,7 +182,7 @@ describe('FlowResizeBatchProcessorService', () => {
     const entry2 = { target: { id: 't2' } } as unknown as ResizeObserverEntry;
 
     mockFlowCore.isInitialized = false;
-    mockBatchDomObserver.getMetadata
+    mockBatchResizeObserver.getMetadata
       .mockReturnValueOnce({ type: 'node', nodeId: 'n1' } as ObservedElementMetadata)
       .mockReturnValueOnce({ type: 'node', nodeId: 'n2' } as ObservedElementMetadata);
     mockFlowCore.getNodeById
@@ -210,7 +210,7 @@ describe('FlowResizeBatchProcessorService', () => {
       labelId: 'l1',
     };
 
-    mockBatchDomObserver.getMetadata.mockReturnValue(metadata);
+    mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     mockFlowCore.getEdgeById.mockReturnValue({ measuredLabels: [{ id: 'l1', size: { width: 1, height: 2 } }] });
     vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
       width: 10,
@@ -227,7 +227,7 @@ describe('FlowResizeBatchProcessorService', () => {
     const entry = { target: {} } as ResizeObserverEntry;
     const metadata = { type: 'unknown' } as unknown as ObservedElementMetadata;
 
-    mockBatchDomObserver.getMetadata.mockReturnValue(metadata);
+    mockBatchResizeObserver.getMetadata.mockReturnValue(metadata);
     service['isInitialized'] = true;
 
     expect(() => service['processAllResizes']([entry])).toThrow();

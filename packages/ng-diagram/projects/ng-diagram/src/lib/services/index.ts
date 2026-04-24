@@ -1,6 +1,6 @@
 export * from './box-selection-provider/box-selection-provider.service';
 export * from './flow-core-provider/flow-core-provider.service';
-export * from './flow-resize-observer/batch-dom-observer.service';
+export * from './flow-resize-observer/batched-resize-observer.service';
 export * from './flow-resize-observer/flow-resize-processor.service';
 export * from './palette/palette.service';
 export * from './renderer/renderer.service';
