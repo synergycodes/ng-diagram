@@ -1,7 +1,5 @@
 import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 
-export type BatchProcessor = (entries: ResizeObserverEntry[]) => void;
-
 export type ObservedElementMetadata =
   | {
       type: 'port';
@@ -18,13 +16,20 @@ export type ObservedElementMetadata =
       nodeId: string;
     };
 
+export interface BatchResizeObserverConfig {
+  /** Processes batched resize entries after the double-RAF stabilization. */
+  processBatch: (entries: ResizeObserverEntry[]) => void;
+  /** Fires when ResizeObserver detects entries, before batch processing is scheduled. */
+  onObserverActivity?: (metadata: ObservedElementMetadata[]) => void;
+}
+
 @Injectable()
 export class BatchResizeObserverService implements OnDestroy {
   private readonly ngZone = inject(NgZone);
 
   private observer: ResizeObserver | null = null;
   private observedElements = new WeakMap<Element, ObservedElementMetadata>();
-  private batchProcessor?: BatchProcessor;
+  private config: BatchResizeObserverConfig | null = null;
   private rafId: number | null = null;
   private pendingEntries: ResizeObserverEntry[] = [];
 
@@ -34,6 +39,20 @@ export class BatchResizeObserverService implements OnDestroy {
       this.observer = new ResizeObserver((entries) => {
         // Collect all entries
         this.pendingEntries.push(...entries);
+
+        // Notify about observer activity before RAF scheduling.
+        if (this.config?.onObserverActivity) {
+          const metadataList: ObservedElementMetadata[] = [];
+          for (const entry of entries) {
+            const metadata = this.observedElements.get(entry.target);
+            if (metadata) {
+              metadataList.push(metadata);
+            }
+          }
+          if (metadataList.length > 0) {
+            this.config.onObserverActivity(metadataList);
+          }
+        }
 
         // Schedule batch processing
         if (!this.rafId) {
@@ -63,10 +82,10 @@ export class BatchResizeObserverService implements OnDestroy {
   }
 
   /**
-   * Set the global batch processor that handles all resize events
+   * Configure batch processing and optional observer activity callbacks.
    */
-  setBatchProcessor(processor: BatchProcessor): void {
-    this.batchProcessor = processor;
+  configure(config: BatchResizeObserverConfig): void {
+    this.config = config;
   }
 
   /**
@@ -82,7 +101,6 @@ export class BatchResizeObserverService implements OnDestroy {
    */
   unobserve(element: Element): void {
     this.observer?.unobserve(element);
-    // WeakMap automatically handles cleanup
   }
 
   /**
@@ -109,11 +127,11 @@ export class BatchResizeObserverService implements OnDestroy {
     this.pendingEntries = [];
     this.rafId = null;
 
-    if (entries.length === 0 || !this.batchProcessor) return;
+    if (entries.length === 0 || !this.config) return;
 
     // Run batch processor in Angular zone
     this.ngZone.run(() => {
-      this.batchProcessor!(entries);
+      this.config!.processBatch(entries);
     });
   }
 
