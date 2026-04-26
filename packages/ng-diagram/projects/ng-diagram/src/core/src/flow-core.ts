@@ -297,10 +297,10 @@ export class FlowCore {
     if (results.commandsCount > 0) {
       if (transactionOptions?.waitForMeasurements) {
         const internalOptions = transactionOptions as InternalTransactionOptions;
-        this.measurementTracker.setNextTrackingConfig(
-          internalOptions._measurementDebounceTimeout,
-          internalOptions._measurementSafetyTimeout
-        );
+        this.measurementTracker.requestTracking({
+          discoveryWindowMs: internalOptions._measurementDiscoveryWindowTimeout,
+          debounceMs: internalOptions._measurementDebounceTimeout,
+        });
       }
 
       await this.applyUpdate(results.results, results.actionTypes);

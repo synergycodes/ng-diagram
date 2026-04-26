@@ -98,6 +98,8 @@ export class MiddlewareExecutor {
     anyEdgesRemoved: () => this.removedEdgesIds.size > 0,
     getAffectedNodeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToNodeIds.get(prop) ?? [])]),
     getAffectedEdgeIds: (props: string[]) => props.flatMap((prop) => [...(this.updatedPropsToEdgeIds.get(prop) ?? [])]),
+    getChangedNodeIds: () => [...this.updatedNodeIdsToProps.keys()],
+    getChangedEdgeIds: () => [...this.updatedEdgeIdsToProps.keys()],
     getAddedNodes: () =>
       Array.from(this.addedNodesIds)
         .map((id) => this.nodesMap.get(id))
