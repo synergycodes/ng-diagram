@@ -27,9 +27,12 @@
   <ng-diagram-minimap [nodeStyle]="nodeStyle" [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
   @if (batchTestMode()) {
     <app-batch-test-toolbar (exit)="exitBatchTest()" />
+  @if (measurementTestMode()) {
+    <app-measurement-tests (exit)="exitMeasurementTest()" />
   } @else {
     <app-toolbar
       (enterBatchTest)="enterBatchTest()"
+      (measurementTestEnter)="enterMeasurementTest()"
       (testVirtualizationClick)="enableVirtualizationTest()"
       (reinitializeModelClick)="onReinitializeModel()"
       (saveModelClick)="onSaveModel()"
