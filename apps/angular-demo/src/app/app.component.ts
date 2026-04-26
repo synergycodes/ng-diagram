@@ -47,6 +47,8 @@ import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edg
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
+import { MeasurementTestsComponent } from './measurement-tests/measurement-tests.component';
+import { type DynamicPortData } from './node-template/dynamic-port-node/dynamic-port-node.component';
 import { PaletteComponent } from './palette/palette.component';
 import { BatchTestToolbarComponent } from './toolbar/batch-test-toolbar.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
@@ -60,6 +62,7 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
   imports: [
     ToolbarComponent,
     BatchTestToolbarComponent,
+    MeasurementTestsComponent,
     PaletteComponent,
     NgDiagramComponent,
     NgDiagramBackgroundComponent,
@@ -131,6 +134,16 @@ export class AppComponent {
   // =============================================
 
   batchTestMode = signal(false);
+  measurementTestMode = signal(false);
+
+  enterMeasurementTest(): void {
+    this.measurementTestMode.set(true);
+  }
+
+  exitMeasurementTest(): void {
+    this.measurementTestMode.set(false);
+  }
+
   private savedModelData: Partial<{ nodes: Node[]; edges: Edge[] }> | null = null;
 
   enterBatchTest(): void {
