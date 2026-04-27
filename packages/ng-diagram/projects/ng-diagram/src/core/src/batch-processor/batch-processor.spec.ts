@@ -191,7 +191,7 @@ describe('BatchProcessor', () => {
   });
 
   describe('flush ordering', () => {
-    it('should flush deletes before updates before adds', async () => {
+    it('should flush adds before updates before deletes', async () => {
       const callOrder: string[] = [];
 
       processor.processAdd('key1', createItem('a'), () => {
@@ -206,31 +206,31 @@ describe('BatchProcessor', () => {
 
       await vi.runAllTimersAsync();
 
-      expect(callOrder).toEqual(['delete', 'update', 'add']);
+      expect(callOrder).toEqual(['add', 'update', 'delete']);
     });
 
     it('should await each callback before starting the next', async () => {
       const callOrder: string[] = [];
 
-      processor.processDelete('key1', 'a', async () => {
-        callOrder.push('delete-start');
+      processor.processAdd('key1', createItem('a'), async () => {
+        callOrder.push('add-start');
         await Promise.resolve();
-        callOrder.push('delete-end');
+        callOrder.push('add-end');
       });
       processor.processUpdate('key1', createUpdate('b'), async () => {
         callOrder.push('update-start');
         await Promise.resolve();
         callOrder.push('update-end');
       });
-      processor.processAdd('key1', createItem('c'), async () => {
-        callOrder.push('add-start');
+      processor.processDelete('key1', 'c', async () => {
+        callOrder.push('delete-start');
         await Promise.resolve();
-        callOrder.push('add-end');
+        callOrder.push('delete-end');
       });
 
       await vi.runAllTimersAsync();
 
-      expect(callOrder).toEqual(['delete-start', 'delete-end', 'update-start', 'update-end', 'add-start', 'add-end']);
+      expect(callOrder).toEqual(['add-start', 'add-end', 'update-start', 'update-end', 'delete-start', 'delete-end']);
     });
 
     it('should keep add, update, and delete callbacks separate', async () => {
@@ -288,6 +288,84 @@ describe('BatchProcessor', () => {
 
       const deletions = onDeleteFlush.mock.calls[0][0] as Map<string, string[]>;
       expect(deletions.get('key1')).toEqual(['d']);
+    });
+  });
+
+  describe('intent cancellation', () => {
+    it('should cancel add+delete for the same item in the same tick', async () => {
+      const onAddFlush = vi.fn();
+      const onDeleteFlush = vi.fn();
+
+      processor.processAdd('key1', createItem('a'), onAddFlush);
+      processor.processDelete('key1', 'a', onDeleteFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onAddFlush).not.toHaveBeenCalled();
+      expect(onDeleteFlush).not.toHaveBeenCalled();
+    });
+
+    it('should apply update to a newly added item in the same tick (add precedes update)', async () => {
+      const callOrder: string[] = [];
+
+      processor.processAdd('key1', createItem('a'), () => {
+        callOrder.push('add');
+      });
+      processor.processUpdate('key1', createUpdate('a'), () => {
+        callOrder.push('update');
+      });
+
+      await vi.runAllTimersAsync();
+
+      expect(callOrder).toEqual(['add', 'update']);
+    });
+
+    it('should keep item when delete+add occurs in the same tick (virtualization re-entry)', async () => {
+      const onAddFlush = vi.fn();
+      const onDeleteFlush = vi.fn();
+
+      processor.processDelete('key1', 'a', onDeleteFlush);
+      processor.processAdd('key1', createItem('a'), onAddFlush);
+
+      await vi.runAllTimersAsync();
+
+      // Both intents cancel out — item stays as-is
+      expect(onAddFlush).not.toHaveBeenCalled();
+      expect(onDeleteFlush).not.toHaveBeenCalled();
+    });
+
+    it('should only cancel matching IDs and flush the rest', async () => {
+      const onAddFlush = vi.fn();
+      const onDeleteFlush = vi.fn();
+
+      processor.processAdd('key1', createItem('a'), onAddFlush);
+      processor.processAdd('key1', createItem('b'), onAddFlush);
+      processor.processDelete('key1', 'a', onDeleteFlush);
+      processor.processDelete('key1', 'c', onDeleteFlush);
+
+      await vi.runAllTimersAsync();
+
+      // 'a' cancelled in both, 'b' still added, 'c' still deleted
+      expect(onAddFlush).toHaveBeenCalledTimes(1);
+      const additions = onAddFlush.mock.calls[0][0] as Map<string, TestItem[]>;
+      expect(additions.get('key1')).toEqual([createItem('b')]);
+
+      expect(onDeleteFlush).toHaveBeenCalledTimes(1);
+      const deletions = onDeleteFlush.mock.calls[0][0] as Map<string, string[]>;
+      expect(deletions.get('key1')).toEqual(['c']);
+    });
+
+    it('should not cancel across different keys', async () => {
+      const onAddFlush = vi.fn();
+      const onDeleteFlush = vi.fn();
+
+      processor.processAdd('key1', createItem('a'), onAddFlush);
+      processor.processDelete('key2', 'a', onDeleteFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onAddFlush).toHaveBeenCalledTimes(1);
+      expect(onDeleteFlush).toHaveBeenCalledTimes(1);
     });
   });
 });
