@@ -29,7 +29,7 @@ The `NgDiagramPortComponent` represents a single port on a node within the diagr
 
 > **id**: `InputSignal`\<`string`\>
 
-The unique identifier for the port. test
+The unique identifier for the port.
 
 ***
 
