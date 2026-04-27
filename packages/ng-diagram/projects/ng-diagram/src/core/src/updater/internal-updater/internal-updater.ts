@@ -116,11 +116,11 @@ export class InternalUpdater implements Updater {
         return false;
       }
 
-      if ('side' in portChanges && portChanges.side !== measuredPort.side) {
+      if (portChanges.side !== undefined && portChanges.side !== measuredPort.side) {
         return true;
       }
 
-      if ('type' in portChanges && portChanges.type !== measuredPort.type) {
+      if (portChanges.type !== undefined && portChanges.type !== measuredPort.type) {
         return true;
       }
 
@@ -156,12 +156,12 @@ export class InternalUpdater implements Updater {
         return false;
       }
 
-      if ('positionOnEdge' in labelChanges && labelChanges.positionOnEdge !== label.positionOnEdge) {
+      if (labelChanges.positionOnEdge !== undefined && labelChanges.positionOnEdge !== label.positionOnEdge) {
         return true;
       }
 
-      if ('size' in labelChanges) {
-        if (!label.size || !labelChanges.size) {
+      if (labelChanges.size !== undefined) {
+        if (!label.size) {
           return true;
         }
 

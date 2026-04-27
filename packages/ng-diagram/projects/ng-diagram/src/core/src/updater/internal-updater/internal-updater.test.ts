@@ -301,6 +301,50 @@ describe('InternalUpdater', () => {
       expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
     });
 
+    it('should filter out undefined side so it does not overwrite a valid value', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            side: 'left' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { side: undefined } }]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined type so it does not overwrite a valid value', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            type: 'source' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { type: undefined } }]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
     it('should batch multiple side changes for the same node', () => {
       const node = {
         ...mockNode,
@@ -485,6 +529,38 @@ describe('InternalUpdater', () => {
 
       internalUpdater.applyEdgeLabelChanges(edge.id, [
         { labelId: mockEdgeLabel.id, labelChanges: { positionOnEdge: 0.5 } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined size so it does not cause redundant emits', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, size: undefined }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: undefined } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined positionOnEdge so it does not overwrite a valid value', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, positionOnEdge: 0.5, size: { width: 100, height: 100 } }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { positionOnEdge: undefined } },
       ]);
 
       expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
