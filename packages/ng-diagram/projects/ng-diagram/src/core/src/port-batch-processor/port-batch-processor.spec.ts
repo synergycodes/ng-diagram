@@ -6,7 +6,7 @@ describe('PortBatchProcessor', () => {
   let processor: PortBatchProcessor;
 
   beforeEach(() => {
-    processor = new PortBatchProcessor();
+    processor = new PortBatchProcessor(() => undefined);
     vi.useFakeTimers();
   });
 

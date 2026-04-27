@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Point, Port, Size } from '../../../core/src';
+import { toPortUpdates } from '../../../core/src/port-batch-processor/port-batch-processor';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
 import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
@@ -140,10 +141,7 @@ export class FlowResizeBatchProcessorService {
     }
 
     updatesByNode.forEach((ports, nodeId) => {
-      flowCore.updater.applyPortChanges(
-        nodeId,
-        ports.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
-      );
+      flowCore.updater.applyPortChanges(nodeId, toPortUpdates(ports));
     });
   }
 
@@ -183,10 +181,7 @@ export class FlowResizeBatchProcessorService {
       // NgDiagramNodeComponent.syncPorts() handles it
       if (!flowCore.actionStateManager.isResizing()) {
         const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
-        flowCore.updater.applyPortChanges(
-          metadata.nodeId,
-          portsData.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
-        );
+        flowCore.updater.applyPortChanges(metadata.nodeId, toPortUpdates(portsData));
       }
     }
 
