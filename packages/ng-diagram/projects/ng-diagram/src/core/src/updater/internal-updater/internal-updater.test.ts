@@ -112,48 +112,6 @@ describe('InternalUpdater', () => {
         additions: expectedAdditions,
       });
     });
-
-    it('should skip addPort when port is already measured with size and position', () => {
-      const node = {
-        ...mockNode,
-        measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 10, height: 10 }, position: { x: 5, y: 5 } }],
-      };
-      getNodeByIdMock.mockReturnValue(node);
-
-      portBatchProcessor.processAdd = vi.fn();
-
-      internalUpdater.addPort('node-1', { ...mockPort, id: 'port-1' });
-
-      expect(portBatchProcessor.processAdd).not.toHaveBeenCalled();
-    });
-
-    it('should proceed with addPort when port exists but has no size', () => {
-      const node = {
-        ...mockNode,
-        measuredPorts: [{ ...mockPort, id: 'port-1', size: undefined, position: { x: 5, y: 5 } }],
-      };
-      getNodeByIdMock.mockReturnValue(node);
-
-      portBatchProcessor.processAdd = vi.fn();
-
-      internalUpdater.addPort('node-1', { ...mockPort, id: 'port-1' });
-
-      expect(portBatchProcessor.processAdd).toHaveBeenCalled();
-    });
-
-    it('should proceed with addPort when port is not in measuredPorts', () => {
-      const node = {
-        ...mockNode,
-        measuredPorts: [],
-      };
-      getNodeByIdMock.mockReturnValue(node);
-
-      portBatchProcessor.processAdd = vi.fn();
-
-      internalUpdater.addPort('node-1', { ...mockPort, id: 'port-1' });
-
-      expect(portBatchProcessor.processAdd).toHaveBeenCalled();
-    });
   });
 
   describe('applyPortChanges', () => {

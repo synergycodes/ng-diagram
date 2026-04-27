@@ -102,8 +102,8 @@ export class FlowCore {
     this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
-    this.portBatchProcessor = new PortBatchProcessor();
-    this.labelBatchProcessor = new LabelBatchProcessor();
+    this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
+    this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,

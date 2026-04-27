@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Node } from '../../../core/src';
+import { toPortUpdates } from '../../../core/src/port-batch-processor/port-batch-processor';
 
 import { NodePositionDirective, NodeSizeDirective, ZIndexDirective } from '../../directives';
 import { NodeSelectionDirective } from '../../directives/input-events/object-selection/object-selection.directive';
@@ -44,18 +45,12 @@ export class NgDiagramNodeComponent {
       // For resizing we don't have to wait for transforms to compute and removing the "wait"
       // helps to minimize visual lag between new port positions and edge routing applied afterwards the ports are measured
       const portsData = this.portsService.getNodePortsData(id);
-      flowCore.updater.applyPortChanges(
-        id,
-        portsData.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
-      );
+      flowCore.updater.applyPortChanges(id, toPortUpdates(portsData));
     } else {
       // Async for rotation and other cases - wait for browser to apply transforms
       queueMicrotask(() => {
         const portsData = this.portsService.getNodePortsData(id);
-        flowCore.updater.applyPortChanges(
-          id,
-          portsData.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }))
-        );
+        flowCore.updater.applyPortChanges(id, toPortUpdates(portsData));
       });
     }
   }

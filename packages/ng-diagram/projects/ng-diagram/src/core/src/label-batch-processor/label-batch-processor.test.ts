@@ -6,7 +6,7 @@ describe('LabelBatchProcessor', () => {
   let processor: LabelBatchProcessor;
 
   beforeEach(() => {
-    processor = new LabelBatchProcessor();
+    processor = new LabelBatchProcessor(() => undefined);
     vi.useFakeTimers();
   });
 

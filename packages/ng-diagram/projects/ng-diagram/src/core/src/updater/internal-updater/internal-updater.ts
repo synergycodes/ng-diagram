@@ -3,7 +3,7 @@ import type { LabelUpdate } from '../../label-batch-processor/label-batch-proces
 import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import type { Node, Port } from '../../types';
 import { EdgeLabel } from '../../types';
-import { getRect, isSameRect } from '../../utils';
+import { getRect, isSameRect, isSameSize } from '../../utils';
 import { Updater } from '../updater.interface';
 
 export class InternalUpdater implements Updater {
@@ -52,14 +52,8 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Skips ports that are already measured to prevent redundant adds
-   * (e.g. when virtualization re-mounts a component for a port still in the model).
    */
   addPort(nodeId: string, port: Port): void {
-    if (this.isPortAlreadyMeasured(nodeId, port.id)) {
-      return;
-    }
-
     this.flowCore.portBatchProcessor.processAdd(nodeId, port, this.onPortAddsFlush);
   }
 
@@ -88,12 +82,6 @@ export class InternalUpdater implements Updater {
     for (const portUpdate of filteredUpdates) {
       this.flowCore.portBatchProcessor.processUpdate(nodeId, portUpdate, this.onPortUpdatesFlush);
     }
-  }
-
-  private isPortAlreadyMeasured(nodeId: string, portId: string): boolean {
-    const node = this.flowCore.getNodeById(nodeId);
-    const existingPort = node?.measuredPorts?.find((p) => p.id === portId);
-    return !!(existingPort?.size && existingPort?.position);
   }
 
   /**
@@ -187,7 +175,7 @@ export class InternalUpdater implements Updater {
           return true;
         }
 
-        if (!isSameRect(getRect({ size: label.size }), getRect({ size: labelChanges.size }))) {
+        if (!isSameSize(label.size, labelChanges.size)) {
           return true;
         }
       }

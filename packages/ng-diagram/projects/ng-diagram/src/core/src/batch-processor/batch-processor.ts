@@ -6,11 +6,24 @@ interface PendingEntry<T> {
 }
 
 /**
+ * Callback to check whether an item is already measured in the model.
+ * Used at flush time to filter out redundant adds (e.g. virtualization re-mounts
+ * a component for an item that was never deleted from the model).
+ */
+type IsAlreadyMeasuredFn = (key: string, itemId: string) => boolean;
+
+/**
  * Generic batch processor that collects operations (add, update, delete) within
  * the same JavaScript tick and flushes them together in a single microtask.
  *
- * Before flushing, matching add+delete intents for the same item ID are cancelled
- * out (both removed), preventing stale state from surviving the tick.
+ * Before flushing, two deduplication strategies are applied:
+ * 1. **Intent cancellation**: matching add+delete pairs for the same item ID are
+ *    removed from both queues (e.g. type change destroys and recreates a port
+ *    with the same ID in the same tick).
+ * 2. **Measurement filtering**: remaining adds with no matching delete are checked
+ *    via `isAlreadyMeasured`. If the item is already measured, the add is dropped
+ *    (e.g. virtualization re-mounts a component for a port that was never deleted
+ *    from the model).
  *
  * Remaining operations are flushed sequentially in order: adds → updates → deletes.
  * Each operation is awaited before the next begins, ensuring that later
@@ -28,6 +41,8 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
   private readonly pendingDeletes = new Map<string, PendingEntry<string>>();
 
   private flushScheduled = false;
+
+  constructor(private readonly isAlreadyMeasured?: IsAlreadyMeasuredFn) {}
 
   processAdd(key: string, item: TAdd, onFlush: FlushCallback<TAdd>): void {
     this.getOrCreate(this.pendingAdds, key, onFlush).items.push(item);
@@ -54,11 +69,13 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
   /**
    * Flushes all pending operations.
    * First cancels matching add+delete intents for the same item ID,
+   * then filters out redundant adds for items that are already measured,
    * then executes remaining operations sequentially: adds → updates → deletes.
    * Each callback is awaited before the next to prevent read-modify-write races.
    */
   private async flush(): Promise<void> {
     this.cancelMatchingIntents();
+    this.filterAlreadyMeasuredAdds();
 
     const allAdds = this.takeAll(this.pendingAdds);
     const allUpdates = this.takeAll(this.pendingUpdates);
@@ -126,6 +143,28 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
         this.pendingDeletes.delete(key);
       } else {
         deleteEntry.items = [...deleteIdSet];
+      }
+    }
+  }
+
+  /**
+   * Filters out adds for items that are already measured and have no matching delete.
+   * This runs after cancelMatchingIntents, so any remaining add without a delete
+   * is an "orphaned" add — typically from virtualization re-mounting a component
+   * for an item that was never removed from the model.
+   */
+  private filterAlreadyMeasuredAdds(): void {
+    if (!this.isAlreadyMeasured) return;
+
+    for (const [key, addEntry] of this.pendingAdds) {
+      const filteredAdds = addEntry.items.filter((item) => !this.isAlreadyMeasured!(key, item.id));
+
+      if (filteredAdds.length === addEntry.items.length) continue;
+
+      if (filteredAdds.length === 0) {
+        this.pendingAdds.delete(key);
+      } else {
+        addEntry.items = filteredAdds;
       }
     }
   }
