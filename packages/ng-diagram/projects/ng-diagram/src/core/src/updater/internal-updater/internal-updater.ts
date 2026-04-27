@@ -7,11 +7,30 @@ import { getRect, isSameRect } from '../../utils';
 import { Updater } from '../updater.interface';
 
 export class InternalUpdater implements Updater {
+  // Stable callback references so BatchProcessor can group keys into a single invocation
+  private readonly onPortAddsFlush = (all: Map<string, Port[]>) => {
+    return this.flowCore.commandHandler.emit('addPortsBulk', { additions: all });
+  };
+  private readonly onPortUpdatesFlush = (all: Map<string, PortUpdate[]>) => {
+    return this.flowCore.commandHandler.emit('updatePortsBulk', { updates: all });
+  };
+  private readonly onPortDeletesFlush = (all: Map<string, string[]>) => {
+    return this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: all });
+  };
+  private readonly onLabelAddsFlush = (all: Map<string, EdgeLabel[]>) => {
+    return this.flowCore.commandHandler.emit('addEdgeLabelsBulk', { additions: all });
+  };
+  private readonly onLabelUpdatesFlush = (all: Map<string, LabelUpdate[]>) => {
+    return this.flowCore.commandHandler.emit('updateEdgeLabelsBulk', { updates: all });
+  };
+  private readonly onLabelDeletesFlush = (all: Map<string, string[]>) => {
+    return this.flowCore.commandHandler.emit('deleteEdgeLabelsBulk', { deletions: all });
+  };
+
   constructor(private readonly flowCore: FlowCore) {}
 
   /**
    * @internal
-   * Internal method to initialize a node size
    */
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
     const node = this.flowCore.getNodeById(nodeId);
@@ -33,7 +52,6 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Internal method to add a new port to the flow.
    * Skips ports that are already measured to prevent redundant adds
    * (e.g. when virtualization re-mounts a component for a port still in the model).
    */
@@ -42,24 +60,18 @@ export class InternalUpdater implements Updater {
       return;
     }
 
-    this.flowCore.portBatchProcessor.processAdd(nodeId, port, (allAdditions) => {
-      return this.flowCore.commandHandler.emit('addPortsBulk', { additions: allAdditions });
-    });
+    this.flowCore.portBatchProcessor.processAdd(nodeId, port, this.onPortAddsFlush);
   }
 
   /**
    * @internal
-   * Internal method to delete a port from the flow
    */
   deletePort(nodeId: string, portId: string): void {
-    this.flowCore.portBatchProcessor.processDelete(nodeId, portId, (allDeletions) => {
-      return this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: allDeletions });
-    });
+    this.flowCore.portBatchProcessor.processDelete(nodeId, portId, this.onPortDeletesFlush);
   }
 
   /**
    * @internal
-   * Apply port changes (size, position, side, type, etc.) through the batch processor.
    * Filters out updates where no property actually differs from current state.
    */
   applyPortChanges(nodeId: string, portUpdates: PortUpdate[]): void {
@@ -74,9 +86,7 @@ export class InternalUpdater implements Updater {
     }
 
     for (const portUpdate of filteredUpdates) {
-      this.flowCore.portBatchProcessor.processUpdate(nodeId, portUpdate, (allUpdates) => {
-        return this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
-      });
+      this.flowCore.portBatchProcessor.processUpdate(nodeId, portUpdate, this.onPortUpdatesFlush);
     }
   }
 
@@ -88,27 +98,20 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Internal method to add a new edge label to the flow
    */
   addEdgeLabel(edgeId: string, label: EdgeLabel): void {
-    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, (allAdditions) => {
-      return this.flowCore.commandHandler.emit('addEdgeLabelsBulk', { additions: allAdditions });
-    });
+    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, this.onLabelAddsFlush);
   }
 
   /**
    * @internal
-   * Internal method to delete an edge label from the flow
    */
   deleteEdgeLabel(edgeId: string, labelId: string): void {
-    this.flowCore.labelBatchProcessor.processDelete(edgeId, labelId, (allDeletions) => {
-      return this.flowCore.commandHandler.emit('deleteEdgeLabelsBulk', { deletions: allDeletions });
-    });
+    this.flowCore.labelBatchProcessor.processDelete(edgeId, labelId, this.onLabelDeletesFlush);
   }
 
   /**
    * @internal
-   * Apply edge label changes (size, positionOnEdge, etc.) through the batch processor.
    * Filters out updates where no property actually differs from current state.
    */
   applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void {
@@ -118,15 +121,13 @@ export class InternalUpdater implements Updater {
     }
 
     for (const labelUpdate of filteredUpdates) {
-      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, (allUpdates) => {
-        return this.flowCore.commandHandler.emit('updateEdgeLabelsBulk', { updates: allUpdates });
-      });
+      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, this.onLabelUpdatesFlush);
     }
   }
 
   /**
    * Filters out port updates where none of the changed properties actually differ from current state.
-   * Uses 1px threshold for size/position, exact equality for side/type.
+   * Uses exact equality for all comparisons (size, position, side, type).
    */
   private filterUnchangedPortUpdates(node: Node, portUpdates: PortUpdate[]): PortUpdate[] {
     const measuredPortsMap = new Map((node.measuredPorts ?? []).map((port) => [port.id, port]));
@@ -161,7 +162,7 @@ export class InternalUpdater implements Updater {
 
   /**
    * Filters out label updates where none of the changed properties actually differ from current state.
-   * Uses 1px threshold for size, exact equality for positionOnEdge.
+   * Uses exact equality for all comparisons (size, positionOnEdge).
    */
   private filterUnchangedLabelUpdates(edgeId: string, labelUpdates: LabelUpdate[]): LabelUpdate[] {
     const edge = this.flowCore.getEdgeById(edgeId);
