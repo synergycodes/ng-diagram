@@ -5,18 +5,9 @@ import type { Node, Port } from '../../types';
 import { EdgeLabel } from '../../types';
 import { getRect, isSameRect } from '../../utils';
 import { Updater } from '../updater.interface';
-import { DirectPortUpdateStrategy } from './direct-port-update-strategy';
-import type { PortUpdateStrategy } from './port-update-strategy.interface';
-import { VirtualizedPortUpdateStrategy } from './virtualized-port-update-strategy';
 
 export class InternalUpdater implements Updater {
-  private readonly portUpdateStrategy: PortUpdateStrategy;
-
-  constructor(private readonly flowCore: FlowCore) {
-    this.portUpdateStrategy = this.flowCore.isVirtualizationActive
-      ? new VirtualizedPortUpdateStrategy(flowCore)
-      : new DirectPortUpdateStrategy(flowCore);
-  }
+  constructor(private readonly flowCore: FlowCore) {}
 
   /**
    * @internal
@@ -42,10 +33,18 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * Internal method to add a new port to the flow
+   * Internal method to add a new port to the flow.
+   * Skips ports that are already measured to prevent redundant adds
+   * (e.g. when virtualization re-mounts a component for a port still in the model).
    */
   addPort(nodeId: string, port: Port): void {
-    this.portUpdateStrategy.addPort(nodeId, port);
+    if (this.isPortAlreadyMeasured(nodeId, port.id)) {
+      return;
+    }
+
+    this.flowCore.portBatchProcessor.processAdd(nodeId, port, (allAdditions) => {
+      return this.flowCore.commandHandler.emit('addPortsBulk', { additions: allAdditions });
+    });
   }
 
   /**
@@ -53,7 +52,9 @@ export class InternalUpdater implements Updater {
    * Internal method to delete a port from the flow
    */
   deletePort(nodeId: string, portId: string): void {
-    this.portUpdateStrategy.deletePort(nodeId, portId);
+    this.flowCore.portBatchProcessor.processDelete(nodeId, portId, (allDeletions) => {
+      return this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: allDeletions });
+    });
   }
 
   /**
@@ -72,7 +73,17 @@ export class InternalUpdater implements Updater {
       return;
     }
 
-    this.portUpdateStrategy.updatePorts(nodeId, filteredUpdates);
+    for (const portUpdate of filteredUpdates) {
+      this.flowCore.portBatchProcessor.processUpdate(nodeId, portUpdate, (allUpdates) => {
+        return this.flowCore.commandHandler.emit('updatePortsBulk', { updates: allUpdates });
+      });
+    }
+  }
+
+  private isPortAlreadyMeasured(nodeId: string, portId: string): boolean {
+    const node = this.flowCore.getNodeById(nodeId);
+    const existingPort = node?.measuredPorts?.find((p) => p.id === portId);
+    return !!(existingPort?.size && existingPort?.position);
   }
 
   /**
