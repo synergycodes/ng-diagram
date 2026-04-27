@@ -162,8 +162,12 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
-      if (node.size && !this.isSizeChanged(node.size, size)) {
-        continue;
+      if (node.size) {
+        // During active user resize, suppress ResizeObserver-driven size updates —
+        // the resize action is the source of truth (with snapping, constraints, transforms).
+        if (isResizing || !this.isSizeChanged(node.size, size)) {
+          continue;
+        }
       }
 
       nodeSizeUpdates.push({ id: metadata.nodeId, size });
@@ -177,7 +181,6 @@ export class FlowResizeBatchProcessorService {
 
     if (nodeSizeUpdates.length > 0) {
       if (flowCore.isInitialized) {
-        // After init: single batch update for all nodes
         flowCore.commandHandler.emit('updateNodes', { nodes: nodeSizeUpdates });
       } else {
         // During init: use updater so InitUpdater can track measurements
