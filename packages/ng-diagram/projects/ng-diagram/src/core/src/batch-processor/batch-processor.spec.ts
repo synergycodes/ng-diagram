@@ -291,6 +291,100 @@ describe('BatchProcessor', () => {
     });
   });
 
+  describe('per-key callbacks', () => {
+    it('should invoke a shared callback once with both keys in the map', async () => {
+      const onFlush = vi.fn();
+
+      processor.processAdd('key1', createItem('a'), onFlush);
+      processor.processAdd('key2', createItem('b'), onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+      const additions = onFlush.mock.calls[0][0] as Map<string, TestItem[]>;
+      expect(additions.get('key1')).toEqual([createItem('a')]);
+      expect(additions.get('key2')).toEqual([createItem('b')]);
+    });
+
+    it('should invoke different callbacks separately with their respective keys', async () => {
+      const onFlushA = vi.fn();
+      const onFlushB = vi.fn();
+
+      processor.processAdd('key1', createItem('a'), onFlushA);
+      processor.processAdd('key2', createItem('b'), onFlushB);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlushA).toHaveBeenCalledTimes(1);
+      const additionsA = onFlushA.mock.calls[0][0] as Map<string, TestItem[]>;
+      expect(additionsA.get('key1')).toEqual([createItem('a')]);
+      expect(additionsA.has('key2')).toBe(false);
+
+      expect(onFlushB).toHaveBeenCalledTimes(1);
+      const additionsB = onFlushB.mock.calls[0][0] as Map<string, TestItem[]>;
+      expect(additionsB.get('key2')).toEqual([createItem('b')]);
+      expect(additionsB.has('key1')).toBe(false);
+    });
+
+    it('should invoke different update callbacks separately with their respective keys', async () => {
+      const onFlushA = vi.fn();
+      const onFlushB = vi.fn();
+
+      processor.processUpdate('key1', createUpdate('a'), onFlushA);
+      processor.processUpdate('key2', createUpdate('b'), onFlushB);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlushA).toHaveBeenCalledTimes(1);
+      const updatesA = onFlushA.mock.calls[0][0] as Map<string, TestUpdate[]>;
+      expect(updatesA.get('key1')).toEqual([createUpdate('a')]);
+      expect(updatesA.has('key2')).toBe(false);
+
+      expect(onFlushB).toHaveBeenCalledTimes(1);
+      const updatesB = onFlushB.mock.calls[0][0] as Map<string, TestUpdate[]>;
+      expect(updatesB.get('key2')).toEqual([createUpdate('b')]);
+      expect(updatesB.has('key1')).toBe(false);
+    });
+
+    it('should invoke different delete callbacks separately with their respective keys', async () => {
+      const onFlushA = vi.fn();
+      const onFlushB = vi.fn();
+
+      processor.processDelete('key1', 'a', onFlushA);
+      processor.processDelete('key2', 'b', onFlushB);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlushA).toHaveBeenCalledTimes(1);
+      const deletionsA = onFlushA.mock.calls[0][0] as Map<string, string[]>;
+      expect(deletionsA.get('key1')).toEqual(['a']);
+      expect(deletionsA.has('key2')).toBe(false);
+
+      expect(onFlushB).toHaveBeenCalledTimes(1);
+      const deletionsB = onFlushB.mock.calls[0][0] as Map<string, string[]>;
+      expect(deletionsB.get('key2')).toEqual(['b']);
+      expect(deletionsB.has('key1')).toBe(false);
+    });
+
+    it('should not let add and delete callbacks overwrite each other', async () => {
+      const onAddFlush = vi.fn();
+      const onDeleteFlush = vi.fn();
+
+      processor.processAdd('key1', createItem('a'), onAddFlush);
+      processor.processDelete('key1', 'b', onDeleteFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onAddFlush).toHaveBeenCalledTimes(1);
+      const additions = onAddFlush.mock.calls[0][0] as Map<string, TestItem[]>;
+      expect(additions.get('key1')).toEqual([createItem('a')]);
+
+      expect(onDeleteFlush).toHaveBeenCalledTimes(1);
+      const deletions = onDeleteFlush.mock.calls[0][0] as Map<string, string[]>;
+      expect(deletions.get('key1')).toEqual(['b']);
+    });
+  });
+
   describe('intent cancellation', () => {
     it('should cancel add+delete for the same item in the same tick', async () => {
       const onAddFlush = vi.fn();

@@ -1,5 +1,10 @@
 type FlushCallback<T> = (all: Map<string, T[]>) => void | Promise<void>;
 
+interface PendingEntry<T> {
+  items: T[];
+  onFlush: FlushCallback<T>;
+}
+
 /**
  * Generic batch processor that collects operations (add, update, delete) within
  * the same JavaScript tick and flushes them together in a single microtask.
@@ -11,35 +16,31 @@ type FlushCallback<T> = (all: Map<string, T[]>) => void | Promise<void>;
  * Each operation is awaited before the next begins, ensuring that later
  * operations read fresh state left by earlier ones.
  *
+ * Callbacks are stored per-key, so different callers can safely use the same
+ * BatchProcessor instance with different flush targets.
+ *
  * @typeParam TAdd - Type of items being added (must have an `id` property)
  * @typeParam TUpdate - Type of update descriptors
  */
 export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
-  private readonly pendingAdds = new Map<string, TAdd[]>();
-  private readonly pendingUpdates = new Map<string, TUpdate[]>();
-  private readonly pendingDeletes = new Map<string, string[]>();
-
-  private addCallback: FlushCallback<TAdd> | null = null;
-  private updateCallback: FlushCallback<TUpdate> | null = null;
-  private deleteCallback: FlushCallback<string> | null = null;
+  private readonly pendingAdds = new Map<string, PendingEntry<TAdd>>();
+  private readonly pendingUpdates = new Map<string, PendingEntry<TUpdate>>();
+  private readonly pendingDeletes = new Map<string, PendingEntry<string>>();
 
   private flushScheduled = false;
 
   processAdd(key: string, item: TAdd, onFlush: FlushCallback<TAdd>): void {
-    this.getOrCreate(this.pendingAdds, key).push(item);
-    this.addCallback = onFlush;
+    this.getOrCreate(this.pendingAdds, key, onFlush).items.push(item);
     this.scheduleFlush();
   }
 
   processUpdate(key: string, update: TUpdate, onFlush: FlushCallback<TUpdate>): void {
-    this.getOrCreate(this.pendingUpdates, key).push(update);
-    this.updateCallback = onFlush;
+    this.getOrCreate(this.pendingUpdates, key, onFlush).items.push(update);
     this.scheduleFlush();
   }
 
   processDelete(key: string, itemId: string, onFlush: FlushCallback<string>): void {
-    this.getOrCreate(this.pendingDeletes, key).push(itemId);
-    this.deleteCallback = onFlush;
+    this.getOrCreate(this.pendingDeletes, key, onFlush).items.push(itemId);
     this.scheduleFlush();
   }
 
@@ -63,23 +64,33 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
     const allUpdates = this.takeAll(this.pendingUpdates);
     const allDeletes = this.takeAll(this.pendingDeletes);
 
-    const addCallback = this.addCallback;
-    const updateCallback = this.updateCallback;
-    const deleteCallback = this.deleteCallback;
-
-    this.addCallback = null;
-    this.updateCallback = null;
-    this.deleteCallback = null;
     this.flushScheduled = false;
 
-    if (allAdds.size > 0 && addCallback) {
-      await addCallback(allAdds);
+    await this.invokeCallbacks(allAdds);
+    await this.invokeCallbacks(allUpdates);
+    await this.invokeCallbacks(allDeletes);
+  }
+
+  /**
+   * Groups entries by callback reference and invokes each callback once
+   * with all its keys collected into a single Map.
+   */
+  private async invokeCallbacks<T>(entries: Map<string, PendingEntry<T>>): Promise<void> {
+    if (entries.size === 0) return;
+
+    const byCallback = new Map<FlushCallback<T>, Map<string, T[]>>();
+
+    for (const [key, { items, onFlush }] of entries) {
+      let map = byCallback.get(onFlush);
+      if (!map) {
+        map = new Map();
+        byCallback.set(onFlush, map);
+      }
+      map.set(key, items);
     }
-    if (allUpdates.size > 0 && updateCallback) {
-      await updateCallback(allUpdates);
-    }
-    if (allDeletes.size > 0 && deleteCallback) {
-      await deleteCallback(allDeletes);
+
+    for (const [callback, data] of byCallback) {
+      await callback(data);
     }
   }
 
@@ -89,13 +100,13 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
    * produces counter-intuitive results due to flush ordering.
    */
   private cancelMatchingIntents(): void {
-    for (const [key, deleteIds] of this.pendingDeletes) {
-      const adds = this.pendingAdds.get(key);
-      if (!adds) continue;
+    for (const [key, deleteEntry] of this.pendingDeletes) {
+      const addEntry = this.pendingAdds.get(key);
+      if (!addEntry) continue;
 
-      const deleteIdSet = new Set(deleteIds);
+      const deleteIdSet = new Set(deleteEntry.items);
 
-      const filteredAdds = adds.filter((item) => {
+      const filteredAdds = addEntry.items.filter((item) => {
         if (deleteIdSet.has(item.id)) {
           deleteIdSet.delete(item.id);
           return false;
@@ -103,30 +114,32 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
         return true;
       });
 
-      if (filteredAdds.length === adds.length) continue;
+      if (filteredAdds.length === addEntry.items.length) continue;
 
       if (filteredAdds.length === 0) {
         this.pendingAdds.delete(key);
       } else {
-        this.pendingAdds.set(key, filteredAdds);
+        addEntry.items = filteredAdds;
       }
 
       if (deleteIdSet.size === 0) {
         this.pendingDeletes.delete(key);
       } else {
-        this.pendingDeletes.set(key, [...deleteIdSet]);
+        deleteEntry.items = [...deleteIdSet];
       }
     }
   }
 
-  private getOrCreate<T>(map: Map<string, T[]>, key: string): T[] {
-    if (!map.has(key)) {
-      map.set(key, []);
+  private getOrCreate<T>(map: Map<string, PendingEntry<T>>, key: string, onFlush: FlushCallback<T>): PendingEntry<T> {
+    let entry = map.get(key);
+    if (!entry) {
+      entry = { items: [], onFlush };
+      map.set(key, entry);
     }
-    return map.get(key)!;
+    return entry;
   }
 
-  private takeAll<T>(map: Map<string, T[]>): Map<string, T[]> {
+  private takeAll<T>(map: Map<string, PendingEntry<T>>): Map<string, PendingEntry<T>> {
     const all = new Map(map);
     map.clear();
     return all;
