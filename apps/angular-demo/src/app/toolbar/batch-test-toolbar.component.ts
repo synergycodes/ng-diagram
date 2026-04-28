@@ -22,9 +22,9 @@ import { type DynamicPortData } from '../node-template/dynamic-port-node/dynamic
       <button (click)="togglePortOrigins()">Toggle Port Origins</button>
       <span class="separator">|</span>
       <span class="group-label">Batch (200):</span>
-      <button (click)="batchAddPort()">Add Port</button>
-      <button (click)="batchRemovePort()">Remove Port</button>
-      <button (click)="batchToggleSide()">Toggle Side</button>
+      <button [disabled]="!isDynamicPortType" (click)="batchAddPort()">Add Port</button>
+      <button [disabled]="!isDynamicPortType" (click)="batchRemovePort()">Remove Port</button>
+      <button [disabled]="!isDynamicPortType" (click)="batchToggleSide()">Toggle Side</button>
       <button (click)="toggleNodeType()">Toggle Node Type</button>
       <span class="separator">|</span>
       <span class="group-label">Labels:</span>
@@ -32,8 +32,8 @@ import { type DynamicPortData } from '../node-template/dynamic-port-node/dynamic
       <button (click)="batchToggleLabel()">Batch Toggle Label</button>
       <span class="separator">|</span>
       <span class="group-label">Measurement:</span>
-      <button (click)="resizeAllNodes()">Resize All Nodes</button>
-      <button (click)="repositionPorts()">Reposition Ports (CSS)</button>
+      <button [disabled]="!isDynamicPortType" (click)="resizeAllNodes()">Resize All Nodes</button>
+      <button [disabled]="!isDynamicPortType" (click)="repositionPorts()">Reposition Ports (CSS)</button>
       <span class="separator">|</span>
       <button (click)="zoomToFit()">Zoom to Fit</button>
     </div>
@@ -47,6 +47,7 @@ export class BatchTestToolbarComponent {
   exit = output<void>();
 
   isDebugMode = false;
+  isDynamicPortType = true;
   private portCounter = 1;
 
   resetPortCounter(): void {
@@ -140,7 +141,8 @@ export class BatchTestToolbarComponent {
     const nodes = this.modelService.getModel().getNodes();
     const gridNodes = nodes.filter((n) => n.id.startsWith('dp-grid-'));
     if (gridNodes.length === 0) return;
-    const targetType = gridNodes[0].type === 'dynamic-port' ? undefined : 'dynamic-port';
+    this.isDynamicPortType = !this.isDynamicPortType;
+    const targetType = this.isDynamicPortType ? 'dynamic-port' : undefined;
     this.modelService.updateNodes(gridNodes.map((node) => ({ id: node.id, type: targetType })));
   }
 
