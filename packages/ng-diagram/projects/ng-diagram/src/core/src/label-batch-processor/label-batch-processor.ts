@@ -9,9 +9,15 @@ export interface LabelUpdate {
 
 export class LabelBatchProcessor extends BatchProcessor<EdgeLabel, LabelUpdate> {
   constructor(getEdgeById: (edgeId: string) => Edge | null | undefined) {
-    super((edgeId, labelId) => {
-      const label = getEdgeById(edgeId)?.measuredLabels?.find((l) => l.id === labelId);
-      return !!label && isValidSize(label.size);
+    super((edgeId) => {
+      const labels = getEdgeById(edgeId)?.measuredLabels ?? [];
+      const measured = new Set<string>();
+      for (const label of labels) {
+        if (isValidSize(label.size)) {
+          measured.add(label.id);
+        }
+      }
+      return measured;
     });
   }
 }
