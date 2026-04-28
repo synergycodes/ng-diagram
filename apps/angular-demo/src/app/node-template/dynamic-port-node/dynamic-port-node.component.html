@@ -5,5 +5,12 @@
   }
 </div>
 @for (port of ports(); track port.id) {
-  <ng-diagram-port [id]="port.id" type="both" [side]="port.side" [originPoint]="port.originPoint" [style.top]="port.top" [style.left]="port.left" />
+  <ng-diagram-port
+    [id]="port.id"
+    type="both"
+    [side]="port.side"
+    [originPoint]="port.originPoint"
+    [style.top]="port.top"
+    [style.left]="port.left"
+  />
 }
