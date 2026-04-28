@@ -55,7 +55,7 @@ describe('InternalUpdater', () => {
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
 
-    it('should emit resizeNode when size changes', () => {
+    it('should emit updateNodes when size changes', () => {
       getNodeByIdMock.mockReturnValue({
         ...mockNode,
         size: { width: 100, height: 100 },
@@ -63,9 +63,8 @@ describe('InternalUpdater', () => {
 
       internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('resizeNode', {
-        id: 'node-1',
-        size: { width: 5, height: 5 },
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-1', size: { width: 5, height: 5 } }],
       });
     });
 

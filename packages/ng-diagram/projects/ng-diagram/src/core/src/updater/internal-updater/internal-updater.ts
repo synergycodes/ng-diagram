@@ -33,21 +33,24 @@ export class InternalUpdater implements Updater {
    * @internal
    */
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
-    const node = this.flowCore.getNodeById(nodeId);
+    this.applyNodeSizes([{ id: nodeId, size }]);
+  }
 
-    if (!node || this.isResizing() || this.hasSameSize(node, size)) {
-      return;
+  applyNodeSizes(updates: { id: string; size: NonNullable<Node['size']> }[]): void {
+    const isResizing = this.flowCore.actionStateManager.isResizing();
+
+    const filtered = updates.filter(({ id, size }) => {
+      const node = this.flowCore.getNodeById(id);
+      if (!node) return false;
+      // During active user resize, only accept initial sizes (nodes without size yet).
+      // Size-changed nodes are suppressed — the resize action is the source of truth.
+      if (node.size && isResizing) return false;
+      return !isSameRect(getRect(node), getRect({ size }));
+    });
+
+    if (filtered.length > 0) {
+      this.flowCore.commandHandler.emit('updateNodes', { nodes: filtered });
     }
-
-    this.flowCore.commandHandler.emit('resizeNode', { id: nodeId, size });
-  }
-
-  private isResizing(): boolean {
-    return this.flowCore.actionStateManager.isResizing();
-  }
-
-  private hasSameSize(node: Node, size: NonNullable<Node['size']>): boolean {
-    return isSameRect(getRect(node), getRect({ size }));
   }
 
   /**
