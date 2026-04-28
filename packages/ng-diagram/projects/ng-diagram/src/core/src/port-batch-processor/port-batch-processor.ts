@@ -12,9 +12,15 @@ export const toPortUpdates = (ports: Pick<Port, 'id' | 'size' | 'position'>[]): 
 
 export class PortBatchProcessor extends BatchProcessor<Port, PortUpdate> {
   constructor(getNodeById: (nodeId: string) => Node | null | undefined) {
-    super((nodeId, portId) => {
-      const port = getNodeById(nodeId)?.measuredPorts?.find((p) => p.id === portId);
-      return !!port && isValidSize(port.size) && isValidPosition(port.position);
+    super((nodeId) => {
+      const ports = getNodeById(nodeId)?.measuredPorts ?? [];
+      const measured = new Set<string>();
+      for (const port of ports) {
+        if (isValidSize(port.size) && isValidPosition(port.position)) {
+          measured.add(port.id);
+        }
+      }
+      return measured;
     });
   }
 }

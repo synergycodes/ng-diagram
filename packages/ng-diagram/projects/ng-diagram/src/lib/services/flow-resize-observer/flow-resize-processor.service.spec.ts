@@ -16,6 +16,7 @@ describe('FlowResizeBatchProcessorService', () => {
   let mockInternalUpdater: {
     applyPortChanges: ReturnType<typeof vi.fn>;
     applyNodeSize: ReturnType<typeof vi.fn>;
+    applyNodeSizes: ReturnType<typeof vi.fn>;
     applyEdgeLabelChanges: ReturnType<typeof vi.fn>;
   };
   let mockFlowCore: {
@@ -43,6 +44,7 @@ describe('FlowResizeBatchProcessorService', () => {
     mockInternalUpdater = {
       applyPortChanges: vi.fn(),
       applyNodeSize: vi.fn(),
+      applyNodeSizes: vi.fn(),
       applyEdgeLabelChanges: vi.fn(),
     };
     mockFlowCore = {
@@ -125,7 +127,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalled();
     expect(mockInternalUpdater.applyPortChanges).toHaveBeenCalled();
   });
 
@@ -144,15 +146,14 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalled();
     expect(mockInternalUpdater.applyPortChanges).not.toHaveBeenCalled();
   });
 
-  it('should batch multiple node size updates into single updateNodes call after init', () => {
+  it('should batch multiple node size updates into single applyNodeSizes call', () => {
     const entry1 = { target: { id: 't1' } } as unknown as ResizeObserverEntry;
     const entry2 = { target: { id: 't2' } } as unknown as ResizeObserverEntry;
 
-    mockFlowCore.isInitialized = true;
     mockBatchResizeObserver.getMetadata
       .mockReturnValueOnce({ type: 'node', nodeId: 'n1' } as ObservedElementMetadata)
       .mockReturnValueOnce({ type: 'node', nodeId: 'n2' } as ObservedElementMetadata);
@@ -167,39 +168,11 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry1, entry2]);
 
-    expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledTimes(1);
-    expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
-      nodes: [
-        { id: 'n1', size: { width: 10, height: 20 } },
-        { id: 'n2', size: { width: 10, height: 20 } },
-      ],
-    });
-    expect(mockInternalUpdater.applyNodeSize).not.toHaveBeenCalled();
-  });
-
-  it('should use applyNodeSize per node during init', () => {
-    const entry1 = { target: { id: 't1' } } as unknown as ResizeObserverEntry;
-    const entry2 = { target: { id: 't2' } } as unknown as ResizeObserverEntry;
-
-    mockFlowCore.isInitialized = false;
-    mockBatchResizeObserver.getMetadata
-      .mockReturnValueOnce({ type: 'node', nodeId: 'n1' } as ObservedElementMetadata)
-      .mockReturnValueOnce({ type: 'node', nodeId: 'n2' } as ObservedElementMetadata);
-    mockFlowCore.getNodeById
-      .mockReturnValueOnce({ size: { width: 1, height: 2 } })
-      .mockReturnValueOnce({ size: { width: 3, height: 4 } });
-
-    vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
-      width: 10,
-      height: 20,
-    });
-    service['isInitialized'] = true;
-    service['processAllResizes']([entry1, entry2]);
-
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalledTimes(2);
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalledWith('n1', { width: 10, height: 20 });
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalledWith('n2', { width: 10, height: 20 });
-    expect(mockFlowCore.commandHandler.emit).not.toHaveBeenCalled();
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalledTimes(1);
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalledWith([
+      { id: 'n1', size: { width: 10, height: 20 } },
+      { id: 'n2', size: { width: 10, height: 20 } },
+    ]);
   });
 
   it('should process edge label batch', () => {

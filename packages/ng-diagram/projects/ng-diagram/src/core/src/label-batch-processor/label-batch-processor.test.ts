@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { EdgeLabel } from '../types';
+import type { Edge, EdgeLabel } from '../types';
 import { LabelBatchProcessor, type LabelUpdate } from './label-batch-processor';
 
 describe('LabelBatchProcessor', () => {
@@ -47,5 +47,49 @@ describe('LabelBatchProcessor', () => {
     expect(onFlush).toHaveBeenCalledTimes(1);
     const deletions = onFlush.mock.calls[0][0] as Map<string, string[]>;
     expect(deletions.get('edge1')).toEqual(['label-1']);
+  });
+
+  describe('getMeasuredIds', () => {
+    it('should filter out adds for labels with valid size', async () => {
+      const edge = {
+        measuredLabels: [{ id: 'label-1', size: { width: 10, height: 10 }, positionOnEdge: 0.5 }],
+      } as unknown as Edge;
+      const proc = new LabelBatchProcessor(() => edge);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('edge1', { id: 'label-1', positionOnEdge: 0.5 }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).not.toHaveBeenCalled();
+    });
+
+    it('should keep adds for labels missing size', async () => {
+      const edge = {
+        measuredLabels: [{ id: 'label-1', size: undefined, positionOnEdge: 0.5 }],
+      } as unknown as Edge;
+      const proc = new LabelBatchProcessor(() => edge);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('edge1', { id: 'label-1', positionOnEdge: 0.5 }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return empty set when edge is not found', async () => {
+      const proc = new LabelBatchProcessor(() => null);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('edge1', { id: 'label-1', positionOnEdge: 0.5 }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
   });
 });

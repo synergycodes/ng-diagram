@@ -95,14 +95,8 @@ export class FlowResizeBatchProcessorService {
    */
   private processPortBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-    const updatesByNode = new Map<
-      string,
-      {
-        id: string;
-        size: Size;
-        position: Point;
-      }[]
-    >();
+    const measuredPortsMaps = new Map<string, Map<string, Port>>();
+    const updatesByNode = new Map<string, { id: string; size: Size; position: Point }[]>();
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'port') continue;
@@ -116,15 +110,16 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
-      const port = node.measuredPorts?.find((port: Port) => port.id === metadata.portId);
-      const currentSize = port?.size;
-      const currentPosition = port?.position;
+      if (!measuredPortsMaps.has(metadata.nodeId)) {
+        measuredPortsMaps.set(metadata.nodeId, new Map((node.measuredPorts ?? []).map((p) => [p.id, p])));
+      }
+      const port = measuredPortsMaps.get(metadata.nodeId)!.get(metadata.portId);
 
       if (
-        currentSize &&
-        !this.isSizeChanged(currentSize, size) &&
-        currentPosition &&
-        !this.isPositionChanged(currentPosition, portData.position)
+        port?.size &&
+        !this.isSizeChanged(port.size, size) &&
+        port?.position &&
+        !this.isPositionChanged(port.position, portData.position)
       ) {
         continue;
       }
@@ -176,15 +171,7 @@ export class FlowResizeBatchProcessorService {
     }
 
     if (nodeSizeUpdates.length > 0) {
-      if (flowCore.isInitialized) {
-        // After init: single batch update for all nodes
-        flowCore.commandHandler.emit('updateNodes', { nodes: nodeSizeUpdates });
-      } else {
-        // During init: use updater so InitUpdater can track measurements
-        for (const { id, size } of nodeSizeUpdates) {
-          flowCore.updater.applyNodeSize(id, size);
-        }
-      }
+      flowCore.updater.applyNodeSizes(nodeSizeUpdates);
     }
   }
 
@@ -193,14 +180,8 @@ export class FlowResizeBatchProcessorService {
    */
   private processEdgeLabelBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-
-    const updatesByEdge = new Map<
-      string,
-      {
-        labelId: string;
-        size: Size;
-      }[]
-    >();
+    const measuredLabelsMaps = new Map<string, Map<string, Size | undefined>>();
+    const updatesByEdge = new Map<string, { labelId: string; size: Size }[]>();
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'edge-label') continue;
@@ -211,7 +192,11 @@ export class FlowResizeBatchProcessorService {
       const edge = flowCore.getEdgeById(metadata.edgeId);
       if (!edge) continue;
 
-      const currentSize = edge.measuredLabels?.find((label) => label.id === metadata.labelId)?.size;
+      if (!measuredLabelsMaps.has(metadata.edgeId)) {
+        measuredLabelsMaps.set(metadata.edgeId, new Map((edge.measuredLabels ?? []).map((l) => [l.id, l.size])));
+      }
+      const currentSize = measuredLabelsMaps.get(metadata.edgeId)!.get(metadata.labelId);
+
       if (currentSize && !this.isSizeChanged(currentSize, size)) {
         continue;
       }

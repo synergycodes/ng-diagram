@@ -465,8 +465,8 @@ describe('BatchProcessor', () => {
 
   describe('measurement filtering', () => {
     it('should filter out adds for items that are already measured', async () => {
-      const isAlreadyMeasured = vi.fn().mockReturnValue(true);
-      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(isAlreadyMeasured);
+      const getMeasuredIds = vi.fn().mockReturnValue(new Set(['a']));
+      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(getMeasuredIds);
       vi.useFakeTimers();
 
       const onFlush = vi.fn();
@@ -474,13 +474,13 @@ describe('BatchProcessor', () => {
 
       await vi.runAllTimersAsync();
 
-      expect(isAlreadyMeasured).toHaveBeenCalledWith('key1', 'a');
+      expect(getMeasuredIds).toHaveBeenCalledWith('key1');
       expect(onFlush).not.toHaveBeenCalled();
     });
 
     it('should keep adds for items that are not yet measured', async () => {
-      const isAlreadyMeasured = vi.fn().mockReturnValue(false);
-      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(isAlreadyMeasured);
+      const getMeasuredIds = vi.fn().mockReturnValue(new Set());
+      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(getMeasuredIds);
       vi.useFakeTimers();
 
       const onFlush = vi.fn();
@@ -494,8 +494,8 @@ describe('BatchProcessor', () => {
     });
 
     it('should not check measurement for adds that have a matching delete (intent cancellation takes priority)', async () => {
-      const isAlreadyMeasured = vi.fn().mockReturnValue(true);
-      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(isAlreadyMeasured);
+      const getMeasuredIds = vi.fn().mockReturnValue(new Set(['a']));
+      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(getMeasuredIds);
       vi.useFakeTimers();
 
       const onAddFlush = vi.fn();
@@ -507,14 +507,14 @@ describe('BatchProcessor', () => {
       await vi.runAllTimersAsync();
 
       // Intent cancellation removes both before measurement filtering runs
-      expect(isAlreadyMeasured).not.toHaveBeenCalled();
+      expect(getMeasuredIds).not.toHaveBeenCalled();
       expect(onAddFlush).not.toHaveBeenCalled();
       expect(onDeleteFlush).not.toHaveBeenCalled();
     });
 
     it('should only filter measured items and keep the rest', async () => {
-      const isAlreadyMeasured = vi.fn().mockImplementation((_key: string, itemId: string) => itemId === 'a');
-      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(isAlreadyMeasured);
+      const getMeasuredIds = vi.fn().mockReturnValue(new Set(['a']));
+      const processorWithCheck = new BatchProcessor<TestItem, TestUpdate>(getMeasuredIds);
       vi.useFakeTimers();
 
       const onFlush = vi.fn();
@@ -528,10 +528,10 @@ describe('BatchProcessor', () => {
       expect(additions.get('key1')).toEqual([createItem('b')]);
     });
 
-    it('should not filter when no isAlreadyMeasured callback is provided', async () => {
+    it('should not filter when no getMeasuredIds callback is provided', async () => {
       const onFlush = vi.fn();
 
-      // Default processor has no isAlreadyMeasured
+      // Default processor has no getMeasuredIds
       processor.processAdd('key1', createItem('a'), onFlush);
 
       await vi.runAllTimersAsync();
