@@ -36,6 +36,9 @@ export class InternalUpdater implements Updater {
     this.applyNodeSizes([{ id: nodeId, size }]);
   }
 
+  /**
+   * @internal
+   */
   applyNodeSizes(updates: { id: string; size: NonNullable<Node['size']> }[]): void {
     const isResizing = this.flowCore.actionStateManager.isResizing();
 

@@ -12,8 +12,9 @@ const computeUpdatedPorts = (
   measuredPorts: Port[],
   portUpdates: { portId: string; portChanges: Partial<Port> }[]
 ): Port[] => {
+  const changesById = new Map(portUpdates.map(({ portId, portChanges }) => [portId, portChanges]));
   return measuredPorts.map((port) => {
-    const portChanges = portUpdates.find(({ portId }) => portId === port.id)?.portChanges;
+    const portChanges = changesById.get(port.id);
     if (!portChanges) {
       return port;
     }

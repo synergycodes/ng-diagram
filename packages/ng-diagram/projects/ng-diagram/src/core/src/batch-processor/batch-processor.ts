@@ -9,8 +9,6 @@ interface PendingEntry<T> {
  * Returns the set of item IDs that are already measured for a given key.
  * Used at flush time to filter out redundant adds (e.g. virtualization re-mounts
  * a component for an item that was never deleted from the model).
- * Called once per key, not per item — allows the implementation to build a
- * lookup structure (Map/Set) once and amortize across all items.
  */
 type GetMeasuredIdsFn = (key: string) => Set<string>;
 
