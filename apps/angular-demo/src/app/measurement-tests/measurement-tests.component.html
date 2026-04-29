@@ -19,7 +19,16 @@
           <span class="status">{{ result.passed ? '✅' : '❌' }}</span>
           <span class="name">{{ result.name }}</span>
           <span class="elapsed">{{ result.elapsed.toFixed(0) }}ms</span>
-          <span class="details">{{ result.details }}</span>
+          @if (result.passed) {
+            <span class="details">{{ result.details }}</span>
+          }
+          @if (!result.passed) {
+            <ul class="failures">
+              @for (failure of result.failures; track failure) {
+                <li>{{ failure }}</li>
+              }
+            </ul>
+          }
         </div>
       }
     </div>

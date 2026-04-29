@@ -68,4 +68,15 @@
   .details {
     color: #888;
   }
+
+  .failures {
+    margin: 0;
+    padding: 0 0 0 16px;
+    color: #c62828;
+    font-size: 11px;
+
+    li {
+      white-space: nowrap;
+    }
+  }
 }
