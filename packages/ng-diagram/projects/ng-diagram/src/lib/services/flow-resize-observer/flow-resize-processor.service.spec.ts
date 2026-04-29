@@ -36,7 +36,7 @@ describe('FlowResizeBatchProcessorService', () => {
     getNodePortsData: ReturnType<typeof vi.fn>;
   };
   let mockBatchResizeObserver: {
-    setBatchProcessor: ReturnType<typeof vi.fn>;
+    configure: ReturnType<typeof vi.fn>;
     getMetadata: ReturnType<typeof vi.fn>;
   };
 
@@ -66,7 +66,7 @@ describe('FlowResizeBatchProcessorService', () => {
         .mockReturnValue([{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }]),
     };
     mockBatchResizeObserver = {
-      setBatchProcessor: vi.fn(),
+      configure: vi.fn(),
       getMetadata: vi.fn(),
     };
 

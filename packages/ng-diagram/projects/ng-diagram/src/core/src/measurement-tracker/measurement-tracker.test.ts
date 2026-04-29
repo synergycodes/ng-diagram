@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_SAFETY_TIMEOUT, MeasurementTracker } from './measurement-tracker';
+import { DEFAULT_DISCOVERY_WINDOW_TIMEOUT, MeasurementTracker } from './measurement-tracker';
 
 describe('MeasurementTracker', () => {
   let tracker: MeasurementTracker;
@@ -14,9 +13,9 @@ describe('MeasurementTracker', () => {
     vi.useRealTimers();
   });
 
-  describe('setNextTrackingConfig()', () => {
+  describe('requestTracking()', () => {
     it('should mark tracking as requested', () => {
-      tracker.setNextTrackingConfig();
+      tracker.requestTracking();
 
       expect(tracker.isTrackingRequested()).toBe(true);
     });
@@ -25,22 +24,22 @@ describe('MeasurementTracker', () => {
       expect(tracker.isTrackingRequested()).toBe(false);
     });
 
-    it('should store custom debounce values', () => {
-      tracker.setNextTrackingConfig(100, 500);
-      tracker.trackEntities(['node:node1']);
+    it('should store custom config values', () => {
+      tracker.requestTracking({ discoveryWindowMs: 200, debounceMs: 100 });
+      tracker.registerParticipants(['node:node1']);
 
-      vi.advanceTimersByTime(99);
+      vi.advanceTimersByTime(199);
       expect(tracker.hasPendingMeasurements()).toBe(true);
 
       vi.advanceTimersByTime(1);
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
-    it('should use default debounce when called without arguments', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities(['node:node1']);
+    it('should use default config when called without arguments', () => {
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1']);
 
-      vi.advanceTimersByTime(49);
+      vi.advanceTimersByTime(DEFAULT_DISCOVERY_WINDOW_TIMEOUT - 1);
       expect(tracker.hasPendingMeasurements()).toBe(true);
 
       vi.advanceTimersByTime(1);
@@ -48,59 +47,48 @@ describe('MeasurementTracker', () => {
     });
   });
 
-  describe('trackEntities()', () => {
-    it('should track entities as pending measurements', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities(['node:node1', 'edge:edge1']);
+  describe('registerParticipants()', () => {
+    it('should register entities and start discovery window', () => {
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1', 'edge:edge1']);
 
       expect(tracker.hasPendingMeasurements()).toBe(true);
     });
 
     it('should consume pending config', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1']);
 
       expect(tracker.isTrackingRequested()).toBe(false);
     });
 
     it('should clear pending config even for empty entity list', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities([]);
+      tracker.requestTracking();
+      tracker.registerParticipants([]);
 
       expect(tracker.isTrackingRequested()).toBe(false);
     });
 
     it('should not have pending measurements for empty entity list (no-op)', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities([]);
+      tracker.requestTracking();
+      tracker.registerParticipants([]);
 
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
     it('should resolve waitForMeasurements immediately for empty entity list', async () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities([]);
+      tracker.requestTracking();
+      tracker.registerParticipants([]);
 
       const result = tracker.waitForMeasurements();
       await expect(result).resolves.toBeUndefined();
     });
 
-    it('should signal activity immediately and start debounce', () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+    it('should start discovery window with configured discoveryWindowMs', () => {
+      tracker.requestTracking({ discoveryWindowMs: 200 });
+      tracker.registerParticipants(['node:node1']);
 
-      vi.advanceTimersByTime(49);
-      expect(tracker.hasPendingMeasurements()).toBe(true);
-
-      vi.advanceTimersByTime(1);
-      expect(tracker.hasPendingMeasurements()).toBe(false);
-    });
-
-    it('should use custom debounce from staged config', () => {
-      tracker.setNextTrackingConfig(100, 2000);
-      tracker.trackEntities(['node:node1']);
-
-      vi.advanceTimersByTime(99);
+      vi.advanceTimersByTime(199);
       expect(tracker.hasPendingMeasurements()).toBe(true);
 
       vi.advanceTimersByTime(1);
@@ -108,14 +96,178 @@ describe('MeasurementTracker', () => {
     });
   });
 
-  describe('signalNodeMeasurement()', () => {
-    it('should reset debounce timeout on subsequent activity', () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+  describe('signalObserverActivity() — ResizeObserver early signal', () => {
+    it('should extend discovery window when remaining time is below threshold', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
 
-      // Subsequent signal at 30ms resets debounce
+      // Advance to leave less than OBSERVER_ACTIVITY_MIN_REMAINING (40ms)
+      vi.advanceTimersByTime(15);
+
+      // Observer fires with 35ms remaining (< 40ms) → should extend to full 50ms
+      tracker.signalObserverActivity('node:node1');
+
+      // Should NOT expire at original time (50ms)
+      vi.advanceTimersByTime(35);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      // Should expire at 15 + 50 = 65ms
+      vi.advanceTimersByTime(15);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not extend discovery window when remaining time is exactly at threshold', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // Advance 10ms → exactly 40ms remaining (= threshold, NOT < threshold)
+      vi.advanceTimersByTime(10);
+
+      tracker.signalObserverActivity('node:node1');
+
+      // Should still expire at original 50ms (no extension)
+      vi.advanceTimersByTime(40);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not extend discovery window when remaining time is above threshold', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // Advance only 5ms → 45ms remaining (> 40ms threshold)
+      vi.advanceTimersByTime(5);
+
+      // Observer fires but plenty of time remaining → should not extend
+      tracker.signalObserverActivity('node:node1');
+
+      // Should still expire at original 50ms
+      vi.advanceTimersByTime(45);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should ignore signals for non-participant entities', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:untracked');
+
+      // Should still expire at original 50ms
+      vi.advanceTimersByTime(35);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should extend debounce when remaining time is below threshold', () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // Transition to debounce
+      tracker.signalMeasurement('node:node1');
+
+      // Advance to leave less than OBSERVER_ACTIVITY_MIN_REMAINING (40ms)
+      vi.advanceTimersByTime(15);
+
+      // Observer fires with 35ms remaining (< 40ms) → should extend to full 50ms
+      tracker.signalObserverActivity('node:node1');
+
+      // Should NOT expire at original time (50ms from measurement)
+      vi.advanceTimersByTime(35);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      // Should expire at 15 + 50 = 65ms from measurement
+      vi.advanceTimersByTime(15);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not extend debounce when remaining time is exactly at threshold', () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.signalMeasurement('node:node1');
+
+      // Advance 10ms → exactly 40ms remaining (= threshold, NOT < threshold)
+      vi.advanceTimersByTime(10);
+
+      tracker.signalObserverActivity('node:node1');
+
+      // Should still expire at original 50ms from measurement (no extension)
+      vi.advanceTimersByTime(40);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not extend debounce when remaining time is above threshold', () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // Transition to debounce
+      tracker.signalMeasurement('node:node1');
+
+      // Advance only 5ms → 45ms remaining (> 40ms threshold)
+      vi.advanceTimersByTime(5);
+
+      // Observer fires but plenty of time remaining → should not extend
+      tracker.signalObserverActivity('node:node1');
+
+      // Should still expire at original 50ms from measurement
+      vi.advanceTimersByTime(45);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should be ignored during idle phase', () => {
+      tracker.signalObserverActivity('node:node1');
+
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should handle multiple observer signals extending the discovery window', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // First observer signal at 15ms → 35ms remaining (< 40ms) → extends to 65ms
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:node1');
+
+      // Second observer signal at 30ms → 35ms remaining (< 40ms) → extends to 80ms
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:node1');
+
+      vi.advanceTimersByTime(49);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+  });
+
+  describe('signalMeasurement()', () => {
+    it('should transition from discovery window to debounce phase', () => {
+      tracker.requestTracking({ discoveryWindowMs: 100, debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // Signal measurement at 20ms → transitions to debounce
+      vi.advanceTimersByTime(20);
+      tracker.signalMeasurement('node:node1');
+
+      // Should NOT resolve at original discovery window time (100ms)
       vi.advanceTimersByTime(30);
-      tracker.signalNodeMeasurement('node1');
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      // Should resolve at 20 + 50 = 70ms (debounce from measurement)
+      // We're at 50ms now, need 20 more
+      vi.advanceTimersByTime(20);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should reset debounce on subsequent measurements', () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // First measurement → debounce starts
+      tracker.signalMeasurement('node:node1');
+
+      // Second measurement at 30ms → debounce resets
+      vi.advanceTimersByTime(30);
+      tracker.signalMeasurement('node:node1');
 
       // 30ms after reset — not yet expired
       vi.advanceTimersByTime(30);
@@ -126,57 +278,33 @@ describe('MeasurementTracker', () => {
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
-    it('should ignore signals for untracked nodes', () => {
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
+    it('should ignore signals for non-participant entities', () => {
+      tracker.requestTracking({ discoveryWindowMs: 100 });
+      tracker.registerParticipants(['node:node1']);
 
-      // Signal for an untracked node should not affect debounce
-      tracker.signalNodeMeasurement('untracked-node');
+      tracker.signalMeasurement('node:untracked');
 
-      // Original debounce from trackEntities should still expire at 50ms
-      vi.advanceTimersByTime(50);
+      // Should still be in discovery window, not debounce
+      vi.advanceTimersByTime(100);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should ignore signals during idle phase', () => {
+      tracker.signalMeasurement('node:node1');
+
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
     it('should use custom debounce timeout from config', () => {
-      tracker.setNextTrackingConfig(100, 2000);
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking({ debounceMs: 100 });
+      tracker.registerParticipants(['node:node1']);
 
-      // Subsequent signal resets debounce to 100ms
-      vi.advanceTimersByTime(50);
-      tracker.signalNodeMeasurement('node1');
+      tracker.signalMeasurement('node:node1');
 
       vi.advanceTimersByTime(99);
       expect(tracker.hasPendingMeasurements()).toBe(true);
 
       vi.advanceTimersByTime(1);
-      expect(tracker.hasPendingMeasurements()).toBe(false);
-    });
-  });
-
-  describe('signalEdgeMeasurement()', () => {
-    it('should reset debounce for edges', () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['edge:edge1']);
-
-      // Subsequent signal resets debounce
-      vi.advanceTimersByTime(30);
-      tracker.signalEdgeMeasurement('edge1');
-
-      vi.advanceTimersByTime(49);
-      expect(tracker.hasPendingMeasurements()).toBe(true);
-
-      vi.advanceTimersByTime(1);
-      expect(tracker.hasPendingMeasurements()).toBe(false);
-    });
-
-    it('should ignore signals for untracked edges', () => {
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['edge:edge1']);
-
-      tracker.signalEdgeMeasurement('untracked-edge');
-
-      vi.advanceTimersByTime(50);
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
   });
@@ -188,9 +316,9 @@ describe('MeasurementTracker', () => {
       await expect(result).resolves.toBeUndefined();
     });
 
-    it('should resolve when debounce completes', async () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+    it('should resolve when discovery window expires with no activity', async () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
 
       const promise = tracker.waitForMeasurements();
       let resolved = false;
@@ -204,9 +332,23 @@ describe('MeasurementTracker', () => {
       expect(resolved).toBe(true);
     });
 
+    it('should resolve when debounce expires after measurement', async () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.signalMeasurement('node:node1');
+
+      const promise = tracker.waitForMeasurements();
+
+      vi.advanceTimersByTime(50);
+      await promise;
+
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
     it('should return same promise for multiple waiters', () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1']);
 
       const promise1 = tracker.waitForMeasurements();
       const promise2 = tracker.waitForMeasurements();
@@ -215,8 +357,10 @@ describe('MeasurementTracker', () => {
     });
 
     it('should resolve all waiters when measurements complete', async () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.signalMeasurement('node:node1');
 
       const results: string[] = [];
       const promise1 = tracker.waitForMeasurements().then(() => results.push('waiter1'));
@@ -231,15 +375,15 @@ describe('MeasurementTracker', () => {
     });
 
     it('should create new promise after previous measurements complete', async () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
 
       const promise1 = tracker.waitForMeasurements();
       vi.advanceTimersByTime(50);
       await promise1;
 
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node2']);
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node2']);
 
       const promise2 = tracker.waitForMeasurements();
 
@@ -252,64 +396,100 @@ describe('MeasurementTracker', () => {
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
-    it('should return true after tracking entities', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities(['node:node1']);
+    it('should return true during discovery window', () => {
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1']);
 
       expect(tracker.hasPendingMeasurements()).toBe(true);
     });
 
-    it('should return false after debounce completes', () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+    it('should return true during debounce phase', () => {
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1']);
 
+      tracker.signalMeasurement('node:node1');
+
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+    });
+
+    it('should return false after discovery window expires', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      vi.advanceTimersByTime(50);
+
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should return false after debounce expires', () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.signalMeasurement('node:node1');
       vi.advanceTimersByTime(50);
 
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
   });
 
-  describe('timing model', () => {
-    it('should complete via debounce after trackEntities signals', async () => {
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
+  describe('two-phase timing model', () => {
+    it('should complete via discovery window when no measurement arrives', async () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
 
       const promise = tracker.waitForMeasurements();
 
       vi.advanceTimersByTime(50);
-
       await promise;
 
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
-    it('should extend debounce when subsequent signals arrive', async () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('should complete via debounce when measurement arrives during discovery window', async () => {
+      tracker.requestTracking({ discoveryWindowMs: 100, debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
 
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
-
-      // Subsequent signal resets debounce
+      // Measurement at 30ms → transitions to debounce
       vi.advanceTimersByTime(30);
-      tracker.signalNodeMeasurement('node1');
+      tracker.signalMeasurement('node:node1');
+
+      const promise = tracker.waitForMeasurements();
+
+      // Debounce expires at 30 + 50 = 80ms
+      vi.advanceTimersByTime(50);
+      await promise;
+
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should extend discovery window with observer signal then transition to debounce', async () => {
+      tracker.requestTracking({ discoveryWindowMs: 50, debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      // Observer signal at 15ms → 35ms remaining (< 40ms) → extends to 65ms
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:node1');
+
+      // Measurement at 45ms → transitions to debounce (expires at 95ms)
+      vi.advanceTimersByTime(30);
+      tracker.signalMeasurement('node:node1');
 
       const promise = tracker.waitForMeasurements();
 
       vi.advanceTimersByTime(50);
-
       await promise;
 
-      expect(consoleSpy).not.toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
+      expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
-    it('should handle rapid consecutive signals', async () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
+    it('should handle rapid consecutive measurements in debounce', async () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.signalMeasurement('node:node1');
 
       for (let i = 0; i < 10; i++) {
-        tracker.signalNodeMeasurement('node1');
+        tracker.signalMeasurement('node:node1');
         vi.advanceTimersByTime(10);
       }
 
@@ -320,17 +500,17 @@ describe('MeasurementTracker', () => {
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
-    it('should handle multiple tracked entities with different signal timing', async () => {
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1', 'node:node2', 'edge:edge1']);
+    it('should handle multiple participants with different signal timing', async () => {
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node1', 'node:node2', 'edge:edge1']);
 
-      tracker.signalNodeMeasurement('node1');
+      tracker.signalMeasurement('node:node1');
       vi.advanceTimersByTime(20);
 
-      tracker.signalNodeMeasurement('node2');
+      tracker.signalMeasurement('node:node2');
       vi.advanceTimersByTime(20);
 
-      tracker.signalEdgeMeasurement('edge1');
+      tracker.signalMeasurement('edge:edge1');
       vi.advanceTimersByTime(20);
 
       expect(tracker.hasPendingMeasurements()).toBe(true);
@@ -343,27 +523,27 @@ describe('MeasurementTracker', () => {
 
   describe('edge cases', () => {
     it('should handle duplicate entity IDs gracefully', () => {
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities(['node:node1', 'node:node1']);
+      tracker.requestTracking();
+      tracker.registerParticipants(['node:node1', 'node:node1']);
 
       expect(tracker.hasPendingMeasurements()).toBe(true);
     });
 
-    it('should handle signal before tracking', () => {
-      tracker.signalNodeMeasurement('node1');
+    it('should handle signal before registration', () => {
+      tracker.signalMeasurement('node:node1');
 
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
 
     it('should handle multiple sequential tracking sessions', async () => {
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
       vi.advanceTimersByTime(50);
 
       expect(tracker.hasPendingMeasurements()).toBe(false);
 
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node2']);
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node2']);
 
       expect(tracker.hasPendingMeasurements()).toBe(true);
 
@@ -373,17 +553,16 @@ describe('MeasurementTracker', () => {
     });
 
     it('should reset state between sessions', async () => {
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
       vi.advanceTimersByTime(50);
 
-      // New session — subsequent signal should still work
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node2']);
+      // New session
+      tracker.requestTracking({ debounceMs: 50 });
+      tracker.registerParticipants(['node:node2']);
 
-      // Subsequent signal resets debounce
-      vi.advanceTimersByTime(30);
-      tracker.signalNodeMeasurement('node2');
+      // Signal for new session should work
+      tracker.signalMeasurement('node:node2');
 
       vi.advanceTimersByTime(49);
       expect(tracker.hasPendingMeasurements()).toBe(true);
@@ -391,103 +570,22 @@ describe('MeasurementTracker', () => {
       vi.advanceTimersByTime(1);
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
-  });
 
-  describe('safety timeout', () => {
-    it('should force-complete with warning when safety timeout fires', async () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('should not resolve discovery window early when observer fires for different participant', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1', 'node:node2']);
 
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
+      // Observer signal for node2 at 15ms → 35ms remaining (< 40ms) → extends to 65ms
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:node2');
 
-      const promise = tracker.waitForMeasurements();
+      // Should NOT have expired at 50ms
+      vi.advanceTimersByTime(35);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
 
-      // Keep resetting debounce so it never expires on its own
-      for (let i = 0; i < 20; i++) {
-        vi.advanceTimersByTime(40);
-        tracker.signalNodeMeasurement('node1');
-      }
-
-      // Safety timeout fires at 500ms total
-      vi.advanceTimersByTime(500);
-      await promise;
-
+      // Should expire at 65ms
+      vi.advanceTimersByTime(15);
       expect(tracker.hasPendingMeasurements()).toBe(false);
-      expect(consoleSpy).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
-    });
-
-    it('should not fire safety timeout when debounce completes normally', async () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      tracker.setNextTrackingConfig(50, 2000);
-      tracker.trackEntities(['node:node1']);
-
-      vi.advanceTimersByTime(50);
-
-      expect(tracker.hasPendingMeasurements()).toBe(false);
-      expect(consoleSpy).not.toHaveBeenCalled();
-
-      // Advance past safety timeout — should not warn (already cleared)
-      vi.advanceTimersByTime(2000);
-      expect(consoleSpy).not.toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
-    });
-
-    it('should use default safety timeout', () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      tracker.setNextTrackingConfig();
-      tracker.trackEntities(['node:node1']);
-
-      // Keep debounce alive past default safety timeout
-      for (let i = 0; i < 100; i++) {
-        vi.advanceTimersByTime(40);
-        tracker.signalNodeMeasurement('node1');
-      }
-
-      vi.advanceTimersByTime(DEFAULT_SAFETY_TIMEOUT);
-
-      expect(tracker.hasPendingMeasurements()).toBe(false);
-      expect(consoleSpy).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
-    });
-
-    it('should use custom safety timeout', () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      tracker.setNextTrackingConfig(50, 300);
-      tracker.trackEntities(['node:node1']);
-
-      // Keep debounce alive
-      for (let i = 0; i < 10; i++) {
-        vi.advanceTimersByTime(40);
-        tracker.signalNodeMeasurement('node1');
-      }
-
-      vi.advanceTimersByTime(300);
-
-      expect(tracker.hasPendingMeasurements()).toBe(false);
-      expect(consoleSpy).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
-    });
-
-    it('should cancel safety timeout between sessions', () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      tracker.setNextTrackingConfig(50, 500);
-      tracker.trackEntities(['node:node1']);
-      vi.advanceTimersByTime(50); // debounce completes, clears safety timeout
-
-      // Safety timeout from first session should not fire
-      vi.advanceTimersByTime(500);
-      expect(consoleSpy).not.toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
     });
   });
 });
