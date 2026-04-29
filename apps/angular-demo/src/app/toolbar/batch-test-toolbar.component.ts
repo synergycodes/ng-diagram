@@ -1,4 +1,4 @@
-import { Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import {
   type EdgeLabelPosition,
   NgDiagramModelService,
@@ -12,19 +12,20 @@ import { type DynamicPortData } from '../node-template/dynamic-port-node/dynamic
 @Component({
   selector: 'app-batch-test-toolbar',
   styleUrl: './toolbar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div>
       <button (click)="exit.emit()">Exit</button>
-      <button (click)="onToggleDebugMode()">{{ isDebugMode ? 'Debug: ON' : 'Debug: OFF' }}</button>
+      <button (click)="onToggleDebugMode()">{{ isDebugMode() ? 'Debug: ON' : 'Debug: OFF' }}</button>
       <span class="separator">|</span>
       <span class="group-label">Single-node:</span>
       <button (click)="togglePortSides()">Toggle Port Sides</button>
       <button (click)="togglePortOrigins()">Toggle Port Origins</button>
       <span class="separator">|</span>
       <span class="group-label">Batch (200):</span>
-      <button [disabled]="!isDynamicPortType" (click)="batchAddPort()">Add Port</button>
-      <button [disabled]="!isDynamicPortType" (click)="batchRemovePort()">Remove Port</button>
-      <button [disabled]="!isDynamicPortType" (click)="batchToggleSide()">Toggle Side</button>
+      <button [disabled]="!isDynamicPortType()" (click)="batchAddPort()">Add Port</button>
+      <button [disabled]="!isDynamicPortType()" (click)="batchRemovePort()">Remove Port</button>
+      <button [disabled]="!isDynamicPortType()" (click)="batchToggleSide()">Toggle Side</button>
       <button (click)="toggleNodeType()">Toggle Node Type</button>
       <span class="separator">|</span>
       <span class="group-label">Labels:</span>
@@ -32,8 +33,8 @@ import { type DynamicPortData } from '../node-template/dynamic-port-node/dynamic
       <button (click)="batchToggleLabel()">Batch Toggle Label</button>
       <span class="separator">|</span>
       <span class="group-label">Measurement:</span>
-      <button [disabled]="!isDynamicPortType" (click)="resizeAllNodes()">Resize All Nodes</button>
-      <button [disabled]="!isDynamicPortType" (click)="repositionPorts()">Reposition Ports (CSS)</button>
+      <button [disabled]="!isDynamicPortType()" (click)="resizeAllNodes()">Resize All Nodes</button>
+      <button [disabled]="!isDynamicPortType()" (click)="repositionPorts()">Reposition Ports (CSS)</button>
       <span class="separator">|</span>
       <button (click)="zoomToFit()">Zoom to Fit</button>
     </div>
@@ -46,17 +47,13 @@ export class BatchTestToolbarComponent {
 
   exit = output<void>();
 
-  isDebugMode = false;
-  isDynamicPortType = true;
+  isDebugMode = signal(false);
+  isDynamicPortType = signal(true);
   private portCounter = 1;
 
-  resetPortCounter(): void {
-    this.portCounter = 1;
-  }
-
   onToggleDebugMode(): void {
-    this.isDebugMode = !this.isDebugMode;
-    this.ngDiagramService.updateConfig({ debugMode: this.isDebugMode });
+    this.isDebugMode.update((v) => !v);
+    this.ngDiagramService.updateConfig({ debugMode: this.isDebugMode() });
   }
 
   togglePortSides(): void {
@@ -141,8 +138,8 @@ export class BatchTestToolbarComponent {
     const nodes = this.modelService.getModel().getNodes();
     const gridNodes = nodes.filter((n) => n.id.startsWith('dp-grid-'));
     if (gridNodes.length === 0) return;
-    this.isDynamicPortType = !this.isDynamicPortType;
-    const targetType = this.isDynamicPortType ? 'dynamic-port' : undefined;
+    this.isDynamicPortType.update((v) => !v);
+    const targetType = this.isDynamicPortType() ? 'dynamic-port' : undefined;
     this.modelService.updateNodes(gridNodes.map((node) => ({ id: node.id, type: targetType })));
   }
 
