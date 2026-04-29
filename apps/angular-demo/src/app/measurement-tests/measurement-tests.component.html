@@ -10,6 +10,7 @@
     <button (click)="testDataDrivenPortSideChange()" [disabled]="isRunning()">Port Side (data)</button>
     <button (click)="testPositionAndDataChange()" [disabled]="isRunning()">Position + Port Side</button>
     <button (click)="testEdgeLabelChange()" [disabled]="isRunning()">Edge Label</button>
+    <button (click)="testCssPortReposition()" [disabled]="isRunning()">CSS Port Reposition</button>
   </div>
 
   @if (results().length > 0) {

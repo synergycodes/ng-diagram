@@ -29,7 +29,7 @@ export class MeasurementTestsComponent {
   results = signal<TestResult[]>([]);
   isRunning = signal(false);
 
-  private testCounter = 0;
+  private testCounter = Date.now();
 
   async runAll() {
     this.results.set([]);
@@ -41,6 +41,7 @@ export class MeasurementTestsComponent {
     await this.testDataDrivenPortSideChange();
     await this.testPositionAndDataChange();
     await this.testEdgeLabelChange();
+    await this.testCssPortReposition();
 
     this.isRunning.set(false);
   }
@@ -418,6 +419,85 @@ export class MeasurementTestsComponent {
         assert(
           label.position.x >= -510 && label.position.x <= -190,
           `label x should be between nodes (-500 to -200), got ${label.position.x}`
+        );
+      }
+    });
+  }
+
+  /**
+   * EXPECTED TO FAIL — NGD-144: no public API for invalidating port measurements after CSS-only reposition.
+   * ResizeObserver doesn't detect position-only changes. Until NGD-144 is implemented, this test
+   * documents the limitation.
+   */
+  async testCssPortReposition() {
+    const id = `test-css-repos-${this.testCounter++}`;
+
+    // Create node with 2 left-side ports — positioned at 33% and 66% via CSS
+    await this.ngDiagramService.transaction(
+      () => {
+        this.ngDiagramModelService.addNodes([
+          {
+            id,
+            type: 'dynamic-port',
+            position: { x: -500, y: -700 },
+            data: {
+              text: 'CSS Reposition',
+              ports: [
+                { id: 'p-a', side: 'left' as PortSide },
+                { id: 'p-b', side: 'left' as PortSide },
+              ],
+            },
+          },
+        ]);
+      },
+      { waitForMeasurements: true }
+    );
+
+    const nodeBefore = this.getNode(id)!;
+    const pABefore = nodeBefore.measuredPorts?.find((p: Port) => p.id === 'p-a');
+    const pBBefore = nodeBefore.measuredPorts?.find((p: Port) => p.id === 'p-b');
+    const t1 = performance.now();
+
+    // Reverse port order — CSS positions swap (p-a goes from 33% to 66%, p-b from 66% to 33%)
+    // but side stays 'left', so no side change triggers invalidate
+    await this.ngDiagramService.transaction(
+      () => {
+        this.ngDiagramModelService.updateNodes([
+          {
+            id,
+            data: {
+              text: 'CSS Reposition',
+              ports: [
+                { id: 'p-b', side: 'left' as PortSide },
+                { id: 'p-a', side: 'left' as PortSide },
+              ],
+            },
+          },
+        ]);
+      },
+      { waitForMeasurements: true }
+    );
+
+    const elapsed = performance.now() - t1;
+    const node = this.getNode(id)!;
+    const pA = node.measuredPorts?.find((p: Port) => p.id === 'p-a');
+    const pB = node.measuredPorts?.find((p: Port) => p.id === 'p-b');
+
+    this.addResult('CSS port reposition (expected fail — NGD-144)', elapsed, (assert) => {
+      // Ports should still exist with correct side
+      assert(pA?.side === 'left', `p-a side: expected 'left', got '${pA?.side}'`);
+      assert(pB?.side === 'left', `p-b side: expected 'left', got '${pB?.side}'`);
+
+      // After reorder: p-a should have moved from ~33% to ~66% (position.y should increase)
+      // and p-b should have moved from ~66% to ~33% (position.y should decrease)
+      if (pABefore?.position && pA?.position && pBBefore?.position && pB?.position) {
+        assert(
+          pA.position.y > pABefore.position.y + PX_TOLERANCE,
+          `p-a should move down after reorder: before y=${r(pABefore.position.y)}, after y=${r(pA.position.y)}`
+        );
+        assert(
+          pB.position.y < pBBefore.position.y - PX_TOLERANCE,
+          `p-b should move up after reorder: before y=${r(pBBefore.position.y)}, after y=${r(pB.position.y)}`
         );
       }
     });
