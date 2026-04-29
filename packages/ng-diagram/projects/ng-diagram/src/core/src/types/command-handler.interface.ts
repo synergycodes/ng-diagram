@@ -1,24 +1,21 @@
 import { AddToGroupCommand } from '../command-handler/commands/add-to-group';
 import {
-  AddEdgeLabelsCommand,
+  AddEdgeLabelsBulkCommand,
   AddEdgesCommand,
   AddNodesCommand,
   AddPortsBulkCommand,
-  AddPortsCommand,
   ClearModelCommand,
-  DeleteEdgeLabelsCommand,
+  DeleteEdgeLabelsBulkCommand,
   DeleteEdgesCommand,
   DeleteNodesCommand,
   DeletePortsBulkCommand,
-  DeletePortsCommand,
   PaletteDropNodeCommand,
   UpdateEdgeCommand,
-  UpdateEdgeLabelsCommand,
+  UpdateEdgeLabelsBulkCommand,
   UpdateEdgesCommand,
   UpdateNodeCommand,
   UpdateNodesCommand,
   UpdatePortsBulkCommand,
-  UpdatePortsCommand,
 } from '../command-handler/commands/add-update-delete';
 import { CenterOnNodeCommand, CenterOnRectCommand } from '../command-handler/commands/centering';
 import { CopyCommand, PasteCommand } from '../command-handler/commands/copy-paste';
@@ -90,17 +87,14 @@ export type Command =
   | ResizeNodeStartCommand
   | ResizeNodeStopCommand
   | ZoomCommand
-  | AddPortsCommand
   | AddPortsBulkCommand
-  | UpdatePortsCommand
   | UpdatePortsBulkCommand
-  | DeletePortsCommand
   | DeletePortsBulkCommand
   | BringToFrontCommand
   | SendToBackCommand
-  | AddEdgeLabelsCommand
-  | UpdateEdgeLabelsCommand
-  | DeleteEdgeLabelsCommand
+  | AddEdgeLabelsBulkCommand
+  | UpdateEdgeLabelsBulkCommand
+  | DeleteEdgeLabelsBulkCommand
   | RotateNodeToCommand
   | RotateNodeStartCommand
   | RotateNodeStopCommand

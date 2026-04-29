@@ -3,62 +3,75 @@ import type { LabelUpdate } from '../../label-batch-processor/label-batch-proces
 import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import type { Node, Port } from '../../types';
 import { EdgeLabel } from '../../types';
-import { getRect, isSameRect } from '../../utils';
+import { getRect, isSameRect, isSameSize } from '../../utils';
 import { Updater } from '../updater.interface';
-import { DirectPortUpdateStrategy } from './direct-port-update-strategy';
-import type { PortUpdateStrategy } from './port-update-strategy.interface';
-import { VirtualizedPortUpdateStrategy } from './virtualized-port-update-strategy';
 
 export class InternalUpdater implements Updater {
-  private readonly portUpdateStrategy: PortUpdateStrategy;
+  // Stable callback references so BatchProcessor can group keys into a single invocation
+  private readonly onPortAddsFlush = (all: Map<string, Port[]>) => {
+    return this.flowCore.commandHandler.emit('addPortsBulk', { additions: all });
+  };
+  private readonly onPortUpdatesFlush = (all: Map<string, PortUpdate[]>) => {
+    return this.flowCore.commandHandler.emit('updatePortsBulk', { updates: all });
+  };
+  private readonly onPortDeletesFlush = (all: Map<string, string[]>) => {
+    return this.flowCore.commandHandler.emit('deletePortsBulk', { deletions: all });
+  };
+  private readonly onLabelAddsFlush = (all: Map<string, EdgeLabel[]>) => {
+    return this.flowCore.commandHandler.emit('addEdgeLabelsBulk', { additions: all });
+  };
+  private readonly onLabelUpdatesFlush = (all: Map<string, LabelUpdate[]>) => {
+    return this.flowCore.commandHandler.emit('updateEdgeLabelsBulk', { updates: all });
+  };
+  private readonly onLabelDeletesFlush = (all: Map<string, string[]>) => {
+    return this.flowCore.commandHandler.emit('deleteEdgeLabelsBulk', { deletions: all });
+  };
 
-  constructor(private readonly flowCore: FlowCore) {
-    this.portUpdateStrategy = this.flowCore.isVirtualizationActive
-      ? new VirtualizedPortUpdateStrategy(flowCore)
-      : new DirectPortUpdateStrategy(flowCore);
-  }
+  constructor(private readonly flowCore: FlowCore) {}
 
   /**
    * @internal
-   * Internal method to initialize a node size
    */
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void {
-    const node = this.flowCore.getNodeById(nodeId);
-
-    if (!node || this.isResizing() || this.hasSameSize(node, size)) {
-      return;
-    }
-
-    this.flowCore.commandHandler.emit('resizeNode', { id: nodeId, size });
-  }
-
-  private isResizing(): boolean {
-    return this.flowCore.actionStateManager.isResizing();
-  }
-
-  private hasSameSize(node: Node, size: NonNullable<Node['size']>): boolean {
-    return isSameRect(getRect(node), getRect({ size }));
+    this.applyNodeSizes([{ id: nodeId, size }]);
   }
 
   /**
    * @internal
-   * Internal method to add a new port to the flow
+   */
+  applyNodeSizes(updates: { id: string; size: NonNullable<Node['size']> }[]): void {
+    const isResizing = this.flowCore.actionStateManager.isResizing();
+
+    const filtered = updates.filter(({ id, size }) => {
+      const node = this.flowCore.getNodeById(id);
+      if (!node) return false;
+      // During active user resize, only accept initial sizes (nodes without size yet).
+      // Size-changed nodes are suppressed — the resize action is the source of truth.
+      if (node.size && isResizing) return false;
+      return !isSameRect(getRect(node), getRect({ size }));
+    });
+
+    if (filtered.length > 0) {
+      this.flowCore.commandHandler.emit('updateNodes', { nodes: filtered });
+    }
+  }
+
+  /**
+   * @internal
    */
   addPort(nodeId: string, port: Port): void {
-    this.portUpdateStrategy.addPort(nodeId, port);
+    this.flowCore.portBatchProcessor.processAdd(nodeId, port, this.onPortAddsFlush);
   }
 
   /**
    * @internal
-   * Internal method to delete a port from the flow
    */
   deletePort(nodeId: string, portId: string): void {
-    this.portUpdateStrategy.deletePort(nodeId, portId);
+    this.flowCore.portBatchProcessor.processDelete(nodeId, portId, this.onPortDeletesFlush);
   }
 
   /**
    * @internal
-   * Apply port changes (size, position, side, type, etc.) through the batch processor.
    * Filters out updates where no property actually differs from current state.
    */
   applyPortChanges(nodeId: string, portUpdates: PortUpdate[]): void {
@@ -72,22 +85,27 @@ export class InternalUpdater implements Updater {
       return;
     }
 
-    this.portUpdateStrategy.updatePorts(nodeId, filteredUpdates);
+    for (const portUpdate of filteredUpdates) {
+      this.flowCore.portBatchProcessor.processUpdate(nodeId, portUpdate, this.onPortUpdatesFlush);
+    }
   }
 
   /**
    * @internal
-   * Internal method to add a new edge label to the flow
    */
   addEdgeLabel(edgeId: string, label: EdgeLabel): void {
-    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, (edgeId, labels) => {
-      this.flowCore.commandHandler.emit('addEdgeLabels', { edgeId, labels });
-    });
+    this.flowCore.labelBatchProcessor.processAdd(edgeId, label, this.onLabelAddsFlush);
   }
 
   /**
    * @internal
-   * Apply edge label changes (size, positionOnEdge, etc.) through the batch processor.
+   */
+  deleteEdgeLabel(edgeId: string, labelId: string): void {
+    this.flowCore.labelBatchProcessor.processDelete(edgeId, labelId, this.onLabelDeletesFlush);
+  }
+
+  /**
+   * @internal
    * Filters out updates where no property actually differs from current state.
    */
   applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void {
@@ -97,15 +115,13 @@ export class InternalUpdater implements Updater {
     }
 
     for (const labelUpdate of filteredUpdates) {
-      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, (edgeId, batchedUpdates) => {
-        this.flowCore.commandHandler.emit('updateEdgeLabels', { edgeId, labelUpdates: batchedUpdates });
-      });
+      this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, this.onLabelUpdatesFlush);
     }
   }
 
   /**
    * Filters out port updates where none of the changed properties actually differ from current state.
-   * Uses 1px threshold for size/position, exact equality for side/type.
+   * Uses exact equality for all comparisons (size, position, side, type).
    */
   private filterUnchangedPortUpdates(node: Node, portUpdates: PortUpdate[]): PortUpdate[] {
     const measuredPortsMap = new Map((node.measuredPorts ?? []).map((port) => [port.id, port]));
@@ -140,7 +156,7 @@ export class InternalUpdater implements Updater {
 
   /**
    * Filters out label updates where none of the changed properties actually differ from current state.
-   * Uses 1px threshold for size, exact equality for positionOnEdge.
+   * Uses exact equality for all comparisons (size, positionOnEdge).
    */
   private filterUnchangedLabelUpdates(edgeId: string, labelUpdates: LabelUpdate[]): LabelUpdate[] {
     const edge = this.flowCore.getEdgeById(edgeId);
@@ -165,7 +181,7 @@ export class InternalUpdater implements Updater {
           return true;
         }
 
-        if (!isSameRect(getRect({ size: label.size }), getRect({ size: labelChanges.size }))) {
+        if (!isSameSize(label.size, labelChanges.size)) {
           return true;
         }
       }

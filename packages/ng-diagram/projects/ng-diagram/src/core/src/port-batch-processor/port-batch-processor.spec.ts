@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Port } from '../types';
-import { PortBatchProcessor, PortUpdate } from './port-batch-processor';
+import { Node, Port } from '../types';
+import { PortBatchProcessor, PortUpdate, toPortUpdates } from './port-batch-processor';
 
 describe('PortBatchProcessor', () => {
   let processor: PortBatchProcessor;
 
   beforeEach(() => {
-    processor = new PortBatchProcessor();
+    processor = new PortBatchProcessor(() => undefined);
     vi.useFakeTimers();
   });
 
@@ -14,237 +14,113 @@ describe('PortBatchProcessor', () => {
     vi.useRealTimers();
   });
 
-  const createPort = (id: string, nodeId = 'node1'): Port => ({
-    id,
-    nodeId,
-    type: 'source',
-    side: 'left',
+  it('should accept Port items for add operations', async () => {
+    const onFlush = vi.fn();
+    const port: Port = { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' };
+
+    processor.processAdd('node1', port, onFlush);
+    await vi.runAllTimersAsync();
+
+    expect(onFlush).toHaveBeenCalledTimes(1);
+    const additions = onFlush.mock.calls[0][0] as Map<string, Port[]>;
+    expect(additions.get('node1')).toEqual([port]);
   });
 
-  const createPortUpdate = (portId: string): PortUpdate => ({
-    portId,
-    portChanges: { side: 'right' },
+  it('should accept PortUpdate items for update operations', async () => {
+    const onFlush = vi.fn();
+    const update: PortUpdate = { portId: 'port-1', portChanges: { side: 'right' } };
+
+    processor.processUpdate('node1', update, onFlush);
+    await vi.runAllTimersAsync();
+
+    expect(onFlush).toHaveBeenCalledTimes(1);
+    const updates = onFlush.mock.calls[0][0] as Map<string, PortUpdate[]>;
+    expect(updates.get('node1')).toEqual([update]);
   });
 
-  describe('Standard Mode (per-node batching)', () => {
-    describe('processAdd', () => {
-      it('should batch multiple port additions for the same node in the same tick', async () => {
-        const onFlush = vi.fn();
+  it('should accept port IDs for delete operations', async () => {
+    const onFlush = vi.fn();
 
-        processor.processAdd('node1', createPort('port1'), onFlush);
-        processor.processAdd('node1', createPort('port2'), onFlush);
-        processor.processAdd('node1', createPort('port3'), onFlush);
+    processor.processDelete('node1', 'port-1', onFlush);
+    await vi.runAllTimersAsync();
 
-        expect(onFlush).not.toHaveBeenCalled();
-
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(1);
-        expect(onFlush).toHaveBeenCalledWith('node1', [createPort('port1'), createPort('port2'), createPort('port3')]);
-      });
-
-      it('should batch separately for different nodes', async () => {
-        const onFlush = vi.fn();
-
-        processor.processAdd('node1', createPort('port1'), onFlush);
-        processor.processAdd('node2', createPort('port2'), onFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(2);
-        expect(onFlush).toHaveBeenCalledWith('node1', [createPort('port1')]);
-        expect(onFlush).toHaveBeenCalledWith('node2', [createPort('port2')]);
-      });
-
-      it('should handle subsequent batches after flush', async () => {
-        const onFlush = vi.fn();
-
-        processor.processAdd('node1', createPort('port1'), onFlush);
-        await vi.runAllTimersAsync();
-
-        processor.processAdd('node1', createPort('port2'), onFlush);
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(2);
-        expect(onFlush).toHaveBeenNthCalledWith(1, 'node1', [createPort('port1')]);
-        expect(onFlush).toHaveBeenNthCalledWith(2, 'node1', [createPort('port2')]);
-      });
-    });
-
-    describe('processUpdate', () => {
-      it('should batch multiple port updates for the same node in the same tick', async () => {
-        const onFlush = vi.fn();
-
-        processor.processUpdate('node1', createPortUpdate('port1'), onFlush);
-        processor.processUpdate('node1', createPortUpdate('port2'), onFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(1);
-        expect(onFlush).toHaveBeenCalledWith('node1', [createPortUpdate('port1'), createPortUpdate('port2')]);
-      });
-
-      it('should batch separately for different nodes', async () => {
-        const onFlush = vi.fn();
-
-        processor.processUpdate('node1', createPortUpdate('port1'), onFlush);
-        processor.processUpdate('node2', createPortUpdate('port2'), onFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(2);
-      });
-    });
-
-    describe('processDelete', () => {
-      it('should batch multiple port deletions for the same node in the same tick', async () => {
-        const onFlush = vi.fn();
-
-        processor.processDelete('node1', 'port1', onFlush);
-        processor.processDelete('node1', 'port2', onFlush);
-        processor.processDelete('node1', 'port3', onFlush);
-
-        expect(onFlush).not.toHaveBeenCalled();
-
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(1);
-        expect(onFlush).toHaveBeenCalledWith('node1', ['port1', 'port2', 'port3']);
-      });
-
-      it('should batch separately for different nodes', async () => {
-        const onFlush = vi.fn();
-
-        processor.processDelete('node1', 'port1', onFlush);
-        processor.processDelete('node2', 'port2', onFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(2);
-        expect(onFlush).toHaveBeenCalledWith('node1', ['port1']);
-        expect(onFlush).toHaveBeenCalledWith('node2', ['port2']);
-      });
-
-      it('should handle subsequent batches after flush', async () => {
-        const onFlush = vi.fn();
-
-        processor.processDelete('node1', 'port1', onFlush);
-        await vi.runAllTimersAsync();
-
-        processor.processDelete('node1', 'port2', onFlush);
-        await vi.runAllTimersAsync();
-
-        expect(onFlush).toHaveBeenCalledTimes(2);
-        expect(onFlush).toHaveBeenNthCalledWith(1, 'node1', ['port1']);
-        expect(onFlush).toHaveBeenNthCalledWith(2, 'node1', ['port2']);
-      });
-
-      it('should fix race condition when multiple ports are deleted simultaneously', async () => {
-        // This is the core bug we fixed: when @if toggles off, multiple ports
-        // call ngOnDestroy in the same tick. Without batching, each emits
-        // a separate command causing race conditions.
-        const onFlush = vi.fn();
-
-        // Simulate two ports being destroyed in the same tick
-        processor.processDelete('node1', 'port-left', onFlush);
-        processor.processDelete('node1', 'port-right', onFlush);
-
-        await vi.runAllTimersAsync();
-
-        // Should result in a single batched deletion
-        expect(onFlush).toHaveBeenCalledTimes(1);
-        expect(onFlush).toHaveBeenCalledWith('node1', ['port-left', 'port-right']);
-      });
-    });
+    expect(onFlush).toHaveBeenCalledTimes(1);
+    const deletions = onFlush.mock.calls[0][0] as Map<string, string[]>;
+    expect(deletions.get('node1')).toEqual(['port-1']);
   });
 
-  describe('Virtualization Mode (global batching)', () => {
-    describe('processAddBatched', () => {
-      it('should batch all additions across all nodes into single callback', async () => {
-        const onBatchFlush = vi.fn();
+  describe('getMeasuredIds', () => {
+    it('should filter out adds for ports with valid size and position', async () => {
+      const node = {
+        measuredPorts: [{ id: 'port-1', size: { width: 10, height: 10 }, position: { x: 5, y: 5 } }],
+      } as unknown as Node;
+      const proc = new PortBatchProcessor(() => node);
+      vi.useFakeTimers();
 
-        processor.processAddBatched('node1', createPort('port1'), onBatchFlush);
-        processor.processAddBatched('node2', createPort('port2'), onBatchFlush);
-        processor.processAddBatched('node1', createPort('port3'), onBatchFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onBatchFlush).toHaveBeenCalledTimes(1);
-
-        const additions = onBatchFlush.mock.calls[0][0] as Map<string, Port[]>;
-        expect(additions.get('node1')).toEqual([createPort('port1'), createPort('port3')]);
-        expect(additions.get('node2')).toEqual([createPort('port2')]);
-      });
-    });
-
-    describe('processUpdateBatched', () => {
-      it('should batch all updates across all nodes into single callback', async () => {
-        const onBatchFlush = vi.fn();
-
-        processor.processUpdateBatched('node1', createPortUpdate('port1'), onBatchFlush);
-        processor.processUpdateBatched('node2', createPortUpdate('port2'), onBatchFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onBatchFlush).toHaveBeenCalledTimes(1);
-
-        const updates = onBatchFlush.mock.calls[0][0] as Map<string, PortUpdate[]>;
-        expect(updates.get('node1')).toEqual([createPortUpdate('port1')]);
-        expect(updates.get('node2')).toEqual([createPortUpdate('port2')]);
-      });
-    });
-
-    describe('processDeleteBatched', () => {
-      it('should batch all deletions across all nodes into single callback', async () => {
-        const onBatchFlush = vi.fn();
-
-        processor.processDeleteBatched('node1', 'port1', onBatchFlush);
-        processor.processDeleteBatched('node2', 'port2', onBatchFlush);
-        processor.processDeleteBatched('node1', 'port3', onBatchFlush);
-
-        await vi.runAllTimersAsync();
-
-        expect(onBatchFlush).toHaveBeenCalledTimes(1);
-
-        const deletions = onBatchFlush.mock.calls[0][0] as Map<string, string[]>;
-        expect(deletions.get('node1')).toEqual(['port1', 'port3']);
-        expect(deletions.get('node2')).toEqual(['port2']);
-      });
-
-      it('should handle virtualization scenario where many nodes are destroyed simultaneously', async () => {
-        const onBatchFlush = vi.fn();
-
-        // Simulate many nodes being virtualized (scrolled out of view)
-        for (let i = 0; i < 100; i++) {
-          processor.processDeleteBatched(`node${i}`, `port${i}`, onBatchFlush);
-        }
-
-        await vi.runAllTimersAsync();
-
-        // Should result in a single batched callback
-        expect(onBatchFlush).toHaveBeenCalledTimes(1);
-
-        const deletions = onBatchFlush.mock.calls[0][0] as Map<string, string[]>;
-        expect(deletions.size).toBe(100);
-      });
-    });
-  });
-
-  describe('Mixed operations', () => {
-    it('should keep add, update, and delete operations separate', async () => {
-      const onAddFlush = vi.fn();
-      const onUpdateFlush = vi.fn();
-      const onDeleteFlush = vi.fn();
-
-      processor.processAdd('node1', createPort('port1'), onAddFlush);
-      processor.processUpdate('node1', createPortUpdate('port2'), onUpdateFlush);
-      processor.processDelete('node1', 'port3', onDeleteFlush);
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
 
       await vi.runAllTimersAsync();
 
-      expect(onAddFlush).toHaveBeenCalledTimes(1);
-      expect(onUpdateFlush).toHaveBeenCalledTimes(1);
-      expect(onDeleteFlush).toHaveBeenCalledTimes(1);
+      expect(onFlush).not.toHaveBeenCalled();
     });
+
+    it('should keep adds for ports missing size', async () => {
+      const node = {
+        measuredPorts: [{ id: 'port-1', size: undefined, position: { x: 5, y: 5 } }],
+      } as unknown as Node;
+      const proc = new PortBatchProcessor(() => node);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+
+    it('should keep adds for ports missing position', async () => {
+      const node = {
+        measuredPorts: [{ id: 'port-1', size: { width: 10, height: 10 }, position: undefined }],
+      } as unknown as Node;
+      const proc = new PortBatchProcessor(() => node);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return empty set when node is not found', async () => {
+      const proc = new PortBatchProcessor(() => null);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe('toPortUpdates', () => {
+  it('should convert port data to PortUpdate array', () => {
+    const ports = [
+      { id: 'p1', size: { width: 10, height: 10 }, position: { x: 0, y: 0 } },
+      { id: 'p2', size: { width: 20, height: 20 }, position: { x: 5, y: 5 } },
+    ];
+
+    const result = toPortUpdates(ports);
+
+    expect(result).toEqual([
+      { portId: 'p1', portChanges: { size: { width: 10, height: 10 }, position: { x: 0, y: 0 } } },
+      { portId: 'p2', portChanges: { size: { width: 20, height: 20 }, position: { x: 5, y: 5 } } },
+    ]);
   });
 });

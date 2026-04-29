@@ -25,12 +25,20 @@
     <ng-diagram-background type="grid"></ng-diagram-background>
   </ng-diagram>
   <ng-diagram-minimap [nodeStyle]="nodeStyle" [minimapNodeTemplateMap]="minimapNodeTemplateMap" />
-  <app-toolbar
-    (testVirtualizationClick)="enableVirtualizationTest()"
-    (reinitializeModelClick)="onReinitializeModel()"
-    (saveModelClick)="onSaveModel()"
-    (loadModelClick)="onLoadModel()"
-    (simulateModelDownloadClick)="onSimulateModelDownload()"
-  />
+  @if (batchTestMode()) {
+    <app-batch-test-toolbar (exit)="exitBatchTest()" />
+  } @else if (measurementTestMode()) {
+    <app-measurement-tests (exit)="exitMeasurementTest()" />
+  } @else {
+    <app-toolbar
+      (enterBatchTest)="enterBatchTest()"
+      (measurementTestEnter)="enterMeasurementTest()"
+      (testVirtualizationClick)="enableVirtualizationTest()"
+      (reinitializeModelClick)="onReinitializeModel()"
+      (saveModelClick)="onSaveModel()"
+      (loadModelClick)="onLoadModel()"
+      (simulateModelDownloadClick)="onSimulateModelDownload()"
+    />
+  }
   <app-palette [model]="paletteModel" />
 </div>

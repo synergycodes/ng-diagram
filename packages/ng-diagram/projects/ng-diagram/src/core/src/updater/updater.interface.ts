@@ -4,9 +4,14 @@ import type { LabelUpdate } from '../label-batch-processor/label-batch-processor
 
 export interface Updater {
   /**
-   * Apply node size changes
+   * Apply a single node size change
    */
   applyNodeSize(nodeId: string, size: NonNullable<Node['size']>): void;
+
+  /**
+   * Apply node size changes in a single batch
+   */
+  applyNodeSizes(updates: { id: string; size: NonNullable<Node['size']> }[]): void;
 
   /**
    * Add a port to a node
@@ -27,4 +32,9 @@ export interface Updater {
    * Apply edge label changes (size, positionOnEdge, etc.)
    */
   applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void;
+
+  /**
+   * Delete an edge label
+   */
+  deleteEdgeLabel(edgeId: string, labelId: string): void;
 }

@@ -132,6 +132,12 @@ export class InitUpdater implements Updater {
     this.tryFinish();
   }
 
+  applyNodeSizes(updates: { id: string; size: NonNullable<Node['size']> }[]): void {
+    for (const { id, size } of updates) {
+      this.applyNodeSize(id, size);
+    }
+  }
+
   /**
    * Adds a new port created during initialization.
    * Queues if finishing, otherwise adds to init state and notifies stability detector.
@@ -187,6 +193,13 @@ export class InitUpdater implements Updater {
 
     this.initState.addLabel(edgeId, label);
     this.labelStabilityDetector.notify();
+  }
+
+  /**
+   * Deletes an edge label. During initialization, queues for replay after init completes.
+   */
+  deleteEdgeLabel(edgeId: string, labelId: string): void {
+    this.lateArrivalQueue.enqueue({ method: 'deleteEdgeLabel', args: [edgeId, labelId] });
   }
 
   /**
