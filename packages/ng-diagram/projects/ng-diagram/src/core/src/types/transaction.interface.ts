@@ -42,9 +42,9 @@ export interface TransactionOptions {
  * @internal
  */
 export interface InternalTransactionOptions extends TransactionOptions {
-  /** Discovery window in ms after transaction commit — waits for measurement activity to begin. @default 50 */
+  /** Discovery window in ms after transaction commit — waits for measurement activity to begin. */
   _measurementDiscoveryWindowTimeout?: number;
-  /** Debounce timeout in ms after last measurement activity before completing. @default 50 */
+  /** Debounce timeout in ms after last measurement activity before completing. */
   _measurementDebounceTimeout?: number;
 }
 
