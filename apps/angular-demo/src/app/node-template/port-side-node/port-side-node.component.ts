@@ -22,6 +22,7 @@ export class PortSideNodeComponent implements NgDiagramNodeTemplate<{ text: stri
   node = input.required<Node<{ text: string }>>();
 
   portSide = signal<PortSide>('bottom');
+  oppositePortSide = computed<PortSide>(() => (this.portSide() === 'bottom' ? 'top' : 'left'));
   text = computed(() => this.node()?.data?.text || 'Port Side Node');
 
   onTogglePortSide(): void {

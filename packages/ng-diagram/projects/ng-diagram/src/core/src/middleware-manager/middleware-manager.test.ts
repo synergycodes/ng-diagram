@@ -92,8 +92,8 @@ describe('MiddlewareManager', () => {
       model: mockModel,
       measurementTracker: {
         hasPendingMeasurements: vi.fn().mockReturnValue(false),
-        signalNodeMeasurement: vi.fn(),
-        signalEdgeMeasurement: vi.fn(),
+        signalMeasurement: vi.fn(),
+        signalObserverActivity: vi.fn(),
       },
     } as unknown as FlowCore;
     middlewareManager = new MiddlewareManager(flowCore);

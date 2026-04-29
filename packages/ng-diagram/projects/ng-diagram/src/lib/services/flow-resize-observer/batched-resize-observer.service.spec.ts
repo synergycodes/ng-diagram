@@ -68,7 +68,7 @@ describe('BatchResizeObserverService', () => {
       ] as unknown as ResizeObserverEntry[];
 
       const processor = vi.fn();
-      service.setBatchProcessor(processor);
+      service.configure({ processBatch: processor });
 
       service['pendingEntries'] = [...mockEntries];
       service['rafId'] = 123;
@@ -82,7 +82,7 @@ describe('BatchResizeObserverService', () => {
 
     it('should not call batch processor if no entries', () => {
       const processor = vi.fn();
-      service.setBatchProcessor(processor);
+      service.configure({ processBatch: processor });
 
       service['pendingEntries'] = [];
       service['processBatch']();

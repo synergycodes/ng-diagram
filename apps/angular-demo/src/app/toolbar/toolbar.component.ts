@@ -29,7 +29,9 @@ export class ToolbarComponent {
   saveModelClick = output<void>();
   loadModelClick = output<void>();
   simulateModelDownloadClick = output<void>();
+  enterBatchTest = output<void>();
 
+  measurementTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 
   selectedLabelledEdge = computed(() => {

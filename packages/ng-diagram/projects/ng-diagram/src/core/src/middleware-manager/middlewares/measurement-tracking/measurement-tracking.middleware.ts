@@ -5,10 +5,10 @@ import { Middleware } from '../../../types';
  * Tracks and signals DOM measurement activity to enable `waitForMeasurements` transaction option.
  *
  * Operates in two modes:
- * - **First pass** (tracking requested via `setNextTrackingConfig`): registers only actually-changed
- *   entities via `trackEntities()`, avoiding the no-op tracking problem.
- * - **Subsequent passes** (pending measurements exist): signals individual entities to reset the
- *   debounce timer as DOM measurements flow back through `applyUpdate()`.
+ * - **First pass** (tracking requested via `requestTracking`): registers ALL changed entities
+ *   as participants via `registerParticipants()`, starting the observation window.
+ * - **Subsequent passes** (pending measurements exist): signals measurement arrivals for
+ *   measurement-related property changes (`size`, `position`, `measuredPorts`, `points`, `measuredLabels`).
  *
  * @internal
  */
@@ -26,42 +26,47 @@ export const createMeasurementTrackingMiddleware = (
     }
 
     const { helpers } = context;
-    const nodeIds: string[] = [];
-    const edgeIds: string[] = [];
-
-    if (helpers.anyNodesAdded()) {
-      for (const node of helpers.getAddedNodes()) {
-        nodeIds.push(node.id);
-      }
-    }
-
-    if (helpers.anyEdgesAdded()) {
-      for (const edge of helpers.getAddedEdges()) {
-        edgeIds.push(edge.id);
-      }
-    }
-
-    if (helpers.checkIfAnyNodePropsChanged(['size', 'position', 'measuredPorts'])) {
-      for (const id of helpers.getAffectedNodeIds(['size', 'position', 'measuredPorts'])) {
-        nodeIds.push(id);
-      }
-    }
-
-    if (helpers.checkIfAnyEdgePropsChanged(['points', 'measuredLabels'])) {
-      for (const id of helpers.getAffectedEdgeIds(['points', 'measuredLabels'])) {
-        edgeIds.push(id);
-      }
-    }
 
     if (isFirstPass) {
-      const entityIds = [...nodeIds.map((id) => `node:${id}`), ...edgeIds.map((id) => `edge:${id}`)];
-      measurementTracker.trackEntities(entityIds);
-    } else {
-      for (const id of nodeIds) {
-        measurementTracker.signalNodeMeasurement(id);
+      // First pass: register ALL changed entities as participants.
+      // Any property change (data, position, size, custom fields, etc.) could indirectly
+      // trigger DOM measurements via Angular template bindings or CSS changes.
+      const entityIds: string[] = [];
+
+      if (helpers.anyNodesAdded()) {
+        for (const node of helpers.getAddedNodes()) {
+          entityIds.push(`node:${node.id}`);
+        }
       }
-      for (const id of edgeIds) {
-        measurementTracker.signalEdgeMeasurement(id);
+
+      if (helpers.anyEdgesAdded()) {
+        for (const edge of helpers.getAddedEdges()) {
+          entityIds.push(`edge:${edge.id}`);
+        }
+      }
+
+      for (const id of helpers.getChangedNodeIds()) {
+        entityIds.push(`node:${id}`);
+      }
+
+      for (const id of helpers.getChangedEdgeIds()) {
+        entityIds.push(`edge:${id}`);
+      }
+
+      measurementTracker.registerParticipants(entityIds);
+    } else {
+      // Subsequent passes: signal measurement arrivals only for measurement-related properties.
+      // These are the properties that indicate DOM measurements have been applied.
+      if (helpers.checkIfAnyNodePropsChanged(['size', 'position', 'measuredPorts', 'angle'])) {
+        for (const id of helpers.getAffectedNodeIds(['size', 'position', 'measuredPorts', 'angle'])) {
+          measurementTracker.signalMeasurement(`node:${id}`);
+        }
+      }
+
+      if (helpers.checkIfAnyEdgePropsChanged(['points', 'measuredLabels'])) {
+        for (const id of helpers.getAffectedEdgeIds(['points', 'measuredLabels'])) {
+          measurementTracker.signalMeasurement(`edge:${id}`);
+        }
       }
     }
 

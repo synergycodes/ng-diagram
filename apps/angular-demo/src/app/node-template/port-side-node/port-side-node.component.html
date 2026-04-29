@@ -1,9 +1,6 @@
 <div class="port-side-node">
   <span class="label">{{ text() }}</span>
-  <span class="side-indicator">Ports: {{ portSide() }}</span>
-  <button class="toggle-btn" (click)="onTogglePortSide()">
-    {{ portSide() === 'bottom' ? 'Bottom → Right' : 'Right → Bottom' }}
-  </button>
+  <button class="toggle-btn" (click)="onTogglePortSide()">Toggle Both Ports</button>
 </div>
-<ng-diagram-port id="port-left" type="both" side="left" />
-<ng-diagram-port id="port-dynamic" type="both" [side]="portSide()" />
+<ng-diagram-port id="port-1" type="both" [side]="portSide()" />
+<ng-diagram-port id="port-2" type="both" [side]="oppositePortSide()" />

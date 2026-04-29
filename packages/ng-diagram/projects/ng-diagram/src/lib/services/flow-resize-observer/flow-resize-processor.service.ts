@@ -32,9 +32,21 @@ export class FlowResizeBatchProcessorService {
   initialize(): void {
     if (this.isInitialized) return;
 
-    // Register this service as the batch processor
-    this.batchResizeObserver.setBatchProcessor((entries) => {
-      this.processAllResizes(entries);
+    this.batchResizeObserver.configure({
+      processBatch: (entries) => this.processAllResizes(entries),
+      // Signal the measurement tracker when ResizeObserver fires, before the
+      // double-RAF batch processing. This extends the tracker's discovery
+      // window so it waits for the measurements to arrive.
+      onObserverActivity: (metadataList) => {
+        const tracker = this.flowCoreProvider.provide().measurementTracker;
+        for (const metadata of metadataList) {
+          if (metadata.type === 'port' || metadata.type === 'node') {
+            tracker.signalObserverActivity(`node:${metadata.nodeId}`);
+          } else if (metadata.type === 'edge-label') {
+            tracker.signalObserverActivity(`edge:${metadata.edgeId}`);
+          }
+        }
+      },
     });
 
     this.isInitialized = true;
