@@ -6,11 +6,11 @@ interface PendingEntry<T> {
 }
 
 /**
- * Callback to check whether an item is already measured in the model.
+ * Returns the set of item IDs that are already measured for a given key.
  * Used at flush time to filter out redundant adds (e.g. virtualization re-mounts
  * a component for an item that was never deleted from the model).
  */
-type IsAlreadyMeasuredFn = (key: string, itemId: string) => boolean;
+type GetMeasuredIdsFn = (key: string) => Set<string>;
 
 /**
  * Generic batch processor that collects operations (add, update, delete) within
@@ -21,7 +21,7 @@ type IsAlreadyMeasuredFn = (key: string, itemId: string) => boolean;
  *    removed from both queues (e.g. type change destroys and recreates a port
  *    with the same ID in the same tick).
  * 2. **Measurement filtering**: remaining adds with no matching delete are checked
- *    via `isAlreadyMeasured`. If the item is already measured, the add is dropped
+ *    via `getMeasuredIds`. If the item is already measured, the add is dropped
  *    (e.g. virtualization re-mounts a component for a port that was never deleted
  *    from the model).
  *
@@ -42,7 +42,7 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
 
   private flushScheduled = false;
 
-  constructor(private readonly isAlreadyMeasured?: IsAlreadyMeasuredFn) {}
+  constructor(private readonly getMeasuredIds?: GetMeasuredIdsFn) {}
 
   processAdd(key: string, item: TAdd, onFlush: FlushCallback<TAdd>): void {
     this.getOrCreate(this.pendingAdds, key, onFlush).items.push(item);
@@ -154,10 +154,13 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
    * for an item that was never removed from the model.
    */
   private filterAlreadyMeasuredAdds(): void {
-    if (!this.isAlreadyMeasured) return;
+    if (!this.getMeasuredIds) return;
 
     for (const [key, addEntry] of this.pendingAdds) {
-      const filteredAdds = addEntry.items.filter((item) => !this.isAlreadyMeasured!(key, item.id));
+      const measuredIds = this.getMeasuredIds(key);
+      if (measuredIds.size === 0) continue;
+
+      const filteredAdds = addEntry.items.filter((item) => !measuredIds.has(item.id));
 
       if (filteredAdds.length === addEntry.items.length) continue;
 

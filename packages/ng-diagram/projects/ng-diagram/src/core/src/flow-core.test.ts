@@ -471,7 +471,7 @@ describe('FlowCore', () => {
     });
 
     it('should set tracking config when waitForMeasurements is true and has commands', async () => {
-      const configSpy = vi.spyOn(flowCore.measurementTracker, 'setNextTrackingConfig');
+      const configSpy = vi.spyOn(flowCore.measurementTracker, 'requestTracking');
       const waitSpy = vi.spyOn(flowCore.measurementTracker, 'waitForMeasurements').mockResolvedValue();
 
       vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
@@ -488,12 +488,15 @@ describe('FlowCore', () => {
 
       await flowCore.transaction(async () => {}, { waitForMeasurements: true });
 
-      expect(configSpy).toHaveBeenCalledWith(undefined, undefined);
+      expect(configSpy).toHaveBeenCalledWith({
+        discoveryWindowMs: undefined,
+        debounceMs: undefined,
+      });
       expect(waitSpy).toHaveBeenCalled();
     });
 
     it('should not set tracking config when waitForMeasurements is false', async () => {
-      const configSpy = vi.spyOn(flowCore.measurementTracker, 'setNextTrackingConfig');
+      const configSpy = vi.spyOn(flowCore.measurementTracker, 'requestTracking');
 
       vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
         results: { nodesToAdd: [mockNode] },
@@ -513,7 +516,7 @@ describe('FlowCore', () => {
     });
 
     it('should not set tracking config when commandsCount is 0', async () => {
-      const configSpy = vi.spyOn(flowCore.measurementTracker, 'setNextTrackingConfig');
+      const configSpy = vi.spyOn(flowCore.measurementTracker, 'requestTracking');
 
       vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
         results: {},

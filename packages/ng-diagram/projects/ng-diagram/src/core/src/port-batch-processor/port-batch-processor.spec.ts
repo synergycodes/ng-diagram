@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Port } from '../types';
-import { PortBatchProcessor, PortUpdate } from './port-batch-processor';
+import { Node, Port } from '../types';
+import { PortBatchProcessor, PortUpdate, toPortUpdates } from './port-batch-processor';
 
 describe('PortBatchProcessor', () => {
   let processor: PortBatchProcessor;
@@ -47,5 +47,80 @@ describe('PortBatchProcessor', () => {
     expect(onFlush).toHaveBeenCalledTimes(1);
     const deletions = onFlush.mock.calls[0][0] as Map<string, string[]>;
     expect(deletions.get('node1')).toEqual(['port-1']);
+  });
+
+  describe('getMeasuredIds', () => {
+    it('should filter out adds for ports with valid size and position', async () => {
+      const node = {
+        measuredPorts: [{ id: 'port-1', size: { width: 10, height: 10 }, position: { x: 5, y: 5 } }],
+      } as unknown as Node;
+      const proc = new PortBatchProcessor(() => node);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).not.toHaveBeenCalled();
+    });
+
+    it('should keep adds for ports missing size', async () => {
+      const node = {
+        measuredPorts: [{ id: 'port-1', size: undefined, position: { x: 5, y: 5 } }],
+      } as unknown as Node;
+      const proc = new PortBatchProcessor(() => node);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+
+    it('should keep adds for ports missing position', async () => {
+      const node = {
+        measuredPorts: [{ id: 'port-1', size: { width: 10, height: 10 }, position: undefined }],
+      } as unknown as Node;
+      const proc = new PortBatchProcessor(() => node);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return empty set when node is not found', async () => {
+      const proc = new PortBatchProcessor(() => null);
+      vi.useFakeTimers();
+
+      const onFlush = vi.fn();
+      proc.processAdd('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' }, onFlush);
+
+      await vi.runAllTimersAsync();
+
+      expect(onFlush).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe('toPortUpdates', () => {
+  it('should convert port data to PortUpdate array', () => {
+    const ports = [
+      { id: 'p1', size: { width: 10, height: 10 }, position: { x: 0, y: 0 } },
+      { id: 'p2', size: { width: 20, height: 20 }, position: { x: 5, y: 5 } },
+    ];
+
+    const result = toPortUpdates(ports);
+
+    expect(result).toEqual([
+      { portId: 'p1', portChanges: { size: { width: 10, height: 10 }, position: { x: 0, y: 0 } } },
+      { portId: 'p2', portChanges: { size: { width: 20, height: 20 }, position: { x: 5, y: 5 } } },
+    ]);
   });
 });

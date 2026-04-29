@@ -1,0 +1,37 @@
+<div class="measurement-tests">
+  <div class="toolbar-row">
+    <button (click)="exit.emit()">Exit</button>
+    <span class="separator">|</span>
+    <button (click)="runAll()" [disabled]="isRunning()">Run All</button>
+    <span class="separator">|</span>
+    <button (click)="testEmptyTransaction()" [disabled]="isRunning()">Empty Tx</button>
+    <button (click)="testPositionOnly()" [disabled]="isRunning()">Position Only</button>
+    <button (click)="testAddNode()" [disabled]="isRunning()">Add Node</button>
+    <button (click)="testDataDrivenPortSideChange()" [disabled]="isRunning()">Port Side (data)</button>
+    <button (click)="testPositionAndDataChange()" [disabled]="isRunning()">Position + Port Side</button>
+    <button (click)="testEdgeLabelChange()" [disabled]="isRunning()">Edge Label</button>
+    <button (click)="testCssPortReposition()" [disabled]="isRunning()">CSS Port Reposition</button>
+  </div>
+
+  @if (results().length > 0) {
+    <div class="results">
+      @for (result of results(); track result.name) {
+        <div class="result" [class.pass]="result.passed" [class.fail]="!result.passed">
+          <span class="status">{{ result.passed ? '✅' : '❌' }}</span>
+          <span class="name">{{ result.name }}</span>
+          <span class="elapsed">{{ result.elapsed.toFixed(0) }}ms</span>
+          @if (result.passed) {
+            <span class="details">{{ result.details }}</span>
+          }
+          @if (!result.passed) {
+            <ul class="failures">
+              @for (failure of result.failures; track failure) {
+                <li>{{ failure }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

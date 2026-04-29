@@ -25,6 +25,7 @@ describe('InternalUpdater', () => {
     portBatchProcessor = {
       processAdd: vi.fn(),
       processUpdate: vi.fn(),
+      processDelete: vi.fn(),
     } as unknown as PortBatchProcessor;
     labelBatchProcessor = {
       processAdd: vi.fn(),
@@ -55,7 +56,7 @@ describe('InternalUpdater', () => {
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
 
-    it('should emit resizeNode when size changes', () => {
+    it('should emit updateNodes when size changes', () => {
       getNodeByIdMock.mockReturnValue({
         ...mockNode,
         size: { width: 100, height: 100 },
@@ -63,9 +64,8 @@ describe('InternalUpdater', () => {
 
       internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('resizeNode', {
-        id: 'node-1',
-        size: { width: 5, height: 5 },
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-1', size: { width: 5, height: 5 } }],
       });
     });
 
@@ -78,12 +78,76 @@ describe('InternalUpdater', () => {
     });
 
     it('should not call anything if manual resizing action is in progress', () => {
-      getNodeByIdMock.mockReturnValue(null);
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: { width: 100, height: 100 },
+      });
       isResizing.mockReturnValue(true);
 
       internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
 
       expect(commandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should accept initial size during resize (node without size)', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: undefined,
+      });
+      isResizing.mockReturnValue(true);
+
+      internalUpdater.applyNodeSize('node-1', { width: 50, height: 50 });
+
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-1', size: { width: 50, height: 50 } }],
+      });
+    });
+
+    it('should batch multiple nodes and filter unchanged ones in applyNodeSizes', () => {
+      isResizing.mockReturnValue(false);
+      const nodes: Record<string, typeof mockNode> = {
+        'node-1': { ...mockNode, id: 'node-1', size: { width: 100, height: 100 } },
+        'node-2': { ...mockNode, id: 'node-2', size: { width: 50, height: 50 } },
+        'node-3': { ...mockNode, id: 'node-3', size: { width: 200, height: 200 } },
+      };
+      getNodeByIdMock.mockImplementation((id: string) => nodes[id] ?? null);
+
+      internalUpdater.applyNodeSizes([
+        { id: 'node-1', size: { width: 100, height: 100 } }, // unchanged
+        { id: 'node-2', size: { width: 75, height: 75 } }, // changed
+        { id: 'node-3', size: { width: 200, height: 200 } }, // unchanged
+      ]);
+
+      expect(commandHandler.emit).toHaveBeenCalledTimes(1);
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-2', size: { width: 75, height: 75 } }],
+      });
+    });
+  });
+
+  describe('deletePort', () => {
+    it('should process port deletion through portBatchProcessor', () => {
+      portBatchProcessor.processDelete = vi.fn().mockImplementation((nodeId, portId, callback) => {
+        const allDeletions = new Map([[nodeId, [portId]]]);
+        callback(allDeletions);
+      });
+
+      internalUpdater.deletePort('node-1', 'port-1');
+
+      expect(portBatchProcessor.processDelete).toHaveBeenCalledWith('node-1', 'port-1', expect.any(Function));
+    });
+
+    it('should emit deletePortsBulk when portBatchProcessor calls callback', () => {
+      portBatchProcessor.processDelete = vi.fn().mockImplementation((nodeId, portId, callback) => {
+        const allDeletions = new Map([[nodeId, [portId]]]);
+        callback(allDeletions);
+      });
+
+      internalUpdater.deletePort('node-1', 'port-1');
+
+      expect(commandHandler.emit).toHaveBeenCalledWith('deletePortsBulk', {
+        deletions: new Map([['node-1', ['port-1']]]),
+      });
     });
   });
 

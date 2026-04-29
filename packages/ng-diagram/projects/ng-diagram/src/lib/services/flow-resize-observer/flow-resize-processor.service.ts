@@ -32,9 +32,21 @@ export class FlowResizeBatchProcessorService {
   initialize(): void {
     if (this.isInitialized) return;
 
-    // Register this service as the batch processor
-    this.batchResizeObserver.setBatchProcessor((entries) => {
-      this.processAllResizes(entries);
+    this.batchResizeObserver.configure({
+      processBatch: (entries) => this.processAllResizes(entries),
+      // Signal the measurement tracker when ResizeObserver fires, before the
+      // double-RAF batch processing. This extends the tracker's discovery
+      // window so it waits for the measurements to arrive.
+      onObserverActivity: (metadataList) => {
+        const tracker = this.flowCoreProvider.provide().measurementTracker;
+        for (const metadata of metadataList) {
+          if (metadata.type === 'port' || metadata.type === 'node') {
+            tracker.signalObserverActivity(`node:${metadata.nodeId}`);
+          } else if (metadata.type === 'edge-label') {
+            tracker.signalObserverActivity(`edge:${metadata.edgeId}`);
+          }
+        }
+      },
     });
 
     this.isInitialized = true;
@@ -95,14 +107,8 @@ export class FlowResizeBatchProcessorService {
    */
   private processPortBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-    const updatesByNode = new Map<
-      string,
-      {
-        id: string;
-        size: Size;
-        position: Point;
-      }[]
-    >();
+    const measuredPortsMaps = new Map<string, Map<string, Port>>();
+    const updatesByNode = new Map<string, { id: string; size: Size; position: Point }[]>();
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'port') continue;
@@ -116,15 +122,16 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
-      const port = node.measuredPorts?.find((port: Port) => port.id === metadata.portId);
-      const currentSize = port?.size;
-      const currentPosition = port?.position;
+      if (!measuredPortsMaps.has(metadata.nodeId)) {
+        measuredPortsMaps.set(metadata.nodeId, new Map((node.measuredPorts ?? []).map((p) => [p.id, p])));
+      }
+      const port = measuredPortsMaps.get(metadata.nodeId)!.get(metadata.portId);
 
       if (
-        currentSize &&
-        !this.isSizeChanged(currentSize, size) &&
-        currentPosition &&
-        !this.isPositionChanged(currentPosition, portData.position)
+        port?.size &&
+        !this.isSizeChanged(port.size, size) &&
+        port?.position &&
+        !this.isPositionChanged(port.position, portData.position)
       ) {
         continue;
       }
@@ -150,9 +157,8 @@ export class FlowResizeBatchProcessorService {
    */
   private processNodeBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-
-    // Collect nodes that need initial size (no size property yet)
-    const nodesNeedingInitialSize: { id: string; size: Size }[] = [];
+    const isResizing = flowCore.actionStateManager.isResizing();
+    const nodeSizeUpdates: { id: string; size: Size }[] = [];
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'node') continue;
@@ -163,41 +169,21 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
-      const currentSize = node.size;
-
-      // Nodes without initial size - collect for batch update
-      if (!currentSize) {
-        nodesNeedingInitialSize.push({ id: metadata.nodeId, size });
+      if (node.size && !this.isSizeChanged(node.size, size)) {
         continue;
       }
 
-      if (!this.isSizeChanged(currentSize, size)) {
-        continue;
-      }
+      nodeSizeUpdates.push({ id: metadata.nodeId, size });
 
-      flowCore.updater.applyNodeSize(metadata.nodeId, size);
-
-      // Skip port measurement during active resize performed by user to avoid redundant updates
-      // NgDiagramNodeComponent.syncPorts() handles it
-      if (!flowCore.actionStateManager.isResizing()) {
+      // Skip port measurement during active resize — NgDiagramNodeComponent.syncPorts() handles it
+      if (!isResizing) {
         const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
         flowCore.updater.applyPortChanges(metadata.nodeId, toPortUpdates(portsData));
       }
     }
 
-    // Batch update nodes without initial size
-    if (nodesNeedingInitialSize.length > 0) {
-      if (flowCore.isInitialized) {
-        // After init: batch update directly for performance
-        flowCore.commandHandler.emit('updateNodes', {
-          nodes: nodesNeedingInitialSize,
-        });
-      } else {
-        // During init: use updater so InitUpdater can track measurements
-        for (const { id, size } of nodesNeedingInitialSize) {
-          flowCore.updater.applyNodeSize(id, size);
-        }
-      }
+    if (nodeSizeUpdates.length > 0) {
+      flowCore.updater.applyNodeSizes(nodeSizeUpdates);
     }
   }
 
@@ -206,14 +192,8 @@ export class FlowResizeBatchProcessorService {
    */
   private processEdgeLabelBatch(entries: ProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-
-    const updatesByEdge = new Map<
-      string,
-      {
-        labelId: string;
-        size: Size;
-      }[]
-    >();
+    const measuredLabelsMaps = new Map<string, Map<string, Size | undefined>>();
+    const updatesByEdge = new Map<string, { labelId: string; size: Size }[]>();
 
     for (const { entry, metadata } of entries) {
       if (metadata?.type !== 'edge-label') continue;
@@ -224,7 +204,11 @@ export class FlowResizeBatchProcessorService {
       const edge = flowCore.getEdgeById(metadata.edgeId);
       if (!edge) continue;
 
-      const currentSize = edge.measuredLabels?.find((label) => label.id === metadata.labelId)?.size;
+      if (!measuredLabelsMaps.has(metadata.edgeId)) {
+        measuredLabelsMaps.set(metadata.edgeId, new Map((edge.measuredLabels ?? []).map((l) => [l.id, l.size])));
+      }
+      const currentSize = measuredLabelsMaps.get(metadata.edgeId)!.get(metadata.labelId);
+
       if (currentSize && !this.isSizeChanged(currentSize, size)) {
         continue;
       }

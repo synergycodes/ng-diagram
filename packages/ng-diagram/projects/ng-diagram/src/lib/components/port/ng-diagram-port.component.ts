@@ -76,7 +76,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   protected readonly nodeData = computed(() => this.nodeComponent?.node());
 
   /**
-   * The unique identifier for the port. test
+   * The unique identifier for the port.
    */
   id = input.required<Port['id']>();
 
@@ -176,6 +176,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       nodeId: nodeData.id,
       portId: this.id(),
     });
+
     this.isInitialized.set(true);
   }
 

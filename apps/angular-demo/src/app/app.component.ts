@@ -37,6 +37,7 @@ import {
 } from 'ng-diagram';
 import { defaultModel } from './data/default-model';
 import { downloadedModel } from './data/downloaded-model';
+import { generateDynamicPortsTestModel } from './data/dynamic-ports-test-model';
 import { generateModel } from './data/generate-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
@@ -45,8 +46,10 @@ import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.com
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
+import { MeasurementTestsComponent } from './measurement-tests/measurement-tests.component';
 import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
 import { PaletteComponent } from './palette/palette.component';
+import { BatchTestToolbarComponent } from './toolbar/batch-test-toolbar.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
 const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
@@ -57,6 +60,8 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
   styleUrl: './app.component.scss',
   imports: [
     ToolbarComponent,
+    BatchTestToolbarComponent,
+    MeasurementTestsComponent,
     PaletteComponent,
     NgDiagramComponent,
     NgDiagramBackgroundComponent,
@@ -123,10 +128,43 @@ export class AppComponent {
   modelData = signal<Partial<{ nodes: Node[]; edges: Edge[] }>>(defaultModel);
   model = computed(() => initializeModel(this.modelData(), this.injector));
 
+  // =============================================
+  // Batch Test Mode
+  // =============================================
+
+  batchTestMode = signal(false);
+  measurementTestMode = signal(false);
+
+  enterMeasurementTest(): void {
+    this.measurementTestMode.set(true);
+  }
+
+  exitMeasurementTest(): void {
+    this.measurementTestMode.set(false);
+  }
+
+  private savedModelData: Partial<{ nodes: Node[]; edges: Edge[] }> | null = null;
+
+  enterBatchTest(): void {
+    this.savedModelData = this.modelData();
+    this.batchTestMode.set(true);
+    this.modelData.set(generateDynamicPortsTestModel());
+  }
+
+  exitBatchTest(): void {
+    this.batchTestMode.set(false);
+    if (this.savedModelData) {
+      this.modelData.set(this.savedModelData);
+      this.savedModelData = null;
+    }
+  }
+
+  // =============================================
+  // Other modes
+  // =============================================
+
   onSimulateModelDownload(): void {
     console.log('Simulating model download...');
-
-    // Simulate an async download that returns a new model
     setTimeout(() => {
       this.modelData.set({ ...downloadedModel });
       console.log('Model download complete');

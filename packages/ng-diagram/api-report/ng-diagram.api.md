@@ -558,6 +558,8 @@ export interface MiddlewareHelpers {
     getAddedNodes: () => Node_2[];
     getAffectedEdgeIds: (props: string[]) => string[];
     getAffectedNodeIds: (props: string[]) => string[];
+    getChangedEdgeIds: () => string[];
+    getChangedNodeIds: () => string[];
     getRemovedEdges: () => Edge[];
     getRemovedNodes: () => Node_2[];
 }
