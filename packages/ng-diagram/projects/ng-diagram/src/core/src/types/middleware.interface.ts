@@ -293,6 +293,18 @@ export interface MiddlewareHelpers {
   getAffectedEdgeIds: (props: string[]) => string[];
 
   /**
+   * Gets all node IDs that have any property changed, regardless of which property.
+   * @returns Array of node IDs that were modified by the initial state update or any previous middleware
+   */
+  getChangedNodeIds: () => string[];
+
+  /**
+   * Gets all edge IDs that have any property changed, regardless of which property.
+   * @returns Array of edge IDs that were modified by the initial state update or any previous middleware
+   */
+  getChangedEdgeIds: () => string[];
+
+  /**
    * Gets all nodes that were added.
    * @returns Array of node instances that were added by the initial state update or any previous middleware
    */

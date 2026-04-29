@@ -31,8 +31,9 @@ const applyMinimumSizeConstraints = (
   requestedPosition: Node['position'] | undefined,
   originalPosition: Node['position']
 ): { size: Required<Node>['size']; position: Node['position'] | undefined } => {
-  const constrainedWidth = Math.max(requestedSize.width, flowConfig.resize.getMinNodeSize(node).width);
-  const constrainedHeight = Math.max(requestedSize.height, flowConfig.resize.getMinNodeSize(node).height);
+  const minSize = flowConfig.resize.getMinNodeSize(node);
+  const constrainedWidth = Math.max(requestedSize.width, minSize.width);
+  const constrainedHeight = Math.max(requestedSize.height, minSize.height);
 
   if (!requestedPosition) {
     return {

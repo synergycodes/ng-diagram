@@ -1,5 +1,6 @@
 import { NgDiagramNodeTemplateMap } from 'ng-diagram';
 import { ChipNodeComponent } from '../node-template/chip-node/chip-node.component';
+import { DynamicPortNodeComponent } from '../node-template/dynamic-port-node/dynamic-port-node.component';
 import { CustomizedDefaultNodeComponent } from '../node-template/customized-default-node/customized-default-node.component';
 import { GroupNodeComponent } from '../node-template/group-node/group-node.component';
 import { ImageNodeComponent } from '../node-template/image-node/image-node.component';
@@ -17,6 +18,7 @@ export enum NodeTemplateType {
   Chip = 'chip',
   PortToggle = 'port-toggle',
   PortSide = 'port-side',
+  DynamicPort = 'dynamic-port',
 }
 
 export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
@@ -28,4 +30,5 @@ export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
   [NodeTemplateType.Chip, ChipNodeComponent],
   [NodeTemplateType.PortToggle, PortToggleNodeComponent],
   [NodeTemplateType.PortSide, PortSideNodeComponent],
+  [NodeTemplateType.DynamicPort, DynamicPortNodeComponent],
 ]);

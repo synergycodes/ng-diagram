@@ -14,12 +14,15 @@ interface MockedFlowResizeBatchProcessorService {
 describe('FlowResizeBatchProcessorService', () => {
   let service: FlowResizeBatchProcessorService;
   let mockInternalUpdater: {
-    applyPortsSizesAndPositions: ReturnType<typeof vi.fn>;
+    applyPortChanges: ReturnType<typeof vi.fn>;
     applyNodeSize: ReturnType<typeof vi.fn>;
-    applyEdgeLabelSize: ReturnType<typeof vi.fn>;
+    applyNodeSizes: ReturnType<typeof vi.fn>;
+    applyEdgeLabelChanges: ReturnType<typeof vi.fn>;
   };
   let mockFlowCore: {
     updater: typeof mockInternalUpdater;
+    commandHandler: { emit: ReturnType<typeof vi.fn> };
+    isInitialized: boolean;
     getNodeById: ReturnType<typeof vi.fn>;
     getEdgeById: ReturnType<typeof vi.fn>;
     actionStateManager: {
@@ -33,18 +36,21 @@ describe('FlowResizeBatchProcessorService', () => {
     getNodePortsData: ReturnType<typeof vi.fn>;
   };
   let mockBatchResizeObserver: {
-    setBatchProcessor: ReturnType<typeof vi.fn>;
+    configure: ReturnType<typeof vi.fn>;
     getMetadata: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     mockInternalUpdater = {
-      applyPortsSizesAndPositions: vi.fn(),
+      applyPortChanges: vi.fn(),
       applyNodeSize: vi.fn(),
-      applyEdgeLabelSize: vi.fn(),
+      applyNodeSizes: vi.fn(),
+      applyEdgeLabelChanges: vi.fn(),
     };
     mockFlowCore = {
       updater: mockInternalUpdater,
+      commandHandler: { emit: vi.fn() },
+      isInitialized: false,
       getNodeById: vi.fn(),
       getEdgeById: vi.fn(),
       actionStateManager: {
@@ -60,7 +66,7 @@ describe('FlowResizeBatchProcessorService', () => {
         .mockReturnValue([{ id: 'p1', size: { width: 1, height: 2 }, position: { x: 1, y: 2 } }]),
     };
     mockBatchResizeObserver = {
-      setBatchProcessor: vi.fn(),
+      configure: vi.fn(),
       getMetadata: vi.fn(),
     };
 
@@ -104,7 +110,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyPortsSizesAndPositions).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortChanges).toHaveBeenCalled();
   });
 
   it('should process node batch', () => {
@@ -121,8 +127,8 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
-    expect(mockInternalUpdater.applyPortsSizesAndPositions).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortChanges).toHaveBeenCalled();
   });
 
   it('should skip port measurement during active resize', () => {
@@ -140,8 +146,33 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyNodeSize).toHaveBeenCalled();
-    expect(mockInternalUpdater.applyPortsSizesAndPositions).not.toHaveBeenCalled();
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyPortChanges).not.toHaveBeenCalled();
+  });
+
+  it('should batch multiple node size updates into single applyNodeSizes call', () => {
+    const entry1 = { target: { id: 't1' } } as unknown as ResizeObserverEntry;
+    const entry2 = { target: { id: 't2' } } as unknown as ResizeObserverEntry;
+
+    mockBatchResizeObserver.getMetadata
+      .mockReturnValueOnce({ type: 'node', nodeId: 'n1' } as ObservedElementMetadata)
+      .mockReturnValueOnce({ type: 'node', nodeId: 'n2' } as ObservedElementMetadata);
+    mockFlowCore.getNodeById
+      .mockReturnValueOnce({ size: { width: 1, height: 2 } })
+      .mockReturnValueOnce({ size: { width: 3, height: 4 } });
+
+    vi.spyOn(service as unknown as MockedFlowResizeBatchProcessorService, 'getBorderBoxSize').mockReturnValue({
+      width: 10,
+      height: 20,
+    });
+    service['isInitialized'] = true;
+    service['processAllResizes']([entry1, entry2]);
+
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalledTimes(1);
+    expect(mockInternalUpdater.applyNodeSizes).toHaveBeenCalledWith([
+      { id: 'n1', size: { width: 10, height: 20 } },
+      { id: 'n2', size: { width: 10, height: 20 } },
+    ]);
   });
 
   it('should process edge label batch', () => {
@@ -162,7 +193,7 @@ describe('FlowResizeBatchProcessorService', () => {
     service['isInitialized'] = true;
     service['processAllResizes']([entry]);
 
-    expect(mockInternalUpdater.applyEdgeLabelSize).toHaveBeenCalled();
+    expect(mockInternalUpdater.applyEdgeLabelChanges).toHaveBeenCalled();
   });
 
   it('should handle unknown metadata type', () => {

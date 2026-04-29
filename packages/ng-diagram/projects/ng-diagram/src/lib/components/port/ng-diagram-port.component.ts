@@ -76,7 +76,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   protected readonly nodeData = computed(() => this.nodeComponent?.node());
 
   /**
-   * The unique identifier for the port. test
+   * The unique identifier for the port.
    */
   id = input.required<Port['id']>();
 
@@ -131,10 +131,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       }
 
       if (Object.keys(portChanges).length > 0) {
-        this.flowCoreProvider.provide().commandHandler.emit('updatePorts', {
-          nodeId: nodeData.id,
-          ports: [{ portId: this.id(), portChanges }],
-        });
+        this.flowCoreProvider.provide().updater.applyPortChanges(nodeData.id, [{ portId: this.id(), portChanges }]);
       }
 
       // ResizeObserver doesn't fire on position-only changes.
@@ -179,6 +176,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       nodeId: nodeData.id,
       portId: this.id(),
     });
+
     this.isInitialized.set(true);
   }
 

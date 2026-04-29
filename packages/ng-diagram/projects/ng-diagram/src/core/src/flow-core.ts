@@ -102,8 +102,8 @@ export class FlowCore {
     this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
-    this.portBatchProcessor = new PortBatchProcessor();
-    this.labelBatchProcessor = new LabelBatchProcessor();
+    this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
+    this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
@@ -297,10 +297,10 @@ export class FlowCore {
     if (results.commandsCount > 0) {
       if (transactionOptions?.waitForMeasurements) {
         const internalOptions = transactionOptions as InternalTransactionOptions;
-        this.measurementTracker.setNextTrackingConfig(
-          internalOptions._measurementDebounceTimeout,
-          internalOptions._measurementSafetyTimeout
-        );
+        this.measurementTracker.requestTracking({
+          discoveryWindowMs: internalOptions._measurementDiscoveryWindowTimeout,
+          debounceMs: internalOptions._measurementDebounceTimeout,
+        });
       }
 
       await this.applyUpdate(results.results, results.actionTypes);
