@@ -46,9 +46,8 @@ import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.com
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
-import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
 import { MeasurementTestsComponent } from './measurement-tests/measurement-tests.component';
-import { type DynamicPortData } from './node-template/dynamic-port-node/dynamic-port-node.component';
+import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
 import { PaletteComponent } from './palette/palette.component';
 import { BatchTestToolbarComponent } from './toolbar/batch-test-toolbar.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';

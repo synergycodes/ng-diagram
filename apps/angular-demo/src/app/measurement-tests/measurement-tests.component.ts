@@ -6,7 +6,14 @@ interface TestResult {
   passed: boolean;
   elapsed: number;
   details: string;
+  failures: string[];
 }
+
+/** Tolerance in pixels for position/size comparisons */
+const PX_TOLERANCE = 2;
+
+/** Round for readable output */
+const r = (n: number) => Math.round(n * 100) / 100;
 
 @Component({
   selector: 'app-measurement-tests',
@@ -45,7 +52,9 @@ export class MeasurementTestsComponent {
     await this.ngDiagramService.transaction(() => {}, { waitForMeasurements: true });
 
     const elapsed = performance.now() - t1;
-    this.addResult('Empty transaction', elapsed < 20, elapsed, `Should resolve immediately`);
+    this.addResult('Empty transaction', elapsed, (assert) => {
+      assert(elapsed < 10, `Should resolve quickly, took ${elapsed.toFixed(0)}ms`);
+    });
   }
 
   async testPositionOnly() {
@@ -53,32 +62,59 @@ export class MeasurementTestsComponent {
     const target = nodes[0];
     if (!target) return;
 
-    const before = this.snapshotNode(target);
+    const originalX = target.position.x;
+    const originalY = target.position.y;
+    const originalSize = target.size ? { ...target.size } : undefined;
+    const originalBounds = target.measuredBounds ? { ...target.measuredBounds } : undefined;
     const t1 = performance.now();
 
     await this.ngDiagramService.transaction(
       () => {
-        this.ngDiagramModelService.updateNodes([
-          {
-            id: target.id,
-            position: { x: target.position.x + 10, y: target.position.y },
-          },
-        ]);
+        this.ngDiagramModelService.updateNodes([{ id: target.id, position: { x: originalX + 10, y: originalY } }]);
       },
       { waitForMeasurements: true }
     );
 
     const elapsed = performance.now() - t1;
-    const node = this.ngDiagramModelService
-      .getModel()
-      .getNodes()
-      .find((n) => n.id === target.id)!;
-    const after = this.snapshotNode(node);
-    const hasBounds = this.hasValidMeasuredBounds(node);
+    const node = this.getNode(target.id)!;
 
-    this.addResult('Position only', hasBounds, elapsed, `measuredBounds valid: ${hasBounds}`);
-    console.log('[MeasurementTest] Position only — before:', before);
-    console.log('[MeasurementTest] Position only — after:', after);
+    this.addResult('Position only', elapsed, (assert) => {
+      // Position updated
+      assert(node.position.x === originalX + 10, `position.x: expected ${originalX + 10}, got ${node.position.x}`);
+      assert(node.position.y === originalY, `position.y: expected ${originalY}, got ${node.position.y}`);
+
+      // Size unchanged
+      if (originalSize) {
+        assert(
+          node.size?.width === originalSize.width,
+          `size.width unchanged: expected ${originalSize.width}, got ${node.size?.width}`
+        );
+        assert(
+          node.size?.height === originalSize.height,
+          `size.height unchanged: expected ${originalSize.height}, got ${node.size?.height}`
+        );
+      }
+
+      // MeasuredBounds shifted by exactly +10 on x, same width/height
+      if (originalBounds && node.measuredBounds) {
+        assert(
+          this.isNear(node.measuredBounds.x, originalBounds.x + 10, PX_TOLERANCE),
+          `measuredBounds.x should shift by +10: expected ~${originalBounds.x + 10}, got ${node.measuredBounds.x}`
+        );
+        assert(
+          node.measuredBounds.y === originalBounds.y,
+          `measuredBounds.y unchanged: expected ${originalBounds.y}, got ${node.measuredBounds.y}`
+        );
+        assert(
+          node.measuredBounds.width === originalBounds.width,
+          `measuredBounds.width unchanged: expected ${originalBounds.width}, got ${node.measuredBounds.width}`
+        );
+        assert(
+          node.measuredBounds.height === originalBounds.height,
+          `measuredBounds.height unchanged: expected ${originalBounds.height}, got ${node.measuredBounds.height}`
+        );
+      }
+    });
   }
 
   async testAddNode() {
@@ -106,24 +142,38 @@ export class MeasurementTestsComponent {
     );
 
     const elapsed = performance.now() - t1;
-    const node = this.ngDiagramModelService
-      .getModel()
-      .getNodes()
-      .find((n) => n.id === id)!;
-    const after = this.snapshotNode(node);
-    const hasSize = !!node.size && node.size.width > 0 && node.size.height > 0;
-    const hasPorts = this.hasValidMeasuredPorts(node);
-    const hasBounds = this.hasValidMeasuredBounds(node);
+    const node = this.getNode(id)!;
+    const p1 = node.measuredPorts?.find((p: Port) => p.id === 'p1');
+    const p2 = node.measuredPorts?.find((p: Port) => p.id === 'p2');
 
-    this.addResult(
-      'Add node with ports',
-      hasSize && hasPorts && hasBounds,
-      elapsed,
-      `size: ${node.size?.width}x${node.size?.height}, ports: ${node.measuredPorts?.length}, bounds: ${hasBounds}`
-    );
-    console.log('[MeasurementTest] Add node — after:', after);
+    this.addResult('Add node with ports', elapsed, (assert) => {
+      // Node size
+      assert(!!node.size, `node should have size`);
+      assert((node.size?.width ?? 0) >= 100, `node width >= 100 (min-width), got ${node.size?.width}`);
+      assert((node.size?.height ?? 0) > 0, `node height > 0, got ${node.size?.height}`);
 
-    this.ngDiagramModelService.deleteNodes([id]);
+      // Port count and sides
+      assert(node.measuredPorts?.length === 2, `expected 2 ports, got ${node.measuredPorts?.length}`);
+      assert(p1?.side === 'left', `p1 side: expected 'left', got '${p1?.side}'`);
+      assert(p2?.side === 'right', `p2 side: expected 'right', got '${p2?.side}'`);
+
+      // Port sizes > 0
+      assert(
+        (p1?.size?.width ?? 0) > 0 && (p1?.size?.height ?? 0) > 0,
+        `p1 should have size, got ${p1?.size?.width}x${p1?.size?.height}`
+      );
+      assert(
+        (p2?.size?.width ?? 0) > 0 && (p2?.size?.height ?? 0) > 0,
+        `p2 should have size, got ${p2?.size?.width}x${p2?.size?.height}`
+      );
+
+      // Port positions exist
+      assert(p1?.position !== undefined, `p1 should have position`);
+      assert(p2?.position !== undefined, `p2 should have position`);
+
+      // MeasuredBounds: should encompass node + ports
+      this.assertBoundsEncompassNodeAndPorts(assert, node);
+    });
   }
 
   async testDataDrivenPortSideChange() {
@@ -149,11 +199,10 @@ export class MeasurementTestsComponent {
       { waitForMeasurements: true }
     );
 
-    const nodeBefore = this.ngDiagramModelService
-      .getModel()
-      .getNodes()
-      .find((n) => n.id === id)!;
-    const before = this.snapshotNode(nodeBefore);
+    // Capture before state
+    const nodeBefore = this.getNode(id)!;
+    const pInBefore = nodeBefore.measuredPorts?.find((p: Port) => p.id === 'p-in');
+    const pOutBefore = nodeBefore.measuredPorts?.find((p: Port) => p.id === 'p-out');
     const t1 = performance.now();
 
     await this.ngDiagramService.transaction(
@@ -175,26 +224,36 @@ export class MeasurementTestsComponent {
     );
 
     const elapsed = performance.now() - t1;
-    const node = this.ngDiagramModelService
-      .getModel()
-      .getNodes()
-      .find((n) => n.id === id)!;
-    const after = this.snapshotNode(node);
-    const portIn = node.measuredPorts?.find((p: Port) => p.id === 'p-in');
-    const portOut = node.measuredPorts?.find((p: Port) => p.id === 'p-out');
-    const sidesCorrect = portIn?.side === 'top' && portOut?.side === 'bottom';
-    const hasPositions = this.hasValidMeasuredPorts(node);
+    const node = this.getNode(id)!;
+    const pIn = node.measuredPorts?.find((p: Port) => p.id === 'p-in');
+    const pOut = node.measuredPorts?.find((p: Port) => p.id === 'p-out');
 
-    this.addResult(
-      'Data-driven port side change (original bug)',
-      sidesCorrect && hasPositions,
-      elapsed,
-      `p-in: ${portIn?.side}, p-out: ${portOut?.side}, positions valid: ${hasPositions}`
-    );
-    console.log('[MeasurementTest] Port side change — before:', before);
-    console.log('[MeasurementTest] Port side change — after:', after);
+    this.addResult('Data-driven port side change', elapsed, (assert) => {
+      // Sides updated in measuredPorts
+      assert(pIn?.side === 'top', `p-in side: expected 'top', got '${pIn?.side}'`);
+      assert(pOut?.side === 'bottom', `p-out side: expected 'bottom', got '${pOut?.side}'`);
 
-    this.ngDiagramModelService.deleteNodes([id]);
+      // Port sizes preserved (side change shouldn't affect port size)
+      if (pInBefore?.size && pIn?.size) {
+        assert(
+          this.isNear(pIn.size.width, pInBefore.size.width, PX_TOLERANCE),
+          `p-in width should be stable: before ${pInBefore.size.width}, after ${pIn.size.width}`
+        );
+      }
+
+      // Positions changed (left→top, right→bottom means positions must differ)
+      assert(
+        pIn?.position?.x !== pInBefore?.position?.x || pIn?.position?.y !== pInBefore?.position?.y,
+        `p-in position should change after side left→top`
+      );
+      assert(
+        pOut?.position?.x !== pOutBefore?.position?.x || pOut?.position?.y !== pOutBefore?.position?.y,
+        `p-out position should change after side right→bottom`
+      );
+
+      // MeasuredBounds should encompass node + ports at new positions
+      this.assertBoundsEncompassNodeAndPorts(assert, node);
+    });
   }
 
   async testPositionAndDataChange() {
@@ -220,11 +279,6 @@ export class MeasurementTestsComponent {
       { waitForMeasurements: true }
     );
 
-    const nodeBefore = this.ngDiagramModelService
-      .getModel()
-      .getNodes()
-      .find((n) => n.id === id)!;
-    const before = this.snapshotNode(nodeBefore);
     const t1 = performance.now();
 
     await this.ngDiagramService.transaction(
@@ -247,27 +301,35 @@ export class MeasurementTestsComponent {
     );
 
     const elapsed = performance.now() - t1;
-    const node = this.ngDiagramModelService
-      .getModel()
-      .getNodes()
-      .find((n) => n.id === id)!;
-    const after = this.snapshotNode(node);
-    const portIn = node.measuredPorts?.find((p: Port) => p.id === 'p-in');
-    const portOut = node.measuredPorts?.find((p: Port) => p.id === 'p-out');
-    const sidesCorrect = portIn?.side === 'top' && portOut?.side === 'bottom';
-    const posCorrect = node.position.x === -400 && node.position.y === -200;
-    const hasBounds = this.hasValidMeasuredBounds(node);
+    const node = this.getNode(id)!;
+    const pIn = node.measuredPorts?.find((p: Port) => p.id === 'p-in');
+    const pOut = node.measuredPorts?.find((p: Port) => p.id === 'p-out');
 
-    this.addResult(
-      'Position + data-driven port side',
-      sidesCorrect && posCorrect && hasBounds,
-      elapsed,
-      `sides: ${portIn?.side}/${portOut?.side}, pos: ${node.position.x},${node.position.y}, bounds: ${hasBounds}`
-    );
-    console.log('[MeasurementTest] Position + data — before:', before);
-    console.log('[MeasurementTest] Position + data — after:', after);
+    this.addResult('Position + data-driven port side', elapsed, (assert) => {
+      // Position updated
+      assert(node.position.x === -400, `position.x: expected -400, got ${node.position.x}`);
+      assert(node.position.y === -200, `position.y: expected -200, got ${node.position.y}`);
 
-    this.ngDiagramModelService.deleteNodes([id]);
+      // Sides updated
+      assert(pIn?.side === 'top', `p-in side: expected 'top', got '${pIn?.side}'`);
+      assert(pOut?.side === 'bottom', `p-out side: expected 'bottom', got '${pOut?.side}'`);
+
+      // MeasuredBounds should be positioned relative to new node position
+      assert(!!node.measuredBounds, `measuredBounds should exist`);
+      if (node.measuredBounds) {
+        assert(
+          this.isNear(node.measuredBounds.x, -400, node.measuredBounds.width),
+          `measuredBounds.x should be near node position -400, got ${node.measuredBounds.x}`
+        );
+        assert(
+          this.isNear(node.measuredBounds.y, -200, node.measuredBounds.height),
+          `measuredBounds.y should be near node position -200, got ${node.measuredBounds.y}`
+        );
+      }
+
+      // MeasuredBounds encompasses node + ports
+      this.assertBoundsEncompassNodeAndPorts(assert, node);
+    });
   }
 
   async testEdgeLabelChange() {
@@ -306,87 +368,173 @@ export class MeasurementTestsComponent {
       { waitForMeasurements: true }
     );
 
-    const edgeBefore = this.ngDiagramModelService
-      .getModel()
-      .getEdges()
-      .find((e) => e.id === edgeId)!;
-    const before = this.snapshotEdge(edgeBefore);
+    const edgeBefore = this.getEdge(edgeId)!;
+    const labelBefore = edgeBefore.measuredLabels?.[0];
     const t1 = performance.now();
 
     await this.ngDiagramService.transaction(
       () => {
-        this.ngDiagramModelService.updateEdges([
-          {
-            id: edgeId,
-            data: { labelPosition: 0.3 },
-          },
-        ]);
+        this.ngDiagramModelService.updateEdges([{ id: edgeId, data: { labelPosition: 0.3 } }]);
       },
       { waitForMeasurements: true }
     );
 
     const elapsed = performance.now() - t1;
-    const edge = this.ngDiagramModelService
+    const edge = this.getEdge(edgeId)!;
+    const label = edge.measuredLabels?.[0];
+
+    this.addResult('Edge label data change', elapsed, (assert) => {
+      // Label exists with measurements
+      assert(!!label, `edge should have a measured label`);
+      assert((label?.size?.width ?? 0) > 0, `label width > 0, got ${label?.size?.width}`);
+      assert((label?.size?.height ?? 0) > 0, `label height > 0, got ${label?.size?.height}`);
+      assert(label?.position !== undefined, `label should have position`);
+
+      // positionOnEdge updated
+      assert(label?.positionOnEdge === 0.3, `positionOnEdge: expected 0.3, got ${label?.positionOnEdge}`);
+
+      // Label size should be stable (text content structure didn't change)
+      if (labelBefore?.size && label?.size) {
+        assert(
+          this.isNear(label.size.width, labelBefore.size.width, PX_TOLERANCE),
+          `label width stable: before ${labelBefore.size.width}, after ${label.size.width}`
+        );
+        assert(
+          this.isNear(label.size.height, labelBefore.size.height, PX_TOLERANCE),
+          `label height stable: before ${labelBefore.size.height}, after ${label.size.height}`
+        );
+      }
+
+      // Label position should have changed (moved from 0.5 to 0.3)
+      if (labelBefore?.position && label?.position) {
+        assert(
+          label.position.x !== labelBefore.position.x || label.position.y !== labelBefore.position.y,
+          `label position should change when positionOnEdge moves from 0.5 to 0.3`
+        );
+      }
+
+      // Label position should be between the two nodes (x: -500 to -200)
+      if (label?.position) {
+        assert(
+          label.position.x >= -510 && label.position.x <= -190,
+          `label x should be between nodes (-500 to -200), got ${label.position.x}`
+        );
+      }
+    });
+  }
+
+  // =============================================
+  // Helpers
+  // =============================================
+
+  private getNode(id: string): Node | undefined {
+    return this.ngDiagramModelService
+      .getModel()
+      .getNodes()
+      .find((n) => n.id === id);
+  }
+
+  private getEdge(id: string): Edge | undefined {
+    return this.ngDiagramModelService
       .getModel()
       .getEdges()
-      .find((e) => e.id === edgeId)!;
-    const after = this.snapshotEdge(edge);
-    const hasLabels = !!edge.measuredLabels && edge.measuredLabels.length > 0;
-    const labelHasSize = hasLabels && (edge.measuredLabels![0].size?.width ?? 0) > 0;
-
-    this.addResult(
-      'Edge label data change',
-      hasLabels && labelHasSize,
-      elapsed,
-      `labels: ${edge.measuredLabels?.length}, size: ${edge.measuredLabels?.[0]?.size?.width}x${edge.measuredLabels?.[0]?.size?.height}`
-    );
-    console.log('[MeasurementTest] Edge label — before:', before);
-    console.log('[MeasurementTest] Edge label — after:', after);
-
-    this.ngDiagramModelService.deleteEdges([edgeId]);
-    this.ngDiagramModelService.deleteNodes([nodeId1, nodeId2]);
+      .find((e) => e.id === id);
   }
 
-  private addResult(name: string, passed: boolean, elapsed: number, details: string) {
+  private isNear(actual: number | undefined, expected: number, tolerance: number): boolean {
+    if (actual === undefined) return false;
+    return Math.abs(actual - expected) <= tolerance;
+  }
+
+  /**
+   * Verifies that measuredBounds encompasses the node body and all its ports,
+   * and that each port's position is consistent with its declared side.
+   */
+  private assertBoundsEncompassNodeAndPorts(assert: (condition: boolean, message: string) => void, node: Node): void {
+    const bounds = node.measuredBounds;
+    assert(!!bounds, `measuredBounds should exist`);
+    if (!bounds || !node.size) return;
+
+    const nodeLeft = node.position.x;
+    const nodeTop = node.position.y;
+    const nodeRight = nodeLeft + node.size.width;
+    const nodeBottom = nodeTop + node.size.height;
+
+    // Bounds should contain the node body
+    assert(bounds.x <= nodeLeft + PX_TOLERANCE, `bounds.x (${r(bounds.x)}) should be <= node left (${r(nodeLeft)})`);
+    assert(bounds.y <= nodeTop + PX_TOLERANCE, `bounds.y (${r(bounds.y)}) should be <= node top (${r(nodeTop)})`);
+    assert(
+      bounds.x + bounds.width >= nodeRight - PX_TOLERANCE,
+      `bounds right (${r(bounds.x + bounds.width)}) should be >= node right (${r(nodeRight)})`
+    );
+    assert(
+      bounds.y + bounds.height >= nodeBottom - PX_TOLERANCE,
+      `bounds bottom (${r(bounds.y + bounds.height)}) should be >= node bottom (${r(nodeBottom)})`
+    );
+
+    // Each port: bounds contain it, and position matches declared side
+    for (const port of node.measuredPorts ?? []) {
+      if (!port.position || !port.size) continue;
+      const portLeft = nodeLeft + port.position.x;
+      const portTop = nodeTop + port.position.y;
+      const portRight = portLeft + port.size.width;
+      const portBottom = portTop + port.size.height;
+      const portCenterX = port.position.x + port.size.width / 2;
+      const portCenterY = port.position.y + port.size.height / 2;
+
+      // Bounds containment
+      assert(bounds.x <= portLeft + PX_TOLERANCE, `bounds should contain port '${port.id}' left edge`);
+      assert(bounds.y <= portTop + PX_TOLERANCE, `bounds should contain port '${port.id}' top edge`);
+      assert(bounds.x + bounds.width >= portRight - PX_TOLERANCE, `bounds should contain port '${port.id}' right edge`);
+      assert(
+        bounds.y + bounds.height >= portBottom - PX_TOLERANCE,
+        `bounds should contain port '${port.id}' bottom edge`
+      );
+
+      // Side-specific position: port center should align with the declared edge of the node
+      switch (port.side) {
+        case 'left':
+          assert(
+            this.isNear(portCenterX, 0, PX_TOLERANCE),
+            `port '${port.id}' (left): center.x should be near 0, got ${r(portCenterX)}`
+          );
+          break;
+        case 'right':
+          assert(
+            this.isNear(portCenterX, node.size.width, PX_TOLERANCE),
+            `port '${port.id}' (right): center.x should be near ${r(node.size.width)}, got ${r(portCenterX)}`
+          );
+          break;
+        case 'top':
+          assert(
+            this.isNear(portCenterY, 0, PX_TOLERANCE),
+            `port '${port.id}' (top): center.y should be near 0, got ${r(portCenterY)}`
+          );
+          break;
+        case 'bottom':
+          assert(
+            this.isNear(portCenterY, node.size.height, PX_TOLERANCE),
+            `port '${port.id}' (bottom): center.y should be near ${r(node.size.height)}, got ${r(portCenterY)}`
+          );
+          break;
+      }
+    }
+  }
+
+  private addResult(
+    name: string,
+    elapsed: number,
+    assertions: (assert: (condition: boolean, message: string) => void) => void
+  ) {
+    const failures: string[] = [];
+    assertions((condition, message) => {
+      if (!condition) failures.push(message);
+    });
+    const passed = failures.length === 0;
+    const details = passed ? 'All assertions passed' : failures.join('; ');
     const status = passed ? 'PASS' : 'FAIL';
-    console.log(`[MeasurementTest] ${passed ? '✅' : '❌'} ${status}: ${name} (${elapsed.toFixed(0)}ms) — ${details}`);
-    this.results.update((r) => [...r, { name, passed, elapsed, details }].slice(-6));
-  }
-
-  private snapshotNode(node: Node) {
-    return {
-      position: { ...node.position },
-      size: node.size ? { ...node.size } : undefined,
-      measuredBounds: node.measuredBounds ? { ...node.measuredBounds } : undefined,
-      measuredPorts: node.measuredPorts?.map((p: Port) => ({
-        id: p.id,
-        side: p.side,
-        size: p.size ? { ...p.size } : undefined,
-        position: p.position ? { ...p.position } : undefined,
-      })),
-    };
-  }
-
-  private snapshotEdge(edge: Edge) {
-    return {
-      measuredLabels: edge.measuredLabels?.map((l) => ({
-        id: l.id,
-        size: l.size ? { ...l.size } : undefined,
-        position: l.position ? { ...l.position } : undefined,
-        positionOnEdge: l.positionOnEdge,
-      })),
-    };
-  }
-
-  private hasValidMeasuredPorts(node: Node): boolean {
-    return (
-      !!node.measuredPorts &&
-      node.measuredPorts.length > 0 &&
-      node.measuredPorts.every((p: Port) => p.size && p.size.width > 0 && p.size.height > 0)
-    );
-  }
-
-  private hasValidMeasuredBounds(node: Node): boolean {
-    return !!node.measuredBounds && node.measuredBounds.width > 0 && node.measuredBounds.height > 0;
+    console.log(`[MeasurementTest] ${passed ? '✅' : '❌'} ${status}: ${name} (${elapsed.toFixed(0)}ms)`);
+    if (!passed) failures.forEach((f) => console.log(`  ❌ ${f}`));
+    this.results.update((r) => [...r, { name, passed, elapsed, details, failures }]);
   }
 }
