@@ -130,7 +130,7 @@ describe('Measurement tracking integration', () => {
     });
   });
 
-  describe('transaction with data change → deferred measuredPorts (the original bug)', () => {
+  describe('transaction with data change → deferred measuredPorts', () => {
     it('should wait for measuredPorts to arrive via subsequent applyUpdate', async () => {
       // First pass: only "data" changed — in old implementation this resolved immediately
       firstPass({
