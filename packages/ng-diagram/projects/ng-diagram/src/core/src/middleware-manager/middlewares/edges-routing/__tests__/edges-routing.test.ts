@@ -5,6 +5,7 @@ import { mockEdge, mockMetadata, mockNode } from '../../../../test-utils';
 import type { Edge, FlowState, MiddlewareContext } from '../../../../types';
 import { DEFAULT_SELECTED_Z_INDEX } from '../../z-index-assignment/constants';
 import { edgesRoutingMiddleware } from '../edges-routing';
+import { getEdgePoints } from '../get-edge-points';
 
 vi.mock('../get-edge-points', () => ({
   getEdgePoints: vi.fn().mockImplementation((edge) => {
@@ -39,6 +40,7 @@ describe('Edges Routing Middleware', () => {
 
   const nodesMap = new Map();
   const edgesMap = new Map();
+  const mockGetEdgePoints = vi.mocked(getEdgePoints);
 
   const mockRoutingManager: Partial<EdgeRoutingManager> = {
     hasRouting: vi.fn().mockReturnValue(true),
@@ -326,6 +328,40 @@ describe('Edges Routing Middleware', () => {
       edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
 
       expect(nextMock).toHaveBeenCalledWith({});
+    });
+
+    it('should pass self-loop metadata to getEdgePoints for sibling loops', () => {
+      const newState = {
+        nodes: [{ ...mockNode, id: 'node-1', position: { x: 100, y: 100 } }],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'self-loop-1',
+            source: 'node-1',
+            target: 'node-1',
+          },
+          {
+            ...mockEdge,
+            id: 'self-loop-2',
+            source: 'node-1',
+            target: 'node-1',
+          },
+        ],
+        metadata: mockMetadata,
+      };
+
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionTypes = ['init'];
+
+      edgesRoutingMiddleware.execute(context as any, nextMock, () => null);
+
+      const selfLoop1Call = mockGetEdgePoints.mock.calls.find((call) => call[0].id === 'self-loop-1');
+      const selfLoop2Call = mockGetEdgePoints.mock.calls.find((call) => call[0].id === 'self-loop-2');
+
+      expect(selfLoop1Call?.[3]).toEqual({ index: 0, count: 2 });
+      expect(selfLoop2Call?.[3]).toEqual({ index: 1, count: 2 });
     });
   });
 
