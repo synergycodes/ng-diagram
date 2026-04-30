@@ -115,6 +115,7 @@ describe('Edge Routing Helper Functions', () => {
         'target',
         'routing',
         'routingMode',
+        'measuredLabels',
       ]);
     });
 
@@ -319,6 +320,27 @@ describe('Edge Routing Helper Functions', () => {
       const result = updateLabelPositions(edge, points, mockRoutingManager as EdgeRoutingManager);
 
       expect(result).toEqual([]);
+    });
+
+    it('should return existing labels unchanged when points has fewer than 2 entries', () => {
+      const existingLabels = [
+        { id: 'label-1', positionOnEdge: 0.5, position: { x: 10, y: 20 } },
+        { id: 'label-2', positionOnEdge: 0.75 },
+      ];
+      const edge: Edge = {
+        ...mockEdge,
+        measuredLabels: existingLabels,
+      };
+
+      const result = updateLabelPositions(edge, [], mockRoutingManager as EdgeRoutingManager);
+
+      expect(result).toBe(existingLabels);
+      expect(mockRoutingManager.computePointOnPath).not.toHaveBeenCalled();
+
+      const resultSingle = updateLabelPositions(edge, [{ x: 0, y: 0 }], mockRoutingManager as EdgeRoutingManager);
+
+      expect(resultSingle).toBe(existingLabels);
+      expect(mockRoutingManager.computePointOnPath).not.toHaveBeenCalled();
     });
 
     it('should use computePointAtDistance for absolute (px) label positions', () => {

@@ -183,7 +183,7 @@ describe('Add Update Delete Command', () => {
     );
   });
 
-  it('should add edge labels to an edge and apply position on edge', () => {
+  it('should add edge labels without resolving position (deferred to edge routing middleware)', () => {
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
 
     commandHandler.emit('addEdgeLabelsBulk', {
@@ -192,7 +192,7 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [{ ...mockEdgeLabel, position: { x: 50, y: 50 } }] }],
+        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [mockEdgeLabel] }],
       },
       'addEdgeLabelsBulk'
     );
@@ -216,7 +216,28 @@ describe('Add Update Delete Command', () => {
     );
   });
 
-  it('should add edge labels with absolute position', () => {
+  it('should preserve existing label positions when edge has no valid points', () => {
+    const existingLabel = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5, position: { x: 10, y: 20 } };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, points: [], measuredLabels: [existingLabel] });
+
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: existingLabel.id, labelChanges: { positionOnEdge: 0.75 } }]]]),
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [
+          {
+            id: mockEdge.id,
+            measuredLabels: [{ ...existingLabel, positionOnEdge: 0.75, position: { x: 10, y: 20 } }],
+          },
+        ],
+      },
+      'updateEdgeLabelsBulk'
+    );
+  });
+
+  it('should add edge labels with absolute position without resolving (deferred to edge routing middleware)', () => {
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
 
     const absoluteLabel = { ...mockEdgeLabel, id: 'abs-label', positionOnEdge: '30px' as const };
@@ -226,7 +247,7 @@ describe('Add Update Delete Command', () => {
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [{ ...absoluteLabel, position: { x: 30, y: 0 } }] }],
+        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [absoluteLabel] }],
       },
       'addEdgeLabelsBulk'
     );
