@@ -1,5 +1,5 @@
 import { resolveLabelPosition } from '../../edge-routing-manager';
-import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
+import type { CommandHandler, Edge, EdgeLabel, EdgeLabelPosition, Node, Point, Port } from '../../types';
 import { snapNodePosition } from '../../utils';
 
 const computeAddedPorts = (node: Node, ports: Port[]): Port[] => {
@@ -12,8 +12,9 @@ const computeUpdatedPorts = (
   measuredPorts: Port[],
   portUpdates: { portId: string; portChanges: Partial<Port> }[]
 ): Port[] => {
+  const changesById = new Map(portUpdates.map(({ portId, portChanges }) => [portId, portChanges]));
   return measuredPorts.map((port) => {
-    const portChanges = portUpdates.find(({ portId }) => portId === port.id)?.portChanges;
+    const portChanges = changesById.get(port.id);
     if (!portChanges) {
       return port;
     }
@@ -149,31 +150,6 @@ export const deleteEdges = async (commandHandler: CommandHandler, command: Delet
   await commandHandler.flowCore.applyUpdate({ edgesToRemove: ids }, 'deleteEdges');
 };
 
-export interface AddPortsCommand {
-  name: 'addPorts';
-  nodeId: string;
-  ports: Port[];
-}
-
-export const addPorts = async (commandHandler: CommandHandler, command: AddPortsCommand) => {
-  const { nodeId, ports } = command;
-  const node = commandHandler.flowCore.getNodeById(nodeId);
-  if (!node) {
-    return;
-  }
-
-  // Even though we have a separate method to update ports, this method also updates existing ports with matching IDs
-  // instead of skipping them. This ensures the adapter stays synchronized with the core.
-  // The front-end is considered the source of truth in this context.
-  const newPorts = computeAddedPorts(node, ports);
-
-  await commandHandler.flowCore.applyUpdate({ nodesToUpdate: [{ id: nodeId, measuredPorts: newPorts }] }, 'updateNode');
-};
-
-/**
- * Bulk add ports for multiple nodes in a single middleware execution.
- * This is optimized for virtualization scenarios where many nodes need port additions simultaneously.
- */
 export interface AddPortsBulkCommand {
   name: 'addPortsBulk';
   additions: Map<string, Port[]>;
@@ -199,29 +175,6 @@ export const addPortsBulk = async (commandHandler: CommandHandler, command: AddP
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'addPortsBulk');
 };
 
-export interface UpdatePortsCommand {
-  name: 'updatePorts';
-  nodeId: string;
-  ports: { portId: string; portChanges: Partial<Port> }[];
-}
-
-export const updatePorts = async (commandHandler: CommandHandler, command: UpdatePortsCommand) => {
-  const { nodeId, ports } = command;
-  const node = commandHandler.flowCore.getNodeById(nodeId);
-  if (!node || !node.measuredPorts) {
-    return;
-  }
-  const portsToUpdate = computeUpdatedPorts(node.measuredPorts, ports);
-  await commandHandler.flowCore.applyUpdate(
-    { nodesToUpdate: [{ id: nodeId, measuredPorts: portsToUpdate }] },
-    'updateNode'
-  );
-};
-
-/**
- * Bulk update ports for multiple nodes in a single middleware execution.
- * This is optimized for virtualization scenarios where many nodes need port updates simultaneously.
- */
 export interface UpdatePortsBulkCommand {
   name: 'updatePortsBulk';
   updates: Map<string, { portId: string; portChanges: Partial<Port> }[]>;
@@ -247,29 +200,6 @@ export const updatePortsBulk = async (commandHandler: CommandHandler, command: U
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'updatePortsBulk');
 };
 
-export interface DeletePortsCommand {
-  name: 'deletePorts';
-  nodeId: string;
-  portIds: string[];
-}
-
-export const deletePorts = async (commandHandler: CommandHandler, command: DeletePortsCommand) => {
-  const { nodeId, portIds } = command;
-  const node = commandHandler.flowCore.getNodeById(nodeId);
-  if (!node) {
-    return;
-  }
-  const leftPorts = computeRemainingPorts(node.measuredPorts, portIds);
-  await commandHandler.flowCore.applyUpdate(
-    { nodesToUpdate: [{ id: nodeId, measuredPorts: leftPorts }] },
-    'updateNode'
-  );
-};
-
-/**
- * Bulk delete ports for multiple nodes in a single middleware execution.
- * This is optimized for virtualization scenarios where many nodes are destroyed simultaneously.
- */
 export interface DeletePortsBulkCommand {
   name: 'deletePortsBulk';
   deletions: Map<string, string[]>;
@@ -295,94 +225,103 @@ export const deletePortsBulk = async (commandHandler: CommandHandler, command: D
   await commandHandler.flowCore.applyUpdate({ nodesToUpdate }, 'deletePortsBulk');
 };
 
-export interface AddEdgeLabelsCommand {
-  name: 'addEdgeLabels';
-  edgeId: string;
-  labels: EdgeLabel[];
+export interface AddEdgeLabelsBulkCommand {
+  name: 'addEdgeLabelsBulk';
+  additions: Map<string, EdgeLabel[]>;
 }
 
-export const addEdgeLabels = async (commandHandler: CommandHandler, command: AddEdgeLabelsCommand) => {
-  const { edgeId, labels } = command;
-  const edge = commandHandler.flowCore.getEdgeById(edgeId);
-  if (!edge) {
-    return;
-  }
-  const points = edge.points || [];
-  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
-  const newLabels = [
-    ...(edge.measuredLabels ?? []),
-    ...labels.map((label) => ({
-      ...label,
-      position: resolveLabelPosition(label.positionOnEdge, edge.routing, points, edgeRoutingManager),
-    })),
-  ];
-  await commandHandler.flowCore.applyUpdate(
-    { edgesToUpdate: [{ id: edgeId, measuredLabels: newLabels }] },
-    'updateEdge'
-  );
-};
+export const addEdgeLabelsBulk = async (commandHandler: CommandHandler, command: AddEdgeLabelsBulkCommand) => {
+  const { additions } = command;
+  const edgesToUpdate: { id: string; measuredLabels: EdgeLabel[] }[] = [];
 
-export interface UpdateEdgeLabelsCommand {
-  name: 'updateEdgeLabels';
-  edgeId: string;
-  labelUpdates: {
-    labelId: string;
-    labelChanges: Partial<EdgeLabel>;
-  }[];
-}
-
-export const updateEdgeLabels = async (commandHandler: CommandHandler, command: UpdateEdgeLabelsCommand) => {
-  const { edgeId, labelUpdates } = command;
-  const edge = commandHandler.flowCore.getEdgeById(edgeId);
-  if (!edge) {
-    return;
-  }
-
-  const points = edge.points || [];
-  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
-
-  const updatesMap = new Map<string, Partial<EdgeLabel>>();
-  labelUpdates.forEach(({ labelId, labelChanges }) => {
-    updatesMap.set(labelId, labelChanges);
-  });
-
-  const newLabels = edge.measuredLabels?.map((label) => {
-    const updates = updatesMap.get(label.id);
-    if (!updates) {
-      const position = resolveLabelPosition(label.positionOnEdge, edge.routing, points, edgeRoutingManager);
-      return { ...label, position };
+  additions.forEach((labels, edgeId) => {
+    const edge = commandHandler.flowCore.getEdgeById(edgeId);
+    if (!edge) {
+      return;
     }
 
-    const positionOnEdge = updates.positionOnEdge ?? label.positionOnEdge;
-    const position = resolveLabelPosition(positionOnEdge, edge.routing, points, edgeRoutingManager);
-    return { ...label, ...updates, position };
+    const newLabels = [...(edge.measuredLabels ?? []), ...labels];
+    edgesToUpdate.push({ id: edgeId, measuredLabels: newLabels });
   });
 
-  if (!newLabels) {
+  if (edgesToUpdate.length === 0) {
     return;
   }
 
-  await commandHandler.flowCore.applyUpdate(
-    { edgesToUpdate: [{ id: edgeId, measuredLabels: newLabels }] },
-    'updateEdge'
-  );
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate }, 'addEdgeLabelsBulk');
 };
 
-export interface DeleteEdgeLabelsCommand {
-  name: 'deleteEdgeLabels';
-  edgeId: string;
-  labelIds: string[];
+export interface UpdateEdgeLabelsBulkCommand {
+  name: 'updateEdgeLabelsBulk';
+  updates: Map<string, { labelId: string; labelChanges: Partial<EdgeLabel> }[]>;
 }
 
-export const deleteEdgeLabels = async (commandHandler: CommandHandler, command: DeleteEdgeLabelsCommand) => {
-  const { edgeId, labelIds } = command;
-  const edge = commandHandler.flowCore.getEdgeById(edgeId);
-  if (!edge) {
+export const updateEdgeLabelsBulk = async (commandHandler: CommandHandler, command: UpdateEdgeLabelsBulkCommand) => {
+  const { updates } = command;
+  const edgesToUpdate: { id: string; measuredLabels: EdgeLabel[] }[] = [];
+  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
+
+  updates.forEach((labelUpdates, edgeId) => {
+    const edge = commandHandler.flowCore.getEdgeById(edgeId);
+    if (!edge) {
+      return;
+    }
+
+    const points = edge.points || [];
+    const updatesMap = new Map<string, Partial<EdgeLabel>>();
+    labelUpdates.forEach(({ labelId, labelChanges }) => {
+      updatesMap.set(labelId, labelChanges);
+    });
+
+    const hasValidPoints = points.length >= 2;
+    const resolvePosition = (positionOnEdge: EdgeLabelPosition, fallback: Point | undefined) =>
+      hasValidPoints ? resolveLabelPosition(positionOnEdge, edge.routing, points, edgeRoutingManager) : fallback;
+
+    const newLabels = edge.measuredLabels?.map((label) => {
+      const labelChanges = updatesMap.get(label.id);
+      if (!labelChanges) {
+        if (!hasValidPoints) return label;
+        return { ...label, position: resolvePosition(label.positionOnEdge, label.position) };
+      }
+
+      const positionOnEdge = labelChanges.positionOnEdge ?? label.positionOnEdge;
+      return { ...label, ...labelChanges, position: resolvePosition(positionOnEdge, label.position) };
+    });
+
+    if (newLabels) {
+      edgesToUpdate.push({ id: edgeId, measuredLabels: newLabels });
+    }
+  });
+
+  if (edgesToUpdate.length === 0) {
     return;
   }
-  const leftLabels = edge.measuredLabels?.filter((label) => !labelIds.includes(label.id));
-  await commandHandler.flowCore.applyUpdate(
-    { edgesToUpdate: [{ id: edgeId, measuredLabels: leftLabels }] },
-    'updateEdge'
-  );
+
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate }, 'updateEdgeLabelsBulk');
+};
+
+export interface DeleteEdgeLabelsBulkCommand {
+  name: 'deleteEdgeLabelsBulk';
+  deletions: Map<string, string[]>;
+}
+
+export const deleteEdgeLabelsBulk = async (commandHandler: CommandHandler, command: DeleteEdgeLabelsBulkCommand) => {
+  const { deletions } = command;
+  const edgesToUpdate: { id: string; measuredLabels: EdgeLabel[] | undefined }[] = [];
+
+  deletions.forEach((labelIds, edgeId) => {
+    const edge = commandHandler.flowCore.getEdgeById(edgeId);
+    if (!edge) {
+      return;
+    }
+    const labelIdsSet = new Set(labelIds);
+    const leftLabels = edge.measuredLabels?.filter((label) => !labelIdsSet.has(label.id));
+    edgesToUpdate.push({ id: edgeId, measuredLabels: leftLabels });
+  });
+
+  if (edgesToUpdate.length === 0) {
+    return;
+  }
+
+  await commandHandler.flowCore.applyUpdate({ edgesToUpdate }, 'deleteEdgeLabelsBulk');
 };

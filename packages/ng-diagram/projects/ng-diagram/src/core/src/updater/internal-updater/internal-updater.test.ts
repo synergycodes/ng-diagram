@@ -25,6 +25,7 @@ describe('InternalUpdater', () => {
     portBatchProcessor = {
       processAdd: vi.fn(),
       processUpdate: vi.fn(),
+      processDelete: vi.fn(),
     } as unknown as PortBatchProcessor;
     labelBatchProcessor = {
       processAdd: vi.fn(),
@@ -55,7 +56,7 @@ describe('InternalUpdater', () => {
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
 
-    it('should emit resizeNode when size changes', () => {
+    it('should emit updateNodes when size changes', () => {
       getNodeByIdMock.mockReturnValue({
         ...mockNode,
         size: { width: 100, height: 100 },
@@ -63,9 +64,8 @@ describe('InternalUpdater', () => {
 
       internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('resizeNode', {
-        id: 'node-1',
-        size: { width: 5, height: 5 },
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-1', size: { width: 5, height: 5 } }],
       });
     });
 
@@ -78,19 +78,84 @@ describe('InternalUpdater', () => {
     });
 
     it('should not call anything if manual resizing action is in progress', () => {
-      getNodeByIdMock.mockReturnValue(null);
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: { width: 100, height: 100 },
+      });
       isResizing.mockReturnValue(true);
 
       internalUpdater.applyNodeSize('node-1', { width: 5, height: 5 });
 
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
+
+    it('should accept initial size during resize (node without size)', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: undefined,
+      });
+      isResizing.mockReturnValue(true);
+
+      internalUpdater.applyNodeSize('node-1', { width: 50, height: 50 });
+
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-1', size: { width: 50, height: 50 } }],
+      });
+    });
+
+    it('should batch multiple nodes and filter unchanged ones in applyNodeSizes', () => {
+      isResizing.mockReturnValue(false);
+      const nodes: Record<string, typeof mockNode> = {
+        'node-1': { ...mockNode, id: 'node-1', size: { width: 100, height: 100 } },
+        'node-2': { ...mockNode, id: 'node-2', size: { width: 50, height: 50 } },
+        'node-3': { ...mockNode, id: 'node-3', size: { width: 200, height: 200 } },
+      };
+      getNodeByIdMock.mockImplementation((id: string) => nodes[id] ?? null);
+
+      internalUpdater.applyNodeSizes([
+        { id: 'node-1', size: { width: 100, height: 100 } }, // unchanged
+        { id: 'node-2', size: { width: 75, height: 75 } }, // changed
+        { id: 'node-3', size: { width: 200, height: 200 } }, // unchanged
+      ]);
+
+      expect(commandHandler.emit).toHaveBeenCalledTimes(1);
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-2', size: { width: 75, height: 75 } }],
+      });
+    });
+  });
+
+  describe('deletePort', () => {
+    it('should process port deletion through portBatchProcessor', () => {
+      portBatchProcessor.processDelete = vi.fn().mockImplementation((nodeId, portId, callback) => {
+        const allDeletions = new Map([[nodeId, [portId]]]);
+        callback(allDeletions);
+      });
+
+      internalUpdater.deletePort('node-1', 'port-1');
+
+      expect(portBatchProcessor.processDelete).toHaveBeenCalledWith('node-1', 'port-1', expect.any(Function));
+    });
+
+    it('should emit deletePortsBulk when portBatchProcessor calls callback', () => {
+      portBatchProcessor.processDelete = vi.fn().mockImplementation((nodeId, portId, callback) => {
+        const allDeletions = new Map([[nodeId, [portId]]]);
+        callback(allDeletions);
+      });
+
+      internalUpdater.deletePort('node-1', 'port-1');
+
+      expect(commandHandler.emit).toHaveBeenCalledWith('deletePortsBulk', {
+        deletions: new Map([['node-1', ['port-1']]]),
+      });
+    });
   });
 
   describe('addPort', () => {
     it('should process port through portBatchProcessor', () => {
       portBatchProcessor.processAdd = vi.fn().mockImplementation((nodeId, port, callback) => {
-        callback(nodeId, [port]);
+        const allAdditions = new Map([[nodeId, [port]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addPort('node-1', mockPort);
@@ -98,21 +163,22 @@ describe('InternalUpdater', () => {
       expect(portBatchProcessor.processAdd).toHaveBeenCalledWith('node-1', mockPort, expect.any(Function));
     });
 
-    it('should emit addPorts when portBatchProcessor calls callback', () => {
+    it('should emit addPortsBulk when portBatchProcessor calls callback', () => {
       portBatchProcessor.processAdd = vi.fn().mockImplementation((nodeId, port, callback) => {
-        callback(nodeId, [port]);
+        const allAdditions = new Map([[nodeId, [port]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addPort('node-1', mockPort);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('addPorts', {
-        nodeId: 'node-1',
-        ports: [mockPort],
+      const expectedAdditions = new Map([['node-1', [mockPort]]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('addPortsBulk', {
+        additions: expectedAdditions,
       });
     });
   });
 
-  describe('applyPortsSizesAndPositions', () => {
+  describe('applyPortChanges', () => {
     it('should not call portBatchProcessor if none of the ports are changed', () => {
       const node = {
         ...mockNode,
@@ -124,9 +190,9 @@ describe('InternalUpdater', () => {
       };
       getNodeByIdMock.mockReturnValue(node);
 
-      internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { id: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
-        { id: 'port-2', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { size: { width: 100, height: 100 }, position: { x: 100, y: 100 } } },
+        { portId: 'port-2', portChanges: { size: { width: 100, height: 100 }, position: { x: 100, y: 100 } } },
       ]);
 
       expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
@@ -145,13 +211,14 @@ describe('InternalUpdater', () => {
       getNodeByIdMock.mockReturnValue(node);
 
       portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, portUpdate, callback) => {
-        callback(nodeId, [portUpdate]);
+        const allUpdates = new Map([[nodeId, [portUpdate]]]);
+        callback(allUpdates);
       });
 
-      internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { id: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
-        { id: 'port-2', size: { width: 100, height: 100 }, position: { x: 50, y: 100 } },
-        { id: 'port-3', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } },
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { size: { width: 50, height: 100 }, position: { x: 100, y: 100 } } },
+        { portId: 'port-2', portChanges: { size: { width: 100, height: 100 }, position: { x: 50, y: 100 } } },
+        { portId: 'port-3', portChanges: { size: { width: 100, height: 100 }, position: { x: 100, y: 100 } } },
       ]);
 
       expect(portBatchProcessor.processUpdate).toHaveBeenCalledTimes(2);
@@ -167,7 +234,7 @@ describe('InternalUpdater', () => {
       );
     });
 
-    it('should emit updatePorts when portBatchProcessor calls callback', () => {
+    it('should emit updatePortsBulk when portBatchProcessor calls callback', () => {
       const node = {
         ...mockNode,
         measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 100, height: 100 }, position: { x: 100, y: 100 } }],
@@ -178,34 +245,224 @@ describe('InternalUpdater', () => {
         { portId: 'port-1', portChanges: { size: { width: 50, height: 100 }, position: { x: 100, y: 100 } } },
       ];
       portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, _, callback) => {
-        callback(nodeId, portUpdates);
+        const allUpdates = new Map([[nodeId, portUpdates]]);
+        callback(allUpdates);
       });
 
-      internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { id: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { size: { width: 50, height: 100 }, position: { x: 100, y: 100 } } },
       ]);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('updatePorts', {
-        nodeId: 'node-1',
-        ports: portUpdates,
+      const expectedUpdates = new Map([['node-1', portUpdates]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('updatePortsBulk', {
+        updates: expectedUpdates,
       });
     });
 
     it('should not call anything if node does not exist', () => {
       getNodeByIdMock.mockReturnValue(null);
 
-      internalUpdater.applyPortsSizesAndPositions('node-1', [
-        { id: 'port-1', size: { width: 50, height: 100 }, position: { x: 100, y: 100 } },
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { size: { width: 50, height: 100 }, position: { x: 100, y: 100 } } },
       ]);
 
       expect(commandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should pass through side changes even when size/position are unchanged', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            side: 'top' as const,
+            size: { width: 100, height: 100 },
+            position: { x: 100, y: 100 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, portUpdate, callback) => {
+        const allUpdates = new Map([[nodeId, [portUpdate]]]);
+        callback(allUpdates);
+      });
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { side: 'bottom' } }]);
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: 'port-1', portChanges: { side: 'bottom' } },
+        expect.any(Function)
+      );
+    });
+
+    it('should pass through type changes even when size/position are unchanged', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            type: 'source' as const,
+            size: { width: 100, height: 100 },
+            position: { x: 100, y: 100 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn().mockImplementation((nodeId, portUpdate, callback) => {
+        const allUpdates = new Map([[nodeId, [portUpdate]]]);
+        callback(allUpdates);
+      });
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { type: 'target' } }]);
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: 'port-1', portChanges: { type: 'target' } },
+        expect.any(Function)
+      );
+    });
+
+    it('should filter out side changes that match current state', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            side: 'top' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { side: 'top' } }]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out type changes that match current state', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            type: 'source' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { type: 'source' } }]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined side so it does not overwrite a valid value', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            side: 'left' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { side: undefined } }]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined type so it does not overwrite a valid value', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            type: 'source' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [{ portId: 'port-1', portChanges: { type: undefined } }]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should batch multiple side changes for the same node', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            side: 'top' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+          {
+            ...mockPort,
+            id: 'port-2',
+            side: 'bottom' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 0, y: 0 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      portBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { side: 'left' } },
+        { portId: 'port-2', portChanges: { side: 'right' } },
+      ]);
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledTimes(2);
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: 'port-1', portChanges: { side: 'left' } },
+        expect.any(Function)
+      );
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: 'port-2', portChanges: { side: 'right' } },
+        expect.any(Function)
+      );
     });
   });
 
   describe('addEdgeLabel', () => {
     it('should process label through labelBatchProcessor', () => {
       labelBatchProcessor.processAdd = vi.fn().mockImplementation((edgeId, label, callback) => {
-        callback(edgeId, [label]);
+        const allAdditions = new Map([[edgeId, [label]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
@@ -213,21 +470,46 @@ describe('InternalUpdater', () => {
       expect(labelBatchProcessor.processAdd).toHaveBeenCalledWith('edge-1', mockEdgeLabel, expect.any(Function));
     });
 
-    it('should emit addEdgeLabels when labelBatchProcessor calls callback', () => {
+    it('should emit addEdgeLabelsBulk when labelBatchProcessor calls callback', () => {
       labelBatchProcessor.processAdd = vi.fn().mockImplementation((edgeId, label, callback) => {
-        callback(edgeId, [label]);
+        const allAdditions = new Map([[edgeId, [label]]]);
+        callback(allAdditions);
       });
 
       internalUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('addEdgeLabels', {
-        edgeId: 'edge-1',
-        labels: [mockEdgeLabel],
+      const expectedAdditions = new Map([['edge-1', [mockEdgeLabel]]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('addEdgeLabelsBulk', {
+        additions: expectedAdditions,
       });
     });
   });
 
-  describe('applyEdgeLabelSize', () => {
+  describe('deleteEdgeLabel', () => {
+    it('should process deletion through labelBatchProcessor', () => {
+      labelBatchProcessor.processDelete = vi.fn();
+
+      internalUpdater.deleteEdgeLabel('edge-1', 'label-1');
+
+      expect(labelBatchProcessor.processDelete).toHaveBeenCalledWith('edge-1', 'label-1', expect.any(Function));
+    });
+
+    it('should emit deleteEdgeLabelsBulk when labelBatchProcessor calls callback', () => {
+      labelBatchProcessor.processDelete = vi.fn().mockImplementation((edgeId, labelId, callback) => {
+        const allDeletions = new Map([[edgeId, [labelId]]]);
+        callback(allDeletions);
+      });
+
+      internalUpdater.deleteEdgeLabel('edge-1', 'label-1');
+
+      const expectedDeletions = new Map([['edge-1', ['label-1']]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('deleteEdgeLabelsBulk', {
+        deletions: expectedDeletions,
+      });
+    });
+  });
+
+  describe('applyEdgeLabelChanges', () => {
     it('should not call anything if size is not changed', () => {
       const edge = {
         ...mockEdge,
@@ -235,7 +517,9 @@ describe('InternalUpdater', () => {
       };
       getEdgeByIdMock.mockReturnValue(edge);
 
-      internalUpdater.applyEdgeLabelSize(edge.id, mockEdgeLabel.id, { width: 100, height: 100 });
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 100, height: 100 } } },
+      ]);
 
       expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
     });
@@ -248,10 +532,13 @@ describe('InternalUpdater', () => {
       getEdgeByIdMock.mockReturnValue(edge);
 
       labelBatchProcessor.processUpdate = vi.fn().mockImplementation((edgeId, labelUpdate, callback) => {
-        callback(edgeId, [labelUpdate]);
+        const allUpdates = new Map([[edgeId, [labelUpdate]]]);
+        callback(allUpdates);
       });
 
-      internalUpdater.applyEdgeLabelSize(edge.id, mockEdgeLabel.id, { width: 50, height: 100 });
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 50, height: 100 } } },
+      ]);
 
       expect(labelBatchProcessor.processUpdate).toHaveBeenCalledWith(
         edge.id,
@@ -260,7 +547,7 @@ describe('InternalUpdater', () => {
       );
     });
 
-    it('should emit updateEdgeLabels when labelBatchProcessor calls callback', () => {
+    it('should emit updateEdgeLabelsBulk when labelBatchProcessor calls callback', () => {
       const edge = {
         ...mockEdge,
         measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
@@ -269,21 +556,26 @@ describe('InternalUpdater', () => {
 
       const labelUpdates = [{ labelId: mockEdgeLabel.id, labelChanges: { size: { width: 50, height: 100 } } }];
       labelBatchProcessor.processUpdate = vi.fn().mockImplementation((edgeId, _, callback) => {
-        callback(edgeId, labelUpdates);
+        const allUpdates = new Map([[edgeId, labelUpdates]]);
+        callback(allUpdates);
       });
 
-      internalUpdater.applyEdgeLabelSize(edge.id, mockEdgeLabel.id, { width: 50, height: 100 });
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 50, height: 100 } } },
+      ]);
 
-      expect(commandHandler.emit).toHaveBeenCalledWith('updateEdgeLabels', {
-        edgeId: edge.id,
-        labelUpdates: labelUpdates,
+      const expectedUpdates = new Map([[edge.id, labelUpdates]]);
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateEdgeLabelsBulk', {
+        updates: expectedUpdates,
       });
     });
 
     it('should not call anything if edge does not exist', () => {
       getEdgeByIdMock.mockReturnValue(null);
 
-      internalUpdater.applyEdgeLabelSize('edge-1', 'label-1', { width: 50, height: 100 });
+      internalUpdater.applyEdgeLabelChanges('edge-1', [
+        { labelId: 'label-1', labelChanges: { size: { width: 50, height: 100 } } },
+      ]);
 
       expect(commandHandler.emit).not.toHaveBeenCalled();
     });
@@ -295,9 +587,112 @@ describe('InternalUpdater', () => {
       };
       getEdgeByIdMock.mockReturnValue(edge);
 
-      internalUpdater.applyEdgeLabelSize(edge.id, 'non-existent-label', { width: 50, height: 100 });
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: 'non-existent-label', labelChanges: { size: { width: 50, height: 100 } } },
+      ]);
 
       expect(commandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should pass through positionOnEdge changes even when size is unchanged', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn().mockImplementation((edgeId, labelUpdate, callback) => {
+        const allUpdates = new Map([[edgeId, [labelUpdate]]]);
+        callback(allUpdates);
+      });
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { positionOnEdge: 0.75 } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        edge.id,
+        { labelId: mockEdgeLabel.id, labelChanges: { positionOnEdge: 0.75 } },
+        expect.any(Function)
+      );
+    });
+
+    it('should filter out positionOnEdge changes that match current state', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, positionOnEdge: 0.5, size: { width: 100, height: 100 } }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { positionOnEdge: 0.5 } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined size so it does not cause redundant emits', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, size: undefined }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: undefined } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should filter out undefined positionOnEdge so it does not overwrite a valid value', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, positionOnEdge: 0.5, size: { width: 100, height: 100 } }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { positionOnEdge: undefined } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should batch multiple label changes for the same edge', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [
+          { ...mockEdgeLabel, id: 'label-1', size: { width: 100, height: 100 } },
+          { ...mockEdgeLabel, id: 'label-2', size: { width: 100, height: 100 } },
+        ],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: 'label-1', labelChanges: { positionOnEdge: 0.25 } },
+        { labelId: 'label-2', labelChanges: { positionOnEdge: 0.75 } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).toHaveBeenCalledTimes(2);
+      expect(labelBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        edge.id,
+        { labelId: 'label-1', labelChanges: { positionOnEdge: 0.25 } },
+        expect.any(Function)
+      );
+      expect(labelBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        edge.id,
+        { labelId: 'label-2', labelChanges: { positionOnEdge: 0.75 } },
+        expect.any(Function)
+      );
     });
   });
 });

@@ -315,6 +315,42 @@ Array of node IDs that have any of these properties modified by the initial stat
 
 ***
 
+### getChangedEdgeIds()
+
+> **getChangedEdgeIds**: () => `string`[]
+
+Gets all edge IDs that have any property changed, regardless of which property.
+
+#### Returns
+
+`string`[]
+
+Array of edge IDs that were modified by the initial state update or any previous middleware
+
+#### Since
+
+1.2.2
+
+***
+
+### getChangedNodeIds()
+
+> **getChangedNodeIds**: () => `string`[]
+
+Gets all node IDs that have any property changed, regardless of which property.
+
+#### Returns
+
+`string`[]
+
+Array of node IDs that were modified by the initial state update or any previous middleware
+
+#### Since
+
+1.2.2
+
+***
+
 ### getRemovedEdges()
 
 > **getRemovedEdges**: () => [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]

@@ -56,6 +56,12 @@ export type ModelActionType =
   | 'updateEdge'
   | 'deleteEdges'
   | 'deleteElements'
+  | 'addEdgeLabelsBulk'
+  | 'updateEdgeLabelsBulk'
+  | 'deleteEdgeLabelsBulk'
+  | 'addPortsBulk'
+  | 'updatePortsBulk'
+  | 'deletePortsBulk'
   | 'paste'
   | 'moveViewport'
   | 'resizeNode'
@@ -291,6 +297,20 @@ export interface MiddlewareHelpers {
    * @returns Array of edge IDs that have any of these properties modified by the initial state update or any previous middleware
    */
   getAffectedEdgeIds: (props: string[]) => string[];
+
+  /**
+   * Gets all node IDs that have any property changed, regardless of which property.
+   * @since 1.2.2
+   * @returns Array of node IDs that were modified by the initial state update or any previous middleware
+   */
+  getChangedNodeIds: () => string[];
+
+  /**
+   * Gets all edge IDs that have any property changed, regardless of which property.
+   * @since 1.2.2
+   * @returns Array of edge IDs that were modified by the initial state update or any previous middleware
+   */
+  getChangedEdgeIds: () => string[];
 
   /**
    * Gets all nodes that were added.

@@ -103,10 +103,11 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
         untracked(() => {
           this.lastPositionOnEdge.set(newPositionOnEdge);
         });
-        this.flowCoreProvider.provide().commandHandler.emit('updateEdgeLabels', {
-          edgeId: this.edgeId(),
-          labelUpdates: [{ labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } }],
-        });
+        this.flowCoreProvider
+          .provide()
+          .updater.applyEdgeLabelChanges(this.edgeId(), [
+            { labelId: this.id(), labelChanges: { positionOnEdge: newPositionOnEdge } },
+          ]);
       }
     });
   }
@@ -137,10 +138,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    flowCore.commandHandler.emit('deleteEdgeLabels', {
-      edgeId: this.edgeId(),
-      labelIds: [this.id()],
-    });
+    flowCore.updater.deleteEdgeLabel(this.edgeId(), this.id());
     this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }

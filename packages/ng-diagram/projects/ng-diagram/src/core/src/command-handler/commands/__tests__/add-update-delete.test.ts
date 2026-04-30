@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { mockEdge, mockEdgeLabel, mockNode, mockPort } from '../../../test-utils';
+import { mockEdge, mockEdgeLabel, mockNode } from '../../../test-utils';
 import { CommandHandler } from '../../command-handler';
 
 describe('Add Update Delete Command', () => {
@@ -183,74 +183,18 @@ describe('Add Update Delete Command', () => {
     );
   });
 
-  it('should add ports to a node', () => {
-    const node = { ...mockNode, id: '1' };
-    const port = { ...mockPort, id: '1' };
-    getNodeByIdMock.mockReturnValue(node);
-
-    commandHandler.emit('addPorts', { nodeId: node.id, ports: [port] });
-
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
-      { nodesToUpdate: [{ id: '1', measuredPorts: [port] }] },
-      'updateNode'
-    );
-  });
-
-  it('should update ports', () => {
-    getNodeByIdMock.mockReturnValue({
-      ...mockNode,
-      measuredPorts: [mockPort, { ...mockPort, id: 'port2' }, { ...mockPort, id: 'port3' }],
-    });
-
-    commandHandler.emit('updatePorts', {
-      nodeId: mockNode.id,
-      ports: [
-        { portId: mockPort.id, portChanges: { size: { width: 100, height: 100 } } },
-        { portId: 'port2', portChanges: { size: { width: 100, height: 100 } } },
-      ],
-    });
-
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
-      {
-        nodesToUpdate: [
-          {
-            id: mockNode.id,
-            measuredPorts: [
-              { ...mockPort, size: { width: 100, height: 100 } },
-              { ...mockPort, id: 'port2', size: { width: 100, height: 100 } },
-              { ...mockPort, id: 'port3' },
-            ],
-          },
-        ],
-      },
-      'updateNode'
-    );
-  });
-
-  it('should delete ports from a node', () => {
-    getNodeByIdMock.mockReturnValue({ ...mockNode, measuredPorts: [mockPort] });
-
-    commandHandler.emit('deletePorts', { nodeId: mockNode.id, portIds: [mockPort.id] });
-
-    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
-      { nodesToUpdate: [{ id: mockNode.id, measuredPorts: [] }] },
-      'updateNode'
-    );
-  });
-
-  it('should add edge labels to an edge and apply position on edge', () => {
+  it('should add edge labels without resolving position (deferred to edge routing middleware)', () => {
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
 
-    commandHandler.emit('addEdgeLabels', {
-      edgeId: mockEdge.id,
-      labels: [mockEdgeLabel],
+    commandHandler.emit('addEdgeLabelsBulk', {
+      additions: new Map([[mockEdge.id, [mockEdgeLabel]]]),
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [{ ...mockEdgeLabel, position: { x: 50, y: 50 } }] }],
+        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [mockEdgeLabel] }],
       },
-      'updateEdge'
+      'addEdgeLabelsBulk'
     );
   });
 
@@ -258,9 +202,8 @@ describe('Add Update Delete Command', () => {
     const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
 
-    commandHandler.emit('updateEdgeLabels', {
-      edgeId: mockEdge.id,
-      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: 0 } }],
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: 0 } }]]]),
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
@@ -269,24 +212,86 @@ describe('Add Update Delete Command', () => {
           { id: mockEdge.id, measuredLabels: [{ ...mockEdgeLabel1, positionOnEdge: 0, position: { x: 0, y: 0 } }] },
         ],
       },
-      'updateEdge'
+      'updateEdgeLabelsBulk'
     );
   });
 
-  it('should add edge labels with absolute position', () => {
-    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
+  it('should preserve existing label positions when edge has no valid points', () => {
+    const existingLabel = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5, position: { x: 10, y: 20 } };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, points: [], measuredLabels: [existingLabel] });
 
-    const absoluteLabel = { ...mockEdgeLabel, id: 'abs-label', positionOnEdge: '30px' as const };
-    commandHandler.emit('addEdgeLabels', {
-      edgeId: mockEdge.id,
-      labels: [absoluteLabel],
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: existingLabel.id, labelChanges: { positionOnEdge: 0.75 } }]]]),
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
-        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [{ ...absoluteLabel, position: { x: 30, y: 0 } }] }],
+        edgesToUpdate: [
+          {
+            id: mockEdge.id,
+            measuredLabels: [{ ...existingLabel, positionOnEdge: 0.75, position: { x: 10, y: 20 } }],
+          },
+        ],
       },
-      'updateEdge'
+      'updateEdgeLabelsBulk'
+    );
+  });
+
+  it('should return unchanged labels by reference when edge has no valid points', () => {
+    const label1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5, position: { x: 10, y: 20 } };
+    const label2 = { ...mockEdgeLabel, id: 'label2', positionOnEdge: 0.75, position: { x: 30, y: 40 } };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, points: [], measuredLabels: [label1, label2] });
+
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: label1.id, labelChanges: { positionOnEdge: 0.25 } }]]]),
+    });
+
+    const call = vi.mocked(flowCore.applyUpdate).mock.calls[0];
+    const updatedLabels = (call[0] as { edgesToUpdate: { measuredLabels: unknown[] }[] }).edgesToUpdate[0]
+      .measuredLabels;
+
+    // label2 has no changes and no valid points — should be the same reference
+    expect(updatedLabels[1]).toBe(label2);
+  });
+
+  it('should recalculate unchanged label positions when edge has valid points', () => {
+    const label1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5, position: { x: 10, y: 20 } };
+    const label2 = { ...mockEdgeLabel, id: 'label2', positionOnEdge: 0.75, position: { x: 30, y: 40 } };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [label1, label2] });
+
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: label1.id, labelChanges: { positionOnEdge: 0 } }]]]),
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [
+          {
+            id: mockEdge.id,
+            measuredLabels: [
+              { ...label1, positionOnEdge: 0, position: { x: 0, y: 0 } },
+              { ...label2, position: { x: 50, y: 50 } },
+            ],
+          },
+        ],
+      },
+      'updateEdgeLabelsBulk'
+    );
+  });
+
+  it('should add edge labels with absolute position without resolving (deferred to edge routing middleware)', () => {
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
+
+    const absoluteLabel = { ...mockEdgeLabel, id: 'abs-label', positionOnEdge: '30px' as const };
+    commandHandler.emit('addEdgeLabelsBulk', {
+      additions: new Map([[mockEdge.id, [absoluteLabel]]]),
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [absoluteLabel] }],
+      },
+      'addEdgeLabelsBulk'
     );
   });
 
@@ -294,9 +299,10 @@ describe('Add Update Delete Command', () => {
     const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
 
-    commandHandler.emit('updateEdgeLabels', {
-      edgeId: mockEdge.id,
-      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: '20px' as const } }],
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([
+        [mockEdge.id, [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: '20px' as const } }]],
+      ]),
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
@@ -308,7 +314,7 @@ describe('Add Update Delete Command', () => {
           },
         ],
       },
-      'updateEdge'
+      'updateEdgeLabelsBulk'
     );
   });
 
@@ -316,9 +322,10 @@ describe('Add Update Delete Command', () => {
     const mockEdgeLabel1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5 };
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [mockEdgeLabel1] });
 
-    commandHandler.emit('updateEdgeLabels', {
-      edgeId: mockEdge.id,
-      labelUpdates: [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: '-20px' as const } }],
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([
+        [mockEdge.id, [{ labelId: mockEdgeLabel1.id, labelChanges: { positionOnEdge: '-20px' as const } }]],
+      ]),
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
@@ -330,7 +337,7 @@ describe('Add Update Delete Command', () => {
           },
         ],
       },
-      'updateEdge'
+      'updateEdgeLabelsBulk'
     );
   });
 
@@ -340,16 +347,15 @@ describe('Add Update Delete Command', () => {
       measuredLabels: [mockEdgeLabel, { ...mockEdgeLabel, id: 'label2' }],
     });
 
-    commandHandler.emit('deleteEdgeLabels', {
-      edgeId: mockEdge.id,
-      labelIds: [mockEdgeLabel.id],
+    commandHandler.emit('deleteEdgeLabelsBulk', {
+      deletions: new Map([[mockEdge.id, [mockEdgeLabel.id]]]),
     });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith(
       {
         edgesToUpdate: [{ id: mockEdge.id, measuredLabels: [{ ...mockEdgeLabel, id: 'label2' }] }],
       },
-      'updateEdge'
+      'deleteEdgeLabelsBulk'
     );
   });
 });

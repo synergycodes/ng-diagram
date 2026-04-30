@@ -9,8 +9,9 @@ describe('LateArrivalQueue', () => {
     addPort: Mock;
     addEdgeLabel: Mock;
     applyNodeSize: Mock;
-    applyPortsSizesAndPositions: Mock;
-    applyEdgeLabelSize: Mock;
+    applyPortChanges: Mock;
+    applyEdgeLabelChanges: Mock;
+    deleteEdgeLabel: Mock;
   } & Updater;
 
   const createMockPort = (id: string): Port => ({
@@ -33,8 +34,9 @@ describe('LateArrivalQueue', () => {
       addPort: vi.fn(),
       addEdgeLabel: vi.fn(),
       applyNodeSize: vi.fn(),
-      applyPortsSizesAndPositions: vi.fn(),
-      applyEdgeLabelSize: vi.fn(),
+      applyPortChanges: vi.fn(),
+      applyEdgeLabelChanges: vi.fn(),
+      deleteEdgeLabel: vi.fn(),
     } as typeof mockUpdater;
   });
 
@@ -91,8 +93,8 @@ describe('LateArrivalQueue', () => {
       expect(mockUpdater.addPort).not.toHaveBeenCalled();
       expect(mockUpdater.addEdgeLabel).not.toHaveBeenCalled();
       expect(mockUpdater.applyNodeSize).not.toHaveBeenCalled();
-      expect(mockUpdater.applyPortsSizesAndPositions).not.toHaveBeenCalled();
-      expect(mockUpdater.applyEdgeLabelSize).not.toHaveBeenCalled();
+      expect(mockUpdater.applyPortChanges).not.toHaveBeenCalled();
+      expect(mockUpdater.applyEdgeLabelChanges).not.toHaveBeenCalled();
     });
 
     it('should process addPort arrival', () => {
@@ -125,27 +127,59 @@ describe('LateArrivalQueue', () => {
       expect(mockUpdater.applyNodeSize).toHaveBeenCalledTimes(1);
     });
 
-    it('should process applyPortsSizesAndPositions arrival', () => {
-      const ports = [
-        { id: 'port1', size: { width: 10, height: 10 }, position: { x: 0, y: 0 } },
-        { id: 'port2', size: { width: 20, height: 20 }, position: { x: 10, y: 10 } },
+    it('should process applyPortChanges arrival', () => {
+      const portUpdates = [
+        { portId: 'port1', portChanges: { size: { width: 10, height: 10 }, position: { x: 0, y: 0 } } },
+        { portId: 'port2', portChanges: { size: { width: 20, height: 20 }, position: { x: 10, y: 10 } } },
       ];
-      queue.enqueue({ method: 'applyPortsSizesAndPositions', args: ['node1', ports] });
+      queue.enqueue({ method: 'applyPortChanges', args: ['node1', portUpdates] });
 
       queue.processAll(mockUpdater);
 
-      expect(mockUpdater.applyPortsSizesAndPositions).toHaveBeenCalledWith('node1', ports);
-      expect(mockUpdater.applyPortsSizesAndPositions).toHaveBeenCalledTimes(1);
+      expect(mockUpdater.applyPortChanges).toHaveBeenCalledWith('node1', portUpdates);
+      expect(mockUpdater.applyPortChanges).toHaveBeenCalledTimes(1);
     });
 
-    it('should process applyEdgeLabelSize arrival', () => {
-      const size = { width: 50, height: 20 };
-      queue.enqueue({ method: 'applyEdgeLabelSize', args: ['edge1', 'label1', size] });
+    it('should process applyEdgeLabelChanges arrival', () => {
+      const labelUpdates = [{ labelId: 'label1', labelChanges: { size: { width: 50, height: 20 } } }];
+      queue.enqueue({ method: 'applyEdgeLabelChanges', args: ['edge1', labelUpdates] });
 
       queue.processAll(mockUpdater);
 
-      expect(mockUpdater.applyEdgeLabelSize).toHaveBeenCalledWith('edge1', 'label1', size);
-      expect(mockUpdater.applyEdgeLabelSize).toHaveBeenCalledTimes(1);
+      expect(mockUpdater.applyEdgeLabelChanges).toHaveBeenCalledWith('edge1', labelUpdates);
+      expect(mockUpdater.applyEdgeLabelChanges).toHaveBeenCalledTimes(1);
+    });
+
+    it('should process applyPortChanges arrival with side/type changes', () => {
+      const portUpdates = [
+        { portId: 'port1', portChanges: { side: 'left' as const } },
+        { portId: 'port2', portChanges: { type: 'target' as const } },
+      ];
+      queue.enqueue({ method: 'applyPortChanges', args: ['node1', portUpdates] });
+
+      queue.processAll(mockUpdater);
+
+      expect(mockUpdater.applyPortChanges).toHaveBeenCalledWith('node1', portUpdates);
+      expect(mockUpdater.applyPortChanges).toHaveBeenCalledTimes(1);
+    });
+
+    it('should process applyEdgeLabelChanges arrival with positionOnEdge changes', () => {
+      const labelUpdates = [{ labelId: 'label1', labelChanges: { positionOnEdge: 0.75 } }];
+      queue.enqueue({ method: 'applyEdgeLabelChanges', args: ['edge1', labelUpdates] });
+
+      queue.processAll(mockUpdater);
+
+      expect(mockUpdater.applyEdgeLabelChanges).toHaveBeenCalledWith('edge1', labelUpdates);
+      expect(mockUpdater.applyEdgeLabelChanges).toHaveBeenCalledTimes(1);
+    });
+
+    it('should process deleteEdgeLabel arrival', () => {
+      queue.enqueue({ method: 'deleteEdgeLabel', args: ['edge1', 'label1'] });
+
+      queue.processAll(mockUpdater);
+
+      expect(mockUpdater.deleteEdgeLabel).toHaveBeenCalledWith('edge1', 'label1');
+      expect(mockUpdater.deleteEdgeLabel).toHaveBeenCalledTimes(1);
     });
 
     it('should process multiple arrivals in order', () => {

@@ -1,4 +1,6 @@
-import { EdgeLabel, Node, Port, Size } from '../../types';
+import { EdgeLabel, Node, Port } from '../../types';
+import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
+import type { LabelUpdate } from '../../label-batch-processor/label-batch-processor';
 import { Updater } from '../updater.interface';
 
 /**
@@ -9,11 +11,9 @@ export type LateArrival =
   | { method: 'addPort'; args: [nodeId: string, port: Port] }
   | { method: 'addEdgeLabel'; args: [edgeId: string, label: EdgeLabel] }
   | { method: 'applyNodeSize'; args: [nodeId: string, size: NonNullable<Node['size']>] }
-  | {
-      method: 'applyPortsSizesAndPositions';
-      args: [nodeId: string, ports: NonNullable<Pick<Port, 'id' | 'size' | 'position'>>[]];
-    }
-  | { method: 'applyEdgeLabelSize'; args: [edgeId: string, labelId: string, size: Size] };
+  | { method: 'applyPortChanges'; args: [nodeId: string, portUpdates: PortUpdate[]] }
+  | { method: 'applyEdgeLabelChanges'; args: [edgeId: string, labelUpdates: LabelUpdate[]] }
+  | { method: 'deleteEdgeLabel'; args: [edgeId: string, labelId: string] };
 
 /**
  * Queues late arrivals during initialization finish to prevent data loss.
@@ -86,11 +86,14 @@ export class LateArrivalQueue {
         case 'applyNodeSize':
           updater.applyNodeSize(...lateArrival.args);
           break;
-        case 'applyPortsSizesAndPositions':
-          updater.applyPortsSizesAndPositions(...lateArrival.args);
+        case 'applyPortChanges':
+          updater.applyPortChanges(...lateArrival.args);
           break;
-        case 'applyEdgeLabelSize':
-          updater.applyEdgeLabelSize(...lateArrival.args);
+        case 'applyEdgeLabelChanges':
+          updater.applyEdgeLabelChanges(...lateArrival.args);
+          break;
+        case 'deleteEdgeLabel':
+          updater.deleteEdgeLabel(...lateArrival.args);
           break;
       }
     }

@@ -6,6 +6,10 @@
   overflow: hidden;
   background-color: var(--ngd-diagram-background-color);
   touch-action: none;
+  // Prevent iOS/iPadOS magnifying glass and context menu on long press due to box selection long press
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
   transform: translateZ(0px);
   -webkit-font-smoothing: antialiased;
   outline: none;

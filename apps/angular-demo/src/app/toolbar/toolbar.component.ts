@@ -29,7 +29,9 @@ export class ToolbarComponent {
   saveModelClick = output<void>();
   loadModelClick = output<void>();
   simulateModelDownloadClick = output<void>();
+  enterBatchTest = output<void>();
 
+  measurementTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
 
   selectedLabelledEdge = computed(() => {
@@ -134,5 +136,44 @@ export class ToolbarComponent {
     console.log('Zooming to fit...');
 
     this.ngDiagramViewportService.zoomToFit();
+  }
+
+  async onCreateEdgeWithLabel() {
+    const ts = Date.now();
+    const node1Id = `edge-label-src-${ts}`;
+    const node2Id = `edge-label-tgt-${ts}`;
+    const edgeId = `edge-label-edge-${ts}`;
+
+    await this.ngDiagramService.transaction(
+      () => {
+        this.ngDiagramModelService.addNodes([
+          {
+            id: node1Id,
+            position: { x: 2000, y: 2000 },
+            data: { label: 'Source' },
+          },
+          {
+            id: node2Id,
+            position: { x: 2400, y: 2000 },
+            data: { label: 'Target' },
+          },
+        ]);
+
+        this.ngDiagramModelService.addEdges([
+          {
+            id: edgeId,
+            type: 'labelled-edge',
+            source: node1Id,
+            target: node2Id,
+            sourcePort: 'port-right',
+            targetPort: 'port-left',
+            data: { labelPosition: 0.5 },
+          },
+        ]);
+      },
+      { waitForMeasurements: true }
+    );
+
+    this.ngDiagramViewportService.centerOnNode(node2Id);
   }
 }

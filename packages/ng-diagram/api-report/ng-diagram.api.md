@@ -558,6 +558,8 @@ export interface MiddlewareHelpers {
     getAddedNodes: () => Node_2[];
     getAffectedEdgeIds: (props: string[]) => string[];
     getAffectedNodeIds: (props: string[]) => string[];
+    getChangedEdgeIds: () => string[];
+    getChangedNodeIds: () => string[];
     getRemovedEdges: () => Edge[];
     getRemovedNodes: () => Node_2[];
 }
@@ -634,7 +636,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'selectEnd';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'selectEnd';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];

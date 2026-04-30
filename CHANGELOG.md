@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-04-30
+
+### Changed
+
+- Reworked port and label measurement pipeline to batch DOM reads and writes, reducing layout thrashing during bulk operations ([#671](https://github.com/synergycodes/ng-diagram/pull/671))
+
+### Added
+
+- `getChangedNodeIds()` and `getChangedEdgeIds()` helpers on `MiddlewareHelpers` — return IDs of all nodes/edges with property changes in the current update ([#671](https://github.com/synergycodes/ng-diagram/pull/671))
+
+### Fixed
+
+- Fixed `waitForMeasurements` transaction not tracking port measurements, causing the transaction to resolve before ports were measured ([#685](https://github.com/synergycodes/ng-diagram/pull/685))
+- Fixed race condition when applying multiple port changes in a single transaction ([#671](https://github.com/synergycodes/ng-diagram/pull/671))
+- Fixed touch input (text fields, dropdowns) inside custom nodes not responding on iOS/iPadOS due to `preventDefault` in the box selection touch handler ([#686](https://github.com/synergycodes/ng-diagram/pull/686))
+
 ## [1.2.1] - 2026-04-21
 
 ### Added
@@ -226,7 +242,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/synergycodes/ng-diagram/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/synergycodes/ng-diagram/compare/v1.1.1...v1.1.2

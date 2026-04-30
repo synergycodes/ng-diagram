@@ -1,123 +1,154 @@
-export const DEFAULT_SAFETY_TIMEOUT = 2000;
+export const DEFAULT_DISCOVERY_WINDOW_TIMEOUT = 70;
 export const DEFAULT_DEBOUNCE_TIMEOUT = 50;
+
+/**
+ * When a ResizeObserver fires during an active timer (discovery window or debounce)
+ * and the remaining time is below this threshold, the timer is extended to its full
+ * duration. This gives the double-RAF measurement pipeline (~32ms) enough time to deliver.
+ */
+export const OBSERVER_ACTIVITY_MIN_REMAINING = 40;
+
+export interface MeasurementTrackingConfig {
+  discoveryWindowMs?: number;
+  debounceMs?: number;
+}
+
+type Phase = 'idle' | 'discoveryWindow' | 'debounce';
+
+interface PhaseTimer {
+  timeoutId: number | null;
+  expiresAt: number;
+  durationMs: number;
+}
 
 /**
  * Tracks pending measurements and notifies when all measurements are complete.
  *
  * This class coordinates asynchronous DOM measurements (node sizes, port positions, labels, etc.)
- * with transaction completion.
+ * with transaction completion using a two-phase observation model.
  *
  * ## Timing Model
  *
- * 1. **`trackEntities()` is called**: Entities are registered and activity is signaled immediately
- *    (because the middleware already detected actual changes). A debounce timer starts, along with
- *    a safety timeout.
+ * ### Phase 1: Discovery Window
+ * After `registerParticipants()` is called, a discovery window opens. The tracker waits
+ * to see if any measurement activity occurs for the registered participant entities.
  *
- * 2. **Subsequent DOM measurement signals arrive**: Each signal resets the debounce timer.
+ * - If a **measurement signal** arrives (via `signalMeasurement()`): transitions to Phase 2.
+ * - If a **ResizeObserver early signal** arrives (via `signalObserverActivity()`):
+ *   if remaining time is below `OBSERVER_ACTIVITY_MIN_REMAINING`, the timer resets
+ *   to full `discoveryWindowMs`, giving the double-RAF pipeline time to deliver.
+ * - If the timer expires with no activity: resolves — nothing to measure.
  *
- * 3. **Debounce expires** (no signals for `debounceMs`): Measurements complete normally.
- *
- * 4. **Safety timeout fires** (total time exceeds `safetyTimeoutMs`): Measurements are
- *    force-completed with a warning. This catches genuine rendering stalls.
+ * ### Phase 2: Debounce
+ * Once the first measurement arrives, subsequent measurements reset a debounce timer.
+ * When no measurements arrive for `debounceMs`, measurements are considered settled.
  *
  * @example
  * ```typescript
- * // Stage config and track entities that actually changed
- * tracker.setNextTrackingConfig(debounceMs, safetyTimeoutMs);
- * // ... middleware detects actual changes ...
- * tracker.trackEntities(['node:abc', 'edge:xyz']); // signals immediately, starts debounce
+ * tracker.requestTracking({ discoveryWindowMs: 50, debounceMs: 50 });
+ * tracker.registerParticipants(['node:abc', 'edge:xyz']); // starts discovery window
  *
- * // Subsequent DOM measurement signals reset the debounce
- * tracker.signalNodeMeasurement(nodeId);
+ * // ResizeObserver fired for a participant — extend if running low
+ * tracker.signalObserverActivity('node:abc');
  *
- * // Wait for all measurements to settle
+ * // Measurement arrived — transition to debounce
+ * tracker.signalMeasurement('node:abc');
+ *
  * await tracker.waitForMeasurements();
  * ```
  *
  * @internal
  */
 export class MeasurementTracker {
-  private trackedIds = new Set<string>();
-  private debounceTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  private safetyTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  private waitingPromise: Promise<void> | null = null;
-  private waitingResolve: (() => void) | null = null;
+  private phase: Phase = 'idle';
+  private participantIds = new Set<string>();
+  private pendingConfig: MeasurementTrackingConfig | null = null;
 
-  private debounceMs = DEFAULT_DEBOUNCE_TIMEOUT;
-  private safetyTimeoutMs = DEFAULT_SAFETY_TIMEOUT;
+  private discoveryWindow: PhaseTimer = { timeoutId: null, expiresAt: 0, durationMs: DEFAULT_DISCOVERY_WINDOW_TIMEOUT };
+  private debounce: PhaseTimer = { timeoutId: null, expiresAt: 0, durationMs: DEFAULT_DEBOUNCE_TIMEOUT };
 
-  private pendingConfig: { debounceMs: number; safetyTimeoutMs: number } | null = null;
+  private settlementPromise: Promise<void> | null = null;
+  private settlementResolve: (() => void) | null = null;
 
   /**
-   * Stages timeout configuration for the next middleware-driven tracking pass.
-   *
-   * @param debounceMs - Debounce duration in milliseconds
-   * @param safetyTimeoutMs - Maximum time to wait before force-completing with a warning
+   * Stages tracking configuration for the next middleware-driven registration pass.
+   * Called before `applyUpdate()` when `waitForMeasurements` is requested.
    */
-  setNextTrackingConfig(debounceMs?: number, safetyTimeoutMs?: number): void {
-    this.pendingConfig = {
-      debounceMs: debounceMs ?? DEFAULT_DEBOUNCE_TIMEOUT,
-      safetyTimeoutMs: safetyTimeoutMs ?? DEFAULT_SAFETY_TIMEOUT,
-    };
+  requestTracking(config?: MeasurementTrackingConfig): void {
+    this.pendingConfig = config ?? {};
   }
 
   /**
-   * Returns true if tracking has been requested via setNextTrackingConfig().
-   * Used by the measurement-tracking middleware to decide whether to track entities.
+   * Returns true if tracking has been requested via `requestTracking()`.
+   * Used by the measurement-tracking middleware to decide first-pass vs subsequent-pass mode.
    */
   isTrackingRequested(): boolean {
     return this.pendingConfig !== null;
   }
 
   /**
-   * Tracks entities detected by the middleware as actually changed.
-   * Consumes the pending config from setNextTrackingConfig().
+   * Registers entities that participated in the transaction.
+   * Consumes the pending config from `requestTracking()`.
    *
    * If entityIds is empty (full no-op), just clears the pending config.
-   * Otherwise, adds IDs to trackedIds and immediately signals activity for each
-   * (because the changes already happened in the middleware). This starts the
-   * debounce timer. Subsequent DOM measurement signals will reset the debounce as needed.
+   * Otherwise, adds IDs to `participantIds` and starts the discovery window.
    *
    * @param entityIds - Prefixed entity IDs (e.g. 'node:abc', 'edge:xyz')
    */
-  trackEntities(entityIds: string[]): void {
+  registerParticipants(entityIds: string[]): void {
     const config = this.pendingConfig;
     this.pendingConfig = null;
 
     if (entityIds.length === 0) return;
 
     if (config) {
-      this.debounceMs = config.debounceMs;
-      this.safetyTimeoutMs = config.safetyTimeoutMs;
+      this.discoveryWindow.durationMs = config.discoveryWindowMs ?? DEFAULT_DISCOVERY_WINDOW_TIMEOUT;
+      this.debounce.durationMs = config.debounceMs ?? DEFAULT_DEBOUNCE_TIMEOUT;
     }
 
     for (const id of entityIds) {
-      this.trackedIds.add(id);
+      this.participantIds.add(id);
     }
 
-    if (!this.safetyTimeoutId) {
-      this.safetyTimeoutId = setTimeout(() => {
-        this.onSafetyTimeout();
-      }, this.safetyTimeoutMs);
-    }
+    this.phase = 'discoveryWindow';
+    this.startTimer(this.discoveryWindow);
+  }
 
-    for (const id of entityIds) {
-      this.signalActivity(id);
+  /**
+   * Signals that a ResizeObserver fired for a participant entity before batch processing.
+   * This is an early indicator that measurements are in the pipeline (the double-RAF
+   * processing hasn't delivered them yet).
+   *
+   * In both phases, if the remaining time is below `OBSERVER_ACTIVITY_MIN_REMAINING`,
+   * the active timer resets to its full duration.
+   */
+  signalObserverActivity(entityId: string): void {
+    if (this.phase === 'idle') return;
+    if (!this.participantIds.has(entityId)) return;
+
+    const timer = this.activeTimer();
+    if (this.remainingTime(timer) < OBSERVER_ACTIVITY_MIN_REMAINING) {
+      this.startTimer(timer);
     }
   }
 
   /**
-   * Signals that measurement activity occurred for a node.
+   * Signals that an actual measurement arrived for a participant entity
+   * (e.g., `measuredPorts`, `size`, `position`, `measuredLabels` changed via `setState`).
+   *
+   * - During discovery window: transitions to debounce phase.
+   * - During debounce phase: resets the debounce timer.
    */
-  signalNodeMeasurement(nodeId: string): void {
-    this.signalActivity(`node:${nodeId}`);
-  }
+  signalMeasurement(entityId: string): void {
+    if (this.phase === 'idle') return;
+    if (!this.participantIds.has(entityId)) return;
 
-  /**
-   * Signals that measurement activity occurred for an edge.
-   */
-  signalEdgeMeasurement(edgeId: string): void {
-    this.signalActivity(`edge:${edgeId}`);
+    if (this.phase === 'discoveryWindow') {
+      this.clearTimer(this.discoveryWindow);
+    }
+
+    this.phase = 'debounce';
+    this.startTimer(this.debounce);
   }
 
   /**
@@ -129,59 +160,56 @@ export class MeasurementTracker {
       return Promise.resolve();
     }
 
-    if (this.waitingPromise) {
-      return this.waitingPromise;
+    if (this.settlementPromise) {
+      return this.settlementPromise;
     }
 
-    this.waitingPromise = new Promise<void>((resolve) => {
-      this.waitingResolve = resolve;
+    this.settlementPromise = new Promise<void>((resolve) => {
+      this.settlementResolve = resolve;
     });
 
-    return this.waitingPromise;
+    return this.settlementPromise;
   }
 
   hasPendingMeasurements(): boolean {
-    return this.trackedIds.size > 0;
+    return this.phase !== 'idle';
   }
 
-  private onSafetyTimeout(): void {
-    this.safetyTimeoutId = null;
-    const pendingIds = [...this.trackedIds];
-    console.warn('[MeasurementTracker] Safety timeout reached. Measurements may not have completed.', {
-      pendingEntities: pendingIds,
-      timeoutMs: this.safetyTimeoutMs,
-    });
-    this.clear();
+  // -- State machine internals --
+
+  private activeTimer(): PhaseTimer {
+    return this.phase === 'discoveryWindow' ? this.discoveryWindow : this.debounce;
   }
 
-  private signalActivity(id: string): void {
-    if (!this.trackedIds.has(id)) return;
-
-    if (this.debounceTimeoutId) {
-      clearTimeout(this.debounceTimeoutId);
-    }
-
-    this.debounceTimeoutId = setTimeout(() => {
-      this.clear();
-    }, this.debounceMs);
+  private remainingTime(timer: PhaseTimer): number {
+    return timer.expiresAt - Date.now();
   }
 
-  private clear(): void {
-    if (this.safetyTimeoutId) {
-      clearTimeout(this.safetyTimeoutId);
-      this.safetyTimeoutId = null;
-    }
-    if (this.debounceTimeoutId) {
-      clearTimeout(this.debounceTimeoutId);
-      this.debounceTimeoutId = null;
-    }
+  private startTimer(timer: PhaseTimer): void {
+    this.clearTimer(timer);
+    timer.expiresAt = Date.now() + timer.durationMs;
+    timer.timeoutId = setTimeout(() => {
+      this.resolve();
+    }, timer.durationMs) as unknown as number;
+  }
 
-    this.trackedIds.clear();
+  private clearTimer(timer: PhaseTimer): void {
+    if (timer.timeoutId) {
+      clearTimeout(timer.timeoutId);
+      timer.timeoutId = null;
+    }
+  }
 
-    if (this.waitingResolve) {
-      this.waitingResolve();
-      this.waitingResolve = null;
-      this.waitingPromise = null;
+  private resolve(): void {
+    this.phase = 'idle';
+    this.participantIds.clear();
+    this.clearTimer(this.discoveryWindow);
+    this.clearTimer(this.debounce);
+
+    if (this.settlementResolve) {
+      this.settlementResolve();
+      this.settlementResolve = null;
+      this.settlementPromise = null;
     }
   }
 }
