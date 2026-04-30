@@ -73,6 +73,7 @@ The [`helpers`](/docs/api/types/middleware/middlewarecontext/#helpers) object pr
 - [`getAffectedEdgeIds(['prop1', 'prop2'])`](/docs/api/types/middleware/middlewarehelpers/#getaffectededgeids) – Get IDs of edges with specified properties changed.
 - [`getAddedNodes()`](/docs/api/types/middleware/middlewarehelpers/#getaddednodes) / [`getAddedEdges()`](/docs/api/types/middleware/middlewarehelpers/#getaddededges) – Get instances of added nodes/edges.
 - [`getRemovedNodes()`](/docs/api/types/middleware/middlewarehelpers/#getremovednodes) / [`getRemovedEdges()`](/docs/api/types/middleware/middlewarehelpers/#getremovededges) – Get instances of removed nodes/edges (from initial state).
+- [`getChangedNodeIds()`](/docs/api/types/middleware/middlewarehelpers/#getchangednodeids) / [`getChangedEdgeIds()`](/docs/api/types/middleware/middlewarehelpers/#getchangededgeids) – Get IDs of all nodes/edges with any property changes.
 
 These helpers allow you to efficiently check what changed during the middleware execution chain.
 
