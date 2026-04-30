@@ -327,6 +327,10 @@ Gets all edge IDs that have any property changed, regardless of which property.
 
 Array of edge IDs that were modified by the initial state update or any previous middleware
 
+#### Since
+
+1.2.2
+
 ***
 
 ### getChangedNodeIds()
@@ -340,6 +344,10 @@ Gets all node IDs that have any property changed, regardless of which property.
 `string`[]
 
 Array of node IDs that were modified by the initial state update or any previous middleware
+
+#### Since
+
+1.2.2
 
 ***
 
