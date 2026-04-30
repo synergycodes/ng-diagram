@@ -50,9 +50,6 @@ export class MobileBoxSelectionDirective {
         this.emitBoxSelectionEvent('start', event, touch);
       }
     }, this.LONG_PRESS_DELAY);
-
-    event.preventDefault();
-    event.stopPropagation();
   }
 
   onTouchMove(event: TouchEvent): void {
