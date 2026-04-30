@@ -38,6 +38,7 @@ export const checkIfShouldRouteEdges = ({
       'target',
       'routing',
       'routingMode',
+      'measuredLabels',
     ])
   );
 };
@@ -72,6 +73,12 @@ export const havePointsChanged = (oldPoints: Point[] | undefined, newPoints: Poi
  * Updates label positions based on edge points.
  */
 export const updateLabelPositions = (edge: Edge, points: Point[], routingManager: EdgeRoutingManager) => {
+  // Don't resolve label positions when edge has no points yet — ports may not be measured.
+  // Labels will be positioned on a subsequent routing pass when points become available.
+  if (points.length < 2) {
+    return edge.measuredLabels;
+  }
+
   return edge.measuredLabels?.map((label) => ({
     ...label,
     position: resolveLabelPosition(label.positionOnEdge, edge.routing, points, routingManager),

@@ -1,5 +1,5 @@
 import { resolveLabelPosition } from '../../edge-routing-manager';
-import type { CommandHandler, Edge, EdgeLabel, Node, Port } from '../../types';
+import type { CommandHandler, Edge, EdgeLabel, EdgeLabelPosition, Node, Point, Port } from '../../types';
 import { snapNodePosition } from '../../utils';
 
 const computeAddedPorts = (node: Node, ports: Port[]): Port[] => {
@@ -233,21 +233,14 @@ export interface AddEdgeLabelsBulkCommand {
 export const addEdgeLabelsBulk = async (commandHandler: CommandHandler, command: AddEdgeLabelsBulkCommand) => {
   const { additions } = command;
   const edgesToUpdate: { id: string; measuredLabels: EdgeLabel[] }[] = [];
-  const edgeRoutingManager = commandHandler.flowCore.edgeRoutingManager;
 
   additions.forEach((labels, edgeId) => {
     const edge = commandHandler.flowCore.getEdgeById(edgeId);
     if (!edge) {
       return;
     }
-    const points = edge.points || [];
-    const newLabels = [
-      ...(edge.measuredLabels ?? []),
-      ...labels.map((label) => ({
-        ...label,
-        position: resolveLabelPosition(label.positionOnEdge, edge.routing, points, edgeRoutingManager),
-      })),
-    ];
+
+    const newLabels = [...(edge.measuredLabels ?? []), ...labels];
     edgesToUpdate.push({ id: edgeId, measuredLabels: newLabels });
   });
 
@@ -280,16 +273,19 @@ export const updateEdgeLabelsBulk = async (commandHandler: CommandHandler, comma
       updatesMap.set(labelId, labelChanges);
     });
 
+    const hasValidPoints = points.length >= 2;
+    const resolvePosition = (positionOnEdge: EdgeLabelPosition, fallback: Point | undefined) =>
+      hasValidPoints ? resolveLabelPosition(positionOnEdge, edge.routing, points, edgeRoutingManager) : fallback;
+
     const newLabels = edge.measuredLabels?.map((label) => {
       const labelChanges = updatesMap.get(label.id);
       if (!labelChanges) {
-        const position = resolveLabelPosition(label.positionOnEdge, edge.routing, points, edgeRoutingManager);
-        return { ...label, position };
+        if (!hasValidPoints) return label;
+        return { ...label, position: resolvePosition(label.positionOnEdge, label.position) };
       }
 
       const positionOnEdge = labelChanges.positionOnEdge ?? label.positionOnEdge;
-      const position = resolveLabelPosition(positionOnEdge, edge.routing, points, edgeRoutingManager);
-      return { ...label, ...labelChanges, position };
+      return { ...label, ...labelChanges, position: resolvePosition(positionOnEdge, label.position) };
     });
 
     if (newLabels) {
