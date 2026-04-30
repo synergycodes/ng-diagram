@@ -237,6 +237,48 @@ describe('Add Update Delete Command', () => {
     );
   });
 
+  it('should return unchanged labels by reference when edge has no valid points', () => {
+    const label1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5, position: { x: 10, y: 20 } };
+    const label2 = { ...mockEdgeLabel, id: 'label2', positionOnEdge: 0.75, position: { x: 30, y: 40 } };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, points: [], measuredLabels: [label1, label2] });
+
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: label1.id, labelChanges: { positionOnEdge: 0.25 } }]]]),
+    });
+
+    const call = vi.mocked(flowCore.applyUpdate).mock.calls[0];
+    const updatedLabels = (call[0] as { edgesToUpdate: { measuredLabels: unknown[] }[] }).edgesToUpdate[0]
+      .measuredLabels;
+
+    // label2 has no changes and no valid points — should be the same reference
+    expect(updatedLabels[1]).toBe(label2);
+  });
+
+  it('should recalculate unchanged label positions when edge has valid points', () => {
+    const label1 = { ...mockEdgeLabel, id: 'label1', positionOnEdge: 0.5, position: { x: 10, y: 20 } };
+    const label2 = { ...mockEdgeLabel, id: 'label2', positionOnEdge: 0.75, position: { x: 30, y: 40 } };
+    getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [label1, label2] });
+
+    commandHandler.emit('updateEdgeLabelsBulk', {
+      updates: new Map([[mockEdge.id, [{ labelId: label1.id, labelChanges: { positionOnEdge: 0 } }]]]),
+    });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        edgesToUpdate: [
+          {
+            id: mockEdge.id,
+            measuredLabels: [
+              { ...label1, positionOnEdge: 0, position: { x: 0, y: 0 } },
+              { ...label2, position: { x: 50, y: 50 } },
+            ],
+          },
+        ],
+      },
+      'updateEdgeLabelsBulk'
+    );
+  });
+
   it('should add edge labels with absolute position without resolving (deferred to edge routing middleware)', () => {
     getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
 
