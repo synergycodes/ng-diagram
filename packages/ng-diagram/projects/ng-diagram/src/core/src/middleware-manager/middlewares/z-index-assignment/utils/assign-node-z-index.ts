@@ -23,7 +23,11 @@ export function assignNodeZIndex(
   function assignZIndex(currentNode: Node, zIndex: number, selected?: boolean): number {
     const nodeWithZIndex: Node = {
       ...currentNode,
-      computedZIndex: selected ? (currentNode?.zOrder ?? zIndex) : zIndex,
+      computedZIndex: selected
+        ? currentNode.groupId != null
+          ? Math.max(currentNode?.zOrder ?? zIndex, zIndex)
+          : (currentNode?.zOrder ?? zIndex)
+        : zIndex,
     };
     nodesWithZIndex.push(nodeWithZIndex);
 

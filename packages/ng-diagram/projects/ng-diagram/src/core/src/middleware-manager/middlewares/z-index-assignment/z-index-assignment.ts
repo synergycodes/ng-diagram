@@ -101,8 +101,10 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
               ? getGroupCurrentZIndex(node) + 1
               : selectedZIndex
             : node.zOrder !== undefined
-              ? node.zOrder
-              : node.groupId
+              ? node.groupId != null
+                ? Math.max(node.zOrder, getGroupCurrentZIndex(node) + 1)
+                : node.zOrder
+              : node.groupId != null
                 ? getGroupCurrentZIndex(node) + 1
                 : 0;
         const assignedNodes = assignNodeZIndex(
@@ -139,7 +141,9 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
       for (const nodeId of helpers.getAffectedNodeIds(['zOrder']).sort(sortWithGroupBefore)) {
         const node = nodesMap.get(nodeId);
         if (!node) continue;
-        const nodeWithZIndex = { ...node, computedZIndex: node.zOrder };
+        const computedZIndex =
+          node.groupId != null ? Math.max(node.zOrder ?? 0, getGroupCurrentZIndex(node) + 1) : node.zOrder;
+        const nodeWithZIndex = { ...node, computedZIndex };
         nodesWithZIndex.push(nodeWithZIndex);
         nodesWithZIndexMap.set(node.id, nodeWithZIndex);
         processedNodeIds.add(node.id);

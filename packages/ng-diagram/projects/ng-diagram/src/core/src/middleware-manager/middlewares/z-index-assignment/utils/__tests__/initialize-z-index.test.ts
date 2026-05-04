@@ -40,11 +40,36 @@ describe('initializeZIndex', () => {
     expect(result.find((n) => n.id === 'c2')?.computedZIndex).toBe(1);
   });
 
-  it('uses zOrder if present', () => {
+  it('uses zOrder if present on root node', () => {
     const node = baseNode('1', { zOrder: 42 });
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = initializeZIndex(nodesMap);
     expect(result[0].computedZIndex).toBe(42);
+  });
+
+  it('clamps negative zOrder on child to at least parentZIndex + 1', () => {
+    const group = baseNode('g', { isGroup: true });
+    const child = baseNode('c', { groupId: 'g', zOrder: -5 });
+    const nodesMap = new Map<string, Node>([
+      ['g', group],
+      ['c', child],
+    ]);
+    const result = initializeZIndex(nodesMap);
+    const groupZ = result.find((n) => n.id === 'g')!.computedZIndex!;
+    const childZ = result.find((n) => n.id === 'c')!.computedZIndex!;
+    expect(childZ).toBeGreaterThan(groupZ);
+    expect(childZ).toBe(1);
+  });
+
+  it('uses zOrder on child when it is above the group-relative minimum', () => {
+    const group = baseNode('g', { isGroup: true });
+    const child = baseNode('c', { groupId: 'g', zOrder: 50 });
+    const nodesMap = new Map<string, Node>([
+      ['g', group],
+      ['c', child],
+    ]);
+    const result = initializeZIndex(nodesMap);
+    expect(result.find((n) => n.id === 'c')!.computedZIndex).toBe(50);
   });
 
   it('handles nested groups', () => {

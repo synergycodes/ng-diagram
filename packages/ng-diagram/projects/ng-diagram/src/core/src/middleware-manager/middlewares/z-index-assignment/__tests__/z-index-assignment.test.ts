@@ -757,6 +757,173 @@ describe('zIndexMiddleware', () => {
     });
   });
 
+  describe('group containment invariant (child never below parent)', () => {
+    it('should clamp negative zOrder child above group when group is selected', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, selected: true, computedZIndex: 0 };
+      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zOrder: -1, computedZIndex: 1 };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['group1', 'child1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      const groupUpdate = updates.find((u) => u.id === 'group1');
+      const childUpdate = updates.find((u) => u.id === 'child1');
+
+      expect(groupUpdate!.computedZIndex).toBe(DEFAULT_SELECTED_Z_INDEX);
+      expect(childUpdate!.computedZIndex).toBeGreaterThan(groupUpdate!.computedZIndex!);
+    });
+
+    it('should clamp negative zOrder child above group when child is selected individually', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 0 };
+      const childNode = {
+        ...mockNode,
+        id: 'child1',
+        groupId: 'group1',
+        selected: true,
+        zOrder: -1,
+        computedZIndex: -1,
+      };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      const childUpdate = updates.find((u) => u.id === 'child1');
+
+      expect(childUpdate!.computedZIndex).toBe(1);
+      expect(childUpdate!.computedZIndex).toBeGreaterThan(groupNode.computedZIndex!);
+    });
+
+    it('should clamp negative zOrder child above group when child is deselected', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
+      const childNode = {
+        ...mockNode,
+        id: 'child1',
+        groupId: 'group1',
+        selected: false,
+        zOrder: -1,
+        computedZIndex: DEFAULT_SELECTED_Z_INDEX,
+      };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      const childUpdate = updates.find((u) => u.id === 'child1');
+
+      expect(childUpdate!.computedZIndex).toBeGreaterThan(groupNode.computedZIndex!);
+      expect(childUpdate!.computedZIndex).toBe(6);
+    });
+
+    it('should clamp negative zOrder when zOrder changes on grouped node', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
+      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zOrder: -3, computedZIndex: 6 };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('zOrder')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      expect(nextMock).toHaveBeenCalledWith({});
+    });
+
+    it('should allow positive zOrder on grouped node when above group minimum', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 5 };
+      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zOrder: 50, computedZIndex: 6 };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('zOrder')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [{ id: 'child1', computedZIndex: 50 }],
+      });
+    });
+
+    it('should allow negative zOrder on ungrouped node', () => {
+      const node = { ...mockNode, id: 'node1', zOrder: -5, computedZIndex: 0 };
+
+      nodesMap.set('node1', node);
+      context.state.nodes = [node];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('zOrder')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['node1']);
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      expect(nextMock).toHaveBeenCalledWith({
+        nodesToUpdate: [{ id: 'node1', computedZIndex: -5 }],
+      });
+    });
+
+    it('should initialize child with negative zOrder above parent', () => {
+      const groupNode = { ...mockNode, id: 'group1', isGroup: true, computedZIndex: 0 };
+      const childNode = { ...mockNode, id: 'child1', groupId: 'group1', zOrder: -10, computedZIndex: 0 };
+
+      nodesMap.set('group1', groupNode);
+      nodesMap.set('child1', childNode);
+      context.state.nodes = [groupNode, childNode];
+      context.state.edges = [];
+      context.modelActionTypes = ['init'];
+
+      zIndexMiddleware.execute(context, nextMock, cancelMock);
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+      const childUpdate = updates.find((u) => u.id === 'child1');
+
+      expect(childUpdate!.computedZIndex).toBe(1);
+    });
+  });
+
   describe('edge cases', () => {
     it('should handle missing nodes in nodesMap', () => {
       (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(true);

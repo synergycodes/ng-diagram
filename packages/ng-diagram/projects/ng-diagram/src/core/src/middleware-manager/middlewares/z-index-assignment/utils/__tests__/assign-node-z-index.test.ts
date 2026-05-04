@@ -37,7 +37,7 @@ describe('assignNodeZIndex', () => {
     expect(result[2].computedZIndex ?? 0).toBeGreaterThanOrEqual(2);
   });
 
-  it('uses zOrder if selected is true and node has zOrder', () => {
+  it('uses zOrder if selected is true and node has zOrder above baseZIndex', () => {
     const node = baseNode('1', { zOrder: 42 });
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = assignNodeZIndex(node, nodesMap, 5, true);
@@ -49,6 +49,38 @@ describe('assignNodeZIndex', () => {
     const nodesMap = new Map<string, Node>([['1', node]]);
     const result = assignNodeZIndex(node, nodesMap, 7, true);
     expect(result[0].computedZIndex).toBe(7);
+  });
+
+  it('allows negative zOrder on ungrouped node when selected', () => {
+    const node = baseNode('1', { zOrder: -5 });
+    const nodesMap = new Map<string, Node>([['1', node]]);
+    const result = assignNodeZIndex(node, nodesMap, 3, true);
+    expect(result[0].computedZIndex).toBe(-5);
+  });
+
+  it('clamps negative zOrder on grouped child to baseZIndex when selected', () => {
+    const group = baseNode('g', { isGroup: true });
+    const child = baseNode('c', { groupId: 'g', zOrder: -5 });
+    const nodesMap = new Map([
+      ['g', group],
+      ['c', child],
+    ]);
+    const result = assignNodeZIndex(child, nodesMap, 3, true);
+    expect(result[0].computedZIndex).toBe(3);
+  });
+
+  it('clamps negative zOrder on child to group-relative baseZIndex when selected', () => {
+    const group = baseNode('g', { isGroup: true });
+    const child = baseNode('c', { groupId: 'g', zOrder: -10 });
+    const nodesMap = new Map([
+      ['g', group],
+      ['c', child],
+    ]);
+    // baseZIndex for group is 5, child gets 6
+    const result = assignNodeZIndex(group, nodesMap, 5, true);
+    const groupResult = result.find((n) => n.id === 'g')!;
+    const childResult = result.find((n) => n.id === 'c')!;
+    expect(childResult.computedZIndex).toBeGreaterThan(groupResult.computedZIndex!);
   });
 
   it('handles nested groups', () => {
