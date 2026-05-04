@@ -49,21 +49,8 @@ export class UpdatePortsService {
       console.error(PORT_PARENT_NOT_FOUND_ERROR(port.id));
       return null;
     }
-    const portRect = port.getBoundingClientRect();
-    const nodeRect = nodeElement.getBoundingClientRect();
 
-    const scale = this.getScale();
-
-    const width = portRect.width / scale;
-    const height = portRect.height / scale;
-
-    const relativeX = (portRect.left - nodeRect.left) / scale;
-    const relativeY = (portRect.top - nodeRect.top) / scale;
-
-    return {
-      position: { x: relativeX, y: relativeY },
-      size: { width, height },
-    };
+    return this.measurePort(port, nodeElement.getBoundingClientRect());
   }
 
   getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | 'size' | 'position'>>[] {
@@ -77,6 +64,7 @@ export class UpdatePortsService {
 
     const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
     const portsData: Required<Pick<Port, 'id' | 'size' | 'position'>>[] = [];
+    const nodeRect = node.getBoundingClientRect();
 
     ports.forEach((port) => {
       const portId = port.getAttribute('data-port-id');
@@ -85,15 +73,27 @@ export class UpdatePortsService {
         return;
       }
 
-      const portData = this.getPortData(port);
-      if (!portData) {
-        return;
-      }
-
+      const portData = this.measurePort(port, nodeRect);
       portsData.push({ id: portId, size: portData.size, position: portData.position });
     });
 
     return portsData;
+  }
+
+  private measurePort(port: HTMLElement, nodeRect: DOMRect): Required<Pick<Port, 'size' | 'position'>> {
+    const portRect = port.getBoundingClientRect();
+    const scale = this.getScale();
+
+    const width = portRect.width / scale;
+    const height = portRect.height / scale;
+
+    const relativeX = (portRect.left - nodeRect.left) / scale;
+    const relativeY = (portRect.top - nodeRect.top) / scale;
+
+    return {
+      position: { x: relativeX, y: relativeY },
+      size: { width, height },
+    };
   }
 
   private getScale() {
