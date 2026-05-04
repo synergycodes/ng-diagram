@@ -6,6 +6,7 @@ import { Middleware, ModelAdapter } from '../../../core/src';
 import { NgDiagramService } from '../../public-services/ng-diagram.service';
 import {
   FlowCoreProviderService,
+  FlowOffsetService,
   FlowResizeBatchProcessorService,
   PaletteService,
   RendererService,
@@ -55,6 +56,15 @@ describe('AngularAdapterDiagramComponent', () => {
           provide: FlowResizeBatchProcessorService,
           useValue: {
             initialize: vi.fn(),
+          },
+        },
+        {
+          provide: FlowOffsetService,
+          useValue: {
+            getFlowOffset: vi.fn().mockReturnValue({ x: 0, y: 0 }),
+            initialize: vi.fn(),
+            invalidateCache: vi.fn(),
+            reset: vi.fn(),
           },
         },
         {

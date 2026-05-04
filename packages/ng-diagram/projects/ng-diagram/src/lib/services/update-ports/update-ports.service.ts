@@ -50,7 +50,7 @@ export class UpdatePortsService {
       return null;
     }
 
-    return this.measurePort(port, nodeElement.getBoundingClientRect());
+    return this.measurePort(port, nodeElement.getBoundingClientRect(), this.getScale());
   }
 
   getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | 'size' | 'position'>>[] {
@@ -65,6 +65,7 @@ export class UpdatePortsService {
     const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
     const portsData: Required<Pick<Port, 'id' | 'size' | 'position'>>[] = [];
     const nodeRect = node.getBoundingClientRect();
+    const scale = this.getScale();
 
     ports.forEach((port) => {
       const portId = port.getAttribute('data-port-id');
@@ -73,16 +74,15 @@ export class UpdatePortsService {
         return;
       }
 
-      const portData = this.measurePort(port, nodeRect);
+      const portData = this.measurePort(port, nodeRect, scale);
       portsData.push({ id: portId, size: portData.size, position: portData.position });
     });
 
     return portsData;
   }
 
-  private measurePort(port: HTMLElement, nodeRect: DOMRect): Required<Pick<Port, 'size' | 'position'>> {
+  private measurePort(port: HTMLElement, nodeRect: DOMRect, scale: number): Required<Pick<Port, 'size' | 'position'>> {
     const portRect = port.getBoundingClientRect();
-    const scale = this.getScale();
 
     const width = portRect.width / scale;
     const height = portRect.height / scale;
