@@ -424,6 +424,17 @@ export interface InputModifiers {
 }
 
 // @public
+export interface InvalidateMeasurementsOptions {
+    edgeLabels?: {
+        edgeId: string;
+        labelId: string;
+    }[];
+    nodes?: {
+        nodeId: string;
+    }[];
+}
+
+// @public
 export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
 
 // @public (undocumented)
@@ -1197,6 +1208,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     getEnvironment(): EnvironmentInfo;
     getRegisteredRoutings(): string[];
     hasEventListeners(event: keyof DiagramEventMap): boolean;
+    invalidateMeasurements(options?: InvalidateMeasurementsOptions): void;
     isInitialized: Signal<boolean>;
     registerMiddleware(middleware: Middleware): () => void;
     registerRouting(routing: EdgeRouting): void;

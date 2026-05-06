@@ -125,9 +125,7 @@ In these cases, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramse
 
 ```typescript
 // Update node data that causes ports to shift via CSS
-this.ngDiagramModelService.updateNodes([
-  { id: 'node-1', data: { ports: reorderedPorts } },
-]);
+this.ngDiagramModelService.updateNodes([{ id: 'node-1', data: { ports: reorderedPorts } }]);
 
 // Tell ngDiagram to re-measure the affected node and its ports
 this.ngDiagramService.invalidateMeasurements({
@@ -142,10 +140,9 @@ this.ngDiagramService.invalidateMeasurements();
 ```
 
 <Aside type="tip">
-  When you need to read updated measurements immediately after invalidation,
-  wrap both the model update and `invalidateMeasurements()` inside a
-  [transaction](/docs/guides/transactions) with
-  [`waitForMeasurements: true`](/docs/api/types/middleware/transactionoptions/#waitformeasurements).
+  When you need to read updated measurements immediately after invalidation, wrap both the model update and
+  `invalidateMeasurements()` inside a [transaction](/docs/guides/transactions) with [`waitForMeasurements:
+  true`](/docs/api/types/middleware/transactionoptions/#waitformeasurements).
 </Aside>
 
 ## Example Usage
