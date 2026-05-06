@@ -361,7 +361,7 @@ export interface ZIndexConfig {
    */
   edgesAboveConnectedNodes: boolean;
   /**
-   * Whether selected elements should be elevated to selectedZIndex.
+   * Whether selected elements should be elevated by adding `selectedZIndex` to their computed z-index.
    * @default true
    */
   elevateOnSelection: boolean;
