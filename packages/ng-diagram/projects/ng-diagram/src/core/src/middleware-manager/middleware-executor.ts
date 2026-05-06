@@ -26,6 +26,7 @@ export class MiddlewareExecutor {
   private nodesMap = new Map<string, Node>();
   private initialNodesMap = new Map<string, Node>();
   private initialEdgesMap = new Map<string, Edge>();
+  private initialConnectedEdgesMap = new Map<string, string[]>();
   private addedNodesIds = new Set<string>();
   private removedNodesIds = new Set<string>();
   private addedEdgesIds = new Set<string>();
@@ -64,6 +65,7 @@ export class MiddlewareExecutor {
       this.initialNodesMap = new Map(this.flowCore.modelLookup.nodesMap);
       this.initialEdgesMap = new Map(this.flowCore.modelLookup.edgesMap);
     }
+    this.initialConnectedEdgesMap = this.flowCore.modelLookup.connectedEdgesMap;
 
     this.initialStateUpdate = stateUpdate;
     this.applyStateUpdate(stateUpdate);
@@ -130,6 +132,7 @@ export class MiddlewareExecutor {
     edgesMap: this.edgesMap,
     initialNodesMap: this.initialNodesMap,
     initialEdgesMap: this.initialEdgesMap,
+    initialConnectedEdgesMap: this.initialConnectedEdgesMap,
     initialState: this.initialState,
     modelActionType: this.modelActionTypes[0] as ModelActionType,
     modelActionTypes: this.modelActionTypes,

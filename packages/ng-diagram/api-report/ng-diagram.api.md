@@ -529,6 +529,7 @@ export interface MiddlewareContext {
     environment: EnvironmentInfo;
     helpers: MiddlewareHelpers;
     history: MiddlewareHistoryUpdate[];
+    initialConnectedEdgesMap: Map<string, string[]>;
     initialEdgesMap: Map<string, Edge>;
     initialNodesMap: Map<string, Node_2>;
     initialState: FlowState;

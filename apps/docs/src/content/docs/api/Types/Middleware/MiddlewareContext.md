@@ -98,6 +98,20 @@ All state updates from previous middlewares in the chain
 
 ***
 
+### initialConnectedEdgesMap
+
+> **initialConnectedEdgesMap**: `Map`\<`string`, `string`[]\>
+
+Map from node ID to connected edge IDs (edges where node is source or target)
+before any modifications (before the initial action and before any middleware modifications).
+Use this to find edges connected to specific nodes without scanning all edges.
+
+#### Since
+
+1.2.3
+
+***
+
 ### initialEdgesMap
 
 > **initialEdgesMap**: `Map`\<`string`, [`Edge`](/docs/api/types/model/edge/)\<`object`\>\>
