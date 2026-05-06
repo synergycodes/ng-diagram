@@ -425,9 +425,8 @@ export class MeasurementTestsComponent {
   }
 
   /**
-   * EXPECTED TO FAIL — NGD-144: no public API for invalidating port measurements after CSS-only reposition.
-   * ResizeObserver doesn't detect position-only changes. Until NGD-144 is implemented, this test
-   * documents the limitation.
+   * Tests that invalidateMeasurements() forces re-measurement after CSS-only port repositioning.
+   * ResizeObserver doesn't detect position-only changes, so the user must call invalidateMeasurements().
    */
   async testCssPortReposition() {
     const id = `test-css-repos-${this.testCounter++}`;
@@ -459,7 +458,7 @@ export class MeasurementTestsComponent {
     const t1 = performance.now();
 
     // Reverse port order — CSS positions swap (p-a goes from 33% to 66%, p-b from 66% to 33%)
-    // but side stays 'left', so no side change triggers invalidate
+    // but side stays 'left', so no side change triggers invalidate automatically
     await this.ngDiagramService.transaction(
       () => {
         this.ngDiagramModelService.updateNodes([
@@ -474,6 +473,7 @@ export class MeasurementTestsComponent {
             },
           },
         ]);
+        this.ngDiagramService.invalidateMeasurements({ nodes: [{ nodeId: id }] });
       },
       { waitForMeasurements: true }
     );
@@ -483,7 +483,7 @@ export class MeasurementTestsComponent {
     const pA = node.measuredPorts?.find((p: Port) => p.id === 'p-a');
     const pB = node.measuredPorts?.find((p: Port) => p.id === 'p-b');
 
-    this.addResult('CSS port reposition (expected fail — NGD-144)', elapsed, (assert) => {
+    this.addResult('CSS port reposition (invalidateMeasurements)', elapsed, (assert) => {
       // Ports should still exist with correct side
       assert(pA?.side === 'left', `p-a side: expected 'left', got '${pA?.side}'`);
       assert(pB?.side === 'left', `p-b side: expected 'left', got '${pB?.side}'`);

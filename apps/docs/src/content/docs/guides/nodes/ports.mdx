@@ -112,6 +112,42 @@ You can enable default hover styles on ports by adding the following code into y
 
 <CodeSnippet relativePath="nodes/ports/node/node.component.ts" sectionId="hover-style" />
 
+## Port Measurement
+
+ngDiagram automatically measures port positions and sizes using a `ResizeObserver`. In most cases, you don't need to do anything — measurements update automatically when:
+
+- A port or its node is **resized** (content change, node resize, etc.)
+- A port's [`side`](/docs/api/components/ngdiagramportcomponent#side) or [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input changes
+
+However, `ResizeObserver` only detects **size** changes, not **position** changes. If you reposition ports through CSS without changing their size — for example by toggling classes, changing `style.top`/`style.left` bindings, or reordering a data-driven port list — ngDiagram has no way to detect this automatically.
+
+In these cases, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramservice/#invalidatemeasurements) <Badge text="since v1.2.3" variant="tip" /> to tell the library to re-measure:
+
+```typescript
+// Update node data that causes ports to shift via CSS
+this.ngDiagramModelService.updateNodes([
+  { id: 'node-1', data: { ports: reorderedPorts } },
+]);
+
+// Tell ngDiagram to re-measure the affected node and its ports
+this.ngDiagramService.invalidateMeasurements({
+  nodes: [{ nodeId: 'node-1' }],
+});
+```
+
+You can also call it without arguments to re-measure the entire diagram:
+
+```typescript
+this.ngDiagramService.invalidateMeasurements();
+```
+
+<Aside type="tip">
+  When you need to read updated measurements immediately after invalidation,
+  wrap both the model update and `invalidateMeasurements()` inside a
+  [transaction](/docs/guides/transactions) with
+  [`waitForMeasurements: true`](/docs/api/types/middleware/transactionoptions/#waitformeasurements).
+</Aside>
+
 ## Example Usage
 
 To add ports to a node, render them in your node template:
