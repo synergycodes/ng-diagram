@@ -5,6 +5,7 @@ sidebar:
   order: 5
 ---
 
+import { Aside, Badge } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Labels are visual elements attached to edges that can display text, buttons, or any custom content. They automatically position themselves along the edge path and follow the edge as it moves or changes shape.
@@ -124,6 +125,23 @@ Absolute values are clamped to the path length — `'500px'` on a 300px edge res
 | `'-20px'` | Absolute | 20px from the target along the path |
 | `'0px'`   | Absolute | At the source                       |
 | `'-0px'`  | Absolute | At the target                       |
+
+## Label Measurement
+
+ngDiagram automatically measures label dimensions using a `ResizeObserver`. Measurements update automatically when:
+
+- A label's content changes size
+- The [`positionOnEdge`](/docs/api/types/model/edgelabel/#positiononedge) property is updated
+
+If you alter a label's layout through CSS in a way that doesn't trigger a size change, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramservice/#invalidatemeasurements) <Badge text="since v1.2.3" variant="tip" /> to force re-measurement:
+
+```typescript
+this.ngDiagramService.invalidateMeasurements({
+  edges: [{ edgeId: 'edge-1' }],
+});
+```
+
+See [Port Measurement](/docs/guides/nodes/ports#port-measurement) for more details on when this is needed.
 
 ## Adding labels
 

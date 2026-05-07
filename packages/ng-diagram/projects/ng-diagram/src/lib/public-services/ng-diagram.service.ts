@@ -13,8 +13,9 @@ import {
   UnsubscribeFn,
 } from '../../core/src';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
+import { BatchResizeObserverService } from '../services/flow-resize-observer/batched-resize-observer.service';
 import { RendererService } from '../services/renderer/renderer.service';
-import { NgDiagramConfig } from '../types';
+import { InvalidateMeasurementsOptions, NgDiagramConfig } from '../types';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 /**
@@ -46,6 +47,7 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
 @Injectable()
 export class NgDiagramService extends NgDiagramBaseService {
   private readonly manualLinkingService = inject(ManualLinkingService);
+  private readonly batchResizeObserver = inject(BatchResizeObserverService);
   private readonly renderer = inject(RendererService);
 
   // ==============================
@@ -396,6 +398,54 @@ export class NgDiagramService extends NgDiagramBaseService {
 
     if (options || isAsync) {
       return promise;
+    }
+  }
+
+  // ==============================
+  // Measurements
+  // ==============================
+
+  /**
+   * Forces re-measurement of diagram elements via ResizeObserver.
+   *
+   * When called with no arguments, all nodes, ports, and edge labels are re-measured.
+   * When called with specific options, only the targeted elements are re-measured.
+   * Invalidating a node also re-measures all its ports.
+   *
+   * @param options Optional. Specifies which elements to re-measure.
+   *
+   * @example
+   * // Re-measure the entire diagram
+   * ngDiagramService.invalidateMeasurements();
+   *
+   * // Re-measure specific nodes (including their ports)
+   * ngDiagramService.invalidateMeasurements({
+   *   nodes: [{ nodeId: 'node-1' }],
+   * });
+   *
+   * // Re-measure all labels on specific edges
+   * ngDiagramService.invalidateMeasurements({
+   *   edges: [{ edgeId: 'edge-1' }],
+   * });
+   *
+   * @since 1.2.3
+   */
+  invalidateMeasurements(options?: InvalidateMeasurementsOptions): void {
+    if (!options) {
+      this.batchResizeObserver.invalidateAll();
+      return;
+    }
+
+    if (options.nodes) {
+      for (const { nodeId } of options.nodes) {
+        this.batchResizeObserver.invalidateNode(nodeId);
+      }
+    }
+
+    if (options.edges) {
+      for (const { edgeId } of options.edges) {
+        this.batchResizeObserver.invalidateEdgeLabels(edgeId);
+      }
     }
   }
 }

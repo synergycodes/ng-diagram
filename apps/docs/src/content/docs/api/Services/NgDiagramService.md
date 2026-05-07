@@ -233,6 +233,51 @@ if (ngDiagramService.hasEventListeners('selectionChanged')) {
 
 ***
 
+### invalidateMeasurements()
+
+> **invalidateMeasurements**(`options?`): `void`
+
+Forces re-measurement of diagram elements via ResizeObserver.
+
+When called with no arguments, all nodes, ports, and edge labels are re-measured.
+When called with specific options, only the targeted elements are re-measured.
+Invalidating a node also re-measures all its ports.
+
+#### Parameters
+
+##### options?
+
+[`InvalidateMeasurementsOptions`](/docs/api/other/invalidatemeasurementsoptions/)
+
+Optional. Specifies which elements to re-measure.
+
+#### Returns
+
+`void`
+
+#### Example
+
+```ts
+// Re-measure the entire diagram
+ngDiagramService.invalidateMeasurements();
+
+// Re-measure specific nodes (including their ports)
+ngDiagramService.invalidateMeasurements({
+  nodes: [{ nodeId: 'node-1' }],
+});
+
+// Re-measure all labels on specific edges
+ngDiagramService.invalidateMeasurements({
+  edges: [{ edgeId: 'edge-1' }],
+});
+```
+
+#### Since
+
+1.2.3
+
+***
+
 ### registerMiddleware()
 
 > **registerMiddleware**(`middleware`): () => `void`

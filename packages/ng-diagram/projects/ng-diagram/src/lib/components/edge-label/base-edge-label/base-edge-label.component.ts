@@ -129,6 +129,8 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
 
   /** @internal */
   ngOnDestroy(): void {
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+
     const flowCore = this.flowCoreProvider.provide();
 
     // Skip cleanup if FlowCore is still initializing
@@ -139,7 +141,6 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     }
 
     flowCore.updater.deleteEdgeLabel(this.edgeId(), this.id());
-    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
   }
 }
 

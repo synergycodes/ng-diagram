@@ -96,27 +96,32 @@ export class BatchTestToolbarComponent {
     const nodes = this.modelService.getModel().getNodes();
     const index = this.portCounter++;
     const side: PortSide = index % 2 === 0 ? 'left' : 'right';
+    const affectedNodes = nodes.filter((n) => n.id.startsWith('dp-grid-'));
     this.modelService.updateNodes(
-      nodes
-        .filter((n) => n.id.startsWith('dp-grid-'))
-        .map((node) => {
-          const data = node.data as DynamicPortData;
-          return { id: node.id, data: { ...data, ports: [...data.ports, { id: `port-added-${index}`, side }] } };
-        })
+      affectedNodes.map((node) => {
+        const data = node.data as DynamicPortData;
+        return { id: node.id, data: { ...data, ports: [...data.ports, { id: `port-added-${index}`, side }] } };
+      })
     );
+    this.ngDiagramService.invalidateMeasurements({
+      nodes: affectedNodes.map((n) => ({ nodeId: n.id })),
+    });
   }
 
   batchRemovePort(): void {
     const nodes = this.modelService.getModel().getNodes();
+    const affectedNodes = nodes
+      .filter((n) => n.id.startsWith('dp-grid-'))
+      .filter((n) => ((n.data as DynamicPortData).ports ?? []).length > 3);
     this.modelService.updateNodes(
-      nodes
-        .filter((n) => n.id.startsWith('dp-grid-'))
-        .filter((n) => ((n.data as DynamicPortData).ports ?? []).length > 3)
-        .map((node) => {
-          const data = node.data as DynamicPortData;
-          return { id: node.id, data: { ...data, ports: data.ports.slice(0, -1) } };
-        })
+      affectedNodes.map((node) => {
+        const data = node.data as DynamicPortData;
+        return { id: node.id, data: { ...data, ports: data.ports.slice(0, -1) } };
+      })
     );
+    this.ngDiagramService.invalidateMeasurements({
+      nodes: affectedNodes.map((n) => ({ nodeId: n.id })),
+    });
   }
 
   batchToggleSide(): void {
@@ -183,14 +188,16 @@ export class BatchTestToolbarComponent {
 
   repositionPorts(): void {
     const nodes = this.modelService.getModel().getNodes();
+    const affectedNodes = nodes.filter((n) => n.id.startsWith('dp-grid-'));
     this.modelService.updateNodes(
-      nodes
-        .filter((n) => n.id.startsWith('dp-grid-'))
-        .map((node) => {
-          const data = node.data as DynamicPortData;
-          return { id: node.id, data: { ...data, ports: [...data.ports].reverse() } };
-        })
+      affectedNodes.map((node) => {
+        const data = node.data as DynamicPortData;
+        return { id: node.id, data: { ...data, ports: [...data.ports].reverse() } };
+      })
     );
+    this.ngDiagramService.invalidateMeasurements({
+      nodes: affectedNodes.map((n) => ({ nodeId: n.id })),
+    });
   }
 
   zoomToFit(): void {

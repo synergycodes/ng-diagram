@@ -43,6 +43,7 @@ title: "ng-diagram"
 
 ## Other
 
+- [InvalidateMeasurementsOptions](/docs/api/other/invalidatemeasurementsoptions/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
 
 ## Services

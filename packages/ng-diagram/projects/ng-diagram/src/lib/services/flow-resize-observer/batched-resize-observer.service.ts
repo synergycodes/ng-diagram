@@ -23,12 +23,14 @@ export interface BatchResizeObserverConfig {
   onObserverActivity?: (metadata: ObservedElementMetadata[]) => void;
 }
 
+/** @internal */
 @Injectable()
 export class BatchResizeObserverService implements OnDestroy {
   private readonly ngZone = inject(NgZone);
 
   private observer: ResizeObserver | null = null;
   private observedElements = new WeakMap<Element, ObservedElementMetadata>();
+  private entityIndex = new Map<string, Set<Element>>();
   private config: BatchResizeObserverConfig | null = null;
   private rafId: number | null = null;
   private pendingEntries: ResizeObserverEntry[] = [];
@@ -93,6 +95,7 @@ export class BatchResizeObserverService implements OnDestroy {
    */
   observe(element: Element, metadata: ObservedElementMetadata): void {
     this.observedElements.set(element, metadata);
+    this.addToEntityIndex(element, metadata);
     this.observer?.observe(element);
   }
 
@@ -100,6 +103,11 @@ export class BatchResizeObserverService implements OnDestroy {
    * Stop observing an element's size via ResizeObserver.
    */
   unobserve(element: Element): void {
+    const metadata = this.observedElements.get(element);
+    if (metadata) {
+      this.removeFromEntityIndex(element, metadata);
+      this.observedElements.delete(element);
+    }
     this.observer?.unobserve(element);
   }
 
@@ -122,6 +130,76 @@ export class BatchResizeObserverService implements OnDestroy {
     return this.observedElements.get(element);
   }
 
+  /**
+   * Invalidate the node element and all its port elements.
+   */
+  invalidateNode(nodeId: string): void {
+    this.invalidateByKey(`node:${nodeId}`);
+  }
+
+  /**
+   * Invalidate all label elements on an edge.
+   */
+  invalidateEdgeLabels(edgeId: string): void {
+    this.invalidateByKey(`edge:${edgeId}`);
+  }
+
+  /**
+   * Invalidate ALL currently observed elements.
+   */
+  invalidateAll(): void {
+    const seen = new Set<Element>();
+    for (const elements of this.entityIndex.values()) {
+      for (const element of elements) {
+        if (!seen.has(element)) {
+          seen.add(element);
+          this.invalidate(element);
+        }
+      }
+    }
+  }
+
+  private invalidateByKey(key: string): void {
+    const elements = this.entityIndex.get(key);
+    if (!elements) return;
+    for (const element of elements) {
+      this.invalidate(element);
+    }
+  }
+
+  private getEntityKeys(metadata: ObservedElementMetadata): string[] {
+    switch (metadata.type) {
+      case 'node':
+      case 'port':
+        return [`node:${metadata.nodeId}`];
+      case 'edge-label':
+        return [`edge:${metadata.edgeId}`];
+    }
+  }
+
+  private addToEntityIndex(element: Element, metadata: ObservedElementMetadata): void {
+    for (const key of this.getEntityKeys(metadata)) {
+      let set = this.entityIndex.get(key);
+      if (!set) {
+        set = new Set();
+        this.entityIndex.set(key, set);
+      }
+      set.add(element);
+    }
+  }
+
+  private removeFromEntityIndex(element: Element, metadata: ObservedElementMetadata): void {
+    for (const key of this.getEntityKeys(metadata)) {
+      const set = this.entityIndex.get(key);
+      if (set) {
+        set.delete(element);
+        if (set.size === 0) {
+          this.entityIndex.delete(key);
+        }
+      }
+    }
+  }
+
   private processBatch(): void {
     const entries = [...this.pendingEntries];
     this.pendingEntries = [];
@@ -140,5 +218,6 @@ export class BatchResizeObserverService implements OnDestroy {
       cancelAnimationFrame(this.rafId);
     }
     this.observer?.disconnect();
+    this.entityIndex.clear();
   }
 }
