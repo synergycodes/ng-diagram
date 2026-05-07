@@ -68,6 +68,23 @@ export class DocumentationIndexer {
     return this.pages.get(normalizedPath);
   }
 
+  /** Serialize the pages map to a JSON string. */
+  pagesToJSON(): string {
+    return JSON.stringify(Object.fromEntries(this.pages));
+  }
+
+  /**
+   * Create a DocumentationIndexer with a pre-built pages map,
+   * skipping all file parsing.
+   */
+  static fromPages(data: Record<string, DocumentPage>): DocumentationIndexer {
+    const indexer = Object.create(DocumentationIndexer.prototype) as DocumentationIndexer;
+    indexer.pages = new Map(Object.entries(data));
+    indexer.snippetReader = null;
+    indexer.config = { docsPath: '', extensions: [], baseUrl: '' };
+    return indexer;
+  }
+
   /**
    * Recursively scan a directory for documentation files.
    * Symbolic links are skipped to prevent cycles. Only regular files whose

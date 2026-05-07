@@ -407,4 +407,39 @@ describe('SearchEngine', () => {
       expect(results[0].content).toBe('');
     });
   });
+
+  describe('serialization', () => {
+    it('should produce identical search results after round-trip serialization', () => {
+      const json = searchEngine.toJSON();
+      const restored = SearchEngine.fromJSON(json);
+
+      const original = searchEngine.search({ query: 'palette', limit: 5 });
+      const deserialized = restored.search({ query: 'palette', limit: 5 });
+
+      expect(deserialized).toEqual(original);
+    });
+
+    it('should preserve all stored fields after deserialization', () => {
+      const json = searchEngine.toJSON();
+      const restored = SearchEngine.fromJSON(json);
+
+      const results = restored.search({ query: 'Node' });
+
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      for (const result of results) {
+        expect(result).toHaveProperty('pageTitle');
+        expect(result).toHaveProperty('sectionTitle');
+        expect(result).toHaveProperty('content');
+        expect(result).toHaveProperty('path');
+        expect(result).toHaveProperty('url');
+      }
+    });
+
+    it('should return empty results for empty query after deserialization', () => {
+      const json = searchEngine.toJSON();
+      const restored = SearchEngine.fromJSON(json);
+
+      expect(restored.search({ query: '   ' })).toEqual([]);
+    });
+  });
 });

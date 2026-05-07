@@ -143,4 +143,37 @@ describe('SymbolSearchEngine ranking', () => {
     expect(names).toContain('DiagramComponent');
     expect(names).toContain('BaseEdgeComponent');
   });
+
+  describe('serialization', () => {
+    it('should produce identical search results after round-trip serialization', () => {
+      const engine = new SymbolSearchEngine(symbols);
+      const json = engine.toJSON();
+      const restored = SymbolSearchEngine.fromJSON(json);
+
+      const original = engine.search('DiagramComponent');
+      const deserialized = restored.search('DiagramComponent');
+
+      expect(deserialized).toEqual(original);
+    });
+
+    it('should preserve camelCase tokenizer after deserialization', () => {
+      const engine = new SymbolSearchEngine(symbols);
+      const restored = SymbolSearchEngine.fromJSON(engine.toJSON());
+
+      const results = restored.search('Component');
+      const names = results.map((r) => r.name);
+
+      expect(names).toContain('DiagramComponent');
+      expect(names).toContain('BaseEdgeComponent');
+    });
+
+    it('should preserve kind filtering after deserialization', () => {
+      const engine = new SymbolSearchEngine(symbols);
+      const restored = SymbolSearchEngine.fromJSON(engine.toJSON());
+
+      const results = restored.search('Diagram', 'class');
+
+      expect(results.every((r) => r.kind === 'class')).toBe(true);
+    });
+  });
 });

@@ -1023,4 +1023,53 @@ title: No Examples
       expect(sections[0].content).toContain('<CodeSnippet');
     });
   });
+
+  describe('serialization', () => {
+    it('should round-trip pages through pagesToJSON / fromPages', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.md'],
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const content = `---
+title: Serialization Test
+---
+
+Page body with **markdown**.
+
+## Section One
+
+Section content here.
+`;
+      await writeFile(join(testDir, 'serialize.md'), content, 'utf-8');
+      await indexer.buildIndex();
+
+      const json = indexer.pagesToJSON();
+      const restored = DocumentationIndexer.fromPages(JSON.parse(json));
+
+      const original = indexer.getPage('serialize.md');
+      const loaded = restored.getPage('serialize.md');
+
+      expect(loaded).toEqual(original);
+    });
+
+    it('should return undefined for non-existent page after fromPages', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.md'],
+      };
+      indexer = new DocumentationIndexer(config);
+
+      await writeFile(join(testDir, 'exists.md'), '# Exists', 'utf-8');
+      await indexer.buildIndex();
+
+      const restored = DocumentationIndexer.fromPages(JSON.parse(indexer.pagesToJSON()));
+
+      expect(restored.getPage('exists.md')).toBeDefined();
+      expect(restored.getPage('nope.md')).toBeUndefined();
+    });
+  });
 });

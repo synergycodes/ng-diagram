@@ -2,6 +2,14 @@
  * Configuration-related type definitions
  */
 
+/** File names for pre-built indexes produced by build-indexes.js and loaded by the server. */
+export const INDEX_FILE_NAMES = {
+  docsSearch: 'docs-search-index.json',
+  docsPages: 'docs-pages.json',
+  symbolSearch: 'symbol-search-index.json',
+  symbolMap: 'symbol-map.json',
+} as const;
+
 /**
  * Configuration for the documentation indexer
  */
@@ -32,4 +40,6 @@ export interface MCPServerConfig {
   apiReportPath?: string;
   /** Path to the examples directory for resolving CodeSnippet/CodeViewer tags */
   examplesPath?: string;
+  /** Path to directory containing pre-built index files (skips runtime indexing when present) */
+  indexDataPath?: string;
 }

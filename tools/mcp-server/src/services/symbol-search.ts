@@ -1,4 +1,4 @@
-import MiniSearch from 'minisearch';
+import MiniSearch, { type Options } from 'minisearch';
 import type { ApiSymbol, SearchSymbolResult } from '../types/index.js';
 
 /**
@@ -28,6 +28,18 @@ export function tokenize(text: string): string[] {
   return allTokens;
 }
 
+const MINISEARCH_OPTIONS: Options<ApiSymbol> = {
+  fields: ['name', 'signature'],
+  storeFields: ['name', 'kind', 'signature', 'importPath'],
+  tokenize,
+  searchOptions: {
+    prefix: true,
+    fuzzy: 0.2,
+    boost: { name: 10, signature: 1 },
+    tokenize,
+  },
+};
+
 /**
  * Full-text search engine for API symbols, backed by MiniSearch.
  *
@@ -50,19 +62,20 @@ export class SymbolSearchEngine {
    * @param symbols Array of API symbols to index
    */
   constructor(symbols: ApiSymbol[]) {
-    this.index = new MiniSearch({
-      fields: ['name', 'signature'],
-      storeFields: ['name', 'kind', 'signature', 'importPath'],
-      tokenize,
-      searchOptions: {
-        prefix: true,
-        fuzzy: 0.2,
-        boost: { name: 10, signature: 1 },
-        tokenize,
-      },
-    });
-
+    this.index = new MiniSearch(MINISEARCH_OPTIONS);
     this.index.addAll(symbols.map((symbol, i) => ({ id: i, ...symbol })));
+  }
+
+  /** Serialize the MiniSearch index to a JSON string. */
+  toJSON(): string {
+    return JSON.stringify(this.index);
+  }
+
+  /** Deserialize a MiniSearch index from a JSON string produced by {@link toJSON}. */
+  static fromJSON(json: string): SymbolSearchEngine {
+    const engine = Object.create(SymbolSearchEngine.prototype) as SymbolSearchEngine;
+    engine.index = MiniSearch.loadJSON(json, MINISEARCH_OPTIONS);
+    return engine;
   }
 
   /**

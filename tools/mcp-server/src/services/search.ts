@@ -1,5 +1,15 @@
-import MiniSearch from 'minisearch';
+import MiniSearch, { type Options } from 'minisearch';
 import type { DocumentSection, SearchQuery, SearchResult } from '../types/index.js';
+
+const MINISEARCH_OPTIONS: Options<DocumentSection> = {
+  fields: ['pageTitle', 'sectionTitle', 'content', 'description'],
+  storeFields: ['pageTitle', 'sectionTitle', 'content', 'path', 'url', 'description'],
+  searchOptions: {
+    prefix: true,
+    fuzzy: 0.2,
+    boost: { sectionTitle: 10, pageTitle: 5, description: 2, content: 1 },
+  },
+};
 
 /**
  * Full-text search engine for documentation sections, backed by MiniSearch.
@@ -20,17 +30,20 @@ export class SearchEngine {
    * @param sections Flat array of document sections to index
    */
   constructor(sections: DocumentSection[]) {
-    this.index = new MiniSearch({
-      fields: ['pageTitle', 'sectionTitle', 'content', 'description'],
-      storeFields: ['pageTitle', 'sectionTitle', 'content', 'path', 'url', 'description'],
-      searchOptions: {
-        prefix: true,
-        fuzzy: 0.2,
-        boost: { sectionTitle: 10, pageTitle: 5, description: 2, content: 1 },
-      },
-    });
-
+    this.index = new MiniSearch(MINISEARCH_OPTIONS);
     this.index.addAll(sections.map((section, i) => ({ id: i, ...section })));
+  }
+
+  /** Serialize the MiniSearch index to a JSON string. */
+  toJSON(): string {
+    return JSON.stringify(this.index);
+  }
+
+  /** Deserialize a MiniSearch index from a JSON string produced by {@link toJSON}. */
+  static fromJSON(json: string): SearchEngine {
+    const engine = Object.create(SearchEngine.prototype) as SearchEngine;
+    engine.index = MiniSearch.loadJSON(json, MINISEARCH_OPTIONS);
+    return engine;
   }
 
   /**

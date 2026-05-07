@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -13,7 +15,7 @@ import { GET_DOC_TOOL, createGetDocHandler } from './tools/get-doc/index.js';
 import { SEARCH_DOCS_TOOL, createSearchDocsHandler } from './tools/search-docs/index.js';
 import { GET_SYMBOL_TOOL, createGetSymbolHandler } from './tools/get-symbol/index.js';
 import { SEARCH_SYMBOLS_TOOL, createSearchSymbolsHandler } from './tools/search-symbols/index.js';
-import type { MCPServerConfig } from './types/index.js';
+import { INDEX_FILE_NAMES, type MCPServerConfig } from './types/index.js';
 
 /**
  * Execute a tool handler and wrap the result in the MCP response format.
@@ -51,7 +53,7 @@ async function callTool(handler: (args: unknown) => Promise<unknown>, args: unkn
  * MCP server for ng-diagram documentation and API symbol search.
  *
  * On {@link start}, the server:
- * 1. Indexes documentation files into searchable sections
+ * 1. Loads pre-built indexes if available, otherwise indexes from source files
  * 2. Optionally parses an API Extractor report into searchable symbols
  * 3. Registers four MCP tools (`search_docs`, `get_doc`, `search_symbols`, `get_symbol`)
  * 4. Connects via stdio transport
@@ -63,7 +65,7 @@ async function callTool(handler: (args: unknown) => Promise<unknown>, args: unkn
 export class NgDiagramMCPServer {
   private config: MCPServerConfig;
   private server: Server;
-  private indexer: DocumentationIndexer;
+  private indexer!: DocumentationIndexer;
   private apiIndexer: ApiReportIndexer | null = null;
   private searchEngine: SearchEngine | null = null;
   private symbolSearch: SymbolSearchEngine | null = null;
@@ -91,13 +93,6 @@ export class NgDiagramMCPServer {
       }
     );
 
-    this.indexer = new DocumentationIndexer({
-      docsPath: config.docsPath,
-      extensions: ['.md', '.mdx'],
-      baseUrl: config.baseUrl,
-      examplesPath: config.examplesPath,
-    });
-
     this.server.onerror = (error) => {
       console.error('[MCP Server Error]:', error);
     };
@@ -118,27 +113,14 @@ export class NgDiagramMCPServer {
     try {
       console.error(`[MCP Server] Starting ${this.config.name} v${this.config.version}...`);
 
-      // Build documentation index
-      console.error(`[MCP Server] Indexing documentation from: ${this.config.docsPath}`);
-      const sections = await this.indexer.buildIndex();
-      console.error(`[MCP Server] Indexed ${sections.length} sections`);
+      const loaded = this.tryLoadPreBuiltIndexes();
 
-      // Build API report index
-      if (this.config.apiReportPath) {
-        this.apiIndexer = new ApiReportIndexer(this.config.apiReportPath);
-        const apiSymbols = await this.apiIndexer.buildIndex();
-        console.error(`[MCP Server] Indexed ${apiSymbols.length} API symbols`);
-
-        this.symbolSearch = new SymbolSearchEngine(apiSymbols);
+      if (!loaded) {
+        await this.buildIndexesFromSource();
       }
 
-      // Initialize search engine
-      this.searchEngine = new SearchEngine(sections);
-
-      // Register tools
       this.registerTools();
 
-      // Start server with stdio transport
       const transport = new StdioServerTransport();
       await this.server.connect(transport);
 
@@ -148,6 +130,68 @@ export class NgDiagramMCPServer {
       console.error('[MCP Server] Failed to start server:', error instanceof Error ? error.message : error);
       throw error;
     }
+  }
+
+  /**
+   * Try to load pre-built indexes from disk.
+   * @returns `true` if pre-built indexes were loaded, `false` to fall back to runtime indexing
+   */
+  private tryLoadPreBuiltIndexes(): boolean {
+    const { indexDataPath } = this.config;
+    if (!indexDataPath) return false;
+
+    try {
+      const docsSearchJson = readFileSync(join(indexDataPath, INDEX_FILE_NAMES.docsSearch), 'utf-8');
+      const docsPagesJson = readFileSync(join(indexDataPath, INDEX_FILE_NAMES.docsPages), 'utf-8');
+
+      console.error('[MCP Server] Loading pre-built indexes...');
+
+      const searchEngine = SearchEngine.fromJSON(docsSearchJson);
+      const indexer = DocumentationIndexer.fromPages(JSON.parse(docsPagesJson));
+
+      this.searchEngine = searchEngine;
+      this.indexer = indexer;
+    } catch (e) {
+      console.error('[MCP Server] Failed to load pre-built indexes, falling back to runtime indexing', e);
+      return false;
+    }
+
+    try {
+      const symbolSearchJson = readFileSync(join(indexDataPath, INDEX_FILE_NAMES.symbolSearch), 'utf-8');
+      const symbolMapJson = readFileSync(join(indexDataPath, INDEX_FILE_NAMES.symbolMap), 'utf-8');
+
+      this.symbolSearch = SymbolSearchEngine.fromJSON(symbolSearchJson);
+      this.apiIndexer = ApiReportIndexer.fromSymbols(JSON.parse(symbolMapJson));
+    } catch {
+      // Symbol indexes are optional — docs-only mode still works
+    }
+
+    console.error('[MCP Server] Pre-built indexes loaded');
+    return true;
+  }
+
+  /** Fall back to building indexes from source files at runtime. */
+  private async buildIndexesFromSource(): Promise<void> {
+    this.indexer = new DocumentationIndexer({
+      docsPath: this.config.docsPath,
+      extensions: ['.md', '.mdx'],
+      baseUrl: this.config.baseUrl,
+      examplesPath: this.config.examplesPath,
+    });
+
+    console.error(`[MCP Server] Indexing documentation from: ${this.config.docsPath}`);
+    const sections = await this.indexer.buildIndex();
+    console.error(`[MCP Server] Indexed ${sections.length} sections`);
+
+    if (this.config.apiReportPath) {
+      this.apiIndexer = new ApiReportIndexer(this.config.apiReportPath);
+      const apiSymbols = await this.apiIndexer.buildIndex();
+      console.error(`[MCP Server] Indexed ${apiSymbols.length} API symbols`);
+
+      this.symbolSearch = new SymbolSearchEngine(apiSymbols);
+    }
+
+    this.searchEngine = new SearchEngine(sections);
   }
 
   /**
@@ -167,7 +211,6 @@ export class NgDiagramMCPServer {
     const searchSymbolsHandler = this.symbolSearch ? createSearchSymbolsHandler(this.symbolSearch) : null;
     const getSymbolHandler = this.apiIndexer ? createGetSymbolHandler(this.apiIndexer) : null;
 
-    // Map tool names to their handlers (all accept unknown and validate via Zod internally)
     const toolHandlers = new Map<string, (args: unknown) => Promise<unknown>>();
     toolHandlers.set('search_docs', searchHandler);
     toolHandlers.set('get_doc', getDocHandler);
