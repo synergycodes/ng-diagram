@@ -62,6 +62,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
   readonly edgeData = computed(() => this.edgeComponent.edge());
   readonly points = computed(() => this.edgeData()?.points);
   readonly edgeId = computed(() => this.edgeData()?.id);
+  private ownerInternalId: string | undefined;
   readonly position = computed(() => {
     const edgeData = this.edgeData();
     const labelData = edgeData?.measuredLabels?.find((label) => label.id === this.id());
@@ -115,6 +116,8 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
   /** @internal */
   ngOnInit() {
     this.lastPositionOnEdge.set(this.positionOnEdge());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.ownerInternalId = (this.edgeData() as any)?._internalId;
     this.flowCoreProvider.provide().updater.addEdgeLabel(this.edgeId(), {
       id: this.id(),
       positionOnEdge: this.positionOnEdge(),
@@ -129,6 +132,8 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
 
   /** @internal */
   ngOnDestroy(): void {
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+
     const flowCore = this.flowCoreProvider.provide();
 
     // Skip cleanup if FlowCore is still initializing
@@ -138,8 +143,21 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    flowCore.updater.deleteEdgeLabel(this.edgeId(), this.id());
-    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+    // Skip if edge was deleted - labels are removed with the edge
+    const edgeId = this.edgeId();
+    const currentEdge = edgeId ? flowCore.getEdgeById(edgeId) : null;
+    if (!currentEdge) {
+      return;
+    }
+
+    // Skip if edge was replaced (removed + re-added with the same id).
+    // The new edge has a different _internalId, so this label belongs to the old instance.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (this.ownerInternalId && (currentEdge as any)._internalId !== this.ownerInternalId) {
+      return;
+    }
+
+    flowCore.updater.deleteEdgeLabel(edgeId, this.id());
   }
 }
 

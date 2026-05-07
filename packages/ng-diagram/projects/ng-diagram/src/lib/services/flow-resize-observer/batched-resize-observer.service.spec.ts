@@ -58,6 +58,31 @@ describe('BatchResizeObserverService', () => {
 
       expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el);
     });
+
+    it('should remove metadata from observedElements', () => {
+      const el = document.createElement('div');
+      service.observe(el, { type: 'node', nodeId: 'n1' });
+
+      service.unobserve(el);
+
+      expect(service.getMetadata(el)).toBeUndefined();
+    });
+
+    it('should remove element from entity index', () => {
+      const el = document.createElement('div');
+      service.observe(el, { type: 'node', nodeId: 'n1' });
+
+      service.unobserve(el);
+
+      expect(service['entityIndex'].size).toBe(0);
+    });
+
+    it('should be safe to call on a never-observed element', () => {
+      const el = document.createElement('div');
+
+      expect(() => service.unobserve(el)).not.toThrow();
+      expect(service['entityIndex'].size).toBe(0);
+    });
   });
 
   describe('processBatch', () => {
@@ -144,6 +169,14 @@ describe('BatchResizeObserverService', () => {
       expect(mockCancelAnimationFrame).not.toHaveBeenCalled();
       expect(mockResizeObserver.disconnect).toHaveBeenCalled();
     });
+
+    it('should clear entity index', () => {
+      service.observe(document.createElement('div'), { type: 'node', nodeId: 'n1' });
+
+      service.ngOnDestroy();
+
+      expect(service['entityIndex'].size).toBe(0);
+    });
   });
 
   describe('getMetadata', () => {
@@ -186,6 +219,169 @@ describe('BatchResizeObserverService', () => {
       service.invalidate(el);
 
       expect(mockResizeObserver.unobserve).not.toHaveBeenCalled();
+      expect(mockResizeObserver.observe).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('entity index', () => {
+    it('should index node element under node key', () => {
+      const el = document.createElement('div');
+      service.observe(el, { type: 'node', nodeId: 'n1' });
+
+      expect(service['entityIndex'].get('node:n1')?.has(el)).toBe(true);
+    });
+
+    it('should index port element under node key', () => {
+      const el = document.createElement('div');
+      service.observe(el, { type: 'port', nodeId: 'n1', portId: 'p1' });
+
+      expect(service['entityIndex'].get('node:n1')?.has(el)).toBe(true);
+    });
+
+    it('should index edge label under edge key', () => {
+      const el = document.createElement('div');
+      service.observe(el, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+
+      expect(service['entityIndex'].get('edge:e1')?.has(el)).toBe(true);
+    });
+
+    it('should group node and its ports under the same node key', () => {
+      const nodeEl = document.createElement('div');
+      const portEl = document.createElement('span');
+      service.observe(nodeEl, { type: 'node', nodeId: 'n1' });
+      service.observe(portEl, { type: 'port', nodeId: 'n1', portId: 'p1' });
+
+      const nodeSet = service['entityIndex'].get('node:n1')!;
+      expect(nodeSet.size).toBe(2);
+      expect(nodeSet.has(nodeEl)).toBe(true);
+      expect(nodeSet.has(portEl)).toBe(true);
+    });
+
+    it('should clean up empty sets on unobserve', () => {
+      const el = document.createElement('div');
+      service.observe(el, { type: 'port', nodeId: 'n1', portId: 'p1' });
+
+      service.unobserve(el);
+
+      expect(service['entityIndex'].has('node:n1')).toBe(false);
+    });
+
+    it('should not remove key when other elements remain', () => {
+      const el1 = document.createElement('div');
+      const el2 = document.createElement('span');
+      service.observe(el1, { type: 'port', nodeId: 'n1', portId: 'p1' });
+      service.observe(el2, { type: 'port', nodeId: 'n1', portId: 'p2' });
+
+      service.unobserve(el1);
+
+      expect(service['entityIndex'].get('node:n1')?.size).toBe(1);
+      expect(service['entityIndex'].get('node:n1')?.has(el2)).toBe(true);
+    });
+  });
+
+  describe('invalidateNode', () => {
+    it('should invalidate node element and all its ports', () => {
+      const nodeEl = document.createElement('div');
+      const portEl1 = document.createElement('span');
+      const portEl2 = document.createElement('span');
+      service.observe(nodeEl, { type: 'node', nodeId: 'n1' });
+      service.observe(portEl1, { type: 'port', nodeId: 'n1', portId: 'p1' });
+      service.observe(portEl2, { type: 'port', nodeId: 'n1', portId: 'p2' });
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateNode('n1');
+
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(3);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(3);
+    });
+
+    it('should be a no-op for unknown nodeId', () => {
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateNode('unknown');
+
+      expect(mockResizeObserver.unobserve).not.toHaveBeenCalled();
+      expect(mockResizeObserver.observe).not.toHaveBeenCalled();
+    });
+
+    it('should not affect other nodes', () => {
+      const el1 = document.createElement('div');
+      const el2 = document.createElement('span');
+      service.observe(el1, { type: 'node', nodeId: 'n1' });
+      service.observe(el2, { type: 'node', nodeId: 'n2' });
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateNode('n1');
+
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(1);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el1);
+    });
+  });
+
+  describe('invalidateEdgeLabels', () => {
+    it('should invalidate all labels on an edge', () => {
+      const el1 = document.createElement('div');
+      const el2 = document.createElement('span');
+      service.observe(el1, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+      service.observe(el2, { type: 'edge-label', edgeId: 'e1', labelId: 'l2' });
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateEdgeLabels('e1');
+
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(2);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not invalidate labels on other edges', () => {
+      const el1 = document.createElement('div');
+      const el2 = document.createElement('span');
+      service.observe(el1, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+      service.observe(el2, { type: 'edge-label', edgeId: 'e2', labelId: 'l2' });
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateEdgeLabels('e1');
+
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(1);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be a no-op for unknown edgeId', () => {
+      mockResizeObserver.observe.mockClear();
+
+      service.invalidateEdgeLabels('unknown');
+
+      expect(mockResizeObserver.observe).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('invalidateAll', () => {
+    it('should invalidate all observed elements', () => {
+      const el1 = document.createElement('div');
+      const el2 = document.createElement('span');
+      const el3 = document.createElement('p');
+      service.observe(el1, { type: 'node', nodeId: 'n1' });
+      service.observe(el2, { type: 'port', nodeId: 'n1', portId: 'p1' });
+      service.observe(el3, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateAll();
+
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(3);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(3);
+    });
+
+    it('should be a no-op when nothing is observed', () => {
+      mockResizeObserver.observe.mockClear();
+
+      service.invalidateAll();
+
       expect(mockResizeObserver.observe).not.toHaveBeenCalled();
     });
   });

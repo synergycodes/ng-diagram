@@ -1,7 +1,6 @@
 import { EdgeRoutingManager, resolveLabelPosition } from '../../../edge-routing-manager';
 import { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point } from '../../../types';
 import { isSamePoint, isValidPosition } from '../../../utils';
-import { DEFAULT_SELECTED_Z_INDEX } from '../z-index-assignment';
 import { getEdgePoints } from './get-edge-points';
 
 /**
@@ -208,7 +207,7 @@ export const edgesRoutingMiddleware: Middleware = {
       config: { zIndex },
     } = context;
 
-    const temporaryEdgeZIndex = zIndex.temporaryEdgeZIndex || DEFAULT_SELECTED_Z_INDEX;
+    const temporaryEdgeZIndex = zIndex.temporaryEdgeZIndex || zIndex.selectedZIndex;
 
     const shouldRouteEdges = checkIfShouldRouteEdges(context);
     const temporaryEdge = actionStateManager.linking?.temporaryEdge;

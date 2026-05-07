@@ -9,6 +9,7 @@ import { NgDiagramService } from '../public-services/ng-diagram.service';
 import { BatchResizeObserverService } from '../services';
 import { CursorPositionTrackerService } from '../services/cursor-position-tracker/cursor-position-tracker.service';
 import { FlowCoreProviderService } from '../services/flow-core-provider/flow-core-provider.service';
+import { FlowOffsetService } from '../services/flow-offset/flow-offset.service';
 import { FlowResizeBatchProcessorService } from '../services/flow-resize-observer/flow-resize-processor.service';
 import { InputEventsRouterService } from '../services/input-events/input-events-router.service';
 import { LinkingEventService } from '../services/input-events/linking-event.service';
@@ -53,6 +54,7 @@ export function provideNgDiagram(): Provider[] {
   return [
     PaletteService,
     FlowCoreProviderService,
+    FlowOffsetService,
     UpdatePortsService,
     RendererService,
     InputEventsRouterService,

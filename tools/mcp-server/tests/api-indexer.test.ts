@@ -526,6 +526,49 @@ export function doStuff(): void;
     });
   });
 
+  describe('serialization', () => {
+    it('should round-trip symbols through symbolsToJSON / fromSymbols', async () => {
+      const report = makeReport(`
+// @public
+export interface Point {
+    x: number;
+    y: number;
+}
+
+// @public
+export function doStuff(): void;
+`);
+      await writeFile(join(fixtureDir, 'report.api.md'), report);
+      const indexer = new ApiReportIndexer(join(fixtureDir, 'report.api.md'));
+      await indexer.buildIndex();
+
+      const json = indexer.symbolsToJSON();
+      const restored = ApiReportIndexer.fromSymbols(JSON.parse(json));
+
+      expect(restored.getSymbol('Point')).toEqual(indexer.getSymbol('Point'));
+      expect(restored.getSymbol('doStuff')).toEqual(indexer.getSymbol('doStuff'));
+      expect(restored.getSymbols()).toEqual(indexer.getSymbols());
+    });
+
+    it('should return undefined for non-existent symbol after fromSymbols', async () => {
+      const report = makeReport(`
+// @public
+export interface Point {
+    x: number;
+    y: number;
+}
+`);
+      await writeFile(join(fixtureDir, 'report.api.md'), report);
+      const indexer = new ApiReportIndexer(join(fixtureDir, 'report.api.md'));
+      await indexer.buildIndex();
+
+      const restored = ApiReportIndexer.fromSymbols(JSON.parse(indexer.symbolsToJSON()));
+
+      expect(restored.getSymbol('Point')).toBeDefined();
+      expect(restored.getSymbol('NonExistent')).toBeUndefined();
+    });
+  });
+
   describe('integration with real API report', () => {
     it('should parse the real ng-diagram API report', async () => {
       const realReportPath = resolve(process.cwd(), '../../packages/ng-diagram/api-report/ng-diagram.api.md');

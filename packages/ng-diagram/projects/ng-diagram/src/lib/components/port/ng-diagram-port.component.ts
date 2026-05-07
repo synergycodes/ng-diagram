@@ -73,6 +73,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   protected readonly lastSide = signal<Port['side'] | undefined>(undefined);
   protected readonly lastType = signal<Port['type'] | undefined>(undefined);
   private lastOriginPoint: OriginPoint | undefined;
+  private ownerInternalId: string | undefined;
   protected readonly nodeData = computed(() => this.nodeComponent?.node());
 
   /**
@@ -163,6 +164,9 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.ownerInternalId = (nodeData as any)._internalId;
+
     // Always call addPort - InternalUpdater handles virtualization logic
     this.flowCoreProvider.provide().updater.addPort(nodeData.id, {
       id: this.id(),
@@ -182,6 +186,8 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
   /** @internal */
   ngOnDestroy(): void {
+    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
+
     const portId = this.id();
     const nodeData = this.nodeData();
     if (!nodeData) {
@@ -197,11 +203,16 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
-    this.batchResizeObserver.unobserve(this.hostElement.nativeElement);
-
     // Skip if node was deleted - ports are removed with the node
-    const nodeStillExists = flowCore.getNodeById(nodeData.id);
-    if (!nodeStillExists) {
+    const currentNode = flowCore.getNodeById(nodeData.id);
+    if (!currentNode) {
+      return;
+    }
+
+    // Skip if node was replaced (removed + re-added with the same id).
+    // The new node has a different _internalId, so this port belongs to the old instance.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (this.ownerInternalId && (currentNode as any)._internalId !== this.ownerInternalId) {
       return;
     }
 

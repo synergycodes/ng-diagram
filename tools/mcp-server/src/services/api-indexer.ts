@@ -68,6 +68,23 @@ export class ApiReportIndexer {
     return this.symbolMap.get(name);
   }
 
+  /** Serialize the symbols array to a JSON string. */
+  symbolsToJSON(): string {
+    return JSON.stringify(this.symbols);
+  }
+
+  /**
+   * Create an ApiReportIndexer with pre-built symbol data,
+   * skipping all file parsing.
+   */
+  static fromSymbols(symbols: ApiSymbol[]): ApiReportIndexer {
+    const indexer = Object.create(ApiReportIndexer.prototype) as ApiReportIndexer;
+    indexer.symbols = symbols;
+    indexer.symbolMap = new Map(symbols.map((s) => [s.name, s]));
+    indexer.apiReportPath = '';
+    return indexer;
+  }
+
   /**
    * Extract the first ```ts ... ``` fenced code block from the report markdown.
    * @returns The code block contents, or `null` if none found

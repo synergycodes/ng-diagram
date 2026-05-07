@@ -50,7 +50,12 @@ import { PanningDirective } from '../../directives/input-events/panning/panning.
 import { MobileZoomingDirective } from '../../directives/input-events/zooming/mobile-zooming.directive';
 import { ZoomingWheelDirective } from '../../directives/input-events/zooming/zooming-wheel.directive';
 import { NgDiagramServicesAvailabilityCheckerDirective } from '../../directives/services-availability-checker/ng-diagram-services-availability-checker.directive';
-import { FlowCoreProviderService, FlowResizeBatchProcessorService, RendererService } from '../../services';
+import {
+  FlowCoreProviderService,
+  FlowOffsetService,
+  FlowResizeBatchProcessorService,
+  RendererService,
+} from '../../services';
 import { TemplateProviderService } from '../../services/template-provider/template-provider.service';
 import { NgDiagramConfig, NgDiagramEdgeTemplateMap, NgDiagramNodeTemplateMap } from '../../types';
 import { BUILTIN_MIDDLEWARES } from '../../utils/create-middlewares';
@@ -111,6 +116,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly renderer = inject(RendererService);
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
+  private readonly flowOffsetService = inject(FlowOffsetService);
   private readonly templateProviderService = inject(TemplateProviderService);
 
   private initializedModel: ModelAdapter | null = null;
@@ -318,10 +324,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
           this.renderer.isInitialized.set(false);
           this.renderer.viewportPannable.set(this.config()?.viewportPanningEnabled ?? true);
           this.flowCoreProvider.destroy();
+          this.flowOffsetService.reset();
           this.flowCoreProvider.init(
             model,
             this.middlewares(),
-            this.getFlowOffset,
+            this.flowOffsetService.getFlowOffset,
             this.getViewportSize,
             this.config()
           );
@@ -329,6 +336,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
         this.initializedModel = model;
 
+        this.flowOffsetService.initialize(this.elementRef.nativeElement);
         this.setupEventBridge();
       }
     });
@@ -411,14 +419,9 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     return this.elementRef.nativeElement.getBoundingClientRect();
   }
 
-  private getFlowOffset = () => {
-    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
-    return clientRect ? { x: clientRect.left, y: clientRect.top } : { x: 0, y: 0 };
-  };
-
   private getViewportSize = () => {
-    const clientRect = this.elementRef.nativeElement.getBoundingClientRect();
-    return clientRect ? { width: clientRect.width, height: clientRect.height } : { width: 0, height: 0 };
+    const { width, height } = this.elementRef.nativeElement.getBoundingClientRect();
+    return { width, height };
   };
 
   private setupViewportSizeTracking(): void {
@@ -429,6 +432,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     this.resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (entry) {
+        this.flowOffsetService.invalidateCache();
         const { width, height } = entry.contentRect;
         this.updateViewportSize(width, height);
       }

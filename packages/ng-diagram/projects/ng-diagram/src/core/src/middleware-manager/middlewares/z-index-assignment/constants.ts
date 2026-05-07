@@ -1,1 +1,0 @@
-export const DEFAULT_SELECTED_Z_INDEX = 1000;

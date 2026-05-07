@@ -38,3 +38,15 @@ if (!existsSync(apiReportSrc)) {
 mkdirSync(dirname(apiReportDest), { recursive: true });
 cpSync(apiReportSrc, apiReportDest);
 console.log(`[bundle-data] Copied API report → ${apiReportDest}`);
+
+// Copy examples (for CodeSnippet/CodeViewer resolution)
+const examplesSrc = resolve(root, 'apps/docs/src/components/angular');
+const examplesDest = resolve(dist, 'data/examples');
+
+if (existsSync(examplesSrc)) {
+  mkdirSync(examplesDest, { recursive: true });
+  cpSync(examplesSrc, examplesDest, { recursive: true, filter: (src) => !src.endsWith('.DS_Store') });
+  console.log(`[bundle-data] Copied examples → ${examplesDest}`);
+} else {
+  console.warn(`[bundle-data] examples directory not found: ${examplesSrc} (snippets will not be inlined)`);
+}

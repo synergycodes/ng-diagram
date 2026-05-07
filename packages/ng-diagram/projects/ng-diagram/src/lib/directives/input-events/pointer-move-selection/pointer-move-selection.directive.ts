@@ -23,6 +23,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   targetData = input<Node>();
 
   private edgePanningInterval: number | null = null;
+  private cachedDiagramRect: DOMRect | null = null;
 
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
@@ -45,6 +46,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     }
 
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Move);
+    this.cachedDiagramRect = this.diagramComponent.getBoundingClientRect();
     event.moveSelectionHandled = true;
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
@@ -98,7 +100,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     let panningForce: Point | null = null;
     if (viewportPanningEnabled && edgePanningEnabled) {
       panningForce = NgDiagramMath.calculateEdgePanningForce(
-        this.diagramComponent.getBoundingClientRect(),
+        this.cachedDiagramRect || this.diagramComponent.getBoundingClientRect(),
         { x: event.clientX, y: event.clientY },
         edgePanningThreshold,
         edgePanningForce
@@ -134,6 +136,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();
+    this.cachedDiagramRect = null;
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
