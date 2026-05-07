@@ -103,8 +103,12 @@ function traverseNodes(
   initialCumulativeElevation = 0
 ): void {
   const elevationAmount = !ignoreSelection && zIndexConfig?.elevateOnSelection ? zIndexConfig.selectedZIndex : 0;
+  const visited = new Set<string>();
 
   function traverse(currentNode: Node, zIndex: number, cumulativeElevation: number): void {
+    if (visited.has(currentNode.id)) return;
+    visited.add(currentNode.id);
+
     const nonElevatedZ =
       currentNode.groupId != null ? Math.max(currentNode.zOrder ?? zIndex, zIndex) : (currentNode.zOrder ?? zIndex);
 

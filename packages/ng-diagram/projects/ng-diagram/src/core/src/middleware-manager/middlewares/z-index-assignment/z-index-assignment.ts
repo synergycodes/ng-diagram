@@ -90,13 +90,15 @@ function findEntryNodes(dirtyNodeIds: Set<string>, nodesMap: Map<string, Node>):
   // Filter out entries whose ancestor is also an entry to avoid reprocessing subtrees
   const entryNodes: Node[] = [];
   for (const id of entryNodeIds) {
+    const visited = new Set<string>();
     let ancestorId = nodesMap.get(id)?.groupId;
     let hasAncestorEntry = false;
-    while (ancestorId != null) {
+    while (ancestorId != null && !visited.has(ancestorId)) {
       if (entryNodeIds.has(ancestorId)) {
         hasAncestorEntry = true;
         break;
       }
+      visited.add(ancestorId);
       ancestorId = nodesMap.get(ancestorId)?.groupId;
     }
     if (!hasAncestorEntry) {
@@ -113,9 +115,11 @@ function findEntryNodes(dirtyNodeIds: Set<string>, nodesMap: Map<string, Node>):
  */
 function computeNodeElevation(node: Node, nodesMap: Map<string, Node>, zIndexConfig: ZIndexConfig): number {
   if (!zIndexConfig.elevateOnSelection) return 0;
+  const visited = new Set<string>();
   let elevation = 0;
   let current: Node | undefined = node;
-  while (current != null) {
+  while (current != null && !visited.has(current.id)) {
+    visited.add(current.id);
     if (current.selected) elevation += zIndexConfig.selectedZIndex;
     current = current.groupId != null ? nodesMap.get(current.groupId) : undefined;
   }
@@ -147,9 +151,8 @@ function computeNodeZIndices(
     let options: { initialCumulativeElevation: number; skipRoot: boolean } | undefined;
 
     if (!dirtyNodeIds.has(entryNode.id) && entryNode.computedZIndex != null) {
-      // Non-dirty promoted parent: strip baked-in elevation to recover non-elevated base.
-      // traverseNodes re-derives the correct elevation from selection state, but skipRoot
-      // prevents emitting the entry node itself — its computedZIndex is preserved as-is.
+      // Non-dirty promoted parent: preserve its computedZIndex, only recompute children.
+      // Strip elevation to recover the non-elevated base for child slot assignment.
       const totalElevation = computeNodeElevation(entryNode, nodesMap, zIndexConfig);
       const ancestorElevation = totalElevation - (entryNode.selected ? zIndexConfig.selectedZIndex : 0);
       baseZIndex = entryNode.computedZIndex - totalElevation;

@@ -27,8 +27,11 @@ export function collectIdsInHierarchyOrder(
   ignoreSelection = false
 ): string[] {
   const result: string[] = [];
+  const visited = new Set<string>();
 
   function traverse(nodeId: string): void {
+    if (visited.has(nodeId)) return;
+    visited.add(nodeId);
     const node = nodesById.get(nodeId);
     if (!node) return;
     result.push(nodeId);

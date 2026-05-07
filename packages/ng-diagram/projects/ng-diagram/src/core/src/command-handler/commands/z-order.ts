@@ -27,9 +27,11 @@ function collectDescendantIds(nodeIds: string[], childrenByGroupId: Map<string, 
 function filterToRootTargets(nodeIds: string[], nodesById: Map<string, Node>): string[] {
   const targetSet = new Set(nodeIds);
   return nodeIds.filter((id) => {
+    const visited = new Set<string>();
     let ancestorId = nodesById.get(id)?.groupId;
-    while (ancestorId != null) {
+    while (ancestorId != null && !visited.has(ancestorId)) {
       if (targetSet.has(ancestorId)) return false;
+      visited.add(ancestorId);
       ancestorId = nodesById.get(ancestorId)?.groupId;
     }
     return true;
@@ -42,8 +44,10 @@ function filterToRootTargets(nodeIds: string[], nodesById: Map<string, Node>): s
  */
 function collectAncestorIds(nodeId: string, nodesById: Map<string, Node>): string[] {
   const ancestors: string[] = [];
+  const visited = new Set<string>();
   let current = nodesById.get(nodeId);
-  while (current?.groupId != null) {
+  while (current?.groupId != null && !visited.has(current.groupId)) {
+    visited.add(current.groupId);
     ancestors.push(current.groupId);
     current = nodesById.get(current.groupId);
   }
