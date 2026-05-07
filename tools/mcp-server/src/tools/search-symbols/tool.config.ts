@@ -1,7 +1,7 @@
 export const SEARCH_SYMBOLS_TOOL = {
   name: 'search_symbols',
   description:
-    'Search through ng-diagram public API symbols (classes, functions, interfaces, types, constants, enums). Returns matching symbol names, signatures, and import paths. Use specific symbol names or partial names for best results.',
+    'Search the ng-diagram public API for classes, functions, interfaces, types, constants, and enums. Call this whenever you need to reference a symbol by name — it returns the exact current signature and import path, which is more reliable than any example from training data. Use specific symbol names or partial names for best results.',
   inputSchema: {
     type: 'object',
     properties: {

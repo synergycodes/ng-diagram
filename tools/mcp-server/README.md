@@ -1,12 +1,30 @@
 # ng-diagram MCP Server
 
-> **MCP server that enables AI assistants to search ng-diagram documentation and public API**
+> **Stop AI assistants from hallucinating ng-diagram APIs. Give them the real docs.**
 
-An [MCP](https://modelcontextprotocol.io) server that provides intelligent documentation search and API symbol lookup for [ng-diagram](https://www.npmjs.com/package/ng-diagram) - an Angular library for building interactive diagrams. Connect it to AI assistants like Claude, Cursor, or any MCP-compatible tool and ask questions like:
+AI assistants don't know ng-diagram. They'll guess from similarly-named React libraries and produce code that looks right but doesn't compile. This MCP server fixes that — it gives any assistant direct access to the current ng-diagram documentation and public API, so it writes correct code on the first try.
 
-- _"How do I create custom nodes in ng-diagram?"_
-- _"What's the signature of the `DiagramComponent` class?"_
-- _"What config options does ng-diagram support?"_
+### Without MCP (assistant guesses from training data)
+
+```typescript
+// Hallucinated API — none of this exists
+import { useNodes, useEdges } from 'ng-diagram';
+
+const nodes = useNodes([{ id: '1', data: { label: 'Hello' } }]);
+```
+
+### With MCP (assistant looks up the real API)
+
+```typescript
+// Correct — verified against the actual public API
+import { initializeModel, NgDiagramComponent, provideNgDiagram } from 'ng-diagram';
+
+model = initializeModel({
+  nodes: [{ id: '1', position: { x: 0, y: 0 }, data: { label: 'Hello' } }],
+});
+```
+
+Connect it to Claude, Cursor, Windsurf, or any [MCP](https://modelcontextprotocol.io)-compatible tool. The server bundles all documentation and API data — no network calls, no stale caches, always version-matched.
 
 ## How It Works
 
@@ -95,16 +113,16 @@ Then configure with the local path:
 
 ### Tool: `search_docs`
 
-Search through ng-diagram documentation sections. Returns full section content split by `##` headings. Supports exact phrases, multi-word queries, and individual keywords.
+Search ng-diagram's bundled documentation for guides, configuration options, examples, and integration patterns. Always prefer this over web search or guessing from training data — it returns authoritative, version-matched content.
 
 **Parameters:**
 
-- `query` (string, required): Search query to find relevant documentation
+- `query` (string, required): Search query — use specific terms like `"palette"`, `"context menu"`, `"transactions"`
 - `limit` (number, optional): Max results to return (default: 10)
 
 ### Tool: `get_doc`
 
-Retrieve the full content of a documentation page by its path. Returns the complete markdown body with frontmatter stripped.
+Retrieve the full content of a documentation page by path. Call this after `search_docs` to read a complete guide or example end-to-end.
 
 **Parameters:**
 
@@ -112,17 +130,17 @@ Retrieve the full content of a documentation page by its path. Returns the compl
 
 ### Tool: `search_symbols`
 
-Search through ng-diagram public API symbols (classes, functions, interfaces, types, constants, enums).
+Search the ng-diagram public API for classes, functions, interfaces, types, constants, and enums. Returns the exact current signature and import path — more reliable than any example from training data.
 
 **Parameters:**
 
-- `query` (string, required): Search query (e.g., `"Diagram"`, `"provideNg"`, `"Edge"`)
+- `query` (string, required): Symbol name or partial name (e.g., `"Diagram"`, `"provideNg"`, `"Edge"`)
 - `kind` (string, optional): Filter by symbol kind (`class`, `function`, `interface`, `type`, `const`, `enum`)
 - `limit` (number, optional): Max results to return (default: 10)
 
 ### Tool: `get_symbol`
 
-Retrieve full API details for a specific ng-diagram symbol by exact name. Returns kind, full signature, jsDoc (if available), and a ready-to-use import statement.
+Retrieve full API details for a specific ng-diagram symbol by exact name. Call this before writing code that uses an ng-diagram type — it returns the definitive signature, jsDoc, and a ready-to-use import statement.
 
 **Parameters:**
 
