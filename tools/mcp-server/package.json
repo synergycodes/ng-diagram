@@ -1,6 +1,6 @@
 {
   "name": "@ng-diagram/mcp",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "MCP server for ng-diagram documentation search",
   "type": "module",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "prebuild": "node scripts/clean.js",
-    "build": "tsc && node scripts/bundle-data.js",
+    "build": "tsc && node scripts/bundle-data.js && node scripts/build-indexes.js",
     "lint:check": "eslint",
     "lint:fix": "eslint --fix",
     "test": "vitest --run",
