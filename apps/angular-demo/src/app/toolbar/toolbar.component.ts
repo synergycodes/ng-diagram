@@ -4,6 +4,7 @@ import {
   Edge,
   EdgeLabelPosition,
   NgDiagramModelService,
+  NgDiagramNodeService,
   NgDiagramSelectionService,
   NgDiagramService,
   NgDiagramViewportService,
@@ -22,6 +23,7 @@ export class ToolbarComponent {
   private readonly ngDiagramSelectionService = inject(NgDiagramSelectionService);
   private readonly ngDiagramViewportService = inject(NgDiagramViewportService);
   private readonly ngDiagramModelService = inject(NgDiagramModelService);
+  private readonly ngDiagramNodeService = inject(NgDiagramNodeService);
   private readonly nodeTypes = Array.from(nodeTemplateMap.keys()) as NodeTemplateType[];
 
   reinitializeModelClick = output<void>();
@@ -33,6 +35,10 @@ export class ToolbarComponent {
 
   measurementTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
+  isAnythingSelected = computed(() => {
+    const selection = this.ngDiagramSelectionService.selection();
+    return selection.nodes.length > 0 || selection.edges.length > 0;
+  });
 
   selectedLabelledEdge = computed(() => {
     const edges = this.ngDiagramSelectionService.selection().edges;
@@ -47,6 +53,14 @@ export class ToolbarComponent {
   });
 
   isDebugModeEnabled = computed(() => this.ngDiagramService.config().debugMode || false);
+
+  onBringToFrontClick(): void {
+    this.ngDiagramNodeService.bringToFront();
+  }
+
+  onSendToBackClick(): void {
+    this.ngDiagramNodeService.sendToBack();
+  }
 
   onToggleLabelPositionClick(): void {
     const edge = this.selectedLabelledEdge();

@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EdgeRoutingManager } from '../../../../edge-routing-manager';
 import { mockEdge, mockMetadata, mockNode } from '../../../../test-utils';
 import type { Edge, FlowState, MiddlewareContext } from '../../../../types';
-import { DEFAULT_SELECTED_Z_INDEX } from '../../z-index-assignment/constants';
 import { edgesRoutingMiddleware } from '../edges-routing';
+
+const TEMPORARY_EDGE_Z_INDEX = 1000;
 
 vi.mock('../get-edge-points', () => ({
   getEdgePoints: vi.fn().mockImplementation((edge) => {
@@ -92,7 +93,7 @@ describe('Edges Routing Middleware', () => {
       initialUpdate: {},
       config: {
         zIndex: {
-          temporaryEdgeZIndex: DEFAULT_SELECTED_Z_INDEX,
+          temporaryEdgeZIndex: TEMPORARY_EDGE_Z_INDEX,
         },
       },
     } as unknown as MiddlewareContext;
@@ -447,7 +448,7 @@ describe('Edges Routing Middleware', () => {
         expect.objectContaining({
           id: 'temp-edge',
           points: expect.any(Array),
-          computedZIndex: DEFAULT_SELECTED_Z_INDEX,
+          computedZIndex: TEMPORARY_EDGE_Z_INDEX,
         })
       );
       expect(nextMock).toHaveBeenCalledWith({});

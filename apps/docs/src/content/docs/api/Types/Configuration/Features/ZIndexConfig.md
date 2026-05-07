@@ -28,7 +28,7 @@ false
 
 > **elevateOnSelection**: `boolean`
 
-Whether selected elements should be elevated to selectedZIndex.
+Whether selected elements should be elevated by adding `selectedZIndex` to their computed z-index.
 
 #### Default
 
@@ -56,12 +56,14 @@ true
 
 > **selectedZIndex**: `number`
 
-The z-index value for selected elements.
+The z-index value added to selected elements' computed z-index.
+Applied cumulatively — a selected child inside a selected parent
+receives this value twice (once from the parent's elevation, once from its own).
 
 #### Default
 
 ```ts
-1000
+10000
 ```
 
 ***
@@ -75,5 +77,5 @@ The z-index value for temporary edge.
 #### Default
 
 ```ts
-1000
+2147483647
 ```

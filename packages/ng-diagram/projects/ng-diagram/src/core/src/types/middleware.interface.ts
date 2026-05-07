@@ -405,6 +405,13 @@ export interface MiddlewareContext {
    */
   initialEdgesMap: Map<string, Edge>;
   /**
+   * Map from node ID to connected edge IDs (edges where node is source or target)
+   * before any modifications (before the initial action and before any middleware modifications).
+   * Use this to find edges connected to specific nodes without scanning all edges.
+   * @since 1.2.3
+   */
+  initialConnectedEdgesMap: Map<string, string[]>;
+  /**
    * The action that triggered the middleware execution.
    * @deprecated Use `modelActionTypes` instead, which supports multiple actions from transactions.
    * For single actions, this returns the first (and only) action type.

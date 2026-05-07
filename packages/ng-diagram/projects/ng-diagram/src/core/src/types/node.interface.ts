@@ -67,13 +67,22 @@ export interface SimpleNode<T extends DataObject = DataObject> {
    */
   autoSize?: boolean;
   /**
-   * The z-order of the node.
+   * The z-order of the node. Controls relative ordering among nodes on the same hierarchy level.
+   * With proper values, it can also influence ordering across different hierarchy levels,
+   * since each nesting level adds +1 to the computed z-index per child.
+   * - Root nodes: used directly as the base z-index (negative values allowed).
+   * - Grouped nodes: acts as a minimum floor — cannot go below the parent's z-index.
+   *
+   * Set by `bringToFront` / `sendToBack` commands, or manually.
+   * @see {@link computedZIndex} for the final rendered z-index.
    */
   zOrder?: number;
   /**
    * @readonly
    * @remarks ComputedZIndex is computed by the system and should not be set manually.
-   * The z-index of the node. This value is set automatically
+   * The final z-index applied to the DOM element for rendering order.
+   * Computed from `zOrder`, group hierarchy, and selection elevation.
+   * Children are always above their parent group.
    */
   readonly computedZIndex?: number;
   /**

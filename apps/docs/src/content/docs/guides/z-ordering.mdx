@@ -1,0 +1,100 @@
+---
+title: Z-Ordering
+description: How z-index layering works for nodes and edges in ngDiagram
+sidebar:
+  badge:
+    text: New
+    variant: tip
+---
+
+ngDiagram automatically manages the rendering order (z-index) of nodes and edges.
+The **desired ordering** is controlled via `zOrder`, and the system computes the **final z-index** (`computedZIndex`) that gets applied to the DOM.
+
+## Key Concepts
+
+### `zOrder` vs `computedZIndex`
+
+- **`zOrder`**: a value on nodes or edges that controls their relative ordering. It can be set manually or via `bringToFront` / `sendToBack` commands.
+- **`computedZIndex`**: the final CSS z-index computed by the system. It accounts for `zOrder`, group hierarchy depth, and selection elevation. This property is read-only.
+
+### How `computedZIndex` Is Computed
+
+For **root nodes** (no parent group), `zOrder` maps directly to `computedZIndex`. Negative values are allowed (useful for `sendToBack`).
+
+For **grouped nodes**, `computedZIndex` is always higher than the parent's. Each nesting level adds +1 per child, and `zOrder` acts as a minimum floor that cannot push a child below its parent. Among siblings, higher `zOrder` renders on top.
+
+For **nodes without `zOrder`**, the system treats them as `zOrder: 0`. Their position is determined by their order among siblings relative to those with explicit `zOrder` values.
+
+For **edges** without `zOrder`, the z-index is derived from the connected nodes: `max(source, target)`. Setting an explicit `zOrder` on an edge overrides this, but the system still adds connected node elevation when those nodes are selected.
+
+## Group Hierarchy
+
+Children are **always rendered above their parent group**. This is enforced regardless of `zOrder` values. A child with `zOrder: -100` inside a group will still appear above the group.
+
+Among siblings within a group, nodes are sorted by `zOrder`. When any sibling's `zOrder`, selection, or group membership changes, all siblings in that group are re-sorted to maintain correct ordering.
+
+With appropriate `zOrder` values, it is also possible to influence ordering across different hierarchy levels. Each nesting level adds +1 to the computed z-index per child, so this offset should be accounted for when setting cross-hierarchy values.
+
+## Selection Elevation
+
+When [`elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig#elevateonselection) is enabled, selecting a node adds [`selectedZIndex`](/docs/api/types/configuration/features/zindexconfig#selectedzindex) to its `computedZIndex`. This ensures selected elements appear above non-selected ones.
+
+Elevation is **cumulative** in nested groups. If a parent group and its child are both selected, the child receives the elevation twice: once inherited from the parent, and once from its own selection. This keeps the child visually above siblings that only inherit the parent's elevation.
+
+Children of a selected group inherit the parent's elevation even if they are not selected themselves. Among siblings, selected children are sorted after non-selected ones, ensuring they render on top.
+
+### Configuration
+
+You can configure z-index behavior via the [`zIndex`](/docs/api/types/configuration/features/zindexconfig) property in your diagram config:
+
+```typescript
+provideNgDiagram({
+  config: {
+    zIndex: {
+      enabled: true,
+      selectedZIndex: 10000,
+      elevateOnSelection: true,
+      edgesAboveConnectedNodes: false,
+      temporaryEdgeZIndex: 2147483647,
+    },
+  },
+});
+```
+
+See [`ZIndexConfig`](/docs/api/types/configuration/features/zindexconfig) for full reference.
+
+## Bring to Front / Send to Back
+
+[`NgDiagramNodeService`](/docs/api/services/ngdiagramnodeservice) provides methods to reorder elements programmatically:
+
+```typescript
+const nodeService = inject(NgDiagramNodeService);
+
+// Bring nodes/edges to front
+nodeService.bringToFront(['node-1', 'node-2'], ['edge-1']);
+
+// Send nodes/edges to back
+nodeService.sendToBack(['node-3']);
+```
+
+If no IDs are provided, the current selection is used.
+
+### Hierarchy Behavior
+
+**`bringToFront`** sets a `zOrder` above all other elements. When applied to a grouped node, descendants receive incrementing `zOrder` values that preserve their internal hierarchy ordering.
+
+**`sendToBack`** sets a `zOrder` below all other elements. It also applies progressively lower values to the node's parent chain, ensuring the entire ancestor hierarchy is sent behind its siblings at each level.
+
+## Edge Z-Index
+
+Edges without an explicit `zOrder` derive their z-index from their connected nodes (`max(source, target)`). This means they automatically follow the nodes they connect to.
+
+When `zOrder` is set on an edge (via `bringToFront` or manually), the edge uses that value as its base. If a connected node is selected, the node's elevation is added to the edge so it remains visible above elevated nodes.
+
+A selected edge adds `selectedZIndex` on top of its computed base.
+
+Setting [`edgesAboveConnectedNodes`](/docs/api/types/configuration/features/zindexconfig#edgesaboveconnectednodes) to `true` adds +1 to every edge's z-index relative to its connected nodes, ensuring edges are always drawn above the nodes they connect.
+
+## Further Reading
+
+[Groups](/docs/guides/nodes/groups) | [Selection](/docs/guides/nodes/selection) | [Configuration](/docs/guides/configuration)

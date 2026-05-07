@@ -85,13 +85,20 @@ export interface Edge<T extends DataObject = DataObject> {
    */
   temporary?: boolean;
   /**
-   * The z-order of the edge.
+   * The z-order of the edge. When set, overrides the default edge z-index
+   * (which is derived from connected nodes). When a connected node is selected,
+   * the node's elevation is added so the edge stays visible above elevated nodes.
+   *
+   * Set by `bringToFront` / `sendToBack` commands, or manually.
+   * @see {@link computedZIndex} for the final rendered z-index.
    */
   zOrder?: number;
   /**
    * @readonly
    * @remarks ComputedZIndex is computed by the system and should not be set manually.
-   * The z-index of the node. This value is set automatically
+   * The final z-index applied to the DOM element for rendering order.
+   * Without `zOrder`: derived from `max(source, target)` connected node z-indices.
+   * With `zOrder`: uses the explicit value plus connected node elevation.
    */
   readonly computedZIndex?: number;
   /**

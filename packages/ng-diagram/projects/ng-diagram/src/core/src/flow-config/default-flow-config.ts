@@ -113,8 +113,8 @@ const defaultSelectionMovingConfig: SelectionMovingConfig = {
 
 const defaultZIndexConfig: ZIndexConfig = {
   enabled: true,
-  selectedZIndex: 1000,
-  temporaryEdgeZIndex: 1000,
+  selectedZIndex: 10000,
+  temporaryEdgeZIndex: 2147483647,
   edgesAboveConnectedNodes: false,
   elevateOnSelection: true,
 };
