@@ -15,5 +15,5 @@ export interface InvalidateMeasurementsOptions {
   /**
    * Edges whose labels should be re-measured.
    */
-  edgeLabels?: { edgeId: string }[];
+  edges?: { edgeId: string }[];
 }

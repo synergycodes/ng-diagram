@@ -268,7 +268,7 @@ ngDiagramService.invalidateMeasurements({
 
 // Re-measure all labels on specific edges
 ngDiagramService.invalidateMeasurements({
-  edgeLabels: [{ edgeId: 'edge-1' }],
+  edges: [{ edgeId: 'edge-1' }],
 });
 ```
 

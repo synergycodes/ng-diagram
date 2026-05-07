@@ -12,9 +12,9 @@ are re-measured. When omitted, all elements are re-measured.
 
 ## Properties
 
-### edgeLabels?
+### edges?
 
-> `optional` **edgeLabels**: `object`[]
+> `optional` **edges**: `object`[]
 
 Edges whose labels should be re-measured.
 
