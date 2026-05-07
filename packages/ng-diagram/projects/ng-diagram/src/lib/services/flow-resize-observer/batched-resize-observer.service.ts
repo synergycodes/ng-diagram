@@ -23,6 +23,7 @@ export interface BatchResizeObserverConfig {
   onObserverActivity?: (metadata: ObservedElementMetadata[]) => void;
 }
 
+/** @internal */
 @Injectable()
 export class BatchResizeObserverService implements OnDestroy {
   private readonly ngZone = inject(NgZone);
@@ -131,7 +132,6 @@ export class BatchResizeObserverService implements OnDestroy {
 
   /**
    * Invalidate the node element and all its port elements.
-   * @internal
    */
   invalidateNode(nodeId: string): void {
     this.invalidateByKey(`node:${nodeId}`);
@@ -139,7 +139,6 @@ export class BatchResizeObserverService implements OnDestroy {
 
   /**
    * Invalidate all label elements on an edge.
-   * @internal
    */
   invalidateEdgeLabels(edgeId: string): void {
     this.invalidateByKey(`edge:${edgeId}`);
@@ -147,7 +146,6 @@ export class BatchResizeObserverService implements OnDestroy {
 
   /**
    * Invalidate ALL currently observed elements.
-   * @internal
    */
   invalidateAll(): void {
     const seen = new Set<Element>();

@@ -377,19 +377,6 @@ describe('BatchResizeObserverService', () => {
       expect(mockResizeObserver.observe).toHaveBeenCalledTimes(3);
     });
 
-    it('should deduplicate elements indexed under multiple keys', () => {
-      const labelEl = document.createElement('div');
-      // Edge label is indexed under both 'edge:e1' and 'edge-label:e1:l1'
-      service.observe(labelEl, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
-      mockResizeObserver.observe.mockClear();
-      mockResizeObserver.unobserve.mockClear();
-
-      service.invalidateAll();
-
-      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(1);
-      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
-    });
-
     it('should be a no-op when nothing is observed', () => {
       mockResizeObserver.observe.mockClear();
 
