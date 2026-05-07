@@ -26,10 +26,12 @@ export function assignNodeZIndex(
   node: Node,
   childrenByGroupId: Map<string, Node[]>,
   baseZIndex: number,
-  zIndexConfig?: ZIndexConfig
+  zIndexConfig?: ZIndexConfig,
+  options?: { initialCumulativeElevation?: number; skipRoot?: boolean }
 ): AssignNodeZIndexResult {
   const nodes: Node[] = [];
   const elevations = new Map<string, number>();
+  const skipId = options?.skipRoot ? node.id : undefined;
 
   traverseNodes(
     node,
@@ -37,9 +39,12 @@ export function assignNodeZIndex(
     baseZIndex,
     zIndexConfig,
     (currentNode, computedZIndex, cumulativeElevation) => {
+      if (currentNode.id === skipId) return;
       nodes.push({ ...currentNode, computedZIndex });
       elevations.set(currentNode.id, cumulativeElevation);
-    }
+    },
+    false,
+    options?.initialCumulativeElevation ?? 0
   );
 
   return { nodes, elevations };
@@ -94,7 +99,8 @@ function traverseNodes(
   baseZIndex: number,
   zIndexConfig: ZIndexConfig | undefined,
   visitor: NodeVisitor,
-  ignoreSelection = false
+  ignoreSelection = false,
+  initialCumulativeElevation = 0
 ): void {
   const elevationAmount = !ignoreSelection && zIndexConfig?.elevateOnSelection ? zIndexConfig.selectedZIndex : 0;
 
@@ -117,5 +123,5 @@ function traverseNodes(
     }
   }
 
-  traverse(node, baseZIndex, 0);
+  traverse(node, baseZIndex, initialCumulativeElevation);
 }

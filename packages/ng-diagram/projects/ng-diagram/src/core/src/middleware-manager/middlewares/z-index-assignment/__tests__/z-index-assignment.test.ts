@@ -1692,6 +1692,112 @@ describe('zIndexMiddleware', () => {
       expect(updates.find((u) => u.id === 'child1')!.computedZIndex).toBe(11 + SELECTED_Z_INDEX);
     });
 
+    it('should not double-elevate selected non-dirty parent promoted as entry', () => {
+      // group1 is selected with computedZIndex=110 (base=10 + selectedZIndex=100).
+      // child1 selection changes (dirty). group1 is NOT dirty, promoted as entry.
+      // Bug: baseZIndex=110 already includes elevation, then traverseNodes adds elevation again → 210.
+      // Fix: group1 stays at 110, children computed from non-elevated base=10.
+      const group1 = {
+        ...mockNode,
+        id: 'group1',
+        isGroup: true,
+        selected: true,
+        computedZIndex: 10 + SELECTED_Z_INDEX,
+      };
+      const child1 = { ...mockNode, id: 'child1', groupId: 'group1', selected: true, computedZIndex: 0 };
+
+      nodesMap.set('group1', group1);
+      nodesMap.set('child1', child1);
+      context.state.nodes = [group1, child1];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      executeMiddleware();
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+
+      // group1 NOT in updates — its computedZIndex=110 is preserved exactly
+      expect(updates.find((u) => u.id === 'group1')).toBeUndefined();
+      // child1: slot=11 (from non-elevated base 10+1), cumulative elevation=200 (parent 100 + self 100)
+      expect(updates.find((u) => u.id === 'child1')!.computedZIndex).toBe(11 + 2 * SELECTED_Z_INDEX);
+    });
+
+    it('should not double-elevate in deeply nested hierarchy with selected non-dirty parent', () => {
+      // grandparent: selected, computedZIndex=100 (base=0 + selectedZIndex)
+      // parent: selected, non-dirty, computedZIndex=201 (slot=1, cumElev=200)
+      // child: dirty (selection changes)
+      const grandparent = { ...mockNode, id: 'gp', isGroup: true, selected: true, computedZIndex: SELECTED_Z_INDEX };
+      const parent = {
+        ...mockNode,
+        id: 'parent',
+        isGroup: true,
+        groupId: 'gp',
+        selected: true,
+        computedZIndex: 1 + 2 * SELECTED_Z_INDEX,
+      };
+      const child = { ...mockNode, id: 'child', groupId: 'parent', selected: true, computedZIndex: 0 };
+
+      nodesMap.set('gp', grandparent);
+      nodesMap.set('parent', parent);
+      nodesMap.set('child', child);
+      context.state.nodes = [grandparent, parent, child];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('selected')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child']);
+
+      executeMiddleware();
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+
+      // parent NOT in updates — preserved at 201
+      expect(updates.find((u) => u.id === 'parent')).toBeUndefined();
+      // child: slot=2 (from non-elevated parent base 1+1), cumElev=300 (gp 100 + parent 100 + self 100)
+      expect(updates.find((u) => u.id === 'child')!.computedZIndex).toBe(2 + 3 * SELECTED_Z_INDEX);
+    });
+
+    it('should NOT double-elevate non-dirty selected parent promoted as entry', () => {
+      // group1: selected, computedZIndex=100 (base=0 + selectedZIndex). NOT dirty.
+      // child1: selected, dirty (zOrder change).
+      // group1 promoted as entry → must stay at SELECTED_Z_INDEX, NOT 2 * SELECTED_Z_INDEX.
+      const group1 = { ...mockNode, id: 'group1', isGroup: true, selected: true, computedZIndex: SELECTED_Z_INDEX };
+      const child1 = {
+        ...mockNode,
+        id: 'child1',
+        groupId: 'group1',
+        selected: true,
+        computedZIndex: 1 + SELECTED_Z_INDEX,
+      };
+
+      nodesMap.set('group1', group1);
+      nodesMap.set('child1', child1);
+      context.state.nodes = [group1, child1];
+
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props) =>
+        props.includes('zOrder')
+      );
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.getAffectedNodeIds as ReturnType<typeof vi.fn>).mockReturnValue(['child1']);
+
+      executeMiddleware();
+
+      const stateUpdate = nextMock.mock.calls[0][0] as FlowStateUpdate;
+      const updates = stateUpdate.nodesToUpdate || [];
+
+      // group1 stays at SELECTED_Z_INDEX — NOT in updates
+      expect(updates.find((u) => u.id === 'group1')).toBeUndefined();
+      // child1: slot=1 (from non-elevated base 0+1), cumulative elevation=200 (parent 100 + self 100)
+      expect(updates.find((u) => u.id === 'child1')!.computedZIndex).toBe(1 + 2 * SELECTED_Z_INDEX);
+    });
+
     it('should skip child when parent is also dirty (parent covers subtree)', () => {
       // Both group1 and child1 selected (both dirty).
       // Only group1 (root) should be entry — child1 handled by recursion.

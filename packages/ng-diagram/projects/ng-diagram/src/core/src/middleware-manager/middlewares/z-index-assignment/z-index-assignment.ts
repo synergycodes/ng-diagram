@@ -108,14 +108,34 @@ function findEntryNodes(dirtyNodeIds: Set<string>, nodesMap: Map<string, Node>):
 }
 
 /**
+ * Computes cumulative elevation for a node by walking its ancestor chain.
+ * Counts selectedZIndex for each selected node from the node itself up to the root.
+ */
+function computeNodeElevation(node: Node, nodesMap: Map<string, Node>, zIndexConfig: ZIndexConfig): number {
+  if (!zIndexConfig.elevateOnSelection) return 0;
+  let elevation = 0;
+  let current: Node | undefined = node;
+  while (current != null) {
+    if (current.selected) elevation += zIndexConfig.selectedZIndex;
+    current = current.groupId != null ? nodesMap.get(current.groupId) : undefined;
+  }
+  return elevation;
+}
+
+/**
  * Phase 2: Computes z-indices for all entry nodes and their subtrees.
  *
- * Non-dirty parents (promoted by dirty children) preserve their existing computedZIndex.
+ * Non-dirty entry nodes (promoted parents of dirty children) are left untouched —
+ * their existing computedZIndex is preserved and only their children are recomputed.
+ * The baked-in elevation is stripped from computedZIndex to recover the non-elevated base,
+ * and cumulative elevation is passed to children so they inherit it correctly.
+ *
  * Dirty entry nodes are always root or orphaned (no valid parent), so base starts at 0.
  */
 function computeNodeZIndices(
   entryNodes: Node[],
   dirtyNodeIds: Set<string>,
+  nodesMap: Map<string, Node>,
   childrenByGroupId: Map<string, Node[]>,
   zIndexConfig: ZIndexConfig
 ): { nodesWithZIndexMap: Map<string, Node>; nodeElevationMap: Map<string, number> } {
@@ -123,16 +143,25 @@ function computeNodeZIndices(
   const nodeElevationMap = new Map<string, number>();
 
   for (const entryNode of entryNodes) {
-    const baseZIndex =
-      !dirtyNodeIds.has(entryNode.id) && entryNode.computedZIndex != null ? entryNode.computedZIndex : 0;
+    let baseZIndex: number;
+    let options: { initialCumulativeElevation: number; skipRoot: boolean } | undefined;
 
-    const { nodes, elevations } = assignNodeZIndex(entryNode, childrenByGroupId, baseZIndex, zIndexConfig);
-    for (const n of nodes) {
-      nodesWithZIndexMap.set(n.id, n);
+    if (!dirtyNodeIds.has(entryNode.id) && entryNode.computedZIndex != null) {
+      // Non-dirty promoted parent: strip baked-in elevation to recover non-elevated base.
+      // traverseNodes re-derives the correct elevation from selection state, but skipRoot
+      // prevents emitting the entry node itself — its computedZIndex is preserved as-is.
+      const totalElevation = computeNodeElevation(entryNode, nodesMap, zIndexConfig);
+      const ancestorElevation = totalElevation - (entryNode.selected ? zIndexConfig.selectedZIndex : 0);
+      baseZIndex = entryNode.computedZIndex - totalElevation;
+      options = { initialCumulativeElevation: ancestorElevation, skipRoot: true };
+      nodeElevationMap.set(entryNode.id, totalElevation);
+    } else {
+      baseZIndex = 0;
     }
-    for (const [id, elev] of elevations) {
-      nodeElevationMap.set(id, elev);
-    }
+
+    const { nodes, elevations } = assignNodeZIndex(entryNode, childrenByGroupId, baseZIndex, zIndexConfig, options);
+    for (const n of nodes) nodesWithZIndexMap.set(n.id, n);
+    for (const [id, elev] of elevations) nodeElevationMap.set(id, elev);
   }
 
   return { nodesWithZIndexMap, nodeElevationMap };
@@ -263,6 +292,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
         ({ nodesWithZIndexMap, nodeElevationMap } = computeNodeZIndices(
           entryNodes,
           dirtyNodeIds,
+          nodesMap,
           getChildrenByGroupId(),
           zIndexConfig
         ));
