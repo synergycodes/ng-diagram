@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-05-07
+
 ### Changed
 
 - **Updated z-index defaults** — `selectedZIndex` changed from `1000` to `10000` to provide more headroom for explicit `zOrder` values; `temporaryEdgeZIndex` changed from `1000` to `2147483647` (max 32-bit int) so the edge being drawn always renders on top ([#697](https://github.com/synergycodes/ng-diagram/pull/697))
@@ -257,7 +259,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.2...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/synergycodes/ng-diagram/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/synergycodes/ng-diagram/compare/v1.1.2...v1.2.0
