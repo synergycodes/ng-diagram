@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Z-ordering reworked** — rewrote the z-index assignment middleware and `bringToFront`/`sendToBack` commands, fixing multiple issues: children are now always rendered above their parent group regardless of `zOrder` values, and siblings within a group are correctly re-sorted when `zOrder`, selection, or group membership changes.([#697](https://github.com/synergycodes/ng-diagram/pull/697))
+- Fixed ports and edge labels not being measured when a node or edge is removed and re-added with the same ID in the same tick ([#701](https://github.com/synergycodes/ng-diagram/pull/701))
 
 ## [1.2.2] - 2026-04-30
 
