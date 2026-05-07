@@ -114,12 +114,12 @@ You can enable default hover styles on ports by adding the following code into y
 
 ## Port Measurement
 
-ngDiagram automatically measures port positions and sizes using a `ResizeObserver`. In most cases, you don't need to do anything — measurements update automatically when:
+ngDiagram automatically measures port positions and sizes using a `ResizeObserver`. In most cases, you don't need to do anything - measurements update automatically when:
 
 - A port or its node is **resized** (content change, node resize, etc.)
 - A port's [`side`](/docs/api/components/ngdiagramportcomponent#side) or [`originPoint`](/docs/api/components/ngdiagramportcomponent#originpoint) input changes
 
-However, `ResizeObserver` only detects **size** changes, not **position** changes. If you reposition ports through CSS without changing their size — for example by toggling classes, changing `style.top`/`style.left` bindings, or reordering a data-driven port list — ngDiagram has no way to detect this automatically.
+However, `ResizeObserver` only detects **size** changes, not **position** changes. If you reposition ports through CSS without changing their size - for example by toggling classes, changing `style.top`/`style.left` bindings, or reordering a data-driven port list - ngDiagram has no way to detect this automatically.
 
 In these cases, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramservice/#invalidatemeasurements) <Badge text="since v1.2.3" variant="tip" /> to tell the library to re-measure:
 
