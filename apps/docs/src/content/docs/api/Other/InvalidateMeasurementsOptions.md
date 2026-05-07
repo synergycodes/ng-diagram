@@ -16,15 +16,11 @@ are re-measured. When omitted, all elements are re-measured.
 
 > `optional` **edgeLabels**: `object`[]
 
-Edge labels to re-measure.
+Edges whose labels should be re-measured.
 
 #### edgeId
 
 > **edgeId**: `string`
-
-#### labelId
-
-> **labelId**: `string`
 
 ***
 

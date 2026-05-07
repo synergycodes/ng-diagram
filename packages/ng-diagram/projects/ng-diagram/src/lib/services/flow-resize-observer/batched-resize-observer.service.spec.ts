@@ -231,20 +231,18 @@ describe('BatchResizeObserverService', () => {
       expect(service['entityIndex'].get('node:n1')?.has(el)).toBe(true);
     });
 
-    it('should index port element under both node and port keys', () => {
+    it('should index port element under node key', () => {
       const el = document.createElement('div');
       service.observe(el, { type: 'port', nodeId: 'n1', portId: 'p1' });
 
       expect(service['entityIndex'].get('node:n1')?.has(el)).toBe(true);
-      expect(service['entityIndex'].get('port:n1:p1')?.has(el)).toBe(true);
     });
 
-    it('should index edge label under both edge and edge-label keys', () => {
+    it('should index edge label under edge key', () => {
       const el = document.createElement('div');
       service.observe(el, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
 
       expect(service['entityIndex'].get('edge:e1')?.has(el)).toBe(true);
-      expect(service['entityIndex'].get('edge-label:e1:l1')?.has(el)).toBe(true);
     });
 
     it('should group node and its ports under the same node key', () => {
@@ -266,7 +264,6 @@ describe('BatchResizeObserverService', () => {
       service.unobserve(el);
 
       expect(service['entityIndex'].has('node:n1')).toBe(false);
-      expect(service['entityIndex'].has('port:n1:p1')).toBe(false);
     });
 
     it('should not remove key when other elements remain', () => {
@@ -325,20 +322,8 @@ describe('BatchResizeObserverService', () => {
     });
   });
 
-  describe('invalidateEdgeLabel', () => {
-    it('should invalidate a specific edge label', () => {
-      const el = document.createElement('div');
-      service.observe(el, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
-      mockResizeObserver.observe.mockClear();
-      mockResizeObserver.unobserve.mockClear();
-
-      service.invalidateEdgeLabel('e1', 'l1');
-
-      expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el);
-      expect(mockResizeObserver.observe).toHaveBeenCalledWith(el);
-    });
-
-    it('should not invalidate other labels on the same edge', () => {
+  describe('invalidateEdgeLabels', () => {
+    it('should invalidate all labels on an edge', () => {
       const el1 = document.createElement('div');
       const el2 = document.createElement('span');
       service.observe(el1, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
@@ -346,16 +331,30 @@ describe('BatchResizeObserverService', () => {
       mockResizeObserver.observe.mockClear();
       mockResizeObserver.unobserve.mockClear();
 
-      service.invalidateEdgeLabel('e1', 'l1');
+      service.invalidateEdgeLabels('e1');
 
-      expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el1);
-      expect(mockResizeObserver.unobserve).not.toHaveBeenCalledWith(el2);
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(2);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(2);
     });
 
-    it('should be a no-op for unknown edge label', () => {
+    it('should not invalidate labels on other edges', () => {
+      const el1 = document.createElement('div');
+      const el2 = document.createElement('span');
+      service.observe(el1, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+      service.observe(el2, { type: 'edge-label', edgeId: 'e2', labelId: 'l2' });
+      mockResizeObserver.observe.mockClear();
+      mockResizeObserver.unobserve.mockClear();
+
+      service.invalidateEdgeLabels('e1');
+
+      expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(1);
+      expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be a no-op for unknown edgeId', () => {
       mockResizeObserver.observe.mockClear();
 
-      service.invalidateEdgeLabel('unknown', 'unknown');
+      service.invalidateEdgeLabels('unknown');
 
       expect(mockResizeObserver.observe).not.toHaveBeenCalled();
     });
@@ -379,14 +378,14 @@ describe('BatchResizeObserverService', () => {
     });
 
     it('should deduplicate elements indexed under multiple keys', () => {
-      const portEl = document.createElement('div');
-      service.observe(portEl, { type: 'port', nodeId: 'n1', portId: 'p1' });
+      const labelEl = document.createElement('div');
+      // Edge label is indexed under both 'edge:e1' and 'edge-label:e1:l1'
+      service.observe(labelEl, { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
       mockResizeObserver.observe.mockClear();
       mockResizeObserver.unobserve.mockClear();
 
       service.invalidateAll();
 
-      // Port is indexed under 'node:n1' and 'port:n1:p1' but should only be invalidated once
       expect(mockResizeObserver.unobserve).toHaveBeenCalledTimes(1);
       expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
     });

@@ -423,9 +423,9 @@ export class NgDiagramService extends NgDiagramBaseService {
    *   nodes: [{ nodeId: 'node-1' }],
    * });
    *
-   * // Re-measure specific edge labels
+   * // Re-measure all labels on specific edges
    * ngDiagramService.invalidateMeasurements({
-   *   edgeLabels: [{ edgeId: 'edge-1', labelId: 'label-1' }],
+   *   edgeLabels: [{ edgeId: 'edge-1' }],
    * });
    *
    * @since 1.2.3
@@ -443,8 +443,8 @@ export class NgDiagramService extends NgDiagramBaseService {
     }
 
     if (options.edgeLabels) {
-      for (const { edgeId, labelId } of options.edgeLabels) {
-        this.batchResizeObserver.invalidateEdgeLabel(edgeId, labelId);
+      for (const { edgeId } of options.edgeLabels) {
+        this.batchResizeObserver.invalidateEdgeLabels(edgeId);
       }
     }
   }

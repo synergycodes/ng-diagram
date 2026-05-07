@@ -427,7 +427,6 @@ export interface InputModifiers {
 export interface InvalidateMeasurementsOptions {
     edgeLabels?: {
         edgeId: string;
-        labelId: string;
     }[];
     nodes?: {
         nodeId: string;

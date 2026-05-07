@@ -138,11 +138,11 @@ export class BatchResizeObserverService implements OnDestroy {
   }
 
   /**
-   * Invalidate a specific edge label element.
+   * Invalidate all label elements on an edge.
    * @internal
    */
-  invalidateEdgeLabel(edgeId: string, labelId: string): void {
-    this.invalidateByKey(`edge-label:${edgeId}:${labelId}`);
+  invalidateEdgeLabels(edgeId: string): void {
+    this.invalidateByKey(`edge:${edgeId}`);
   }
 
   /**
@@ -172,11 +172,10 @@ export class BatchResizeObserverService implements OnDestroy {
   private getEntityKeys(metadata: ObservedElementMetadata): string[] {
     switch (metadata.type) {
       case 'node':
-        return [`node:${metadata.nodeId}`];
       case 'port':
-        return [`node:${metadata.nodeId}`, `port:${metadata.nodeId}:${metadata.portId}`];
+        return [`node:${metadata.nodeId}`];
       case 'edge-label':
-        return [`edge:${metadata.edgeId}`, `edge-label:${metadata.edgeId}:${metadata.labelId}`];
+        return [`edge:${metadata.edgeId}`];
     }
   }
 
