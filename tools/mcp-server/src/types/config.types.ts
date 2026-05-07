@@ -12,6 +12,8 @@ export interface IndexerConfig {
   extensions: string[];
   /** Base URL for the documentation site (e.g., 'https://www.ngdiagram.dev') */
   baseUrl: string;
+  /** Path to the examples directory for resolving CodeSnippet/CodeViewer tags */
+  examplesPath?: string;
 }
 
 /**
@@ -28,4 +30,6 @@ export interface MCPServerConfig {
   baseUrl: string;
   /** Path to the API Extractor report file (.api.md) */
   apiReportPath?: string;
+  /** Path to the examples directory for resolving CodeSnippet/CodeViewer tags */
+  examplesPath?: string;
 }

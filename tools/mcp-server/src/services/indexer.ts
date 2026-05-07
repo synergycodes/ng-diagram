@@ -2,6 +2,7 @@ import { readdir, readFile } from 'fs/promises';
 import matter from 'gray-matter';
 import { basename, extname, join, relative } from 'path';
 import type { DocumentPage, DocumentSection, IndexerConfig } from '../types/index.js';
+import { SnippetReader } from './snippet-reader.js';
 
 /**
  * Scans a documentation directory for markdown files (.md/.mdx), extracts
@@ -18,10 +19,12 @@ import type { DocumentPage, DocumentSection, IndexerConfig } from '../types/inde
 export class DocumentationIndexer {
   private config: IndexerConfig;
   private pages = new Map<string, DocumentPage>();
+  private snippetReader: SnippetReader | null;
 
   /** @param config Indexer configuration (docs path, file extensions, base URL) */
   constructor(config: IndexerConfig) {
     this.config = config;
+    this.snippetReader = config.examplesPath ? new SnippetReader(config.examplesPath) : null;
   }
 
   /**
@@ -135,6 +138,10 @@ export class DocumentationIndexer {
         body = rawContent;
       }
 
+      if (this.snippetReader) {
+        body = await this.resolveSnippetTags(body);
+      }
+
       const pageTitle = title || this.getFilenameAsTitle(filePath);
       const normalizedPath = relativePath.replace(/\\/g, '/');
 
@@ -149,6 +156,56 @@ export class DocumentationIndexer {
       console.warn(`Failed to read file ${filePath}:`, error instanceof Error ? error.message : error);
       return [];
     }
+  }
+
+  /**
+   * Replace `<CodeSnippet>` and `<CodeViewer>` JSX tags with inline fenced
+   * code blocks by reading the referenced source files via {@link SnippetReader}.
+   *
+   * If a referenced file or directory cannot be found, the tag is replaced
+   * with an HTML comment noting the missing path.
+   */
+  private async resolveSnippetTags(body: string): Promise<string> {
+    if (!this.snippetReader) return body;
+
+    // Process <CodeSnippet> tags
+    const snippetRegex = /<CodeSnippet\s+relativePath="([^"]+)"(?:\s+sectionId="([^"]+)")?\s*\/>/g;
+    const snippetMatches = [...body.matchAll(snippetRegex)];
+
+    for (const match of snippetMatches.reverse()) {
+      const [fullMatch, relativePath, sectionId] = match;
+      const result = await this.snippetReader.readFile(relativePath, sectionId);
+
+      let replacement: string;
+      if (result) {
+        replacement = `\`\`\`${result.language}\n// ${relativePath.replace(/^\//, '')}${sectionId ? ` (section: ${sectionId})` : ''}\n${result.content}\n\`\`\``;
+      } else {
+        replacement = `<!-- snippet not found: ${relativePath} -->`;
+      }
+
+      body = body.substring(0, match.index!) + replacement + body.substring(match.index! + fullMatch.length);
+    }
+
+    // Process <CodeViewer> tags
+    const viewerRegex = /<CodeViewer\s+dirName="([^"]+)"\s*\/>/g;
+    const viewerMatches = [...body.matchAll(viewerRegex)];
+
+    for (const match of viewerMatches.reverse()) {
+      const [fullMatch, dirName] = match;
+      const files = await this.snippetReader.readDirectory(dirName);
+
+      let replacement: string;
+      if (files.length > 0) {
+        const blocks = files.map((f) => `\`\`\`${f.language}\n// ${f.relativePath}\n${f.content}\n\`\`\``);
+        replacement = `<!-- ${dirName} -->\n\n${blocks.join('\n\n')}`;
+      } else {
+        replacement = `<!-- code viewer directory not found: ${dirName} -->`;
+      }
+
+      body = body.substring(0, match.index!) + replacement + body.substring(match.index! + fullMatch.length);
+    }
+
+    return body;
   }
 
   /**

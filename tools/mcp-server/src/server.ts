@@ -95,6 +95,7 @@ export class NgDiagramMCPServer {
       docsPath: config.docsPath,
       extensions: ['.md', '.mdx'],
       baseUrl: config.baseUrl,
+      examplesPath: config.examplesPath,
     });
 
     this.server.onerror = (error) => {

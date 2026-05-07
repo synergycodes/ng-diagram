@@ -10,16 +10,19 @@ import type { IndexerConfig } from '../src/types/index.js';
 
 describe('DocumentationIndexer', () => {
   const testDir = join(process.cwd(), 'tests', 'fixtures', 'test-docs');
+  const examplesDir = join(process.cwd(), 'tests', 'fixtures', 'test-indexer-examples');
   let indexer: DocumentationIndexer;
 
   beforeEach(async () => {
     // Create test directory structure
     await mkdir(testDir, { recursive: true });
+    await mkdir(examplesDir, { recursive: true });
   });
 
   afterEach(async () => {
-    // Clean up test directory
+    // Clean up test directories
     await rm(testDir, { recursive: true, force: true });
+    await rm(examplesDir, { recursive: true, force: true });
   });
 
   describe('frontmatter extraction', () => {
@@ -813,6 +816,211 @@ Content B.
       for (const section of sections) {
         expect(section.pageTitle).toBe('My Page');
       }
+    });
+  });
+
+  describe('snippet resolution', () => {
+    it('should inline <CodeSnippet> tags with code blocks', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+        examplesPath: examplesDir,
+      };
+      indexer = new DocumentationIndexer(config);
+
+      // Create example source file
+      await mkdir(join(examplesDir, 'nodes'), { recursive: true });
+      await writeFile(join(examplesDir, 'nodes', 'component.ts'), 'export class NodeComponent {}', 'utf-8');
+
+      // Create doc file referencing it
+      const content = `---
+title: Nodes Guide
+---
+
+## Custom Nodes
+
+<CodeSnippet relativePath="nodes/component.ts" />
+`;
+      await writeFile(join(testDir, 'nodes.mdx'), content, 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections).toHaveLength(1);
+      expect(sections[0].content).toContain('```typescript');
+      expect(sections[0].content).toContain('export class NodeComponent {}');
+      expect(sections[0].content).not.toContain('<CodeSnippet');
+    });
+
+    it('should inline <CodeSnippet> with sectionId', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+        examplesPath: examplesDir,
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const source = [
+        'import { Component } from "@angular/core";',
+        '',
+        '// @section-start:registering',
+        'export class DiagramComponent {',
+        '  templateMap = new Map();',
+        '}',
+        '// @section-end:registering',
+        '',
+        'export class Other {}',
+      ].join('\n');
+
+      await writeFile(join(examplesDir, 'diagram.ts'), source, 'utf-8');
+
+      const content = `---
+title: Test
+---
+
+<CodeSnippet relativePath="diagram.ts" sectionId="registering" />
+`;
+      await writeFile(join(testDir, 'test.mdx'), content, 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections[0].content).toContain('export class DiagramComponent');
+      expect(sections[0].content).toContain('templateMap = new Map()');
+      expect(sections[0].content).not.toContain('import { Component }');
+      expect(sections[0].content).not.toContain('export class Other');
+    });
+
+    it('should inline <CodeViewer> with all files from directory', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+        examplesPath: examplesDir,
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const dir = join(examplesDir, 'my-example');
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, 'diagram.component.ts'), 'export class Diagram {}', 'utf-8');
+      await writeFile(join(dir, 'diagram.component.html'), '<div>template</div>', 'utf-8');
+      await writeFile(join(dir, 'diagram.component.scss'), '.root { }', 'utf-8');
+      await writeFile(join(dir, 'example.astro'), '<Fragment />', 'utf-8');
+
+      const content = `---
+title: Example
+---
+
+<CodeViewer dirName="my-example" />
+`;
+      await writeFile(join(testDir, 'example.mdx'), content, 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections[0].content).toContain('```typescript');
+      expect(sections[0].content).toContain('export class Diagram {}');
+      expect(sections[0].content).toContain('```html');
+      expect(sections[0].content).toContain('<div>template</div>');
+      expect(sections[0].content).toContain('```scss');
+      expect(sections[0].content).toContain('.root { }');
+      expect(sections[0].content).not.toContain('<CodeViewer');
+      expect(sections[0].content).not.toContain('.astro');
+      expect(sections[0].content).not.toContain('Fragment');
+    });
+
+    it('should replace missing snippet with comment', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+        examplesPath: examplesDir,
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const content = `---
+title: Test
+---
+
+<CodeSnippet relativePath="missing/file.ts" />
+`;
+      await writeFile(join(testDir, 'missing.mdx'), content, 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections[0].content).toContain('<!-- snippet not found: missing/file.ts -->');
+      expect(sections[0].content).not.toContain('<CodeSnippet');
+    });
+
+    it('should replace missing CodeViewer directory with comment', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+        examplesPath: examplesDir,
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const content = `---
+title: Test
+---
+
+<CodeViewer dirName="nonexistent-dir" />
+`;
+      await writeFile(join(testDir, 'missing-dir.mdx'), content, 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      expect(sections[0].content).toContain('<!-- code viewer directory not found: nonexistent-dir -->');
+    });
+
+    it('should include inlined code in getPage() body', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+        examplesPath: examplesDir,
+      };
+      indexer = new DocumentationIndexer(config);
+
+      await writeFile(join(examplesDir, 'simple.ts'), 'const x = 1;', 'utf-8');
+
+      const content = `---
+title: Page
+---
+
+<CodeSnippet relativePath="simple.ts" />
+`;
+      await writeFile(join(testDir, 'page.mdx'), content, 'utf-8');
+
+      await indexer.buildIndex();
+      const page = indexer.getPage('page.mdx');
+
+      expect(page).toBeDefined();
+      expect(page!.body).toContain('```typescript');
+      expect(page!.body).toContain('const x = 1;');
+      expect(page!.body).not.toContain('<CodeSnippet');
+    });
+
+    it('should not resolve snippets when examplesPath is not configured', async () => {
+      const config: IndexerConfig = {
+        docsPath: testDir,
+        baseUrl: 'https://www.ngdiagram.dev',
+        extensions: ['.mdx'],
+      };
+      indexer = new DocumentationIndexer(config);
+
+      const content = `---
+title: No Examples
+---
+
+<CodeSnippet relativePath="file.ts" />
+`;
+      await writeFile(join(testDir, 'no-examples.mdx'), content, 'utf-8');
+
+      const sections = await indexer.buildIndex();
+
+      // Tag should remain as-is since no examplesPath
+      expect(sections[0].content).toContain('<CodeSnippet');
     });
   });
 });

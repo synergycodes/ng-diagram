@@ -32,12 +32,18 @@ async function main(): Promise<void> {
       ? bundledApiReportPath
       : resolve(__dirname, '../../../packages/ng-diagram/api-report/ng-diagram.api.md');
 
+    const bundledExamplesPath = resolve(__dirname, 'data/examples');
+    const examplesPath = existsSync(bundledExamplesPath)
+      ? bundledExamplesPath
+      : resolve(__dirname, '../../../apps/docs/src/components/angular');
+
     const server = new NgDiagramMCPServer({
       name: 'ng-diagram-docs',
       version: pkg.version,
       docsPath,
       baseUrl: 'https://www.ngdiagram.dev',
       apiReportPath,
+      examplesPath,
     });
 
     // Handle signals at the entry point level
