@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Updated z-index defaults** — `selectedZIndex` changed from `1000` to `10000` to provide more headroom for explicit `zOrder` values; `temporaryEdgeZIndex` changed from `1000` to `2147483647` (max 32-bit int) so the edge being drawn always renders on top ([#697](https://github.com/synergycodes/ng-diagram/pull/697))
+
+### Added
+
+- `invalidateMeasurements(options?)` method on `NgDiagramService` — forces re-measurement of nodes, ports, and edge labels via `ResizeObserver`. Call with no arguments to re-measure the entire diagram, or pass `{ nodes: [...], edges: [...] }` to target specific elements. Invalidating a node also re-measures all its ports. Use this when CSS-only repositioning (class toggles, style bindings) changes port positions without changing sizes, which `ResizeObserver` cannot detect ([#698](https://github.com/synergycodes/ng-diagram/pull/698))
+- `initialConnectedEdgesMap` on `MiddlewareContext` — a `Map<string, string[]>` from node ID to connected edge IDs (source or target) captured before any modifications. Allows middleware to find edges connected to specific nodes without scanning all edges ([#697](https://github.com/synergycodes/ng-diagram/pull/697))
+- **MCP server: inline code snippets** — `search_docs` and `get_doc` now resolve `<CodeSnippet>` and `<CodeViewer>` tags in documentation pages, inlining the referenced source files directly into tool results. AI assistants see complete, runnable examples without needing access to the source repository ([#699](https://github.com/synergycodes/ng-diagram/pull/699))
+
+### Fixed
+
+- **Z-ordering reworked** — rewrote the z-index assignment middleware and `bringToFront`/`sendToBack` commands, fixing multiple issues: children are now always rendered above their parent group regardless of `zOrder` values, and siblings within a group are correctly re-sorted when `zOrder`, selection, or group membership changes.([#697](https://github.com/synergycodes/ng-diagram/pull/697))
+
 ## [1.2.2] - 2026-04-30
 
 ### Changed
