@@ -3,6 +3,27 @@ import { Edge, FlowStateUpdate, Middleware, MiddlewareContext, Node, Point } fro
 import { isSamePoint, isValidPosition } from '../../../utils';
 import { getEdgePoints } from './get-edge-points';
 
+const getSelfLoopMetadataByEdgeId = (edges: Edge[]): Map<string, { index: number; count: number }> => {
+  const selfLoopMetadataByEdgeId = new Map<string, { index: number; count: number }>();
+  const selfLoopsByNodeId = new Map<string, Edge[]>();
+
+  edges.forEach((edge) => {
+    if (edge.source !== edge.target || edge.source === '') return;
+    const loopEdges = selfLoopsByNodeId.get(edge.source) ?? [];
+    loopEdges.push(edge);
+    selfLoopsByNodeId.set(edge.source, loopEdges);
+  });
+
+  selfLoopsByNodeId.forEach((loopEdges) => {
+    const count = loopEdges.length;
+    loopEdges.forEach((edge, index) => {
+      selfLoopMetadataByEdgeId.set(edge.id, { index, count });
+    });
+  });
+
+  return selfLoopMetadataByEdgeId;
+};
+
 /**
  * Determines if edges should be re-routed based on changes in the flow state.
  */
@@ -147,13 +168,19 @@ export const processEdgesForRouting = (
   modelActionTypes: MiddlewareContext['modelActionTypes']
 ): NonNullable<FlowStateUpdate['edgesToUpdate']> => {
   const edgesToUpdate: NonNullable<FlowStateUpdate['edgesToUpdate']> = [];
+  const selfLoopMetadataByEdgeId = getSelfLoopMetadataByEdgeId(edges);
 
   edges.forEach((edge) => {
     if (!shouldRouteEdge(edge, helpers, modelActionTypes)) {
       return;
     }
 
-    const { sourcePoint, targetPoint, points } = getEdgePoints(edge, nodesMap, routingManager);
+    const { sourcePoint, targetPoint, points } = getEdgePoints(
+      edge,
+      nodesMap,
+      routingManager,
+      selfLoopMetadataByEdgeId.get(edge.id)
+    );
 
     // Skip if we don't have valid points (e.g., ports not initialized)
     if (!points || points.length === 0) {
