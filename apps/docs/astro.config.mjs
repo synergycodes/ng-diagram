@@ -169,6 +169,7 @@ export default defineConfig({
         PageTitle: './src/components/page-title/page-title.astro',
         ThemeProvider: './src/components/ForceDarkTheme.astro',
         ThemeSelect: './src/components/ForceThemeSelect.astro',
+        Footer: './src/components/help-banner/footer-with-help-banner.astro',
       },
     }),
   ],
