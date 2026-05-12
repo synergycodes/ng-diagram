@@ -1,0 +1,19 @@
+---
+export type Props = {
+  title: string;
+  description: string;
+  badgeLabel?: string;
+};
+
+const { title, description, badgeLabel = 'Coming soon' } = Astro.props;
+---
+
+<article class="content-tile content-tile-placeholder">
+  <div class="content-tile-content">
+    <div class="content-tile-placeholder-header">
+      <h4>{title}</h4>
+      <span class="content-tile-placeholder-badge">{badgeLabel}</span>
+    </div>
+    <p class="content-tile-description">{description}</p>
+  </div>
+</article>
