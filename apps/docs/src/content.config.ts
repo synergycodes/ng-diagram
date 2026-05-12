@@ -11,6 +11,14 @@ export const collections = {
     schema: docsSchema({
       extend: z.object({
         version: z.string().optional(),
+        helpBanner: z
+          .object({
+            title: z.string().min(1),
+            body: z.string().min(1),
+            linkLabel: z.string().min(1).optional(),
+            href: z.string().url().optional(),
+          })
+          .optional(),
       }),
     }),
   }),

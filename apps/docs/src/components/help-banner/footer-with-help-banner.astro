@@ -1,0 +1,20 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+import HelpBanner from './help-banner.astro';
+
+const { entry } = Astro.locals.starlightRoute;
+const helpBanner = entry.data.helpBanner;
+---
+
+{
+  helpBanner && (
+    <HelpBanner
+      title={helpBanner.title}
+      body={helpBanner.body}
+      linkLabel={helpBanner.linkLabel}
+      href={helpBanner.href}
+    />
+  )
+}
+
+<Default><slot /></Default>
