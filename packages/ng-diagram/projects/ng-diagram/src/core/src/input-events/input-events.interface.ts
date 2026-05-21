@@ -11,6 +11,7 @@ export type InputEventName =
   | 'deleteSelection'
   | 'panning'
   | 'keyboardPanning'
+  | 'wheelPanning'
   | 'pointerMoveSelection'
   | 'keyboardMoveSelection'
   | 'resize'

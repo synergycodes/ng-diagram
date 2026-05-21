@@ -3,6 +3,9 @@ import { FlowCoreProviderService } from '../../../services/flow-core-provider/fl
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { WheelInputEvent } from '../../../types';
 
+const PINCH_DELTA_THRESHOLD = 50;
+const PINCH_ZOOM_SENSITIVITY = 0.01;
+
 @Directive({
   selector: '[ngDiagramZoomingWheel]',
   standalone: true,
@@ -24,8 +27,7 @@ export class ZoomingWheelDirective {
     event.zoomingHandled = true;
 
     const flow = this.flowCoreProvider.provide();
-
-    const zoomFactor = event.deltaY > 0 ? 1 - flow.config.zoom.step : 1 + flow.config.zoom.step;
+    const zoomFactor = this.getZoomFactor(event, flow.config.zoom.step);
 
     const baseEvent = this.inputEventsRouterService.getBaseEvent(event);
     this.inputEventsRouterService.emit({
@@ -35,14 +37,32 @@ export class ZoomingWheelDirective {
         x: event.clientX,
         y: event.clientY,
       },
-      zoomFactor: zoomFactor,
+      zoomFactor,
     });
   }
 
   private shouldHandle(event: WheelInputEvent): boolean {
+    if (event.zoomingHandled) {
+      return false;
+    }
+
+    if (this.isPinchGesture(event)) {
+      return true;
+    }
+
     const flowCore = this.flowCoreProvider.provide();
     const modifiers = this.inputEventsRouterService.getBaseEvent(event).modifiers;
+    return flowCore.shortcutManager.matchesAction('zoom', { modifiers });
+  }
 
-    return !event.zoomingHandled && flowCore.shortcutManager.matchesAction('zoom', { modifiers });
+  private isPinchGesture(event: WheelInputEvent): boolean {
+    return event.ctrlKey && Math.abs(event.deltaY) < PINCH_DELTA_THRESHOLD;
+  }
+
+  private getZoomFactor(event: WheelInputEvent, step: number): number {
+    if (this.isPinchGesture(event)) {
+      return Math.exp(-event.deltaY * PINCH_ZOOM_SENSITIVITY);
+    }
+    return event.deltaY > 0 ? 1 - step : 1 + step;
   }
 }

@@ -72,18 +72,19 @@ export class PanningDirective implements OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    // Calculate deltas for panning direction
-    const deltaX = event.shiftKey ? event.deltaY : event.deltaX;
-    const deltaY = event.shiftKey ? 0 : event.deltaY;
+    let { deltaX, deltaY } = event;
 
-    const direction =
-      Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'left' : 'right') : deltaY > 0 ? 'top' : 'bottom';
+    if (event.shiftKey && deltaX === 0 && deltaY !== 0) {
+      deltaX = deltaY;
+      deltaY = 0;
+    }
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'keyboardPanning',
-      direction,
+      name: 'wheelPanning',
+      deltaX,
+      deltaY,
     });
   }
 
@@ -149,7 +150,8 @@ export class PanningDirective implements OnDestroy {
       !!viewportPanningEnabled &&
       !event.zoomingHandled &&
       !shouldDiscardEvent(event, 'pan') &&
-      !this.inputEventsRouter.eventGuards.withPrimaryModifier(event)
+      !this.inputEventsRouter.eventGuards.withPrimaryModifier(event) &&
+      !event.ctrlKey
     );
   }
 
