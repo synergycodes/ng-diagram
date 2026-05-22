@@ -46,15 +46,23 @@ export class ZoomingWheelDirective {
       return false;
     }
 
-    if (this.isPinchGesture(event)) {
+    const flowCore = this.flowCoreProvider.provide();
+    if (flowCore.actionStateManager.isPanning()) {
+      return false;
+    }
+
+    if (event.ctrlKey) {
       return true;
     }
 
-    const flowCore = this.flowCoreProvider.provide();
     const modifiers = this.inputEventsRouterService.getBaseEvent(event).modifiers;
     return flowCore.shortcutManager.matchesAction('zoom', { modifiers });
   }
 
+  /**
+   * A pinch gesture on trackpads is typically represented
+   * as a wheel event with ctrlKey=true and a small deltaY compared to regular scrolls.
+   */
   private isPinchGesture(event: WheelInputEvent): boolean {
     return event.ctrlKey && Math.abs(event.deltaY) < PINCH_DELTA_THRESHOLD;
   }
