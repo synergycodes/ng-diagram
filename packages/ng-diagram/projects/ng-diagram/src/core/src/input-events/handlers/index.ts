@@ -10,4 +10,5 @@ export * from './pointer-move-selection';
 export * from './resize';
 export * from './rotate';
 export * from './select';
+export * from './wheel-panning';
 export * from './zooming';

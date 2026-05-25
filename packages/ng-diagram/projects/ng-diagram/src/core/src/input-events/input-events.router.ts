@@ -17,6 +17,7 @@ import { RotateEventHandler } from './handlers/rotate/rotate.handler';
 import { SelectAllEventHandler } from './handlers/select-all/select-all.handler';
 import { SelectEventHandler } from './handlers/select/select.handler';
 import { UndoEventHandler } from './handlers/undo/undo.handler';
+import { WheelPanningEventHandler } from './handlers/wheel-panning/wheel-panning.handler';
 import { ZoomingEventHandler } from './handlers/zooming/zooming.handler';
 import { BaseInputEvent, InputEventName } from './input-events.interface';
 
@@ -43,6 +44,7 @@ export abstract class InputEventsRouter {
     this.register('selectAll', new SelectAllEventHandler(flow));
     this.register('panning', panningHandlerFactory(flow));
     this.register('keyboardPanning', new KeyboardPanningEventHandler(flow));
+    this.register('wheelPanning', new WheelPanningEventHandler(flow));
     this.register('pointerMoveSelection', new PointerMoveSelectionEventHandler(flow));
     this.register('keyboardMoveSelection', new KeyboardMoveSelectionEventHandler(flow));
     this.register('resize', new ResizeEventHandler(flow));
