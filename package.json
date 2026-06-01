@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs",
-    "dev:mobile": "cross-env NODE_ENV=development turbo watch dev --filter=!docs -- --host 0.0.0.0 --port 6011",
+    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs --filter=!@ng-diagram-package/e2e",
+    "dev:mobile": "cross-env NODE_ENV=development turbo watch dev --filter=!docs --filter=!@ng-diagram-package/e2e -- --host 0.0.0.0 --port 6011",
     "docs:dev": "cross-env NODE_ENV=development turbo watch docs:dev",
     "docs:build": "turbo run build --filter=docs",
     "lint:check": "turbo run lint:check",
@@ -17,6 +17,9 @@
     "api:update": "turbo run api:update",
     "test": "turbo run test --parallel",
     "test:coverage": "turbo run test --parallel -- --coverage",
+    "e2e": "turbo run e2e --filter=@ng-diagram-package/e2e",
+    "e2e:ui": "pnpm --filter @ng-diagram-package/e2e e2e:ui",
+    "e2e:install": "pnpm --filter @ng-diagram-package/e2e e2e:install",
     "prepare": "husky"
   },
   "devDependencies": {

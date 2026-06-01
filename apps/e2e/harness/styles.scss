@@ -1,0 +1,14 @@
+@import 'ng-diagram/styles.css';
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, sans-serif;
+}
+
+harness-root,
+harness-root > * {
+  display: block;
+  height: 100%;
+}
