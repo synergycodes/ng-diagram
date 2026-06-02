@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Improved trackpad gestures support** - panning with a trackpad now smoothly pans the diagram. Pinching defaults to zooming in/out on the diagram ([#717](https://github.com/synergycodes/ng-diagram/pull/717))
-
 ### Added
+
+### Fixed
+
+## [1.2.4] - 2026-06-02
+
+### Changed
+
+- **Improved trackpad gestures support** - panning with a trackpad now smoothly pans the diagram. Pinching defaults to zooming in/out on the diagram ([#717](https://github.com/synergycodes/ng-diagram/pull/717))
 
 ### Fixed
 
@@ -269,7 +275,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.3...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.4...HEAD
+[1.2.4]: https://github.com/synergycodes/ng-diagram/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/synergycodes/ng-diagram/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...v1.2.1
