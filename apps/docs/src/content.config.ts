@@ -15,6 +15,7 @@ export const collections = {
           .object({
             title: z.string().min(1),
             body: z.string().min(1),
+            eyebrow: z.string().min(1).optional(),
             linkLabel: z.string().min(1).optional(),
             href: z.string().url().optional(),
           })
