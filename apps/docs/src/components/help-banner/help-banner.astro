@@ -1,0 +1,210 @@
+---
+import { CONTACT_URL } from '../../consts';
+import decorGradient from '../../assets/help-banner/decor-gradient.svg';
+import decorNoise from '../../assets/help-banner/decor-noise.png';
+import arrowIcon from '../../assets/help-banner/arrow.svg';
+
+export type Props = {
+  title: string;
+  body: string;
+  eyebrow?: string;
+  linkLabel?: string;
+  href?: string;
+};
+
+const DEFAULT_EYEBROW = 'IMPLEMENTATION SUPPORT';
+const DEFAULT_LINK_LABEL = 'Talk to the team';
+
+const {
+  title,
+  body,
+  eyebrow = DEFAULT_EYEBROW,
+  linkLabel = DEFAULT_LINK_LABEL,
+  href = CONTACT_URL,
+} = Astro.props;
+
+const pagePath = Astro.url.pathname;
+
+const decorStyle = [
+  `--hb-glow:url(${decorGradient.src})`,
+  `--hb-noise:url(${decorNoise.src})`,
+  `--hb-arrow:url(${arrowIcon.src})`,
+].join(';');
+---
+
+<aside class="help-banner" style={decorStyle}>
+  <div class="help-banner-content">
+    <p class="help-banner-eyebrow">
+      <span class="help-banner-dot" aria-hidden="true"></span>
+      {eyebrow}
+    </p>
+    <p class="help-banner-title">{title}</p>
+    <p class="help-banner-body">{body}</p>
+  </div>
+
+  <a
+    class="help-banner-button"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-umami-event="help-banner-click"
+    data-umami-event-page={pagePath}
+  >
+    <span>{linkLabel}</span>
+    <span class="help-banner-arrow" aria-hidden="true"></span>
+  </a>
+</aside>
+
+<style>
+  @layer starlight.core {
+    .help-banner {
+      /* Surface + text. */
+      --hb-surface: #151516;
+      --hb-title: #ffffff;
+      --hb-body: #d5d8e0;
+      /* Accent: button, border, arrow. */
+      --hb-accent: #5e6ff6;
+      --hb-accent-border: rgba(94, 111, 246, 0.3);
+      --hb-accent-hover: rgba(94, 111, 246, 0.12);
+      /* Glow: eyebrow, dot, ambient light (all #7d95fc at varying alpha). */
+      --hb-glow-color: #7d95fc;
+      --hb-glow-soft: rgba(125, 149, 252, 0.8);
+      --hb-glow-ambient: rgba(125, 149, 252, 0.08);
+      --hb-shadow: rgba(0, 0, 0, 0.6);
+
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-top: 3rem;
+      padding: 2rem;
+      overflow: clip;
+      border: 1px solid var(--hb-accent-border);
+      border-radius: 1.25rem;
+      background: var(--hb-surface);
+      box-shadow:
+        0 0 5rem -1.25rem var(--hb-glow-ambient),
+        0 1.5rem 3.75rem -1.25rem var(--hb-shadow);
+    }
+
+    /* Decorative layers: blurred gradient blob + tiling noise overlay. */
+    .help-banner::before,
+    .help-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .help-banner::before {
+      background: var(--hb-glow) center / 100% 100% no-repeat;
+    }
+
+    .help-banner::after {
+      background: var(--hb-noise) top left / 9.875rem 9.875rem repeat;
+      mix-blend-mode: overlay;
+      opacity: 0.5;
+    }
+
+    /* Keep content above the decorative pseudo-elements. */
+    .help-banner-content,
+    .help-banner-button {
+      position: relative;
+      z-index: 1;
+    }
+
+    .help-banner-content {
+      display: flex;
+      flex: 1 0 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.625rem;
+      min-width: 0;
+    }
+
+    .help-banner-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+      font-size: 0.75rem;
+      line-height: 1.3;
+      color: var(--hb-glow-color);
+    }
+
+    .help-banner-dot {
+      flex-shrink: 0;
+      width: 0.375rem;
+      height: 0.375rem;
+      border-radius: 50%;
+      background: var(--hb-glow-color);
+      box-shadow: 0 0 0.75rem var(--hb-glow-soft);
+    }
+
+    .help-banner-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--hb-title);
+    }
+
+    .help-banner-body {
+      margin: 0;
+      max-width: 35rem;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      color: var(--hb-body);
+    }
+
+    .help-banner-button {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border: 1px solid var(--hb-accent);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--hb-accent);
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .help-banner-button:hover {
+      background-color: var(--hb-accent-hover);
+    }
+
+    .help-banner-arrow {
+      flex-shrink: 0;
+      width: 1.125rem;
+      height: 0.9375rem;
+      background-color: var(--hb-accent);
+      -webkit-mask: var(--hb-arrow) center / contain no-repeat;
+      mask: var(--hb-arrow) center / contain no-repeat;
+    }
+
+    @media (max-width: 50em) {
+      .help-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+        padding: 1.5rem;
+      }
+
+      .help-banner-button {
+        align-self: flex-start;
+      }
+    }
+
+    @media print {
+      .help-banner {
+        display: none;
+      }
+    }
+  }
+</style>

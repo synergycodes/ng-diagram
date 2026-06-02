@@ -1,5 +1,6 @@
 import { Directive, ElementRef, inject, type OnDestroy } from '@angular/core';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
+import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import type { PointerInputEvent, WheelInputEvent } from '../../../types';
 import { shouldDiscardEvent } from '../utils/should-discard-event';
@@ -16,6 +17,7 @@ export class PanningDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly elementRef = inject(ElementRef);
   private readonly diagramService = inject(NgDiagramService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   ngOnDestroy(): void {
     document.removeEventListener('pointermove', this.onMouseMove);
@@ -72,18 +74,19 @@ export class PanningDirective implements OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    // Calculate deltas for panning direction
-    const deltaX = event.shiftKey ? event.deltaY : event.deltaX;
-    const deltaY = event.shiftKey ? 0 : event.deltaY;
+    let { deltaX, deltaY } = event;
 
-    const direction =
-      Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'left' : 'right') : deltaY > 0 ? 'top' : 'bottom';
+    if (event.shiftKey && deltaX === 0 && deltaY !== 0) {
+      deltaX = deltaY;
+      deltaY = 0;
+    }
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
-      name: 'keyboardPanning',
-      direction,
+      name: 'wheelPanning',
+      deltaX,
+      deltaY,
     });
   }
 
@@ -145,12 +148,15 @@ export class PanningDirective implements OnDestroy {
 
   private shouldHandleWheel(event: WheelInputEvent): boolean {
     const { viewportPanningEnabled } = this.diagramService.config();
-    return (
-      !!viewportPanningEnabled &&
-      !event.zoomingHandled &&
-      !shouldDiscardEvent(event, 'pan') &&
-      !this.inputEventsRouter.eventGuards.withPrimaryModifier(event)
-    );
+    if (!viewportPanningEnabled || event.zoomingHandled || shouldDiscardEvent(event, 'pan')) {
+      return false;
+    }
+
+    if (this.flowCoreProvider.provide().actionStateManager.isPanning()) {
+      return true;
+    }
+
+    return !this.inputEventsRouter.eventGuards.withPrimaryModifier(event) && !event.ctrlKey;
   }
 
   private toggleGrabbingCursor(isGrabbing: boolean): void {
