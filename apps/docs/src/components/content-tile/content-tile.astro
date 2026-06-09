@@ -8,11 +8,13 @@ export type Props = {
   imageAlt?: string;
   openInNewTab?: boolean;
   codeHref?: string;
+  author?: string;
+  authorUrl?: string;
 }
 
 export type ContentTile = Omit<Props, 'openInNewTab' | 'navigationTitle'>;
 
-const { title, description, href, navigationTitle, image, imageAlt = title, openInNewTab = false, codeHref } = Astro.props;
+const { title, description, href, navigationTitle, image, imageAlt = title, openInNewTab = false, codeHref, author, authorUrl } = Astro.props;
 const targetAttr = openInNewTab ? '_blank' : undefined;
 const relAttr = openInNewTab ? 'noopener noreferrer' : undefined;
 ---
@@ -23,6 +25,11 @@ const relAttr = openInNewTab ? 'noopener noreferrer' : undefined;
   </div>
   <div class="content-tile-content">
     <h4>{title}</h4>
+    {author && (
+      <p class="content-tile-author">
+        by {authorUrl ? <a href={authorUrl} target={targetAttr} rel={relAttr}>{author}</a> : author}
+      </p>
+    )}
     <p class="content-tile-description">{description}</p>
     <div class="content-tile-actions">
       <a href={href} class="content-tile-link" target={targetAttr} rel={relAttr}>
