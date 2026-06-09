@@ -37,6 +37,22 @@
   margin-top: 0;
 }
 
+.content-tile-author {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sl-color-gray-3);
+  margin: 0;
+}
+
+.content-tile-author a {
+  color: var(--sl-color-text-accent);
+  text-decoration: none;
+}
+
+.content-tile-author a:hover {
+  text-decoration: underline;
+}
+
 .content-tile-description {
   font-size: 0.875rem;
   line-height: 1.6;

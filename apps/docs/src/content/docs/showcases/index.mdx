@@ -1,0 +1,34 @@
+---
+title: Showcases
+description: Projects built with ngDiagram by the community
+---
+
+import ContentTile from '../../../components/content-tile/content-tile.astro';
+import { showcaseProjects } from './showcases.ts';
+
+export const ASSETS_BASE = '/docs/assets/showcases/';
+
+Projects built with ngDiagram by the community. Unlike [Templates](/docs/templates/), which are curated and maintained by the ngDiagram team, the Showcases section is where developers share what they have built. Got something to show? [Submit your project](#submit-your-project).
+
+<div class="content-tile-grid not-content">
+  {showcaseProjects.map((project) => (
+    <ContentTile
+      title={project.title}
+      description={project.description}
+      href={project.href ?? project.codeHref}
+      codeHref={project.href ? project.codeHref : undefined}
+      navigationTitle={'View Project'}
+      image={`${ASSETS_BASE}${project.image}`}
+      imageAlt={project.imageAlt}
+      author={project.author}
+      authorUrl={project.authorUrl}
+      openInNewTab={true}
+    />
+  ))}
+</div>
+
+## Submit your project
+
+Built something with ngDiagram? We would love to feature it. Submissions are made by opening a pull request, so anyone can contribute.
+
+Full instructions and the entry format live in the [showcases folder on GitHub](https://github.com/synergycodes/ng-diagram/tree/main/apps/docs/src/content/docs/showcases). The ngDiagram team reviews each submission and may decline entries that are spam or contain inappropriate content.
