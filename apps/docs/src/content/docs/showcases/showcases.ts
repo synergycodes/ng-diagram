@@ -1,0 +1,57 @@
+/**
+ * Showcase entries — projects built by the ngDiagram community.
+ */
+
+export type ShowcaseProject = {
+  title: string;
+  /** Short description of what the project is and how it uses ngDiagram. */
+  description: string;
+  /** Screenshot file name only, placed in `public/assets/showcases/`. E.g. `my-project.png`. */
+  image: string;
+  /** Alt text for the screenshot. Falls back to `title` when omitted. */
+  imageAlt?: string;
+  /** Live demo / site URL. Provide this or `codeHref` (or both). */
+  href?: string;
+  /** Public repository URL. Provide this or `href` (or both). */
+  codeHref?: string;
+  /** Author name (person or company). */
+  author: string;
+  /** Optional link to the author's profile or site (GitHub, portfolio, etc.). */
+  authorUrl?: string;
+};
+
+export const showcaseProjects: ShowcaseProject[] = [
+  {
+    title: 'Footlball Pass Network Visualizaer',
+    description:
+      'Interactive pass network visualization tool for football match analysis. It renders player nodes positioned by their average pass origin on the pitch, with edges encoding pass volume (line width) and accuracy (color)',
+    image: 'pass-network-visualizer.png',
+    imageAlt: 'Screenshot of the Footlball Pass Network Visualizaer',
+    href: 'https://mateuszdropinski.github.io/pass-network-visualizer/',
+    codeHref: 'https://github.com/MateuszDropinski/pass-network-visualizer',
+    author: 'Mateusz Dropiński',
+    authorUrl: 'https://github.com/MateuszDropinski',
+  },
+  {
+    title: 'Player Similarity Explorer',
+    description:
+      'Interactive graph tool for exploring statistical similarity between football players across Attacking, Passing, and Defensive dimensions',
+    image: 'player-similarity-explorer.png',
+    imageAlt: 'Screenshot of the Player Similarity Explorer',
+    href: 'https://mateuszdropinski.github.io/player-similarity-explorer/',
+    codeHref: 'https://github.com/MateuszDropinski/player-similarity-explorer',
+    author: 'Mateusz Dropiński',
+    authorUrl: 'https://github.com/MateuszDropinski',
+  },
+  {
+    title: 'TTRPG Virtual Tabletop',
+    description:
+      'Tabletop RPG companion tool. It lets game masters run campaigns by dropping background maps and character or monster tokens onto a grid canvas, moving elements freely, measuring distances between positions, and pinning location markers that navigate between maps',
+    image: 'ttrpg-virtual-tabletop.png',
+    imageAlt: 'Screenshot of the TTRPG Virtual Tabletop',
+    href: 'https://mateuszdropinski.github.io/rpg-game-master-tool/',
+    codeHref: 'https://github.com/MateuszDropinski/rpg-game-master-tool',
+    author: 'Mateusz Dropiński',
+    authorUrl: 'https://github.com/MateuszDropinski',
+  },
+];

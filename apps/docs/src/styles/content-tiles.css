@@ -10,10 +10,6 @@
   height: 100%;
 }
 
-.content-tile:hover {
-  border-color: var(--sl-color-gray-2);
-}
-
 .content-tile-image {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -35,6 +31,22 @@
   gap: 0.5rem;
   flex: 1;
   margin-top: 0;
+}
+
+.content-tile-author {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sl-color-gray-3);
+  margin: 0;
+}
+
+.content-tile-author a {
+  color: var(--sl-color-text-accent);
+  text-decoration: none;
+}
+
+.content-tile-author a:hover {
+  text-decoration: underline;
 }
 
 .content-tile-description {
@@ -75,10 +87,6 @@
 .content-tile-placeholder {
   border-style: dashed;
   background: transparent;
-}
-
-.content-tile-placeholder:hover {
-  border-color: var(--sl-color-gray-5);
 }
 
 .content-tile-placeholder-header {
