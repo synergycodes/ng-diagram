@@ -10,10 +10,6 @@
   height: 100%;
 }
 
-.content-tile:hover {
-  border-color: var(--sl-color-gray-2);
-}
-
 .content-tile-image {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -91,10 +87,6 @@
 .content-tile-placeholder {
   border-style: dashed;
   background: transparent;
-}
-
-.content-tile-placeholder:hover {
-  border-color: var(--sl-color-gray-5);
 }
 
 .content-tile-placeholder-header {
