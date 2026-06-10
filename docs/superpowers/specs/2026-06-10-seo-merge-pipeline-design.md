@@ -69,6 +69,7 @@ Fully derived from inputs each run (no appends) → idempotent.
 ## CI workflow — `.github/workflows/deploy-seo.yml`
 
 `on: push: branches: [release]` + `workflow_dispatch`. Steps:
+
 1. checkout ng-diagram
 2. setup node/pnpm + `pnpm install --frozen-lockfile`
 3. `pnpm run docs:build` → `apps/docs/dist`
