@@ -54,4 +54,26 @@ export const showcaseProjects: ShowcaseProject[] = [
     author: 'Mateusz Dropiński',
     authorUrl: 'https://github.com/MateuszDropinski',
   },
+  {
+    title: 'Binary Adder Visualization',
+    description:
+      'An interactive visualization of a 4-bit binary adder, where toggling input bits propagates signals through XOR, AND, and OR gates in real time to compute and display the result.',
+    image: 'binary-adder-visualization.png',
+    imageAlt: 'Screenshot of the Binary Adder Visualization',
+    href: 'https://binary-adder-visualization.vercel.app/',
+    codeHref: 'https://github.com/karoljaskolka/binary-adder-visualization',
+    author: 'Karol Jaskółka',
+    authorUrl: 'https://github.com/karoljaskolka',
+  },
+  {
+    title: 'Warsaw Metro Timetable',
+    description:
+      'An interactive diagram of the Warsaw Metro network that displays departure timetables for each station.',
+    image: 'warsaw-metro-timetable.png',
+    imageAlt: 'Screenshot of the Warsaw Metro Timetable',
+    href: 'https://warsaw-metro-timetable.vercel.app/',
+    codeHref: 'https://github.com/karoljaskolka/warsaw-metro-timetable',
+    author: 'Karol Jaskółka',
+    authorUrl: 'https://github.com/karoljaskolka',
+  },
 ];
