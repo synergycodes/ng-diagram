@@ -1,0 +1,64 @@
+name: Sync SEO files
+
+# On every docs release, build the docs, merge their SEO files (sitemap.xml,
+# robots.txt, llms.txt, llms-full.txt) with the manually maintained main-site
+# (Webflow) source from synergycodes/seo-ngdiagram, and push the merged output
+# back to that repo's dist/ folder. The VM/proxy deployment pulls from there
+# (separate task).
+
+on:
+  push:
+    branches: ['release']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync-seo:
+    runs-on: ubuntu-latest
+    name: Build, merge & push SEO files
+    steps:
+      - name: Checkout ng-diagram
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Build docs
+        run: pnpm run docs:build
+
+      - name: Checkout seo-ngdiagram repo
+        uses: actions/checkout@v4
+        with:
+          repository: synergycodes/seo-ngdiagram
+          token: ${{ secrets.SEO_REPO_TOKEN }}
+          path: seo-repo
+          ref: main
+
+      - name: Merge SEO files
+        run: |
+          node apps/docs/scripts/merge-seo.js \
+            --docs-dist apps/docs/dist \
+            --main-site seo-repo/main-site \
+            --out seo-repo/dist
+
+      - name: Commit & push merged files
+        working-directory: seo-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist
+          if git diff --cached --quiet; then
+            echo "No SEO changes to publish."
+          else
+            git commit -m "chore: sync merged SEO files from ng-diagram@${GITHUB_SHA:0:7}"
+            git push origin main
+          fi
