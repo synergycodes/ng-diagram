@@ -5,13 +5,13 @@
  * (Webflow) SEO files into a single set of files served at the ngdiagram.dev root.
  *
  * Usage:
- *   node scripts/merge-seo.js --docs-dist <dir> --main-site <dir> --out <dir>
+ *   node scripts/merge-seo.js --docs-dist <dir> --src <dir> --out <dir>
  *
  *   --docs-dist  Built docs output (apps/docs/dist). Reads:
  *                  <docs-dist>/docs/sitemap-0.xml
  *                  <docs-dist>/llms.txt
  *                  <docs-dist>/llms-full.txt
- *   --main-site  Manually maintained main-site source (seo-ngdiagram/main-site). Reads:
+ *   --src        Manually maintained main-site source (seo-ngdiagram repo root). Reads:
  *                  sitemap.xml, robots.txt, llms.txt, llms-full.txt
  *   --out        Output dir (seo-ngdiagram/dist). Writes:
  *                  sitemap.xml, robots.txt, llms.txt, llms-full.txt
@@ -40,7 +40,7 @@ function parseArgs(argv) {
       i += 1;
     }
   }
-  for (const required of ['docs-dist', 'main-site', 'out']) {
+  for (const required of ['docs-dist', 'src', 'out']) {
     if (!args[required]) {
       throw new Error(`Missing required argument --${required}`);
     }
@@ -192,7 +192,7 @@ function mergeLlmsFull(docsDist, mainSite) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   const docsDist = args['docs-dist'];
-  const mainSite = args['main-site'];
+  const mainSite = args.src;
   const out = args.out;
 
   mkdirSync(out, { recursive: true });

@@ -7,8 +7,8 @@ name: Sync SEO files
 # (separate task).
 
 on:
-  push:
-    branches: ['release']
+  pull_request:
+    branches: ['main']
   workflow_dispatch:
 
 permissions:
@@ -35,23 +35,23 @@ jobs:
       - name: Build docs
         run: pnpm run docs:build
 
-      - name: Checkout seo-ngdiagram repo
-        uses: actions/checkout@v4
+      - name: Configure SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          repository: synergycodes/seo-ngdiagram
-          token: ${{ secrets.SEO_REPO_TOKEN }}
-          path: seo-repo
-          ref: main
+          ssh-private-key: ${{ secrets.SEO_DEPLOY_KEY }}
+
+      - name: Clone seo-ngdiagram
+        run: git clone --branch NGD-142 git@github.com:synergycodes/seo-ngdiagram.git tmp/seo-repo
 
       - name: Merge SEO files
         run: |
           node apps/docs/scripts/merge-seo.js \
             --docs-dist apps/docs/dist \
-            --main-site seo-repo/main-site \
-            --out seo-repo/dist
+            --src tmp/seo-repo \
+            --out tmp/seo-repo/dist
 
       - name: Commit & push merged files
-        working-directory: seo-repo
+        working-directory: tmp/seo-repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -60,5 +60,5 @@ jobs:
             echo "No SEO changes to publish."
           else
             git commit -m "chore: sync merged SEO files from ng-diagram@${GITHUB_SHA:0:7}"
-            git push origin main
+            git push
           fi
