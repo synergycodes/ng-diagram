@@ -1,10 +1,9 @@
-name: Sync SEO files
+name: Generate docs SEO files
 
-# On every docs release, build the docs, merge their SEO files (sitemap.xml,
-# robots.txt, llms.txt, llms-full.txt) with the manually maintained main-site
-# (Webflow) source from synergycodes/seo-ngdiagram, and push the merged output
-# back to that repo's dist/ folder. The VM/proxy deployment pulls from there
-# (separate task).
+# On every docs release, build the docs and push their generated SEO files
+# (sitemap-0.xml, llms.txt, llms-full.txt) into the docs/ folder of
+# synergycodes/seo-ngdiagram. The merge with the manually maintained main-site
+# source and artifact build happen in that repo's own workflow (merge-seo.yml).
 
 on:
   push:
@@ -15,9 +14,9 @@ permissions:
   contents: read
 
 jobs:
-  sync-seo:
+  push-docs-seo:
     runs-on: ubuntu-latest
-    name: Build, merge & push SEO files
+    name: Build & push docs SEO files
     steps:
       - name: Checkout ng-diagram
         uses: actions/checkout@v4
@@ -43,22 +42,22 @@ jobs:
       - name: Clone seo-ngdiagram
         run: git clone git@github.com:synergycodes/seo-ngdiagram.git tmp/seo-repo
 
-      - name: Merge SEO files
+      - name: Copy docs SEO files
         run: |
-          node apps/docs/scripts/merge-seo.js \
-            --docs-dist apps/docs/dist \
-            --src tmp/seo-repo \
-            --out tmp/seo-repo/dist
+          mkdir -p tmp/seo-repo/docs
+          cp apps/docs/dist/docs/sitemap-0.xml tmp/seo-repo/docs/sitemap-0.xml
+          cp apps/docs/dist/llms.txt tmp/seo-repo/docs/llms.txt
+          cp apps/docs/dist/llms-full.txt tmp/seo-repo/docs/llms-full.txt
 
-      - name: Commit & push merged files
+      - name: Commit & push docs SEO files
         working-directory: tmp/seo-repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add dist
+          git add docs
           if git diff --cached --quiet; then
-            echo "No SEO changes to publish."
+            echo "No docs SEO changes to publish."
           else
-            git commit -m "chore: sync merged SEO files from ng-diagram@${GITHUB_SHA:0:7}"
+            git commit -m "chore: sync docs SEO files from ng-diagram@${GITHUB_SHA:0:7}"
             git push
           fi
