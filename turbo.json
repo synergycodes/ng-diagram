@@ -41,6 +41,11 @@
     "test": {
       "dependsOn": ["^test"],
       "outputs": []
+    },
+    "e2e": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "outputs": ["playwright-report/**", "test-results/**"]
     }
   }
 }

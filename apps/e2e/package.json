@@ -1,0 +1,35 @@
+{
+  "name": "@ng-diagram-package/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ng serve --port 4201",
+    "build": "ng build",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:ui": "playwright test --ui",
+    "e2e:debug": "playwright test --debug",
+    "e2e:install": "playwright install --with-deps chromium",
+    "e2e:report": "playwright show-report",
+    "check-types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.e2e.json"
+  },
+  "dependencies": {
+    "@angular/common": "^19.2.7",
+    "@angular/compiler": "^19.2.7",
+    "@angular/core": "^19.2.7",
+    "@angular/platform-browser": "^19.2.7",
+    "ng-diagram": "workspace:*",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.7",
+    "@angular/cli": "^19.2.7",
+    "@angular/compiler-cli": "^19.2.6",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20.0.0",
+    "typescript": "~5.8.3"
+  }
+}
