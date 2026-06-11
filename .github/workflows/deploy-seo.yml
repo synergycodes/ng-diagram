@@ -7,8 +7,8 @@ name: Sync SEO files
 # (separate task).
 
 on:
-  pull_request:
-    branches: ['main']
+  push:
+    branches: ['release']
   workflow_dispatch:
 
 permissions:
@@ -41,7 +41,7 @@ jobs:
           ssh-private-key: ${{ secrets.SEO_DEPLOY_KEY }}
 
       - name: Clone seo-ngdiagram
-        run: git clone --branch NGD-142 git@github.com:synergycodes/seo-ngdiagram.git tmp/seo-repo
+        run: git clone git@github.com:synergycodes/seo-ngdiagram.git tmp/seo-repo
 
       - name: Merge SEO files
         run: |
