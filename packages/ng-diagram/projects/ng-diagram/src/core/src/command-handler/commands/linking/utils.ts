@@ -17,13 +17,12 @@ export const isProperTargetPort = (targetPort: Port, sourceNodeId?: string, sour
   if (targetPort.type === 'source') {
     return false;
   }
-  if (sourceNodeId && targetPort.nodeId !== sourceNodeId) {
-    return true;
-  }
-  if (sourcePortId && targetPort.id !== sourcePortId) {
-    return true;
-  }
-  return false;
+
+  if (!sourceNodeId) return true;
+  if (targetPort.nodeId !== sourceNodeId) return true;
+  if (!sourcePortId) return false;
+
+  return targetPort.id !== sourcePortId;
 };
 
 export const validateConnection = (
