@@ -12,6 +12,7 @@ This folder contains documentation for maintaining and releasing the ng-diagram 
 - 🔍 **Check for API breaking changes** → See [API Extractor](api-extractor.md)
 - ⚠️ **Deprecate an API** → See [Deprecation Guide](deprecation-guide.md)
 - 📋 **Understand our policies** → See [Policies](policies.md)
+- 🔎 **Understand the SEO release pipeline** → See [SEO Pipeline](seo-pipeline.md)
 
 ## Documents Overview
 
@@ -30,6 +31,12 @@ This folder contains documentation for maintaining and releasing the ng-diagram 
 | [API Extractor](api-extractor.md)         | Automated breaking change detection                 | When making public API changes            |
 | [Policies](policies.md)                   | API stability, deprecation, and versioning policies | When planning API changes or deprecations |
 | [Deprecation Guide](deprecation-guide.md) | Step-by-step deprecation workflow                   | When deprecating an API                   |
+
+### Deployment
+
+| Document                        | Purpose                                     | When to Use                        |
+| ------------------------------- | ------------------------------------------- | ---------------------------------- |
+| [SEO Pipeline](seo-pipeline.md) | How docs SEO files are generated and merged | When changing the SEO release flow |
 
 ## Typical Release Checklist
 
