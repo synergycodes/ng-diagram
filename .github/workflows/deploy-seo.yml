@@ -1,0 +1,63 @@
+name: Generate docs SEO files
+
+# On every docs release, build the docs and push their generated SEO files
+# (sitemap-0.xml, llms.txt, llms-full.txt) into the docs/ folder of
+# synergycodes/seo-ngdiagram. The merge with the manually maintained main-site
+# source and artifact build happen in that repo's own workflow (merge-seo.yml).
+
+on:
+  push:
+    branches: ['release']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  push-docs-seo:
+    runs-on: ubuntu-latest
+    name: Build & push docs SEO files
+    steps:
+      - name: Checkout ng-diagram
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Build docs
+        run: pnpm run docs:build
+
+      - name: Configure SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SEO_DEPLOY_KEY }}
+
+      - name: Clone seo-ngdiagram
+        run: git clone git@github.com:synergycodes/seo-ngdiagram.git tmp/seo-repo
+
+      - name: Copy docs SEO files
+        run: |
+          mkdir -p tmp/seo-repo/docs
+          cp apps/docs/dist/docs/sitemap-0.xml tmp/seo-repo/docs/sitemap-0.xml
+          cp apps/docs/dist/llms.txt tmp/seo-repo/docs/llms.txt
+          cp apps/docs/dist/llms-full.txt tmp/seo-repo/docs/llms-full.txt
+
+      - name: Commit & push docs SEO files
+        working-directory: tmp/seo-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then
+            echo "No docs SEO changes to publish."
+          else
+            git commit -m "chore: sync docs SEO files from ng-diagram@${GITHUB_SHA:0:7}"
+            git push
+          fi

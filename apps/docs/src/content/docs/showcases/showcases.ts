@@ -76,4 +76,14 @@ export const showcaseProjects: ShowcaseProject[] = [
     author: 'Karol Jaskółka',
     authorUrl: 'https://github.com/karoljaskolka',
   },
+  {
+    title: 'World Cup Chart',
+    description:
+      'An interactive FIFA World Cup 2026 chart that visualizes group standings and the knockout bracket, with collapsible group nodes and live match results, scorers, and assists.',
+    image: 'world-cup-chart.png',
+    imageAlt: 'Screenshot of the World Cup Chart showing group standings and the knockout bracket',
+    href: 'https://www.wc26chart.com/',
+    author: 'Synergy Codes',
+    authorUrl: 'https://www.synergycodes.com/',
+  },
 ];
