@@ -77,6 +77,17 @@ export const showcaseProjects: ShowcaseProject[] = [
     authorUrl: 'https://github.com/karoljaskolka',
   },
   {
+    title: 'Neural Network Visualization',
+    description:
+      'An interactive web application for building and visualizing neural network architectures. Configure layers, nodes and connections to define network topology - rendered in real time.',
+    image: 'neural-network-visualization.png',
+    imageAlt: 'Screenshot of the Neural Network Visualization',
+    href: 'https://neural-network-diagram-visualization.vercel.app/',
+    codeHref: 'https://github.com/karoljaskolka/neural-network-visualization',
+    author: 'Karol Jaskółka',
+    authorUrl: 'https://github.com/karoljaskolka',
+  },
+  {
     title: 'World Cup Chart',
     description:
       'An interactive FIFA World Cup 2026 chart that visualizes group standings and the knockout bracket, with collapsible group nodes and live match results, scorers, and assists.',
