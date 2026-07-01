@@ -3,7 +3,7 @@ import type { NgDiagramPanelPosition } from './panel-position.type';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
 import type { ShortcutDefinition } from './shortcut.interface';
-import { Size } from './utils';
+import { PortSide, Size } from './utils';
 
 /**
  * Configuration for node resizing behavior.
@@ -401,6 +401,27 @@ export interface EdgeRoutingConfig {
      * @default 15
      */
     maxCornerRadius?: number;
+  };
+
+  /** configuration options for self-loop routing
+   */
+  selfLoop?: {
+    /** Distance that loop extends outward from the node side.
+     * @default 50
+     */
+    loopSize?: number;
+    /** Distance between self-loop start and end anchor points.
+     * @default 30
+     */
+    loopSpread?: number;
+    /** Preferred side for the first self-loop.
+     * @default 'top'
+     */
+    defaultSide?: PortSide;
+    /** Loop size increment for each additional self-loop on the same node.
+     * @default 25
+     */
+    sizeIncrement?: number;
   };
 
   /**

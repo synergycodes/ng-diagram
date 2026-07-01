@@ -88,7 +88,8 @@ export const computeAutoModePoints = (
   target: PortLocation,
   sourceNode: Node | undefined,
   targetNode: Node | undefined,
-  routingManager: EdgeRoutingManager
+  routingManager: EdgeRoutingManager,
+  selfLoopMetadata?: { index: number; count: number }
 ): Point[] => {
   const context: EdgeRoutingContext = {
     sourcePoint: source,
@@ -98,10 +99,15 @@ export const computeAutoModePoints = (
     targetNode,
     sourcePort: findNodePort(sourceNode, edge.sourcePort),
     targetPort: findNodePort(targetNode, edge.targetPort),
+    selfLoopIndex: selfLoopMetadata?.index,
+    selfLoopCount: selfLoopMetadata?.count,
   };
 
-  if (edge.routing && routingManager.hasRouting(edge.routing)) {
-    return routingManager.computePoints(edge.routing, context);
+  const hasSelfLoop = edge.source === edge.target && edge.source !== '';
+  const effectiveRouting = edge.routing || (hasSelfLoop ? 'self-loop' : undefined);
+
+  if (effectiveRouting && routingManager.hasRouting(effectiveRouting)) {
+    return routingManager.computePoints(effectiveRouting, context);
   }
 
   // Warn if edge specified a routing that wasn't registered
@@ -122,7 +128,12 @@ export const computeAutoModePoints = (
 /**
  * Gets edge points based on routing mode and configuration.
  */
-export const getEdgePoints = (edge: Edge, nodesMap: Map<string, Node>, routingManager: EdgeRoutingManager) => {
+export const getEdgePoints = (
+  edge: Edge,
+  nodesMap: Map<string, Node>,
+  routingManager: EdgeRoutingManager,
+  selfLoopMetadata?: { index: number; count: number }
+) => {
   const sourceNode = nodesMap.get(edge.source);
   const targetNode = nodesMap.get(edge.target);
 
@@ -149,7 +160,7 @@ export const getEdgePoints = (edge: Edge, nodesMap: Map<string, Node>, routingMa
   const points =
     isManualMode && hasManualPoints
       ? edge.points // Use user-provided points for manual mode
-      : computeAutoModePoints(edge, source, target, sourceNode, targetNode, routingManager);
+      : computeAutoModePoints(edge, source, target, sourceNode, targetNode, routingManager, selfLoopMetadata);
 
   return { sourcePoint, targetPoint, points };
 };

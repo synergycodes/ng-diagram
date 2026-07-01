@@ -28,6 +28,47 @@ const getTemporaryEdgeSides = (
   return {};
 };
 
+function arePointsEqual(firstPoint: Point, secondPoint: Point): boolean {
+  return firstPoint.x === secondPoint.x && firstPoint.y === secondPoint.y;
+}
+
+function getSelfLoopSide(edge: Edge, sourceSide?: PortSide, targetSide?: PortSide): PortSide {
+  return sourceSide ?? targetSide ?? (edge.sourcePosition ? 'right' : 'top');
+}
+
+function computeSyntheticSelfLoopPositions(node: Node, side: PortSide): { source: PortLocation; target: PortLocation } {
+  const width = node.size?.width ?? 0;
+  const height = node.size?.height ?? 0;
+  const centerX = node.position.x + width / 2;
+  const centerY = node.position.y + height / 2;
+  const spread = Math.max(12, Math.min(width, height, 24));
+  const halfSpread = spread / 2;
+
+  switch (side) {
+    case 'right':
+      return {
+        source: { x: node.position.x + width, y: centerY - halfSpread, side },
+        target: { x: node.position.x + width, y: centerY + halfSpread, side },
+      };
+    case 'bottom':
+      return {
+        source: { x: centerX - halfSpread, y: node.position.y + height, side },
+        target: { x: centerX + halfSpread, y: node.position.y + height, side },
+      };
+    case 'left':
+      return {
+        source: { x: node.position.x, y: centerY - halfSpread, side },
+        target: { x: node.position.x, y: centerY + halfSpread, side },
+      };
+    case 'top':
+    default:
+      return {
+        source: { x: centerX - halfSpread, y: node.position.y, side },
+        target: { x: centerX + halfSpread, y: node.position.y, side },
+      };
+  }
+}
+
 /**
  * Calculates and returns the source and target positions for a given edge based on the connected nodes.
  *
@@ -48,6 +89,24 @@ export const getSourceTargetPositions = (edge: Edge, nodesMap: Map<string, Node>
 
   const preliminarySourcePoint = getPreliminaryPosition(sourceNode, edge.sourcePort, edge.sourcePosition);
   const preliminaryTargetPoint = getPreliminaryPosition(targetNode, edge.targetPort, edge.targetPosition);
+
+  const isSelfLoopEdge = edge.source === edge.target && !!sourceNode;
+  if (isSelfLoopEdge && sourceNode) {
+    const sourcePortLocation = edge.sourcePort ? getPortFlowPositionSide(sourceNode, edge.sourcePort) : undefined;
+    const targetPortLocation = edge.targetPort ? getPortFlowPositionSide(sourceNode, edge.targetPort) : undefined;
+    const hasDistinctPortAnchors =
+      !!sourcePortLocation && !!targetPortLocation && !arePointsEqual(sourcePortLocation, targetPortLocation);
+
+    if (hasDistinctPortAnchors) {
+      return {
+        source: sourcePortLocation,
+        target: targetPortLocation,
+      };
+    }
+
+    const loopSide = getSelfLoopSide(edge, sourcePortLocation?.side, targetPortLocation?.side);
+    return computeSyntheticSelfLoopPositions(sourceNode, loopSide);
+  }
 
   // Second pass: calculate final positions with correct 'from' points for border intersections
   const sourcePoint = getPosition(
