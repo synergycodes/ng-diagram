@@ -81,6 +81,7 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
 export type {
+  AbsoluteEdgeLabelPosition,
   ActionState,
   ActionStateManager,
   BackgroundConfig,
@@ -88,10 +89,10 @@ export type {
   ClipboardPastedEvent,
   CopyPasteActionState,
   DataObject,
+  DefaultNodeTemplateConfig,
   DiagramEventMap,
   DiagramInitEvent,
   DraggingActionState,
-  AbsoluteEdgeLabelPosition,
   Edge,
   EdgeDrawCancelReason,
   EdgeDrawEndedEvent,
@@ -137,8 +138,8 @@ export type {
   Node,
   NodeDragEndedEvent,
   NodeDragStartedEvent,
-  NodeResizeEndedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
   NodeResizeStartedEvent,
   NodeRotateEndedEvent,
   NodeRotateStartedEvent,

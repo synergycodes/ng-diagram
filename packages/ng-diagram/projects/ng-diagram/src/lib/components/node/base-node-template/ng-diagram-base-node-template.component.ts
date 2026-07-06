@@ -48,6 +48,12 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
   private readonly diagramService = inject(NgDiagramService);
 
   node = input.required<Node>();
+  /**
+   * When explicitly set to `true` this will hide the default ports in the template.
+   * When the ports are hidden through configuration, this can override the global config,
+   * i.e. set to `false` to show ports no matter the global setting.
+   * @since 1.3.0
+   */
   hideDefaultPorts = input<boolean | undefined>(undefined);
 
   isSelected = computed(() => this.node().selected ?? false);

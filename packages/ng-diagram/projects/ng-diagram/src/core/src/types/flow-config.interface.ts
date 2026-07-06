@@ -465,6 +465,10 @@ export interface VirtualizationConfig {
 
 /**
  * Configuration for the default Node Templates
+ *
+ * @public
+ * @since 1.3.0
+ * @category Types/Configuration/Features
  */
 export interface DefaultNodeTemplateConfig {
   /**
@@ -608,6 +612,7 @@ export interface FlowConfig {
   nodeDraggingEnabled: boolean;
 
   /**
+   * @since 1.3.0
    * Configuration options for the default Node Templates
    */
   defaultNode?: DefaultNodeTemplateConfig;

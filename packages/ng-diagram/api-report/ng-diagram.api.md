@@ -147,6 +147,11 @@ export class CursorPositionTrackerDirective {
 export type DataObject = object;
 
 // @public
+export interface DefaultNodeTemplateConfig {
+    hidePorts: boolean;
+}
+
+// @public
 export interface DiagramEventMap {
     clipboardPasted: ClipboardPastedEvent;
     diagramInit: DiagramInitEvent;
@@ -338,6 +343,7 @@ export interface FlowConfig {
     computeEdgeId: () => string;
     computeNodeId: () => string;
     debugMode: boolean;
+    defaultNode?: DefaultNodeTemplateConfig;
     edgeRouting: EdgeRoutingConfig;
     grouping: GroupingConfig;
     hideWatermark?: boolean;
@@ -772,13 +778,16 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
     // (undocumented)
     classes: Signal<string>;
     // (undocumented)
+    effectiveHideDefaultPorts: Signal<boolean | undefined>;
+    // (undocumented)
     enablePortHover: Signal<boolean>;
+    hideDefaultPorts: InputSignal<boolean | undefined>;
     // (undocumented)
     isSelected: Signal<boolean>;
     // (undocumented)
     node: InputSignal<Node_2>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseNodeTemplateComponent, "ng-diagram-base-node-template", never, { "node": { "alias": "node"; "required": true; "isSignal": true; }; }, {}, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseNodeTemplateComponent, "ng-diagram-base-node-template", never, { "node": { "alias": "node"; "required": true; "isSignal": true; }; "hideDefaultPorts": { "alias": "hideDefaultPorts"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramBaseNodeTemplateComponent, never>;
 }
