@@ -48,10 +48,24 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
   private readonly diagramService = inject(NgDiagramService);
 
   node = input.required<Node>();
+  hideDefaultPorts = input<boolean | undefined>(undefined);
 
   isSelected = computed(() => this.node().selected ?? false);
   classes = computed(() => `node ${this.isSelected() ? 'isSelected' : ''}`);
 
   // Disable port hover during resize to prevent style flickering at node edges
   enablePortHover = computed(() => !this.diagramService.actionState().resize);
+
+  effectiveHideDefaultPorts = computed(() => {
+    if (this.hideDefaultPorts() !== undefined) {
+      return this.hideDefaultPorts();
+    }
+
+    const configHidePorts = this.diagramService.config().defaultNode?.hidePorts;
+    if (configHidePorts !== undefined) {
+      return configHidePorts;
+    }
+
+    return false;
+  });
 }
