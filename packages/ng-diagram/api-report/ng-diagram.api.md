@@ -148,7 +148,7 @@ export type DataObject = object;
 
 // @public
 export interface DefaultNodeTemplateConfig {
-    hidePorts: boolean;
+    removePorts: boolean;
 }
 
 // @public
@@ -778,16 +778,16 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
     // (undocumented)
     classes: Signal<string>;
     // (undocumented)
-    effectiveHideDefaultPorts: Signal<boolean | undefined>;
+    effectiveRemoveDefaultPorts: Signal<boolean | undefined>;
     // (undocumented)
     enablePortHover: Signal<boolean>;
-    hideDefaultPorts: InputSignal<boolean | undefined>;
     // (undocumented)
     isSelected: Signal<boolean>;
     // (undocumented)
     node: InputSignal<Node_2>;
+    removeDefaultPorts: InputSignal<boolean | undefined>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseNodeTemplateComponent, "ng-diagram-base-node-template", never, { "node": { "alias": "node"; "required": true; "isSignal": true; }; "hideDefaultPorts": { "alias": "hideDefaultPorts"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseNodeTemplateComponent, "ng-diagram-base-node-template", never, { "node": { "alias": "node"; "required": true; "isSignal": true; }; "removeDefaultPorts": { "alias": "removeDefaultPorts"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramBaseNodeTemplateComponent, never>;
 }

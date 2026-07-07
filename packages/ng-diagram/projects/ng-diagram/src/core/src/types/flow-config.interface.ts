@@ -472,10 +472,10 @@ export interface VirtualizationConfig {
  */
 export interface DefaultNodeTemplateConfig {
   /**
-   * When explicitly set to `true` this will hide the ports in the default Node Template
+   * When explicitly set to `true` this will remove the ports in the default Node Template
    * @default undefined;
    */
-  hidePorts: boolean;
+  removePorts: boolean;
 }
 
 /**

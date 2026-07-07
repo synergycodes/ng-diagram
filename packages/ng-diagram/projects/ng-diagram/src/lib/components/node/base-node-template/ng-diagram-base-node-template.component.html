@@ -3,7 +3,7 @@
   <div [class]="classes()" ngDiagramNodeSelected [node]="node()">
     <ng-content></ng-content>
   </div>
-  @if (!effectiveHideDefaultPorts()) {
+  @if (!effectiveRemoveDefaultPorts()) {
     <ng-diagram-port id="port-left" type="both" side="left" />
     <ng-diagram-port id="port-right" type="both" side="right" />
   }

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Remove ports from default nodes** – this is now possible to remove ports from default nodes ([#759](https://github.com/synergycodes/ng-diagram/pull/759))
+
 ### Fixed
 
 ## [1.2.4] - 2026-06-02

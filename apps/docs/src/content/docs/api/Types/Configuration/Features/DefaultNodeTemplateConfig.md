@@ -10,11 +10,11 @@ Configuration for the default Node Templates
 
 ## Properties
 
-### hidePorts
+### removePorts
 
-> **hidePorts**: `boolean`
+> **removePorts**: `boolean`
 
-When explicitly set to `true` this will hide the ports in the default Node Template
+When explicitly set to `true` this will remove the ports in the default Node Template
 
 #### Default
 

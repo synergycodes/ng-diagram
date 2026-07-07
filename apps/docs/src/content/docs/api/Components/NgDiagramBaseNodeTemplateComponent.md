@@ -28,20 +28,6 @@ maintain the default node's look and feel while adding custom content.
 
 ## Properties
 
-### hideDefaultPorts
-
-> **hideDefaultPorts**: `InputSignal`\<`undefined` \| `boolean`\>
-
-When explicitly set to `true` this will hide the default ports in the template.
-When the ports are hidden through configuration, this can override the global config,
-i.e. set to `false` to show ports no matter the global setting.
-
-#### Since
-
-1.3.0
-
-***
-
 ### node
 
 > **node**: `InputSignal`\<[`Node`](/docs/api/types/model/node/)\>
@@ -51,3 +37,18 @@ Input signal containing the node data and properties.
 #### Implementation of
 
 [`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/).[`node`](/docs/api/types/templates/ngdiagramnodetemplate/#node)
+
+***
+
+### removeDefaultPorts
+
+> **removeDefaultPorts**: `InputSignal`\<`undefined` \| `boolean`\>
+
+When explicitly set to `true` this will remove the default ports in the template.
+
+When the ports are hidden through configuration, this can override the global config,
+i.e. set to `false` to show ports no matter the global setting.
+
+#### Since
+
+1.3.0

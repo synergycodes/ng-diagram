@@ -49,12 +49,13 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
 
   node = input.required<Node>();
   /**
-   * When explicitly set to `true` this will hide the default ports in the template.
+   * When explicitly set to `true` this will remove the default ports in the template.
+   *
    * When the ports are hidden through configuration, this can override the global config,
    * i.e. set to `false` to show ports no matter the global setting.
    * @since 1.3.0
    */
-  hideDefaultPorts = input<boolean | undefined>(undefined);
+  removeDefaultPorts = input<boolean | undefined>(undefined);
 
   isSelected = computed(() => this.node().selected ?? false);
   classes = computed(() => `node ${this.isSelected() ? 'isSelected' : ''}`);
@@ -62,14 +63,14 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
   // Disable port hover during resize to prevent style flickering at node edges
   enablePortHover = computed(() => !this.diagramService.actionState().resize);
 
-  effectiveHideDefaultPorts = computed(() => {
-    if (this.hideDefaultPorts() !== undefined) {
-      return this.hideDefaultPorts();
+  effectiveRemoveDefaultPorts = computed(() => {
+    if (this.removeDefaultPorts() !== undefined) {
+      return this.removeDefaultPorts();
     }
 
-    const configHidePorts = this.diagramService.config().defaultNode?.hidePorts;
-    if (configHidePorts !== undefined) {
-      return configHidePorts;
+    const configRemovePorts = this.diagramService.config().defaultNode?.removePorts;
+    if (configRemovePorts !== undefined) {
+      return configRemovePorts;
     }
 
     return false;
