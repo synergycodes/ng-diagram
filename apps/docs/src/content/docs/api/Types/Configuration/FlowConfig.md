@@ -73,6 +73,17 @@ false
 
 ***
 
+### defaultNode?
+
+> `optional` **defaultNode**: [`DefaultNodeTemplateConfig`](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
+
+#### Since
+
+1.3.0
+Configuration options for the default Node Templates
+
+***
+
 ### edgeRouting
 
 > **edgeRouting**: [`EdgeRoutingConfig`](/docs/api/types/configuration/features/edgeroutingconfig/)

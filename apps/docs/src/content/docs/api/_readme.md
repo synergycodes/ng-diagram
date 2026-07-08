@@ -69,6 +69,7 @@ title: "ng-diagram"
 
 - [BackgroundConfig](/docs/api/types/configuration/features/backgroundconfig/)
 - [BoxSelectionConfig](/docs/api/types/configuration/features/boxselectionconfig/)
+- [DefaultNodeTemplateConfig](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
 - [EdgeRoutingConfig](/docs/api/types/configuration/features/edgeroutingconfig/)
 - [GroupingConfig](/docs/api/types/configuration/features/groupingconfig/)
 - [LinkingConfig](/docs/api/types/configuration/features/linkingconfig/)

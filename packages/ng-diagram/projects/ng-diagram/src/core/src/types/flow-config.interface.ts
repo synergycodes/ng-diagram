@@ -1,7 +1,7 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
-import type { NgDiagramPanelPosition } from './panel-position.type';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
+import type { NgDiagramPanelPosition } from './panel-position.interface';
 import type { ShortcutDefinition } from './shortcut.interface';
 import { Size } from './utils';
 
@@ -464,6 +464,21 @@ export interface VirtualizationConfig {
 }
 
 /**
+ * Configuration for the default Node Templates
+ *
+ * @public
+ * @since 1.3.0
+ * @category Types/Configuration/Features
+ */
+export interface DefaultNodeTemplateConfig {
+  /**
+   * When explicitly set to `true` this will remove the ports in the default Node Template
+   * @default undefined;
+   */
+  removePorts: boolean;
+}
+
+/**
  * The main configuration interface for the flow system.
  *
  * This type defines all available configuration options for the diagram engine.
@@ -595,4 +610,10 @@ export interface FlowConfig {
    * @default true
    */
   nodeDraggingEnabled: boolean;
+
+  /**
+   * @since 1.3.0
+   * Configuration options for the default Node Templates
+   */
+  defaultNode?: DefaultNodeTemplateConfig;
 }
