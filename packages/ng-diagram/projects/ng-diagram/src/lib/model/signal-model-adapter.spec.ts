@@ -78,4 +78,30 @@ describe('SignalModelAdapter', () => {
     expect(service.getNodes()).toEqual([]);
     expect(service.getEdges()).toEqual([]);
   });
+
+  describe('toJSON', () => {
+    it('should strip runtime properties by default', () => {
+      service.updateNodes([{ ...mockNodes[0], selected: true, computedZIndex: 1 }]);
+      service.updateEdges([{ ...mockEdges[0], sourcePosition: { x: 1, y: 2 }, computedZIndex: 1 }]);
+
+      const { nodes, edges } = JSON.parse(service.toJSON());
+
+      expect(nodes[0].selected).toBeUndefined();
+      expect(nodes[0].computedZIndex).toBeUndefined();
+      expect(edges[0].sourcePosition).toBeUndefined();
+      expect(edges[0].computedZIndex).toBeUndefined();
+    });
+
+    it('should use overridden strip functions', () => {
+      service.stripNodeRuntimeProperties = (node) => node;
+      service.stripEdgeRuntimeProperties = (edge) => edge;
+      service.updateNodes([{ ...mockNodes[0], selected: true }]);
+      service.updateEdges([{ ...mockEdges[0], sourcePosition: { x: 1, y: 2 } }]);
+
+      const { nodes, edges } = JSON.parse(service.toJSON());
+
+      expect(nodes[0].selected).toBe(true);
+      expect(edges[0].sourcePosition).toEqual({ x: 1, y: 2 });
+    });
+  });
 });

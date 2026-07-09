@@ -6,7 +6,7 @@ prev: false
 title: "initializeModelAdapter"
 ---
 
-> **initializeModelAdapter**(`adapter`, `model?`, `injector?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+> **initializeModelAdapter**(`adapter`, `model?`, `injector?`, `options?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 Initializes an existing model adapter for use in ng-diagram.
 
@@ -34,6 +34,15 @@ Optional initial model data to seed the adapter with.
 
 Optional Angular `Injector` if not running inside an injection context.
 
+### options?
+
+[`InitializeModelOptions`](/docs/api/types/model/initializemodeloptions/)
+
+Optional [InitializeModelOptions](/docs/api/types/model/initializemodeloptions/). ⚠️ Overriding the strip
+functions can and probably will break the diagram — use at your own risk. Note
+that for custom adapters these functions only affect initialization; keeping
+serialization consistent in your adapter's `toJSON()` is up to you.
+
 ## Returns
 
 [`ModelAdapter`](/docs/api/types/model/modeladapter/)
@@ -53,3 +62,10 @@ model = initializeModelAdapter(new NgRxModelAdapter(this.store), {
 // With an explicit injector (outside injection context)
 model = initializeModelAdapter(new NgRxModelAdapter(this.store), undefined, this.injector);
 ```
+
+## Version History
+
+| Version | Changes |
+|---------|---------|
+| v1.1.0  | Introduced |
+| v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
