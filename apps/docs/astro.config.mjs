@@ -83,6 +83,7 @@ export default defineConfig({
         {
           label: 'Templates',
           link: '/templates/',
+          badge: { text: 'New', variant: 'tip' },
         },
         {
           label: 'Showcases',
