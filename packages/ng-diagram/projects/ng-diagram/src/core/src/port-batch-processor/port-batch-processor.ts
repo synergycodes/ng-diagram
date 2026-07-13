@@ -1,5 +1,5 @@
 import { BatchProcessor } from '../batch-processor/batch-processor';
-import type { Node, Port } from '../types';
+import type { MeasuredPortProperty, Node, Port } from '../types';
 import { isValidPosition, isValidSize } from '../utils/measurement-validation';
 
 export interface PortUpdate {
@@ -7,7 +7,7 @@ export interface PortUpdate {
   portChanges: Partial<Port>;
 }
 
-export const toPortUpdates = (ports: Pick<Port, 'id' | 'size' | 'position'>[]): PortUpdate[] =>
+export const toPortUpdates = (ports: Pick<Port, 'id' | MeasuredPortProperty>[]): PortUpdate[] =>
   ports.map(({ id, size, position }) => ({ portId: id, portChanges: { size, position } }));
 
 export class PortBatchProcessor extends BatchProcessor<Port, PortUpdate> {

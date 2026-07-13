@@ -2,8 +2,8 @@ import { FlowCore } from '../../flow-core';
 import type { LabelUpdate } from '../../label-batch-processor/label-batch-processor';
 import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import type { Node, Port } from '../../types';
-import { EdgeLabel } from '../../types';
-import { getRect, isSameRect, isSameSize } from '../../utils';
+import { EdgeLabel, MEASURED_LABEL_PROPERTIES, MEASURED_PORT_PROPERTIES } from '../../types';
+import { getRect, hasChangedProperties, isSameRect, omitProperties } from '../../utils';
 import { Updater } from '../updater.interface';
 
 export class InternalUpdater implements Updater {
@@ -58,8 +58,19 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
+   * An add for a port that already exists in the model comes from a component
+   * that was destroyed and recreated (same-tick recreation cancels out in the
+   * batch processor; virtualization re-mounts are dropped as already measured),
+   * so the kept entry would never receive properties the new component instance
+   * carries. Reconcile the authored properties here — measured ones are kept,
+   * and updates where nothing actually differs are filtered out.
    */
   addPort(nodeId: string, port: Port): void {
+    const exists = this.flowCore.getNodeById(nodeId)?.measuredPorts?.some(({ id }) => id === port.id);
+    if (exists) {
+      this.applyPortChanges(nodeId, [{ portId: port.id, portChanges: omitProperties(port, MEASURED_PORT_PROPERTIES) }]);
+    }
+
     this.flowCore.portBatchProcessor.processAdd(nodeId, port, this.onPortAddsFlush);
   }
 
@@ -92,8 +103,16 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
+   * See {@link addPort} — the same recreation scenario applies to edge labels.
    */
   addEdgeLabel(edgeId: string, label: EdgeLabel): void {
+    const exists = this.flowCore.getEdgeById(edgeId)?.measuredLabels?.some(({ id }) => id === label.id);
+    if (exists) {
+      this.applyEdgeLabelChanges(edgeId, [
+        { labelId: label.id, labelChanges: omitProperties(label, MEASURED_LABEL_PROPERTIES) },
+      ]);
+    }
+
     this.flowCore.labelBatchProcessor.processAdd(edgeId, label, this.onLabelAddsFlush);
   }
 
@@ -121,42 +140,20 @@ export class InternalUpdater implements Updater {
 
   /**
    * Filters out port updates where none of the changed properties actually differ from current state.
-   * Uses exact equality for all comparisons (size, position, side, type).
+   * Compares every property in the update generically; see {@link hasChangedProperties}.
    */
   private filterUnchangedPortUpdates(node: Node, portUpdates: PortUpdate[]): PortUpdate[] {
     const measuredPortsMap = new Map((node.measuredPorts ?? []).map((port) => [port.id, port]));
 
     return portUpdates.filter(({ portId, portChanges }) => {
       const measuredPort = measuredPortsMap.get(portId);
-      if (!measuredPort) {
-        return false;
-      }
-
-      if (portChanges.side !== undefined && portChanges.side !== measuredPort.side) {
-        return true;
-      }
-
-      if (portChanges.type !== undefined && portChanges.type !== measuredPort.type) {
-        return true;
-      }
-
-      const hasGeometricChanges = 'size' in portChanges || 'position' in portChanges;
-      if (hasGeometricChanges) {
-        const newSize = portChanges.size ?? measuredPort.size;
-        const newPosition = portChanges.position ?? measuredPort.position;
-
-        if (!isSameRect(getRect(measuredPort), getRect({ size: newSize, position: newPosition }))) {
-          return true;
-        }
-      }
-
-      return false;
+      return !!measuredPort && hasChangedProperties(measuredPort, portChanges);
     });
   }
 
   /**
    * Filters out label updates where none of the changed properties actually differ from current state.
-   * Uses exact equality for all comparisons (size, positionOnEdge).
+   * Compares every property in the update generically; see {@link hasChangedProperties}.
    */
   private filterUnchangedLabelUpdates(edgeId: string, labelUpdates: LabelUpdate[]): LabelUpdate[] {
     const edge = this.flowCore.getEdgeById(edgeId);
@@ -168,25 +165,7 @@ export class InternalUpdater implements Updater {
 
     return labelUpdates.filter(({ labelId, labelChanges }) => {
       const label = measuredLabelsMap.get(labelId);
-      if (!label) {
-        return false;
-      }
-
-      if (labelChanges.positionOnEdge !== undefined && labelChanges.positionOnEdge !== label.positionOnEdge) {
-        return true;
-      }
-
-      if (labelChanges.size !== undefined) {
-        if (!label.size) {
-          return true;
-        }
-
-        if (!isSameSize(label.size, labelChanges.size)) {
-          return true;
-        }
-      }
-
-      return false;
+      return !!label && hasChangedProperties(label, labelChanges);
     });
   }
 }
