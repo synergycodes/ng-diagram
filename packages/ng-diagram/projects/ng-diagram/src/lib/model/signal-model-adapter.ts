@@ -1,6 +1,11 @@
 import { EffectRef, Injectable, effect, signal, untracked } from '@angular/core';
 import type { Edge, Metadata, ModelAdapter, ModelChanges, Node } from '../../core/src';
-import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-runtime-properties';
+import {
+  stripEdgeRuntimeProperties,
+  stripNodeRuntimeProperties,
+  type StripEdgeRuntimePropertiesFn,
+  type StripNodeRuntimePropertiesFn,
+} from './strip-runtime-properties';
 
 /**
  * An implementation of ModelAdapter using Angular signals to manage the state of nodes, edges, and metadata.
@@ -9,6 +14,24 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  */
 @Injectable()
 export class SignalModelAdapter implements ModelAdapter {
+  /**
+   * Function used to strip runtime-computed properties from nodes in `toJSON()`.
+   *
+   * ⚠️ **Use at your own risk.** Replacing this to keep runtime properties in the
+   * serialized output can and probably will break the diagram when the data is
+   * loaded back. Set via the `options` parameter of `initializeModel`.
+   */
+  stripNodeRuntimeProperties: StripNodeRuntimePropertiesFn = stripNodeRuntimeProperties;
+
+  /**
+   * Function used to strip runtime-computed properties from edges in `toJSON()`.
+   *
+   * ⚠️ **Use at your own risk.** Replacing this to keep runtime properties in the
+   * serialized output can and probably will break the diagram when the data is
+   * loaded back. Set via the `options` parameter of `initializeModel`.
+   */
+  stripEdgeRuntimeProperties: StripEdgeRuntimePropertiesFn = stripEdgeRuntimeProperties;
+
   private effectRef: EffectRef | null = null;
   // Internal state signals
   private nodes = signal<Node[]>([]);
@@ -90,8 +113,8 @@ export class SignalModelAdapter implements ModelAdapter {
   toJSON(): string {
     const metadata = this.metadata();
     return JSON.stringify({
-      nodes: this.nodes().map(stripNodeRuntimeProperties),
-      edges: this.edges().map(stripEdgeRuntimeProperties),
+      nodes: this.nodes().map((node) => this.stripNodeRuntimeProperties(node)),
+      edges: this.edges().map((edge) => this.stripEdgeRuntimeProperties(edge)),
       metadata,
     });
   }

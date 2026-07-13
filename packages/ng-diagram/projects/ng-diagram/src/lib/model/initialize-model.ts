@@ -2,7 +2,50 @@ import { inject, Injector, runInInjectionContext, untracked } from '@angular/cor
 import { assignInternalId, type Model, type ModelAdapter } from '../../core/src';
 import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { SignalModelAdapter } from './signal-model-adapter';
-import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-runtime-properties';
+import {
+  stripEdgeRuntimeProperties,
+  stripNodeRuntimeProperties,
+  type StripEdgeRuntimePropertiesFn,
+  type StripNodeRuntimePropertiesFn,
+} from './strip-runtime-properties';
+
+/**
+ * Options for {@link initializeModel} and {@link initializeModelAdapter}.
+ *
+ * @public
+ * @since 1.2.5
+ * @category Types/Model
+ */
+export interface InitializeModelOptions {
+  /**
+   * Replaces the function that strips runtime-computed properties from nodes
+   * during initialization (and, for the default model created by
+   * {@link initializeModel}, during `toJSON()` serialization).
+   *
+   * ⚠️ **Use at your own risk.** The default ({@link stripNodeRuntimeProperties})
+   * exists because stale runtime values (`selected`, `measuredPorts`,
+   * `measuredBounds`, `computedZIndex`, `_internalId`) loaded from persistence
+   * can and probably will break the diagram — e.g. skipped DOM measurements,
+   * wrong z-ordering, or duplicated internal ids. Overriding this function and
+   * keeping such properties is unsupported territory; prefer wrapping the
+   * default and re-adding only the properties you know you need.
+   */
+  stripNodeRuntimeProperties?: StripNodeRuntimePropertiesFn;
+  /**
+   * Replaces the function that strips runtime-computed properties from edges
+   * during initialization (and, for the default model created by
+   * {@link initializeModel}, during `toJSON()` serialization).
+   *
+   * ⚠️ **Use at your own risk.** The default ({@link stripEdgeRuntimeProperties})
+   * exists because stale runtime values (`sourcePosition`, `targetPosition`,
+   * `measuredLabels`, `computedZIndex`, `_internalId`) loaded from persistence
+   * can and probably will break the diagram — e.g. edges rendered at outdated
+   * positions or duplicated internal ids. Overriding this function and keeping
+   * such properties is unsupported territory; prefer wrapping the default and
+   * re-adding only the properties you know you need.
+   */
+  stripEdgeRuntimeProperties?: StripEdgeRuntimePropertiesFn;
+}
 
 /**
  * Creates a model adapter with initial nodes, edges, and metadata.
@@ -29,6 +72,14 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  *
  * // Safe to use inside reactive contexts (computed, effect, linkedSignal)
  * model = computed(() => initializeModel(this.myModel(), this.injector));
+ *
+ * // ⚠️ At your own risk: customize which runtime properties are stripped
+ * model = initializeModel({ nodes: [...], edges: [...] }, undefined, {
+ *   stripEdgeRuntimeProperties: (edge) => ({
+ *     ...stripEdgeRuntimeProperties(edge),
+ *     sourcePosition: edge.sourcePosition, // keep authored free-endpoint position
+ *   }),
+ * });
  * ```
  *
  * ## Version History
@@ -37,17 +88,33 @@ import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-
  * |---------|---------|
  * | v0.8.0  | Introduced |
  * | v1.2.0  | Can now be safely used inside reactive contexts (`computed`, `effect`, `linkedSignal`) |
+ * | v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
  *
  * @param model Initial model data (nodes, edges, metadata).
  * @param injector Optional Angular `Injector` if not running inside an injection context.
+ * @param options Optional {@link InitializeModelOptions}. ⚠️ Overriding the strip
+ * functions can and probably will break the diagram — use at your own risk.
  *
  * @public
  * @since 0.8.0
  * @category Utilities
  */
-export function initializeModel(model: Partial<Model> = {}, injector?: Injector): ModelAdapter {
+export function initializeModel(
+  model: Partial<Model> = {},
+  injector?: Injector,
+  options?: InitializeModelOptions
+): ModelAdapter {
   return untracked(() => {
-    const init = () => initializeModelAdapter(new SignalModelAdapter(), model);
+    const init = () => {
+      const adapter = new SignalModelAdapter();
+      if (options?.stripNodeRuntimeProperties) {
+        adapter.stripNodeRuntimeProperties = options.stripNodeRuntimeProperties;
+      }
+      if (options?.stripEdgeRuntimeProperties) {
+        adapter.stripEdgeRuntimeProperties = options.stripEdgeRuntimeProperties;
+      }
+      return initializeModelAdapter(adapter, model, undefined, options);
+    };
 
     return injector ? runInInjectionContext(injector, init) : init();
   });
@@ -75,9 +142,20 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
  * model = initializeModelAdapter(new NgRxModelAdapter(this.store), undefined, this.injector);
  * ```
  *
+ * ## Version History
+ *
+ * | Version | Changes |
+ * |---------|---------|
+ * | v1.1.0  | Introduced |
+ * | v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
+ *
  * @param adapter An existing ModelAdapter to initialize.
  * @param model Optional initial model data to seed the adapter with.
  * @param injector Optional Angular `Injector` if not running inside an injection context.
+ * @param options Optional {@link InitializeModelOptions}. ⚠️ Overriding the strip
+ * functions can and probably will break the diagram — use at your own risk. Note
+ * that for custom adapters these functions only affect initialization; keeping
+ * serialization consistent in your adapter's `toJSON()` is up to you.
  *
  * @public
  * @since 1.1.0
@@ -86,11 +164,14 @@ export function initializeModel(model: Partial<Model> = {}, injector?: Injector)
 export function initializeModelAdapter(
   adapter: ModelAdapter,
   model?: Partial<Model>,
-  injector?: Injector
+  injector?: Injector,
+  options?: InitializeModelOptions
 ): ModelAdapter {
   const init = () => {
     const environment = inject(EnvironmentProviderService);
     const generateId = () => environment.generateId();
+    const stripNode = options?.stripNodeRuntimeProperties ?? stripNodeRuntimeProperties;
+    const stripEdge = options?.stripEdgeRuntimeProperties ?? stripEdgeRuntimeProperties;
 
     if (model) {
       adapter.updateNodes(model.nodes || []);
@@ -98,12 +179,8 @@ export function initializeModelAdapter(
       adapter.updateMetadata((prev) => ({ ...prev, ...model.metadata }));
     }
 
-    adapter.updateNodes(
-      adapter.getNodes().map((node) => assignInternalId(stripNodeRuntimeProperties(node), generateId))
-    );
-    adapter.updateEdges(
-      adapter.getEdges().map((edge) => assignInternalId(stripEdgeRuntimeProperties(edge), generateId))
-    );
+    adapter.updateNodes(adapter.getNodes().map((node) => assignInternalId(stripNode(node), generateId)));
+    adapter.updateEdges(adapter.getEdges().map((edge) => assignInternalId(stripEdge(edge), generateId)));
 
     return adapter;
   };

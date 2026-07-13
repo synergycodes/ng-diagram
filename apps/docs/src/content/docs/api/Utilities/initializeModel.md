@@ -6,7 +6,7 @@ prev: false
 title: "initializeModel"
 ---
 
-> **initializeModel**(`model`, `injector?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+> **initializeModel**(`model`, `injector?`, `options?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 Creates a model adapter with initial nodes, edges, and metadata.
 
@@ -30,6 +30,13 @@ Initial model data (nodes, edges, metadata).
 
 Optional Angular `Injector` if not running inside an injection context.
 
+### options?
+
+[`InitializeModelOptions`](/docs/api/types/model/initializemodeloptions/)
+
+Optional [InitializeModelOptions](/docs/api/types/model/initializemodeloptions/). ⚠️ Overriding the strip
+functions can and probably will break the diagram — use at your own risk.
+
 ## Returns
 
 [`ModelAdapter`](/docs/api/types/model/modeladapter/)
@@ -51,6 +58,14 @@ model = initializeModel({ nodes: [...], edges: [...] }, this.injector);
 
 // Safe to use inside reactive contexts (computed, effect, linkedSignal)
 model = computed(() => initializeModel(this.myModel(), this.injector));
+
+// ⚠️ At your own risk: customize which runtime properties are stripped
+model = initializeModel({ nodes: [...], edges: [...] }, undefined, {
+  stripEdgeRuntimeProperties: (edge) => ({
+    ...stripEdgeRuntimeProperties(edge),
+    sourcePosition: edge.sourcePosition, // keep authored free-endpoint position
+  }),
+});
 ```
 
 ## Version History
@@ -59,3 +74,4 @@ model = computed(() => initializeModel(this.myModel(), this.injector));
 |---------|---------|
 | v0.8.0  | Introduced |
 | v1.2.0  | Can now be safely used inside reactive contexts (`computed`, `effect`, `linkedSignal`) |
+| v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
