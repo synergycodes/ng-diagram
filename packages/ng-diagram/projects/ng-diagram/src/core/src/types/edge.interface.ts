@@ -170,6 +170,25 @@ export interface EdgeLabel {
 }
 
 /**
+ * Edge label properties owned by the measurement and routing pipeline rather
+ * than by the registering component (`size` is measured from the DOM,
+ * `position` is computed by edge routing). They must never be overwritten by
+ * authored data when a label component re-registers; every other
+ * {@link EdgeLabel} property is authored and is reconciled on re-registration.
+ *
+ * @internal
+ */
+export const MEASURED_LABEL_PROPERTIES = ['size', 'position'] as const satisfies readonly (keyof EdgeLabel)[];
+
+/**
+ * Union of the {@link MEASURED_LABEL_PROPERTIES} keys. Types the measurement
+ * pipeline's view of a label, e.g. `Pick<EdgeLabel, 'id' | MeasuredLabelProperty>`.
+ *
+ * @internal
+ */
+export type MeasuredLabelProperty = (typeof MEASURED_LABEL_PROPERTIES)[number];
+
+/**
  * The origin point options for port placement.
  * @category Types/Model
  */

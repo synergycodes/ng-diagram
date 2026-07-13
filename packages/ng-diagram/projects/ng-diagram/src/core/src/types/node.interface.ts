@@ -152,3 +152,21 @@ export interface Port {
    */
   side: PortSide;
 }
+
+/**
+ * Port properties owned by the measurement pipeline rather than by the
+ * registering component. They are computed from the DOM and must never be
+ * overwritten by authored data when a port component re-registers; every
+ * other {@link Port} property is authored and is reconciled on re-registration.
+ *
+ * @internal
+ */
+export const MEASURED_PORT_PROPERTIES = ['size', 'position'] as const satisfies readonly (keyof Port)[];
+
+/**
+ * Union of the {@link MEASURED_PORT_PROPERTIES} keys. Types the measurement
+ * pipeline's view of a port, e.g. `Pick<Port, 'id' | MeasuredPortProperty>`.
+ *
+ * @internal
+ */
+export type MeasuredPortProperty = (typeof MEASURED_PORT_PROPERTIES)[number];
