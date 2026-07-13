@@ -119,6 +119,7 @@ describe('EdgeRoutingManager', () => {
       expect(routings).toContain('orthogonal');
       expect(routings).toContain('bezier');
       expect(routings).toContain('polyline');
+      expect(routings).toContain('self-loop');
     });
 
     it('should use provided default routing', () => {
@@ -213,7 +214,8 @@ describe('EdgeRoutingManager', () => {
       expect(routings).toContain('orthogonal');
       expect(routings).toContain('bezier');
       expect(routings).toContain('polyline');
-      expect(routings.length).toBe(3);
+      expect(routings).toContain('self-loop');
+      expect(routings.length).toBe(4);
     });
 
     it('should include custom routings', () => {
@@ -223,7 +225,7 @@ describe('EdgeRoutingManager', () => {
       const routings = manager.getRegisteredRoutings();
       expect(routings).toContain('custom1');
       expect(routings).toContain('custom2');
-      expect(routings.length).toBe(5);
+      expect(routings.length).toBe(6);
     });
   });
 
@@ -232,6 +234,7 @@ describe('EdgeRoutingManager', () => {
       expect(manager.hasRouting('orthogonal')).toBe(true);
       expect(manager.hasRouting('bezier')).toBe(true);
       expect(manager.hasRouting('polyline')).toBe(true);
+      expect(manager.hasRouting('self-loop')).toBe(true);
     });
 
     it('should return false for non-existent routings', () => {
@@ -525,6 +528,20 @@ describe('EdgeRoutingManager', () => {
       expect(polylinePath).toContain('M');
       const polylinePoint = manager.computePointOnPath('polyline', polylinePoints, 0.5);
       expect(polylinePoint).toBeDefined();
+
+      // Test self-loop
+      const selfLoopContext: EdgeRoutingContext = {
+        ...context,
+        edge: { id: 'self-loop-edge', source: 'n1', target: 'n1', data: {} },
+        targetNode: context.sourceNode,
+        targetPoint: { x: context.sourcePoint.x + 20, y: context.sourcePoint.y, side: 'top' },
+      };
+      const selfLoopPoints = manager.computePoints('self-loop', selfLoopContext);
+      expect(selfLoopPoints.length).toBeGreaterThanOrEqual(2);
+      const selfLoopPath = manager.computePath('self-loop', selfLoopPoints);
+      expect(selfLoopPath).toContain('M');
+      const selfLoopPoint = manager.computePointOnPath('self-loop', selfLoopPoints, 0.5);
+      expect(selfLoopPoint).toBeDefined();
     });
 
     it('should support custom routing workflow', () => {

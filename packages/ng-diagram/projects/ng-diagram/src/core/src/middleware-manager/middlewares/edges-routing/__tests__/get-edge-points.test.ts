@@ -370,6 +370,27 @@ describe('getEdgePoints', () => {
         { x: 90, y: 90 },
       ]);
     });
+
+    it('should auto-use self-loop routing for self-loop edges', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'self-loop-edge',
+        source: 'node-1',
+        target: 'node-1',
+      };
+
+      nodesMap.set('node-1', { ...mockNode, id: 'node-1', position: { x: 100, y: 100 } });
+      mockRoutingManager.hasRouting = vi.fn().mockImplementation((routing) => routing === 'self-loop');
+
+      getEdgePoints(edge, nodesMap, mockRoutingManager as EdgeRoutingManager);
+
+      expect(mockRoutingManager.computePoints).toHaveBeenCalledWith(
+        'self-loop',
+        expect.objectContaining({
+          edge,
+        })
+      );
+    });
   });
 
   describe('Edge Context Building', () => {
@@ -452,6 +473,27 @@ describe('getEdgePoints', () => {
       expect(result.sourcePoint).toEqual({ x: 0, y: 0 });
       expect(result.targetPoint).toEqual({ x: 100, y: 100 });
       expect(result.points).toHaveLength(3);
+    });
+
+    it('should pass self-loop metadata in routing context', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'self-loop-edge',
+        source: 'node-1',
+        target: 'node-1',
+      };
+
+      nodesMap.set('node-1', { ...mockNode, id: 'node-1', position: { x: 0, y: 0 } });
+
+      getEdgePoints(edge, nodesMap, mockRoutingManager as EdgeRoutingManager, { index: 2, count: 4 });
+
+      expect(mockRoutingManager.computePoints).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          selfLoopIndex: 2,
+          selfLoopCount: 4,
+        })
+      );
     });
   });
 
