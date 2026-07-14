@@ -64,4 +64,12 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
       }
     }
   }
+
+  override async cancel(): Promise<void> {
+    if (!this.flow.actionStateManager.isLinking()) {
+      return;
+    }
+
+    await this.flow.commandHandler.emit('cancelLinking');
+  }
 }

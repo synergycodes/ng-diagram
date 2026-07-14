@@ -32,7 +32,8 @@ export class NodeRotateEndedEmitter implements EventEmitter {
       return;
     }
 
-    const nodeId = context.actionStateManager.rotation?.nodeId;
+    const rotation = context.actionStateManager.rotation;
+    const nodeId = rotation?.nodeId;
     if (!nodeId) {
       return;
     }
@@ -42,6 +43,9 @@ export class NodeRotateEndedEmitter implements EventEmitter {
       return;
     }
 
-    eventManager.deferredEmit('nodeRotateEnded', { node });
+    eventManager.deferredEmit('nodeRotateEnded', {
+      node,
+      ...(rotation.cancelReason && { cancelReason: rotation.cancelReason }),
+    });
   }
 }

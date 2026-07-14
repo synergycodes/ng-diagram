@@ -48,6 +48,13 @@ export class VirtualizedPanningEventHandler extends EventHandler<PanningEvent> {
     }
   }
 
+  override cancel(): void {
+    this.accumulatedDelta = { x: 0, y: 0 };
+    this.lastPoint = undefined;
+    this.rafScheduled = false;
+    this.flow.actionStateManager.clearPanning();
+  }
+
   /**
    * Schedules a RAF callback to flush accumulated delta.
    * Only one callback is scheduled at a time.

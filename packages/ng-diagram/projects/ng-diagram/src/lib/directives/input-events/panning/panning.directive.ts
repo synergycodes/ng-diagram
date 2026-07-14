@@ -19,9 +19,10 @@ export class PanningDirective implements OnDestroy {
   private readonly diagramService = inject(NgDiagramService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
+  private unregisterInteractionCleanup: (() => void) | null = null;
+
   ngOnDestroy(): void {
-    document.removeEventListener('pointermove', this.onMouseMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
+    this.removeListeners();
   }
 
   onPointerDown(event: PointerInputEvent): void {
@@ -52,13 +53,15 @@ export class PanningDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onMouseMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   onPointerUp = (event: PointerEvent): void => {
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event)) {
       return;
     }
-    this.toggleGrabbingCursor(false);
 
     event.preventDefault();
     event.stopPropagation();
@@ -113,9 +116,16 @@ export class PanningDirective implements OnDestroy {
     });
   };
 
-  private finishPanning(event: PointerInputEvent): void {
+  private removeListeners(): void {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onMouseMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    this.toggleGrabbingCursor(false);
+  }
+
+  private finishPanning(event: PointerInputEvent): void {
+    this.removeListeners();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({

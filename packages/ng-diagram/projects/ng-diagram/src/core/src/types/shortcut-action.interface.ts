@@ -62,7 +62,10 @@ export type KeyboardActionName =
   | KeyboardMoveSelectionAction
   | KeyboardPanAction
   | KeyboardZoomAction
-  | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
+  | Extract<
+      InputEventName,
+      'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'
+    >;
 
 /**
  * All valid action names for shortcuts

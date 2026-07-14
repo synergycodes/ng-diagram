@@ -13,6 +13,14 @@ Nodes will have their final positions when this event is received.
 
 ## Properties
 
+### cancelReason?
+
+> `optional` **cancelReason**: `"cancelled"`
+
+Present when the drag ended without a normal pointer release
+
+***
+
 ### nodes
 
 > **nodes**: [`Node`](/docs/api/types/model/node/)[]

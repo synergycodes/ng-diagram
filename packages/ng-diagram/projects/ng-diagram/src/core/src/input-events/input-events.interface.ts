@@ -21,7 +21,8 @@ export type InputEventName =
   | 'paletteDrop'
   | 'boxSelection'
   | 'undo'
-  | 'redo';
+  | 'redo'
+  | 'cancelInteraction';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 

@@ -1,5 +1,6 @@
 import { FlowCore } from '../flow-core';
 import { BoxSelectionEventHandler } from './handlers/box-selection/box-selection.handler';
+import { CancelInteractionEventHandler } from './handlers/cancel-interaction/cancel-interaction.handler';
 import { CopyEventHandler } from './handlers/copy/copy.handler';
 import { CutEventHandler } from './handlers/cut/cut.handler';
 import { DeleteSelectionEventHandler } from './handlers/delete-selection/delete-selection.handler';
@@ -58,9 +59,18 @@ export abstract class InputEventsRouter {
     this.register('boxSelection', new BoxSelectionEventHandler(flow));
     this.register('undo', new UndoEventHandler(flow));
     this.register('redo', new RedoEventHandler(flow));
+    this.register('cancelInteraction', new CancelInteractionEventHandler(flow));
   }
 
   hasHandler(eventName: InputEventName): boolean {
     return !!this.handlers[eventName];
+  }
+
+  /**
+   * Aborts the gesture tracked by the handler registered for `eventName`.
+   * No-op when the handler is missing or has no gesture in progress.
+   */
+  async cancel(eventName: InputEventName): Promise<void> {
+    await this.handlers[eventName]?.cancel();
   }
 }

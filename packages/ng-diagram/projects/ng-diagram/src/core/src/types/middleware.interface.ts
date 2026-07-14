@@ -67,6 +67,7 @@ export type ModelActionType =
   | 'resizeNode'
   | 'resizeNodeStart'
   | 'resizeNodeStop'
+  | 'cancelResize'
   | 'startLinking'
   | 'moveTemporaryEdge'
   | 'finishLinking'
@@ -75,11 +76,13 @@ export type ModelActionType =
   | 'rotateNodeTo'
   | 'rotateNodeStart'
   | 'rotateNodeStop'
+  | 'cancelRotate'
   | 'highlightGroup'
   | 'highlightGroupClear'
   | 'moveNodes'
   | 'moveNodesStart'
   | 'moveNodesStop'
+  | 'cancelDrag'
   | 'selectEnd';
 
 /**

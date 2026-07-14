@@ -52,6 +52,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
               modifiers: { ...event.modifiers },
               movementStarted: true,
               accumulatedDeltas: new Map(),
+              // Nodes haven't moved yet at this point — the first delta is applied below.
+              initialPositions: new Map(selectedNodesWithChildren.map((n) => [n.id, { ...n.position }])),
             };
             await this.flow.commandHandler.emit('moveNodesStart');
           }
@@ -93,6 +95,47 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         this.hasMoved = false;
       }
     }
+  }
+
+  override async cancel(): Promise<void> {
+    if (this.isMoving || this.flow.actionStateManager.isDragging()) {
+      const dragging = this.flow.actionStateManager.dragging;
+      const needsStop = this.hasMoved;
+      const needsHighlightClear = !!this.flow.actionStateManager.highlightGroup;
+
+      if (needsStop && dragging) {
+        // Must be set BEFORE the transaction commits — the NodeDragEndedEmitter
+        // reads it from the action state during middleware execution.
+        dragging.cancelReason = 'cancelled';
+      }
+
+      if (needsStop || needsHighlightClear) {
+        // Unlike the 'end' phase, skip the drop handling — an aborted drag must
+        // not change group membership.
+        await this.flow.transaction('cancelDrag', async (tx) => {
+          if (needsStop) {
+            // Snap the dragged nodes back to where they were before the drag.
+            const initialPositions = dragging?.initialPositions;
+            if (initialPositions?.size) {
+              await tx.emit('updateNodes', {
+                nodes: [...initialPositions].map(([id, position]) => ({ id, position })),
+              });
+            }
+            await tx.emit('moveNodesStop');
+          }
+          if (needsHighlightClear) {
+            await tx.emit('highlightGroupClear');
+          }
+        });
+      }
+
+      this.flow.actionStateManager.clearDragging();
+    }
+
+    this.lastPointerPosition = undefined;
+    this.startPoint = undefined;
+    this.isMoving = false;
+    this.hasMoved = false;
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {

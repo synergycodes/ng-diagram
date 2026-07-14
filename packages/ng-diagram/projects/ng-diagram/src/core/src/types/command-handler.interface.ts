@@ -24,6 +24,7 @@ import { DeleteSelectionCommand } from '../command-handler/commands/delete-selec
 import { HighlightGroupClearCommand, HighlightGroupCommand } from '../command-handler/commands/highlight-group';
 import { InitCommand } from '../command-handler/commands/init';
 import {
+  CancelLinkingCommand,
   FinishLinkingCommand,
   FinishLinkingToPositionCommand,
   MoveTemporaryEdgeCommand,
@@ -81,6 +82,7 @@ export type Command =
   | StartLinkingCommand
   | MoveTemporaryEdgeCommand
   | FinishLinkingCommand
+  | CancelLinkingCommand
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
   | ResizeNodeCommand

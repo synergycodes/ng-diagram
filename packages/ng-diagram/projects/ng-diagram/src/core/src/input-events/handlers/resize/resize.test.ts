@@ -28,6 +28,7 @@ function createResizeEvent(overrides: Partial<ResizeEvent> = {}): ResizeEvent {
 describe('ResizeEventHandler', () => {
   let handler: ResizeEventHandler;
   let mockEmit: ReturnType<typeof vi.fn>;
+  let mockTransaction: ReturnType<typeof vi.fn>;
   let mockActionStateManager: {
     resize: ResizeActionState | undefined;
     clearResize: ReturnType<typeof vi.fn>;
@@ -36,6 +37,10 @@ describe('ResizeEventHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockEmit = vi.fn();
+    mockTransaction = vi.fn().mockImplementation(async (_name, callback) => {
+      const txContext = { emit: mockEmit };
+      return await callback(txContext);
+    });
 
     mockActionStateManager = {
       resize: undefined,
@@ -53,6 +58,7 @@ describe('ResizeEventHandler', () => {
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       getNodeById: vi.fn().mockReturnValue(nodeWithSize),
       actionStateManager: mockActionStateManager,
+      transaction: mockTransaction,
     } as unknown as FlowCore;
 
     handler = new ResizeEventHandler(mockFlowCore);
@@ -121,6 +127,54 @@ describe('ResizeEventHandler', () => {
       await handler.handle(event);
 
       expect(callOrder).toEqual(['resizeNodeStop', 'clearResize']);
+    });
+  });
+
+  describe('cancel', () => {
+    it('should do nothing when no resize is in progress', async () => {
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalled();
+      expect(mockActionStateManager.clearResize).not.toHaveBeenCalled();
+    });
+
+    it('should set the cancelled reason, emit resizeNodeStop and clear the state', async () => {
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const resizeState = mockActionStateManager.resize;
+
+      await handler.cancel();
+
+      expect(resizeState?.cancelReason).toBe('cancelled');
+      expect(mockEmit).toHaveBeenCalledWith('resizeNodeStop');
+      expect(mockActionStateManager.clearResize).toHaveBeenCalled();
+    });
+
+    it('should restore the pre-resize size, position and autoSize', async () => {
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      await handler.handle(
+        createResizeEvent({ phase: 'continue', direction: 'bottom-right', lastInputPoint: { x: 150, y: 140 } })
+      );
+
+      await handler.cancel();
+
+      expect(mockEmit).toHaveBeenCalledWith('updateNode', {
+        id: 'node1',
+        nodeChanges: {
+          size: { width: 200, height: 100 },
+          position: mockNode.position,
+          autoSize: undefined,
+        },
+      });
+      const calls = mockEmit.mock.calls.map(([name]) => name);
+      expect(calls.indexOf('updateNode')).toBeLessThan(calls.indexOf('resizeNodeStop'));
+    });
+
+    it('should roll back inside a cancelResize transaction', async () => {
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+
+      await handler.cancel();
+
+      expect(mockTransaction).toHaveBeenCalledWith('cancelResize', expect.any(Function));
     });
   });
 });

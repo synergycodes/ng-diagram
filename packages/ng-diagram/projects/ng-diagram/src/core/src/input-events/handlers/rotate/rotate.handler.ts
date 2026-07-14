@@ -82,4 +82,25 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
       }
     }
   }
+
+  override async cancel(): Promise<void> {
+    const rotation = this.flow.actionStateManager.rotation;
+    if (!rotation) {
+      return;
+    }
+
+    rotation.cancelReason = 'cancelled';
+
+    // Restore the exact pre-rotation angle (updateNode instead of rotateNodeTo
+    // so angle snapping can't distort the original value).
+    await this.flow.transaction('cancelRotate', async (tx) => {
+      await tx.emit('updateNode', {
+        id: rotation.nodeId,
+        nodeChanges: { angle: rotation.initialNodeAngle },
+      });
+      await tx.emit('rotateNodeStop');
+    });
+
+    this.flow.actionStateManager.clearRotation();
+  }
 }

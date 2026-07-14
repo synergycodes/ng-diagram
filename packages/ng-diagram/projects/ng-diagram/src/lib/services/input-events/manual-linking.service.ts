@@ -2,14 +2,17 @@ import { inject, Injectable } from '@angular/core';
 import { Node } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
+import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { LinkingEventService } from './linking-event.service';
 
 @Injectable()
 export class ManualLinkingService {
   private readonly linkingEventService = inject(LinkingEventService);
   private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private node: Node | undefined;
   private portId: string | undefined;
+  private unregisterInteractionCleanup: (() => void) | null = null;
 
   /** Call this method to start linking from your custom logic */
   startLinking(node: Node, portId?: string) {
@@ -28,6 +31,9 @@ export class ManualLinkingService {
     document.addEventListener('click', this.onDocumentClick, true);
     document.addEventListener('touchmove', this.onTouchMove, { passive: false });
     document.addEventListener('touchend', this.onTouchEnd, { passive: false });
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.cleanup());
   }
 
   private onPointerMove = (event: PointerEvent) => {
@@ -70,6 +76,8 @@ export class ManualLinkingService {
   };
 
   private cleanup() {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('click', this.onDocumentClick, true);
     document.removeEventListener('touchmove', this.onTouchMove);

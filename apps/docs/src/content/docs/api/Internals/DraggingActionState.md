@@ -19,6 +19,23 @@ Key is node ID, value is the accumulated delta that hasn't been applied due to s
 
 ***
 
+### cancelReason?
+
+> `optional` **cancelReason**: `"cancelled"`
+
+Set when the drag is aborted; carried into `nodeDragEnded`.
+
+***
+
+### initialPositions?
+
+> `optional` **initialPositions**: `Map`\<`string`, [`Point`](/docs/api/types/geometry/point/)\>
+
+Positions of the dragged nodes captured when the move threshold was crossed,
+used to restore them when the drag is cancelled.
+
+***
+
 ### modifiers
 
 > **modifiers**: [`InputModifiers`](/docs/api/types/configuration/shortcuts/inputmodifiers/)

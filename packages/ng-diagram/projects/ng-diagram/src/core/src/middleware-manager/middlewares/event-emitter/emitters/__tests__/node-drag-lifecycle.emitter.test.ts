@@ -5,7 +5,7 @@ import type { DraggingActionState, MiddlewareContext, Node } from '../../../../.
 import { NodeDragEndedEmitter, NodeDragStartedEmitter } from '../node-drag-lifecycle.emitter';
 
 interface MockActionStateManager {
-  dragging: Pick<DraggingActionState, 'nodeIds'> | undefined;
+  dragging: Pick<DraggingActionState, 'nodeIds' | 'cancelReason'> | undefined;
 }
 
 function createContext(
@@ -162,6 +162,15 @@ describe('NodeDragEndedEmitter', () => {
       const node = context.nodesMap.get('node1')!;
       expect(emitSpy).toHaveBeenCalledOnce();
       expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node] });
+    });
+
+    it('should include the cancel reason when the drag was aborted', () => {
+      mockActionStateManager.dragging = { nodeIds: ['node1'], cancelReason: 'cancelled' };
+
+      emitter.emit(context, eventManager);
+
+      const node = context.nodesMap.get('node1')!;
+      expect(emitSpy).toHaveBeenCalledWith('nodeDragEnded', { nodes: [node], cancelReason: 'cancelled' });
     });
   });
 

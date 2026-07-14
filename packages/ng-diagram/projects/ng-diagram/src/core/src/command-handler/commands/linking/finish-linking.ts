@@ -7,7 +7,15 @@ export interface FinishLinkingCommand {
   position?: Point;
 }
 
-const clearTemporaryEdge = async (commandHandler: CommandHandler): Promise<void> => {
+/**
+ * Ends a linking gesture without creating an edge: removes the temporary edge
+ * and clears the linking action state. Runs under the `finishLinking` action
+ * type so the `edgeDrawEnded` emitter observes every gesture ending — set
+ * `linking.cancelReason` before calling to mark the ending as a cancellation.
+ *
+ * @internal
+ */
+export const clearTemporaryEdge = async (commandHandler: CommandHandler): Promise<void> => {
   await commandHandler.flowCore.applyUpdate({}, 'finishLinking');
   commandHandler.flowCore.actionStateManager.clearLinking();
 };
