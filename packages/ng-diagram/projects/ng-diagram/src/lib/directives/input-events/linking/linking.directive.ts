@@ -20,6 +20,7 @@ export class LinkingInputDirective implements OnDestroy {
 
   private target = signal<Node | undefined>(undefined);
   private edgePanningInterval: number | null = null;
+  private unregisterInteractionCleanup: (() => void) | null = null;
 
   portId = input.required<string>();
 
@@ -41,6 +42,9 @@ export class LinkingInputDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    this.unregisterInteractionCleanup = this.flowCoreProviderService
+      .provide()
+      .registerInteractionCleanup(() => this.cleanup());
 
     this.linkingEventService.emitStart($event, this.target(), this.portId());
   }
@@ -95,6 +99,8 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   private cleanup() {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
     this.touchEventsStateService.clearCurrentEvent();
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);

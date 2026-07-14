@@ -13,6 +13,14 @@ The node will have its final angle when this event is received.
 
 ## Properties
 
+### cancelReason?
+
+> `optional` **cancelReason**: `"cancelled"`
+
+Present when the rotation ended without a normal pointer release
+
+***
+
 ### node
 
 > **node**: [`Node`](/docs/api/types/model/node/)

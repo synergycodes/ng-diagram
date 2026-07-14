@@ -126,4 +126,31 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
       }
     }
   }
+
+  override async cancel(): Promise<void> {
+    const resize = this.flow.actionStateManager.resize;
+    if (!resize) {
+      return;
+    }
+
+    resize.cancelReason = 'cancelled';
+
+    // Restore the exact pre-resize geometry (updateNode instead of resizeNode
+    // so min-size constraints and snapping can't distort the original values)
+    // along with the autoSize flag the resize gesture disabled.
+    const { startWidth, startHeight, startNodePositionX, startNodePositionY, resizingNode } = resize;
+    await this.flow.transaction('cancelResize', async (tx) => {
+      await tx.emit('updateNode', {
+        id: resizingNode.id,
+        nodeChanges: {
+          size: { width: startWidth, height: startHeight },
+          position: { x: startNodePositionX, y: startNodePositionY },
+          autoSize: resizingNode.autoSize,
+        },
+      });
+      await tx.emit('resizeNodeStop');
+    });
+
+    this.flow.actionStateManager.clearResize();
+  }
 }

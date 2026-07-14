@@ -43,7 +43,8 @@ export class NodeDragEndedEmitter implements EventEmitter {
       return;
     }
 
-    const nodeIds = context.actionStateManager.dragging?.nodeIds;
+    const dragging = context.actionStateManager.dragging;
+    const nodeIds = dragging?.nodeIds;
     if (!nodeIds || nodeIds.length === 0) {
       return;
     }
@@ -53,6 +54,9 @@ export class NodeDragEndedEmitter implements EventEmitter {
       return;
     }
 
-    eventManager.deferredEmit('nodeDragEnded', { nodes });
+    eventManager.deferredEmit('nodeDragEnded', {
+      nodes,
+      ...(dragging.cancelReason && { cancelReason: dragging.cancelReason }),
+    });
   }
 }

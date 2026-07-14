@@ -1,6 +1,7 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node, ResizeDirection } from '../../../../core/src';
 
+import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, type PointerInputEvent } from '../../../types/pointer-event';
@@ -15,12 +16,14 @@ import { DiagramEventName, type PointerInputEvent } from '../../../types/pointer
 export class ResizeDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly touchEventsStateService = inject(TouchEventsStateService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   direction = input.required<ResizeDirection>();
   targetData = input.required<Node>();
 
+  private unregisterInteractionCleanup: (() => void) | null = null;
+
   ngOnDestroy() {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
+    this.removeListeners();
   }
   onPointerDown(event: PointerInputEvent): void {
     if (!this.shouldHandle(event)) {
@@ -34,6 +37,9 @@ export class ResizeDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -50,11 +56,16 @@ export class ResizeDirective implements OnDestroy {
     });
   }
 
-  onPointerUp = (event: PointerEvent) => {
+  private removeListeners(): void {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
-
     this.touchEventsStateService.clearCurrentEvent();
+  }
+
+  onPointerUp = (event: PointerEvent) => {
+    this.removeListeners();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({

@@ -1,5 +1,6 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '../../../../core/src';
+import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, PointerInputEvent } from '../../../types';
@@ -14,8 +15,11 @@ import { DiagramEventName, PointerInputEvent } from '../../../types';
 export class RotateHandleDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly touchEventsStateService = inject(TouchEventsStateService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   targetData = input<Node>();
+
+  private unregisterInteractionCleanup: (() => void) | null = null;
 
   ngOnDestroy() {
     this.cleanup();
@@ -50,6 +54,9 @@ export class RotateHandleDirective implements OnDestroy {
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
     document.addEventListener('pointercancel', this.onPointerCancel);
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.cleanup());
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
@@ -130,6 +137,8 @@ export class RotateHandleDirective implements OnDestroy {
   }
 
   private cleanup() {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
     this.touchEventsStateService.clearCurrentEvent();
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);

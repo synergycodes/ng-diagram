@@ -49,13 +49,19 @@ export class KeyboardInputsDirective {
       modifiers: baseEvent.modifiers,
     });
 
-    if (shortcuts.length === 0 || this.isInputFieldFocused(event)) {
+    // Don't swallow the key's default behavior (e.g. Escape closing a <dialog>)
+    // when the only match is cancelInteraction and there is nothing to cancel.
+    const actionableShortcuts = shortcuts.filter(
+      (shortcut) => shortcut.actionName !== 'cancelInteraction' || flowCore.hasActiveInteraction()
+    );
+
+    if (actionableShortcuts.length === 0 || this.isInputFieldFocused(event)) {
       return;
     }
 
     event.preventDefault();
 
-    for (const shortcut of shortcuts) {
+    for (const shortcut of actionableShortcuts) {
       const matchingAction = this.keyboardActions.find((action) => action.canHandle(shortcut, flowCore));
       const event = matchingAction && matchingAction.createEvent(shortcut, baseEvent, flowCore);
 

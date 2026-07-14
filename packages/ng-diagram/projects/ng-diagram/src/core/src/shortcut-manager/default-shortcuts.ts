@@ -24,6 +24,12 @@ export const DEFAULT_SHORTCUTS = [
     bindings: [{ key: 'Delete' }, { key: 'Backspace' }],
   },
 
+  // Abort the in-progress interactive gesture (linking, drag, resize, rotate, pan)
+  {
+    actionName: 'cancelInteraction',
+    bindings: [{ key: 'Escape' }],
+  },
+
   // Move selected nodes with arrow keys
   {
     actionName: 'keyboardMoveSelectionUp',

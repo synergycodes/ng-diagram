@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Remove ports from default nodes** – this is now possible to remove ports from default nodes ([#759](https://github.com/synergycodes/ng-diagram/pull/759))
+- **Cancel in-progress gestures** – new `NgDiagramService.cancelActiveInteraction()` aborts the active linking, drag, resize, rotate or pan gesture immediately and restores the pre-gesture state: dragged nodes snap back to their initial positions, resized/rotated nodes regain their original geometry, and the temporary edge is discarded (state cleared, document listeners removed, no need to wait for pointer release). Bound to Escape by default via the new `cancelInteraction` shortcut action. The `edgeDrawEnded` event gains a `cancelled` reason, and `nodeDragEnded`/`nodeResizeEnded`/`nodeRotateEnded` gain an optional `cancelReason` field
 
 ### Fixed
 

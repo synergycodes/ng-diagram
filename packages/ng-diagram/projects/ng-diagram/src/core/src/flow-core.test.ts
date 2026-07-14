@@ -115,6 +115,7 @@ describe('FlowCore', () => {
       emit: vi.fn(),
       register: vi.fn(),
       registerDefaultCallbacks: vi.fn(),
+      cancel: vi.fn().mockResolvedValue(undefined),
     } as unknown as InputEventsRouter;
 
     // Reset all mocks
@@ -221,6 +222,128 @@ describe('FlowCore', () => {
       // Should still have default values for other config properties
       expect(flowCore.config.computeNodeId).toBeDefined();
       expect(flowCore.config.linking.portSnapDistance).toBe(10); // default value
+    });
+  });
+
+  describe('cancelActiveInteraction', () => {
+    it('should return false and cancel nothing when no gesture is active', async () => {
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(result).toBe(false);
+      expect(mockEventRouter.cancel).not.toHaveBeenCalled();
+    });
+
+    it('should run registered interaction cleanups', async () => {
+      const cleanup = vi.fn();
+      flowCore.registerInteractionCleanup(cleanup);
+
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).toHaveBeenCalledTimes(1);
+      expect(result).toBe(true);
+    });
+
+    it('should not run unregistered cleanups', async () => {
+      const cleanup = vi.fn();
+      const unregister = flowCore.registerInteractionCleanup(cleanup);
+      unregister();
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).not.toHaveBeenCalled();
+    });
+
+    it('should not run a cleanup twice across two cancellations', async () => {
+      const cleanup = vi.fn();
+      flowCore.registerInteractionCleanup(cleanup);
+
+      await flowCore.cancelActiveInteraction();
+      await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).toHaveBeenCalledTimes(1);
+    });
+
+    it('should route linking cancellation to the linking handler', async () => {
+      flowCore.actionStateManager.linking = { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null };
+
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('linking');
+      expect(result).toBe(true);
+    });
+
+    it('should cancel every active gesture', async () => {
+      flowCore.actionStateManager.dragging = {
+        nodeIds: [],
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        accumulatedDeltas: new Map(),
+        movementStarted: true,
+      };
+      flowCore.actionStateManager.panning = { active: true };
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('pointerMoveSelection');
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('panning');
+      expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('resize');
+      expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('rotate');
+    });
+  });
+
+  describe('hasActiveInteraction', () => {
+    it('should return false when nothing is active', () => {
+      expect(flowCore.hasActiveInteraction()).toBe(false);
+    });
+
+    it('should return true for each active gesture state', () => {
+      flowCore.actionStateManager.linking = { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearLinking();
+
+      flowCore.actionStateManager.dragging = {
+        nodeIds: [],
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        accumulatedDeltas: new Map(),
+        movementStarted: false,
+      };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearDragging();
+
+      flowCore.actionStateManager.resize = {
+        startWidth: 1,
+        startHeight: 1,
+        startX: 0,
+        startY: 0,
+        startNodePositionX: 0,
+        startNodePositionY: 0,
+        resizingNode: mockNode,
+      };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearResize();
+
+      flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n1' };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearRotation();
+
+      flowCore.actionStateManager.panning = { active: true };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearPanning();
+
+      expect(flowCore.hasActiveInteraction()).toBe(false);
+    });
+
+    it('should return true when only a listener cleanup is registered', () => {
+      flowCore.registerInteractionCleanup(vi.fn());
+
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+    });
+
+    it('should return false again after cancelActiveInteraction tears down registered cleanups', async () => {
+      flowCore.registerInteractionCleanup(vi.fn());
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(flowCore.hasActiveInteraction()).toBe(false);
     });
   });
 

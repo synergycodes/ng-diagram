@@ -1,4 +1,4 @@
-import type { EdgeDrawCancelReason } from '../event-manager/event-types';
+import type { EdgeDrawCancelReason, GestureCancelReason } from '../event-manager/event-types';
 import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
@@ -26,6 +26,8 @@ export interface ResizeActionState {
   startNodePositionY: number;
   /** Reference to the node being resized. */
   resizingNode: Node;
+  /** Set when the resize is aborted; carried into `nodeResizeEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -88,6 +90,8 @@ export interface RotationActionState {
   initialNodeAngle: number;
   /** ID of the node being rotated. */
   nodeId: string;
+  /** Set when the rotation is aborted; carried into `nodeRotateEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -112,6 +116,13 @@ export interface DraggingActionState {
    * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
    */
   movementStarted: boolean;
+  /**
+   * Positions of the dragged nodes captured when the move threshold was crossed,
+   * used to restore them when the drag is cancelled.
+   */
+  initialPositions?: Map<string, Point>;
+  /** Set when the drag is aborted; carried into `nodeDragEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**

@@ -25,6 +25,7 @@ import { deleteSelection } from './delete-selection';
 import { highlightGroup, highlightGroupClear } from './highlight-group';
 import { init } from './init';
 import {
+  cancelLinking,
   finishLinking,
   finishLinkingToPosition,
   moveTemporaryEdge,
@@ -81,6 +82,7 @@ export const commands: CommandMap = {
   startLinking,
   moveTemporaryEdge,
   finishLinking,
+  cancelLinking,
   finishLinkingToPosition,
   startLinkingFromPosition,
   resizeNode,

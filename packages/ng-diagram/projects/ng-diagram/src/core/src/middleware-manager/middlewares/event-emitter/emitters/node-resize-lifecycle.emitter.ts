@@ -32,7 +32,8 @@ export class NodeResizeEndedEmitter implements EventEmitter {
       return;
     }
 
-    const resizingNode = context.actionStateManager.resize?.resizingNode;
+    const resize = context.actionStateManager.resize;
+    const resizingNode = resize?.resizingNode;
     if (!resizingNode) {
       return;
     }
@@ -42,6 +43,9 @@ export class NodeResizeEndedEmitter implements EventEmitter {
       return;
     }
 
-    eventManager.deferredEmit('nodeResizeEnded', { node });
+    eventManager.deferredEmit('nodeResizeEnded', {
+      node,
+      ...(resize.cancelReason && { cancelReason: resize.cancelReason }),
+    });
   }
 }

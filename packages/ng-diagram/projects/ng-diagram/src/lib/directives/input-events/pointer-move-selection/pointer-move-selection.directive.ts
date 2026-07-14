@@ -24,11 +24,10 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
   private edgePanningInterval: number | null = null;
   private cachedDiagramRect: DOMRect | null = null;
+  private unregisterInteractionCleanup: (() => void) | null = null;
 
   ngOnDestroy() {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
-    this.stopEdgePanning();
+    this.removeListeners();
   }
 
   onPointerDown(event: PointerInputEvent): void {
@@ -65,6 +64,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   onPointerUp = (event: PointerEvent): void => {
@@ -127,16 +129,23 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     });
   };
 
+  private removeListeners(): void {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+    this.stopEdgePanning();
+    this.cachedDiagramRect = null;
+    this.touchEventsStateService.clearCurrentEvent();
+  }
+
   private finishDragging(event: PointerInputEvent): void {
     const targetData = this.targetData();
     if (!targetData) {
       return;
     }
 
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
-    this.stopEdgePanning();
-    this.cachedDiagramRect = null;
+    this.removeListeners();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -151,8 +160,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       },
       currentDiagramEdge: null,
     });
-
-    this.touchEventsStateService.clearCurrentEvent();
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {

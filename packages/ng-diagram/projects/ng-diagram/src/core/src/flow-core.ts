@@ -3,7 +3,7 @@ import { CommandHandler } from './command-handler/command-handler';
 import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
-import { InputEventsRouter } from './input-events';
+import { InputEventsRouter, type InputEventName } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MeasurementTracker } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -437,6 +437,76 @@ export class FlowCore {
    */
   getEdgeById(edgeId: string): Edge | null {
     return this.modelLookup.getEdgeById(edgeId);
+  }
+
+  private readonly interactionCleanups = new Set<() => void>();
+
+  /**
+   * Registers a cleanup callback for the gesture that is starting — typically
+   * the removal of document-level pointer listeners owned by the view layer.
+   *
+   * The callback runs when {@link cancelActiveInteraction} aborts the gesture.
+   * The caller must invoke the returned unregister function in its own normal
+   * teardown (pointer release) so stale callbacks don't accumulate.
+   *
+   * @param cleanup Callback tearing down the gesture's listeners
+   * @returns Function that unregisters the callback
+   */
+  registerInteractionCleanup(cleanup: () => void): () => void {
+    this.interactionCleanups.add(cleanup);
+    return () => {
+      this.interactionCleanups.delete(cleanup);
+    };
+  }
+
+  /**
+   * Whether an interactive gesture (linking, dragging, resizing, rotating,
+   * panning) is currently in progress, or a gesture's listener cleanup is
+   * still registered.
+   */
+  hasActiveInteraction(): boolean {
+    return (
+      this.actionStateManager.isLinking() ||
+      this.actionStateManager.isDragging() ||
+      this.actionStateManager.isResizing() ||
+      this.actionStateManager.isRotating() ||
+      this.actionStateManager.isPanning() ||
+      this.interactionCleanups.size > 0
+    );
+  }
+
+  /**
+   * Aborts the interactive gesture currently in progress (linking, dragging,
+   * resizing, rotating or panning).
+   *
+   * Runs the registered listener cleanups, restores the diagram state the
+   * gesture modified (node positions/size/angle, temporary edge), clears the
+   * gesture's action state and lets the corresponding "ended" event fire with
+   * the `cancelled` reason. No-op when nothing is active.
+   *
+   * @returns Whether any gesture or registered listener cleanup was torn down
+   */
+  async cancelActiveInteraction(): Promise<boolean> {
+    const activeGestures: InputEventName[] = [];
+    if (this.actionStateManager.isLinking()) activeGestures.push('linking');
+    if (this.actionStateManager.isDragging()) activeGestures.push('pointerMoveSelection');
+    if (this.actionStateManager.isResizing()) activeGestures.push('resize');
+    if (this.actionStateManager.isRotating()) activeGestures.push('rotate');
+    if (this.actionStateManager.isPanning()) activeGestures.push('panning');
+
+    // Tear down document-level listeners first so no further pointer events
+    // reach the gesture handlers while (or after) they are being cancelled.
+    const cleanups = [...this.interactionCleanups];
+    this.interactionCleanups.clear();
+    for (const cleanup of cleanups) {
+      cleanup();
+    }
+
+    for (const gesture of activeGestures) {
+      await this.inputEventsRouter.cancel(gesture);
+    }
+
+    return activeGestures.length > 0 || cleanups.length > 0;
   }
 
   /**

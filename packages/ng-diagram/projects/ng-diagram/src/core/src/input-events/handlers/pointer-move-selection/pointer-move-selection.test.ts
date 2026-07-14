@@ -48,6 +48,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     dragging: DraggingActionState | undefined;
     highlightGroup: HighlightGroupActionState | undefined;
     clearDragging: ReturnType<typeof vi.fn>;
+    isDragging: ReturnType<typeof vi.fn>;
   };
   let mockGetState: ReturnType<typeof vi.fn>;
   let lastInputPointOverThreshold = { x: 100, y: 100 };
@@ -69,6 +70,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       dragging: undefined,
       highlightGroup: undefined,
       clearDragging: vi.fn(),
+      isDragging: vi.fn(() => !!mockActionStateManager.dragging),
     };
 
     mockGetState = vi.fn().mockReturnValue({ nodes: [], edges: [] });
@@ -763,6 +765,90 @@ describe('PointerMoveSelectionEventHandler', () => {
       );
 
       expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStop');
+    });
+  });
+
+  describe('cancel', () => {
+    it('should do nothing when no drag is in progress', async () => {
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalled();
+      expect(mockActionStateManager.clearDragging).not.toHaveBeenCalled();
+    });
+
+    it('should clear dragging without moveNodesStop when the threshold was not crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStop');
+      expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
+    });
+
+    it('should set the cancelled reason and emit moveNodesStop after an actual drag', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      await handler.cancel();
+
+      expect(mockActionStateManager.dragging?.cancelReason).toBe('cancelled');
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStop');
+      expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
+    });
+
+    it('should snap dragged nodes back to their pre-drag positions', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      await handler.cancel();
+
+      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: mockNode.id, position: mockNode.position }],
+      });
+      // The restore must happen before the drag-ended lifecycle command
+      const calls = mockEmit.mock.calls.map(([name]) => name);
+      expect(calls.indexOf('updateNodes')).toBeLessThan(calls.indexOf('moveNodesStop'));
+      expect(mockFlowCore.transaction).toHaveBeenCalledWith('cancelDrag', expect.any(Function));
+    });
+
+    it('should not change group membership when cancelled over a group', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalledWith('addToGroup', expect.anything());
+      expect(mockEmit).not.toHaveBeenCalledWith('removeFromGroup', expect.anything());
+    });
+
+    it('should clear an active group highlight', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+      mockActionStateManager.highlightGroup = { highlightedGroupId: mockGroupNode.id };
+
+      await handler.cancel();
+
+      expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
+    });
+
+    it('should ignore continue events after cancellation', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.cancel();
+      mockEmit.mockClear();
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStart');
     });
   });
 });

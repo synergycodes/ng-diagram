@@ -216,6 +216,43 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   // ==============================
+  // Interaction Control
+  // ==============================
+
+  /**
+   * Aborts the interactive gesture currently in progress — linking, dragging,
+   * resizing, rotating or panning.
+   *
+   * The gesture is torn down immediately: its action state is cleared, its
+   * document-level pointer listeners are removed (no need to wait for pointer
+   * release) and the corresponding "ended" event (`edgeDrawEnded`,
+   * `nodeDragEnded`, `nodeResizeEnded`, `nodeRotateEnded`) fires with the
+   * `cancelled` reason. Diagram state modified by the gesture is restored:
+   * dragged nodes snap back to their pre-drag positions, a resized node gets
+   * its original size/position/autoSize back, a rotated node its original
+   * angle, and the temporary edge of a linking gesture is discarded. Panning
+   * only stops — the viewport is navigation state and is not rolled back.
+   * No-op when nothing is active.
+   *
+   * Bound to the Escape key by default via the `cancelInteraction` shortcut
+   * action; rebind or disable it with {@link configureShortcuts}.
+   *
+   * @example
+   * ```typescript
+   * // Abort the temporary edge / drag preview from custom logic
+   * ngDiagramService.cancelActiveInteraction();
+   * ```
+   *
+   * @returns Promise resolving to whether any gesture or registered listener
+   * cleanup was torn down.
+   *
+   * @since 1.3.0
+   */
+  cancelActiveInteraction(): Promise<boolean> {
+    return this.flowCore.cancelActiveInteraction();
+  }
+
+  // ==============================
   // Event Management
   // ==============================
 

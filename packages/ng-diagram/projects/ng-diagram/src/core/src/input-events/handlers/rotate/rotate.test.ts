@@ -55,6 +55,10 @@ describe('RotateEventHandler', () => {
       actionStateManager: mockActionStateManager,
       clientToFlowPosition: vi.fn().mockImplementation((point) => point),
       getNodeById: vi.fn().mockReturnValue(node),
+      transaction: vi.fn().mockImplementation(async (_name, callback) => {
+        const txContext = { emit: mockCommandHandler.emit };
+        return await callback(txContext);
+      }),
     } as unknown as FlowCore;
     instance = new RotateEventHandler(flowCore);
     vi.clearAllMocks();
@@ -162,6 +166,48 @@ describe('RotateEventHandler', () => {
 
         expect(callOrder).toEqual(['rotateNodeStop', 'clearRotation']);
       });
+    });
+  });
+
+  describe('cancel', () => {
+    it('should do nothing when no rotation is in progress', async () => {
+      await instance.cancel();
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      expect(mockActionStateManager.clearRotation).not.toHaveBeenCalled();
+    });
+
+    it('should set the cancelled reason, emit rotateNodeStop and clear the state', async () => {
+      const rotation: RotationActionState = { startAngle: 45, initialNodeAngle: 30, nodeId: 'test-node' };
+      mockActionStateManager.rotation = rotation;
+
+      await instance.cancel();
+
+      expect(rotation.cancelReason).toBe('cancelled');
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStop');
+      expect(mockActionStateManager.clearRotation).toHaveBeenCalled();
+    });
+
+    it('should restore the pre-rotation angle', async () => {
+      const rotation: RotationActionState = { startAngle: 45, initialNodeAngle: 30, nodeId: 'test-node' };
+      mockActionStateManager.rotation = rotation;
+
+      await instance.cancel();
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updateNode', {
+        id: 'test-node',
+        nodeChanges: { angle: 30 },
+      });
+      const calls = mockCommandHandler.emit.mock.calls.map(([name]) => name);
+      expect(calls.indexOf('updateNode')).toBeLessThan(calls.indexOf('rotateNodeStop'));
+    });
+
+    it('should roll back inside a cancelRotate transaction', async () => {
+      mockActionStateManager.rotation = { startAngle: 45, initialNodeAngle: 30, nodeId: 'test-node' };
+
+      await instance.cancel();
+
+      expect(flowCore.transaction).toHaveBeenCalledWith('cancelRotate', expect.any(Function));
     });
   });
 });
