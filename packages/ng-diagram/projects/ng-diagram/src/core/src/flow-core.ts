@@ -5,7 +5,7 @@ import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
-import { MeasurementTracker } from './measurement-tracker/measurement-tracker';
+import { MeasurementTracker, MeasurementTrackingConfig } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -284,29 +284,43 @@ export class FlowCore {
 
     if (typeof nameOrCallback === 'function') {
       transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+    } else {
+      transactionOptions = options;
+    }
+
+    if (transactionOptions?.waitForMeasurements && this.transactionManager.isActive()) {
+      console.warn(
+        '[ngDiagram] waitForMeasurements is ignored on a nested transaction — its updates are applied (and measured) only when the root transaction commits. Pass the option to the root transaction instead.'
+      );
+    }
+
+    if (typeof nameOrCallback === 'function') {
       results = await this.transactionManager.transaction(nameOrCallback, transactionOptions ?? {});
     } else {
       const callback = callbackOrOptions as TransactionCallback | undefined;
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
       }
-      transactionOptions = options;
       results = await this.transactionManager.transaction(nameOrCallback, callback, transactionOptions ?? {});
     }
+
+    let measurementTracking: MeasurementTrackingConfig | null = null;
 
     if (results.commandsCount > 0) {
       if (transactionOptions?.waitForMeasurements) {
         const internalOptions = transactionOptions as InternalTransactionOptions;
-        this.measurementTracker.requestTracking({
+        measurementTracking = {
           discoveryWindowMs: internalOptions._measurementDiscoveryWindowTimeout,
           debounceMs: internalOptions._measurementDebounceTimeout,
-        });
+        };
       }
 
-      await this.applyUpdate(results.results, results.actionTypes);
+      // Commit directly — applyUpdate would re-queue this completed root
+      // transaction's result into whatever unrelated transaction is active now.
+      await this.applyUpdateToModel(results.results, results.actionTypes, measurementTracking);
     }
 
-    if (transactionOptions?.waitForMeasurements) {
+    if (measurementTracking) {
       await this.measurementTracker.waitForMeasurements();
     }
 
@@ -329,10 +343,30 @@ export class FlowCore {
       return;
     }
 
+    return this.applyUpdateToModel(stateUpdate, actionTypesArray);
+  }
+
+  /**
+   * Runs an update through the middleware chain and commits it to the model,
+   * bypassing the active-transaction routing in `applyUpdate`.
+   */
+  private async applyUpdateToModel(
+    stateUpdate: FlowStateUpdate,
+    modelActionTypes: LooseAutocomplete<ModelActionType> | ModelActionTypes,
+    measurementTracking: MeasurementTrackingConfig | null = null
+  ): Promise<void> {
+    const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
+
     // Acquire semaphore to ensure atomic updates
     await this.updateSemaphore.acquire();
 
     try {
+      // Staged under the held semaphore so only this pass's
+      // measurement-tracking middleware can consume the request.
+      if (measurementTracking) {
+        this.measurementTracker.requestTracking(measurementTracking);
+      }
+
       const currentState = this.getState();
       const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
 
@@ -343,6 +377,11 @@ export class FlowCore {
         this.eventManager.clearDeferredEmits();
       }
     } finally {
+      // A cancelled or throwing chain may never reach the measurement-tracking
+      // middleware — clear the staged request so it cannot poison the next pass.
+      if (measurementTracking && this.measurementTracker.isTrackingRequested()) {
+        this.measurementTracker.cancelTrackingRequest();
+      }
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();
     }

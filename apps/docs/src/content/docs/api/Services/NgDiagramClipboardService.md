@@ -24,31 +24,35 @@ this.clipboardService.copy();
 
 ### copy()
 
-> **copy**(): `void`
+> **copy**(): `Promise`\<`void`\>
 
 Copies the current selection to the clipboard.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the selection has been copied.
 
 ***
 
 ### cut()
 
-> **cut**(): `void`
+> **cut**(): `Promise`\<`void`\>
 
 Cuts the current selection to the clipboard.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### paste()
 
-> **paste**(`position`): `void`
+> **paste**(`position`): `Promise`\<`void`\>
 
 Pastes the clipboard content at the specified position.
 
@@ -62,4 +66,6 @@ The position where to paste the content.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).

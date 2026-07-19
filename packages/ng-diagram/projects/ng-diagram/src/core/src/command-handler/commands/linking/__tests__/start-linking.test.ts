@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockNode, mockPort } from '../../../../test-utils';
 import type { CommandHandler, LinkingActionState, Node } from '../../../../types';
+import type { InternalLinkingActionState } from '../../../../types/action-state.interface';
 import { startLinking, StartLinkingCommand } from '../start-linking';
 
 vi.mock('../../../../utils', () => ({
@@ -179,6 +180,7 @@ describe('startLinking', () => {
           temporaryEdge: mockTemporaryEdge,
           sourceNodeId: 'source-node',
           sourcePortId: 'source-port',
+          _gestureId: expect.any(Number),
         });
         expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
@@ -213,6 +215,7 @@ describe('startLinking', () => {
           temporaryEdge: mockTemporaryEdge,
           sourceNodeId: 'source-node',
           sourcePortId: '',
+          _gestureId: expect.any(Number),
         });
         expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
@@ -257,6 +260,7 @@ describe('startLinking', () => {
           temporaryEdge: mockTemporaryEdge,
           sourceNodeId: 'source-node',
           sourcePortId: 'both-port',
+          _gestureId: expect.any(Number),
         });
         expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
@@ -287,9 +291,28 @@ describe('startLinking', () => {
           temporaryEdge: mockTemporaryEdge,
           sourceNodeId: 'source-node',
           sourcePortId: 'source-port',
+          _gestureId: expect.any(Number),
         });
         expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
+    });
+  });
+
+  describe('gesture stamping', () => {
+    it('should stamp each gesture with a fresh unique id', async () => {
+      mockFlowCore.getNodeById.mockReturnValue({ ...mockNode, id: 'source-node', position: { x: 1, y: 2 } });
+
+      await startLinking(mockCommandHandler, { name: 'startLinking', source: 'source-node' });
+      const first = mockFlowCore.actionStateManager.linking as InternalLinkingActionState;
+
+      await startLinking(mockCommandHandler, { name: 'startLinking', source: 'source-node' });
+      const second = mockFlowCore.actionStateManager.linking as InternalLinkingActionState;
+
+      // The finish commands' clear guards can tell gestures apart only when
+      // ids differ between gestures.
+      expect(first._gestureId).toEqual(expect.any(Number));
+      expect(second._gestureId).toEqual(expect.any(Number));
+      expect(second._gestureId).not.toBe(first._gestureId);
     });
   });
 });

@@ -68,6 +68,58 @@ describe('TransactionManager', () => {
     vi.clearAllMocks();
   });
 
+  describe('un-awaited nested transactions', () => {
+    it('should remove itself by identity so a still-live nested transaction stays current', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      let releaseInner: () => void = () => {};
+      let innerPromise: Promise<unknown> | undefined;
+
+      await transactionManager.transaction(() => {
+        // Fire-and-forget nested transaction that stays suspended past the outer commit
+        innerPromise = transactionManager.transaction('addNodes', async (tx) => {
+          await new Promise<void>((resolve) => {
+            releaseInner = resolve;
+          });
+          await tx.emit('addNodes', { nodes: [mockNode] });
+        });
+      });
+
+      // The outer's cleanup must remove ITSELF — the live inner transaction
+      // (named 'addNodes') must still be the current one, not a stale outer.
+      expect(transactionManager.isActive()).toBe(true);
+      expect(transactionManager.getTransactionName()).toBe('addNodes');
+
+      releaseInner();
+      await innerPromise;
+
+      expect(transactionManager.isActive()).toBe(false);
+      warn.mockRestore();
+    });
+
+    it('should commit an orphaned nested transaction independently instead of merging into its completed parent', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      let releaseInner: () => void = () => {};
+      let innerPromise: Promise<{ commandsCount: number }> | undefined;
+
+      await transactionManager.transaction(() => {
+        innerPromise = transactionManager.transaction('deleteNodes', async (tx) => {
+          await new Promise<void>((resolve) => {
+            releaseInner = resolve;
+          });
+          await tx.emit('deleteNodes', { ids: ['1'] });
+        });
+      });
+
+      releaseInner();
+      const result = await innerPromise!;
+
+      // Merging into the already-committed parent would silently discard the update
+      expect(result.commandsCount).toBeGreaterThan(0);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('nested transaction outlived its parent'));
+      warn.mockRestore();
+    });
+  });
+
   describe('transaction with callback only', () => {
     it('should execute transaction with default name', async () => {
       const callback: TransactionCallback = async (tx) => {

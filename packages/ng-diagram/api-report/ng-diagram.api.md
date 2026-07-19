@@ -375,6 +375,8 @@ export interface FlowStateUpdate {
     edgesToUpdate?: (Partial<Edge> & {
         id: Edge['id'];
     })[];
+    // @internal
+    gestureNodeIds?: string[];
     metadataUpdate?: Partial<Metadata>;
     nodesToAdd?: Node_2[];
     nodesToRemove?: string[];
@@ -794,9 +796,9 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
 
 // @public
 export class NgDiagramClipboardService extends NgDiagramBaseService {
-    copy(): void;
-    cut(): void;
-    paste(position: Point): void;
+    copy(): Promise<void>;
+    cut(): Promise<void>;
+    paste(position: Point): Promise<void>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramClipboardService, never>;
     // (undocumented)
@@ -890,10 +892,10 @@ export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject
 
 // @public
 export class NgDiagramGroupsService extends NgDiagramBaseService {
-    addToGroup(groupId: string, nodeIds: string[]): void;
-    highlightGroup(groupId: string, nodes: Node_2[]): void;
-    highlightGroupClear(): void;
-    removeFromGroup(groupId: string, nodeIds: string[]): void;
+    addToGroup(groupId: string, nodeIds: string[]): Promise<void>;
+    highlightGroup(groupId: string, nodes: Node_2[]): Promise<void>;
+    highlightGroupClear(): Promise<void>;
+    removeFromGroup(groupId: string, nodeIds: string[]): Promise<void>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramGroupsService, never>;
     // (undocumented)
@@ -996,11 +998,15 @@ export class NgDiagramMinimapNodeTemplateMap extends Map<string, Type<NgDiagramM
 // @public
 export class NgDiagramModelService extends NgDiagramBaseService implements OnDestroy {
     constructor();
-    addEdges(edges: Edge[]): void;
-    addNodes(nodes: Node_2[]): void;
+    addEdges(edges: Edge[], options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
+    addNodes(nodes: Node_2[], options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
     computePartsBounds(nodes: Node_2[], edges: Edge[]): Rect;
-    deleteEdges(ids: string[]): void;
-    deleteNodes(ids: string[]): void;
+    deleteEdges(ids: string[]): Promise<void>;
+    deleteNodes(ids: string[]): Promise<void>;
     readonly edges: Signal<Edge<object>[]>;
     getChildren<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
     getChildrenNested<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
@@ -1025,12 +1031,20 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     ngOnDestroy(): void;
     readonly nodes: Signal<Node_2[]>;
     toJSON(): string;
-    updateEdge(edgeId: string, edge: Partial<Edge>): void;
-    updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T): void;
-    updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]): void;
-    updateNode(nodeId: string, node: Partial<Node_2>): void;
-    updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T): void;
-    updateNodes(nodes: (Pick<Node_2, 'id'> & Partial<Node_2>)[]): void;
+    updateEdge(edgeId: string, edge: Partial<Edge>, options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
+    updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T): Promise<void>;
+    updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[], options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
+    updateNode(nodeId: string, node: Partial<Node_2>, options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
+    updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T): Promise<void>;
+    updateNodes(nodes: (Pick<Node_2, 'id'> & Partial<Node_2>)[], options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramModelService, never>;
     // (undocumented)
@@ -1095,11 +1109,13 @@ export class NgDiagramNodeSelectedDirective {
 
 // @public
 export class NgDiagramNodeService extends NgDiagramBaseService {
-    bringToFront(nodeIds?: string[], edgeIds?: string[]): void;
-    moveNodesBy(nodes: Node_2[], delta: Point): void;
-    resizeNode(id: string, size: Size, position?: Point, disableAutoSize?: boolean): void;
-    rotateNodeTo(nodeId: string, angle: number): void;
-    sendToBack(nodeIds?: string[], edgeIds?: string[]): void;
+    bringToFront(nodeIds?: string[], edgeIds?: string[]): Promise<void>;
+    moveNodesBy(nodes: Node_2[], delta: Point): Promise<void>;
+    resizeNode(id: string, size: Size, position?: Point, disableAutoSize?: boolean, options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
+    rotateNodeTo(nodeId: string, angle: number): Promise<void>;
+    sendToBack(nodeIds?: string[], edgeIds?: string[]): Promise<void>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramNodeService, never>;
     // (undocumented)
@@ -1191,10 +1207,10 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
 // @public
 export class NgDiagramSelectionService extends NgDiagramBaseService {
-    deleteSelection(): void;
-    deselect(nodeIds?: string[], edgeIds?: string[]): void;
-    deselectAll(): void;
-    select(nodeIds?: string[], edgeIds?: string[]): void;
+    deleteSelection(): Promise<void>;
+    deselect(nodeIds?: string[], edgeIds?: string[]): Promise<void>;
+    deselectAll(): Promise<void>;
+    select(nodeIds?: string[], edgeIds?: string[]): Promise<void>;
     selection: Signal<    {
     nodes: Node_2[];
     edges: Edge<object>[];
@@ -1228,7 +1244,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     startLinking(node: Node_2, portId?: string): void;
     transaction(callback: () => Promise<void>): Promise<TransactionResult>;
     transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
-    transaction(callback: () => void): void;
+    transaction(callback: () => void): Promise<TransactionResult>;
     transaction(callback: () => void, options: TransactionOptions): Promise<TransactionResult>;
     unregisterMiddleware(name: string): void;
     unregisterRouting(name: string): void;
@@ -1252,24 +1268,24 @@ export class NgDiagramServicesAvailabilityCheckerDirective {
 export class NgDiagramViewportService extends NgDiagramBaseService {
     canZoomIn: Signal<boolean>;
     canZoomOut: Signal<boolean>;
-    centerOnNode(nodeOrId: string | Node_2): void;
-    centerOnRect(rect: Rect): void;
+    centerOnNode(nodeOrId: string | Node_2): Promise<void>;
+    centerOnRect(rect: Rect): Promise<void>;
     clientToFlowPosition(clientPosition: Point): Point;
     clientToFlowViewportPosition(clientPosition: Point): Point;
     flowToClientPosition(flowPosition: Point): Point;
     get maxZoom(): number;
     get minZoom(): number;
-    moveViewport(x: number, y: number): void;
-    moveViewportBy(dx: number, dy: number): void;
+    moveViewport(x: number, y: number): Promise<void>;
+    moveViewportBy(dx: number, dy: number): Promise<void>;
     scale: Signal<number>;
-    setViewport(x: number, y: number, scale: number): void;
+    setViewport(x: number, y: number, scale: number): Promise<void>;
     viewport: Signal<Viewport>;
-    zoom(factor: number, center?: Point | undefined): void;
+    zoom(factor: number, center?: Point | undefined): Promise<void>;
     zoomToFit(options?: {
         nodeIds?: string[];
         edgeIds?: string[];
         padding?: number | [number, number] | [number, number, number] | [number, number, number, number];
-    }): void;
+    }): Promise<void>;
 }
 
 // @public

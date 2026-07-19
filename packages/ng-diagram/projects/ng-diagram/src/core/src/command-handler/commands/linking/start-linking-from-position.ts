@@ -1,3 +1,4 @@
+import { createLinkingState } from './linking-gesture';
 import type { CommandHandler, Point } from '../../../types';
 import { createTemporaryEdge } from './utils';
 
@@ -19,11 +20,11 @@ export const startLinkingFromPosition = async (
     targetPosition: position,
   });
 
-  commandHandler.flowCore.actionStateManager.linking = {
+  commandHandler.flowCore.actionStateManager.linking = createLinkingState({
     sourceNodeId: '',
     sourcePortId: '',
     temporaryEdge,
-  };
+  });
 
   await commandHandler.flowCore.applyUpdate({}, 'startLinkingFromPosition');
 };

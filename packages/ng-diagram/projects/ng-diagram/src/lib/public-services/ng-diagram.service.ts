@@ -356,6 +356,9 @@ export class NgDiagramService extends NgDiagramBaseService {
    * All state updates within the callback are batched and applied atomically.
    *
    * @param callback The function to execute within the transaction.
+   * @returns A promise that resolves with the transaction result once the
+   * transaction has been committed to the model (returned since 1.3.0; safe to
+   * ignore when not needed).
    *
    * @example
    * this.ngDiagramService.transaction(() => {
@@ -363,7 +366,7 @@ export class NgDiagramService extends NgDiagramBaseService {
    *   this.ngDiagramModelService.addEdges([edge1]);
    * });
    */
-  transaction(callback: () => void): void;
+  transaction(callback: () => void): Promise<TransactionResult>;
   /**
    * @since 0.9.0
    *
@@ -384,21 +387,13 @@ export class NgDiagramService extends NgDiagramBaseService {
   transaction(
     callback: (() => void) | (() => Promise<void>),
     options?: TransactionOptions
-  ): void | Promise<TransactionResult> {
-    let isAsync = false;
-    const wrappedCallback: TransactionCallback = () => {
-      const result = callback();
-      if (result instanceof Promise) {
-        isAsync = true;
-      }
-      return result;
-    };
-
-    const promise = this.flowCore.transaction(wrappedCallback, options ?? {});
-
-    if (options || isAsync) {
-      return promise;
-    }
+  ): Promise<TransactionResult> {
+    // Always return the commit promise — do not branch on `result instanceof
+    // Promise` to detect sync callbacks: the check is realm-sensitive (a promise
+    // created outside the Zone.js-patched realm, e.g. in a test driver or an
+    // iframe, fails it) and would silently discard the commit promise.
+    const wrappedCallback: TransactionCallback = () => callback();
+    return this.flowCore.transaction(wrappedCallback, options ?? {});
   }
 
   // ==============================

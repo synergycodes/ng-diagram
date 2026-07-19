@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockNode, mockPort } from '../../../../test-utils';
 import type { CommandHandler, Edge, LinkingActionState, Node, Port } from '../../../../types';
+import type { InternalLinkingActionState } from '../../../../types/action-state.interface';
 import { moveTemporaryEdge, MoveTemporaryEdgeCommand } from '../move-temporary-edge';
 
 vi.mock('../utils', () => ({
@@ -242,5 +243,24 @@ describe('moveTemporaryEdge', () => {
       position,
       mockFlowCore.config.linking.portSnapDistance
     );
+  });
+
+  it('should preserve the gesture stamp when replacing the linking state', async () => {
+    const stamped: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      _gestureId: 42,
+    };
+    mockFlowCore.actionStateManager.linking = stamped;
+    mockFlowCore.getNearestPortInRange.mockReturnValue(null);
+    mockCreateTemporaryEdge.mockReturnValue({ ...mockTemporaryEdge, target: '', targetPort: '' });
+
+    await moveTemporaryEdge(mockCommandHandler, { name: 'moveTemporaryEdge', position: { x: 100, y: 200 } });
+
+    const replaced = mockFlowCore.actionStateManager.linking as InternalLinkingActionState;
+    // The finish commands' clear guards depend on the stamp surviving this replacement.
+    expect(replaced).not.toBe(stamped);
+    expect(replaced._gestureId).toBe(42);
   });
 });

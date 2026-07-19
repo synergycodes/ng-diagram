@@ -254,7 +254,15 @@ export class InitUpdater implements Updater {
     this.initState.applyToDiagramState(this.flowCore);
 
     if (this.onCompleteCallback) {
-      await this.onCompleteCallback();
+      try {
+        await this.onCompleteCallback();
+      } catch (error) {
+        // The callback awaits the 'init' command pass, which can reject (e.g. a
+        // throwing custom ModelAdapter). Initialization must still complete —
+        // otherwise the updater stays in init mode and swallows every future
+        // measurement.
+        console.error('[ngDiagram] Initialization completion failed — continuing initialization.', error);
+      }
     }
 
     this.isInitialized = true;

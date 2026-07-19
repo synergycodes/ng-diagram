@@ -128,9 +128,10 @@ export type WithoutName<T> = Omit<T, 'name'>;
 export type IsEmpty<T> = keyof WithoutName<T> extends never ? true : false;
 
 /**
- * Type for command callback function
+ * Type for command callback function.
+ * A returned promise is awaited by `emit`, so emit resolves only after the command finished applying its updates.
  */
-export type CommandCallback<K extends CommandName> = (command: CommandByName<K>) => void;
+export type CommandCallback<K extends CommandName> = (command: CommandByName<K>) => void | Promise<void>;
 
 /**
  * Interface for interpreting and routing system commands

@@ -43,7 +43,7 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
           nodeId,
         };
 
-        await this.flow.commandHandler.emit('rotateNodeStart');
+        await this.flow.commandHandler.emit('rotateNodeStart', { nodeId });
         break;
       }
 
@@ -76,8 +76,17 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
       }
 
       case 'end': {
-        await this.flow.commandHandler.emit('rotateNodeStop');
-        this.flow.actionStateManager.clearRotation();
+        const rotationState = this.flow.actionStateManager.rotation;
+        try {
+          await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
+        } finally {
+          // Cleanup must run even when the emit rejects, but a fast re-grab that
+          // started a new rotation while the emit was suspended must not have its
+          // fresh state cleared.
+          if (this.flow.actionStateManager.rotation === rotationState) {
+            this.flow.actionStateManager.clearRotation();
+          }
+        }
         break;
       }
     }

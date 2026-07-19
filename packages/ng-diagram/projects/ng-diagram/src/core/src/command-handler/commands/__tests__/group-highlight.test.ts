@@ -115,6 +115,25 @@ describe('Highlight Group Commands', () => {
   });
 
   describe('highlightGroupClear', () => {
+    it('should not clear a newer highlight state set while the update was suspended', async () => {
+      const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
+      const groupNode = { id: 'group1', type: 'group', position: { x: 0, y: 0 }, data: {} };
+      (flowCore.modelLookup.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
+      (flowCore.config.grouping.canGroup as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      await highlightGroup(commandHandler, { name: 'highlightGroup', groupId: 'group1', nodes: testNodes });
+
+      const newerState = { highlightedGroupId: 'group2' };
+      (flowCore.applyUpdate as ReturnType<typeof vi.fn>).mockImplementation(async () => {
+        // A newer highlightGroup replaces the state while the clear's update is suspended
+        flowCore.actionStateManager.highlightGroup = newerState;
+      });
+
+      await highlightGroupClear(commandHandler);
+
+      expect(flowCore.actionStateManager.clearHighlightGroup).not.toHaveBeenCalled();
+      expect(flowCore.actionStateManager.highlightGroup).toBe(newerState);
+    });
+
     it('should clear highlight if a group is highlighted', async () => {
       const testNodes = [{ id: 'node1', type: 'rectangle', position: { x: 0, y: 0 }, data: {} }];
       const groupNode = { id: 'group1', type: 'group', position: { x: 0, y: 0 }, data: {} };

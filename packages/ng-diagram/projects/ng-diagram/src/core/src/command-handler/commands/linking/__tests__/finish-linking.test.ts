@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockNode } from '../../../../test-utils';
 import type { CommandHandler, Edge, LinkingActionState, Node } from '../../../../types';
+import type { InternalLinkingActionState } from '../../../../types/action-state.interface';
 import { finishLinking } from '../finish-linking';
 
 vi.mock('../../../../utils', () => ({
@@ -97,6 +98,49 @@ describe('finishLinking', () => {
     await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
 
     expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should clear the linking state even when connection validation throws', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockValidateConnection.mockImplementation(() => {
+      throw new Error('user validation failed');
+    });
+
+    await expect(
+      finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } })
+    ).rejects.toThrow('user validation failed');
+
+    // A stranded linking state would permanently block new links (the linking
+    // directive refuses to start while isLinking() is true).
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should clear the linking state even when the state object was replaced during the awaited update', async () => {
+    // The edges-routing middleware replaces actionStateManager.linking with a copy
+    // during finishLinking's own applyUpdate — the clear must still run, or the
+    // temporary edge is stranded.
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: null,
+    };
+
+    const replacedByMiddleware: LinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: null,
+    };
+    mockFlowCore.applyUpdate.mockImplementation(async () => {
+      mockFlowCore.actionStateManager.linking = replacedByMiddleware;
+    });
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
@@ -321,6 +365,57 @@ describe('finishLinking', () => {
       },
       'finishLinking'
     );
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should not clear a new linking gesture that replaced the state while finishLinking was suspended', async () => {
+    const ownGesture: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: null,
+      _gestureId: 1,
+    };
+    const newGesture: InternalLinkingActionState = {
+      sourceNodeId: 'other-node',
+      sourcePortId: 'other-port',
+      temporaryEdge: null,
+      _gestureId: 2,
+    };
+    mockFlowCore.actionStateManager.linking = ownGesture;
+    // A programmatic startLinking issued while this command awaits its pass.
+    mockFlowCore.applyUpdate.mockImplementation(async () => {
+      mockFlowCore.actionStateManager.linking = newGesture;
+    });
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
+    expect(mockFlowCore.actionStateManager.linking).toBe(newGesture);
+  });
+
+  it('should clear its own gesture when the state was replaced by a same-gesture copy mid-update', async () => {
+    const ownGesture: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      _gestureId: 7,
+    };
+    mockFlowCore.actionStateManager.linking = ownGesture;
+    mockValidateConnection.mockReturnValue(true);
+    mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
+    mockGetPortFlowPosition.mockReturnValue({ x: 150, y: 250 });
+    mockCreateFinalEdge.mockReturnValue({ id: 'final-edge', source: 'source-node', target: 'target-node', data: {} });
+    // The edges-routing middleware replaces the linking object with a spread
+    // copy during this command's own pass — the stamp survives the copy.
+    mockFlowCore.applyUpdate.mockImplementation(async () => {
+      mockFlowCore.actionStateManager.linking = {
+        ...(mockFlowCore.actionStateManager.linking as InternalLinkingActionState),
+        temporaryEdge: { ...mockTemporaryEdge, points: [{ x: 1, y: 1 }] },
+      };
+    });
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 });

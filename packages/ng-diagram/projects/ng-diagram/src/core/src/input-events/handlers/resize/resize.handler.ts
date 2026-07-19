@@ -36,7 +36,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
             resizingNode: node,
           };
 
-          await this.flow.commandHandler.emit('resizeNodeStart');
+          await this.flow.commandHandler.emit('resizeNodeStart', { nodeId: node.id });
         }
 
         break;
@@ -120,8 +120,17 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
         break;
       }
       case 'end': {
-        await this.flow.commandHandler.emit('resizeNodeStop');
-        this.flow.actionStateManager.clearResize();
+        const resizeState = this.flow.actionStateManager.resize;
+        try {
+          await this.flow.commandHandler.emit('resizeNodeStop', { nodeId: resizeState?.resizingNode.id });
+        } finally {
+          // Cleanup must run even when the emit rejects (leaked resize state suppresses
+          // node measurements), but a fast re-grab that started a new resize while the
+          // emit was suspended must not have its fresh state cleared.
+          if (this.flow.actionStateManager.resize === resizeState) {
+            this.flow.actionStateManager.clearResize();
+          }
+        }
         break;
       }
     }

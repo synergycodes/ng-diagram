@@ -26,6 +26,67 @@ describe('BatchProcessor', () => {
   const createItem = (id: string): TestItem => ({ id, value: `value-${id}` });
   const createUpdate = (itemId: string): TestUpdate => ({ itemId, changes: { value: 'updated' } });
 
+  describe('flush serialization', () => {
+    it('should not start a later flush generation before the previous one finished', async () => {
+      const order: string[] = [];
+      let releaseDelete: () => void = () => undefined;
+
+      const deleteFlush = vi.fn(async () => {
+        order.push('delete-start');
+        await new Promise<void>((resolve) => {
+          releaseDelete = resolve;
+        });
+        order.push('delete-end');
+      });
+      const addFlush = vi.fn(async () => {
+        order.push('add');
+      });
+
+      const drainMicrotasks = async () => {
+        for (let i = 0; i < 10; i++) {
+          await Promise.resolve();
+        }
+      };
+
+      processor.processDelete('key1', 'x', deleteFlush);
+      await drainMicrotasks();
+      expect(order).toEqual(['delete-start']);
+
+      // A second generation is scheduled while the first flush is still awaiting
+      processor.processAdd('key1', createItem('x'), addFlush);
+      await drainMicrotasks();
+      expect(order).toEqual(['delete-start']);
+
+      releaseDelete();
+      await drainMicrotasks();
+      expect(order).toEqual(['delete-start', 'delete-end', 'add']);
+    });
+  });
+
+  describe('flush error isolation', () => {
+    it('should still invoke later flush callbacks when an earlier one rejects', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const addFlush = vi.fn(async () => {
+        throw new Error('adapter failed');
+      });
+      const deleteFlush = vi.fn(async () => undefined);
+
+      processor.processAdd('key1', createItem('a'), addFlush);
+      processor.processDelete('key1', 'other-id', deleteFlush);
+
+      for (let i = 0; i < 10; i++) {
+        await Promise.resolve();
+      }
+
+      // The generation's queues were already drained — the rejection must not
+      // discard the remaining callbacks' items.
+      expect(addFlush).toHaveBeenCalled();
+      expect(deleteFlush).toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalledWith('[ngDiagram] BatchProcessor flush callback failed.', expect.any(Error));
+      errorSpy.mockRestore();
+    });
+  });
+
   describe('processAdd', () => {
     it('should batch multiple additions for the same key in the same tick', async () => {
       const onFlush = vi.fn();

@@ -24,7 +24,7 @@ this.groupsService.addToGroup('groupId', ['nodeId1', 'nodeId2']);
 
 ### addToGroup()
 
-> **addToGroup**(`groupId`, `nodeIds`): `void`
+> **addToGroup**(`groupId`, `nodeIds`): `Promise`\<`void`\>
 
 Adds nodes to a group.
 
@@ -44,13 +44,15 @@ Array of node IDs to add to the group.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### highlightGroup()
 
-> **highlightGroup**(`groupId`, `nodes`): `void`
+> **highlightGroup**(`groupId`, `nodes`): `Promise`\<`void`\>
 
 Highlights a group.
 
@@ -70,25 +72,29 @@ The nodes to highlight as part of the group.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied.
 
 ***
 
 ### highlightGroupClear()
 
-> **highlightGroupClear**(): `void`
+> **highlightGroupClear**(): `Promise`\<`void`\>
 
 Clears all group highlights.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied.
 
 ***
 
 ### removeFromGroup()
 
-> **removeFromGroup**(`groupId`, `nodeIds`): `void`
+> **removeFromGroup**(`groupId`, `nodeIds`): `Promise`\<`void`\>
 
 Removes nodes from a group.
 
@@ -108,4 +114,6 @@ Array of node IDs to remove from the group.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).

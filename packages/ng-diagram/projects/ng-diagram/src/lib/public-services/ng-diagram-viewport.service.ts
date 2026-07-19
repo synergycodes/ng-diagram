@@ -101,18 +101,20 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * Moves the viewport to the specified coordinates.
    * @param x The x-coordinate to move the viewport to.
    * @param y The y-coordinate to move the viewport to.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  moveViewport(x: number, y: number) {
-    this.flowCore.commandHandler.emit('moveViewport', { x, y });
+  moveViewport(x: number, y: number): Promise<void> {
+    return this.flowCore.commandHandler.emit('moveViewport', { x, y });
   }
 
   /**
    * Moves the viewport by the specified amounts.
    * @param dx The amount to move the viewport in the x-direction.
    * @param dy The amount to move the viewport in the y-direction.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  moveViewportBy(dx: number, dy: number) {
-    this.flowCore.commandHandler.emit('moveViewportBy', { x: dx, y: dy });
+  moveViewportBy(dx: number, dy: number): Promise<void> {
+    return this.flowCore.commandHandler.emit('moveViewportBy', { x: dx, y: dy });
   }
 
   /**
@@ -127,10 +129,11 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * @param x The absolute x-coordinate for the viewport.
    * @param y The absolute y-coordinate for the viewport.
    * @param scale The absolute zoom scale (clamped to configured min/max).
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    *
    * @since 1.2.0
    */
-  setViewport(x: number, y: number, scale: number) {
+  setViewport(x: number, y: number, scale: number): Promise<void> {
     const { min, max } = this.flowCore.config.zoom;
     if (scale < min || scale > max) {
       console.warn(
@@ -138,7 +141,7 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
       );
     }
     const clampedScale = Math.max(min, Math.min(max, scale));
-    this.flowCore.commandHandler.emit('zoom', { scale: clampedScale, x, y });
+    return this.flowCore.commandHandler.emit('zoom', { scale: clampedScale, x, y });
   }
 
   // ===================
@@ -149,13 +152,14 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * Zooms the viewport by the specified factor.
    * @param factor The factor to zoom by (e.g., 1.1 for 10% zoom in, 0.9 for 10% zoom out).
    * @param center The center point to zoom towards.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  zoom(factor: number, center?: Point | undefined) {
+  zoom(factor: number, center?: Point | undefined): Promise<void> {
     const currentScale = this.scale();
     const newScale = currentScale * factor;
     const x = center?.x ?? this.viewport().x;
     const y = center?.y ?? this.viewport().y;
-    this.flowCore.commandHandler.emit('zoom', { scale: newScale, x, y });
+    return this.flowCore.commandHandler.emit('zoom', { scale: newScale, x, y });
   }
 
   /**
@@ -209,8 +213,8 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
     nodeIds?: string[];
     edgeIds?: string[];
     padding?: number | [number, number] | [number, number, number] | [number, number, number, number];
-  }) {
-    this.flowCore.commandHandler.emit('zoomToFit', options ?? {});
+  }): Promise<void> {
+    return this.flowCore.commandHandler.emit('zoomToFit', options ?? {});
   }
 
   // ===================
@@ -231,16 +235,18 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * ```
    *
    * @param nodeOrId The ID of the node or the node object to center on.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  centerOnNode(nodeOrId: string | Node) {
-    this.flowCore.commandHandler.emit('centerOnNode', { nodeOrId });
+  centerOnNode(nodeOrId: string | Node): Promise<void> {
+    return this.flowCore.commandHandler.emit('centerOnNode', { nodeOrId });
   }
 
   /**
    * Centers the rectangle within the current viewport bounds.
    * @param rect The rectangle to center on.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  centerOnRect(rect: Rect) {
-    this.flowCore.commandHandler.emit('centerOnRect', { rect });
+  centerOnRect(rect: Rect): Promise<void> {
+    return this.flowCore.commandHandler.emit('centerOnRect', { rect });
   }
 }

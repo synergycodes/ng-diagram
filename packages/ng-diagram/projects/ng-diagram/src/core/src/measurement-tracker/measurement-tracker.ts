@@ -87,6 +87,13 @@ export class MeasurementTracker {
   }
 
   /**
+   * Clears a staged tracking request.
+   */
+  cancelTrackingRequest(): void {
+    this.pendingConfig = null;
+  }
+
+  /**
    * Registers entities that participated in the transaction.
    * Consumes the pending config from `requestTracking()`.
    *

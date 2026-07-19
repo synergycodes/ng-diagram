@@ -38,3 +38,8 @@ __tmp__*
 
 # Kiro
 .kiro
+
+.claude
+CLAUDE.md
+ngdiagram_architecture_map.md
+KNOWLEDGE_TRANSFER.md

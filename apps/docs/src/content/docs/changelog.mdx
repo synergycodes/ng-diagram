@@ -14,9 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Improved trackpad gestures support** - panning with a trackpad now smoothly pans the diagram. Pinching defaults to zooming in/out on the diagram ([#717](https://github.com/synergycodes/ng-diagram/pull/717))
+- **Awaitable service methods** — every mutating method on the public services (`NgDiagramModelService`, `NgDiagramNodeService`, `NgDiagramSelectionService`, `NgDiagramClipboardService`, `NgDiagramGroupsService`, `NgDiagramViewportService`) now returns a `Promise<void>` that resolves only after the middleware chain has run and the change has been committed to the model. `CommandHandler.emit` resolves at the same point, and commands await their nested emits. Call sites are backward compatible (`void` → `Promise<void>`). Note: Angular signals (`NgDiagramModelService.nodes()` etc.) still refresh asynchronously after the promise resolves. **Do not await these promises from inside a middleware** — the middleware chain runs inside the update lock and the await would deadlock; fire-and-forget calls queue safely ([#TBD](https://github.com/synergycodes/ng-diagram/pull/TBD))
 
 ### Added
+
+- `waitForMeasurements` option on content-creating and updating service methods — `addNodes`, `addEdges`, `updateNode`, `updateNodes`, `updateEdge`, `updateEdges` on `NgDiagramModelService` and `resizeNode` on `NgDiagramNodeService` accept `options?: { waitForMeasurements?: boolean }`; when set, the returned promise resolves only after measurements triggered by the change have completed, so `zoomToFit()`/`centerOnNode()` can be called immediately after ([#TBD](https://github.com/synergycodes/ng-diagram/pull/TBD))
+
+### Fixed
+
+- **Drag re-entrancy hardening** — the node-drag handler no longer loses or double-applies movement when command emits suspend on asynchronous middleware, and a fast re-drag no longer gets its state clobbered by the previous drag's asynchronous cleanup ([#TBD](https://github.com/synergycodes/ng-diagram/pull/TBD))
+
+## [1.2.4] - 2026-06-02
+
+### Changed
+
+- **Improved trackpad gestures support** - panning with a trackpad now smoothly pans the diagram. Pinching defaults to zooming in/out on the diagram ([#717](https://github.com/synergycodes/ng-diagram/pull/717))
 
 ### Fixed
 
@@ -274,7 +286,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.3...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.4...HEAD
+[1.2.4]: https://github.com/synergycodes/ng-diagram/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/synergycodes/ng-diagram/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/synergycodes/ng-diagram/compare/v1.2.0...v1.2.1

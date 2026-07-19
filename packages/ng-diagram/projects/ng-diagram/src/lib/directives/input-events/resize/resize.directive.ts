@@ -1,6 +1,7 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node, ResizeDirection } from '../../../../core/src';
 
+import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, type PointerInputEvent } from '../../../types/pointer-event';
@@ -15,18 +16,31 @@ import { DiagramEventName, type PointerInputEvent } from '../../../types/pointer
 export class ResizeDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly touchEventsStateService = inject(TouchEventsStateService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private gestureActive = false;
   direction = input.required<ResizeDirection>();
   targetData = input.required<Node>();
 
   ngOnDestroy() {
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    // Destroyed mid-gesture (e.g. the node was deleted while resizing): the pointerup
+    // will never be routed, so the resize state must be cleared here — a leaked
+    // resize state suppresses every subsequent node size measurement.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+      if (this.flowCoreProvider.isInitialized()) {
+        this.flowCoreProvider.provide().actionStateManager.clearResize();
+      }
+    }
   }
   onPointerDown(event: PointerInputEvent): void {
     if (!this.shouldHandle(event)) {
       return;
     }
 
+    this.gestureActive = true;
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Resize);
 
     event.preventDefault();
@@ -51,6 +65,7 @@ export class ResizeDirective implements OnDestroy {
   }
 
   onPointerUp = (event: PointerEvent) => {
+    this.gestureActive = false;
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
 

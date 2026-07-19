@@ -23,33 +23,37 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
    * Adds nodes to a group.
    * @param groupId The ID of the group to add nodes to.
    * @param nodeIds Array of node IDs to add to the group.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  addToGroup(groupId: string, nodeIds: string[]) {
-    this.flowCore.commandHandler.emit('addToGroup', { groupId, nodeIds });
+  addToGroup(groupId: string, nodeIds: string[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('addToGroup', { groupId, nodeIds });
   }
 
   /**
    * Highlights a group.
    * @param groupId The ID of the group to highlight.
    * @param nodes The nodes to highlight as part of the group.
+   * @returns A promise that resolves once the change has been applied.
    */
-  highlightGroup(groupId: string, nodes: Node[]) {
-    this.flowCore.commandHandler.emit('highlightGroup', { groupId, nodes });
+  highlightGroup(groupId: string, nodes: Node[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('highlightGroup', { groupId, nodes });
   }
 
   /**
    * Clears all group highlights.
+   * @returns A promise that resolves once the change has been applied.
    */
-  highlightGroupClear() {
-    this.flowCore.commandHandler.emit('highlightGroupClear');
+  highlightGroupClear(): Promise<void> {
+    return this.flowCore.commandHandler.emit('highlightGroupClear');
   }
 
   /**
    * Removes nodes from a group.
    * @param groupId The ID of the group to remove nodes from.
    * @param nodeIds Array of node IDs to remove from the group.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  removeFromGroup(groupId: string, nodeIds: string[]) {
-    this.flowCore.commandHandler.emit('removeFromGroup', { groupId, nodeIds });
+  removeFromGroup(groupId: string, nodeIds: string[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('removeFromGroup', { groupId, nodeIds });
   }
 }

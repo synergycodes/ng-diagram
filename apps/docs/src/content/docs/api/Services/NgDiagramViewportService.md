@@ -87,7 +87,7 @@ Returns the minimum zoom scale from the diagram configuration.
 
 ### centerOnNode()
 
-> **centerOnNode**(`nodeOrId`): `void`
+> **centerOnNode**(`nodeOrId`): `Promise`\<`void`\>
 
 Centers the Node within the current viewport bounds.
 
@@ -101,7 +101,9 @@ The ID of the node or the node object to center on.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 #### Remarks
 
@@ -118,7 +120,7 @@ this.viewportService.centerOnNode(newNode.id); // Now centers correctly
 
 ### centerOnRect()
 
-> **centerOnRect**(`rect`): `void`
+> **centerOnRect**(`rect`): `Promise`\<`void`\>
 
 Centers the rectangle within the current viewport bounds.
 
@@ -132,7 +134,9 @@ The rectangle to center on.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
@@ -204,7 +208,7 @@ Client position.
 
 ### moveViewport()
 
-> **moveViewport**(`x`, `y`): `void`
+> **moveViewport**(`x`, `y`): `Promise`\<`void`\>
 
 Moves the viewport to the specified coordinates.
 
@@ -224,13 +228,15 @@ The y-coordinate to move the viewport to.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### moveViewportBy()
 
-> **moveViewportBy**(`dx`, `dy`): `void`
+> **moveViewportBy**(`dx`, `dy`): `Promise`\<`void`\>
 
 Moves the viewport by the specified amounts.
 
@@ -250,13 +256,15 @@ The amount to move the viewport in the y-direction.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### setViewport()
 
-> **setViewport**(`x`, `y`, `scale`): `void`
+> **setViewport**(`x`, `y`, `scale`): `Promise`\<`void`\>
 
 Sets the viewport to an absolute position and scale.
 
@@ -282,7 +290,9 @@ The absolute zoom scale (clamped to configured min/max).
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 #### Example
 
@@ -299,7 +309,7 @@ this.viewportService.setViewport(0, 0, 0.5);
 
 ### zoom()
 
-> **zoom**(`factor`, `center?`): `void`
+> **zoom**(`factor`, `center?`): `Promise`\<`void`\>
 
 Zooms the viewport by the specified factor.
 
@@ -319,13 +329,15 @@ The center point to zoom towards.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### zoomToFit()
 
-> **zoomToFit**(`options?`): `void`
+> **zoomToFit**(`options?`): `Promise`\<`void`\>
 
 Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
 
@@ -359,7 +371,7 @@ Padding around the content (default: 50). Supports CSS-like syntax:
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
 
 #### Remarks
 

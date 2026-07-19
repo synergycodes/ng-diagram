@@ -24,7 +24,7 @@ this.nodeService.moveNodesBy([node1, node2], { x: 10, y: 20 });
 
 ### bringToFront()
 
-> **bringToFront**(`nodeIds?`, `edgeIds?`): `void`
+> **bringToFront**(`nodeIds?`, `edgeIds?`): `Promise`\<`void`\>
 
 Brings the specified nodes and edges to the front (highest z-index).
 
@@ -44,13 +44,15 @@ Array of edge IDs to bring to front.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### moveNodesBy()
 
-> **moveNodesBy**(`nodes`, `delta`): `void`
+> **moveNodesBy**(`nodes`, `delta`): `Promise`\<`void`\>
 
 Moves nodes by the specified amounts.
 
@@ -70,13 +72,15 @@ The amount to move the nodes by.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### resizeNode()
 
-> **resizeNode**(`id`, `size`, `position?`, `disableAutoSize?`): `void`
+> **resizeNode**(`id`, `size`, `position?`, `disableAutoSize?`, `options?`): `Promise`\<`void`\>
 
 Resizes a node to the specified dimensions.
 `Node.autoSize` must be set to false to resize a node.
@@ -107,15 +111,26 @@ Optional new position of the node.
 
 Optional flag to disable auto-sizing.
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the resize have completed. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### rotateNodeTo()
 
-> **rotateNodeTo**(`nodeId`, `angle`): `void`
+> **rotateNodeTo**(`nodeId`, `angle`): `Promise`\<`void`\>
 
 Rotates a node to the specified angle.
 
@@ -135,13 +150,15 @@ The rotation angle in degrees.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### sendToBack()
 
-> **sendToBack**(`nodeIds?`, `edgeIds?`): `void`
+> **sendToBack**(`nodeIds?`, `edgeIds?`): `Promise`\<`void`\>
 
 Sends the specified nodes and edges to the back (lowest z-index).
 
@@ -161,4 +178,6 @@ Array of edge IDs to send to back.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).

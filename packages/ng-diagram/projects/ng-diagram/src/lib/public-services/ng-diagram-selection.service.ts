@@ -34,31 +34,35 @@ export class NgDiagramSelectionService extends NgDiagramBaseService {
    * Selects nodes and edges by their IDs.
    * @param nodeIds Array of node IDs to select.
    * @param edgeIds Array of edge IDs to select.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  select(nodeIds: string[] = [], edgeIds: string[] = []) {
-    this.flowCore.commandHandler.emit('select', { nodeIds, edgeIds });
+  select(nodeIds: string[] = [], edgeIds: string[] = []): Promise<void> {
+    return this.flowCore.commandHandler.emit('select', { nodeIds, edgeIds });
   }
 
   /**
    * Deselects nodes and edges by their IDs.
    * @param nodeIds Array of node IDs to deselect.
    * @param edgeIds Array of edge IDs to deselect.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  deselect(nodeIds: string[] = [], edgeIds: string[] = []) {
-    this.flowCore.commandHandler.emit('deselect', { nodeIds, edgeIds });
+  deselect(nodeIds: string[] = [], edgeIds: string[] = []): Promise<void> {
+    return this.flowCore.commandHandler.emit('deselect', { nodeIds, edgeIds });
   }
 
   /**
    * Deselects all currently selected nodes and edges.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  deselectAll() {
-    this.flowCore.commandHandler.emit('deselectAll');
+  deselectAll(): Promise<void> {
+    return this.flowCore.commandHandler.emit('deselectAll');
   }
 
   /**
    * Deletes the current selection of nodes and edges.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  deleteSelection() {
-    this.flowCore.commandHandler.emit('deleteSelection');
+  deleteSelection(): Promise<void> {
+    return this.flowCore.commandHandler.emit('deleteSelection');
   }
 }

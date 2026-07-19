@@ -1,0 +1,189 @@
+<div class="awaitable-tests">
+  <div class="toolbar-row">
+    <button (click)="exit.emit()">Exit</button>
+    <span class="separator">|</span>
+    <button
+      (click)="runAll()"
+      [disabled]="isRunning()"
+      title="Runs all 12 scenarios in order and verifies the state after each one automatically"
+    >
+      ▶ Run All (auto-verify)
+    </button>
+    @if (summary(); as s) {
+      <span class="summary">{{ s }}</span>
+    }
+    <span class="separator">|</span>
+    <button (click)="zoomToTestArea()" title="Fit the whole diagram (including the test column) into view">
+      Zoom to Fit
+    </button>
+    <span class="hint">Test nodes stack in one column in the visible area; hover a button for details.</span>
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">Read right after await:</span>
+    <button
+      (click)="testFreshAfterAdd()"
+      [disabled]="isRunning()"
+      title="S1: await addNodes(), then read the model in the very next line — the node must already be there. Also reports (info only) that Angular signals still lag behind."
+    >
+      S1 add → instant read
+    </button>
+    <button
+      (click)="testFreshAfterUpdate()"
+      [disabled]="isRunning()"
+      title="S2: adds a node, waits 0.5s so you can see it, then await updateNode() moves it right — the new position must be readable immediately after the await."
+    >
+      S2 update → instant read
+    </button>
+    <button
+      (click)="testFreshAfterDelete()"
+      [disabled]="isRunning()"
+      title="S3: adds a node labelled 'will be DELETED', waits 0.5s so you can see it, then await deleteNodes() — the node must be gone from the model immediately after the await (watch it vanish)."
+    >
+      S3 delete → instant read
+    </button>
+    <button
+      (click)="testDeleteThenReadd()"
+      [disabled]="isRunning()"
+      title="S4: tight chain with NO pauses — await add, await delete (verify gone), await re-add with the SAME id. Works only because each awaited step committed; inside one transaction this sequence would not work (adds apply before removes). Too fast to watch — see the results panel."
+    >
+      S4 delete, then re-add same id
+    </button>
+    <button
+      (click)="testFreshWithAsyncMiddleware()"
+      [disabled]="isRunning()"
+      title="S5 (the key regression test): registers a middleware that delays every update by 20ms on a macrotask, then await updateNode(). The await must span the delay AND the read must be fresh. On the old implementation both assertions failed 100% of the time."
+    >
+      S5 slow middleware → still fresh
+    </button>
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">waitForMeasurements:</span>
+    <button
+      (click)="testWaitForMeasurementsAdd()"
+      [disabled]="isRunning()"
+      title="S6: await addNodes(..., { waitForMeasurements: true }) — when the promise resolves, node.size must already be measured (>0), so zoomToFit()/centerOnNode() right after is safe."
+    >
+      S6 add + measured on resolve
+    </button>
+    <button
+      (click)="testWaitForMeasurementsDataOnly()"
+      [disabled]="isRunning()"
+      title="S7: waitForMeasurements on an update of a data field that is NOT rendered anywhere — guaranteed zero measurement activity. The promise must still RESOLVE (via the discovery-window timeout, not hang) and the data must be applied."
+    >
+      S7 no-measure update resolves
+    </button>
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">Transactions:</span>
+    <button
+      (click)="testTransactionCommit()"
+      [disabled]="isRunning()"
+      title="S8: a transaction adds two nodes and an edge with awaited calls inside. Mid-callback the model must NOT contain them yet (only queued); after the awaited transaction resolves, everything must be committed."
+    >
+      S8 atomic commit
+    </button>
+    <button
+      (click)="testTransactionRollback()"
+      [disabled]="isRunning()"
+      title="S9: the transaction callback adds a node and then throws — the awaited transaction must reject and the node must never reach the model."
+    >
+      S9 rollback on error
+    </button>
+    <button
+      (click)="testWaitForMeasurementsInsideTransaction()"
+      [disabled]="isRunning()"
+      title="S10: waitForMeasurements on a service call INSIDE a transaction is ignored with a console.warn (asserted), and the node still commits with the transaction. Guards the old transaction-stack corruption bug."
+    >
+      S10 wfm inside tx → warn
+    </button>
+    <button
+      (click)="testOrphanNestedTransaction()"
+      [disabled]="isRunning()"
+      title="S11: a nested transaction fired WITHOUT await outlives its parent. Updates from both must survive (they used to be silently lost) and a console.warn 'outlived its parent' must appear (asserted)."
+    >
+      S11 orphaned nested tx
+    </button>
+    <span class="separator">|</span>
+    <span class="group-label">Errors:</span>
+    <button
+      (click)="testThrowingMiddleware()"
+      [disabled]="isRunning()"
+      title="S12: a middleware throws for one specific node. The awaited update must REJECT with that error (it used to freeze the diagram forever), the next update must apply normally (lock released), and NO unhandled-rejection error may leak to the console."
+    >
+      S12 throwing middleware → reject, not freeze
+    </button>
+    <button
+      (click)="testNestedEmitAwaited()"
+      [disabled]="isRunning()"
+      title="S13: addToGroup internally emits highlightGroupClear. Right after `await addToGroup` the group's `highlighted` model property must ALREADY be false — proving commands await their nested emits."
+    >
+      S13 nested emit awaited (group highlight)
+    </button>
+    <button
+      (click)="testTrackingNotHijacked()"
+      [disabled]="isRunning()"
+      title="S14: an un-awaited decoy update (slowed by middleware) overlaps addNodes(waitForMeasurements). The tracking request must belong to the add's own pass — pre-fix the decoy consumed it and the promise resolved before the added node was measured."
+    >
+      S14 tracking not hijacked by concurrent update
+    </button>
+  </div>
+
+  @if (virtualizationEnabled) {
+    <div class="warning">
+      ⚠ Virtualization is enabled — measurement scenarios may be unreliable for off-screen nodes. Reinitialize the
+      model first.
+    </div>
+  }
+
+  @if (results().length > 0) {
+    <div class="results">
+      @for (result of results(); track result.name) {
+        <div class="result" [class.pass]="result.passed" [class.fail]="!result.passed">
+          <span class="status">{{ result.passed ? '✅' : '❌' }}</span>
+          <span class="name">{{ result.name }}</span>
+          <span class="elapsed">{{ result.elapsed.toFixed(0) }}ms</span>
+          @if (result.passed) {
+            <span class="details">{{ result.details }}</span>
+          }
+          @if (!result.passed) {
+            <ul class="failures">
+              @for (failure of result.failures; track failure) {
+                <li>{{ failure }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <details class="manual">
+    <summary>Manual gesture checks (cannot be automated here)</summary>
+    <ol>
+      <li>
+        <strong>Fast re-drag</strong>: drag a node, release, and immediately grab and drag it again — the second drag
+        must move the node (no dead gesture).
+      </li>
+      <li>
+        <strong>Drag with slow middleware</strong>: run "S5" first to confirm awaits span middleware; then drag a node
+        quickly — movement must track the pointer exactly (no jitter, no double-applied movement).
+      </li>
+      <li>
+        <strong>Delete mid-resize</strong>: select a node, start dragging a resize handle, press
+        <code>Delete</code> while still holding the button. Then edit another node so its content grows — its size must
+        still update (no frozen measurements).
+      </li>
+      <li>
+        <strong>Link, then immediately re-link</strong>: draw an edge between ports, then instantly start a new link
+        from another port — the temporary edge must appear and the new link must complete.
+      </li>
+      <li>
+        <strong>Console</strong>: after any FAIL, check the console — every scenario logs PASS/FAIL with details;
+        scenario warns ("ignored inside a transaction", "outlived its parent") are expected and asserted.
+      </li>
+    </ol>
+  </details>
+</div>

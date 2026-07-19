@@ -29,10 +29,13 @@
     <app-batch-test-toolbar (exit)="exitBatchTest()" />
   } @else if (measurementTestMode()) {
     <app-measurement-tests (exit)="exitMeasurementTest()" />
+  } @else if (awaitableTestMode()) {
+    <app-awaitable-tests (exit)="exitAwaitableTest()" />
   } @else {
     <app-toolbar
       (enterBatchTest)="enterBatchTest()"
       (measurementTestEnter)="enterMeasurementTest()"
+      (awaitableTestEnter)="enterAwaitableTest()"
       (testVirtualizationClick)="enableVirtualizationTest()"
       (reinitializeModelClick)="onReinitializeModel()"
       (saveModelClick)="onSaveModel()"

@@ -96,17 +96,56 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   /**
    * Adds new edges to the diagram.
    * @param edges Array of edges to add.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after the
+   * added elements (e.g. edge labels) have been measured. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  addEdges(edges: Edge[]) {
-    this.flowCore.commandHandler.emit('addEdges', { edges });
+  addEdges(edges: Edge[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    // Read the engine synchronously so an uninitialized diagram throws synchronously
+    // instead of surfacing an unhandled promise rejection.
+    const flowCore = this.flowCore;
+    if (this.canWaitForMeasurements(options)) {
+      return flowCore
+        .transaction(
+          'addEdges',
+          async (tx) => {
+            await tx.emit('addEdges', { edges });
+          },
+          // Spread the caller's options so internal tuning fields (e.g. the
+          // measurement discovery-window escape hatch) reach the transaction.
+          { ...options, waitForMeasurements: true }
+        )
+        .then(() => undefined);
+    }
+    return flowCore.commandHandler.emit('addEdges', { edges });
   }
 
   /**
    * Adds new nodes to the diagram.
    * @param nodes Array of nodes to add.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after the
+   * added nodes have been measured — useful before calling `zoomToFit()` or `centerOnNode()`.
+   * Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  addNodes(nodes: Node[]) {
-    this.flowCore.commandHandler.emit('addNodes', { nodes });
+  addNodes(nodes: Node[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    // Read the engine synchronously so an uninitialized diagram throws synchronously
+    // instead of surfacing an unhandled promise rejection.
+    const flowCore = this.flowCore;
+    if (this.canWaitForMeasurements(options)) {
+      return flowCore
+        .transaction(
+          'addNodes',
+          async (tx) => {
+            await tx.emit('addNodes', { nodes });
+          },
+          // Spread the caller's options so internal tuning fields (e.g. the
+          // measurement discovery-window escape hatch) reach the transaction.
+          { ...options, waitForMeasurements: true }
+        )
+        .then(() => undefined);
+    }
+    return flowCore.commandHandler.emit('addNodes', { nodes });
   }
 
   // ===================
@@ -282,9 +321,28 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * Updates the properties of an edge.
    * @param edgeId Edge id.
    * @param edge New edge properties.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  updateEdge(edgeId: string, edge: Partial<Edge>) {
-    this.flowCore.commandHandler.emit('updateEdge', {
+  updateEdge(edgeId: string, edge: Partial<Edge>, options?: { waitForMeasurements?: boolean }): Promise<void> {
+    // Read the engine synchronously so an uninitialized diagram throws synchronously
+    // instead of surfacing an unhandled promise rejection.
+    const flowCore = this.flowCore;
+    if (this.canWaitForMeasurements(options)) {
+      return flowCore
+        .transaction(
+          'updateEdge',
+          async (tx) => {
+            await tx.emit('updateEdge', { id: edgeId, edgeChanges: { ...edge } });
+          },
+          // Spread the caller's options so internal tuning fields (e.g. the
+          // measurement discovery-window escape hatch) reach the transaction.
+          { ...options, waitForMeasurements: true }
+        )
+        .then(() => undefined);
+    }
+    return flowCore.commandHandler.emit('updateEdge', {
       id: edgeId,
       edgeChanges: { ...edge },
     });
@@ -295,9 +353,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @typeParam T - The type of the edge's `data` property. Defaults to `DataObject`.
    * @param edgeId Edge id.
    * @param data New data to set for the edge.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T) {
-    this.flowCore.commandHandler.emit('updateEdge', {
+  updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T): Promise<void> {
+    return this.flowCore.commandHandler.emit('updateEdge', {
       id: edgeId,
       edgeChanges: {
         data: data,
@@ -309,9 +368,28 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * Updates the properties of a node.
    * @param nodeId Node id.
    * @param node New node properties.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  updateNode(nodeId: string, node: Partial<Node>) {
-    this.flowCore.commandHandler.emit('updateNode', {
+  updateNode(nodeId: string, node: Partial<Node>, options?: { waitForMeasurements?: boolean }): Promise<void> {
+    // Read the engine synchronously so an uninitialized diagram throws synchronously
+    // instead of surfacing an unhandled promise rejection.
+    const flowCore = this.flowCore;
+    if (this.canWaitForMeasurements(options)) {
+      return flowCore
+        .transaction(
+          'updateNode',
+          async (tx) => {
+            await tx.emit('updateNode', { id: nodeId, nodeChanges: { ...node } });
+          },
+          // Spread the caller's options so internal tuning fields (e.g. the
+          // measurement discovery-window escape hatch) reach the transaction.
+          { ...options, waitForMeasurements: true }
+        )
+        .then(() => undefined);
+    }
+    return flowCore.commandHandler.emit('updateNode', {
       id: nodeId,
       nodeChanges: { ...node },
     });
@@ -322,9 +400,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @typeParam T - The type of the node's `data` property. Defaults to `DataObject`.
    * @param nodeId Node id.
    * @param data New data to set for the node.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T) {
-    this.flowCore.commandHandler.emit('updateNode', {
+  updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T): Promise<void> {
+    return this.flowCore.commandHandler.emit('updateNode', {
       id: nodeId,
       nodeChanges: {
         data: data,
@@ -335,17 +414,55 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   /**
    * Updates multiple nodes at once.
    * @param nodes Array of node updates (must include id and any properties to update).
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  updateNodes(nodes: (Pick<Node, 'id'> & Partial<Node>)[]) {
-    this.flowCore.commandHandler.emit('updateNodes', { nodes });
+  updateNodes(nodes: (Pick<Node, 'id'> & Partial<Node>)[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    // Read the engine synchronously so an uninitialized diagram throws synchronously
+    // instead of surfacing an unhandled promise rejection.
+    const flowCore = this.flowCore;
+    if (this.canWaitForMeasurements(options)) {
+      return flowCore
+        .transaction(
+          'updateNodes',
+          async (tx) => {
+            await tx.emit('updateNodes', { nodes });
+          },
+          // Spread the caller's options so internal tuning fields (e.g. the
+          // measurement discovery-window escape hatch) reach the transaction.
+          { ...options, waitForMeasurements: true }
+        )
+        .then(() => undefined);
+    }
+    return flowCore.commandHandler.emit('updateNodes', { nodes });
   }
 
   /**
    * Updates multiple edges at once.
    * @param edges Array of edge updates (must include id and any properties to update).
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]) {
-    this.flowCore.commandHandler.emit('updateEdges', { edges });
+  updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    // Read the engine synchronously so an uninitialized diagram throws synchronously
+    // instead of surfacing an unhandled promise rejection.
+    const flowCore = this.flowCore;
+    if (this.canWaitForMeasurements(options)) {
+      return flowCore
+        .transaction(
+          'updateEdges',
+          async (tx) => {
+            await tx.emit('updateEdges', { edges });
+          },
+          // Spread the caller's options so internal tuning fields (e.g. the
+          // measurement discovery-window escape hatch) reach the transaction.
+          { ...options, waitForMeasurements: true }
+        )
+        .then(() => undefined);
+    }
+    return flowCore.commandHandler.emit('updateEdges', { edges });
   }
 
   // ===================
@@ -355,17 +472,38 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   /**
    * Deletes edges by their IDs.
    * @param ids Array of edge IDs to delete.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  deleteEdges(ids: string[]) {
-    this.flowCore.commandHandler.emit('deleteEdges', { ids });
+  deleteEdges(ids: string[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('deleteEdges', { ids });
   }
 
   /**
    * Deletes nodes by their IDs.
    * @param ids Array of node IDs to delete.
+   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
    */
-  deleteNodes(ids: string[]) {
-    this.flowCore.commandHandler.emit('deleteNodes', { ids });
+  deleteNodes(ids: string[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('deleteNodes', { ids });
+  }
+
+  /**
+   * waitForMeasurements is implemented as a named transaction. Inside an already
+   * active transaction that inner transaction would suspend past the outer commit
+   * (and an un-awaited call would corrupt the transaction stack), so the option is
+   * ignored there — the outer transaction owns the timing.
+   */
+  private canWaitForMeasurements(options?: { waitForMeasurements?: boolean }): boolean {
+    if (!options?.waitForMeasurements) {
+      return false;
+    }
+    if (this.flowCore.transactionManager.isActive()) {
+      console.warn(
+        '[ngDiagram] waitForMeasurements is ignored inside a transaction — pass { waitForMeasurements: true } to the transaction itself instead.'
+      );
+      return false;
+    }
+    return true;
   }
 
   private modelListener = (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => {

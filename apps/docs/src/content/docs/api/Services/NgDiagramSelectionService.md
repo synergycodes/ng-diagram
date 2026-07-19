@@ -32,19 +32,21 @@ Returns a computed signal for the current selection of nodes and edges.
 
 ### deleteSelection()
 
-> **deleteSelection**(): `void`
+> **deleteSelection**(): `Promise`\<`void`\>
 
 Deletes the current selection of nodes and edges.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### deselect()
 
-> **deselect**(`nodeIds`, `edgeIds`): `void`
+> **deselect**(`nodeIds`, `edgeIds`): `Promise`\<`void`\>
 
 Deselects nodes and edges by their IDs.
 
@@ -64,25 +66,29 @@ Array of edge IDs to deselect.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### deselectAll()
 
-> **deselectAll**(): `void`
+> **deselectAll**(): `Promise`\<`void`\>
 
 Deselects all currently selected nodes and edges.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### select()
 
-> **select**(`nodeIds`, `edgeIds`): `void`
+> **select**(`nodeIds`, `edgeIds`): `Promise`\<`void`\>
 
 Selects nodes and edges by their IDs.
 
@@ -102,4 +108,6 @@ Array of edge IDs to select.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).

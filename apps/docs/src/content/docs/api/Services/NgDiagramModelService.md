@@ -52,7 +52,7 @@ Readonly signal of current nodes in the diagram.
 
 ### addEdges()
 
-> **addEdges**(`edges`): `void`
+> **addEdges**(`edges`, `options?`): `Promise`\<`void`\>
 
 Adds new edges to the diagram.
 
@@ -64,15 +64,26 @@ Adds new edges to the diagram.
 
 Array of edges to add.
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after the
+added elements (e.g. edge labels) have been measured. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### addNodes()
 
-> **addNodes**(`nodes`): `void`
+> **addNodes**(`nodes`, `options?`): `Promise`\<`void`\>
 
 Adds new nodes to the diagram.
 
@@ -84,9 +95,21 @@ Adds new nodes to the diagram.
 
 Array of nodes to add.
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after the
+added nodes have been measured — useful before calling `zoomToFit()` or `centerOnNode()`.
+Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
@@ -124,7 +147,7 @@ Computes the axis-aligned bounding rectangle that contains all specified nodes a
 
 ### deleteEdges()
 
-> **deleteEdges**(`ids`): `void`
+> **deleteEdges**(`ids`): `Promise`\<`void`\>
 
 Deletes edges by their IDs.
 
@@ -138,13 +161,15 @@ Array of edge IDs to delete.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### deleteNodes()
 
-> **deleteNodes**(`ids`): `void`
+> **deleteNodes**(`ids`): `Promise`\<`void`\>
 
 Deletes nodes by their IDs.
 
@@ -158,7 +183,9 @@ Array of node IDs to delete.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
@@ -631,7 +658,7 @@ The model as a JSON string.
 
 ### updateEdge()
 
-> **updateEdge**(`edgeId`, `edge`): `void`
+> **updateEdge**(`edgeId`, `edge`, `options?`): `Promise`\<`void`\>
 
 Updates the properties of an edge.
 
@@ -649,15 +676,26 @@ Edge id.
 
 New edge properties.
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the update have completed. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### updateEdgeData()
 
-> **updateEdgeData**\<`T`\>(`edgeId`, `data`): `void`
+> **updateEdgeData**\<`T`\>(`edgeId`, `data`): `Promise`\<`void`\>
 
 Updates the data of an edge.
 
@@ -685,13 +723,15 @@ New data to set for the edge.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### updateEdges()
 
-> **updateEdges**(`edges`): `void`
+> **updateEdges**(`edges`, `options?`): `Promise`\<`void`\>
 
 Updates multiple edges at once.
 
@@ -703,15 +743,26 @@ Updates multiple edges at once.
 
 Array of edge updates (must include id and any properties to update).
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the update have completed. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### updateNode()
 
-> **updateNode**(`nodeId`, `node`): `void`
+> **updateNode**(`nodeId`, `node`, `options?`): `Promise`\<`void`\>
 
 Updates the properties of a node.
 
@@ -729,15 +780,26 @@ Node id.
 
 New node properties.
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the update have completed. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### updateNodeData()
 
-> **updateNodeData**\<`T`\>(`nodeId`, `data`): `void`
+> **updateNodeData**\<`T`\>(`nodeId`, `data`): `Promise`\<`void`\>
 
 Updates the data of a node.
 
@@ -765,13 +827,15 @@ New data to set for the node.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
 
 ***
 
 ### updateNodes()
 
-> **updateNodes**(`nodes`): `void`
+> **updateNodes**(`nodes`, `options?`): `Promise`\<`void`\>
 
 Updates multiple nodes at once.
 
@@ -783,6 +847,17 @@ Updates multiple nodes at once.
 
 Array of node updates (must include id and any properties to update).
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the update have completed. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).

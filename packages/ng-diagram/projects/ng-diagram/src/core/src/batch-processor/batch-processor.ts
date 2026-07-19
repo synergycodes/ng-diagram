@@ -41,6 +41,7 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
   private readonly pendingDeletes = new Map<string, PendingEntry<string>>();
 
   private flushScheduled = false;
+  private lastFlush: Promise<void> = Promise.resolve();
 
   constructor(private readonly getMeasuredIds?: GetMeasuredIdsFn) {}
 
@@ -62,7 +63,16 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
   private scheduleFlush(): void {
     if (!this.flushScheduled) {
       this.flushScheduled = true;
-      queueMicrotask(() => void this.flush());
+      // Chain onto the previous flush so generations cannot interleave — flush
+      // callbacks await full state-update passes, and a delete from flush N must
+      // reach the model before an add from flush N+1 for the same item.
+      queueMicrotask(() => {
+        this.lastFlush = this.lastFlush
+          .then(() => this.flush())
+          .catch((error) => {
+            console.error('[ngDiagram] BatchProcessor flush failed.', error);
+          });
+      });
     }
   }
 
@@ -107,7 +117,13 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
     }
 
     for (const [callback, data] of byCallback) {
-      await callback(data);
+      try {
+        await callback(data);
+      } catch (error) {
+        // The pending queues were already drained for this generation — a rejecting
+        // callback must not discard the remaining callbacks' items.
+        console.error('[ngDiagram] BatchProcessor flush callback failed.', error);
+      }
     }
   }
 

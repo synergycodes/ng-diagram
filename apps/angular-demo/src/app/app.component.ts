@@ -35,6 +35,7 @@ import {
   type Node,
   type Port,
 } from 'ng-diagram';
+import { AwaitableTestsComponent } from './awaitable-tests/awaitable-tests.component';
 import { defaultModel } from './data/default-model';
 import { downloadedModel } from './data/downloaded-model';
 import { generateDynamicPortsTestModel } from './data/dynamic-ports-test-model';
@@ -62,6 +63,7 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
     ToolbarComponent,
     BatchTestToolbarComponent,
     MeasurementTestsComponent,
+    AwaitableTestsComponent,
     PaletteComponent,
     NgDiagramComponent,
     NgDiagramBackgroundComponent,
@@ -100,7 +102,7 @@ export class AppComponent {
       cellSize: { width: 10, height: 10 },
     },
     snapping: {
-      shouldSnapDragForNode: () => true,
+      shouldSnapDragForNode: () => false,
     },
     linking: {
       selectNodeOnPortPress: false,
@@ -134,6 +136,7 @@ export class AppComponent {
 
   batchTestMode = signal(false);
   measurementTestMode = signal(false);
+  awaitableTestMode = signal(false);
 
   enterMeasurementTest(): void {
     this.measurementTestMode.set(true);
@@ -141,6 +144,14 @@ export class AppComponent {
 
   exitMeasurementTest(): void {
     this.measurementTestMode.set(false);
+  }
+
+  enterAwaitableTest(): void {
+    this.awaitableTestMode.set(true);
+  }
+
+  exitAwaitableTest(): void {
+    this.awaitableTestMode.set(false);
   }
 
   private savedModelData: Partial<{ nodes: Node[]; edges: Edge[] }> | null = null;

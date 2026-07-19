@@ -1,3 +1,4 @@
+import { createLinkingState } from '../../../command-handler/commands/linking/linking-gesture';
 import { EventHandler } from '../event-handler';
 import { LinkingInputEvent } from './linking.event';
 
@@ -25,11 +26,11 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
           throw new Error(LINKING_MISSING_TARGET_ERROR(event));
         }
 
-        this.flow.actionStateManager.linking = {
+        this.flow.actionStateManager.linking = createLinkingState({
           sourceNodeId,
           sourcePortId: event.portId,
           temporaryEdge: null,
-        };
+        });
 
         this.flow.commandHandler.emit('startLinking', {
           source: sourceNodeId,
