@@ -166,6 +166,10 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * Automatically adjusts the viewport to fit all diagram content (or a specified subset) within the visible area.
    *
    * @remarks
+   * Always `await` the preceding model mutation (e.g. `await modelService.deleteNodes(...)`)
+   * before calling `zoomToFit()` — an un-awaited mutation is not yet committed when
+   * `zoomToFit()` reads the model, so the viewport would fit the old content.
+   *
    * When calling `zoomToFit()` immediately after adding or modifying nodes/edges, their dimensions may not be measured yet.
    * Use the `waitForMeasurements` transaction option to ensure accurate results:
    * ```typescript

@@ -52,7 +52,7 @@ A promise that resolves once the change has been applied to the model. When call
 
 ### paste()
 
-> **paste**(`position`): `Promise`\<`void`\>
+> **paste**(`position`, `options?`): `Promise`\<`void`\>
 
 Pastes the clipboard content at the specified position.
 
@@ -63,6 +63,16 @@ Pastes the clipboard content at the specified position.
 [`Point`](/docs/api/types/geometry/point/)
 
 The position where to paste the content.
+
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after the
+pasted elements have been measured — useful before calling `zoomToFit()` or
+`centerOnNode()`. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
 
 #### Returns
 

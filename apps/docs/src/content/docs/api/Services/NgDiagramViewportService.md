@@ -375,6 +375,10 @@ Padding around the content (default: 50). Supports CSS-like syntax:
 
 #### Remarks
 
+Always `await` the preceding model mutation (e.g. `await modelService.deleteNodes(...)`)
+before calling `zoomToFit()` — an un-awaited mutation is not yet committed when
+`zoomToFit()` reads the model, so the viewport would fit the old content.
+
 When calling `zoomToFit()` immediately after adding or modifying nodes/edges, their dimensions may not be measured yet.
 Use the `waitForMeasurements` transaction option to ensure accurate results:
 ```typescript

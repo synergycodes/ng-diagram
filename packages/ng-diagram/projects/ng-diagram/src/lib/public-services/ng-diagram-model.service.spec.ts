@@ -52,8 +52,8 @@ describe('NgDiagramModelService', () => {
       throw new Error('NgDiagram is not initialized');
     });
 
-    // Pre-awaitable behavior: an uninitialized engine throws synchronously —
-    // it must not become an unhandled promise rejection on fire-and-forget calls.
+    // An uninitialized engine throws synchronously — it must not become an
+    // unhandled promise rejection on fire-and-forget calls.
     expect(() => service.addNodes(nodes)).toThrow('NgDiagram is not initialized');
     expect(() => service.addNodes(nodes, { waitForMeasurements: true })).toThrow('NgDiagram is not initialized');
   });
@@ -91,5 +91,24 @@ describe('NgDiagramModelService', () => {
 
     expect(mockTransaction).not.toHaveBeenCalled();
     expect(mockEmit).toHaveBeenCalledWith('updateNode', { id: 'node-1', nodeChanges: { position: { x: 5, y: 5 } } });
+  });
+
+  it('should emit plain update commands from updateNodeData/updateEdgeData without options', async () => {
+    await service.updateNodeData('node-1', { label: 'x' });
+    await service.updateEdgeData('edge-1', { label: 'y' });
+
+    expect(mockTransaction).not.toHaveBeenCalled();
+    expect(mockEmit).toHaveBeenCalledWith('updateNode', { id: 'node-1', nodeChanges: { data: { label: 'x' } } });
+    expect(mockEmit).toHaveBeenCalledWith('updateEdge', { id: 'edge-1', edgeChanges: { data: { label: 'y' } } });
+  });
+
+  it('should route updateNodeData/updateEdgeData waitForMeasurements through their update commands', async () => {
+    await service.updateNodeData('node-1', { label: 'x' }, { waitForMeasurements: true });
+    await service.updateEdgeData('edge-1', { label: 'y' }, { waitForMeasurements: true });
+
+    expect(mockTransaction).toHaveBeenCalledWith('updateNode', expect.any(Function), { waitForMeasurements: true });
+    expect(mockTransaction).toHaveBeenCalledWith('updateEdge', expect.any(Function), { waitForMeasurements: true });
+    expect(mockEmit).toHaveBeenCalledWith('updateNode', { id: 'node-1', nodeChanges: { data: { label: 'x' } } });
+    expect(mockEmit).toHaveBeenCalledWith('updateEdge', { id: 'edge-1', edgeChanges: { data: { label: 'y' } } });
   });
 });

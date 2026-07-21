@@ -695,7 +695,7 @@ A promise that resolves once the change has been applied to the model. When call
 
 ### updateEdgeData()
 
-> **updateEdgeData**\<`T`\>(`edgeId`, `data`): `Promise`\<`void`\>
+> **updateEdgeData**\<`T`\>(`edgeId`, `data`, `options?`): `Promise`\<`void`\>
 
 Updates the data of an edge.
 
@@ -720,6 +720,16 @@ Edge id.
 `T`
 
 New data to set for the edge.
+
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the update (e.g. re-rendered edge labels) have completed.
+Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
 
 #### Returns
 
@@ -799,7 +809,7 @@ A promise that resolves once the change has been applied to the model. When call
 
 ### updateNodeData()
 
-> **updateNodeData**\<`T`\>(`nodeId`, `data`): `Promise`\<`void`\>
+> **updateNodeData**\<`T`\>(`nodeId`, `data`, `options?`): `Promise`\<`void`\>
 
 Updates the data of a node.
 
@@ -824,6 +834,16 @@ Node id.
 `T`
 
 New data to set for the node.
+
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after
+measurements triggered by the update (e.g. a template resized by the new data) have
+completed. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
 
 #### Returns
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Node, Point, Size } from '../../core/src';
+import { emitWithMeasurementOption } from './emit-with-measurement-option';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 
 /**
@@ -47,29 +48,7 @@ export class NgDiagramNodeService extends NgDiagramBaseService {
     disableAutoSize?: boolean,
     options?: { waitForMeasurements?: boolean }
   ): Promise<void> {
-    // Read the engine synchronously so an uninitialized diagram throws synchronously
-    // instead of surfacing an unhandled promise rejection.
-    const flowCore = this.flowCore;
-    // Inside an active transaction the nested waitForMeasurements transaction would
-    // suspend past the outer commit (an un-awaited call corrupts the transaction
-    // stack) — the outer transaction owns the timing, so the option is ignored.
-    if (options?.waitForMeasurements && flowCore.transactionManager.isActive()) {
-      console.warn(
-        '[ngDiagram] waitForMeasurements is ignored inside a transaction — pass { waitForMeasurements: true } to the transaction itself instead.'
-      );
-    } else if (options?.waitForMeasurements) {
-      return flowCore
-        .transaction(
-          'resizeNode',
-          async (tx) => {
-            await tx.emit('resizeNode', { id, size, position, disableAutoSize });
-          },
-          // Spread the caller's options so internal tuning fields reach the transaction.
-          { ...options, waitForMeasurements: true }
-        )
-        .then(() => undefined);
-    }
-    return flowCore.commandHandler.emit('resizeNode', { id, size, position, disableAutoSize });
+    return emitWithMeasurementOption(this.flowCore, 'resizeNode', { id, size, position, disableAutoSize }, options);
   }
 
   /**

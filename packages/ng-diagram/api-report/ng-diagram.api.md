@@ -185,7 +185,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -318,7 +318,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -798,7 +798,9 @@ export class NgDiagramBaseNodeTemplateComponent implements NgDiagramNodeTemplate
 export class NgDiagramClipboardService extends NgDiagramBaseService {
     copy(): Promise<void>;
     cut(): Promise<void>;
-    paste(position: Point): Promise<void>;
+    paste(position: Point, options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramClipboardService, never>;
     // (undocumented)
@@ -1034,14 +1036,18 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     updateEdge(edgeId: string, edge: Partial<Edge>, options?: {
         waitForMeasurements?: boolean;
     }): Promise<void>;
-    updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T): Promise<void>;
+    updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T, options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
     updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[], options?: {
         waitForMeasurements?: boolean;
     }): Promise<void>;
     updateNode(nodeId: string, node: Partial<Node_2>, options?: {
         waitForMeasurements?: boolean;
     }): Promise<void>;
-    updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T): Promise<void>;
+    updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T, options?: {
+        waitForMeasurements?: boolean;
+    }): Promise<void>;
     updateNodes(nodes: (Pick<Node_2, 'id'> & Partial<Node_2>)[], options?: {
         waitForMeasurements?: boolean;
     }): Promise<void>;
@@ -1353,7 +1359,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1667,7 +1673,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)

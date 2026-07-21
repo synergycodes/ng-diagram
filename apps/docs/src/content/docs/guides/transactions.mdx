@@ -94,6 +94,21 @@ await this.ngDiagramService.transaction(
 this.ngDiagramViewportService.zoomToFit();
 ```
 
+#### Per-method option <Badge text="since v1.3.0" variant="tip" />
+
+Methods that can change what gets measured also accept `waitForMeasurements` directly — no explicit transaction needed:
+
+- [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/): `addNodes`, `addEdges`, `updateNode`, `updateNodes`, `updateNodeData`, `updateEdge`, `updateEdges`, `updateEdgeData`
+- [`NgDiagramNodeService`](/docs/api/services/ngdiagramnodeservice/): `resizeNode`
+- [`NgDiagramClipboardService`](/docs/api/services/ngdiagramclipboardservice/): `paste`
+
+```typescript
+await this.ngDiagramModelService.addNodes([newNode], { waitForMeasurements: true });
+this.ngDiagramViewportService.zoomToFit();
+```
+
+Other mutating methods (`deleteNodes`, `deleteEdges`, `addToGroup`, `removeFromGroup`, `rotateNodeTo`, selection and viewport operations) deliberately do not take the option: they change only model state, and everything derived from it — group membership, z-order, rotated bounds, edge routing — is computed within the same update pass, so awaiting the returned promise is already enough. Rotation, for example, is applied as a CSS transform: the element's size does not change, so there is nothing new to measure.
+
 ## How Transactions Work
 
 Understanding how transactions are applied internally helps you write better code and reason about your diagram state changes. When a transaction is committed, operations are executed in a specific sequence to maintain data integrity:

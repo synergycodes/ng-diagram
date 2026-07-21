@@ -551,7 +551,7 @@ await this.ngDiagramService.transaction(async () => {
 
 #### Call Signature
 
-> **transaction**(`callback`): `void`
+> **transaction**(`callback`): `Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
 
 Executes a function within a transaction context.
 All state updates within the callback are batched and applied atomically.
@@ -566,7 +566,11 @@ The function to execute within the transaction.
 
 ##### Returns
 
-`void`
+`Promise`\<[`TransactionResult`](/docs/api/types/middleware/transactionresult/)\>
+
+A promise that resolves with the transaction result once the
+transaction has been committed to the model (returned since 1.3.0; safe to
+ignore when not needed).
 
 ##### Example
 
