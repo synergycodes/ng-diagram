@@ -46,7 +46,7 @@ Array of edge IDs to bring to front.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -74,7 +74,7 @@ The amount to move the nodes by.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -124,7 +124,7 @@ measurements triggered by the resize have completed. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -152,7 +152,7 @@ The rotation angle in degrees.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -180,4 +180,4 @@ Array of edge IDs to send to back.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.

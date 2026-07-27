@@ -346,6 +346,110 @@ describe('awaitable emit (integration)', () => {
     flowCore.destroy();
   });
 
+  it('should reject the awaited emit when an ASYNC middleware rejects without calling next', async () => {
+    const model = createModelAdapter();
+    let shouldReject = false;
+    const rejectingMiddleware: Middleware = {
+      name: 'async-rejector',
+      execute: async (_context, next) => {
+        if (shouldReject) {
+          await macrotask();
+          throw new Error('async primary failure');
+        }
+        await next();
+      },
+    };
+    const flowCore = createFlowCore(model, [rejectingMiddleware]);
+
+    shouldReject = true;
+    await expect(
+      flowCore.commandHandler.emit('addNodes', {
+        nodes: [{ id: 'node-1', type: 'node', selected: false, position: { x: 0, y: 0 }, data: {} }],
+      })
+    ).rejects.toThrow('async primary failure');
+    expect(model.getNodes()).toEqual([]);
+
+    // The update lock must be released — the next update goes through normally
+    shouldReject = false;
+    await flowCore.commandHandler.emit('addNodes', {
+      nodes: [{ id: 'node-2', type: 'node', selected: false, position: { x: 10, y: 10 }, data: {} }],
+    });
+    expect(model.getNodes()).toContainEqual(expect.objectContaining({ id: 'node-2' }));
+
+    flowCore.destroy();
+  });
+
+  it('should reject the awaited transaction when its commit pass fails, leaving the model unchanged', async () => {
+    const model = createModelAdapter();
+    let shouldThrow = false;
+    const throwingMiddleware: Middleware = {
+      name: 'commit-thrower',
+      execute: (_context, next) => {
+        if (shouldThrow) {
+          throw new Error('commit failed');
+        }
+        next();
+      },
+    };
+    const flowCore = createFlowCore(model, [throwingMiddleware]);
+
+    shouldThrow = true;
+    await expect(
+      flowCore.transaction(async (tx) => {
+        await tx.emit('addNodes', {
+          nodes: [{ id: 'node-1', type: 'node', selected: false, position: { x: 0, y: 0 }, data: {} }],
+        });
+      })
+    ).rejects.toThrow('commit failed');
+    expect(model.getNodes()).toEqual([]);
+
+    shouldThrow = false;
+    await flowCore.commandHandler.emit('addNodes', {
+      nodes: [{ id: 'node-2', type: 'node', selected: false, position: { x: 10, y: 10 }, data: {} }],
+    });
+    expect(model.getNodes()).toContainEqual(expect.objectContaining({ id: 'node-2' }));
+
+    flowCore.destroy();
+  });
+
+  it('should clear the staged tracking request when a waitForMeasurements transaction commit fails', async () => {
+    const model = createModelAdapter();
+    let shouldThrow = false;
+    const throwingMiddleware: Middleware = {
+      name: 'commit-thrower',
+      execute: (_context, next) => {
+        if (shouldThrow) {
+          throw new Error('commit failed');
+        }
+        next();
+      },
+    };
+    const flowCore = createFlowCore(model, [throwingMiddleware]);
+
+    shouldThrow = true;
+    await expect(
+      flowCore.transaction(
+        async (tx) => {
+          await tx.emit('addNodes', {
+            nodes: [{ id: 'node-1', type: 'node', selected: false, position: { x: 0, y: 0 }, data: {} }],
+          });
+        },
+        { waitForMeasurements: true }
+      )
+    ).rejects.toThrow('commit failed');
+
+    // A stale staged request would be consumed by the next unrelated pass.
+    expect(flowCore.measurementTracker.isTrackingRequested()).toBe(false);
+
+    shouldThrow = false;
+    await flowCore.commandHandler.emit('addNodes', {
+      nodes: [{ id: 'node-2', type: 'node', selected: false, position: { x: 10, y: 10 }, data: {} }],
+    });
+    expect(model.getNodes()).toContainEqual(expect.objectContaining({ id: 'node-2' }));
+
+    flowCore.destroy();
+  });
+
   it('should not run remaining middlewares when a suspended middleware resumes after the pass failed', async () => {
     const model = createModelAdapter();
     let shouldThrow = false;

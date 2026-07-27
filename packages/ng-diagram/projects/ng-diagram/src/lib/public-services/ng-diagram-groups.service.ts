@@ -23,7 +23,7 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
    * Adds nodes to a group.
    * @param groupId The ID of the group to add nodes to.
    * @param nodeIds Array of node IDs to add to the group.
-   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
   addToGroup(groupId: string, nodeIds: string[]): Promise<void> {
     return this.flowCore.commandHandler.emit('addToGroup', { groupId, nodeIds });
@@ -51,7 +51,7 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
    * Removes nodes from a group.
    * @param groupId The ID of the group to remove nodes from.
    * @param nodeIds Array of node IDs to remove from the group.
-   * @returns A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
   removeFromGroup(groupId: string, nodeIds: string[]): Promise<void> {
     return this.flowCore.commandHandler.emit('removeFromGroup', { groupId, nodeIds });

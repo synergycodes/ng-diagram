@@ -84,14 +84,15 @@ export class BatchProcessor<TAdd extends { id: string }, TUpdate> {
    * Each callback is awaited before the next to prevent read-modify-write races.
    */
   private async flush(): Promise<void> {
+    // Reset BEFORE any work that can throw
+    this.flushScheduled = false;
+
     this.cancelMatchingIntents();
     this.filterAlreadyMeasuredAdds();
 
     const allAdds = this.takeAll(this.pendingAdds);
     const allUpdates = this.takeAll(this.pendingUpdates);
     const allDeletes = this.takeAll(this.pendingDeletes);
-
-    this.flushScheduled = false;
 
     await this.invokeCallbacks(allAdds);
     await this.invokeCallbacks(allUpdates);

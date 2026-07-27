@@ -103,7 +103,7 @@ The ID of the node or the node object to center on.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 #### Remarks
 
@@ -136,7 +136,7 @@ The rectangle to center on.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -230,7 +230,7 @@ The y-coordinate to move the viewport to.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -258,7 +258,7 @@ The amount to move the viewport in the y-direction.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -292,7 +292,7 @@ The absolute zoom scale (clamped to configured min/max).
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 #### Example
 
@@ -331,7 +331,7 @@ The center point to zoom towards.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 

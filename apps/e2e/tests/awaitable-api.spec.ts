@@ -449,11 +449,27 @@ test.describe('awaited service API matrix', () => {
       const size = model.getNodeById('w-node')?.size;
       check((size?.width ?? 0) > 0 && (size?.height ?? 0) > 0, 'addNodes+wfm: node not measured on resolve');
 
-      await model.updateNode('w-node', { position: { x: 420, y: 120 } }, { waitForMeasurements: true });
-      check(model.getNodeById('w-node')?.position.x === 420, 'updateNode+wfm: position stale on resolve');
+      const widthAfterAdd = model.getNodeById('w-node')?.size?.width ?? 0;
+      await model.updateNode('w-node', { data: { label: 'w-stretched-by-a-longer-label' } }, {
+        waitForMeasurements: true,
+        _measurementDiscoveryWindowTimeout: 500,
+      } as { waitForMeasurements: boolean });
+      const widthAfterUpdate = model.getNodeById('w-node')?.size?.width ?? 0;
+      check(widthAfterUpdate > widthAfterAdd, 'updateNode+wfm: size stale on resolve');
 
-      await model.updateNodes([{ id: 'w-node', position: { x: 440, y: 140 } }], { waitForMeasurements: true });
-      check(model.getNodeById('w-node')?.position.x === 440, 'updateNodes+wfm: position stale on resolve');
+      await model.updateNodes([{ id: 'w-node', data: { label: 'w-stretched-by-an-even-longer-label-still' } }], {
+        waitForMeasurements: true,
+        _measurementDiscoveryWindowTimeout: 500,
+      } as { waitForMeasurements: boolean });
+      const widthAfterUpdates = model.getNodeById('w-node')?.size?.width ?? 0;
+      check(widthAfterUpdates > widthAfterUpdate, 'updateNodes+wfm: size stale on resolve');
+
+      await model.updateNodeData('w-node', { label: 'w-stretched-by-the-longest-label-of-them-all-so-far' }, {
+        waitForMeasurements: true,
+        _measurementDiscoveryWindowTimeout: 500,
+      } as { waitForMeasurements: boolean });
+      const widthAfterData = model.getNodeById('w-node')?.size?.width ?? 0;
+      check(widthAfterData > widthAfterUpdates, 'updateNodeData+wfm: size stale on resolve');
 
       await model.addNodes([{ id: 'w-node2', position: { x: 400, y: 220 }, data: { label: 'w2' } }]);
       await model.addEdges([{ id: 'w-edge', source: 'w-node', target: 'w-node2', data: {} }], {
@@ -473,6 +489,12 @@ test.describe('awaited service API matrix', () => {
         'updateEdges+wfm: data stale on resolve'
       );
 
+      await model.updateEdgeData('w-edge', { note: 'c' }, { waitForMeasurements: true });
+      check(
+        (model.getEdgeById('w-edge')?.data as { note?: string })?.note === 'c',
+        'updateEdgeData+wfm: data stale on resolve'
+      );
+
       await handle.nodes.resizeNode('w-node', { width: 260, height: 80 }, undefined, true, {
         waitForMeasurements: true,
       });
@@ -481,6 +503,24 @@ test.describe('awaited service API matrix', () => {
         resized?.width === 260 && resized?.height === 80,
         `resizeNode+wfm: size stale on resolve (got ${JSON.stringify(resized)})`
       );
+
+      await handle.selection.select(['w-node2']);
+      await handle.clipboard.copy();
+      const idsBefore = new Set(
+        model
+          .getModel()
+          .getNodes()
+          .map((n) => n.id)
+      );
+      await handle.clipboard.paste({ x: 620, y: 320 }, {
+        waitForMeasurements: true,
+        _measurementDiscoveryWindowTimeout: 500,
+      } as { waitForMeasurements: boolean });
+      const pasted = model
+        .getModel()
+        .getNodes()
+        .find((n) => !idsBefore.has(n.id));
+      check(!!pasted && (pasted?.size?.width ?? 0) > 0, 'paste+wfm: pasted node not measured on resolve');
 
       return fails;
     });

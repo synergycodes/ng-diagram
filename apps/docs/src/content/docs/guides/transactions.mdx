@@ -165,6 +165,10 @@ Use transactions for:
 
 ## Best Practices
 
+Prefer `await`-ing transactions over running them fire-and-forget. Overlapping un-awaited
+transactions each still commit their own updates, but the overlap logs a console warning —
+awaiting keeps the commits explicitly ordered.
+
 Group related operations together, but avoid making transactions too large or complex:
 
 ```typescript

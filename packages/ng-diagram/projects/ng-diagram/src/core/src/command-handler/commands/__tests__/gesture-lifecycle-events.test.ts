@@ -121,6 +121,23 @@ describe('resizeNodeStart/resizeNodeStop lifecycle events', () => {
     flowCore.destroy();
   });
 
+  it('should report nodeResizeStarted from the capture, not the live resize state', async () => {
+    const flowCore = createFlowCore(createModelAdapter());
+    await flowCore.commandHandler.emit('addNodes', { nodes: [node('n1'), node('n2')] });
+    const started: string[] = [];
+    flowCore.eventManager.on('nodeResizeStarted', (event) => started.push(event.node.id));
+
+    flowCore.actionStateManager.resize = resizeStateOf(node('n1'));
+    const start = flowCore.commandHandler.emit('resizeNodeStart', { nodeId: 'n1' });
+    // A fast re-grab replaces the resize state before the start pass runs.
+    flowCore.actionStateManager.resize = resizeStateOf(node('n2'));
+    await start;
+
+    expect(started).toEqual(['n1']);
+
+    flowCore.destroy();
+  });
+
   it('should fall back to the live resize state when no capture was provided', async () => {
     const flowCore = createFlowCore(createModelAdapter());
     await flowCore.commandHandler.emit('addNodes', { nodes: [node('n1')] });
@@ -147,6 +164,37 @@ describe('rotateNodeStart/rotateNodeStop lifecycle events', () => {
     const stop = flowCore.commandHandler.emit('rotateNodeStop', { nodeId: 'n1' });
     flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n2' };
     await stop;
+
+    expect(ended).toEqual(['n1']);
+
+    flowCore.destroy();
+  });
+
+  it('should report nodeRotateStarted from the capture, not the live rotation state', async () => {
+    const flowCore = createFlowCore(createModelAdapter());
+    await flowCore.commandHandler.emit('addNodes', { nodes: [node('n1'), node('n2')] });
+    const started: string[] = [];
+    flowCore.eventManager.on('nodeRotateStarted', (event) => started.push(event.node.id));
+
+    flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n1' };
+    const start = flowCore.commandHandler.emit('rotateNodeStart', { nodeId: 'n1' });
+    // A fast re-grab replaces the rotation state before the start pass runs.
+    flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n2' };
+    await start;
+
+    expect(started).toEqual(['n1']);
+
+    flowCore.destroy();
+  });
+
+  it('should fall back to the live rotation state when no capture was provided', async () => {
+    const flowCore = createFlowCore(createModelAdapter());
+    await flowCore.commandHandler.emit('addNodes', { nodes: [node('n1')] });
+    const ended: string[] = [];
+    flowCore.eventManager.on('nodeRotateEnded', (event) => ended.push(event.node.id));
+
+    flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n1' };
+    await flowCore.commandHandler.emit('rotateNodeStop', {});
 
     expect(ended).toEqual(['n1']);
 

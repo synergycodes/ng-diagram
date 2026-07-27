@@ -47,7 +47,7 @@ interface SettleOutcome {
 /**
  * Awaitable-mutations test mode.
  *
- * Verifies the Phase 1 guarantees end-to-end in the real app:
+ * Verifies awaitable guarantees end-to-end in the real app:
  * a promise returned by a mutating service method resolves only after the
  * middleware chain ran and the change was committed to the model — so code
  * that previously needed polling / manual waiting can read synchronously
@@ -62,6 +62,11 @@ interface SettleOutcome {
  * between. The visual pauses sit only BETWEEN scenario steps. Signals are
  * intentionally NOT asserted (they refresh asynchronously — Phase 2);
  * scenario 1 reports their state as info only.
+ *
+ * Scope: this suite demonstrates the mechanism-level guarantees; per-method
+ * coverage of the awaitable/waitForMeasurements surface (including
+ * updateNodeData/updateEdgeData/paste) is pinned by
+ * apps/e2e/tests/awaitable-api.spec.ts.
  */
 @Component({
   selector: 'app-awaitable-tests',
@@ -104,30 +109,103 @@ export class AwaitableTestsComponent implements OnDestroy {
     delete (window as unknown as Record<string, unknown>)['__awaitableTests'];
   }
 
+  /** Per-scenario deadline — headroom over the slowest legitimate scenario. */
+  private static readonly SCENARIO_TIMEOUT_MS = 15000;
+
+  /**
+   * Scenarios that timed out or were skipped after a hang: their FAILED row is
+   * final — a zombie scenario completing later must not flip it back to PASS
+   * behind the already-computed verdict.
+   */
+  private readonly deadScenarios = new Set<string>();
+
   async runAll() {
     this.results.set([]);
     this.summary.set(null);
     this.isRunning.set(true);
+    this.deadScenarios.clear();
 
-    await this.testFreshAfterAdd();
-    await this.testFreshAfterUpdate();
-    await this.testFreshAfterDelete();
-    await this.testDeleteThenReadd();
-    await this.testFreshWithAsyncMiddleware();
-    await this.testWaitForMeasurementsAdd();
-    await this.testWaitForMeasurementsDataOnly();
-    await this.testTransactionCommit();
-    await this.testTransactionRollback();
-    await this.testWaitForMeasurementsInsideTransaction();
-    await this.testOrphanNestedTransaction();
-    await this.testThrowingMiddleware();
-    await this.testNestedEmitAwaited();
-    await this.testTrackingNotHijacked();
+    const scenarios: { name: string; run: () => Promise<void> }[] = [
+      { name: 'S1 · Model fresh after awaited addNodes', run: () => this.testFreshAfterAdd() },
+      { name: 'S2 · Model fresh after awaited updateNode', run: () => this.testFreshAfterUpdate() },
+      { name: 'S3 · Model fresh after awaited deleteNodes', run: () => this.testFreshAfterDelete() },
+      { name: 'S4 · Sequential delete → re-add of the same id', run: () => this.testDeleteThenReadd() },
+      { name: 'S5 · Model fresh despite macrotask-async middleware', run: () => this.testFreshWithAsyncMiddleware() },
+      { name: 'S6 · waitForMeasurements: node measured on resolve', run: () => this.testWaitForMeasurementsAdd() },
+      {
+        name: 'S7 · waitForMeasurements: no-measure update resolves',
+        run: () => this.testWaitForMeasurementsDataOnly(),
+      },
+      { name: 'S8 · Awaited transaction commits everything on resolve', run: () => this.testTransactionCommit() },
+      { name: 'S9 · Transaction rollback on error', run: () => this.testTransactionRollback() },
+      {
+        name: 'S10 · waitForMeasurements inside a transaction: warn + applied at commit',
+        run: () => this.testWaitForMeasurementsInsideTransaction(),
+      },
+      { name: 'S11 · Orphaned nested transaction loses no updates', run: () => this.testOrphanNestedTransaction() },
+      {
+        name: 'S12 · Throwing middleware rejects the call, diagram survives',
+        run: () => this.testThrowingMiddleware(),
+      },
+      {
+        name: 'S12b · Middleware error rejects the awaited transaction',
+        run: () => this.testTransactionRejectedByMiddleware(),
+      },
+      { name: 'S13 · addToGroup awaits its nested highlight-clear emit', run: () => this.testNestedEmitAwaited() },
+      {
+        name: 'S14 · waitForMeasurements settles despite a concurrent update',
+        run: () => this.testTrackingNotHijacked(),
+      },
+    ];
 
-    const results = this.results();
-    const passed = results.filter((r) => r.passed).length;
-    this.summary.set(`${passed}/${results.length} passed`);
-    this.isRunning.set(false);
+    // Every scenario runs behind its own deadline so a frozen update lock
+    // becomes a FAILED row (the suite's contract) instead of hanging runAll
+    // and the CI runner. After the first hang the lock is assumed dead — the
+    // remaining scenarios are marked failed instead of burning a timeout each.
+    let hung = false;
+    try {
+      for (const scenario of scenarios) {
+        if (hung) {
+          this.recordScenarioFailure(
+            scenario.name,
+            0,
+            'skipped — an earlier scenario hung (possible frozen update lock)'
+          );
+          continue;
+        }
+        const t1 = performance.now();
+        const HUNG = Symbol('hung');
+        try {
+          const raced = await Promise.race([
+            scenario.run(),
+            sleep(AwaitableTestsComponent.SCENARIO_TIMEOUT_MS).then(() => HUNG),
+          ]);
+          if (raced === HUNG) {
+            hung = true;
+            this.recordScenarioFailure(
+              scenario.name,
+              performance.now() - t1,
+              `did not complete within ${AwaitableTestsComponent.SCENARIO_TIMEOUT_MS}ms — possible frozen update lock`
+            );
+          }
+        } catch (error) {
+          this.recordScenarioFailure(scenario.name, performance.now() - t1, `threw unexpectedly: ${String(error)}`);
+        }
+      }
+
+      const results = this.results();
+      const passed = results.filter((r) => r.passed).length;
+      this.summary.set(`${passed}/${results.length} passed`);
+    } finally {
+      this.isRunning.set(false);
+    }
+  }
+
+  /** Records a final FAILED row for a scenario that hung, threw, or was skipped. */
+  private recordScenarioFailure(name: string, elapsed: number, message: string): void {
+    this.deadScenarios.delete(name); // let this write through, then freeze the row
+    this.addResult(name, elapsed, (assert) => assert(false, message));
+    this.deadScenarios.add(name);
   }
 
   // =============================================
@@ -279,7 +357,13 @@ export class AwaitableTestsComponent implements OnDestroy {
     const t1 = performance.now();
 
     const outcome = await this.settleWithin(
-      this.modelService.addNodes([this.makeNode(id, 'S6: measured before resolve')], { waitForMeasurements: true })
+      this.modelService.addNodes([this.makeNode(id, 'S6: measured before resolve')], {
+        // Widened discovery window (internal escape hatch): on a starved CI
+        // renderer the production 70ms window can expire before the first
+        // frame delivers the measurement, turning this into a false red.
+        waitForMeasurements: true,
+        _measurementDiscoveryWindowTimeout: 500,
+      } as { waitForMeasurements: boolean })
     );
     const node = this.getNode(id);
 
@@ -535,6 +619,71 @@ export class AwaitableTestsComponent implements OnDestroy {
   }
 
   // =============================================
+  // 12b. A middleware throwing during a TRANSACTION's commit pass: the awaited
+  // transaction must reject, the queued update must not reach the model, and
+  // the diagram must keep working.
+  // =============================================
+
+  async testTransactionRejectedByMiddleware() {
+    const id = this.nextId('tx-throw');
+    const originalLabel = 'S12b: tx commit will be rejected';
+    await this.modelService.addNodes([this.makeNode(id, originalLabel)]);
+    await sleep(VISUAL_PAUSE_MS);
+
+    const throwingMiddleware: Middleware = {
+      name: 'awaitable-test-tx-thrower',
+      execute: (context, next) => {
+        if (context.initialUpdate.nodesToUpdate?.some((n) => n.id === id)) {
+          throw new Error('middleware rejected the transaction');
+        }
+        next();
+      },
+    };
+    const unregister = this.ngDiagramService.registerMiddleware(throwingMiddleware);
+    const t1 = performance.now();
+    let outcome: SettleOutcome = { status: 'timeout' };
+
+    try {
+      outcome = await this.settleWithin(
+        this.ngDiagramService.transaction(async () => {
+          await this.modelService.updateNode(id, { data: { label: 'S12b: must never apply' } });
+        })
+      );
+    } finally {
+      unregister();
+    }
+    const nodeAfterReject = this.getNode(id);
+
+    // Diagram must survive: the next update (middleware gone) must apply normally.
+    const secondOutcome = await this.settleWithin(
+      this.modelService.updateNode(id, { data: { label: 'S12b: rejected once, then recovered' } })
+    );
+    const nodeAfterRecovery = this.getNode(id);
+
+    this.addResult('S12b · Middleware error rejects the awaited transaction', performance.now() - t1, (assert) => {
+      assert(
+        outcome.status === 'rejected',
+        outcome.status === 'timeout'
+          ? `transaction did not settle within ${SETTLE_TIMEOUT_MS}ms — possible frozen update lock`
+          : `the awaited transaction must REJECT with the middleware error, but it ${outcome.status}`
+      );
+      assert(
+        String(outcome.error).includes('middleware rejected the transaction'),
+        `rejection must carry the middleware error, got: ${String(outcome.error)}`
+      );
+      assert(
+        (nodeAfterReject?.data as { label?: string })?.label === originalLabel,
+        `the queued update must NOT reach the model after the rejected commit, got label '${(nodeAfterReject?.data as { label?: string })?.label}'`
+      );
+      assert(secondOutcome.status === 'resolved', this.settleFailure('post-recovery updateNode', secondOutcome));
+      assert(
+        (nodeAfterRecovery?.data as { label?: string })?.label === 'S12b: rejected once, then recovered',
+        `the update lock must be released — the follow-up update must apply, got label '${(nodeAfterRecovery?.data as { label?: string })?.label}'`
+      );
+    });
+  }
+
+  // =============================================
   // 13. Commands await their nested emits: addToGroup internally emits
   // highlightGroupClear and must not resolve before it finished. Proven via
   // the MODEL (synchronous read): right after `await addToGroup` the group's
@@ -573,11 +722,12 @@ export class AwaitableTestsComponent implements OnDestroy {
   }
 
   // =============================================
-  // 14. waitForMeasurements tracking must belong to ITS OWN update pass.
-  // A concurrent un-awaited update (slowed by a middleware so it genuinely
-  // overlaps) must not consume the tracking request — pre-fix it registered
-  // the decoy's entities as participants and the promise resolved before the
-  // added node was measured.
+  // 14. waitForMeasurements must settle AND deliver the measurement even while
+  // a concurrent un-awaited update (slowed by a middleware so it genuinely
+  // overlaps) holds the update lock. This demonstrates the user-visible
+  // outcome; the sharper discrimination of the tracking-hijack itself (spying
+  // WHO registers as tracking participants) lives in
+  // apps/e2e/tests/awaitable-hardening.spec.ts.
   // =============================================
 
   async testTrackingNotHijacked() {
@@ -610,14 +760,16 @@ export class AwaitableTestsComponent implements OnDestroy {
 
       const outcome = await this.settleWithin(
         this.modelService.addNodes([this.makeNode(addedId, 'S14: measured despite the decoy')], {
+          // Widened discovery window — same starved-CI-renderer rationale as S6.
           waitForMeasurements: true,
-        })
+          _measurementDiscoveryWindowTimeout: 500,
+        } as { waitForMeasurements: boolean })
       );
       const node = this.getNode(addedId);
       await decoy.catch(() => undefined);
 
       this.addResult(
-        'S14 · waitForMeasurements not hijacked by a concurrent update',
+        'S14 · waitForMeasurements settles despite a concurrent update',
         performance.now() - t1,
         (assert) => {
           assert(outcome.status === 'resolved', this.settleFailure('addNodes(waitForMeasurements)', outcome));
@@ -743,6 +895,9 @@ export class AwaitableTestsComponent implements OnDestroy {
     assertions: (assert: (condition: boolean, message: string) => void) => void,
     infoDetails?: string
   ) {
+    if (this.deadScenarios.has(name)) {
+      return; // the scenario's FAILED row is final (it hung or was skipped)
+    }
     const failures: string[] = [];
     assertions((condition, message) => {
       if (!condition) failures.push(message);

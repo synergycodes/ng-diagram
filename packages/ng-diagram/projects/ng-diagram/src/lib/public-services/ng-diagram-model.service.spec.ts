@@ -72,6 +72,34 @@ describe('NgDiagramModelService', () => {
     expect(mockEmit).toHaveBeenCalledWith('addNodes', { nodes });
   });
 
+  it('should forward internal tuning options through to the transaction', async () => {
+    await service.addNodes(nodes, { waitForMeasurements: true, _measurementDiscoveryWindowTimeout: 123 } as {
+      waitForMeasurements: boolean;
+    });
+
+    expect(mockTransaction).toHaveBeenCalledWith(
+      'addNodes',
+      expect.any(Function),
+      expect.objectContaining({ waitForMeasurements: true, _measurementDiscoveryWindowTimeout: 123 })
+    );
+  });
+
+  it('should route waitForMeasurements through NAMED transactions for the edge and bulk methods too', async () => {
+    const edges = [{ id: 'edge-1', source: 'a', target: 'b', data: {} }];
+
+    await service.addEdges(edges, { waitForMeasurements: true });
+    expect(mockTransaction).toHaveBeenCalledWith('addEdges', expect.any(Function), { waitForMeasurements: true });
+    expect(mockEmit).toHaveBeenCalledWith('addEdges', { edges });
+
+    await service.updateNodes([{ id: 'node-1', position: { x: 1, y: 2 } }], { waitForMeasurements: true });
+    expect(mockTransaction).toHaveBeenCalledWith('updateNodes', expect.any(Function), { waitForMeasurements: true });
+    expect(mockEmit).toHaveBeenCalledWith('updateNodes', { nodes: [{ id: 'node-1', position: { x: 1, y: 2 } }] });
+
+    await service.updateEdges([{ id: 'edge-1', data: { note: 'x' } }], { waitForMeasurements: true });
+    expect(mockTransaction).toHaveBeenCalledWith('updateEdges', expect.any(Function), { waitForMeasurements: true });
+    expect(mockEmit).toHaveBeenCalledWith('updateEdges', { edges: [{ id: 'edge-1', data: { note: 'x' } }] });
+  });
+
   it('should ignore waitForMeasurements inside an active transaction and fall back to a plain emit', async () => {
     mockIsActive.mockReturnValue(true);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);

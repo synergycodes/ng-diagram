@@ -64,6 +64,34 @@ describe('BatchProcessor', () => {
   });
 
   describe('flush error isolation', () => {
+    it('should keep flushing after a flush itself throws (e.g. a throwing getMeasuredIds)', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      let throwOnce = true;
+      const throwingProcessor = new BatchProcessor<TestItem, TestUpdate>(() => {
+        if (throwOnce) {
+          throwOnce = false;
+          throw new Error('getMeasuredIds failed');
+        }
+        return new Set<string>();
+      });
+      const onFlush = vi.fn();
+      const drainMicrotasks = async () => {
+        for (let i = 0; i < 10; i++) {
+          await Promise.resolve();
+        }
+      };
+
+      throwingProcessor.processAdd('key1', createItem('a'), onFlush);
+      await drainMicrotasks();
+      expect(errorSpy).toHaveBeenCalledWith('[ngDiagram] BatchProcessor flush failed.', expect.any(Error));
+
+      // The failed flush must not wedge scheduling — the next add still flushes.
+      throwingProcessor.processAdd('key1', createItem('b'), onFlush);
+      await drainMicrotasks();
+      expect(onFlush).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
+
     it('should still invoke later flush callbacks when an earlier one rejects', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
       const addFlush = vi.fn(async () => {

@@ -33,66 +33,87 @@ zoomToFit" required guesswork or `waitForMeasurements` transactions).
 
 ### Required companions: gesture re-entrancy hardening
 
+Once emits genuinely await (and can reject), every flow that suspends mid-gesture needed
+hardening. Grouped by mechanism:
+
+#### Interleaved handler calls (pointer-move)
+
 `PointerMoveSelectionEventHandler.handle()` is invoked un-awaited by the router. Once emits
 genuinely await, a macrotask-async middleware lets the next pointermove interleave while the
 previous one is suspended, which double-applied/lost movement (deltas were computed from
 instance state mutated after the await). The handler now computes deltas from locals and
 commits all instance state before the first suspension point; work resuming after the
 `moveNodesStart` await is skipped if the gesture ended (or a new one started) meanwhile. The
-`end` phase captures a gesture generation counter before its awaits and skips cleanup when a
-new drag started in the meantime, so a fast re-drag is not clobbered. `start` fully
-re-initializes gesture state (including `hasMoved`).
+`end` phase captures its gesture before its awaits and skips cleanup when a new drag started
+in the meantime, so a fast re-drag is not clobbered. `start` fully re-initializes gesture
+state (including `hasMoved`).
 
-The same clear-after-await pattern existed in other flows and got identity guards (only clear
-the action state if it still belongs to this gesture/command): resize end (`clearResize` after
-`resizeNodeStop`), rotate end (`clearRotation` after `rotateNodeStop`), and
-`highlightGroupClear` (`clearHighlightGroup` after its applyUpdate). Linking cannot use object
-identity — the linking object is replaced (spread) on every pointer move and by the
-edges-routing middleware during finishLinking's own applyUpdate, so an identity guard would
-skip the clear and strand the temporary edge (caught by the linking e2e test). Instead it uses
-a gesture stamp: `InternalLinkingActionState._gestureId`, assigned at every site that creates a
-fresh linking state (the linking input handler and both start commands) and preserved by all
-the spread copies. `finishLinking` and `finishLinkingToPosition` clear in `finally` only when
-the current stamp matches the one captured at entry, so a new gesture started while the finish
-was suspended (programmatic `startLinking` — the linking directive itself refuses to start
-while `isLinking()`) is no longer wiped. This closed the previously documented fast-re-link
-gap; `finishLinkingToPosition` also gained the clear-in-finally it was missing entirely.
+#### Clear-after-await guards
 
-Rejections are a companion concern: pre-change, a command function's rejection was swallowed
-(the wrapper discarded the promise), so gesture cleanup always ran. Now that awaited emits can
-reject (e.g. a user `config.grouping.canGroup` callback throwing during a drop), the drag,
-resize, and rotate end-phase cleanups run in `finally` — otherwise leaked action state blocked
-subsequent gestures and (via `isResizing()`) suppressed node measurements. The same applies to
-`finishLinking` and `finishLinkingToPosition` (their stamp-guarded clears run in `finally`; user
-callbacks `validateConnection`/`finalEdgeDataBuilder`/`computeEdgeId` run inside them) and to the
-gesture directives — destroying a handle mid-gesture (node deleted while resizing/rotating/
-linking) now clears the corresponding action state from `ngOnDestroy`. Initialization is
-resilient too: a rejected `init` pass logs and completes instead of wedging the updater in init
-mode. Finally, the middleware executor itself converts an uncaught middleware throw (or async
-rejection) into a rejection of the whole pass — previously it left the pass suspended forever
-with the update semaphore held, i.e. a frozen diagram. The promise returned by `next()` carries
-a pre-attached no-op rejection handler on a branch, so the common fire-and-forget `next()`
-pattern in sync middlewares does not surface one unhandled rejection per suspended middleware
-when a pass fails; middlewares that `await next()` still observe the real rejection. `cancel()`
-needs no such handler (it returns `void` and only ever resolves promises), but errors thrown
-after the pass has settled — after `cancel()` or after the chain completed — cannot reject it
-anymore and are reported via `console.error` instead of being silently swallowed (cascade
-rethrows of an already-reported failure stay silent, like the duplicate-`next()` guard). Two
-more corners from a follow-up adversarial round: (1) a middleware suspended across a settled
-pass no longer resumes the remaining chain against it — its late `next()` settles with the pass
-outcome (the pass error, or the initial state after a cancel) instead of dispatching a "zombie"
-chain whose internal tail would consume a live pass's staged measurement-tracking request and
-push phantom deferred events; (2) the cascade silence is error-identity-aware — a DISTINCT
-error raised while a pass is failing (e.g. a bug in a middleware's own catch/cleanup path) is
-reported via `console.error`, only rethrows of the already-reported error stay silent.
+The same clear-after-await pattern existed in other flows; each clear now runs only when the
+action state still belongs to the gesture/command that is clearing it:
 
-`waitForMeasurements` accuracy: the tracking request is staged inside the transaction's own
-update pass, under the update semaphore (`applyUpdateToModel`), so a concurrent unrelated pass
-cannot consume it and register the wrong participants; a pass cancelled by a middleware clears
-the staged request in `finally`; and the option on a nested transaction logs a warning (its
-updates are applied only when the root commits, so waiting there is meaningless).
+- **Identity guards** — resize end (`clearResize` after `resizeNodeStop`), rotate end
+  (`clearRotation` after `rotateNodeStop`), and `highlightGroupClear` (`clearHighlightGroup`
+  after its applyUpdate).
+- **Gesture stamp for linking** — linking cannot use object identity: the linking object is
+  replaced (spread) on every pointer move and by the edges-routing middleware during
+  finishLinking's own applyUpdate, so an identity guard would skip the clear and strand the
+  temporary edge (caught by the linking e2e test). Instead
+  `InternalLinkingActionState._gestureId` is stamped at every site that creates a fresh
+  linking state (the linking input handler and both start commands) and preserved by all the
+  spread copies. `finishLinking` and `finishLinkingToPosition` clear in `finally` only when
+  the current stamp matches the one captured at entry, so a new gesture started while the
+  finish was suspended (programmatic `startLinking` — the linking directive itself refuses to
+  start while `isLinking()`) is no longer wiped. This closed the previously documented
+  fast-re-link gap; `finishLinkingToPosition` also gained the clear-in-finally it was missing
+  entirely.
 
-Races the longer suspension window amplified were fixed at the source:
+#### Rejections reach cleanup
+
+Pre-change, a command function's rejection was swallowed (the wrapper discarded the promise),
+so gesture cleanup always ran. Now that awaited emits can reject (e.g. a user
+`config.grouping.canGroup` callback throwing during a drop):
+
+- Drag, resize, and rotate end-phase cleanups run in `finally` — otherwise leaked action
+  state blocked subsequent gestures and (via `isResizing()`) suppressed node measurements.
+- `finishLinking` and `finishLinkingToPosition` run their stamp-guarded clears in `finally`
+  (user callbacks `validateConnection`/`finalEdgeDataBuilder`/`computeEdgeId` run inside them).
+- The gesture directives clear the corresponding action state from `ngOnDestroy` — destroying
+  a handle mid-gesture (node deleted while resizing/rotating/linking) no longer leaks it.
+- A rejected `init` pass logs and completes instead of wedging the updater in init mode.
+
+#### Middleware executor failure semantics
+
+- An uncaught middleware throw (or async rejection) rejects the whole pass — previously it
+  left the pass suspended forever with the update semaphore held, i.e. a frozen diagram.
+- The promise returned by `next()` carries a pre-attached no-op rejection handler on a
+  branch, so the common fire-and-forget `next()` pattern in sync middlewares does not surface
+  one unhandled rejection per suspended middleware when a pass fails; middlewares that
+  `await next()` still observe the real rejection. `cancel()` needs no such handler (it
+  returns `void` and only ever resolves promises).
+- Errors thrown after the pass has settled — after `cancel()` or after the chain completed —
+  cannot reject it anymore and are reported via `console.error` instead of being silently
+  swallowed (cascade rethrows of an already-reported failure stay silent, like the
+  duplicate-`next()` guard).
+- Zombie guard: a middleware suspended across a settled pass no longer resumes the remaining
+  chain against it — its late `next()` settles with the pass outcome (the pass error, or the
+  initial state after a cancel) instead of dispatching a chain whose internal tail would
+  consume a live pass's staged measurement-tracking request and push phantom deferred events.
+- The cascade silence is error-identity-aware — a DISTINCT error raised while a pass is
+  failing (e.g. a bug in a middleware's own catch/cleanup path) is reported via
+  `console.error`; only rethrows of the already-reported error stay silent.
+
+#### `waitForMeasurements` accuracy
+
+- The tracking request is staged inside the transaction's own update pass, under the update
+  semaphore (`applyUpdateToModel`), so a concurrent unrelated pass cannot consume it and
+  register the wrong participants.
+- A pass cancelled by a middleware clears the staged request in `finally`.
+- The option on a nested transaction logs a warning (its updates are applied only when the
+  root commits, so waiting there is meaningless).
+
+#### Races amplified by the longer suspension window
 
 - `TransactionManager` removed completed transactions from its stack positionally (`pop()`); an
   un-awaited nested transaction still running when an outer one completed was popped instead,

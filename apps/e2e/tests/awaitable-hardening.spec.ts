@@ -269,6 +269,76 @@ test.describe('awaitable hardening', () => {
       .toBe(true);
   });
 
+  test('deleting the node mid-rotate clears the gesture state and rotation keeps working', async ({ diagram }) => {
+    await diagram.load({ model: pair });
+
+    // Select the node to reveal the rotate adornment.
+    const nodeBox = await diagram.node('node-a').boundingBox();
+    if (!nodeBox) throw new Error('node-a has no bounding box');
+    await diagram.page.mouse.click(nodeBox.x + nodeBox.width / 2, nodeBox.y + nodeBox.height / 2);
+
+    const handle = diagram.page.locator('[data-node-id="node-a"] ng-diagram-rotate-handle');
+    await expect(handle).toBeVisible();
+    const handleBox = await handle.boundingBox();
+    if (!handleBox) throw new Error('rotate handle has no bounding box');
+
+    // Start rotating, then press Delete while still holding the button.
+    await diagram.page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
+    await diagram.page.mouse.down();
+    await diagram.page.mouse.move(handleBox.x + 25, handleBox.y + 25, { steps: 4 });
+    await diagram.page.keyboard.press('Delete');
+    await diagram.page.mouse.move(handleBox.x + 45, handleBox.y + 45, { steps: 2 });
+    await diagram.page.mouse.up();
+
+    await expect(diagram.node('node-a')).toHaveCount(0);
+
+    // The destroyed handle's directive must clear the rotation state.
+    await expect
+      .poll(() => diagram.page.evaluate(() => window.__diagram!.diagram.actionState().rotation != null))
+      .toBe(false);
+
+    // Rotation still works on the surviving node.
+    await diagram.nodes.rotateNodeTo('node-b', 45);
+    await expect.poll(async () => (await diagram.model.getNodeById('node-b'))?.angle).toBe(45);
+  });
+
+  test('deleting the source node mid-linking clears the linking state and linking recovers', async ({ diagram }) => {
+    await diagram.load({ model: trio });
+    await expect(diagram.allEdges).toHaveCount(1); // seeded edge-ab
+
+    // Select the node first so Delete has a target, then start linking from its port.
+    const nodeBox = await diagram.node('node-a').boundingBox();
+    if (!nodeBox) throw new Error('node-a has no bounding box');
+    await diagram.page.mouse.click(nodeBox.x + nodeBox.width / 2, nodeBox.y + nodeBox.height / 2);
+
+    const portBox = await diagram.port('node-a', 'port-right').boundingBox();
+    if (!portBox) throw new Error('node-a/port-right has no bounding box');
+    await diagram.page.mouse.move(portBox.x + portBox.width / 2, portBox.y + portBox.height / 2);
+    await diagram.page.mouse.down();
+    await diagram.page.mouse.move(portBox.x + 80, portBox.y - 40, { steps: 6 });
+
+    await expect
+      .poll(() => diagram.page.evaluate(() => window.__diagram!.diagram.actionState().linking != null))
+      .toBe(true);
+
+    // Delete the source node while the linking drag is still in progress.
+    await diagram.page.keyboard.press('Delete');
+    await expect(diagram.node('node-a')).toHaveCount(0);
+    await diagram.page.mouse.move(portBox.x + 120, portBox.y - 60, { steps: 2 });
+    await diagram.page.mouse.up();
+
+    // The destroyed directive must clear the linking state — a stranded state
+    // permanently refuses new links (shouldHandle checks isLinking()).
+    await expect
+      .poll(() => diagram.page.evaluate(() => window.__diagram!.diagram.actionState().linking != null))
+      .toBe(false);
+
+    // Linking must work again; edge-ab cascaded away with node-a.
+    await diagram.linkPorts({ node: 'node-c', port: 'port-right' }, { node: 'node-b', port: 'port-left' });
+    await expect.poll(async () => (await diagram.model.edges()).length).toBe(1);
+    await expect(diagram.allEdges).toHaveCount(1);
+  });
+
   test('a throwing middleware rejects the awaited call and the diagram keeps working', async ({ diagram }) => {
     await diagram.load({ model: pair });
 

@@ -77,7 +77,7 @@ added elements (e.g. edge labels) have been measured. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -109,7 +109,7 @@ Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -163,7 +163,7 @@ Array of edge IDs to delete.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -185,7 +185,7 @@ Array of node IDs to delete.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -689,7 +689,7 @@ measurements triggered by the update have completed. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -735,7 +735,7 @@ Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -766,7 +766,7 @@ measurements triggered by the update have completed. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -803,7 +803,7 @@ measurements triggered by the update have completed. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -849,7 +849,7 @@ completed. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -880,4 +880,4 @@ measurements triggered by the update have completed. Available since 1.3.0.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.

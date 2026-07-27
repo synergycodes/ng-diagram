@@ -40,7 +40,7 @@ Deletes the current selection of nodes and edges.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -68,7 +68,7 @@ Array of edge IDs to deselect.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -82,7 +82,7 @@ Deselects all currently selected nodes and edges.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
@@ -110,4 +110,4 @@ Array of edge IDs to select.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the change has been applied to the model. When called inside a transaction, it resolves once the change has been queued on it (applied when the transaction commits).
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
