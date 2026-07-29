@@ -170,6 +170,78 @@ describe('getSourceTargetPositions', () => {
     expect(result.target).toEqual({ x: 205, y: 50, side: 'left' });
   });
 
+  it('should return distinct synthetic points for self-loop without ports', () => {
+    const edge: Edge = {
+      ...mockEdge,
+      source: 'node-1',
+      target: 'node-1',
+    };
+
+    const nodesMap = new Map<string, Node>([
+      [
+        'node-1',
+        {
+          ...mockNode,
+          id: 'node-1',
+          position: { x: 100, y: 100 },
+          size: { width: 100, height: 80 },
+        },
+      ],
+    ]);
+
+    const result = getSourceTargetPositions(edge, nodesMap);
+
+    expect(result.source).toBeDefined();
+    expect(result.target).toBeDefined();
+    expect(result.source?.side).toBe('top');
+    expect(result.target?.side).toBe('top');
+    expect(result.source?.x).not.toBe(result.target?.x);
+    expect(result.source?.y).toBe(result.target?.y);
+  });
+
+  it('should use distinct same-node ports for self-loop', () => {
+    const edge: Edge = {
+      ...mockEdge,
+      source: 'node-1',
+      target: 'node-1',
+      sourcePort: 'source-port',
+      targetPort: 'target-port',
+    };
+
+    const nodesMap = new Map<string, Node>([
+      [
+        'node-1',
+        {
+          ...mockNode,
+          id: 'node-1',
+          position: { x: 100, y: 100 },
+          size: { width: 100, height: 80 },
+          measuredPorts: [
+            {
+              ...mockPort,
+              id: 'source-port',
+              side: 'right',
+              position: { x: 90, y: 20 },
+              size: { width: 10, height: 10 },
+            },
+            {
+              ...mockPort,
+              id: 'target-port',
+              side: 'bottom',
+              position: { x: 30, y: 70 },
+              size: { width: 10, height: 10 },
+            },
+          ],
+        },
+      ],
+    ]);
+
+    const result = getSourceTargetPositions(edge, nodesMap);
+
+    expect(result.source).toEqual({ x: 195, y: 125, side: 'right' });
+    expect(result.target).toEqual({ x: 135, y: 175, side: 'bottom' });
+  });
+
   it('should handle rotated nodes with ports', () => {
     const edge: Edge = {
       ...mockEdge,

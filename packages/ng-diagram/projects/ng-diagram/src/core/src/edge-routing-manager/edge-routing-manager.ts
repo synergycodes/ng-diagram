@@ -2,6 +2,7 @@ import { EdgeRoutingConfig, Point } from '../types';
 import { BezierRouting } from './routings/bezier/bezier-routing';
 import { OrthogonalRouting } from './routings/orthogonal/orthogonal-routing';
 import { PolylineRouting } from './routings/polyline/polyline-routing';
+import { SelfLoopRouting } from './routings/self-loop/self-loop-routing';
 import { EdgeRouting, EdgeRoutingContext, EdgeRoutingName } from './types';
 import { computeLinearSegmentLengths, interpolateAlongLinearSegments } from './utils/linear-segment-utils';
 import { normalizeDistance } from './utils/normalize-distance';
@@ -50,7 +51,7 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/routing/
  *
  * @category Types/Routing
  */
-export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline'] as const;
+export const BUILT_IN_EDGE_ROUTINGS = ['orthogonal', 'bezier', 'polyline', 'self-loop'] as const;
 
 /**
  * **Internal manager** for registration, selection, and execution of edge routing implementations.
@@ -100,6 +101,7 @@ export class EdgeRoutingManager {
     this.registerRouting(new OrthogonalRouting());
     this.registerRouting(new BezierRouting());
     this.registerRouting(new PolylineRouting());
+    this.registerRouting(new SelfLoopRouting());
   }
 
   /**

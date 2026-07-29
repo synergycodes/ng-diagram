@@ -60,6 +60,16 @@ export interface EdgeRoutingContext {
    * Target port (if edge is connected to a specific port)
    */
   targetPort?: Port;
+
+  /**
+   * Zero-based index of this self-loop among sibling self-loops on the same node.
+   */
+  selfLoopIndex?: number;
+
+  /**
+   * Total number of self-loops on the same node.
+   */
+  selfLoopCount?: number;
 }
 
 /**
