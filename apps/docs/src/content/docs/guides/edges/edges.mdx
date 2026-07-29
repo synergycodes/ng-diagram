@@ -13,19 +13,21 @@ Edges are the connections between nodes in ngDiagram. They represent relationshi
 ## Edge Properties
 
 Edges have numerous parameters affecting their appearance and behavior.
-Here are the required properties of an edge:
+Here are the core properties of an edge:
 
 ```typescript
-interface Edge<T = any> {
+interface Edge<T extends DataObject = DataObject> {
   id: string; // ID of the edge
   source: string; // ID of the source node
-  sourcePort: string; // ID of the port on the source node
   target: string; // ID of the target node
-  targetPort: string; // ID of the port on the target node
   data: T; // Custom data associated with the edge
+  sourcePort?: string; // Optional ID of the port on the source node
+  targetPort?: string; // Optional ID of the port on the target node
   // ...optional properties
 }
 ```
+
+`sourcePort` and `targetPort` are optional — when you omit them, the edge connects to the node border as a [floating edge](/docs/guides/edges/floating-edges).
 
 [Edge API Reference →](/docs/api/types/model/edge)
 
@@ -80,6 +82,11 @@ ng-diagram-base-edge.default-edge:hover:not(.selected) {
 ng-diagram-base-edge.default-edge.selected {
   --edge-stroke: #3b82f6;
   --edge-stroke-width: 4;
+}
+
+// Draw preview shown while the user is dragging a new connection
+ng-diagram-base-edge.default-edge.temporary {
+  --edge-stroke-opacity: 0.8;
 }
 ```
 

@@ -9,7 +9,7 @@ import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import Background from '../../../components/angular/background/background.astro';
 
 The background of your diagram canvas can be easily customized in ngDiagram.\
-You can choose between built-in patterns (`solid`, `grid`, `dotted`), or provide your own custom background.
+You can use the built-in patterns of the background component (`dots`, `grid`), set a solid color via CSS, or provide your own custom background.
 
 ## Available Background Types
 
@@ -51,7 +51,7 @@ Our grid pattern is fully customizable, allowing you to adjust preferences.
 
 **Configurable settings:**
 
-- **Minor cell size**: Size of the smallest grid cell (used for minor grid lines). Controlled via the diagram config [BackgroundConfig.cellSize](/docs/api/types/configuration/features/backgroundconfig/#cellSize)
+- **Minor cell size**: Size of the smallest grid cell (used for minor grid lines). Controlled via the diagram config [BackgroundConfig.cellSize](/docs/api/types/configuration/features/backgroundconfig/#cellsize)
 - **Major line frequency**: How often a major line appears [BackgroundConfig.majorLinesFrequency](/docs/api/types/configuration/features/backgroundconfig/#majorlinesfrequency)
 - **Line colors, widths, and opacity**: Controlled via CSS variables.
 
@@ -83,7 +83,7 @@ This is the default background type.
 
 **Configurable settings:**
 
-- **Dot spacing**: Controlled via the diagram config [BackgroundConfig.dotSpacing](/docs/api/types/configuration/features/backgroundconfig/#dotSpacing)
+- **Dot spacing**: Controlled via the diagram config [BackgroundConfig.dotSpacing](/docs/api/types/configuration/features/backgroundconfig/#dotspacing)
 - **Dot color**: Controlled via CSS variable.
 
 **CSS Variables:**

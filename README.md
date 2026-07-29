@@ -74,9 +74,8 @@ import { NgDiagramComponent, initializeModel, provideNgDiagram } from 'ng-diagra
   template: ` <ng-diagram [model]="model" /> `,
   styles: `
     :host {
-      flex: 1;
       display: flex;
-      height: 100%;
+      height: 300px;
     }
   `,
 })
@@ -109,15 +108,21 @@ That's it! You now have a working diagram with default node and edge templates.
 Create custom node components with any Angular template:
 
 ```typescript
+import { Component, input } from '@angular/core';
+import { NgDiagramPortComponent, type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
+
+type CustomNodeData = { title: string; description: string };
+
 @Component({
   selector: 'app-custom-node',
+  imports: [NgDiagramPortComponent],
   template: `
     <div class="custom-node">
-      <h3>{{ node.data.title }}</h3>
-      <p>{{ node.data.description }}</p>
-      <ng-diagram-port id="input" position="left" type="target"> </ng-diagram-port>
-      <ng-diagram-port id="output" position="right" type="source"> </ng-diagram-port>
+      <h3>{{ node().data.title }}</h3>
+      <p>{{ node().data.description }}</p>
     </div>
+    <ng-diagram-port id="input" side="left" type="target" />
+    <ng-diagram-port id="output" side="right" type="source" />
   `,
   styles: [
     `
@@ -131,8 +136,8 @@ Create custom node components with any Angular template:
     `,
   ],
 })
-export class CustomNodeComponent implements NgDiagramNodeTemplate {
-  node = input.required<Node>();
+export class CustomNodeComponent implements NgDiagramNodeTemplate<CustomNodeData> {
+  node = input.required<Node<CustomNodeData>>();
 }
 ```
 
@@ -141,19 +146,16 @@ export class CustomNodeComponent implements NgDiagramNodeTemplate {
 Create custom edge components with unique visual styles:
 
 ```typescript
+import { Component, input } from '@angular/core';
+import { NgDiagramBaseEdgeComponent, type Edge, type NgDiagramEdgeTemplate } from 'ng-diagram';
+
 @Component({
   selector: 'app-custom-edge',
-  template: `
-    <ng-diagram-base-edge [path]="path" [markerEnd]="markerEnd" [style]="edgeStyle"> </ng-diagram-base-edge>
-  `,
+  imports: [NgDiagramBaseEdgeComponent],
+  template: ` <ng-diagram-base-edge [edge]="edge()" stroke="#962ee5" [strokeWidth]="2" /> `,
 })
 export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
-
-  get path() {
-    // Custom path calculation
-    return this.calculateCustomPath();
-  }
 }
 ```
 

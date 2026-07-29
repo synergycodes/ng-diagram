@@ -12,7 +12,7 @@ import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 When ngDiagram's default edge customizations are not sufficient, you can create custom edges that provide more precise control over edge rendering, including routing.
 
-You can create a custom edge by extending [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) and implementing `NgDiagramEdgeTemplate`
+You can create a custom edge by writing a component that implements the [`NgDiagramEdgeTemplate`](/docs/api/types/templates/ngdiagramedgetemplate) interface and renders [`NgDiagramBaseEdgeComponent`](/docs/api/components/ngdiagrambaseedgecomponent) in its template.
 
 <CodeSnippet relativePath="edges/custom-edges/custom-edge.component.ts" />
 

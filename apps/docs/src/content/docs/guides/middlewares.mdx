@@ -88,7 +88,7 @@ export const myMiddleware: Middleware = {
   name: 'group-node-checker',
   execute: async (context, next) => {
     const { helpers } = context;
-    if (helpers.checkIfAnyNodePropsChanged(['groupId']).length > 0) {
+    if (helpers.checkIfAnyNodePropsChanged(['groupId'])) {
       const affectedNodeIds = helpers.getAffectedNodeIds(['groupId']);
       console.log('Nodes were added to groups:', affectedNodeIds);
     }

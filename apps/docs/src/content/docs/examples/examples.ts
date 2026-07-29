@@ -95,6 +95,6 @@ export const examples: ContentTile[] = [
     description: `Demonstrates the library's capabilities and integration with external libraries like charts in real-case scenario.`,
     href: '/docs/examples/landing-page-diagram',
     image: '/docs/assets/examples/landing-page-diagram.png',
-    imageAlt: 'Screenshot of Performance Landing Page Diagram example',
+    imageAlt: 'Screenshot of Landing Page Diagram example',
   },
 ];

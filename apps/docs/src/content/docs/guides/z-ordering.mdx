@@ -48,17 +48,19 @@ Children of a selected group inherit the parent's elevation even if they are not
 You can configure z-index behavior via the [`zIndex`](/docs/api/types/configuration/features/zindexconfig) property in your diagram config:
 
 ```typescript
-provideNgDiagram({
-  config: {
-    zIndex: {
-      enabled: true,
-      selectedZIndex: 10000,
-      elevateOnSelection: true,
-      edgesAboveConnectedNodes: false,
-      temporaryEdgeZIndex: 2147483647,
-    },
+config: NgDiagramConfig = {
+  zIndex: {
+    enabled: true,
+    selectedZIndex: 10000,
+    elevateOnSelection: true,
+    edgesAboveConnectedNodes: false,
+    temporaryEdgeZIndex: 2147483647,
   },
-});
+};
+```
+
+```html
+<ng-diagram [model]="model" [config]="config" />
 ```
 
 See [`ZIndexConfig`](/docs/api/types/configuration/features/zindexconfig) for full reference.
