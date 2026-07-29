@@ -101,8 +101,12 @@ const defaultNodeSnappingConfig: SnappingConfig = {
   computeSnapForNodeSize: (): Size | null => {
     return null;
   },
+  computeSnapOffsetForNodeSize: (): Size | null => {
+    return null;
+  },
   defaultDragSnap: { width: 10, height: 10 },
   defaultResizeSnap: { width: 10, height: 10 },
+  defaultResizeSnapOffset: { width: 0, height: 0 },
 };
 
 const defaultSelectionMovingConfig: SelectionMovingConfig = {

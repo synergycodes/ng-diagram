@@ -247,7 +247,8 @@ const calculateSnappedDimensions = (
   nextPosition: Node['position'] | undefined,
   nextSize: Node['size'],
   snappedPosition: Node['position'] | undefined,
-  snapping: Size
+  snapping: Size,
+  snapOffset: Size
 ): Size => {
   const prevWidth = node.size?.width ?? 0;
   const prevHeight = node.size?.height ?? 0;
@@ -265,7 +266,7 @@ const calculateSnappedDimensions = (
       // Maintain right edge position when left edge moves
       width = Math.round(node.position.x + prevWidth) - snappedPosition.x;
     } else {
-      width = NgDiagramMath.snapNumber(nodeWidth, snapping.width);
+      width = NgDiagramMath.snapNumber(nodeWidth, snapping.width, snapOffset.width);
     }
   }
 
@@ -275,7 +276,7 @@ const calculateSnappedDimensions = (
       // Maintain bottom edge position when top edge moves
       height = Math.max(Math.round(node.position.y + prevHeight) - snappedPosition.y, 0);
     } else {
-      height = NgDiagramMath.snapNumber(nodeHeight, snapping.height);
+      height = NgDiagramMath.snapNumber(nodeHeight, snapping.height, snapOffset.height);
     }
   }
 
@@ -289,11 +290,37 @@ const computeAndApplySnapping = async (
   nextSize: Node['size'],
   nextDisableAutoSize: boolean | undefined
 ) => {
-  const { computeSnapForNodeSize, defaultResizeSnap } = commandHandler.flowCore.config.snapping;
+  const { computeSnapForNodeSize, defaultResizeSnap, computeSnapOffsetForNodeSize, defaultResizeSnapOffset } =
+    commandHandler.flowCore.config.snapping;
   const snapping = computeSnapForNodeSize(node) ?? defaultResizeSnap;
-  const snappedPosition = nextPosition && NgDiagramMath.snapPoint(nextPosition, snapping);
+  const snapOffset = computeSnapOffsetForNodeSize(node) ?? defaultResizeSnapOffset;
 
-  const { width, height } = calculateSnappedDimensions(node, nextPosition, nextSize, snappedPosition, snapping);
+  // Only snap a position axis that the resize actually moved. Resizing from the
+  // bottom/right edge leaves the top-left corner in place, but the group path
+  // always synthesizes a position (to contain children), so snapping the whole
+  // point here would move an unaligned group even though no edge with a position
+  // handle was dragged. Preserving unmoved axes keeps the group anchored.
+  const snappedPosition = nextPosition
+    ? {
+        x:
+          node.position.x !== nextPosition.x
+            ? NgDiagramMath.snapNumber(nextPosition.x, snapping.width, snapOffset.width)
+            : node.position.x,
+        y:
+          node.position.y !== nextPosition.y
+            ? NgDiagramMath.snapNumber(nextPosition.y, snapping.height, snapOffset.height)
+            : node.position.y,
+      }
+    : undefined;
+
+  const { width, height } = calculateSnappedDimensions(
+    node,
+    nextPosition,
+    nextSize,
+    snappedPosition,
+    snapping,
+    snapOffset
+  );
 
   const updateData: Partial<Node> & { id: Node['id'] } = {
     id: node.id,

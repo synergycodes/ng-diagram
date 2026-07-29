@@ -102,7 +102,15 @@ export class AppComponent {
       cellSize: { width: 10, height: 10 },
     },
     snapping: {
-      shouldSnapDragForNode: () => false,
+      // shouldSnapDragForNode: () => true,
+      shouldSnapResizeForNode: () => true,
+      computeSnapForNodeSize: (node: Node) => {
+        console.log('computeSnapForNodeSize', node.type);
+        if (node.type === 'custom-group') {
+          return { width: 100, height: 100 };
+        }
+        return { width: 10, height: 10 };
+      },
     },
     linking: {
       selectNodeOnPortPress: false,

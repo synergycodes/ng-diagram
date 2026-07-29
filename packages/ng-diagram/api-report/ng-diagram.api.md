@@ -1606,8 +1606,10 @@ export interface Size {
 export interface SnappingConfig {
     computeSnapForNodeDrag: (node: Node_2) => Size | null;
     computeSnapForNodeSize: (node: Node_2) => Size | null;
+    computeSnapOffsetForNodeSize: (node: Node_2) => Size | null;
     defaultDragSnap: Size;
     defaultResizeSnap: Size;
+    defaultResizeSnapOffset: Size;
     shouldSnapDragForNode: (node: Node_2) => boolean;
     shouldSnapResizeForNode: (node: Node_2) => boolean;
 }

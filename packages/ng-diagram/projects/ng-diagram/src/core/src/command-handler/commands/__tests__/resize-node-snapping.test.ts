@@ -38,7 +38,9 @@ describe('Resize Node Command with Snapping', () => {
           shouldSnapDragForNode: vi.fn().mockReturnValue(false),
           shouldSnapResizeForNode: vi.fn().mockReturnValue(true), // Enable snapping
           computeSnapForNodeSize: vi.fn().mockReturnValue(SNAP_GRID),
+          computeSnapOffsetForNodeSize: vi.fn().mockReturnValue(null),
           defaultResizeSnap: SNAP_GRID,
+          defaultResizeSnapOffset: { width: 0, height: 0 },
         },
       },
       transactionManager: {
@@ -377,6 +379,57 @@ describe('Resize Node Command with Snapping', () => {
       );
     });
 
+    it('should not move a group with children when resizing from bottom-right (position unchanged)', async () => {
+      // Regression: a group whose position is not aligned to the resize snap grid
+      // must stay anchored when resized from an edge that does not move its
+      // top-left corner. Previously the group path always synthesized a position,
+      // which then got snapped to the grid and made the group jump.
+      const groupNode: GroupNode = {
+        id: 'group1',
+        size: { width: 200, height: 150 },
+        position: { x: 137, y: 84 }, // Deliberately off the snap grid
+        isGroup: true,
+        selected: true,
+        highlighted: false,
+      } as GroupNode;
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(groupNode);
+      mockIsGroup.mockReturnValue(true);
+
+      // One child fully inside the group
+      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+        { id: 'child1', position: { x: 160, y: 100 }, size: { width: 40, height: 30 } },
+      ]);
+      mockCalculateGroupBounds.mockReturnValue({ left: 160, top: 100, right: 200, bottom: 130 });
+
+      // Custom resize snap grid, matching the reported configuration
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+
+      // Resize from bottom-right corner: no position is provided by the handler
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 240, height: 170 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 200, height: 150 }, // 240 -> 200, 170 -> 150 (snapped)
+              position: { x: 137, y: 84 }, // Preserved - the group must not move
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
     it('should handle group resize from top edge with snapping correctly', async () => {
       const groupNode: GroupNode = {
         id: 'group1',
@@ -409,6 +462,87 @@ describe('Resize Node Command with Snapping', () => {
               id: 'group1',
               size: { width: 200, height: 150 }, // Height calculated: 300 - 150 = 150
               position: { x: 100, y: 150 }, // Snapped position
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+  });
+
+  describe('Resize Snap Offset', () => {
+    it('snaps size to the sequence offset + n * snap (header + min height use case)', async () => {
+      // A node with a 60px header / 60px min height, snapping every 50px vertically.
+      // The next snapped height after 60 should be 110 (60 + 50), not 100.
+      const node = {
+        id: '1',
+        size: { width: 200, height: 60 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 100, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+      (flowCore.config.snapping.computeSnapOffsetForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 0,
+        height: 60,
+      });
+
+      // Resize from the bottom edge: only height changes, no position provided.
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 200, height: 95 }, // Would snap to 100 without the offset
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 200, height: 110 }, // 60 + 50, thanks to the offset
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('falls back to defaultResizeSnapOffset when computeSnapOffsetForNodeSize returns null', async () => {
+      const node = {
+        id: '1',
+        size: { width: 200, height: 60 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 100, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+      (flowCore.config.snapping.computeSnapOffsetForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue(null);
+      flowCore.config.snapping.defaultResizeSnapOffset = { width: 0, height: 60 };
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 200, height: 95 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 200, height: 110 }, // Uses the default offset
               autoSize: false,
             },
           ],
@@ -579,7 +713,7 @@ describe('Resize Node Command with Snapping', () => {
             {
               id: '1',
               size: { width: 225, height: 180 }, // Width snapped to 25, height to 15
-              position: { x: 100, y: 105 }, // Y position adjusted due to height constraint
+              position: { x: 100, y: 100 }, // Position preserved - neither axis moved
               autoSize: false,
             },
           ],
