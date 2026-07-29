@@ -934,8 +934,8 @@ export const NgDiagramMath: {
     distanceBetweenPoints: (a: Point, b: Point) => number;
     normalizeAngle: (angle: number) => number;
     snapAngle: typeof snapAngle;
-    snapNumber: (value: number, step: number) => number;
-    snapPoint: (point: Point, step: Size) => {
+    snapNumber: (value: number, step: number, offset?: number) => number;
+    snapPoint: (point: Point, step: Size, offset?: Size) => {
         x: number;
         y: number;
     };
