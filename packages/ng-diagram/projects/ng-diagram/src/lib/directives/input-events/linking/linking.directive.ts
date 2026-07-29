@@ -20,11 +20,22 @@ export class LinkingInputDirective implements OnDestroy {
 
   private target = signal<Node | undefined>(undefined);
   private edgePanningInterval: number | null = null;
+  private gestureActive = false;
 
   portId = input.required<string>();
 
   ngOnDestroy(): void {
     this.cleanup();
+    // Destroyed mid-gesture (e.g. the source node was deleted while linking): the
+    // pointerup will never be routed and finishLinking will never run. The state
+    // must be cleared here — a stranded linking state permanently disables linking,
+    // because shouldHandle refuses to start while isLinking() is true.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      if (this.flowCoreProviderService.isInitialized()) {
+        this.flowCoreProviderService.provide().actionStateManager.clearLinking();
+      }
+    }
   }
 
   setTargetNode(node: Node) {
@@ -37,6 +48,7 @@ export class LinkingInputDirective implements OnDestroy {
     }
 
     $event.linkingHandled = true;
+    this.gestureActive = true;
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Linking);
 
     document.addEventListener('pointermove', this.onPointerMove);
@@ -77,6 +89,7 @@ export class LinkingInputDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
+    this.gestureActive = false;
     this.linkingEventService.emitEnd($event, this.target(), this.portId());
     this.cleanup();
   };

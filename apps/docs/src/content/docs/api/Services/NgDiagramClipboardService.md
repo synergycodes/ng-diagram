@@ -24,31 +24,35 @@ this.clipboardService.copy();
 
 ### copy()
 
-> **copy**(): `void`
+> **copy**(): `Promise`\<`void`\>
 
 Copies the current selection to the clipboard.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the selection has been copied.
 
 ***
 
 ### cut()
 
-> **cut**(): `void`
+> **cut**(): `Promise`\<`void`\>
 
 Cuts the current selection to the clipboard.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
 
 ***
 
 ### paste()
 
-> **paste**(`position`): `void`
+> **paste**(`position`, `options?`): `Promise`\<`void`\>
 
 Pastes the clipboard content at the specified position.
 
@@ -60,6 +64,18 @@ Pastes the clipboard content at the specified position.
 
 The position where to paste the content.
 
+##### options?
+
+Optional settings. Set `waitForMeasurements: true` to resolve only after the
+pasted elements have been measured — useful before calling `zoomToFit()` or
+`centerOnNode()`. Available since 1.3.0.
+
+###### waitForMeasurements?
+
+`boolean`
+
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.

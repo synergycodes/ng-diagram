@@ -49,6 +49,21 @@ export interface LinkingActionState {
 }
 
 /**
+ * Linking state with the gesture stamp. The linking object is replaced on every
+ * pointer move and by the edges-routing middleware, so object identity cannot
+ * tell gestures apart — finish commands clear only when the stamp matches.
+ * Created only via `createLinkingState`, which stamps a fresh id; updaters must COPY
+ * the previous state (spread), never rebuild it field by field — a rebuild
+ * silently drops the stamp.
+ *
+ * @internal
+ */
+export interface InternalLinkingActionState extends LinkingActionState {
+  /** Monotonic id of the linking gesture this state belongs to. */
+  _gestureId?: number;
+}
+
+/**
  * State containing copied nodes and edges for paste operations.
  *
  * @public
