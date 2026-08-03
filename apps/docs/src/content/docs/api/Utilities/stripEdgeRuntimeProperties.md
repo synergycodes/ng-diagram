@@ -1,5 +1,5 @@
 ---
-version: "since v1.2.5"
+version: "since v1.3.0"
 editUrl: false
 next: false
 prev: false
@@ -13,6 +13,10 @@ Strips runtime-computed properties from an edge
 
 These properties are recomputed during initialization and stale values
 from persistence cause the measurement system to skip fresh DOM measurement.
+
+Free endpoints of dangling edges are the exception: when `source` or `target`
+is empty, the corresponding `sourcePosition`/`targetPosition` is authored data
+— the only source of truth for that endpoint — so it is preserved.
 
 This is the default edge strip function used by [initializeModel](/docs/api/utilities/initializemodel/) and
 [initializeModelAdapter](/docs/api/utilities/initializemodeladapter/). When providing a custom strip function, wrap

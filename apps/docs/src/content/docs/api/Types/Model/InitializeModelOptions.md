@@ -1,5 +1,5 @@
 ---
-version: "since v1.2.5"
+version: "since v1.3.0"
 editUrl: false
 next: false
 prev: false
@@ -22,9 +22,12 @@ during initialization (and, for the default model created by
 exists because stale runtime values (`sourcePosition`, `targetPosition`,
 `measuredLabels`, `computedZIndex`, `_internalId`) loaded from persistence
 can and probably will break the diagram — e.g. edges rendered at outdated
-positions or duplicated internal ids. Overriding this function and keeping
-such properties is unsupported territory; prefer wrapping the default and
-re-adding only the properties you know you need.
+positions or duplicated internal ids. The default already preserves the
+authored free-endpoint position of a dangling edge (empty `source`/`target`),
+so keeping `sourcePosition`/`targetPosition` yourself is not needed for that.
+Overriding this function and keeping such properties is unsupported
+territory; prefer wrapping the default and re-adding only the properties
+you know you need.
 
 ***
 

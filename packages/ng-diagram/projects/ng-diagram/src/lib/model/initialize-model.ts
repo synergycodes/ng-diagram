@@ -13,7 +13,7 @@ import {
  * Options for {@link initializeModel} and {@link initializeModelAdapter}.
  *
  * @public
- * @since 1.2.5
+ * @since 1.3.0
  * @category Types/Model
  */
 export interface InitializeModelOptions {
@@ -40,9 +40,12 @@ export interface InitializeModelOptions {
    * exists because stale runtime values (`sourcePosition`, `targetPosition`,
    * `measuredLabels`, `computedZIndex`, `_internalId`) loaded from persistence
    * can and probably will break the diagram — e.g. edges rendered at outdated
-   * positions or duplicated internal ids. Overriding this function and keeping
-   * such properties is unsupported territory; prefer wrapping the default and
-   * re-adding only the properties you know you need.
+   * positions or duplicated internal ids. The default already preserves the
+   * authored free-endpoint position of a dangling edge (empty `source`/`target`),
+   * so keeping `sourcePosition`/`targetPosition` yourself is not needed for that.
+   * Overriding this function and keeping such properties is unsupported
+   * territory; prefer wrapping the default and re-adding only the properties
+   * you know you need.
    */
   stripEdgeRuntimeProperties?: StripEdgeRuntimePropertiesFn;
 }
@@ -75,9 +78,9 @@ export interface InitializeModelOptions {
  *
  * // ⚠️ At your own risk: customize which runtime properties are stripped
  * model = initializeModel({ nodes: [...], edges: [...] }, undefined, {
- *   stripEdgeRuntimeProperties: (edge) => ({
- *     ...stripEdgeRuntimeProperties(edge),
- *     sourcePosition: edge.sourcePosition, // keep authored free-endpoint position
+ *   stripNodeRuntimeProperties: (node) => ({
+ *     ...stripNodeRuntimeProperties(node),
+ *     selected: node.selected, // keep selection state across reloads
  *   }),
  * });
  * ```
@@ -88,7 +91,7 @@ export interface InitializeModelOptions {
  * |---------|---------|
  * | v0.8.0  | Introduced |
  * | v1.2.0  | Can now be safely used inside reactive contexts (`computed`, `effect`, `linkedSignal`) |
- * | v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
+ * | v1.3.0  | Added `options` parameter for customizing runtime-property stripping |
  *
  * @param model Initial model data (nodes, edges, metadata).
  * @param injector Optional Angular `Injector` if not running inside an injection context.
@@ -147,7 +150,7 @@ export function initializeModel(
  * | Version | Changes |
  * |---------|---------|
  * | v1.1.0  | Introduced |
- * | v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
+ * | v1.3.0  | Added `options` parameter for customizing runtime-property stripping |
  *
  * @param adapter An existing ModelAdapter to initialize.
  * @param model Optional initial model data to seed the adapter with.

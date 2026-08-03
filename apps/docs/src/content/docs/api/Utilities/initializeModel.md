@@ -61,9 +61,9 @@ model = computed(() => initializeModel(this.myModel(), this.injector));
 
 // ⚠️ At your own risk: customize which runtime properties are stripped
 model = initializeModel({ nodes: [...], edges: [...] }, undefined, {
-  stripEdgeRuntimeProperties: (edge) => ({
-    ...stripEdgeRuntimeProperties(edge),
-    sourcePosition: edge.sourcePosition, // keep authored free-endpoint position
+  stripNodeRuntimeProperties: (node) => ({
+    ...stripNodeRuntimeProperties(node),
+    selected: node.selected, // keep selection state across reloads
   }),
 });
 ```
@@ -74,4 +74,4 @@ model = initializeModel({ nodes: [...], edges: [...] }, undefined, {
 |---------|---------|
 | v0.8.0  | Introduced |
 | v1.2.0  | Can now be safely used inside reactive contexts (`computed`, `effect`, `linkedSignal`) |
-| v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
+| v1.3.0  | Added `options` parameter for customizing runtime-property stripping |

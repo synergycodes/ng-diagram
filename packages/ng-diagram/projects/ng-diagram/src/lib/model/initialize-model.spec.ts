@@ -287,6 +287,62 @@ describe('initializeModel', () => {
     ]);
   });
 
+  describe('dangling edges', () => {
+    const danglingEdge: Edge = {
+      id: 'dangling',
+      source: 'node1',
+      target: '',
+      data: {},
+      targetPosition: { x: 300, y: 150 },
+    };
+
+    it('should keep the authored targetPosition of a dangling edge', () => {
+      const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: [danglingEdge] }));
+
+      expect(adapter.getEdges()[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
+
+    it('should keep the authored sourcePosition of a reverse dangling edge', () => {
+      const reverseDangling: Edge = {
+        id: 'reverse-dangling',
+        source: '',
+        target: 'node1',
+        data: {},
+        sourcePosition: { x: 300, y: 150 },
+      };
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ nodes: mockNodes, edges: [reverseDangling] })
+      );
+
+      expect(adapter.getEdges()[0].sourcePosition).toEqual({ x: 300, y: 150 });
+    });
+
+    it('should still strip the connected-end position and other runtime properties of a dangling edge', () => {
+      const edge: Edge = {
+        ...danglingEdge,
+        sourcePosition: { x: 10, y: 20 },
+        measuredLabels: [
+          { id: 'label1', positionOnEdge: 0.5, size: { width: 50, height: 20 }, position: { x: 50, y: 25 } },
+        ],
+        computedZIndex: 3,
+      };
+      const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: [edge] }));
+
+      const [result] = adapter.getEdges();
+      expect((result as any).sourcePosition).toBeUndefined();
+      expect(result.targetPosition).toEqual({ x: 300, y: 150 });
+      expect(result.measuredLabels).toBeUndefined();
+      expect(result.computedZIndex).toBeUndefined();
+    });
+
+    it('should survive a toJSON → initializeModel round trip without options', () => {
+      const first = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: [danglingEdge] }));
+      const second = TestBed.runInInjectionContext(() => initializeModel(JSON.parse(first.toJSON())));
+
+      expect(second.getEdges()[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
+  });
+
   it('should preserve user-set node properties', () => {
     const nodesWithComputed = createNodesWithComputedProperties();
     const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: nodesWithComputed }));

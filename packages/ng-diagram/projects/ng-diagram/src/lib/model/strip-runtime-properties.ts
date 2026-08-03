@@ -5,7 +5,7 @@ import type { Edge, Node } from '../../core/src';
  * initialization or serialization.
  *
  * @public
- * @since 1.2.5
+ * @since 1.3.0
  * @category Types/Model
  */
 export type StripNodeRuntimePropertiesFn = (node: Node) => Node;
@@ -15,7 +15,7 @@ export type StripNodeRuntimePropertiesFn = (node: Node) => Node;
  * initialization or serialization.
  *
  * @public
- * @since 1.2.5
+ * @since 1.3.0
  * @category Types/Model
  */
 export type StripEdgeRuntimePropertiesFn = (edge: Edge) => Edge;
@@ -32,7 +32,7 @@ export type StripEdgeRuntimePropertiesFn = (edge: Edge) => Edge;
  * this one instead of reimplementing it so future runtime properties stay covered.
  *
  * @public
- * @since 1.2.5
+ * @since 1.3.0
  * @category Utilities
  */
 export function stripNodeRuntimeProperties(node: Node): Node {
@@ -50,12 +50,16 @@ export function stripNodeRuntimeProperties(node: Node): Node {
  * These properties are recomputed during initialization and stale values
  * from persistence cause the measurement system to skip fresh DOM measurement.
  *
+ * Free endpoints of dangling edges are the exception: when `source` or `target`
+ * is empty, the corresponding `sourcePosition`/`targetPosition` is authored data
+ * — the only source of truth for that endpoint — so it is preserved.
+ *
  * This is the default edge strip function used by {@link initializeModel} and
  * {@link initializeModelAdapter}. When providing a custom strip function, wrap
  * this one instead of reimplementing it so future runtime properties stay covered.
  *
  * @public
- * @since 1.2.5
+ * @since 1.3.0
  * @category Utilities
  */
 export function stripEdgeRuntimeProperties(edge: Edge): Edge {
@@ -63,5 +67,9 @@ export function stripEdgeRuntimeProperties(edge: Edge): Edge {
   const { sourcePosition, targetPosition, measuredLabels, computedZIndex, _internalId, ...rest } = edge as Edge & {
     _internalId?: unknown;
   };
-  return rest;
+  return {
+    ...rest,
+    ...(!edge.source && sourcePosition ? { sourcePosition } : {}),
+    ...(!edge.target && targetPosition ? { targetPosition } : {}),
+  };
 }

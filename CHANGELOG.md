@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Dangling edges survive persistence** — `initializeModel` and `initializeModelAdapter` no longer strip the authored `sourcePosition`/`targetPosition` of an edge's free endpoint (empty `source`/`target`), and `toJSON()` now includes them in the serialized output, so dangling edges load from a persisted model the same way they work when added at runtime; no more "Invalid edge coordinates detected" for valid dangling edges on init ([#751](https://github.com/synergycodes/ng-diagram/issues/751), [#760](https://github.com/synergycodes/ng-diagram/pull/760))
+
 ## [1.2.4] - 2026-06-02
 
 ### Changed

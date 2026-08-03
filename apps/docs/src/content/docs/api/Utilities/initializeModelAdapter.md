@@ -68,4 +68,4 @@ model = initializeModelAdapter(new NgRxModelAdapter(this.store), undefined, this
 | Version | Changes |
 |---------|---------|
 | v1.1.0  | Introduced |
-| v1.2.5  | Added `options` parameter for customizing runtime-property stripping |
+| v1.3.0  | Added `options` parameter for customizing runtime-property stripping |

@@ -92,6 +92,14 @@ describe('SignalModelAdapter', () => {
       expect(edges[0].computedZIndex).toBeUndefined();
     });
 
+    it('should keep the authored free-endpoint position of a dangling edge', () => {
+      service.updateEdges([{ id: 'dangling', source: '1', target: '', data: {}, targetPosition: { x: 300, y: 150 } }]);
+
+      const { edges } = JSON.parse(service.toJSON());
+
+      expect(edges[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
+
     it('should use overridden strip functions', () => {
       service.stripNodeRuntimeProperties = (node) => node;
       service.stripEdgeRuntimeProperties = (edge) => edge;

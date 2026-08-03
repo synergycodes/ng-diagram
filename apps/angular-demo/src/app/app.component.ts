@@ -30,7 +30,6 @@ import {
   SelectionGestureEndedEvent,
   SelectionRemovedEvent,
   SelectionRotatedEvent,
-  stripEdgeRuntimeProperties,
   type Edge,
   type EdgeLabel,
   type Node,
@@ -127,15 +126,7 @@ export class AppComponent {
   };
 
   modelData = signal<Partial<{ nodes: Node[]; edges: Edge[] }>>(defaultModel);
-  model = computed(() =>
-    initializeModel(this.modelData(), this.injector, {
-      stripEdgeRuntimeProperties: (edge) => ({
-        ...stripEdgeRuntimeProperties(edge),
-        sourcePosition: edge.sourcePosition,
-        targetPosition: edge.targetPosition,
-      }),
-    })
-  );
+  model = computed(() => initializeModel(this.modelData(), this.injector));
 
   // =============================================
   // Batch Test Mode
