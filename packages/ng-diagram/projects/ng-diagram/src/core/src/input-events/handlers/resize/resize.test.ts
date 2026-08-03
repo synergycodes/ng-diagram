@@ -194,7 +194,7 @@ describe('ResizeEventHandler', () => {
       await handler.cancel();
 
       expect(resizeState?.cancelReason).toBe('cancelled');
-      expect(mockEmit).toHaveBeenCalledWith('resizeNodeStop');
+      expect(mockEmit).toHaveBeenCalledWith('resizeNodeStop', { nodeId: 'node1' });
       expect(mockActionStateManager.clearResize).toHaveBeenCalled();
     });
 

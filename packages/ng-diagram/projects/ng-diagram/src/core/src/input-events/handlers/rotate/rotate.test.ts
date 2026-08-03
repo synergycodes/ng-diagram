@@ -238,7 +238,7 @@ describe('RotateEventHandler', () => {
       await instance.cancel();
 
       expect(rotation.cancelReason).toBe('cancelled');
-      expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStop');
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStop', { nodeId: 'test-node' });
       expect(mockActionStateManager.clearRotation).toHaveBeenCalled();
     });
 

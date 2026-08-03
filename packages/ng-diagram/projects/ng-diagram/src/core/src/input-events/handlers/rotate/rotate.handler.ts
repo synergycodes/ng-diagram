@@ -107,7 +107,7 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
         id: rotation.nodeId,
         nodeChanges: { angle: rotation.initialNodeAngle },
       });
-      await tx.emit('rotateNodeStop');
+      await tx.emit('rotateNodeStop', { nodeId: rotation.nodeId });
     });
 
     this.flow.actionStateManager.clearRotation();

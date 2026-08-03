@@ -1020,7 +1020,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       await handler.cancel();
 
       expect(mockActionStateManager.dragging?.cancelReason).toBe('cancelled');
-      expect(mockEmit).toHaveBeenCalledWith('moveNodesStop');
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStop', { nodeIds: expect.any(Array) });
       expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
     });
 

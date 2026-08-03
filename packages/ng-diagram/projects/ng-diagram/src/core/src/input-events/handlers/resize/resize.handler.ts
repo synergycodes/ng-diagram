@@ -157,7 +157,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           autoSize: resizingNode.autoSize,
         },
       });
-      await tx.emit('resizeNodeStop');
+      await tx.emit('resizeNodeStop', { nodeId: resizingNode.id });
     });
 
     this.flow.actionStateManager.clearResize();
