@@ -281,6 +281,30 @@ describe('InitUpdater', () => {
       expect(onComplete).toHaveBeenCalledTimes(1);
       expect(initUpdater.isInitialized).toBe(true);
     });
+
+    it('should complete initialization even when the onComplete callback rejects', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      mockRenderedModel = { nodes: [], edges: [] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      const onComplete = vi.fn().mockRejectedValue(new Error('init command failed'));
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges, onComplete);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      // A rejected init pass must not wedge the updater in init mode — that would
+      // swallow every future measurement.
+      expect(initUpdater.isInitialized).toBe(true);
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
   });
 
   describe('applyNodeSize', () => {

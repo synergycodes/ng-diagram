@@ -1,6 +1,6 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
 import { Node } from '../../../../core/src';
-import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
+import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, PointerInputEvent } from '../../../types';
@@ -16,6 +16,7 @@ export class RotateHandleDirective implements OnDestroy {
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly touchEventsStateService = inject(TouchEventsStateService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
+  private gestureActive = false;
 
   targetData = input<Node>();
 
@@ -23,6 +24,14 @@ export class RotateHandleDirective implements OnDestroy {
 
   ngOnDestroy() {
     this.cleanup();
+    // Destroyed mid-gesture (e.g. the node was deleted while rotating): the pointerup
+    // will never be routed, so the rotation state must be cleared here.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      if (this.flowCoreProvider.isInitialized()) {
+        this.flowCoreProvider.provide().actionStateManager.clearRotation();
+      }
+    }
   }
 
   onPointerDown($event: PointerInputEvent) {
@@ -31,6 +40,7 @@ export class RotateHandleDirective implements OnDestroy {
     }
 
     $event.rotateHandled = true;
+    this.gestureActive = true;
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Rotate);
 
     const targetData = this.targetData();
@@ -87,6 +97,7 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
+    this.gestureActive = false;
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -108,6 +119,7 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   onPointerCancel = ($event: PointerInputEvent) => {
+    this.gestureActive = false;
     const targetData = this.targetData();
     if (!targetData) {
       return;

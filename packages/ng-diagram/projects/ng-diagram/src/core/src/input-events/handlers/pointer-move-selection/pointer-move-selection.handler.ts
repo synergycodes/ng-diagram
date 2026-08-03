@@ -7,20 +7,34 @@ import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
 export const MOVE_THRESHOLD = 5; // to find out if move was intended
 
+/**
+ * One drag gesture's private input-tracking state — a fresh object per gesture,
+ * written only by this handler, so object identity reliably answers "same
+ * gesture?". Deliberately not in actionState.dragging: nothing outside this
+ * handler reads these fields, and actionState is public API where every write
+ * emits actionStateChanged.
+ */
+interface DragGesture {
+  startPoint: Point;
+  lastPointerPosition: Point;
+  hasMoved: boolean;
+  ended: boolean;
+}
+
 export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSelectionEvent> {
-  private lastPointerPosition: Point | undefined;
-  private startPoint: Point | undefined;
-  private isMoving = false;
-  private hasMoved = false;
+  private gesture: DragGesture | null = null;
 
   async handle(event: PointerMoveSelectionEvent) {
     switch (event.phase) {
       case 'start': {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        this.lastPointerPosition = flowPosition;
-        this.startPoint = flowPosition;
-        this.isMoving = true;
+        this.gesture = {
+          startPoint: flowPosition,
+          lastPointerPosition: flowPosition,
+          hasMoved: false,
+          ended: false,
+        };
         this.flow.actionStateManager.dragging = {
           nodeIds: [],
           modifiers: { ...event.modifiers },
@@ -35,38 +49,55 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           .getSelectedNodesWithChildren({ directOnly: false })
           .filter((node) => node.draggable ?? true);
         const selectedNodes = this.flow.modelLookup.getSelectedNodes();
-        if (selectedNodesWithChildren.length === 0 || !this.isMoving || !this.lastPointerPosition || !this.startPoint) {
+        // Un-awaited handle() calls interleave at every await (see EventHandler.handle)
+        // — snapshot values before the first suspension and re-validate the gesture
+        // after it, or moves get double-applied.
+        const gesture = this.gesture;
+        if (selectedNodesWithChildren.length === 0 || !gesture || gesture.ended) {
           return;
         }
+        const { startPoint, lastPointerPosition } = gesture;
 
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        if (!this.hasMoved) {
-          const totalDeltaX = pointer.x - this.startPoint.x;
-          const totalDeltaY = pointer.y - this.startPoint.y;
-          const distance = Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY);
-          if (distance >= MOVE_THRESHOLD) {
-            this.hasMoved = true;
-            this.flow.actionStateManager.dragging = {
-              nodeIds: selectedNodesWithChildren.map((n) => n.id),
-              modifiers: { ...event.modifiers },
-              movementStarted: true,
-              accumulatedDeltas: new Map(),
-              // Nodes haven't moved yet at this point — the first delta is applied below.
-              initialPositions: new Map(selectedNodesWithChildren.map((n) => [n.id, { ...n.position }])),
-            };
-            await this.flow.commandHandler.emit('moveNodesStart');
-          }
+        const totalDeltaX = pointer.x - startPoint.x;
+        const totalDeltaY = pointer.y - startPoint.y;
+        const crossedThreshold =
+          !gesture.hasMoved && Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY) >= MOVE_THRESHOLD;
+        const draggedNodeIds = selectedNodesWithChildren.map((n) => n.id);
+        if (crossedThreshold) {
+          gesture.hasMoved = true;
+          this.flow.actionStateManager.dragging = {
+            nodeIds: draggedNodeIds,
+            modifiers: { ...event.modifiers },
+            movementStarted: true,
+            accumulatedDeltas: new Map(),
+            // Snapshot positions before the first delta is applied so an aborted
+            // drag (cancelActiveInteraction) can restore them.
+            initialPositions: new Map(selectedNodesWithChildren.map((n) => [n.id, { ...n.position }])),
+          };
         }
 
-        const dx = pointer.x - this.lastPointerPosition.x;
-        const dy = pointer.y - this.lastPointerPosition.y;
+        const dx = pointer.x - lastPointerPosition.x;
+        const dy = pointer.y - lastPointerPosition.y;
+        const shouldMove = gesture.hasMoved;
 
         if (this.flow.actionStateManager.dragging) {
           this.flow.actionStateManager.dragging.modifiers = { ...event.modifiers };
         }
 
-        if (this.hasMoved) {
+        gesture.lastPointerPosition = pointer;
+
+        if (crossedThreshold) {
+          await this.flow.commandHandler.emit('moveNodesStart', { nodeIds: draggedNodeIds });
+          // Ended (even with its 'end' still in flight) or replaced while the emit
+          // was suspended — applying the move now would move nodes after the drop.
+          if (this.gesture !== gesture || gesture.ended) {
+            break;
+          }
+        }
+
+        if (shouldMove) {
           this.flow.transaction('moveNodes', async (tx) => {
             await tx.emit('moveNodesBy', {
               delta: { x: dx, y: dy },
@@ -78,30 +109,63 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           this.panDiagramOnScreenEdge(event.panningForce);
         }
 
-        this.lastPointerPosition = pointer;
         break;
       }
       case 'end': {
-        const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
-        if (this.hasMoved) {
-          await this.handleDrop(pointer);
-          await this.flow.commandHandler.emit('moveNodesStop');
+        const gesture = this.gesture;
+        if (gesture) {
+          // Marks the gesture dead for suspended continues — synchronously,
+          // because this.gesture is nulled only after the awaits below.
+          gesture.ended = true;
         }
-
-        this.flow.actionStateManager.clearDragging();
-        this.lastPointerPosition = undefined;
-        this.startPoint = undefined;
-        this.isMoving = false;
-        this.hasMoved = false;
+        // Captured before any await — a re-drag can replace the dragging state
+        // while the drop below is suspended, and nodeDragEnded must report THIS
+        // gesture's nodes.
+        const draggedNodeIds = this.flow.actionStateManager.dragging?.nodeIds ?? [];
+        const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
+        // Two guarantees, two finallys: the inner pairs moveNodesStop with the
+        // drop; the outer runs cleanup even when moveNodesStop itself rejects.
+        try {
+          if (gesture?.hasMoved) {
+            try {
+              await this.handleDrop(pointer);
+            } finally {
+              // moveNodesStop must fire even when the drop rejects (a user config
+              // callback can throw inside addToGroup) — app code pairs the
+              // nodeDragStarted/nodeDragEnded lifecycle events.
+              await this.flow.commandHandler.emit('moveNodesStop', { nodeIds: draggedNodeIds });
+            }
+          }
+        } finally {
+          // A fast re-drag started while the drop was suspended must not have its
+          // freshly initialized gesture state clobbered — hence the identity guard.
+          if (this.gesture === gesture) {
+            // A rejected drop can skip addToGroup's own highlight clear — no
+            // highlight may survive the end of the gesture.
+            if (this.flow.actionStateManager.highlightGroup) {
+              void this.flow.commandHandler.emit('highlightGroupClear');
+            }
+            this.flow.actionStateManager.clearDragging();
+            this.gesture = null;
+          }
+        }
       }
     }
   }
 
   override async cancel(): Promise<void> {
-    if (this.isMoving || this.flow.actionStateManager.isDragging()) {
+    const gesture = this.gesture;
+    if (gesture || this.flow.actionStateManager.isDragging()) {
       const dragging = this.flow.actionStateManager.dragging;
-      const needsStop = this.hasMoved;
+      const needsStop = gesture?.hasMoved ?? false;
       const needsHighlightClear = !!this.flow.actionStateManager.highlightGroup;
+      const draggedNodeIds = dragging?.nodeIds ?? [];
+
+      // Marks the gesture dead for any suspended 'continue' passes, mirroring
+      // the 'end' phase — a delta must not be applied after the abort.
+      if (gesture) {
+        gesture.ended = true;
+      }
 
       if (needsStop && dragging) {
         // Must be set BEFORE the transaction commits — the NodeDragEndedEmitter
@@ -121,7 +185,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
                 nodes: [...initialPositions].map(([id, position]) => ({ id, position })),
               });
             }
-            await tx.emit('moveNodesStop');
+            await tx.emit('moveNodesStop', { nodeIds: draggedNodeIds });
           }
           if (needsHighlightClear) {
             await tx.emit('highlightGroupClear');
@@ -132,10 +196,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       this.flow.actionStateManager.clearDragging();
     }
 
-    this.lastPointerPosition = undefined;
-    this.startPoint = undefined;
-    this.isMoving = false;
-    this.hasMoved = false;
+    this.gesture = null;
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {

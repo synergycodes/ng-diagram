@@ -22,9 +22,7 @@ export class CommandHandler implements CoreCommandHandler {
   constructor(flowCore: FlowCore) {
     this.flowCore = flowCore;
     (Object.entries(commands) as [CommandName, CommandHandlerFunction<CommandName>][]).forEach(([commandName, fn]) => {
-      this.register(commandName, (command) => {
-        fn(this, command);
-      });
+      this.register(commandName, (command) => fn(this, command));
     });
   }
 
