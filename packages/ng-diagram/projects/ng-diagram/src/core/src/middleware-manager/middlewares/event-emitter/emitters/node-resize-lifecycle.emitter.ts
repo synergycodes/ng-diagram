@@ -10,12 +10,14 @@ export class NodeResizeStartedEmitter implements EventEmitter {
       return;
     }
 
-    const resizingNode = context.actionStateManager.resize?.resizingNode;
-    if (!resizingNode) {
+    // Prefer the pass's own capture over the (possibly newer-gesture) live
+    // state — see FlowStateUpdate.gestureNodeIds.
+    const nodeId = context.initialUpdate.gestureNodeIds?.[0] ?? context.actionStateManager.resize?.resizingNode.id;
+    if (!nodeId) {
       return;
     }
 
-    const node = context.nodesMap.get(resizingNode.id);
+    const node = context.nodesMap.get(nodeId);
     if (!node) {
       return;
     }
@@ -32,12 +34,12 @@ export class NodeResizeEndedEmitter implements EventEmitter {
       return;
     }
 
-    const resizingNode = context.actionStateManager.resize?.resizingNode;
-    if (!resizingNode) {
+    const nodeId = context.initialUpdate.gestureNodeIds?.[0] ?? context.actionStateManager.resize?.resizingNode.id;
+    if (!nodeId) {
       return;
     }
 
-    const node = context.nodesMap.get(resizingNode.id);
+    const node = context.nodesMap.get(nodeId);
     if (!node) {
       return;
     }

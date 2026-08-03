@@ -223,7 +223,7 @@ Most diagram behavior is configurable through the config object passed to the di
 
 ## Services
 
-ngDiagram provides injectable services for all diagram operations. Services are the only way to safely update the model and control diagram behavior programmatically.
+ngDiagram provides injectable services for all diagram operations. Services are the only way to safely update the model and control diagram behavior programmatically. Every mutating method returns a promise that resolves once the change has been applied to the model, so operations can be sequenced with `await` — see [Awaiting Changes](/docs/guides/state-management/#awaiting-changes).
 
 **Core services:**
 
@@ -259,7 +259,8 @@ Transactions batch multiple state changes into a single atomic operation, improv
 
 - Batch multiple add, remove, and update operations
 - Async transactions for server-fetched data
-- [`waitForMeasurements`](/docs/api/types/middleware/transactionoptions/#waitformeasurements) option to wait for element dimensions before proceeding (e.g., before calling `zoomToFit()`)
+- Awaitable — the transaction promise resolves once all batched changes are committed
+- [`waitForMeasurements`](/docs/api/types/middleware/transactionoptions/#waitformeasurements) option to wait for element dimensions before proceeding (e.g., before calling `zoomToFit()`); also available [directly on mutating methods](/docs/guides/transactions/#per-method-option) whose changes get measured
 - Deterministic operation order - additions before removals, edges removed before their nodes
 
 [Transactions Documentation →](/docs/guides/transactions)
@@ -343,7 +344,9 @@ ngDiagram uses a middleware system that allows you to intercept and modify any s
 
 <Aside type="caution">
   Use middlewares carefully - poorly implemented middleware can break core functionality and severely impact
-  performance. Always test thoroughly and ensure your middleware properly passes through unhandled operations.
+  performance. Always test thoroughly and ensure your middleware properly passes through unhandled operations. In
+  particular, never `await` a mutating service call or emit from inside a middleware — fire such calls without awaiting
+  them (see the [middleware guide](/docs/guides/middlewares)).
 </Aside>
 
 [Middleware Documentation →](/docs/guides/middlewares)

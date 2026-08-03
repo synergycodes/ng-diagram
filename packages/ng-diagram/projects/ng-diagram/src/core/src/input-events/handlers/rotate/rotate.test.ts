@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { NgDiagramMath } from '../../../math';
-import { mockNode } from '../../../test-utils';
+import { macrotask, mockNode } from '../../../test-utils';
 import { RotationActionState } from '../../../types';
 import { RotateInputEvent } from './rotate.event';
 import { RotateEventHandler } from './rotate.handler';
@@ -58,6 +58,60 @@ describe('RotateEventHandler', () => {
     } as unknown as FlowCore;
     instance = new RotateEventHandler(flowCore);
     vi.clearAllMocks();
+  });
+
+  describe('re-entrancy under async command emits', () => {
+    it('should not clear a newly started rotation while the previous stop emit is suspended', async () => {
+      vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(45);
+      mockCommandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'rotateNodeStop') {
+          await macrotask();
+        }
+      });
+
+      await instance.handle(getSampleRotateEvent({ target: node, phase: 'start' }));
+      const endPromise = instance.handle(getSampleRotateEvent({ target: node, phase: 'end' }));
+
+      // A new rotation starts while the previous end is suspended on rotateNodeStop
+      await instance.handle(getSampleRotateEvent({ target: node, phase: 'start' }));
+      const newState = mockActionStateManager.rotation;
+      expect(newState).toBeDefined();
+
+      await endPromise;
+
+      expect(mockActionStateManager.clearRotation).not.toHaveBeenCalled();
+      expect(mockActionStateManager.rotation).toBe(newState);
+    });
+
+    it('should clear the rotation state even when the stop emit rejects', async () => {
+      vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(45);
+      mockCommandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'rotateNodeStop') {
+          throw new Error('middleware failed');
+        }
+      });
+
+      await instance.handle(getSampleRotateEvent({ target: node, phase: 'start' }));
+      await expect(instance.handle(getSampleRotateEvent({ target: node, phase: 'end' }))).rejects.toThrow(
+        'middleware failed'
+      );
+
+      expect(mockActionStateManager.clearRotation).toHaveBeenCalled();
+    });
+
+    it('should clear the rotation state when no new gesture started during the stop emit', async () => {
+      vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(45);
+      mockCommandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'rotateNodeStop') {
+          await macrotask();
+        }
+      });
+
+      await instance.handle(getSampleRotateEvent({ target: node, phase: 'start' }));
+      await instance.handle(getSampleRotateEvent({ target: node, phase: 'end' }));
+
+      expect(mockActionStateManager.clearRotation).toHaveBeenCalled();
+    });
   });
 
   describe('handle', () => {
@@ -126,7 +180,7 @@ describe('RotateEventHandler', () => {
 
         await instance.handle(event);
 
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStart');
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStart', { nodeId: expect.any(String) });
       });
 
       it('should NOT emit rotateNodeStart when node does not exist', async () => {
@@ -135,7 +189,7 @@ describe('RotateEventHandler', () => {
 
         await instance.handle(event);
 
-        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('rotateNodeStart');
+        expect(mockCommandHandler.emit.mock.calls.some((call) => call[0] === 'rotateNodeStart')).toBe(false);
       });
 
       it('should emit rotateNodeStop command on end phase', async () => {
@@ -143,7 +197,7 @@ describe('RotateEventHandler', () => {
 
         await instance.handle(event);
 
-        expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStop');
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('rotateNodeStop', { nodeId: undefined });
       });
 
       it('should emit rotateNodeStop before clearRotation is called', async () => {

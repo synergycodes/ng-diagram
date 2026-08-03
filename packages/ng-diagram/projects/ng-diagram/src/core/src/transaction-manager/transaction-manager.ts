@@ -45,11 +45,18 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
       await transactionCallback(transaction.context);
 
       if (!transaction.isAborted()) {
-        if (parentTransaction) {
+        if (parentTransaction && this.transactionStack.includes(parentTransaction)) {
           // Nested transaction - merge to parent
           transaction.mergeToParent();
         } else {
-          // Root transaction - apply changes
+          if (parentTransaction) {
+            // Orphaned: the parent completed first (un-awaited overlap) — merging
+            // into the dead parent would silently discard these updates.
+            console.warn(
+              '[ngDiagram] A nested transaction outlived its parent transaction — committing its updates independently. Await transactions instead of running them fire-and-forget.'
+            );
+          }
+          // Root (or orphaned nested) transaction - apply changes
           const { mergedUpdate, commandsCount, actionTypes } = transaction.getMergedUpdates();
 
           return {
@@ -70,8 +77,12 @@ export class TransactionManager<TFlowCore extends FlowCore = FlowCore> {
       transaction.rollback();
       throw error;
     } finally {
-      // Remove from stack
-      this.transactionStack.pop();
+      // Remove by identity — with an un-awaited nested transaction still live on
+      // the stack, pop() would remove that transaction instead of this one.
+      const index = this.transactionStack.lastIndexOf(transaction);
+      if (index !== -1) {
+        this.transactionStack.splice(index, 1);
+      }
       if (!parentTransaction) {
         this.pendingOptions = null;
       }

@@ -186,6 +186,15 @@ export interface FlowStateUpdate {
    * @internal
    */
   renderedEdgeIds?: string[];
+  /**
+   * Node ids of the gesture that emitted this lifecycle pass (moveNodes/
+   * resizeNode/rotateNode start/stop) — the lifecycle emitters read it so their
+   * events report the emitting gesture even when the live action state already
+   * belongs to a newer one; absent means fall back to the live state. Not part
+   * of the model state.
+   * @internal
+   */
+  gestureNodeIds?: string[];
 }
 
 /**

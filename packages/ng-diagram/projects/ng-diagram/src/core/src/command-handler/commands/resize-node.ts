@@ -118,7 +118,7 @@ export const resizeNode = async (commandHandler: CommandHandler, command: Resize
     return;
   }
 
-  if (isSameSize(node.size, command.size) || (isGroup(node) && !node.selected)) {
+  if (isSameSize(node.size, command.size)) {
     return;
   }
 

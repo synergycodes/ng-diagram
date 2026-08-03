@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
-import { mockGroupNode, mockNode } from '../../../test-utils';
+import { macrotask, mockGroupNode, mockNode } from '../../../test-utils';
 import type { CommandHandler, Node } from '../../../types';
 import { addToGroup, AddToGroupCommand } from '../add-to-group';
 
@@ -18,6 +18,9 @@ describe('addToGroup', () => {
   let mockFlowCore: {
     modelLookup: typeof mockModelLookup;
     config: typeof mockConfig;
+    actionStateManager: {
+      highlightGroup: { highlightedGroupId: string | null } | undefined;
+    };
     commandHandler: {
       emit: ReturnType<typeof vi.fn>;
     };
@@ -40,6 +43,9 @@ describe('addToGroup', () => {
     mockFlowCore = {
       modelLookup: mockModelLookup,
       config: mockConfig,
+      actionStateManager: {
+        highlightGroup: undefined,
+      },
       commandHandler: {
         emit: vi.fn(),
       },
@@ -215,6 +221,49 @@ describe('addToGroup', () => {
       expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('highlightGroupClear');
     });
 
+    it('should not clear a highlight that a newer gesture set while the update was suspended', async () => {
+      const command: AddToGroupCommand = {
+        name: 'addToGroup',
+        groupId: 'group1',
+        nodeIds: ['node1'],
+      };
+
+      mockModelLookup.wouldCreateCircularDependency.mockReturnValue(false);
+      mockConfig.grouping.canGroup.mockReturnValue(true);
+      mockFlowCore.actionStateManager.highlightGroup = { highlightedGroupId: 'group1' };
+      mockFlowCore.commandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'updateNodes') {
+          // A re-drag highlighted its own drop target while our pass was suspended.
+          mockFlowCore.actionStateManager.highlightGroup = { highlightedGroupId: 'group2' };
+        }
+      });
+
+      await addToGroup(mockCommandHandler, command);
+
+      expect(mockFlowCore.commandHandler.emit).not.toHaveBeenCalledWith('highlightGroupClear');
+    });
+
+    it('should resolve only after nested emits have resolved, in emit order', async () => {
+      const order: string[] = [];
+      mockFlowCore.commandHandler.emit.mockImplementation(async (name: string) => {
+        await macrotask();
+        order.push(name);
+      });
+      mockModelLookup.wouldCreateCircularDependency.mockReturnValue(false);
+      mockConfig.grouping.canGroup.mockReturnValue(true);
+
+      const command: AddToGroupCommand = {
+        name: 'addToGroup',
+        groupId: 'group1',
+        nodeIds: ['node1'],
+      };
+
+      await addToGroup(mockCommandHandler, command);
+      order.push('addToGroupResolved');
+
+      expect(order).toEqual(['updateNodes', 'highlightGroupClear', 'addToGroupResolved']);
+    });
+
     it('should not emit highlightGroupClear when no nodes are grouped', async () => {
       const command: AddToGroupCommand = {
         name: 'addToGroup',
@@ -252,6 +301,28 @@ describe('addToGroup', () => {
         nodes: [{ id: 'node1', groupId: 'group1' }],
       });
       expect(mockFlowCore.commandHandler.emit).toHaveBeenCalledWith('highlightGroupClear');
+    });
+
+    it('should not clear a highlight that a newer gesture set while the update was suspended', async () => {
+      const command: AddToGroupCommand = {
+        name: 'addToGroup',
+        groupId: 'group1',
+        nodeIds: ['node1'],
+      };
+
+      mockModelLookup.wouldCreateCircularDependency.mockReturnValue(false);
+      mockConfig.grouping.canGroup.mockReturnValue(true);
+      mockFlowCore.actionStateManager.highlightGroup = { highlightedGroupId: 'group1' };
+      mockFlowCore.commandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'updateNodes') {
+          // A re-drag highlighted its own drop target while our pass was suspended.
+          mockFlowCore.actionStateManager.highlightGroup = { highlightedGroupId: 'group2' };
+        }
+      });
+
+      await addToGroup(mockCommandHandler, command);
+
+      expect(mockFlowCore.commandHandler.emit).not.toHaveBeenCalledWith('highlightGroupClear');
     });
 
     it('should handle empty nodeIds array', async () => {

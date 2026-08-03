@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../flow-core';
+import { macrotask } from '../test-utils';
 import type { Command } from '../types/command-handler.interface';
 import { FlowState } from '../types/middleware.interface';
 import { CommandHandler } from './command-handler';
@@ -49,6 +50,51 @@ describe('CoreCommandHandler', () => {
   });
 
   describe('emit', () => {
+    it('should resolve only after the async command function completes', async () => {
+      const order: string[] = [];
+      vi.mocked(commands.select).mockImplementationOnce(async () => {
+        await macrotask();
+        order.push('commandCompleted');
+      });
+
+      await handler.emit('select', { nodeIds: ['1'] });
+      order.push('emitResolved');
+
+      expect(order).toEqual(['commandCompleted', 'emitResolved']);
+    });
+
+    it('should reject when the command function rejects', async () => {
+      vi.mocked(commands.select).mockImplementationOnce(async () => {
+        throw new Error('command failed');
+      });
+
+      await expect(handler.emit('select', { nodeIds: ['1'] })).rejects.toThrow('command failed');
+    });
+
+    it('should still invoke sibling callbacks when one callback rejects', async () => {
+      const sibling = vi.fn();
+      vi.mocked(commands.select).mockImplementationOnce(async () => {
+        throw new Error('command failed');
+      });
+      handler.register('select', sibling);
+
+      await expect(handler.emit('select', { nodeIds: ['1'] })).rejects.toThrow('command failed');
+      expect(sibling).toHaveBeenCalledWith({ name: 'select', nodeIds: ['1'] });
+    });
+
+    it('should resolve only after all registered async callbacks complete', async () => {
+      const order: string[] = [];
+      handler.register('select', async () => {
+        await macrotask();
+        order.push('callbackCompleted');
+      });
+
+      await handler.emit('select', { nodeIds: ['1'] });
+      order.push('emitResolved');
+
+      expect(order).toEqual(['callbackCompleted', 'emitResolved']);
+    });
+
     it('should call all registered callbacks for the event type', () => {
       const commandCallback = vi.fn();
       const otherCommandCallback = vi.fn();
@@ -103,8 +149,12 @@ describe('CoreCommandHandler', () => {
 
     it('should preserve callback order', () => {
       const calls: string[] = [];
-      const callback1 = () => calls.push('1');
-      const callback2 = () => calls.push('2');
+      const callback1 = () => {
+        calls.push('1');
+      };
+      const callback2 = () => {
+        calls.push('2');
+      };
 
       handler.register('select', callback1);
       handler.register('select', callback2);

@@ -75,6 +75,7 @@ describe('LinkingEventHandler', () => {
           sourceNodeId: 'node-1',
           sourcePortId: 'port-1',
           temporaryEdge: null,
+          _gestureId: expect.any(Number),
         });
       });
 

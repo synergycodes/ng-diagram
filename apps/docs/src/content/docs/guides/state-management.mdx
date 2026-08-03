@@ -3,7 +3,7 @@ title: State Management
 description: Learn how to create models, access the model service, and perform operations on your diagram data
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Badge } from '@astrojs/starlight/components';
 
 ngDiagram uses a reactive state management system that allows you to create, access, and modify diagram data efficiently.
 Understanding this system is essential for building dynamic, interactive diagrams.
@@ -169,6 +169,25 @@ The model service provides comprehensive methods for adding, updating, deleting,
   desynchronize UI and state, leading to inconsistent or "weird" results.
 </Aside>
 
+### Awaiting Changes <Badge text="since v1.3.0" variant="tip" />
+
+Every mutating service method returns a `Promise<void>` that resolves once the change has been
+applied to the model — the next line of code reads the updated state:
+
+```typescript
+await this.modelService.deleteNodes(['node-1']);
+// The model is already updated here — safe to act on it:
+this.viewportService.zoomToFit();
+```
+
+Awaiting is optional — a call whose promise you ignore applies the change all the same. Await
+when the next step depends on the change being applied: sequencing operations, reading the
+model right after a mutation, or reacting to a rejected update (a failing
+[middleware](/docs/guides/middlewares/) rejects the returned promise).
+
+Inside a [transaction](/docs/guides/transactions/) the promise resolves right away and the
+change is applied when the transaction commits.
+
 ### Adding Elements
 
 Add new nodes and edges to your diagram:
@@ -200,8 +219,10 @@ this.modelService.addEdges([
   When you need to perform viewport operations (like
   [`zoomToFit()`](/docs/api/services/ngdiagramviewportservice/#zoomtofit) or
   [`centerOnNode()`](/docs/api/services/ngdiagramviewportservice/#centeronnode)) immediately after adding or modifying
-  elements, use the [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure
-  the elements are measured before the viewport adjusts.
+  elements, pass `{ waitForMeasurements: true }` to the method itself (see the
+  [per-method option](/docs/guides/transactions/#per-method-option)) or use the
+  [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure the elements are
+  measured before the viewport adjusts.
 </Aside>
 
 ### Updating Elements
