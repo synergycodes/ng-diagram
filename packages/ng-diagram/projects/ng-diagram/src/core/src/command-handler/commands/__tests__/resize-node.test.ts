@@ -749,6 +749,53 @@ describe('Resize Node Command', () => {
         'resizeNode'
       );
     });
+
+    it('should resize an unselected group node with children bounds constraints applied', async () => {
+      mockIsGroup.mockReturnValue(true);
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        id: 'group1',
+        size: { width: 400, height: 300 },
+        position: { x: 100, y: 100 },
+        isGroup: true,
+        selected: false, // unselected group — programmatic resize must still apply
+        highlighted: false,
+      } as GroupNode);
+
+      const children = [
+        { id: 'child1', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } },
+        { id: 'child2', position: { x: 450, y: 150 }, size: { width: 100, height: 60 } }, // extends to x=550
+      ];
+      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue(children);
+
+      mockCalculateGroupBounds.mockReturnValue({
+        left: 120,
+        top: 120,
+        right: 550, // extends beyond requested maxX of 450 (100 + 350)
+        bottom: 210,
+      });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 350, height: 250 },
+        position: { x: 100, y: 100 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 450, height: 250 }, // width expanded to contain children
+              position: { x: 100, y: 100 },
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
   });
 
   describe('applyChildrenBoundsConstraints', () => {
