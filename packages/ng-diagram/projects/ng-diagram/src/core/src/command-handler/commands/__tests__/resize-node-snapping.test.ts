@@ -550,6 +550,265 @@ describe('Resize Node Command with Snapping', () => {
         'resizeNode'
       );
     });
+
+    it('keeps the bottom edge fixed and lands the height on the offset grid when resizing from the top edge', async () => {
+      // Bottom edge is fixed at y = 100 + 110 = 210, so with offset 60 and snap 50
+      // the valid positions are 210 - (60 + n * 50) = ..., 0, 50, 100, 150 and the
+      // resulting heights land on 60, 110, 160, ...
+      const node = {
+        id: '1',
+        size: { width: 200, height: 110 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 100, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+      (flowCore.config.snapping.computeSnapOffsetForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 0,
+        height: 60,
+      });
+
+      // Drag the top edge from y=100 up to y=70 (height 110 -> 140)
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 200, height: 140 },
+        position: { x: 100, y: 70 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 200, height: 160 }, // 60 + 2 * 50 — on the offset grid
+              position: { x: 100, y: 50 }, // 210 - 160 — bottom edge unchanged
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('keeps the right edge fixed and lands the width on the offset grid when resizing from the left edge', async () => {
+      // Right edge is fixed at x = 100 + 200 = 300, so with offset 60 and snap 100
+      // the valid positions are 300 - (60 + n * 100) = ..., 40, 140, 240 and the
+      // resulting widths land on 60, 160, 260, ...
+      const node = {
+        id: '1',
+        size: { width: 200, height: 110 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 60, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+      (flowCore.config.snapping.computeSnapOffsetForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 60,
+        height: 0,
+      });
+
+      // Drag the left edge from x=100 to x=120 (width 200 -> 180)
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 180, height: 110 },
+        position: { x: 120, y: 100 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 160, height: 110 }, // 60 + 100 — on the offset grid
+              position: { x: 140, y: 100 }, // 300 - 160 — right edge unchanged
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+  });
+
+  describe('Minimum Size After Snapping', () => {
+    it('bumps a snapped size below the minimum up to the next snap increment', async () => {
+      // Min height 60, snap 50: resizing to 70 used to snap DOWN to 50, below the
+      // minimum — it must land on the next valid increment instead (100).
+      const node = {
+        id: '1',
+        size: { width: 200, height: 60 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 100, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+
+      // Resize from the bottom edge: no position provided
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 200, height: 70 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 200, height: 100 }, // Next increment >= min, not 50
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('keeps the bottom edge fixed when the minimum bump happens on a top-edge resize', async () => {
+      // Bottom edge fixed at y = 210. Snapping the dragged top edge would give
+      // height 50 < min 60, so the height bumps to 100 and the position moves
+      // back to 210 - 100 = 110 to keep the bottom edge in place.
+      const node = {
+        id: '1',
+        size: { width: 200, height: 110 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 100, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+
+      // Drag the top edge from y=100 down to y=140 (height 110 -> 70)
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 200, height: 70 },
+        position: { x: 100, y: 140 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 200, height: 100 },
+              position: { x: 100, y: 110 }, // 210 - 100 — bottom edge unchanged
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('does not let a collapse past the fixed edge escape the grid when the minimum is 0', async () => {
+      // With min 0 and an offset that is not a multiple of the snap, the
+      // phase-snapped position can land past the fixed bottom edge (300); the
+      // derived height clamps to 0, which is not below a 0 minimum. The bump
+      // must still fire: height goes to the smallest grid value (30) and the
+      // position is pulled back to 300 - 30 = 270.
+      const node = {
+        id: '1',
+        size: { width: 200, height: 200 },
+        position: { x: 100, y: 100 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 0, height: 0 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 50,
+        height: 50,
+      });
+      (flowCore.config.snapping.computeSnapOffsetForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 30,
+        height: 30,
+      });
+
+      // Drag the top edge almost to the bottom edge (height 200 -> 3)
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 200, height: 3 },
+        position: { x: 100, y: 297 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 200, height: 30 }, // smallest value on the 30 + n*50 grid
+              position: { x: 100, y: 270 }, // 300 - 30 — never past the fixed edge
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('ignores the float residue of the min-size clamp instead of treating it as a moved axis', async () => {
+      // A left-edge nudge on a node already at its minimum size: the min clamp
+      // restores the size and derives the position back with a ~1e-16 residue.
+      // That residue must not count as a moved axis — the node must stay put
+      // instead of having its position phase-snapped sideways.
+      const node = {
+        id: '1',
+        size: { width: 60, height: 60 },
+        position: { x: 0, y: 0 },
+      };
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(node);
+      mockIsGroup.mockReturnValue(false);
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 60, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 50,
+        height: 50,
+      });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: '1',
+        size: { width: 59.6, height: 60 },
+        position: { x: 0.4, y: 0 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: '1',
+              size: { width: 60, height: 60 },
+              position: { x: 0, y: 0 }, // no sideways jump
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
   });
 
   describe('Edge Cases', () => {

@@ -237,6 +237,14 @@ const applySnappingIfNeeded = async (
   return await computeAndApplySnapping(commandHandler, node, nextPosition, nextSize, nextDisableAutoSize);
 };
 
+/** Smallest value on the `offset + n * snap` grid that satisfies `min` (`min` itself when snapping is off). */
+const snapCeilToMin = (min: number, step: number, offset: number): number =>
+  step ? offset + step * Math.ceil((min - offset) / step) : min;
+
+// Above the float residue (~1e-16) the min-size clamp leaves on positions — a residue must not count as a move.
+const AXIS_MOVE_EPSILON = 1e-6;
+const isAxisMoved = (from: number, to: number): boolean => Math.abs(from - to) > AXIS_MOVE_EPSILON;
+
 /**
  * Calculates snapped dimensions considering position changes when resizing from edges.
  * When resizing from left/top edges, the size must be calculated relative to the snapped position
@@ -254,8 +262,8 @@ const calculateSnappedDimensions = (
   const prevHeight = node.size?.height ?? 0;
   const nodeWidth = nextSize?.width ?? prevWidth;
   const nodeHeight = nextSize?.height ?? prevHeight;
-  const movedX = nextPosition && node.position.x !== nextPosition.x;
-  const movedY = nextPosition && node.position.y !== nextPosition.y;
+  const movedX = nextPosition && isAxisMoved(node.position.x, nextPosition.x);
+  const movedY = nextPosition && isAxisMoved(node.position.y, nextPosition.y);
 
   let width = nodeWidth;
   let height = nodeHeight;
@@ -294,22 +302,23 @@ const computeAndApplySnapping = async (
     commandHandler.flowCore.config.snapping;
   const snapping = computeSnapForNodeSize(node) ?? defaultResizeSnap;
   const snapOffset = computeSnapOffsetForNodeSize(node) ?? defaultResizeSnapOffset;
+  const fixedRightEdge = Math.round(node.position.x + (node.size?.width ?? 0));
+  const fixedBottomEdge = Math.round(node.position.y + (node.size?.height ?? 0));
+  const movedX = nextPosition && isAxisMoved(node.position.x, nextPosition.x);
+  const movedY = nextPosition && isAxisMoved(node.position.y, nextPosition.y);
 
-  // Only snap a position axis that the resize actually moved. Resizing from the
-  // bottom/right edge leaves the top-left corner in place, but the group path
-  // always synthesizes a position (to contain children), so snapping the whole
-  // point here would move an unaligned group even though no edge with a position
-  // handle was dragged. Preserving unmoved axes keeps the group anchored.
+  // Snap only the axes the resize actually moved — the group path always
+  // synthesizes a position, and snapping an untouched axis would shift the node.
+  // A moved axis keeps its opposite edge fixed: phasing its grid at
+  // `fixedEdge - offset` makes the derived size land on `offset + n * snap`.
   const snappedPosition = nextPosition
     ? {
-        x:
-          node.position.x !== nextPosition.x
-            ? NgDiagramMath.snapNumber(nextPosition.x, snapping.width, snapOffset.width)
-            : node.position.x,
-        y:
-          node.position.y !== nextPosition.y
-            ? NgDiagramMath.snapNumber(nextPosition.y, snapping.height, snapOffset.height)
-            : node.position.y,
+        x: movedX
+          ? NgDiagramMath.snapNumber(nextPosition.x, snapping.width, fixedRightEdge - snapOffset.width)
+          : node.position.x,
+        y: movedY
+          ? NgDiagramMath.snapNumber(nextPosition.y, snapping.height, fixedBottomEdge - snapOffset.height)
+          : node.position.y,
       }
     : undefined;
 
@@ -322,14 +331,34 @@ const computeAndApplySnapping = async (
     snapOffset
   );
 
+  // Min size is enforced before snapping, so a snapped size can dip below it —
+  // bump to the smallest valid increment and re-anchor the fixed edge. `<= 0`
+  // catches a collapse past the fixed edge (min 0 + misaligned offset).
+  const minSize = commandHandler.flowCore.config.resize.getMinNodeSize(node);
+  let finalWidth = width;
+  let finalHeight = height;
+  const finalPosition = snappedPosition ? { ...snappedPosition } : undefined;
+  if (finalWidth < minSize.width || finalWidth <= 0) {
+    finalWidth = snapCeilToMin(Math.max(minSize.width, 0), snapping.width, snapOffset.width);
+    if (finalPosition && movedX) {
+      finalPosition.x = fixedRightEdge - finalWidth;
+    }
+  }
+  if (finalHeight < minSize.height || finalHeight <= 0) {
+    finalHeight = snapCeilToMin(Math.max(minSize.height, 0), snapping.height, snapOffset.height);
+    if (finalPosition && movedY) {
+      finalPosition.y = fixedBottomEdge - finalHeight;
+    }
+  }
+
   const updateData: Partial<Node> & { id: Node['id'] } = {
     id: node.id,
-    size: { width, height },
+    size: { width: finalWidth, height: finalHeight },
     ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
   };
 
-  if (snappedPosition) {
-    updateData.position = snappedPosition;
+  if (finalPosition) {
+    updateData.position = finalPosition;
   }
 
   await commandHandler.flowCore.applyUpdate(
