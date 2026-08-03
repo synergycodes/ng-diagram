@@ -3,8 +3,10 @@ title: Snapping
 description: Understanding how snapping works in ngDiagram
 ---
 
+import { Badge } from '@astrojs/starlight/components';
 import DragSnapExample from '@components/angular/nodes/snapping/drag-snap/drag-snap.astro';
 import ResizeSnapExample from '@components/angular/nodes/snapping/resize-snap/resize-snap.astro';
+import ResizeSnapOffsetExample from '@components/angular/nodes/snapping/resize-snap-offset/resize-snap-offset.astro';
 import GridExample from '@components/angular/nodes/snapping/usage-with-grid/usage-with-grid.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -45,7 +47,7 @@ The following configuration options allow you to configure snapping when resizin
 const config = {
   snapping: {
     shouldSnapResizeForNode: (node) => true,
-    computeSnapForNodeResize: (node) => ({ width: 10, height: 10 }),
+    computeSnapForNodeSize: (node) => ({ width: 10, height: 10 }),
     defaultResizeSnap: { width: 10, height: 10 },
   },
 } satisfies NgDiagramConfig;
@@ -54,20 +56,49 @@ const config = {
 - [`shouldSnapResizeForNode`](/docs/api/types/configuration/features/snappingconfig/#shouldsnapresizefornode) determines whether a node should snap to a grid when being resized.
   When this function returns `true` for a given node, the node's size will align to the nearest snap points during resize operations.
 
-- [`computeSnapForNodeResize`](/docs/api/types/configuration/features/snappingconfig/#computesnapfornoderesize) defines the snap step for resizing nodes.
+- [`computeSnapForNodeSize`](/docs/api/types/configuration/features/snappingconfig/#computesnapfornodesize) defines the snap step for resizing nodes.
 
-- [`defaultResizeSnap`](/docs/api/types/configuration/features/snappingconfig/#defaultresizesnap) sets a default snap step for resizing nodes if [`computeSnapForNodeResize`](/docs/api/types/configuration/features/snappingconfig/#computesnapfornoderesize) is not provided.\
+- [`defaultResizeSnap`](/docs/api/types/configuration/features/snappingconfig/#defaultresizesnap) sets a default snap step for resizing nodes if [`computeSnapForNodeSize`](/docs/api/types/configuration/features/snappingconfig/#computesnapfornodesize) is not provided.\
   The default value is `{ width: 10, height: 10 }`.
+
+When resizing from the top or left edge, the opposite edge stays in place and the resulting size lands on the snap step — the node never jumps.
 
 <br />
 <ResizeSnapExample />
 <br />
 <CodeSnippet relativePath="nodes/snapping/resize-snap/diagram.component.ts" sectionId="config" />
 
+## Resize Snap Offset <Badge text="since v1.3.0" variant="tip" />
+
+By default, snapped sizes are plain multiples of the snap step (50, 100, 150, ...). If a node has a fixed base size — for example a 60px header that is also its minimum height — you can shift the whole sequence with a **snap offset**. Snapped sizes then follow `offset + n * snap` per axis, so with an offset of 60 and a step of 50 the heights snap to 60, 110, 160, ...
+
+```typescript
+const config = {
+  snapping: {
+    shouldSnapResizeForNode: (node) => true,
+    computeSnapForNodeSize: (node) => ({ width: 20, height: 50 }),
+    computeSnapOffsetForNodeSize: (node) => ({ width: 0, height: 60 }),
+    defaultResizeSnapOffset: { width: 0, height: 0 },
+  },
+} satisfies NgDiagramConfig;
+```
+
+- [`computeSnapOffsetForNodeSize`](/docs/api/types/configuration/features/snappingconfig/#computesnapoffsetfornodesize) defines the snap offset per node — useful when different node types have different header heights.
+
+- [`defaultResizeSnapOffset`](/docs/api/types/configuration/features/snappingconfig/#defaultresizesnapoffset) sets a default offset if [`computeSnapOffsetForNodeSize`](/docs/api/types/configuration/features/snappingconfig/#computesnapoffsetfornodesize) is not provided.\
+  The default value is `{ width: 0, height: 0 }`, which keeps the plain step sequence.
+
+If a snapped size would fall below the [minimum node size](/docs/api/types/configuration/features/resizeconfig/), it lands on the smallest value of the sequence that satisfies the minimum instead.
+
+<br />
+<ResizeSnapOffsetExample />
+<br />
+<CodeSnippet relativePath="nodes/snapping/resize-snap-offset/diagram.component.ts" sectionId="config" />
+
 ## Usage with Background Grid
 
 Snapping can be configured to work in conjunction with the background grid feature.
-When both the grid and snapping are using multiples of the same size, nodes will snap to the grid lines during drag and resize operations.
+When both the grid and snapping are using multiples of the same size, dragged nodes align to the grid lines, and resized nodes keep their sizes on the grid — so a node whose position sits on the grid stays aligned to the grid lines through every resize.
 
 <br />
 <GridExample />
