@@ -270,5 +270,17 @@ export const defaultModel: DiagramModel = {
       targetPort: 'port-right-1',
       targetArrowhead: 'ng-diagram-arrow',
     },
+    {
+      id: '20',
+      source: '11',
+      target: '',
+      data: {},
+      sourcePort: 'port-right',
+      targetPort: undefined,
+      type: 'dashed-edge',
+      routing: 'orthogonal',
+      sourcePosition: { x: 800, y: 650 },
+      targetPosition: { x: 1000, y: 550 },
+    },
   ],
 };

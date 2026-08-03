@@ -224,6 +224,50 @@ describe('FlowCore', () => {
     });
   });
 
+  describe('port recreation in the same tick', () => {
+    const measuredPort = {
+      id: 'port-1',
+      nodeId: 'node1',
+      type: 'source' as const,
+      side: 'left' as const,
+      size: { width: 10, height: 10 },
+      position: { x: 0, y: 0 },
+    };
+
+    beforeEach(() => {
+      mockModelLookup.getNodeById.mockReturnValue({ ...mockNode, id: 'node1', measuredPorts: [measuredPort] });
+    });
+
+    it('should re-apply side and type from a cancelled add as a port update', async () => {
+      flowCore.internalUpdater.deletePort('node1', 'port-1');
+      flowCore.internalUpdater.addPort('node1', { id: 'port-1', nodeId: 'node1', type: 'target', side: 'right' });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updatePortsBulk', {
+        updates: new Map([
+          [
+            'node1',
+            [{ portId: 'port-1', portChanges: { id: 'port-1', nodeId: 'node1', side: 'right', type: 'target' } }],
+          ],
+        ]),
+      });
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('addPortsBulk', expect.anything());
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('deletePortsBulk', expect.anything());
+    });
+
+    it('should not emit any port update when the recreated port has unchanged side and type', async () => {
+      flowCore.internalUpdater.deletePort('node1', 'port-1');
+      flowCore.internalUpdater.addPort('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('updatePortsBulk', expect.anything());
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('addPortsBulk', expect.anything());
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('deletePortsBulk', expect.anything());
+    });
+  });
+
   describe('get model', () => {
     it('should return the current model', () => {
       expect(flowCore.model).toBe(mockModelAdapter);
