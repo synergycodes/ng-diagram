@@ -58,12 +58,8 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * An add for a port that already exists in the model comes from a component
-   * that was destroyed and recreated (same-tick recreation cancels out in the
-   * batch processor; virtualization re-mounts are dropped as already measured),
-   * so the kept entry would never receive properties the new component instance
-   * carries. Reconcile the authored properties here — measured ones are kept,
-   * and updates where nothing actually differs are filtered out.
+   * An add for a port already in the model is a component recreation whose
+   * batched add never lands — re-apply its authored (non-measured) properties.
    */
   addPort(nodeId: string, port: Port): void {
     const exists = this.flowCore.getNodeById(nodeId)?.measuredPorts?.some(({ id }) => id === port.id);
@@ -103,7 +99,7 @@ export class InternalUpdater implements Updater {
 
   /**
    * @internal
-   * See {@link addPort} — the same recreation scenario applies to edge labels.
+   * See {@link addPort} — same recreation handling for labels.
    */
   addEdgeLabel(edgeId: string, label: EdgeLabel): void {
     const exists = this.flowCore.getEdgeById(edgeId)?.measuredLabels?.some(({ id }) => id === label.id);
@@ -140,7 +136,6 @@ export class InternalUpdater implements Updater {
 
   /**
    * Filters out port updates where none of the changed properties actually differ from current state.
-   * Compares every property in the update generically; see {@link hasChangedProperties}.
    */
   private filterUnchangedPortUpdates(node: Node, portUpdates: PortUpdate[]): PortUpdate[] {
     const measuredPortsMap = new Map((node.measuredPorts ?? []).map((port) => [port.id, port]));
@@ -153,7 +148,6 @@ export class InternalUpdater implements Updater {
 
   /**
    * Filters out label updates where none of the changed properties actually differ from current state.
-   * Compares every property in the update generically; see {@link hasChangedProperties}.
    */
   private filterUnchangedLabelUpdates(edgeId: string, labelUpdates: LabelUpdate[]): LabelUpdate[] {
     const edge = this.flowCore.getEdgeById(edgeId);
