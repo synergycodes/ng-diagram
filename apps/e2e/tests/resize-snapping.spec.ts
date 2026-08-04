@@ -50,20 +50,6 @@ async function enableOffsetSnapping(diagram: Diagram): Promise<void> {
   });
 }
 
-async function dragHandle(diagram: Diagram, nodeId: string, handle: string, delta: { x: number; y: number }) {
-  const locator = diagram.node(nodeId).locator(`.resize-handle--${handle}`);
-  await expect(locator).toBeVisible();
-  const boxRect = await locator.boundingBox();
-  expect(boxRect).not.toBeNull();
-  const cx = boxRect!.x + boxRect!.width / 2;
-  const cy = boxRect!.y + boxRect!.height / 2;
-  await diagram.page.mouse.move(cx, cy);
-  await diagram.page.mouse.down();
-  await diagram.page.mouse.move(cx + delta.x / 2, cy + delta.y / 2, { steps: 4 });
-  await diagram.page.mouse.move(cx + delta.x, cy + delta.y, { steps: 4 });
-  await diagram.page.mouse.up();
-}
-
 test.describe('resize snapping with offset', () => {
   test('service resize lands the height on the offset + n * snap sequence', async ({ diagram }) => {
     await diagram.load({ model: box });
@@ -92,7 +78,7 @@ test.describe('resize snapping with offset', () => {
     await enableOffsetSnapping(diagram);
 
     await diagram.node('box').click();
-    await dragHandle(diagram, 'box', 'bottom-right', { x: 0, y: 40 });
+    await diagram.dragResizeHandle('box', 'bottom-right', { x: 0, y: 40 });
 
     // 110 + 40 = 150 requested → snaps to 160 (60 + 2 * 50)
     await expect.poll(async () => (await diagram.model.getNodeById('box'))?.size?.height).toBe(160);
@@ -109,7 +95,7 @@ test.describe('resize snapping with offset', () => {
 
     await diagram.node('box').click();
     // Shrink from the top: bottom edge stays at 100 + 110 = 210
-    await dragHandle(diagram, 'box', 'top-right', { x: 0, y: 40 });
+    await diagram.dragResizeHandle('box', 'top-right', { x: 0, y: 40 });
 
     await expect.poll(async () => (await diagram.model.getNodeById('box'))?.size?.height).toBe(60);
     const node = await diagram.model.getNodeById('box');

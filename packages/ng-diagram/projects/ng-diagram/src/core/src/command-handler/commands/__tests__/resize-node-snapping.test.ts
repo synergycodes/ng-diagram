@@ -769,11 +769,11 @@ describe('Resize Node Command with Snapping', () => {
       );
     });
 
-    it('ignores the float residue of the min-size clamp instead of treating it as a moved axis', async () => {
-      // A left-edge nudge on a node already at its minimum size: the min clamp
-      // restores the size and derives the position back with a ~1e-16 residue.
-      // That residue must not count as a moved axis — the node must stay put
-      // instead of having its position phase-snapped sideways.
+    it('snaps a left-edge nudge on a node at an off-grid minimum up to the next valid increment', async () => {
+      // The node sits at its 60px minimum, which is not on the 50px grid. Any
+      // left-edge drag must land the width on the grid at or above the minimum
+      // (100), with the right edge staying fixed — consistent with how a
+      // bottom/right nudge behaves on the same node.
       const node = {
         id: '1',
         size: { width: 60, height: 60 },
@@ -800,8 +800,174 @@ describe('Resize Node Command with Snapping', () => {
           nodesToUpdate: [
             {
               id: '1',
-              size: { width: 60, height: 60 },
-              position: { x: 0, y: 0 }, // no sideways jump
+              size: { width: 100, height: 60 }, // next grid value >= min
+              position: { x: -40, y: 0 }, // 60 - 100 — right edge stays at 60
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+  });
+
+  describe('Children Bounds After Snapping', () => {
+    const group = {
+      id: 'group1',
+      size: { width: 300, height: 300 },
+      position: { x: 100, y: 100 },
+      isGroup: true,
+      selected: true,
+      highlighted: false,
+    } as GroupNode;
+
+    beforeEach(() => {
+      mockIsGroup.mockReturnValue(true);
+      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue([{ id: 'child1' }]);
+    });
+
+    it('bumps a snapped-down width back up so the children stay contained', async () => {
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue(group);
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 100,
+      });
+      // Children reach x=540; the requested width is expanded to contain them (440),
+      // but the 100px grid would round it down to 400 and cut them by 40px
+      mockCalculateGroupBounds.mockReturnValue({ left: 120, top: 120, right: 540, bottom: 280 });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 430, height: 300 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 500, height: 300 }, // next grid value containing the children, not 400
+              position: { x: 100, y: 100 },
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('keeps the children contained when they push the position during a bottom-right resize', async () => {
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        ...group,
+        size: { width: 200, height: 150 },
+        position: { x: 137, y: 84 },
+      });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 10,
+        height: 10,
+      });
+      // Children stick out past the LEFT edge (x=93), so containment moves the
+      // position; the phase-snapped position must not land inside the children
+      mockCalculateGroupBounds.mockReturnValue({ left: 93, top: 100, right: 360, bottom: 200 });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 240, height: 170 },
+        disableAutoSize: true,
+      });
+
+      // The right edge stays anchored at 337, so children reaching x=360 remain
+      // uncovered on that side — a separate, pre-existing limitation (NGD-291)
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 250, height: 170 }, // >= 337 - 93 = 244, on the grid
+              position: { x: 87, y: 84 }, // 337 - 250 — left of the children
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('bumps a top-edge resize over the children instead of cutting them', async () => {
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        ...group,
+        size: { width: 200, height: 200 },
+      });
+      (flowCore.config.resize.getMinNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({ width: 100, height: 60 });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+      (flowCore.config.snapping.computeSnapOffsetForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 0,
+        height: 60,
+      });
+      // Children start at y=135, just above where the snapped top edge would land
+      mockCalculateGroupBounds.mockReturnValue({ left: 120, top: 135, right: 280, bottom: 280 });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 200, height: 140 },
+        position: { x: 100, y: 160 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 200, height: 210 }, // on the 60 + n*50 sequence, >= 300 - 135
+              position: { x: 100, y: 90 }, // 300 - 210 — above the children
+              autoSize: false,
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
+    it('ignores children minimums when containment is disabled (infinite bounds)', async () => {
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        ...group,
+        size: { width: 200, height: 150 },
+        position: { x: 137, y: 84 },
+      });
+      (flowCore.config.snapping.computeSnapForNodeSize as ReturnType<typeof vi.fn>).mockReturnValue({
+        width: 100,
+        height: 50,
+      });
+      // allowResizeBelowChildrenBounds: true reports inverted infinite bounds
+      mockCalculateGroupBounds.mockReturnValue({
+        left: Infinity,
+        top: Infinity,
+        right: -Infinity,
+        bottom: -Infinity,
+      });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 240, height: 170 },
+        disableAutoSize: true,
+      });
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 200, height: 150 }, // plain snap, no children influence
+              position: { x: 137, y: 84 },
               autoSize: false,
             },
           ],
