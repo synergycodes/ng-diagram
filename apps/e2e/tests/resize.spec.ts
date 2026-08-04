@@ -1,5 +1,6 @@
 import type { Model, Node } from 'ng-diagram';
 import { expect, test } from './fixtures/diagram';
+import type { Diagram } from './fixtures/diagram';
 
 /**
  * Resize as a gesture (no snapping — library defaults): handle/line semantics
@@ -45,7 +46,7 @@ const groupWithChild: Partial<Model> = {
   edges: [],
 };
 
-async function boxNode(diagram: { model: { getNodeById(id: string): Promise<Node | undefined> } }, id = 'box') {
+async function boxNode(diagram: Diagram, id = 'box'): Promise<Node> {
   const node = await diagram.model.getNodeById(id);
   expect(node).toBeDefined();
   return node!;
