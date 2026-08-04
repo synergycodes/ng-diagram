@@ -48,6 +48,8 @@ const config = {
     shouldSnapResizeForNode: (node) => true,
     computeSnapForNodeSize: (node) => ({ width: 10, height: 10 }),
     defaultResizeSnap: { width: 10, height: 10 },
+    computeSnapOffsetForNodeSize: (node) => ({ width: 0, height: 0 }),
+    defaultResizeSnapOffset: { width: 0, height: 0 },
   },
 } satisfies NgDiagramConfig;
 ```
@@ -61,7 +63,7 @@ const config = {
   The default value is `{ width: 10, height: 10 }`.
 
 - [`computeSnapOffsetForNodeSize`](/docs/api/types/configuration/features/snappingconfig/#computesnapoffsetfornodesize) and [`defaultResizeSnapOffset`](/docs/api/types/configuration/features/snappingconfig/#defaultresizesnapoffset) <Badge text="since v1.3.0" variant="tip" /> shift the sequence of snapped sizes: sizes land on `offset + n * snap`, so a node with a 60px header and a 50px vertical snap can snap to 60, 110, 160, … instead of 50, 100, 150, ….\
-  The default offset is `{ width: 0, height: 0 }`. Only `offset % snap` is observable — an offset that is a multiple of the snap step changes nothing. A size that would snap below the [minimum node size](/docs/api/types/configuration/features/resizeconfig/) lands on the smallest value of the sequence satisfying the minimum instead.
+  The default offset is `{ width: 0, height: 0 }`.
 
 <br />
 <ResizeSnapExample />
