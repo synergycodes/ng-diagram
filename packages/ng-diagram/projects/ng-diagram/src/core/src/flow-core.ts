@@ -3,7 +3,8 @@ import { CommandHandler } from './command-handler/command-handler';
 import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
-import { InputEventsRouter, type InputEventName } from './input-events';
+import { InputEventsRouter } from './input-events';
+import { InteractionCoordinator } from './interaction-coordinator/interaction-coordinator';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MeasurementTracker, MeasurementTrackingConfig } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -72,23 +73,7 @@ export class FlowCore {
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
 
-  private readonly interactionCleanups = new Set<() => void>();
-  private cancellingInteraction = false;
-
-  /**
-   * Every cancellable gesture: the action-state probe paired with the input
-   * event name its handler is registered under. A new cancellable gesture
-   * joins {@link hasActiveInteraction} and {@link cancelActiveInteraction} by
-   * adding one entry here.
-   */
-  private readonly cancellableGestures: readonly { event: InputEventName; isActive: () => boolean }[] = [
-    { event: 'linking', isActive: () => this.actionStateManager.isLinking() },
-    { event: 'pointerMoveSelection', isActive: () => this.actionStateManager.isDragging() },
-    { event: 'resize', isActive: () => this.actionStateManager.isResizing() },
-    { event: 'rotate', isActive: () => this.actionStateManager.isRotating() },
-    { event: 'panning', isActive: () => this.actionStateManager.isPanning() },
-  ];
-
+  private readonly interactionCoordinator: InteractionCoordinator;
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
 
@@ -119,6 +104,7 @@ export class FlowCore {
     this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
+    this.interactionCoordinator = new InteractionCoordinator(this);
     this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
     this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
@@ -507,10 +493,7 @@ export class FlowCore {
    * @returns Function that unregisters the callback
    */
   registerInteractionCleanup(cleanup: () => void): () => void {
-    this.interactionCleanups.add(cleanup);
-    return () => {
-      this.interactionCleanups.delete(cleanup);
-    };
+    return this.interactionCoordinator.registerInteractionCleanup(cleanup);
   }
 
   /**
@@ -520,7 +503,7 @@ export class FlowCore {
    * rewrite.
    */
   isCancellingInteraction(): boolean {
-    return this.cancellingInteraction;
+    return this.interactionCoordinator.isCancellingInteraction();
   }
 
   /**
@@ -529,7 +512,7 @@ export class FlowCore {
    * still registered.
    */
   hasActiveInteraction(): boolean {
-    return this.cancellableGestures.some((gesture) => gesture.isActive()) || this.interactionCleanups.size > 0;
+    return this.interactionCoordinator.hasActiveInteraction();
   }
 
   /**
@@ -547,50 +530,8 @@ export class FlowCore {
    *
    * @returns Whether any gesture or registered listener cleanup was torn down
    */
-  async cancelActiveInteraction(): Promise<boolean> {
-    if (this.cancellingInteraction) {
-      return false;
-    }
-    if (this.transactionManager.isActive()) {
-      console.warn(
-        '[ngDiagram] cancelActiveInteraction() called while a transaction is active — ignored. The rollback would merge into the transaction and could be discarded with it; await the transaction and cancel afterwards.'
-      );
-      return false;
-    }
-
-    const activeGestures = this.cancellableGestures
-      .filter((gesture) => gesture.isActive())
-      .map((gesture) => gesture.event);
-
-    this.cancellingInteraction = true;
-    try {
-      // Tear down document-level listeners first so no further pointer events
-      // reach the gesture handlers while (or after) they are being cancelled.
-      const cleanups = [...this.interactionCleanups];
-      this.interactionCleanups.clear();
-      for (const cleanup of cleanups) {
-        cleanup();
-      }
-
-      // One failing cancel must not leave the remaining gestures active — cancel
-      // them all, then rethrow the first failure.
-      let cancelledAny = false;
-      const errors: unknown[] = [];
-      for (const gesture of activeGestures) {
-        try {
-          cancelledAny = (await this.inputEventsRouter.cancel(gesture)) || cancelledAny;
-        } catch (error) {
-          errors.push(error);
-        }
-      }
-      if (errors.length > 0) {
-        throw errors[0];
-      }
-
-      return cancelledAny || cleanups.length > 0;
-    } finally {
-      this.cancellingInteraction = false;
-    }
+  cancelActiveInteraction(): Promise<boolean> {
+    return this.interactionCoordinator.cancelActiveInteraction();
   }
 
   /**
