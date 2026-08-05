@@ -19,8 +19,12 @@ This indicates a programming error. Rotation events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
 
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
-  /** The rotation state whose end or cancel is currently in flight. */
-  private finishingState: RotationActionState | null = null;
+  /**
+   * The rotation state whose end or cancel claimed the teardown. Never reset —
+   * every gesture starts with a fresh state object, so a stale reference can
+   * never match a live gesture.
+   */
+  private finishingState: RotationActionState | undefined;
 
   async handle(event: RotateInputEvent): Promise<void> {
     const { center, lastInputPoint, target, phase } = event;
@@ -81,9 +85,9 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
 
       case 'end': {
         const rotationState = this.flow.actionStateManager.rotation;
-        // Marks this state as being finished — cancel() must not roll back a
-        // rotation whose normal end is already in flight.
-        this.finishingState = rotationState ?? null;
+        // Claims the teardown — cancel() must not roll back a rotation whose
+        // normal end is already in flight.
+        this.finishingState = rotationState;
         try {
           await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
         } finally {
@@ -92,9 +96,6 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
           // fresh state cleared.
           if (this.flow.actionStateManager.rotation === rotationState) {
             this.flow.actionStateManager.clearRotation();
-          }
-          if (this.finishingState === rotationState) {
-            this.finishingState = null;
           }
         }
         break;
@@ -126,9 +127,6 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
     // the identity guard keeps its fresh state intact.
     if (this.flow.actionStateManager.rotation === rotation) {
       this.flow.actionStateManager.clearRotation();
-    }
-    if (this.finishingState === rotation) {
-      this.finishingState = null;
     }
     return true;
   }

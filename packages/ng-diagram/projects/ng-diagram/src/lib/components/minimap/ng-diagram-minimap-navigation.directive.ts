@@ -51,13 +51,12 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
   private unregisterInteractionCleanup: (() => void) | null = null;
 
   ngOnDestroy(): void {
-    const wasDragging = this.dragState.isDragging;
-    this.stopDragging();
     // Destroyed mid-drag: the pointerup will never come, so the panning state
     // this directive set must be cleared here.
-    if (wasDragging && this.flowCoreProvider.isInitialized()) {
-      this.flowCoreProvider.provide().actionStateManager.clearPanning();
+    if (this.dragState.isDragging && this.flowCoreProvider.isInitialized()) {
+      this.setPanningState(false);
     }
+    this.stopDragging();
   }
 
   onPointerDown(event: PointerEvent): void {

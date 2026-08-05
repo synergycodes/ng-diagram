@@ -31,8 +31,7 @@ export class PanningDirective implements OnDestroy {
     if (event.pointerType === 'touch') {
       return;
     }
-    // A second pointerdown mid-pan must not restart the gesture —
-    // re-registering the interaction cleanup would orphan the previous entry.
+    // Re-entry guard: a second pointerdown mid-gesture would orphan the previous interaction-cleanup registration.
     if (this.gestureActive) {
       return;
     }

@@ -32,9 +32,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   onPointerDown(event: PointerInputEvent): void {
-    // A second pointerdown mid-gesture (second touch contact) must not restart
-    // the gesture — re-registering the interaction cleanup would orphan the
-    // previous entry in FlowCore's registry.
+    // Re-entry guard: a second pointerdown mid-gesture would orphan the previous interaction-cleanup registration.
     if (this.gestureActive) {
       return;
     }

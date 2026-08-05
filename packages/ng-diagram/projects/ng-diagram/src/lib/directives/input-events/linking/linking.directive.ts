@@ -42,8 +42,7 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
-    // A second pointerdown mid-gesture must not restart the gesture —
-    // re-registering the interaction cleanup would orphan the previous entry.
+    // Re-entry guard: a second pointerdown mid-gesture would orphan the previous interaction-cleanup registration.
     if (this.gestureActive || !this.shouldHandle($event)) {
       return;
     }

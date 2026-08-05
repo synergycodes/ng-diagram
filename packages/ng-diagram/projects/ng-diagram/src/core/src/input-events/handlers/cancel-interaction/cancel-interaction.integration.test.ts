@@ -102,6 +102,27 @@ const draggableNode = (overrides: Partial<Node> = {}): Node => ({
   ...overrides,
 });
 
+/** Starts a drag on `node` and moves it past the threshold to (150,180). */
+const startDrag = async (flowCore: FlowCore, router: InputEventsRouter, node: Node) => {
+  emitGesture(router, {
+    name: 'pointerMoveSelection',
+    phase: 'start',
+    target: node,
+    targetType: 'node',
+    lastInputPoint: { x: 100, y: 100 },
+    panningForce: null,
+  });
+  await emitGesture(router, {
+    name: 'pointerMoveSelection',
+    phase: 'continue',
+    target: node,
+    targetType: 'node',
+    lastInputPoint: { x: 150, y: 180 },
+    panningForce: null,
+  });
+  await macrotask();
+};
+
 describe('cancelActiveInteraction (integration)', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -118,26 +139,6 @@ describe('cancelActiveInteraction (integration)', () => {
   });
 
   describe('drag', () => {
-    const startDrag = async (flowCore: FlowCore, router: InputEventsRouter, node: Node) => {
-      emitGesture(router, {
-        name: 'pointerMoveSelection',
-        phase: 'start',
-        target: node,
-        targetType: 'node',
-        lastInputPoint: { x: 100, y: 100 },
-        panningForce: null,
-      });
-      await emitGesture(router, {
-        name: 'pointerMoveSelection',
-        phase: 'continue',
-        target: node,
-        targetType: 'node',
-        lastInputPoint: { x: 150, y: 180 },
-        panningForce: null,
-      });
-      await macrotask();
-    };
-
     it('rolls the dragged node back and emits nodeDragEnded with the cancelled reason', async () => {
       const node = draggableNode();
       const { flowCore, router, observedActionTypes } = createFlowCore([node]);
@@ -375,15 +376,6 @@ describe('cancelActiveInteraction (integration)', () => {
   });
 
   describe('cancel vs concurrent work', () => {
-    const dragStartEvent = (node: Node) => ({
-      name: 'pointerMoveSelection' as const,
-      phase: 'start' as const,
-      target: node,
-      targetType: 'node' as const,
-      lastInputPoint: { x: 100, y: 100 },
-      panningForce: null,
-    });
-
     it('refuses to cancel a drag whose pointerup end is already in flight', async () => {
       const node = draggableNode();
       const { flowCore, router } = createFlowCore([node]);
@@ -404,7 +396,7 @@ describe('cancelActiveInteraction (integration)', () => {
         },
       });
 
-      await startDragOn(flowCore, router, node);
+      await startDrag(flowCore, router, node);
       const endPromise = emitGesture(router, {
         name: 'pointerMoveSelection',
         phase: 'end',
@@ -432,7 +424,7 @@ describe('cancelActiveInteraction (integration)', () => {
       const { flowCore, router } = createFlowCore([node]);
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-      await startDragOn(flowCore, router, node);
+      await startDrag(flowCore, router, node);
 
       let releaseTx: () => void = () => undefined;
       const txPromise = flowCore.transaction('appTransaction', async () => {
@@ -461,7 +453,7 @@ describe('cancelActiveInteraction (integration)', () => {
       const dragEnded = vi.fn();
       flowCore.eventManager.on('nodeDragEnded', dragEnded);
 
-      await startDragOn(flowCore, router, node);
+      await startDrag(flowCore, router, node);
       const [first, second] = await Promise.all([
         flowCore.cancelActiveInteraction(),
         flowCore.cancelActiveInteraction(),
@@ -478,7 +470,7 @@ describe('cancelActiveInteraction (integration)', () => {
       const child = draggableNode({ id: 'child', selected: false, groupId: 'grp', position: { x: 120, y: 130 } });
       const { flowCore, router } = createFlowCore([group, child]);
 
-      await startDragOn(flowCore, router, group);
+      await startDrag(flowCore, router, group);
       expect(flowCore.getNodeById('grp')?.position).toEqual({ x: 150, y: 180 });
       expect(flowCore.getNodeById('child')?.position).toEqual({ x: 170, y: 210 });
 
@@ -487,19 +479,5 @@ describe('cancelActiveInteraction (integration)', () => {
       expect(flowCore.getNodeById('grp')?.position).toEqual({ x: 100, y: 100 });
       expect(flowCore.getNodeById('child')?.position).toEqual({ x: 120, y: 130 });
     });
-
-    // Mirrors the drag suite's startDrag but reusable for any node fixture
-    async function startDragOn(flowCore: FlowCore, router: InputEventsRouter, node: Node) {
-      emitGesture(router, dragStartEvent(node));
-      await emitGesture(router, {
-        name: 'pointerMoveSelection',
-        phase: 'continue',
-        target: node,
-        targetType: 'node',
-        lastInputPoint: { x: 150, y: 180 },
-        panningForce: null,
-      });
-      await macrotask();
-    }
   });
 });

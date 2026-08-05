@@ -17,8 +17,12 @@ This indicates a programming error. Resize events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/resizing/`;
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
-  /** The resize state whose end or cancel is currently in flight. */
-  private finishingState: ResizeActionState | null = null;
+  /**
+   * The resize state whose end or cancel claimed the teardown. Never reset —
+   * every gesture starts with a fresh state object, so a stale reference can
+   * never match a live gesture.
+   */
+  private finishingState: ResizeActionState | undefined;
 
   async handle(event: ResizeEvent): Promise<void> {
     if (!event.target) {
@@ -125,9 +129,9 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
       }
       case 'end': {
         const resizeState = this.flow.actionStateManager.resize;
-        // Marks this state as being finished — cancel() must not roll back a
-        // resize whose normal end is already in flight.
-        this.finishingState = resizeState ?? null;
+        // Claims the teardown — cancel() must not roll back a resize whose
+        // normal end is already in flight.
+        this.finishingState = resizeState;
         try {
           await this.flow.commandHandler.emit('resizeNodeStop', { nodeId: resizeState?.resizingNode.id });
         } finally {
@@ -136,9 +140,6 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           // emit was suspended must not have its fresh state cleared.
           if (this.flow.actionStateManager.resize === resizeState) {
             this.flow.actionStateManager.clearResize();
-          }
-          if (this.finishingState === resizeState) {
-            this.finishingState = null;
           }
         }
         break;
@@ -176,9 +177,6 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
     // the identity guard keeps its fresh state intact.
     if (this.flow.actionStateManager.resize === resize) {
       this.flow.actionStateManager.clearResize();
-    }
-    if (this.finishingState === resize) {
-      this.finishingState = null;
     }
     return true;
   }
