@@ -220,35 +220,25 @@ export class NgDiagramService extends NgDiagramBaseService {
   // ==============================
 
   /**
-   * Aborts the interactive gesture currently in progress — linking, dragging,
-   * resizing, rotating or panning.
+   * Aborts the in-progress gesture (linking, drag, resize, rotate or pan):
+   * removes its listeners immediately, restores the state it modified
+   * (positions, size, angle, temporary edge — the viewport is not rolled
+   * back) and fires the corresponding "ended" event with the `cancelled`
+   * reason.
    *
-   * The gesture is torn down immediately: its action state is cleared, its
-   * document-level pointer listeners are removed (no need to wait for pointer
-   * release) and the corresponding "ended" event (`edgeDrawEnded`,
-   * `nodeDragEnded`, `nodeResizeEnded`, `nodeRotateEnded`) fires with the
-   * `cancelled` reason. Diagram state modified by the gesture is restored:
-   * dragged nodes snap back to their pre-drag positions, a resized node gets
-   * its original size/position/autoSize back, a rotated node its original
-   * angle, and the temporary edge of a linking gesture is discarded. Panning
-   * only stops — the viewport is navigation state and is not rolled back.
-   * No-op when nothing is active, when the gesture's normal end is already
-   * completing (a finished gesture is never rolled back), or when a
-   * transaction is active — the rollback would merge into the transaction and
-   * could be discarded with it, so the call is refused with a console warning;
-   * await the transaction and cancel afterwards.
+   * No-op when nothing is active, when the gesture is already completing, or
+   * while a transaction is active (refused with a console warning — cancel
+   * after it settles).
    *
-   * Bound to the Escape key by default via the `cancelInteraction` shortcut
-   * action; rebind or disable it with {@link configureShortcuts}.
+   * Bound to Escape by default via the `cancelInteraction` shortcut action —
+   * see {@link configureShortcuts}.
    *
    * @example
    * ```typescript
-   * // Abort the temporary edge / drag preview from custom logic
    * ngDiagramService.cancelActiveInteraction();
    * ```
    *
-   * @returns Promise resolving to whether any gesture or registered listener
-   * cleanup was torn down.
+   * @returns Promise resolving to whether anything was torn down
    *
    * @since 1.3.0
    */
