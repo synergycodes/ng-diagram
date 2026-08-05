@@ -22,6 +22,43 @@ export const solo: Partial<Model> = {
   edges: [],
 };
 
+/**
+ * Resizable nodes for the resize-adornment specs. `free` uses the default template
+ * (adornment with all edges active); the `resize-edges` nodes use the harness template
+ * that feeds `data.resizeEdges` into the adornment's `resizeEdges` input.
+ */
+export const resizeArena: Partial<Model> = {
+  nodes: [
+    {
+      id: 'free',
+      position: { x: 80, y: 80 },
+      size: { width: 200, height: 120 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'default' },
+    },
+    {
+      id: 'corner',
+      type: 'resize-edges',
+      position: { x: 420, y: 80 },
+      size: { width: 200, height: 120 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'right + bottom', resizeEdges: ['right', 'bottom'] },
+    },
+    {
+      id: 'frozen',
+      type: 'resize-edges',
+      position: { x: 80, y: 320 },
+      size: { width: 200, height: 120 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'none', resizeEdges: [] },
+    },
+  ],
+  edges: [],
+};
+
 /** A group, a member inside it, and a free node — for group/selection scenarios. */
 export const groupArena: Partial<Model> = {
   nodes: [

@@ -7,6 +7,7 @@ import {
   NgDiagramGroupsService,
   NgDiagramModelService,
   NgDiagramNodeService,
+  NgDiagramNodeTemplateMap,
   NgDiagramSelectionService,
   NgDiagramService,
   NgDiagramViewportService,
@@ -14,6 +15,7 @@ import {
 } from 'ng-diagram';
 import type { HarnessBridge } from './api';
 import { DEFAULT_E2E_MODEL } from './default-model';
+import { ResizeEdgesNodeComponent } from './resize-edges-node.component';
 
 declare global {
   interface Window extends HarnessBridge {}
@@ -27,7 +29,12 @@ declare global {
   providers: [provideNgDiagram()],
   template: `
     <div class="diagram-container" data-testid="diagram-container">
-      <ng-diagram [model]="model()" [config]="config" (diagramInit)="onDiagramInit()">
+      <ng-diagram
+        [model]="model()"
+        [config]="config"
+        [nodeTemplateMap]="nodeTemplateMap"
+        (diagramInit)="onDiagramInit()"
+      >
         <ng-diagram-background type="grid"></ng-diagram-background>
       </ng-diagram>
     </div>
@@ -53,6 +60,7 @@ export class HarnessComponent {
 
   readonly model = signal(initializeModel(window.__diagramSeed ?? DEFAULT_E2E_MODEL));
   readonly config = window.__diagramConfig ?? {};
+  readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([['resize-edges', ResizeEdgesNodeComponent]]);
 
   onDiagramInit(): void {
     window.__diagram = {
