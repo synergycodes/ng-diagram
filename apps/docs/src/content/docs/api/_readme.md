@@ -156,6 +156,7 @@ title: "ng-diagram"
 - [EdgeLabel](/docs/api/types/model/edgelabel/)
 - [FlowState](/docs/api/types/model/flowstate/)
 - [GroupNode](/docs/api/types/model/groupnode/)
+- [InitializeModelOptions](/docs/api/types/model/initializemodeloptions/)
 - [Metadata](/docs/api/types/model/metadata/)
 - [Model](/docs/api/types/model/model/)
 - [ModelAdapter](/docs/api/types/model/modeladapter/)
@@ -169,6 +170,8 @@ title: "ng-diagram"
 - [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)
 - [PortSide](/docs/api/types/model/portside/)
+- [StripEdgeRuntimePropertiesFn](/docs/api/types/model/stripedgeruntimepropertiesfn/)
+- [StripNodeRuntimePropertiesFn](/docs/api/types/model/stripnoderuntimepropertiesfn/)
 
 ## Types/Palette
 
@@ -199,3 +202,5 @@ title: "ng-diagram"
 - [initializeModel](/docs/api/utilities/initializemodel/)
 - [initializeModelAdapter](/docs/api/utilities/initializemodeladapter/)
 - [provideNgDiagram](/docs/api/utilities/providengdiagram/)
+- [stripEdgeRuntimeProperties](/docs/api/utilities/stripedgeruntimeproperties/)
+- [stripNodeRuntimeProperties](/docs/api/utilities/stripnoderuntimeproperties/)

@@ -423,10 +423,16 @@ export interface HighlightGroupActionState {
 }
 
 // @public
-export function initializeModel(model?: Partial<Model>, injector?: Injector): ModelAdapter;
+export function initializeModel(model?: Partial<Model>, injector?: Injector, options?: InitializeModelOptions): ModelAdapter;
 
 // @public
-export function initializeModelAdapter(adapter: ModelAdapter, model?: Partial<Model>, injector?: Injector): ModelAdapter;
+export function initializeModelAdapter(adapter: ModelAdapter, model?: Partial<Model>, injector?: Injector, options?: InitializeModelOptions): ModelAdapter;
+
+// @public
+export interface InitializeModelOptions {
+    stripEdgeRuntimeProperties?: StripEdgeRuntimePropertiesFn;
+    stripNodeRuntimeProperties?: StripNodeRuntimePropertiesFn;
+}
 
 // @public
 export interface InputModifiers {
@@ -933,8 +939,8 @@ export const NgDiagramMath: {
     distanceBetweenPoints: (a: Point, b: Point) => number;
     normalizeAngle: (angle: number) => number;
     snapAngle: typeof snapAngle;
-    snapNumber: (value: number, step: number) => number;
-    snapPoint: (point: Point, step: Size) => {
+    snapNumber: (value: number, step: number, offset?: number) => number;
+    snapPoint: (point: Point, step: Size, offset?: Size) => {
         x: number;
         y: number;
     };
@@ -1611,11 +1617,25 @@ export interface Size {
 export interface SnappingConfig {
     computeSnapForNodeDrag: (node: Node_2) => Size | null;
     computeSnapForNodeSize: (node: Node_2) => Size | null;
+    computeSnapOffsetForNodeSize: (node: Node_2) => Size | null;
     defaultDragSnap: Size;
     defaultResizeSnap: Size;
+    defaultResizeSnapOffset: Size;
     shouldSnapDragForNode: (node: Node_2) => boolean;
     shouldSnapResizeForNode: (node: Node_2) => boolean;
 }
+
+// @public
+export function stripEdgeRuntimeProperties(edge: Edge): Edge;
+
+// @public
+export type StripEdgeRuntimePropertiesFn = (edge: Edge) => Edge;
+
+// @public
+export function stripNodeRuntimeProperties(node: Node_2): Node_2;
+
+// @public
+export type StripNodeRuntimePropertiesFn = (node: Node_2) => Node_2;
 
 // @public
 export interface TransactionOptions {

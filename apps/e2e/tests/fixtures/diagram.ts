@@ -128,6 +128,34 @@ export class Diagram {
     await this.pointerDrag(centerOf(src), centerOf(dst));
   }
 
+  /**
+   * Drag a resize handle (`top-left`, `bottom-right`, …) or a resize line
+   * (`top`, `right`, `bottom`, `left`) of an already selected node by the
+   * given delta (client px).
+   */
+  async dragResizeHandle(id: string, handle: string, delta: Point): Promise<void> {
+    const locator = this.node(id).locator(`.resize-handle--${handle}, .resize-line--${handle}`);
+    const box = await requireBox(locator, `resize handle "${handle}" of node "${id}"`);
+    // Grab lines off-center — the middle of a side line can overlap a port
+    const isLine = ['top', 'right', 'bottom', 'left'].includes(handle);
+    const start = isLine
+      ? {
+          x: box.x + box.width * (handle === 'left' || handle === 'right' ? 0.5 : 0.3),
+          y: box.y + box.height * (handle === 'top' || handle === 'bottom' ? 0.5 : 0.3),
+        }
+      : centerOf(box);
+    const end = { x: start.x + delta.x, y: start.y + delta.y };
+    const mid = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+    await this.page.mouse.move(start.x, start.y);
+    await this.page.mouse.down();
+    await this.page.mouse.move(mid.x, mid.y, { steps: 6 });
+    await this.page.mouse.move(end.x, end.y, { steps: 6 });
+    // pointermove delivery is frame-aligned in Chromium — give the final
+    // coalesced move a frame to arrive before releasing the pointer
+    await this.page.evaluate(() => new Promise(requestAnimationFrame));
+    await this.page.mouse.up();
+  }
+
   /** Pan the canvas from an empty corner by a delta. */
   async panBy(delta: Point): Promise<void> {
     const box = await requireBox(this.container, 'container');
