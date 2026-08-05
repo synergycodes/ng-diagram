@@ -465,6 +465,61 @@ describe('cancelActiveInteraction (integration)', () => {
       expect(flowCore.getNodeById('n1')?.position).toEqual({ x: 10, y: 20 });
     });
 
+    it('a resize started while the cancel rollback is still committing does not capture stale geometry', async () => {
+      const node = draggableNode({ size: { width: 200, height: 100 }, autoSize: false });
+      const { flowCore, router } = createFlowCore([node]);
+
+      // Parks the cancelResize rollback pass so the second gesture can race it
+      let release: () => void = () => undefined;
+      flowCore.middlewareManager.register({
+        name: 'slow-cancel',
+        execute: async (context, next) => {
+          if (context.modelActionTypes.includes('cancelResize')) {
+            await new Promise<void>((resolve) => {
+              release = resolve;
+            });
+          }
+          await next();
+        },
+      });
+
+      const resizeEvent = (phase: string, lastInputPoint: { x: number; y: number }) =>
+        emitGesture(router, {
+          name: 'resize',
+          phase,
+          target: node,
+          targetType: 'node',
+          direction: 'bottom-right',
+          lastInputPoint,
+        });
+
+      await resizeEvent('start', { x: 100, y: 100 });
+      await resizeEvent('continue', { x: 150, y: 140 });
+      await macrotask();
+      expect(flowCore.getNodeById('n1')?.size).toEqual({ width: 250, height: 140 });
+
+      const cancelPromise = flowCore.cancelActiveInteraction();
+
+      // Second resize begins before the rollback commits — it must not start
+      // from the pre-rollback 250x140
+      resizeEvent('start', { x: 100, y: 100 });
+      resizeEvent('continue', { x: 110, y: 110 });
+
+      // Let the rollback pass reach the parking middleware before releasing it
+      await macrotask();
+      release();
+      await cancelPromise;
+      await macrotask();
+
+      expect(flowCore.getNodeById('n1')?.size).toEqual({ width: 200, height: 100 });
+
+      // Once the cancel has settled, the next resize starts from the rolled-back size
+      await resizeEvent('start', { x: 100, y: 100 });
+      await resizeEvent('continue', { x: 120, y: 115 });
+      await macrotask();
+      expect(flowCore.getNodeById('n1')?.size).toEqual({ width: 220, height: 115 });
+    });
+
     it('drag cancel restores group children moved with the group', async () => {
       const group = draggableNode({ id: 'grp', position: { x: 100, y: 100 }, isGroup: true });
       const child = draggableNode({ id: 'child', selected: false, groupId: 'grp', position: { x: 120, y: 130 } });

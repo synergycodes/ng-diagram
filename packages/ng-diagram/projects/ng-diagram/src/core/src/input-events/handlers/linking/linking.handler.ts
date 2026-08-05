@@ -20,6 +20,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 
 export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
   handle(event: LinkingInputEvent): void {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         const sourceNodeId = event.target?.id;

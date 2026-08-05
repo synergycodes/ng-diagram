@@ -514,6 +514,16 @@ export class FlowCore {
   }
 
   /**
+   * Whether {@link cancelActiveInteraction} is mid-flight — its rollback has
+   * not committed yet. Gesture handlers drop input events while this is true,
+   * so a new gesture cannot capture geometry the pending rollback is about to
+   * rewrite.
+   */
+  isCancellingInteraction(): boolean {
+    return this.cancellingInteraction;
+  }
+
+  /**
    * Whether an interactive gesture (linking, dragging, resizing, rotating,
    * panning) is currently in progress, or a gesture's listener cleanup is
    * still registered.

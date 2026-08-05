@@ -51,6 +51,7 @@ describe('VirtualizedPanningEventHandler', () => {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       commandHandler: mockCommandHandler,
+      isCancellingInteraction: () => false,
       actionStateManager: mockActionStateManager,
       environment: mockEnvironment,
     } as unknown as FlowCore;

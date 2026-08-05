@@ -78,6 +78,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     mockFlowCore = {
       getState: mockGetState,
       commandHandler: { emit: mockEmit },
+      isCancellingInteraction: () => false,
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       modelLookup: mockModelLookup,

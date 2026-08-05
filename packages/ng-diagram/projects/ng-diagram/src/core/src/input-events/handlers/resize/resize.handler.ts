@@ -17,6 +17,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/nodes/resizing/`;
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
   async handle(event: ResizeEvent): Promise<void> {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     if (!event.target) {
       throw new Error(RESIZE_MISSING_TARGET_ERROR(event));
     }

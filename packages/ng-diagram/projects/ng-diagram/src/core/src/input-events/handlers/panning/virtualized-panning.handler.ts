@@ -16,6 +16,9 @@ export class VirtualizedPanningEventHandler extends EventHandler<PanningEvent> {
   private rafScheduled = false;
 
   handle(event: PanningEvent): void {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         this.lastPoint = event.lastInputPoint;

@@ -19,6 +19,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
 
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
   async handle(event: RotateInputEvent): Promise<void> {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     const { center, lastInputPoint, target, phase } = event;
     if (!target) {
       throw new Error(ROTATE_MISSING_TARGET_ERROR(event));

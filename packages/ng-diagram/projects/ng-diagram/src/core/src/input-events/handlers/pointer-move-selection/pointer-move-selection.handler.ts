@@ -27,6 +27,9 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
   private gesture: DragGesture | null = null;
 
   async handle(event: PointerMoveSelectionEvent) {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);

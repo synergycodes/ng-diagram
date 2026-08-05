@@ -55,6 +55,7 @@ describe('ResizeEventHandler', () => {
 
     const mockFlowCore = {
       commandHandler: { emit: mockEmit },
+      isCancellingInteraction: () => false,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       getNodeById: vi.fn().mockReturnValue(nodeWithSize),
       actionStateManager: mockActionStateManager,
@@ -130,6 +131,7 @@ describe('ResizeEventHandler', () => {
 
       const mockFlowCore = {
         commandHandler: { emit: mockEmit },
+        isCancellingInteraction: () => false,
         clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
         getNodeById: vi.fn().mockReturnValue(nodeWithoutSize),
         actionStateManager: mockActionStateManager,

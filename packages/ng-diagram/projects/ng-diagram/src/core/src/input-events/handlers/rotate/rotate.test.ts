@@ -52,6 +52,7 @@ describe('RotateEventHandler', () => {
     };
     flowCore = {
       commandHandler: mockCommandHandler,
+      isCancellingInteraction: () => false,
       actionStateManager: mockActionStateManager,
       clientToFlowPosition: vi.fn().mockImplementation((point) => point),
       getNodeById: vi.fn().mockReturnValue(node),
