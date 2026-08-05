@@ -16,6 +16,9 @@ export class VirtualizedPanningEventHandler extends EventHandler<PanningEvent> {
   private rafScheduled = false;
 
   handle(event: PanningEvent): void {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         this.lastPoint = event.lastInputPoint;
@@ -46,6 +49,17 @@ export class VirtualizedPanningEventHandler extends EventHandler<PanningEvent> {
         break;
       }
     }
+  }
+
+  override cancel(): boolean {
+    if (!this.flow.actionStateManager.isPanning()) {
+      return false;
+    }
+    this.accumulatedDelta = { x: 0, y: 0 };
+    this.lastPoint = undefined;
+    this.rafScheduled = false;
+    this.flow.actionStateManager.clearPanning();
+    return true;
   }
 
   /**

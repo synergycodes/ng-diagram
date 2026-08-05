@@ -17,6 +17,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/nodes/resizing/`;
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
   async handle(event: ResizeEvent): Promise<void> {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     if (!event.target) {
       throw new Error(RESIZE_MISSING_TARGET_ERROR(event));
     }
@@ -121,6 +124,7 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
       }
       case 'end': {
         const resizeState = this.flow.actionStateManager.resize;
+        this.claimTeardown(resizeState);
         try {
           await this.flow.commandHandler.emit('resizeNodeStop', { nodeId: resizeState?.resizingNode.id });
         } finally {
@@ -134,5 +138,38 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
         break;
       }
     }
+  }
+
+  override async cancel(): Promise<boolean> {
+    const resize = this.flow.actionStateManager.resize;
+    if (!resize || this.isTeardownClaimed(resize)) {
+      return false;
+    }
+    this.claimTeardown(resize);
+
+    resize.cancelReason = 'cancelled';
+
+    // Restore the exact pre-resize geometry (updateNode instead of resizeNode
+    // so min-size constraints and snapping can't distort the original values)
+    // along with the autoSize flag the resize gesture disabled.
+    const { startWidth, startHeight, startNodePositionX, startNodePositionY, resizingNode } = resize;
+    await this.flow.transaction('cancelResize', async (tx) => {
+      await tx.emit('updateNode', {
+        id: resizingNode.id,
+        nodeChanges: {
+          size: { width: startWidth, height: startHeight },
+          position: { x: startNodePositionX, y: startNodePositionY },
+          autoSize: resizingNode.autoSize,
+        },
+      });
+      await tx.emit('resizeNodeStop', { nodeId: resizingNode.id });
+    });
+
+    // A new resize may have started while the transaction above was suspended —
+    // the identity guard keeps its fresh state intact.
+    if (this.flow.actionStateManager.resize === resize) {
+      this.flow.actionStateManager.clearResize();
+    }
+    return true;
   }
 }

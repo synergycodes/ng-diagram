@@ -121,6 +121,7 @@ title: "ng-diagram"
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
 - [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
 - [EdgeDrawCancelReason](/docs/api/types/events/edgedrawcancelreason/)
+- [GestureCancelReason](/docs/api/types/events/gesturecancelreason/)
 
 ## Types/Geometry
 

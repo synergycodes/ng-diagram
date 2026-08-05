@@ -197,6 +197,7 @@ export class DiagramSelectionDirective extends ObjectSelectionDirective {
 // @public
 export interface DraggingActionState {
     accumulatedDeltas: Map<string, Point>;
+    cancelReason?: GestureCancelReason;
     modifiers: InputModifiers;
     movementStarted: boolean;
     nodeIds: string[];
@@ -228,7 +229,7 @@ export interface Edge<T extends DataObject = DataObject> {
 }
 
 // @public
-export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget';
+export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget' | 'cancelled';
 
 // @public
 export interface EdgeDrawEndedEvent {
@@ -390,6 +391,9 @@ export interface FlowStateUpdate {
 }
 
 // @public
+export type GestureCancelReason = 'cancelled';
+
+// @public
 export interface GroupingConfig {
     canGroup: (node: Node_2, group: Node_2) => boolean;
 }
@@ -448,10 +452,13 @@ export interface InvalidateMeasurementsOptions {
 }
 
 // @public
-export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
+export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'>;
 
 // @public (undocumented)
-export class KeyboardInputsDirective {
+export class KeyboardInputsDirective implements OnDestroy {
+    constructor();
+    // (undocumented)
+    ngOnDestroy(): void;
     // (undocumented)
     onKeyDown(event: KeyboardEvent): void;
     // (undocumented)
@@ -661,7 +668,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'selectEnd';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'cancelResize' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'cancelRotate' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'cancelDrag' | 'selectEnd';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
@@ -1240,6 +1247,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     addEventListener<K extends keyof DiagramEventMap>(event: K, callback: EventListener_2<DiagramEventMap[K]>): UnsubscribeFn;
     addEventListenerOnce<K extends keyof DiagramEventMap>(event: K, callback: EventListener_2<DiagramEventMap[K]>): UnsubscribeFn;
     areEventsEnabled(): boolean;
+    cancelActiveInteraction(): Promise<boolean>;
     readonly config: Signal<Readonly<DeepPartial<FlowConfig>>>;
     getDefaultRouting(): string;
     getEnvironment(): EnvironmentInfo;
@@ -1306,6 +1314,7 @@ export { Node_2 as Node }
 
 // @public
 export interface NodeDragEndedEvent {
+    cancelReason?: GestureCancelReason;
     nodes: Node_2[];
 }
 
@@ -1336,6 +1345,7 @@ export interface NodeResizedEvent {
 
 // @public
 export interface NodeResizeEndedEvent {
+    cancelReason?: GestureCancelReason;
     node: Node_2;
 }
 
@@ -1346,6 +1356,7 @@ export interface NodeResizeStartedEvent {
 
 // @public
 export interface NodeRotateEndedEvent {
+    cancelReason?: GestureCancelReason;
     node: Node_2;
 }
 
@@ -1494,6 +1505,7 @@ export interface Rect {
 
 // @public
 export interface ResizeActionState {
+    cancelReason?: GestureCancelReason;
     resizingNode: Node_2;
     startHeight: number;
     startNodePositionX: number;
@@ -1512,6 +1524,7 @@ export interface ResizeConfig {
 
 // @public
 export interface RotationActionState {
+    cancelReason?: GestureCancelReason;
     initialNodeAngle: number;
     nodeId: string;
     startAngle: number;

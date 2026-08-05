@@ -28,6 +28,7 @@ function createResizeEvent(overrides: Partial<ResizeEvent> = {}): ResizeEvent {
 describe('ResizeEventHandler', () => {
   let handler: ResizeEventHandler;
   let mockEmit: ReturnType<typeof vi.fn>;
+  let mockTransaction: ReturnType<typeof vi.fn>;
   let mockActionStateManager: {
     resize: ResizeActionState | undefined;
     clearResize: ReturnType<typeof vi.fn>;
@@ -36,6 +37,10 @@ describe('ResizeEventHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockEmit = vi.fn();
+    mockTransaction = vi.fn().mockImplementation(async (_name, callback) => {
+      const txContext = { emit: mockEmit };
+      return await callback(txContext);
+    });
 
     mockActionStateManager = {
       resize: undefined,
@@ -50,9 +55,11 @@ describe('ResizeEventHandler', () => {
 
     const mockFlowCore = {
       commandHandler: { emit: mockEmit },
+      isCancellingInteraction: () => false,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       getNodeById: vi.fn().mockReturnValue(nodeWithSize),
       actionStateManager: mockActionStateManager,
+      transaction: mockTransaction,
     } as unknown as FlowCore;
 
     handler = new ResizeEventHandler(mockFlowCore);
@@ -124,6 +131,7 @@ describe('ResizeEventHandler', () => {
 
       const mockFlowCore = {
         commandHandler: { emit: mockEmit },
+        isCancellingInteraction: () => false,
         clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
         getNodeById: vi.fn().mockReturnValue(nodeWithoutSize),
         actionStateManager: mockActionStateManager,
@@ -170,6 +178,98 @@ describe('ResizeEventHandler', () => {
       await handler.handle(event);
 
       expect(callOrder).toEqual(['resizeNodeStop', 'clearResize']);
+    });
+  });
+
+  describe('cancel', () => {
+    it('should do nothing when no resize is in progress', async () => {
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalled();
+      expect(mockActionStateManager.clearResize).not.toHaveBeenCalled();
+    });
+
+    it('should set the cancelled reason, emit resizeNodeStop and clear the state', async () => {
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const resizeState = mockActionStateManager.resize;
+
+      await handler.cancel();
+
+      expect(resizeState?.cancelReason).toBe('cancelled');
+      expect(mockEmit).toHaveBeenCalledWith('resizeNodeStop', { nodeId: 'node1' });
+      expect(mockActionStateManager.clearResize).toHaveBeenCalled();
+    });
+
+    it('should restore the pre-resize size, position and autoSize', async () => {
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      await handler.handle(
+        createResizeEvent({ phase: 'continue', direction: 'bottom-right', lastInputPoint: { x: 150, y: 140 } })
+      );
+
+      await handler.cancel();
+
+      expect(mockEmit).toHaveBeenCalledWith('updateNode', {
+        id: 'node1',
+        nodeChanges: {
+          size: { width: 200, height: 100 },
+          position: mockNode.position,
+          autoSize: undefined,
+        },
+      });
+      const calls = mockEmit.mock.calls.map(([name]) => name);
+      expect(calls.indexOf('updateNode')).toBeLessThan(calls.indexOf('resizeNodeStop'));
+    });
+
+    it('should roll back inside a cancelResize transaction', async () => {
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+
+      await handler.cancel();
+
+      expect(mockTransaction).toHaveBeenCalledWith('cancelResize', expect.any(Function));
+    });
+
+    it('should refuse to cancel while the normal end phase is in flight', async () => {
+      let releaseStop: () => void = () => undefined;
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'resizeNodeStop') {
+          await new Promise<void>((resolve) => {
+            releaseStop = resolve;
+          });
+        }
+      });
+
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const endPromise = handler.handle(createResizeEvent({ phase: 'end' }));
+
+      await expect(handler.cancel()).resolves.toBe(false);
+
+      // The completed gesture is left to its end phase: no rollback, no cancel stamp
+      expect(mockActionStateManager.resize?.cancelReason).toBeUndefined();
+      expect(mockTransaction).not.toHaveBeenCalledWith('cancelResize', expect.any(Function));
+
+      releaseStop();
+      await endPromise;
+    });
+
+    it('should not clear a resize that started while the cancel rollback was suspended', async () => {
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'resizeNodeStop') {
+          await macrotask();
+        }
+      });
+
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const cancelPromise = handler.cancel();
+
+      // A new resize starts while the cancel rollback is suspended on resizeNodeStop
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const newState = mockActionStateManager.resize;
+      expect(newState).toBeDefined();
+
+      await cancelPromise;
+
+      expect(mockActionStateManager.clearResize).not.toHaveBeenCalled();
+      expect(mockActionStateManager.resize).toBe(newState);
     });
   });
 });

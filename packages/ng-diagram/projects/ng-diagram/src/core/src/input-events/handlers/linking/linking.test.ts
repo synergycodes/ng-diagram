@@ -44,6 +44,7 @@ describe('LinkingEventHandler', () => {
 
     mockFlowCore = {
       commandHandler: mockCommandHandler,
+      isCancellingInteraction: () => false,
       environment: mockEnvironment,
       actionStateManager: mockActionStateManager,
       clientToFlowPosition: mockClientToFlowPosition,
@@ -204,6 +205,7 @@ describe('LinkingEventHandler', () => {
 
         mockFlowCore = {
           commandHandler: mockCommandHandler,
+          isCancellingInteraction: () => false,
           environment: mockEnvironment,
           actionStateManager: mockActionStateManager,
           clientToFlowPosition: mockClientToFlowPosition,

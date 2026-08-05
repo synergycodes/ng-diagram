@@ -114,6 +114,7 @@ export type {
   FlowConfig,
   FlowState,
   FlowStateUpdate,
+  GestureCancelReason,
   GroupingConfig,
   GroupMembershipChangedEvent,
   GroupNode,

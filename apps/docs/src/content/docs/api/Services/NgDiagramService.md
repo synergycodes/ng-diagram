@@ -161,6 +161,41 @@ True if events are enabled.
 
 ***
 
+### cancelActiveInteraction()
+
+> **cancelActiveInteraction**(): `Promise`\<`boolean`\>
+
+Aborts the in-progress gesture (linking, drag, resize, rotate or pan):
+removes its listeners immediately, restores the state it modified
+(positions, size, angle, temporary edge — the viewport is not rolled
+back) and fires the corresponding "ended" event with the `cancelled`
+reason.
+
+No-op when nothing is active, when the gesture is already completing, or
+while a transaction is active (refused with a console warning — cancel
+after it settles).
+
+Bound to Escape by default via the `cancelInteraction` shortcut action —
+see [configureShortcuts](/docs/api/utilities/configureshortcuts/).
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+Promise resolving to whether anything was torn down
+
+#### Example
+
+```typescript
+ngDiagramService.cancelActiveInteraction();
+```
+
+#### Since
+
+1.3.0
+
+***
+
 ### getDefaultRouting()
 
 > **getDefaultRouting**(): `string`

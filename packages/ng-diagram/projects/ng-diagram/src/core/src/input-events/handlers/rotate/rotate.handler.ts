@@ -19,6 +19,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
 
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
   async handle(event: RotateInputEvent): Promise<void> {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     const { center, lastInputPoint, target, phase } = event;
     if (!target) {
       throw new Error(ROTATE_MISSING_TARGET_ERROR(event));
@@ -77,6 +80,7 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
 
       case 'end': {
         const rotationState = this.flow.actionStateManager.rotation;
+        this.claimTeardown(rotationState);
         try {
           await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
         } finally {
@@ -90,5 +94,32 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
         break;
       }
     }
+  }
+
+  override async cancel(): Promise<boolean> {
+    const rotation = this.flow.actionStateManager.rotation;
+    if (!rotation || this.isTeardownClaimed(rotation)) {
+      return false;
+    }
+    this.claimTeardown(rotation);
+
+    rotation.cancelReason = 'cancelled';
+
+    // Restore the exact pre-rotation angle (updateNode instead of rotateNodeTo
+    // so angle snapping can't distort the original value).
+    await this.flow.transaction('cancelRotate', async (tx) => {
+      await tx.emit('updateNode', {
+        id: rotation.nodeId,
+        nodeChanges: { angle: rotation.initialNodeAngle },
+      });
+      await tx.emit('rotateNodeStop', { nodeId: rotation.nodeId });
+    });
+
+    // A new rotation may have started while the transaction above was suspended —
+    // the identity guard keeps its fresh state intact.
+    if (this.flow.actionStateManager.rotation === rotation) {
+      this.flow.actionStateManager.clearRotation();
+    }
+    return true;
   }
 }
