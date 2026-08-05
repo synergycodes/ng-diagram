@@ -1,5 +1,4 @@
 import { NgDiagramMath } from '../../../math';
-import type { RotationActionState } from '../../../types/action-state.interface';
 import { EventHandler } from '../event-handler';
 import { RotateInputEvent } from './rotate.event';
 
@@ -19,13 +18,6 @@ This indicates a programming error. Rotation events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
 
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
-  /**
-   * The rotation state whose end or cancel claimed the teardown. Never reset —
-   * every gesture starts with a fresh state object, so a stale reference can
-   * never match a live gesture.
-   */
-  private finishingState: RotationActionState | undefined;
-
   async handle(event: RotateInputEvent): Promise<void> {
     const { center, lastInputPoint, target, phase } = event;
     if (!target) {
@@ -85,9 +77,7 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
 
       case 'end': {
         const rotationState = this.flow.actionStateManager.rotation;
-        // Claims the teardown — cancel() must not roll back a rotation whose
-        // normal end is already in flight.
-        this.finishingState = rotationState;
+        this.claimTeardown(rotationState);
         try {
           await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
         } finally {
@@ -105,11 +95,10 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
 
   override async cancel(): Promise<boolean> {
     const rotation = this.flow.actionStateManager.rotation;
-    // No rotation, or its normal end (or another cancel) already owns the teardown.
-    if (!rotation || rotation === this.finishingState) {
+    if (!rotation || this.isTeardownClaimed(rotation)) {
       return false;
     }
-    this.finishingState = rotation;
+    this.claimTeardown(rotation);
 
     rotation.cancelReason = 'cancelled';
 

@@ -24,7 +24,7 @@ export class RotateHandleDirective implements OnDestroy {
 
   ngOnDestroy() {
     const wasMidGesture = this.gestureActive;
-    this.cleanup();
+    this.removeListeners();
     // Destroyed mid-gesture (e.g. the node was deleted while rotating): the pointerup
     // will never be routed, so the rotation state must be cleared here.
     if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
@@ -38,14 +38,14 @@ export class RotateHandleDirective implements OnDestroy {
       return;
     }
 
-    $event.rotateHandled = true;
-    this.gestureActive = true;
-    this.touchEventsStateService.currentEvent.set(DiagramEventName.Rotate);
-
     const targetData = this.targetData();
     if (!targetData) {
       return;
     }
+
+    $event.rotateHandled = true;
+    this.gestureActive = true;
+    this.touchEventsStateService.currentEvent.set(DiagramEventName.Rotate);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
@@ -65,7 +65,7 @@ export class RotateHandleDirective implements OnDestroy {
     document.addEventListener('pointercancel', this.onPointerCancel);
     this.unregisterInteractionCleanup = this.flowCoreProvider
       .provide()
-      .registerInteractionCleanup(() => this.cleanup());
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   onPointerMove = ($event: PointerInputEvent) => {
@@ -96,6 +96,8 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
+    this.removeListeners();
+
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -113,28 +115,10 @@ export class RotateHandleDirective implements OnDestroy {
       },
       center: this.getNodeCenter(targetData),
     });
-    this.cleanup();
   };
 
   onPointerCancel = ($event: PointerInputEvent) => {
-    const targetData = this.targetData();
-    if (!targetData) {
-      return;
-    }
-
-    const baseEvent = this.inputEventsRouter.getBaseEvent($event);
-    this.inputEventsRouter.emit({
-      ...baseEvent,
-      name: 'rotate',
-      phase: 'end',
-      target: targetData,
-      lastInputPoint: {
-        x: $event.clientX,
-        y: $event.clientY,
-      },
-      center: this.getNodeCenter(targetData),
-    });
-    this.cleanup();
+    this.onPointerUp($event);
   };
 
   private shouldHandle(event: PointerInputEvent) {
@@ -145,7 +129,7 @@ export class RotateHandleDirective implements OnDestroy {
     );
   }
 
-  private cleanup() {
+  private removeListeners() {
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
     // The shared touch marker belongs to whichever gesture set it — a bystander

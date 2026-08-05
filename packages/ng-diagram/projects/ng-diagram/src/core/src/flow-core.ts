@@ -75,6 +75,20 @@ export class FlowCore {
   private readonly interactionCleanups = new Set<() => void>();
   private cancellingInteraction = false;
 
+  /**
+   * Every cancellable gesture: the action-state probe paired with the input
+   * event name its handler is registered under. A new cancellable gesture
+   * joins {@link hasActiveInteraction} and {@link cancelActiveInteraction} by
+   * adding one entry here.
+   */
+  private readonly cancellableGestures: readonly { event: InputEventName; isActive: () => boolean }[] = [
+    { event: 'linking', isActive: () => this.actionStateManager.isLinking() },
+    { event: 'pointerMoveSelection', isActive: () => this.actionStateManager.isDragging() },
+    { event: 'resize', isActive: () => this.actionStateManager.isResizing() },
+    { event: 'rotate', isActive: () => this.actionStateManager.isRotating() },
+    { event: 'panning', isActive: () => this.actionStateManager.isPanning() },
+  ];
+
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
 
@@ -505,14 +519,7 @@ export class FlowCore {
    * still registered.
    */
   hasActiveInteraction(): boolean {
-    return (
-      this.actionStateManager.isLinking() ||
-      this.actionStateManager.isDragging() ||
-      this.actionStateManager.isResizing() ||
-      this.actionStateManager.isRotating() ||
-      this.actionStateManager.isPanning() ||
-      this.interactionCleanups.size > 0
-    );
+    return this.cancellableGestures.some((gesture) => gesture.isActive()) || this.interactionCleanups.size > 0;
   }
 
   /**
@@ -541,12 +548,9 @@ export class FlowCore {
       return false;
     }
 
-    const activeGestures: InputEventName[] = [];
-    if (this.actionStateManager.isLinking()) activeGestures.push('linking');
-    if (this.actionStateManager.isDragging()) activeGestures.push('pointerMoveSelection');
-    if (this.actionStateManager.isResizing()) activeGestures.push('resize');
-    if (this.actionStateManager.isRotating()) activeGestures.push('rotate');
-    if (this.actionStateManager.isPanning()) activeGestures.push('panning');
+    const activeGestures = this.cancellableGestures
+      .filter((gesture) => gesture.isActive())
+      .map((gesture) => gesture.event);
 
     this.cancellingInteraction = true;
     try {

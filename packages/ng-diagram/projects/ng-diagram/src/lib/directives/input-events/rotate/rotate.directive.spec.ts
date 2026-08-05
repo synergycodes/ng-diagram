@@ -1,10 +1,22 @@
-import { TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Node } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, type PointerInputEvent } from '../../../types';
 import { RotateHandleDirective } from './rotate.directive';
+
+@Component({
+  template: `<div ngDiagramRotateHandle [targetData]="node"></div>`,
+  standalone: true,
+  imports: [RotateHandleDirective],
+})
+class HostComponent {
+  node = { id: 'n1', type: 'node', position: { x: 0, y: 0 }, size: { width: 100, height: 50 }, data: {} } as Node;
+}
 
 function makePointerEvent(overrides: Partial<PointerInputEvent> = {}): PointerInputEvent {
   return {
@@ -16,12 +28,17 @@ function makePointerEvent(overrides: Partial<PointerInputEvent> = {}): PointerIn
 }
 
 describe('RotateHandleDirective (shared touch marker ownership)', () => {
+  let fixture: ComponentFixture<HostComponent>;
   let directive: RotateHandleDirective;
   let touchState: TouchEventsStateService;
   let clearRotation: ReturnType<typeof vi.fn>;
+  let registerInteractionCleanup: ReturnType<typeof vi.fn>;
+  let unregister: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     clearRotation = vi.fn();
+    unregister = vi.fn();
+    registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
     const mockRouter = {
       getBaseEvent: () => ({
@@ -35,20 +52,22 @@ describe('RotateHandleDirective (shared touch marker ownership)', () => {
       isInitialized: () => true,
       provide: () => ({
         actionStateManager: { clearRotation },
-        registerInteractionCleanup: vi.fn().mockReturnValue(vi.fn()),
+        registerInteractionCleanup,
       }),
     };
 
     TestBed.configureTestingModule({
+      imports: [HostComponent],
       providers: [
-        RotateHandleDirective,
         { provide: InputEventsRouterService, useValue: mockRouter },
         { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
         TouchEventsStateService,
       ],
     });
 
-    directive = TestBed.inject(RotateHandleDirective);
+    fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    directive = fixture.debugElement.query(By.directive(RotateHandleDirective)).injector.get(RotateHandleDirective);
     touchState = TestBed.inject(TouchEventsStateService);
   });
 
@@ -56,19 +75,36 @@ describe('RotateHandleDirective (shared touch marker ownership)', () => {
     // Simulates virtualization destroying this handle's component during a touch pan
     touchState.currentEvent.set(DiagramEventName.Panning);
 
-    directive.ngOnDestroy();
+    fixture.destroy();
 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
     expect(clearRotation).not.toHaveBeenCalled();
+  });
+
+  it('clears the shared touch marker on normal pointerup', () => {
+    directive.onPointerDown(makePointerEvent());
+    expect(touchState.currentEvent()).toBe(DiagramEventName.Rotate);
+
+    directive.onPointerUp(makePointerEvent());
+
+    expect(touchState.currentEvent()).toBeNull();
+    expect(unregister).toHaveBeenCalledTimes(1);
   });
 
   it('clears its own marker and the rotation state when destroyed mid-gesture', () => {
     directive.onPointerDown(makePointerEvent());
     expect(touchState.currentEvent()).toBe(DiagramEventName.Rotate);
 
-    directive.ngOnDestroy();
+    fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
     expect(clearRotation).toHaveBeenCalled();
+  });
+
+  it('does not re-register the cleanup on a second pointerdown mid-gesture', () => {
+    directive.onPointerDown(makePointerEvent());
+    directive.onPointerDown(makePointerEvent());
+
+    expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
   });
 });

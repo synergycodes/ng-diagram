@@ -39,10 +39,12 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
   let touchState: TouchEventsStateService;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
+  let clearDragging: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
+    clearDragging = vi.fn();
     const mockRouter = {
       getBaseEvent: () => ({
         id: 'id',
@@ -58,6 +60,7 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
       isInitialized: () => true,
       provide: () => ({
         config: { nodeDraggingEnabled: true },
+        actionStateManager: { clearDragging },
         registerInteractionCleanup,
       }),
     };
@@ -101,12 +104,19 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
   });
 
-  it('clears its own marker when destroyed mid-gesture', () => {
+  it('clears its own marker and the dragging state when destroyed mid-gesture', () => {
     directive.onPointerDown(makePointerEvent());
 
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
+    expect(clearDragging).toHaveBeenCalled();
+  });
+
+  it('does not clear the dragging state when destroyed as a bystander', () => {
+    fixture.destroy();
+
+    expect(clearDragging).not.toHaveBeenCalled();
   });
 
   it('unregisters its interaction cleanup on normal pointerup', () => {

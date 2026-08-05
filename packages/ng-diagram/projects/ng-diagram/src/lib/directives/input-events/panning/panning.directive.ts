@@ -23,7 +23,14 @@ export class PanningDirective implements OnDestroy {
   private gestureActive = false;
 
   ngOnDestroy(): void {
+    const wasMidGesture = this.gestureActive;
     this.removeListeners();
+    // Destroyed mid-gesture: the pointerup will never be routed, so the panning
+    // state must be cleared here — a leaked panning state keeps
+    // hasActiveInteraction() true forever.
+    if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
+      this.flowCoreProvider.provide().actionStateManager.clearPanning();
+    }
   }
 
   onPointerDown(event: PointerInputEvent): void {

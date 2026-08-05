@@ -18,7 +18,7 @@ export class ManualLinkingService {
   startLinking(node: Node, portId?: string) {
     // A previous manual linking still in flight would leave its document
     // listeners and its interaction-cleanup entry orphaned — latest call wins.
-    this.cleanup();
+    this.removeListeners();
     this.node = node;
     this.portId = portId;
     const position = this.cursorPositionTrackerService.getLastPosition();
@@ -36,7 +36,7 @@ export class ManualLinkingService {
     document.addEventListener('touchend', this.onTouchEnd, { passive: false });
     this.unregisterInteractionCleanup = this.flowCoreProvider
       .provide()
-      .registerInteractionCleanup(() => this.cleanup());
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   private onPointerMove = (event: PointerEvent) => {
@@ -69,16 +69,16 @@ export class ManualLinkingService {
       clientY: touch.clientY,
     } as PointerInputEvent;
 
-    this.cleanup();
+    this.removeListeners();
     this.linkingEventService.emitEnd(mockEvent, this.node, this.portId);
   };
 
   private onDocumentClick = (event: MouseEvent) => {
-    this.cleanup();
+    this.removeListeners();
     this.linkingEventService.emitEnd(event as PointerInputEvent, this.node, this.portId);
   };
 
-  private cleanup() {
+  private removeListeners() {
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onPointerMove);

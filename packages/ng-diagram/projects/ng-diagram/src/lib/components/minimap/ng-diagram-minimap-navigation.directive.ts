@@ -56,7 +56,7 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     if (this.dragState.isDragging && this.flowCoreProvider.isInitialized()) {
       this.setPanningState(false);
     }
-    this.stopDragging();
+    this.removeListeners();
   }
 
   onPointerDown(event: PointerEvent): void {
@@ -76,7 +76,7 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     // listeners and the pointer capture.
     this.unregisterInteractionCleanup = this.flowCoreProvider
       .provide()
-      .registerInteractionCleanup(() => this.stopDragging());
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   private onPointerMove = (event: PointerEvent): void => {
@@ -93,10 +93,10 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
 
   private onPointerUp = (): void => {
     this.setPanningState(false);
-    this.stopDragging();
+    this.removeListeners();
   };
 
-  private stopDragging(): void {
+  private removeListeners(): void {
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
     this.dragState.isDragging = false;
