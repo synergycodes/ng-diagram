@@ -3,25 +3,20 @@ import { BaseInputEvent } from '../input-events.interface';
 
 export abstract class EventHandler<TEvent extends BaseInputEvent> {
   /**
-   * The gesture state whose end or cancel claimed the teardown — see
-   * {@link claimTeardown}. Never reset: every gesture starts with a fresh
-   * state object, so a stale claim can never match a live gesture.
+   * State whose end/cancel claimed the teardown. Never reset — a fresh state
+   * object per gesture means a stale claim cannot match a live one.
    */
   private claimedTeardownState: unknown;
 
   constructor(protected readonly flow: FlowCore) {}
 
+  /** Handles one input event. Invoked un-awaited — implementations must tolerate interleaving at every await. */
   abstract handle(event: TEvent): void | Promise<void>;
 
   /**
-   * Claims the teardown of the gesture owning `state`: the end phase claims it
-   * so a racing cancel() no-ops instead of rolling back a completing gesture,
-   * and cancel() claims it so a second cancel no-ops.
-   *
-   * Only usable when the gesture keeps ONE state object for its whole lifetime.
-   * Linking replaces its state object mid-gesture, so it stamps the state
-   * instead (see `InternalLinkingActionState`); drag folds the claim into its
-   * private `DragGesture.ended` flag, which also kills suspended continues.
+   * Claims the teardown of the gesture owning `state`, so a racing cancel()
+   * (or a second one) no-ops. Requires one state object per gesture lifetime —
+   * linking stamps its replaced state instead, drag uses `DragGesture.ended`.
    */
   protected claimTeardown(state: unknown): void {
     this.claimedTeardownState = state;
@@ -33,15 +28,11 @@ export abstract class EventHandler<TEvent extends BaseInputEvent> {
   }
 
   /**
-   * Aborts the gesture this handler is currently tracking, without the side
-   * effects of a normal `end` phase (no edge creation, no group drop, …).
+   * Aborts the tracked gesture without the side effects of a normal `end`
+   * (no edge creation, no group drop). Default: no-op.
    *
-   * Gesture handlers override this to clear their action state, reset internal
-   * tracking and let the corresponding "ended" event fire with a cancel reason.
-   * The default is a no-op for handlers without an in-progress gesture concept.
-   *
-   * @returns Whether anything was actually torn down — `false` when there is no
-   * gesture, or when its normal end (or another cancel) is already in flight.
+   * @returns Whether anything was torn down — `false` when there is no gesture
+   * or its teardown is already claimed by an in-flight end or cancel.
    */
   cancel(): boolean | Promise<boolean> {
     return false;

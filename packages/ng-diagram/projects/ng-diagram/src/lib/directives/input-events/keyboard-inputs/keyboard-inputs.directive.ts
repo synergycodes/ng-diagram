@@ -32,9 +32,9 @@ export class KeyboardInputsDirective implements OnDestroy {
   private readonly grabFocus = (): void => this.onPointerDown();
 
   constructor() {
-    // Capture phase: the resize/rotate handles stopPropagation() on pointerdown,
-    // so a bubble-phase focus grab never fires for them — a gesture started with
-    // focus outside the diagram would leave every shortcut (incl. Escape) dead.
+    // Capture phase: inner handlers may stopPropagation() on pointerdown, which
+    // would skip a bubble-phase focus grab — a gesture started with focus
+    // outside the diagram would leave every shortcut dead.
     this.elementRef.nativeElement.addEventListener('pointerdown', this.grabFocus, true);
   }
 

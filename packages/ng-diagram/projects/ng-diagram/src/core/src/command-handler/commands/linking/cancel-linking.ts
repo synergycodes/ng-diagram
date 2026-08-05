@@ -27,9 +27,9 @@ export const cancelLinking = async (commandHandler: CommandHandler): Promise<voi
   linking.cancelReason = 'cancelled';
   linking.dropPosition ??= linking.temporaryEdge?.targetPosition ?? { x: 0, y: 0 };
 
-  // Mirror finishLinking: run the 'finishLinking' pass so the edgeDrawEnded
-  // emitter observes the cancellation, then clear the linking state in finally
-  // (gesture-stamped, so a state replaced mid-gesture is not wrongly cleared).
+  // The empty pass emits edgeDrawEnded and erases the temporary edge (see
+  // runCancelledFinishPass); the stamped clear in finally survives a throwing
+  // middleware and spares a linking that replaced this one mid-pass.
   try {
     await runCancelledFinishPass(commandHandler);
   } finally {

@@ -482,14 +482,10 @@ export class FlowCore {
   }
 
   /**
-   * Registers a cleanup callback for the gesture that is starting — typically
-   * the removal of document-level pointer listeners owned by the view layer.
+   * Registers a cleanup for the gesture that is starting; it runs when
+   * {@link cancelActiveInteraction} aborts the gesture. The caller must
+   * unregister it in its own normal teardown, or stale cleanups accumulate.
    *
-   * The callback runs when {@link cancelActiveInteraction} aborts the gesture.
-   * The caller must invoke the returned unregister function in its own normal
-   * teardown (pointer release) so stale callbacks don't accumulate.
-   *
-   * @param cleanup Callback tearing down the gesture's listeners
    * @returns Function that unregisters the callback
    */
   registerInteractionCleanup(cleanup: () => void): () => void {
@@ -498,9 +494,8 @@ export class FlowCore {
 
   /**
    * Whether {@link cancelActiveInteraction} is mid-flight — its rollback has
-   * not committed yet. Gesture handlers drop input events while this is true,
-   * so a new gesture cannot capture geometry the pending rollback is about to
-   * rewrite.
+   * not committed yet, so input read now could capture geometry it is about
+   * to rewrite.
    */
   isCancellingInteraction(): boolean {
     return this.interactionCoordinator.isCancellingInteraction();
@@ -516,19 +511,13 @@ export class FlowCore {
   }
 
   /**
-   * Aborts the interactive gesture currently in progress (linking, dragging,
-   * resizing, rotating or panning).
+   * Aborts the in-progress gesture (linking, drag, resize, rotate or pan):
+   * removes its listeners, restores the state it modified (the viewport is
+   * not rolled back) and fires the "ended" event with the `cancelled` reason.
+   * No-op when nothing is active, when the gesture is already completing, or
+   * while a transaction is active (refused with a console warning).
    *
-   * Runs the registered listener cleanups, restores the diagram state the
-   * gesture modified (node positions/size/angle, temporary edge), clears the
-   * gesture's action state and lets the corresponding "ended" event fire with
-   * the `cancelled` reason. No-op when nothing is active, when a cancel is
-   * already in flight, when the gesture's normal end is already being
-   * processed, or when a transaction is active — the rollback would merge into
-   * the transaction and could be silently discarded, so it is refused with a
-   * console warning instead.
-   *
-   * @returns Whether any gesture or registered listener cleanup was torn down
+   * @returns Whether any gesture or registered cleanup was torn down
    */
   cancelActiveInteraction(): Promise<boolean> {
     return this.interactionCoordinator.cancelActiveInteraction();

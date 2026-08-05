@@ -150,8 +150,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();
     this.cachedDiagramRect = null;
-    // The shared touch marker belongs to whichever gesture set it — a bystander
-    // destroyed mid-gesture (virtualization during touch panning) must leave it alone.
+    // The shared marker keeps concurrent gestures out (panningHandled() etc.), so
+    // only its writer may clear it. gestureActive marks that writer — set only by
+    // this instance's own pointerdown, so a bystander's destroy skips the clear.
     if (this.gestureActive) {
       this.gestureActive = false;
       this.touchEventsStateService.clearCurrentEvent();

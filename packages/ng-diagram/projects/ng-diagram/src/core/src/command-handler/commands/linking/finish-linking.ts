@@ -9,15 +9,9 @@ export interface FinishLinkingCommand {
   position?: Point;
 }
 
-// Empty 'finishLinking' pass: the event-emitter middleware turns the linking
-// state (cancelReason, dropPosition) into an edgeDrawEnded event, and the
-// commit schedules a redraw that runs after finally has cleared the linking
-// state — which is what erases the temporary edge (it is rendered from action
-// state, not the model).
-//
-// Exported so `cancelLinking` can reuse the exact same pass; both callers clear
-// the linking state afterwards via `clearLinkingForGesture` (see the `finally`
-// in `finishLinking`), never inside this helper.
+// Empty 'finishLinking' pass: the emitter turns the linking state into an
+// edgeDrawEnded event and the commit's redraw erases the temporary edge.
+// Callers clear the state themselves (stamped, in their finally).
 export const runCancelledFinishPass = async (commandHandler: CommandHandler): Promise<void> => {
   await commandHandler.flowCore.applyUpdate({}, 'finishLinking');
 };

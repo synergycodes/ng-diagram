@@ -13,6 +13,7 @@ interface DragState {
   isDragging: boolean;
   lastPosition: Point;
   pointerId: number | null;
+  /** Kept so the cancel path can release the capture without an event. */
   captureElement: Element | null;
 }
 
@@ -60,6 +61,7 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
   }
 
   onPointerDown(event: PointerEvent): void {
+    // Re-entry guard: a second pointerdown mid-gesture would orphan the previous interaction-cleanup registration.
     if (event.button !== 0 || this.dragState.isDragging) {
       return;
     }
