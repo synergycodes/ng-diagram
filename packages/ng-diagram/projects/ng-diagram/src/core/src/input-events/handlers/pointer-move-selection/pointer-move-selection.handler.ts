@@ -193,10 +193,16 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         });
       }
 
-      this.flow.actionStateManager.clearDragging();
+      // A new drag may have started while the transaction above was suspended —
+      // the identity guards (mirroring the 'end' phase) keep its fresh state intact.
+      if (this.flow.actionStateManager.dragging === dragging) {
+        this.flow.actionStateManager.clearDragging();
+      }
     }
 
-    this.gesture = null;
+    if (this.gesture === gesture) {
+      this.gesture = null;
+    }
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {

@@ -263,5 +263,27 @@ describe('RotateEventHandler', () => {
 
       expect(flowCore.transaction).toHaveBeenCalledWith('cancelRotate', expect.any(Function));
     });
+
+    it('should not clear a rotation that started while the cancel rollback was suspended', async () => {
+      vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(45);
+      mockCommandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'rotateNodeStop') {
+          await macrotask();
+        }
+      });
+
+      mockActionStateManager.rotation = { startAngle: 45, initialNodeAngle: 30, nodeId: 'test-node' };
+      const cancelPromise = instance.cancel();
+
+      // A new rotation starts while the cancel rollback is suspended on rotateNodeStop
+      await instance.handle(getSampleRotateEvent({ target: node, phase: 'start' }));
+      const newState = mockActionStateManager.rotation;
+      expect(newState).toBeDefined();
+
+      await cancelPromise;
+
+      expect(mockActionStateManager.clearRotation).not.toHaveBeenCalled();
+      expect(mockActionStateManager.rotation).toBe(newState);
+    });
   });
 });

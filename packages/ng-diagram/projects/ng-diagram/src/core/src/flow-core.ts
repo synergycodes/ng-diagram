@@ -72,6 +72,8 @@ export class FlowCore {
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
 
+  private readonly interactionCleanups = new Set<() => void>();
+
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
 
@@ -478,8 +480,6 @@ export class FlowCore {
     return this.modelLookup.getEdgeById(edgeId);
   }
 
-  private readonly interactionCleanups = new Set<() => void>();
-
   /**
    * Registers a cleanup callback for the gesture that is starting — typically
    * the removal of document-level pointer listeners owned by the view layer.
@@ -541,8 +541,22 @@ export class FlowCore {
       cleanup();
     }
 
+    // One failing cancel must not leave the remaining gestures active — cancel
+    // them all, then rethrow the first failure.
+    let firstError: unknown;
+    let failed = false;
     for (const gesture of activeGestures) {
-      await this.inputEventsRouter.cancel(gesture);
+      try {
+        await this.inputEventsRouter.cancel(gesture);
+      } catch (error) {
+        if (!failed) {
+          failed = true;
+          firstError = error;
+        }
+      }
+    }
+    if (failed) {
+      throw firstError;
     }
 
     return activeGestures.length > 0 || cleanups.length > 0;

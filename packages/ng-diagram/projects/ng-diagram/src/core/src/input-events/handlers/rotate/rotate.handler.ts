@@ -110,6 +110,10 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
       await tx.emit('rotateNodeStop', { nodeId: rotation.nodeId });
     });
 
-    this.flow.actionStateManager.clearRotation();
+    // A new rotation may have started while the transaction above was suspended —
+    // the identity guard keeps its fresh state intact.
+    if (this.flow.actionStateManager.rotation === rotation) {
+      this.flow.actionStateManager.clearRotation();
+    }
   }
 }

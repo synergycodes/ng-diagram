@@ -332,6 +332,24 @@ describe('FlowCore', () => {
       expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('resize');
       expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('rotate');
     });
+
+    it('should still cancel the remaining gestures and rethrow when one cancel fails', async () => {
+      flowCore.actionStateManager.dragging = {
+        nodeIds: [],
+        modifiers: { primary: false, secondary: false, shift: false, meta: false },
+        accumulatedDeltas: new Map(),
+        movementStarted: true,
+      };
+      flowCore.actionStateManager.panning = { active: true };
+      const error = new Error('cancel failed');
+      (mockEventRouter.cancel as Mock).mockImplementation((name: string) =>
+        name === 'pointerMoveSelection' ? Promise.reject(error) : Promise.resolve()
+      );
+
+      await expect(flowCore.cancelActiveInteraction()).rejects.toBe(error);
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('panning');
+    });
   });
 
   describe('hasActiveInteraction', () => {

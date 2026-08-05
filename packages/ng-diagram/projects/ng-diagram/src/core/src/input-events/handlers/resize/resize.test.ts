@@ -225,5 +225,26 @@ describe('ResizeEventHandler', () => {
 
       expect(mockTransaction).toHaveBeenCalledWith('cancelResize', expect.any(Function));
     });
+
+    it('should not clear a resize that started while the cancel rollback was suspended', async () => {
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'resizeNodeStop') {
+          await macrotask();
+        }
+      });
+
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const cancelPromise = handler.cancel();
+
+      // A new resize starts while the cancel rollback is suspended on resizeNodeStop
+      await handler.handle(createResizeEvent({ phase: 'start' }));
+      const newState = mockActionStateManager.resize;
+      expect(newState).toBeDefined();
+
+      await cancelPromise;
+
+      expect(mockActionStateManager.clearResize).not.toHaveBeenCalled();
+      expect(mockActionStateManager.resize).toBe(newState);
+    });
   });
 });

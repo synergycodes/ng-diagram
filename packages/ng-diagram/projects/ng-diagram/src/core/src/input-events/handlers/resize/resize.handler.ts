@@ -160,6 +160,10 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
       await tx.emit('resizeNodeStop', { nodeId: resizingNode.id });
     });
 
-    this.flow.actionStateManager.clearResize();
+    // A new resize may have started while the transaction above was suspended —
+    // the identity guard keeps its fresh state intact.
+    if (this.flow.actionStateManager.resize === resize) {
+      this.flow.actionStateManager.clearResize();
+    }
   }
 }
