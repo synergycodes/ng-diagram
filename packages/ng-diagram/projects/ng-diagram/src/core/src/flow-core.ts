@@ -526,6 +526,8 @@ export class FlowCore {
    * @returns Whether any gesture or registered listener cleanup was torn down
    */
   async cancelActiveInteraction(): Promise<boolean> {
+    const hadInteraction = this.hasActiveInteraction();
+
     const activeGestures: InputEventName[] = [];
     if (this.actionStateManager.isLinking()) activeGestures.push('linking');
     if (this.actionStateManager.isDragging()) activeGestures.push('pointerMoveSelection');
@@ -543,23 +545,19 @@ export class FlowCore {
 
     // One failing cancel must not leave the remaining gestures active — cancel
     // them all, then rethrow the first failure.
-    let firstError: unknown;
-    let failed = false;
+    const errors: unknown[] = [];
     for (const gesture of activeGestures) {
       try {
         await this.inputEventsRouter.cancel(gesture);
       } catch (error) {
-        if (!failed) {
-          failed = true;
-          firstError = error;
-        }
+        errors.push(error);
       }
     }
-    if (failed) {
-      throw firstError;
+    if (errors.length > 0) {
+      throw errors[0];
     }
 
-    return activeGestures.length > 0 || cleanups.length > 0;
+    return hadInteraction;
   }
 
   /**

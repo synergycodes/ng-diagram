@@ -49,6 +49,9 @@ export class VirtualizedPanningEventHandler extends EventHandler<PanningEvent> {
   }
 
   override cancel(): void {
+    if (!this.flow.actionStateManager.isPanning()) {
+      return;
+    }
     this.accumulatedDelta = { x: 0, y: 0 };
     this.lastPoint = undefined;
     this.rafScheduled = false;

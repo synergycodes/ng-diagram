@@ -5,6 +5,7 @@ import { FlowCore } from './flow-core';
 import type { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
+import type { DraggingActionState } from './types/action-state.interface';
 import type { Edge } from './types/edge.interface';
 import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
@@ -13,6 +14,13 @@ import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
 import type { TransactionOptions } from './types/transaction.interface';
+
+const draggingState = (movementStarted = true): DraggingActionState => ({
+  nodeIds: [],
+  modifiers: { primary: false, secondary: false, shift: false, meta: false },
+  accumulatedDeltas: new Map(),
+  movementStarted,
+});
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
@@ -317,12 +325,7 @@ describe('FlowCore', () => {
     });
 
     it('should cancel every active gesture', async () => {
-      flowCore.actionStateManager.dragging = {
-        nodeIds: [],
-        modifiers: { primary: false, secondary: false, shift: false, meta: false },
-        accumulatedDeltas: new Map(),
-        movementStarted: true,
-      };
+      flowCore.actionStateManager.dragging = draggingState();
       flowCore.actionStateManager.panning = { active: true };
 
       await flowCore.cancelActiveInteraction();
@@ -334,12 +337,7 @@ describe('FlowCore', () => {
     });
 
     it('should still cancel the remaining gestures and rethrow when one cancel fails', async () => {
-      flowCore.actionStateManager.dragging = {
-        nodeIds: [],
-        modifiers: { primary: false, secondary: false, shift: false, meta: false },
-        accumulatedDeltas: new Map(),
-        movementStarted: true,
-      };
+      flowCore.actionStateManager.dragging = draggingState();
       flowCore.actionStateManager.panning = { active: true };
       const error = new Error('cancel failed');
       (mockEventRouter.cancel as Mock).mockImplementation((name: string) =>
@@ -362,12 +360,7 @@ describe('FlowCore', () => {
       expect(flowCore.hasActiveInteraction()).toBe(true);
       flowCore.actionStateManager.clearLinking();
 
-      flowCore.actionStateManager.dragging = {
-        nodeIds: [],
-        modifiers: { primary: false, secondary: false, shift: false, meta: false },
-        accumulatedDeltas: new Map(),
-        movementStarted: false,
-      };
+      flowCore.actionStateManager.dragging = draggingState(false);
       expect(flowCore.hasActiveInteraction()).toBe(true);
       flowCore.actionStateManager.clearDragging();
 

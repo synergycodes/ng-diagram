@@ -1,4 +1,4 @@
-import type { Model, Point } from 'ng-diagram';
+import type { Model } from 'ng-diagram';
 import { expect, test } from './fixtures/diagram';
 import type { Diagram } from './fixtures/diagram';
 import { pair } from './fixtures/models';
@@ -10,32 +10,6 @@ import { pair } from './fixtures/models';
  * the gesture-ended events carry the cancelled reason — and Escape stays
  * non-intrusive when there is nothing to cancel.
  */
-
-const positionOf = async (diagram: Diagram, id: string) => {
-  const node = await diagram.model.getNodeById(id);
-  if (!node) throw new Error(`node "${id}" not in model`);
-  return { x: node.position.x, y: node.position.y };
-};
-
-const centerOf = async (locator: import('@playwright/test').Locator, label: string): Promise<Point> => {
-  const box = await locator.boundingBox();
-  if (!box) throw new Error(`${label} has no bounding box`);
-  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-};
-
-/** Pointer-down plus moves WITHOUT the release — the gesture stays in flight. */
-const beginPointerGesture = async (diagram: Diagram, from: Point, to: Point) => {
-  const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
-  await diagram.page.mouse.move(from.x, from.y);
-  await diagram.page.mouse.down();
-  await diagram.page.mouse.move(mid.x, mid.y, { steps: 6 });
-  await diagram.page.mouse.move(to.x, to.y, { steps: 6 });
-  // pointermove delivery is frame-aligned in Chromium — let the last
-  // coalesced move land before the test continues
-  await diagram.page.evaluate(() => new Promise(requestAnimationFrame));
-};
-
-const nextFrame = (diagram: Diagram) => diagram.page.evaluate(() => new Promise(requestAnimationFrame));
 
 /** Record every gesture-ended event as `kind:reason`, in emission order. */
 const recordEndedEvents = (diagram: Diagram) =>
@@ -109,24 +83,24 @@ test.describe('Escape cancels the in-flight gesture', () => {
   test('drag: nodes snap back, listeners are gone, nodeDragEnded reports cancelled', async ({ diagram }) => {
     await diagram.load({ model: pair });
     await recordEndedEvents(diagram);
-    const before = await positionOf(diagram, 'node-a');
+    const before = await diagram.nodePosition('node-a');
 
-    const start = await centerOf(diagram.node('node-a'), 'node "node-a"');
-    await beginPointerGesture(diagram, start, { x: start.x + 90, y: start.y + 60 });
-    await expect.poll(() => positionOf(diagram, 'node-a')).not.toEqual(before);
+    const start = await diagram.centerOf(diagram.node('node-a'), 'node "node-a"');
+    await diagram.beginDrag(start, { x: start.x + 90, y: start.y + 60 });
+    await expect.poll(() => diagram.nodePosition('node-a')).not.toEqual(before);
 
     await diagram.page.keyboard.press('Escape');
 
-    await expect.poll(() => positionOf(diagram, 'node-a')).toEqual(before);
+    await expect.poll(() => diagram.nodePosition('node-a')).toEqual(before);
     await expect.poll(() => endedEvents(diagram)).toEqual(['drag:cancelled']);
     await expect.poll(async () => (await diagram.diagram.actionState()).dragging).toBeUndefined();
 
     // Listeners were removed on cancel: further moves and the release are inert
     await diagram.page.mouse.move(start.x + 200, start.y + 150, { steps: 4 });
-    await nextFrame(diagram);
-    expect(await positionOf(diagram, 'node-a')).toEqual(before);
+    await diagram.nextFrame();
+    expect(await diagram.nodePosition('node-a')).toEqual(before);
     await diagram.page.mouse.up();
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await endedEvents(diagram)).toEqual(['drag:cancelled']);
   });
 
@@ -134,8 +108,8 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await diagram.load({ model: pair });
     await recordEndedEvents(diagram);
 
-    const from = await centerOf(diagram.port('node-a', 'port-right'), 'port node-a/port-right');
-    await beginPointerGesture(diagram, from, { x: from.x + 120, y: from.y + 90 });
+    const from = await diagram.centerOf(diagram.port('node-a', 'port-right'), 'port node-a/port-right');
+    await diagram.beginDrag(from, { x: from.x + 120, y: from.y + 90 });
     await expect(diagram.edge('TEMPORARY_EDGE')).toBeAttached();
 
     await diagram.page.keyboard.press('Escape');
@@ -145,7 +119,7 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await expect.poll(async () => (await diagram.diagram.actionState()).linking).toBeUndefined();
 
     await diagram.page.mouse.up();
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await diagram.model.edges()).toEqual([]);
     expect(await endedEvents(diagram)).toEqual(['link:cancelled']);
   });
@@ -156,8 +130,11 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await diagram.node('box').click();
 
     // Top-left handle changes both size and position — rollback must restore both
-    const handle = await centerOf(diagram.node('box').locator('.resize-handle--top-left'), 'top-left resize handle');
-    await beginPointerGesture(diagram, handle, { x: handle.x + 30, y: handle.y + 20 });
+    const handle = await diagram.centerOf(
+      diagram.node('box').locator('.resize-handle--top-left'),
+      'top-left resize handle'
+    );
+    await diagram.beginDrag(handle, { x: handle.x + 30, y: handle.y + 20 });
     await expect
       .poll(async () => (await diagram.model.getNodeById('box'))?.size)
       .not.toEqual({
@@ -172,7 +149,7 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await expect.poll(() => endedEvents(diagram)).toEqual(['resize:cancelled']);
 
     await diagram.page.mouse.up();
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await endedEvents(diagram)).toEqual(['resize:cancelled']);
   });
 
@@ -183,11 +160,11 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await expect.poll(async () => (await diagram.model.getNodeById('auto'))?.size).toBeDefined();
     const measured = (await diagram.model.getNodeById('auto'))!.size;
 
-    const handle = await centerOf(
+    const handle = await diagram.centerOf(
       diagram.node('auto').locator('.resize-handle--bottom-right'),
       'bottom-right resize handle'
     );
-    await beginPointerGesture(diagram, handle, { x: handle.x + 40, y: handle.y + 30 });
+    await diagram.beginDrag(handle, { x: handle.x + 40, y: handle.y + 30 });
     await expect.poll(async () => (await diagram.model.getNodeById('auto'))?.autoSize).toBe(false);
 
     await diagram.page.keyboard.press('Escape');
@@ -202,8 +179,8 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await recordEndedEvents(diagram);
     await diagram.node('spin').click();
 
-    const handle = await centerOf(diagram.node('spin').locator('.ng-diagram-rotate-handle'), 'rotate handle');
-    await beginPointerGesture(diagram, handle, { x: handle.x + 120, y: handle.y + 120 });
+    const handle = await diagram.centerOf(diagram.node('spin').locator('.ng-diagram-rotate-handle'), 'rotate handle');
+    await diagram.beginDrag(handle, { x: handle.x + 120, y: handle.y + 120 });
     await expect.poll(async () => (await diagram.model.getNodeById('spin'))?.angle).not.toBe(30);
 
     await diagram.page.keyboard.press('Escape');
@@ -212,7 +189,7 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await expect.poll(() => endedEvents(diagram)).toEqual(['rotate:cancelled']);
 
     await diagram.page.mouse.up();
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await endedEvents(diagram)).toEqual(['rotate:cancelled']);
   });
 
@@ -226,7 +203,7 @@ test.describe('Escape cancels the in-flight gesture', () => {
       x: containerBox.x + containerBox.width - 30,
       y: containerBox.y + containerBox.height - 30,
     };
-    await beginPointerGesture(diagram, corner, { x: corner.x - 60, y: corner.y - 40 });
+    await diagram.beginDrag(corner, { x: corner.x - 60, y: corner.y - 40 });
     await expect.poll(async () => (await diagram.viewport.viewport()).x).not.toBe(initial.x);
 
     await diagram.page.keyboard.press('Escape');
@@ -237,10 +214,10 @@ test.describe('Escape cancels the in-flight gesture', () => {
 
     // Listeners were removed on cancel: further moves and the release are inert
     await diagram.page.mouse.move(corner.x - 200, corner.y - 150, { steps: 4 });
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await diagram.viewport.viewport()).toEqual(frozen);
     await diagram.page.mouse.up();
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await diagram.viewport.viewport()).toEqual(frozen);
   });
 });
@@ -248,15 +225,15 @@ test.describe('Escape cancels the in-flight gesture', () => {
 test.describe('cancelActiveInteraction()', () => {
   test('aborts a pointer drag programmatically and resolves true', async ({ diagram }) => {
     await diagram.load({ model: pair });
-    const before = await positionOf(diagram, 'node-a');
+    const before = await diagram.nodePosition('node-a');
 
-    const start = await centerOf(diagram.node('node-a'), 'node "node-a"');
-    await beginPointerGesture(diagram, start, { x: start.x + 80, y: start.y + 50 });
-    await expect.poll(() => positionOf(diagram, 'node-a')).not.toEqual(before);
+    const start = await diagram.centerOf(diagram.node('node-a'), 'node "node-a"');
+    await diagram.beginDrag(start, { x: start.x + 80, y: start.y + 50 });
+    await expect.poll(() => diagram.nodePosition('node-a')).not.toEqual(before);
 
     expect(await diagram.diagram.cancelActiveInteraction()).toBe(true);
 
-    await expect.poll(() => positionOf(diagram, 'node-a')).toEqual(before);
+    await expect.poll(() => diagram.nodePosition('node-a')).toEqual(before);
     await diagram.page.mouse.up();
   });
 
@@ -266,7 +243,7 @@ test.describe('cancelActiveInteraction()', () => {
 
     expect(await diagram.diagram.cancelActiveInteraction()).toBe(false);
 
-    await nextFrame(diagram);
+    await diagram.nextFrame();
     expect(await endedEvents(diagram)).toEqual([]);
   });
 });
@@ -288,8 +265,8 @@ test.describe('Escape stays non-intrusive', () => {
     await diagram.clickCanvas();
     await diagram.page.keyboard.press('Escape'); // …nothing to cancel → not swallowed
 
-    const start = await centerOf(diagram.node('node-a'), 'node "node-a"');
-    await beginPointerGesture(diagram, start, { x: start.x + 60, y: start.y + 40 });
+    const start = await diagram.centerOf(diagram.node('node-a'), 'node "node-a"');
+    await diagram.beginDrag(start, { x: start.x + 60, y: start.y + 40 });
     await diagram.page.keyboard.press('Escape'); // mid-drag → swallowed
     await diagram.page.mouse.up();
 

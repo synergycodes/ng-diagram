@@ -11,8 +11,9 @@ import type {
   Node,
   Renderer,
 } from '../../../types';
+import { macrotask, mockEnvironment } from '../../../test-utils';
 import { InputEventsRouter } from '../../input-events.router';
-import type { InputModifiers } from '../../input-events.interface';
+import type { InputEventName, InputModifiers } from '../../input-events.interface';
 
 /**
  * Integration tests for cancelActiveInteraction() using a real FlowCore —
@@ -26,9 +27,7 @@ import type { InputModifiers } from '../../input-events.interface';
 class TestInputEventsRouter extends InputEventsRouter {}
 
 const environment: EnvironmentInfo = {
-  os: 'MacOS',
-  browser: 'Chrome',
-  runtime: 'web',
+  ...mockEnvironment,
   now: () => 0,
   generateId: (() => {
     let i = 0;
@@ -37,6 +36,11 @@ const environment: EnvironmentInfo = {
 };
 
 const modifiers: InputModifiers = { primary: false, secondary: false, shift: false, meta: false };
+
+let eventId = 0;
+/** Emits a gesture phase with the shared boilerplate fields filled in. */
+const emitGesture = (router: InputEventsRouter, event: { name: InputEventName } & Record<string, unknown>) =>
+  router.emit({ id: `e${++eventId}`, timestamp: 0, modifiers, ...event });
 
 function createModelAdapter(nodes: Node[], edges: Edge[] = []): ModelAdapter {
   let state = { nodes, edges, metadata: { viewport: { x: 0, y: 0, scale: 1 } } as Metadata };
@@ -89,9 +93,6 @@ function createFlowCore(nodes: Node[], edges: Edge[] = []) {
   return { flowCore, router, observedActionTypes };
 }
 
-/** Flushes the fire-and-forget async work the input handlers schedule. */
-const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
-
 const draggableNode = (overrides: Partial<Node> = {}): Node => ({
   id: 'n1',
   type: 'node',
@@ -118,29 +119,23 @@ describe('cancelActiveInteraction (integration)', () => {
 
   describe('drag', () => {
     const startDrag = async (flowCore: FlowCore, router: InputEventsRouter, node: Node) => {
-      router.emit({
+      emitGesture(router, {
         name: 'pointerMoveSelection',
         phase: 'start',
-        id: 'e1',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         lastInputPoint: { x: 100, y: 100 },
         panningForce: null,
       });
-      await router.emit({
+      await emitGesture(router, {
         name: 'pointerMoveSelection',
         phase: 'continue',
-        id: 'e2',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         lastInputPoint: { x: 150, y: 180 },
         panningForce: null,
       });
-      await settle();
+      await macrotask();
     };
 
     it('rolls the dragged node back and emits nodeDragEnded with the cancelled reason', async () => {
@@ -180,18 +175,15 @@ describe('cancelActiveInteraction (integration)', () => {
       flowCore.eventManager.on('nodeDragEnded', dragEnded);
 
       await startDrag(flowCore, router, node);
-      await router.emit({
+      await emitGesture(router, {
         name: 'pointerMoveSelection',
         phase: 'end',
-        id: 'e3',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         lastInputPoint: { x: 150, y: 180 },
         panningForce: null,
       });
-      await settle();
+      await macrotask();
 
       expect(dragEnded).toHaveBeenCalledTimes(1);
       expect(dragEnded.mock.calls[0][0].cancelReason).toBeUndefined();
@@ -219,29 +211,23 @@ describe('cancelActiveInteraction (integration)', () => {
       const resizeEnded = vi.fn();
       flowCore.eventManager.on('nodeResizeEnded', resizeEnded);
 
-      await router.emit({
+      await emitGesture(router, {
         name: 'resize',
         phase: 'start',
-        id: 'e1',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         direction: 'bottom-right',
         lastInputPoint: { x: 100, y: 100 },
       });
-      await router.emit({
+      await emitGesture(router, {
         name: 'resize',
         phase: 'continue',
-        id: 'e2',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         direction: 'bottom-right',
         lastInputPoint: { x: 150, y: 140 },
       });
-      await settle();
+      await macrotask();
 
       const resized = flowCore.getNodeById('n1');
       expect(resized?.size).toEqual({ width: 250, height: 140 });
@@ -278,29 +264,23 @@ describe('cancelActiveInteraction (integration)', () => {
       const rotateEnded = vi.fn();
       flowCore.eventManager.on('nodeRotateEnded', rotateEnded);
 
-      await router.emit({
+      await emitGesture(router, {
         name: 'rotate',
         phase: 'start',
-        id: 'e1',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         center: { x: 60, y: 45 },
         lastInputPoint: { x: 200, y: 45 },
       });
-      await router.emit({
+      await emitGesture(router, {
         name: 'rotate',
         phase: 'continue',
-        id: 'e2',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         center: { x: 60, y: 45 },
         lastInputPoint: { x: 60, y: 200 },
       });
-      await settle();
+      await macrotask();
 
       expect(flowCore.getNodeById('n1')?.angle).not.toBe(30);
       expect(flowCore.actionStateManager.isRotating()).toBe(true);
@@ -328,30 +308,24 @@ describe('cancelActiveInteraction (integration)', () => {
       const edgeDrawEnded = vi.fn();
       flowCore.eventManager.on('edgeDrawEnded', edgeDrawEnded);
 
-      router.emit({
+      emitGesture(router, {
         name: 'linking',
         phase: 'start',
-        id: 'e1',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         portId: undefined,
         lastInputPoint: { x: 10, y: 20 },
       });
-      await settle();
-      router.emit({
+      await macrotask();
+      emitGesture(router, {
         name: 'linking',
         phase: 'continue',
-        id: 'e2',
-        timestamp: 0,
-        modifiers,
         target: node,
         targetType: 'node',
         portId: undefined,
         lastInputPoint: { x: 120, y: 90 },
       });
-      await settle();
+      await macrotask();
 
       expect(flowCore.actionStateManager.isLinking()).toBe(true);
 
@@ -372,27 +346,21 @@ describe('cancelActiveInteraction (integration)', () => {
     it('stops panning without rolling back the viewport', async () => {
       const { flowCore, router } = createFlowCore([draggableNode({ selected: false })]);
 
-      router.emit({
+      emitGesture(router, {
         name: 'panning',
         phase: 'start',
-        id: 'e1',
-        timestamp: 0,
-        modifiers,
         target: undefined,
         targetType: 'diagram',
         lastInputPoint: { x: 100, y: 100 },
       });
-      await router.emit({
+      await emitGesture(router, {
         name: 'panning',
         phase: 'continue',
-        id: 'e2',
-        timestamp: 0,
-        modifiers,
         target: undefined,
         targetType: 'diagram',
         lastInputPoint: { x: 130, y: 110 },
       });
-      await settle();
+      await macrotask();
 
       const viewportAfterPan = { ...flowCore.getState().metadata.viewport };
       expect(flowCore.actionStateManager.isPanning()).toBe(true);

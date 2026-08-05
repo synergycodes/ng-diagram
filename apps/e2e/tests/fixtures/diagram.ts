@@ -104,6 +104,18 @@ export class Diagram {
     return this.node(nodeId).locator(`[data-port-id="${cssEscape(portId)}"]`);
   }
 
+  /** Model position of a node (flow coordinates). */
+  async nodePosition(id: string): Promise<Point> {
+    const node = await this.model.getNodeById(id);
+    if (!node) throw new Error(`node "${id}" not in model`);
+    return { x: node.position.x, y: node.position.y };
+  }
+
+  /** Center of a locator's bounding box (client px). */
+  async centerOf(locator: Locator, label: string): Promise<Point> {
+    return centerOf(await requireBox(locator, label));
+  }
+
   // ──────────────────────────────────────────────────────────────────────
   // Gestures (DOM-level)
   // ──────────────────────────────────────────────────────────────────────
@@ -144,16 +156,7 @@ export class Diagram {
           y: box.y + box.height * (handle === 'top' || handle === 'bottom' ? 0.5 : 0.3),
         }
       : centerOf(box);
-    const end = { x: start.x + delta.x, y: start.y + delta.y };
-    const mid = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
-    await this.page.mouse.move(start.x, start.y);
-    await this.page.mouse.down();
-    await this.page.mouse.move(mid.x, mid.y, { steps: 6 });
-    await this.page.mouse.move(end.x, end.y, { steps: 6 });
-    // pointermove delivery is frame-aligned in Chromium — give the final
-    // coalesced move a frame to arrive before releasing the pointer
-    await this.page.evaluate(() => new Promise(requestAnimationFrame));
-    await this.page.mouse.up();
+    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
   }
 
   /** Pan the canvas from an empty corner by a delta. */
@@ -163,13 +166,26 @@ export class Diagram {
     await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
   }
 
-  /** Pointer drag with an intermediate move so the diagram registers a drag rather than a click. */
-  private async pointerDrag(from: Point, to: Point): Promise<void> {
+  /** Begin a drag: pointer-down plus moves WITHOUT the release — the gesture stays in flight. */
+  async beginDrag(from: Point, to: Point): Promise<void> {
     const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
     await this.page.mouse.move(from.x, from.y);
     await this.page.mouse.down();
     await this.page.mouse.move(mid.x, mid.y, { steps: 6 });
     await this.page.mouse.move(to.x, to.y, { steps: 6 });
+    // pointermove delivery is frame-aligned in Chromium — give the final
+    // coalesced move a frame to arrive before the caller proceeds
+    await this.nextFrame();
+  }
+
+  /** Waits one animation frame in the page. */
+  nextFrame(): Promise<unknown> {
+    return this.page.evaluate(() => new Promise(requestAnimationFrame));
+  }
+
+  /** Pointer drag with an intermediate move so the diagram registers a drag rather than a click. */
+  private async pointerDrag(from: Point, to: Point): Promise<void> {
+    await this.beginDrag(from, to);
     await this.page.mouse.up();
   }
 }

@@ -131,11 +131,6 @@ export interface DraggingActionState {
    * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
    */
   movementStarted: boolean;
-  /**
-   * Positions of the dragged nodes captured when the move threshold was crossed,
-   * used to restore them when the drag is cancelled.
-   */
-  initialPositions?: Map<string, Point>;
   /** Set when the drag is aborted; carried into `nodeDragEnded`. */
   cancelReason?: GestureCancelReason;
 }
