@@ -235,6 +235,69 @@ const applySnappingIfNeeded = async (
 const snapCeilToMin = (min: number, step: number, offset: number): number =>
   step ? offset + step * Math.ceil((min - offset) / step) : min;
 
+/**
+ * Resolves one axis of a snapped resize: snapped position, derived size, and
+ * the minimum-size bump. Both axes run the exact same pipeline.
+ */
+const resolveSnappedAxis = (axis: {
+  /** Current node position and size on this axis. */
+  position: number;
+  size: number;
+  /** Requested values; `nextPosition` is undefined when the command has no position. */
+  nextPosition: number | undefined;
+  nextSize: number;
+  step: number;
+  offset: number;
+  /** Minimum node size on this axis. */
+  min: number;
+  /** Children bounds projected on this axis (groups only). */
+  childrenNear?: number;
+  childrenFar?: number;
+}): { position: number | undefined; size: number } => {
+  const fixedEdge = Math.round(axis.position + axis.size);
+  const moved = axis.nextPosition !== undefined && axis.nextPosition !== axis.position;
+
+  // Snap only an axis this resize actually moved — groups get here with a
+  // position even for bottom/right resizes (derived from the children bounds),
+  // and snapping an untouched axis would shift the node. A moved axis snaps on
+  // the grid phased at `fixedEdge - offset`, so the size derived from it lands
+  // on `offset + n * step` with the opposite edge fixed.
+  let position =
+    axis.nextPosition === undefined
+      ? undefined
+      : moved
+        ? NgDiagramMath.snapNumber(axis.nextPosition, axis.step, fixedEdge - axis.offset)
+        : axis.position;
+
+  let size = axis.nextSize;
+  if (axis.size !== size) {
+    size =
+      moved && position !== undefined ? fixedEdge - position : NgDiagramMath.snapNumber(size, axis.step, axis.offset);
+  }
+
+  // A size below the minimum bumps to the smallest valid increment, re-anchoring
+  // the fixed edge. For a group the minimum also covers what the children need,
+  // so rounding can never cut them. `<= 0` catches a collapse past the fixed
+  // edge (min 0 + misaligned offset).
+  const min = Math.max(
+    0,
+    axis.min,
+    axis.childrenNear !== undefined && axis.childrenFar !== undefined
+      ? moved
+        ? fixedEdge - axis.childrenNear
+        : axis.childrenFar - axis.position
+      : 0
+  );
+  if (size < min || size <= 0) {
+    size = snapCeilToMin(min, axis.step, axis.offset);
+    if (moved && position !== undefined) {
+      position = fixedEdge - size;
+    }
+  }
+
+  return { position, size };
+};
+
 const computeAndApplySnapping = async (
   commandHandler: CommandHandler,
   node: Node,
@@ -247,80 +310,39 @@ const computeAndApplySnapping = async (
     commandHandler.flowCore.config.snapping;
   const snapping = computeSnapForNodeSize(node) ?? defaultResizeSnap;
   const snapOffset = computeSnapOffsetForNodeSize(node) ?? defaultResizeSnapOffset;
-  const fixedRightEdge = Math.round(node.position.x + (node.size?.width ?? 0));
-  const fixedBottomEdge = Math.round(node.position.y + (node.size?.height ?? 0));
-  const movedX = nextPosition && node.position.x !== nextPosition.x;
-  const movedY = nextPosition && node.position.y !== nextPosition.y;
-
-  // Snap only the axes this resize actually moved. Groups get here with a
-  // position even for bottom/right resizes (handleGroupNodeResize derives one
-  // from the children bounds) — snapping such an untouched axis would shift the node.
-  // For a moved axis the grid is phased at `fixedEdge - offset`, so the size
-  // derived from it lands on `offset + n * snap` with the opposite edge fixed.
-  const snappedPosition = nextPosition
-    ? {
-        x: movedX
-          ? NgDiagramMath.snapNumber(nextPosition.x, snapping.width, fixedRightEdge - snapOffset.width)
-          : node.position.x,
-        y: movedY
-          ? NgDiagramMath.snapNumber(nextPosition.y, snapping.height, fixedBottomEdge - snapOffset.height)
-          : node.position.y,
-      }
-    : undefined;
-
-  // An axis resized from the top/left derives its size from the snapped
-  // position, keeping the opposite edge fixed and preventing jittering.
-  let finalWidth = nextSize.width;
-  let finalHeight = nextSize.height;
-  if ((node.size?.width ?? 0) !== finalWidth) {
-    finalWidth =
-      movedX && snappedPosition
-        ? fixedRightEdge - snappedPosition.x
-        : NgDiagramMath.snapNumber(finalWidth, snapping.width, snapOffset.width);
-  }
-  if ((node.size?.height ?? 0) !== finalHeight) {
-    finalHeight =
-      movedY && snappedPosition
-        ? Math.max(fixedBottomEdge - snappedPosition.y, 0)
-        : NgDiagramMath.snapNumber(finalHeight, snapping.height, snapOffset.height);
-  }
-
-  // A snapped size below the minimum bumps to the smallest valid increment,
-  // re-anchoring the fixed edge. For a group the minimum also covers what its
-  // children need, so rounding can never cut them. `<= 0` catches a collapse
-  // past the fixed edge (min 0 + misaligned offset).
   const minSize = commandHandler.flowCore.config.resize.getMinNodeSize(node);
-  const minWidth = Math.max(
-    0,
-    minSize.width,
-    childrenBounds ? (movedX ? fixedRightEdge - childrenBounds.left : childrenBounds.right - node.position.x) : 0
-  );
-  const minHeight = Math.max(
-    0,
-    minSize.height,
-    childrenBounds ? (movedY ? fixedBottomEdge - childrenBounds.top : childrenBounds.bottom - node.position.y) : 0
-  );
-  if (finalWidth < minWidth || finalWidth <= 0) {
-    finalWidth = snapCeilToMin(minWidth, snapping.width, snapOffset.width);
-    if (snappedPosition && movedX) {
-      snappedPosition.x = fixedRightEdge - finalWidth;
-    }
-  }
-  if (finalHeight < minHeight || finalHeight <= 0) {
-    finalHeight = snapCeilToMin(minHeight, snapping.height, snapOffset.height);
-    if (snappedPosition && movedY) {
-      snappedPosition.y = fixedBottomEdge - finalHeight;
-    }
-  }
+
+  const x = resolveSnappedAxis({
+    position: node.position.x,
+    size: node.size?.width ?? 0,
+    nextPosition: nextPosition?.x,
+    nextSize: nextSize.width,
+    step: snapping.width,
+    offset: snapOffset.width,
+    min: minSize.width,
+    childrenNear: childrenBounds?.left,
+    childrenFar: childrenBounds?.right,
+  });
+  const y = resolveSnappedAxis({
+    position: node.position.y,
+    size: node.size?.height ?? 0,
+    nextPosition: nextPosition?.y,
+    nextSize: nextSize.height,
+    step: snapping.height,
+    offset: snapOffset.height,
+    min: minSize.height,
+    childrenNear: childrenBounds?.top,
+    childrenFar: childrenBounds?.bottom,
+  });
 
   const updateData: Partial<Node> & { id: Node['id'] } = {
     id: node.id,
-    size: { width: finalWidth, height: finalHeight },
+    size: { width: x.size, height: y.size },
     ...(nextDisableAutoSize !== undefined && { autoSize: !nextDisableAutoSize }),
   };
 
-  if (snappedPosition) {
-    updateData.position = snappedPosition;
+  if (x.position !== undefined && y.position !== undefined) {
+    updateData.position = { x: x.position, y: y.position };
   }
 
   await commandHandler.flowCore.applyUpdate(
