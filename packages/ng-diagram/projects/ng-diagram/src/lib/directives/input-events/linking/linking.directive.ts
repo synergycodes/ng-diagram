@@ -26,16 +26,14 @@ export class LinkingInputDirective implements OnDestroy {
   portId = input.required<string>();
 
   ngOnDestroy(): void {
+    const wasMidGesture = this.gestureActive;
     this.cleanup();
     // Destroyed mid-gesture (e.g. the source node was deleted while linking): the
     // pointerup will never be routed and finishLinking will never run. The state
     // must be cleared here — a stranded linking state permanently disables linking,
     // because shouldHandle refuses to start while isLinking() is true.
-    if (this.gestureActive) {
-      this.gestureActive = false;
-      if (this.flowCoreProviderService.isInitialized()) {
-        this.flowCoreProviderService.provide().actionStateManager.clearLinking();
-      }
+    if (wasMidGesture && this.flowCoreProviderService.isInitialized()) {
+      this.flowCoreProviderService.provide().actionStateManager.clearLinking();
     }
   }
 
@@ -93,7 +91,6 @@ export class LinkingInputDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
-    this.gestureActive = false;
     this.linkingEventService.emitEnd($event, this.target(), this.portId());
     this.cleanup();
   };
@@ -114,7 +111,12 @@ export class LinkingInputDirective implements OnDestroy {
   private cleanup() {
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
-    this.touchEventsStateService.clearCurrentEvent();
+    // The shared touch marker belongs to whichever gesture set it — a bystander
+    // destroyed mid-gesture (virtualization during touch panning) must leave it alone.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+    }
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();

@@ -24,15 +24,13 @@ export class ResizeDirective implements OnDestroy {
   private unregisterInteractionCleanup: (() => void) | null = null;
 
   ngOnDestroy() {
+    const wasMidGesture = this.gestureActive;
     this.removeListeners();
     // Destroyed mid-gesture (e.g. the node was deleted while resizing): the pointerup
     // will never be routed, so the resize state must be cleared here — a leaked
     // resize state suppresses every subsequent node size measurement.
-    if (this.gestureActive) {
-      this.gestureActive = false;
-      if (this.flowCoreProvider.isInitialized()) {
-        this.flowCoreProvider.provide().actionStateManager.clearResize();
-      }
+    if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
+      this.flowCoreProvider.provide().actionStateManager.clearResize();
     }
   }
   onPointerDown(event: PointerInputEvent): void {
@@ -72,11 +70,15 @@ export class ResizeDirective implements OnDestroy {
     this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
-    this.touchEventsStateService.clearCurrentEvent();
+    // The shared touch marker belongs to whichever gesture set it — a bystander
+    // destroyed mid-gesture (virtualization during touch panning) must leave it alone.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+    }
   }
 
   onPointerUp = (event: PointerEvent) => {
-    this.gestureActive = false;
     this.removeListeners();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);

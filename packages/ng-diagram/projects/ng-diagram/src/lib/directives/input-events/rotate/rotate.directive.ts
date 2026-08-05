@@ -23,14 +23,12 @@ export class RotateHandleDirective implements OnDestroy {
   private unregisterInteractionCleanup: (() => void) | null = null;
 
   ngOnDestroy() {
+    const wasMidGesture = this.gestureActive;
     this.cleanup();
     // Destroyed mid-gesture (e.g. the node was deleted while rotating): the pointerup
     // will never be routed, so the rotation state must be cleared here.
-    if (this.gestureActive) {
-      this.gestureActive = false;
-      if (this.flowCoreProvider.isInitialized()) {
-        this.flowCoreProvider.provide().actionStateManager.clearRotation();
-      }
+    if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
+      this.flowCoreProvider.provide().actionStateManager.clearRotation();
     }
   }
 
@@ -97,7 +95,6 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
-    this.gestureActive = false;
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -119,7 +116,6 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   onPointerCancel = ($event: PointerInputEvent) => {
-    this.gestureActive = false;
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -151,7 +147,12 @@ export class RotateHandleDirective implements OnDestroy {
   private cleanup() {
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
-    this.touchEventsStateService.clearCurrentEvent();
+    // The shared touch marker belongs to whichever gesture set it — a bystander
+    // destroyed mid-gesture (virtualization during touch panning) must leave it alone.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+    }
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     document.removeEventListener('pointercancel', this.onPointerCancel);

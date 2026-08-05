@@ -25,6 +25,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   private edgePanningInterval: number | null = null;
   private cachedDiagramRect: DOMRect | null = null;
   private unregisterInteractionCleanup: (() => void) | null = null;
+  private gestureActive = false;
 
   ngOnDestroy() {
     this.removeListeners();
@@ -44,6 +45,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
+    this.gestureActive = true;
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Move);
     this.cachedDiagramRect = this.diagramComponent.getBoundingClientRect();
     event.moveSelectionHandled = true;
@@ -136,7 +138,12 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();
     this.cachedDiagramRect = null;
-    this.touchEventsStateService.clearCurrentEvent();
+    // The shared touch marker belongs to whichever gesture set it — a bystander
+    // destroyed mid-gesture (virtualization during touch panning) must leave it alone.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+    }
   }
 
   private finishDragging(event: PointerInputEvent): void {
