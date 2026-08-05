@@ -101,7 +101,16 @@ export const defaultModel: DiagramModel = {
       autoSize: false,
       type: 'custom-group',
       isGroup: true,
+      resizable: true,
       rotatable: true,
+    },
+    {
+      id: 'offset-demo',
+      position: { x: 150, y: 550 },
+      size: { width: 200, height: 110 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'Resize me: heights 60, 110, 160…' },
     },
     {
       id: '16',
