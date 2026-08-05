@@ -1,4 +1,4 @@
-import { Directive, ElementRef, inject } from '@angular/core';
+import { Directive, ElementRef, inject, OnDestroy } from '@angular/core';
 
 import { InputEventName } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
@@ -15,11 +15,10 @@ import { ZoomAction } from './keyboard-actions/zoom.action';
   providers: [PanningAction, MovingAction, PasteAction, ZoomAction],
   host: {
     '(document:keydown)': 'onKeyDown($event)',
-    '(pointerdown)': 'onPointerDown()',
     tabindex: '0',
   },
 })
-export class KeyboardInputsDirective {
+export class KeyboardInputsDirective implements OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly keyboardActions: KeyboardAction[] = [
@@ -30,11 +29,22 @@ export class KeyboardInputsDirective {
   ];
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  onPointerDown(): void {
+  constructor() {
+    // Capture phase: the resize/rotate handles stopPropagation() on pointerdown,
+    // so a bubble-phase focus grab never fires for them — a gesture started with
+    // focus outside the diagram would leave every shortcut (incl. Escape) dead.
+    this.elementRef.nativeElement.addEventListener('pointerdown', this.onPointerDown, true);
+  }
+
+  ngOnDestroy(): void {
+    this.elementRef.nativeElement.removeEventListener('pointerdown', this.onPointerDown, true);
+  }
+
+  onPointerDown = (): void => {
     if (!this.elementRef.nativeElement.contains(document.activeElement)) {
       this.elementRef.nativeElement.focus();
     }
-  }
+  };
 
   onKeyDown(event: KeyboardEvent): void {
     if (!this.elementRef.nativeElement.contains(document.activeElement)) {

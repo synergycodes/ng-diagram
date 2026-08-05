@@ -155,6 +155,36 @@ test.describe('Escape cancels the in-flight gesture', () => {
     expect(await endedEvents(diagram)).toEqual(['resize:cancelled']);
   });
 
+  test('resize: Escape works when the gesture starts with focus outside the diagram', async ({ diagram }) => {
+    await diagram.load({ model: box });
+    await diagram.node('box').click();
+    // Focus leaves the diagram — like clicking a toolbar button right before resizing.
+    // The resize handle stops pointerdown propagation, so only the capture-phase
+    // focus grab brings the keyboard back to the diagram.
+    await diagram.page.evaluate(() => {
+      const button = document.createElement('button');
+      document.body.appendChild(button);
+      button.focus();
+    });
+
+    const handle = await diagram.centerOf(
+      diagram.node('box').locator('.resize-handle--bottom-right'),
+      'bottom-right resize handle'
+    );
+    await diagram.beginDrag(handle, { x: handle.x + 40, y: handle.y + 30 });
+    await expect
+      .poll(async () => (await diagram.model.getNodeById('box'))?.size)
+      .not.toEqual({
+        width: 200,
+        height: 120,
+      });
+
+    await diagram.page.keyboard.press('Escape');
+
+    await expect.poll(async () => (await diagram.model.getNodeById('box'))?.size).toEqual({ width: 200, height: 120 });
+    await diagram.page.mouse.up();
+  });
+
   test('resize: a cancelled gesture gives autoSize back', async ({ diagram }) => {
     await diagram.load({ model: autoBox });
     await diagram.node('auto').click();
