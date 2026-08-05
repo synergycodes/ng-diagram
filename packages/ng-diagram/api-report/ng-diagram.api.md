@@ -455,7 +455,10 @@ export interface InvalidateMeasurementsOptions {
 export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'>;
 
 // @public (undocumented)
-export class KeyboardInputsDirective {
+export class KeyboardInputsDirective implements OnDestroy {
+    constructor();
+    // (undocumented)
+    ngOnDestroy(): void;
     // (undocumented)
     onKeyDown(event: KeyboardEvent): void;
     // (undocumented)
