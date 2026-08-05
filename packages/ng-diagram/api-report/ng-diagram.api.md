@@ -1066,20 +1066,26 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
 // @public
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
     // (undocumented)
+    readonly activeEdges: Signal<Set<ResizeEdge>>;
+    // (undocumented)
     readonly dataResizable: Signal<boolean | undefined>;
     defaultResizable: InputSignal<boolean | undefined>;
     // (undocumented)
-    readonly handlePositions: HandlePosition[];
+    readonly handles: Signal<    {
+    position: HandlePosition;
+    active: boolean;
+    }[]>;
     // (undocumented)
     readonly isResizable: Signal<boolean | undefined>;
     // (undocumented)
-    readonly linePositions: LinePosition[];
+    readonly linePositions: readonly ResizeEdge[];
     // (undocumented)
     readonly nodeData: Signal<Node_2 | undefined>;
+    resizeEdges: InputSignal<readonly ResizeEdge[]>;
     // (undocumented)
     readonly showAdornment: Signal<boolean | undefined>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramNodeResizeAdornmentComponent, "ng-diagram-node-resize-adornment", never, { "defaultResizable": { "alias": "defaultResizable"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramNodeResizeAdornmentComponent, "ng-diagram-node-resize-adornment", never, { "defaultResizable": { "alias": "defaultResizable"; "required": false; "isSignal": true; }; "resizeEdges": { "alias": "resizeEdges"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramNodeResizeAdornmentComponent, never>;
 }
@@ -1509,6 +1515,9 @@ export interface ResizeConfig {
     defaultResizable: boolean;
     getMinNodeSize: (node: Node_2) => Size;
 }
+
+// @public
+export type ResizeEdge = 'top' | 'right' | 'bottom' | 'left';
 
 // @public
 export interface RotationActionState {

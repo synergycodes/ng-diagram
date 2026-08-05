@@ -1,0 +1,9 @@
+<ng-diagram-node-resize-adornment [resizeEdges]="resizeEdges()">
+  <div class="resize-edges-node">
+    <span class="resize-edges-node__title">{{ label() }}</span>
+    <span class="resize-edges-node__edges">edges: {{ edgesText() }}</span>
+    <span class="resize-edges-node__size">
+      {{ node().size?.width | number: '1.0-0' }} × {{ node().size?.height | number: '1.0-0' }}
+    </span>
+  </div>
+</ng-diagram-node-resize-adornment>

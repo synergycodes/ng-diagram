@@ -193,6 +193,7 @@ title: "ng-diagram"
 - [NgDiagramEdgeTemplate](/docs/api/types/templates/ngdiagramedgetemplate/)
 - [NgDiagramGroupNodeTemplate](/docs/api/types/templates/ngdiagramgroupnodetemplate/)
 - [NgDiagramNodeTemplate](/docs/api/types/templates/ngdiagramnodetemplate/)
+- [ResizeEdge](/docs/api/types/templates/resizeedge/)
 
 ## Utilities
 

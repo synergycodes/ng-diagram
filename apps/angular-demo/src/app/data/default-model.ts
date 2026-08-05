@@ -121,6 +121,56 @@ export const defaultModel: DiagramModel = {
       position: { x: 400, y: 850 },
       data: { text: 'Port Side Test' },
     },
+    {
+      id: '19',
+      type: 'resize-edges',
+      position: { x: 100, y: 1000 },
+      size: { width: 220, height: 110 },
+      autoSize: false,
+      data: { label: 'resizable all four', resizeEdges: ['top', 'right', 'bottom', 'left'] },
+    },
+    {
+      id: '20',
+      type: 'resize-edges',
+      position: { x: 380, y: 1000 },
+      size: { width: 220, height: 110 },
+      autoSize: false,
+      data: { label: 'resizable right + bottom', resizeEdges: ['right', 'bottom'] },
+    },
+    {
+      id: '21',
+      type: 'resize-edges',
+      position: { x: 660, y: 1000 },
+      size: { width: 220, height: 110 },
+      autoSize: false,
+      data: { label: 'resizable top + left', resizeEdges: ['top', 'left'] },
+    },
+    {
+      id: '22',
+      type: 'resize-edges',
+      position: { x: 100, y: 1160 },
+      size: { width: 220, height: 110 },
+      autoSize: false,
+      data: { label: 'resizable left', resizeEdges: ['left'] },
+    },
+    {
+      id: '23',
+      type: 'resize-edges',
+      position: { x: 380, y: 1160 },
+      size: { width: 220, height: 110 },
+      autoSize: false,
+      // Opposite edges: both lines resize, but no corner has both of its edges allowed.
+      data: { label: 'resizable left + right', resizeEdges: ['left', 'right'] },
+    },
+    {
+      id: '24',
+      type: 'resize-edges',
+      position: { x: 660, y: 1160 },
+      size: { width: 220, height: 110 },
+      autoSize: false,
+      // Empty list: the selection frame still draws, nothing resizes.
+      data: { label: 'resizable none', resizeEdges: [] },
+    },
   ],
   edges: [
     {

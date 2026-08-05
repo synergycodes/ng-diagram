@@ -77,6 +77,7 @@ export type {
   MinimapNodeStyleFn,
   NgDiagramMinimapNodeTemplate,
 } from './lib/components/minimap/ng-diagram-minimap.types';
+export type { ResizeEdge } from './lib/components/node/resize/ng-diagram-node-resize-adornment.types';
 export type { NgDiagramConfig } from './lib/types/config';
 export type { NgDiagramEdgeTemplate } from './lib/types/edge-template-map';
 export type { InvalidateMeasurementsOptions } from './lib/types/invalidate-measurements';
