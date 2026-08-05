@@ -1,13 +1,13 @@
 ---
 title: Roadmap
-description: What we've delivered in v1.0 and what's next for ng-diagram
+description: What we are working on right now and what is next for ng-diagram
 sidebar:
   order: 7
 ---
 
 import { Badge, Card, CardGrid } from '@astrojs/starlight/components';
 
-We've reached v1.0! 🎉 This milestone marks a stable, feature-complete library for building interactive diagrams in Angular. Here's what we delivered - and what's next.
+ngDiagram is stable and actively developed. Here's what we're working on right now - and what's next. Have a feature request? Join our [GitHub discussions](https://github.com/synergycodes/ng-diagram/discussions).
 
 ## Implementation Status
 
@@ -23,6 +23,52 @@ We've reached v1.0! 🎉 This milestone marks a stable, feature-complete library
     <tr>
       <td>
         <div class="task-card">
+          <h4>Accessibility</h4>
+          <p>Keyboard navigation, focus management, and screen reader support</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>Awaitable Service Methods</h4>
+          <p>Every mutating service call returns a promise you can await</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>AV Schematic Template</h4>
+          <p>Demo app for audio-video diagrams</p>
+          <Badge text="demo" variant="tip" size="small" />
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Undo / Redo</h4>
+          <p>Built-in history for diagram changes</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>Hidden Elements</h4>
+          <p>Hide nodes, edges, and ports without breaking measurement or layout</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>Single-Line Diagram Template</h4>
+          <p>Demo app for single-line electrical diagrams</p>
+          <Badge text="demo" variant="tip" size="small" />
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
           <h4>Edge Reshaping</h4>
           <p>Interactive editing of edge paths and waypoints</p>
           <Badge text="feature" variant="tip" size="small" />
@@ -30,8 +76,31 @@ We've reached v1.0! 🎉 This milestone marks a stable, feature-complete library
       </td>
       <td>
         <div class="task-card">
-          <h4>Collect User Feedback</h4>
-          <p>Shaping future development based on user input</p>
+          <h4>Async Event Callbacks</h4>
+          <p>Async support in diagram event callbacks</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>Electric Circuit Template</h4>
+          <p>Demo app for electrical circuit diagrams</p>
+          <Badge text="demo" variant="tip" size="small" />
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="task-card">
+          <h4>Edge Relinking</h4>
+          <p>Reconnect existing edges to other nodes and ports</p>
+          <Badge text="feature" variant="tip" size="small" />
+        </div>
+      </td>
+      <td>
+        <div class="task-card">
+          <h4>Resize Snap Offset</h4>
+          <p>Snapping offset for node resize - a community request</p>
           <Badge text="community" variant="caution" size="small" />
         </div>
       </td>
@@ -47,8 +116,8 @@ We've reached v1.0! 🎉 This milestone marks a stable, feature-complete library
       <td></td>
       <td>
         <div class="task-card">
-          <h4>Electrical Template</h4>
-          <p>Demo app for electrical diagrams</p>
+          <h4>Assembly Line Template</h4>
+          <p>Demo app for assembly line diagrams</p>
           <Badge text="demo" variant="tip" size="small" />
         </div>
       </td>
@@ -62,13 +131,7 @@ We've reached v1.0! 🎉 This milestone marks a stable, feature-complete library
     </tr>
     <tr>
       <td></td>
-      <td>
-        <div class="task-card">
-          <h4>AV Template</h4>
-          <p>Demo app for audio-video diagrams</p>
-          <Badge text="demo" variant="tip" size="small" />
-        </div>
-      </td>
+      <td></td>
       <td>
         <div class="task-card">
           <h4>Orgchart Template</h4>
