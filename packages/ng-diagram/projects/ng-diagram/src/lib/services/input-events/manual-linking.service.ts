@@ -16,6 +16,11 @@ export class ManualLinkingService {
 
   /** Call this method to start linking from your custom logic */
   startLinking(node: Node, portId?: string) {
+    // A previous manual linking still in flight would leave its document
+    // listeners and its interaction-cleanup entry orphaned — latest call wins.
+    if (this.unregisterInteractionCleanup) {
+      this.cleanup();
+    }
     this.node = node;
     this.portId = portId;
     const position = this.cursorPositionTrackerService.getLastPosition();

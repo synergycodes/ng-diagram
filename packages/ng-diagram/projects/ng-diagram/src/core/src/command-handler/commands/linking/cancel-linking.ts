@@ -17,10 +17,12 @@ export interface CancelLinkingCommand {
 export const cancelLinking = async (commandHandler: CommandHandler): Promise<void> => {
   const linking = commandHandler.flowCore.actionStateManager.linking as InternalLinkingActionState | undefined;
 
-  if (!linking) {
+  // No linking, or a finishLinking/another cancel already owns the teardown.
+  if (!linking || linking._finishing) {
     return;
   }
 
+  linking._finishing = true;
   const gestureId = linking._gestureId;
   linking.cancelReason = 'cancelled';
   linking.dropPosition ??= linking.temporaryEdge?.targetPosition ?? { x: 0, y: 0 };

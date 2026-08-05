@@ -13,6 +13,7 @@ interface DragState {
   isDragging: boolean;
   lastPosition: Point;
   pointerId: number | null;
+  captureElement: Element | null;
 }
 
 /**
@@ -44,14 +45,23 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     isDragging: false,
     lastPosition: { x: 0, y: 0 },
     pointerId: null,
+    captureElement: null,
   };
 
+  private unregisterInteractionCleanup: (() => void) | null = null;
+
   ngOnDestroy(): void {
-    this.removeDocumentListeners();
+    const wasDragging = this.dragState.isDragging;
+    this.stopDragging();
+    // Destroyed mid-drag: the pointerup will never come, so the panning state
+    // this directive set must be cleared here.
+    if (wasDragging && this.flowCoreProvider.isInitialized()) {
+      this.flowCoreProvider.provide().actionStateManager.clearPanning();
+    }
   }
 
   onPointerDown(event: PointerEvent): void {
-    if (event.button !== 0) {
+    if (event.button !== 0 || this.dragState.isDragging) {
       return;
     }
 
@@ -62,6 +72,12 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     this.dragState.lastPosition = { x: event.clientX, y: event.clientY };
     this.setPanningState(true);
     this.attachDocumentListeners();
+    // cancelActiveInteraction() must be able to stop a minimap drag like any
+    // other pan: core clears the panning state, this cleanup tears down the
+    // listeners and the pointer capture.
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.stopDragging());
   }
 
   private onPointerMove = (event: PointerEvent): void => {
@@ -76,29 +92,33 @@ export class NgDiagramMinimapNavigationDirective implements OnDestroy {
     this.viewportService.moveViewportBy(viewportDelta.x, viewportDelta.y);
   };
 
-  private onPointerUp = (event: PointerEvent): void => {
-    this.dragState.isDragging = false;
+  private onPointerUp = (): void => {
     this.setPanningState(false);
-    this.releasePointer(event);
-    this.removeDocumentListeners();
+    this.stopDragging();
   };
+
+  private stopDragging(): void {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
+    this.dragState.isDragging = false;
+    this.releasePointer();
+    this.removeDocumentListeners();
+  }
 
   private capturePointer(event: PointerEvent): void {
     const target = event.target as Element;
     target.setPointerCapture(event.pointerId);
     this.dragState.pointerId = event.pointerId;
+    this.dragState.captureElement = target;
   }
 
-  private releasePointer(event: PointerEvent): void {
-    if (this.dragState.pointerId === null) {
-      return;
-    }
-
-    const target = event.target as Element;
-    if (target.hasPointerCapture(this.dragState.pointerId)) {
-      target.releasePointerCapture(this.dragState.pointerId);
+  private releasePointer(): void {
+    const { captureElement, pointerId } = this.dragState;
+    if (captureElement && pointerId !== null && captureElement.hasPointerCapture(pointerId)) {
+      captureElement.releasePointerCapture(pointerId);
     }
     this.dragState.pointerId = null;
+    this.dragState.captureElement = null;
   }
 
   private attachDocumentListeners(): void {

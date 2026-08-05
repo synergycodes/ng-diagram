@@ -1,4 +1,5 @@
 import { NgDiagramMath } from '../../../math';
+import type { RotationActionState } from '../../../types/action-state.interface';
 import { EventHandler } from '../event-handler';
 import { RotateInputEvent } from './rotate.event';
 
@@ -18,6 +19,9 @@ This indicates a programming error. Rotation events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/rotation/`;
 
 export class RotateEventHandler extends EventHandler<RotateInputEvent> {
+  /** The rotation state whose end or cancel is currently in flight. */
+  private finishingState: RotationActionState | null = null;
+
   async handle(event: RotateInputEvent): Promise<void> {
     const { center, lastInputPoint, target, phase } = event;
     if (!target) {
@@ -77,6 +81,9 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
 
       case 'end': {
         const rotationState = this.flow.actionStateManager.rotation;
+        // Marks this state as being finished — cancel() must not roll back a
+        // rotation whose normal end is already in flight.
+        this.finishingState = rotationState ?? null;
         try {
           await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
         } finally {
@@ -86,17 +93,22 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
           if (this.flow.actionStateManager.rotation === rotationState) {
             this.flow.actionStateManager.clearRotation();
           }
+          if (this.finishingState === rotationState) {
+            this.finishingState = null;
+          }
         }
         break;
       }
     }
   }
 
-  override async cancel(): Promise<void> {
+  override async cancel(): Promise<boolean> {
     const rotation = this.flow.actionStateManager.rotation;
-    if (!rotation) {
-      return;
+    // No rotation, or its normal end (or another cancel) already owns the teardown.
+    if (!rotation || rotation === this.finishingState) {
+      return false;
     }
+    this.finishingState = rotation;
 
     rotation.cancelReason = 'cancelled';
 
@@ -115,5 +127,9 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
     if (this.flow.actionStateManager.rotation === rotation) {
       this.flow.actionStateManager.clearRotation();
     }
+    if (this.finishingState === rotation) {
+      this.finishingState = null;
+    }
+    return true;
   }
 }

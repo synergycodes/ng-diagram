@@ -73,6 +73,7 @@ export class FlowCore {
   readonly measurementTracker: MeasurementTracker;
 
   private readonly interactionCleanups = new Set<() => void>();
+  private cancellingInteraction = false;
 
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
@@ -521,12 +522,24 @@ export class FlowCore {
    * Runs the registered listener cleanups, restores the diagram state the
    * gesture modified (node positions/size/angle, temporary edge), clears the
    * gesture's action state and lets the corresponding "ended" event fire with
-   * the `cancelled` reason. No-op when nothing is active.
+   * the `cancelled` reason. No-op when nothing is active, when a cancel is
+   * already in flight, when the gesture's normal end is already being
+   * processed, or when a transaction is active — the rollback would merge into
+   * the transaction and could be silently discarded, so it is refused with a
+   * console warning instead.
    *
    * @returns Whether any gesture or registered listener cleanup was torn down
    */
   async cancelActiveInteraction(): Promise<boolean> {
-    const hadInteraction = this.hasActiveInteraction();
+    if (this.cancellingInteraction) {
+      return false;
+    }
+    if (this.transactionManager.isActive()) {
+      console.warn(
+        '[ngDiagram] cancelActiveInteraction() called while a transaction is active — ignored. The rollback would merge into the transaction and could be discarded with it; await the transaction and cancel afterwards.'
+      );
+      return false;
+    }
 
     const activeGestures: InputEventName[] = [];
     if (this.actionStateManager.isLinking()) activeGestures.push('linking');
@@ -535,29 +548,35 @@ export class FlowCore {
     if (this.actionStateManager.isRotating()) activeGestures.push('rotate');
     if (this.actionStateManager.isPanning()) activeGestures.push('panning');
 
-    // Tear down document-level listeners first so no further pointer events
-    // reach the gesture handlers while (or after) they are being cancelled.
-    const cleanups = [...this.interactionCleanups];
-    this.interactionCleanups.clear();
-    for (const cleanup of cleanups) {
-      cleanup();
-    }
-
-    // One failing cancel must not leave the remaining gestures active — cancel
-    // them all, then rethrow the first failure.
-    const errors: unknown[] = [];
-    for (const gesture of activeGestures) {
-      try {
-        await this.inputEventsRouter.cancel(gesture);
-      } catch (error) {
-        errors.push(error);
+    this.cancellingInteraction = true;
+    try {
+      // Tear down document-level listeners first so no further pointer events
+      // reach the gesture handlers while (or after) they are being cancelled.
+      const cleanups = [...this.interactionCleanups];
+      this.interactionCleanups.clear();
+      for (const cleanup of cleanups) {
+        cleanup();
       }
-    }
-    if (errors.length > 0) {
-      throw errors[0];
-    }
 
-    return hadInteraction;
+      // One failing cancel must not leave the remaining gestures active — cancel
+      // them all, then rethrow the first failure.
+      let cancelledAny = false;
+      const errors: unknown[] = [];
+      for (const gesture of activeGestures) {
+        try {
+          cancelledAny = (await this.inputEventsRouter.cancel(gesture)) || cancelledAny;
+        } catch (error) {
+          errors.push(error);
+        }
+      }
+      if (errors.length > 0) {
+        throw errors[0];
+      }
+
+      return cancelledAny || cleanups.length > 0;
+    } finally {
+      this.cancellingInteraction = false;
+    }
   }
 
   /**

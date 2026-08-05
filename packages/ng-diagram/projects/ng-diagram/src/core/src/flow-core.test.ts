@@ -123,7 +123,7 @@ describe('FlowCore', () => {
       emit: vi.fn(),
       register: vi.fn(),
       registerDefaultCallbacks: vi.fn(),
-      cancel: vi.fn().mockResolvedValue(undefined),
+      cancel: vi.fn().mockResolvedValue(true),
     } as unknown as InputEventsRouter;
 
     // Reset all mocks

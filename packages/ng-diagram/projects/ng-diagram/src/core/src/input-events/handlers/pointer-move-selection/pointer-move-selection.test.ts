@@ -1065,6 +1065,71 @@ describe('PointerMoveSelectionEventHandler', () => {
       expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
     });
 
+    it('should kill a continue pass that resumes while the cancel rollback is still suspended', async () => {
+      let releaseStart: () => void = () => undefined;
+      let releaseStop: () => void = () => undefined;
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'moveNodesStart') {
+          await new Promise<void>((resolve) => {
+            releaseStart = resolve;
+          });
+        }
+        if (name === 'moveNodesStop') {
+          await new Promise<void>((resolve) => {
+            releaseStop = resolve;
+          });
+        }
+      });
+
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      const continuePromise = handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      // Cancel parks on its own moveNodesStop; the continue then resumes while
+      // this.gesture still points at the cancelled gesture — only gesture.ended
+      // stops it from applying a move after the rollback.
+      const cancelPromise = handler.cancel();
+      releaseStart();
+      await continuePromise;
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+
+      releaseStop();
+      await cancelPromise;
+    });
+
+    it('should refuse to cancel while the normal end phase is in flight', async () => {
+      let releaseStop: () => void = () => undefined;
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'moveNodesStop') {
+          await new Promise<void>((resolve) => {
+            releaseStop = resolve;
+          });
+        }
+      });
+
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+      const endPromise = handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'end', lastInputPoint: lastInputPointOverThreshold })
+      );
+      await macrotask();
+      mockEmit.mockClear();
+
+      await expect(handler.cancel()).resolves.toBe(false);
+
+      // The completed gesture is left to its end phase: no rollback, no cancel stamp
+      expect(mockEmit).not.toHaveBeenCalledWith('updateNodes', expect.anything());
+      expect(mockActionStateManager.dragging?.cancelReason).toBeUndefined();
+      expect(mockFlowCore.transaction).not.toHaveBeenCalledWith('cancelDrag', expect.any(Function));
+
+      releaseStop();
+      await endPromise;
+    });
+
     it('should not clobber a new drag that starts while the cancel rollback is suspended', async () => {
       mockEmit.mockImplementation(async (name: string) => {
         if (name === 'moveNodesStop') {

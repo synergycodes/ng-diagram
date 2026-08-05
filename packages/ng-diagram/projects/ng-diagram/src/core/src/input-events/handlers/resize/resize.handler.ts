@@ -1,4 +1,5 @@
 import { Point, Size } from '../../..';
+import type { ResizeActionState } from '../../../types/action-state.interface';
 import { EventHandler } from '../event-handler';
 import { ResizeEvent } from './resize.event';
 
@@ -16,6 +17,9 @@ This indicates a programming error. Resize events must have a target node.
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/resizing/`;
 
 export class ResizeEventHandler extends EventHandler<ResizeEvent> {
+  /** The resize state whose end or cancel is currently in flight. */
+  private finishingState: ResizeActionState | null = null;
+
   async handle(event: ResizeEvent): Promise<void> {
     if (!event.target) {
       throw new Error(RESIZE_MISSING_TARGET_ERROR(event));
@@ -121,6 +125,9 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
       }
       case 'end': {
         const resizeState = this.flow.actionStateManager.resize;
+        // Marks this state as being finished — cancel() must not roll back a
+        // resize whose normal end is already in flight.
+        this.finishingState = resizeState ?? null;
         try {
           await this.flow.commandHandler.emit('resizeNodeStop', { nodeId: resizeState?.resizingNode.id });
         } finally {
@@ -130,17 +137,22 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
           if (this.flow.actionStateManager.resize === resizeState) {
             this.flow.actionStateManager.clearResize();
           }
+          if (this.finishingState === resizeState) {
+            this.finishingState = null;
+          }
         }
         break;
       }
     }
   }
 
-  override async cancel(): Promise<void> {
+  override async cancel(): Promise<boolean> {
     const resize = this.flow.actionStateManager.resize;
-    if (!resize) {
-      return;
+    // No resize, or its normal end (or another cancel) already owns the teardown.
+    if (!resize || resize === this.finishingState) {
+      return false;
     }
+    this.finishingState = resize;
 
     resize.cancelReason = 'cancelled';
 
@@ -165,5 +177,9 @@ export class ResizeEventHandler extends EventHandler<ResizeEvent> {
     if (this.flow.actionStateManager.resize === resize) {
       this.flow.actionStateManager.clearResize();
     }
+    if (this.finishingState === resize) {
+      this.finishingState = null;
+    }
+    return true;
   }
 }

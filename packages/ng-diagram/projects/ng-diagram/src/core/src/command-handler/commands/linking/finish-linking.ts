@@ -55,6 +55,9 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
     return;
   }
 
+  // Claims the teardown — a cancelLinking racing this finish must no-op instead
+  // of overwriting the reason and emitting a second edgeDrawEnded.
+  linking._finishing = true;
   const gestureId = linking._gestureId;
 
   // Clear in finally — a user callback below can throw, and a stranded linking

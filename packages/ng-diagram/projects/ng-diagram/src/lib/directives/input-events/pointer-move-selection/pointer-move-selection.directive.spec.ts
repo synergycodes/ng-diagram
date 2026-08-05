@@ -37,8 +37,12 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
   let fixture: ComponentFixture<HostComponent>;
   let directive: PointerMoveSelectionDirective;
   let touchState: TouchEventsStateService;
+  let registerInteractionCleanup: ReturnType<typeof vi.fn>;
+  let unregister: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    unregister = vi.fn();
+    registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
     const mockRouter = {
       getBaseEvent: () => ({
         id: 'id',
@@ -54,7 +58,7 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
       isInitialized: () => true,
       provide: () => ({
         config: { nodeDraggingEnabled: true },
-        registerInteractionCleanup: vi.fn().mockReturnValue(vi.fn()),
+        registerInteractionCleanup,
       }),
     };
     const mockDiagramComponent = {
@@ -103,5 +107,23 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
+  });
+
+  it('unregisters its interaction cleanup on normal pointerup', () => {
+    directive.onPointerDown(makePointerEvent());
+    expect(unregister).not.toHaveBeenCalled();
+
+    directive.onPointerUp(makePointerEvent() as unknown as PointerEvent);
+
+    // A lingering registration would make hasActiveInteraction() true forever
+    // and swallow every subsequent Escape press
+    expect(unregister).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not re-register the cleanup on a second pointerdown mid-gesture', () => {
+    directive.onPointerDown(makePointerEvent());
+    directive.onPointerDown(makePointerEvent());
+
+    expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
   });
 });

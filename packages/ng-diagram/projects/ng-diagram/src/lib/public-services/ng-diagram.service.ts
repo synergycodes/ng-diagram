@@ -232,7 +232,11 @@ export class NgDiagramService extends NgDiagramBaseService {
    * its original size/position/autoSize back, a rotated node its original
    * angle, and the temporary edge of a linking gesture is discarded. Panning
    * only stops — the viewport is navigation state and is not rolled back.
-   * No-op when nothing is active.
+   * No-op when nothing is active, when the gesture's normal end is already
+   * completing (a finished gesture is never rolled back), or when a
+   * transaction is active — the rollback would merge into the transaction and
+   * could be discarded with it, so the call is refused with a console warning;
+   * await the transaction and cancel afterwards.
    *
    * Bound to the Escape key by default via the `cancelInteraction` shortcut
    * action; rebind or disable it with {@link configureShortcuts}.

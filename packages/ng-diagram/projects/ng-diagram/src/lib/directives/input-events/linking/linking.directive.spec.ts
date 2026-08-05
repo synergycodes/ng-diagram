@@ -1,18 +1,41 @@
-import { TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
-import { DiagramEventName } from '../../../types';
+import { DiagramEventName, type PointerInputEvent } from '../../../types';
 import { LinkingInputDirective } from './linking.directive';
 
+@Component({
+  template: `<div ngDiagramLinkingInput portId="p1"></div>`,
+  standalone: true,
+  imports: [LinkingInputDirective],
+})
+class HostComponent {}
+
+function makePointerEvent(overrides: Partial<PointerInputEvent> = {}): PointerInputEvent {
+  return {
+    clientX: 10,
+    clientY: 10,
+    boxSelectionHandled: false,
+    ...overrides,
+  } as unknown as PointerInputEvent;
+}
+
 describe('LinkingInputDirective (shared touch marker ownership)', () => {
+  let fixture: ComponentFixture<HostComponent>;
   let directive: LinkingInputDirective;
   let touchState: TouchEventsStateService;
   let clearLinking: ReturnType<typeof vi.fn>;
+  let registerInteractionCleanup: ReturnType<typeof vi.fn>;
+  let unregister: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     clearLinking = vi.fn();
+    unregister = vi.fn();
+    registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
     const mockLinkingEventService = {
       emitStart: vi.fn(),
@@ -23,20 +46,20 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
       isInitialized: () => true,
       provide: () => ({
         actionStateManager: { clearLinking, isLinking: () => false },
-        registerInteractionCleanup: vi.fn().mockReturnValue(vi.fn()),
+        registerInteractionCleanup,
       }),
     };
 
     TestBed.configureTestingModule({
-      providers: [
-        LinkingInputDirective,
-        { provide: LinkingEventService, useValue: mockLinkingEventService },
-        { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
-        TouchEventsStateService,
-      ],
+      imports: [HostComponent],
+      providers: [{ provide: FlowCoreProviderService, useValue: mockFlowCoreProvider }, TouchEventsStateService],
     });
+    // LinkingEventService is a directive-level provider — override it there
+    TestBed.overrideProvider(LinkingEventService, { useValue: mockLinkingEventService });
 
-    directive = TestBed.inject(LinkingInputDirective);
+    fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    directive = fixture.debugElement.query(By.directive(LinkingInputDirective)).injector.get(LinkingInputDirective);
     touchState = TestBed.inject(TouchEventsStateService);
   });
 
@@ -44,9 +67,35 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     // Simulates virtualization destroying this port's component during a touch pan
     touchState.currentEvent.set(DiagramEventName.Panning);
 
-    directive.ngOnDestroy();
+    fixture.destroy();
 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
     expect(clearLinking).not.toHaveBeenCalled();
+  });
+
+  it('clears the shared touch marker on normal pointerup', () => {
+    directive.onPointerDown(makePointerEvent());
+    expect(touchState.currentEvent()).toBe(DiagramEventName.Linking);
+
+    directive.onPointerUp(makePointerEvent());
+
+    expect(touchState.currentEvent()).toBeNull();
+    expect(unregister).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears its own marker and the linking state when destroyed mid-gesture', () => {
+    directive.onPointerDown(makePointerEvent());
+
+    fixture.destroy();
+
+    expect(touchState.currentEvent()).toBeNull();
+    expect(clearLinking).toHaveBeenCalled();
+  });
+
+  it('does not re-register the cleanup on a second pointerdown mid-gesture', () => {
+    directive.onPointerDown(makePointerEvent());
+    directive.onPointerDown(makePointerEvent());
+
+    expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
   });
 });

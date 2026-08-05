@@ -155,11 +155,17 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     }
   }
 
-  override async cancel(): Promise<void> {
+  override async cancel(): Promise<boolean> {
     const gesture = this.gesture;
     const dragging = this.flow.actionStateManager.dragging;
     if (!gesture && !dragging) {
-      return;
+      return false;
+    }
+    // The normal 'end' phase (or a previous cancel) already owns this gesture's
+    // teardown — cancelling now would roll back a completed drop and stamp its
+    // ended event as cancelled.
+    if (gesture?.ended) {
+      return false;
     }
 
     const needsStop = !!dragging && (gesture?.hasMoved ?? false);
@@ -205,6 +211,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     if (this.gesture === gesture) {
       this.gesture = null;
     }
+    return true;
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {

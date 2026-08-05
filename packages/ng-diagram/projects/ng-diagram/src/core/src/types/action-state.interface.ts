@@ -63,6 +63,8 @@ export interface LinkingActionState {
 export interface InternalLinkingActionState extends LinkingActionState {
   /** Monotonic id of the linking gesture this state belongs to. */
   _gestureId?: number;
+  /** Set while finishLinking/cancelLinking is tearing this gesture down — the other must no-op. */
+  _finishing?: boolean;
 }
 
 /**

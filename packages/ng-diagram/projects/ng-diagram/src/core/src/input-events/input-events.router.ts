@@ -69,8 +69,10 @@ export abstract class InputEventsRouter {
   /**
    * Aborts the gesture tracked by the handler registered for `eventName`.
    * No-op when the handler is missing or has no gesture in progress.
+   *
+   * @returns Whether the handler actually tore anything down
    */
-  async cancel(eventName: InputEventName): Promise<void> {
-    await this.handlers[eventName]?.cancel();
+  async cancel(eventName: InputEventName): Promise<boolean> {
+    return (await this.handlers[eventName]?.cancel()) ?? false;
   }
 }

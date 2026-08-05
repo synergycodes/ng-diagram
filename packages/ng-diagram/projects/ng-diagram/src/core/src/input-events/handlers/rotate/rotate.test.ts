@@ -264,6 +264,29 @@ describe('RotateEventHandler', () => {
       expect(flowCore.transaction).toHaveBeenCalledWith('cancelRotate', expect.any(Function));
     });
 
+    it('should refuse to cancel while the normal end phase is in flight', async () => {
+      let releaseStop: () => void = () => undefined;
+      mockCommandHandler.emit.mockImplementation(async (name: string) => {
+        if (name === 'rotateNodeStop') {
+          await new Promise<void>((resolve) => {
+            releaseStop = resolve;
+          });
+        }
+      });
+
+      mockActionStateManager.rotation = { startAngle: 45, initialNodeAngle: 30, nodeId: 'test-node' };
+      const endPromise = instance.handle(getSampleRotateEvent({ target: node, phase: 'end' }));
+
+      await expect(instance.cancel()).resolves.toBe(false);
+
+      // The completed gesture is left to its end phase: no rollback, no cancel stamp
+      expect(mockActionStateManager.rotation?.cancelReason).toBeUndefined();
+      expect(flowCore.transaction).not.toHaveBeenCalledWith('cancelRotate', expect.any(Function));
+
+      releaseStop();
+      await endPromise;
+    });
+
     it('should not clear a rotation that started while the cancel rollback was suspended', async () => {
       vi.mocked(NgDiagramMath.angleBetweenPoints).mockReturnValue(45);
       mockCommandHandler.emit.mockImplementation(async (name: string) => {

@@ -20,6 +20,7 @@ export class PanningDirective implements OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
 
   private unregisterInteractionCleanup: (() => void) | null = null;
+  private gestureActive = false;
 
   ngOnDestroy(): void {
     this.removeListeners();
@@ -28,6 +29,11 @@ export class PanningDirective implements OnDestroy {
   onPointerDown(event: PointerInputEvent): void {
     // ignore on mobile touch devices
     if (event.pointerType === 'touch') {
+      return;
+    }
+    // A second pointerdown mid-pan must not restart the gesture —
+    // re-registering the interaction cleanup would orphan the previous entry.
+    if (this.gestureActive) {
       return;
     }
     if (!this.inputEventsRouter.eventGuards.withPrimaryButton(event) || !this.shouldHandle(event)) {
@@ -51,6 +57,7 @@ export class PanningDirective implements OnDestroy {
       },
     });
 
+    this.gestureActive = true;
     document.addEventListener('pointermove', this.onMouseMove);
     document.addEventListener('pointerup', this.onPointerUp);
     this.unregisterInteractionCleanup = this.flowCoreProvider
@@ -117,6 +124,7 @@ export class PanningDirective implements OnDestroy {
   };
 
   private removeListeners(): void {
+    this.gestureActive = false;
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onMouseMove);

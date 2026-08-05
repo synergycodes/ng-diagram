@@ -13,8 +13,11 @@ export abstract class EventHandler<TEvent extends BaseInputEvent> {
    * Gesture handlers override this to clear their action state, reset internal
    * tracking and let the corresponding "ended" event fire with a cancel reason.
    * The default is a no-op for handlers without an in-progress gesture concept.
+   *
+   * @returns Whether anything was actually torn down — `false` when there is no
+   * gesture, or when its normal end (or another cancel) is already in flight.
    */
-  cancel(): void | Promise<void> {
-    // No-op by default.
+  cancel(): boolean | Promise<boolean> {
+    return false;
   }
 }

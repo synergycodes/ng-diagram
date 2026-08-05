@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import type { CommandHandler, Edge, LinkingActionState } from '../../../../types';
+import type { InternalLinkingActionState } from '../../../../types/action-state.interface';
 import { cancelLinking } from '../cancel-linking';
 
 describe('cancelLinking', () => {
@@ -72,6 +73,45 @@ describe('cancelLinking', () => {
     await cancelLinking(mockCommandHandler);
 
     expect(linking.dropPosition).toEqual({ x: 150, y: 250 });
+  });
+
+  it('should no-op when a finishLinking already owns the teardown', async () => {
+    const linking: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      _finishing: true,
+    };
+    mockFlowCore.actionStateManager.linking = linking;
+
+    await cancelLinking(mockCommandHandler);
+
+    expect(linking.cancelReason).toBeUndefined();
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
+  });
+
+  it('should not clear a linking state that replaced the cancelled one mid-pass', async () => {
+    const linking: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      _gestureId: 1,
+    };
+    mockFlowCore.actionStateManager.linking = linking;
+    mockFlowCore.applyUpdate.mockImplementation(async () => {
+      // A new linking gesture starts while the cancelled finish pass is suspended
+      mockFlowCore.actionStateManager.linking = {
+        sourceNodeId: 'other-node',
+        sourcePortId: 'other-port',
+        temporaryEdge: null,
+        _gestureId: 2,
+      } as InternalLinkingActionState;
+    });
+
+    await cancelLinking(mockCommandHandler);
+
+    expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
   });
 
   it('should fall back to a zero drop position without a temporary edge', async () => {

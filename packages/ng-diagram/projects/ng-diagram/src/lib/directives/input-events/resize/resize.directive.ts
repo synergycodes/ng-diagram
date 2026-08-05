@@ -34,7 +34,10 @@ export class ResizeDirective implements OnDestroy {
     }
   }
   onPointerDown(event: PointerInputEvent): void {
-    if (!this.shouldHandle(event)) {
+    // A second pointerdown mid-gesture (second touch contact, other mouse
+    // button) must not restart the gesture — re-registering the interaction
+    // cleanup would orphan the previous entry in FlowCore's registry.
+    if (this.gestureActive || !this.shouldHandle(event)) {
       return;
     }
 

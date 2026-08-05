@@ -1,4 +1,5 @@
 import { createLinkingState } from '../../../command-handler/commands/linking/linking-gesture';
+import type { InternalLinkingActionState } from '../../../types/action-state.interface';
 import { EventHandler } from '../event-handler';
 import { LinkingInputEvent } from './linking.event';
 
@@ -66,11 +67,14 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
     }
   }
 
-  override async cancel(): Promise<void> {
-    if (!this.flow.actionStateManager.isLinking()) {
-      return;
+  override async cancel(): Promise<boolean> {
+    const linking = this.flow.actionStateManager.linking as InternalLinkingActionState | undefined;
+    // No linking, or a finishLinking/another cancel already owns the teardown.
+    if (!linking || linking._finishing) {
+      return false;
     }
 
     await this.flow.commandHandler.emit('cancelLinking');
+    return true;
   }
 }

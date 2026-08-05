@@ -34,9 +34,13 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
   let directive: ResizeDirective;
   let touchState: TouchEventsStateService;
   let clearResize: ReturnType<typeof vi.fn>;
+  let registerInteractionCleanup: ReturnType<typeof vi.fn>;
+  let unregister: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     clearResize = vi.fn();
+    unregister = vi.fn();
+    registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
     const mockRouter = {
       getBaseEvent: () => ({
@@ -50,7 +54,7 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
       isInitialized: () => true,
       provide: () => ({
         actionStateManager: { clearResize },
-        registerInteractionCleanup: vi.fn().mockReturnValue(vi.fn()),
+        registerInteractionCleanup,
       }),
     };
 
@@ -95,5 +99,23 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
 
     expect(touchState.currentEvent()).toBeNull();
     expect(clearResize).toHaveBeenCalled();
+  });
+
+  it('unregisters its interaction cleanup on normal pointerup', () => {
+    directive.onPointerDown(makePointerEvent());
+    expect(unregister).not.toHaveBeenCalled();
+
+    directive.onPointerUp(makePointerEvent() as unknown as PointerEvent);
+
+    // A lingering registration would make hasActiveInteraction() true forever
+    // and swallow every subsequent Escape press
+    expect(unregister).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not re-register the cleanup on a second pointerdown mid-gesture', () => {
+    directive.onPointerDown(makePointerEvent());
+    directive.onPointerDown(makePointerEvent());
+
+    expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
   });
 });

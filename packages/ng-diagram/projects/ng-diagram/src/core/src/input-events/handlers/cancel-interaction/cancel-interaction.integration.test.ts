@@ -373,4 +373,133 @@ describe('cancelActiveInteraction (integration)', () => {
       expect(flowCore.getState().metadata.viewport).toEqual(viewportAfterPan);
     });
   });
+
+  describe('cancel vs concurrent work', () => {
+    const dragStartEvent = (node: Node) => ({
+      name: 'pointerMoveSelection' as const,
+      phase: 'start' as const,
+      target: node,
+      targetType: 'node' as const,
+      lastInputPoint: { x: 100, y: 100 },
+      panningForce: null,
+    });
+
+    it('refuses to cancel a drag whose pointerup end is already in flight', async () => {
+      const node = draggableNode();
+      const { flowCore, router } = createFlowCore([node]);
+      const dragEnded = vi.fn();
+      flowCore.eventManager.on('nodeDragEnded', dragEnded);
+
+      // Parks the end's moveNodesStop pass so the cancel arrives mid-end
+      let release: () => void = () => undefined;
+      flowCore.middlewareManager.register({
+        name: 'slow-stop',
+        execute: async (context, next) => {
+          if (context.modelActionTypes.includes('moveNodesStop')) {
+            await new Promise<void>((resolve) => {
+              release = resolve;
+            });
+          }
+          await next();
+        },
+      });
+
+      await startDragOn(flowCore, router, node);
+      const endPromise = emitGesture(router, {
+        name: 'pointerMoveSelection',
+        phase: 'end',
+        target: node,
+        targetType: 'node',
+        lastInputPoint: { x: 150, y: 180 },
+        panningForce: null,
+      });
+      await macrotask();
+
+      expect(await flowCore.cancelActiveInteraction()).toBe(false);
+
+      release();
+      await endPromise;
+      await macrotask();
+
+      // The completed drop stands: one normally-labeled ended event, no rollback
+      expect(flowCore.getNodeById('n1')?.position).toEqual({ x: 60, y: 100 });
+      expect(dragEnded).toHaveBeenCalledTimes(1);
+      expect(dragEnded.mock.calls[0][0].cancelReason).toBeUndefined();
+    });
+
+    it('refuses to cancel while a transaction is active, works after it settles', async () => {
+      const node = draggableNode();
+      const { flowCore, router } = createFlowCore([node]);
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      await startDragOn(flowCore, router, node);
+
+      let releaseTx: () => void = () => undefined;
+      const txPromise = flowCore.transaction('appTransaction', async () => {
+        await new Promise<void>((resolve) => {
+          releaseTx = resolve;
+        });
+      });
+      await macrotask();
+
+      expect(await flowCore.cancelActiveInteraction()).toBe(false);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('cancelActiveInteraction'));
+      expect(flowCore.actionStateManager.isDragging()).toBe(true);
+      expect(flowCore.getNodeById('n1')?.position).toEqual({ x: 60, y: 100 });
+
+      releaseTx();
+      await txPromise;
+
+      expect(await flowCore.cancelActiveInteraction()).toBe(true);
+      expect(flowCore.getNodeById('n1')?.position).toEqual({ x: 10, y: 20 });
+      warn.mockRestore();
+    });
+
+    it('a concurrent second cancel is a no-op', async () => {
+      const node = draggableNode();
+      const { flowCore, router } = createFlowCore([node]);
+      const dragEnded = vi.fn();
+      flowCore.eventManager.on('nodeDragEnded', dragEnded);
+
+      await startDragOn(flowCore, router, node);
+      const [first, second] = await Promise.all([
+        flowCore.cancelActiveInteraction(),
+        flowCore.cancelActiveInteraction(),
+      ]);
+
+      expect(first).toBe(true);
+      expect(second).toBe(false);
+      expect(dragEnded).toHaveBeenCalledTimes(1);
+      expect(flowCore.getNodeById('n1')?.position).toEqual({ x: 10, y: 20 });
+    });
+
+    it('drag cancel restores group children moved with the group', async () => {
+      const group = draggableNode({ id: 'grp', position: { x: 100, y: 100 }, isGroup: true });
+      const child = draggableNode({ id: 'child', selected: false, groupId: 'grp', position: { x: 120, y: 130 } });
+      const { flowCore, router } = createFlowCore([group, child]);
+
+      await startDragOn(flowCore, router, group);
+      expect(flowCore.getNodeById('grp')?.position).toEqual({ x: 150, y: 180 });
+      expect(flowCore.getNodeById('child')?.position).toEqual({ x: 170, y: 210 });
+
+      expect(await flowCore.cancelActiveInteraction()).toBe(true);
+
+      expect(flowCore.getNodeById('grp')?.position).toEqual({ x: 100, y: 100 });
+      expect(flowCore.getNodeById('child')?.position).toEqual({ x: 120, y: 130 });
+    });
+
+    // Mirrors the drag suite's startDrag but reusable for any node fixture
+    async function startDragOn(flowCore: FlowCore, router: InputEventsRouter, node: Node) {
+      emitGesture(router, dragStartEvent(node));
+      await emitGesture(router, {
+        name: 'pointerMoveSelection',
+        phase: 'continue',
+        target: node,
+        targetType: 'node',
+        lastInputPoint: { x: 150, y: 180 },
+        panningForce: null,
+      });
+      await macrotask();
+    }
+  });
 });

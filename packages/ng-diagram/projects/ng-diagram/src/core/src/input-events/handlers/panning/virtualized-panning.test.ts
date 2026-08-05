@@ -213,4 +213,24 @@ describe('VirtualizedPanningEventHandler', () => {
       });
     });
   });
+
+  describe('cancel', () => {
+    it('should do nothing and return false when no pan is active', () => {
+      expect(instance.cancel()).toBe(false);
+
+      expect(mockFlowCore.actionStateManager.clearPanning).not.toHaveBeenCalled();
+    });
+
+    it('should clear the panning state and drop the accumulated delta', () => {
+      instance.handle(getSamplePanningEvent({ phase: 'start' }));
+      instance.handle(getSamplePanningEvent({ phase: 'continue', lastInputPoint: { x: 130, y: 110 } }));
+
+      expect(instance.cancel()).toBe(true);
+
+      expect(mockFlowCore.actionStateManager.clearPanning).toHaveBeenCalled();
+      // The delta accumulated before the cancel must not jump the viewport later
+      flushRAF();
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveViewportBy', expect.anything());
+    });
+  });
 });

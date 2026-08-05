@@ -94,6 +94,8 @@ test.describe('Escape cancels the in-flight gesture', () => {
     await expect.poll(() => diagram.nodePosition('node-a')).toEqual(before);
     await expect.poll(() => endedEvents(diagram)).toEqual(['drag:cancelled']);
     await expect.poll(async () => (await diagram.diagram.actionState()).dragging).toBeUndefined();
+    // Cancel aborts the move and nothing else — the selection stays
+    expect((await diagram.model.getNodeById('node-a'))?.selected).toBe(true);
 
     // Listeners were removed on cancel: further moves and the release are inert
     await diagram.page.mouse.move(start.x + 200, start.y + 150, { steps: 4 });
@@ -237,6 +239,25 @@ test.describe('cancelActiveInteraction()', () => {
     await diagram.page.mouse.up();
   });
 
+  test('aborts manual linking started via startLinking()', async ({ diagram }) => {
+    await diagram.load({ model: pair });
+
+    await diagram.page.evaluate(() => {
+      const node = window.__diagram!.model.getNodeById('node-a');
+      window.__diagram!.diagram.startLinking(node!, 'port-right');
+    });
+    await diagram.page.mouse.move(300, 300);
+    await expect(diagram.edge('TEMPORARY_EDGE')).toBeAttached();
+
+    expect(await diagram.diagram.cancelActiveInteraction()).toBe(true);
+
+    await expect(diagram.allEdges).toHaveCount(0);
+    // The manual-linking document listeners are gone: a click completes nothing
+    await diagram.clickCanvas();
+    await diagram.nextFrame();
+    expect(await diagram.model.edges()).toEqual([]);
+  });
+
   test('resolves false and emits nothing when no gesture is active', async ({ diagram }) => {
     await diagram.load({ model: pair });
     await recordEndedEvents(diagram);
@@ -270,8 +291,13 @@ test.describe('Escape stays non-intrusive', () => {
     await diagram.page.keyboard.press('Escape'); // mid-drag → swallowed
     await diagram.page.mouse.up();
 
+    // A normally completed gesture must leave nothing cancellable behind —
+    // a lingering interaction registration would swallow this Escape too
+    await diagram.dragNode('node-a', { x: 40, y: 30 });
+    await diagram.page.keyboard.press('Escape');
+
     await expect
       .poll(() => diagram.page.evaluate(() => (window as unknown as { __escSwallowed?: boolean[] }).__escSwallowed))
-      .toEqual([false, true]);
+      .toEqual([false, true, false]);
   });
 });

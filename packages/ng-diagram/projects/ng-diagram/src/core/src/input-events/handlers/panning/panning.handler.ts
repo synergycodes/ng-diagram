@@ -36,11 +36,12 @@ export class PanningEventHandler extends EventHandler<PanningEvent> {
     }
   }
 
-  override cancel(): void {
+  override cancel(): boolean {
     if (!this.flow.actionStateManager.isPanning()) {
-      return;
+      return false;
     }
     this.lastPoint = undefined;
     this.flow.actionStateManager.clearPanning();
+    return true;
   }
 }
