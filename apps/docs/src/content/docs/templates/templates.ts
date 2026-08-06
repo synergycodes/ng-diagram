@@ -51,9 +51,14 @@ export const templates: Template[] = [
       'Screenshot of the single-line diagram editor: IEC 60617 substation symbols placed from a categorized palette onto a schematic canvas.',
   },
   {
-    type: 'coming-soon',
-    title: 'AV Template',
+    type: 'regular',
+    title: 'AV Schematic',
     description:
-      'A starter kit for audiovisual system diagrams. Signal flow, equipment racks, and routing for integrators planning installations and documenting deployed setups.',
+      'Interactive AV (audio/video) schematic editor. A starter kit for building your own signal-flow or device-wiring diagram. Drag devices from a searchable library, wire them port-to-port with typed connectors (XLR, HDMI, Speakon), and export to PNG or DXF for AutoCAD.',
+    href: 'https://www.ngdiagram.dev/templates/av/',
+    codeHref: 'https://github.com/synergycodes/ng-diagram-av-schematic',
+    image: '/docs/assets/templates/av.png',
+    imageAlt:
+      'Screenshot of the AV signal-flow editor: devices wired port-to-port with a properties panel for editing device fields and ports.',
   },
 ];

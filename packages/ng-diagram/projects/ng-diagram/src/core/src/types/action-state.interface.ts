@@ -1,4 +1,4 @@
-import type { EdgeDrawCancelReason } from '../event-manager/event-types';
+import type { EdgeDrawCancelReason, GestureCancelReason } from '../event-manager/event-types';
 import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
@@ -26,6 +26,8 @@ export interface ResizeActionState {
   startNodePositionY: number;
   /** Reference to the node being resized. */
   resizingNode: Node;
+  /** Set when the resize is aborted; carried into `nodeResizeEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -46,6 +48,23 @@ export interface LinkingActionState {
   dropPosition?: Point;
   /** Reason the linking gesture was cancelled (set by finishLinking on failure paths). */
   cancelReason?: EdgeDrawCancelReason;
+}
+
+/**
+ * Linking state with the gesture stamp. The linking object is replaced on every
+ * pointer move and by the edges-routing middleware, so object identity cannot
+ * tell gestures apart — finish commands clear only when the stamp matches.
+ * Created only via `createLinkingState`, which stamps a fresh id; updaters must COPY
+ * the previous state (spread), never rebuild it field by field — a rebuild
+ * silently drops the stamp.
+ *
+ * @internal
+ */
+export interface InternalLinkingActionState extends LinkingActionState {
+  /** Monotonic id of the linking gesture this state belongs to. */
+  _gestureId?: number;
+  /** Set while finishLinking/cancelLinking is tearing this gesture down — the other must no-op. */
+  _finishing?: boolean;
 }
 
 /**
@@ -88,6 +107,8 @@ export interface RotationActionState {
   initialNodeAngle: number;
   /** ID of the node being rotated. */
   nodeId: string;
+  /** Set when the rotation is aborted; carried into `nodeRotateEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -112,6 +133,8 @@ export interface DraggingActionState {
    * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
    */
   movementStarted: boolean;
+  /** Set when the drag is aborted; carried into `nodeDragEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**

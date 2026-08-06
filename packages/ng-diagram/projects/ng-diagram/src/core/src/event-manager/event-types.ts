@@ -267,12 +267,27 @@ export interface EdgeDrawnEvent {
  * - `noTarget` — the user released on empty space (no target node/port snapped)
  * - `invalidConnection` — `validateConnection()` returned false
  * - `invalidTarget` — the target node doesn't exist or the target port has wrong type
+ * - `cancelled` — the gesture was aborted programmatically (e.g. Esc key,
+ *   {@link NgDiagramService.cancelActiveInteraction})
  *
  * @public
  * @since 1.2.0
  * @category Types/Events
  */
-export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget';
+export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget' | 'cancelled';
+
+/**
+ * Reason an interactive gesture (drag, resize, rotation) ended without a normal
+ * pointer release.
+ *
+ * - `cancelled` — the gesture was aborted programmatically (e.g. Esc key,
+ *   {@link NgDiagramService.cancelActiveInteraction})
+ *
+ * @public
+ * @since 1.3.0
+ * @category Types/Events
+ */
+export type GestureCancelReason = 'cancelled';
 
 /**
  * Event payload emitted when an edge draw gesture ends, regardless of outcome.
@@ -436,6 +451,8 @@ export interface NodeResizeStartedEvent {
 export interface NodeResizeEndedEvent {
   /** The node that was resized, with its final size */
   node: Node;
+  /** Present when the resize ended without a normal pointer release */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -466,6 +483,8 @@ export interface NodeRotateStartedEvent {
 export interface NodeRotateEndedEvent {
   /** The node that was rotated, with its final angle */
   node: Node;
+  /** Present when the rotation ended without a normal pointer release */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -496,6 +515,8 @@ export interface NodeDragStartedEvent {
 export interface NodeDragEndedEvent {
   /** Nodes that were dragged, with their final positions */
   nodes: Node[];
+  /** Present when the drag ended without a normal pointer release */
+  cancelReason?: GestureCancelReason;
 }
 
 /**

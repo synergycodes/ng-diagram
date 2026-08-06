@@ -58,7 +58,13 @@ export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 // Configuration helpers
 export { configureShortcuts } from './core/src';
 export { NgDiagramMinimapNodeTemplateMap } from './lib/components/minimap/ng-diagram-minimap.types';
-export { initializeModel, initializeModelAdapter } from './lib/model/initialize-model';
+export { initializeModel, initializeModelAdapter, type InitializeModelOptions } from './lib/model/initialize-model';
+export {
+  stripEdgeRuntimeProperties,
+  stripNodeRuntimeProperties,
+  type StripEdgeRuntimePropertiesFn,
+  type StripNodeRuntimePropertiesFn,
+} from './lib/model/strip-runtime-properties';
 export { provideNgDiagram } from './lib/providers/ng-diagram.providers';
 export { NgDiagramEdgeTemplateMap } from './lib/types/edge-template-map';
 export { NgDiagramNodeTemplateMap } from './lib/types/node-template-map';
@@ -81,6 +87,7 @@ export type { AppMiddlewares } from './lib/utils/create-middlewares';
 
 // Core types re-export
 export type {
+  AbsoluteEdgeLabelPosition,
   ActionState,
   ActionStateManager,
   BackgroundConfig,
@@ -88,10 +95,10 @@ export type {
   ClipboardPastedEvent,
   CopyPasteActionState,
   DataObject,
+  DefaultNodeTemplateConfig,
   DiagramEventMap,
   DiagramInitEvent,
   DraggingActionState,
-  AbsoluteEdgeLabelPosition,
   Edge,
   EdgeDrawCancelReason,
   EdgeDrawEndedEvent,
@@ -107,6 +114,7 @@ export type {
   FlowConfig,
   FlowState,
   FlowStateUpdate,
+  GestureCancelReason,
   GroupingConfig,
   GroupMembershipChangedEvent,
   GroupNode,
@@ -137,8 +145,8 @@ export type {
   Node,
   NodeDragEndedEvent,
   NodeDragStartedEvent,
-  NodeResizeEndedEvent,
   NodeResizedEvent,
+  NodeResizeEndedEvent,
   NodeResizeStartedEvent,
   NodeRotateEndedEvent,
   NodeRotateStartedEvent,
@@ -166,6 +174,7 @@ export type {
   SelectionRotatedEvent,
   ShortcutActionName,
   ShortcutDefinition,
+  Side,
   SimpleNode,
   Size,
   SnappingConfig,

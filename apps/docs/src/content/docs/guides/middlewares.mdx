@@ -299,6 +299,41 @@ export const myCustomMiddleware: Middleware = {
 
 However, you should avoid long-running async operations in middlewares as they can block the UI.
 
+An uncaught error thrown inside a middleware rejects the in-flight update: the promise returned
+by the mutating service call rejects and the update is discarded, while the diagram keeps
+working. Prefer handling expected failures yourself and calling `cancel()`, as shown above.
+
+:::danger[Never await mutating calls from inside a middleware]
+The middleware chain runs inside a non-reentrant update lock. Since promises returned by
+mutating service methods and `emit` resolve only after the state has been committed, awaiting
+one of them from inside a middleware waits on the very lock your middleware is holding — the
+update never completes and the diagram freezes.
+
+```typescript
+export const badMiddleware: Middleware = {
+  name: 'deadlock',
+  execute: async (context, next) => {
+    // ❌ Deadlock: this promise resolves only after the current update
+    // finishes, but the current update is waiting for this middleware.
+    await modelService.updateNode('node-1', { data: { flagged: true } });
+    next();
+  },
+};
+
+export const goodMiddleware: Middleware = {
+  name: 'fire-and-forget',
+  execute: (context, next) => {
+    // ✅ Fire-and-forget: the update queues safely behind the current one.
+    void modelService.updateNode('node-1', { data: { flagged: true } });
+    // ✅ Or better: modify the current update directly.
+    next({ nodesToUpdate: [{ id: 'node-1', data: { flagged: true } }] });
+  },
+};
+```
+
+To transform the update that is currently in flight, pass a `FlowStateUpdate` to `next()` instead.
+:::
+
 ## Best Practices
 
 ### Performance

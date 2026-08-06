@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
 import type { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
-import { mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
+import { flushMicrotasks, mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
+import type { DraggingActionState } from './types/action-state.interface';
 import type { Edge } from './types/edge.interface';
 import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
@@ -13,6 +14,13 @@ import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
 import type { TransactionOptions } from './types/transaction.interface';
+
+const draggingState = (movementStarted = true): DraggingActionState => ({
+  nodeIds: [],
+  modifiers: { primary: false, secondary: false, shift: false, meta: false },
+  accumulatedDeltas: new Map(),
+  movementStarted,
+});
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
@@ -115,6 +123,7 @@ describe('FlowCore', () => {
       emit: vi.fn(),
       register: vi.fn(),
       registerDefaultCallbacks: vi.fn(),
+      cancel: vi.fn().mockResolvedValue(true),
     } as unknown as InputEventsRouter;
 
     // Reset all mocks
@@ -221,6 +230,175 @@ describe('FlowCore', () => {
       // Should still have default values for other config properties
       expect(flowCore.config.computeNodeId).toBeDefined();
       expect(flowCore.config.linking.portSnapDistance).toBe(10); // default value
+    });
+  });
+
+  describe('port recreation in the same tick', () => {
+    const measuredPort = {
+      id: 'port-1',
+      nodeId: 'node1',
+      type: 'source' as const,
+      side: 'left' as const,
+      size: { width: 10, height: 10 },
+      position: { x: 0, y: 0 },
+    };
+
+    beforeEach(() => {
+      mockModelLookup.getNodeById.mockReturnValue({ ...mockNode, id: 'node1', measuredPorts: [measuredPort] });
+    });
+
+    it('should re-apply side and type from a cancelled add as a port update', async () => {
+      flowCore.internalUpdater.deletePort('node1', 'port-1');
+      flowCore.internalUpdater.addPort('node1', { id: 'port-1', nodeId: 'node1', type: 'target', side: 'right' });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(mockCommandHandler.emit).toHaveBeenCalledWith('updatePortsBulk', {
+        updates: new Map([
+          [
+            'node1',
+            [{ portId: 'port-1', portChanges: { id: 'port-1', nodeId: 'node1', side: 'right', type: 'target' } }],
+          ],
+        ]),
+      });
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('addPortsBulk', expect.anything());
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('deletePortsBulk', expect.anything());
+    });
+
+    it('should not emit any port update when the recreated port has unchanged side and type', async () => {
+      flowCore.internalUpdater.deletePort('node1', 'port-1');
+      flowCore.internalUpdater.addPort('node1', { id: 'port-1', nodeId: 'node1', type: 'source', side: 'left' });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('updatePortsBulk', expect.anything());
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('addPortsBulk', expect.anything());
+      expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('deletePortsBulk', expect.anything());
+    });
+  });
+
+  describe('cancelActiveInteraction', () => {
+    it('should return false and cancel nothing when no gesture is active', async () => {
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(result).toBe(false);
+      expect(mockEventRouter.cancel).not.toHaveBeenCalled();
+    });
+
+    it('should run registered interaction cleanups', async () => {
+      const cleanup = vi.fn();
+      flowCore.registerInteractionCleanup(cleanup);
+
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).toHaveBeenCalledTimes(1);
+      expect(result).toBe(true);
+    });
+
+    it('should not run unregistered cleanups', async () => {
+      const cleanup = vi.fn();
+      const unregister = flowCore.registerInteractionCleanup(cleanup);
+      unregister();
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).not.toHaveBeenCalled();
+    });
+
+    it('should not run a cleanup twice across two cancellations', async () => {
+      const cleanup = vi.fn();
+      flowCore.registerInteractionCleanup(cleanup);
+
+      await flowCore.cancelActiveInteraction();
+      await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).toHaveBeenCalledTimes(1);
+    });
+
+    it('should route linking cancellation to the linking handler', async () => {
+      flowCore.actionStateManager.linking = { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null };
+
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('linking');
+      expect(result).toBe(true);
+    });
+
+    it('should cancel every active gesture', async () => {
+      flowCore.actionStateManager.dragging = draggingState();
+      flowCore.actionStateManager.panning = { active: true };
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('pointerMoveSelection');
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('panning');
+      expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('resize');
+      expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('rotate');
+    });
+
+    it('should still cancel the remaining gestures and rethrow when one cancel fails', async () => {
+      flowCore.actionStateManager.dragging = draggingState();
+      flowCore.actionStateManager.panning = { active: true };
+      const error = new Error('cancel failed');
+      (mockEventRouter.cancel as Mock).mockImplementation((name: string) =>
+        name === 'pointerMoveSelection' ? Promise.reject(error) : Promise.resolve()
+      );
+
+      await expect(flowCore.cancelActiveInteraction()).rejects.toBe(error);
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('panning');
+    });
+  });
+
+  describe('hasActiveInteraction', () => {
+    it('should return false when nothing is active', () => {
+      expect(flowCore.hasActiveInteraction()).toBe(false);
+    });
+
+    it('should return true for each active gesture state', () => {
+      flowCore.actionStateManager.linking = { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearLinking();
+
+      flowCore.actionStateManager.dragging = draggingState(false);
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearDragging();
+
+      flowCore.actionStateManager.resize = {
+        startWidth: 1,
+        startHeight: 1,
+        startX: 0,
+        startY: 0,
+        startNodePositionX: 0,
+        startNodePositionY: 0,
+        resizingNode: mockNode,
+      };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearResize();
+
+      flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n1' };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearRotation();
+
+      flowCore.actionStateManager.panning = { active: true };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearPanning();
+
+      expect(flowCore.hasActiveInteraction()).toBe(false);
+    });
+
+    it('should return true when only a listener cleanup is registered', () => {
+      flowCore.registerInteractionCleanup(vi.fn());
+
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+    });
+
+    it('should return false again after cancelActiveInteraction tears down registered cleanups', async () => {
+      flowCore.registerInteractionCleanup(vi.fn());
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(flowCore.hasActiveInteraction()).toBe(false);
     });
   });
 
@@ -559,6 +737,82 @@ describe('FlowCore', () => {
       await flowCore.transaction(async () => {});
 
       expect(mockMiddlewareManager.execute).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('trackMeasurements', () => {
+    // Suspends the next middleware pass, holding the update semaphore until released.
+    const holdPass = (): (() => void) => {
+      let release!: () => void;
+      mockMiddlewareManager.execute.mockReturnValue(
+        new Promise((resolve) => {
+          release = () => resolve(undefined);
+        })
+      );
+      return release;
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should open the round immediately when the update pipeline is idle', async () => {
+      const settled = vi.fn();
+      void flowCore.trackMeasurements(['node:n1']).then(settled);
+      await flushMicrotasks();
+
+      expect(flowCore.measurementTracker.hasPendingMeasurements()).toBe(true);
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(settled).toHaveBeenCalled();
+    });
+
+    it('should defer opening the round until the in-flight pass releases the semaphore', async () => {
+      // A pass held open by a slow middleware would otherwise let the discovery
+      // window expire before the queued measurements can signal.
+      const releasePass = holdPass();
+      const pass = flowCore.applyUpdate({}, 'slowAction');
+
+      const settled = vi.fn();
+      void flowCore.trackMeasurements(['node:n1']).then(settled);
+      await flushMicrotasks();
+      expect(flowCore.measurementTracker.hasPendingMeasurements()).toBe(false);
+
+      releasePass();
+      await pass;
+      await flushMicrotasks();
+      expect(flowCore.measurementTracker.hasPendingMeasurements()).toBe(true);
+
+      // The round settles normally once open.
+      flowCore.measurementTracker.signalMeasurement('node:n1');
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(settled).toHaveBeenCalled();
+    });
+
+    it('should not consume a tracking request staged by a concurrent commit', async () => {
+      const releasePass = holdPass();
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: { nodesToAdd: [mockNode] },
+        commandsCount: 1,
+        actionTypes: ['addNodes'],
+      });
+
+      // The commit stages its request under the held semaphore; the out-of-band
+      // registration queues behind it and must leave the staged request alone.
+      const commit = flowCore.transaction(async () => {}, { waitForMeasurements: true });
+      await flushMicrotasks();
+      const tracked = flowCore.trackMeasurements(['node:n1']);
+      await flushMicrotasks();
+
+      expect(flowCore.measurementTracker.isTrackingRequested()).toBe(true);
+
+      releasePass();
+      await vi.advanceTimersByTimeAsync(1000);
+      await Promise.all([commit, tracked]);
     });
   });
 });

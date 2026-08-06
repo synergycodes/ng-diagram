@@ -1,4 +1,5 @@
 // Commands
+export * from './cancel-linking';
 export * from './finish-linking';
 export * from './finish-linking-to-position';
 export * from './move-temporary-edge';

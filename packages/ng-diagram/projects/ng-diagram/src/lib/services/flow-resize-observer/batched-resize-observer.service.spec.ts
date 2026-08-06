@@ -91,38 +91,66 @@ describe('BatchResizeObserverService', () => {
         { target: document.createElement('div') },
         { target: document.createElement('span') },
       ] as unknown as ResizeObserverEntry[];
+      const captured = mockEntries.map((entry) => ({ entry, resizingNodeId: undefined }));
 
       const processor = vi.fn();
-      service.configure({ processBatch: processor });
+      service.configure({ processBatch: processor, activeResizeNodeId: () => undefined });
 
-      service['pendingEntries'] = [...mockEntries];
+      service['pendingEntries'] = new Map(captured.map((c) => [c.entry.target, c]));
       service['rafId'] = 123;
 
       service['processBatch']();
 
-      expect(service['pendingEntries']).toEqual([]);
+      expect(service['pendingEntries'].size).toBe(0);
       expect(service['rafId']).toBeNull();
-      expect(processor).toHaveBeenCalledWith(mockEntries);
+      expect(processor).toHaveBeenCalledWith(captured);
     });
 
     it('should not call batch processor if no entries', () => {
       const processor = vi.fn();
-      service.configure({ processBatch: processor });
+      service.configure({ processBatch: processor, activeResizeNodeId: () => undefined });
 
-      service['pendingEntries'] = [];
+      service['pendingEntries'] = new Map();
       service['processBatch']();
 
       expect(processor).not.toHaveBeenCalled();
     });
 
     it('should not throw if batch processor is not set', () => {
-      service['pendingEntries'] = [
-        {
-          target: document.createElement('div'),
-        } as unknown as ResizeObserverEntry,
-      ];
+      const el = document.createElement('div');
+      const entry = { target: el } as unknown as ResizeObserverEntry;
+      service['pendingEntries'] = new Map([[el, { entry, resizingNodeId: undefined }]]);
 
       expect(() => service['processBatch']()).not.toThrow();
+    });
+
+    it('should keep only the newest measurement per element', () => {
+      const el = document.createElement('div');
+      // Distinguishable payloads — "newest wins" must hold for the measurement,
+      // not just the stamp
+      const stale = {
+        target: el,
+        borderBoxSize: [{ inlineSize: 300, blockSize: 200 }],
+      } as unknown as ResizeObserverEntry;
+      const fresh = {
+        target: el,
+        borderBoxSize: [{ inlineSize: 100, blockSize: 50 }],
+      } as unknown as ResizeObserverEntry;
+      const other = { target: document.createElement('span') } as unknown as ResizeObserverEntry;
+
+      const processor = vi.fn();
+      const activeResizeNodeId = vi.fn().mockReturnValueOnce('n1').mockReturnValueOnce(undefined);
+      service.configure({ processBatch: processor, activeResizeNodeId });
+      const resizeObserverCallback = (global.ResizeObserver as Mock).mock.calls[0][0];
+
+      resizeObserverCallback([stale, other]);
+      resizeObserverCallback([fresh]);
+      service['processBatch']();
+
+      expect(processor).toHaveBeenCalledWith([
+        { entry: fresh, resizingNodeId: undefined },
+        { entry: other, resizingNodeId: 'n1' },
+      ]);
     });
   });
 
@@ -134,8 +162,27 @@ describe('BatchResizeObserverService', () => {
 
       resizeObserverCallback(mockEntries);
 
-      expect(service['pendingEntries']).toEqual(mockEntries);
+      expect([...service['pendingEntries'].values()]).toEqual(
+        mockEntries.map((entry) => ({ entry, resizingNodeId: undefined }))
+      );
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
+    });
+
+    it('should stamp entries with the resizing node id sampled at delivery time', () => {
+      const entryDuring = { target: document.createElement('div') } as unknown as ResizeObserverEntry;
+      const entryAfter = { target: document.createElement('span') } as unknown as ResizeObserverEntry;
+      const activeResizeNodeId = vi.fn().mockReturnValueOnce('n1').mockReturnValueOnce(undefined);
+      service.configure({ processBatch: vi.fn(), activeResizeNodeId });
+
+      const resizeObserverCallback = (global.ResizeObserver as Mock).mock.calls[0][0];
+
+      resizeObserverCallback([entryDuring]);
+      resizeObserverCallback([entryAfter]);
+
+      expect([...service['pendingEntries'].values()]).toEqual([
+        { entry: entryDuring, resizingNodeId: 'n1' },
+        { entry: entryAfter, resizingNodeId: undefined },
+      ]);
     });
 
     it('should not schedule multiple RAFs if one is already pending', () => {
@@ -320,6 +367,16 @@ describe('BatchResizeObserverService', () => {
       expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
       expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el1);
     });
+
+    it('should return the invalidated entity key', () => {
+      service.observe(document.createElement('div'), { type: 'node', nodeId: 'n1' });
+
+      expect(service.invalidateNode('n1')).toEqual(['node:n1']);
+    });
+
+    it('should return no entity key for an unknown nodeId', () => {
+      expect(service.invalidateNode('unknown')).toEqual([]);
+    });
   });
 
   describe('invalidateEdgeLabels', () => {
@@ -358,6 +415,16 @@ describe('BatchResizeObserverService', () => {
 
       expect(mockResizeObserver.observe).not.toHaveBeenCalled();
     });
+
+    it('should return the invalidated entity key', () => {
+      service.observe(document.createElement('div'), { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+
+      expect(service.invalidateEdgeLabels('e1')).toEqual(['edge:e1']);
+    });
+
+    it('should return no entity key for an unknown edgeId', () => {
+      expect(service.invalidateEdgeLabels('unknown')).toEqual([]);
+    });
   });
 
   describe('invalidateAll', () => {
@@ -384,6 +451,18 @@ describe('BatchResizeObserverService', () => {
 
       expect(mockResizeObserver.observe).not.toHaveBeenCalled();
     });
+
+    it('should return one entity key per invalidated entity, deduplicated across its elements', () => {
+      service.observe(document.createElement('div'), { type: 'node', nodeId: 'n1' });
+      service.observe(document.createElement('span'), { type: 'port', nodeId: 'n1', portId: 'p1' });
+      service.observe(document.createElement('p'), { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+
+      expect(service.invalidateAll().sort()).toEqual(['edge:e1', 'node:n1']);
+    });
+
+    it('should return no entity keys when nothing is observed', () => {
+      expect(service.invalidateAll()).toEqual([]);
+    });
   });
 
   describe('observer initialization', () => {
@@ -393,7 +472,7 @@ describe('BatchResizeObserverService', () => {
     });
 
     it('should initialize with empty state', () => {
-      expect(service['pendingEntries']).toEqual([]);
+      expect(service['pendingEntries'].size).toBe(0);
       expect(service['rafId']).toBeNull();
     });
   });

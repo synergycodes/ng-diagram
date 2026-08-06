@@ -36,7 +36,7 @@ The position of the port in the node.
 
 ### side
 
-> **side**: [`PortSide`](/docs/api/types/model/portside/)
+> **side**: [`Side`](/docs/api/types/model/side/)
 
 The side of the node that the port is on.
 

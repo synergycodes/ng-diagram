@@ -69,6 +69,7 @@ title: "ng-diagram"
 
 - [BackgroundConfig](/docs/api/types/configuration/features/backgroundconfig/)
 - [BoxSelectionConfig](/docs/api/types/configuration/features/boxselectionconfig/)
+- [DefaultNodeTemplateConfig](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
 - [EdgeRoutingConfig](/docs/api/types/configuration/features/edgeroutingconfig/)
 - [GroupingConfig](/docs/api/types/configuration/features/groupingconfig/)
 - [LinkingConfig](/docs/api/types/configuration/features/linkingconfig/)
@@ -120,6 +121,7 @@ title: "ng-diagram"
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
 - [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
 - [EdgeDrawCancelReason](/docs/api/types/events/edgedrawcancelreason/)
+- [GestureCancelReason](/docs/api/types/events/gesturecancelreason/)
 
 ## Types/Geometry
 
@@ -154,6 +156,7 @@ title: "ng-diagram"
 - [EdgeLabel](/docs/api/types/model/edgelabel/)
 - [FlowState](/docs/api/types/model/flowstate/)
 - [GroupNode](/docs/api/types/model/groupnode/)
+- [InitializeModelOptions](/docs/api/types/model/initializemodeloptions/)
 - [Metadata](/docs/api/types/model/metadata/)
 - [Model](/docs/api/types/model/model/)
 - [ModelAdapter](/docs/api/types/model/modeladapter/)
@@ -167,6 +170,9 @@ title: "ng-diagram"
 - [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)
 - [PortSide](/docs/api/types/model/portside/)
+- [Side](/docs/api/types/model/side/)
+- [StripEdgeRuntimePropertiesFn](/docs/api/types/model/stripedgeruntimepropertiesfn/)
+- [StripNodeRuntimePropertiesFn](/docs/api/types/model/stripnoderuntimepropertiesfn/)
 
 ## Types/Palette
 
@@ -197,3 +203,5 @@ title: "ng-diagram"
 - [initializeModel](/docs/api/utilities/initializemodel/)
 - [initializeModelAdapter](/docs/api/utilities/initializemodeladapter/)
 - [provideNgDiagram](/docs/api/utilities/providengdiagram/)
+- [stripEdgeRuntimeProperties](/docs/api/utilities/stripedgeruntimeproperties/)
+- [stripNodeRuntimeProperties](/docs/api/utilities/stripnoderuntimeproperties/)

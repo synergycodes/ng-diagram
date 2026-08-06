@@ -45,7 +45,7 @@ By default, it is set to 'center'.
 
 ### side
 
-> **side**: `InputSignal`\<[`PortSide`](/docs/api/types/model/portside/)\>
+> **side**: `InputSignal`\<[`Side`](/docs/api/types/model/side/)\>
 
 The side of the node where the port is rendered (e.g., top, right, bottom, left).
 

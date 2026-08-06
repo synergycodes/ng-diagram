@@ -67,6 +67,42 @@ The snap size for the node while resizing, or null.
 
 ***
 
+### computeSnapOffsetForNodeSize()
+
+> **computeSnapOffsetForNodeSize**: (`node`) => `null` \| [`Size`](/docs/api/types/geometry/size/)
+
+Computes the snap offset for a node while resizing. The snapped size follows the
+sequence `offset + n * snap` per axis, so a node with a 60px header snapping every
+50px can snap to 60, 110, 160, ... instead of 50, 100, 150, ...
+If null is returned, [defaultResizeSnapOffset](/docs/api/types/configuration/features/snappingconfig/#defaultresizesnapoffset) is used.
+If computeSnapOffsetForNodeSize is used, it takes precedence over defaultResizeSnapOffset.
+
+#### Parameters
+
+##### node
+
+[`Node`](/docs/api/types/model/node/)
+
+The node to compute the snap offset for resizing.
+
+#### Returns
+
+`null` \| [`Size`](/docs/api/types/geometry/size/)
+
+The snap offset for the node while resizing, or null.
+
+#### Default
+
+```ts
+() => null
+```
+
+#### Since
+
+1.3.0
+
+***
+
 ### defaultDragSnap
 
 > **defaultDragSnap**: [`Size`](/docs/api/types/geometry/size/)
@@ -93,6 +129,26 @@ The default snap size for node resizing.
 ```ts
 { width: 10, height: 10 }
 ```
+
+***
+
+### defaultResizeSnapOffset
+
+> **defaultResizeSnapOffset**: [`Size`](/docs/api/types/geometry/size/)
+
+The default snap offset for node resizing. The snapped size follows the
+sequence `offset + n * snap` per axis (see [computeSnapOffsetForNodeSize](/docs/api/types/configuration/features/snappingconfig/#computesnapoffsetfornodesize)).
+If computeSnapOffsetForNodeSize is used, it takes precedence over this value.
+
+#### Default
+
+```ts
+{ width: 0, height: 0 }
+```
+
+#### Since
+
+1.3.0
 
 ***
 

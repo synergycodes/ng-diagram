@@ -2,7 +2,7 @@ import type { Model } from 'ng-diagram';
 
 /**
  * Deterministic seed model used by the e2e harness. Tests can override it via
- * `window.__ngDiagramSeed__` before navigation; otherwise this is rendered.
+ * `window.__diagramSeed` before navigation; otherwise this is rendered.
  *
  * Keep IDs stable — tests reference them directly.
  */

@@ -88,6 +88,17 @@ export const showcaseProjects: ShowcaseProject[] = [
     authorUrl: 'https://github.com/karoljaskolka',
   },
   {
+    title: 'BPMN Editor',
+    description:
+      'Interactive BPMN process editor with events, activities, and gateways, typed connection styles, and swimlanes built as ngDiagram groups - featuring live lane resizing, per-lane ELK.js auto-layout, inline label editing, and a drag-and-drop shape palette.',
+    image: 'bpmn-editor.png',
+    imageAlt: 'Screenshot of the BPMN Editor showing a process diagram with swimlanes',
+    href: 'https://synergycodes.github.io/bpmn-editor/',
+    codeHref: 'https://github.com/synergycodes/bpmn-editor',
+    author: 'Synergy Codes',
+    authorUrl: 'https://www.synergycodes.com/',
+  },
+  {
     title: 'World Cup Chart',
     description:
       'An interactive FIFA World Cup 2026 chart that visualizes group standings and the knockout bracket, with collapsible group nodes and live match results, scorers, and assists.',
