@@ -4,6 +4,7 @@ import {
   NgDiagramBackgroundComponent,
   NgDiagramClipboardService,
   NgDiagramComponent,
+  NgDiagramEdgeTemplateMap,
   NgDiagramGroupsService,
   NgDiagramModelService,
   NgDiagramNodeService,
@@ -15,6 +16,7 @@ import {
 } from 'ng-diagram';
 import type { HarnessBridge } from './api';
 import { DEFAULT_E2E_MODEL } from './default-model';
+import { LabelledEdgeComponent } from './labelled-edge.component';
 import { ResizeSidesNodeComponent } from './resize-sides-node.component';
 
 declare global {
@@ -33,6 +35,7 @@ declare global {
         [model]="model()"
         [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
+        [edgeTemplateMap]="edgeTemplateMap"
         (diagramInit)="onDiagramInit()"
       >
         <ng-diagram-background type="grid"></ng-diagram-background>
@@ -61,6 +64,7 @@ export class HarnessComponent {
   readonly model = signal(initializeModel(window.__diagramSeed ?? DEFAULT_E2E_MODEL));
   readonly config = window.__diagramConfig ?? {};
   readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([['resize-sides', ResizeSidesNodeComponent]]);
+  readonly edgeTemplateMap = new NgDiagramEdgeTemplateMap([['labelled', LabelledEdgeComponent]]);
 
   onDiagramInit(): void {
     window.__diagram = {
