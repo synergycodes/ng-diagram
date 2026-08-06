@@ -143,9 +143,11 @@ export class Diagram {
   /**
    * Drag a resize handle (`top-left`, `bottom-right`, …) or a resize line
    * (`top`, `right`, `bottom`, `left`) of an already selected node by the
-   * given delta (client px).
+   * given delta (client px). With `fastRelease` the pointer is released while
+   * still moving — no frame wait between the last move and the pointerup, so
+   * both land in the same frame (the "fast release" from discussion #771).
    */
-  async dragResizeHandle(id: string, handle: string, delta: Point): Promise<void> {
+  async dragResizeHandle(id: string, handle: string, delta: Point, opts?: { fastRelease?: boolean }): Promise<void> {
     const locator = this.node(id).locator(`.resize-handle--${handle}, .resize-line--${handle}`);
     const box = await requireBox(locator, `resize handle "${handle}" of node "${id}"`);
     // Grab lines off-center — the middle of a side line can overlap a port
@@ -156,7 +158,7 @@ export class Diagram {
           y: box.y + box.height * (handle === 'top' || handle === 'bottom' ? 0.5 : 0.3),
         }
       : centerOf(box);
-    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y }, { settleFrame: !opts?.fastRelease });
   }
 
   /** Pan the canvas from an empty corner by a delta. */
@@ -167,15 +169,17 @@ export class Diagram {
   }
 
   /** Begin a drag: pointer-down plus moves WITHOUT the release — the gesture stays in flight. */
-  async beginDrag(from: Point, to: Point): Promise<void> {
+  async beginDrag(from: Point, to: Point, opts?: { settleFrame?: boolean }): Promise<void> {
     const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
     await this.page.mouse.move(from.x, from.y);
     await this.page.mouse.down();
     await this.page.mouse.move(mid.x, mid.y, { steps: 6 });
     await this.page.mouse.move(to.x, to.y, { steps: 6 });
-    // pointermove delivery is frame-aligned in Chromium — give the final
-    // coalesced move a frame to arrive before the caller proceeds
-    await this.nextFrame();
+    if (opts?.settleFrame ?? true) {
+      // pointermove delivery is frame-aligned in Chromium — give the final
+      // coalesced move a frame to arrive before the caller proceeds
+      await this.nextFrame();
+    }
   }
 
   /** Waits one animation frame in the page. */
@@ -184,8 +188,8 @@ export class Diagram {
   }
 
   /** Pointer drag with an intermediate move so the diagram registers a drag rather than a click. */
-  private async pointerDrag(from: Point, to: Point): Promise<void> {
-    await this.beginDrag(from, to);
+  private async pointerDrag(from: Point, to: Point, opts?: { settleFrame?: boolean }): Promise<void> {
+    await this.beginDrag(from, to, opts);
     await this.page.mouse.up();
   }
 }
