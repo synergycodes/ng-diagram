@@ -153,16 +153,13 @@ export class BatchResizeObserverService implements OnDestroy {
    * @returns The entity keys actually invalidated.
    */
   invalidateAll(): string[] {
-    const seen = new Set<Element>();
+    // Each element lives under exactly one entity key (getEntityKeys), and
+    // removeFromEntityIndex drops emptied sets — every element is visited once.
     const entityKeys: string[] = [];
     for (const [key, elements] of this.entityIndex) {
-      if (elements.size === 0) continue;
       entityKeys.push(key);
       for (const element of elements) {
-        if (!seen.has(element)) {
-          seen.add(element);
-          this.invalidate(element);
-        }
+        this.invalidate(element);
       }
     }
     return entityKeys;
@@ -170,7 +167,7 @@ export class BatchResizeObserverService implements OnDestroy {
 
   private invalidateByKey(key: string): string[] {
     const elements = this.entityIndex.get(key);
-    if (!elements || elements.size === 0) return [];
+    if (!elements) return [];
     for (const element of elements) {
       this.invalidate(element);
     }
