@@ -33,9 +33,7 @@ export interface WorkflowNodeData {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class WorkflowNodeComponent
-  implements NgDiagramNodeTemplate<WorkflowNodeData>
-{
+export class WorkflowNodeComponent implements NgDiagramNodeTemplate<WorkflowNodeData> {
   node = input.required<Node<WorkflowNodeData>>();
 
   className = computed(() => `ph ph-${this.node().data.icon}`);

@@ -29,8 +29,10 @@ export interface NgDiagramNodeTemplate<
  * @template Data - The type of data associated with the group node
  * @category Types/Templates
  */
-export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject>
-  extends NgDiagramNodeTemplate<Data, GroupNode<Data>> {}
+export interface NgDiagramGroupNodeTemplate<Data extends DataObject = DataObject> extends NgDiagramNodeTemplate<
+  Data,
+  GroupNode<Data>
+> {}
 
 /**
  * Map that associates node type names with their corresponding Angular component classes.
