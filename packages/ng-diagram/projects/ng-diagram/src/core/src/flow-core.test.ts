@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { CommandHandler } from './command-handler/command-handler';
 import { FlowCore } from './flow-core';
 import type { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
-import { mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
+import { flushMicrotasks, mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
 import type { Edge } from './types/edge.interface';
 import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
@@ -603,6 +603,82 @@ describe('FlowCore', () => {
       await flowCore.transaction(async () => {});
 
       expect(mockMiddlewareManager.execute).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('trackMeasurements', () => {
+    // Suspends the next middleware pass, holding the update semaphore until released.
+    const holdPass = (): (() => void) => {
+      let release!: () => void;
+      mockMiddlewareManager.execute.mockReturnValue(
+        new Promise((resolve) => {
+          release = () => resolve(undefined);
+        })
+      );
+      return release;
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should open the round immediately when the update pipeline is idle', async () => {
+      const settled = vi.fn();
+      void flowCore.trackMeasurements(['node:n1']).then(settled);
+      await flushMicrotasks();
+
+      expect(flowCore.measurementTracker.hasPendingMeasurements()).toBe(true);
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(settled).toHaveBeenCalled();
+    });
+
+    it('should defer opening the round until the in-flight pass releases the semaphore', async () => {
+      // A pass held open by a slow middleware would otherwise let the discovery
+      // window expire before the queued measurements can signal.
+      const releasePass = holdPass();
+      const pass = flowCore.applyUpdate({}, 'slowAction');
+
+      const settled = vi.fn();
+      void flowCore.trackMeasurements(['node:n1']).then(settled);
+      await flushMicrotasks();
+      expect(flowCore.measurementTracker.hasPendingMeasurements()).toBe(false);
+
+      releasePass();
+      await pass;
+      await flushMicrotasks();
+      expect(flowCore.measurementTracker.hasPendingMeasurements()).toBe(true);
+
+      // The round settles normally once open.
+      flowCore.measurementTracker.signalMeasurement('node:n1');
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(settled).toHaveBeenCalled();
+    });
+
+    it('should not consume a tracking request staged by a concurrent commit', async () => {
+      const releasePass = holdPass();
+      vi.spyOn(flowCore.transactionManager, 'transaction').mockResolvedValue({
+        results: { nodesToAdd: [mockNode] },
+        commandsCount: 1,
+        actionTypes: ['addNodes'],
+      });
+
+      // The commit stages its request under the held semaphore; the out-of-band
+      // registration queues behind it and must leave the staged request alone.
+      const commit = flowCore.transaction(async () => {}, { waitForMeasurements: true });
+      await flushMicrotasks();
+      const tracked = flowCore.trackMeasurements(['node:n1']);
+      await flushMicrotasks();
+
+      expect(flowCore.measurementTracker.isTrackingRequested()).toBe(true);
+
+      releasePass();
+      await vi.advanceTimersByTimeAsync(1000);
+      await Promise.all([commit, tracked]);
     });
   });
 });

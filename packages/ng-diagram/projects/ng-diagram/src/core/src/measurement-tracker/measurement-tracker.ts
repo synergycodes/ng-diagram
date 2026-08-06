@@ -105,7 +105,28 @@ export class MeasurementTracker {
   registerParticipants(entityIds: string[]): void {
     const config = this.pendingConfig;
     this.pendingConfig = null;
+    this.register(entityIds, config);
+  }
 
+  /**
+   * Registers participants outside the middleware-driven transaction flow — used by
+   * `invalidateMeasurements`, where measurements come from re-observing DOM elements
+   * rather than a state-update pass. Settles like the transaction path (the discovery
+   * window expires on its own, so `waitForMeasurements()` cannot hang), never consumes
+   * a staged tracking request, and joining an active round keeps its window durations
+   * unless an explicit config is given.
+   *
+   * @param entityIds - Prefixed entity IDs (e.g. 'node:abc', 'edge:xyz')
+   */
+  trackParticipants(entityIds: string[], config?: MeasurementTrackingConfig): void {
+    // pendingConfig belongs to the transaction handshake — a staged request survives
+    // this call. A null config keeps the active round's durations (defaults are
+    // restored in resolve()).
+    this.register(entityIds, config ?? null);
+  }
+
+  /** Shared registration body; `null` config keeps the current window durations. */
+  private register(entityIds: string[], config: MeasurementTrackingConfig | null): void {
     if (entityIds.length === 0) return;
 
     if (config) {
@@ -123,21 +144,6 @@ export class MeasurementTracker {
 
     this.phase = 'discoveryWindow';
     this.startTimer(this.discoveryWindow);
-  }
-
-  /**
-   * Registers participants outside the middleware-driven transaction flow and opens the
-   * discovery window immediately — used by `invalidateMeasurements`, where the measurements
-   * are triggered by re-observing DOM elements rather than by a state update pass.
-   *
-   * Settles exactly like the transaction path: the discovery window expires on its own if
-   * no measurement ever arrives, so the promise from `waitForMeasurements()` cannot hang.
-   *
-   * @param entityIds - Prefixed entity IDs (e.g. 'node:abc', 'edge:xyz')
-   */
-  trackParticipants(entityIds: string[], config?: MeasurementTrackingConfig): void {
-    this.requestTracking(config);
-    this.registerParticipants(entityIds);
   }
 
   /**
@@ -231,6 +237,9 @@ export class MeasurementTracker {
     this.participantIds.clear();
     this.clearTimer(this.discoveryWindow);
     this.clearTimer(this.debounce);
+    // Fresh rounds start from the defaults; only an explicit config changes them.
+    this.discoveryWindow.durationMs = DEFAULT_DISCOVERY_WINDOW_TIMEOUT;
+    this.debounce.durationMs = DEFAULT_DEBOUNCE_TIMEOUT;
 
     if (this.settlementResolve) {
       this.settlementResolve();

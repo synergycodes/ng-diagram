@@ -6,14 +6,12 @@ import {
   DEFAULT_DISCOVERY_WINDOW_TIMEOUT,
   MeasurementTracker,
 } from '../../core/src/measurement-tracker/measurement-tracker';
+import { flushMicrotasks } from '../../core/src/test-utils';
 import { BatchResizeObserverService } from '../services/flow-resize-observer/batched-resize-observer.service';
 import { FlowCoreProviderService } from '../services/flow-core-provider/flow-core-provider.service';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
 import { RendererService } from '../services/renderer/renderer.service';
 import { NgDiagramService } from './ng-diagram.service';
-
-/** Resolves once the microtask queue has drained, so a settled promise can be observed. */
-const flushMicrotasks = () => Promise.resolve().then(() => undefined);
 
 const settled = async (promise: Promise<void>): Promise<boolean> => {
   let done = false;
@@ -31,6 +29,7 @@ describe('NgDiagramService', () => {
     invalidateEdgeLabels: ReturnType<typeof vi.fn>;
   };
   let provide: ReturnType<typeof vi.fn>;
+  let trackMeasurements: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -42,7 +41,13 @@ describe('NgDiagramService', () => {
       invalidateEdgeLabels: vi.fn().mockReturnValue([]),
     };
 
-    provide = vi.fn().mockReturnValue({ measurementTracker: tracker });
+    // Mirrors FlowCore.trackMeasurements against the real tracker, minus the
+    // update-semaphore serialization (exercised in flow-core.test.ts).
+    trackMeasurements = vi.fn((entityIds: string[]) => {
+      tracker.trackParticipants(entityIds);
+      return tracker.waitForMeasurements();
+    });
+    provide = vi.fn().mockReturnValue({ trackMeasurements });
 
     TestBed.configureTestingModule({
       providers: [
@@ -76,21 +81,43 @@ describe('NgDiagramService', () => {
       await expect(promise).resolves.toBeUndefined();
     });
 
-    it('should resolve a full invalidation only after the measurements have been applied', async () => {
-      batchResizeObserver.invalidateAll.mockReturnValue(['node:n1', 'edge:e1']);
+    it.each([
+      {
+        label: 'full',
+        setup: () => batchResizeObserver.invalidateAll.mockReturnValue(['node:n1', 'edge:e1']),
+        options: undefined,
+        signal: 'node:n1',
+      },
+      {
+        label: 'selective node',
+        setup: () => batchResizeObserver.invalidateNode.mockReturnValue(['node:n1']),
+        options: { nodes: [{ nodeId: 'n1' }] },
+        signal: 'node:n1',
+      },
+      {
+        label: 'edge-label',
+        setup: () => batchResizeObserver.invalidateEdgeLabels.mockReturnValue(['edge:e1']),
+        options: { edges: [{ edgeId: 'e1' }] },
+        signal: 'edge:e1',
+      },
+    ])(
+      'should resolve a $label invalidation only after the measurements have been applied',
+      async ({ setup, options, signal }) => {
+        setup();
 
-      const promise = service.invalidateMeasurements();
+        const promise = service.invalidateMeasurements(options);
 
-      // A measurement arrives mid-discovery — settling now waits out the debounce.
-      await vi.advanceTimersByTimeAsync(20);
-      tracker.signalMeasurement('node:n1');
+        // A measurement arrives mid-discovery — settling now waits out the debounce.
+        await vi.advanceTimersByTimeAsync(20);
+        tracker.signalMeasurement(signal);
 
-      await vi.advanceTimersByTimeAsync(DEFAULT_DEBOUNCE_TIMEOUT - 1);
-      expect(await settled(promise)).toBe(false);
+        await vi.advanceTimersByTimeAsync(DEFAULT_DEBOUNCE_TIMEOUT - 1);
+        expect(await settled(promise)).toBe(false);
 
-      await vi.advanceTimersByTimeAsync(1);
-      expect(await settled(promise)).toBe(true);
-    });
+        await vi.advanceTimersByTimeAsync(1);
+        expect(await settled(promise)).toBe(true);
+      }
+    );
 
     it('should invalidate only the targeted nodes and edges', async () => {
       batchResizeObserver.invalidateNode.mockReturnValue(['node:n1']);
@@ -104,21 +131,6 @@ describe('NgDiagramService', () => {
 
       await vi.advanceTimersByTimeAsync(DEFAULT_DISCOVERY_WINDOW_TIMEOUT);
       await expect(promise).resolves.toBeUndefined();
-    });
-
-    it('should resolve a selective invalidation only after the measurements have been applied', async () => {
-      batchResizeObserver.invalidateNode.mockReturnValue(['node:n1']);
-
-      const promise = service.invalidateMeasurements({ nodes: [{ nodeId: 'n1' }] });
-
-      await vi.advanceTimersByTimeAsync(20);
-      tracker.signalMeasurement('node:n1');
-
-      await vi.advanceTimersByTimeAsync(DEFAULT_DEBOUNCE_TIMEOUT - 1);
-      expect(await settled(promise)).toBe(false);
-
-      await vi.advanceTimersByTimeAsync(1);
-      expect(await settled(promise)).toBe(true);
     });
 
     it('should track only the entities that actually had observed elements', async () => {
@@ -165,7 +177,7 @@ describe('NgDiagramService', () => {
       expect(() => service.invalidateMeasurements({ nodes: [{ nodeId: 'n1' }] })).not.toThrow();
 
       expect(batchResizeObserver.invalidateNode).toHaveBeenCalledWith('n1');
-      expect(tracker.hasPendingMeasurements()).toBe(true);
+      expect(trackMeasurements).toHaveBeenCalledWith(['node:n1']);
     });
 
     it('should resolve a full invalidation immediately when nothing is observed', async () => {
@@ -182,21 +194,6 @@ describe('NgDiagramService', () => {
       expect(batchResizeObserver.invalidateAll).not.toHaveBeenCalled();
       expect(batchResizeObserver.invalidateNode).not.toHaveBeenCalled();
       expect(batchResizeObserver.invalidateEdgeLabels).not.toHaveBeenCalled();
-      expect(await settled(promise)).toBe(true);
-    });
-
-    it('should resolve an edge-label invalidation only after the label measurements have been applied', async () => {
-      batchResizeObserver.invalidateEdgeLabels.mockReturnValue(['edge:e1']);
-
-      const promise = service.invalidateMeasurements({ edges: [{ edgeId: 'e1' }] });
-
-      await vi.advanceTimersByTimeAsync(20);
-      tracker.signalMeasurement('edge:e1');
-
-      await vi.advanceTimersByTimeAsync(DEFAULT_DEBOUNCE_TIMEOUT - 1);
-      expect(await settled(promise)).toBe(false);
-
-      await vi.advanceTimersByTimeAsync(1);
       expect(await settled(promise)).toBe(true);
     });
 

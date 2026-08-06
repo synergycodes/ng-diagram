@@ -698,5 +698,69 @@ describe('MeasurementTracker', () => {
       vi.advanceTimersByTime(50);
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
+
+    it('should preserve a staged request even for an empty participant list', () => {
+      tracker.requestTracking();
+
+      tracker.trackParticipants([]);
+
+      expect(tracker.isTrackingRequested()).toBe(true);
+    });
+
+    it('should keep the active round durations when joining without explicit config', () => {
+      tracker.requestTracking({ discoveryWindowMs: 200, debounceMs: 100 });
+      tracker.registerParticipants(['node:tx']);
+
+      // 100ms into the 200ms window an invalidation joins the round — the restart
+      // must reuse the round's 200ms duration, not shrink it to the 70ms default.
+      vi.advanceTimersByTime(100);
+      tracker.trackParticipants(['node:invalidated']);
+
+      vi.advanceTimersByTime(199);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should apply an explicit config when joining an active round', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 200, debounceMs: 100 });
+
+      tracker.trackParticipants(['node:node2'], { discoveryWindowMs: 30, debounceMs: 20 });
+
+      vi.advanceTimersByTime(29);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should return to defaults for a fresh round after a custom round settles', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 200, debounceMs: 100 });
+      vi.advanceTimersByTime(200);
+
+      tracker.trackParticipants(['node:node2']);
+
+      vi.advanceTimersByTime(DEFAULT_DISCOVERY_WINDOW_TIMEOUT - 1);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should keep the staged config for the transaction that staged it', () => {
+      tracker.requestTracking({ discoveryWindowMs: 200, debounceMs: 100 });
+      tracker.trackParticipants(['node:invalidated']);
+
+      // The middleware's first pass registers the transaction's participants —
+      // its 200ms discovery window must apply, not the invalidation's default.
+      tracker.registerParticipants(['node:tx']);
+
+      vi.advanceTimersByTime(199);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
   });
 });

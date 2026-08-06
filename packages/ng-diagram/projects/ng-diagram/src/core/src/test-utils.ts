@@ -77,6 +77,11 @@ export const mockEdgeLabel: EdgeLabel = {
 /** Yields one macrotask — lets fire-and-forget emits and transactions settle. */
 export const macrotask = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+/** Drains the microtask queue — lets awaited-but-timerless chains (e.g. semaphore hops) settle. */
+export const flushMicrotasks = async () => {
+  for (let i = 0; i < 5; i++) await Promise.resolve();
+};
+
 /** In-memory ModelAdapter for integration tests — real reads/writes, spied lifecycle. */
 export const createInMemoryModelAdapter = (): ModelAdapter => {
   let nodes: Node[] = [];

@@ -255,41 +255,35 @@ Optional. Specifies which elements to re-measure.
 
 `Promise`\<`void`\>
 
-A promise that resolves once the triggered re-measurements have settled
-(returned since 1.3.0; safe to ignore when the fresh geometry is not needed).
-After awaiting it, the invalidated elements' `size`, `measuredPorts` and
-`measuredLabels` read fresh.
+A promise that resolves once the triggered re-measurements have settled —
+the invalidated elements' `size`, `measuredPorts` and `measuredLabels` then read
+fresh (returned since 1.3.0; safe to ignore).
 
 #### Remarks
 
-Resolution is **settle-based**, using the same mechanism as the transaction
-`waitForMeasurements` option: a discovery window opens, and once measurements start
-arriving a rolling debounce waits for them to stop. Consequences:
+Resolution is settle-based, like the transaction `waitForMeasurements` option: a
+discovery window opens and a rolling debounce waits for measurements to stop.
 
-- An invalidated element that never delivers a new measurement (it is unmounted,
-  has zero size, or simply did not change) does not stall the promise — the
-  discovery window expires and the promise resolves.
-- Targets that are not currently rendered/observed at all resolve immediately.
-- Measurements triggered concurrently by other work settle together with these, so
-  the promise may resolve slightly later than this call's own measurements.
+- The promise never hangs: an element that delivers no new measurement (unmounted,
+  zero-size, or unchanged) settles on window expiry; when nothing matching the
+  request is observed, it resolves immediately.
+- Concurrent measurements settle together with these, and updates in flight at
+  call time are waited out, so the promise may resolve slightly later.
+- Do not await this inside an active transaction (re-measurements apply only at
+  commit, so the promise resolves before the fresh geometry lands) or inside a
+  middleware (the update pipeline is not re-entrant — the await deadlocks).
+  Fire-and-forget is safe in both.
 
 #### Example
 
 ```ts
-// Re-measure the entire diagram and wait for the new geometry
-await ngDiagramService.invalidateMeasurements();
+// Re-measure specific nodes (including their ports) and wait for fresh geometry
+await ngDiagramService.invalidateMeasurements({ nodes: [{ nodeId: 'node-1' }] });
 
-// Re-measure specific nodes (including their ports), then reflow their edges
-await ngDiagramService.invalidateMeasurements({
-  nodes: [{ nodeId: 'node-1' }],
-});
+// Re-measure labels on specific edges
+await ngDiagramService.invalidateMeasurements({ edges: [{ edgeId: 'edge-1' }] });
 
-// Re-measure all labels on specific edges
-await ngDiagramService.invalidateMeasurements({
-  edges: [{ edgeId: 'edge-1' }],
-});
-
-// Fire-and-forget is still fine
+// Re-measure the entire diagram, fire-and-forget
 ngDiagramService.invalidateMeasurements();
 ```
 

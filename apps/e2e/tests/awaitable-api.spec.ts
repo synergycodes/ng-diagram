@@ -573,13 +573,7 @@ test.describe('awaited service API matrix', () => {
     diagram,
   }) => {
     await diagram.load({
-      model: {
-        nodes: [
-          { id: 'node-a', position: { x: 80, y: 120 }, data: { label: 'A' } },
-          { id: 'node-b', position: { x: 360, y: 120 }, data: { label: 'B' } },
-        ],
-        edges: [{ id: 'edge-ab', source: 'node-a', target: 'node-b', data: { label: 'link' } }],
-      },
+      model: { ...pair, edges: [{ id: 'edge-ab', source: 'node-a', target: 'node-b', data: { label: 'link' } }] },
     });
 
     const result = await diagram.page.evaluate(async () => {
@@ -605,5 +599,90 @@ test.describe('awaited service API matrix', () => {
     expect(result.fails).toEqual([]);
     // The label is observed, so a real settle cannot beat the tracker's timers.
     expect(result.elapsed).toBeGreaterThanOrEqual(20);
+  });
+
+  test('invalidateMeasurements during a waitForMeasurements commit does not hijack its tracking', async ({
+    diagram,
+  }) => {
+    await diagram.load({ model: pair });
+
+    const result = await diagram.page.evaluate(async () => {
+      const handle = window.__diagram!;
+      const model = handle.model;
+
+      // An invalidation fired mid-commit queues behind the commit and joins its round.
+      // It must neither steal the staged tracking request nor shrink the round's
+      // windows: the addNodes promise must still wait for race-node's measurement.
+      // Measurement passes are held 150ms so a broken round (default 70ms window)
+      // settles before the size arrives; the widened debounce spans those holds.
+      const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+      let fired = false;
+      const unregister = handle.diagram.registerMiddleware({
+        name: 'e2e-invalidate-mid-chain',
+        execute: async (context, next) => {
+          if (context.modelActionTypes.includes('addNodes')) {
+            if (!fired) {
+              fired = true;
+              void handle.diagram.invalidateMeasurements({ nodes: [{ nodeId: 'node-a' }] });
+            }
+          } else if (fired) {
+            await sleep(150);
+          }
+          next();
+        },
+      });
+
+      try {
+        await model.addNodes([{ id: 'race-node', position: { x: 420, y: 240 }, data: { label: 'race' } }], {
+          waitForMeasurements: true,
+          _measurementDiscoveryWindowTimeout: 500,
+          _measurementDebounceTimeout: 300,
+        } as { waitForMeasurements: boolean });
+        const size = model.getNodeById('race-node')?.size;
+        return { fired, width: size?.width ?? 0, height: size?.height ?? 0 };
+      } finally {
+        unregister();
+      }
+    });
+
+    // The middleware must have actually attempted the mid-chain invalidation.
+    expect(result.fired).toBe(true);
+    expect(result.width).toBeGreaterThan(0);
+    expect(result.height).toBeGreaterThan(0);
+  });
+
+  test('invalidateMeasurements is not cut short by a slow in-flight update pass', async ({ diagram }) => {
+    await diagram.load({ model: pair });
+
+    const result = await diagram.page.evaluate(async () => {
+      const handle = window.__diagram!;
+      const model = handle.model;
+      const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      // A slow async middleware holds the update semaphore well past the tracker's
+      // default 70ms discovery window. The awaited invalidation must serialize with
+      // that pass instead of letting its round expire while measurements are queued.
+      const unregister = handle.diagram.registerMiddleware({
+        name: 'e2e-slow-pass',
+        execute: async (_context, next) => {
+          await sleep(250);
+          next();
+        },
+      });
+
+      try {
+        const t0 = performance.now();
+        void model.updateNode('node-b', { position: { x: 300, y: 40 } });
+        await sleep(10);
+        await handle.diagram.invalidateMeasurements({ nodes: [{ nodeId: 'node-a' }] });
+        return { elapsed: performance.now() - t0 };
+      } finally {
+        unregister();
+      }
+    });
+
+    // A round opened at call time expires at ~70-140ms while the 250ms pass still
+    // holds the semaphore; serialized registration cannot resolve before the pass ends.
+    expect(result.elapsed).toBeGreaterThanOrEqual(250);
   });
 });
