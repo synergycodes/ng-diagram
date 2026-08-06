@@ -174,6 +174,7 @@ export type {
   SelectionRotatedEvent,
   ShortcutActionName,
   ShortcutDefinition,
+  Side,
   SimpleNode,
   Size,
   SnappingConfig,
