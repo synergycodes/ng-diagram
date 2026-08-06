@@ -10,6 +10,9 @@
   transition: var(--edge-label-border-transition, border-color 0.1s ease-in-out);
 
   &.selected {
-    border-color: var(--edge-label-border-color, var(--ngd-default-edge-stroke-selected));
+    border-color: var(
+      --edge-label-border-color-selected,
+      var(--edge-label-border-color, var(--ngd-default-edge-stroke-selected))
+    );
   }
 }

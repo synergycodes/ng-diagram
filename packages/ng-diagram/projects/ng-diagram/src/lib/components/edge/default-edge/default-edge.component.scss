@@ -10,6 +10,8 @@ ng-diagram-base-edge.default-edge:hover:not(.selected):not(.temporary) {
 
 ng-diagram-base-edge.default-edge.selected {
   --edge-stroke: var(--ngd-default-edge-stroke-selected);
+  /* Set on the edge element so it out-ranks a user's inherited --edge-label-border-color
+     (e.g. from :root); the chip's own .selected fallback loses to any set var. */
   --edge-label-border-color: var(--ngd-default-edge-stroke-selected);
 }
 
