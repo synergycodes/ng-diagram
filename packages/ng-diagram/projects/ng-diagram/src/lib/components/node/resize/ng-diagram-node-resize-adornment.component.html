@@ -2,7 +2,7 @@
 
 @if (showAdornment()) {
   @for (position of linePositions; track position) {
-    <ng-diagram-resize-line [position]="position" [targetData]="nodeData()!" [active]="activeEdges().has(position)" />
+    <ng-diagram-resize-line [position]="position" [targetData]="nodeData()!" [active]="activeSideSet().has(position)" />
   }
   @for (handle of handles(); track handle.position) {
     @if (handle.active) {

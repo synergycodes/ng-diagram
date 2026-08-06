@@ -24,8 +24,8 @@ export const solo: Partial<Model> = {
 
 /**
  * Resizable nodes for the resize-adornment specs. `free` uses the default template
- * (adornment with all edges active); the `resize-edges` nodes use the harness template
- * that feeds `data.resizeEdges` into the adornment's `resizeEdges` input.
+ * (adornment with all sides active); the `resize-sides` nodes use the harness template
+ * that feeds `data.activeSides` into the adornment's `activeSides` input.
  */
 export const resizeArena: Partial<Model> = {
   nodes: [
@@ -39,21 +39,21 @@ export const resizeArena: Partial<Model> = {
     },
     {
       id: 'corner',
-      type: 'resize-edges',
+      type: 'resize-sides',
       position: { x: 420, y: 80 },
       size: { width: 200, height: 120 },
       autoSize: false,
       resizable: true,
-      data: { label: 'right + bottom', resizeEdges: ['right', 'bottom'] },
+      data: { label: 'right + bottom', activeSides: ['right', 'bottom'] },
     },
     {
       id: 'frozen',
-      type: 'resize-edges',
+      type: 'resize-sides',
       position: { x: 80, y: 320 },
       size: { width: 200, height: 120 },
       autoSize: false,
       resizable: true,
-      data: { label: 'none', resizeEdges: [] },
+      data: { label: 'none', activeSides: [] },
     },
   ],
   edges: [],

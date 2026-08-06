@@ -28,28 +28,28 @@ To make a custom node resizable, wrap your node with [`<ng-diagram-node-resize-a
 
 <CodeSnippet relativePath="nodes/resizing/node/node.component.ts" />
 
-## Limiting Which Edges Resize
+## Limiting Which Sides Resize
 
-By default all four edges and all four corners of a node can be dragged. Use the
-[`resizeEdges`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/#resizeedges) input to narrow that down —
+By default all four sides and all four corners of a node can be dragged. Use the
+[`activeSides`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/#activesides) input to narrow that down —
 useful for nodes anchored on one side, such as swimlanes stacked from the top-left corner, where dragging the top or
-left edge fights the layout that keeps them anchored:
+left side fights the layout that keeps them anchored:
 
 ```html
-<ng-diagram-node-resize-adornment [resizeEdges]="['right', 'bottom']">
+<ng-diagram-node-resize-adornment [activeSides]="['right', 'bottom']">
   <!-- Node content here -->
 </ng-diagram-node-resize-adornment>
 ```
 
-- All four lines keep rendering, because they also draw the node's selection frame. Lines for edges you leave out are
+- All four lines keep rendering, because they also draw the node's selection frame. Lines for sides you leave out are
   inert: they do not start a resize and show no resize cursor.
-- A corner handle appears only when both of its edges are listed, so `['right', 'bottom']` leaves only the bottom-right
+- A corner handle appears only when both of its sides are listed, so `['right', 'bottom']` leaves only the bottom-right
   handle.
 - An empty array keeps the selection frame without any interactive resize.
 
 <Aside type="note">
   This input is available on the adornment you place in your own node template. The default node and group templates
-  render the adornment with all edges enabled.
+  render the adornment with all sides enabled.
 </Aside>
 
 ## Customization

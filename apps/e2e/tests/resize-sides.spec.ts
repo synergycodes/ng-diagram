@@ -3,8 +3,8 @@ import { expect, test, type Diagram } from './fixtures/diagram';
 import { resizeArena } from './fixtures/models';
 
 /**
- * The `resizeEdges` input of the resize adornment: lines for edges left out are
- * rendered but inert, corner handles render only when both of their edges are
+ * The `activeSides` input of the resize adornment: lines for sides left out are
+ * rendered but inert, corner handles render only when both of their sides are
  * listed. Plain resize-gesture semantics live in resize.spec.ts.
  */
 
@@ -19,17 +19,17 @@ const sizeOf = async (diagram: Diagram, id: string) => {
  * resize line's 8px hit band, so an active line would capture it, but an inert
  * line lets the pointer fall through to the node body underneath.
  */
-const dragThroughLine = async (diagram: Diagram, nodeId: string, edge: 'top' | 'right', delta: Point) => {
-  const line = diagram.node(nodeId).locator(`.resize-line--${edge}`);
-  const center = await diagram.centerOf(line, `resize line "${edge}" of node "${nodeId}"`);
-  const inset = edge === 'top' ? { x: 0, y: 2 } : { x: -2, y: 0 };
+const dragThroughLine = async (diagram: Diagram, nodeId: string, side: 'top' | 'right', delta: Point) => {
+  const line = diagram.node(nodeId).locator(`.resize-line--${side}`);
+  const center = await diagram.centerOf(line, `resize line "${side}" of node "${nodeId}"`);
+  const inset = side === 'top' ? { x: 0, y: 2 } : { x: -2, y: 0 };
   const from = { x: center.x + inset.x, y: center.y + inset.y };
   await diagram.beginDrag(from, { x: from.x + delta.x, y: from.y + delta.y });
   await diagram.page.mouse.up();
 };
 
-test.describe('resize adornment edges', () => {
-  test('default template keeps all four edges and corner handles active', async ({ diagram }) => {
+test.describe('resize adornment sides', () => {
+  test('default template keeps all four sides and corner handles active', async ({ diagram }) => {
     await diagram.load({ model: resizeArena });
     await diagram.selection.select(['free']);
 
@@ -38,7 +38,7 @@ test.describe('resize adornment edges', () => {
     await expect(diagram.node('free').locator('.resize-line--inactive')).toHaveCount(0);
   });
 
-  test('an edge listed in resizeEdges resizes the node', async ({ diagram }) => {
+  test('a side listed in activeSides resizes the node', async ({ diagram }) => {
     await diagram.load({ model: resizeArena });
     await diagram.selection.select(['corner']);
 
@@ -47,7 +47,7 @@ test.describe('resize adornment edges', () => {
     await expect.poll(() => sizeOf(diagram, 'corner')).toEqual({ width: 240, height: 120 });
   });
 
-  test('an edge left out of resizeEdges is inert and the drag falls through to the node', async ({ diagram }) => {
+  test('a side left out of activeSides is inert and the drag falls through to the node', async ({ diagram }) => {
     await diagram.load({ model: resizeArena });
     await diagram.selection.select(['corner']);
 
@@ -66,7 +66,7 @@ test.describe('resize adornment edges', () => {
     await expect.poll(() => sizeOf(diagram, 'corner')).toEqual({ width: 200, height: 120 });
   });
 
-  test('the resize cursor shows over active edges only', async ({ diagram }) => {
+  test('the resize cursor shows over active sides only', async ({ diagram }) => {
     await diagram.load({ model: resizeArena });
     await diagram.selection.select(['corner']);
     await expect(diagram.node('corner').locator('.resize-line--top')).toHaveClass(/resize-line--inactive/);
@@ -96,7 +96,7 @@ test.describe('resize adornment edges', () => {
     expect(overInertTop.cursor).toBe(overBody.cursor);
   });
 
-  test('a corner handle renders only when both of its edges are listed', async ({ diagram }) => {
+  test('a corner handle renders only when both of its sides are listed', async ({ diagram }) => {
     await diagram.load({ model: resizeArena });
     await diagram.selection.select(['corner']);
 
@@ -105,7 +105,7 @@ test.describe('resize adornment edges', () => {
     await expect(handles).toHaveClass(/resize-handle--bottom-right/);
   });
 
-  test('an empty resizeEdges keeps the selection frame but disables all resizing', async ({ diagram }) => {
+  test('an empty activeSides keeps the selection frame but disables all resizing', async ({ diagram }) => {
     await diagram.load({ model: resizeArena });
     await diagram.selection.select(['frozen']);
 

@@ -8,13 +8,13 @@ import { InputFieldNodeComponent } from '../node-template/input-field-node/input
 import { PortSideNodeComponent } from '../node-template/port-side-node/port-side-node.component';
 import { PortToggleNodeComponent } from '../node-template/port-toggle-node/port-toggle-node.component';
 import { ResizableNodeComponent } from '../node-template/resizable-node/resizable-node.component';
-import { ResizeEdgesNodeComponent } from '../node-template/resize-edges-node/resize-edges-node.component';
+import { ResizeSidesNodeComponent } from '../node-template/resize-sides-node/resize-sides-node.component';
 
 export enum NodeTemplateType {
   InputField = 'input-field',
   Image = 'image',
   Resizable = 'resizable',
-  ResizeEdges = 'resize-edges',
+  ResizeSides = 'resize-sides',
   CustomizedDefault = 'customized-default',
   Group = 'custom-group',
   Chip = 'chip',
@@ -27,7 +27,7 @@ export const nodeTemplateMap = new NgDiagramNodeTemplateMap([
   [NodeTemplateType.InputField, InputFieldNodeComponent],
   [NodeTemplateType.Image, ImageNodeComponent],
   [NodeTemplateType.Resizable, ResizableNodeComponent],
-  [NodeTemplateType.ResizeEdges, ResizeEdgesNodeComponent],
+  [NodeTemplateType.ResizeSides, ResizeSidesNodeComponent],
   [NodeTemplateType.Group, GroupNodeComponent],
   [NodeTemplateType.CustomizedDefault, CustomizedDefaultNodeComponent],
   [NodeTemplateType.Chip, ChipNodeComponent],

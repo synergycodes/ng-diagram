@@ -15,7 +15,7 @@ import {
 } from 'ng-diagram';
 import type { HarnessBridge } from './api';
 import { DEFAULT_E2E_MODEL } from './default-model';
-import { ResizeEdgesNodeComponent } from './resize-edges-node.component';
+import { ResizeSidesNodeComponent } from './resize-sides-node.component';
 
 declare global {
   interface Window extends HarnessBridge {}
@@ -60,7 +60,7 @@ export class HarnessComponent {
 
   readonly model = signal(initializeModel(window.__diagramSeed ?? DEFAULT_E2E_MODEL));
   readonly config = window.__diagramConfig ?? {};
-  readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([['resize-edges', ResizeEdgesNodeComponent]]);
+  readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([['resize-sides', ResizeSidesNodeComponent]]);
 
   onDiagramInit(): void {
     window.__diagram = {

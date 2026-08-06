@@ -1072,8 +1072,9 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
 
 // @public
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
+    activeSides: InputSignal<readonly Side[]>;
     // (undocumented)
-    readonly activeEdges: Signal<Set<ResizeEdge>>;
+    readonly activeSideSet: Signal<Set<Side>>;
     // (undocumented)
     readonly dataResizable: Signal<boolean | undefined>;
     defaultResizable: InputSignal<boolean | undefined>;
@@ -1085,14 +1086,13 @@ export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase 
     // (undocumented)
     readonly isResizable: Signal<boolean | undefined>;
     // (undocumented)
-    readonly linePositions: readonly ResizeEdge[];
+    readonly linePositions: readonly Side[];
     // (undocumented)
     readonly nodeData: Signal<Node_2 | undefined>;
-    resizeEdges: InputSignal<readonly ResizeEdge[]>;
     // (undocumented)
     readonly showAdornment: Signal<boolean | undefined>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramNodeResizeAdornmentComponent, "ng-diagram-node-resize-adornment", never, { "defaultResizable": { "alias": "defaultResizable"; "required": false; "isSignal": true; }; "resizeEdges": { "alias": "resizeEdges"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramNodeResizeAdornmentComponent, "ng-diagram-node-resize-adornment", never, { "defaultResizable": { "alias": "defaultResizable"; "required": false; "isSignal": true; }; "activeSides": { "alias": "activeSides"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramNodeResizeAdornmentComponent, never>;
 }
@@ -1208,7 +1208,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     protected readonly isInitialized: WritableSignal<boolean>;
     // (undocumented)
-    protected readonly lastSide: WritableSignal<PortSide | undefined>;
+    protected readonly lastSide: WritableSignal<Side | undefined>;
     // (undocumented)
     protected readonly lastType: WritableSignal<"source" | "target" | "both" | undefined>;
     // @internal (undocumented)
@@ -1222,7 +1222,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     originPoint: InputSignal<OriginPoint>;
     // (undocumented)
     get portClass(): string;
-    side: InputSignal<PortSide>;
+    side: InputSignal<Side>;
     type: InputSignal<"source" | "target" | "both">;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
@@ -1496,7 +1496,7 @@ export type PortLocation = {
 } & Point;
 
 // @public
-export type PortSide = 'top' | 'right' | 'bottom' | 'left';
+export type PortSide = Side;
 
 // @public
 export function provideNgDiagram(): Provider[];
@@ -1527,9 +1527,6 @@ export interface ResizeConfig {
     defaultResizable: boolean;
     getMinNodeSize: (node: Node_2) => Size;
 }
-
-// @public
-export type ResizeEdge = 'top' | 'right' | 'bottom' | 'left';
 
 // @public
 export interface RotationActionState {
@@ -1591,6 +1588,9 @@ export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName | Wh
 
 // @public
 export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition | WheelOnlyShortcutDefinition;
+
+// @public
+export type Side = 'top' | 'right' | 'bottom' | 'left';
 
 // @public
 export interface SimpleNode<T extends DataObject = DataObject> {

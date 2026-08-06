@@ -170,6 +170,7 @@ title: "ng-diagram"
 - [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)
 - [PortSide](/docs/api/types/model/portside/)
+- [Side](/docs/api/types/model/side/)
 - [StripEdgeRuntimePropertiesFn](/docs/api/types/model/stripedgeruntimepropertiesfn/)
 - [StripNodeRuntimePropertiesFn](/docs/api/types/model/stripnoderuntimepropertiesfn/)
 
@@ -194,7 +195,6 @@ title: "ng-diagram"
 - [NgDiagramEdgeTemplate](/docs/api/types/templates/ngdiagramedgetemplate/)
 - [NgDiagramGroupNodeTemplate](/docs/api/types/templates/ngdiagramgroupnodetemplate/)
 - [NgDiagramNodeTemplate](/docs/api/types/templates/ngdiagramnodetemplate/)
-- [ResizeEdge](/docs/api/types/templates/resizeedge/)
 
 ## Utilities
 

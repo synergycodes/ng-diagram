@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { Side } from '../../../../../core/src';
 import { ResizeDirective } from '../../../../directives/input-events/resize/resize.directive';
-import { ResizeEdge } from '../ng-diagram-node-resize-adornment.types';
 
 @Component({
   selector: 'ng-diagram-resize-line',
@@ -15,7 +15,7 @@ import { ResizeEdge } from '../ng-diagram-node-resize-adornment.types';
   },
 })
 export class NgDiagramResizeLineComponent {
-  position = input.required<ResizeEdge>();
+  position = input.required<Side>();
   active = input<boolean>(true);
   classes = computed(
     () => `resize-line resize-line--${this.position()}${this.active() ? '' : ' resize-line--inactive'}`

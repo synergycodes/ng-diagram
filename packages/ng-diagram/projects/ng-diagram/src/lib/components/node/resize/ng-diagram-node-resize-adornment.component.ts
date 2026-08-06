@@ -4,7 +4,8 @@ import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { NodeContextGuardBase } from '../../../utils/node-context-guard.base';
 import { NgDiagramResizeHandleComponent } from './handle/ng-diagram-resize-handle.component';
 import { NgDiagramResizeLineComponent } from './line/ng-diagram-resize-line.component';
-import { ALL_RESIZE_EDGES, HANDLE_EDGES, HandlePosition, ResizeEdge } from './ng-diagram-node-resize-adornment.types';
+import { Side } from '../../../../core/src';
+import { ALL_SIDES, HANDLE_SIDES, HandlePosition } from './ng-diagram-node-resize-adornment.types';
 
 /**
  * The `NgDiagramNodeResizeAdornmentComponent` displays resize handles and lines around a selected, resizable node.
@@ -37,11 +38,11 @@ export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase 
    */
   defaultResizable = input<boolean | undefined>(undefined);
   /**
-   * Which edges of the node can be grabbed to resize it.
+   * Which sides of the node can be grabbed to resize it.
    *
    * All four lines always render, since they double as the node's selection frame, but the ones
-   * for edges left out here are inert: they do not start a resize and show no resize cursor.
-   * A corner handle renders only when both of its edges are listed, so
+   * for sides left out here are inert: they do not start a resize and show no resize cursor.
+   * A corner handle renders only when both of its sides are listed, so
    * `['right', 'bottom']` leaves only the bottom-right handle.
    *
    * Pass an empty array to keep the selection frame without allowing any interactive resize.
@@ -51,12 +52,12 @@ export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase 
    *
    * @example
    * ```html
-   * <ng-diagram-node-resize-adornment [resizeEdges]="['right', 'bottom']">
+   * <ng-diagram-node-resize-adornment [activeSides]="['right', 'bottom']">
    *   <!-- Node content here -->
    * </ng-diagram-node-resize-adornment>
    * ```
    */
-  resizeEdges = input<readonly ResizeEdge[]>(ALL_RESIZE_EDGES);
+  activeSides = input<readonly Side[]>(ALL_SIDES);
   readonly nodeData = computed(() => this.nodeComponent?.node());
   readonly dataResizable = computed(() => this.nodeData()?.resizable);
   readonly isResizable = computed(
@@ -65,13 +66,13 @@ export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase 
   readonly showAdornment = computed(
     () => !!this.isResizable() && this.nodeData()?.selected && this.isRenderedOnCanvas() && !this.nodeData()?.angle
   );
-  readonly linePositions: readonly ResizeEdge[] = ALL_RESIZE_EDGES;
-  readonly activeEdges = computed(() => new Set<ResizeEdge>(this.resizeEdges()));
+  readonly linePositions: readonly Side[] = ALL_SIDES;
+  readonly activeSideSet = computed(() => new Set<Side>(this.activeSides()));
   readonly handles = computed<{ position: HandlePosition; active: boolean }[]>(() => {
-    const activeEdges = this.activeEdges();
-    return HANDLE_EDGES.map(({ position, edges }) => ({
+    const activeSideSet = this.activeSideSet();
+    return HANDLE_SIDES.map(({ position, sides }) => ({
       position,
-      active: edges.every((edge) => activeEdges.has(edge)),
+      active: sides.every((side) => activeSideSet.has(side)),
     }));
   });
 }

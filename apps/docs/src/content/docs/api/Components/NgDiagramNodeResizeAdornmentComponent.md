@@ -21,29 +21,15 @@ The `NgDiagramNodeResizeAdornmentComponent` displays resize handles and lines ar
 
 ## Properties
 
-### defaultResizable
+### activeSides
 
-> **defaultResizable**: `InputSignal`\<`undefined` \| `boolean`\>
+> **activeSides**: `InputSignal`\<readonly [`Side`](/docs/api/types/model/side/)[]\>
 
-Whether the node is resizable.
-
-#### Default
-
-```ts
-undefined
-```
-
-***
-
-### resizeEdges
-
-> **resizeEdges**: `InputSignal`\<readonly [`ResizeEdge`](/docs/api/types/templates/resizeedge/)[]\>
-
-Which edges of the node can be grabbed to resize it.
+Which sides of the node can be grabbed to resize it.
 
 All four lines always render, since they double as the node's selection frame, but the ones
-for edges left out here are inert: they do not start a resize and show no resize cursor.
-A corner handle renders only when both of its edges are listed, so
+for sides left out here are inert: they do not start a resize and show no resize cursor.
+A corner handle renders only when both of its sides are listed, so
 `['right', 'bottom']` leaves only the bottom-right handle.
 
 Pass an empty array to keep the selection frame without allowing any interactive resize.
@@ -61,7 +47,21 @@ Pass an empty array to keep the selection frame without allowing any interactive
 #### Example
 
 ```html
-<ng-diagram-node-resize-adornment [resizeEdges]="['right', 'bottom']">
+<ng-diagram-node-resize-adornment [activeSides]="['right', 'bottom']">
   <!-- Node content here -->
 </ng-diagram-node-resize-adornment>
+```
+
+***
+
+### defaultResizable
+
+> **defaultResizable**: `InputSignal`\<`undefined` \| `boolean`\>
+
+Whether the node is resizable.
+
+#### Default
+
+```ts
+undefined
 ```

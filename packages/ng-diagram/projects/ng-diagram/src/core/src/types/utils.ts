@@ -35,13 +35,22 @@ export interface Point {
 }
 
 /**
+ * One of the four sides of a rectangular area.
+ *
+ * @public
+ * @since 1.3.0
+ * @category Types/Model
+ */
+export type Side = 'top' | 'right' | 'bottom' | 'left';
+
+/**
  * Interface representing a port side on a node in the diagram
  *
  * @public
  * @since 0.8.0
  * @category Types/Model
  */
-export type PortSide = 'top' | 'right' | 'bottom' | 'left';
+export type PortSide = Side;
 
 /**
  * Interface representing a rect in the flow diagram
