@@ -4,6 +4,7 @@ import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
+import { InteractionCoordinator } from './interaction-coordinator/interaction-coordinator';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
 import { MeasurementTracker, MeasurementTrackingConfig } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
@@ -72,6 +73,7 @@ export class FlowCore {
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
 
+  private readonly interactionCoordinator: InteractionCoordinator;
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
 
@@ -102,6 +104,7 @@ export class FlowCore {
     this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
+    this.interactionCoordinator = new InteractionCoordinator(this);
     this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
     this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
@@ -493,6 +496,48 @@ export class FlowCore {
    */
   getEdgeById(edgeId: string): Edge | null {
     return this.modelLookup.getEdgeById(edgeId);
+  }
+
+  /**
+   * Registers a cleanup for the gesture that is starting; it runs when
+   * {@link cancelActiveInteraction} aborts the gesture. The caller must
+   * unregister it in its own normal teardown, or stale cleanups accumulate.
+   *
+   * @returns Function that unregisters the callback
+   */
+  registerInteractionCleanup(cleanup: () => void): () => void {
+    return this.interactionCoordinator.registerInteractionCleanup(cleanup);
+  }
+
+  /**
+   * Whether {@link cancelActiveInteraction} is mid-flight — its rollback has
+   * not committed yet, so input read now could capture geometry it is about
+   * to rewrite.
+   */
+  isCancellingInteraction(): boolean {
+    return this.interactionCoordinator.isCancellingInteraction();
+  }
+
+  /**
+   * Whether an interactive gesture (linking, dragging, resizing, rotating,
+   * panning) is currently in progress, or a gesture's listener cleanup is
+   * still registered.
+   */
+  hasActiveInteraction(): boolean {
+    return this.interactionCoordinator.hasActiveInteraction();
+  }
+
+  /**
+   * Aborts the in-progress gesture (linking, drag, resize, rotate or pan):
+   * removes its listeners, restores the state it modified (the viewport is
+   * not rolled back) and fires the "ended" event with the `cancelled` reason.
+   * No-op when nothing is active, when the gesture is already completing, or
+   * while a transaction is active (refused with a console warning).
+   *
+   * @returns Whether any gesture or registered cleanup was torn down
+   */
+  cancelActiveInteraction(): Promise<boolean> {
+    return this.interactionCoordinator.cancelActiveInteraction();
   }
 
   /**

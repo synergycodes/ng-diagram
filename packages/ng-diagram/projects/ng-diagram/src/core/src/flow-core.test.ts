@@ -5,6 +5,7 @@ import { FlowCore } from './flow-core';
 import type { InputEventsRouter } from './input-events';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { flushMicrotasks, mockEdge, mockEnvironment, mockMetadata, mockNode } from './test-utils';
+import type { DraggingActionState } from './types/action-state.interface';
 import type { Edge } from './types/edge.interface';
 import type { FlowConfig } from './types/flow-config.interface';
 import type { Metadata } from './types/metadata.interface';
@@ -13,6 +14,13 @@ import type { ModelAdapter } from './types/model-adapter.interface';
 import type { Node } from './types/node.interface';
 import type { Renderer } from './types/renderer.interface';
 import type { TransactionOptions } from './types/transaction.interface';
+
+const draggingState = (movementStarted = true): DraggingActionState => ({
+  nodeIds: [],
+  modifiers: { primary: false, secondary: false, shift: false, meta: false },
+  accumulatedDeltas: new Map(),
+  movementStarted,
+});
 
 vi.mock('./updater/init-updater/init-updater', () => ({
   InitUpdater: vi.fn(() => ({
@@ -115,6 +123,7 @@ describe('FlowCore', () => {
       emit: vi.fn(),
       register: vi.fn(),
       registerDefaultCallbacks: vi.fn(),
+      cancel: vi.fn().mockResolvedValue(true),
     } as unknown as InputEventsRouter;
 
     // Reset all mocks
@@ -265,6 +274,131 @@ describe('FlowCore', () => {
       expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('updatePortsBulk', expect.anything());
       expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('addPortsBulk', expect.anything());
       expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('deletePortsBulk', expect.anything());
+    });
+  });
+
+  describe('cancelActiveInteraction', () => {
+    it('should return false and cancel nothing when no gesture is active', async () => {
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(result).toBe(false);
+      expect(mockEventRouter.cancel).not.toHaveBeenCalled();
+    });
+
+    it('should run registered interaction cleanups', async () => {
+      const cleanup = vi.fn();
+      flowCore.registerInteractionCleanup(cleanup);
+
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).toHaveBeenCalledTimes(1);
+      expect(result).toBe(true);
+    });
+
+    it('should not run unregistered cleanups', async () => {
+      const cleanup = vi.fn();
+      const unregister = flowCore.registerInteractionCleanup(cleanup);
+      unregister();
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).not.toHaveBeenCalled();
+    });
+
+    it('should not run a cleanup twice across two cancellations', async () => {
+      const cleanup = vi.fn();
+      flowCore.registerInteractionCleanup(cleanup);
+
+      await flowCore.cancelActiveInteraction();
+      await flowCore.cancelActiveInteraction();
+
+      expect(cleanup).toHaveBeenCalledTimes(1);
+    });
+
+    it('should route linking cancellation to the linking handler', async () => {
+      flowCore.actionStateManager.linking = { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null };
+
+      const result = await flowCore.cancelActiveInteraction();
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('linking');
+      expect(result).toBe(true);
+    });
+
+    it('should cancel every active gesture', async () => {
+      flowCore.actionStateManager.dragging = draggingState();
+      flowCore.actionStateManager.panning = { active: true };
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('pointerMoveSelection');
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('panning');
+      expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('resize');
+      expect(mockEventRouter.cancel).not.toHaveBeenCalledWith('rotate');
+    });
+
+    it('should still cancel the remaining gestures and rethrow when one cancel fails', async () => {
+      flowCore.actionStateManager.dragging = draggingState();
+      flowCore.actionStateManager.panning = { active: true };
+      const error = new Error('cancel failed');
+      (mockEventRouter.cancel as Mock).mockImplementation((name: string) =>
+        name === 'pointerMoveSelection' ? Promise.reject(error) : Promise.resolve()
+      );
+
+      await expect(flowCore.cancelActiveInteraction()).rejects.toBe(error);
+
+      expect(mockEventRouter.cancel).toHaveBeenCalledWith('panning');
+    });
+  });
+
+  describe('hasActiveInteraction', () => {
+    it('should return false when nothing is active', () => {
+      expect(flowCore.hasActiveInteraction()).toBe(false);
+    });
+
+    it('should return true for each active gesture state', () => {
+      flowCore.actionStateManager.linking = { sourceNodeId: 'n1', sourcePortId: 'p1', temporaryEdge: null };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearLinking();
+
+      flowCore.actionStateManager.dragging = draggingState(false);
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearDragging();
+
+      flowCore.actionStateManager.resize = {
+        startWidth: 1,
+        startHeight: 1,
+        startX: 0,
+        startY: 0,
+        startNodePositionX: 0,
+        startNodePositionY: 0,
+        resizingNode: mockNode,
+      };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearResize();
+
+      flowCore.actionStateManager.rotation = { startAngle: 0, initialNodeAngle: 0, nodeId: 'n1' };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearRotation();
+
+      flowCore.actionStateManager.panning = { active: true };
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+      flowCore.actionStateManager.clearPanning();
+
+      expect(flowCore.hasActiveInteraction()).toBe(false);
+    });
+
+    it('should return true when only a listener cleanup is registered', () => {
+      flowCore.registerInteractionCleanup(vi.fn());
+
+      expect(flowCore.hasActiveInteraction()).toBe(true);
+    });
+
+    it('should return false again after cancelActiveInteraction tears down registered cleanups', async () => {
+      flowCore.registerInteractionCleanup(vi.fn());
+
+      await flowCore.cancelActiveInteraction();
+
+      expect(flowCore.hasActiveInteraction()).toBe(false);
     });
   });
 

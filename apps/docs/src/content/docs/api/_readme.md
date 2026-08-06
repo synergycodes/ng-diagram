@@ -121,6 +121,7 @@ title: "ng-diagram"
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
 - [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
 - [EdgeDrawCancelReason](/docs/api/types/events/edgedrawcancelreason/)
+- [GestureCancelReason](/docs/api/types/events/gesturecancelreason/)
 
 ## Types/Geometry
 
@@ -169,6 +170,7 @@ title: "ng-diagram"
 - [OriginPoint](/docs/api/types/model/originpoint/)
 - [PortLocation](/docs/api/types/model/portlocation/)
 - [PortSide](/docs/api/types/model/portside/)
+- [Side](/docs/api/types/model/side/)
 - [StripEdgeRuntimePropertiesFn](/docs/api/types/model/stripedgeruntimepropertiesfn/)
 - [StripNodeRuntimePropertiesFn](/docs/api/types/model/stripnoderuntimepropertiesfn/)
 

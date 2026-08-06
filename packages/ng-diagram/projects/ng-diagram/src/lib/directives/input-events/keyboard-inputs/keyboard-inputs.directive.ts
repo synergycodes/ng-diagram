@@ -1,4 +1,4 @@
-import { Directive, ElementRef, inject } from '@angular/core';
+import { Directive, ElementRef, inject, OnDestroy } from '@angular/core';
 
 import { InputEventName } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services/flow-core-provider/flow-core-provider.service';
@@ -15,11 +15,10 @@ import { ZoomAction } from './keyboard-actions/zoom.action';
   providers: [PanningAction, MovingAction, PasteAction, ZoomAction],
   host: {
     '(document:keydown)': 'onKeyDown($event)',
-    '(pointerdown)': 'onPointerDown()',
     tabindex: '0',
   },
 })
-export class KeyboardInputsDirective {
+export class KeyboardInputsDirective implements OnDestroy {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly inputEventsRouter = inject(InputEventsRouterService);
   private readonly keyboardActions: KeyboardAction[] = [
@@ -29,6 +28,19 @@ export class KeyboardInputsDirective {
     inject(ZoomAction),
   ];
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  private readonly grabFocus = (): void => this.onPointerDown();
+
+  constructor() {
+    // Capture phase: inner handlers may stopPropagation() on pointerdown, which
+    // would skip a bubble-phase focus grab — a gesture started with focus
+    // outside the diagram would leave every shortcut dead.
+    this.elementRef.nativeElement.addEventListener('pointerdown', this.grabFocus, true);
+  }
+
+  ngOnDestroy(): void {
+    this.elementRef.nativeElement.removeEventListener('pointerdown', this.grabFocus, true);
+  }
 
   onPointerDown(): void {
     if (!this.elementRef.nativeElement.contains(document.activeElement)) {
@@ -49,13 +61,19 @@ export class KeyboardInputsDirective {
       modifiers: baseEvent.modifiers,
     });
 
-    if (shortcuts.length === 0 || this.isInputFieldFocused(event)) {
+    // Don't swallow the key's default behavior (e.g. Escape closing a <dialog>)
+    // when the only match is cancelInteraction and there is nothing to cancel.
+    const actionableShortcuts = shortcuts.filter(
+      (shortcut) => shortcut.actionName !== 'cancelInteraction' || flowCore.hasActiveInteraction()
+    );
+
+    if (actionableShortcuts.length === 0 || this.isInputFieldFocused(event)) {
       return;
     }
 
     event.preventDefault();
 
-    for (const shortcut of shortcuts) {
+    for (const shortcut of actionableShortcuts) {
       const matchingAction = this.keyboardActions.find((action) => action.canHandle(shortcut, flowCore));
       const event = matchingAction && matchingAction.createEvent(shortcut, baseEvent, flowCore);
 

@@ -16,9 +16,17 @@ export type ObservedElementMetadata =
       nodeId: string;
     };
 
+export interface CapturedResizeEntry {
+  entry: ResizeObserverEntry;
+  /** Id of the node under an active resize gesture when ResizeObserver delivered the entry, undefined when none. */
+  resizingNodeId: string | undefined;
+}
+
 export interface BatchResizeObserverConfig {
   /** Processes batched resize entries after the double-RAF stabilization. */
-  processBatch: (entries: ResizeObserverEntry[]) => void;
+  processBatch: (entries: CapturedResizeEntry[]) => void;
+  /** Sampled synchronously at each ResizeObserver delivery to stamp the entries. */
+  activeResizeNodeId: () => string | undefined;
   /** Fires when ResizeObserver detects entries, before batch processing is scheduled. */
   onObserverActivity?: (metadata: ObservedElementMetadata[]) => void;
 }
@@ -33,14 +41,20 @@ export class BatchResizeObserverService implements OnDestroy {
   private entityIndex = new Map<string, Set<Element>>();
   private config: BatchResizeObserverConfig | null = null;
   private rafId: number | null = null;
-  private pendingEntries: ResizeObserverEntry[] = [];
+  // At most one pending entry per element, the newest — a batch can span several
+  // deliveries, and only an element's latest measurement is meaningful.
+  private pendingEntries = new Map<Element, CapturedResizeEntry>();
 
   constructor() {
     // Create observer outside Angular zone for performance
     this.ngZone.runOutsideAngular(() => {
       this.observer = new ResizeObserver((entries) => {
-        // Collect all entries
-        this.pendingEntries.push(...entries);
+        // Stamped per delivery: by processing time (two rAFs later) the gesture may
+        // already be over, and a gesture-era measurement must stay recognizable.
+        const resizingNodeId = this.config?.activeResizeNodeId();
+        for (const entry of entries) {
+          this.pendingEntries.set(entry.target, { entry, resizingNodeId });
+        }
 
         // Notify about observer activity before RAF scheduling.
         if (this.config?.onObserverActivity) {
@@ -208,8 +222,8 @@ export class BatchResizeObserverService implements OnDestroy {
   }
 
   private processBatch(): void {
-    const entries = [...this.pendingEntries];
-    this.pendingEntries = [];
+    const entries = [...this.pendingEntries.values()];
+    this.pendingEntries.clear();
     this.rafId = null;
 
     if (entries.length === 0 || !this.config) return;

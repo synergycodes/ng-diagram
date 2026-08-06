@@ -48,6 +48,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     dragging: DraggingActionState | undefined;
     highlightGroup: HighlightGroupActionState | undefined;
     clearDragging: ReturnType<typeof vi.fn>;
+    isDragging: ReturnType<typeof vi.fn>;
   };
   let mockGetState: ReturnType<typeof vi.fn>;
   let lastInputPointOverThreshold = { x: 100, y: 100 };
@@ -69,6 +70,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       dragging: undefined,
       highlightGroup: undefined,
       clearDragging: vi.fn(),
+      isDragging: vi.fn(() => !!mockActionStateManager.dragging),
     };
 
     mockGetState = vi.fn().mockReturnValue({ nodes: [], edges: [] });
@@ -76,6 +78,7 @@ describe('PointerMoveSelectionEventHandler', () => {
     mockFlowCore = {
       getState: mockGetState,
       commandHandler: { emit: mockEmit },
+      isCancellingInteraction: () => false,
       environment: mockEnvironment,
       clientToFlowPosition: vi.fn(({ x, y }) => ({ x, y })),
       modelLookup: mockModelLookup,
@@ -989,6 +992,189 @@ describe('PointerMoveSelectionEventHandler', () => {
       );
 
       expect(mockEmit.mock.calls.some((call) => call[0] === 'moveNodesStop')).toBe(false);
+    });
+  });
+
+  describe('cancel', () => {
+    it('should do nothing when no drag is in progress', async () => {
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalled();
+      expect(mockActionStateManager.clearDragging).not.toHaveBeenCalled();
+    });
+
+    it('should clear dragging without moveNodesStop when the threshold was not crossed', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStop');
+      expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
+    });
+
+    it('should set the cancelled reason and emit moveNodesStop after an actual drag', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      await handler.cancel();
+
+      expect(mockActionStateManager.dragging?.cancelReason).toBe('cancelled');
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesStop', { nodeIds: expect.any(Array) });
+      expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
+    });
+
+    it('should snap dragged nodes back to their pre-drag positions', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      await handler.cancel();
+
+      expect(mockEmit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: mockNode.id, position: mockNode.position }],
+      });
+      // The restore must happen before the drag-ended lifecycle command
+      const calls = mockEmit.mock.calls.map(([name]) => name);
+      expect(calls.indexOf('updateNodes')).toBeLessThan(calls.indexOf('moveNodesStop'));
+      expect(mockFlowCore.transaction).toHaveBeenCalledWith('cancelDrag', expect.any(Function));
+    });
+
+    it('should not change group membership when cancelled over a group', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      await handler.cancel();
+
+      expect(mockEmit).not.toHaveBeenCalledWith('addToGroup', expect.anything());
+      expect(mockEmit).not.toHaveBeenCalledWith('removeFromGroup', expect.anything());
+    });
+
+    it('should clear an active group highlight', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+      mockActionStateManager.highlightGroup = { highlightedGroupId: mockGroupNode.id };
+
+      await handler.cancel();
+
+      expect(mockEmit).toHaveBeenCalledWith('highlightGroupClear');
+    });
+
+    it('should kill a continue pass that resumes while the cancel rollback is still suspended', async () => {
+      let releaseStart: () => void = () => undefined;
+      let releaseStop: () => void = () => undefined;
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'moveNodesStart') {
+          await new Promise<void>((resolve) => {
+            releaseStart = resolve;
+          });
+        }
+        if (name === 'moveNodesStop') {
+          await new Promise<void>((resolve) => {
+            releaseStop = resolve;
+          });
+        }
+      });
+
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      const continuePromise = handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      // Cancel parks on its own moveNodesStop; the continue then resumes while
+      // this.gesture still points at the cancelled gesture — only gesture.ended
+      // stops it from applying a move after the rollback.
+      const cancelPromise = handler.cancel();
+      releaseStart();
+      await continuePromise;
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+
+      releaseStop();
+      await cancelPromise;
+    });
+
+    it('should refuse to cancel while the normal end phase is in flight', async () => {
+      let releaseStop: () => void = () => undefined;
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'moveNodesStop') {
+          await new Promise<void>((resolve) => {
+            releaseStop = resolve;
+          });
+        }
+      });
+
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+      const endPromise = handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'end', lastInputPoint: lastInputPointOverThreshold })
+      );
+      await macrotask();
+      mockEmit.mockClear();
+
+      await expect(handler.cancel()).resolves.toBe(false);
+
+      // The completed gesture is left to its end phase: no rollback, no cancel stamp
+      expect(mockEmit).not.toHaveBeenCalledWith('updateNodes', expect.anything());
+      expect(mockActionStateManager.dragging?.cancelReason).toBeUndefined();
+      expect(mockFlowCore.transaction).not.toHaveBeenCalledWith('cancelDrag', expect.any(Function));
+
+      releaseStop();
+      await endPromise;
+    });
+
+    it('should not clobber a new drag that starts while the cancel rollback is suspended', async () => {
+      mockEmit.mockImplementation(async (name: string) => {
+        if (name === 'moveNodesStop') {
+          await macrotask();
+        }
+      });
+
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      const cancelPromise = handler.cancel();
+      // A new drag starts while the cancel rollback is suspended on moveNodesStop —
+      // its fresh state must survive the cancel's cleanup.
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start', lastInputPoint: { x: 200, y: 200 } }));
+      const freshDragging = mockActionStateManager.dragging;
+      await cancelPromise;
+
+      expect(mockActionStateManager.clearDragging).not.toHaveBeenCalled();
+      expect(mockActionStateManager.dragging).toBe(freshDragging);
+      mockEmit.mockClear();
+
+      // The new gesture must still be alive: crossing the threshold moves nodes
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: { x: 220, y: 220 } })
+      );
+
+      expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+        delta: { x: 20, y: 20 },
+        nodes: [mockNode],
+      });
+    });
+
+    it('should ignore continue events after cancellation', async () => {
+      handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
+      await handler.cancel();
+      mockEmit.mockClear();
+
+      await handler.handle(
+        getSamplePointerMoveSelectionEvent({ phase: 'continue', lastInputPoint: lastInputPointOverThreshold })
+      );
+
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesStart');
     });
   });
 });

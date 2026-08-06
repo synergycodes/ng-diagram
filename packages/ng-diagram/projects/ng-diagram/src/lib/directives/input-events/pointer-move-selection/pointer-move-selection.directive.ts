@@ -24,14 +24,26 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
   private edgePanningInterval: number | null = null;
   private cachedDiagramRect: DOMRect | null = null;
+  private unregisterInteractionCleanup: (() => void) | null = null;
+  private gestureActive = false;
 
   ngOnDestroy() {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
-    this.stopEdgePanning();
+    const wasMidGesture = this.gestureActive;
+    this.removeListeners();
+    // Destroyed mid-gesture (e.g. the dragged node was deleted): the pointerup
+    // will never be routed, so the dragging state must be cleared here — a
+    // leaked dragging state keeps hasActiveInteraction() true forever.
+    if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
+      this.flowCoreProvider.provide().actionStateManager.clearDragging();
+    }
   }
 
   onPointerDown(event: PointerInputEvent): void {
+    // Re-entry guard: a second pointerdown mid-gesture would orphan the previous interaction-cleanup registration.
+    if (this.gestureActive) {
+      return;
+    }
+
     if (!this.shouldHandle(event)) {
       return;
     }
@@ -45,6 +57,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       return;
     }
 
+    this.gestureActive = true;
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Move);
     this.cachedDiagramRect = this.diagramComponent.getBoundingClientRect();
     event.moveSelectionHandled = true;
@@ -65,6 +78,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   onPointerUp = (event: PointerEvent): void => {
@@ -127,16 +143,29 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     });
   };
 
+  private removeListeners(): void {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+    this.stopEdgePanning();
+    this.cachedDiagramRect = null;
+    // The shared marker keeps concurrent gestures out (panningHandled() etc.), so
+    // only its writer may clear it. gestureActive marks that writer — set only by
+    // this instance's own pointerdown, so a bystander's destroy skips the clear.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+    }
+  }
+
   private finishDragging(event: PointerInputEvent): void {
     const targetData = this.targetData();
     if (!targetData) {
       return;
     }
 
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
-    this.stopEdgePanning();
-    this.cachedDiagramRect = null;
+    this.removeListeners();
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
@@ -151,8 +180,6 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       },
       currentDiagramEdge: null,
     });
-
-    this.touchEventsStateService.clearCurrentEvent();
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {

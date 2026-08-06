@@ -197,6 +197,7 @@ export class DiagramSelectionDirective extends ObjectSelectionDirective {
 // @public
 export interface DraggingActionState {
     accumulatedDeltas: Map<string, Point>;
+    cancelReason?: GestureCancelReason;
     modifiers: InputModifiers;
     movementStarted: boolean;
     nodeIds: string[];
@@ -228,7 +229,7 @@ export interface Edge<T extends DataObject = DataObject> {
 }
 
 // @public
-export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget';
+export type EdgeDrawCancelReason = 'noTarget' | 'invalidConnection' | 'invalidTarget' | 'cancelled';
 
 // @public
 export interface EdgeDrawEndedEvent {
@@ -390,6 +391,9 @@ export interface FlowStateUpdate {
 }
 
 // @public
+export type GestureCancelReason = 'cancelled';
+
+// @public
 export interface GroupingConfig {
     canGroup: (node: Node_2, group: Node_2) => boolean;
 }
@@ -448,10 +452,13 @@ export interface InvalidateMeasurementsOptions {
 }
 
 // @public
-export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
+export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'>;
 
 // @public (undocumented)
-export class KeyboardInputsDirective {
+export class KeyboardInputsDirective implements OnDestroy {
+    constructor();
+    // (undocumented)
+    ngOnDestroy(): void;
     // (undocumented)
     onKeyDown(event: KeyboardEvent): void;
     // (undocumented)
@@ -661,7 +668,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'selectEnd';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'cancelResize' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'cancelRotate' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'cancelDrag' | 'selectEnd';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
@@ -934,8 +941,8 @@ export const NgDiagramMath: {
     distanceBetweenPoints: (a: Point, b: Point) => number;
     normalizeAngle: (angle: number) => number;
     snapAngle: typeof snapAngle;
-    snapNumber: (value: number, step: number) => number;
-    snapPoint: (point: Point, step: Size) => {
+    snapNumber: (value: number, step: number, offset?: number) => number;
+    snapPoint: (point: Point, step: Size, offset?: Size) => {
         x: number;
         y: number;
     };
@@ -1065,21 +1072,27 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
 
 // @public
 export class NgDiagramNodeResizeAdornmentComponent extends NodeContextGuardBase {
+    activeSides: InputSignal<readonly Side[]>;
+    // (undocumented)
+    readonly activeSideSet: Signal<Set<Side>>;
     // (undocumented)
     readonly dataResizable: Signal<boolean | undefined>;
     defaultResizable: InputSignal<boolean | undefined>;
     // (undocumented)
-    readonly handlePositions: HandlePosition[];
+    readonly handles: Signal<    {
+    position: HandlePosition;
+    active: boolean;
+    }[]>;
     // (undocumented)
     readonly isResizable: Signal<boolean | undefined>;
     // (undocumented)
-    readonly linePositions: LinePosition[];
+    readonly linePositions: readonly Side[];
     // (undocumented)
     readonly nodeData: Signal<Node_2 | undefined>;
     // (undocumented)
     readonly showAdornment: Signal<boolean | undefined>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramNodeResizeAdornmentComponent, "ng-diagram-node-resize-adornment", never, { "defaultResizable": { "alias": "defaultResizable"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramNodeResizeAdornmentComponent, "ng-diagram-node-resize-adornment", never, { "defaultResizable": { "alias": "defaultResizable"; "required": false; "isSignal": true; }; "activeSides": { "alias": "activeSides"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramNodeResizeAdornmentComponent, never>;
 }
@@ -1195,7 +1208,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     // (undocumented)
     protected readonly isInitialized: WritableSignal<boolean>;
     // (undocumented)
-    protected readonly lastSide: WritableSignal<PortSide | undefined>;
+    protected readonly lastSide: WritableSignal<Side | undefined>;
     // (undocumented)
     protected readonly lastType: WritableSignal<"source" | "target" | "both" | undefined>;
     // @internal (undocumented)
@@ -1209,7 +1222,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     originPoint: InputSignal<OriginPoint>;
     // (undocumented)
     get portClass(): string;
-    side: InputSignal<PortSide>;
+    side: InputSignal<Side>;
     type: InputSignal<"source" | "target" | "both">;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
@@ -1240,6 +1253,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     addEventListener<K extends keyof DiagramEventMap>(event: K, callback: EventListener_2<DiagramEventMap[K]>): UnsubscribeFn;
     addEventListenerOnce<K extends keyof DiagramEventMap>(event: K, callback: EventListener_2<DiagramEventMap[K]>): UnsubscribeFn;
     areEventsEnabled(): boolean;
+    cancelActiveInteraction(): Promise<boolean>;
     readonly config: Signal<Readonly<DeepPartial<FlowConfig>>>;
     getDefaultRouting(): string;
     getEnvironment(): EnvironmentInfo;
@@ -1306,6 +1320,7 @@ export { Node_2 as Node }
 
 // @public
 export interface NodeDragEndedEvent {
+    cancelReason?: GestureCancelReason;
     nodes: Node_2[];
 }
 
@@ -1336,6 +1351,7 @@ export interface NodeResizedEvent {
 
 // @public
 export interface NodeResizeEndedEvent {
+    cancelReason?: GestureCancelReason;
     node: Node_2;
 }
 
@@ -1346,6 +1362,7 @@ export interface NodeResizeStartedEvent {
 
 // @public
 export interface NodeRotateEndedEvent {
+    cancelReason?: GestureCancelReason;
     node: Node_2;
 }
 
@@ -1479,7 +1496,7 @@ export type PortLocation = {
 } & Point;
 
 // @public
-export type PortSide = 'top' | 'right' | 'bottom' | 'left';
+export type PortSide = Side;
 
 // @public
 export function provideNgDiagram(): Provider[];
@@ -1494,6 +1511,7 @@ export interface Rect {
 
 // @public
 export interface ResizeActionState {
+    cancelReason?: GestureCancelReason;
     resizingNode: Node_2;
     startHeight: number;
     startNodePositionX: number;
@@ -1512,6 +1530,7 @@ export interface ResizeConfig {
 
 // @public
 export interface RotationActionState {
+    cancelReason?: GestureCancelReason;
     initialNodeAngle: number;
     nodeId: string;
     startAngle: number;
@@ -1571,6 +1590,9 @@ export type ShortcutActionName = KeyboardActionName | PointerOnlyActionName | Wh
 export type ShortcutDefinition = KeyboardShortcutDefinition | PointerOnlyShortcutDefinition | WheelOnlyShortcutDefinition;
 
 // @public
+export type Side = 'top' | 'right' | 'bottom' | 'left';
+
+// @public
 export interface SimpleNode<T extends DataObject = DataObject> {
     angle?: number;
     autoSize?: boolean;
@@ -1606,8 +1628,10 @@ export interface Size {
 export interface SnappingConfig {
     computeSnapForNodeDrag: (node: Node_2) => Size | null;
     computeSnapForNodeSize: (node: Node_2) => Size | null;
+    computeSnapOffsetForNodeSize: (node: Node_2) => Size | null;
     defaultDragSnap: Size;
     defaultResizeSnap: Size;
+    defaultResizeSnapOffset: Size;
     shouldSnapDragForNode: (node: Node_2) => boolean;
     shouldSnapResizeForNode: (node: Node_2) => boolean;
 }

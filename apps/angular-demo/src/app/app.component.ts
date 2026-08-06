@@ -97,12 +97,23 @@ export class AppComponent {
     },
     resize: {
       allowResizeBelowChildrenBounds: false,
+      // 60px "header" — pairs with the resize snap offset below
+      getMinNodeSize: () => ({ width: 100, height: 60 }),
     },
     background: {
       cellSize: { width: 10, height: 10 },
     },
     snapping: {
-      shouldSnapDragForNode: () => false,
+      // shouldSnapDragForNode: () => true,
+      shouldSnapResizeForNode: () => true,
+      computeSnapForNodeSize: (node: Node) => {
+        if (node.type === 'custom-group') {
+          return { width: 100, height: 100 };
+        }
+        return { width: 20, height: 50 };
+      },
+      // Issue #765 use case: heights snap to 60, 110, 160, ... (header + n * 50)
+      computeSnapOffsetForNodeSize: (node: Node) => (node.type === 'custom-group' ? null : { width: 0, height: 60 }),
     },
     linking: {
       selectNodeOnPortPress: false,

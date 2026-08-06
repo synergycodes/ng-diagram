@@ -10,6 +10,14 @@ State tracking a node resize operation in progress.
 
 ## Properties
 
+### cancelReason?
+
+> `optional` **cancelReason**: `"cancelled"`
+
+Set when the resize is aborted; carried into `nodeResizeEnded`.
+
+***
+
 ### resizingNode
 
 > **resizingNode**: [`Node`](/docs/api/types/model/node/)

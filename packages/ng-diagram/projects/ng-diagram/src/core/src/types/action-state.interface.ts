@@ -1,4 +1,4 @@
-import type { EdgeDrawCancelReason } from '../event-manager/event-types';
+import type { EdgeDrawCancelReason, GestureCancelReason } from '../event-manager/event-types';
 import type { InputModifiers } from '../input-events/input-events.interface';
 import type { Edge } from './edge.interface';
 import type { Node } from './node.interface';
@@ -26,6 +26,8 @@ export interface ResizeActionState {
   startNodePositionY: number;
   /** Reference to the node being resized. */
   resizingNode: Node;
+  /** Set when the resize is aborted; carried into `nodeResizeEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -61,6 +63,8 @@ export interface LinkingActionState {
 export interface InternalLinkingActionState extends LinkingActionState {
   /** Monotonic id of the linking gesture this state belongs to. */
   _gestureId?: number;
+  /** Set while finishLinking/cancelLinking is tearing this gesture down — the other must no-op. */
+  _finishing?: boolean;
 }
 
 /**
@@ -103,6 +107,8 @@ export interface RotationActionState {
   initialNodeAngle: number;
   /** ID of the node being rotated. */
   nodeId: string;
+  /** Set when the rotation is aborted; carried into `nodeRotateEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**
@@ -127,6 +133,8 @@ export interface DraggingActionState {
    * `false` when the drag state is first created (on pointer down), `true` once movement exceeds the threshold.
    */
   movementStarted: boolean;
+  /** Set when the drag is aborted; carried into `nodeDragEnded`. */
+  cancelReason?: GestureCancelReason;
 }
 
 /**

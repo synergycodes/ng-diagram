@@ -20,21 +20,20 @@ export class LinkingInputDirective implements OnDestroy {
 
   private target = signal<Node | undefined>(undefined);
   private edgePanningInterval: number | null = null;
+  private unregisterInteractionCleanup: (() => void) | null = null;
   private gestureActive = false;
 
   portId = input.required<string>();
 
   ngOnDestroy(): void {
-    this.cleanup();
+    const wasMidGesture = this.gestureActive;
+    this.removeListeners();
     // Destroyed mid-gesture (e.g. the source node was deleted while linking): the
     // pointerup will never be routed and finishLinking will never run. The state
     // must be cleared here — a stranded linking state permanently disables linking,
     // because shouldHandle refuses to start while isLinking() is true.
-    if (this.gestureActive) {
-      this.gestureActive = false;
-      if (this.flowCoreProviderService.isInitialized()) {
-        this.flowCoreProviderService.provide().actionStateManager.clearLinking();
-      }
+    if (wasMidGesture && this.flowCoreProviderService.isInitialized()) {
+      this.flowCoreProviderService.provide().actionStateManager.clearLinking();
     }
   }
 
@@ -43,7 +42,8 @@ export class LinkingInputDirective implements OnDestroy {
   }
 
   onPointerDown($event: PointerInputEvent) {
-    if (!this.shouldHandle($event)) {
+    // Re-entry guard: a second pointerdown mid-gesture would orphan the previous interaction-cleanup registration.
+    if (this.gestureActive || !this.shouldHandle($event)) {
       return;
     }
 
@@ -53,6 +53,9 @@ export class LinkingInputDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    this.unregisterInteractionCleanup = this.flowCoreProviderService
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
 
     this.linkingEventService.emitStart($event, this.target(), this.portId());
   }
@@ -89,9 +92,8 @@ export class LinkingInputDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
-    this.gestureActive = false;
     this.linkingEventService.emitEnd($event, this.target(), this.portId());
-    this.cleanup();
+    this.removeListeners();
   };
 
   private shouldHandle(event: PointerInputEvent) {
@@ -107,8 +109,16 @@ export class LinkingInputDirective implements OnDestroy {
     );
   }
 
-  private cleanup() {
-    this.touchEventsStateService.clearCurrentEvent();
+  private removeListeners() {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
+    // The shared marker keeps concurrent gestures out (panningHandled() etc.), so
+    // only its writer may clear it. gestureActive marks that writer — set only by
+    // this instance's own pointerdown, so a bystander's destroy skips the clear.
+    if (this.gestureActive) {
+      this.gestureActive = false;
+      this.touchEventsStateService.clearCurrentEvent();
+    }
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
     this.stopEdgePanning();

@@ -6,6 +6,6 @@ prev: false
 title: "PortSide"
 ---
 
-> **PortSide** = `"top"` \| `"right"` \| `"bottom"` \| `"left"`
+> **PortSide** = [`Side`](/docs/api/types/model/side/)
 
 Interface representing a port side on a node in the diagram

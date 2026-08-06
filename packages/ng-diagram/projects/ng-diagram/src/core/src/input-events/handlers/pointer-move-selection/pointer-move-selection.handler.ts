@@ -5,26 +5,29 @@ import { isGroup, sortNodesByZIndex } from '../../../utils';
 import { EventHandler } from '../event-handler';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
-export const MOVE_THRESHOLD = 5; // to find out if move was intended
+export const MOVE_THRESHOLD = 5; // px of pointer travel before a click becomes a drag
 
 /**
- * One drag gesture's private input-tracking state — a fresh object per gesture,
- * written only by this handler, so object identity reliably answers "same
- * gesture?". Deliberately not in actionState.dragging: nothing outside this
- * handler reads these fields, and actionState is public API where every write
- * emits actionStateChanged.
+ * One drag gesture's private state — a fresh object per gesture, so identity
+ * answers "same gesture?". Deliberately not in actionState.dragging: that is
+ * public API and every write emits actionStateChanged.
  */
 interface DragGesture {
   startPoint: Point;
   lastPointerPosition: Point;
   hasMoved: boolean;
   ended: boolean;
+  /** Pre-drag node positions captured at threshold crossing — cancel() restores them. */
+  initialPositions?: Map<string, Point>;
 }
 
 export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSelectionEvent> {
   private gesture: DragGesture | null = null;
 
   async handle(event: PointerMoveSelectionEvent) {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
@@ -67,6 +70,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         const draggedNodeIds = selectedNodesWithChildren.map((n) => n.id);
         if (crossedThreshold) {
           gesture.hasMoved = true;
+          // Snapshot before the first delta is applied.
+          gesture.initialPositions = new Map(selectedNodesWithChildren.map((n) => [n.id, { ...n.position }]));
           this.flow.actionStateManager.dragging = {
             nodeIds: draggedNodeIds,
             modifiers: { ...event.modifiers },
@@ -134,8 +139,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
             }
           }
         } finally {
-          // A fast re-drag started while the drop was suspended must not have its
-          // freshly initialized gesture state clobbered — hence the identity guard.
+          // A fast re-drag started while the drop was suspended must not have
+          // its freshly initialized gesture state clobbered.
           if (this.gesture === gesture) {
             // A rejected drop can skip addToGroup's own highlight clear — no
             // highlight may survive the end of the gesture.
@@ -148,6 +153,63 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         }
       }
     }
+  }
+
+  override async cancel(): Promise<boolean> {
+    const gesture = this.gesture;
+    const dragging = this.flow.actionStateManager.dragging;
+    if (!gesture && !dragging) {
+      return false;
+    }
+    // The normal 'end' phase (or a previous cancel) already owns this gesture's
+    // teardown — cancelling now would roll back a completed drop and stamp its
+    // ended event as cancelled.
+    if (gesture?.ended) {
+      return false;
+    }
+
+    const needsStop = !!dragging && (gesture?.hasMoved ?? false);
+    const needsHighlightClear = !!this.flow.actionStateManager.highlightGroup;
+
+    // Marks the gesture dead for any suspended 'continue' passes — a delta
+    // must not be applied after the abort.
+    if (gesture) {
+      gesture.ended = true;
+    }
+
+    if (needsStop && dragging) {
+      // Not a dead write: the NodeDragEndedEmitter reads the reason from this
+      // live object during the moveNodesStop pass below.
+      dragging.cancelReason = 'cancelled';
+    }
+
+    if (needsStop || needsHighlightClear) {
+      // An aborted drag must not change group membership — no drop handling.
+      await this.flow.transaction('cancelDrag', async (tx) => {
+        if (needsStop) {
+          const initialPositions = gesture?.initialPositions;
+          if (initialPositions?.size) {
+            await tx.emit('updateNodes', {
+              nodes: [...initialPositions].map(([id, position]) => ({ id, position })),
+            });
+          }
+          await tx.emit('moveNodesStop', { nodeIds: dragging?.nodeIds ?? [] });
+        }
+        if (needsHighlightClear) {
+          await tx.emit('highlightGroupClear');
+        }
+      });
+    }
+
+    // A new drag may have started while the transaction above was suspended —
+    // its fresh state must stay intact.
+    if (dragging && this.flow.actionStateManager.dragging === dragging) {
+      this.flow.actionStateManager.clearDragging();
+    }
+    if (this.gesture === gesture) {
+      this.gesture = null;
+    }
+    return true;
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {
