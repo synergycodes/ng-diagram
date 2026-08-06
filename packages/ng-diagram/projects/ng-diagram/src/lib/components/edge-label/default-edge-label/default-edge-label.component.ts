@@ -15,7 +15,7 @@ import { NgDiagramBaseEdgeComponent } from '../../edge/base-edge/base-edge.compo
  * ## Example usage
  * ```html
  * <ng-diagram-base-edge [edge]="edge()">
- *   <ng-diagram-base-edge-label [id]="edge().id + '-label'" [positionOnEdge]="0.5">
+ *   <ng-diagram-base-edge-label [id]="'edge-label'" [positionOnEdge]="0.5">
  *     <ng-diagram-default-edge-label>{{ label() }}</ng-diagram-default-edge-label>
  *   </ng-diagram-base-edge-label>
  * </ng-diagram-base-edge>
