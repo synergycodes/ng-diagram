@@ -182,6 +182,100 @@ test.describe('resize events', () => {
   });
 });
 
+test.describe('resize validation middleware', () => {
+  // The deterministic regression guard for the stale-measurement bug (#771)
+  // lives in the unit suite (flow-resize-processor.service.spec.ts) — these
+  // tests are the end-to-end reproduction. Whether a single gesture hits the
+  // race depends on frame phase, so each test rolls several fast releases and
+  // must catch a regression on any of them; retries would mask exactly that.
+  test.describe.configure({ retries: 0 });
+
+  const GESTURES = 6;
+  // Covers the stale gesture-era batch (pointerup + ~2 frames) plus the
+  // gesture-end re-measure's own double-rAF (~2 more)
+  const FRAME_SAMPLES = 6;
+  const REVERT_THRESHOLD = 220;
+  const ORIGINAL = { size: box.nodes![0].size!, position: box.nodes![0].position };
+
+  /** Rolls fast-release resizes past the validation threshold: every revert must apply and hold. */
+  async function expectRevertsSurviveFastReleases(diagram: Diagram): Promise<void> {
+    for (let i = 1; i <= GESTURES; i++) {
+      await diagram.dragResizeHandle('box', 'bottom-right', { x: 60, y: 40 }, { fastRelease: true });
+
+      await expect.poll(async () => (await boxNode(diagram)).size).toEqual(ORIGINAL.size);
+      const { maxWidth, widths } = await diagram.page.evaluate(async (frames) => {
+        const log = (window as unknown as { __boxWidths: number[] }).__boxWidths;
+        const maxWidth = Math.max(...log.splice(0));
+        // The stale gesture-era batch lands up to two frames after the pointerup —
+        // sample the model each frame and require the revert to hold in all of them
+        const widths: number[] = [];
+        for (let frame = 0; frame < frames; frame++) {
+          await new Promise(requestAnimationFrame);
+          widths.push(window.__diagram!.model.getNodeById('box')!.size!.width);
+        }
+        return { maxWidth, widths };
+      }, FRAME_SAMPLES);
+      // Canary: the gesture must have crossed the threshold, or this run tested nothing
+      expect(maxWidth, `gesture #${i} crossed the validation threshold`).toBeGreaterThan(REVERT_THRESHOLD);
+      expect(widths, `gesture #${i} revert survives the trailing batch`).toEqual(
+        Array(FRAME_SAMPLES).fill(ORIGINAL.size.width)
+      );
+    }
+  }
+
+  test('a size revert on resizeNodeStop survives a fast release', async ({ diagram }) => {
+    await diagram.load({ model: box });
+    await diagram.page.evaluate(
+      ({ threshold, original }) => {
+        const log: number[] = [];
+        (window as unknown as { __boxWidths: number[] }).__boxWidths = log;
+        // The validation-middleware pattern from GitHub discussion #771: any
+        // resize ending wider than the threshold is reverted to the original rect.
+        window.__diagram!.diagram.registerMiddleware({
+          name: 'resize-validator',
+          execute: (context, next) => {
+            const node = context.state.nodes.find((n) => n.id === 'box');
+            if (node?.size) log.push(node.size.width);
+            if (context.modelActionTypes.includes('resizeNodeStop') && node?.size && node.size.width > threshold) {
+              next({ nodesToUpdate: [{ id: 'box', ...original }] });
+              return;
+            }
+            next();
+          },
+        });
+      },
+      { threshold: REVERT_THRESHOLD, original: ORIGINAL }
+    );
+    await diagram.node('box').click();
+
+    await expectRevertsSurviveFastReleases(diagram);
+  });
+
+  test('a size revert from a nodeResizeEnded listener survives a fast release', async ({ diagram }) => {
+    await diagram.load({ model: box });
+    await diagram.page.evaluate(
+      ({ threshold, original }) => {
+        const log: number[] = [];
+        (window as unknown as { __boxWidths: number[] }).__boxWidths = log;
+        // Same revert wired through the public event instead of a middleware —
+        // the write lands in its own later pass, after the gesture state is
+        // cleared, and the stale batch threatens it the same way.
+        window.__diagram!.diagram.addEventListener('nodeResizeEnded', (e) => {
+          const width = e.node.size?.width ?? 0;
+          log.push(width);
+          if (width > threshold) {
+            void window.__diagram!.model.updateNode('box', { ...original });
+          }
+        });
+      },
+      { threshold: REVERT_THRESHOLD, original: ORIGINAL }
+    );
+    await diagram.node('box').click();
+
+    await expectRevertsSurviveFastReleases(diagram);
+  });
+});
+
 test.describe('resize minimum size', () => {
   test('bottom-right shrink clamps at the minimum with the position unchanged', async ({ diagram }) => {
     await diagram.load({ model: box });
