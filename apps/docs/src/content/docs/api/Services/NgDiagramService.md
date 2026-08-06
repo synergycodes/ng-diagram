@@ -235,7 +235,7 @@ if (ngDiagramService.hasEventListeners('selectionChanged')) {
 
 ### invalidateMeasurements()
 
-> **invalidateMeasurements**(`options?`): `void`
+> **invalidateMeasurements**(`options?`): `Promise`\<`void`\>
 
 Forces re-measurement of diagram elements via ResizeObserver.
 
@@ -253,23 +253,44 @@ Optional. Specifies which elements to re-measure.
 
 #### Returns
 
-`void`
+`Promise`\<`void`\>
+
+A promise that resolves once the triggered re-measurements have settled
+(returned since 1.3.0; safe to ignore when the fresh geometry is not needed).
+After awaiting it, the invalidated elements' `size`, `measuredPorts` and
+`measuredLabels` read fresh.
+
+#### Remarks
+
+Resolution is **settle-based**, using the same mechanism as the transaction
+`waitForMeasurements` option: a discovery window opens, and once measurements start
+arriving a rolling debounce waits for them to stop. Consequences:
+
+- An invalidated element that never delivers a new measurement (it is unmounted,
+  has zero size, or simply did not change) does not stall the promise — the
+  discovery window expires and the promise resolves.
+- Targets that are not currently rendered/observed at all resolve immediately.
+- Measurements triggered concurrently by other work settle together with these, so
+  the promise may resolve slightly later than this call's own measurements.
 
 #### Example
 
 ```ts
-// Re-measure the entire diagram
-ngDiagramService.invalidateMeasurements();
+// Re-measure the entire diagram and wait for the new geometry
+await ngDiagramService.invalidateMeasurements();
 
-// Re-measure specific nodes (including their ports)
-ngDiagramService.invalidateMeasurements({
+// Re-measure specific nodes (including their ports), then reflow their edges
+await ngDiagramService.invalidateMeasurements({
   nodes: [{ nodeId: 'node-1' }],
 });
 
 // Re-measure all labels on specific edges
-ngDiagramService.invalidateMeasurements({
+await ngDiagramService.invalidateMeasurements({
   edges: [{ edgeId: 'edge-1' }],
 });
+
+// Fire-and-forget is still fine
+ngDiagramService.invalidateMeasurements();
 ```
 
 #### Since

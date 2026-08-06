@@ -1245,7 +1245,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     getEnvironment(): EnvironmentInfo;
     getRegisteredRoutings(): string[];
     hasEventListeners(event: keyof DiagramEventMap): boolean;
-    invalidateMeasurements(options?: InvalidateMeasurementsOptions): void;
+    invalidateMeasurements(options?: InvalidateMeasurementsOptions): Promise<void>;
     isInitialized: Signal<boolean>;
     registerMiddleware(middleware: Middleware): () => void;
     registerRouting(routing: EdgeRouting): void;

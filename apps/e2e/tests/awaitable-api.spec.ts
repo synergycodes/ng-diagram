@@ -527,4 +527,83 @@ test.describe('awaited service API matrix', () => {
 
     expect(failures).toEqual([]);
   });
+
+  test('invalidateMeasurements resolves on measurement settle, with geometry readable right after', async ({
+    diagram,
+  }) => {
+    await diagram.load({ model: pair });
+
+    const result = await diagram.page.evaluate(async () => {
+      const handle = window.__diagram!;
+      const model = handle.model;
+      const fails: string[] = [];
+      const check = (cond: boolean, msg: string) => {
+        if (!cond) fails.push(msg);
+      };
+      // A hang in any await below would time out the whole test.
+
+      // Fire-and-forget must stay safe (no throw, no unhandled rejection).
+      handle.diagram.invalidateMeasurements({ nodes: [{ nodeId: 'node-a' }] });
+
+      const t0 = performance.now();
+      await handle.diagram.invalidateMeasurements();
+      const fullElapsed = performance.now() - t0;
+
+      await handle.diagram.invalidateMeasurements({ nodes: [{ nodeId: 'node-a' }], edges: [] });
+      const node = model.getNodeById('node-a');
+      check((node?.size?.width ?? 0) > 0, 'selective: size missing right after await');
+      check((node?.measuredPorts?.length ?? 0) > 0, 'selective: measuredPorts missing right after await');
+
+      // Targets that are not rendered have nothing in flight — settle instead of hanging.
+      const t1 = performance.now();
+      await handle.diagram.invalidateMeasurements({ nodes: [{ nodeId: 'not-rendered' }] });
+      const unmountedElapsed = performance.now() - t1;
+
+      return { fails, fullElapsed, unmountedElapsed };
+    });
+
+    expect(result.fails).toEqual([]);
+    // A dropped/instantly-resolved promise returns at ~0ms; a real settle cannot beat
+    // the tracker's discovery window.
+    expect(result.fullElapsed).toBeGreaterThanOrEqual(20);
+    expect(result.unmountedElapsed).toBeLessThan(20);
+  });
+
+  test('invalidateMeasurements for edge labels resolves with measuredLabels readable right after', async ({
+    diagram,
+  }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          { id: 'node-a', position: { x: 80, y: 120 }, data: { label: 'A' } },
+          { id: 'node-b', position: { x: 360, y: 120 }, data: { label: 'B' } },
+        ],
+        edges: [{ id: 'edge-ab', source: 'node-a', target: 'node-b', data: { label: 'link' } }],
+      },
+    });
+
+    const result = await diagram.page.evaluate(async () => {
+      const handle = window.__diagram!;
+      const model = handle.model;
+      const fails: string[] = [];
+      const check = (cond: boolean, msg: string) => {
+        if (!cond) fails.push(msg);
+      };
+
+      const t0 = performance.now();
+      await handle.diagram.invalidateMeasurements({ edges: [{ edgeId: 'edge-ab' }] });
+      const elapsed = performance.now() - t0;
+
+      const edge = model.getEdgeById('edge-ab');
+      const label = edge?.measuredLabels?.[0];
+      check(!!label, 'edges: measuredLabels missing right after await');
+      check((label?.size?.width ?? 0) > 0, 'edges: measuredLabels size missing right after await');
+
+      return { fails, elapsed };
+    });
+
+    expect(result.fails).toEqual([]);
+    // The label is observed, so a real settle cannot beat the tracker's timers.
+    expect(result.elapsed).toBeGreaterThanOrEqual(20);
+  });
 });

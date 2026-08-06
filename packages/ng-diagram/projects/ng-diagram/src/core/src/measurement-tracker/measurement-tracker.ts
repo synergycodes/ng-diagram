@@ -117,8 +117,27 @@ export class MeasurementTracker {
       this.participantIds.add(id);
     }
 
+    // A debounce timer left over from an earlier registration would still fire on
+    // its own schedule and resolve this fresh discovery window early.
+    this.clearTimer(this.debounce);
+
     this.phase = 'discoveryWindow';
     this.startTimer(this.discoveryWindow);
+  }
+
+  /**
+   * Registers participants outside the middleware-driven transaction flow and opens the
+   * discovery window immediately — used by `invalidateMeasurements`, where the measurements
+   * are triggered by re-observing DOM elements rather than by a state update pass.
+   *
+   * Settles exactly like the transaction path: the discovery window expires on its own if
+   * no measurement ever arrives, so the promise from `waitForMeasurements()` cannot hang.
+   *
+   * @param entityIds - Prefixed entity IDs (e.g. 'node:abc', 'edge:xyz')
+   */
+  trackParticipants(entityIds: string[], config?: MeasurementTrackingConfig): void {
+    this.requestTracking(config);
+    this.registerParticipants(entityIds);
   }
 
   /**

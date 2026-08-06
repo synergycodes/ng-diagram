@@ -46,6 +46,14 @@ The reasoning has two halves:
 - `rotateNodeTo` — CSS transform; border-box unchanged
 - highlight, selection, and viewport operations
 
+**Outside the ledger** — `invalidateMeasurements` (awaitable since 1.3.0). It takes no
+`waitForMeasurements` option because it is not a mutation with an optional measurement
+tail: re-measuring IS the operation, so its promise always settles on measurements. It
+reuses the same `MeasurementTracker` (via `trackParticipants`, which opens the discovery
+window directly instead of going through a state-update pass), so the semantics and the
+~70 ms no-activity floor are identical — the only difference is that here the latency is
+what the caller asked for, not dead latency bolted onto a measurement-free pass.
+
 ### Evidence
 
 1. **Nodes render flat** — one `@for (node of nodes())` in `ng-diagram.component.html`; a

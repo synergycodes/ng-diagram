@@ -408,39 +408,80 @@ export class NgDiagramService extends NgDiagramBaseService {
    * Invalidating a node also re-measures all its ports.
    *
    * @param options Optional. Specifies which elements to re-measure.
+   * @returns A promise that resolves once the triggered re-measurements have settled
+   * (returned since 1.3.0; safe to ignore when the fresh geometry is not needed).
+   * After awaiting it, the invalidated elements' `size`, `measuredPorts` and
+   * `measuredLabels` read fresh.
+   *
+   * @remarks
+   * Resolution is **settle-based**, using the same mechanism as the transaction
+   * `waitForMeasurements` option: a discovery window opens, and once measurements start
+   * arriving a rolling debounce waits for them to stop. Consequences:
+   *
+   * - An invalidated element that never delivers a new measurement (it is unmounted,
+   *   has zero size, or simply did not change) does not stall the promise — the
+   *   discovery window expires and the promise resolves.
+   * - Targets that are not currently rendered/observed at all resolve immediately.
+   * - Measurements triggered concurrently by other work settle together with these, so
+   *   the promise may resolve slightly later than this call's own measurements.
    *
    * @example
-   * // Re-measure the entire diagram
-   * ngDiagramService.invalidateMeasurements();
+   * // Re-measure the entire diagram and wait for the new geometry
+   * await ngDiagramService.invalidateMeasurements();
    *
-   * // Re-measure specific nodes (including their ports)
-   * ngDiagramService.invalidateMeasurements({
+   * // Re-measure specific nodes (including their ports), then reflow their edges
+   * await ngDiagramService.invalidateMeasurements({
    *   nodes: [{ nodeId: 'node-1' }],
    * });
    *
    * // Re-measure all labels on specific edges
-   * ngDiagramService.invalidateMeasurements({
+   * await ngDiagramService.invalidateMeasurements({
    *   edges: [{ edgeId: 'edge-1' }],
    * });
    *
+   * // Fire-and-forget is still fine
+   * ngDiagramService.invalidateMeasurements();
+   *
    * @since 1.2.3
    */
-  invalidateMeasurements(options?: InvalidateMeasurementsOptions): void {
+  invalidateMeasurements(options?: InvalidateMeasurementsOptions): Promise<void> {
+    const entityIds = this.invalidateObservedElements(options);
+
+    // Nothing observed matched the request (never rendered, or already unmounted):
+    // there is no measurement in flight to wait for. Returning early also keeps
+    // fire-and-forget calls on an uninitialized diagram a silent no-op, as before.
+    if (entityIds.length === 0) {
+      return Promise.resolve();
+    }
+
+    // `this.flowCore` is read synchronously (this method is deliberately not `async`),
+    // so an uninitialized diagram throws at the call site instead of surfacing an
+    // unhandled rejection on a fire-and-forget call.
+    const { measurementTracker } = this.flowCore;
+    measurementTracker.trackParticipants(entityIds);
+
+    return measurementTracker.waitForMeasurements();
+  }
+
+  /**
+   * Re-observes the targeted elements and returns the prefixed entity IDs
+   * (`node:<id>` / `edge:<id>`) that actually had observed elements.
+   */
+  private invalidateObservedElements(options?: InvalidateMeasurementsOptions): string[] {
     if (!options) {
-      this.batchResizeObserver.invalidateAll();
-      return;
+      return this.batchResizeObserver.invalidateAll();
     }
 
-    if (options.nodes) {
-      for (const { nodeId } of options.nodes) {
-        this.batchResizeObserver.invalidateNode(nodeId);
-      }
+    const entityIds: string[] = [];
+
+    for (const { nodeId } of options.nodes ?? []) {
+      entityIds.push(...this.batchResizeObserver.invalidateNode(nodeId));
     }
 
-    if (options.edges) {
-      for (const { edgeId } of options.edges) {
-        this.batchResizeObserver.invalidateEdgeLabels(edgeId);
-      }
+    for (const { edgeId } of options.edges ?? []) {
+      entityIds.push(...this.batchResizeObserver.invalidateEdgeLabels(edgeId));
     }
+
+    return entityIds;
   }
 }

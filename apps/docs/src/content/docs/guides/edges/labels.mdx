@@ -136,7 +136,8 @@ ngDiagram automatically measures label dimensions using a `ResizeObserver`. Meas
 If you alter a label's layout through CSS in a way that doesn't trigger a size change, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramservice/#invalidatemeasurements) <Badge text="since v1.2.3" variant="tip" /> to force re-measurement:
 
 ```typescript
-this.ngDiagramService.invalidateMeasurements({
+// Await it when you need the fresh `measuredLabels` right away — since v1.3.0
+await this.ngDiagramService.invalidateMeasurements({
   edges: [{ edgeId: 'edge-1' }],
 });
 ```

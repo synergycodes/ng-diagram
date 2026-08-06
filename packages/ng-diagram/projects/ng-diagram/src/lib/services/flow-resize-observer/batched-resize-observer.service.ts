@@ -132,24 +132,32 @@ export class BatchResizeObserverService implements OnDestroy {
 
   /**
    * Invalidate the node element and all its port elements.
+   * @returns The entity keys actually invalidated — `['node:<nodeId>']`, or empty when
+   * nothing is currently observed for that node.
    */
-  invalidateNode(nodeId: string): void {
-    this.invalidateByKey(`node:${nodeId}`);
+  invalidateNode(nodeId: string): string[] {
+    return this.invalidateByKey(`node:${nodeId}`);
   }
 
   /**
    * Invalidate all label elements on an edge.
+   * @returns The entity keys actually invalidated — `['edge:<edgeId>']`, or empty when
+   * nothing is currently observed for that edge.
    */
-  invalidateEdgeLabels(edgeId: string): void {
-    this.invalidateByKey(`edge:${edgeId}`);
+  invalidateEdgeLabels(edgeId: string): string[] {
+    return this.invalidateByKey(`edge:${edgeId}`);
   }
 
   /**
    * Invalidate ALL currently observed elements.
+   * @returns The entity keys actually invalidated.
    */
-  invalidateAll(): void {
+  invalidateAll(): string[] {
     const seen = new Set<Element>();
-    for (const elements of this.entityIndex.values()) {
+    const entityKeys: string[] = [];
+    for (const [key, elements] of this.entityIndex) {
+      if (elements.size === 0) continue;
+      entityKeys.push(key);
       for (const element of elements) {
         if (!seen.has(element)) {
           seen.add(element);
@@ -157,14 +165,16 @@ export class BatchResizeObserverService implements OnDestroy {
         }
       }
     }
+    return entityKeys;
   }
 
-  private invalidateByKey(key: string): void {
+  private invalidateByKey(key: string): string[] {
     const elements = this.entityIndex.get(key);
-    if (!elements) return;
+    if (!elements || elements.size === 0) return [];
     for (const element of elements) {
       this.invalidate(element);
     }
+    return [key];
   }
 
   private getEntityKeys(metadata: ObservedElementMetadata): string[] {
