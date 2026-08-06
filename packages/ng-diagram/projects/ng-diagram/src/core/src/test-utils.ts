@@ -77,6 +77,16 @@ export const mockEdgeLabel: EdgeLabel = {
 /** Yields one macrotask — lets fire-and-forget emits and transactions settle. */
 export const macrotask = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+// Captured at module load, before any test installs fake timers.
+const realSetTimeout = setTimeout;
+
+/**
+ * Exhaustively drains the microtask queue (any await depth) without advancing fake
+ * timers — one real-macrotask hop, so awaited-but-timerless chains (e.g. semaphore
+ * hops) settle completely.
+ */
+export const flushMicrotasks = () => new Promise<void>((resolve) => realSetTimeout(resolve, 0));
+
 /** In-memory ModelAdapter for integration tests — real reads/writes, spied lifecycle. */
 export const createInMemoryModelAdapter = (): ModelAdapter => {
   let nodes: Node[] = [];

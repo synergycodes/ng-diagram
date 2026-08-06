@@ -391,6 +391,23 @@ export class FlowCore {
   }
 
   /**
+   * Opens an out-of-band measurement round (used by `invalidateMeasurements`) and
+   * resolves once the triggered measurements settle.
+   */
+  async trackMeasurements(entityIds: string[]): Promise<void> {
+    // Registration is serialized with the update pipeline, like the transaction path's
+    // staging: an in-flight pass must not eat the discovery window while this round's
+    // measurements are still queued behind the same semaphore.
+    await this.updateSemaphore.acquire();
+    try {
+      this.measurementTracker.trackParticipants(entityIds);
+    } finally {
+      this.updateSemaphore.release();
+    }
+    return this.measurementTracker.waitForMeasurements();
+  }
+
+  /**
    * Fast-path for viewport-only updates (panning/zooming).
    * Bypasses middleware chain and only updates viewport metadata.
    * Use this for high-frequency viewport changes where middleware processing is unnecessary.

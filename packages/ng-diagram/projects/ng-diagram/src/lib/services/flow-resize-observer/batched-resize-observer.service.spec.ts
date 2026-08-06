@@ -367,6 +367,16 @@ describe('BatchResizeObserverService', () => {
       expect(mockResizeObserver.observe).toHaveBeenCalledTimes(1);
       expect(mockResizeObserver.unobserve).toHaveBeenCalledWith(el1);
     });
+
+    it('should return the invalidated entity key', () => {
+      service.observe(document.createElement('div'), { type: 'node', nodeId: 'n1' });
+
+      expect(service.invalidateNode('n1')).toEqual(['node:n1']);
+    });
+
+    it('should return no entity key for an unknown nodeId', () => {
+      expect(service.invalidateNode('unknown')).toEqual([]);
+    });
   });
 
   describe('invalidateEdgeLabels', () => {
@@ -405,6 +415,16 @@ describe('BatchResizeObserverService', () => {
 
       expect(mockResizeObserver.observe).not.toHaveBeenCalled();
     });
+
+    it('should return the invalidated entity key', () => {
+      service.observe(document.createElement('div'), { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+
+      expect(service.invalidateEdgeLabels('e1')).toEqual(['edge:e1']);
+    });
+
+    it('should return no entity key for an unknown edgeId', () => {
+      expect(service.invalidateEdgeLabels('unknown')).toEqual([]);
+    });
   });
 
   describe('invalidateAll', () => {
@@ -430,6 +450,18 @@ describe('BatchResizeObserverService', () => {
       service.invalidateAll();
 
       expect(mockResizeObserver.observe).not.toHaveBeenCalled();
+    });
+
+    it('should return one entity key per invalidated entity, deduplicated across its elements', () => {
+      service.observe(document.createElement('div'), { type: 'node', nodeId: 'n1' });
+      service.observe(document.createElement('span'), { type: 'port', nodeId: 'n1', portId: 'p1' });
+      service.observe(document.createElement('p'), { type: 'edge-label', edgeId: 'e1', labelId: 'l1' });
+
+      expect(service.invalidateAll().sort()).toEqual(['edge:e1', 'node:n1']);
+    });
+
+    it('should return no entity keys when nothing is observed', () => {
+      expect(service.invalidateAll()).toEqual([]);
     });
   });
 
