@@ -180,6 +180,16 @@ export const defaultModel: DiagramModel = {
       // Empty list: the selection frame still draws, nothing resizes.
       data: { label: 'resizable none', activeSides: [] },
     },
+    {
+      id: '25',
+      position: { x: 650, y: 870 },
+      data: { label: 'custom edge with' },
+    },
+    {
+      id: '26',
+      position: { x: 1000, y: 870 },
+      data: { label: 'the default label chip' },
+    },
   ],
   edges: [
     {
@@ -340,6 +350,13 @@ export const defaultModel: DiagramModel = {
       routing: 'orthogonal',
       sourcePosition: { x: 800, y: 650 },
       targetPosition: { x: 1000, y: 550 },
+    },
+    {
+      id: '21',
+      source: '25',
+      target: '26',
+      data: { label: 'select me' },
+      type: 'default-labelled-edge',
     },
   ],
 };
