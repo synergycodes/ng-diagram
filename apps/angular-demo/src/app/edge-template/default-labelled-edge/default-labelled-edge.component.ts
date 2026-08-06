@@ -22,6 +22,13 @@ import {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent, NgDiagramDefaultEdgeLabelComponent],
+  styles: [
+    `
+      ng-diagram-base-edge.selected {
+        --edge-stroke: var(--ngd-default-edge-stroke-selected);
+      }
+    `,
+  ],
 })
 export class DefaultLabelledEdgeComponent implements NgDiagramEdgeTemplate<Data> {
   edge = input.required<Edge<Data>>();
