@@ -8,10 +8,7 @@ import type { InputEventName } from '../input-events/input-events.interface';
  * @category Types/Configuration/Shortcuts
  */
 export type KeyboardMoveSelectionAction =
-  | 'keyboardMoveSelectionUp'
-  | 'keyboardMoveSelectionDown'
-  | 'keyboardMoveSelectionLeft'
-  | 'keyboardMoveSelectionRight';
+  'keyboardMoveSelectionUp' | 'keyboardMoveSelectionDown' | 'keyboardMoveSelectionLeft' | 'keyboardMoveSelectionRight';
 
 /**
  * Keyboard panning actions that map to directional events

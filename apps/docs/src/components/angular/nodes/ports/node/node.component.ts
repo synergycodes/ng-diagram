@@ -35,9 +35,9 @@ import {
   styleUrl: './node.component.scss',
   // @collapse-end:hover-style
 })
-export class CustomNodeComponent
-  implements NgDiagramNodeTemplate<{ label: string }>
-{
+export class CustomNodeComponent implements NgDiagramNodeTemplate<{
+  label: string;
+}> {
   node = input.required<Node<{ label: string }>>();
 }
 // @section-end:hover-style

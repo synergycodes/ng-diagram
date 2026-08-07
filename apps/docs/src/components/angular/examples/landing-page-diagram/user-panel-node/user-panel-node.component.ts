@@ -31,9 +31,7 @@ export interface UserPanelData {
     '[class.ng-diagram-port-hoverable-over-node]': 'true',
   },
 })
-export class UserPanelNodeComponent
-  implements NgDiagramNodeTemplate<UserPanelData>
-{
+export class UserPanelNodeComponent implements NgDiagramNodeTemplate<UserPanelData> {
   selectedUser = signal(2);
 
   node = input.required<Node<UserPanelData>>();
