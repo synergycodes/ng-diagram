@@ -1,7 +1,7 @@
 import type { Model } from 'ng-diagram';
 import { expect, test } from './fixtures/diagram';
 import type { Diagram } from './fixtures/diagram';
-import { pair } from './fixtures/models';
+import { pair, spin } from './fixtures/models';
 
 /**
  * cancelActiveInteraction() and its default Escape binding: every gesture
@@ -58,22 +58,6 @@ const autoBox: Partial<Model> = {
       autoSize: true,
       resizable: true,
       data: { label: 'auto' },
-    },
-  ],
-  edges: [],
-};
-
-/** Rotatable node with a non-zero starting angle — rollback to 30° is unambiguous. */
-const spin: Partial<Model> = {
-  nodes: [
-    {
-      id: 'spin',
-      position: { x: 150, y: 150 },
-      size: { width: 140, height: 80 },
-      autoSize: false,
-      rotatable: true,
-      angle: 30,
-      data: { label: 'spin' },
     },
   ],
   edges: [],

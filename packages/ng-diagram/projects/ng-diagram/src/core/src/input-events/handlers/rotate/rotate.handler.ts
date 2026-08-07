@@ -1,8 +1,9 @@
 import { NgDiagramMath } from '../../../math';
+import type { Point, RotationActionState } from '../../../types';
 import { EventHandler } from '../event-handler';
 import { RotateInputEvent } from './rotate.event';
 
-const MIN_DISTANCE_TO_CENTER = 30;
+export const MIN_DISTANCE_TO_CENTER = 30;
 
 const ROTATE_MISSING_TARGET_ERROR = (event: RotateInputEvent) =>
   `[ngDiagram] Rotate event missing target node.
@@ -56,25 +57,12 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
           return;
         }
 
-        const pointerToCenterDistance = NgDiagramMath.distanceBetweenPoints(pointer, center);
-
-        /*
-          Someone has a mouse near the center,
-          and a movement of a few pixels causes a huge jump in rotation.
-          We just ignore that space and do not react.
-        */
-        if (pointerToCenterDistance < MIN_DISTANCE_TO_CENTER) {
+        const angle = this.computeTargetAngle(rotationState, pointer, center);
+        if (angle === null) {
           return;
         }
 
-        // Calculate current angle from center to pointer
-        const currentAngle = NgDiagramMath.angleBetweenPoints(center, pointer);
-        const angleDelta = currentAngle - rotationState.startAngle;
-
-        this.flow.commandHandler.emit('rotateNodeTo', {
-          nodeId,
-          angle: rotationState.initialNodeAngle + angleDelta,
-        });
+        this.flow.commandHandler.emit('rotateNodeTo', { nodeId, angle });
         break;
       }
 
@@ -82,18 +70,47 @@ export class RotateEventHandler extends EventHandler<RotateInputEvent> {
         const rotationState = this.flow.actionStateManager.rotation;
         this.claimTeardown(rotationState);
         try {
-          await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
+          // pointerup is not frame-aligned: the coalesced pointermove of the final
+          // frame may never be delivered, so the release point itself is applied as
+          // the last rotation. rotateNodeTo no-ops when the angle did not change.
+          if (rotationState && rotationState.nodeId === nodeId) {
+            const angle = this.computeTargetAngle(rotationState, pointer, center);
+            if (angle !== null) {
+              await this.flow.commandHandler.emit('rotateNodeTo', { nodeId, angle });
+            }
+          }
         } finally {
-          // Cleanup must run even when the emit rejects, but a fast re-grab that
-          // started a new rotation while the emit was suspended must not have its
-          // fresh state cleared.
-          if (this.flow.actionStateManager.rotation === rotationState) {
-            this.flow.actionStateManager.clearRotation();
+          try {
+            await this.flow.commandHandler.emit('rotateNodeStop', { nodeId: rotationState?.nodeId });
+          } finally {
+            // Cleanup must run even when the emit rejects, but a fast re-grab that
+            // started a new rotation while the emit was suspended must not have its
+            // fresh state cleared.
+            if (this.flow.actionStateManager.rotation === rotationState) {
+              this.flow.actionStateManager.clearRotation();
+            }
           }
         }
         break;
       }
     }
+  }
+
+  /** Angle math shared by continue and end; null inside the dead zone around the center. */
+  private computeTargetAngle(rotationState: RotationActionState, pointer: Point, center: Point): number | null {
+    /*
+      Someone has a mouse near the center,
+      and a movement of a few pixels causes a huge jump in rotation.
+      We just ignore that space and do not react.
+    */
+    if (NgDiagramMath.distanceBetweenPoints(pointer, center) < MIN_DISTANCE_TO_CENTER) {
+      return null;
+    }
+
+    const currentAngle = NgDiagramMath.angleBetweenPoints(center, pointer);
+    const angleDelta = currentAngle - rotationState.startAngle;
+
+    return rotationState.initialNodeAngle + angleDelta;
   }
 
   override async cancel(): Promise<boolean> {

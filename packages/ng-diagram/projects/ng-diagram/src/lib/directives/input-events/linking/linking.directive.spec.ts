@@ -31,17 +31,23 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
   let clearLinking: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
+  let linkingEventService: {
+    emitStart: ReturnType<typeof vi.fn>;
+    emitContinue: ReturnType<typeof vi.fn>;
+    emitEnd: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     clearLinking = vi.fn();
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
-    const mockLinkingEventService = {
+    linkingEventService = {
       emitStart: vi.fn(),
       emitContinue: vi.fn(),
       emitEnd: vi.fn(),
     };
+    const mockLinkingEventService = linkingEventService;
     const mockFlowCoreProvider = {
       isInitialized: () => true,
       provide: () => ({
@@ -97,5 +103,16 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     directive.onPointerDown(makePointerEvent());
 
     expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancels the linking on a takeover instead of finishing at the foreign point', () => {
+    directive.onPointerDown(makePointerEvent({ clientX: 10, clientY: 10 }));
+
+    // A two-finger pan takes over mid-linking; the second finger's move must
+    // end the gesture as taken over, not as a finish at its coordinates
+    touchState.currentEvent.set(DiagramEventName.Panning);
+    directive.onPointerMove(makePointerEvent({ clientX: 300, clientY: 400 }));
+
+    expect(linkingEventService.emitEnd).toHaveBeenCalledWith(expect.anything(), undefined, 'p1', true);
   });
 });

@@ -62,7 +62,10 @@ export class LinkingInputDirective implements OnDestroy {
 
   onPointerMove = ($event: PointerInputEvent) => {
     if (this.touchEventsStateService.panningHandled() || this.touchEventsStateService.zoomingHandled()) {
-      this.onPointerUp($event);
+      // Another touch gesture claimed the pointer — this move may come from the
+      // other finger, so the linking is cancelled instead of finished at its point.
+      this.linkingEventService.emitEnd($event, this.target(), this.portId(), true);
+      this.removeListeners();
       return;
     }
 

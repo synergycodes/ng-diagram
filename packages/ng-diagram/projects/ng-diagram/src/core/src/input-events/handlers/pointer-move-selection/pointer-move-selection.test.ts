@@ -7,10 +7,9 @@ import { sortNodesByZIndex } from '../../../utils';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 import { MOVE_THRESHOLD, PointerMoveSelectionEventHandler } from './pointer-move-selection.handler';
 
-vi.mock('../../../utils', () => ({
-  sortNodesByZIndex: vi.fn((nodes) => [...nodes].sort((a, b) => (b.computedZIndex ?? 0) - (a.computedZIndex ?? 0))),
-  isGroup: vi.fn((node) => node?.isGroup === true),
-}));
+// Every util keeps its real implementation, wrapped in a spy — tests assert
+// sortNodesByZIndex calls.
+vi.mock('../../../utils', { spy: true });
 
 function getSamplePointerMoveSelectionEvent(
   overrides: Partial<PointerMoveSelectionEvent> = {}
@@ -516,6 +515,75 @@ describe('PointerMoveSelectionEventHandler', () => {
       mockEmit.mockClear();
     });
 
+    describe('final frame apply', () => {
+      it('should recover the trailing pointer movement from the release point before the drop', async () => {
+        const callOrder: string[] = [];
+        mockEmit.mockImplementation((name: string) => {
+          callOrder.push(name);
+          return Promise.resolve();
+        });
+
+        await handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'end',
+            lastInputPoint: { x: lastInputPointOverThreshold.x + 8, y: lastInputPointOverThreshold.y + 6 },
+          })
+        );
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: 8, y: 6 },
+          nodes: [mockNode],
+        });
+        expect(callOrder.filter((name) => name === 'moveNodesBy' || name === 'moveNodesStop')).toEqual([
+          'moveNodesBy',
+          'moveNodesStop',
+        ]);
+      });
+
+      it('should not emit an extra move when the release point equals the last pointermove', async () => {
+        await handler.handle(
+          getSamplePointerMoveSelectionEvent({ phase: 'end', lastInputPoint: lastInputPointOverThreshold })
+        );
+
+        expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      });
+
+      it('should filter non-draggable nodes from the final move', async () => {
+        const draggableNode = { ...mockNode, id: 'draggable' };
+        const lockedNode = { ...mockNode, id: 'locked', draggable: false };
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([draggableNode, lockedNode]);
+
+        await handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'end',
+            lastInputPoint: { x: lastInputPointOverThreshold.x + 20, y: lastInputPointOverThreshold.y + 20 },
+          })
+        );
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', expect.objectContaining({ nodes: [draggableNode] }));
+      });
+
+      it('should emit moveNodesStop and clean up even when the final move emit rejects', async () => {
+        mockEmit.mockImplementation(async (name: string) => {
+          if (name === 'moveNodesBy') {
+            throw new Error('middleware failed');
+          }
+        });
+
+        await expect(
+          handler.handle(
+            getSamplePointerMoveSelectionEvent({
+              phase: 'end',
+              lastInputPoint: { x: lastInputPointOverThreshold.x + 20, y: lastInputPointOverThreshold.y + 20 },
+            })
+          )
+        ).rejects.toThrow('middleware failed');
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesStop', { nodeIds: expect.any(Array) });
+        expect(mockActionStateManager.clearDragging).toHaveBeenCalled();
+      });
+    });
+
     describe('group changes on drop', () => {
       it('should only handle drop if movement exceeded threshold', async () => {
         // Reset handler
@@ -974,7 +1042,7 @@ describe('PointerMoveSelectionEventHandler', () => {
       expect(mockEmit).toHaveBeenCalledWith('moveNodesStop', { nodeIds: expect.any(Array) });
     });
 
-    it('should not emit moveNodesStop command when threshold was not crossed', async () => {
+    it('should not emit moveNodesStop nor a final move when threshold was not crossed', async () => {
       handler.handle(getSamplePointerMoveSelectionEvent({ phase: 'start' }));
 
       await handler.handle(
@@ -984,14 +1052,18 @@ describe('PointerMoveSelectionEventHandler', () => {
         })
       );
 
+      // The release point differs from the last move and lies beyond the
+      // threshold, but the end phase does no threshold crossing — a gesture
+      // that never crossed it during moves stays a click, no recovery move.
       await handler.handle(
         getSamplePointerMoveSelectionEvent({
           phase: 'end',
-          lastInputPoint: lastInputPointBelowThreshold,
+          lastInputPoint: lastInputPointOverThreshold,
         })
       );
 
       expect(mockEmit.mock.calls.some((call) => call[0] === 'moveNodesStop')).toBe(false);
+      expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
     });
   });
 

@@ -6,4 +6,6 @@ export interface LinkingInputEvent extends BasePointerInputEvent {
   phase: InputEventPhase;
   portId: string;
   panningForce: Point | null;
+  /** Set on an `end` emitted because another gesture claimed the pointer — the linking is cancelled, not finished. */
+  takenOver?: boolean;
 }

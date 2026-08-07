@@ -200,7 +200,7 @@ test.describe('resize validation middleware', () => {
   /** Rolls fast-release resizes past the validation threshold: every revert must apply and hold. */
   async function expectRevertsSurviveFastReleases(diagram: Diagram): Promise<void> {
     for (let i = 1; i <= GESTURES; i++) {
-      await diagram.dragResizeHandle('box', 'bottom-right', { x: 60, y: 40 }, { fastRelease: true });
+      await diagram.dragResizeHandle('box', 'bottom-right', { x: 60, y: 40 });
 
       await expect.poll(async () => (await boxNode(diagram)).size).toEqual(ORIGINAL.size);
       const { maxWidth, widths } = await diagram.page.evaluate(async (frames) => {

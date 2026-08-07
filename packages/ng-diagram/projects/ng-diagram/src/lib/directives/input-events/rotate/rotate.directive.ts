@@ -1,5 +1,5 @@
 import { Directive, inject, input, OnDestroy } from '@angular/core';
-import { Node } from '../../../../core/src';
+import { Node, Point } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
@@ -17,6 +17,9 @@ export class RotateHandleDirective implements OnDestroy {
   private readonly touchEventsStateService = inject(TouchEventsStateService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private gestureActive = false;
+  // Last point this gesture actually produced — takeover and pointercancel ends
+  // must not use the triggering event's coordinates (foreign finger / unreliable).
+  private lastGesturePoint: Point | null = null;
 
   targetData = input<Node>();
 
@@ -45,6 +48,7 @@ export class RotateHandleDirective implements OnDestroy {
 
     $event.rotateHandled = true;
     this.gestureActive = true;
+    this.lastGesturePoint = { x: $event.clientX, y: $event.clientY };
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Rotate);
 
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
@@ -70,7 +74,9 @@ export class RotateHandleDirective implements OnDestroy {
 
   onPointerMove = ($event: PointerInputEvent) => {
     if (this.touchEventsStateService.panningHandled() || this.touchEventsStateService.zoomingHandled()) {
-      this.onPointerUp($event);
+      // Takeover by another touch gesture: this move may come from the other
+      // finger — end with the gesture's own last point, not this event's.
+      this.endGesture($event, this.lastGesturePoint);
       return;
     }
 
@@ -81,6 +87,7 @@ export class RotateHandleDirective implements OnDestroy {
       return;
     }
 
+    this.lastGesturePoint = { x: $event.clientX, y: $event.clientY };
     const baseEvent = this.inputEventsRouter.getBaseEvent($event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -96,6 +103,10 @@ export class RotateHandleDirective implements OnDestroy {
   };
 
   onPointerUp = ($event: PointerInputEvent) => {
+    this.endGesture($event);
+  };
+
+  private endGesture($event: PointerInputEvent, lastPoint: Point | null = null): void {
     this.removeListeners();
 
     const targetData = this.targetData();
@@ -109,16 +120,14 @@ export class RotateHandleDirective implements OnDestroy {
       name: 'rotate',
       phase: 'end',
       target: targetData,
-      lastInputPoint: {
-        x: $event.clientX,
-        y: $event.clientY,
-      },
+      lastInputPoint: lastPoint ?? { x: $event.clientX, y: $event.clientY },
       center: this.getNodeCenter(targetData),
     });
-  };
+  }
 
   onPointerCancel = ($event: PointerInputEvent) => {
-    this.onPointerUp($event);
+    // pointercancel coordinates are unreliable — end with the gesture's own last point.
+    this.endGesture($event, this.lastGesturePoint);
   };
 
   private shouldHandle(event: PointerInputEvent) {
