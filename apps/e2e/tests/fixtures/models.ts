@@ -59,6 +59,24 @@ export const resizeArena: Partial<Model> = {
   edges: [],
 };
 
+/**
+ * Labelled edges for the edge-label specs. `edge-default` renders its label through
+ * the default edge template (`data.label`); `edge-custom` uses the harness `labelled`
+ * template, which composes the public default label chip.
+ */
+export const labelArena: Partial<Model> = {
+  nodes: [
+    { id: 'node-a', position: { x: 80, y: 80 }, data: { label: 'A' } },
+    { id: 'node-b', position: { x: 360, y: 80 }, data: { label: 'B' } },
+    { id: 'node-c', position: { x: 80, y: 260 }, data: { label: 'C' } },
+    { id: 'node-d', position: { x: 360, y: 260 }, data: { label: 'D' } },
+  ],
+  edges: [
+    { id: 'edge-default', source: 'node-a', target: 'node-b', data: { label: 'default' } },
+    { id: 'edge-custom', source: 'node-c', target: 'node-d', type: 'labelled', data: { label: 'custom' } },
+  ],
+};
+
 /** A group, a member inside it, and a free node — for group/selection scenarios. */
 export const groupArena: Partial<Model> = {
   nodes: [

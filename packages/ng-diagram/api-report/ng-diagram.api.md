@@ -882,6 +882,16 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 export type NgDiagramConfig = DeepPartial<FlowConfig>;
 
 // @public
+export class NgDiagramDefaultEdgeLabelComponent {
+    // (undocumented)
+    readonly selected: Signal<boolean | undefined>;
+    // (undocumented)
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramDefaultEdgeLabelComponent, "ng-diagram-default-edge-label", never, {}, {}, never, ["*"], true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramDefaultEdgeLabelComponent, never>;
+}
+
+// @public
 export interface NgDiagramEdgeTemplate<Data extends DataObject = DataObject> {
     edge: InputSignal<Edge<Data>>;
 }
