@@ -9,7 +9,7 @@ import {
 
 /**
  * Custom edge that reuses the default label chip via NgDiagramDefaultEdgeLabelComponent
- * instead of copying its styles — theming and the selected-state border come for free.
+ * instead of copying its styles — theming and the hover/selected border highlights come for free.
  */
 @Component({
   selector: 'app-default-labelled-edge',
@@ -24,6 +24,10 @@ import {
   imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent, NgDiagramDefaultEdgeLabelComponent],
   styles: [
     `
+      ng-diagram-base-edge:hover:not(.selected) {
+        --edge-stroke: var(--ngd-default-edge-stroke-hover);
+      }
+
       ng-diagram-base-edge.selected {
         --edge-stroke: var(--ngd-default-edge-stroke-selected);
       }

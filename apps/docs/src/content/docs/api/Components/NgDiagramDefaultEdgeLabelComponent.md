@@ -8,7 +8,7 @@ title: "NgDiagramDefaultEdgeLabelComponent"
 
 The `NgDiagramDefaultEdgeLabelComponent` wraps any projected content in the default
 edge label chip — theme-aware background, rounded border and a highlighted border
-while the edge is selected. Use it inside a [NgDiagramBaseEdgeLabelComponent](/docs/api/components/ngdiagrambaseedgelabelcomponent/)
+while the edge is hovered or selected. Use it inside a [NgDiagramBaseEdgeLabelComponent](/docs/api/components/ngdiagrambaseedgelabelcomponent/)
 to give a custom edge template the same label look as the default edge without
 copying its styles.
 

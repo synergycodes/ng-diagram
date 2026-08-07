@@ -51,6 +51,7 @@ ng-diagram-default-edge-label {
 - `--edge-label-text-color` - Label text color
 - `--edge-label-border-width` - Label border width
 - `--edge-label-border-color` - Label border color
+- `--edge-label-border-color-hover` - Label border color while the edge is hovered
 - `--edge-label-border-color-selected` - Label border color while the edge is selected
 - `--edge-label-border-transition` - Transition for border changes
 
@@ -102,8 +103,9 @@ The two elements have separate jobs: `ng-diagram-base-edge-label` places the lab
 edge path and measures it, while `ng-diagram-default-edge-label` only gives the content its look.
 
 The chip keeps the theme colors, responds to the CSS variables listed above, and highlights
-its border while the edge is selected. The hover highlight is not part of the chip — it comes
-from the default edge template and applies only there.
+its border while the edge is hovered or selected — the same states as in the default edge.
+Use `--edge-label-border-color-hover` and `--edge-label-border-color-selected` to change the
+highlight colors.
 
 ## Label Positioning
 
