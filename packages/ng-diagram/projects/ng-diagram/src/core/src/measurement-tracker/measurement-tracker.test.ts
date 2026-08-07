@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_DISCOVERY_WINDOW_TIMEOUT, MeasurementTracker } from './measurement-tracker';
+import { DEFAULT_DEBOUNCE_TIMEOUT, DEFAULT_DISCOVERY_WINDOW_TIMEOUT, MeasurementTracker } from './measurement-tracker';
 
 describe('MeasurementTracker', () => {
   let tracker: MeasurementTracker;
@@ -585,6 +585,181 @@ describe('MeasurementTracker', () => {
 
       // Should expire at 65ms
       vi.advanceTimersByTime(15);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not let a leftover debounce timer resolve a freshly opened discovery window', () => {
+      tracker.requestTracking({ discoveryWindowMs: 70, debounceMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+      tracker.signalMeasurement('node:node1');
+
+      // 30ms into the 50ms debounce, a new registration opens a fresh discovery window.
+      vi.advanceTimersByTime(30);
+      tracker.requestTracking({ discoveryWindowMs: 70, debounceMs: 50 });
+      tracker.registerParticipants(['node:node2']);
+
+      // The old debounce would have fired here — it must not resolve the new window.
+      vi.advanceTimersByTime(20);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      // Resolves on the new discovery window instead (70ms after registration).
+      vi.advanceTimersByTime(50);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+  });
+
+  describe('trackParticipants()', () => {
+    it('should register participants and start the discovery window in one call', () => {
+      tracker.trackParticipants(['node:node1']);
+
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+      expect(tracker.isTrackingRequested()).toBe(false);
+    });
+
+    it('should resolve on discovery window expiry when no measurement arrives', async () => {
+      tracker.trackParticipants(['node:node1']);
+      const promise = tracker.waitForMeasurements();
+
+      vi.advanceTimersByTime(DEFAULT_DISCOVERY_WINDOW_TIMEOUT);
+
+      await expect(promise).resolves.toBeUndefined();
+    });
+
+    it('should transition to debounce when a measurement arrives', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 70, debounceMs: 50 });
+
+      vi.advanceTimersByTime(20);
+      tracker.signalMeasurement('node:node1');
+
+      vi.advanceTimersByTime(49);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should leave no staged tracking request for an empty participant list', () => {
+      tracker.trackParticipants([]);
+
+      expect(tracker.isTrackingRequested()).toBe(false);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should apply a custom discovery window duration', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 200, debounceMs: 100 });
+
+      vi.advanceTimersByTime(199);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should apply a custom debounce duration', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 200, debounceMs: 100 });
+      tracker.signalMeasurement('node:node1');
+
+      vi.advanceTimersByTime(99);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should keep earlier participants when called during an active round', () => {
+      tracker.trackParticipants(['node:node1']);
+      tracker.signalMeasurement('node:node1');
+
+      // A second round opens a fresh discovery window; node1 must stay a participant.
+      tracker.trackParticipants(['node:node2']);
+      tracker.signalMeasurement('node:node1');
+
+      // If node1's signal were ignored, the round would still be in the (longer)
+      // discovery window here instead of settling on the debounce.
+      vi.advanceTimersByTime(DEFAULT_DEBOUNCE_TIMEOUT - 1);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should not let a leftover debounce timer resolve a freshly opened round', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 70, debounceMs: 50 });
+      tracker.signalMeasurement('node:node1');
+
+      // 30ms into the 50ms debounce, an overlapping invalidation starts a new round.
+      vi.advanceTimersByTime(30);
+      tracker.trackParticipants(['node:node2'], { discoveryWindowMs: 70, debounceMs: 50 });
+
+      // The old debounce would have fired here — it must not resolve the new window.
+      vi.advanceTimersByTime(20);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(50);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should preserve a staged request even for an empty participant list', () => {
+      tracker.requestTracking();
+
+      tracker.trackParticipants([]);
+
+      expect(tracker.isTrackingRequested()).toBe(true);
+    });
+
+    it('should keep the active round durations when joining without explicit config', () => {
+      tracker.requestTracking({ discoveryWindowMs: 200, debounceMs: 100 });
+      tracker.registerParticipants(['node:tx']);
+
+      // 100ms into the 200ms window an invalidation joins the round — the restart
+      // must reuse the round's 200ms duration, not shrink it to the 70ms default.
+      vi.advanceTimersByTime(100);
+      tracker.trackParticipants(['node:invalidated']);
+
+      vi.advanceTimersByTime(199);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should apply an explicit config when joining an active round', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 200, debounceMs: 100 });
+
+      tracker.trackParticipants(['node:node2'], { discoveryWindowMs: 30, debounceMs: 20 });
+
+      vi.advanceTimersByTime(29);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should return to defaults for a fresh round after a custom round settles', () => {
+      tracker.trackParticipants(['node:node1'], { discoveryWindowMs: 200, debounceMs: 100 });
+      vi.advanceTimersByTime(200);
+
+      tracker.trackParticipants(['node:node2']);
+
+      vi.advanceTimersByTime(DEFAULT_DISCOVERY_WINDOW_TIMEOUT - 1);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should keep the staged config for the transaction that staged it', () => {
+      tracker.requestTracking({ discoveryWindowMs: 200, debounceMs: 100 });
+      tracker.trackParticipants(['node:invalidated']);
+
+      // The middleware's first pass registers the transaction's participants —
+      // its 200ms discovery window must apply, not the invalidation's default.
+      tracker.registerParticipants(['node:tx']);
+
+      vi.advanceTimersByTime(199);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(1);
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
   });

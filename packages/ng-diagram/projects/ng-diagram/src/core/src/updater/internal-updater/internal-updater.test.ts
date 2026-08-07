@@ -5,6 +5,7 @@ import { FlowCore } from '../../flow-core';
 import { LabelBatchProcessor } from '../../label-batch-processor/label-batch-processor';
 import { PortBatchProcessor } from '../../port-batch-processor/port-batch-processor';
 import { mockEdge, mockEdgeLabel, mockNode, mockPort } from '../../test-utils';
+import type { Port } from '../../types';
 import { InternalUpdater } from './internal-updater';
 
 describe('InternalUpdater', () => {
@@ -175,6 +176,82 @@ describe('InternalUpdater', () => {
       expect(commandHandler.emit).toHaveBeenCalledWith('addPortsBulk', {
         additions: expectedAdditions,
       });
+    });
+
+    it('should re-apply authored properties when the port already exists in the model (component recreation)', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        measuredPorts: [{ ...mockPort, side: 'left', type: 'source' }],
+      });
+
+      internalUpdater.addPort('node-1', { ...mockPort, side: 'right', type: 'target' });
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        {
+          portId: mockPort.id,
+          portChanges: { id: mockPort.id, nodeId: mockPort.nodeId, side: 'right', type: 'target' },
+        },
+        expect.any(Function)
+      );
+      expect(portBatchProcessor.processAdd).toHaveBeenCalled();
+    });
+
+    it('should reconcile properties added to Port in the future without listing them explicitly', () => {
+      type FuturePort = Port & { futureProp: string };
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        measuredPorts: [{ ...mockPort, futureProp: 'old' } as FuturePort],
+      });
+
+      internalUpdater.addPort('node-1', { ...mockPort, futureProp: 'new' } as FuturePort);
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: mockPort.id, portChanges: expect.objectContaining({ futureProp: 'new' }) },
+        expect.any(Function)
+      );
+    });
+
+    it('should never include measured geometry in the reconciled properties', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        measuredPorts: [{ ...mockPort, side: 'left' }],
+      });
+
+      internalUpdater.addPort('node-1', {
+        ...mockPort,
+        side: 'right',
+        size: { width: 999, height: 999 },
+        position: { x: 999, y: 999 },
+      });
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: mockPort.id, portChanges: expect.not.objectContaining({ size: expect.anything() }) },
+        expect.any(Function)
+      );
+    });
+
+    it('should not queue an update when the existing port has the same side and type', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        measuredPorts: [{ ...mockPort }],
+      });
+
+      internalUpdater.addPort('node-1', { ...mockPort });
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+      expect(portBatchProcessor.processAdd).toHaveBeenCalled();
+    });
+
+    it('should not queue an update when the port does not exist in the model yet', () => {
+      getNodeByIdMock.mockReturnValue({ ...mockNode, measuredPorts: [] });
+
+      internalUpdater.addPort('node-1', mockPort);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+      expect(portBatchProcessor.processAdd).toHaveBeenCalled();
     });
   });
 
@@ -482,6 +559,43 @@ describe('InternalUpdater', () => {
       expect(commandHandler.emit).toHaveBeenCalledWith('addEdgeLabelsBulk', {
         additions: expectedAdditions,
       });
+    });
+
+    it('should re-apply authored properties when the label already exists in the model (component recreation)', () => {
+      getEdgeByIdMock.mockReturnValue({
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, positionOnEdge: 0.5 }],
+      });
+
+      internalUpdater.addEdgeLabel('edge-1', { ...mockEdgeLabel, positionOnEdge: 0.8 });
+
+      expect(labelBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'edge-1',
+        { labelId: mockEdgeLabel.id, labelChanges: { id: mockEdgeLabel.id, positionOnEdge: 0.8 } },
+        expect.any(Function)
+      );
+      expect(labelBatchProcessor.processAdd).toHaveBeenCalled();
+    });
+
+    it('should not queue an update when the existing label has the same positionOnEdge', () => {
+      getEdgeByIdMock.mockReturnValue({
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel }],
+      });
+
+      internalUpdater.addEdgeLabel('edge-1', { ...mockEdgeLabel });
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+      expect(labelBatchProcessor.processAdd).toHaveBeenCalled();
+    });
+
+    it('should not queue an update when the label does not exist in the model yet', () => {
+      getEdgeByIdMock.mockReturnValue({ ...mockEdge, measuredLabels: [] });
+
+      internalUpdater.addEdgeLabel('edge-1', mockEdgeLabel);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+      expect(labelBatchProcessor.processAdd).toHaveBeenCalled();
     });
   });
 

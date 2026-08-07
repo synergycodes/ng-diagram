@@ -4,8 +4,9 @@ import { EdgeRoutingManager } from './edge-routing-manager';
 import { EventManager } from './event-manager';
 import { createFlowConfig } from './flow-config/default-flow-config';
 import { InputEventsRouter } from './input-events';
+import { InteractionCoordinator } from './interaction-coordinator/interaction-coordinator';
 import { LabelBatchProcessor } from './label-batch-processor/label-batch-processor';
-import { MeasurementTracker } from './measurement-tracker/measurement-tracker';
+import { MeasurementTracker, MeasurementTrackingConfig } from './measurement-tracker/measurement-tracker';
 import { MiddlewareManager } from './middleware-manager/middleware-manager';
 import { loggerMiddleware } from './middleware-manager/middlewares';
 import { ModelLookup } from './model-lookup/model-lookup';
@@ -72,6 +73,7 @@ export class FlowCore {
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
 
+  private readonly interactionCoordinator: InteractionCoordinator;
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;
 
@@ -102,6 +104,7 @@ export class FlowCore {
     this.virtualizedRenderStrategy = new VirtualizedRenderStrategy(this);
     this.middlewareManager = new MiddlewareManager(this, middlewares);
     this.transactionManager = new TransactionManager(this);
+    this.interactionCoordinator = new InteractionCoordinator(this);
     this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
     this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
@@ -284,29 +287,43 @@ export class FlowCore {
 
     if (typeof nameOrCallback === 'function') {
       transactionOptions = callbackOrOptions as TransactionOptions | undefined;
+    } else {
+      transactionOptions = options;
+    }
+
+    if (transactionOptions?.waitForMeasurements && this.transactionManager.isActive()) {
+      console.warn(
+        '[ngDiagram] waitForMeasurements is ignored on a nested transaction — its updates are applied (and measured) only when the root transaction commits. Pass the option to the root transaction instead.'
+      );
+    }
+
+    if (typeof nameOrCallback === 'function') {
       results = await this.transactionManager.transaction(nameOrCallback, transactionOptions ?? {});
     } else {
       const callback = callbackOrOptions as TransactionCallback | undefined;
       if (!callback) {
         throw new Error('Callback is required when transaction name is provided');
       }
-      transactionOptions = options;
       results = await this.transactionManager.transaction(nameOrCallback, callback, transactionOptions ?? {});
     }
+
+    let measurementTracking: MeasurementTrackingConfig | null = null;
 
     if (results.commandsCount > 0) {
       if (transactionOptions?.waitForMeasurements) {
         const internalOptions = transactionOptions as InternalTransactionOptions;
-        this.measurementTracker.requestTracking({
+        measurementTracking = {
           discoveryWindowMs: internalOptions._measurementDiscoveryWindowTimeout,
           debounceMs: internalOptions._measurementDebounceTimeout,
-        });
+        };
       }
 
-      await this.applyUpdate(results.results, results.actionTypes);
+      // Commit directly — applyUpdate would re-queue this completed root
+      // transaction's result into whatever unrelated transaction is active now.
+      await this.applyUpdateToModel(results.results, results.actionTypes, measurementTracking);
     }
 
-    if (transactionOptions?.waitForMeasurements) {
+    if (measurementTracking) {
       await this.measurementTracker.waitForMeasurements();
     }
 
@@ -329,10 +346,30 @@ export class FlowCore {
       return;
     }
 
+    return this.applyUpdateToModel(stateUpdate, actionTypesArray);
+  }
+
+  /**
+   * Runs an update through the middleware chain and commits it to the model,
+   * bypassing the active-transaction routing in `applyUpdate`.
+   */
+  private async applyUpdateToModel(
+    stateUpdate: FlowStateUpdate,
+    modelActionTypes: LooseAutocomplete<ModelActionType> | ModelActionTypes,
+    measurementTracking: MeasurementTrackingConfig | null = null
+  ): Promise<void> {
+    const actionTypesArray: ModelActionTypes = Array.isArray(modelActionTypes) ? modelActionTypes : [modelActionTypes];
+
     // Acquire semaphore to ensure atomic updates
     await this.updateSemaphore.acquire();
 
     try {
+      // Staged under the held semaphore so only this pass's
+      // measurement-tracking middleware can consume the request.
+      if (measurementTracking) {
+        this.measurementTracker.requestTracking(measurementTracking);
+      }
+
       const currentState = this.getState();
       const finalState = await this.middlewareManager.execute(currentState, stateUpdate, actionTypesArray);
 
@@ -343,9 +380,31 @@ export class FlowCore {
         this.eventManager.clearDeferredEmits();
       }
     } finally {
+      // A cancelled or throwing chain may never reach the measurement-tracking
+      // middleware — clear the staged request so it cannot poison the next pass.
+      if (measurementTracking && this.measurementTracker.isTrackingRequested()) {
+        this.measurementTracker.cancelTrackingRequest();
+      }
       // Always release the semaphore, even if an error occurs
       this.updateSemaphore.release();
     }
+  }
+
+  /**
+   * Opens an out-of-band measurement round (used by `invalidateMeasurements`) and
+   * resolves once the triggered measurements settle.
+   */
+  async trackMeasurements(entityIds: string[]): Promise<void> {
+    // Registration is serialized with the update pipeline, like the transaction path's
+    // staging: an in-flight pass must not eat the discovery window while this round's
+    // measurements are still queued behind the same semaphore.
+    await this.updateSemaphore.acquire();
+    try {
+      this.measurementTracker.trackParticipants(entityIds);
+    } finally {
+      this.updateSemaphore.release();
+    }
+    return this.measurementTracker.waitForMeasurements();
   }
 
   /**
@@ -437,6 +496,48 @@ export class FlowCore {
    */
   getEdgeById(edgeId: string): Edge | null {
     return this.modelLookup.getEdgeById(edgeId);
+  }
+
+  /**
+   * Registers a cleanup for the gesture that is starting; it runs when
+   * {@link cancelActiveInteraction} aborts the gesture. The caller must
+   * unregister it in its own normal teardown, or stale cleanups accumulate.
+   *
+   * @returns Function that unregisters the callback
+   */
+  registerInteractionCleanup(cleanup: () => void): () => void {
+    return this.interactionCoordinator.registerInteractionCleanup(cleanup);
+  }
+
+  /**
+   * Whether {@link cancelActiveInteraction} is mid-flight — its rollback has
+   * not committed yet, so input read now could capture geometry it is about
+   * to rewrite.
+   */
+  isCancellingInteraction(): boolean {
+    return this.interactionCoordinator.isCancellingInteraction();
+  }
+
+  /**
+   * Whether an interactive gesture (linking, dragging, resizing, rotating,
+   * panning) is currently in progress, or a gesture's listener cleanup is
+   * still registered.
+   */
+  hasActiveInteraction(): boolean {
+    return this.interactionCoordinator.hasActiveInteraction();
+  }
+
+  /**
+   * Aborts the in-progress gesture (linking, drag, resize, rotate or pan):
+   * removes its listeners, restores the state it modified (the viewport is
+   * not rolled back) and fires the "ended" event with the `cancelled` reason.
+   * No-op when nothing is active, when the gesture is already completing, or
+   * while a transaction is active (refused with a console warning).
+   *
+   * @returns Whether any gesture or registered cleanup was torn down
+   */
+  cancelActiveInteraction(): Promise<boolean> {
+    return this.interactionCoordinator.cancelActiveInteraction();
   }
 
   /**

@@ -44,6 +44,7 @@ describe('LinkingEventHandler', () => {
 
     mockFlowCore = {
       commandHandler: mockCommandHandler,
+      isCancellingInteraction: () => false,
       environment: mockEnvironment,
       actionStateManager: mockActionStateManager,
       clientToFlowPosition: mockClientToFlowPosition,
@@ -75,6 +76,7 @@ describe('LinkingEventHandler', () => {
           sourceNodeId: 'node-1',
           sourcePortId: 'port-1',
           temporaryEdge: null,
+          _gestureId: expect.any(Number),
         });
       });
 
@@ -203,6 +205,7 @@ describe('LinkingEventHandler', () => {
 
         mockFlowCore = {
           commandHandler: mockCommandHandler,
+          isCancellingInteraction: () => false,
           environment: mockEnvironment,
           actionStateManager: mockActionStateManager,
           clientToFlowPosition: mockClientToFlowPosition,

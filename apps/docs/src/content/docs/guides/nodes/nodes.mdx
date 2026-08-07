@@ -56,10 +56,13 @@ import RotatableResizableNode from '@components/angular/nodes/nodes/rotatable-re
 
 ### Ports
 
-Nodes can expose one or more **ports**, which define the connection points for edges. By convention, the default node includes a single input and a single output port, but you can customize the number, placement, and appearance of ports in your own node templates.
+Nodes can expose one or more **ports**, which define the connection points for edges.
+
+By convention, the default node includes a single input and a single output port. You can remove the ports using global configuration with [`removePorts: true`](/docs/api/types/configuration/features/defaultnodetemplateconfig/#removeports). If you want to customize the number, placement, and appearance of ports, you need to create your own node templates.
 
 :::note
-Nodes can also have no ports at all, but without ports, they cannot be connected to other nodes with edges.
+Nodes can have no ports at all, yet users won't be able to manually draw new edges between nodes.
+Without ports, we can still render existing edges - check [Floating edges](/docs/guides/edges/floating-edges/) for reference
 :::
 
 [Ports →](/docs/guides/nodes/ports)

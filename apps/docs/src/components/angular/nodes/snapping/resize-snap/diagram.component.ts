@@ -43,6 +43,9 @@ export class DiagramComponent {
       {
         id: '1',
         position: { x: 0, y: 0 },
+        // Aligned to the 20px snap step, so the first resize does not jump
+        size: { width: 200, height: 40 },
+        autoSize: false,
         data: { label: 'Node' },
       },
     ],

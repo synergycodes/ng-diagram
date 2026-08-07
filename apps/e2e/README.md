@@ -21,18 +21,28 @@ apps/e2e/
 ├── harness/
 │   ├── main.ts              # bootstrapApplication(...)
 │   ├── harness.component.ts # mounts ng-diagram, exposes window.__diagram
+│   ├── resize-sides-node.component.ts # custom node template for the activeSides specs
 │   ├── api.ts               # HarnessBridge / DiagramHandle types shared with tests
 │   └── default-model.ts     # deterministic seed model
 └── tests/
     ├── fixtures/
     │   ├── diagram.ts       # Diagram page object + extended `test`
-    │   └── models.ts        # named seed models (trio, pair, solo)
-    ├── render.spec.ts
-    ├── selection.spec.ts
+    │   └── models.ts        # named seed models (trio, pair, solo, groupArena, resizeArena)
+    ├── awaitable.spec.ts
+    ├── awaitable-api.spec.ts
+    ├── awaitable-hardening.spec.ts
+    ├── cancel-interaction.spec.ts
+    ├── clipboard.spec.ts
     ├── drag.spec.ts
     ├── linking.spec.ts
-    ├── viewport.spec.ts
-    └── model.spec.ts
+    ├── model.spec.ts
+    ├── render.spec.ts
+    ├── resize.spec.ts
+    ├── resize-sides.spec.ts
+    ├── resize-snapping.spec.ts
+    ├── selection.spec.ts
+    ├── transform.spec.ts
+    └── viewport.spec.ts
 ```
 
 ## Running locally
@@ -97,9 +107,10 @@ test('clicking a node selects it', async ({ diagram }) => {
    `allEdges`, `container`. Use these with Playwright's web-first assertions
    (`toBeVisible`, `toHaveCount`, `toBeAttached`).
 
-3. **Gestures** — `dragNode`, `linkPorts`, `panBy`, `clickCanvas`. Wraps the
-   pointer-down / intermediate-move / pointer-up dance so tests don't spell
-   it out every time.
+3. **Gestures** — `dragNode`, `dragResizeHandle`, `linkPorts`, `panBy`,
+   `clickCanvas`, plus `beginDrag` when a test needs to release the pointer
+   itself. Wraps the pointer-down / intermediate-move / pointer-up dance so
+   tests don't spell it out every time.
 
 For escape hatches the proxy can't cover (event listeners, middleware
 registration, transactions with callbacks) drop down to
@@ -119,9 +130,9 @@ test('my scenario', async ({ diagram }) => {
 });
 ```
 
-`tests/fixtures/models.ts` collects re-usable shapes — `trio`, `pair`, `solo`.
-Prefer one of those over inlining a new model unless the test really needs
-something bespoke.
+`tests/fixtures/models.ts` collects re-usable shapes — `trio`, `pair`, `solo`,
+`groupArena`, `resizeArena`. Prefer one of those over inlining a new model
+unless the test really needs something bespoke.
 
 ### When to use which approach
 

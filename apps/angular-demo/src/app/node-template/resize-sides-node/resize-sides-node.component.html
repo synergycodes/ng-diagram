@@ -1,0 +1,9 @@
+<ng-diagram-node-resize-adornment [activeSides]="activeSides()">
+  <div class="resize-sides-node">
+    <span class="resize-sides-node__title">{{ label() }}</span>
+    <span class="resize-sides-node__sides">sides: {{ sidesText() }}</span>
+    <span class="resize-sides-node__size">
+      {{ node().size?.width | number: '1.0-0' }} × {{ node().size?.height | number: '1.0-0' }}
+    </span>
+  </div>
+</ng-diagram-node-resize-adornment>

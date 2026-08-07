@@ -10,7 +10,9 @@ export class NodeRotateStartedEmitter implements EventEmitter {
       return;
     }
 
-    const nodeId = context.actionStateManager.rotation?.nodeId;
+    // Prefer the pass's own capture over the (possibly newer-gesture) live
+    // state — see FlowStateUpdate.gestureNodeIds.
+    const nodeId = context.initialUpdate.gestureNodeIds?.[0] ?? context.actionStateManager.rotation?.nodeId;
     if (!nodeId) {
       return;
     }
@@ -32,7 +34,10 @@ export class NodeRotateEndedEmitter implements EventEmitter {
       return;
     }
 
-    const nodeId = context.actionStateManager.rotation?.nodeId;
+    const rotation = context.actionStateManager.rotation;
+    // Prefer the pass's own capture over the (possibly newer-gesture) live
+    // state — see FlowStateUpdate.gestureNodeIds.
+    const nodeId = context.initialUpdate.gestureNodeIds?.[0] ?? rotation?.nodeId;
     if (!nodeId) {
       return;
     }
@@ -42,6 +47,9 @@ export class NodeRotateEndedEmitter implements EventEmitter {
       return;
     }
 
-    eventManager.deferredEmit('nodeRotateEnded', { node });
+    eventManager.deferredEmit('nodeRotateEnded', {
+      node,
+      ...(rotation?.cancelReason && { cancelReason: rotation.cancelReason }),
+    });
   }
 }

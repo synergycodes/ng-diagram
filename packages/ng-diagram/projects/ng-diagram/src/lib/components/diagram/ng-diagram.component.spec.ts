@@ -56,6 +56,7 @@ describe('AngularAdapterDiagramComponent', () => {
           provide: FlowResizeBatchProcessorService,
           useValue: {
             initialize: vi.fn(),
+            watchResizeGestureEnd: vi.fn(),
           },
         },
         {

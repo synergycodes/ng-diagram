@@ -3,7 +3,11 @@ import { Point, Port, Size } from '../../../core/src';
 import { toPortUpdates } from '../../../core/src/port-batch-processor/port-batch-processor';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { UpdatePortsService } from '../update-ports/update-ports.service';
-import { BatchResizeObserverService, type ObservedElementMetadata } from './batched-resize-observer.service';
+import {
+  BatchResizeObserverService,
+  type CapturedResizeEntry,
+  type ObservedElementMetadata,
+} from './batched-resize-observer.service';
 
 const UNKNOWN_ELEMENT_TYPE_ERROR = (elementType: string) =>
   `[ngDiagram] Unknown element type: "${elementType}"
@@ -16,6 +20,12 @@ Check that elements are registered with the correct type.`;
 interface ProcessedEntry {
   entry: ResizeObserverEntry;
   metadata: ObservedElementMetadata;
+}
+
+// Only the node path consumes resizingNodeId — ports and labels have no
+// suppression rule tied to the resize gesture.
+interface NodeProcessedEntry extends ProcessedEntry {
+  resizingNodeId: string | undefined;
 }
 
 @Injectable()
@@ -34,6 +44,9 @@ export class FlowResizeBatchProcessorService {
 
     this.batchResizeObserver.configure({
       processBatch: (entries) => this.processAllResizes(entries),
+      // Sampled at delivery time — processing happens two rAFs later, when a
+      // fast pointer release may already have ended the gesture.
+      activeResizeNodeId: () => this.flowCoreProvider.provide().actionStateManager.resize?.resizingNode.id,
       // Signal the measurement tracker when ResizeObserver fires, before the
       // double-RAF batch processing. This extends the tracker's discovery
       // window so it waits for the measurements to arrive.
@@ -53,9 +66,30 @@ export class FlowResizeBatchProcessorService {
   }
 
   /**
+   * Re-measures the resized node once when its gesture ends. Measurements of
+   * that node captured during the gesture are dropped (see processNodeBatch),
+   * and when CSS (e.g. `min-width`) stops the DOM from following the model
+   * size, ResizeObserver never fires again on its own — without this
+   * re-measure the model would keep a size the DOM never reached. Must be
+   * called after each FlowCore (re)initialization — the listener dies with
+   * the replaced EventManager.
+   */
+  watchResizeGestureEnd(): void {
+    const flowCore = this.flowCoreProvider.provide();
+    let lastResizingNodeId: string | undefined;
+    flowCore.eventManager.on('actionStateChanged', ({ actionState }) => {
+      const currentId = actionState.resize?.resizingNode.id;
+      if (lastResizingNodeId !== undefined && currentId === undefined) {
+        this.batchResizeObserver.invalidateNode(lastResizingNodeId);
+      }
+      lastResizingNodeId = currentId;
+    });
+  }
+
+  /**
    * Main batch processor - handles all resize events in one go
    */
-  private processAllResizes(entries: ResizeObserverEntry[]): void {
+  private processAllResizes(entries: CapturedResizeEntry[]): void {
     // Ensure service is initialized
     if (!this.isInitialized) {
       console.warn('FlowResizeBatchProcessorService not initialized yet, skipping resize processing');
@@ -64,10 +98,10 @@ export class FlowResizeBatchProcessorService {
 
     const portEntries: ProcessedEntry[] = [];
     const edgeLabelEntries: ProcessedEntry[] = [];
-    const nodeEntries: ProcessedEntry[] = [];
+    const nodeEntries: NodeProcessedEntry[] = [];
 
     // Categorize entries by type
-    for (const entry of entries) {
+    for (const { entry, resizingNodeId } of entries) {
       const metadata = this.batchResizeObserver.getMetadata(entry.target);
 
       if (!metadata) continue;
@@ -80,7 +114,7 @@ export class FlowResizeBatchProcessorService {
           edgeLabelEntries.push({ metadata, entry });
           break;
         case 'node':
-          nodeEntries.push({ metadata, entry });
+          nodeEntries.push({ metadata, entry, resizingNodeId });
           break;
         default:
           throw new Error(UNKNOWN_ELEMENT_TYPE_ERROR((metadata as ObservedElementMetadata).type));
@@ -155,12 +189,15 @@ export class FlowResizeBatchProcessorService {
   /**
    * Process all node resize events
    */
-  private processNodeBatch(entries: ProcessedEntry[]): void {
+  private processNodeBatch(entries: NodeProcessedEntry[]): void {
     const flowCore = this.flowCoreProvider.provide();
-    const isResizing = flowCore.actionStateManager.isResizing();
+    // Sampled at processing time — NOT interchangeable with the per-entry
+    // resizingNodeId, which was sampled two rAFs earlier at ResizeObserver
+    // delivery; a fast pointer release ends the gesture in between.
+    const isResizingNow = flowCore.actionStateManager.isResizing();
     const nodeSizeUpdates: { id: string; size: Size }[] = [];
 
-    for (const { entry, metadata } of entries) {
+    for (const { entry, metadata, resizingNodeId } of entries) {
       if (metadata?.type !== 'node') continue;
 
       const size = this.getBorderBoxSize(entry);
@@ -169,6 +206,16 @@ export class FlowResizeBatchProcessorService {
       const node = flowCore.getNodeById(metadata.nodeId);
       if (!node) continue;
 
+      // While a node is being resized, the gesture — not the DOM — is the
+      // source of truth for its size, and this batch may run after the gesture
+      // ended and after writes that followed it (e.g. a middleware reverting
+      // the size on resizeNodeStop). A measurement taken during the node's own
+      // gesture must not overwrite those; the node is re-measured once the
+      // gesture ends (watchResizeGestureEnd).
+      if (node.size && resizingNodeId === metadata.nodeId) {
+        continue;
+      }
+
       if (node.size && !this.isSizeChanged(node.size, size)) {
         continue;
       }
@@ -176,7 +223,7 @@ export class FlowResizeBatchProcessorService {
       nodeSizeUpdates.push({ id: metadata.nodeId, size });
 
       // Skip port measurement during active resize — NgDiagramNodeComponent.syncPorts() handles it
-      if (!isResizing) {
+      if (!isResizingNow) {
         const portsData = this.updatePortsService.getNodePortsData(metadata.nodeId);
         flowCore.updater.applyPortChanges(metadata.nodeId, toPortUpdates(portsData));
       }

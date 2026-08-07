@@ -51,6 +51,8 @@ ng-diagram-default-edge-label {
 - `--edge-label-text-color` - Label text color
 - `--edge-label-border-width` - Label border width
 - `--edge-label-border-color` - Label border color
+- `--edge-label-border-color-hover` - Label border color while the edge is hovered
+- `--edge-label-border-color-selected` - Label border color while the edge is selected
 - `--edge-label-border-transition` - Transition for border changes
 
 The default label also uses these semantic variables that map to the design system:
@@ -82,6 +84,28 @@ import CustomLabel from '@components/angular/edges/labels/custom-label/custom-la
 <CustomLabel />
 
 <CodeSnippet relativePath="edges/labels/custom-label/custom-label-edge.component.ts" />
+
+### Reusing the Default Label
+
+To give a custom edge the same label look as the default edge, wrap your content in
+[`NgDiagramDefaultEdgeLabelComponent`](/docs/api/components/ngdiagramdefaultedgelabelcomponent/) <Badge text="since v1.3.0" variant="tip" />
+instead of copying its styles:
+
+```html
+<ng-diagram-base-edge [edge]="edge()">
+  <ng-diagram-base-edge-label [id]="'edge-label'" [positionOnEdge]="0.5">
+    <ng-diagram-default-edge-label>{{ label() }}</ng-diagram-default-edge-label>
+  </ng-diagram-base-edge-label>
+</ng-diagram-base-edge>
+```
+
+The two elements have separate jobs: `ng-diagram-base-edge-label` places the label along the
+edge path and measures it, while `ng-diagram-default-edge-label` only gives the content its look.
+
+The chip keeps the theme colors, responds to the CSS variables listed above, and highlights
+its border while the edge is hovered or selected — the same states as in the default edge.
+Use `--edge-label-border-color-hover` and `--edge-label-border-color-selected` to change the
+highlight colors.
 
 ## Label Positioning
 
@@ -133,10 +157,10 @@ ngDiagram automatically measures label dimensions using a `ResizeObserver`. Meas
 - A label's content changes size
 - The [`positionOnEdge`](/docs/api/types/model/edgelabel/#positiononedge) property is updated
 
-If you alter a label's layout through CSS in a way that doesn't trigger a size change, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramservice/#invalidatemeasurements) <Badge text="since v1.2.3" variant="tip" /> to force re-measurement:
+If you alter a label's layout through CSS in a way that doesn't trigger a size change, call [`invalidateMeasurements()`](/docs/api/services/ngdiagramservice/#invalidatemeasurements) <Badge text="since v1.2.3" variant="tip" /> to force re-measurement. `await` it <Badge text="since v1.3.0" variant="tip" /> when you need the fresh `measuredLabels` right away:
 
 ```typescript
-this.ngDiagramService.invalidateMeasurements({
+await this.ngDiagramService.invalidateMeasurements({
   edges: [{ edgeId: 'edge-1' }],
 });
 ```

@@ -337,6 +337,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
         this.initializedModel = model;
 
         this.flowOffsetService.initialize(this.elementRef.nativeElement);
+        this.flowResizeBatchProcessor.watchResizeGestureEnd();
         this.setupEventBridge();
       }
     });

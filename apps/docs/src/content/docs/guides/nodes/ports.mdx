@@ -140,9 +140,20 @@ this.ngDiagramService.invalidateMeasurements();
 ```
 
 <Aside type="tip">
-  When you need to read updated measurements immediately after invalidation, wrap both the model update and
-  `invalidateMeasurements()` inside a [transaction](/docs/guides/transactions) with [`waitForMeasurements:
-  true`](/docs/api/types/middleware/transactionoptions/#waitformeasurements).
+  When you need to read the updated measurements immediately, `await` the call
+  <Badge text="since v1.3.0" variant="tip" /> — the returned promise resolves once the re-measurements have settled, so
+  the fresh `measuredPorts` are readable on the next line:
+
+```typescript
+await this.ngDiagramService.invalidateMeasurements({
+  nodes: [{ nodeId: 'node-1' }],
+});
+
+const ports = this.ngDiagramModelService.getNodeById('node-1')?.measuredPorts;
+```
+
+Ignoring the promise is still fine when you only want to trigger the re-measurement.
+
 </Aside>
 
 ## Example Usage
