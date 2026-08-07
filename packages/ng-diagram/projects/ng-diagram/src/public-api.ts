@@ -9,6 +9,7 @@ export {
   BaseEdgeLabelComponent,
   NgDiagramBaseEdgeLabelComponent,
 } from './lib/components/edge-label/base-edge-label/base-edge-label.component';
+export { NgDiagramDefaultEdgeLabelComponent } from './lib/components/edge-label/default-edge-label/default-edge-label.component';
 export { NgDiagramBaseEdgeComponent } from './lib/components/edge/base-edge/base-edge.component';
 export { NgDiagramMarkerComponent } from './lib/components/marker/ng-diagram-marker.component';
 export { NgDiagramMinimapComponent } from './lib/components/minimap/ng-diagram-minimap.component';
