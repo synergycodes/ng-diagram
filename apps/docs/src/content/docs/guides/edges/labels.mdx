@@ -98,6 +98,9 @@ instead of copying its styles:
 </ng-diagram-base-edge>
 ```
 
+The two elements have separate jobs: `ng-diagram-base-edge-label` places the label along the
+edge path and measures it, while `ng-diagram-default-edge-label` only gives the content its look.
+
 The chip keeps the theme colors, responds to the CSS variables listed above, and highlights
 its border while the edge is selected. The hover highlight is not part of the chip — it comes
 from the default edge template and applies only there.
