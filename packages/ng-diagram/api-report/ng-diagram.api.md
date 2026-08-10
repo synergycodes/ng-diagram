@@ -185,7 +185,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -319,7 +319,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -956,6 +956,7 @@ export const NgDiagramMath: {
         x: number;
         y: number;
     };
+    subtractPoints: (a: Point, b: Point) => Point;
     calculateEdgePanningForce: (containerBox: Rect, clientPosition: Point, detectionThreshold: number, forceMultiplier: number) => Point | null;
 };
 
@@ -1392,7 +1393,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1725,7 +1726,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)

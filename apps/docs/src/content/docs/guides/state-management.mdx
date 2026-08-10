@@ -188,6 +188,15 @@ model right after a mutation, or reacting to a rejected update (a failing
 Inside a [transaction](/docs/guides/transactions/) the promise resolves right away and the
 change is applied when the transaction commits.
 
+<Aside type="caution" title="Reading state right after a change">
+  The `nodes()`, `edges()` and `metadata()` signals refresh with Angular's change detection.
+  Right after an `await` — and inside diagram event handlers — they can still return the
+  previous state. To read the state immediately, use the getter methods (`getNodeById()`,
+  `getEdgeById()`, `getConnectedEdges()`, …) or the model itself via `getModel()` — these are
+  always synchronous with the applied changes. Use the signals in reactive contexts: templates,
+  `computed()`, and `effect()`.
+</Aside>
+
 ### Adding Elements
 
 Add new nodes and edges to your diagram:
