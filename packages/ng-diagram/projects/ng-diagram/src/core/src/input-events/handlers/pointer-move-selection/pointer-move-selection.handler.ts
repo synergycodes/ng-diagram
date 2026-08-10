@@ -77,7 +77,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           };
         }
 
-        const delta = this.pointerDelta(lastPointerPosition, pointer);
+        const delta = NgDiagramMath.subtractPoints(pointer, lastPointerPosition);
         const shouldMove = gesture.hasMoved;
 
         if (this.flow.actionStateManager.dragging) {
@@ -131,7 +131,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
               // from the release point before the drop.
               if (!isSamePoint(pointer, gesture.lastPointerPosition)) {
                 await this.flow.commandHandler.emit('moveNodesBy', {
-                  delta: this.pointerDelta(gesture.lastPointerPosition, pointer),
+                  delta: NgDiagramMath.subtractPoints(pointer, gesture.lastPointerPosition),
                   nodes: this.draggableSelection(),
                 });
               }
@@ -215,11 +215,6 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       this.gesture = null;
     }
     return true;
-  }
-
-  /** Movement vector from `from` to `to` (flow coordinates). */
-  private pointerDelta(from: Point, to: Point): Point {
-    return { x: to.x - from.x, y: to.y - from.y };
   }
 
   /** Selected nodes (with children) that can actually be dragged. */

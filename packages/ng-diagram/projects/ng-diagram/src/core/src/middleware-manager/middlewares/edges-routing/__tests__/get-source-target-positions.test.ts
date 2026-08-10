@@ -334,6 +334,79 @@ describe('getSourceTargetPositions', () => {
       expect(result.target).toEqual({ x: 150, y: 150, side: 'left' });
     });
   });
+
+  describe('dangling edges', () => {
+    it('should compute dynamic side for a committed edge with a floating target', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: 'node-1',
+        target: '', // Dangling end
+        sourcePort: 'port-1',
+        targetPosition: { x: 50, y: 100 }, // Drop position below the source
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-1',
+          {
+            ...mockNode,
+            id: 'node-1',
+            position: { x: 0, y: 0 },
+            measuredPorts: [
+              {
+                ...mockPort,
+                id: 'port-1',
+                side: 'right',
+                position: { x: 90, y: 45 },
+                size: { width: 10, height: 10 },
+              },
+            ],
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result.source?.side).toBe('right'); // Source side comes from the port
+      expect(result.target?.side).toBe('top'); // Dangling side computed dynamically, not the 'left' default
+    });
+
+    it('should compute dynamic side for a committed edge with a floating source', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: '', // Dangling start
+        target: 'node-2',
+        sourcePosition: { x: 250, y: -50 }, // Dangling position above the target
+        targetPosition: { x: 200, y: 50 },
+        targetPort: 'port-2',
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-2',
+          {
+            ...mockNode,
+            id: 'node-2',
+            position: { x: 200, y: 0 },
+            measuredPorts: [
+              {
+                ...mockPort,
+                id: 'port-2',
+                side: 'left',
+                position: { x: 0, y: 45 },
+                size: { width: 10, height: 10 },
+              },
+            ],
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result.source?.side).toBe('bottom'); // Dangling side computed dynamically, not the 'right' default
+      expect(result.target?.side).toBe('left'); // Target side comes from the port
+    });
+  });
 });
 
 describe('getPoint', () => {

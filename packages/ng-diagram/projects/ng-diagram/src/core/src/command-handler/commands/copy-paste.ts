@@ -1,3 +1,4 @@
+import { NgDiagramMath } from '../../math';
 import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node, Point } from '../../types';
 import { snapNodePosition } from '../../utils';
 
@@ -47,20 +48,16 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     const nodeHeight = singleNode.size?.height ?? 0;
 
     // Calculate position so that cursor is at the center of the node
-    const targetX = command.position.x - nodeWidth / 2;
-    const targetY = command.position.y - nodeHeight / 2;
-
-    return {
-      x: targetX - singleNode.position.x,
-      y: targetY - singleNode.position.y,
+    const target = {
+      x: command.position.x - nodeWidth / 2,
+      y: command.position.y - nodeHeight / 2,
     };
+
+    return NgDiagramMath.subtractPoints(target, singleNode.position);
   }
 
   // Multiple nodes: maintain relative positioning with center at cursor
-  return {
-    x: command.position.x - center.x,
-    y: command.position.y - center.y,
-  };
+  return NgDiagramMath.subtractPoints(command.position, center);
 };
 
 /**
