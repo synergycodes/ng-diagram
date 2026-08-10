@@ -77,6 +77,13 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Custom Middleware example',
   },
   {
+    title: 'Tailwind CSS',
+    description: 'Style your custom nodes with Tailwind CSS utility classes.',
+    href: '/docs/examples/tailwind-styling',
+    image: '/docs/assets/examples/tailwind-styling.png',
+    imageAlt: 'Screenshot of Tailwind CSS example',
+  },
+  {
     title: 'Angular Material Node',
     description: 'Learn how to integrate Angular Material components within your custom nodes.',
     href: '/docs/examples/angular-material-node',

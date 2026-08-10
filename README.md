@@ -10,14 +10,18 @@ Unlike generic diagramming libraries, **ng-diagram** is Angular-first - built on
 ## ✨ Features
 
 - **🎯 Interactive Elements**: Draggable, resizable, and rotatable nodes
-- **🔗 Customizable Connections**: Flexible edges with various routing options (polyline, curved, orthogonal)
-- **🎨 Consistent Styling**: Built-in design system with CSS variables and themes
-- **🧩 Custom Templates**: Define own Angular templates for nodes and edges to create tailored visuals and behaviors
-- **📦 Groups**: Container nodes that can be moved together with automatic sizing
-- **🔌 Extensible Architecture**: Plugin-based system for custom behaviors and business logic
-- **⚡ Reactive State Management**: Built on Angular signals for optimal performance
-- **🎨 Embedded Palette**: Built-in drag-and-drop palette system for adding nodes to diagrams
-- **🎛️ Rich Interactions**: Selection, rotation, resizing, panning, zooming, and more
+- **🔗 Flexible Edges**: Orthogonal, polyline, and bezier routing, custom arrowheads, labels, and floating edges that connect without ports
+- **🧩 Custom Templates**: Your own Angular components as nodes and edges — templates, signals, DI, everything works
+- **📦 Groups**: Container nodes with nesting and group-aware dragging
+- **🎛️ Rich Interactions**: Selection, box selection, copy/paste, snapping, panning, zooming, and more
+- **⌨️ Keyboard Shortcuts**: Configurable, platform-aware bindings for all common actions
+- **📱 Touch Support**: Pinch zoom, two-finger panning, and long-press box selection out of the box
+- **🗺️ Minimap**: Bird's-eye overview widget with click-and-drag navigation
+- **🎨 Consistent Styling**: Built-in design system with CSS variables and light/dark themes
+- **🖱️ Embedded Palette**: Built-in drag-and-drop palette system for adding nodes to diagrams
+- **⚡ Performance**: Signal-based reactivity, spatial hashing, and viewport virtualization for large diagrams
+- **🔌 Extensible Architecture**: Middleware pipeline for custom behaviors and business logic
+- **🤖 AI-Ready Docs**: Official [MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) lets AI assistants search the docs and API from your editor
 
 ## 📚 What You Can Build
 
@@ -159,30 +163,9 @@ export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
 }
 ```
 
-## 🛠️ Core Components
+## 🛠️ Core Building Blocks
 
-### Main Components
-
-- **`NgDiagramComponent`**: The main diagram component
-- **`NgDiagramPortComponent`**: Connection points on nodes
-- **`NgDiagramBaseEdgeComponent`**: Base edge component for custom edges
-- **`NgDiagramPaletteItemComponent`**: Drag-and-drop palette items
-- **`NgDiagramPaletteItemPreviewComponent`**: Live preview during drag operations
-
-### Services
-
-- **`NgDiagramService`**: Main service providing access to all diagram functionality
-- **`NgDiagramModelService`**: Model management and state
-- **`NgDiagramNodeService`**: Node operations and manipulation
-- **`NgDiagramGroupsService`**: Group node operations and management
-- **`NgDiagramSelectionService`**: Selection state management
-- **`NgDiagramViewportService`**: Panning and zooming controls
-- **`NgDiagramClipboardService`**: Copy, paste, and clipboard operations
-
-### Directives
-
-- **`NgDiagramNodeSelectedDirective`**: Node selection styling
-- **`NgDiagramGroupHighlightedDirective`**: Group highlighting styling
+The library ships **components** for the diagram canvas, backgrounds, ports, palette, and minimap; **injectable services** (model, nodes, selection, viewport, clipboard, groups) for programmatic control; and **directives** for selection and highlight styling. Start with the [Services guide](https://www.ngdiagram.dev/docs/intro/services/) and browse the full API reference in the [documentation](https://www.ngdiagram.dev/docs).
 
 ## 👩‍💻 About the Creators
 

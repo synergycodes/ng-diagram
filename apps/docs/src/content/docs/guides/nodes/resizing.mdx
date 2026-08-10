@@ -1,9 +1,11 @@
 ---
 title: Resizing
 description: Understanding how resizing works in ngDiagram
+sidebar:
+  badge: New
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Badge } from '@astrojs/starlight/components';
 import Configuration from '@components/angular/nodes/resizing/resizing.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -28,7 +30,7 @@ To make a custom node resizable, wrap your node with [`<ng-diagram-node-resize-a
 
 <CodeSnippet relativePath="nodes/resizing/node/node.component.ts" />
 
-## Limiting Which Sides Resize
+## Limiting Which Sides Resize <Badge text="since v1.3.0" variant="tip" />
 
 By default all four sides and all four corners of a node can be dragged. Use the
 [`activeSides`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/#activesides) input to narrow that down —

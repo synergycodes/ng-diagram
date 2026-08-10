@@ -86,13 +86,13 @@ import { NgDiagramModelService } from 'ng-diagram';
 @Component({
   selector: 'app-properties-panel',
   template: `
-    <div *ngIf="hasNodes()">
+    @if (hasNodes()) {
       <p>Total nodes: {{ nodeCount() }}</p>
       <p>Total edges: {{ edgeCount() }}</p>
 
       <button (click)="updateSelectedNode()">Update Node</button>
       <button (click)="findNearbyNodes()">Find Nearby</button>
-    </div>
+    }
   `,
 })
 export class PropertiesPanelComponent {
@@ -243,11 +243,13 @@ import { NgDiagramSelectionService } from 'ng-diagram';
       <p>Selected: {{ selectionSummary() }}</p>
     </div>
 
-    <div class="actions" *ngIf="hasSelection()">
-      <button (click)="selectAll()">Select All</button>
-      <button (click)="clearSelection()">Clear Selection</button>
-      <button (click)="deleteSelected()">Delete Selected</button>
-    </div>
+    @if (hasSelection()) {
+      <div class="actions">
+        <button (click)="selectAll()">Select All</button>
+        <button (click)="clearSelection()">Clear Selection</button>
+        <button (click)="deleteSelected()">Delete Selected</button>
+      </div>
+    }
   `,
 })
 export class SelectionToolbarComponent {
@@ -378,7 +380,9 @@ import { NgDiagramNodeService } from 'ng-diagram';
     <div class="node-content" (click)="handleClick()" (dblclick)="handleDoubleClick()">
       <h3>{{ node().data?.title }}</h3>
       <div class="ports">
-        <div *ngFor="let port of node().ports" [id]="port.id" class="port"></div>
+        @for (port of node().ports; track port.id) {
+          <div [id]="port.id" class="port"></div>
+        }
       </div>
     </div>
   `,

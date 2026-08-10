@@ -1,8 +1,11 @@
 ---
 title: Keyboard Shortcuts
 description: Learn how to customize and use keyboard shortcuts in ngDiagram
+sidebar:
+  badge: New
 ---
 
+import { Badge } from '@astrojs/starlight/components';
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
 import ShortcutManager from '../../../components/angular/shortcut-manager/shortcut-manager.astro';
 
@@ -16,7 +19,7 @@ All available shortcut actions with their default key bindings. See [`ShortcutAc
 | Action                       | Default Shortcut                          | Description                                                                 |
 | ---------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
 | `boxSelection`               | <kbd>Shift</kbd> held                     | Enable box selection mode (pointer only)                                    |
-| `cancelInteraction`          | <kbd>Escape</kbd>                         | Cancel the in-progress interaction (linking, drag, resize, rotate, pan)     |
+| `cancelInteraction`          | <kbd>Escape</kbd>                         | Cancel the in-progress interaction (linking, drag, resize, rotate, pan) <Badge text="since v1.3.0" variant="tip" /> |
 | `copy`                       | <kbd>Ctrl/Cmd + C</kbd>                   | Copy selected elements to clipboard                                         |
 | `cut`                        | <kbd>Ctrl/Cmd + X</kbd>                   | Cut selected elements to clipboard                                          |
 | `deleteSelection`            | <kbd>Delete</kbd> or <kbd>Backspace</kbd> | Delete currently selected elements                                          |
