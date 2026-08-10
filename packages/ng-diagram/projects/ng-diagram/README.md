@@ -46,12 +46,12 @@ See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagra
 
 Production-ready starter kits built with ng-diagram. Fork, customize, ship.
 
-| Template                | Description                                                                                                      | Demo                                                                    | Source                                                                     |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| **Org Chart**           | Tree-based org chart with drag-and-drop reordering, expand/collapse, ELK.js layout, minimap, dark/light theme    | [Live Demo](https://www.ngdiagram.dev/templates/org-chart/)             | [Source](https://github.com/synergycodes/ng-diagram-orgchart)              |
-| **Electric Circuit**    | Electronic circuit editor with a searchable SVG parts library, smart wire junctions, and SVG/JPEG/JSON export    | [Live Demo](https://www.ngdiagram.dev/templates/electric-circuit/)      | [Source](https://github.com/synergycodes/ng-diagram-electric-circuit)      |
-| **Single-Line Diagram** | High-voltage substation SLD editor with IEC 60617 symbols and a schema-driven properties panel                   | [Live Demo](https://www.ngdiagram.dev/templates/single-line-diagram/)   | [Source](https://github.com/synergycodes/ng-diagram-single-line-diagram)   |
-| **AV Schematic**        | Audio/video signal-flow editor with typed connectors (XLR, HDMI, Speakon) and PNG/DXF export for AutoCAD         | [Live Demo](https://www.ngdiagram.dev/templates/av/)                    | [Source](https://github.com/synergycodes/ng-diagram-av-schematic)          |
+| Template                | Description                                                                                                   | Demo                                                                  | Source                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Org Chart**           | Tree-based org chart with drag-and-drop reordering, expand/collapse, ELK.js layout, minimap, dark/light theme | [Live Demo](https://www.ngdiagram.dev/templates/org-chart/)           | [Source](https://github.com/synergycodes/ng-diagram-orgchart)            |
+| **Electric Circuit**    | Electronic circuit editor with a searchable SVG parts library, smart wire junctions, and SVG/JPEG/JSON export | [Live Demo](https://www.ngdiagram.dev/templates/electric-circuit/)    | [Source](https://github.com/synergycodes/ng-diagram-electric-circuit)    |
+| **Single-Line Diagram** | High-voltage substation SLD editor with IEC 60617 symbols and a schema-driven properties panel                | [Live Demo](https://www.ngdiagram.dev/templates/single-line-diagram/) | [Source](https://github.com/synergycodes/ng-diagram-single-line-diagram) |
+| **AV Schematic**        | Audio/video signal-flow editor with typed connectors (XLR, HDMI, Speakon) and PNG/DXF export for AutoCAD      | [Live Demo](https://www.ngdiagram.dev/templates/av/)                  | [Source](https://github.com/synergycodes/ng-diagram-av-schematic)        |
 
 ## 🚀 Quick Start
 
