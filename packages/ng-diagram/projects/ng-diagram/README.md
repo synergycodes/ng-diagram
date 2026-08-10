@@ -7,6 +7,8 @@ A robust Angular library for building interactive diagrams, node-based editors, 
 
 Unlike generic diagramming libraries, **ng-diagram** is Angular-first - built on Angular signals and templates for seamless integration and performance.
 
+![Interactive ng-diagram editor: custom Angular components as nodes — including a live chart — with groups, edge drawing, rotation, and zooming](https://raw.githubusercontent.com/synergycodes/ng-diagram/main/.github/assets/ngdiagram-hero.gif)
+
 ## ✨ Features
 
 - **🎯 Interactive Elements**: Draggable, resizable, and rotatable nodes
