@@ -185,7 +185,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
+    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -319,7 +319,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
+    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1393,7 +1393,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
+    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1726,7 +1726,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Node_2 | Edge<object>>;
+    data: InputSignal<Edge<object> | Node_2>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)
