@@ -7,17 +7,23 @@ A robust Angular library for building interactive diagrams, node-based editors, 
 
 Unlike generic diagramming libraries, **ng-diagram** is Angular-first - built on Angular signals and templates for seamless integration and performance.
 
+![Interactive ng-diagram editor: custom Angular components as nodes — including a live chart — with groups, edge drawing, rotation, and zooming](https://raw.githubusercontent.com/synergycodes/ng-diagram/main/.github/assets/ngdiagram-hero.gif)
+
 ## ✨ Features
 
 - **🎯 Interactive Elements**: Draggable, resizable, and rotatable nodes
-- **🔗 Customizable Connections**: Flexible edges with various routing options (polyline, curved, orthogonal)
-- **🎨 Consistent Styling**: Built-in design system with CSS variables and themes
-- **🧩 Custom Templates**: Define own Angular templates for nodes and edges to create tailored visuals and behaviors
-- **📦 Groups**: Container nodes that can be moved together with automatic sizing
-- **🔌 Extensible Architecture**: Plugin-based system for custom behaviors and business logic
-- **⚡ Reactive State Management**: Built on Angular signals for optimal performance
-- **🎨 Embedded Palette**: Built-in drag-and-drop palette system for adding nodes to diagrams
-- **🎛️ Rich Interactions**: Selection, rotation, resizing, panning, zooming, and more
+- **🔗 Flexible Edges**: Orthogonal, polyline, and bezier routing, custom arrowheads, labels, and floating edges that connect without ports
+- **🧩 Custom Templates**: Your own Angular components as nodes and edges — templates, signals, DI, everything works
+- **📦 Groups**: Container nodes with nesting and group-aware dragging
+- **🎛️ Rich Interactions**: Selection, box selection, copy/paste, snapping, panning, zooming, and more
+- **⌨️ Keyboard Shortcuts**: Configurable, platform-aware bindings for all common actions
+- **📱 Touch Support**: Pinch zoom, two-finger panning, and long-press box selection out of the box
+- **🗺️ Minimap**: Bird's-eye overview widget with click-and-drag navigation
+- **🎨 Consistent Styling**: Built-in design system with CSS variables and light/dark themes
+- **🖱️ Embedded Palette**: Built-in drag-and-drop palette system for adding nodes to diagrams
+- **⚡ Performance**: Signal-based reactivity, spatial hashing, and viewport virtualization for large diagrams
+- **🔌 Extensible Architecture**: Middleware pipeline for custom behaviors and business logic
+- **🤖 AI-Ready Docs**: Official [MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) lets AI assistants search the docs and API from your editor
 
 ## 📚 What You Can Build
 
@@ -40,9 +46,12 @@ See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagra
 
 Production-ready starter kits built with ng-diagram. Fork, customize, ship.
 
-| Template      | Description                                                                                                               | Demo                                                             | Source                                                        |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------- |
-| **Org Chart** | Interactive organizational chart with drag-and-drop reordering, expand/collapse, ELK.js layout, dark/light theme, minimap | [Live Demo](https://synergycodes.github.io/ng-diagram-orgchart/) | [Source](https://github.com/synergycodes/ng-diagram-orgchart) |
+| Template                | Description                                                                                                   | Demo                                                                  | Source                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Org Chart**           | Tree-based org chart with drag-and-drop reordering, expand/collapse, ELK.js layout, minimap, dark/light theme | [Live Demo](https://www.ngdiagram.dev/templates/org-chart/)           | [Source](https://github.com/synergycodes/ng-diagram-orgchart)            |
+| **Electric Circuit**    | Electronic circuit editor with a searchable SVG parts library, smart wire junctions, and SVG/JPEG/JSON export | [Live Demo](https://www.ngdiagram.dev/templates/electric-circuit/)    | [Source](https://github.com/synergycodes/ng-diagram-electric-circuit)    |
+| **Single-Line Diagram** | High-voltage substation SLD editor with IEC 60617 symbols and a schema-driven properties panel                | [Live Demo](https://www.ngdiagram.dev/templates/single-line-diagram/) | [Source](https://github.com/synergycodes/ng-diagram-single-line-diagram) |
+| **AV Schematic**        | Audio/video signal-flow editor with typed connectors (XLR, HDMI, Speakon) and PNG/DXF export for AutoCAD      | [Live Demo](https://www.ngdiagram.dev/templates/av/)                  | [Source](https://github.com/synergycodes/ng-diagram-av-schematic)        |
 
 ## 🚀 Quick Start
 
@@ -74,9 +83,8 @@ import { NgDiagramComponent, initializeModel, provideNgDiagram } from 'ng-diagra
   template: ` <ng-diagram [model]="model" /> `,
   styles: `
     :host {
-      flex: 1;
       display: flex;
-      height: 100%;
+      height: 300px;
     }
   `,
 })
@@ -109,15 +117,21 @@ That's it! You now have a working diagram with default node and edge templates.
 Create custom node components with any Angular template:
 
 ```typescript
+import { Component, input } from '@angular/core';
+import { NgDiagramPortComponent, type NgDiagramNodeTemplate, type Node } from 'ng-diagram';
+
+type CustomNodeData = { title: string; description: string };
+
 @Component({
   selector: 'app-custom-node',
+  imports: [NgDiagramPortComponent],
   template: `
     <div class="custom-node">
-      <h3>{{ node.data.title }}</h3>
-      <p>{{ node.data.description }}</p>
-      <ng-diagram-port id="input" position="left" type="target"> </ng-diagram-port>
-      <ng-diagram-port id="output" position="right" type="source"> </ng-diagram-port>
+      <h3>{{ node().data.title }}</h3>
+      <p>{{ node().data.description }}</p>
     </div>
+    <ng-diagram-port id="input" side="left" type="target" />
+    <ng-diagram-port id="output" side="right" type="source" />
   `,
   styles: [
     `
@@ -131,8 +145,8 @@ Create custom node components with any Angular template:
     `,
   ],
 })
-export class CustomNodeComponent implements NgDiagramNodeTemplate {
-  node = input.required<Node>();
+export class CustomNodeComponent implements NgDiagramNodeTemplate<CustomNodeData> {
+  node = input.required<Node<CustomNodeData>>();
 }
 ```
 
@@ -141,46 +155,22 @@ export class CustomNodeComponent implements NgDiagramNodeTemplate {
 Create custom edge components with unique visual styles:
 
 ```typescript
+import { Component, input } from '@angular/core';
+import { NgDiagramBaseEdgeComponent, type Edge, type NgDiagramEdgeTemplate } from 'ng-diagram';
+
 @Component({
   selector: 'app-custom-edge',
-  template: `
-    <ng-diagram-base-edge [path]="path" [markerEnd]="markerEnd" [style]="edgeStyle"> </ng-diagram-base-edge>
-  `,
+  imports: [NgDiagramBaseEdgeComponent],
+  template: ` <ng-diagram-base-edge [edge]="edge()" stroke="#962ee5" [strokeWidth]="2" /> `,
 })
 export class CustomEdgeComponent implements NgDiagramEdgeTemplate {
   edge = input.required<Edge>();
-
-  get path() {
-    // Custom path calculation
-    return this.calculateCustomPath();
-  }
 }
 ```
 
-## 🛠️ Core Components
+## 🛠️ Core Building Blocks
 
-### Main Components
-
-- **`NgDiagramComponent`**: The main diagram component
-- **`NgDiagramPortComponent`**: Connection points on nodes
-- **`NgDiagramBaseEdgeComponent`**: Base edge component for custom edges
-- **`NgDiagramPaletteItemComponent`**: Drag-and-drop palette items
-- **`NgDiagramPaletteItemPreviewComponent`**: Live preview during drag operations
-
-### Services
-
-- **`NgDiagramService`**: Main service providing access to all diagram functionality
-- **`NgDiagramModelService`**: Model management and state
-- **`NgDiagramNodeService`**: Node operations and manipulation
-- **`NgDiagramGroupsService`**: Group node operations and management
-- **`NgDiagramSelectionService`**: Selection state management
-- **`NgDiagramViewportService`**: Panning and zooming controls
-- **`NgDiagramClipboardService`**: Copy, paste, and clipboard operations
-
-### Directives
-
-- **`NgDiagramNodeSelectedDirective`**: Node selection styling
-- **`NgDiagramGroupHighlightedDirective`**: Group highlighting styling
+The library ships **components** for the diagram canvas, backgrounds, ports, palette, and minimap; **injectable services** (model, nodes, selection, viewport, clipboard, groups) for programmatic control; and **directives** for selection and highlight styling. Start with the [Services guide](https://www.ngdiagram.dev/docs/intro/services/) and browse the full API reference in the [documentation](https://www.ngdiagram.dev/docs).
 
 ## 👩‍💻 About the Creators
 

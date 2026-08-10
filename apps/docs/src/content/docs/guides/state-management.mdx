@@ -1,6 +1,8 @@
 ---
 title: State Management
 description: Learn how to create models, access the model service, and perform operations on your diagram data
+sidebar:
+  badge: New
 ---
 
 import { Aside, Badge } from '@astrojs/starlight/components';
@@ -183,7 +185,9 @@ this.viewportService.zoomToFit();
 Awaiting is optional — a call whose promise you ignore applies the change all the same. Await
 when the next step depends on the change being applied: sequencing operations, reading the
 model right after a mutation, or reacting to a rejected update (a failing
-[middleware](/docs/guides/middlewares/) rejects the returned promise).
+[middleware](/docs/guides/middlewares/) rejects the returned promise). In projects using the
+`@typescript-eslint/no-floating-promises` lint rule, mark intentional fire-and-forget calls
+with the `void` operator: `void this.modelService.addNodes([node]);`.
 
 Inside a [transaction](/docs/guides/transactions/) the promise resolves right away and the
 change is applied when the transaction commits.
@@ -424,20 +428,24 @@ Multi-user collaboration requires synchronizing diagram changes across different
 When working with complex Angular applications that use state management libraries like NgRx or Akita, you can create model adapters that integrate seamlessly with your existing store architecture. These adapters would dispatch actions for diagram changes and subscribe to state selections, ensuring that diagram data follows your application's established data flow patterns and benefits from features like time-travel debugging and state persistence.
 
 ```typescript
+// Sketch — a real adapter implements every ModelAdapter member;
+// see the Custom Model example for a complete implementation.
 class NgRxModelAdapter implements ModelAdapter {
-  constructor(private store: Store) {}
+  private store = inject(Store);
 
   updateNodes(nodes: Node[]): void {
     this.store.dispatch(DiagramActions.updateNodes({ nodes }));
   }
 
-  onChange(callback: Function): void {
+  onChange(callback: (changes: ModelChanges) => void): void {
     this.store.select(selectDiagramData).subscribe(callback);
   }
+
+  // ...remaining ModelAdapter members
 }
 
 // Wire up the custom adapter with initializeModelAdapter
-model = initializeModelAdapter(new NgRxModelAdapter(this.store));
+model = initializeModelAdapter(new NgRxModelAdapter());
 ```
 
 Custom model implementations provide the flexibility to integrate NgDiagram with any data architecture while maintaining full compatibility with all diagram features and the model service API.

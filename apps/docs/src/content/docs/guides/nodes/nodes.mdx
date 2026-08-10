@@ -5,15 +5,16 @@ sidebar:
   order: 0
 ---
 
+import { Badge } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
 Nodes are the fundamental building blocks of a diagram in ngDiagram.
 They represent entities such as components, processes, or data sources within your system. Each node can contain metadata, inputs, outputs, or custom content, and can be styled or configured to fit your use case.
 
 ```typescript
-interface Node<T = any> {
-  id: string; // ID of the edge
-  position: string; // The position of the node in the diagram.
+interface Node<T extends DataObject = DataObject> {
+  id: string; // Unique ID of the node
+  position: Point; // The position of the node in the diagram
   data: T; // Custom data associated with the node
   // ...optional properties
 }
@@ -58,7 +59,7 @@ import RotatableResizableNode from '@components/angular/nodes/nodes/rotatable-re
 
 Nodes can expose one or more **ports**, which define the connection points for edges.
 
-By convention, the default node includes a single input and a single output port. You can remove the ports using global configuration with [`removePorts: true`](/docs/api/types/configuration/features/defaultnodetemplateconfig/#removeports). If you want to customize the number, placement, and appearance of ports, you need to create your own node templates.
+By convention, the default node includes a single input and a single output port. You can remove the ports using global configuration with [`removePorts: true`](/docs/api/types/configuration/features/defaultnodetemplateconfig/#removeports) <Badge text="since v1.3.0" variant="tip" />. If you want to customize the number, placement, and appearance of ports, you need to create your own node templates.
 
 :::note
 Nodes can have no ports at all, yet users won't be able to manually draw new edges between nodes.

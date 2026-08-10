@@ -1,9 +1,11 @@
 ---
 title: Resizing
 description: Understanding how resizing works in ngDiagram
+sidebar:
+  badge: New
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Badge } from '@astrojs/starlight/components';
 import Configuration from '@components/angular/nodes/resizing/resizing.astro';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 
@@ -28,7 +30,7 @@ To make a custom node resizable, wrap your node with [`<ng-diagram-node-resize-a
 
 <CodeSnippet relativePath="nodes/resizing/node/node.component.ts" />
 
-## Limiting Which Sides Resize
+## Limiting Which Sides Resize <Badge text="since v1.3.0" variant="tip" />
 
 By default all four sides and all four corners of a node can be dragged. Use the
 [`activeSides`](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/#activesides) input to narrow that down —
@@ -87,7 +89,7 @@ You can override these variables in your styles to customize the appearance and 
 
 You can further customize resizing behavior using the [`resize`](/docs/api/types/configuration/flowconfig/#resize) configuration in [`NgDiagramConfig`](/docs/api/types/configuration/flowconfig):
 
-- **[`defaultResizable`](/docs/api/types/configuration/features/resizeconfig/#allowresizebelowchildrenbounds)** – Controls whether resizing is enabled by default for all nodes. Default is `true`.
+- **[`defaultResizable`](/docs/api/types/configuration/features/resizeconfig/#defaultresizable)** – Controls whether resizing is enabled by default for all nodes. Default is `true`.
 - **[`getMinNodeSize`](/docs/api/types/configuration/features/resizeconfig/#getminnodesize)** – Returns the minimum size for a node during resizing. Default is 20x20px.
 - **[`allowResizeBelowChildrenBounds`](/docs/api/types/configuration/features/resizeconfig/#allowresizebelowchildrenbounds)** – By default, groups can be resized to any size, even smaller than their children. If you want to prevent resizing a group smaller than its children (so all children always remain fully contained), set this option to `false`.
 
