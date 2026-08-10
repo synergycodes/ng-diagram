@@ -26,6 +26,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   private cachedDiagramRect: DOMRect | null = null;
   private unregisterInteractionCleanup: (() => void) | null = null;
   private gestureActive = false;
+  // Last point this gesture actually produced — a takeover end must not use the
+  // triggering event's coordinates (they may belong to a different finger).
+  private lastGesturePoint: Point | null = null;
 
   ngOnDestroy() {
     const wasMidGesture = this.gestureActive;
@@ -58,6 +61,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     }
 
     this.gestureActive = true;
+    this.lastGesturePoint = { x: event.clientX, y: event.clientY };
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Move);
     this.cachedDiagramRect = this.diagramComponent.getBoundingClientRect();
     event.moveSelectionHandled = true;
@@ -98,7 +102,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       this.touchEventsStateService.panningHandled() ||
       this.touchEventsStateService.zoomingHandled()
     ) {
-      this.finishDragging(event);
+      // Takeover by another touch gesture: this move may come from the other
+      // finger — end with the gesture's own last point, not this event's.
+      this.finishDragging(event, this.lastGesturePoint);
       return;
     }
 
@@ -106,6 +112,8 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     if (!targetData) {
       return;
     }
+
+    this.lastGesturePoint = { x: event.clientX, y: event.clientY };
 
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     const {
@@ -159,7 +167,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     }
   }
 
-  private finishDragging(event: PointerInputEvent): void {
+  private finishDragging(event: PointerInputEvent, lastPoint: Point | null = null): void {
     const targetData = this.targetData();
     if (!targetData) {
       return;
@@ -174,7 +182,7 @@ export class PointerMoveSelectionDirective implements OnDestroy {
       phase: 'end',
       target: targetData,
       targetType: 'node',
-      lastInputPoint: {
+      lastInputPoint: lastPoint ?? {
         x: event.clientX,
         y: event.clientY,
       },

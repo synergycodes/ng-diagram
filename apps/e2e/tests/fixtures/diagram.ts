@@ -143,11 +143,9 @@ export class Diagram {
   /**
    * Drag a resize handle (`top-left`, `bottom-right`, …) or a resize line
    * (`top`, `right`, `bottom`, `left`) of an already selected node by the
-   * given delta (client px). With `fastRelease` the pointer is released while
-   * still moving — no frame wait between the last move and the pointerup, so
-   * both land in the same frame (the "fast release" from discussion #771).
+   * given delta (client px).
    */
-  async dragResizeHandle(id: string, handle: string, delta: Point, opts?: { fastRelease?: boolean }): Promise<void> {
+  async dragResizeHandle(id: string, handle: string, delta: Point): Promise<void> {
     const locator = this.node(id).locator(`.resize-handle--${handle}, .resize-line--${handle}`);
     const box = await requireBox(locator, `resize handle "${handle}" of node "${id}"`);
     // Grab lines off-center — the middle of a side line can overlap a port
@@ -158,14 +156,29 @@ export class Diagram {
           y: box.y + box.height * (handle === 'top' || handle === 'bottom' ? 0.5 : 0.3),
         }
       : centerOf(box);
-    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y }, { settleFrame: !opts?.fastRelease });
+    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+  }
+
+  /** Drag the rotate handle of an already selected node by the given delta (client px). */
+  async dragRotateHandle(id: string, delta: Point, opts?: { settleFrame?: boolean }): Promise<void> {
+    const handle = await this.centerOf(this.node(id).locator('.ng-diagram-rotate-handle'), `rotate handle of "${id}"`);
+    await this.beginDrag(
+      handle,
+      { x: handle.x + delta.x, y: handle.y + delta.y },
+      { settleFrame: opts?.settleFrame ?? false }
+    );
+    await this.page.mouse.up();
   }
 
   /** Pan the canvas from an empty corner by a delta. */
   async panBy(delta: Point): Promise<void> {
     const box = await requireBox(this.container, 'container');
     const start = { x: box.x + box.width - 30, y: box.y + box.height - 30 };
-    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+    // Panning's end phase intentionally ignores the release point (a trailing
+    // frame of viewport travel is benign), so exact-value pan assertions need
+    // beginDrag's settle frame before the release.
+    await this.beginDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+    await this.page.mouse.up();
   }
 
   /** Begin a drag: pointer-down plus moves WITHOUT the release — the gesture stays in flight. */
@@ -187,9 +200,14 @@ export class Diagram {
     return this.page.evaluate(() => new Promise(requestAnimationFrame));
   }
 
-  /** Pointer drag with an intermediate move so the diagram registers a drag rather than a click. */
-  private async pointerDrag(from: Point, to: Point, opts?: { settleFrame?: boolean }): Promise<void> {
-    await this.beginDrag(from, to, opts);
+  /**
+   * Pointer drag with an intermediate move so the diagram registers a drag
+   * rather than a click. Releases without waiting a frame — the trailing
+   * coalesced pointermove is lost and the gesture's end phase must recover it
+   * from the pointerup position, like a real user's fast release.
+   */
+  private async pointerDrag(from: Point, to: Point): Promise<void> {
+    await this.beginDrag(from, to, { settleFrame: false });
     await this.page.mouse.up();
   }
 }

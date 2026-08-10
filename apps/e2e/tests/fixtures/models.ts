@@ -77,6 +77,22 @@ export const labelArena: Partial<Model> = {
   ],
 };
 
+/** Rotatable node with a non-zero starting angle, so angle assertions are unambiguous. */
+export const spin: Partial<Model> = {
+  nodes: [
+    {
+      id: 'spin',
+      position: { x: 150, y: 150 },
+      size: { width: 140, height: 80 },
+      autoSize: false,
+      rotatable: true,
+      angle: 30,
+      data: { label: 'spin' },
+    },
+  ],
+  edges: [],
+};
+
 /** A group, a member inside it, and a free node — for group/selection scenarios. */
 export const groupArena: Partial<Model> = {
   nodes: [

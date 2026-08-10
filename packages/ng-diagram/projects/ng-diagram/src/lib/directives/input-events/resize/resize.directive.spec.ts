@@ -118,4 +118,18 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
 
     expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
   });
+
+  it('ends a takeover with the gesture own last point, not the foreign move coordinates', () => {
+    const router = TestBed.inject(InputEventsRouterService) as unknown as { emit: ReturnType<typeof vi.fn> };
+    directive.onPointerDown(makePointerEvent({ clientX: 10, clientY: 10 }));
+    directive.onPointerMove(makePointerEvent({ clientX: 20, clientY: 25 }) as unknown as PointerEvent);
+
+    // A two-finger pan takes over mid-resize; the second finger's move must not
+    // become the final resize point (it would be applied as geometry by the handler)
+    touchState.currentEvent.set(DiagramEventName.Panning);
+    directive.onPointerMove(makePointerEvent({ clientX: 300, clientY: 400 }) as unknown as PointerEvent);
+
+    const end = router.emit.mock.calls.map((call) => call[0]).find((event) => event.phase === 'end');
+    expect(end?.lastInputPoint).toEqual({ x: 20, y: 25 });
+  });
 });

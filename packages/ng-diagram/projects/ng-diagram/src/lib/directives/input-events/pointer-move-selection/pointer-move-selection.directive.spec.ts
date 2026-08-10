@@ -59,7 +59,11 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
     const mockFlowCoreProvider = {
       isInitialized: () => true,
       provide: () => ({
-        config: { nodeDraggingEnabled: true },
+        config: {
+          nodeDraggingEnabled: true,
+          viewportPanningEnabled: false,
+          selectionMoving: { edgePanningThreshold: 10, edgePanningEnabled: false, edgePanningForce: 20 },
+        },
         actionStateManager: { clearDragging },
         registerInteractionCleanup,
       }),
@@ -135,5 +139,20 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
     directive.onPointerDown(makePointerEvent());
 
     expect(registerInteractionCleanup).toHaveBeenCalledTimes(1);
+  });
+
+  it('ends a takeover with the gesture own last point, not the foreign move coordinates', () => {
+    const router = TestBed.inject(InputEventsRouterService) as unknown as { emit: ReturnType<typeof vi.fn> };
+    const pointerMove = (directive as unknown as { onPointerMove: (event: PointerInputEvent) => void }).onPointerMove;
+    directive.onPointerDown(makePointerEvent({ clientX: 10, clientY: 10 }));
+    pointerMove(makePointerEvent({ clientX: 20, clientY: 25 }));
+
+    // A two-finger pan takes over mid-drag; the second finger's move must not
+    // become the final drag point (the handler applies it as the final move)
+    touchState.currentEvent.set(DiagramEventName.Panning);
+    pointerMove(makePointerEvent({ clientX: 300, clientY: 400 }));
+
+    const end = router.emit.mock.calls.map((call) => call[0]).find((event) => event.phase === 'end');
+    expect(end?.lastInputPoint).toEqual({ x: 20, y: 25 });
   });
 });

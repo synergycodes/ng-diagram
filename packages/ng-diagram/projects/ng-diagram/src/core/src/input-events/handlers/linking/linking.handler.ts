@@ -61,6 +61,13 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
       case 'end': {
         if (!this.flow.actionStateManager.isLinking()) break;
 
+        // A taken-over end carries another pointer's coordinates — abort the
+        // linking instead of hit-testing them as the drop target.
+        if (event.takenOver) {
+          this.flow.commandHandler.emit('cancelLinking');
+          break;
+        }
+
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
         this.flow.commandHandler.emit('finishLinking', { position: flowPosition });

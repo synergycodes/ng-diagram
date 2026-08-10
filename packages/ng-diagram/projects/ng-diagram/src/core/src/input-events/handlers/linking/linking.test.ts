@@ -186,6 +186,24 @@ describe('LinkingEventHandler', () => {
         expect(mockCommandHandler.emit).not.toHaveBeenCalled();
         expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
       });
+
+      it('should cancel instead of finishing when the end was taken over by another gesture', () => {
+        const event = getSampleLinkingEvent({ phase: 'end', takenOver: true });
+
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('cancelLinking');
+        expect(mockCommandHandler.emit.mock.calls.some((call) => call[0] === 'finishLinking')).toBe(false);
+      });
+
+      it('should not emit cancelLinking on a taken-over end when not linking', () => {
+        mockActionStateManager.linking = undefined;
+        mockActionStateManager.isLinking.mockReturnValue(false);
+
+        instance.handle(getSampleLinkingEvent({ phase: 'end', takenOver: true }));
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      });
     });
 
     describe('Panning behavior', () => {

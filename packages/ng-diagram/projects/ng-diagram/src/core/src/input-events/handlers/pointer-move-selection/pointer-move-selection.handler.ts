@@ -1,7 +1,8 @@
+import { NgDiagramMath } from '../../../math';
 import { Node } from '../../../types/node.interface';
 import { TransactionContext } from '../../../types/transaction.interface';
 import { Point } from '../../../types/utils';
-import { isGroup, sortNodesByZIndex } from '../../../utils';
+import { isGroup, isSamePoint, sortNodesByZIndex } from '../../../utils';
 import { EventHandler } from '../event-handler';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
@@ -48,9 +49,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         break;
       }
       case 'continue': {
-        const selectedNodesWithChildren = this.flow.modelLookup
-          .getSelectedNodesWithChildren({ directOnly: false })
-          .filter((node) => node.draggable ?? true);
+        const selectedNodesWithChildren = this.draggableSelection();
         const selectedNodes = this.flow.modelLookup.getSelectedNodes();
         // Un-awaited handle() calls interleave at every await (see EventHandler.handle)
         // — snapshot values before the first suspension and re-validate the gesture
@@ -63,10 +62,8 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
         const pointer = this.flow.clientToFlowPosition(event.lastInputPoint);
 
-        const totalDeltaX = pointer.x - startPoint.x;
-        const totalDeltaY = pointer.y - startPoint.y;
         const crossedThreshold =
-          !gesture.hasMoved && Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY) >= MOVE_THRESHOLD;
+          !gesture.hasMoved && NgDiagramMath.distanceBetweenPoints(startPoint, pointer) >= MOVE_THRESHOLD;
         const draggedNodeIds = selectedNodesWithChildren.map((n) => n.id);
         if (crossedThreshold) {
           gesture.hasMoved = true;
@@ -80,8 +77,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           };
         }
 
-        const dx = pointer.x - lastPointerPosition.x;
-        const dy = pointer.y - lastPointerPosition.y;
+        const delta = this.pointerDelta(lastPointerPosition, pointer);
         const shouldMove = gesture.hasMoved;
 
         if (this.flow.actionStateManager.dragging) {
@@ -102,7 +98,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         if (shouldMove) {
           this.flow.transaction('moveNodes', async (tx) => {
             await tx.emit('moveNodesBy', {
-              delta: { x: dx, y: dy },
+              delta,
               nodes: selectedNodesWithChildren,
             });
 
@@ -130,6 +126,15 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
         try {
           if (gesture?.hasMoved) {
             try {
+              // pointerup is not frame-aligned: the coalesced pointermove of the
+              // final frame may never be delivered, so its movement is recovered
+              // from the release point before the drop.
+              if (!isSamePoint(pointer, gesture.lastPointerPosition)) {
+                await this.flow.commandHandler.emit('moveNodesBy', {
+                  delta: this.pointerDelta(gesture.lastPointerPosition, pointer),
+                  nodes: this.draggableSelection(),
+                });
+              }
               await this.handleDrop(pointer);
             } finally {
               // moveNodesStop must fire even when the drop rejects (a user config
@@ -210,6 +215,18 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       this.gesture = null;
     }
     return true;
+  }
+
+  /** Movement vector from `from` to `to` (flow coordinates). */
+  private pointerDelta(from: Point, to: Point): Point {
+    return { x: to.x - from.x, y: to.y - from.y };
+  }
+
+  /** Selected nodes (with children) that can actually be dragged. */
+  private draggableSelection(): Node[] {
+    return this.flow.modelLookup
+      .getSelectedNodesWithChildren({ directOnly: false })
+      .filter((node) => node.draggable ?? true);
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {
