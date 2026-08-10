@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Added
+
+### Fixed
+
+## [1.3.0] - 2026-08-10
+
+### Changed
+
 - **`NgDiagramService.invalidateMeasurements` is awaitable** — it returns a `Promise<void>` that resolves once the triggered re-measurements have settled, so the invalidated elements' `size`, `measuredPorts` and `measuredLabels` read fresh on the next line. An element that delivers no new measurement (unmounted, zero-size, or unchanged) does not stall the promise. Existing call sites keep working (`void` → `Promise<void>`); ignoring the promise is fine ([#773](https://github.com/synergycodes/ng-diagram/pull/773))
 
 - **Awaitable service methods** — every mutating method on the public services (`NgDiagramModelService`, `NgDiagramNodeService`, `NgDiagramSelectionService`, `NgDiagramClipboardService`, `NgDiagramGroupsService`, `NgDiagramViewportService`) now returns a `Promise<void>` that resolves once the change has been applied to the model, so the next line of code reads the updated state. Read it through `getModel()` or the getter methods (`getNodeById`, `getEdgeById`, `getConnectedEdges`, …) — these are synchronous with the model. The `nodes()`, `edges()` and `metadata()` signals refresh with Angular's change detection, so right after the `await` (and inside diagram event handlers) they can still show the previous state. Existing call sites keep working (`void` → `Promise<void>`). **Do not await these promises from inside a middleware** — the update pipeline is not re-entrant and the await would deadlock; fire-and-forget calls are safe there ([#769](https://github.com/synergycodes/ng-diagram/pull/769))
@@ -306,7 +314,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial tagged release.
 
-[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.2.4...HEAD
+[unreleased]: https://github.com/synergycodes/ng-diagram/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/synergycodes/ng-diagram/compare/v1.2.4...v1.3.0
 [1.2.4]: https://github.com/synergycodes/ng-diagram/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/synergycodes/ng-diagram/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/synergycodes/ng-diagram/compare/v1.2.1...v1.2.2
