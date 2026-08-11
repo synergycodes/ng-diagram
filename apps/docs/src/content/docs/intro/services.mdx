@@ -63,12 +63,18 @@ Handles all model-related operations including node and edge updates, spatial qu
 - Access nodes, edges, and metadata as reactive signals
 - Find elements by ID
 
+Every mutating method returns a promise that resolves once the change has been applied to the
+model, so operations can be sequenced with `await` — see
+[Awaiting Changes](/docs/guides/state-management/#awaiting-changes).
+
 <Aside type="tip" title="Waiting for measurements">
   When you need to perform viewport operations (like
   [`zoomToFit()`](/docs/api/services/ngdiagramviewportservice/#zoomtofit) or
   [`centerOnNode()`](/docs/api/services/ngdiagramviewportservice/#centeronnode)) immediately after adding or modifying
-  elements, use the [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure
-  the elements are measured before the viewport adjusts.
+  elements, pass `{ waitForMeasurements: true }` to the method itself (see the
+  [per-method option](/docs/guides/transactions/#per-method-option)) or use the
+  [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure the elements are
+  measured before the viewport adjusts.
 </Aside>
 
 **Usage Example:**
@@ -80,13 +86,13 @@ import { NgDiagramModelService } from 'ng-diagram';
 @Component({
   selector: 'app-properties-panel',
   template: `
-    <div *ngIf="hasNodes()">
+    @if (hasNodes()) {
       <p>Total nodes: {{ nodeCount() }}</p>
       <p>Total edges: {{ edgeCount() }}</p>
 
       <button (click)="updateSelectedNode()">Update Node</button>
       <button (click)="findNearbyNodes()">Find Nearby</button>
-    </div>
+    }
   `,
 })
 export class PropertiesPanelComponent {
@@ -237,11 +243,13 @@ import { NgDiagramSelectionService } from 'ng-diagram';
       <p>Selected: {{ selectionSummary() }}</p>
     </div>
 
-    <div class="actions" *ngIf="hasSelection()">
-      <button (click)="selectAll()">Select All</button>
-      <button (click)="clearSelection()">Clear Selection</button>
-      <button (click)="deleteSelected()">Delete Selected</button>
-    </div>
+    @if (hasSelection()) {
+      <div class="actions">
+        <button (click)="selectAll()">Select All</button>
+        <button (click)="clearSelection()">Clear Selection</button>
+        <button (click)="deleteSelected()">Delete Selected</button>
+      </div>
+    }
   `,
 })
 export class SelectionToolbarComponent {
@@ -372,7 +380,9 @@ import { NgDiagramNodeService } from 'ng-diagram';
     <div class="node-content" (click)="handleClick()" (dblclick)="handleDoubleClick()">
       <h3>{{ node().data?.title }}</h3>
       <div class="ports">
-        <div *ngFor="let port of node().ports" [id]="port.id" class="port"></div>
+        @for (port of node().ports; track port.id) {
+          <div [id]="port.id" class="port"></div>
+        }
       </div>
     </div>
   `,

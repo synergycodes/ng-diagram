@@ -3,21 +3,24 @@ import { getNodeBorderIntersection, getPortFlowPositionSide } from '../../../uti
 import { computeFloatingEndSide } from '../../../utils/compute-floating-edge-side';
 
 /**
- * Computes dynamic sides for temporary edge floating ends.
+ * Computes dynamic sides for floating edge ends — the live end of a temporary
+ * edge while drawing, and the free end of a committed dangling edge alike.
+ * The side faces the anchored end, so the route heads toward the floating
+ * position instead of assuming the default left/right sides.
  * Returns undefined for sides that should use defaults.
  */
-const getTemporaryEdgeSides = (
+const getFloatingEndSides = (
   edge: Edge,
   nodesMap: Map<string, Node>
 ): { sourceSide?: PortSide; targetSide?: PortSide } => {
-  // Temporary edge with floating target (drawing from source)
+  // Floating target (dangling end, or drawing from source)
   if (!edge.target && edge.targetPosition) {
     const startNode = nodesMap.get(edge.source);
     const targetSide = computeFloatingEndSide(startNode, edge.sourcePort, edge.targetPosition);
     return { targetSide };
   }
 
-  // Temporary edge with floating source (reverse drawing from target)
+  // Floating source (dangling start, or reverse drawing from target)
   if (!edge.source && edge.sourcePosition && edge.targetPosition) {
     const endNode = nodesMap.get(edge.target);
     const sourceSide = computeFloatingEndSide(endNode, edge.targetPort, edge.sourcePosition);
@@ -35,12 +38,12 @@ const getTemporaryEdgeSides = (
  * @param {Map<string, Node>} nodesMap - A map of node IDs to node objects, used to look up node positions.
  */
 export const getSourceTargetPositions = (edge: Edge, nodesMap: Map<string, Node>) => {
-  // Get dynamic sides for temporary edges, if applicable
-  const temporarySides = edge.temporary ? getTemporaryEdgeSides(edge, nodesMap) : {};
+  // Get dynamic sides for floating ends, if applicable
+  const floatingSides = getFloatingEndSides(edge, nodesMap);
 
   // Use dynamic sides if available, otherwise use defaults
-  const sourceSide = temporarySides.sourceSide ?? 'right';
-  const targetSide = temporarySides.targetSide ?? 'left';
+  const sourceSide = floatingSides.sourceSide ?? 'right';
+  const targetSide = floatingSides.targetSide ?? 'left';
 
   // First pass: get preliminary positions to use as reference points
   const sourceNode = nodesMap.get(edge.source);

@@ -30,6 +30,7 @@ ngDiagram follows Angular's official support policy:
 
 | Angular Version | ngDiagram Support | Angular EOL |
 | --------------- | ----------------- | ----------- |
+| Angular 21      | ✅ Supported      | May 2027    |
 | Angular 20      | ✅ Supported      | Nov 2026    |
 | Angular 19      | ✅ Supported      | May 2026    |
 | Angular 18      | ✅ Supported      | Nov 2025    |
@@ -49,7 +50,7 @@ When a new Angular version releases:
 
 | ngDiagram Version | Support Status | Updates                            |
 | ----------------- | -------------- | ---------------------------------- |
-| Latest (0.8.x)    | Active         | Features, bugs, security           |
+| Latest (1.x)      | Active         | Features, bugs, security           |
 | Previous major    | Maintenance    | Critical bugs, security (6 months) |
 | Older versions    | Unsupported    | No updates                         |
 

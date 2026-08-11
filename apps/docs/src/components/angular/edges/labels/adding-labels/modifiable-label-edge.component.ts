@@ -31,9 +31,7 @@ import {
   styleUrl: './modifiable-label-edge.component.scss',
   imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
-export class ModifiableLabelEdgeComponent
-  implements NgDiagramEdgeTemplate<MultiLabelEdgeData>
-{
+export class ModifiableLabelEdgeComponent implements NgDiagramEdgeTemplate<MultiLabelEdgeData> {
   // @collapse-start
   edge = input.required<Edge<MultiLabelEdgeData>>();
 

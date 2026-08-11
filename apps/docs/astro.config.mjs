@@ -88,7 +88,6 @@ export default defineConfig({
         {
           label: 'Showcases',
           link: '/showcases/',
-          badge: { text: 'New', variant: 'tip' },
         },
         {
           label: 'API',

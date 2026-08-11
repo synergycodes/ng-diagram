@@ -105,6 +105,4 @@ export interface WheelOnlyShortcutDefinition {
  * @category Types/Configuration/Shortcuts
  */
 export type ShortcutDefinition =
-  | KeyboardShortcutDefinition
-  | PointerOnlyShortcutDefinition
-  | WheelOnlyShortcutDefinition;
+  KeyboardShortcutDefinition | PointerOnlyShortcutDefinition | WheelOnlyShortcutDefinition;

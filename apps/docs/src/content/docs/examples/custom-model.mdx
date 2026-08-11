@@ -47,3 +47,9 @@ You can find the complete interface documentation in the [API reference](/docs/a
 #### LocalStorageModelAdapter Implementation
 
 This example demonstrates a custom model adapter that persists diagram data to localStorage. The data will survive page refreshes and browser sessions. You can try it by adding nodes and edges, then refreshing the page to see that your changes are retained.
+
+### When to Use This Approach
+
+A custom `ModelAdapter` makes your storage layer the single source of truth — every change goes straight to it. If you only need save/load buttons on top of the default model, snapshotting with `toJSON()` is much simpler — see the [Save Persistence example](/docs/examples/save-state/).
+
+**Learn more:** [State Management guide →](/docs/guides/state-management/)

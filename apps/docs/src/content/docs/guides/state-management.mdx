@@ -1,9 +1,11 @@
 ---
 title: State Management
 description: Learn how to create models, access the model service, and perform operations on your diagram data
+sidebar:
+  badge: New
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Badge } from '@astrojs/starlight/components';
 
 ngDiagram uses a reactive state management system that allows you to create, access, and modify diagram data efficiently.
 Understanding this system is essential for building dynamic, interactive diagrams.
@@ -169,6 +171,35 @@ The model service provides comprehensive methods for adding, updating, deleting,
   desynchronize UI and state, leading to inconsistent or "weird" results.
 </Aside>
 
+### Awaiting Changes <Badge text="since v1.3.0" variant="tip" />
+
+Every mutating service method returns a `Promise<void>` that resolves once the change has been
+applied to the model — the next line of code reads the updated state:
+
+```typescript
+await this.modelService.deleteNodes(['node-1']);
+// The model is already updated here — safe to act on it:
+this.viewportService.zoomToFit();
+```
+
+Awaiting is optional — a call whose promise you ignore applies the change all the same. Await
+when the next step depends on the change being applied: sequencing operations, reading the
+model right after a mutation, or reacting to a rejected update (a failing
+[middleware](/docs/guides/middlewares/) rejects the returned promise). In projects using the
+`@typescript-eslint/no-floating-promises` lint rule, mark intentional fire-and-forget calls
+with the `void` operator: `void this.modelService.addNodes([node]);`.
+
+Inside a [transaction](/docs/guides/transactions/) the promise resolves right away and the
+change is applied when the transaction commits.
+
+<Aside type="caution" title="Reading state right after a change">
+  The `nodes()`, `edges()` and `metadata()` signals refresh with Angular's change detection. Right after an `await` —
+  and inside diagram event handlers — they can still return the previous state. To read the state immediately, use the
+  getter methods (`getNodeById()`, `getEdgeById()`, `getConnectedEdges()`, …) or the model itself via `getModel()` —
+  these are always synchronous with the applied changes. Use the signals in reactive contexts: templates, `computed()`,
+  and `effect()`.
+</Aside>
+
 ### Adding Elements
 
 Add new nodes and edges to your diagram:
@@ -200,8 +231,10 @@ this.modelService.addEdges([
   When you need to perform viewport operations (like
   [`zoomToFit()`](/docs/api/services/ngdiagramviewportservice/#zoomtofit) or
   [`centerOnNode()`](/docs/api/services/ngdiagramviewportservice/#centeronnode)) immediately after adding or modifying
-  elements, use the [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure
-  the elements are measured before the viewport adjusts.
+  elements, pass `{ waitForMeasurements: true }` to the method itself (see the
+  [per-method option](/docs/guides/transactions/#per-method-option)) or use the
+  [`waitForMeasurements`](/docs/guides/transactions/#waitformeasurements) transaction option to ensure the elements are
+  measured before the viewport adjusts.
 </Aside>
 
 ### Updating Elements
@@ -395,20 +428,24 @@ Multi-user collaboration requires synchronizing diagram changes across different
 When working with complex Angular applications that use state management libraries like NgRx or Akita, you can create model adapters that integrate seamlessly with your existing store architecture. These adapters would dispatch actions for diagram changes and subscribe to state selections, ensuring that diagram data follows your application's established data flow patterns and benefits from features like time-travel debugging and state persistence.
 
 ```typescript
+// Sketch — a real adapter implements every ModelAdapter member;
+// see the Custom Model example for a complete implementation.
 class NgRxModelAdapter implements ModelAdapter {
-  constructor(private store: Store) {}
+  private store = inject(Store);
 
   updateNodes(nodes: Node[]): void {
     this.store.dispatch(DiagramActions.updateNodes({ nodes }));
   }
 
-  onChange(callback: Function): void {
+  onChange(callback: (changes: ModelChanges) => void): void {
     this.store.select(selectDiagramData).subscribe(callback);
   }
+
+  // ...remaining ModelAdapter members
 }
 
 // Wire up the custom adapter with initializeModelAdapter
-model = initializeModelAdapter(new NgRxModelAdapter(this.store));
+model = initializeModelAdapter(new NgRxModelAdapter());
 ```
 
 Custom model implementations provide the flexibility to integrate NgDiagram with any data architecture while maintaining full compatibility with all diagram features and the model service API.

@@ -35,6 +35,7 @@ import {
   type Node,
   type Port,
 } from 'ng-diagram';
+import { AwaitableTestsComponent } from './awaitable-tests/awaitable-tests.component';
 import { defaultModel } from './data/default-model';
 import { downloadedModel } from './data/downloaded-model';
 import { generateDynamicPortsTestModel } from './data/dynamic-ports-test-model';
@@ -45,6 +46,7 @@ import { virtualizationConfigOverrides, virtualizationTestConfig } from './data/
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
+import { DefaultLabelledEdgeComponent } from './edge-template/default-labelled-edge/default-labelled-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { MeasurementTestsComponent } from './measurement-tests/measurement-tests.component';
 import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
@@ -62,6 +64,7 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
     ToolbarComponent,
     BatchTestToolbarComponent,
     MeasurementTestsComponent,
+    AwaitableTestsComponent,
     PaletteComponent,
     NgDiagramComponent,
     NgDiagramBackgroundComponent,
@@ -81,6 +84,7 @@ export class AppComponent {
     ['custom-polyline-edge', CustomPolylineEdgeComponent],
     ['labelled-edge', LabelledEdgeComponent],
     ['dashed-edge', DashedEdgeComponent],
+    ['default-labelled-edge', DefaultLabelledEdgeComponent],
   ]);
 
   minimapNodeTemplateMap = new NgDiagramMinimapNodeTemplateMap([['image', ImageMinimapNodeComponent]]);
@@ -95,12 +99,23 @@ export class AppComponent {
     },
     resize: {
       allowResizeBelowChildrenBounds: false,
+      // 60px "header" — pairs with the resize snap offset below
+      getMinNodeSize: () => ({ width: 100, height: 60 }),
     },
     background: {
       cellSize: { width: 10, height: 10 },
     },
     snapping: {
-      shouldSnapDragForNode: () => true,
+      // shouldSnapDragForNode: () => true,
+      shouldSnapResizeForNode: () => true,
+      computeSnapForNodeSize: (node: Node) => {
+        if (node.type === 'custom-group') {
+          return { width: 100, height: 100 };
+        }
+        return { width: 20, height: 50 };
+      },
+      // Issue #765 use case: heights snap to 60, 110, 160, ... (header + n * 50)
+      computeSnapOffsetForNodeSize: (node: Node) => (node.type === 'custom-group' ? null : { width: 0, height: 60 }),
     },
     linking: {
       selectNodeOnPortPress: false,
@@ -134,6 +149,7 @@ export class AppComponent {
 
   batchTestMode = signal(false);
   measurementTestMode = signal(false);
+  awaitableTestMode = signal(false);
 
   enterMeasurementTest(): void {
     this.measurementTestMode.set(true);
@@ -141,6 +157,14 @@ export class AppComponent {
 
   exitMeasurementTest(): void {
     this.measurementTestMode.set(false);
+  }
+
+  enterAwaitableTest(): void {
+    this.awaitableTestMode.set(true);
+  }
+
+  exitAwaitableTest(): void {
+    this.awaitableTestMode.set(false);
   }
 
   private savedModelData: Partial<{ nodes: Node[]; edges: Edge[] }> | null = null;

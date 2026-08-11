@@ -61,5 +61,9 @@ export const highlightGroupClear = async (commandHandler: CommandHandler) => {
     'highlightGroupClear'
   );
 
-  commandHandler.flowCore.actionStateManager.clearHighlightGroup();
+  // A newer highlightGroup may have replaced the state while the update above
+  // was suspended; only clear when it still belongs to this command.
+  if (commandHandler.flowCore.actionStateManager.highlightGroup === highlightGroupState) {
+    commandHandler.flowCore.actionStateManager.clearHighlightGroup();
+  }
 };

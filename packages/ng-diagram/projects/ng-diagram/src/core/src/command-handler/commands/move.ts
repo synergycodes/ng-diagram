@@ -1,3 +1,4 @@
+import { NgDiagramMath } from '../../math';
 import type { CommandHandler, Node, Point } from '../../types';
 import { isSamePoint, snapNodePosition } from '../../utils';
 
@@ -83,10 +84,7 @@ const calculateRootNodeMovement = (
     accumulatedDeltas.set(node.id, newAccumulated);
   }
 
-  const actualDelta = {
-    x: snappedPosition.x - node.position.x,
-    y: snappedPosition.y - node.position.y,
-  };
+  const actualDelta = NgDiagramMath.subtractPoints(snappedPosition, node.position);
 
   return { snappedPosition, actualDelta };
 };
@@ -134,14 +132,8 @@ const applySnappingWithAccumulation = (
   };
   const snappedPosition = snapNodePosition(commandHandler.flowCore.config, node, targetPosition);
 
-  const actualMovement = {
-    x: snappedPosition.x - node.position.x,
-    y: snappedPosition.y - node.position.y,
-  };
-  const newAccumulated = {
-    x: totalDelta.x - actualMovement.x,
-    y: totalDelta.y - actualMovement.y,
-  };
+  const actualMovement = NgDiagramMath.subtractPoints(snappedPosition, node.position);
+  const newAccumulated = NgDiagramMath.subtractPoints(totalDelta, actualMovement);
 
   return { snappedPosition, newAccumulated };
 };

@@ -1,6 +1,7 @@
 import { effect, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { DataObject, Edge, GroupNode, Metadata, Node, Point, Port, Rect } from '../../core/src';
 import { calculatePartsBounds } from '../../core/src/utils/dimensions';
+import { emitWithMeasurementOption } from './emit-with-measurement-option';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
 import { NgDiagramService } from './ng-diagram.service';
 
@@ -96,17 +97,24 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   /**
    * Adds new edges to the diagram.
    * @param edges Array of edges to add.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after the
+   * added elements (e.g. edge labels) have been measured. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  addEdges(edges: Edge[]) {
-    this.flowCore.commandHandler.emit('addEdges', { edges });
+  addEdges(edges: Edge[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    return emitWithMeasurementOption(this.flowCore, 'addEdges', { edges }, options);
   }
 
   /**
    * Adds new nodes to the diagram.
    * @param nodes Array of nodes to add.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after the
+   * added nodes have been measured — useful before calling `zoomToFit()` or `centerOnNode()`.
+   * Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  addNodes(nodes: Node[]) {
-    this.flowCore.commandHandler.emit('addNodes', { nodes });
+  addNodes(nodes: Node[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    return emitWithMeasurementOption(this.flowCore, 'addNodes', { nodes }, options);
   }
 
   // ===================
@@ -282,12 +290,12 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * Updates the properties of an edge.
    * @param edgeId Edge id.
    * @param edge New edge properties.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  updateEdge(edgeId: string, edge: Partial<Edge>) {
-    this.flowCore.commandHandler.emit('updateEdge', {
-      id: edgeId,
-      edgeChanges: { ...edge },
-    });
+  updateEdge(edgeId: string, edge: Partial<Edge>, options?: { waitForMeasurements?: boolean }): Promise<void> {
+    return emitWithMeasurementOption(this.flowCore, 'updateEdge', { id: edgeId, edgeChanges: { ...edge } }, options);
   }
 
   /**
@@ -295,26 +303,29 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @typeParam T - The type of the edge's `data` property. Defaults to `DataObject`.
    * @param edgeId Edge id.
    * @param data New data to set for the edge.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update (e.g. re-rendered edge labels) have completed.
+   * Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  updateEdgeData<T extends DataObject = DataObject>(edgeId: string, data: T) {
-    this.flowCore.commandHandler.emit('updateEdge', {
-      id: edgeId,
-      edgeChanges: {
-        data: data,
-      },
-    });
+  updateEdgeData<T extends DataObject = DataObject>(
+    edgeId: string,
+    data: T,
+    options?: { waitForMeasurements?: boolean }
+  ): Promise<void> {
+    return this.updateEdge(edgeId, { data }, options);
   }
 
   /**
    * Updates the properties of a node.
    * @param nodeId Node id.
    * @param node New node properties.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  updateNode(nodeId: string, node: Partial<Node>) {
-    this.flowCore.commandHandler.emit('updateNode', {
-      id: nodeId,
-      nodeChanges: { ...node },
-    });
+  updateNode(nodeId: string, node: Partial<Node>, options?: { waitForMeasurements?: boolean }): Promise<void> {
+    return emitWithMeasurementOption(this.flowCore, 'updateNode', { id: nodeId, nodeChanges: { ...node } }, options);
   }
 
   /**
@@ -322,30 +333,39 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @typeParam T - The type of the node's `data` property. Defaults to `DataObject`.
    * @param nodeId Node id.
    * @param data New data to set for the node.
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update (e.g. a template resized by the new data) have
+   * completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  updateNodeData<T extends DataObject = DataObject>(nodeId: string, data: T) {
-    this.flowCore.commandHandler.emit('updateNode', {
-      id: nodeId,
-      nodeChanges: {
-        data: data,
-      },
-    });
+  updateNodeData<T extends DataObject = DataObject>(
+    nodeId: string,
+    data: T,
+    options?: { waitForMeasurements?: boolean }
+  ): Promise<void> {
+    return this.updateNode(nodeId, { data }, options);
   }
 
   /**
    * Updates multiple nodes at once.
    * @param nodes Array of node updates (must include id and any properties to update).
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  updateNodes(nodes: (Pick<Node, 'id'> & Partial<Node>)[]) {
-    this.flowCore.commandHandler.emit('updateNodes', { nodes });
+  updateNodes(nodes: (Pick<Node, 'id'> & Partial<Node>)[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    return emitWithMeasurementOption(this.flowCore, 'updateNodes', { nodes }, options);
   }
 
   /**
    * Updates multiple edges at once.
    * @param edges Array of edge updates (must include id and any properties to update).
+   * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after
+   * measurements triggered by the update have completed. Available since 1.3.0.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[]) {
-    this.flowCore.commandHandler.emit('updateEdges', { edges });
+  updateEdges(edges: (Pick<Edge, 'id'> & Partial<Edge>)[], options?: { waitForMeasurements?: boolean }): Promise<void> {
+    return emitWithMeasurementOption(this.flowCore, 'updateEdges', { edges }, options);
   }
 
   // ===================
@@ -355,17 +375,19 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   /**
    * Deletes edges by their IDs.
    * @param ids Array of edge IDs to delete.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  deleteEdges(ids: string[]) {
-    this.flowCore.commandHandler.emit('deleteEdges', { ids });
+  deleteEdges(ids: string[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('deleteEdges', { ids });
   }
 
   /**
    * Deletes nodes by their IDs.
    * @param ids Array of node IDs to delete.
+   * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
-  deleteNodes(ids: string[]) {
-    this.flowCore.commandHandler.emit('deleteNodes', { ids });
+  deleteNodes(ids: string[]): Promise<void> {
+    return this.flowCore.commandHandler.emit('deleteNodes', { ids });
   }
 
   private modelListener = (data: { nodes: Node[]; edges: Edge[]; metadata: Metadata }) => {

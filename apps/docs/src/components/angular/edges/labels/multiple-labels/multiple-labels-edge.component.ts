@@ -54,9 +54,7 @@ const ANIMATION_DURATION = 0.5;
   `,
   imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent],
 })
-export class MultipleLabelsEdgeComponent
-  implements NgDiagramEdgeTemplate<MultiLabelEdgeData>
-{
+export class MultipleLabelsEdgeComponent implements NgDiagramEdgeTemplate<MultiLabelEdgeData> {
   edge = input.required<Edge<MultiLabelEdgeData>>();
   selected = computed(() => this.edge().selected);
 

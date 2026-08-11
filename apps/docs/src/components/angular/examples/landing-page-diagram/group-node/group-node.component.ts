@@ -34,9 +34,7 @@ export interface GroupNodeData {
     '[class.ng-diagram-port-hoverable]': 'true',
   },
 })
-export class GroupNodeComponent
-  implements NgDiagramGroupNodeTemplate<GroupNodeData>
-{
+export class GroupNodeComponent implements NgDiagramGroupNodeTemplate<GroupNodeData> {
   node = input.required<GroupNode<GroupNodeData>>();
   title = computed(() => this.node()?.data?.title || 'Group');
 }

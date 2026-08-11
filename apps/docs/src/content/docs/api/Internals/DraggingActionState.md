@@ -19,6 +19,14 @@ Key is node ID, value is the accumulated delta that hasn't been applied due to s
 
 ***
 
+### cancelReason?
+
+> `optional` **cancelReason**: `"cancelled"`
+
+Set when the drag is aborted; carried into `nodeDragEnded`.
+
+***
+
 ### modifiers
 
 > **modifiers**: [`InputModifiers`](/docs/api/types/configuration/shortcuts/inputmodifiers/)

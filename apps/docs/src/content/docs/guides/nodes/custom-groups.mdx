@@ -9,7 +9,7 @@ helpBanner:
 ---
 
 You can create custom group templates, similar to custom nodes.
-All you need to do is implement a component that extends [`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate) and register it in the [`nodeTemplateMap`](/docs/api/types/templates/ngdiagramnodetemplatemap) with a unique [`type`](/docs/api/types/model/simplenode#type).
+All you need to do is write a component that implements [`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate) and register it in the [`nodeTemplateMap`](/docs/api/types/templates/ngdiagramnodetemplatemap) with a unique [`type`](/docs/api/types/model/simplenode#type).
 Remember that in your diagram model, the group node must have [`isGroup: true`](/docs/api/types/model/groupnode#isgroup) set to function as a group.
 
 ```typescript {22}
@@ -32,7 +32,7 @@ import {
       </div>
     </ng-diagram-node-resize-adornment>
   `,
-  // styles: { ... }
+  // styleUrl: './custom-group.component.scss'
 })
 export class CustomGroupComponent implements NgDiagramGroupNodeTemplate {
   node = input.required<GroupNode>();

@@ -2,17 +2,23 @@ import { inject, Injectable } from '@angular/core';
 import { Node } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
+import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { LinkingEventService } from './linking-event.service';
 
 @Injectable()
 export class ManualLinkingService {
   private readonly linkingEventService = inject(LinkingEventService);
   private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
+  private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private node: Node | undefined;
   private portId: string | undefined;
+  private unregisterInteractionCleanup: (() => void) | null = null;
 
   /** Call this method to start linking from your custom logic */
   startLinking(node: Node, portId?: string) {
+    // A previous manual linking still in flight would leave its document
+    // listeners and its interaction-cleanup entry orphaned — latest call wins.
+    this.removeListeners();
     this.node = node;
     this.portId = portId;
     const position = this.cursorPositionTrackerService.getLastPosition();
@@ -28,6 +34,9 @@ export class ManualLinkingService {
     document.addEventListener('click', this.onDocumentClick, true);
     document.addEventListener('touchmove', this.onTouchMove, { passive: false });
     document.addEventListener('touchend', this.onTouchEnd, { passive: false });
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
   }
 
   private onPointerMove = (event: PointerEvent) => {
@@ -60,16 +69,18 @@ export class ManualLinkingService {
       clientY: touch.clientY,
     } as PointerInputEvent;
 
-    this.cleanup();
+    this.removeListeners();
     this.linkingEventService.emitEnd(mockEvent, this.node, this.portId);
   };
 
   private onDocumentClick = (event: MouseEvent) => {
-    this.cleanup();
+    this.removeListeners();
     this.linkingEventService.emitEnd(event as PointerInputEvent, this.node, this.portId);
   };
 
-  private cleanup() {
+  private removeListeners() {
+    this.unregisterInteractionCleanup?.();
+    this.unregisterInteractionCleanup = null;
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('click', this.onDocumentClick, true);
     document.removeEventListener('touchmove', this.onTouchMove);

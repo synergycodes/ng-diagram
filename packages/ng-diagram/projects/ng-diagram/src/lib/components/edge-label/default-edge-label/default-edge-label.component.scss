@@ -8,4 +8,21 @@
   border: var(--edge-label-border-width, 1px) solid
     var(--edge-label-border-color, var(--ngd-default-edge-label-border-color));
   transition: var(--edge-label-border-transition, border-color 0.1s ease-in-out);
+
+  /* Matches the surrounding edge in any template, keeping hover parity with the
+     default edge; there its wrapper's per-state --edge-label-border-color out-ranks
+     these fallbacks, so resolution inside the default edge is unchanged. */
+  :host-context(ng-diagram-base-edge:hover:not(.selected):not(.temporary)) & {
+    border-color: var(
+      --edge-label-border-color-hover,
+      var(--edge-label-border-color, var(--ngd-default-edge-stroke-hover))
+    );
+  }
+
+  &.selected {
+    border-color: var(
+      --edge-label-border-color-selected,
+      var(--edge-label-border-color, var(--ngd-default-edge-stroke-selected))
+    );
+  }
 }

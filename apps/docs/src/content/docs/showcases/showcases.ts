@@ -22,11 +22,11 @@ export type ShowcaseProject = {
 
 export const showcaseProjects: ShowcaseProject[] = [
   {
-    title: 'Footlball Pass Network Visualizaer',
+    title: 'Football Pass Network Visualizer',
     description:
       'Interactive pass network visualization tool for football match analysis. It renders player nodes positioned by their average pass origin on the pitch, with edges encoding pass volume (line width) and accuracy (color)',
     image: 'pass-network-visualizer.png',
-    imageAlt: 'Screenshot of the Footlball Pass Network Visualizaer',
+    imageAlt: 'Screenshot of the Football Pass Network Visualizer',
     href: 'https://mateuszdropinski.github.io/pass-network-visualizer/',
     codeHref: 'https://github.com/MateuszDropinski/pass-network-visualizer',
     author: 'Mateusz Dropiński',

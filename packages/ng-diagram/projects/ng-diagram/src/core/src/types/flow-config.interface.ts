@@ -1,7 +1,7 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
-import type { NgDiagramPanelPosition } from './panel-position.type';
 import type { Edge } from './edge.interface';
 import type { Node, Port } from './node.interface';
+import type { NgDiagramPanelPosition } from './panel-position.interface';
 import type { ShortcutDefinition } from './shortcut.interface';
 import { Size } from './utils';
 
@@ -288,6 +288,19 @@ export interface SnappingConfig {
   computeSnapForNodeSize: (node: Node) => Size | null;
 
   /**
+   * Computes the snap offset for a node while resizing. The snapped size follows the
+   * sequence `offset + n * snap` per axis, so a node with a 60px header snapping every
+   * 50px can snap to 60, 110, 160, ... instead of 50, 100, 150, ...
+   * If null is returned, {@link defaultResizeSnapOffset} is used.
+   * If computeSnapOffsetForNodeSize is used, it takes precedence over defaultResizeSnapOffset.
+   * @param node The node to compute the snap offset for resizing.
+   * @returns The snap offset for the node while resizing, or null.
+   * @default () => null
+   * @since 1.3.0
+   */
+  computeSnapOffsetForNodeSize: (node: Node) => Size | null;
+
+  /**
    * The default snap size for node dragging.
    * If computeSnapForNodeDrag is used, it takes precedence over this value.
    * @default { width: 10, height: 10 }
@@ -299,6 +312,15 @@ export interface SnappingConfig {
    * @default { width: 10, height: 10 }
    */
   defaultResizeSnap: Size;
+
+  /**
+   * The default snap offset for node resizing. The snapped size follows the
+   * sequence `offset + n * snap` per axis (see {@link computeSnapOffsetForNodeSize}).
+   * If computeSnapOffsetForNodeSize is used, it takes precedence over this value.
+   * @default { width: 0, height: 0 }
+   * @since 1.3.0
+   */
+  defaultResizeSnapOffset: Size;
 }
 
 /**
@@ -464,6 +486,21 @@ export interface VirtualizationConfig {
 }
 
 /**
+ * Configuration for the default Node Templates
+ *
+ * @public
+ * @since 1.3.0
+ * @category Types/Configuration/Features
+ */
+export interface DefaultNodeTemplateConfig {
+  /**
+   * When explicitly set to `true` this will remove the ports in the default Node Template
+   * @default undefined;
+   */
+  removePorts: boolean;
+}
+
+/**
  * The main configuration interface for the flow system.
  *
  * This type defines all available configuration options for the diagram engine.
@@ -595,4 +632,10 @@ export interface FlowConfig {
    * @default true
    */
   nodeDraggingEnabled: boolean;
+
+  /**
+   * @since 1.3.0
+   * Configuration options for the default Node Templates
+   */
+  defaultNode?: DefaultNodeTemplateConfig;
 }

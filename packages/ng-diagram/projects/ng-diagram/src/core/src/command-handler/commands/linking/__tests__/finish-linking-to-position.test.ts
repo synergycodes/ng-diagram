@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import type { CommandHandler, Edge, LinkingActionState } from '../../../../types';
+import type { InternalLinkingActionState } from '../../../../types/action-state.interface';
 import { finishLinkingToPosition, FinishLinkingToPositionCommand } from '../finish-linking-to-position';
 
 vi.mock('../utils', () => ({
@@ -191,5 +192,65 @@ describe('finishLinkingToPosition', () => {
       'finishLinking'
     );
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should clear linking when createFinalEdge throws', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockCreateFinalEdge.mockImplementation(() => {
+      // finalEdgeDataBuilder / computeEdgeId are user callbacks — they can throw.
+      throw new Error('builder exploded');
+    });
+
+    await expect(
+      finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 1, y: 2 } })
+    ).rejects.toThrow('builder exploded');
+
+    // A stranded linking state would permanently block new links.
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should clear linking when the awaited update rejects', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockCreateFinalEdge.mockReturnValue({ id: 'final-edge', source: 'source-node', target: '', data: {} });
+    mockFlowCore.applyUpdate.mockRejectedValue(new Error('pass failed'));
+
+    await expect(
+      finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 1, y: 2 } })
+    ).rejects.toThrow('pass failed');
+
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should not clear a different gesture that replaced the state while the update was in flight', async () => {
+    const ownGesture: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      _gestureId: 1,
+    };
+    const newGesture: InternalLinkingActionState = {
+      sourceNodeId: 'other-node',
+      sourcePortId: 'other-port',
+      temporaryEdge: null,
+      _gestureId: 2,
+    };
+    mockFlowCore.actionStateManager.linking = ownGesture;
+    mockCreateFinalEdge.mockReturnValue({ id: 'final-edge', source: 'source-node', target: '', data: {} });
+    mockFlowCore.applyUpdate.mockImplementation(async () => {
+      mockFlowCore.actionStateManager.linking = newGesture;
+    });
+
+    await finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 1, y: 2 } });
+
+    expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
+    expect(mockFlowCore.actionStateManager.linking).toBe(newGesture);
   });
 });

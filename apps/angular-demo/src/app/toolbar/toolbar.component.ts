@@ -9,6 +9,7 @@ import {
   NgDiagramService,
   NgDiagramViewportService,
   Node,
+  type GroupNode,
 } from 'ng-diagram';
 import { nodeTemplateMap, NodeTemplateType } from '../data/node-template';
 
@@ -34,6 +35,7 @@ export class ToolbarComponent {
   enterBatchTest = output<void>();
 
   measurementTestEnter = output<void>();
+  awaitableTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
   isAnythingSelected = computed(() => {
     const selection = this.ngDiagramSelectionService.selection();
@@ -93,6 +95,39 @@ export class ToolbarComponent {
 
   onZoomToFitClick() {
     this.ngDiagramViewportService.zoomToFit();
+  }
+
+  /**
+   * Regression check for the "resize an unselected group" fix: pick the first
+   * group node that is NOT selected and resize it programmatically with random
+   * dimensions. Before the fix this silently no-op'd for unselected groups.
+   */
+  async onResizeUnselectedGroup() {
+    const group = this.ngDiagramModelService
+      .nodes()
+      .find((node: Node): node is GroupNode => 'isGroup' in node && !!node.isGroup && !node.selected);
+
+    if (!group) {
+      console.warn('[demo] No unselected group node found — deselect the group and try again.');
+      return;
+    }
+
+    const size = {
+      width: Math.round(200 + Math.random() * 400),
+      height: Math.round(150 + Math.random() * 300),
+    };
+
+    console.log('[demo] Resizing unselected group', {
+      id: group.id,
+      selected: group.selected,
+      from: group.size,
+      to: size,
+    });
+
+    await this.ngDiagramNodeService.resizeNode(group.id, size, undefined, true);
+
+    const updated = this.ngDiagramModelService.getNodeById(group.id);
+    console.log('[demo] Group size after resize', updated?.size);
   }
 
   onChangeNodeTypeClick() {

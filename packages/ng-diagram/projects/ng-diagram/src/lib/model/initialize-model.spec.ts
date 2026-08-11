@@ -6,6 +6,7 @@ import type { Edge, ModelAdapter, Node, Port } from '../../core/src';
 import { EnvironmentProviderService } from '../services/environment-provider/environment-provider.service';
 import { initializeModel, initializeModelAdapter } from './initialize-model';
 import { SignalModelAdapter } from './signal-model-adapter';
+import { stripEdgeRuntimeProperties, stripNodeRuntimeProperties } from './strip-runtime-properties';
 
 const mockNodes: Node[] = [
   { id: 'node1', type: 'default', data: { label: 'Node 1' }, position: { x: 0, y: 0 } },
@@ -286,6 +287,62 @@ describe('initializeModel', () => {
     ]);
   });
 
+  describe('dangling edges', () => {
+    const danglingEdge: Edge = {
+      id: 'dangling',
+      source: 'node1',
+      target: '',
+      data: {},
+      targetPosition: { x: 300, y: 150 },
+    };
+
+    it('should keep the authored targetPosition of a dangling edge', () => {
+      const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: [danglingEdge] }));
+
+      expect(adapter.getEdges()[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
+
+    it('should keep the authored sourcePosition of a reverse dangling edge', () => {
+      const reverseDangling: Edge = {
+        id: 'reverse-dangling',
+        source: '',
+        target: 'node1',
+        data: {},
+        sourcePosition: { x: 300, y: 150 },
+      };
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ nodes: mockNodes, edges: [reverseDangling] })
+      );
+
+      expect(adapter.getEdges()[0].sourcePosition).toEqual({ x: 300, y: 150 });
+    });
+
+    it('should still strip the connected-end position and other runtime properties of a dangling edge', () => {
+      const edge: Edge = {
+        ...danglingEdge,
+        sourcePosition: { x: 10, y: 20 },
+        measuredLabels: [
+          { id: 'label1', positionOnEdge: 0.5, size: { width: 50, height: 20 }, position: { x: 50, y: 25 } },
+        ],
+        computedZIndex: 3,
+      };
+      const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: [edge] }));
+
+      const [result] = adapter.getEdges();
+      expect((result as any).sourcePosition).toBeUndefined();
+      expect(result.targetPosition).toEqual({ x: 300, y: 150 });
+      expect(result.measuredLabels).toBeUndefined();
+      expect(result.computedZIndex).toBeUndefined();
+    });
+
+    it('should survive a toJSON → initializeModel round trip without options', () => {
+      const first = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: [danglingEdge] }));
+      const second = TestBed.runInInjectionContext(() => initializeModel(JSON.parse(first.toJSON())));
+
+      expect(second.getEdges()[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
+  });
+
   it('should preserve user-set node properties', () => {
     const nodesWithComputed = createNodesWithComputedProperties();
     const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: nodesWithComputed }));
@@ -311,6 +368,95 @@ describe('initializeModel', () => {
     const adapter = initializeModel({ nodes: mockNodes }, injector);
 
     expect(adapter.getNodes()).toHaveLength(2);
+  });
+
+  describe('custom strip options', () => {
+    it('should use custom stripNodeRuntimeProperties on init', () => {
+      const nodesWithComputed = createNodesWithComputedProperties();
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ nodes: nodesWithComputed }, undefined, {
+          stripNodeRuntimeProperties: (node) => ({ ...stripNodeRuntimeProperties(node), selected: node.selected }),
+        })
+      );
+
+      const nodes = adapter.getNodes();
+      expect(nodes[0].selected).toBe(true);
+      expect(nodes[0].measuredPorts).toBeUndefined();
+    });
+
+    it('should use custom stripEdgeRuntimeProperties on init', () => {
+      const edgesWithComputed = createEdgesWithComputedProperties();
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ edges: edgesWithComputed }, undefined, {
+          stripEdgeRuntimeProperties: (edge) => ({
+            ...stripEdgeRuntimeProperties(edge),
+            sourcePosition: edge.sourcePosition,
+            targetPosition: edge.targetPosition,
+          }),
+        })
+      );
+
+      const edges = adapter.getEdges();
+      expect(edges[0].sourcePosition).toEqual({ x: 10, y: 20 });
+      expect(edges[0].targetPosition).toEqual({ x: 200, y: 100 });
+      expect(edges[0].measuredLabels).toBeUndefined();
+    });
+
+    it('should still assign _internalId when custom strip functions keep it', () => {
+      const identity = <T>(value: T): T => value;
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ nodes: mockNodes, edges: mockEdges }, undefined, {
+          stripNodeRuntimeProperties: identity,
+          stripEdgeRuntimeProperties: identity,
+        })
+      );
+
+      for (const element of [...adapter.getNodes(), ...adapter.getEdges()]) {
+        expect((element as any)._internalId).toBeDefined();
+      }
+    });
+
+    it('should use custom strip functions in toJSON of the created model', () => {
+      const edgesWithComputed = createEdgesWithComputedProperties();
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ edges: edgesWithComputed }, undefined, {
+          stripEdgeRuntimeProperties: (edge) => ({
+            ...stripEdgeRuntimeProperties(edge),
+            sourcePosition: edge.sourcePosition,
+          }),
+        })
+      );
+
+      const { edges } = JSON.parse(adapter.toJSON());
+      expect(edges[0].sourcePosition).toEqual({ x: 10, y: 20 });
+      expect(edges[0].measuredLabels).toBeUndefined();
+    });
+
+    it('should survive a toJSON → initializeModel round trip with custom strip functions', () => {
+      const options = {
+        stripEdgeRuntimeProperties: (edge: Edge) => ({
+          ...stripEdgeRuntimeProperties(edge),
+          sourcePosition: edge.sourcePosition,
+          targetPosition: edge.targetPosition,
+        }),
+      };
+      const danglingEdge: Edge = {
+        id: 'dangling',
+        source: 'node1',
+        target: '',
+        data: {},
+        targetPosition: { x: 300, y: 150 },
+      };
+
+      const first = TestBed.runInInjectionContext(() =>
+        initializeModel({ nodes: mockNodes, edges: [danglingEdge] }, undefined, options)
+      );
+      const second = TestBed.runInInjectionContext(() =>
+        initializeModel(JSON.parse(first.toJSON()), undefined, options)
+      );
+
+      expect(second.getEdges()[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
   });
 });
 
@@ -520,5 +666,26 @@ describe('initializeModelAdapter', () => {
     const result = initializeModelAdapter(customAdapter, undefined, injector);
 
     expect(result).toBe(customAdapter);
+  });
+
+  it('should use custom strip functions from options', () => {
+    const nodesWithComputed = createNodesWithComputedProperties();
+    const edgesWithComputed = createEdgesWithComputedProperties();
+    const customAdapter = createMockModelAdapter(nodesWithComputed, edgesWithComputed);
+
+    TestBed.runInInjectionContext(() =>
+      initializeModelAdapter(customAdapter, undefined, undefined, {
+        stripNodeRuntimeProperties: (node) => ({ ...stripNodeRuntimeProperties(node), selected: node.selected }),
+        stripEdgeRuntimeProperties: (edge) => ({
+          ...stripEdgeRuntimeProperties(edge),
+          sourcePosition: edge.sourcePosition,
+        }),
+      })
+    );
+
+    expect(customAdapter.getNodes()[0].selected).toBe(true);
+    expect(customAdapter.getNodes()[0].measuredPorts).toBeUndefined();
+    expect(customAdapter.getEdges()[0].sourcePosition).toEqual({ x: 10, y: 20 });
+    expect(customAdapter.getEdges()[0].measuredLabels).toBeUndefined();
   });
 });

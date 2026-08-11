@@ -21,3 +21,84 @@ export const solo: Partial<Model> = {
   nodes: [{ id: 'solo', position: { x: 100, y: 100 }, data: { label: 'solo' } }],
   edges: [],
 };
+
+/**
+ * Resizable nodes for the resize-adornment specs. `free` uses the default template
+ * (adornment with all sides active); the `resize-sides` nodes use the harness template
+ * that feeds `data.activeSides` into the adornment's `activeSides` input.
+ */
+export const resizeArena: Partial<Model> = {
+  nodes: [
+    {
+      id: 'free',
+      position: { x: 80, y: 80 },
+      size: { width: 200, height: 120 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'default' },
+    },
+    {
+      id: 'corner',
+      type: 'resize-sides',
+      position: { x: 420, y: 80 },
+      size: { width: 200, height: 120 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'right + bottom', activeSides: ['right', 'bottom'] },
+    },
+    {
+      id: 'frozen',
+      type: 'resize-sides',
+      position: { x: 80, y: 320 },
+      size: { width: 200, height: 120 },
+      autoSize: false,
+      resizable: true,
+      data: { label: 'none', activeSides: [] },
+    },
+  ],
+  edges: [],
+};
+
+/**
+ * Labelled edges for the edge-label specs. `edge-default` renders its label through
+ * the default edge template (`data.label`); `edge-custom` uses the harness `labelled`
+ * template, which composes the public default label chip.
+ */
+export const labelArena: Partial<Model> = {
+  nodes: [
+    { id: 'node-a', position: { x: 80, y: 80 }, data: { label: 'A' } },
+    { id: 'node-b', position: { x: 360, y: 80 }, data: { label: 'B' } },
+    { id: 'node-c', position: { x: 80, y: 260 }, data: { label: 'C' } },
+    { id: 'node-d', position: { x: 360, y: 260 }, data: { label: 'D' } },
+  ],
+  edges: [
+    { id: 'edge-default', source: 'node-a', target: 'node-b', data: { label: 'default' } },
+    { id: 'edge-custom', source: 'node-c', target: 'node-d', type: 'labelled', data: { label: 'custom' } },
+  ],
+};
+
+/** Rotatable node with a non-zero starting angle, so angle assertions are unambiguous. */
+export const spin: Partial<Model> = {
+  nodes: [
+    {
+      id: 'spin',
+      position: { x: 150, y: 150 },
+      size: { width: 140, height: 80 },
+      autoSize: false,
+      rotatable: true,
+      angle: 30,
+      data: { label: 'spin' },
+    },
+  ],
+  edges: [],
+};
+
+/** A group, a member inside it, and a free node — for group/selection scenarios. */
+export const groupArena: Partial<Model> = {
+  nodes: [
+    { id: 'grp-1', position: { x: 100, y: 100 }, data: { label: 'group' }, isGroup: true },
+    { id: 'member-1', position: { x: 140, y: 150 }, data: { label: 'member' }, groupId: 'grp-1' },
+    { id: 'free-1', position: { x: 460, y: 120 }, data: { label: 'free' } },
+  ],
+  edges: [],
+};

@@ -21,8 +21,7 @@ import { GroupNode, SimpleNode } from '../../core/src';
  * @category Types/Palette
  */
 export type NgDiagramPaletteItem<Data extends object = BasePaletteItemData> =
-  | SimpleNodeData<Data>
-  | GroupNodeData<Data>;
+  SimpleNodeData<Data> | GroupNodeData<Data>;
 
 /**
  * Data structure for node palette items. Contains the essential properties needed to create a fully configured node from the palette.

@@ -21,7 +21,8 @@ export type InputEventName =
   | 'paletteDrop'
   | 'boxSelection'
   | 'undo'
-  | 'redo';
+  | 'redo'
+  | 'cancelInteraction';
 
 export type InputEventPhase = 'start' | 'continue' | 'end';
 
@@ -36,7 +37,9 @@ export interface BasePointerInputEvent extends BaseInputEvent {
   target: Node | Edge | undefined;
   targetType: 'node' | 'edge' | 'diagram';
   /**
-   * The last input point in the client coordinates.
+   * The last input point in the client coordinates. Must come from the
+   * gesture's own pointer — never from another one (e.g. a second finger).
+   * On the `end` phase it is applied as the gesture's final geometry.
    */
   lastInputPoint: Point;
 }

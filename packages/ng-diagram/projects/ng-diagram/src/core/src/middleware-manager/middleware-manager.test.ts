@@ -100,22 +100,18 @@ describe('MiddlewareManager', () => {
 
     mockMiddleware1 = {
       name: 'mockMiddleware1',
-      execute: vi.fn().mockImplementation(
-        (state: FlowState): FlowState => ({
-          ...state,
-          nodes: [...state.nodes, { ...mockNode, id: 'node2' }],
-        })
-      ),
+      execute: vi.fn().mockImplementation((state: FlowState): FlowState => ({
+        ...state,
+        nodes: [...state.nodes, { ...mockNode, id: 'node2' }],
+      })),
     };
 
     mockMiddleware2 = {
       name: 'mockMiddleware2',
-      execute: vi.fn().mockImplementation(
-        (state: FlowState): FlowState => ({
-          ...state,
-          nodes: [...state.nodes, { ...mockNode, id: 'node3' }],
-        })
-      ),
+      execute: vi.fn().mockImplementation((state: FlowState): FlowState => ({
+        ...state,
+        nodes: [...state.nodes, { ...mockNode, id: 'node3' }],
+      })),
     };
 
     initialState = {

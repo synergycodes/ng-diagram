@@ -34,7 +34,7 @@ export class LinkingEventService {
     });
   }
 
-  emitEnd(event: PointerInputEvent, target?: Node, portId?: string) {
+  emitEnd(event: PointerInputEvent, target?: Node, portId?: string, takenOver = false) {
     const baseEvent = this.inputEventsRouter.getBaseEvent(event);
     this.inputEventsRouter.emit({
       ...baseEvent,
@@ -44,6 +44,7 @@ export class LinkingEventService {
       targetType: 'node',
       portId: portId,
       lastInputPoint: { x: event.clientX, y: event.clientY },
+      takenOver,
     });
   }
 }
